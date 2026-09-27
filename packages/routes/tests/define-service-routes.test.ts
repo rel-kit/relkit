@@ -1,9 +1,15 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
+import { Effect } from "effect";
 import { defineEvent } from "@relkit/events";
 import { defineFunction } from "@relkit/functions";
 import { z } from "@relkit/schema";
 import { defineService } from "@relkit/services";
-import { defineServiceRoutes, SERVICE_ROUTE_METHODS } from "./src/index.ts";
+import {
+  defineServiceRoutes,
+  defineServiceRoutesEffect,
+  SERVICE_ROUTE_METHODS,
+} from "../src/index.js";
+import { RouteOperationError } from "../src/route-observability.js";
 
 const target = defineFunction({
   id: "orders.create",
@@ -48,5 +54,25 @@ describe("defineServiceRoutes", () => {
     expect(() => defineServiceRoutes(orders, { GET: "missing" } as never)).toThrow(
       "not a public function",
     );
+  });
+
+  test("returns tagged failures for malformed route tables", () => {
+    const failure = Effect.runSync(
+      Effect.flip(defineServiceRoutesEffect(orders, { GET: 42 } as never)),
+    );
+    expect(failure).toBeInstanceOf(RouteOperationError);
+    expect(failure.operation).toBe("service-routes.define");
+    expect(() => defineServiceRoutes(orders, null as never)).toThrow("must be an object");
+    expect(() => defineServiceRoutes(null as never, { GET: "create" } as never)).toThrow(
+      "Service descriptor must be an object",
+    );
+    expect(() => defineServiceRoutes(orders, { GET: { member: 42 } } as never)).toThrow(
+      "needs a member",
+    );
+    expect(() => defineServiceRoutes(orders, { GET: "missing" } as never)).toThrow(
+      "not a public function",
+    );
+    const routes = Effect.runSync(defineServiceRoutesEffect(orders, { GET: "create" }));
+    expect(routes.GET.target).toBe(target);
   });
 });

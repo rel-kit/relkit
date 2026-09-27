@@ -8,14 +8,26 @@ import type {
 } from "./http-dsl.js";
 import type { RouteRateLimit } from "./route-options.js";
 
+/** A raw HTTP handler receiving the incoming Request.
+ * @example const handler: RawHttpHandler = () => new Response("ok");
+ */
 export type RawHttpHandler = (request: Request) => MaybePromise<Response>;
+/** Client exposure and operation policy for a route.
+ * @example const policy: RouteClientPolicy = { operation: "query" };
+ */
 export type RouteClientPolicy = false | { readonly operation?: "query" | "mutation" };
+/** Native streaming transport formats.
+ * @example const format: NativeStreamFormat = "sse";
+ */
 export type NativeStreamFormat = "sse" | "text" | "bytes";
 
 interface RouteSharedOptions<Id extends string> extends DescriptorMetadata {
   readonly id?: Id;
 }
 
+/** Authoring options for a function-backed route.
+ * @example type Options = FunctionRouteOptions<"orders.get", typeof getOrder>;
+ */
 export interface FunctionRouteOptions<
   Id extends string,
   Target extends FunctionRefAny,
@@ -34,6 +46,9 @@ export interface FunctionRouteOptions<
   readonly stream?: { readonly format: NativeStreamFormat };
 }
 
+/** Authoring options for a raw HTTP route.
+ * @example const options: RawRouteOptions<"health"> = { handler: () => new Response("ok") };
+ */
 export interface RawRouteOptions<
   Id extends string,
   Handler extends RawHttpHandler = RawHttpHandler,
@@ -45,6 +60,9 @@ export interface RawRouteOptions<
   };
 }
 
+/** Frozen descriptor for a function-backed route.
+ * @example type Route = FunctionRouteDescriptor<"orders.get">;
+ */
 export interface FunctionRouteDescriptor<
   Id extends string,
   Target extends FunctionRefAny = FunctionRefAny,
@@ -65,6 +83,9 @@ export interface FunctionRouteDescriptor<
   readonly stream?: { readonly format: NativeStreamFormat };
 }
 
+/** Frozen descriptor for a raw HTTP route.
+ * @example type Route = RawRouteDescriptor<"health">;
+ */
 export interface RawRouteDescriptor<
   Id extends string,
   Handler extends RawHttpHandler = RawHttpHandler,
@@ -81,6 +102,9 @@ export interface RawRouteDescriptor<
   };
 }
 
+/** Union of function-backed and raw route descriptors.
+ * @example type Route = RouteDescriptor<"orders.get">;
+ */
 export type RouteDescriptor<
   Id extends string,
   Target extends FunctionRefAny = FunctionRefAny,

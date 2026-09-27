@@ -34,14 +34,19 @@
     "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*",
     "@relkit/services": "workspace:*",
+    "effect": "4.0.0-rc.115",
     "hono": "4.13.5"
   },
   "devDependencies": {
-    "@relkit/events": "workspace:*"
+    "@relkit/events": "workspace:*",
+    "@vitest/coverage-v8": "5.0.1",
+    "vitest": "5.0.1"
   },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
   }
 }

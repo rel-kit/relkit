@@ -772,10 +772,13 @@
         "@relkit/invocation": "workspace:*",
         "@relkit/schema": "workspace:*",
         "@relkit/services": "workspace:*",
+        "effect": "4.0.0-rc.115",
         "hono": "4.13.5",
       },
       "devDependencies": {
         "@relkit/events": "workspace:*",
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/runtime-effect": {

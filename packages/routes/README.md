@@ -45,3 +45,24 @@ headers, cookies, transforms, multipart, redirects, and alternate media types.
 Middleware is auto-discovered and registered with native Hono `app.use` in
 canonical ID order. Supported paths are `*`, static segments, `:param`, and a
 trailing `*`; route descriptors do not list middleware.
+
+## Effect authoring
+
+The synchronous `defineRoute`, `defineMiddleware`, `defineServiceRoutes`,
+`defineTransform`, and `http` APIs are compatibility adapters. Their Effect
+counterparts (`defineRouteEffect`, `defineMiddlewareEffect`,
+`defineServiceRoutesEffect`, `defineTransformEffect`, and `httpEffects`) contain
+the authoring logic and report invalid input as `RouteOperationError` in the
+error channel. Synchronous calls preserve their TypeError messages.
+
+```ts
+import { Effect } from "effect";
+import { defineRouteEffect } from "@relkit/app/routes";
+
+const route = Effect.runSync(defineRouteEffect({ target: getOrder }));
+```
+
+Operations emit `routes.*` spans and bounded `relkit_route_*` metrics. Supply
+`RouteTelemetry` in a Layer to replace the observer in tests. Omitted IDs use
+the invocation package's `IdentityStore`, so a test Layer can provide a
+deterministic ID source.
