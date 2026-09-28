@@ -3,7 +3,10 @@ import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import { nativeAgentInterruptionFailure } from "./native-agent-interruption-error.js";
 import type { NativeAgent, NativeAgentConfig } from "./native-agent-interruption.types.js";
-import { snapshotInterrupts, validateNativeAgentResumeInputCore } from "./native-agent-interruption-validation.js";
+import {
+  snapshotInterrupts,
+  validateNativeAgentResumeInputCore,
+} from "./native-agent-interruption-validation.js";
 import type { AgentWaitingRequest } from "./state.types.js";
 
 /** Reads native pending requests and constructs a resume command.
@@ -19,12 +22,16 @@ export const nativeAgentResumeCommandEffect = Effect.fn("Agents.nativeHitl.resum
     const reply = yield* validateNativeAgentResumeInputEffect(requests, value);
     const replies = requests.length === 1 ? [reply] : (reply as readonly unknown[]);
     return yield* Effect.try({
-      try: () => new Command({
-        resume: Object.fromEntries(requests.map((request, index) => {
-          if (request.id === undefined) throw new TypeError("Agent interruption has no native ID");
-          return [request.id, replies[index]];
-        })),
-      }),
+      try: () =>
+        new Command({
+          resume: Object.fromEntries(
+            requests.map((request, index) => {
+              if (request.id === undefined)
+                throw new TypeError("Agent interruption has no native ID");
+              return [request.id, replies[index]];
+            }),
+          ),
+        }),
       catch: nativeAgentInterruptionFailure,
     });
   },
@@ -44,9 +51,11 @@ export function nativeAgentResumeCommand(
   config: NativeAgentConfig,
   value: unknown,
 ): Promise<Command> {
-  return Effect.runPromise(nativeAgentResumeCommandEffect(agent, config, value).pipe(
-    Effect.catchTag("NativeAgentInterruptionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    nativeAgentResumeCommandEffect(agent, config, value).pipe(
+      Effect.catchTag("NativeAgentInterruptionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Reads and projects waiting native interruptions.
@@ -56,13 +65,24 @@ export function nativeAgentResumeCommand(
  * @example await Effect.runPromise(nativeAgentWaitingInterruptsEffect(agent, config));
  */
 export const nativeAgentWaitingInterruptsEffect = Effect.fn("Agents.nativeHitl.waiting")(
-  (agent: NativeAgent, config: NativeAgentConfig) => Effect.tryPromise({
-    try: async (effectSignal) => snapshotInterrupts(await agent.getState({
-      ...config,
-      signal: config.signal === undefined ? effectSignal : AbortSignal.any([config.signal, effectSignal]),
-    }, { subgraphs: true }), []),
-    catch: nativeAgentInterruptionFailure,
-  }),
+  (agent: NativeAgent, config: NativeAgentConfig) =>
+    Effect.tryPromise({
+      try: async (effectSignal) =>
+        snapshotInterrupts(
+          await agent.getState(
+            {
+              ...config,
+              signal:
+                config.signal === undefined
+                  ? effectSignal
+                  : AbortSignal.any([config.signal, effectSignal]),
+            },
+            { subgraphs: true },
+          ),
+          [],
+        ),
+      catch: nativeAgentInterruptionFailure,
+    }),
   (effect) => observeAgent("native-hitl.waiting", effect),
 );
 
@@ -77,9 +97,11 @@ export function nativeAgentWaitingInterrupts(
   agent: NativeAgent,
   config: NativeAgentConfig,
 ): Promise<readonly import("./graph-interruption.js").GraphWaitingInterrupt[]> {
-  return Effect.runPromise(nativeAgentWaitingInterruptsEffect(agent, config).pipe(
-    Effect.catchTag("NativeAgentInterruptionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    nativeAgentWaitingInterruptsEffect(agent, config).pipe(
+      Effect.catchTag("NativeAgentInterruptionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Validates native continuation replies against pending requests.
@@ -89,10 +111,11 @@ export function nativeAgentWaitingInterrupts(
  * @example Effect.runSync(validateNativeAgentResumeInputEffect(requests, reply));
  */
 export const validateNativeAgentResumeInputEffect = Effect.fn("Agents.nativeHitl.validateReply")(
-  (requests: readonly AgentWaitingRequest[], value: unknown) => Effect.try({
-    try: () => validateNativeAgentResumeInputCore(requests, value),
-    catch: nativeAgentInterruptionFailure,
-  }),
+  (requests: readonly AgentWaitingRequest[], value: unknown) =>
+    Effect.try({
+      try: () => validateNativeAgentResumeInputCore(requests, value),
+      catch: nativeAgentInterruptionFailure,
+    }),
   (effect) => observeAgent("native-hitl.validate-reply", effect),
 );
 
@@ -107,7 +130,9 @@ export function validateNativeAgentResumeInput(
   requests: readonly AgentWaitingRequest[],
   value: unknown,
 ): unknown {
-  return Effect.runSync(validateNativeAgentResumeInputEffect(requests, value).pipe(
-    Effect.catchTag("NativeAgentInterruptionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    validateNativeAgentResumeInputEffect(requests, value).pipe(
+      Effect.catchTag("NativeAgentInterruptionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }

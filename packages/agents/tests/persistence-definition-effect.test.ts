@@ -10,11 +10,16 @@ import {
 
 test("persistence definition Effects create and recognize a lazy resource", async () => {
   let creates = 0;
-  const resource = Effect.runSync(defineCheckpointerDbEffect({
-    id: "effect.checkpointer",
-    client: () => { creates += 1; return new MemorySaver(); },
-    dispose: () => undefined,
-  }));
+  const resource = Effect.runSync(
+    defineCheckpointerDbEffect({
+      id: "effect.checkpointer",
+      client: () => {
+        creates += 1;
+        return new MemorySaver();
+      },
+      dispose: () => undefined,
+    }),
+  );
   expect(creates).toBe(0);
   expect(Effect.runSync(isPersistenceResourceEffect(resource))).toBe(true);
   const saver = await resource.acquire({ env: {} });

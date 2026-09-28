@@ -18,12 +18,13 @@ const clientEventsCount = Metric.counter("relkit.agents.client_events.project.to
  * @example
  * const events = Effect.runSync(agentClientEventsEffect(record));
  */
-export const agentClientEventsEffect = Effect.fn("Agents.clientEvents.project")(function* (
-  record: JournalRecord,
-) {
-  yield* Metric.update(clientEventsCount, 1);
-  return yield* Effect.sync(() => projectClientEvents(record));
-}, (effect) => observeAgent("client-events.project", effect));
+export const agentClientEventsEffect = Effect.fn("Agents.clientEvents.project")(
+  function* (record: JournalRecord) {
+    yield* Metric.update(clientEventsCount, 1);
+    return yield* Effect.sync(() => projectClientEvents(record));
+  },
+  (effect) => observeAgent("client-events.project", effect),
+);
 
 /**
  * Projects a journal record for existing synchronous client callers.

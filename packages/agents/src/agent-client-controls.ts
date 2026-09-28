@@ -23,40 +23,41 @@ const allowed = new Set<AgentControl>(["steer", "follow-up", "stop", "approve"])
  * void controls;
  * ```
  */
-export const copyAgentControlsEffect = Effect.fn("Agents.clientPolicy.controls")(function* (
-  value: unknown,
-) {
-  yield* Metric.update(clientPolicyCount, 1);
-  if (value === undefined) return undefined;
-  if (!Array.isArray(value)) {
-    yield* Metric.update(clientPolicyFailures, 1);
-    return yield* Effect.fail(
-      new AgentClientPolicyError({
-        operation: "controls",
-        message: "Agent controls must be an array",
-      }),
-    );
-  }
-  if (!value.every((control): control is AgentControl => allowed.has(control))) {
-    yield* Metric.update(clientPolicyFailures, 1);
-    return yield* Effect.fail(
-      new AgentClientPolicyError({
-        operation: "controls",
-        message: "Agent controls contain an unsupported capability",
-      }),
-    );
-  }
-  if (new Set(value).size !== value.length) {
-    yield* Metric.update(clientPolicyFailures, 1);
-    return yield* Effect.fail(
-      new AgentClientPolicyError({
-        operation: "controls",
-        message: "Agent controls must be unique",
-      }),
-    );
-  }
-  return Object.freeze([...value]) as readonly AgentControl[];
-}, (effect) => observeAgent("client.controls", effect));
+export const copyAgentControlsEffect = Effect.fn("Agents.clientPolicy.controls")(
+  function* (value: unknown) {
+    yield* Metric.update(clientPolicyCount, 1);
+    if (value === undefined) return undefined;
+    if (!Array.isArray(value)) {
+      yield* Metric.update(clientPolicyFailures, 1);
+      return yield* Effect.fail(
+        new AgentClientPolicyError({
+          operation: "controls",
+          message: "Agent controls must be an array",
+        }),
+      );
+    }
+    if (!value.every((control): control is AgentControl => allowed.has(control))) {
+      yield* Metric.update(clientPolicyFailures, 1);
+      return yield* Effect.fail(
+        new AgentClientPolicyError({
+          operation: "controls",
+          message: "Agent controls contain an unsupported capability",
+        }),
+      );
+    }
+    if (new Set(value).size !== value.length) {
+      yield* Metric.update(clientPolicyFailures, 1);
+      return yield* Effect.fail(
+        new AgentClientPolicyError({
+          operation: "controls",
+          message: "Agent controls must be unique",
+        }),
+      );
+    }
+    return Object.freeze([...value]) as readonly AgentControl[];
+  },
+  (effect) => observeAgent("client.controls", effect),
+);
 
 /**
  * Copies client controls for synchronous descriptor callers.

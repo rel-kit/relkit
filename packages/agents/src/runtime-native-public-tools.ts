@@ -22,7 +22,11 @@ export function publicToolValue(value: unknown): unknown {
 
 function publicToolValueCore(value: unknown): unknown {
   if (typeof value === "string") {
-    try { return JSON.parse(value) as unknown; } catch { return value; }
+    try {
+      return JSON.parse(value) as unknown;
+    } catch {
+      return value;
+    }
   }
   if (isRecord(value) && value.lg_name === "Command") {
     const update = value.update;

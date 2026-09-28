@@ -2,7 +2,11 @@ import { normalizeId } from "@relkit/contracts";
 import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import { generatedAgentFunctionFailure } from "./generated-function-error.js";
-import type { GeneratedAgentExecutor, GeneratedAgentFunction, GeneratedAgentFunctionMarker } from "./generated-function.types.js";
+import type {
+  GeneratedAgentExecutor,
+  GeneratedAgentFunction,
+  GeneratedAgentFunctionMarker,
+} from "./generated-function.types.js";
 
 export type * from "./generated-function.types.js";
 
@@ -25,10 +29,11 @@ export class GeneratedAgentFunctionUnboundError extends Error {
  * @example Effect.runSync(generatedAgentFunctionIdEffect("support"));
  */
 export const generatedAgentFunctionIdEffect = Effect.fn("Agents.generated.id")(
-  (agentId: unknown) => Effect.try({
-    try: () => generatedAgentFunctionIdValue(agentId),
-    catch: generatedAgentFunctionFailure,
-  }),
+  (agentId: unknown) =>
+    Effect.try({
+      try: () => generatedAgentFunctionIdValue(agentId),
+      catch: generatedAgentFunctionFailure,
+    }),
   (effect) => observeAgent("generated.id", effect),
 );
 
@@ -39,9 +44,11 @@ export const generatedAgentFunctionIdEffect = Effect.fn("Agents.generated.id")(
  * @example generatedAgentFunctionId("support");
  */
 export function generatedAgentFunctionId(agentId: unknown): string {
-  return Effect.runSync(generatedAgentFunctionIdEffect(agentId).pipe(
-    Effect.catchTag("GeneratedAgentFunctionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    generatedAgentFunctionIdEffect(agentId).pipe(
+      Effect.catchTag("GeneratedAgentFunctionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function generatedAgentFunctionIdValue(agentId: unknown): string {
@@ -55,10 +62,11 @@ function generatedAgentFunctionIdValue(agentId: unknown): string {
  * @example Effect.runSync(createGeneratedAgentFunctionEffect("support", executor));
  */
 export const createGeneratedAgentFunctionEffect = Effect.fn("Agents.generated.create")(
-  (agentId: unknown, executor?: GeneratedAgentExecutor) => Effect.try({
-    try: () => createGeneratedAgentFunctionValue(agentId, executor),
-    catch: generatedAgentFunctionFailure,
-  }),
+  (agentId: unknown, executor?: GeneratedAgentExecutor) =>
+    Effect.try({
+      try: () => createGeneratedAgentFunctionValue(agentId, executor),
+      catch: generatedAgentFunctionFailure,
+    }),
   (effect) => observeAgent("generated.create", effect),
 );
 
@@ -73,12 +81,17 @@ export function createGeneratedAgentFunction(
   agentId: unknown,
   executor?: GeneratedAgentExecutor,
 ): GeneratedAgentFunction {
-  return Effect.runSync(createGeneratedAgentFunctionEffect(agentId, executor).pipe(
-    Effect.catchTag("GeneratedAgentFunctionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    createGeneratedAgentFunctionEffect(agentId, executor).pipe(
+      Effect.catchTag("GeneratedAgentFunctionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
-function createGeneratedAgentFunctionValue(agentId: unknown, executor?: GeneratedAgentExecutor): GeneratedAgentFunction {
+function createGeneratedAgentFunctionValue(
+  agentId: unknown,
+  executor?: GeneratedAgentExecutor,
+): GeneratedAgentFunction {
   const normalizedAgentId = normalizeId(agentId);
   const functionId = generatedAgentFunctionIdValue(normalizedAgentId);
   if (executor !== undefined && typeof executor !== "function") {

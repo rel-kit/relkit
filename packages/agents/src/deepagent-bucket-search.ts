@@ -24,10 +24,12 @@ export const listDirectoryEffect = Effect.fn("Agents.bucket.list")(
       catch: deepAgentBucketFailure,
     });
     const keyPrefix = directory === "/" ? `${context.prefix}/` : `${context.prefix}${directory}`;
-    const keys = [...(yield* Effect.tryPromise({
-      try: () => context.bucket.list(keyPrefix),
-      catch: deepAgentBucketFailure,
-    }))].sort();
+    const keys = [
+      ...(yield* Effect.tryPromise({
+        try: () => context.bucket.list(keyPrefix),
+        catch: deepAgentBucketFailure,
+      })),
+    ].sort();
     const directories = new Set<string>();
     const direct: string[] = [];
     for (const key of keys) {
@@ -36,11 +38,9 @@ export const listDirectoryEffect = Effect.fn("Agents.bucket.list")(
       if (separator >= 0) directories.add(relative.slice(0, separator));
       else if (relative !== "") direct.push(key);
     }
-    const outcomes = yield* Effect.forEach(
-      direct,
-      (key) => Effect.result(infoForEffect(key)),
-      { concurrency: 8 },
-    );
+    const outcomes = yield* Effect.forEach(direct, (key) => Effect.result(infoForEffect(key)), {
+      concurrency: 8,
+    });
     const firstFailure = outcomes.find(Result.isFailure);
     if (firstFailure !== undefined) return yield* Effect.fail(firstFailure.failure);
     const files: FileInfo[] = outcomes.flatMap((outcome) =>
@@ -61,10 +61,7 @@ export const listDirectoryEffect = Effect.fn("Agents.bucket.list")(
  * @throws A cancellation or control failure.
  * @example await listDirectory(context, "/notes");
  */
-export function listDirectory(
-  context: DeepAgentBucketContext,
-  path: string,
-): Promise<LsResult> {
+export function listDirectory(context: DeepAgentBucketContext, path: string): Promise<LsResult> {
   return Effect.runPromise(
     listDirectoryEffect(path).pipe(
       Effect.catchTag("DeepAgentBucketFailure", (failure) =>

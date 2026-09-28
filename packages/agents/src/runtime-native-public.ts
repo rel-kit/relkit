@@ -27,7 +27,12 @@ export const nativePublicEventEffect = Effect.fn("Agents.runtime.nativePublicEve
     context: NativeExecutionContext = {},
     eventSchemas: Readonly<Record<string, StandardSchemaV1>> = {},
   ) {
-    const value = yield* publicValueEffect(event.method, event.params.data, stateSchemas, eventSchemas);
+    const value = yield* publicValueEffect(
+      event.method,
+      event.params.data,
+      stateSchemas,
+      eventSchemas,
+    );
     return yield* Effect.try({
       try: (): AgentExecutionEvent => ({
         nativeSequence: event.seq,
@@ -59,40 +64,45 @@ export function nativePublicEvent(
   context: NativeExecutionContext = {},
   eventSchemas: Readonly<Record<string, StandardSchemaV1>> = {},
 ): Promise<AgentExecutionEvent> {
-  return Effect.runPromise(nativePublicEventEffect(event, stateSchemas, context, eventSchemas).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    nativePublicEventEffect(event, stateSchemas, context, eventSchemas).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 const publicValueEffect = Effect.fn("Agents.runtime.publicEventValue")(
   function* (
-  method: string,
-  value: unknown,
-  stateSchemas: ReadonlyMap<string, StandardSchemaV1>,
-  eventSchemas: Readonly<Record<string, StandardSchemaV1>>,
+    method: string,
+    value: unknown,
+    stateSchemas: ReadonlyMap<string, StandardSchemaV1>,
+    eventSchemas: Readonly<Record<string, StandardSchemaV1>>,
   ) {
-  if (method === "input") return undefined;
-  if (method === "values" || method === "updates") return yield* selectedStateEffect(value, stateSchemas);
-  if (method === "tasks") return publicTask(value);
-  if (method === "checkpoints") {
-    return eventFields(value, ["id", "parent_id", "step", "source"]);
-  }
-  if (method === "lifecycle") return publicLifecycle(value);
-  if (method === "messages") return publicMessage(value);
-  if (method === "tools" && isRecord(value)) {
-    return {
-      ...eventFields(value, ["event", "tool_call_id", "tool_name", "code"]),
-      ...(value.input === undefined ? {} : { input: publicToolValue(value.input) }),
-      ...(value.output === undefined ? {} : { output: publicToolValue(value.output) }),
-    };
-  }
-  if (method === "custom" && isRecord(value) && typeof value.name === "string") {
-    const schema = eventSchemas[value.name];
-    if (schema === undefined) return undefined;
-    return { name: value.name, data: yield* validateValueEffect(schema, value.data, "output") };
-  }
-  return undefined;
-}, (effect) => observeAgent("runtime.public-event-value", effect));
+    if (method === "input") return undefined;
+    if (method === "values" || method === "updates")
+      return yield* selectedStateEffect(value, stateSchemas);
+    if (method === "tasks") return publicTask(value);
+    if (method === "checkpoints") {
+      return eventFields(value, ["id", "parent_id", "step", "source"]);
+    }
+    if (method === "lifecycle") return publicLifecycle(value);
+    if (method === "messages") return publicMessage(value);
+    if (method === "tools" && isRecord(value)) {
+      return {
+        ...eventFields(value, ["event", "tool_call_id", "tool_name", "code"]),
+        ...(value.input === undefined ? {} : { input: publicToolValue(value.input) }),
+        ...(value.output === undefined ? {} : { output: publicToolValue(value.output) }),
+      };
+    }
+    if (method === "custom" && isRecord(value) && typeof value.name === "string") {
+      const schema = eventSchemas[value.name];
+      if (schema === undefined) return undefined;
+      return { name: value.name, data: yield* validateValueEffect(schema, value.data, "output") };
+    }
+    return undefined;
+  },
+  (effect) => observeAgent("runtime.public-event-value", effect),
+);
 
 function publicTask(value: unknown): unknown {
   if (!isRecord(value)) return {};

@@ -25,28 +25,29 @@ export class GraphWaitingResponseError extends Schema.TaggedError<GraphWaitingRe
  * @example
  * const response = Effect.runSync(graphWaitingResponseEffect([{ node: "review", response: true }]));
  */
-export const graphWaitingResponseEffect = Effect.fn("Agents.graphInterruption.response")(function* (
-  interrupts: readonly GraphWaitingInterrupt[],
-) {
-  yield* Metric.update(responseCount, 1);
-  const first = interrupts[0];
-  if (first === undefined) {
-    yield* Metric.update(responseFailures, 1);
-    return yield* Effect.fail(
-      new GraphWaitingResponseError({
-        message: "Graph interruption has no pending requests",
-      }),
-    );
-  }
-  if (interrupts.length === 1) return first.response;
-  return {
-    type: "array",
-    prefixItems: interrupts.map((entry) => entry.response),
-    items: false,
-    minItems: interrupts.length,
-    maxItems: interrupts.length,
-  } satisfies JsonValue;
-}, (effect) => observeAgent("graph-interruption.response", effect));
+export const graphWaitingResponseEffect = Effect.fn("Agents.graphInterruption.response")(
+  function* (interrupts: readonly GraphWaitingInterrupt[]) {
+    yield* Metric.update(responseCount, 1);
+    const first = interrupts[0];
+    if (first === undefined) {
+      yield* Metric.update(responseFailures, 1);
+      return yield* Effect.fail(
+        new GraphWaitingResponseError({
+          message: "Graph interruption has no pending requests",
+        }),
+      );
+    }
+    if (interrupts.length === 1) return first.response;
+    return {
+      type: "array",
+      prefixItems: interrupts.map((entry) => entry.response),
+      items: false,
+      minItems: interrupts.length,
+      maxItems: interrupts.length,
+    } satisfies JsonValue;
+  },
+  (effect) => observeAgent("graph-interruption.response", effect),
+);
 
 /**
  * Combines pending graph responses for synchronous runtime callers.

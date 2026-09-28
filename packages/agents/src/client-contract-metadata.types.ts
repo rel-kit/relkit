@@ -8,7 +8,11 @@ export type ClientEventMetadata = ClientTypeField | { readonly kind: "dynamic" }
 
 /** Client visible tool schema or dynamic tool marker. */
 export type ClientToolMetadata =
-  | { readonly id: string; readonly input: ClientSchemaMetadata; readonly output: ClientSchemaMetadata }
+  | {
+      readonly id: string;
+      readonly input: ClientSchemaMetadata;
+      readonly output: ClientSchemaMetadata;
+    }
   | { readonly kind: "dynamic" };
 
 /** Client visible agent, subagent, or graph node scope. */

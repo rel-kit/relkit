@@ -3,17 +3,34 @@ import { Effect } from "effect";
 import { defineFunction } from "@relkit/functions";
 import { z } from "@relkit/schema";
 import {
-  assertServiceDescriptor, assertServiceDescriptorEffect, assertServiceMemberName,
-  assertServiceMemberNameEffect, assertServiceRef, assertServiceRefEffect, defineService,
-  freezeServiceDescriptor, freezeServiceDescriptorEffect, isFunctionDescriptor,
-  isFunctionDescriptorEffect, isReservedServiceMemberName, isReservedServiceMemberNameEffect,
-  isServiceDescriptor, isServiceDescriptorEffect, isServiceRef, isServiceRefEffect,
-  normalizeServiceMemberName, normalizeServiceMemberNameEffect, serviceMemberEntries,
+  assertServiceDescriptor,
+  assertServiceDescriptorEffect,
+  assertServiceMemberName,
+  assertServiceMemberNameEffect,
+  assertServiceRef,
+  assertServiceRefEffect,
+  defineService,
+  freezeServiceDescriptor,
+  freezeServiceDescriptorEffect,
+  isFunctionDescriptor,
+  isFunctionDescriptorEffect,
+  isReservedServiceMemberName,
+  isReservedServiceMemberNameEffect,
+  isServiceDescriptor,
+  isServiceDescriptorEffect,
+  isServiceRef,
+  isServiceRefEffect,
+  normalizeServiceMemberName,
+  normalizeServiceMemberNameEffect,
+  serviceMemberEntries,
   serviceMemberEntriesEffect,
 } from "../src/index.js";
 
 const lookup = defineFunction({
-  id: "guards.lookup", input: z.object({}), output: z.object({}), handler: () => ({}),
+  id: "guards.lookup",
+  input: z.object({}),
+  output: z.object({}),
+  handler: () => ({}),
 });
 
 describe("service guards", () => {
@@ -41,8 +58,9 @@ describe("service guards", () => {
     assertServiceRef(wrapper);
     expect(Effect.runSync(assertServiceRefEffect(wrapper))).toBe(wrapper);
     expect(() => assertServiceRef({})).toThrow("Invalid service reference");
-    expect(Effect.runSync(Effect.flip(assertServiceRefEffect({})))._tag)
-      .toBe("ServiceValidationError");
+    expect(Effect.runSync(Effect.flip(assertServiceRefEffect({})))._tag).toBe(
+      "ServiceValidationError",
+    );
   });
 
   test("checks function and service descriptor shapes", () => {
@@ -66,7 +84,10 @@ describe("service guards", () => {
 
   test("freezes and lists public members through both APIs", () => {
     const ownLookup = defineFunction({
-      id: "guards.members", input: z.object({}), output: z.object({}), handler: () => ({}),
+      id: "guards.members",
+      input: z.object({}),
+      output: z.object({}),
+      handler: () => ({}),
     });
     const service = defineService({ id: "guards-members", functions: { ownLookup } });
     expect(freezeServiceDescriptor(service)).toBe(service);

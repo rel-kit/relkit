@@ -49,7 +49,12 @@ test("interrupting the exported invocation Effect aborts active model work", asy
   const controller = new AbortController();
   const pending = Effect.runPromise(
     Effect.provide(
-      invokeAgentEffect({ agent, input: { question: "Hi" }, tools: {}, engine: { invoke: async () => undefined } }),
+      invokeAgentEffect({
+        agent,
+        input: { question: "Hi" },
+        tools: {},
+        engine: { invoke: async () => undefined },
+      }),
       layer,
     ),
     { signal: controller.signal },
@@ -79,24 +84,44 @@ test("interrupting a graph invocation Effect aborts the supplied graph service",
   });
   let markStarted = () => {};
   let markAborted = () => {};
-  const started = new Promise<void>((resolve) => { markStarted = resolve; });
-  const aborted = new Promise<void>((resolve) => { markAborted = resolve; });
+  const started = new Promise<void>((resolve) => {
+    markStarted = resolve;
+  });
+  const aborted = new Promise<void>((resolve) => {
+    markAborted = resolve;
+  });
   const layer = Layer.succeed(AgentExecution, {
-    resolveModel: async () => { throw new Error("unexpected model resolution"); },
-    runLoop: async () => { throw new Error("unexpected loop"); },
-    invokeGraph: async (options) => new Promise<never>((_resolve, reject) => {
-      markStarted();
-      const stop = () => { markAborted(); reject(new Error("interrupted")); };
-      if (options.signal?.aborted) stop();
-      else options.signal?.addEventListener("abort", stop, { once: true });
-    }),
+    resolveModel: async () => {
+      throw new Error("unexpected model resolution");
+    },
+    runLoop: async () => {
+      throw new Error("unexpected loop");
+    },
+    invokeGraph: async (options) =>
+      new Promise<never>((_resolve, reject) => {
+        markStarted();
+        const stop = () => {
+          markAborted();
+          reject(new Error("interrupted"));
+        };
+        if (options.signal?.aborted) stop();
+        else options.signal?.addEventListener("abort", stop, { once: true });
+      }),
     randomUUID: () => "test-id",
   });
   const controller = new AbortController();
-  const pending = Effect.runPromise(Effect.provide(
-    invokeAgentEffect({ agent: graph, input: { question: "Hi" }, tools: {}, engine: { invoke: async () => undefined } }),
-    layer,
-  ), { signal: controller.signal });
+  const pending = Effect.runPromise(
+    Effect.provide(
+      invokeAgentEffect({
+        agent: graph,
+        input: { question: "Hi" },
+        tools: {},
+        engine: { invoke: async () => undefined },
+      }),
+      layer,
+    ),
+    { signal: controller.signal },
+  );
   await started;
   controller.abort();
   await expect(pending).rejects.toThrow();

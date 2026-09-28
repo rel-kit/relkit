@@ -6,15 +6,21 @@ import {
   copyAgentMiddlewareEffect,
   middlewareStateKeysEffect,
 } from "../src/define-agent-native-middleware.js";
-import { copyAgentTools, copyAgentToolsEffect, relkitToolRefsEffect } from "../src/define-agent-native-tools.js";
+import {
+  copyAgentTools,
+  copyAgentToolsEffect,
+  relkitToolRefsEffect,
+} from "../src/define-agent-native-tools.js";
 import { isAgentModelEffect } from "../src/define-agent-native-model.js";
 
 test("native authoring Effects copy middleware and select public state", () => {
-  const middleware = [{
-    [MIDDLEWARE_BRAND]: true as const,
-    name: "context",
-    stateSchema: { fields: { visible: {}, _private: {} } },
-  }];
+  const middleware = [
+    {
+      [MIDDLEWARE_BRAND]: true as const,
+      name: "context",
+      stateSchema: { fields: { visible: {}, _private: {} } },
+    },
+  ];
   const copied = Effect.runSync(copyAgentMiddlewareEffect(middleware));
   expect(Object.isFrozen(copied)).toBe(true);
   expect([...Effect.runSync(middlewareStateKeysEffect(copied))]).toEqual(["visible", "_private"]);

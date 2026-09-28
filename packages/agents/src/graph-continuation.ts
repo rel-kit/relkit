@@ -9,7 +9,10 @@ import { waitingInterruptsEffect } from "./graph-continuation-waiting.js";
 import type { GraphWaitingInterrupt } from "./graph-interruption.js";
 
 export type { GraphConfig } from "./graph-continuation.types.js";
-export { validateGraphResumeInput, validateGraphResumeInputEffect } from "./graph-continuation-validation.js";
+export {
+  validateGraphResumeInput,
+  validateGraphResumeInputEffect,
+} from "./graph-continuation-validation.js";
 export { waitingInterrupts, waitingInterruptsEffect } from "./graph-continuation-waiting.js";
 
 /** Builds a persistent graph run configuration.
@@ -19,16 +22,17 @@ export { waitingInterrupts, waitingInterruptsEffect } from "./graph-continuation
  * @example Effect.runSync(graphConfigEffect(graph, "thread"));
  */
 export const graphConfigEffect = Effect.fn("Agents.graph.config")(
-  (descriptor: GraphDescriptor, threadId?: string) => Effect.try({
-    try: (): GraphConfig => {
-      const persistent = graphExecution(descriptor).checkpointer !== undefined;
-      if (persistent && (typeof threadId !== "string" || threadId.length === 0)) {
-        throw new TypeError("Graph execution with a checkpointer requires threadId");
-      }
-      return threadId === undefined ? {} : { configurable: { thread_id: threadId } };
-    },
-    catch: graphContinuationFailure,
-  }),
+  (descriptor: GraphDescriptor, threadId?: string) =>
+    Effect.try({
+      try: (): GraphConfig => {
+        const persistent = graphExecution(descriptor).checkpointer !== undefined;
+        if (persistent && (typeof threadId !== "string" || threadId.length === 0)) {
+          throw new TypeError("Graph execution with a checkpointer requires threadId");
+        }
+        return threadId === undefined ? {} : { configurable: { thread_id: threadId } };
+      },
+      catch: graphContinuationFailure,
+    }),
   (effect) => observeAgent("graph.config", effect),
 );
 
@@ -40,9 +44,11 @@ export const graphConfigEffect = Effect.fn("Agents.graph.config")(
  * @example const config = graphConfig(graph, "thread");
  */
 export function graphConfig(descriptor: GraphDescriptor, threadId?: string): GraphConfig {
-  return Effect.runSync(graphConfigEffect(descriptor, threadId).pipe(
-    Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    graphConfigEffect(descriptor, threadId).pipe(
+      Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Validates a reply and constructs a native LangGraph resume command.
@@ -54,7 +60,12 @@ export function graphConfig(descriptor: GraphDescriptor, threadId?: string): Gra
  * @example Effect.runPromise(resumeCommandEffect(graph, descriptor, config, reply));
  */
 export const resumeCommandEffect = Effect.fn("Agents.graph.resumeCommand")(
-  function* (graph: CompiledGraph, descriptor: GraphDescriptor, config: GraphConfig, value: unknown) {
+  function* (
+    graph: CompiledGraph,
+    descriptor: GraphDescriptor,
+    config: GraphConfig,
+    value: unknown,
+  ) {
     yield* Effect.try({
       try: () => {
         if (graphExecution(descriptor).checkpointer === undefined) {
@@ -88,9 +99,11 @@ export function resumeCommand(
   config: GraphConfig,
   value: unknown,
 ): Promise<Command> {
-  return Effect.runPromise(resumeCommandEffect(graph, descriptor, config, value).pipe(
-    Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    resumeCommandEffect(graph, descriptor, config, value).pipe(
+      Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function nativeResume(requests: readonly GraphWaitingInterrupt[], value: unknown): unknown {

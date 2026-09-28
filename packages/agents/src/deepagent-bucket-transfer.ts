@@ -15,22 +15,27 @@ import type { DeepAgentBucketContext } from "./deepagent-bucket-files.types.js";
 export const uploadBucketFilesEffect = Effect.fn("Agents.bucket.upload")(
   function* (files: Array<[string, Uint8Array]>) {
     yield* DeepAgentBucket;
-    return yield* Effect.forEach(files, ([path, content]) =>
-      Effect.gen(function* () {
-        const normalized = yield* Effect.try({
-          try: () => {
-            if (!(content instanceof Uint8Array)) throw new TypeError("File content must be bytes");
-            return virtualPath(path);
-          },
-          catch: deepAgentBucketFailure,
-        });
-        yield* putFileDataEffect(normalized, content);
-        return { path: normalized, error: null } satisfies FileUploadResponse;
-      }).pipe(Effect.catchTag("DeepAgentBucketFailure", (failure) =>
-        isControlFailure(failure.cause)
-          ? Effect.fail(failure)
-          : Effect.succeed({ path, error: "invalid_path" as const }),
-      )),
+    return yield* Effect.forEach(
+      files,
+      ([path, content]) =>
+        Effect.gen(function* () {
+          const normalized = yield* Effect.try({
+            try: () => {
+              if (!(content instanceof Uint8Array))
+                throw new TypeError("File content must be bytes");
+              return virtualPath(path);
+            },
+            catch: deepAgentBucketFailure,
+          });
+          yield* putFileDataEffect(normalized, content);
+          return { path: normalized, error: null } satisfies FileUploadResponse;
+        }).pipe(
+          Effect.catchTag("DeepAgentBucketFailure", (failure) =>
+            isControlFailure(failure.cause)
+              ? Effect.fail(failure)
+              : Effect.succeed({ path, error: "invalid_path" as const }),
+          ),
+        ),
       { concurrency: 1 },
     );
   },
@@ -48,10 +53,12 @@ export function uploadBucketFiles(
   context: DeepAgentBucketContext,
   files: Array<[string, Uint8Array]>,
 ): Promise<FileUploadResponse[]> {
-  return Effect.runPromise(uploadBucketFilesEffect(files).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+  return Effect.runPromise(
+    uploadBucketFilesEffect(files).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(deepAgentBucketLayer(context)),
+    ),
+  );
 }
 
 /** Downloads files in input order with a result for each path.
@@ -62,21 +69,28 @@ export function uploadBucketFiles(
 export const downloadBucketFilesEffect = Effect.fn("Agents.bucket.download")(
   function* (paths: string[]) {
     const context = yield* DeepAgentBucket;
-    return yield* Effect.forEach(paths, (path) =>
-      Effect.gen(function* () {
-        const key = yield* Effect.try({ try: () => bucketKey(context, path), catch: deepAgentBucketFailure });
-        const content = yield* Effect.tryPromise({
-          try: () => context.bucket.get(key),
-          catch: deepAgentBucketFailure,
-        });
-        return content === undefined
-          ? { path, content: null, error: "file_not_found" as const }
-          : { path: virtualPath(path), content, error: null };
-      }).pipe(Effect.catchTag("DeepAgentBucketFailure", (failure) =>
-        isControlFailure(failure.cause)
-          ? Effect.fail(failure)
-          : Effect.succeed({ path, content: null, error: "invalid_path" as const }),
-      )),
+    return yield* Effect.forEach(
+      paths,
+      (path) =>
+        Effect.gen(function* () {
+          const key = yield* Effect.try({
+            try: () => bucketKey(context, path),
+            catch: deepAgentBucketFailure,
+          });
+          const content = yield* Effect.tryPromise({
+            try: () => context.bucket.get(key),
+            catch: deepAgentBucketFailure,
+          });
+          return content === undefined
+            ? { path, content: null, error: "file_not_found" as const }
+            : { path: virtualPath(path), content, error: null };
+        }).pipe(
+          Effect.catchTag("DeepAgentBucketFailure", (failure) =>
+            isControlFailure(failure.cause)
+              ? Effect.fail(failure)
+              : Effect.succeed({ path, content: null, error: "invalid_path" as const }),
+          ),
+        ),
       { concurrency: 1 },
     );
   },
@@ -94,8 +108,10 @@ export function downloadBucketFiles(
   context: DeepAgentBucketContext,
   paths: string[],
 ): Promise<FileDownloadResponse[]> {
-  return Effect.runPromise(downloadBucketFilesEffect(paths).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+  return Effect.runPromise(
+    downloadBucketFilesEffect(paths).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(deepAgentBucketLayer(context)),
+    ),
+  );
 }

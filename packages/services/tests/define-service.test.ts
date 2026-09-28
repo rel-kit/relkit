@@ -4,9 +4,16 @@ import { defineEvent } from "@relkit/events";
 import { defineFunction } from "@relkit/functions";
 import { defineJob, defineTask } from "@relkit/jobs";
 import { z } from "@relkit/schema";
-import { DescriptorIdentityError, getDescriptorServiceIdentity, IdentityStore } from "@relkit/invocation";
 import {
-  defineService, defineServiceEffect, isServiceDescriptor, ServiceValidationError,
+  DescriptorIdentityError,
+  getDescriptorServiceIdentity,
+  IdentityStore,
+} from "@relkit/invocation";
+import {
+  defineService,
+  defineServiceEffect,
+  isServiceDescriptor,
+  ServiceValidationError,
 } from "../src/index.js";
 
 const lookup = defineFunction({
@@ -42,7 +49,10 @@ describe("service authoring", () => {
 
   test("accepts task and job members without replacing their descriptors", () => {
     const task = defineTask({
-      id: "services.task", version: "1", input: z.string(), output: z.string(),
+      id: "services.task",
+      version: "1",
+      input: z.string(),
+      output: z.string(),
       handler: async (input) => input,
     });
     const job = defineJob({ name: "serviceJob", task });
@@ -53,22 +63,33 @@ describe("service authoring", () => {
   });
 
   test("reports expected input failures in the Effect error channel", () => {
-    const nullMessage = Effect.runSync(Effect.catchTag(
-      defineServiceEffect(null as never), "ServiceValidationError",
-      (error) => Effect.succeed(error.message),
-    ));
+    const nullMessage = Effect.runSync(
+      Effect.catchTag(defineServiceEffect(null as never), "ServiceValidationError", (error) =>
+        Effect.succeed(error.message),
+      ),
+    );
     expect(nullMessage).toBe("Service options must be an object");
-    const reserved = Effect.runSync(Effect.flip(defineServiceEffect({
-      id: "bad", functions: { functions: lookup },
-    })));
+    const reserved = Effect.runSync(
+      Effect.flip(
+        defineServiceEffect({
+          id: "bad",
+          functions: { functions: lookup },
+        }),
+      ),
+    );
     expect(reserved._tag).toBe("ServiceValidationError");
-    expect(() => defineService({ id: "bad", functions: { functions: lookup } })).toThrow("reserved");
-    expect(() => defineService({ id: "bad", functions: { lookup: {} as typeof lookup } }))
-      .toThrow("Invalid service function");
-    expect(() => defineService({ id: "bad", events: { created: {} as typeof created } }))
-      .toThrow("Invalid service event");
-    expect(Effect.runSync(Effect.flip(defineServiceEffect({ id: "bad/id" })))._tag)
-      .toBe("ServiceValidationError");
+    expect(() => defineService({ id: "bad", functions: { functions: lookup } })).toThrow(
+      "reserved",
+    );
+    expect(() => defineService({ id: "bad", functions: { lookup: {} as typeof lookup } })).toThrow(
+      "Invalid service function",
+    );
+    expect(() => defineService({ id: "bad", events: { created: {} as typeof created } })).toThrow(
+      "Invalid service event",
+    );
+    expect(Effect.runSync(Effect.flip(defineServiceEffect({ id: "bad/id" })))._tag).toBe(
+      "ServiceValidationError",
+    );
   });
 
   test("runs event validation in the caller trace", () => {
@@ -80,9 +101,9 @@ describe("service authoring", () => {
         return Tracer.nativeTracer.span(options);
       },
     });
-    Effect.runSync(Effect.withTracer(
-      defineServiceEffect({ id: "traced", events: { event } }), tracer,
-    ));
+    Effect.runSync(
+      Effect.withTracer(defineServiceEffect({ id: "traced", events: { event } }), tracer),
+    );
     expect(spans).toContain("services.define");
     expect(spans).toContain("events.event.assertDescriptor");
   });
@@ -105,39 +126,59 @@ describe("service authoring", () => {
 
   test("rejects member ownership conflicts through both APIs", () => {
     const member = defineFunction({
-      id: "shared.member", input: z.object({}), output: z.object({}), handler: () => ({}),
+      id: "shared.member",
+      input: z.object({}),
+      output: z.object({}),
+      handler: () => ({}),
     });
     defineService({ id: "first", functions: { member } });
-    expect(() => defineService({ id: "second", functions: { member } }))
-      .toThrow(DescriptorIdentityError);
-    expect(() => defineService({ id: "second", functions: { member } }))
-      .toThrow("already belongs to another service");
-    const error = Effect.runSync(Effect.flip(defineServiceEffect({
-      id: "third", functions: { member },
-    })));
+    expect(() => defineService({ id: "second", functions: { member } })).toThrow(
+      DescriptorIdentityError,
+    );
+    expect(() => defineService({ id: "second", functions: { member } })).toThrow(
+      "already belongs to another service",
+    );
+    const error = Effect.runSync(
+      Effect.flip(
+        defineServiceEffect({
+          id: "third",
+          functions: { member },
+        }),
+      ),
+    );
     expect(error).toBeInstanceOf(ServiceValidationError);
     expect(error.message).toContain("already belongs");
   });
 
   test("turns a substituted identity generator failure into a tagged error", () => {
-    const layer = Layer.succeed(IdentityStore, IdentityStore.of({
-      canonical: new WeakMap(), unbound: new WeakMap(), services: new WeakMap(),
-      nextUnboundId: () => { throw new TypeError("identity generator failed"); },
-    }));
-    const error = Effect.runSync(Effect.provide(
-      Effect.flip(defineServiceEffect({})), layer,
-    ));
+    const layer = Layer.succeed(
+      IdentityStore,
+      IdentityStore.of({
+        canonical: new WeakMap(),
+        unbound: new WeakMap(),
+        services: new WeakMap(),
+        nextUnboundId: () => {
+          throw new TypeError("identity generator failed");
+        },
+      }),
+    );
+    const error = Effect.runSync(Effect.provide(Effect.flip(defineServiceEffect({})), layer));
     expect(error).toBeInstanceOf(ServiceValidationError);
     expect(error.message).toBe("identity generator failed");
   });
 
   test("rejects malformed category maps and duplicate names in order", () => {
-    expect(() => defineService({ id: "bad", events: [] as never })).toThrow("events must be an object");
-    expect(() => defineService({ id: "bad", tasks: { run: {} as never } }))
-      .toThrow("Invalid service task");
-    expect(() => defineService({ id: "bad", jobs: { run: {} as never } }))
-      .toThrow("Invalid service job");
-    expect(() => defineService({ id: "bad", functions: { lookup }, events: { lookup: created } }))
-      .toThrow('Duplicate service member "lookup"');
+    expect(() => defineService({ id: "bad", events: [] as never })).toThrow(
+      "events must be an object",
+    );
+    expect(() => defineService({ id: "bad", tasks: { run: {} as never } })).toThrow(
+      "Invalid service task",
+    );
+    expect(() => defineService({ id: "bad", jobs: { run: {} as never } })).toThrow(
+      "Invalid service job",
+    );
+    expect(() =>
+      defineService({ id: "bad", functions: { lookup }, events: { lookup: created } }),
+    ).toThrow('Duplicate service member "lookup"');
   });
 });

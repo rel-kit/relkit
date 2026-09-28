@@ -8,7 +8,11 @@ import type { GraphNodeAny } from "./define-graph-node.js";
 import { isSubgraphNode, subgraphForNode, type SubgraphNodeDescriptor } from "./graph-subgraph.js";
 import type { GraphEdgeOperation } from "./graph-edges.js";
 import { graphWorkflowFailure } from "./graph-workflow-error.js";
-import type { GraphWorkflow, GraphWorkflowEdge, GraphWorkflowNode } from "./graph-workflow.types.js";
+import type {
+  GraphWorkflow,
+  GraphWorkflowEdge,
+  GraphWorkflowNode,
+} from "./graph-workflow.types.js";
 
 export type * from "./graph-workflow.types.js";
 
@@ -22,16 +26,18 @@ export const graphWorkflowEffect = Effect.fn("Agents.graph.workflow")(
   <Id extends string, State>(
     nodes: readonly (GraphNodeAny | FunctionGraphNodeDescriptor | SubgraphNodeDescriptor)[],
     edges: readonly GraphEdgeOperation<Id, State>[],
-  ) => Effect.try({
-    try: (): GraphWorkflow => Object.freeze({
-      version: 1 as const,
-      start: START,
-      end: END,
-      nodes: Object.freeze(nodes.map(workflowNode)),
-      edges: Object.freeze(edges.map(workflowEdge)),
+  ) =>
+    Effect.try({
+      try: (): GraphWorkflow =>
+        Object.freeze({
+          version: 1 as const,
+          start: START,
+          end: END,
+          nodes: Object.freeze(nodes.map(workflowNode)),
+          edges: Object.freeze(edges.map(workflowEdge)),
+        }),
+      catch: graphWorkflowFailure,
     }),
-    catch: graphWorkflowFailure,
-  }),
   (effect) => observeAgent("graph.workflow", effect),
 );
 
@@ -46,9 +52,11 @@ export function graphWorkflow<Id extends string, State>(
   nodes: readonly (GraphNodeAny | FunctionGraphNodeDescriptor | SubgraphNodeDescriptor)[],
   edges: readonly GraphEdgeOperation<Id, State>[],
 ): GraphWorkflow {
-  return Effect.runSync(graphWorkflowEffect(nodes, edges).pipe(
-    Effect.catchTag("GraphWorkflowFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    graphWorkflowEffect(nodes, edges).pipe(
+      Effect.catchTag("GraphWorkflowFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Checks whether any graph node has a resumable continuation.

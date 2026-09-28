@@ -10,7 +10,13 @@ import { graphWorkflow } from "./graph-workflow.js";
 import { graphClientContractMetadata } from "./client-contract-metadata.js";
 import { createSubgraphNode, type GraphAsNodeOptions } from "./graph-subgraph.js";
 import { GRAPH_EXECUTION } from "./graph-execution-symbol.js";
-import type { DefineGraphOptions, GraphDescriptor, GraphNodeLike, GraphState, GraphStateKey } from "./define-graph.types.js";
+import type {
+  DefineGraphOptions,
+  GraphDescriptor,
+  GraphNodeLike,
+  GraphState,
+  GraphStateKey,
+} from "./define-graph.types.js";
 
 /** Validates graph authoring options and returns an assembler for its identity.
  * @param options - Graph state, nodes, edges, limits, and client policy.
@@ -41,7 +47,8 @@ export function prepareGraphDescriptor<
   if (client !== undefined && options.stateProfile === undefined) {
     throw new TypeError("Client-exposed graphs require stateProfile");
   }
-  const stateProfile = options.stateProfile === undefined ? undefined : normalizeId(options.stateProfile);
+  const stateProfile =
+    options.stateProfile === undefined ? undefined : normalizeId(options.stateProfile);
   const controls = copyAgentControls(options.controls);
   const workflow = graphWorkflow(nodes, operations);
 
@@ -82,7 +89,11 @@ export function prepareGraphDescriptor<
       enumerable: false,
     });
     return Object.freeze(descriptor) as unknown as GraphDescriptor<
-      Id, InputSchema, OutputSchema, State, Nodes
+      Id,
+      InputSchema,
+      OutputSchema,
+      State,
+      Nodes
     >;
   };
 }

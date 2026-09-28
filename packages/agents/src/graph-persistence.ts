@@ -2,10 +2,7 @@ import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
 import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import { graphExecution, type GraphDescriptor } from "./define-graph.js";
-import {
-  assertPersistenceProtocol,
-  isPersistenceResource,
-} from "./define-persistence.js";
+import { assertPersistenceProtocol, isPersistenceResource } from "./define-persistence.js";
 import type {
   AgentPersistenceDeclaration,
   AnyPersistenceResource,
@@ -14,8 +11,14 @@ import type {
 } from "./graph-persistence.types.js";
 import { agentPersistenceFailure } from "./persistence-error.js";
 
-export type { AgentPersistenceDeclaration, ResolvedGraphPersistence } from "./graph-persistence.types.js";
-export { releaseAgentPersistence, releaseAgentPersistenceEffect } from "./graph-persistence-release.js";
+export type {
+  AgentPersistenceDeclaration,
+  ResolvedGraphPersistence,
+} from "./graph-persistence.types.js";
+export {
+  releaseAgentPersistence,
+  releaseAgentPersistenceEffect,
+} from "./graph-persistence-release.js";
 
 const resolutions = new WeakMap<AnyPersistenceResource, ResolutionState>();
 

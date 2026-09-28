@@ -20,24 +20,28 @@ export const removeBucketPathEffect = Effect.fn("Agents.bucket.delete")(
   function* (path: string) {
     const context = yield* DeepAgentBucket;
     const normalized = yield* Effect.try({
-      try: () => path === "/" ? "/" : virtualPath(path),
+      try: () => (path === "/" ? "/" : virtualPath(path)),
       catch: deepAgentBucketFailure,
     });
-    const keys = normalized === "/"
-      ? yield* Effect.tryPromise({
-          try: () => context.bucket.list(`${context.prefix}/`),
-          catch: deepAgentBucketFailure,
-        })
-      : yield* deletionKeys(context, normalized);
+    const keys =
+      normalized === "/"
+        ? yield* Effect.tryPromise({
+            try: () => context.bucket.list(`${context.prefix}/`),
+            catch: deepAgentBucketFailure,
+          })
+        : yield* deletionKeys(context, normalized);
     if (keys.length === 0) {
       return { error: `Error: File '${normalized}' not found` } satisfies DeleteResult;
     }
     const outcomes = yield* Effect.forEach(
       keys,
-      (key) => Effect.result(Effect.tryPromise({
-        try: () => context.bucket.delete(key),
-        catch: deepAgentBucketFailure,
-      })),
+      (key) =>
+        Effect.result(
+          Effect.tryPromise({
+            try: () => context.bucket.delete(key),
+            catch: deepAgentBucketFailure,
+          }),
+        ),
       { concurrency: 8 },
     );
     const firstFailure = outcomes.find(Result.isFailure);

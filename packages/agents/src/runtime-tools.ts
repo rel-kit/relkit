@@ -14,8 +14,12 @@ import type { AgentToolCall } from "./runtime-tools.types.js";
 
 export type { AgentToolCall } from "./runtime-tools.types.js";
 export {
-  findModelTool, findModelToolEffect, findTool, findToolEffect,
-  modelToolName, modelToolNameEffect,
+  findModelTool,
+  findModelToolEffect,
+  findTool,
+  findToolEffect,
+  modelToolName,
+  modelToolNameEffect,
 } from "./runtime-tool-lookup.js";
 
 /** Executes an allowed RELKIT tool with safe public error projection.
@@ -40,19 +44,33 @@ export const runToolEffect = Effect.fn("Agents.runtime.runTool")(
     parentSpanId?: string,
   ) {
     const tool = yield* findToolEffect(options.tools, turn.toolId);
-    if (tool === undefined ||
-      !relkitToolRefs(options.agent.tools).some((entry) => entry.ref.id === turn.toolId)) {
+    if (
+      tool === undefined ||
+      !relkitToolRefs(options.agent.tools).some((entry) => entry.ref.id === turn.toolId)
+    ) {
       return safeToolError("RELKIT_TOOL_NOT_ALLOWED");
     }
     const outcome = yield* invokeAgentToolEffect(
-      options.engine, tool, turn, options, signal, invocationId, traceId, parentSpanId,
-    ).pipe(Effect.map((value) => ({ kind: "result" as const, value })),
-    Effect.catchTag("AgentInvocationFailure", (failure) => {
-      const cause = failure.cause;
-      if (cause instanceof ApprovalRequiredError) return Effect.fail(failure);
-      if (signal.aborted) return Effect.fail(agentInvocationFailure(signalFailure(signal)));
-      return Effect.succeed({ kind: "error" as const, value: safeToolError(safeCode(cause, tool)) });
-    }));
+      options.engine,
+      tool,
+      turn,
+      options,
+      signal,
+      invocationId,
+      traceId,
+      parentSpanId,
+    ).pipe(
+      Effect.map((value) => ({ kind: "result" as const, value })),
+      Effect.catchTag("AgentInvocationFailure", (failure) => {
+        const cause = failure.cause;
+        if (cause instanceof ApprovalRequiredError) return Effect.fail(failure);
+        if (signal.aborted) return Effect.fail(agentInvocationFailure(signalFailure(signal)));
+        return Effect.succeed({
+          kind: "error" as const,
+          value: safeToolError(safeCode(cause, tool)),
+        });
+      }),
+    );
     if (outcome.kind === "error") return outcome.value;
     return yield* jsonValueEffect(outcome.value, maxOutputBytes, "tool result").pipe(
       Effect.catchTag("AgentInvocationFailure", (failure) => {
@@ -85,9 +103,12 @@ export function runTool(
   traceId?: string,
   parentSpanId?: string,
 ): Promise<JsonValue> {
-  return Effect.runPromise(runToolEffect(
-    options, turn, signal, maxOutputBytes, invocationId, traceId, parentSpanId,
-  ).pipe(Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause))), { signal });
+  return Effect.runPromise(
+    runToolEffect(options, turn, signal, maxOutputBytes, invocationId, traceId, parentSpanId).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+    { signal },
+  );
 }
 
 function safeToolError(code: string): JsonValue {

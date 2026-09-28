@@ -22,17 +22,24 @@ const graph = defineGraph({
   limits: { maxSteps: 3, maxToolCalls: 1, timeoutMs: 1_000 },
 });
 const options = {
-  agent: graph, tools: {},
-  engine: { invoke: async () => { throw new Error("unexpected tool"); } },
+  agent: graph,
+  tools: {},
+  engine: {
+    invoke: async () => {
+      throw new Error("unexpected tool");
+    },
+  },
 } as never;
 
 test("compiled graph Effect and Promise adapter preserve output", async () => {
   const signal = new AbortController().signal;
   const input = { question: "Hello" };
-  expect(await Effect.runPromise(runCompiledGraphEffect(
-    options, input, signal, "run-1", "trace-1", 1024,
-  ))).toEqual({ answer: "Hello" });
-  expect(await runCompiledGraph(
-    options, input, signal, "run-2", "trace-2", 1024,
-  )).toEqual({ answer: "Hello" });
+  expect(
+    await Effect.runPromise(
+      runCompiledGraphEffect(options, input, signal, "run-1", "trace-1", 1024),
+    ),
+  ).toEqual({ answer: "Hello" });
+  expect(await runCompiledGraph(options, input, signal, "run-2", "trace-2", 1024)).toEqual({
+    answer: "Hello",
+  });
 });

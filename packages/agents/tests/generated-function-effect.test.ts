@@ -8,7 +8,9 @@ import {
 } from "../src/generated-function.js";
 
 test("generated function Effects derive, mark, and invoke a bound handler", async () => {
-  expect(Effect.runSync(generatedAgentFunctionIdEffect("support"))).toBe("relkit.agent.support.invoke");
+  expect(Effect.runSync(generatedAgentFunctionIdEffect("support"))).toBe(
+    "relkit.agent.support.invoke",
+  );
   const handler = Effect.runSync(createGeneratedAgentFunctionEffect("support", (input) => input));
   expect(Effect.runSync(isGeneratedAgentFunctionEffect(handler))).toBe(true);
   expect(await handler("hello", {})).toBe("hello");

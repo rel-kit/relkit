@@ -29,52 +29,53 @@ export class AgentCapturePolicyError extends Schema.TaggedError<AgentCapturePoli
  * @example
  * const policy = Effect.runSync(createAgentCapturePolicyEffect({ mode: "off" }));
  */
-export const createAgentCapturePolicyEffect = Effect.fn("Agents.capture.policy")(function* (
-  value: AgentCapturePolicy | undefined,
-) {
-  yield* Metric.update(policyCount, 1);
-  if (value === undefined || value.mode === "off") {
-    return Object.freeze({ mode: "off" }) as AgentCapturePolicy;
-  }
-  if (value.mode !== "development-redacted") {
-    yield* Metric.update(policyFailures, 1);
-    return yield* Effect.fail(
-      new AgentCapturePolicyError({
-        message: "Agent capture mode must be off or development-redacted",
-      }),
-    );
-  }
-  const maxBytes = value.maxBytes;
-  if (typeof maxBytes !== "number" || !Number.isSafeInteger(maxBytes) || maxBytes <= 0) {
-    yield* Metric.update(policyFailures, 1);
-    return yield* Effect.fail(
-      new AgentCapturePolicyError({
-        message: "Agent capture maxBytes must be a positive safe integer",
-      }),
-    );
-  }
-  if (
-    !Array.isArray(value.redactKeys ?? []) ||
-    (value.redactKeys ?? []).some((key) => typeof key !== "string")
-  ) {
-    yield* Metric.update(policyFailures, 1);
-    return yield* Effect.fail(
-      new AgentCapturePolicyError({
-        message: "Agent capture redactKeys must be text values",
-      }),
-    );
-  }
-  return Object.freeze({
-    mode: "development-redacted" as const,
-    maxBytes,
-    redactKeys: Object.freeze([
-      ...new Set([
-        ...DEFAULT_REDACT_KEYS,
-        ...(value.redactKeys ?? []).map((key) => key.toLowerCase()),
+export const createAgentCapturePolicyEffect = Effect.fn("Agents.capture.policy")(
+  function* (value: AgentCapturePolicy | undefined) {
+    yield* Metric.update(policyCount, 1);
+    if (value === undefined || value.mode === "off") {
+      return Object.freeze({ mode: "off" }) as AgentCapturePolicy;
+    }
+    if (value.mode !== "development-redacted") {
+      yield* Metric.update(policyFailures, 1);
+      return yield* Effect.fail(
+        new AgentCapturePolicyError({
+          message: "Agent capture mode must be off or development-redacted",
+        }),
+      );
+    }
+    const maxBytes = value.maxBytes;
+    if (typeof maxBytes !== "number" || !Number.isSafeInteger(maxBytes) || maxBytes <= 0) {
+      yield* Metric.update(policyFailures, 1);
+      return yield* Effect.fail(
+        new AgentCapturePolicyError({
+          message: "Agent capture maxBytes must be a positive safe integer",
+        }),
+      );
+    }
+    if (
+      !Array.isArray(value.redactKeys ?? []) ||
+      (value.redactKeys ?? []).some((key) => typeof key !== "string")
+    ) {
+      yield* Metric.update(policyFailures, 1);
+      return yield* Effect.fail(
+        new AgentCapturePolicyError({
+          message: "Agent capture redactKeys must be text values",
+        }),
+      );
+    }
+    return Object.freeze({
+      mode: "development-redacted" as const,
+      maxBytes,
+      redactKeys: Object.freeze([
+        ...new Set([
+          ...DEFAULT_REDACT_KEYS,
+          ...(value.redactKeys ?? []).map((key) => key.toLowerCase()),
+        ]),
       ]),
-    ]),
-  });
-}, (effect) => observeAgent("capture.policy", effect));
+    });
+  },
+  (effect) => observeAgent("capture.policy", effect),
+);
 
 /**
  * Creates a capture policy for synchronous descriptor callers.

@@ -12,12 +12,15 @@ import type { AgentLimits } from "./define-agent.types.js";
 export const copyAgentLimitsEffect = Effect.fn("Agents.definition.copyLimits")(
   function* (value: unknown) {
     if (!(yield* isRecordEffect(value))) {
-      return yield* Effect.fail(agentDefinitionFailure(new TypeError("Agent limits must be an object")));
+      return yield* Effect.fail(
+        agentDefinitionFailure(new TypeError("Agent limits must be an object")),
+      );
     }
     const record = value as Record<PropertyKey, unknown>;
-    const check = (input: unknown, name: string) => positiveIntegerEffect(input, name).pipe(
-      Effect.mapError((error) => agentDefinitionFailure(new TypeError(error.message))),
-    );
+    const check = (input: unknown, name: string) =>
+      positiveIntegerEffect(input, name).pipe(
+        Effect.mapError((error) => agentDefinitionFailure(new TypeError(error.message))),
+      );
     const maxSteps = yield* check(record.maxSteps, "limits.maxSteps");
     const maxToolCalls = yield* check(record.maxToolCalls, "limits.maxToolCalls");
     const timeoutMs = yield* check(record.timeoutMs, "limits.timeoutMs");
@@ -33,7 +36,9 @@ export const copyAgentLimitsEffect = Effect.fn("Agents.definition.copyLimits")(
  * @example const limits = copyAgentLimits({ maxSteps: 3, maxToolCalls: 2, timeoutMs: 1000 });
  */
 export function copyAgentLimits(value: unknown): AgentLimits {
-  return Effect.runSync(copyAgentLimitsEffect(value).pipe(
-    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    copyAgentLimitsEffect(value).pipe(
+      Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }

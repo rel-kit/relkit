@@ -4,7 +4,11 @@ import { observeAgent } from "./agent-telemetry.js";
 import { graphExecutionEffect } from "./define-graph.js";
 import { resumeCommandEffect, waitingInterruptsEffect } from "./graph-continuation.js";
 import type { GraphConfig } from "./graph-continuation.types.js";
-import { GraphInterruptedError, graphWaitingResponse, publicWaitingRequests } from "./graph-interruption.js";
+import {
+  GraphInterruptedError,
+  graphWaitingResponse,
+  publicWaitingRequests,
+} from "./graph-interruption.js";
 import { graphInvocationFailure } from "./graph-runtime-error.js";
 import type { GraphRuntimeOptions } from "./graph-runtime.types.js";
 import { collectNativeEventsEffect } from "./runtime-native-events.js";
@@ -39,38 +43,62 @@ export const streamCompiledGraphEffect = Effect.fn("Agents.graph.streamCompiled"
         )
       : input;
     const run = yield* Effect.tryPromise({
-      try: () => withSignal(graph.streamEvents(nativeInput, {
-        version: "v3", signal, recursionLimit: options.agent.limits.maxSteps, ...config,
-      }), signal),
+      try: () =>
+        withSignal(
+          graph.streamEvents(nativeInput, {
+            version: "v3",
+            signal,
+            recursionLimit: options.agent.limits.maxSteps,
+            ...config,
+          }),
+          signal,
+        ),
       catch: graphInvocationFailure,
     });
     return yield* Effect.gen(function* () {
       const execution = yield* graphExecutionEffect(options.agent);
       const stateSchemas = yield* selectedStateSchemasEffect(
-        [execution.state], options.agent.client?.state ?? [],
+        [execution.state],
+        options.agent.client?.state ?? [],
       ).pipe(Effect.mapError((failure) => graphInvocationFailure(failure.cause)));
       yield* collectNativeEventsEffect(
-        run, options.contentSink, new Map(), new Set(), signal, options.agent.limits,
-        stateSchemas, () => undefined, undefined, (reason) => run.abort(reason),
+        run,
+        options.contentSink,
+        new Map(),
+        new Set(),
+        signal,
+        options.agent.limits,
+        stateSchemas,
+        () => undefined,
+        undefined,
+        (reason) => run.abort(reason),
         options.agent.client?.events,
       ).pipe(Effect.mapError((failure) => graphInvocationFailure(failure.cause)));
       const state = yield* Effect.tryPromise({
-        try: () => withSignal(run.output, signal), catch: graphInvocationFailure,
+        try: () => withSignal(run.output, signal),
+        catch: graphInvocationFailure,
       });
       if (isInterrupted(state)) {
         const interrupts = yield* waitingInterruptsEffect(graph, options.agent, config).pipe(
           Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
         );
         yield* Effect.tryPromise({
-          try: () => withSignal(options.contentSink?.emitWaiting?.({
-            response: graphWaitingResponse(interrupts),
-            requests: publicWaitingRequests(interrupts),
-          }, signal), signal),
+          try: () =>
+            withSignal(
+              options.contentSink?.emitWaiting?.(
+                {
+                  response: graphWaitingResponse(interrupts),
+                  requests: publicWaitingRequests(interrupts),
+                },
+                signal,
+              ),
+              signal,
+            ),
           catch: graphInvocationFailure,
         });
-        return yield* Effect.fail(graphInvocationFailure(
-          new GraphInterruptedError(options.threadId!, interrupts),
-        ));
+        return yield* Effect.fail(
+          graphInvocationFailure(new GraphInterruptedError(options.threadId!, interrupts)),
+        );
       }
       const validated = yield* validateValueEffect(options.agent.output, state, "output").pipe(
         Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
@@ -87,11 +115,17 @@ export const streamCompiledGraphEffect = Effect.fn("Agents.graph.streamCompiled"
         catch: graphInvocationFailure,
       });
       return output;
-    }).pipe(Effect.onExit((exit) => Exit.isFailure(exit)
-      ? Effect.sync(() => {
-          try { run.abort(signalFailure(signal)); } catch {}
-        })
-      : Effect.void));
+    }).pipe(
+      Effect.onExit((exit) =>
+        Exit.isFailure(exit)
+          ? Effect.sync(() => {
+              try {
+                run.abort(signalFailure(signal));
+              } catch {}
+            })
+          : Effect.void,
+      ),
+    );
   },
   (effect) => observeAgent("graph.stream-compiled", effect),
 );

@@ -23,16 +23,20 @@ import { isSubgraphNode } from "./graph-subgraph.js";
  * @returns An Effect with nodes, edges, and state keys or GraphDefinitionFailure.
  * @example Effect.runSync(prepareGraphDefinitionEffect(state, input, output, nodes, edges));
  */
-export const prepareGraphDefinitionEffect = Effect.fn("Agents.graph.prepareDefinition")((
-  state: AnyStateSchema,
-  input: StandardSchemaV1,
-  output: StandardSchemaV1,
-  sourceNodes: readonly GraphNodeLike[],
-  edges: (builder: GraphEdgeBuilder<string, any>) => unknown,
-) => Effect.try({
-  try: () => prepareGraphDefinitionCore(state, input, output, sourceNodes, edges),
-  catch: graphDefinitionFailure,
-}), (effect) => observeAgent("graph.prepare-definition", effect));
+export const prepareGraphDefinitionEffect = Effect.fn("Agents.graph.prepareDefinition")(
+  (
+    state: AnyStateSchema,
+    input: StandardSchemaV1,
+    output: StandardSchemaV1,
+    sourceNodes: readonly GraphNodeLike[],
+    edges: (builder: GraphEdgeBuilder<string, any>) => unknown,
+  ) =>
+    Effect.try({
+      try: () => prepareGraphDefinitionCore(state, input, output, sourceNodes, edges),
+      catch: graphDefinitionFailure,
+    }),
+  (effect) => observeAgent("graph.prepare-definition", effect),
+);
 
 /** Validates graph authoring for existing synchronous callers.
  * @param state - Native graph state schema.
@@ -55,9 +59,11 @@ export function prepareGraphDefinition(
   readonly operations: readonly GraphEdgeOperation<string, any>[];
   readonly stateKeys: Set<string>;
 } {
-  return Effect.runSync(prepareGraphDefinitionEffect(state, input, output, sourceNodes, edges).pipe(
-    Effect.catchTag("GraphDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    prepareGraphDefinitionEffect(state, input, output, sourceNodes, edges).pipe(
+      Effect.catchTag("GraphDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function prepareGraphDefinitionCore(

@@ -3,8 +3,14 @@ import type { DescriptorMetadata, MaybePromise } from "@relkit/contracts";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import type { RELKIT_GRAPH_NODE } from "./graph-node-symbol.js";
 
-type NodeUpdateInput<Schema extends StandardSchemaV1> = Extract<InferInput<Schema>, Record<string, unknown>>;
-type NodeUpdate<Schema extends StandardSchemaV1> = Extract<InferOutput<Schema>, Record<string, unknown>>;
+type NodeUpdateInput<Schema extends StandardSchemaV1> = Extract<
+  InferInput<Schema>,
+  Record<string, unknown>
+>;
+type NodeUpdate<Schema extends StandardSchemaV1> = Extract<
+  InferOutput<Schema>,
+  Record<string, unknown>
+>;
 type CommandNodes<Ends extends readonly string[]> = Ends extends readonly []
   ? string
   : Extract<Ends[number], string>;
@@ -31,7 +37,10 @@ export type GraphNodeImplementation<
 > = (
   input: InferOutput<InputSchema>,
   config?: LangGraphRunnableConfig,
-) => MaybePromise<NodeUpdateInput<OutputSchema> | Command<unknown, NodeUpdateInput<OutputSchema>, CommandNodes<Ends>>>;
+) => MaybePromise<
+  | NodeUpdateInput<OutputSchema>
+  | Command<unknown, NodeUpdateInput<OutputSchema>, CommandNodes<Ends>>
+>;
 
 /** Immutable native graph node descriptor. */
 export interface GraphNodeDescriptor<
@@ -53,7 +62,11 @@ export interface GraphNodeDescriptor<
 
 /** Erased graph node descriptor for runtime validation. */
 export type GraphNodeAny = GraphNodeDescriptor<
-  string, StandardSchemaV1, StandardSchemaV1, StandardSchemaV1 | undefined, readonly string[]
+  string,
+  StandardSchemaV1,
+  StandardSchemaV1,
+  StandardSchemaV1 | undefined,
+  readonly string[]
 >;
 
 /** Authoring options for a native LangGraph node. */

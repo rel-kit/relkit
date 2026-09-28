@@ -15,22 +15,22 @@ import {
  * @example
  * const limit = Effect.runSync(positiveIntegerEffect(3, "maxSteps"));
  */
-export const positiveIntegerEffect = Effect.fn("Agents.validation.positiveInteger")(function* (
-  value: unknown,
-  name: string,
-) {
-  yield* Metric.update(validationCount, 1);
-  if (!positiveIntegerShape(value)) {
-    yield* Metric.update(validationFailures, 1);
-    return yield* Effect.fail(
-      new AgentValidationError({
-        operation: "positiveInteger",
-        message: `${name} must be a finite positive integer`,
-      }),
-    );
-  }
-  return value;
-}, (effect) => observeAgent("validation.positive-integer", effect));
+export const positiveIntegerEffect = Effect.fn("Agents.validation.positiveInteger")(
+  function* (value: unknown, name: string) {
+    yield* Metric.update(validationCount, 1);
+    if (!positiveIntegerShape(value)) {
+      yield* Metric.update(validationFailures, 1);
+      return yield* Effect.fail(
+        new AgentValidationError({
+          operation: "positiveInteger",
+          message: `${name} must be a finite positive integer`,
+        }),
+      );
+    }
+    return value;
+  },
+  (effect) => observeAgent("validation.positive-integer", effect),
+);
 
 /**
  * Validates a finite positive integer for existing synchronous callers.
@@ -62,13 +62,14 @@ export function positiveInteger(value: unknown, name: string): number {
  * @example
  * const valid = Effect.runSync(isPositiveIntegerEffect(3));
  */
-export const isPositiveIntegerEffect = Effect.fn("Agents.validation.isPositiveInteger")(function* (
-  value: unknown,
-) {
-  const valid = yield* Effect.sync(() => positiveIntegerShape(value));
-  yield* Metric.update(validationCount, 1);
-  return valid;
-}, (effect) => observeAgent("validation.is-positive-integer", effect));
+export const isPositiveIntegerEffect = Effect.fn("Agents.validation.isPositiveInteger")(
+  function* (value: unknown) {
+    const valid = yield* Effect.sync(() => positiveIntegerShape(value));
+    yield* Metric.update(validationCount, 1);
+    return valid;
+  },
+  (effect) => observeAgent("validation.is-positive-integer", effect),
+);
 
 /**
  * Checks a finite positive integer for existing synchronous callers.
@@ -90,11 +91,14 @@ export function isPositiveInteger(value: unknown): value is number {
  * @example
  * const valid = Effect.runSync(isRecordEffect({ id: "one" }));
  */
-export const isRecordEffect = Effect.fn("Agents.validation.isRecord")(function* (value: unknown) {
-  const valid = yield* Effect.sync(() => recordShape(value));
-  yield* Metric.update(validationCount, 1);
-  return valid;
-}, (effect) => observeAgent("validation.is-record", effect));
+export const isRecordEffect = Effect.fn("Agents.validation.isRecord")(
+  function* (value: unknown) {
+    const valid = yield* Effect.sync(() => recordShape(value));
+    yield* Metric.update(validationCount, 1);
+    return valid;
+  },
+  (effect) => observeAgent("validation.is-record", effect),
+);
 
 /**
  * Checks a record for existing synchronous callers.

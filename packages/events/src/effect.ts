@@ -3,7 +3,10 @@ export {
   isEventDescriptorEffect,
   assertEventDescriptorEffect,
 } from "./define-event.js";
-export { defineEventFunctionEffect, isEventFunctionDescriptorEffect } from "./define-event-function.js";
+export {
+  defineEventFunctionEffect,
+  isEventFunctionDescriptorEffect,
+} from "./define-event-function.js";
 export { bindFunctionEventsEffect } from "./event-function-target.js";
 export { createEventClientEffect } from "./client.js";
 export { EventPublisher, eventPublisherLayer, publishEventEffect } from "./client-publish.js";

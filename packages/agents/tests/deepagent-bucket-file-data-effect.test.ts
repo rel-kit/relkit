@@ -1,7 +1,10 @@
 import { Clock, Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import { putFileDataEffect, readFileDataEffect } from "../src/deepagent-bucket-file-data.js";
-import type { DeepAgentBucketClient, DeepAgentBucketMetadata } from "../src/deepagent-bucket-files.types.js";
+import type {
+  DeepAgentBucketClient,
+  DeepAgentBucketMetadata,
+} from "../src/deepagent-bucket-files.types.js";
 import { deepAgentBucketLayer } from "../src/deepagent-bucket-service.js";
 
 test("file data Effects use a substituted clock and bucket service", async () => {
@@ -34,7 +37,11 @@ test("file data Effects use a substituted clock and bucket service", async () =>
     return yield* readFileDataEffect("/note.md");
   });
   const result = await Effect.runPromise(
-    Effect.provideService(Effect.provide(operation, deepAgentBucketLayer(context)), Clock.Clock, clock),
+    Effect.provideService(
+      Effect.provide(operation, deepAgentBucketLayer(context)),
+      Clock.Clock,
+      clock,
+    ),
   );
   expect(result).toMatchObject({
     content: "hello",
@@ -53,9 +60,14 @@ test("file data Effect reports invalid paths as tagged failures", async () => {
     exists: async () => false,
     list: async () => [],
   };
-  const result = await Effect.runPromise(Effect.result(
-    Effect.provide(readFileDataEffect("../escape"), deepAgentBucketLayer({ bucket, prefix: "deepagents" })),
-  ));
+  const result = await Effect.runPromise(
+    Effect.result(
+      Effect.provide(
+        readFileDataEffect("../escape"),
+        deepAgentBucketLayer({ bucket, prefix: "deepagents" }),
+      ),
+    ),
+  );
   expect(Result.isFailure(result)).toBe(true);
   if (Result.isFailure(result)) {
     expect(result.failure).toMatchObject({ _tag: "DeepAgentBucketFailure" });

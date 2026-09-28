@@ -83,12 +83,18 @@ describe("serializable agent model selection", () => {
 
   test("exposes tagged Effect failures while preserving the synchronous errors", () => {
     expect(Effect.runSync(normalizeModelSelectorEffect("openai:gpt"))).toBe("openai:gpt");
-    expect(Effect.runSync(parseModelProviderConfigurationEffect({
-      defaultProvider: "openai",
-      defaultModel: "gpt",
-      openai: {},
-    }))).toEqual({ defaultProvider: "openai", defaultModel: "gpt", providers: { openai: {} } });
-    const failure = Effect.runSync(Effect.flip(resolveModelSelectorEffect("missing", configuration)));
+    expect(
+      Effect.runSync(
+        parseModelProviderConfigurationEffect({
+          defaultProvider: "openai",
+          defaultModel: "gpt",
+          openai: {},
+        }),
+      ),
+    ).toEqual({ defaultProvider: "openai", defaultModel: "gpt", providers: { openai: {} } });
+    const failure = Effect.runSync(
+      Effect.flip(resolveModelSelectorEffect("missing", configuration)),
+    );
     expect(failure).toMatchObject({
       _tag: "ModelSelectionEffectError",
       code: "RELKIT_MODEL_PROVIDER_UNKNOWN",

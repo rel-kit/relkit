@@ -20,7 +20,11 @@ export type {
   NativeAgentTool,
 } from "./define-agent-native.types.js";
 export type { AgentChatMapping, AgentClientPolicy, AgentControl } from "./agent-client.js";
-export type { AgentFilesystemBackend, AgentSubagent, DeepAgentCapabilities } from "./define-agent-deep.types.js";
+export type {
+  AgentFilesystemBackend,
+  AgentSubagent,
+  DeepAgentCapabilities,
+} from "./define-agent-deep.types.js";
 export type {
   AgentDescriptor,
   AgentInstructions,
@@ -44,20 +48,25 @@ export const defineAgentEffect = Effect.fn("Agents.definition.define")(
     const Tools extends readonly AgentTool[] = readonly AgentTool[],
   >(options: DefineAgentOptions<Id, InputSchema, OutputSchema, Middleware, Tools>) {
     if (!(yield* isRecordEffect(options))) {
-      return yield* Effect.fail(agentDefinitionFailure(new TypeError("Agent options must be an object")));
+      return yield* Effect.fail(
+        agentDefinitionFailure(new TypeError("Agent options must be an object")),
+      );
     }
     if (Object.hasOwn(options, "handler")) {
-      return yield* Effect.fail(agentDefinitionFailure(new TypeError("Agents cannot own handlers")));
+      return yield* Effect.fail(
+        agentDefinitionFailure(new TypeError("Agents cannot own handlers")),
+      );
     }
     const assemble = yield* Effect.try({
       try: () => prepareAgentDescriptor(options),
       catch: agentDefinitionFailure,
     });
-    const id = options.id === undefined
-      ? yield* createUnboundIdentityEffect().pipe(
-          Effect.mapError((error) => agentDefinitionFailure(error.cause)),
-        )
-      : options.id;
+    const id =
+      options.id === undefined
+        ? yield* createUnboundIdentityEffect().pipe(
+            Effect.mapError((error) => agentDefinitionFailure(error.cause)),
+          )
+        : options.id;
     return yield* Effect.try({
       try: () => assemble(id as Id),
       catch: agentDefinitionFailure,
@@ -105,7 +114,9 @@ export function defineAgent<
   Middleware,
   Tools
 > {
-  return Effect.runSync(defineAgentEffect(options).pipe(
-    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    defineAgentEffect(options).pipe(
+      Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }

@@ -14,14 +14,14 @@ export { createExecutionSignal, signalFailure, withSignal };
  * @returns An Effect with validated value or AgentInvocationFailure.
  * @example await Effect.runPromise(validateValueEffect(schema, input, "input"));
  */
-export const validateValueEffect = Effect.fn("Agents.runtime.validateValue")((
-  schema: StandardSchemaV1,
-  value: unknown,
-  phase: "input" | "output",
-) => Effect.tryPromise({
-  try: () => validateValueCore(schema, value, phase),
-  catch: agentInvocationFailure,
-}), (effect) => observeAgent("runtime.validate-value", effect));
+export const validateValueEffect = Effect.fn("Agents.runtime.validateValue")(
+  (schema: StandardSchemaV1, value: unknown, phase: "input" | "output") =>
+    Effect.tryPromise({
+      try: () => validateValueCore(schema, value, phase),
+      catch: agentInvocationFailure,
+    }),
+  (effect) => observeAgent("runtime.validate-value", effect),
+);
 
 /** Validates an invocation value for existing Promise callers.
  * @param schema - Input or output validator.
@@ -36,13 +36,17 @@ export function validateValue(
   value: unknown,
   phase: "input" | "output",
 ): Promise<unknown> {
-  return Effect.runPromise(validateValueEffect(schema, value, phase).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    validateValueEffect(schema, value, phase).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 async function validateValueCore(
-  schema: StandardSchemaV1, value: unknown, phase: "input" | "output",
+  schema: StandardSchemaV1,
+  value: unknown,
+  phase: "input" | "output",
 ): Promise<unknown> {
   try {
     const result = await validate(schema, value as never);
@@ -69,10 +73,11 @@ async function validateValueCore(
  * @returns An Effect with JSON or AgentInvocationFailure.
  * @example Effect.runSync(jsonValueEffect({ ok: true }, 1024, "output"));
  */
-export const jsonValueEffect = Effect.fn("Agents.runtime.jsonValue")((
-  value: unknown, maxBytes: number, label: string,
-) => Effect.try({ try: () => jsonValueCore(value, maxBytes, label), catch: agentInvocationFailure }),
-  (effect) => observeAgent("runtime.json-value", effect));
+export const jsonValueEffect = Effect.fn("Agents.runtime.jsonValue")(
+  (value: unknown, maxBytes: number, label: string) =>
+    Effect.try({ try: () => jsonValueCore(value, maxBytes, label), catch: agentInvocationFailure }),
+  (effect) => observeAgent("runtime.json-value", effect),
+);
 
 /** Produces bounded JSON for existing synchronous callers.
  * @param value - Candidate JSON value.
@@ -83,9 +88,11 @@ export const jsonValueEffect = Effect.fn("Agents.runtime.jsonValue")((
  * @example jsonValue({ ok: true }, 1024, "output");
  */
 export function jsonValue(value: unknown, maxBytes: number, label: string): JsonValue {
-  return Effect.runSync(jsonValueEffect(value, maxBytes, label).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    jsonValueEffect(value, maxBytes, label).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function jsonValueCore(value: unknown, maxBytes: number, label: string): JsonValue {
@@ -106,10 +113,10 @@ function jsonValueCore(value: unknown, maxBytes: number, label: string): JsonVal
  * @returns An Effect with a safe AgentRuntimeError.
  * @example Effect.runSync(modelFailureEffect(error, signal));
  */
-export const modelFailureEffect = Effect.fn("Agents.runtime.modelFailure")((
-  cause: unknown, signal: AbortSignal,
-) => Effect.sync(() => modelFailureCore(cause, signal)),
-  (effect) => observeAgent("runtime.model-failure", effect));
+export const modelFailureEffect = Effect.fn("Agents.runtime.modelFailure")(
+  (cause: unknown, signal: AbortSignal) => Effect.sync(() => modelFailureCore(cause, signal)),
+  (effect) => observeAgent("runtime.model-failure", effect),
+);
 
 /** Classifies a model failure for existing synchronous callers.
  * @param cause - Provider or response failure.

@@ -3,10 +3,18 @@ import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { agentModelResolutionFailure } from "./runtime-model-error.js";
-import type { AgentContentLimits, ResolvedRuntimeModel, RuntimeModelOptions } from "./runtime-model.types.js";
+import type {
+  AgentContentLimits,
+  ResolvedRuntimeModel,
+  RuntimeModelOptions,
+} from "./runtime-model.types.js";
 import type { AgentLanguageModel } from "./define-agent-native.types.js";
 
-export type { AgentContentLimits, ResolvedRuntimeModel, RuntimeModelOptions } from "./runtime-model.types.js";
+export type {
+  AgentContentLimits,
+  ResolvedRuntimeModel,
+  RuntimeModelOptions,
+} from "./runtime-model.types.js";
 
 const DEFAULT_MAX_INPUT_BYTES = 64 * 1024;
 const DEFAULT_MAX_OUTPUT_BYTES = 16 * 1024;
@@ -26,7 +34,12 @@ export const resolveRuntimeModelEffect = Effect.fn("Agents.runtime.resolveModel"
         catch: agentModelResolutionFailure,
       });
       return yield* Effect.try({
-        try: (): ResolvedRuntimeModel => ({ id: nativeId(model), model: asLanguageModel(model), maxInputBytes, maxOutputBytes }),
+        try: (): ResolvedRuntimeModel => ({
+          id: nativeId(model),
+          model: asLanguageModel(model),
+          maxInputBytes,
+          maxOutputBytes,
+        }),
         catch: agentModelResolutionFailure,
       });
     }
@@ -74,9 +87,11 @@ export const resolveRuntimeModelEffect = Effect.fn("Agents.runtime.resolveModel"
  * @example await resolveRuntimeModel({ model: "test", registry: null, environment: {} });
  */
 export function resolveRuntimeModel(options: RuntimeModelOptions): Promise<ResolvedRuntimeModel> {
-  return Effect.runPromise(resolveRuntimeModelEffect(options).pipe(
-    Effect.catchTag("AgentModelResolutionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    resolveRuntimeModelEffect(options).pipe(
+      Effect.catchTag("AgentModelResolutionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Validates content byte limits against fixed package maximums.
@@ -85,13 +100,14 @@ export function resolveRuntimeModel(options: RuntimeModelOptions): Promise<Resol
  * @example Effect.runSync(resolveAgentContentLimitsEffect({ maxInputBytes: 1024 }));
  */
 export const resolveAgentContentLimitsEffect = Effect.fn("Agents.runtime.contentLimits")(
-  (options: Pick<RuntimeModelOptions, "maxInputBytes" | "maxOutputBytes">) => Effect.try({
-    try: (): AgentContentLimits => ({
-      maxInputBytes: boundedLimit(options.maxInputBytes, DEFAULT_MAX_INPUT_BYTES),
-      maxOutputBytes: boundedLimit(options.maxOutputBytes, DEFAULT_MAX_OUTPUT_BYTES),
+  (options: Pick<RuntimeModelOptions, "maxInputBytes" | "maxOutputBytes">) =>
+    Effect.try({
+      try: (): AgentContentLimits => ({
+        maxInputBytes: boundedLimit(options.maxInputBytes, DEFAULT_MAX_INPUT_BYTES),
+        maxOutputBytes: boundedLimit(options.maxOutputBytes, DEFAULT_MAX_OUTPUT_BYTES),
+      }),
+      catch: agentModelResolutionFailure,
     }),
-    catch: agentModelResolutionFailure,
-  }),
   (effect) => observeAgent("runtime.content-limits", effect),
 );
 
@@ -104,13 +120,18 @@ export const resolveAgentContentLimitsEffect = Effect.fn("Agents.runtime.content
 export function resolveAgentContentLimits(
   options: Pick<RuntimeModelOptions, "maxInputBytes" | "maxOutputBytes">,
 ): AgentContentLimits {
-  return Effect.runSync(resolveAgentContentLimitsEffect(options).pipe(
-    Effect.catchTag("AgentModelResolutionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    resolveAgentContentLimitsEffect(options).pipe(
+      Effect.catchTag("AgentModelResolutionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function nativeId(model: AgentLanguageModel): string {
-  const value = model as { readonly name?: unknown; readonly constructor?: { readonly name?: unknown } };
+  const value = model as {
+    readonly name?: unknown;
+    readonly constructor?: { readonly name?: unknown };
+  };
   const name = typeof value.name === "string" ? value.name : value.constructor?.name;
   return `native:${typeof name === "string" && name !== "" ? name : "model"}`;
 }

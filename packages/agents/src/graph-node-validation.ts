@@ -19,13 +19,19 @@ import {
  * @example Effect.runSync(assertGraphNodeDestinationsEffect(node, ids));
  */
 export const assertGraphNodeDestinationsEffect = Effect.fn("Agents.graphNode.destinations")(
-  (node: Pick<GraphNodeAny, "id" | "ends">, registeredNodeIds: ReadonlySet<string> | readonly string[]) =>
+  (
+    node: Pick<GraphNodeAny, "id" | "ends">,
+    registeredNodeIds: ReadonlySet<string> | readonly string[],
+  ) =>
     Effect.try({
       try: () => {
-        const registered = registeredNodeIds instanceof Set ? registeredNodeIds : new Set(registeredNodeIds);
+        const registered =
+          registeredNodeIds instanceof Set ? registeredNodeIds : new Set(registeredNodeIds);
         for (const destination of node.ends) {
           if (destination !== END && !registered.has(destination)) {
-            throw new TypeError(`Graph node "${node.id}" declares unknown destination "${destination}"`);
+            throw new TypeError(
+              `Graph node "${node.id}" declares unknown destination "${destination}"`,
+            );
           }
         }
       },
@@ -45,9 +51,11 @@ export function assertGraphNodeDestinations(
   node: Pick<GraphNodeAny, "id" | "ends">,
   registeredNodeIds: ReadonlySet<string> | readonly string[],
 ): void {
-  Effect.runSync(assertGraphNodeDestinationsEffect(node, registeredNodeIds).pipe(
-    Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  Effect.runSync(
+    assertGraphNodeDestinationsEffect(node, registeredNodeIds).pipe(
+      Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Validates and freezes a node's static destination list.
@@ -56,19 +64,21 @@ export function assertGraphNodeDestinations(
  * @example Effect.runSync(copyGraphNodeEndsEffect([END]));
  */
 export const copyGraphNodeEndsEffect = Effect.fn("Agents.graphNode.copyEnds")(
-  (value: readonly string[] | undefined) => Effect.try({
-    try: (): readonly string[] => {
-      if (value === undefined) return Object.freeze([]);
-      if (!Array.isArray(value)) throw new TypeError("Graph node ends must be an array");
-      const ends = value.map((entry) => {
-        if (entry === START) throw new TypeError("Graph node ends cannot contain START");
-        return entry === END ? END : normalizeId(entry);
-      });
-      if (new Set(ends).size !== ends.length) throw new TypeError("Graph node ends must be unique");
-      return Object.freeze(ends);
-    },
-    catch: graphNodeValidationFailure,
-  }),
+  (value: readonly string[] | undefined) =>
+    Effect.try({
+      try: (): readonly string[] => {
+        if (value === undefined) return Object.freeze([]);
+        if (!Array.isArray(value)) throw new TypeError("Graph node ends must be an array");
+        const ends = value.map((entry) => {
+          if (entry === START) throw new TypeError("Graph node ends cannot contain START");
+          return entry === END ? END : normalizeId(entry);
+        });
+        if (new Set(ends).size !== ends.length)
+          throw new TypeError("Graph node ends must be unique");
+        return Object.freeze(ends);
+      },
+      catch: graphNodeValidationFailure,
+    }),
   (effect) => observeAgent("graph-node.copy-ends", effect),
 );
 
@@ -79,9 +89,11 @@ export const copyGraphNodeEndsEffect = Effect.fn("Agents.graphNode.copyEnds")(
  * @example const ends = copyGraphNodeEnds([END]);
  */
 export function copyGraphNodeEnds(value: readonly string[] | undefined): readonly string[] {
-  return Effect.runSync(copyGraphNodeEndsEffect(value).pipe(
-    Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    copyGraphNodeEndsEffect(value).pipe(
+      Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Validates a node result and any native command update.
@@ -118,14 +130,15 @@ export const validateGraphNodeResultEffect = Effect.fn("Agents.graphNode.result"
  * @throws The original schema, update, or destination error.
  * @example await validateGraphNodeResult(schema, [], value);
  */
-export function validateGraphNodeResult<OutputSchema extends StandardSchemaV1, Ends extends readonly string[]>(
-  output: OutputSchema,
-  ends: Ends,
-  result: unknown,
-): Promise<GraphNodeResult<OutputSchema, Ends>> {
-  return Effect.runPromise(validateGraphNodeResultEffect(output, ends, result).pipe(
-    Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+export function validateGraphNodeResult<
+  OutputSchema extends StandardSchemaV1,
+  Ends extends readonly string[],
+>(output: OutputSchema, ends: Ends, result: unknown): Promise<GraphNodeResult<OutputSchema, Ends>> {
+  return Effect.runPromise(
+    validateGraphNodeResultEffect(output, ends, result).pipe(
+      Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Validates graph node input against its standard schema.
@@ -151,7 +164,9 @@ export function validatedGraphNodeInput<Schema extends StandardSchemaV1>(
   schema: Schema,
   value: unknown,
 ): Promise<InferOutput<Schema>> {
-  return Effect.runPromise(validatedGraphNodeInputEffect(schema, value).pipe(
-    Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    validatedGraphNodeInputEffect(schema, value).pipe(
+      Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }

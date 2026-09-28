@@ -4,7 +4,9 @@ import { withSignal } from "../src/signal.js";
 test("cancellation removes the listener even when underlying work never settles", async () => {
   const controller = new AbortController();
   let finishWork = (_value: string) => {};
-  const work = new Promise<string>((resolve) => { finishWork = resolve; });
+  const work = new Promise<string>((resolve) => {
+    finishWork = resolve;
+  });
   const removed = vi.spyOn(controller.signal, "removeEventListener");
   const pending = withSignal(work, controller.signal);
   controller.abort();

@@ -1,5 +1,8 @@
 import type { FileInfo } from "deepagents";
-import type { DeepAgentBucketContext, DeepAgentBucketMetadata } from "./deepagent-bucket-files.types.js";
+import type {
+  DeepAgentBucketContext,
+  DeepAgentBucketMetadata,
+} from "./deepagent-bucket-files.types.js";
 import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
@@ -43,11 +46,16 @@ export const scopedKeysEffect = Effect.fn("Agents.bucket.scopedKeys")(
  * @throws The original bucket or path failure.
  * @example await scopedKeys(context, "/notes");
  */
-export function scopedKeys(context: DeepAgentBucketContext, path: string | null | undefined): Promise<readonly string[]> {
-  return Effect.runPromise(scopedKeysEffect(path).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+export function scopedKeys(
+  context: DeepAgentBucketContext,
+  path: string | null | undefined,
+): Promise<readonly string[]> {
+  return Effect.runPromise(
+    scopedKeysEffect(path).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(deepAgentBucketLayer(context)),
+    ),
+  );
 }
 
 /** Reads metadata for one bucket key.
@@ -63,7 +71,10 @@ export const infoForEffect = Effect.fn("Agents.bucket.info")(
       catch: deepAgentBucketFailure,
     });
     if (metadata === undefined) return undefined;
-    const path = yield* Effect.try({ try: () => filePath(context, key), catch: deepAgentBucketFailure });
+    const path = yield* Effect.try({
+      try: () => filePath(context, key),
+      catch: deepAgentBucketFailure,
+    });
     const info: FileInfo = {
       path,
       is_dir: false,
@@ -82,11 +93,16 @@ export const infoForEffect = Effect.fn("Agents.bucket.info")(
  * @throws The original bucket or path failure.
  * @example await infoFor(context, "deepagents/a.md");
  */
-export function infoFor(context: DeepAgentBucketContext, key: string): Promise<FileInfo | undefined> {
-  return Effect.runPromise(infoForEffect(key).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+export function infoFor(
+  context: DeepAgentBucketContext,
+  key: string,
+): Promise<FileInfo | undefined> {
+  return Effect.runPromise(
+    infoForEffect(key).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(deepAgentBucketLayer(context)),
+    ),
+  );
 }
 
 function timestamp(metadata: DeepAgentBucketMetadata, key: string): string {

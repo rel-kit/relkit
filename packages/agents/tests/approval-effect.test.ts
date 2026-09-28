@@ -33,9 +33,7 @@ test("approval operations run through typed Effects and compatibility adapters",
 });
 
 test("expected validation and state errors remain typed and recoverable", () => {
-  const invalid = Effect.runSync(
-    Effect.flip(requiresApprovalEffect("invalid" as never, "write")),
-  );
+  const invalid = Effect.runSync(Effect.flip(requiresApprovalEffect("invalid" as never, "write")));
   expect(invalid).toMatchObject({ _tag: "ApprovalEffectError", code: "RELKIT_APPROVAL_INVALID" });
   expect(() => requiresApproval("invalid" as never, "write")).toThrow(TypeError);
   const pending = createApproval(options);

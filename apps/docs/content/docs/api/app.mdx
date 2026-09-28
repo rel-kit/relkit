@@ -1254,6 +1254,7 @@ type ResolvedPrompt<Descriptor extends PromptDescriptor> = Descriptor["value"];
 - [utils](#utils)
   - [AppConstantRunner (class)](#appconstantrunner-class)
   - [AppConstantRunnerLive](#appconstantrunnerlive)
+  - [AppConstantRunnerPromiseLive](#appconstantrunnerpromiselive)
   - [AppConstantRunnerService](#appconstantrunnerservice)
 
 ---
@@ -1276,7 +1277,7 @@ Effect.provide(resolver.resolveEffect(context), AppConstantRunnerLive);
 declare class AppConstantRunner
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L8)
 
 ## AppConstantRunnerLive
 
@@ -1294,7 +1295,19 @@ Effect.provide(resolver.resolveEffect(context), AppConstantRunnerLive);
 declare const AppConstantRunnerLive: Layer.Layer<AppConstantRunner, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L15)
+
+## AppConstantRunnerPromiseLive
+
+Compatibility runner that passes the caller's exact signal to callbacks.
+
+**Signature**
+
+```ts
+declare const AppConstantRunnerPromiseLive: Layer.Layer<AppConstantRunner, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L27)
 
 ## AppConstantRunnerService
 
@@ -1304,7 +1317,7 @@ declare const AppConstantRunnerLive: Layer.Layer<AppConstantRunner, never, never
 declare const AppConstantRunnerService: AppConstantRunnerService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L4)
 
 ## `context-resolution-service.types.ts`
 
@@ -1335,13 +1348,17 @@ const runner: AppConstantRunnerService = { run: () => Effect.succeed("eu") };
 export interface AppConstantRunnerService {
   /** Invokes a dynamic constant resolver.
    * @param resolver - User supplied constant callback.
-   * @param options - Environment and logger available to the callback.
+   * @param options - Environment, logger, and caller signal available to the callback.
    * @returns The callback result or ContextResolutionFailure.
    * @example runner.run(() => "eu", { env: {}, log });
    */
   readonly run: (
     resolver: ConstantResolver,
-    options: { readonly env: Readonly<Record<string, unknown>>; readonly log: PublicLogger },
+    options: {
+      readonly env: Readonly<Record<string, unknown>>;
+      readonly log: PublicLogger;
+      readonly signal: AbortSignal;
+    },
   ) => Effect.Effect<unknown, ContextResolutionFailure>;
 }
 ```
@@ -1416,7 +1433,7 @@ declare const createApplicationContextResolver: (
 ) => ApplicationContextResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L111)
 
 ## createApplicationContextResolverEffect
 

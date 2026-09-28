@@ -15,33 +15,33 @@ const truncatedCount = Metric.counter("relkit.agents.capture.content.truncated.t
  * @example
  * const record = Effect.runSync(captureAgentContentEffect({ token: "secret" }, policy));
  */
-export const captureAgentContentEffect = Effect.fn("Agents.capture.content")(function* (
-  value: unknown,
-  policy: AgentCapturePolicy,
-) {
-  yield* Metric.update(captureCount, 1);
-  if (policy.mode !== "development-redacted" || value === undefined) return undefined;
-  const maxBytes = policy.maxBytes ?? Number.POSITIVE_INFINITY;
-  let record: AgentCaptureRecord;
-  try {
-    const redacted = redact(value, policy.redactKeys ?? DEFAULT_REDACT_KEYS);
-    const serialized = canonicalJson(redacted);
-    const bytes = new TextEncoder().encode(serialized).byteLength;
-    record =
-      bytes > maxBytes
-        ? Object.freeze({ mode: policy.mode, bytes: maxBytes, truncated: true })
-        : Object.freeze({
-            mode: policy.mode,
-            bytes,
-            truncated: false,
-            content: deepFreeze(JSON.parse(serialized) as JsonValue),
-          });
-  } catch {
-    record = Object.freeze({ mode: policy.mode, bytes: 0, truncated: true });
-  }
-  if (record.truncated) yield* Metric.update(truncatedCount, 1);
-  return record;
-}, (effect) => observeAgent("capture.content", effect));
+export const captureAgentContentEffect = Effect.fn("Agents.capture.content")(
+  function* (value: unknown, policy: AgentCapturePolicy) {
+    yield* Metric.update(captureCount, 1);
+    if (policy.mode !== "development-redacted" || value === undefined) return undefined;
+    const maxBytes = policy.maxBytes ?? Number.POSITIVE_INFINITY;
+    let record: AgentCaptureRecord;
+    try {
+      const redacted = redact(value, policy.redactKeys ?? DEFAULT_REDACT_KEYS);
+      const serialized = canonicalJson(redacted);
+      const bytes = new TextEncoder().encode(serialized).byteLength;
+      record =
+        bytes > maxBytes
+          ? Object.freeze({ mode: policy.mode, bytes: maxBytes, truncated: true })
+          : Object.freeze({
+              mode: policy.mode,
+              bytes,
+              truncated: false,
+              content: deepFreeze(JSON.parse(serialized) as JsonValue),
+            });
+    } catch {
+      record = Object.freeze({ mode: policy.mode, bytes: 0, truncated: true });
+    }
+    if (record.truncated) yield* Metric.update(truncatedCount, 1);
+    return record;
+  },
+  (effect) => observeAgent("capture.content", effect),
+);
 
 /**
  * Captures redacted content for synchronous runtime callers.

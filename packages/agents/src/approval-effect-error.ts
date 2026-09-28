@@ -1,5 +1,9 @@
 import { Schema } from "effect";
-import { ApprovalDeniedError, ApprovalRequiredError, ApprovalStateError } from "./approval-error.js";
+import {
+  ApprovalDeniedError,
+  ApprovalRequiredError,
+  ApprovalStateError,
+} from "./approval-error.js";
 
 /** Tagged failure for an invalid approval or denied execution. */
 export class ApprovalEffectError extends Schema.TaggedError<ApprovalEffectError>()(

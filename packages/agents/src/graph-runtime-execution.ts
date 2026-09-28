@@ -32,13 +32,16 @@ export const runCompiledGraphEffect = Effect.fn("Agents.graph.runCompiled")(
   ) {
     if (signal.aborted) return yield* Effect.fail(graphInvocationFailure(signalFailure(signal)));
     const persistence = yield* resolveGraphPersistenceEffect(
-      options.agent, options.environment ?? {},
+      options.agent,
+      options.environment ?? {},
     ).pipe(Effect.mapError((failure) => graphInvocationFailure(failure.cause)));
-    if (persistence.checkpointer === undefined &&
-      (yield* graphWorkflowRequiresPersistenceEffect(options.agent.workflow))) {
-      return yield* Effect.fail(graphInvocationFailure(
-        new TypeError("Graphs with resumable nodes require a checkpointer"),
-      ));
+    if (
+      persistence.checkpointer === undefined &&
+      (yield* graphWorkflowRequiresPersistenceEffect(options.agent.workflow))
+    ) {
+      return yield* Effect.fail(
+        graphInvocationFailure(new TypeError("Graphs with resumable nodes require a checkpointer")),
+      );
     }
     const graph = yield* compileGraphEffect(options.agent, persistence).pipe(
       Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
@@ -47,24 +50,34 @@ export const runCompiledGraphEffect = Effect.fn("Agents.graph.runCompiled")(
       Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
     );
     const current = yield* Effect.sync(() => currentInvocationScope());
-    const dispatcher = current?.dispatcher ?? (yield* createAgentInvocationDispatcherEffect(
-      options.engine, options, invocationId, traceId, options.parentSpanId, signal,
-    ));
+    const dispatcher =
+      current?.dispatcher ??
+      (yield* createAgentInvocationDispatcherEffect(
+        options.engine,
+        options,
+        invocationId,
+        traceId,
+        options.parentSpanId,
+        signal,
+      ));
     return yield* Effect.tryPromise({
       try: (effectSignal) => {
         const combined = AbortSignal.any([signal, effectSignal]);
-        const scope = current === undefined
-          ? { dispatcher, parent: { id: invocationId, traceId, signal: combined } }
-          : current;
-        return Promise.resolve(runInInvocationScope(scope, () => Effect.runPromise(
-          streamCompiledGraphEffect(
-            options, graph, config, input, combined, maxOutputBytes,
-          ), { signal: combined },
-        )));
+        const scope =
+          current === undefined
+            ? { dispatcher, parent: { id: invocationId, traceId, signal: combined } }
+            : current;
+        return Promise.resolve(
+          runInInvocationScope(scope, () =>
+            Effect.runPromise(
+              streamCompiledGraphEffect(options, graph, config, input, combined, maxOutputBytes),
+              { signal: combined },
+            ),
+          ),
+        );
       },
-      catch: (cause) => graphInvocationFailure(
-        cause instanceof GraphInvocationFailure ? cause.cause : cause,
-      ),
+      catch: (cause) =>
+        graphInvocationFailure(cause instanceof GraphInvocationFailure ? cause.cause : cause),
     });
   },
   (effect) => observeAgent("graph.run-compiled", effect),
@@ -89,8 +102,12 @@ export function runCompiledGraph(
   traceId: string,
   maxOutputBytes: number,
 ): Promise<unknown> {
-  return Effect.runPromise(runCompiledGraphEffect(
-    options, input, signal, invocationId, traceId, maxOutputBytes,
-  ).pipe(Effect.catchTag("GraphInvocationFailure", (failure) =>
-    Effect.fail(signal.aborted ? signalFailure(signal) : failure.cause))), { signal });
+  return Effect.runPromise(
+    runCompiledGraphEffect(options, input, signal, invocationId, traceId, maxOutputBytes).pipe(
+      Effect.catchTag("GraphInvocationFailure", (failure) =>
+        Effect.fail(signal.aborted ? signalFailure(signal) : failure.cause),
+      ),
+    ),
+    { signal },
+  );
 }

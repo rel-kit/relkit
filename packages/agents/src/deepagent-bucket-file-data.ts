@@ -1,4 +1,8 @@
-import type { DeepAgentBucketFileData, DeepAgentBucketMetadata, DeepAgentBucketContext } from "./deepagent-bucket-files.types.js";
+import type {
+  DeepAgentBucketFileData,
+  DeepAgentBucketMetadata,
+  DeepAgentBucketContext,
+} from "./deepagent-bucket-files.types.js";
 import { Clock, Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
@@ -13,7 +17,10 @@ import { bucketKey, isTextMimeType } from "./deepagent-bucket-files.js";
 export const readFileDataEffect = Effect.fn("Agents.bucket.readData")(
   function* (path: string) {
     const context = yield* DeepAgentBucket;
-    const key = yield* Effect.try({ try: () => bucketKey(context, path), catch: deepAgentBucketFailure });
+    const key = yield* Effect.try({
+      try: () => bucketKey(context, path),
+      catch: deepAgentBucketFailure,
+    });
     const [bytes, metadata] = yield* Effect.all([
       Effect.tryPromise({ try: () => context.bucket.get(key), catch: deepAgentBucketFailure }),
       Effect.tryPromise({ try: () => context.bucket.head(key), catch: deepAgentBucketFailure }),
@@ -38,11 +45,16 @@ export const readFileDataEffect = Effect.fn("Agents.bucket.readData")(
  * @throws The original bucket or path failure.
  * @example await readFileData(context, "/a.md");
  */
-export function readFileData(context: DeepAgentBucketContext, path: string): Promise<DeepAgentBucketFileData | undefined> {
-  return Effect.runPromise(readFileDataEffect(path).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+export function readFileData(
+  context: DeepAgentBucketContext,
+  path: string,
+): Promise<DeepAgentBucketFileData | undefined> {
+  return Effect.runPromise(
+    readFileDataEffect(path).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(deepAgentBucketLayer(context)),
+    ),
+  );
 }
 
 /** Writes file content with timestamps from the Effect clock.
@@ -54,7 +66,10 @@ export function readFileData(context: DeepAgentBucketContext, path: string): Pro
 export const putFileDataEffect = Effect.fn("Agents.bucket.writeData")(
   function* (path: string, content: string | Uint8Array) {
     const context = yield* DeepAgentBucket;
-    const key = yield* Effect.try({ try: () => bucketKey(context, path), catch: deepAgentBucketFailure });
+    const key = yield* Effect.try({
+      try: () => bucketKey(context, path),
+      catch: deepAgentBucketFailure,
+    });
     const previous = yield* Effect.tryPromise({
       try: () => context.bucket.head(key),
       catch: deepAgentBucketFailure,
@@ -62,17 +77,18 @@ export const putFileDataEffect = Effect.fn("Agents.bucket.writeData")(
     const now = new Date(yield* Clock.currentTimeMillis).toISOString();
     const mimeType = mimeTypeFor(path);
     const bytes = yield* Effect.try({
-      try: () => typeof content === "string" ? encodeContent(content, mimeType) : content,
+      try: () => (typeof content === "string" ? encodeContent(content, mimeType) : content),
       catch: deepAgentBucketFailure,
     });
     yield* Effect.tryPromise({
-      try: () => context.bucket.put(key, bytes, {
-        contentType: mimeType,
-        metadata: {
-          "deepagents-created-at": timestamp(previous, "deepagents-created-at", now),
-          "deepagents-modified-at": now,
-        },
-      }),
+      try: () =>
+        context.bucket.put(key, bytes, {
+          contentType: mimeType,
+          metadata: {
+            "deepagents-created-at": timestamp(previous, "deepagents-created-at", now),
+            "deepagents-modified-at": now,
+          },
+        }),
       catch: deepAgentBucketFailure,
     });
   },
@@ -87,11 +103,17 @@ export const putFileDataEffect = Effect.fn("Agents.bucket.writeData")(
  * @throws The original bucket or path failure.
  * @example await putFileData(context, "/a.md", "hi");
  */
-export function putFileData(context: DeepAgentBucketContext, path: string, content: string | Uint8Array): Promise<void> {
-  return Effect.runPromise(putFileDataEffect(path, content).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+export function putFileData(
+  context: DeepAgentBucketContext,
+  path: string,
+  content: string | Uint8Array,
+): Promise<void> {
+  return Effect.runPromise(
+    putFileDataEffect(path, content).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(deepAgentBucketLayer(context)),
+    ),
+  );
 }
 
 function encodeContent(content: string, mimeType: string): Uint8Array {
@@ -102,7 +124,11 @@ function encodeContent(content: string, mimeType: string): Uint8Array {
   return Uint8Array.fromBase64(payload.replaceAll(/\s/g, ""));
 }
 
-function timestamp(metadata: DeepAgentBucketMetadata | undefined, key: string, fallback = new Date(0).toISOString()): string {
+function timestamp(
+  metadata: DeepAgentBucketMetadata | undefined,
+  key: string,
+  fallback = new Date(0).toISOString(),
+): string {
   return metadata?.metadata?.[key] ?? fallback;
 }
 
@@ -113,7 +139,8 @@ function mimeTypeFor(path: string): string {
   }
   if (extension === ".pdf") return "application/pdf";
   if (extension === ".json") return "application/json";
-  if (extension === ".js" || extension === ".mjs" || extension === ".cjs") return "application/javascript";
+  if (extension === ".js" || extension === ".mjs" || extension === ".cjs")
+    return "application/javascript";
   if (extension === ".svg") return "image/svg+xml";
   if (extension === ".md" || extension === ".markdown") return "text/markdown";
   return "text/plain";

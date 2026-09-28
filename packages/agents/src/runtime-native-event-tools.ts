@@ -26,8 +26,8 @@ export const emitToolEventEffect = Effect.fn("Agents.runtime.emitNativeToolEvent
     toolNames: Map<string, string>,
     signal: AbortSignal,
   ) {
-    if (event.method !== "tools" || sink?.emitTool === undefined ||
-      !isRecord(event.params.data)) return;
+    if (event.method !== "tools" || sink?.emitTool === undefined || !isRecord(event.params.data))
+      return;
     const data = event.params.data;
     const callId = data.tool_call_id;
     if (typeof callId !== "string") return;
@@ -41,10 +41,18 @@ export const emitToolEventEffect = Effect.fn("Agents.runtime.emitNativeToolEvent
       return Effect.tryPromise({
         try: (effectSignal) => {
           const combined = AbortSignal.any([signal, effectSignal]);
-          return withSignal(sink.emitTool!({
-            toolCallId: callId, toolId, state,
-            ...(value === undefined ? {} : { value }),
-          }, combined), combined);
+          return withSignal(
+            sink.emitTool!(
+              {
+                toolCallId: callId,
+                toolId,
+                state,
+                ...(value === undefined ? {} : { value }),
+              },
+              combined,
+            ),
+            combined,
+          );
         },
         catch: agentInvocationFailure,
       });
@@ -81,9 +89,12 @@ export function emitToolEvent(
   toolNames: Map<string, string>,
   signal: AbortSignal,
 ): Promise<void> {
-  return Effect.runPromise(emitToolEventEffect(
-    event, sink, toolIds, relkitNames, toolNames, signal,
-  ).pipe(Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause))), { signal });
+  return Effect.runPromise(
+    emitToolEventEffect(event, sink, toolIds, relkitNames, toolNames, signal).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+    { signal },
+  );
 }
 
 function toolState(event: unknown, output: unknown): ToolPartState | undefined {
@@ -93,8 +104,12 @@ function toolState(event: unknown, output: unknown): ToolPartState | undefined {
 }
 
 function isSafeToolError(value: unknown): boolean {
-  return isRecord(value) && isRecord(value.error) &&
-    typeof value.error.code === "string" && value.error.message === "Tool call failed";
+  return (
+    isRecord(value) &&
+    isRecord(value.error) &&
+    typeof value.error.code === "string" &&
+    value.error.message === "Tool call failed"
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

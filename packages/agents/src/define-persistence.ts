@@ -26,10 +26,11 @@ export {
  * @example Effect.runSync(defineCheckpointerDbEffect({ id: "db", client: saver }));
  */
 export const defineCheckpointerDbEffect = Effect.fn("Agents.persistence.defineCheckpointer")(
-  <Value extends BaseCheckpointSaver>(options: PersistenceOptions<Value>) => Effect.try({
-    try: () => buildAgentStorageResource("checkpointer", options),
-    catch: agentPersistenceFailure,
-  }),
+  <Value extends BaseCheckpointSaver>(options: PersistenceOptions<Value>) =>
+    Effect.try({
+      try: () => buildAgentStorageResource("checkpointer", options),
+      catch: agentPersistenceFailure,
+    }),
   (effect) => observeAgent("persistence.define-checkpointer", effect),
 );
 
@@ -42,9 +43,11 @@ export const defineCheckpointerDbEffect = Effect.fn("Agents.persistence.defineCh
 export function defineCheckpointerDb<Value extends BaseCheckpointSaver>(
   options: PersistenceOptions<Value>,
 ): CheckpointerResource<Value> {
-  return Effect.runSync(defineCheckpointerDbEffect(options).pipe(
-    Effect.catchTag("AgentPersistenceFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    defineCheckpointerDbEffect(options).pipe(
+      Effect.catchTag("AgentPersistenceFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Defines a lazily acquired memory store resource.
@@ -53,10 +56,11 @@ export function defineCheckpointerDb<Value extends BaseCheckpointSaver>(
  * @example Effect.runSync(defineMemoryDbEffect({ id: "memory", client: store }));
  */
 export const defineMemoryDbEffect = Effect.fn("Agents.persistence.defineMemory")(
-  <Value extends BaseStore>(options: PersistenceOptions<Value>) => Effect.try({
-    try: () => buildAgentStorageResource("memory", options),
-    catch: agentPersistenceFailure,
-  }),
+  <Value extends BaseStore>(options: PersistenceOptions<Value>) =>
+    Effect.try({
+      try: () => buildAgentStorageResource("memory", options),
+      catch: agentPersistenceFailure,
+    }),
   (effect) => observeAgent("persistence.define-memory", effect),
 );
 
@@ -69,9 +73,11 @@ export const defineMemoryDbEffect = Effect.fn("Agents.persistence.defineMemory")
 export function defineMemoryDb<Value extends BaseStore>(
   options: PersistenceOptions<Value>,
 ): MemoryResource<Value> {
-  return Effect.runSync(defineMemoryDbEffect(options).pipe(
-    Effect.catchTag("AgentPersistenceFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    defineMemoryDbEffect(options).pipe(
+      Effect.catchTag("AgentPersistenceFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function buildAgentStorageResource<Kind extends "checkpointer" | "memory", Value>(

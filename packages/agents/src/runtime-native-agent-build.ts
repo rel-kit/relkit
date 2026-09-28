@@ -8,7 +8,10 @@ import { hasDeepAgentCapabilities } from "./define-agent-deep.js";
 import { resolveAgentPersistenceEffect } from "./graph-persistence.js";
 import { AgentInvocationFailure, agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
-import type { CreateNativeAgentOptions, NativeAgentRuntimeOptions } from "./runtime-native-agent.types.js";
+import type {
+  CreateNativeAgentOptions,
+  NativeAgentRuntimeOptions,
+} from "./runtime-native-agent.types.js";
 import { createNativeToolsEffect, type NativeTools } from "./runtime-native-tools.js";
 import { NativeToolIdentity } from "./runtime-native-tools-identity.js";
 import { nativeInstructionsEffect } from "./runtime-native-support.js";
@@ -21,30 +24,53 @@ import { resolveRuntimeModelEffect } from "./runtime-model.js";
  * @returns An Effect with native tools or AgentInvocationFailure.
  * @example Effect.runSync(createToolsForAgentEffect(runtime, options, child));
  */
-export const createToolsForAgentEffect = Effect.fn("Agents.runtime.createAgentTools")((
-  runtime: NativeAgentRuntimeOptions,
-  options: CreateNativeAgentOptions,
-  agent: AgentDescriptor<string, unknown, unknown>,
-) => createNativeToolsEffect(
-  { ...runtime, agent }, options.signal, options.maxOutputBytes, options.invocationId, options.traceId,
-), (effect) => observeAgent("runtime.create-agent-tools", effect));
+export const createToolsForAgentEffect = Effect.fn("Agents.runtime.createAgentTools")(
+  (
+    runtime: NativeAgentRuntimeOptions,
+    options: CreateNativeAgentOptions,
+    agent: AgentDescriptor<string, unknown, unknown>,
+  ) =>
+    createNativeToolsEffect(
+      { ...runtime, agent },
+      options.signal,
+      options.maxOutputBytes,
+      options.invocationId,
+      options.traceId,
+    ),
+  (effect) => observeAgent("runtime.create-agent-tools", effect),
+);
 
 /** Creates the native structured output strategy.
  * @param schema - Authored output validator.
  * @returns An Effect with a strategy or AgentInvocationFailure.
  * @example Effect.runSync(responseFormatEffect(output));
  */
-export const responseFormatEffect = Effect.fn("Agents.runtime.responseFormat")((schema: StandardSchemaV1) =>
-  Effect.try({ try: () => {
-    const projection = getJsonSchema(schema);
-    if (!projection.ok) {
-      throw new AgentRuntimeError("RELKIT_SCHEMA_UNAVAILABLE", "Agent output schema is unavailable");
-    }
-    return toolStrategy({
-      title: "relkit_output", type: "object",
-      properties: { value: projection.schema }, required: ["value"], additionalProperties: false,
-    }, { handleError: false });
-  }, catch: agentInvocationFailure }), (effect) => observeAgent("runtime.response-format", effect));
+export const responseFormatEffect = Effect.fn("Agents.runtime.responseFormat")(
+  (schema: StandardSchemaV1) =>
+    Effect.try({
+      try: () => {
+        const projection = getJsonSchema(schema);
+        if (!projection.ok) {
+          throw new AgentRuntimeError(
+            "RELKIT_SCHEMA_UNAVAILABLE",
+            "Agent output schema is unavailable",
+          );
+        }
+        return toolStrategy(
+          {
+            title: "relkit_output",
+            type: "object",
+            properties: { value: projection.schema },
+            required: ["value"],
+            additionalProperties: false,
+          },
+          { handleError: false },
+        );
+      },
+      catch: agentInvocationFailure,
+    }),
+  (effect) => observeAgent("runtime.response-format", effect),
+);
 
 /** Resolves a child model or inherits its parent model.
  * @param child - Child descriptor.
@@ -61,7 +87,9 @@ export const childModelEffect = Effect.fn("Agents.runtime.childModel")(
   ) {
     if (child.model === undefined) return inherited;
     const resolved = yield* resolveRuntimeModelEffect({
-      model: child.model, registry: runtime.modelRegistry, environment: runtime.environment ?? {},
+      model: child.model,
+      registry: runtime.modelRegistry,
+      environment: runtime.environment ?? {},
     }).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)));
     return resolved.model;
   },
@@ -90,9 +118,17 @@ export const createSubagentsEffect = Effect.fn("Agents.runtime.createSubagents")
     groups: NativeTools[],
     deepagents: typeof import("deepagents"),
     limitMiddleware: AnyAgentMiddleware,
-  ) => createSubagentsCore(
-    children, inheritedModel, inheritedBackend, runtime, options, groups, deepagents, limitMiddleware,
-  ),
+  ) =>
+    createSubagentsCore(
+      children,
+      inheritedModel,
+      inheritedBackend,
+      runtime,
+      options,
+      groups,
+      deepagents,
+      limitMiddleware,
+    ),
   (effect) => observeAgent("runtime.create-subagents", effect),
 );
 
@@ -115,8 +151,14 @@ function createSubagentsCore(
       const instructions = yield* nativeInstructionsEffect(child);
       const format = yield* responseFormatEffect(child.output);
       const common = {
-        name: child.id, model, systemPrompt: instructions, tools: [...childTools.values],
-        middleware: [...(child.middleware as unknown as readonly AnyAgentMiddleware[]), limitMiddleware],
+        name: child.id,
+        model,
+        systemPrompt: instructions,
+        tools: [...childTools.values],
+        middleware: [
+          ...(child.middleware as unknown as readonly AnyAgentMiddleware[]),
+          limitMiddleware,
+        ],
         responseFormat: format,
       };
       if (!hasDeepAgentCapabilities(child)) {
@@ -124,25 +166,38 @@ function createSubagentsCore(
         continue;
       }
       const backend = child.backend ?? inheritedBackend;
-      const persistence = yield* resolveAgentPersistenceEffect(child, runtime.environment ?? {}).pipe(
-        Effect.mapError((failure) => agentInvocationFailure(failure.cause)),
-      );
+      const persistence = yield* resolveAgentPersistenceEffect(
+        child,
+        runtime.environment ?? {},
+      ).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)));
       const nested = yield* createSubagentsCore(
-        child.subagents ?? [], model, backend, runtime, options, groups, deepagents, limitMiddleware,
+        child.subagents ?? [],
+        model,
+        backend,
+        runtime,
+        options,
+        groups,
+        deepagents,
+        limitMiddleware,
       );
-      subagents.push(yield* Effect.try({
-        try: () => ({
-          name: child.id, description: child.description ?? child.title ?? child.id,
-          runnable: deepagents.createDeepAgent({
-            ...common, ...persistence, subagents: nested,
-            ...(child.skills === undefined ? {} : { skills: [...child.skills] }),
-            ...(child.memory === undefined ? {} : { memory: [...child.memory] }),
-            ...(backend === undefined ? {} : { backend }),
-            ...(child.interruptOn === undefined ? {} : { interruptOn: child.interruptOn }),
-          } as never),
+      subagents.push(
+        yield* Effect.try({
+          try: () => ({
+            name: child.id,
+            description: child.description ?? child.title ?? child.id,
+            runnable: deepagents.createDeepAgent({
+              ...common,
+              ...persistence,
+              subagents: nested,
+              ...(child.skills === undefined ? {} : { skills: [...child.skills] }),
+              ...(child.memory === undefined ? {} : { memory: [...child.memory] }),
+              ...(backend === undefined ? {} : { backend }),
+              ...(child.interruptOn === undefined ? {} : { interruptOn: child.interruptOn }),
+            } as never),
+          }),
+          catch: agentInvocationFailure,
         }),
-        catch: agentInvocationFailure,
-      }));
+      );
     }
     return subagents;
   });

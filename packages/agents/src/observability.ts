@@ -3,8 +3,12 @@ import { observeAgent } from "./agent-telemetry.js";
 import type { AgentObservedEdge, AgentRuntimeHooks } from "./observability.types.js";
 
 export {
-  captureAgentContent, captureAgentContentEffect, createAgentCapturePolicy,
-  createAgentCapturePolicyEffect, createAgentSpanCapture, createAgentSpanCaptureEffect,
+  captureAgentContent,
+  captureAgentContentEffect,
+  createAgentCapturePolicy,
+  createAgentCapturePolicyEffect,
+  createAgentSpanCapture,
+  createAgentSpanCaptureEffect,
   AgentCapturePolicyError,
 } from "./capture.js";
 export type { AgentCapturePolicy, AgentCaptureRecord, AgentSpanCapture } from "./capture.js";
@@ -20,24 +24,25 @@ export const AGENT_OBSERVABILITY_VERSION = 1 as const;
  * @returns An Effect with void; hook errors are intentionally suppressed.
  * @example Effect.runSync(emitAgentEdgeEffect(hooks, edge));
  */
-export const emitAgentEdgeEffect = Effect.fn("Agents.observability.emitEdge")((
-  hooks: AgentRuntimeHooks | undefined,
-  edge: AgentObservedEdge,
-) => Effect.sync(() => {
-  const safe = Object.freeze({ ...edge });
-  try {
-    hooks?.onObservedEdge?.(safe);
-  } catch {}
-  try {
-    const result = hooks?.observability?.emit({
-      protocol: AGENT_OBSERVABILITY_PROTOCOL,
-      version: AGENT_OBSERVABILITY_VERSION,
-      type: "edge.observed",
-      edge: safe,
-    });
-    if (result !== undefined) void Promise.resolve(result).catch(() => undefined);
-  } catch {}
-}), (effect) => observeAgent("observability.emit-edge", effect));
+export const emitAgentEdgeEffect = Effect.fn("Agents.observability.emitEdge")(
+  (hooks: AgentRuntimeHooks | undefined, edge: AgentObservedEdge) =>
+    Effect.sync(() => {
+      const safe = Object.freeze({ ...edge });
+      try {
+        hooks?.onObservedEdge?.(safe);
+      } catch {}
+      try {
+        const result = hooks?.observability?.emit({
+          protocol: AGENT_OBSERVABILITY_PROTOCOL,
+          version: AGENT_OBSERVABILITY_VERSION,
+          type: "edge.observed",
+          edge: safe,
+        });
+        if (result !== undefined) void Promise.resolve(result).catch(() => undefined);
+      } catch {}
+    }),
+  (effect) => observeAgent("observability.emit-edge", effect),
+);
 
 /** Emits an observed relationship for existing synchronous tracing callers.
  * @param hooks - Optional tracing hooks.

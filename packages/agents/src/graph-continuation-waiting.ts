@@ -42,9 +42,11 @@ export function waitingInterrupts(
   descriptor: GraphDescriptor,
   config: GraphConfig,
 ): Promise<readonly GraphWaitingInterrupt[]> {
-  return Effect.runPromise(waitingInterruptsEffect(graph, descriptor, config).pipe(
-    Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    waitingInterruptsEffect(graph, descriptor, config).pipe(
+      Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function snapshotInterrupts(

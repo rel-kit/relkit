@@ -14,15 +14,25 @@ export const selectedStateEffect = Effect.fn("Agents.runtime.selectedState")(
     if (!isRecord(value) || schemas.size === 0) return undefined;
     const direct = yield* selectEffect(value, schemas);
     if (Object.keys(direct).length > 0) return direct;
-    const outcomes = yield* Effect.forEach(Object.entries(value), ([name, update]) =>
-      Effect.result(isRecord(update)
-        ? selectEffect(update, schemas).pipe(Effect.map((selected) =>
-          Object.keys(selected).length === 0 ? undefined : [name, selected] as const))
-        : Effect.succeed(undefined)), { concurrency: 8 });
+    const outcomes = yield* Effect.forEach(
+      Object.entries(value),
+      ([name, update]) =>
+        Effect.result(
+          isRecord(update)
+            ? selectEffect(update, schemas).pipe(
+                Effect.map((selected) =>
+                  Object.keys(selected).length === 0 ? undefined : ([name, selected] as const),
+                ),
+              )
+            : Effect.succeed(undefined),
+        ),
+      { concurrency: 8 },
+    );
     const firstFailure = outcomes.find(Result.isFailure);
     if (firstFailure !== undefined) return yield* Effect.fail(firstFailure.failure);
-    const entries = outcomes.flatMap((outcome) => Result.isSuccess(outcome) && outcome.success !== undefined
-      ? [outcome.success] : []);
+    const entries = outcomes.flatMap((outcome) =>
+      Result.isSuccess(outcome) && outcome.success !== undefined ? [outcome.success] : [],
+    );
     return entries.length === 0 ? undefined : Object.fromEntries(entries);
   },
   (effect) => observeAgent("runtime.selected-state", effect),
@@ -36,16 +46,25 @@ export const selectedStateEffect = Effect.fn("Agents.runtime.selectedState")(
  */
 export const selectEffect = Effect.fn("Agents.runtime.selectStateFields")(
   function* (value: Record<string, unknown>, schemas: ReadonlyMap<string, StandardSchemaV1>) {
-    const outcomes = yield* Effect.forEach([...schemas], ([key, schema]) =>
-      Effect.result(value[key] === undefined
-        ? Effect.succeed(undefined)
-        : validateValueEffect(schema, value[key], "output").pipe(
-            Effect.map((projected) => [key, projected] as const),
-          )), { concurrency: 8 });
+    const outcomes = yield* Effect.forEach(
+      [...schemas],
+      ([key, schema]) =>
+        Effect.result(
+          value[key] === undefined
+            ? Effect.succeed(undefined)
+            : validateValueEffect(schema, value[key], "output").pipe(
+                Effect.map((projected) => [key, projected] as const),
+              ),
+        ),
+      { concurrency: 8 },
+    );
     const firstFailure = outcomes.find(Result.isFailure);
     if (firstFailure !== undefined) return yield* Effect.fail(firstFailure.failure);
-    return Object.fromEntries(outcomes.flatMap((outcome) =>
-      Result.isSuccess(outcome) && outcome.success !== undefined ? [outcome.success] : []));
+    return Object.fromEntries(
+      outcomes.flatMap((outcome) =>
+        Result.isSuccess(outcome) && outcome.success !== undefined ? [outcome.success] : [],
+      ),
+    );
   },
   (effect) => observeAgent("runtime.select-state-fields", effect),
 );

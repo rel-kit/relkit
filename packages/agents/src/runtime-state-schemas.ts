@@ -9,10 +9,14 @@ import { agentInvocationFailure } from "./runtime-effect-error.js";
  * @returns An Effect with validators or AgentInvocationFailure.
  * @example Effect.runSync(selectedStateSchemasEffect([state], ["answer"]));
  */
-export const selectedStateSchemasEffect = Effect.fn("Agents.runtime.selectedStateSchemas")((
-  sources: readonly unknown[], selected: readonly string[],
-) => Effect.try({ try: () => selectedStateSchemasCore(sources, selected), catch: agentInvocationFailure }),
-  (effect) => observeAgent("runtime.selected-state-schemas", effect));
+export const selectedStateSchemasEffect = Effect.fn("Agents.runtime.selectedStateSchemas")(
+  (sources: readonly unknown[], selected: readonly string[]) =>
+    Effect.try({
+      try: () => selectedStateSchemasCore(sources, selected),
+      catch: agentInvocationFailure,
+    }),
+  (effect) => observeAgent("runtime.selected-state-schemas", effect),
+);
 
 /** Resolves public state validators for existing synchronous callers.
  * @param sources - State schema sources in precedence order.
@@ -25,13 +29,16 @@ export function selectedStateSchemas(
   sources: readonly unknown[],
   selected: readonly string[],
 ): ReadonlyMap<string, StandardSchemaV1> {
-  return Effect.runSync(selectedStateSchemasEffect(sources, selected).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    selectedStateSchemasEffect(sources, selected).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function selectedStateSchemasCore(
-  sources: readonly unknown[], selected: readonly string[],
+  sources: readonly unknown[],
+  selected: readonly string[],
 ): ReadonlyMap<string, StandardSchemaV1> {
   const schemas = new Map<string, StandardSchemaV1>();
   for (const source of sources) {

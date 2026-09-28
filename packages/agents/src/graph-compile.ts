@@ -29,10 +29,16 @@ export const runGraphRouteEffect = Effect.fn("Agents.graph.route")(
     destinations?: Readonly<Record<string, Id | "__end__">>,
   ) {
     const destination = yield* Effect.tryPromise({
-      try: (effectSignal) => Promise.resolve(route(state, {
-        ...config,
-        signal: config.signal === undefined ? effectSignal : AbortSignal.any([config.signal, effectSignal]),
-      })),
+      try: (effectSignal) =>
+        Promise.resolve(
+          route(state, {
+            ...config,
+            signal:
+              config.signal === undefined
+                ? effectSignal
+                : AbortSignal.any([config.signal, effectSignal]),
+          }),
+        ),
       catch: graphCompilationFailure,
     });
     yield* Effect.try({
@@ -51,41 +57,46 @@ export const runGraphRouteEffect = Effect.fn("Agents.graph.route")(
  * @example Effect.runSync(compileGraphEffect(graph));
  */
 export const compileGraphEffect = Effect.fn("Agents.graph.compile")(
-  (descriptor: GraphDescriptor, persistence: ResolvedGraphPersistence = {}) => Effect.try({
-    try: () => {
-      const execution = graphExecution(descriptor);
-      const native = new StateGraph({
-        state: execution.state,
-        input: selectGraphState(execution.state, descriptor.input),
-        output: selectGraphState(execution.state, descriptor.output),
-      }) as any;
-      const ids = new Set(descriptor.nodes.map((node) => node.id));
-      for (const node of descriptor.nodes) {
-        native.addNode(node.id, nodeAction(node), {
-          ...((isGraphNodeDescriptor(node) || isSubgraphNode(node)) && node.ends.length > 0
-            ? { ends: node.ends }
-            : {}),
-        });
-      }
-      for (const edge of execution.operations) {
-        if (edge.kind === "edge") {
-          native.addEdge(edge.start, edge.end);
-          continue;
+  (descriptor: GraphDescriptor, persistence: ResolvedGraphPersistence = {}) =>
+    Effect.try({
+      try: () => {
+        const execution = graphExecution(descriptor);
+        const native = new StateGraph({
+          state: execution.state,
+          input: selectGraphState(execution.state, descriptor.input),
+          output: selectGraphState(execution.state, descriptor.output),
+        }) as any;
+        const ids = new Set(descriptor.nodes.map((node) => node.id));
+        for (const node of descriptor.nodes) {
+          native.addNode(node.id, nodeAction(node), {
+            ...((isGraphNodeDescriptor(node) || isSubgraphNode(node)) && node.ends.length > 0
+              ? { ends: node.ends }
+              : {}),
+          });
         }
-        const route = (state: unknown, config: LangGraphRunnableConfig) =>
-          Effect.runPromise(runGraphRouteEffect(edge.route, state, config, ids, edge.destinations).pipe(
-            Effect.catchTag("GraphCompilationFailure", (failure) => Effect.fail(failure.cause)),
-          ));
-        native.addConditionalEdges(edge.source, route, edge.destinations);
-      }
-      return native.compile({
-        name: descriptor.id,
-        ...(persistence.checkpointer === undefined ? {} : { checkpointer: persistence.checkpointer }),
-        ...(persistence.store === undefined ? {} : { store: persistence.store }),
-      });
-    },
-    catch: graphCompilationFailure,
-  }),
+        for (const edge of execution.operations) {
+          if (edge.kind === "edge") {
+            native.addEdge(edge.start, edge.end);
+            continue;
+          }
+          const route = (state: unknown, config: LangGraphRunnableConfig) =>
+            Effect.runPromise(
+              runGraphRouteEffect(edge.route, state, config, ids, edge.destinations).pipe(
+                Effect.catchTag("GraphCompilationFailure", (failure) => Effect.fail(failure.cause)),
+              ),
+            );
+          native.addConditionalEdges(edge.source, route, edge.destinations);
+        }
+        return native.compile({
+          name: descriptor.id,
+          ...(persistence.checkpointer === undefined
+            ? {}
+            : { checkpointer: persistence.checkpointer }),
+          ...(persistence.store === undefined ? {} : { store: persistence.store }),
+        });
+      },
+      catch: graphCompilationFailure,
+    }),
   (effect) => observeAgent("graph.compile", effect),
 );
 
@@ -96,10 +107,15 @@ export const compileGraphEffect = Effect.fn("Agents.graph.compile")(
  * @throws The original compilation error.
  * @example const runnable = compileGraph(graph);
  */
-export function compileGraph(descriptor: GraphDescriptor, persistence: ResolvedGraphPersistence = {}) {
-  return Effect.runSync(compileGraphEffect(descriptor, persistence).pipe(
-    Effect.catchTag("GraphCompilationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+export function compileGraph(
+  descriptor: GraphDescriptor,
+  persistence: ResolvedGraphPersistence = {},
+) {
+  return Effect.runSync(
+    compileGraphEffect(descriptor, persistence).pipe(
+      Effect.catchTag("GraphCompilationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function nodeAction(node: GraphNodeLike) {

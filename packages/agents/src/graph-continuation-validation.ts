@@ -15,7 +15,11 @@ import { graphContinuationFailure } from "./graph-continuation-error.js";
  * @example Effect.runPromise(validateGraphResumeInputEffect(graph, requests, reply));
  */
 export const validateGraphResumeInputEffect = Effect.fn("Agents.graph.validateResume")(
-  function* (descriptor: GraphDescriptor, requests: readonly AgentWaitingRequest[], value: unknown) {
+  function* (
+    descriptor: GraphDescriptor,
+    requests: readonly AgentWaitingRequest[],
+    value: unknown,
+  ) {
     yield* Effect.try({
       try: () => {
         if (requests.length === 0) throw new TypeError("Graph has no waiting continuation");
@@ -34,15 +38,18 @@ export const validateGraphResumeInputEffect = Effect.fn("Agents.graph.validateRe
     const values = value as readonly unknown[];
     const outcomes = yield* Effect.forEach(
       requests,
-      (request, index) => Effect.result(Effect.tryPromise({
-        try: () => validateRequest(descriptor, request, values[index]),
-        catch: graphContinuationFailure,
-      })),
+      (request, index) =>
+        Effect.result(
+          Effect.tryPromise({
+            try: () => validateRequest(descriptor, request, values[index]),
+            catch: graphContinuationFailure,
+          }),
+        ),
       { concurrency: 8 },
     );
     const firstFailure = outcomes.find(Result.isFailure);
     if (firstFailure !== undefined) return yield* Effect.fail(firstFailure.failure);
-    return outcomes.map((outcome) => Result.isSuccess(outcome) ? outcome.success : undefined);
+    return outcomes.map((outcome) => (Result.isSuccess(outcome) ? outcome.success : undefined));
   },
   (effect) => observeAgent("graph.validate-resume", effect),
 );
@@ -60,9 +67,11 @@ export function validateGraphResumeInput(
   requests: readonly AgentWaitingRequest[],
   value: unknown,
 ): Promise<unknown> {
-  return Effect.runPromise(validateGraphResumeInputEffect(descriptor, requests, value).pipe(
-    Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    validateGraphResumeInputEffect(descriptor, requests, value).pipe(
+      Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 async function validateRequest(
@@ -77,7 +86,10 @@ async function validateRequest(
   return validateValue(node.resume, value, "input");
 }
 
-function resumeNode(descriptor: GraphDescriptor, path: readonly string[]): GraphNodeLike | undefined {
+function resumeNode(
+  descriptor: GraphDescriptor,
+  path: readonly string[],
+): GraphNodeLike | undefined {
   const [head, ...tail] = path;
   const node = descriptor.nodes.find((candidate) => candidate.id === head);
   if (tail.length === 0) return node;

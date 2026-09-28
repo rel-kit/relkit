@@ -8,15 +8,17 @@ import {
 
 test("model resolution Effect uses a supplied factory and environment", async () => {
   const model = { invoke: () => undefined };
-  const resolved = await Effect.runPromise(resolveRuntimeModelEffect({
-    model: (environment) => {
-      expect(environment.API_KEY).toBe("test");
-      return model;
-    },
-    registry: null,
-    environment: { API_KEY: "test" },
-    maxInputBytes: 1024,
-  }));
+  const resolved = await Effect.runPromise(
+    resolveRuntimeModelEffect({
+      model: (environment) => {
+        expect(environment.API_KEY).toBe("test");
+        return model;
+      },
+      registry: null,
+      environment: { API_KEY: "test" },
+      maxInputBytes: 1024,
+    }),
+  );
   expect(resolved.model).toBe(model);
   expect(resolved.maxInputBytes).toBe(1024);
   expect(Effect.runSync(resolveAgentContentLimitsEffect({}))).toEqual({

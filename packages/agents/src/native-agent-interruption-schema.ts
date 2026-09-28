@@ -1,7 +1,11 @@
 import type { JsonValue } from "@relkit/contracts";
 import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
-import type { DecisionType, HitlRequest, ReviewConfig } from "./native-agent-interruption-schema.types.js";
+import type {
+  DecisionType,
+  HitlRequest,
+  ReviewConfig,
+} from "./native-agent-interruption-schema.types.js";
 
 export type * from "./native-agent-interruption-schema.types.js";
 
@@ -11,24 +15,25 @@ export type * from "./native-agent-interruption-schema.types.js";
  * @example Effect.runSync(hitlResponseSchemaEffect(configs));
  */
 export const hitlResponseSchemaEffect = Effect.fn("Agents.nativeHitl.responseSchema")(
-  (configs: readonly ReviewConfig[]) => Effect.sync((): JsonValue => ({
-    type: "object",
-    properties: {
-      decisions: {
-        type: "array",
-        prefixItems: configs.map(({ actionName, allowedDecisions, argsSchema }) => ({
-          oneOf: allowedDecisions.map((decision) =>
-            decisionSchema(decision, actionName, argsSchema),
-          ),
-        })),
-        items: false,
-        minItems: configs.length,
-        maxItems: configs.length,
+  (configs: readonly ReviewConfig[]) =>
+    Effect.sync((): JsonValue => ({
+      type: "object",
+      properties: {
+        decisions: {
+          type: "array",
+          prefixItems: configs.map(({ actionName, allowedDecisions, argsSchema }) => ({
+            oneOf: allowedDecisions.map((decision) =>
+              decisionSchema(decision, actionName, argsSchema),
+            ),
+          })),
+          items: false,
+          minItems: configs.length,
+          maxItems: configs.length,
+        },
       },
-    },
-    required: ["decisions"],
-    additionalProperties: false,
-  })),
+      required: ["decisions"],
+      additionalProperties: false,
+    })),
   (effect) => observeAgent("native-hitl.response-schema", effect),
 );
 
@@ -47,21 +52,23 @@ export function hitlResponseSchema(configs: readonly ReviewConfig[]): JsonValue 
  * @example Effect.runSync(isHitlRequestEffect(value));
  */
 export const isHitlRequestEffect = Effect.fn("Agents.nativeHitl.isRequest")(
-  (value: unknown) => Effect.sync(() => (
-    recordShape(value) &&
-    Array.isArray(value.actionRequests) &&
-    value.actionRequests.every(recordShape) &&
-    Array.isArray(value.reviewConfigs) &&
-    value.actionRequests.length === value.reviewConfigs.length &&
-    value.reviewConfigs.every(
-      (config) =>
-        recordShape(config) &&
-        typeof config.actionName === "string" &&
-        Array.isArray(config.allowedDecisions) &&
-        config.allowedDecisions.length > 0 &&
-        config.allowedDecisions.every(decisionShape),
-    )
-  )),
+  (value: unknown) =>
+    Effect.sync(
+      () =>
+        recordShape(value) &&
+        Array.isArray(value.actionRequests) &&
+        value.actionRequests.every(recordShape) &&
+        Array.isArray(value.reviewConfigs) &&
+        value.actionRequests.length === value.reviewConfigs.length &&
+        value.reviewConfigs.every(
+          (config) =>
+            recordShape(config) &&
+            typeof config.actionName === "string" &&
+            Array.isArray(config.allowedDecisions) &&
+            config.allowedDecisions.length > 0 &&
+            config.allowedDecisions.every(decisionShape),
+        ),
+    ),
   (effect) => observeAgent("native-hitl.is-request", effect),
 );
 
@@ -80,18 +87,19 @@ export function isHitlRequest(value: unknown): value is HitlRequest {
  * @example Effect.runSync(publicHitlRequestEffect(request));
  */
 export const publicHitlRequestEffect = Effect.fn("Agents.nativeHitl.publicRequest")(
-  (value: HitlRequest) => Effect.sync((): HitlRequest => ({
-    actionRequests: value.actionRequests.map((action) => ({
-      name: action.name,
-      args: action.args,
-      ...(typeof action.description === "string" ? { description: action.description } : {}),
+  (value: HitlRequest) =>
+    Effect.sync((): HitlRequest => ({
+      actionRequests: value.actionRequests.map((action) => ({
+        name: action.name,
+        args: action.args,
+        ...(typeof action.description === "string" ? { description: action.description } : {}),
+      })),
+      reviewConfigs: value.reviewConfigs.map((config) => ({
+        actionName: config.actionName,
+        allowedDecisions: [...config.allowedDecisions],
+        ...(config.argsSchema === undefined ? {} : { argsSchema: config.argsSchema }),
+      })),
     })),
-    reviewConfigs: value.reviewConfigs.map((config) => ({
-      actionName: config.actionName,
-      allowedDecisions: [...config.allowedDecisions],
-      ...(config.argsSchema === undefined ? {} : { argsSchema: config.argsSchema }),
-    })),
-  })),
   (effect) => observeAgent("native-hitl.public-request", effect),
 );
 

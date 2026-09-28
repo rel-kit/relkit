@@ -19,7 +19,8 @@ test("native HITL schema Effects project only public fields", () => {
   expect(Effect.runSync(isDecisionEffect("approve"))).toBe(true);
   expect(Effect.runSync(isRecordEffect([]))).toBe(false);
   expect(Effect.runSync(publicHitlRequestEffect(request)).actionRequests[0]).toEqual({
-    name: "pay", args: { amount: 1 },
+    name: "pay",
+    args: { amount: 1 },
   });
   expect(Effect.runSync(hitlResponseSchemaEffect(request.reviewConfigs))).toEqual(
     hitlResponseSchema(request.reviewConfigs),

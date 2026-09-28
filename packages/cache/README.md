@@ -23,22 +23,9 @@ expose `increment`.
 
 The package also exposes Effect operations for callers that compose workflows
 or replace the provider with a test Layer. The Promise client runs the same
-Effect implementation.
-
-```ts
-import { createCacheClientEffect } from "@relkit/cache";
-import { Effect } from "effect";
-
-const cache = Effect.runSync(
-  createCacheClientEffect({
-    ownerId: "orders.create",
-    cacheId: "prices",
-    source: { get: async () => 42 },
-  }),
-);
-
-const price = await Effect.runPromise(cache.get("sku"));
-```
+Effect implementation. Import `createCacheClientEffect` from `@relkit/cache`
+to create a client in an Effect runtime, then run operations such as
+`cache.get("sku")` in that runtime.
 
 Cache operations emit `cache.<operation>` spans and bounded call, failure, and
 duration metrics. Bridge spans use `relkit.cache.<operation>` without cache IDs

@@ -28,20 +28,19 @@ export const globFilesEffect = Effect.fn("Agents.bucket.glob")(
     });
     const keys = yield* scopedKeysEffect(path);
     const matching = yield* Effect.try({
-      try: () => keys.filter((key) => {
-        const absolute = filePath(context, key);
-        const relative = absolute.startsWith(base)
-          ? absolute.slice(base.length)
-          : absolute.split("/").at(-1)!;
-        return relative !== "" && matchesGlob(relative, glob);
-      }),
+      try: () =>
+        keys.filter((key) => {
+          const absolute = filePath(context, key);
+          const relative = absolute.startsWith(base)
+            ? absolute.slice(base.length)
+            : absolute.split("/").at(-1)!;
+          return relative !== "" && matchesGlob(relative, glob);
+        }),
       catch: deepAgentBucketFailure,
     });
-    const outcomes = yield* Effect.forEach(
-      matching,
-      (key) => Effect.result(infoForEffect(key)),
-      { concurrency: 8 },
-    );
+    const outcomes = yield* Effect.forEach(matching, (key) => Effect.result(infoForEffect(key)), {
+      concurrency: 8,
+    });
     const firstFailure = outcomes.find(Result.isFailure);
     if (firstFailure !== undefined) return yield* Effect.fail(firstFailure.failure);
     const infos: FileInfo[] = outcomes.flatMap((outcome) =>

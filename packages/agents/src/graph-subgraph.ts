@@ -27,7 +27,9 @@ export const createSubgraphNodeEffect = Effect.fn("Agents.graph.subgraphCreate")
     options: GraphAsNodeOptions<Id> = {},
   ) {
     if (!(yield* isRecordEffect(options))) {
-      return yield* Effect.fail(graphNodeValidationFailure(new TypeError("Subgraph node options must be an object")));
+      return yield* Effect.fail(
+        graphNodeValidationFailure(new TypeError("Subgraph node options must be an object")),
+      );
     }
     const id = yield* Effect.try({
       try: () => normalizeId(options.id ?? graph.id) as unknown as Id,
@@ -63,9 +65,11 @@ export function createSubgraphNode<
   graph: GraphDescriptor<string, InputSchema, OutputSchema>,
   options: GraphAsNodeOptions<Id> = {},
 ): SubgraphNodeDescriptor<Id, InputSchema, OutputSchema> {
-  return Effect.runSync(createSubgraphNodeEffect(graph, options).pipe(
-    Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    createSubgraphNodeEffect(graph, options).pipe(
+      Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Checks whether a value is an embedded graph node.
@@ -77,9 +81,13 @@ export const isSubgraphNodeEffect = Effect.fn("Agents.graph.subgraphIsNode")(
   function* (value: unknown) {
     if (!(yield* isRecordEffect(value))) return false;
     const record = value as Record<PropertyKey, unknown>;
-    return record[RELKIT_SUBGRAPH_NODE] === true && record.kind === "subgraph-node" &&
-      typeof record.id === "string" && Array.isArray(record.ends) &&
-      record[RELKIT_SUBGRAPH] !== undefined;
+    return (
+      record[RELKIT_SUBGRAPH_NODE] === true &&
+      record.kind === "subgraph-node" &&
+      typeof record.id === "string" &&
+      Array.isArray(record.ends) &&
+      record[RELKIT_SUBGRAPH] !== undefined
+    );
   },
   (effect) => observeAgent("graph.subgraph-is-node", effect),
 );

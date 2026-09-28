@@ -41,9 +41,11 @@ export function createThreadBucketBackend(
   agentId: string,
   threadId: string,
 ) {
-  return Effect.runSync(createThreadBucketBackendEffect(bucket, agentId, threadId).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    createThreadBucketBackendEffect(bucket, agentId, threadId).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function digest(value: string): string {

@@ -8,6 +8,8 @@
     "check": "bun run scripts/check-boundaries.ts",
     "typecheck": "tsc -b --pretty false && bun packages/cli/dist/index.js check --project-root examples/commerce --json",
     "lint": "bun run scripts/lint.ts",
+    "lint:fix": "bun x eslint --fix eslint.config.mjs apps/docs/next.config.mjs apps/docs/postcss.config.mjs apps/inspector/postcss.config.mjs scripts/jobs-coverage/stryker.config.mjs && bun run lint",
+    "format:fix": "bun x prettier --write AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md",
     "test": "bun run scripts/test-all.ts",
     "test:types": "bun run scripts/test-types.ts",
     "test:packages": "bun run scripts/test-packages.ts",

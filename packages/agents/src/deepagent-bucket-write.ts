@@ -37,15 +37,21 @@ export const writeBucketEffect = Effect.fn("Agents.bucket.write")(
  * @throws A cancellation or timeout failure from the bucket client.
  * @example await writeBucket(context, "/a.md", "hi");
  */
-export function writeBucket(context: DeepAgentBucketContext, path: string, content: string): Promise<WriteResult> {
-  return Effect.runPromise(writeBucketEffect(path, content).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) =>
-      isControlFailure(failure.cause)
-        ? Effect.fail(failure.cause)
-        : Effect.succeed({ error: errorMessage(failure.cause) }),
+export function writeBucket(
+  context: DeepAgentBucketContext,
+  path: string,
+  content: string,
+): Promise<WriteResult> {
+  return Effect.runPromise(
+    writeBucketEffect(path, content).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) =>
+        isControlFailure(failure.cause)
+          ? Effect.fail(failure.cause)
+          : Effect.succeed({ error: errorMessage(failure.cause) }),
+      ),
+      Effect.provide(deepAgentBucketLayer(context)),
     ),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+  );
 }
 
 /** Replaces text with the existing DeepAgents edit rules.
@@ -59,7 +65,10 @@ export function writeBucket(context: DeepAgentBucketContext, path: string, conte
 export const editBucketEffect = Effect.fn("Agents.bucket.edit")(
   function* (path: string, oldText: string, newText: string, replaceAll = false) {
     yield* DeepAgentBucket;
-    const normalized = yield* Effect.try({ try: () => virtualPath(path), catch: deepAgentBucketFailure });
+    const normalized = yield* Effect.try({
+      try: () => virtualPath(path),
+      catch: deepAgentBucketFailure,
+    });
     const data = yield* readFileDataEffect(normalized);
     if (data === undefined) return { error: `Error: File '${normalized}' not found` };
     if (typeof data.content !== "string") return { error: `Error: File '${normalized}' is binary` };
@@ -97,12 +106,14 @@ export function editBucket(
   newText: string,
   replaceAll = false,
 ): Promise<EditResult> {
-  return Effect.runPromise(editBucketEffect(path, oldText, newText, replaceAll).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) =>
-      isControlFailure(failure.cause)
-        ? Effect.fail(failure.cause)
-        : Effect.succeed({ error: errorMessage(failure.cause) }),
+  return Effect.runPromise(
+    editBucketEffect(path, oldText, newText, replaceAll).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) =>
+        isControlFailure(failure.cause)
+          ? Effect.fail(failure.cause)
+          : Effect.succeed({ error: errorMessage(failure.cause) }),
+      ),
+      Effect.provide(deepAgentBucketLayer(context)),
     ),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+  );
 }

@@ -14,4 +14,5 @@ export type GeneratedAgentExecutor = (input: unknown, context: unknown) => Maybe
 /** Callable handler with a compiler-visible agent identity marker. */
 export type GeneratedAgentFunction = ((
   ...arguments_: readonly unknown[]
-) => MaybePromise<unknown>) & GeneratedAgentFunctionMarker;
+) => MaybePromise<unknown>) &
+  GeneratedAgentFunctionMarker;

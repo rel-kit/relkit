@@ -34,39 +34,49 @@ export const invokeGraphEffect = Effect.fn("Agents.graph.invoke")(
     const limits = yield* resolveAgentContentLimitsEffect(options).pipe(
       Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
     );
-    return yield* Effect.scoped(Effect.gen(function* () {
-      const execution = yield* acquireExecutionSignalEffect(options).pipe(
-        Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
-        Effect.provide(ExecutionSignalClockLive),
-      );
-      return yield* Effect.tryPromise({
-        try: (effectSignal) => {
-          const signal = AbortSignal.any([execution.signal, effectSignal]);
-          return frameworkTrace.span(
-            `relkit.agent.${options.agent.id}.invoke`,
-            {
-              input: options.input,
-              attributes: {
-                "relkit.agent.id": options.agent.id,
-                "relkit.function.id": generatedAgentFunctionId(options.agent.id),
-                "relkit.invocation.id": invocationId,
-                "relkit.agent.execution": "graph",
+    return yield* Effect.scoped(
+      Effect.gen(function* () {
+        const execution = yield* acquireExecutionSignalEffect(options).pipe(
+          Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
+          Effect.provide(ExecutionSignalClockLive),
+        );
+        return yield* Effect.tryPromise({
+          try: (effectSignal) => {
+            const signal = AbortSignal.any([execution.signal, effectSignal]);
+            return frameworkTrace.span(
+              `relkit.agent.${options.agent.id}.invoke`,
+              {
+                input: options.input,
+                attributes: {
+                  "relkit.agent.id": options.agent.id,
+                  "relkit.function.id": generatedAgentFunctionId(options.agent.id),
+                  "relkit.invocation.id": invocationId,
+                  "relkit.agent.execution": "graph",
+                },
               },
-            },
-            async () => {
-              if (signal.aborted) throw signalFailure(signal);
-              const input = options.resume
-                ? options.input
-                : await withSignal(validateValue(options.agent.input, options.input, "input"), signal);
-              return runCompiledGraph(
-                options, input, signal, invocationId, traceId, limits.maxOutputBytes,
-              );
-            },
-          );
-        },
-        catch: graphInvocationFailure,
-      });
-    }));
+              async () => {
+                if (signal.aborted) throw signalFailure(signal);
+                const input = options.resume
+                  ? options.input
+                  : await withSignal(
+                      validateValue(options.agent.input, options.input, "input"),
+                      signal,
+                    );
+                return runCompiledGraph(
+                  options,
+                  input,
+                  signal,
+                  invocationId,
+                  traceId,
+                  limits.maxOutputBytes,
+                );
+              },
+            );
+          },
+          catch: graphInvocationFailure,
+        });
+      }),
+    );
   },
   (effect) => observeAgent("graph.invoke", effect),
 );
@@ -78,8 +88,10 @@ export const invokeGraphEffect = Effect.fn("Agents.graph.invoke")(
  * @example await invokeGraph(options);
  */
 export function invokeGraph(options: GraphRuntimeOptions): Promise<unknown> {
-  return Effect.runPromise(invokeGraphEffect(options).pipe(
-    Effect.catchTag("GraphInvocationFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(GraphInvocationIdentityLive),
-  ));
+  return Effect.runPromise(
+    invokeGraphEffect(options).pipe(
+      Effect.catchTag("GraphInvocationFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(GraphInvocationIdentityLive),
+    ),
+  );
 }

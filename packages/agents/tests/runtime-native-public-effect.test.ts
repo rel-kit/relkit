@@ -6,12 +6,14 @@ import { selectEffect } from "../src/runtime-native-public-state.js";
 import { native } from "./native-deep-events.helpers.js";
 
 test("public native event Effects project safe tool values", async () => {
-  const event = await Effect.runPromise(nativePublicEventEffect(
-    native(0, "tools", [], { event: "tool-finished", output: "{\"ok\":true}" }),
-    new Map(),
-  ));
+  const event = await Effect.runPromise(
+    nativePublicEventEffect(
+      native(0, "tools", [], { event: "tool-finished", output: '{"ok":true}' }),
+      new Map(),
+    ),
+  );
   expect(event.value).toEqual({ event: "tool-finished", output: { ok: true } });
-  expect(Effect.runSync(publicToolValueEffect("{\"ok\":true}"))).toEqual({ ok: true });
+  expect(Effect.runSync(publicToolValueEffect('{"ok":true}'))).toEqual({ ok: true });
 });
 
 test("public state validation caps concurrent schema work at eight and retains key order", async () => {
@@ -20,17 +22,27 @@ test("public state validation caps concurrent schema work at eight and retains k
   let started = 0;
   let release!: () => void;
   let reached!: () => void;
-  const gate = new Promise<void>((resolve) => { release = resolve; });
-  const firstBatch = new Promise<void>((resolve) => { reached = resolve; });
-  const schema = { "~standard": { version: 1, vendor: "test", validate: async (value: unknown) => {
-    active += 1;
-    peak = Math.max(peak, active);
-    started += 1;
-    if (started === 8) reached();
-    await gate;
-    active -= 1;
-    return { value };
-  } } } as StandardSchemaV1;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const firstBatch = new Promise<void>((resolve) => {
+    reached = resolve;
+  });
+  const schema = {
+    "~standard": {
+      version: 1,
+      vendor: "test",
+      validate: async (value: unknown) => {
+        active += 1;
+        peak = Math.max(peak, active);
+        started += 1;
+        if (started === 8) reached();
+        await gate;
+        active -= 1;
+        return { value };
+      },
+    },
+  } as StandardSchemaV1;
   const keys = Array.from({ length: 12 }, (_, index) => `field${index}`);
   const schemas = new Map(keys.map((key) => [key, schema]));
   const value = Object.fromEntries(keys.map((key) => [key, key]));

@@ -9,15 +9,26 @@ import { GraphInvocationIdentity, invokeGraphEffect } from "../src/graph-runtime
 
 test("interrupting graph Effect rolls back a late persistence acquisition", async () => {
   let finishFactory = (_value: MemorySaver) => {};
-  const factory = new Promise<MemorySaver>((resolve) => { finishFactory = resolve; });
+  const factory = new Promise<MemorySaver>((resolve) => {
+    finishFactory = resolve;
+  });
   let markStarted = () => {};
-  const started = new Promise<void>((resolve) => { markStarted = resolve; });
+  const started = new Promise<void>((resolve) => {
+    markStarted = resolve;
+  });
   let markDisposed = () => {};
-  const disposed = new Promise<void>((resolve) => { markDisposed = resolve; });
+  const disposed = new Promise<void>((resolve) => {
+    markDisposed = resolve;
+  });
   const checkpointer = defineCheckpointerDb({
     id: "graph.interrupted.persistence",
-    client: () => { markStarted(); return factory; },
-    dispose: () => { markDisposed(); },
+    client: () => {
+      markStarted();
+      return factory;
+    },
+    dispose: () => {
+      markDisposed();
+    },
   });
   const node = defineGraphNode({
     id: "respond",
@@ -37,13 +48,19 @@ test("interrupting graph Effect rolls back a late persistence acquisition", asyn
   });
   const identity = Layer.succeed(GraphInvocationIdentity, { randomUUID: () => "fixed" });
   const controller = new AbortController();
-  const pending = Effect.runPromise(Effect.provide(invokeGraphEffect({
-    agent: graph,
-    input: { question: "Hi" },
-    threadId: "thread",
-    tools: {},
-    engine: { invoke: async () => undefined },
-  }), identity), { signal: controller.signal });
+  const pending = Effect.runPromise(
+    Effect.provide(
+      invokeGraphEffect({
+        agent: graph,
+        input: { question: "Hi" },
+        threadId: "thread",
+        tools: {},
+        engine: { invoke: async () => undefined },
+      }),
+      identity,
+    ),
+    { signal: controller.signal },
+  );
   await started;
   controller.abort();
   finishFactory(new MemorySaver());

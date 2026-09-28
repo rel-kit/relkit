@@ -11,12 +11,32 @@ test("graph workflow Effects project topology and detect nested persistence need
   expect(empty.nodes).toEqual([]);
   expect(Object.isFrozen(empty)).toBe(true);
   expect(Effect.runSync(graphWorkflowRequiresPersistenceEffect(empty))).toBe(false);
-  const nested = { ...empty, nodes: [{
-    id: "wait", kind: "node" as const, input: null, output: null, resume: null, ends: [],
-  }] };
-  const parent = { ...empty, nodes: [{
-    id: "nested", kind: "subgraph" as const, input: null, output: null, ends: [], workflow: nested,
-  }] };
+  const nested = {
+    ...empty,
+    nodes: [
+      {
+        id: "wait",
+        kind: "node" as const,
+        input: null,
+        output: null,
+        resume: null,
+        ends: [],
+      },
+    ],
+  };
+  const parent = {
+    ...empty,
+    nodes: [
+      {
+        id: "nested",
+        kind: "subgraph" as const,
+        input: null,
+        output: null,
+        ends: [],
+        workflow: nested,
+      },
+    ],
+  };
   expect(Effect.runSync(graphWorkflowRequiresPersistenceEffect(parent))).toBe(true);
   expect(graphWorkflow([], [])).toEqual(empty);
 });

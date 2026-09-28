@@ -30,7 +30,17 @@ export function prepareAgentDescriptor<
   const Tools extends readonly AgentTool[],
 >(
   options: DefineAgentOptions<Id, InputSchema, OutputSchema, Middleware, Tools>,
-): (id: Id) => AgentDescriptor<Id, InferInput<InputSchema>, InferOutput<OutputSchema>, InputSchema, OutputSchema, Middleware, Tools> {
+): (
+  id: Id,
+) => AgentDescriptor<
+  Id,
+  InferInput<InputSchema>,
+  InferOutput<OutputSchema>,
+  InputSchema,
+  OutputSchema,
+  Middleware,
+  Tools
+> {
   assertAgentSchema(options.input, "input");
   assertAgentSchema(options.output, "output");
   const model = normalizeAgentModel(options.model);
@@ -45,7 +55,8 @@ export function prepareAgentDescriptor<
   if (client !== undefined && options.stateProfile === undefined) {
     throw new TypeError("Client-exposed agents require stateProfile");
   }
-  const stateProfile = options.stateProfile === undefined ? undefined : normalizeId(options.stateProfile);
+  const stateProfile =
+    options.stateProfile === undefined ? undefined : normalizeId(options.stateProfile);
   return (id: Id) => {
     const base = createDescriptorBase("agent", id, options);
     const clientContract = agentClientContractMetadata({

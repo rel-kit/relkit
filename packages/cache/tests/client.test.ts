@@ -95,10 +95,12 @@ describe("cache Promise client", () => {
       },
     });
     expect(await client.get("sku")).toBe(1);
-    expect(metadata).toMatchObject([{
-      name: "relkit.cache.get",
-      attributes: { "relkit.cache.operation": "get" },
-    }]);
+    expect(metadata).toMatchObject([
+      {
+        name: "relkit.cache.get",
+        attributes: { "relkit.cache.operation": "get" },
+      },
+    ]);
     expect(JSON.stringify(metadata)).not.toContain("secret-cache-id");
   });
   test("rejects invalid values and TTLs before provider writes", async () => {

@@ -8,10 +8,20 @@ import {
 
 test("instruction Effects accept text, templates, and prompt descriptors", () => {
   expect(Effect.runSync(copyAgentInstructionsEffect("  Answer.  "))).toBe("Answer.");
-  expect(Effect.runSync(copyAgentInstructionsEffect({
-    template: "Hello {name}", variables: ["name"],
-  }))).toEqual({ template: "Hello {name}", variables: ["name"] });
-  const prompt = { kind: "prompt", id: "greeting", ref: { kind: "prompt", id: "greeting" }, value: ["Hi"] };
+  expect(
+    Effect.runSync(
+      copyAgentInstructionsEffect({
+        template: "Hello {name}",
+        variables: ["name"],
+      }),
+    ),
+  ).toEqual({ template: "Hello {name}", variables: ["name"] });
+  const prompt = {
+    kind: "prompt",
+    id: "greeting",
+    ref: { kind: "prompt", id: "greeting" },
+    value: ["Hi"],
+  };
   expect(Effect.runSync(copyAgentInstructionsEffect(prompt))).toBe(prompt);
   expect(Effect.runSync(isAgentInstructionsEffect(prompt))).toBe(true);
   expect(Effect.runSync(isAgentInstructionsEffect({ template: " ", variables: [] }))).toBe(false);

@@ -24,14 +24,18 @@ export type GraphState<State extends AnyStateSchema> = State["State"];
 /** Public state keys selected from a LangGraph StateSchema. */
 export type GraphStateKey<State extends AnyStateSchema> = Extract<keyof GraphState<State>, string>;
 
-type UniqueNodes<Nodes extends readonly GraphNodeLike[], Seen extends string = never> =
-  number extends Nodes["length"]
-    ? Nodes
-    : Nodes extends readonly [infer Head extends GraphNodeLike, ...infer Tail extends GraphNodeLike[]]
-      ? Head["id"] extends Seen
+type UniqueNodes<
+  Nodes extends readonly GraphNodeLike[],
+  Seen extends string = never,
+> = number extends Nodes["length"]
+  ? Nodes
+  : Nodes extends readonly [infer Head extends GraphNodeLike, ...infer Tail extends GraphNodeLike[]]
+    ? Head["id"] extends Seen
+      ? never
+      : UniqueNodes<Tail, Seen | Head["id"]> extends never
         ? never
-        : UniqueNodes<Tail, Seen | Head["id"]> extends never ? never : Nodes
-      : Nodes;
+        : Nodes
+    : Nodes;
 
 /** Runtime state and persistence declarations hidden on a graph descriptor. */
 export interface GraphExecution<State = any> {
@@ -48,7 +52,8 @@ export interface GraphDescriptor<
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
   State extends AnyStateSchema = AnyStateSchema,
   Nodes extends readonly GraphNodeLike[] = readonly GraphNodeLike[],
-> extends DescriptorBase<"agent", Id>, AgentRef<Id, InputSchema, OutputSchema> {
+>
+  extends DescriptorBase<"agent", Id>, AgentRef<Id, InputSchema, OutputSchema> {
   readonly execution: "graph";
   readonly input: InputSchema;
   readonly output: OutputSchema;

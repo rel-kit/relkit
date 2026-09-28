@@ -11,13 +11,16 @@ import { agentPersistenceFailure } from "./persistence-error.js";
  * @example Effect.runSync(isPersistenceResourceEffect(candidate));
  */
 export const isPersistenceResourceEffect = Effect.fn("Agents.persistence.isResource")(
-  (value: unknown) => Effect.sync(() =>
-    isRecord(value) &&
-    value[RELKIT_PERSISTENCE] === true &&
-    value.kind === "agent-persistence" &&
-    (value.resource === "checkpointer" || value.resource === "memory") &&
-    typeof value.acquire === "function" &&
-    typeof value.release === "function"),
+  (value: unknown) =>
+    Effect.sync(
+      () =>
+        isRecord(value) &&
+        value[RELKIT_PERSISTENCE] === true &&
+        value.kind === "agent-persistence" &&
+        (value.resource === "checkpointer" || value.resource === "memory") &&
+        typeof value.acquire === "function" &&
+        typeof value.release === "function",
+    ),
   (effect) => observeAgent("persistence.is-resource", effect),
 );
 
@@ -37,17 +40,19 @@ export function isPersistenceResource(value: unknown): value is PersistenceResou
  * @example Effect.runSync(assertPersistenceProtocolEffect("memory", store));
  */
 export const assertPersistenceProtocolEffect = Effect.fn("Agents.persistence.assertProtocol")(
-  (resource: "checkpointer" | "memory", value: unknown) => Effect.try({
-    try: () => {
-      const methods = resource === "checkpointer"
-        ? ["getTuple", "list", "put", "putWrites", "deleteThread"]
-        : ["batch"];
-      if (!isRecord(value) || methods.some((method) => typeof value[method] !== "function")) {
-        throw new TypeError(`${resource} resource does not implement the LangGraph protocol`);
-      }
-    },
-    catch: agentPersistenceFailure,
-  }),
+  (resource: "checkpointer" | "memory", value: unknown) =>
+    Effect.try({
+      try: () => {
+        const methods =
+          resource === "checkpointer"
+            ? ["getTuple", "list", "put", "putWrites", "deleteThread"]
+            : ["batch"];
+        if (!isRecord(value) || methods.some((method) => typeof value[method] !== "function")) {
+          throw new TypeError(`${resource} resource does not implement the LangGraph protocol`);
+        }
+      },
+      catch: agentPersistenceFailure,
+    }),
   (effect) => observeAgent("persistence.assert-protocol", effect),
 );
 
@@ -62,9 +67,11 @@ export function assertPersistenceProtocol(
   resource: "checkpointer" | "memory",
   value: unknown,
 ): asserts value is BaseCheckpointSaver | BaseStore {
-  Effect.runSync(assertPersistenceProtocolEffect(resource, value).pipe(
-    Effect.catchTag("AgentPersistenceFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  Effect.runSync(
+    assertPersistenceProtocolEffect(resource, value).pipe(
+      Effect.catchTag("AgentPersistenceFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function isRecord(value: unknown): value is Record<PropertyKey, any> {

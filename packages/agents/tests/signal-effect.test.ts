@@ -13,11 +13,20 @@ test("execution signal Effect uses a replaceable clock and clears its timer once
   let deadline!: () => void;
   let delay = -1;
   let clears = 0;
-  const clock = Layer.succeed(ExecutionSignalClock, ExecutionSignalClock.of({
-    now: () => 100,
-    setTimeout: (callback, delayMs) => { deadline = callback; delay = delayMs; return 1; },
-    clearTimeout: () => { clears += 1; },
-  }));
+  const clock = Layer.succeed(
+    ExecutionSignalClock,
+    ExecutionSignalClock.of({
+      now: () => 100,
+      setTimeout: (callback, delayMs) => {
+        deadline = callback;
+        delay = delayMs;
+        return 1;
+      },
+      clearTimeout: () => {
+        clears += 1;
+      },
+    }),
+  );
   const active = Effect.runSync(Effect.provide(createExecutionSignalEffect(options), clock));
   expect(delay).toBe(500);
   deadline();
@@ -31,12 +40,19 @@ test("execution signal Effect uses a replaceable clock and clears its timer once
 });
 
 test("execution signal Effect tags invalid deadlines", () => {
-  const clock = Layer.succeed(ExecutionSignalClock, ExecutionSignalClock.of({
-    now: () => 100, setTimeout: () => 1, clearTimeout: () => undefined,
-  }));
-  const failure = Effect.runSync(Effect.result(Effect.provide(
-    createExecutionSignalEffect({ ...options, timeoutMs: -1 }), clock,
-  )));
+  const clock = Layer.succeed(
+    ExecutionSignalClock,
+    ExecutionSignalClock.of({
+      now: () => 100,
+      setTimeout: () => 1,
+      clearTimeout: () => undefined,
+    }),
+  );
+  const failure = Effect.runSync(
+    Effect.result(
+      Effect.provide(createExecutionSignalEffect({ ...options, timeoutMs: -1 }), clock),
+    ),
+  );
   expect(Result.isFailure(failure)).toBe(true);
   if (Result.isFailure(failure)) expect(failure.failure._tag).toBe("AgentInvocationFailure");
 });

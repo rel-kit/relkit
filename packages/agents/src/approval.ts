@@ -19,7 +19,11 @@ import type {
 } from "./approval.types.js";
 
 export { APPROVAL_STATES } from "./approval-core.js";
-export { ApprovalDeniedError, ApprovalRequiredError, ApprovalStateError } from "./approval-error.js";
+export {
+  ApprovalDeniedError,
+  ApprovalRequiredError,
+  ApprovalStateError,
+} from "./approval-error.js";
 export { ApprovalEffectError } from "./approval-effect-error.js";
 export type * from "./approval.types.js";
 
@@ -31,7 +35,10 @@ export type * from "./approval.types.js";
  */
 export const requiresApprovalEffect = Effect.fn("Agents.approval.requires")(
   (policy: ApprovalPolicy, sideEffect: ApprovalSideEffect) =>
-    Effect.try({ try: () => requiresApprovalValue(policy, sideEffect), catch: approvalEffectError }),
+    Effect.try({
+      try: () => requiresApprovalValue(policy, sideEffect),
+      catch: approvalEffectError,
+    }),
   (effect) => observeAgent("approval.requires", effect),
 );
 
@@ -150,7 +157,9 @@ export const assertApprovalGrantedEffect = Effect.fn("Agents.approval.assertGran
  * @throws ApprovalRequiredError, ApprovalDeniedError, or ApprovalStateError.
  * @example assertApprovalGranted(approved);
  */
-export function assertApprovalGranted(approval: ApprovalRecord): asserts approval is ApprovedApproval {
+export function assertApprovalGranted(
+  approval: ApprovalRecord,
+): asserts approval is ApprovedApproval {
   runApproval(assertApprovalGrantedEffect(approval));
 }
 

@@ -12,10 +12,11 @@ export type * from "./define-agent-deep.types.js";
  * @example Effect.runSync(copyDeepAgentCapabilitiesEffect({ skills: ["/skills"] }));
  */
 export const copyDeepAgentCapabilitiesEffect = Effect.fn("Agents.definition.copyDeep")(
-  (value: DeepAgentCapabilities) => Effect.try({
-    try: () => copyDeepAgentCapabilitiesValue(value),
-    catch: agentDefinitionFailure,
-  }),
+  (value: DeepAgentCapabilities) =>
+    Effect.try({
+      try: () => copyDeepAgentCapabilitiesValue(value),
+      catch: agentDefinitionFailure,
+    }),
   (effect) => observeAgent("definition.copy-deep", effect),
 );
 
@@ -26,9 +27,11 @@ export const copyDeepAgentCapabilitiesEffect = Effect.fn("Agents.definition.copy
  * @example const options = copyDeepAgentCapabilities({ skills: ["/skills"] });
  */
 export function copyDeepAgentCapabilities(value: DeepAgentCapabilities): DeepAgentCapabilities {
-  return Effect.runSync(copyDeepAgentCapabilitiesEffect(value).pipe(
-    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    copyDeepAgentCapabilitiesEffect(value).pipe(
+      Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function copyDeepAgentCapabilitiesValue(value: DeepAgentCapabilities): DeepAgentCapabilities {

@@ -16,7 +16,10 @@ import type { AgentWaitingRequest } from "./state.types.js";
  * @returns Public interruptions in task order.
  * @example const requests = snapshotInterrupts(snapshot, []);
  */
-export function snapshotInterrupts(snapshot: unknown, path: readonly string[]): GraphWaitingInterrupt[] {
+export function snapshotInterrupts(
+  snapshot: unknown,
+  path: readonly string[],
+): GraphWaitingInterrupt[] {
   if (!isRecord(snapshot) || !Array.isArray(snapshot.tasks)) return [];
   return snapshot.tasks.flatMap((task): GraphWaitingInterrupt[] => {
     if (!isRecord(task)) return [];
@@ -28,12 +31,14 @@ export function snapshotInterrupts(snapshot: unknown, path: readonly string[]): 
     return task.interrupts.flatMap((entry): GraphWaitingInterrupt[] => {
       if (!isRecord(entry) || !isHitlRequest(entry.value)) return [];
       const value = publicHitlRequest(entry.value);
-      return [{
-        ...(typeof entry.id === "string" ? { id: entry.id } : {}),
-        node: [...path, name].join("/"),
-        value,
-        response: hitlResponseSchema(value.reviewConfigs),
-      }];
+      return [
+        {
+          ...(typeof entry.id === "string" ? { id: entry.id } : {}),
+          node: [...path, name].join("/"),
+          value,
+          response: hitlResponseSchema(value.reviewConfigs),
+        },
+      ];
     });
   });
 }
@@ -76,7 +81,11 @@ function validateReply(request: AgentWaitingRequest, value: unknown): unknown {
 }
 
 function validateDecision(value: unknown, config: ReviewConfig): unknown {
-  if (!isRecord(value) || !isDecision(value.type) || !config.allowedDecisions.includes(value.type)) {
+  if (
+    !isRecord(value) ||
+    !isDecision(value.type) ||
+    !config.allowedDecisions.includes(value.type)
+  ) {
     throw new TypeError("Agent continuation decision is not allowed");
   }
   if (value.type === "approve") {
@@ -91,12 +100,18 @@ function validateDecision(value: unknown, config: ReviewConfig): unknown {
     return { type: "reject", ...(value.message === undefined ? {} : { message: value.message }) };
   }
   exactKeys(value, ["type", "editedAction"]);
-  if (!isRecord(value.editedAction) || value.editedAction.name !== config.actionName ||
-    !isRecord(value.editedAction.args)) {
+  if (
+    !isRecord(value.editedAction) ||
+    value.editedAction.name !== config.actionName ||
+    !isRecord(value.editedAction.args)
+  ) {
     throw new TypeError("Agent edited action is invalid");
   }
   exactKeys(value.editedAction, ["name", "args"]);
-  if (config.argsSchema !== undefined && !validate(value.editedAction.args, config.argsSchema as never).valid) {
+  if (
+    config.argsSchema !== undefined &&
+    !validate(value.editedAction.args, config.argsSchema as never).valid
+  ) {
     throw new TypeError("Agent edited action arguments are invalid");
   }
   return { type: "edit", editedAction: value.editedAction };

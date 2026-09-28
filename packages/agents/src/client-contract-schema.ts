@@ -21,22 +21,23 @@ const projectCount = Metric.counter("relkit.agents.client_schema.project.total")
  * @example
  * const schema = Effect.runSync(mergeClientSchemasEffect([{ type: "object" }]));
  */
-export const mergeClientSchemasEffect = Effect.fn("Agents.clientSchema.merge")(function* (
-  values: readonly unknown[],
-) {
-  const documents: Record<string, unknown>[] = [];
-  for (const value of values) {
-    const document = yield* clientSchemaMetadataEffect(value);
-    if (isJsonSchemaObject(document)) documents.push(document);
-  }
-  const merged: ClientSchemaMetadata = {
-    type: "object",
-    properties: Object.assign({}, ...documents.map(schemaProperties)),
-    required: [...new Set(documents.flatMap(schemaRequired))],
-  } as JsonValue;
-  yield* Metric.update(mergeCount, 1);
-  return merged;
-}, (effect) => observeAgent("client-schema.merge", effect));
+export const mergeClientSchemasEffect = Effect.fn("Agents.clientSchema.merge")(
+  function* (values: readonly unknown[]) {
+    const documents: Record<string, unknown>[] = [];
+    for (const value of values) {
+      const document = yield* clientSchemaMetadataEffect(value);
+      if (isJsonSchemaObject(document)) documents.push(document);
+    }
+    const merged: ClientSchemaMetadata = {
+      type: "object",
+      properties: Object.assign({}, ...documents.map(schemaProperties)),
+      required: [...new Set(documents.flatMap(schemaRequired))],
+    } as JsonValue;
+    yield* Metric.update(mergeCount, 1);
+    return merged;
+  },
+  (effect) => observeAgent("client-schema.merge", effect),
+);
 
 /**
  * Synchronously merges client schemas for existing descriptor callers.
@@ -59,30 +60,30 @@ export function mergeClientSchemas(values: readonly unknown[]): ClientSchemaMeta
  * @example
  * const fields = Effect.runSync(selectedClientFieldsEffect({ type: "object" }, ["name"]));
  */
-export const selectedClientFieldsEffect = Effect.fn("Agents.clientSchema.select")(function* (
-  schema: ClientSchemaMetadata,
-  keys?: readonly string[],
-) {
-  const fields = yield* Effect.sync((): readonly ClientTypeField[] => {
-    if (keys === undefined || !isJsonSchemaObject(schema)) return Object.freeze([]);
-    const required = new Set(schemaRequired(schema));
-    const properties = schemaProperties(schema);
-    return Object.freeze(
-      keys.map((name) => {
-        const value = properties[name];
-        const field = value === undefined ? dynamicClientSchema : value;
-        const defaulted = isRecord(field) && Object.hasOwn(field, "default");
-        return {
-          name,
-          schema: field,
-          ...(!required.has(name) && !defaulted ? { optional: true as const } : {}),
-        };
-      }),
-    );
-  });
-  yield* Metric.update(selectCount, 1);
-  return fields;
-}, (effect) => observeAgent("client-schema.select", effect));
+export const selectedClientFieldsEffect = Effect.fn("Agents.clientSchema.select")(
+  function* (schema: ClientSchemaMetadata, keys?: readonly string[]) {
+    const fields = yield* Effect.sync((): readonly ClientTypeField[] => {
+      if (keys === undefined || !isJsonSchemaObject(schema)) return Object.freeze([]);
+      const required = new Set(schemaRequired(schema));
+      const properties = schemaProperties(schema);
+      return Object.freeze(
+        keys.map((name) => {
+          const value = properties[name];
+          const field = value === undefined ? dynamicClientSchema : value;
+          const defaulted = isRecord(field) && Object.hasOwn(field, "default");
+          return {
+            name,
+            schema: field,
+            ...(!required.has(name) && !defaulted ? { optional: true as const } : {}),
+          };
+        }),
+      );
+    });
+    yield* Metric.update(selectCount, 1);
+    return fields;
+  },
+  (effect) => observeAgent("client-schema.select", effect),
+);
 
 /**
  * Synchronously selects client fields for existing descriptor callers.
@@ -108,20 +109,21 @@ export function selectedClientFields(
  * @example
  * const metadata = Effect.runSync(clientSchemaMetadataEffect({ type: "string" }));
  */
-export const clientSchemaMetadataEffect = Effect.fn("Agents.clientSchema.project")(function* (
-  value: unknown,
-) {
-  const metadata = yield* Effect.sync((): ClientSchemaMetadata => {
-    if (isDynamic(value) || isJsonSchemaObject(value)) return value;
-    try {
-      return JSON.parse(JSON.stringify(toJsonSchema(value as never))) as JsonValue;
-    } catch {
-      return dynamicClientSchema;
-    }
-  });
-  yield* Metric.update(projectCount, 1);
-  return metadata;
-}, (effect) => observeAgent("client-schema.project", effect));
+export const clientSchemaMetadataEffect = Effect.fn("Agents.clientSchema.project")(
+  function* (value: unknown) {
+    const metadata = yield* Effect.sync((): ClientSchemaMetadata => {
+      if (isDynamic(value) || isJsonSchemaObject(value)) return value;
+      try {
+        return JSON.parse(JSON.stringify(toJsonSchema(value as never))) as JsonValue;
+      } catch {
+        return dynamicClientSchema;
+      }
+    });
+    yield* Metric.update(projectCount, 1);
+    return metadata;
+  },
+  (effect) => observeAgent("client-schema.project", effect),
+);
 
 /**
  * Synchronously projects schema metadata for existing descriptor callers.

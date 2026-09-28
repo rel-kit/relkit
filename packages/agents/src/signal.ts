@@ -4,7 +4,9 @@ import { observeAgent } from "./agent-telemetry.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import type {
-  ExecutionSignalClockService, ExecutionSignalHandle, ExecutionSignalOptions,
+  ExecutionSignalClockService,
+  ExecutionSignalHandle,
+  ExecutionSignalOptions,
 } from "./signal.types.js";
 
 export type * from "./signal.types.js";
@@ -12,29 +14,37 @@ export type * from "./signal.types.js";
 /** Replaceable clock and timer boundary for execution deadlines.
  * @example Effect.provide(createExecutionSignalEffect(options), ExecutionSignalClockLive);
  */
-export class ExecutionSignalClock extends Context.Service<ExecutionSignalClock, ExecutionSignalClockService>()(
-  "relkit/agents/ExecutionSignalClock",
-) {}
+export class ExecutionSignalClock extends Context.Service<
+  ExecutionSignalClock,
+  ExecutionSignalClockService
+>()("relkit/agents/ExecutionSignalClock") {}
 
 /** Live wall clock and timer implementation.
  * @example Effect.runSync(Effect.provide(createExecutionSignalEffect(options), ExecutionSignalClockLive));
  */
-export const ExecutionSignalClockLive = Layer.succeed(ExecutionSignalClock, ExecutionSignalClock.of({
-  now: () => Date.now(),
-  setTimeout: (callback, delayMs) => setTimeout(callback, delayMs),
-  clearTimeout: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-}));
+export const ExecutionSignalClockLive = Layer.succeed(
+  ExecutionSignalClock,
+  ExecutionSignalClock.of({
+    now: () => Date.now(),
+    setTimeout: (callback, delayMs) => setTimeout(callback, delayMs),
+    clearTimeout: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
+  }),
+);
 
 /** Converts an abort reason to a safe invocation error.
  * @param signal - Aborted invocation signal.
  * @returns An Effect with a timeout or cancellation error.
  * @example Effect.runSync(signalFailureEffect(signal));
  */
-export const signalFailureEffect = Effect.fn("Agents.signal.failure")((signal: AbortSignal) =>
-  Effect.sync(() => signal.reason instanceof AgentRuntimeError && signal.reason.code === "RELKIT_AGENT_TIMEOUT"
-    ? signal.reason
-    : new AgentRuntimeError("RELKIT_AGENT_CANCELLED", "Agent invocation cancelled")),
-  (effect) => observeAgent("signal.failure", effect));
+export const signalFailureEffect = Effect.fn("Agents.signal.failure")(
+  (signal: AbortSignal) =>
+    Effect.sync(() =>
+      signal.reason instanceof AgentRuntimeError && signal.reason.code === "RELKIT_AGENT_TIMEOUT"
+        ? signal.reason
+        : new AgentRuntimeError("RELKIT_AGENT_CANCELLED", "Agent invocation cancelled"),
+    ),
+  (effect) => observeAgent("signal.failure", effect),
+);
 
 /** Converts an abort reason for existing synchronous callers.
  * @param signal - Aborted invocation signal.
@@ -59,18 +69,25 @@ export const createExecutionSignalEffect = Effect.fn("Agents.signal.create")(
         const listeners: Array<readonly [AbortSignal, () => void]> = [];
         const now = clock.now();
         const deadlines = [now + options.agent.limits.timeoutMs, options.deadlineMs];
-        if (options.timeoutMs !== undefined &&
-          (!Number.isSafeInteger(options.timeoutMs) || options.timeoutMs < 0)) {
+        if (
+          options.timeoutMs !== undefined &&
+          (!Number.isSafeInteger(options.timeoutMs) || options.timeoutMs < 0)
+        ) {
           throw new AgentRuntimeError("RELKIT_AGENT_DEADLINE_INVALID", "Agent timeout is invalid");
         }
         if (options.timeoutMs !== undefined) deadlines.push(now + options.timeoutMs);
         if (deadlines.some((deadline) => deadline !== undefined && !Number.isFinite(deadline))) {
           throw new AgentRuntimeError("RELKIT_AGENT_DEADLINE_INVALID", "Agent deadline is invalid");
         }
-        const deadline = Math.min(...deadlines.filter((value): value is number => value !== undefined));
+        const deadline = Math.min(
+          ...deadlines.filter((value): value is number => value !== undefined),
+        );
         const timeout = new AgentRuntimeError("RELKIT_AGENT_TIMEOUT", "Agent deadline exceeded");
         if (deadline <= now) controller.abort(timeout);
-        const timer = clock.setTimeout(() => controller.abort(timeout), Math.max(0, deadline - now));
+        const timer = clock.setTimeout(
+          () => controller.abort(timeout),
+          Math.max(0, deadline - now),
+        );
         const signal = options.signal;
         if (signal !== undefined) {
           const abort = () => controller.abort(signal.reason);
@@ -87,7 +104,8 @@ export const createExecutionSignalEffect = Effect.fn("Agents.signal.create")(
             if (closed) return;
             closed = true;
             clock.clearTimeout(timer);
-            for (const [source, listener] of listeners) source.removeEventListener("abort", listener);
+            for (const [source, listener] of listeners)
+              source.removeEventListener("abort", listener);
           },
         };
       },
@@ -102,9 +120,13 @@ export const createExecutionSignalEffect = Effect.fn("Agents.signal.create")(
  * @returns A scoped Effect with a signal or AgentInvocationFailure.
  * @example Effect.scoped(Effect.gen(function* () { const active = yield* acquireExecutionSignalEffect(options); }));
  */
-export const acquireExecutionSignalEffect = Effect.fn("Agents.signal.acquire")((options: ExecutionSignalOptions) =>
-  Effect.acquireRelease(createExecutionSignalEffect(options), (active) => Effect.sync(() => active.close())),
-  (effect) => observeAgent("signal.acquire", effect));
+export const acquireExecutionSignalEffect = Effect.fn("Agents.signal.acquire")(
+  (options: ExecutionSignalOptions) =>
+    Effect.acquireRelease(createExecutionSignalEffect(options), (active) =>
+      Effect.sync(() => active.close()),
+    ),
+  (effect) => observeAgent("signal.acquire", effect),
+);
 
 /** Creates a live signal for existing callers that own and close the handle.
  * @param options - Invocation limits, deadline, and caller signal.
@@ -113,10 +135,12 @@ export const acquireExecutionSignalEffect = Effect.fn("Agents.signal.acquire")((
  * @example const active = createExecutionSignal(options); try { await work(active.signal); } finally { active.close(); }
  */
 export function createExecutionSignal(options: ExecutionSignalOptions): ExecutionSignalHandle {
-  return Effect.runSync(createExecutionSignalEffect(options).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(ExecutionSignalClockLive),
-  ));
+  return Effect.runSync(
+    createExecutionSignalEffect(options).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(ExecutionSignalClockLive),
+    ),
+  );
 }
 
 /** Races Promise work with caller and Effect cancellation.
@@ -126,13 +150,15 @@ export function createExecutionSignal(options: ExecutionSignalOptions): Executio
  * @returns An Effect with the value or AgentInvocationFailure.
  * @example await Effect.runPromise(withSignalEffect(work, signal));
  */
-export const withSignalEffect = Effect.fn("Agents.signal.withSignal")(<T>(
-  work: MaybePromise<T>, signal: AbortSignal, linkEffectSignal = true,
-) => Effect.tryPromise({
-  try: (effectSignal) => withSignalCore(work,
-    linkEffectSignal ? AbortSignal.any([signal, effectSignal]) : signal),
-  catch: agentInvocationFailure,
-}), (effect) => observeAgent("signal.with-signal", effect));
+export const withSignalEffect = Effect.fn("Agents.signal.withSignal")(
+  <T>(work: MaybePromise<T>, signal: AbortSignal, linkEffectSignal = true) =>
+    Effect.tryPromise({
+      try: (effectSignal) =>
+        withSignalCore(work, linkEffectSignal ? AbortSignal.any([signal, effectSignal]) : signal),
+      catch: agentInvocationFailure,
+    }),
+  (effect) => observeAgent("signal.with-signal", effect),
+);
 
 /** Races work with a caller signal for existing Promise callers.
  * @param work - Already started Promise or immediate value.
@@ -142,9 +168,11 @@ export const withSignalEffect = Effect.fn("Agents.signal.withSignal")(<T>(
  * @example await withSignal(fetchData(), signal);
  */
 export function withSignal<T>(work: MaybePromise<T>, signal: AbortSignal): Promise<T> {
-  return Effect.runPromise(withSignalEffect(work, signal, false).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runPromise(
+    withSignalEffect(work, signal, false).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function withSignalCore<T>(work: MaybePromise<T>, signal: AbortSignal): Promise<T> {
@@ -159,7 +187,10 @@ function withSignalCore<T>(work: MaybePromise<T>, signal: AbortSignal): Promise<
     };
     const abort = () => finish(() => reject(signalFailure(signal)));
     signal.addEventListener("abort", abort, { once: true });
-    if (signal.aborted) { abort(); return; }
+    if (signal.aborted) {
+      abort();
+      return;
+    }
     Promise.resolve(work).then(
       (value) => finish(() => resolve(value)),
       (error) => finish(() => reject(error)),

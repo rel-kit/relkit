@@ -36,8 +36,10 @@ export const runGraphNodeHandlerEffect = Effect.fn("Agents.graphNode.handle")(
     OutputSchema extends StandardSchemaV1,
     Ends extends readonly string[],
   >(
-    options: Pick<DefineGraphNodeOptions<string, InputSchema, OutputSchema, StandardSchemaV1 | undefined, Ends>,
-      "input" | "output" | "handler">,
+    options: Pick<
+      DefineGraphNodeOptions<string, InputSchema, OutputSchema, StandardSchemaV1 | undefined, Ends>,
+      "input" | "output" | "handler"
+    >,
     ends: Ends,
     input: unknown,
     config?: LangGraphRunnableConfig,
@@ -66,24 +68,38 @@ export const defineGraphNodeEffect = Effect.fn("Agents.graphNode.define")(
     const Ends extends readonly string[] = readonly [],
   >(options: DefineGraphNodeOptions<Id, InputSchema, OutputSchema, ResumeSchema, Ends>) {
     if (!(yield* isRecordEffect(options))) {
-      return yield* Effect.fail(graphNodeValidationFailure(new TypeError("Graph node options must be an object")));
+      return yield* Effect.fail(
+        graphNodeValidationFailure(new TypeError("Graph node options must be an object")),
+      );
     }
     const asGraphFailure = (failure: { readonly message: string }) =>
       graphNodeValidationFailure(new TypeError(failure.message));
     yield* assertAgentSchemaEffect(options.input, "input").pipe(Effect.mapError(asGraphFailure));
     yield* assertAgentSchemaEffect(options.output, "output").pipe(Effect.mapError(asGraphFailure));
     if (options.resume !== undefined) {
-      yield* assertAgentSchemaEffect(options.resume, "resume").pipe(Effect.mapError(asGraphFailure));
+      yield* assertAgentSchemaEffect(options.resume, "resume").pipe(
+        Effect.mapError(asGraphFailure),
+      );
     }
     if (typeof options.handler !== "function") {
-      return yield* Effect.fail(graphNodeValidationFailure(new TypeError("Graph node handler is required")));
+      return yield* Effect.fail(
+        graphNodeValidationFailure(new TypeError("Graph node handler is required")),
+      );
     }
-    const id = yield* Effect.try({ try: () => normalizeId(options.id) as unknown as Id, catch: graphNodeValidationFailure });
+    const id = yield* Effect.try({
+      try: () => normalizeId(options.id) as unknown as Id,
+      catch: graphNodeValidationFailure,
+    });
     const ends = (yield* copyGraphNodeEndsEffect(options.ends)) as Ends;
-    const handler = (input: InferOutput<InputSchema>, config?: LangGraphRunnableConfig): Promise<GraphNodeResult<OutputSchema, Ends>> =>
-      Effect.runPromise(runGraphNodeHandlerEffect(options, ends, input, config).pipe(
-        Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
-      ));
+    const handler = (
+      input: InferOutput<InputSchema>,
+      config?: LangGraphRunnableConfig,
+    ): Promise<GraphNodeResult<OutputSchema, Ends>> =>
+      Effect.runPromise(
+        runGraphNodeHandlerEffect(options, ends, input, config).pipe(
+          Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
+        ),
+      );
     return Object.freeze({
       [RELKIT_GRAPH_NODE]: true as const,
       kind: "graph-node" as const,
@@ -113,11 +129,14 @@ export function defineGraphNode<
   const OutputSchema extends StandardSchemaV1,
   const ResumeSchema extends StandardSchemaV1 | undefined = undefined,
   const Ends extends readonly string[] = readonly [],
->(options: DefineGraphNodeOptions<Id, InputSchema, OutputSchema, ResumeSchema, Ends>):
-  GraphNodeDescriptor<Id, InputSchema, OutputSchema, ResumeSchema, Ends> {
-  return Effect.runSync(defineGraphNodeEffect(options).pipe(
-    Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+>(
+  options: DefineGraphNodeOptions<Id, InputSchema, OutputSchema, ResumeSchema, Ends>,
+): GraphNodeDescriptor<Id, InputSchema, OutputSchema, ResumeSchema, Ends> {
+  return Effect.runSync(
+    defineGraphNodeEffect(options).pipe(
+      Effect.catchTag("GraphNodeValidationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Checks whether a value is a native graph node descriptor.
@@ -129,12 +148,17 @@ export const isGraphNodeDescriptorEffect = Effect.fn("Agents.graphNode.isDescrip
   function* (value: unknown) {
     if (!(yield* isRecordEffect(value))) return false;
     const record = value as Record<PropertyKey, unknown>;
-    return record[RELKIT_GRAPH_NODE] === true && record.kind === "graph-node" &&
-      typeof record.id === "string" && Array.isArray(record.ends) &&
+    return (
+      record[RELKIT_GRAPH_NODE] === true &&
+      record.kind === "graph-node" &&
+      typeof record.id === "string" &&
+      Array.isArray(record.ends) &&
       record.ends.every((destination: unknown) => typeof destination === "string") &&
-      (yield* isAgentSchemaEffect(record.input)) && (yield* isAgentSchemaEffect(record.output)) &&
+      (yield* isAgentSchemaEffect(record.input)) &&
+      (yield* isAgentSchemaEffect(record.output)) &&
       (record.resume === undefined || (yield* isAgentSchemaEffect(record.resume))) &&
-      typeof record.handler === "function";
+      typeof record.handler === "function"
+    );
   },
   (effect) => observeAgent("graph-node.is-descriptor", effect),
 );

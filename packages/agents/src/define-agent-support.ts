@@ -14,10 +14,11 @@ import type {
  * @example Effect.runSync(copyAgentInstructionsEffect("Answer clearly"));
  */
 export const copyAgentInstructionsEffect = Effect.fn("Agents.definition.copyInstructions")(
-  (value: unknown) => Effect.try({
-    try: () => copyAgentInstructionsValue(value),
-    catch: agentDefinitionFailure,
-  }),
+  (value: unknown) =>
+    Effect.try({
+      try: () => copyAgentInstructionsValue(value),
+      catch: agentDefinitionFailure,
+    }),
   (effect) => observeAgent("definition.copy-instructions", effect),
 );
 
@@ -28,9 +29,11 @@ export const copyAgentInstructionsEffect = Effect.fn("Agents.definition.copyInst
  * @example const instructions = copyAgentInstructions("Answer clearly");
  */
 export function copyAgentInstructions(value: unknown): AgentInstructions {
-  return Effect.runSync(copyAgentInstructionsEffect(value).pipe(
-    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    copyAgentInstructionsEffect(value).pipe(
+      Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function copyAgentInstructionsValue(value: unknown): AgentInstructions {

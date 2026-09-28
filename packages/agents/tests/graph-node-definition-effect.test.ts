@@ -18,12 +18,19 @@ import {
 
 const input = z.object({ value: z.string() });
 const output = z.object({ result: z.string() });
-const options = { id: "step", input, output, handler: ({ value }: { value: string }) => ({ result: value }) };
+const options = {
+  id: "step",
+  input,
+  output,
+  handler: ({ value }: { value: string }) => ({ result: value }),
+};
 
 test("graph node Effect defines a descriptor and validates a handler result", async () => {
   const node = Effect.runSync(defineGraphNodeEffect(options));
   expect(Effect.runSync(isGraphNodeDescriptorEffect(node))).toBe(true);
-  expect(await Effect.runPromise(runGraphNodeHandlerEffect(options, [], { value: "ok" }))).toEqual({ result: "ok" });
+  expect(await Effect.runPromise(runGraphNodeHandlerEffect(options, [], { value: "ok" }))).toEqual({
+    result: "ok",
+  });
   expect(await node.handler({ value: "ok" })).toEqual({ result: "ok" });
 });
 
@@ -34,7 +41,9 @@ test("graph node Effect tags authoring and handler failures while adapters prese
   if (Result.isFailure(result)) expect(result.failure._tag).toBe("GraphNodeValidationFailure");
   expect(() => defineGraphNode(invalid)).toThrow("Graph node ends cannot contain START");
 
-  const failure = await Effect.runPromise(Effect.result(runGraphNodeHandlerEffect(options, [], {})));
+  const failure = await Effect.runPromise(
+    Effect.result(runGraphNodeHandlerEffect(options, [], {})),
+  );
   expect(Result.isFailure(failure)).toBe(true);
   if (Result.isFailure(failure)) expect(failure.failure._tag).toBe("GraphNodeValidationFailure");
 });
@@ -42,8 +51,11 @@ test("graph node Effect tags authoring and handler failures while adapters prese
 test("subgraph Effects preserve hidden graph identity and tag invalid destinations", () => {
   const node = defineGraphNode(options);
   const graph = defineGraph({
-    id: "flow", state: new StateSchema({ value: z.string(), result: z.string().optional() }),
-    input, output, nodes: [node],
+    id: "flow",
+    state: new StateSchema({ value: z.string(), result: z.string().optional() }),
+    input,
+    output,
+    nodes: [node],
     edges: (edge) => edge.addEdge(START, "step").addEdge("step", END),
     limits: { maxSteps: 2, maxToolCalls: 1, timeoutMs: 1000 },
   });

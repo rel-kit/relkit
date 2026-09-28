@@ -22,7 +22,10 @@ export interface PersistenceResource<Kind extends "checkpointer" | "memory", Val
 export type CheckpointerResource<Value extends BaseCheckpointSaver = BaseCheckpointSaver> =
   PersistenceResource<"checkpointer", Value>;
 /** Memory store resource passed to a LangGraph runtime. */
-export type MemoryResource<Value extends BaseStore = BaseStore> = PersistenceResource<"memory", Value>;
+export type MemoryResource<Value extends BaseStore = BaseStore> = PersistenceResource<
+  "memory",
+  Value
+>;
 
 /** Acquisition and disposal configuration for an agent persistence resource. */
 export interface PersistenceOptions<Value> {

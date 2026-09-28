@@ -11,27 +11,28 @@ import type { AgentTool, NativeAgentTool } from "./define-agent-native.types.js"
  * @example Effect.runSync(copyAgentToolsEffect([]));
  */
 export const copyAgentToolsEffect = Effect.fn("Agents.definition.copyTools")(
-  <Tools extends readonly AgentTool[]>(value: Tools) => Effect.try({
-    try: (): Tools => {
-      if (!Array.isArray(value)) throw new TypeError("Agent tools must be an array");
-      const ids = new Set<string>();
-      const tools = value.map((entry, index) => {
-        if (isToolRef(entry)) {
-          const id = entry.ref.id;
-          duplicate(ids, id);
-          return Object.freeze({ ref: Object.freeze({ kind: "tool" as const, id }) });
-        }
-        if (!isNativeAgentTool(entry)) {
-          throw new TypeError(`Agent tool at index ${index} is invalid`);
-        }
-        const name = nativeToolName(entry);
-        if (name !== undefined) duplicate(ids, name);
-        return entry;
-      });
-      return Object.freeze(tools) as unknown as Tools;
-    },
-    catch: agentDefinitionFailure,
-  }),
+  <Tools extends readonly AgentTool[]>(value: Tools) =>
+    Effect.try({
+      try: (): Tools => {
+        if (!Array.isArray(value)) throw new TypeError("Agent tools must be an array");
+        const ids = new Set<string>();
+        const tools = value.map((entry, index) => {
+          if (isToolRef(entry)) {
+            const id = entry.ref.id;
+            duplicate(ids, id);
+            return Object.freeze({ ref: Object.freeze({ kind: "tool" as const, id }) });
+          }
+          if (!isNativeAgentTool(entry)) {
+            throw new TypeError(`Agent tool at index ${index} is invalid`);
+          }
+          const name = nativeToolName(entry);
+          if (name !== undefined) duplicate(ids, name);
+          return entry;
+        });
+        return Object.freeze(tools) as unknown as Tools;
+      },
+      catch: agentDefinitionFailure,
+    }),
   (effect) => observeAgent("definition.copy-tools", effect),
 );
 
@@ -42,9 +43,11 @@ export const copyAgentToolsEffect = Effect.fn("Agents.definition.copyTools")(
  * @example const tools = copyAgentTools([]);
  */
 export function copyAgentTools<Tools extends readonly AgentTool[]>(value: Tools): Tools {
-  return Effect.runSync(copyAgentToolsEffect(value).pipe(
-    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    copyAgentToolsEffect(value).pipe(
+      Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Selects RELKIT tool references from a mixed native tool list.

@@ -1,9 +1,6 @@
 import { Effect, Layer, Metric } from "effect";
 import { expect, test } from "vitest";
-import {
-  AgentTelemetry,
-  AgentTelemetryLive,
-} from "../src/agent-telemetry.js";
+import { AgentTelemetry, AgentTelemetryLive } from "../src/agent-telemetry.js";
 import { createAgentCapturePolicyEffect } from "../src/capture-policy.js";
 
 test("live telemetry records calls, failures, and durations", () => {
@@ -35,7 +32,11 @@ test("live telemetry records calls, failures, and durations", () => {
 
   expect(
     Effect.runSync(
-      Effect.provideService(Effect.provide(program, AgentTelemetryLive), Metric.MetricRegistry, registry),
+      Effect.provideService(
+        Effect.provide(program, AgentTelemetryLive),
+        Metric.MetricRegistry,
+        registry,
+      ),
     ),
   ).toEqual({ calls: 2, failures: 1, duration: 2 });
 });

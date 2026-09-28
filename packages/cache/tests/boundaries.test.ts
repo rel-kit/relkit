@@ -164,17 +164,34 @@ describe("cache boundaries", () => {
         return 1;
       },
     };
-    const invalidIdentity = await Effect.runPromise(Effect.flip(
-      getCacheEffect("sku").pipe(Effect.provide(cacheRuntimeLayer({
-        ownerId: "", cacheId: "prices", source,
-      }))),
-    ));
+    const invalidIdentity = await Effect.runPromise(
+      Effect.flip(
+        getCacheEffect("sku").pipe(
+          Effect.provide(
+            cacheRuntimeLayer({
+              ownerId: "",
+              cacheId: "prices",
+              source,
+            }),
+          ),
+        ),
+      ),
+    );
     expect(invalidIdentity).toBeInstanceOf(CacheValidationError);
-    const invalidPolicy = await Effect.runPromise(Effect.flip(
-      getCacheEffect("sku").pipe(Effect.provide(cacheRuntimeLayer({
-        ownerId: "orders", cacheId: "prices", source, maxTtlMs: 0,
-      }))),
-    ));
+    const invalidPolicy = await Effect.runPromise(
+      Effect.flip(
+        getCacheEffect("sku").pipe(
+          Effect.provide(
+            cacheRuntimeLayer({
+              ownerId: "orders",
+              cacheId: "prices",
+              source,
+              maxTtlMs: 0,
+            }),
+          ),
+        ),
+      ),
+    );
     expect(invalidPolicy).toBeInstanceOf(CacheTtlPolicyError);
     expect(starts).toBe(0);
   });

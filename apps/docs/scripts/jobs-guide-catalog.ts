@@ -130,7 +130,10 @@ export const jobsGuideRelations = [
   {
     path: "jobs/migration",
     api: ["app", "jobs"],
-    examples: ["packages/jobs/tests/migration.test.ts", "apps/docs/examples/jobs/send-receipt.job.ts"],
+    examples: [
+      "packages/jobs/tests/migration.test.ts",
+      "apps/docs/examples/jobs/send-receipt.job.ts",
+    ],
   },
   {
     path: "jobs/troubleshooting",

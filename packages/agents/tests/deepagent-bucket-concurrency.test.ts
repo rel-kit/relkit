@@ -6,7 +6,10 @@ import type { DeepAgentBucketClient } from "../src/deepagent-bucket-files.js";
 import { deepAgentBucketLayer } from "../src/deepagent-bucket-service.js";
 
 test("directory metadata requests stay bounded and retain file order", async () => {
-  const keys = Array.from({ length: 40 }, (_, index) => `deepagents/f${String(index).padStart(2, "0")}`);
+  const keys = Array.from(
+    { length: 40 },
+    (_, index) => `deepagents/f${String(index).padStart(2, "0")}`,
+  );
   let active = 0;
   let peak = 0;
   const bucket: DeepAgentBucketClient = {
@@ -35,17 +38,24 @@ test("direct delete Effect exposes a tagged bucket failure", async () => {
   const providerError = new Error("bucket unavailable");
   const bucket: DeepAgentBucketClient = {
     list: async () => ["deepagents/one"],
-    delete: async () => { throw providerError; },
+    delete: async () => {
+      throw providerError;
+    },
     head: async () => undefined,
     get: async () => undefined,
     put: async () => undefined,
     exists: async () => false,
   };
   const result = await Effect.runPromise(
-    Effect.result(Effect.provide(removeBucketPathEffect("/"), deepAgentBucketLayer({
-      bucket,
-      prefix: "deepagents",
-    }))),
+    Effect.result(
+      Effect.provide(
+        removeBucketPathEffect("/"),
+        deepAgentBucketLayer({
+          bucket,
+          prefix: "deepagents",
+        }),
+      ),
+    ),
   );
   expect(Result.isFailure(result)).toBe(true);
   if (Result.isFailure(result)) {
@@ -55,15 +65,22 @@ test("direct delete Effect exposes a tagged bucket failure", async () => {
 
 test("concurrent deletes report the first key failure in input order", async () => {
   let releaseFirst = () => {};
-  const firstMayFinish = new Promise<void>((resolve) => { releaseFirst = resolve; });
+  const firstMayFinish = new Promise<void>((resolve) => {
+    releaseFirst = resolve;
+  });
   let markSecond = () => {};
-  const secondFinished = new Promise<void>((resolve) => { markSecond = resolve; });
+  const secondFinished = new Promise<void>((resolve) => {
+    markSecond = resolve;
+  });
   const first = new Error("first key failed");
   const second = new Error("second key failed");
   const bucket: DeepAgentBucketClient = {
     list: async () => ["deepagents/a", "deepagents/b"],
     delete: async (key) => {
-      if (key.endsWith("/a")) { await firstMayFinish; throw first; }
+      if (key.endsWith("/a")) {
+        await firstMayFinish;
+        throw first;
+      }
       markSecond();
       throw second;
     },

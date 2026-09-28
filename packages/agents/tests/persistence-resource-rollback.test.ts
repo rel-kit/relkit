@@ -2,7 +2,10 @@ import { expect, test } from "vitest";
 import { MemorySaver } from "@langchain/langgraph";
 import { Effect } from "effect";
 import { defineCheckpointerDb } from "../src/define-persistence.js";
-import { resolveAgentPersistence, resolveAgentPersistenceEffect } from "../src/graph-persistence.js";
+import {
+  resolveAgentPersistence,
+  resolveAgentPersistenceEffect,
+} from "../src/graph-persistence.js";
 
 test("releases an owned checkpointer when later store validation fails", async () => {
   let disposals = 0;
@@ -22,21 +25,31 @@ test("releases an owned checkpointer when later store validation fails", async (
 
 test("interrupted resolution releases an owned handle acquired after cancellation", async () => {
   let finishFactory = (_handle: MemorySaver) => {};
-  const factory = new Promise<MemorySaver>((resolve) => { finishFactory = resolve; });
+  const factory = new Promise<MemorySaver>((resolve) => {
+    finishFactory = resolve;
+  });
   let markStarted = () => {};
-  const started = new Promise<void>((resolve) => { markStarted = resolve; });
+  const started = new Promise<void>((resolve) => {
+    markStarted = resolve;
+  });
   let markDisposed = () => {};
-  const disposed = new Promise<void>((resolve) => { markDisposed = resolve; });
+  const disposed = new Promise<void>((resolve) => {
+    markDisposed = resolve;
+  });
   const checkpointer = defineCheckpointerDb({
     id: "interrupted.checkpointer",
-    client: () => { markStarted(); return factory; },
-    dispose: () => { markDisposed(); },
+    client: () => {
+      markStarted();
+      return factory;
+    },
+    dispose: () => {
+      markDisposed();
+    },
   });
   const controller = new AbortController();
-  const pending = Effect.runPromise(
-    resolveAgentPersistenceEffect({ checkpointer }, {}),
-    { signal: controller.signal },
-  );
+  const pending = Effect.runPromise(resolveAgentPersistenceEffect({ checkpointer }, {}), {
+    signal: controller.signal,
+  });
   await started;
   controller.abort();
   finishFactory(new MemorySaver());

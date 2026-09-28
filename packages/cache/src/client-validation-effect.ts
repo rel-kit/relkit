@@ -11,31 +11,36 @@ import type { CacheClientOptions, CacheOperationOptions } from "./client.types.j
  * @returns Void or a tagged configuration error.
  * @example Effect.runSync(validateClientIdentityEffect({ ownerId: "orders", cacheId: "prices", source: {} }));
  */
-export const validateClientIdentityEffect = Effect.fn("cache.validateClientIdentity")(
-  function* (options: CacheClientOptions) {
-    if (options === null || typeof options !== "object" || Array.isArray(options))
-      return yield* new CacheValidationError({ reason: "Cache options must be an object" });
-    yield* assertTextEffect(options.ownerId, "ownerId");
-    yield* assertTextEffect(options.cacheId, "cacheId");
-  },
-);
+export const validateClientIdentityEffect = Effect.fn("cache.validateClientIdentity")(function* (
+  options: CacheClientOptions,
+) {
+  if (options === null || typeof options !== "object" || Array.isArray(options))
+    return yield* new CacheValidationError({ reason: "Cache options must be an object" });
+  yield* assertTextEffect(options.ownerId, "ownerId");
+  yield* assertTextEffect(options.cacheId, "cacheId");
+});
 /** Validates schemas and TTL policy after the provider source.
  * @param options - Client configuration with validated identity.
  * @returns Void or a tagged schema or TTL error.
  * @example Effect.runSync(validateClientPolicyEffect({ ownerId: "orders", cacheId: "prices", source: {} }));
  */
-export const validateClientPolicyEffect = Effect.fn("cache.validateClientPolicy")(
-  function* (options: CacheClientOptions) {
-    yield* assertSchemaEffect(options.keySchema ?? options.key ?? options.descriptor?.key, "key");
-    yield* assertSchemaEffect(options.valueSchema ?? options.value ?? options.descriptor?.value, "value");
-    const defaultTtlMs = options.defaultTtlMs ?? options.descriptor?.defaultTtlMs;
-    const maxTtlMs = options.maxTtlMs ?? options.descriptor?.maxTtlMs;
-    yield* validatePolicyEffect(defaultTtlMs, "defaultTtlMs");
-    yield* validatePolicyEffect(maxTtlMs, "maxTtlMs");
-    if (defaultTtlMs !== undefined && maxTtlMs !== undefined && defaultTtlMs > maxTtlMs)
-      return yield* Effect.fail(new CacheTtlPolicyError("Cache defaultTtlMs must not exceed maxTtlMs"));
-  },
-);
+export const validateClientPolicyEffect = Effect.fn("cache.validateClientPolicy")(function* (
+  options: CacheClientOptions,
+) {
+  yield* assertSchemaEffect(options.keySchema ?? options.key ?? options.descriptor?.key, "key");
+  yield* assertSchemaEffect(
+    options.valueSchema ?? options.value ?? options.descriptor?.value,
+    "value",
+  );
+  const defaultTtlMs = options.defaultTtlMs ?? options.descriptor?.defaultTtlMs;
+  const maxTtlMs = options.maxTtlMs ?? options.descriptor?.maxTtlMs;
+  yield* validatePolicyEffect(defaultTtlMs, "defaultTtlMs");
+  yield* validatePolicyEffect(maxTtlMs, "maxTtlMs");
+  if (defaultTtlMs !== undefined && maxTtlMs !== undefined && defaultTtlMs > maxTtlMs)
+    return yield* Effect.fail(
+      new CacheTtlPolicyError("Cache defaultTtlMs must not exceed maxTtlMs"),
+    );
+});
 /** Validates a required human-readable cache identifier. */
 function assertTextEffect(value: unknown, name: string) {
   return typeof value === "string" && value.trim() !== ""
@@ -48,9 +53,11 @@ function assertSchemaEffect(value: StandardSchemaV1 | undefined, name: string) {
   const standard = value["~standard"];
   return standard?.version === 1 && typeof standard.validate === "function"
     ? Effect.void
-    : Effect.fail(new CacheValidationError({
-        reason: `Cache ${name} must be a Standard Schema v1 validator`,
-      }));
+    : Effect.fail(
+        new CacheValidationError({
+          reason: `Cache ${name} must be a Standard Schema v1 validator`,
+        }),
+      );
 }
 /** Validates a value through Standard Schema in the typed error channel.
  * @param schema - Optional validator.
@@ -68,7 +75,9 @@ export const validateSchemaEffect = Effect.fn("cache.validateSchema")(
         catch: () => new CacheSchemaValidationError(phase, [{ message: `Invalid cache ${phase}` }]),
       });
       if ("issues" in result && result.issues !== undefined)
-        return yield* Effect.fail(new CacheSchemaValidationError(phase, freezeIssues(result.issues)));
+        return yield* Effect.fail(
+          new CacheSchemaValidationError(phase, freezeIssues(result.issues)),
+        );
       return result.value;
     }),
 );
@@ -85,9 +94,13 @@ export const normalizeTtlEffect = Effect.fn("cache.normalizeTtl")(
       const ttlMs = value === undefined ? defaultTtlMs : value;
       if (ttlMs === undefined) return undefined;
       if (typeof ttlMs !== "number" || !Number.isSafeInteger(ttlMs) || ttlMs <= 0)
-        return yield* Effect.fail(new CacheTtlPolicyError("Cache ttlMs must be a positive integer"));
+        return yield* Effect.fail(
+          new CacheTtlPolicyError("Cache ttlMs must be a positive integer"),
+        );
       if (maxTtlMs !== undefined && ttlMs > maxTtlMs)
-        return yield* Effect.fail(new CacheTtlPolicyError("Cache ttlMs exceeds the configured maximum"));
+        return yield* Effect.fail(
+          new CacheTtlPolicyError("Cache ttlMs exceeds the configured maximum"),
+        );
       return { ttlMs } satisfies CacheOperationOptions;
     }),
 );

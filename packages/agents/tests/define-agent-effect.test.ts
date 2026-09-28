@@ -19,7 +19,9 @@ test("defineAgent Effect uses a substituted identity store", () => {
     services: new WeakMap(),
     nextUnboundId: () => "fixed",
   };
-  const agent = Effect.runSync(Effect.provideService(defineAgentEffect(options), IdentityStore, store));
+  const agent = Effect.runSync(
+    Effect.provideService(defineAgentEffect(options), IdentityStore, store),
+  );
   expect(agent.id).toBe("unbound.fixed");
   expect(Object.isFrozen(agent)).toBe(true);
 });
@@ -27,16 +29,19 @@ test("defineAgent Effect uses a substituted identity store", () => {
 test("defineAgent Effect tags invalid options and adapter retains TypeError", () => {
   const invalid = { ...options, limits: { ...options.limits, maxSteps: 0 } };
   let generated = 0;
-  const result = Effect.runSync(Effect.result(Effect.provideService(
-    defineAgentEffect(invalid),
-    IdentityStore,
-    {
-      canonical: new WeakMap(),
-      unbound: new WeakMap(),
-      services: new WeakMap(),
-      nextUnboundId: () => { generated += 1; return "unused"; },
-    },
-  )));
+  const result = Effect.runSync(
+    Effect.result(
+      Effect.provideService(defineAgentEffect(invalid), IdentityStore, {
+        canonical: new WeakMap(),
+        unbound: new WeakMap(),
+        services: new WeakMap(),
+        nextUnboundId: () => {
+          generated += 1;
+          return "unused";
+        },
+      }),
+    ),
+  );
   expect(Result.isFailure(result)).toBe(true);
   if (Result.isFailure(result)) expect(result.failure._tag).toBe("AgentDefinitionFailure");
   expect(generated).toBe(0);
@@ -45,11 +50,15 @@ test("defineAgent Effect tags invalid options and adapter retains TypeError", ()
 
 test("defineAgent Effect rejects non-records and handlers before identity lookup", () => {
   const nonRecord = Effect.runSync(Effect.flip(defineAgentEffect(null as never)));
-  const handler = Effect.runSync(Effect.flip(defineAgentEffect({
-    ...options, handler: () => undefined,
-  } as never)));
+  const handler = Effect.runSync(
+    Effect.flip(
+      defineAgentEffect({
+        ...options,
+        handler: () => undefined,
+      } as never),
+    ),
+  );
   expect(nonRecord).toMatchObject({ _tag: "AgentDefinitionFailure" });
   expect(handler).toMatchObject({ _tag: "AgentDefinitionFailure" });
-  expect(Effect.runSync(defineAgentEffect({ ...options, id: "explicit" })).id)
-    .toBe("explicit");
+  expect(Effect.runSync(defineAgentEffect({ ...options, id: "explicit" })).id).toBe("explicit");
 });

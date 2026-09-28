@@ -62,11 +62,19 @@ describe("cache tagged errors", () => {
     expect(schema).toBeInstanceOf(TypeError);
     expect(ttl).toBeInstanceOf(RangeError);
     expect(ttl.reason).toBe("bad TTL");
-    expect(Effect.runSync(Effect.fail(schema).pipe(
-      Effect.catchTag("CacheSchemaValidationError", (error) => Effect.succeed(error.phase)),
-    ))).toBe("key");
-    expect(Effect.runSync(Effect.fail(ttl).pipe(
-      Effect.catchTag("CacheTtlPolicyError", (error) => Effect.succeed(error.message)),
-    ))).toBe("bad TTL");
+    expect(
+      Effect.runSync(
+        Effect.fail(schema).pipe(
+          Effect.catchTag("CacheSchemaValidationError", (error) => Effect.succeed(error.phase)),
+        ),
+      ),
+    ).toBe("key");
+    expect(
+      Effect.runSync(
+        Effect.fail(ttl).pipe(
+          Effect.catchTag("CacheTtlPolicyError", (error) => Effect.succeed(error.message)),
+        ),
+      ),
+    ).toBe("bad TTL");
   });
 });

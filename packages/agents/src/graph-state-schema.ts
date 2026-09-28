@@ -23,38 +23,38 @@ export class GraphStateSelectionError extends Schema.TaggedError<GraphStateSelec
  * @example
  * const projected = Effect.runSync(selectGraphStateEffect(state, z.object({ answer: z.string() })));
  */
-export const selectGraphStateEffect = Effect.fn("Agents.graphState.select")(function* (
-  state: AnyStateSchema,
-  selection: StandardSchemaV1,
-) {
-  yield* Metric.update(selectionCount, 1);
-  const projection = yield* Effect.sync(() => getJsonSchema(selection));
-  const properties = projection.ok ? projection.schema.properties : undefined;
-  if (!isRecord(properties)) {
-    yield* Metric.update(selectionFailures, 1);
-    return yield* Effect.fail(
-      new GraphStateSelectionError({
-        code: "RELKIT_SCHEMA_UNAVAILABLE",
-        message: "Graph state selection is unavailable",
-      }),
-    );
-  }
-  const selected: Record<string, (typeof state.fields)[string]> = {};
-  for (const key of Object.keys(properties)) {
-    const field = state.fields[key];
-    if (field === undefined) {
+export const selectGraphStateEffect = Effect.fn("Agents.graphState.select")(
+  function* (state: AnyStateSchema, selection: StandardSchemaV1) {
+    yield* Metric.update(selectionCount, 1);
+    const projection = yield* Effect.sync(() => getJsonSchema(selection));
+    const properties = projection.ok ? projection.schema.properties : undefined;
+    if (!isRecord(properties)) {
       yield* Metric.update(selectionFailures, 1);
       return yield* Effect.fail(
         new GraphStateSelectionError({
           code: "RELKIT_SCHEMA_UNAVAILABLE",
-          message: `Graph state field "${key}" is unavailable`,
+          message: "Graph state selection is unavailable",
         }),
       );
     }
-    selected[key] = field;
-  }
-  return yield* Effect.sync(() => new StateSchema(selected));
-}, (effect) => observeAgent("graph-state.select", effect));
+    const selected: Record<string, (typeof state.fields)[string]> = {};
+    for (const key of Object.keys(properties)) {
+      const field = state.fields[key];
+      if (field === undefined) {
+        yield* Metric.update(selectionFailures, 1);
+        return yield* Effect.fail(
+          new GraphStateSelectionError({
+            code: "RELKIT_SCHEMA_UNAVAILABLE",
+            message: `Graph state field "${key}" is unavailable`,
+          }),
+        );
+      }
+      selected[key] = field;
+    }
+    return yield* Effect.sync(() => new StateSchema(selected));
+  },
+  (effect) => observeAgent("graph-state.select", effect),
+);
 
 /**
  * Projects graph state for existing synchronous graph definition callers.

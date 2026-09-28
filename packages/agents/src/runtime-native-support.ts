@@ -19,31 +19,40 @@ export class DeepAgentsLoader extends Context.Service<DeepAgentsLoader, DeepAgen
 /** Live dynamic import of the optional DeepAgents dependency.
  * @example Effect.runPromise(Effect.provide(loadDeepAgentsEffect(), DeepAgentsLoaderLive));
  */
-export const DeepAgentsLoaderLive = Layer.succeed(DeepAgentsLoader, DeepAgentsLoader.of({
-  load: () => import("deepagents"),
-}));
+export const DeepAgentsLoaderLive = Layer.succeed(
+  DeepAgentsLoader,
+  DeepAgentsLoader.of({
+    load: () => import("deepagents"),
+  }),
+);
 
 /** Combines public IDs and failures from native tool groups.
  * @param groups - Root and subagent tool groups.
  * @returns An Effect with combined tools or AgentInvocationFailure.
  * @example Effect.runSync(combineNativeToolsEffect(groups));
  */
-export const combineNativeToolsEffect = Effect.fn("Agents.runtime.combineNativeTools")((
-  groups: readonly NativeTools[],
-) => Effect.try({ try: (): NativeTools => {
-  const publicIds = new Map<string, string>();
-  const relkitNames = new Set<string>();
-  for (const group of groups) {
-    for (const [name, id] of group.publicIds) publicIds.set(name, id);
-    for (const name of group.relkitNames) relkitNames.add(name);
-  }
-  return {
-    values: groups[0]!.values,
-    publicIds,
-    relkitNames,
-    failure: () => groups.map((group) => group.failure()).find((failure) => failure !== undefined),
-  };
-}, catch: agentInvocationFailure }), (effect) => observeAgent("runtime.combine-native-tools", effect));
+export const combineNativeToolsEffect = Effect.fn("Agents.runtime.combineNativeTools")(
+  (groups: readonly NativeTools[]) =>
+    Effect.try({
+      try: (): NativeTools => {
+        const publicIds = new Map<string, string>();
+        const relkitNames = new Set<string>();
+        for (const group of groups) {
+          for (const [name, id] of group.publicIds) publicIds.set(name, id);
+          for (const name of group.relkitNames) relkitNames.add(name);
+        }
+        return {
+          values: groups[0]!.values,
+          publicIds,
+          relkitNames,
+          failure: () =>
+            groups.map((group) => group.failure()).find((failure) => failure !== undefined),
+        };
+      },
+      catch: agentInvocationFailure,
+    }),
+  (effect) => observeAgent("runtime.combine-native-tools", effect),
+);
 
 /** Combines tool groups for existing synchronous callers.
  * @param groups - Root and subagent tool groups.
@@ -52,9 +61,11 @@ export const combineNativeToolsEffect = Effect.fn("Agents.runtime.combineNativeT
  * @example combineNativeTools(groups);
  */
 export function combineNativeTools(groups: readonly NativeTools[]): NativeTools {
-  return Effect.runSync(combineNativeToolsEffect(groups).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    combineNativeToolsEffect(groups).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Projects authored instructions to native system prompt text.
@@ -62,14 +73,19 @@ export function combineNativeTools(groups: readonly NativeTools[]): NativeTools 
  * @returns An Effect with prompt text or AgentInvocationFailure.
  * @example Effect.runSync(nativeInstructionsEffect(agent));
  */
-export const nativeInstructionsEffect = Effect.fn("Agents.runtime.nativeInstructions")((
-  agent: AgentDescriptor<string, unknown, unknown>,
-) => Effect.try({ try: () => {
-  const value = agent.instructions;
-  if (typeof value === "string") return value;
-  if ("template" in value) return value.template;
-  return typeof value.value === "string" ? value.value : value.value.join("\n\n");
-}, catch: agentInvocationFailure }), (effect) => observeAgent("runtime.native-instructions", effect));
+export const nativeInstructionsEffect = Effect.fn("Agents.runtime.nativeInstructions")(
+  (agent: AgentDescriptor<string, unknown, unknown>) =>
+    Effect.try({
+      try: () => {
+        const value = agent.instructions;
+        if (typeof value === "string") return value;
+        if ("template" in value) return value.template;
+        return typeof value.value === "string" ? value.value : value.value.join("\n\n");
+      },
+      catch: agentInvocationFailure,
+    }),
+  (effect) => observeAgent("runtime.native-instructions", effect),
+);
 
 /** Projects native instructions for existing synchronous callers.
  * @param agent - Authored agent descriptor.
@@ -78,9 +94,11 @@ export const nativeInstructionsEffect = Effect.fn("Agents.runtime.nativeInstruct
  * @example nativeInstructions(agent);
  */
 export function nativeInstructions(agent: AgentDescriptor<string, unknown, unknown>): string {
-  return Effect.runSync(nativeInstructionsEffect(agent).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    nativeInstructionsEffect(agent).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Loads the optional DeepAgents module through a replaceable service.
@@ -92,10 +110,13 @@ export const loadDeepAgentsEffect = Effect.fn("Agents.runtime.loadDeepAgents")(
     const loader = yield* DeepAgentsLoader;
     return yield* Effect.tryPromise({
       try: () => loader.load(),
-      catch: () => agentInvocationFailure(new AgentRuntimeError(
-        "RELKIT_DEEPAGENTS_UNAVAILABLE",
-        "DeepAgents capabilities require the application dependency deepagents@1.13.3",
-      )),
+      catch: () =>
+        agentInvocationFailure(
+          new AgentRuntimeError(
+            "RELKIT_DEEPAGENTS_UNAVAILABLE",
+            "DeepAgents capabilities require the application dependency deepagents@1.13.3",
+          ),
+        ),
     });
   },
   (effect) => observeAgent("runtime.load-deepagents", effect),
@@ -107,10 +128,12 @@ export const loadDeepAgentsEffect = Effect.fn("Agents.runtime.loadDeepAgents")(
  * @example await loadDeepAgents();
  */
 export function loadDeepAgents(): Promise<typeof import("deepagents")> {
-  return Effect.runPromise(loadDeepAgentsEffect().pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(DeepAgentsLoaderLive),
-  ));
+  return Effect.runPromise(
+    loadDeepAgentsEffect().pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(DeepAgentsLoaderLive),
+    ),
+  );
 }
 
 /** Verifies optional runtime dependencies for authored agents.
@@ -134,8 +157,10 @@ export const assertAgentRuntimeDependenciesEffect = Effect.fn("Agents.runtime.as
 export function assertAgentRuntimeDependencies(
   agents: readonly AgentDescriptor<string, unknown, unknown>[],
 ): Promise<void> {
-  return Effect.runPromise(assertAgentRuntimeDependenciesEffect(agents).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(DeepAgentsLoaderLive),
-  ));
+  return Effect.runPromise(
+    assertAgentRuntimeDependenciesEffect(agents).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(DeepAgentsLoaderLive),
+    ),
+  );
 }

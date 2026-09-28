@@ -13,9 +13,14 @@ import { agentDefinitionFailure } from "./define-agent-error.js";
 import { graphDefinitionFailure } from "./define-graph-error.js";
 import type { GraphWorkflow } from "./graph-workflow.js";
 import type {
-  AgentClientContractMetadata, AgentClientMetadataOptions, ClientEventMetadata,
-  ClientScopeMetadata, ClientToolMetadata, ClientWaitingMetadata,
-  GraphClientMetadataOptions, SubagentMetadataSource,
+  AgentClientContractMetadata,
+  AgentClientMetadataOptions,
+  ClientEventMetadata,
+  ClientScopeMetadata,
+  ClientToolMetadata,
+  ClientWaitingMetadata,
+  GraphClientMetadataOptions,
+  SubagentMetadataSource,
 } from "./client-contract-metadata.types.js";
 
 export type * from "./client-contract-metadata.types.js";
@@ -25,10 +30,14 @@ export type * from "./client-contract-metadata.types.js";
  * @returns An Effect with metadata or AgentDefinitionFailure.
  * @example Effect.runSync(agentClientContractMetadataEffect(options));
  */
-export const agentClientContractMetadataEffect = Effect.fn("Agents.client.agentMetadata")((
-  options: AgentClientMetadataOptions,
-) => Effect.try({ try: () => agentClientContractMetadataCore(options), catch: agentDefinitionFailure }),
-  (effect) => observeAgent("client.agent-metadata", effect));
+export const agentClientContractMetadataEffect = Effect.fn("Agents.client.agentMetadata")(
+  (options: AgentClientMetadataOptions) =>
+    Effect.try({
+      try: () => agentClientContractMetadataCore(options),
+      catch: agentDefinitionFailure,
+    }),
+  (effect) => observeAgent("client.agent-metadata", effect),
+);
 
 /** Builds native agent metadata for existing synchronous callers.
  * @param options - Agent tools, middleware, public policy, and nested agents.
@@ -36,13 +45,19 @@ export const agentClientContractMetadataEffect = Effect.fn("Agents.client.agentM
  * @throws The original invalid metadata error.
  * @example agentClientContractMetadata(options);
  */
-export function agentClientContractMetadata(options: AgentClientMetadataOptions): AgentClientContractMetadata {
-  return Effect.runSync(agentClientContractMetadataEffect(options).pipe(
-    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+export function agentClientContractMetadata(
+  options: AgentClientMetadataOptions,
+): AgentClientContractMetadata {
+  return Effect.runSync(
+    agentClientContractMetadataEffect(options).pipe(
+      Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
-function agentClientContractMetadataCore(options: AgentClientMetadataOptions): AgentClientContractMetadata {
+function agentClientContractMetadataCore(
+  options: AgentClientMetadataOptions,
+): AgentClientContractMetadata {
   const stateSchema = mergeClientSchemas(options.middleware.map((item) => item.stateSchema));
   const scopes: ClientScopeMetadata[] = [{ kind: "agent", id: options.id }];
   collectSubagents(options.subagents, scopes);
@@ -65,10 +80,14 @@ function agentClientContractMetadataCore(options: AgentClientMetadataOptions): A
  * @returns An Effect with metadata or GraphDefinitionFailure.
  * @example Effect.runSync(graphClientContractMetadataEffect(options));
  */
-export const graphClientContractMetadataEffect = Effect.fn("Agents.client.graphMetadata")((
-  options: GraphClientMetadataOptions,
-) => Effect.try({ try: () => graphClientContractMetadataCore(options), catch: graphDefinitionFailure }),
-  (effect) => observeAgent("client.graph-metadata", effect));
+export const graphClientContractMetadataEffect = Effect.fn("Agents.client.graphMetadata")(
+  (options: GraphClientMetadataOptions) =>
+    Effect.try({
+      try: () => graphClientContractMetadataCore(options),
+      catch: graphDefinitionFailure,
+    }),
+  (effect) => observeAgent("client.graph-metadata", effect),
+);
 
 /** Builds graph metadata for existing synchronous callers.
  * @param options - Graph state, workflow, and public policy.
@@ -76,13 +95,19 @@ export const graphClientContractMetadataEffect = Effect.fn("Agents.client.graphM
  * @throws The original invalid graph metadata error.
  * @example graphClientContractMetadata(options);
  */
-export function graphClientContractMetadata(options: GraphClientMetadataOptions): AgentClientContractMetadata {
-  return Effect.runSync(graphClientContractMetadataEffect(options).pipe(
-    Effect.catchTag("GraphDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+export function graphClientContractMetadata(
+  options: GraphClientMetadataOptions,
+): AgentClientContractMetadata {
+  return Effect.runSync(
+    graphClientContractMetadataEffect(options).pipe(
+      Effect.catchTag("GraphDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
-function graphClientContractMetadataCore(options: GraphClientMetadataOptions): AgentClientContractMetadata {
+function graphClientContractMetadataCore(
+  options: GraphClientMetadataOptions,
+): AgentClientContractMetadata {
   const scopes: ClientScopeMetadata[] = [{ kind: "agent", id: options.id }];
   const waiting: ClientWaitingMetadata[] = [];
   collectWorkflow(options.workflow, scopes, waiting);

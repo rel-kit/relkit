@@ -39,9 +39,10 @@ export const grepFilesEffect = Effect.fn("Agents.bucket.grep")(
       catch: deepAgentBucketFailure,
     });
     const keys = yield* scopedKeysEffect(path);
-    const cap = maxCount === null || !Number.isFinite(maxCount)
-      ? Number.POSITIVE_INFINITY
-      : Math.max(0, Math.floor(maxCount));
+    const cap =
+      maxCount === null || !Number.isFinite(maxCount)
+        ? Number.POSITIVE_INFINITY
+        : Math.max(0, Math.floor(maxCount));
     const matches: NonNullable<GrepResult["matches"]> = [];
     for (const key of keys) {
       const absolute = yield* Effect.try({
@@ -51,7 +52,11 @@ export const grepFilesEffect = Effect.fn("Agents.bucket.grep")(
       const name = absolute.split("/").at(-1)!;
       if (glob !== undefined && !matchesGlob(name, glob)) continue;
       const data = yield* readFileDataEffect(absolute);
-      if (data === undefined || !isTextMimeType(data.mimeType) || typeof data.content !== "string") {
+      if (
+        data === undefined ||
+        !isTextMimeType(data.mimeType) ||
+        typeof data.content !== "string"
+      ) {
         continue;
       }
       for (const [index, text] of data.content.split("\n").entries()) {

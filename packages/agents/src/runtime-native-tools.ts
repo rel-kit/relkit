@@ -49,7 +49,10 @@ export const createNativeToolsEffect = Effect.fn("Agents.runtime.createNativeToo
           }
           const projection = getJsonSchema(registered.target.input);
           if (!projection.ok) {
-            throw new AgentRuntimeError("RELKIT_SCHEMA_UNAVAILABLE", "Tool input schema is unavailable");
+            throw new AgentRuntimeError(
+              "RELKIT_SCHEMA_UNAVAILABLE",
+              "Tool input schema is unavailable",
+            );
           }
           const name = modelToolName(registered.id, index);
           publicIds.set(name, registered.id);
@@ -64,19 +67,38 @@ export const createNativeToolsEffect = Effect.fn("Agents.runtime.createNativeToo
                     `relkit.tool.${registered.id}`,
                     {
                       input,
-                      attributes: { "relkit.tool.id": registered.id, "relkit.tool.call.id": callId },
+                      attributes: {
+                        "relkit.tool.id": registered.id,
+                        "relkit.tool.call.id": callId,
+                      },
                     },
-                    () => Effect.runPromise(runToolEffect(
-                      options, { callId, toolId: registered.id, input }, combined,
-                      maxOutputBytes, invocationId, traceId,
-                    )),
+                    () =>
+                      Effect.runPromise(
+                        runToolEffect(
+                          options,
+                          { callId, toolId: registered.id, input },
+                          combined,
+                          maxOutputBytes,
+                          invocationId,
+                          traceId,
+                        ),
+                      ),
                   );
                 },
                 catch: agentInvocationFailure,
-              }).pipe(Effect.catchTag("AgentInvocationFailure", (error) => Effect.sync(() => {
-                failure = error.cause instanceof AgentInvocationFailure ? error.cause.cause : error.cause;
-                return { error: { code: "RELKIT_APPROVAL_REQUIRED", message: "Tool call paused" } };
-              })));
+              }).pipe(
+                Effect.catchTag("AgentInvocationFailure", (error) =>
+                  Effect.sync(() => {
+                    failure =
+                      error.cause instanceof AgentInvocationFailure
+                        ? error.cause.cause
+                        : error.cause;
+                    return {
+                      error: { code: "RELKIT_APPROVAL_REQUIRED", message: "Tool call paused" },
+                    };
+                  }),
+                ),
+              );
               return Effect.runPromise(result, { signal: config.signal ?? signal });
             },
             { name, description: registered.description, schema: projection.schema as never },
@@ -107,10 +129,12 @@ export function createNativeTools(
   invocationId: string,
   traceId: string,
 ): NativeTools {
-  return Effect.runSync(createNativeToolsEffect(options, signal, maxOutputBytes, invocationId, traceId).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-    Effect.provide(NativeToolIdentityLive),
-  ));
+  return Effect.runSync(
+    createNativeToolsEffect(options, signal, maxOutputBytes, invocationId, traceId).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(NativeToolIdentityLive),
+    ),
+  );
 }
 
 function nativeName(value: ClientTool | ServerTool): string | undefined {

@@ -23,31 +23,35 @@ import type { AgentClientEvents, AgentClientPolicy } from "./agent-client.types.
  * void policy;
  * ```
  */
-export const copyAgentClientPolicyEffect = Effect.fn("Agents.clientPolicy.copy")(function* <
-  StateKey extends string,
->(value: unknown, allowedStateKeys: ReadonlySet<StateKey> = new Set()) {
-  yield* Metric.update(clientPolicyCount, 1);
-  if (value === undefined) return undefined;
-  if (!isRecord(value)) return yield* reject("Agent client policy must be an object");
-  const publicAccess = value.public === true;
-  const authorize = isGuard(value.authorize) ? value.authorize : undefined;
-  if (publicAccess === (authorize !== undefined)) {
-    return yield* reject("Agent client policy requires exactly one of public or authorize");
-  }
-  const state = yield* copyStateKeys(value.state, allowedStateKeys);
-  const events = yield* copyEvents(value.events);
-  if (publicAccess) {
-    return Object.freeze({
-      public: true as const,
-      ...(state === undefined ? {} : { state }),
-      ...events,
-    });
-  }
-  if (authorize === undefined) {
-    return yield* reject("Agent client policy requires exactly one of public or authorize");
-  }
-  return Object.freeze({ authorize, ...(state === undefined ? {} : { state }), ...events });
-}, (effect) => observeAgent("client.copy", effect));
+export const copyAgentClientPolicyEffect = Effect.fn("Agents.clientPolicy.copy")(
+  function* <StateKey extends string>(
+    value: unknown,
+    allowedStateKeys: ReadonlySet<StateKey> = new Set(),
+  ) {
+    yield* Metric.update(clientPolicyCount, 1);
+    if (value === undefined) return undefined;
+    if (!isRecord(value)) return yield* reject("Agent client policy must be an object");
+    const publicAccess = value.public === true;
+    const authorize = isGuard(value.authorize) ? value.authorize : undefined;
+    if (publicAccess === (authorize !== undefined)) {
+      return yield* reject("Agent client policy requires exactly one of public or authorize");
+    }
+    const state = yield* copyStateKeys(value.state, allowedStateKeys);
+    const events = yield* copyEvents(value.events);
+    if (publicAccess) {
+      return Object.freeze({
+        public: true as const,
+        ...(state === undefined ? {} : { state }),
+        ...events,
+      });
+    }
+    if (authorize === undefined) {
+      return yield* reject("Agent client policy requires exactly one of public or authorize");
+    }
+    return Object.freeze({ authorize, ...(state === undefined ? {} : { state }), ...events });
+  },
+  (effect) => observeAgent("client.copy", effect),
+);
 
 /**
  * Copies a client policy for synchronous descriptor callers.

@@ -3,7 +3,12 @@ import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import { readFileDataEffect } from "./deepagent-bucket-file-data.js";
-import { errorMessage, isControlFailure, isTextMimeType, normalizedPage } from "./deepagent-bucket-files.js";
+import {
+  errorMessage,
+  isControlFailure,
+  isTextMimeType,
+  normalizedPage,
+} from "./deepagent-bucket-files.js";
 import type { DeepAgentBucketContext } from "./deepagent-bucket-files.types.js";
 
 /** Reads the full file payload from the current bucket service.
@@ -27,15 +32,20 @@ export const readBucketRawEffect = Effect.fn("Agents.bucket.readRaw")(
  * @throws A cancellation or timeout failure from the bucket client.
  * @example await readBucketRaw(context, "/a.md");
  */
-export function readBucketRaw(context: DeepAgentBucketContext, path: string): Promise<ReadRawResult> {
-  return Effect.runPromise(readBucketRawEffect(path).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) =>
-      isControlFailure(failure.cause)
-        ? Effect.fail(failure.cause)
-        : Effect.succeed({ error: errorMessage(failure.cause) }),
+export function readBucketRaw(
+  context: DeepAgentBucketContext,
+  path: string,
+): Promise<ReadRawResult> {
+  return Effect.runPromise(
+    readBucketRawEffect(path).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) =>
+        isControlFailure(failure.cause)
+          ? Effect.fail(failure.cause)
+          : Effect.succeed({ error: errorMessage(failure.cause) }),
+      ),
+      Effect.provide(deepAgentBucketLayer(context)),
     ),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+  );
 }
 
 /** Reads a paged text file or an unmodified binary payload.
@@ -83,13 +93,20 @@ export const readBucketEffect = Effect.fn("Agents.bucket.read")(
  * @throws A cancellation or timeout failure from the bucket client.
  * @example await readBucket(context, "/a.md", 0, 50);
  */
-export function readBucket(context: DeepAgentBucketContext, path: string, offset = 0, limit = 500): Promise<ReadResult> {
-  return Effect.runPromise(readBucketEffect(path, offset, limit).pipe(
-    Effect.catchTag("DeepAgentBucketFailure", (failure) =>
-      isControlFailure(failure.cause)
-        ? Effect.fail(failure.cause)
-        : Effect.succeed({ error: errorMessage(failure.cause) }),
+export function readBucket(
+  context: DeepAgentBucketContext,
+  path: string,
+  offset = 0,
+  limit = 500,
+): Promise<ReadResult> {
+  return Effect.runPromise(
+    readBucketEffect(path, offset, limit).pipe(
+      Effect.catchTag("DeepAgentBucketFailure", (failure) =>
+        isControlFailure(failure.cause)
+          ? Effect.fail(failure.cause)
+          : Effect.succeed({ error: errorMessage(failure.cause) }),
+      ),
+      Effect.provide(deepAgentBucketLayer(context)),
     ),
-    Effect.provide(deepAgentBucketLayer(context)),
-  ));
+  );
 }

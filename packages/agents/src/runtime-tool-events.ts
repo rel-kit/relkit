@@ -3,7 +3,10 @@ import type { ToolApprovalRequest } from "@relkit/tools";
 import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import {
-  approveApprovalEffect, assertApprovalGrantedEffect, createApprovalEffect, denyApprovalEffect,
+  approveApprovalEffect,
+  assertApprovalGrantedEffect,
+  createApprovalEffect,
+  denyApprovalEffect,
 } from "./approval.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { signalFailure } from "./signal.js";
@@ -20,24 +23,36 @@ import type { ToolPartState } from "./state.types.js";
  * @returns An Effect with void or AgentInvocationFailure.
  * @example await Effect.runPromise(emitToolEffect(options, turn, "running", undefined, signal));
  */
-export const emitToolEffect = Effect.fn("Agents.runtime.emitTool")((
-  options: RuntimeToolOptions,
-  turn: Pick<AgentToolCall, "callId" | "toolId">,
-  state: ToolPartState,
-  value: unknown,
-  signal: AbortSignal,
-) => Effect.gen(function* () {
-  const emit = options.contentSink?.emitTool;
-  if (emit === undefined) return;
-  if (signal.aborted) return yield* Effect.fail(agentInvocationFailure(signalFailure(signal)));
-  yield* Effect.tryPromise({
-    try: (effectSignal) => Promise.resolve(emit({
-      toolCallId: turn.callId, toolId: turn.toolId, state,
-      ...(value === undefined ? {} : { value }),
-    }, AbortSignal.any([signal, effectSignal]))),
-    catch: agentInvocationFailure,
-  });
-}), (effect) => observeAgent("runtime.emit-tool", effect));
+export const emitToolEffect = Effect.fn("Agents.runtime.emitTool")(
+  (
+    options: RuntimeToolOptions,
+    turn: Pick<AgentToolCall, "callId" | "toolId">,
+    state: ToolPartState,
+    value: unknown,
+    signal: AbortSignal,
+  ) =>
+    Effect.gen(function* () {
+      const emit = options.contentSink?.emitTool;
+      if (emit === undefined) return;
+      if (signal.aborted) return yield* Effect.fail(agentInvocationFailure(signalFailure(signal)));
+      yield* Effect.tryPromise({
+        try: (effectSignal) =>
+          Promise.resolve(
+            emit(
+              {
+                toolCallId: turn.callId,
+                toolId: turn.toolId,
+                state,
+                ...(value === undefined ? {} : { value }),
+              },
+              AbortSignal.any([signal, effectSignal]),
+            ),
+          ),
+        catch: agentInvocationFailure,
+      });
+    }),
+  (effect) => observeAgent("runtime.emit-tool", effect),
+);
 
 /** Emits a tool transition for existing Promise callers.
  * @param options - Runtime content sink.
@@ -56,9 +71,12 @@ export function emitTool(
   value: unknown,
   signal: AbortSignal,
 ): Promise<void> {
-  return Effect.runPromise(emitToolEffect(options, turn, state, value, signal).pipe(
-    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
-  ), { signal });
+  return Effect.runPromise(
+    emitToolEffect(options, turn, state, value, signal).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+    { signal },
+  );
 }
 
 /** Resolves tool approval and emits its lifecycle transitions.
@@ -80,15 +98,21 @@ export const resolveAgentApprovalEffect = Effect.fn("Agents.runtime.resolveAppro
   ) {
     if (signal.aborted) return yield* Effect.fail(agentInvocationFailure(signalFailure(signal)));
     const approval = yield* createApprovalEffect({
-      invocationId, toolCallId, toolId: request.toolId,
-      sideEffect: request.sideEffect, policy: request.policy,
+      invocationId,
+      toolCallId,
+      toolId: request.toolId,
+      sideEffect: request.sideEffect,
+      policy: request.policy,
     }).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)));
     if (approval.state !== "pending") return true as const;
     const turn = { callId: toolCallId, toolId: request.toolId };
     yield* emitToolEffect(options, turn, "approval-required", undefined, signal);
-    yield* Effect.sync(() => frameworkTrace.event("agent.tool.approval.requested", {
-      "relkit.tool.id": request.toolId, "relkit.tool.call.id": toolCallId,
-    }));
+    yield* Effect.sync(() =>
+      frameworkTrace.event("agent.tool.approval.requested", {
+        "relkit.tool.id": request.toolId,
+        "relkit.tool.call.id": toolCallId,
+      }),
+    );
     const handler = options.approval;
     if (handler === undefined) {
       yield* assertApprovalGrantedEffect(approval).pipe(
@@ -100,17 +124,29 @@ export const resolveAgentApprovalEffect = Effect.fn("Agents.runtime.resolveAppro
       try: () => Promise.resolve(handler(approval)),
       catch: agentInvocationFailure,
     });
-    const decision = response === "approved" || response === true
-      ? yield* approveApprovalEffect(approval).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)))
-      : response === "denied" || response === false
-        ? yield* denyApprovalEffect(approval).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)))
-        : response;
-    yield* Effect.sync(() => frameworkTrace.event("agent.tool.approval.resolved", {
-      "relkit.tool.id": request.toolId, "relkit.tool.call.id": toolCallId,
-      "relkit.tool.approval": decision.state,
-    }));
+    const decision =
+      response === "approved" || response === true
+        ? yield* approveApprovalEffect(approval).pipe(
+            Effect.mapError((failure) => agentInvocationFailure(failure.cause)),
+          )
+        : response === "denied" || response === false
+          ? yield* denyApprovalEffect(approval).pipe(
+              Effect.mapError((failure) => agentInvocationFailure(failure.cause)),
+            )
+          : response;
+    yield* Effect.sync(() =>
+      frameworkTrace.event("agent.tool.approval.resolved", {
+        "relkit.tool.id": request.toolId,
+        "relkit.tool.call.id": toolCallId,
+        "relkit.tool.approval": decision.state,
+      }),
+    );
     yield* emitToolEffect(
-      options, turn, decision.state === "approved" ? "running" : "denied", undefined, signal,
+      options,
+      turn,
+      decision.state === "approved" ? "running" : "denied",
+      undefined,
+      signal,
     );
     yield* assertApprovalGrantedEffect(decision).pipe(
       Effect.mapError((failure) => agentInvocationFailure(failure.cause)),
@@ -137,7 +173,10 @@ export function resolveAgentApproval(
   invocationId: string,
   signal: AbortSignal,
 ): Promise<true> {
-  return Effect.runPromise(resolveAgentApprovalEffect(
-    options, request, toolCallId, invocationId, signal,
-  ).pipe(Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause))), { signal });
+  return Effect.runPromise(
+    resolveAgentApprovalEffect(options, request, toolCallId, invocationId, signal).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+    { signal },
+  );
 }

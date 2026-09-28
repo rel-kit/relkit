@@ -22,7 +22,10 @@ export interface GraphEdgeBuilder<Id extends string, State> {
    * @throws TypeError for invalid or duplicate edges.
    * @example edge.addEdge("start", "finish");
    */
-  addEdge(start: typeof START | NoInfer<Id> | readonly NoInfer<Id>[], end: NoInfer<Id> | typeof END): GraphEdgeBuilder<Id, State>;
+  addEdge(
+    start: typeof START | NoInfer<Id> | readonly NoInfer<Id>[],
+    end: NoInfer<Id> | typeof END,
+  ): GraphEdgeBuilder<Id, State>;
   /** Adds a dynamic edge.
    * @param source - Source node.
    * @param route - Route callback.
@@ -30,7 +33,10 @@ export interface GraphEdgeBuilder<Id extends string, State> {
    * @throws TypeError for invalid or duplicate routes.
    * @example edge.addConditionalEdges("start", () => "finish");
    */
-  addConditionalEdges(source: typeof START | NoInfer<Id>, route: GraphRoute<NoInfer<Id>, State>): GraphEdgeBuilder<Id, State>;
+  addConditionalEdges(
+    source: typeof START | NoInfer<Id>,
+    route: GraphRoute<NoInfer<Id>, State>,
+  ): GraphEdgeBuilder<Id, State>;
   /** Adds a labeled dynamic edge.
    * @param source - Source node.
    * @param route - Route callback.
@@ -48,7 +54,11 @@ export interface GraphEdgeBuilder<Id extends string, State> {
 
 /** Recorded edge operation consumed by the LangGraph compiler. */
 export type GraphEdgeOperation<Id extends string, State> =
-  | { readonly kind: "edge"; readonly start: typeof START | Id | readonly Id[]; readonly end: Id | typeof END }
+  | {
+      readonly kind: "edge";
+      readonly start: typeof START | Id | readonly Id[];
+      readonly end: Id | typeof END;
+    }
   | {
       readonly kind: "conditional";
       readonly source: typeof START | Id;

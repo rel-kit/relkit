@@ -8,11 +8,14 @@ import { observeAgent } from "./agent-telemetry.js";
  * @returns An Effect with a stable native name.
  * @example Effect.runSync(modelToolNameEffect("math.add", 0));
  */
-export const modelToolNameEffect = Effect.fn("Agents.runtime.modelToolName")((id: string, index: number) =>
-  Effect.sync(() => {
-    const suffix = `_${index}`;
-    return `${id.replaceAll(".", "_").slice(0, 64 - suffix.length)}${suffix}`;
-  }), (effect) => observeAgent("runtime.model-tool-name", effect));
+export const modelToolNameEffect = Effect.fn("Agents.runtime.modelToolName")(
+  (id: string, index: number) =>
+    Effect.sync(() => {
+      const suffix = `_${index}`;
+      return `${id.replaceAll(".", "_").slice(0, 64 - suffix.length)}${suffix}`;
+    }),
+  (effect) => observeAgent("runtime.model-tool-name", effect),
+);
 
 /** Produces a native tool name for existing synchronous callers.
  * @param id - RELKIT tool ID.
@@ -31,14 +34,16 @@ export function modelToolName(id: string, index: number): string {
  * @returns An Effect with a tool descriptor or undefined.
  * @example Effect.runSync(findModelToolEffect(tools, refs, "math_add_0"));
  */
-export const findModelToolEffect = Effect.fn("Agents.runtime.findModelTool")((
-  source: ToolSource, refs: readonly { readonly ref: { readonly id: string } }[], name: string,
-) => Effect.sync(() => {
-  const direct = findToolCore(source, name);
-  if (direct !== undefined) return direct;
-  const ref = refs.find((entry, index) => modelToolName(entry.ref.id, index) === name);
-  return ref === undefined ? undefined : findToolCore(source, ref.ref.id);
-}), (effect) => observeAgent("runtime.find-model-tool", effect));
+export const findModelToolEffect = Effect.fn("Agents.runtime.findModelTool")(
+  (source: ToolSource, refs: readonly { readonly ref: { readonly id: string } }[], name: string) =>
+    Effect.sync(() => {
+      const direct = findToolCore(source, name);
+      if (direct !== undefined) return direct;
+      const ref = refs.find((entry, index) => modelToolName(entry.ref.id, index) === name);
+      return ref === undefined ? undefined : findToolCore(source, ref.ref.id);
+    }),
+  (effect) => observeAgent("runtime.find-model-tool", effect),
+);
 
 /** Finds a native tool for existing synchronous callers.
  * @param source - Registered tool source.
@@ -48,7 +53,9 @@ export const findModelToolEffect = Effect.fn("Agents.runtime.findModelTool")((
  * @example findModelTool(tools, refs, "math_add_0");
  */
 export function findModelTool(
-  source: ToolSource, refs: readonly { readonly ref: { readonly id: string } }[], name: string,
+  source: ToolSource,
+  refs: readonly { readonly ref: { readonly id: string } }[],
+  name: string,
 ): ToolDescriptor<string> | undefined {
   return Effect.runSync(findModelToolEffect(source, refs, name));
 }
@@ -59,9 +66,10 @@ export function findModelTool(
  * @returns An Effect with a descriptor or undefined.
  * @example Effect.runSync(findToolEffect(tools, "math.add"));
  */
-export const findToolEffect = Effect.fn("Agents.runtime.findTool")((source: ToolSource, id: string) =>
-  Effect.sync(() => findToolCore(source, id)),
-  (effect) => observeAgent("runtime.find-tool", effect));
+export const findToolEffect = Effect.fn("Agents.runtime.findTool")(
+  (source: ToolSource, id: string) => Effect.sync(() => findToolCore(source, id)),
+  (effect) => observeAgent("runtime.find-tool", effect),
+);
 
 /** Finds a tool for existing synchronous callers.
  * @param source - Registered tool source.
@@ -75,7 +83,8 @@ export function findTool(source: ToolSource, id: string): ToolDescriptor<string>
 
 function findToolCore(source: ToolSource, id: string): ToolDescriptor<string> | undefined {
   if (Array.isArray(source)) return source.find((tool) => tool.id === id);
-  if (source instanceof Map) return source.get(id) ?? [...source.values()].find((tool) => tool.id === id);
+  if (source instanceof Map)
+    return source.get(id) ?? [...source.values()].find((tool) => tool.id === id);
   const record = source as Readonly<Record<string, ToolDescriptor<string>>>;
   return record[id] ?? Object.values(record).find((tool) => tool.id === id);
 }

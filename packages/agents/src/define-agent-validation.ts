@@ -56,12 +56,13 @@ function isAgentDescriptorValue(value: unknown): boolean {
  * @example Effect.runSync(assertAgentDescriptorEffect(agent));
  */
 export const assertAgentDescriptorEffect = Effect.fn("Agents.definition.assertDescriptor")(
-  (value: unknown) => Effect.try({
-    try: () => {
-      if (!isAgentDescriptorValue(value)) throw new TypeError("Invalid agent descriptor");
-    },
-    catch: agentDefinitionFailure,
-  }),
+  (value: unknown) =>
+    Effect.try({
+      try: () => {
+        if (!isAgentDescriptorValue(value)) throw new TypeError("Invalid agent descriptor");
+      },
+      catch: agentDefinitionFailure,
+    }),
   (effect) => observeAgent("definition.assert-descriptor", effect),
 );
 
@@ -72,9 +73,11 @@ export const assertAgentDescriptorEffect = Effect.fn("Agents.definition.assertDe
  * @example assertAgentDescriptor(candidate);
  */
 export function assertAgentDescriptor(value: unknown): asserts value is AgentAny {
-  Effect.runSync(assertAgentDescriptorEffect(value).pipe(
-    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  Effect.runSync(
+    assertAgentDescriptorEffect(value).pipe(
+      Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Normalizes the selector of a string model definition.
@@ -83,10 +86,12 @@ export function assertAgentDescriptor(value: unknown): asserts value is AgentAny
  * @example Effect.runSync(normalizeAgentModelEffect("openai:gpt"));
  */
 export const normalizeAgentModelEffect = Effect.fn("Agents.definition.normalizeModel")(
-  (value: AgentModel | undefined) => Effect.try({
-    try: () => value === undefined || typeof value !== "string" ? value : normalizeModelSelector(value),
-    catch: agentDefinitionFailure,
-  }),
+  (value: AgentModel | undefined) =>
+    Effect.try({
+      try: () =>
+        value === undefined || typeof value !== "string" ? value : normalizeModelSelector(value),
+      catch: agentDefinitionFailure,
+    }),
   (effect) => observeAgent("definition.normalize-model", effect),
 );
 
@@ -97,9 +102,11 @@ export const normalizeAgentModelEffect = Effect.fn("Agents.definition.normalizeM
  * @example const model = normalizeAgentModel("openai:gpt");
  */
 export function normalizeAgentModel(value: AgentModel | undefined): AgentModel | undefined {
-  return Effect.runSync(normalizeAgentModelEffect(value).pipe(
-    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    normalizeAgentModelEffect(value).pipe(
+      Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 function isAgentModelSelector(value: unknown): value is AgentModel | undefined {

@@ -55,12 +55,8 @@ counterparts (`defineRouteEffect`, `defineMiddlewareEffect`,
 the authoring logic and report invalid input as `RouteOperationError` in the
 error channel. Synchronous calls preserve their TypeError messages.
 
-```ts
-import { Effect } from "effect";
-import { defineRouteEffect } from "@relkit/app/routes";
-
-const route = Effect.runSync(defineRouteEffect({ target: getOrder }));
-```
+For example, run `defineRouteEffect({ target: getOrder })` in an Effect runtime
+to build a route from the `getOrder` function above.
 
 Operations emit `routes.*` spans and bounded `relkit_route_*` metrics. Supply
 `RouteTelemetry` in a Layer to replace the observer in tests. Omitted IDs use

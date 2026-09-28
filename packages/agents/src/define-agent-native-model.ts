@@ -8,10 +8,13 @@ import type { AgentModel } from "./define-agent-native.types.js";
  * @example Effect.runSync(isAgentModelEffect("openai:gpt"));
  */
 export const isAgentModelEffect = Effect.fn("Agents.definition.isModel")(
-  (value: unknown) => Effect.sync(() =>
-    typeof value === "string" ||
-    typeof value === "function" ||
-    (isRecord(value) && typeof value.invoke === "function")),
+  (value: unknown) =>
+    Effect.sync(
+      () =>
+        typeof value === "string" ||
+        typeof value === "function" ||
+        (isRecord(value) && typeof value.invoke === "function"),
+    ),
   (effect) => observeAgent("definition.is-model", effect),
 );
 

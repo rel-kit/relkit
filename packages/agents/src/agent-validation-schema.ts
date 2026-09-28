@@ -16,22 +16,22 @@ import {
  * @example
  * const schema = Effect.runSync(assertAgentSchemaEffect(z.string(), "input"));
  */
-export const assertAgentSchemaEffect = Effect.fn("Agents.validation.assertSchema")(function* (
-  value: unknown,
-  name: string,
-) {
-  yield* Metric.update(validationCount, 1);
-  if (!schemaShape(value)) {
-    yield* Metric.update(validationFailures, 1);
-    return yield* Effect.fail(
-      new AgentValidationError({
-        operation: "assertAgentSchema",
-        message: `Agent ${name} must be a Standard Schema v1 validator`,
-      }),
-    );
-  }
-  return value;
-}, (effect) => observeAgent("validation.schema", effect));
+export const assertAgentSchemaEffect = Effect.fn("Agents.validation.assertSchema")(
+  function* (value: unknown, name: string) {
+    yield* Metric.update(validationCount, 1);
+    if (!schemaShape(value)) {
+      yield* Metric.update(validationFailures, 1);
+      return yield* Effect.fail(
+        new AgentValidationError({
+          operation: "assertAgentSchema",
+          message: `Agent ${name} must be a Standard Schema v1 validator`,
+        }),
+      );
+    }
+    return value;
+  },
+  (effect) => observeAgent("validation.schema", effect),
+);
 
 /**
  * Throws for an invalid schema in existing synchronous authoring calls.
@@ -63,13 +63,14 @@ export function assertAgentSchema(value: unknown, name: string): asserts value i
  * @example
  * const valid = Effect.runSync(isAgentSchemaEffect(z.string()));
  */
-export const isAgentSchemaEffect = Effect.fn("Agents.validation.isSchema")(function* (
-  value: unknown,
-) {
-  const valid = yield* Effect.sync(() => schemaShape(value));
-  yield* Metric.update(validationCount, 1);
-  return valid;
-}, (effect) => observeAgent("validation.is-schema", effect));
+export const isAgentSchemaEffect = Effect.fn("Agents.validation.isSchema")(
+  function* (value: unknown) {
+    const valid = yield* Effect.sync(() => schemaShape(value));
+    yield* Metric.update(validationCount, 1);
+    return valid;
+  },
+  (effect) => observeAgent("validation.is-schema", effect),
+);
 
 /**
  * Checks whether a candidate implements Standard Schema v1.

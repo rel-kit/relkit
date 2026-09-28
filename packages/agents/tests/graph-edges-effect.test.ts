@@ -20,7 +20,9 @@ test("graph edge Effects build ordered edges and validate routes", () => {
 });
 
 test("graph edge Effects tag invalid destinations", () => {
-  const result = Effect.runSync(Effect.result(validateGraphRouteEffect("missing", new Set(["step"]))));
+  const result = Effect.runSync(
+    Effect.result(validateGraphRouteEffect("missing", new Set(["step"]))),
+  );
   expect(Result.isFailure(result)).toBe(true);
   if (Result.isFailure(result)) expect(result.failure._tag).toBe("GraphDefinitionFailure");
 });

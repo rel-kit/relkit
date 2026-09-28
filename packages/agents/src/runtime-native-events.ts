@@ -5,7 +5,12 @@ import { observeAgent } from "./agent-telemetry.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import type { AgentContentSink } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
-import { executionContext, isModelStart, isToolStart, trackExecutionContext } from "./runtime-native-events-helpers.js";
+import {
+  executionContext,
+  isModelStart,
+  isToolStart,
+  trackExecutionContext,
+} from "./runtime-native-events-helpers.js";
 import { emitToolEvent } from "./runtime-native-event-tools.js";
 import { NativeMessageAccumulator } from "./runtime-native-messages.js";
 import { nativePublicEvent, type NativeExecutionContext } from "./runtime-native-public.js";
@@ -26,30 +31,48 @@ import { signalFailure, withSignal } from "./runtime-utils.js";
  * @returns An Effect with void or AgentInvocationFailure.
  * @example await Effect.runPromise(collectNativeEventsEffect(events, sink, ids, names, signal, limits, schemas, failure, observe, abort));
  */
-export const collectNativeEventsEffect = Effect.fn("Agents.runtime.collectNativeEvents")((
-  events: AsyncIterable<ProtocolEvent>,
-  sink: AgentContentSink | undefined,
-  toolIds: ReadonlyMap<string, string>,
-  relkitNames: ReadonlySet<string>,
-  signal: AbortSignal,
-  limits: { readonly maxSteps: number; readonly maxToolCalls: number },
-  stateSchemas: ReadonlyMap<string, StandardSchemaV1>,
-  failure: () => unknown,
-  observe: ((event: ProtocolEvent) => void) | undefined,
-  abort: (reason: unknown) => void,
-  eventSchemas: Readonly<Record<string, StandardSchemaV1>> = {},
-) => Effect.gen(function* () {
-  if (signal.aborted) return yield* Effect.fail(agentInvocationFailure(signalFailure(signal)));
-  yield* Effect.tryPromise({
-    try: (effectSignal) => collectNativeEventsCore(
-      events, sink, toolIds, relkitNames, AbortSignal.any([signal, effectSignal]),
-      limits, stateSchemas, failure, observe, abort, eventSchemas,
-    ),
-    catch: agentInvocationFailure,
-  }).pipe(Effect.onInterrupt(() => Effect.sync(() => abort(new AgentRuntimeError(
-    "RELKIT_AGENT_CANCELLED", "Agent invocation cancelled",
-  )))));
-}), (effect) => observeAgent("runtime.collect-native-events", effect));
+export const collectNativeEventsEffect = Effect.fn("Agents.runtime.collectNativeEvents")(
+  (
+    events: AsyncIterable<ProtocolEvent>,
+    sink: AgentContentSink | undefined,
+    toolIds: ReadonlyMap<string, string>,
+    relkitNames: ReadonlySet<string>,
+    signal: AbortSignal,
+    limits: { readonly maxSteps: number; readonly maxToolCalls: number },
+    stateSchemas: ReadonlyMap<string, StandardSchemaV1>,
+    failure: () => unknown,
+    observe: ((event: ProtocolEvent) => void) | undefined,
+    abort: (reason: unknown) => void,
+    eventSchemas: Readonly<Record<string, StandardSchemaV1>> = {},
+  ) =>
+    Effect.gen(function* () {
+      if (signal.aborted) return yield* Effect.fail(agentInvocationFailure(signalFailure(signal)));
+      yield* Effect.tryPromise({
+        try: (effectSignal) =>
+          collectNativeEventsCore(
+            events,
+            sink,
+            toolIds,
+            relkitNames,
+            AbortSignal.any([signal, effectSignal]),
+            limits,
+            stateSchemas,
+            failure,
+            observe,
+            abort,
+            eventSchemas,
+          ),
+        catch: agentInvocationFailure,
+      }).pipe(
+        Effect.onInterrupt(() =>
+          Effect.sync(() =>
+            abort(new AgentRuntimeError("RELKIT_AGENT_CANCELLED", "Agent invocation cancelled")),
+          ),
+        ),
+      );
+    }),
+  (effect) => observeAgent("runtime.collect-native-events", effect),
+);
 
 /** Collects native events for existing Promise runtime callers.
  * @param events - Native event stream.
@@ -80,10 +103,22 @@ export function collectNativeEvents(
   abort: (reason: unknown) => void,
   eventSchemas: Readonly<Record<string, StandardSchemaV1>> = {},
 ): Promise<void> {
-  return Effect.runPromise(collectNativeEventsEffect(
-    events, sink, toolIds, relkitNames, signal, limits, stateSchemas,
-    failure, observe, abort, eventSchemas,
-  ).pipe(Effect.catchTag("AgentInvocationFailure", (error) => Effect.fail(error.cause))), { signal });
+  return Effect.runPromise(
+    collectNativeEventsEffect(
+      events,
+      sink,
+      toolIds,
+      relkitNames,
+      signal,
+      limits,
+      stateSchemas,
+      failure,
+      observe,
+      abort,
+      eventSchemas,
+    ).pipe(Effect.catchTag("AgentInvocationFailure", (error) => Effect.fail(error.cause))),
+    { signal },
+  );
 }
 
 async function collectNativeEventsCore(
@@ -112,15 +147,24 @@ async function collectNativeEventsCore(
       throw error;
     }
     if (isToolStart(event) && ++toolCalls > limits.maxToolCalls) {
-      const error = new AgentRuntimeError("RELKIT_AGENT_TOOL_LIMIT", "Agent tool-call limit reached");
+      const error = new AgentRuntimeError(
+        "RELKIT_AGENT_TOOL_LIMIT",
+        "Agent tool-call limit reached",
+      );
       abort(error);
       throw error;
     }
     trackExecutionContext(event, contexts);
     await emitToolEvent(event, sink, toolIds, relkitNames, toolNames, signal);
     observe?.(event);
-    const publicEvent = await nativePublicEvent(event, stateSchemas, executionContext(event, contexts), eventSchemas);
-    if (sink?.emitEvent !== undefined) await withSignal(sink.emitEvent(publicEvent, signal), signal);
+    const publicEvent = await nativePublicEvent(
+      event,
+      stateSchemas,
+      executionContext(event, contexts),
+      eventSchemas,
+    );
+    if (sink?.emitEvent !== undefined)
+      await withSignal(sink.emitEvent(publicEvent, signal), signal);
     const message = messages.update(publicEvent);
     if (message !== undefined && sink?.emitMessage !== undefined) {
       await withSignal(sink.emitMessage(message, signal), signal);

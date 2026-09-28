@@ -21,30 +21,31 @@ import type { AgentChatMapping } from "./agent-client.types.js";
  * void chat;
  * ```
  */
-export const copyAgentChatEffect = Effect.fn("Agents.clientPolicy.chat")(function* (
-  value: unknown,
-) {
-  yield* Metric.update(clientPolicyCount, 1);
-  if (value === undefined) return undefined;
-  if (
-    value === null ||
-    typeof value !== "object" ||
-    Array.isArray(value) ||
-    !("input" in value) ||
-    value.input !== "message" ||
-    !("output" in value) ||
-    value.output !== "answer"
-  ) {
-    yield* Metric.update(clientPolicyFailures, 1);
-    return yield* Effect.fail(
-      new AgentClientPolicyError({
-        operation: "chat",
-        message: 'Agent chat mapping must be { input: "message", output: "answer" }',
-      }),
-    );
-  }
-  return Object.freeze({ input: "message" as const, output: "answer" as const });
-}, (effect) => observeAgent("client.chat", effect));
+export const copyAgentChatEffect = Effect.fn("Agents.clientPolicy.chat")(
+  function* (value: unknown) {
+    yield* Metric.update(clientPolicyCount, 1);
+    if (value === undefined) return undefined;
+    if (
+      value === null ||
+      typeof value !== "object" ||
+      Array.isArray(value) ||
+      !("input" in value) ||
+      value.input !== "message" ||
+      !("output" in value) ||
+      value.output !== "answer"
+    ) {
+      yield* Metric.update(clientPolicyFailures, 1);
+      return yield* Effect.fail(
+        new AgentClientPolicyError({
+          operation: "chat",
+          message: 'Agent chat mapping must be { input: "message", output: "answer" }',
+        }),
+      );
+    }
+    return Object.freeze({ input: "message" as const, output: "answer" as const });
+  },
+  (effect) => observeAgent("client.chat", effect),
+);
 
 /**
  * Copies a chat mapping for synchronous descriptor callers.

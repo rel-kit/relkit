@@ -6,7 +6,12 @@ import { observeAgent } from "./agent-telemetry.js";
 import { isRecordEffect } from "./agent-validation-value.js";
 import { prepareGraphDescriptor } from "./define-graph-build.js";
 import { graphDefinitionFailure } from "./define-graph-error.js";
-import type { DefineGraphOptions, GraphDescriptor, GraphExecution, GraphNodeLike } from "./define-graph.types.js";
+import type {
+  DefineGraphOptions,
+  GraphDescriptor,
+  GraphExecution,
+  GraphNodeLike,
+} from "./define-graph.types.js";
 import { GRAPH_EXECUTION } from "./graph-execution-symbol.js";
 
 export type * from "./define-graph.types.js";
@@ -25,17 +30,20 @@ export const defineGraphEffect = Effect.fn("Agents.graph.define")(
     const Nodes extends readonly GraphNodeLike[],
   >(options: DefineGraphOptions<Id, InputSchema, OutputSchema, State, Nodes>) {
     if (!(yield* isRecordEffect(options))) {
-      return yield* Effect.fail(graphDefinitionFailure(new TypeError("Graph options must be an object")));
+      return yield* Effect.fail(
+        graphDefinitionFailure(new TypeError("Graph options must be an object")),
+      );
     }
     const assemble = yield* Effect.try({
       try: () => prepareGraphDescriptor(options),
       catch: graphDefinitionFailure,
     });
-    const id = options.id === undefined
-      ? yield* createUnboundIdentityEffect().pipe(
-          Effect.mapError((failure) => graphDefinitionFailure(failure.cause)),
-        )
-      : options.id;
+    const id =
+      options.id === undefined
+        ? yield* createUnboundIdentityEffect().pipe(
+            Effect.mapError((failure) => graphDefinitionFailure(failure.cause)),
+          )
+        : options.id;
     return yield* Effect.try({
       try: () => assemble(id as Id),
       catch: graphDefinitionFailure,
@@ -59,9 +67,11 @@ export function defineGraph<
 >(
   options: DefineGraphOptions<Id, InputSchema, OutputSchema, State, Nodes>,
 ): GraphDescriptor<Id, InputSchema, OutputSchema, State, Nodes> {
-  return Effect.runSync(defineGraphEffect(options).pipe(
-    Effect.catchTag("GraphDefinitionFailure", (failure) => Effect.fail(failure.cause)),
-  ));
+  return Effect.runSync(
+    defineGraphEffect(options).pipe(
+      Effect.catchTag("GraphDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
 /** Reads the hidden runtime state of an authored graph.
@@ -89,11 +99,16 @@ export function graphExecution(value: GraphDescriptor): GraphExecution {
  * @example Effect.runSync(isGraphDescriptorEffect(candidate));
  */
 export const isGraphDescriptorEffect = Effect.fn("Agents.graph.isDescriptor")(
-  (value: unknown) => Effect.sync(() =>
-    value !== null && typeof value === "object" && !Array.isArray(value) &&
-    (value as Record<PropertyKey, unknown>).execution === "graph" &&
-    (value as Record<PropertyKey, unknown>).kind === "agent" &&
-    (value as Record<PropertyKey, unknown>)[GRAPH_EXECUTION] !== undefined),
+  (value: unknown) =>
+    Effect.sync(
+      () =>
+        value !== null &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        (value as Record<PropertyKey, unknown>).execution === "graph" &&
+        (value as Record<PropertyKey, unknown>).kind === "agent" &&
+        (value as Record<PropertyKey, unknown>)[GRAPH_EXECUTION] !== undefined,
+    ),
   (effect) => observeAgent("graph.is-descriptor", effect),
 );
 

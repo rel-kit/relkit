@@ -1,5 +1,9 @@
 import { normalizeId } from "@relkit/contracts";
-import { ApprovalDeniedError, ApprovalRequiredError, ApprovalStateError } from "./approval-error.js";
+import {
+  ApprovalDeniedError,
+  ApprovalRequiredError,
+  ApprovalStateError,
+} from "./approval-error.js";
 import type {
   ApprovalOptions,
   ApprovalPolicy,
@@ -20,7 +24,10 @@ export const APPROVAL_STATES = Object.freeze(["pending", "approved", "denied"] a
  * @throws TypeError for invalid inputs.
  * @example requiresApprovalValue("always", "read");
  */
-export function requiresApprovalValue(policy: ApprovalPolicy, sideEffect: ApprovalSideEffect): boolean {
+export function requiresApprovalValue(
+  policy: ApprovalPolicy,
+  sideEffect: ApprovalSideEffect,
+): boolean {
   assertPolicy(policy);
   assertSideEffect(sideEffect);
   return (
