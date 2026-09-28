@@ -69,7 +69,7 @@ export const jobsGuideRelations = [
     api: ["jobs", "testing"],
     examples: [
       "examples/commerce/src/orders/tasks/export-orders.task.ts",
-      "packages/jobs/task-policy.test.ts",
+      "packages/jobs/tests/task-policy.test.ts",
     ],
   },
   {
@@ -92,7 +92,7 @@ export const jobsGuideRelations = [
     api: ["jobs", "integrations/inngest", "integrations/effect-mq"],
     examples: [
       "examples/commerce/src/orders/jobs/cleanup-orders.job.ts",
-      "packages/jobs/schedule-reconciliation.test.ts",
+      "packages/jobs/tests/schedule-reconciliation.test.ts",
     ],
   },
   {
@@ -125,12 +125,12 @@ export const jobsGuideRelations = [
   {
     path: "jobs/testing",
     api: ["jobs", "testing", "client"],
-    examples: ["packages/jobs/task-wire.test.ts", "packages/client/jobs-watch.test.ts"],
+    examples: ["packages/jobs/tests/task-wire.test.ts", "packages/client/jobs-watch.test.ts"],
   },
   {
     path: "jobs/migration",
     api: ["app", "jobs"],
-    examples: ["packages/jobs/migration.test.ts", "apps/docs/examples/jobs/send-receipt.job.ts"],
+    examples: ["packages/jobs/tests/migration.test.ts", "apps/docs/examples/jobs/send-receipt.job.ts"],
   },
   {
     path: "jobs/troubleshooting",

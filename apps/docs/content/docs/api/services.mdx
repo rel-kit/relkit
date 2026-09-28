@@ -13,6 +13,8 @@ description: Generated public TypeScript reference for @relkit/services.
 
 - [Services](#services)
   - [defineService](#defineservice)
+- [utils](#utils)
+  - [defineServiceEffect](#defineserviceeffect)
 
 ---
 
@@ -20,15 +22,16 @@ description: Generated public TypeScript reference for @relkit/services.
 
 ## defineService
 
-Defines a domain's public functions and events as identity-preserving members.
+Define a service synchronously for authoring and preserve member identity.
+
+**Throws**
+
+TypeError for malformed local input, or the original identity/ID error.
 
 **Example**
 
 ```ts
-import { defineService } from "@relkit/app/services";
-
-const orders = defineService({});
-void orders;
+const orders = defineService({ id: "orders", functions: { lookup } });
 ```
 
 **Signature**
@@ -37,87 +40,368 @@ void orders;
 declare const defineService: DefineService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L105)
 
 Since v0.1.0
 
-## `guards.ts`
+# utils
+
+## defineServiceEffect
+
+Define a service without cloning its member descriptors.
+
+**Example**
+
+```ts
+Effect.runSync(defineServiceEffect({ id: "orders", functions: { lookup } }));
+```
+
+**Signature**
+
+```ts
+declare const defineServiceEffect: <
+  const Id extends string,
+  const Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  const Events extends ServiceEventMap = Readonly<Record<never, never>>,
+  const Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
+  const Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
+>(
+  options: DefineServiceOptions<Id, Functions, Events, Tasks, Jobs>,
+) => Effect.Effect<
+  ServiceDescriptor<Id, Functions, Events, Tasks, Jobs>,
+  ServiceValidationError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L29)
+
+## `define-service.types.ts`
 
 ---
 
 ## Exports Grouped by Category
 
 - [utils](#utils)
-  - [RESERVED_SERVICE_MEMBER_NAMES](#reserved_service_member_names)
-  - [SERVICE_RESERVED_MEMBER_NAMES](#service_reserved_member_names)
-  - [assertServiceDescriptor](#assertservicedescriptor)
-  - [assertServiceMemberName](#assertservicemembername)
-  - [assertServiceRef](#assertserviceref)
-  - [freezeServiceDescriptor](#freezeservicedescriptor)
-  - [isFunctionDescriptor](#isfunctiondescriptor)
-  - [isReservedServiceMemberName](#isreservedservicemembername)
-  - [isServiceDescriptor](#isservicedescriptor)
-  - [isServiceRef](#isserviceref)
-  - [normalizeServiceMemberName](#normalizeservicemembername)
-  - [serviceMemberEntries](#servicememberentries)
+  - [DefineService (interface)](#defineservice-interface)
+  - [DefineServiceOptions (interface)](#defineserviceoptions-interface)
+  - [ServiceDescriptor (type alias)](#servicedescriptor-type-alias)
+  - [ServiceDescriptorAny (type alias)](#servicedescriptorany-type-alias)
+  - [ServiceEventMap (type alias)](#serviceeventmap-type-alias)
+  - [ServiceEvents (type alias)](#serviceevents-type-alias)
+  - [ServiceFunctionMap (type alias)](#servicefunctionmap-type-alias)
+  - [ServiceFunctions (type alias)](#servicefunctions-type-alias)
+  - [ServiceJobMap (type alias)](#servicejobmap-type-alias)
+  - [ServiceJobs (type alias)](#servicejobs-type-alias)
+  - [ServiceTaskMap (type alias)](#servicetaskmap-type-alias)
+  - [ServiceTasks (type alias)](#servicetasks-type-alias)
 
 ---
 
 # utils
 
-## RESERVED_SERVICE_MEMBER_NAMES
+## DefineService (interface)
+
+Generic synchronous service factory preserving member inference.
+
+**Throws**
+
+TypeError for malformed local input, or the original identity/ID error.
+
+**Example**
+
+```ts
+const orders = defineService({ id: "orders", functions: { lookup } });
+```
 
 **Signature**
 
 ```ts
-declare const RESERVED_SERVICE_MEMBER_NAMES: readonly [
-  "kind",
-  "id",
-  "ref",
-  "functions",
-  "events",
-  "tasks",
-  "jobs",
-  "capability",
-  "title",
-  "description",
-  "tags",
-  "handler",
-  "constructor",
-  "prototype",
-  "__proto__",
-];
+export interface DefineService {
+  <
+    const Id extends string,
+    const Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+    const Events extends ServiceEventMap = Readonly<Record<never, never>>,
+    const Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
+    const Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
+  >(
+    options: DefineServiceOptions<Id, Functions, Events, Tasks, Jobs>,
+  ): ServiceDescriptor<Id, Functions, Events, Tasks, Jobs>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L122)
 
-## SERVICE_RESERVED_MEMBER_NAMES
+## DefineServiceOptions (interface)
+
+Metadata and optional descriptor members accepted by defineService.
+
+**Example**
+
+```ts
+const options: DefineServiceOptions<"orders"> = { id: "orders" };
+```
 
 **Signature**
 
 ```ts
-declare const SERVICE_RESERVED_MEMBER_NAMES: readonly [
-  "kind",
-  "id",
-  "ref",
-  "functions",
-  "events",
-  "tasks",
-  "jobs",
-  "capability",
-  "title",
-  "description",
-  "tags",
-  "handler",
-  "constructor",
-  "prototype",
-  "__proto__",
-];
+export interface DefineServiceOptions<
+  Id extends string,
+  Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  Events extends ServiceEventMap = Readonly<Record<never, never>>,
+  Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
+  Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
+> extends DescriptorMetadata {
+  readonly id?: Id;
+  readonly functions?: Functions;
+  readonly events?: Events;
+  readonly tasks?: Tasks;
+  readonly jobs?: Jobs;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L102)
+
+## ServiceDescriptor (type alias)
+
+Frozen service descriptor with identity-preserving public members.
+
+**Example**
+
+```ts
+type Orders = ServiceDescriptor<"orders", { lookup: typeof lookup }>;
+```
+
+**Signature**
+
+```ts
+type ServiceDescriptor<
+  Id extends string,
+  Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  Events extends ServiceEventMap = Readonly<Record<never, never>>,
+  Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
+  Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
+> = DescriptorBase<"service", Id> &
+  PublicMembers<Functions, Events, Tasks, Jobs> & {
+    readonly [serviceTypes]: ServiceTypeMembers<Functions, Events, Tasks, Jobs>;
+  };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L47)
+
+## ServiceDescriptorAny (type alias)
+
+Service descriptor with an unspecified ID and member set.
+
+**Example**
+
+```ts
+function inspect(service: ServiceDescriptorAny) {
+  return service.id;
+}
+```
+
+**Signature**
+
+```ts
+type ServiceDescriptorAny = DescriptorBase<"service", string>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L61)
+
+## ServiceEventMap (type alias)
+
+Named event members on a service.
+
+**Example**
+
+```ts
+type Events = ServiceEventMap;
+```
+
+**Signature**
+
+```ts
+type ServiceEventMap = Readonly<Record<string, EventDescriptorAny>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L13)
+
+## ServiceEvents (type alias)
+
+Extracts the event members recorded in a service type.
+
+**Example**
+
+```ts
+type Events = ServiceEvents<typeof orders>;
+```
+
+**Signature**
+
+```ts
+type ServiceEvents<Service> = Service extends {
+  readonly [serviceTypes]: { readonly events: infer Events };
+}
+  ? Events
+  : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L75)
+
+## ServiceFunctionMap (type alias)
+
+Named function members on a service.
+
+**Example**
+
+```ts
+type Functions = ServiceFunctionMap;
+```
+
+**Signature**
+
+```ts
+type ServiceFunctionMap = Readonly<Record<string, FunctionRefAny>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L9)
+
+## ServiceFunctions (type alias)
+
+Extracts the function members recorded in a service type.
+
+**Example**
+
+```ts
+type Functions = ServiceFunctions<typeof orders>;
+```
+
+**Signature**
+
+```ts
+type ServiceFunctions<Service> = Service extends {
+  readonly [serviceTypes]: { readonly functions: infer Functions };
+}
+  ? Functions
+  : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L66)
+
+## ServiceJobMap (type alias)
+
+Named job members on a service.
+
+**Example**
+
+```ts
+type Jobs = ServiceJobMap;
+```
+
+**Signature**
+
+```ts
+type ServiceJobMap = Readonly<Record<string, JobDescriptorAny>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L21)
+
+## ServiceJobs (type alias)
+
+Extracts the job members recorded in a service type.
+
+**Example**
+
+```ts
+type Jobs = ServiceJobs<typeof orders>;
+```
+
+**Signature**
+
+```ts
+type ServiceJobs<Service> = Service extends {
+  readonly [serviceTypes]: { readonly jobs: infer Jobs };
+}
+  ? Jobs
+  : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L93)
+
+## ServiceTaskMap (type alias)
+
+Named task members on a service.
+
+**Example**
+
+```ts
+type Tasks = ServiceTaskMap;
+```
+
+**Signature**
+
+```ts
+type ServiceTaskMap = Readonly<Record<string, TaskDescriptorAny>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L17)
+
+## ServiceTasks (type alias)
+
+Extracts the task members recorded in a service type.
+
+**Example**
+
+```ts
+type Tasks = ServiceTasks<typeof orders>;
+```
+
+**Signature**
+
+```ts
+type ServiceTasks<Service> = Service extends {
+  readonly [serviceTypes]: { readonly tasks: infer Tasks };
+}
+  ? Tasks
+  : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L84)
+
+## `descriptor-guards.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [assertServiceDescriptor](#assertservicedescriptor)
+  - [assertServiceDescriptorEffect](#assertservicedescriptoreffect)
+  - [freezeServiceDescriptor](#freezeservicedescriptor)
+  - [freezeServiceDescriptorEffect](#freezeservicedescriptoreffect)
+  - [isServiceDescriptor](#isservicedescriptor)
+  - [isServiceDescriptorEffect](#isservicedescriptoreffect)
+  - [serviceMemberEntries](#servicememberentries)
+  - [serviceMemberEntriesEffect](#servicememberentrieseffect)
+
+---
+
+# utils
 
 ## assertServiceDescriptor
+
+Require a valid service descriptor synchronously.
+
+**Throws**
+
+TypeError when invalid.
+
+**Example**
+
+```ts
+assertServiceDescriptor(candidate);
+```
 
 **Signature**
 
@@ -125,29 +409,41 @@ declare const SERVICE_RESERVED_MEMBER_NAMES: readonly [
 declare const assertServiceDescriptor: (value: unknown) => asserts value is ServiceDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L67)
 
-## assertServiceMemberName
+## assertServiceDescriptorEffect
+
+Require a valid service descriptor in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(assertServiceDescriptorEffect(candidate));
+```
 
 **Signature**
 
 ```ts
-declare const assertServiceMemberName: (value: unknown) => asserts value is string;
+declare const assertServiceDescriptorEffect: (
+  value: unknown,
+) => Effect.Effect<ServiceDescriptorAny, ServiceValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L40)
-
-## assertServiceRef
-
-**Signature**
-
-```ts
-declare const assertServiceRef: (value: unknown) => asserts value is ServiceRefAny;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L49)
 
 ## freezeServiceDescriptor
+
+Validate and freeze a descriptor synchronously.
+
+**Throws**
+
+TypeError when the descriptor is invalid.
+
+**Example**
+
+```ts
+freezeServiceDescriptor(service);
+```
 
 **Signature**
 
@@ -155,29 +451,37 @@ declare const assertServiceRef: (value: unknown) => asserts value is ServiceRefA
 declare const freezeServiceDescriptor: <T extends ServiceDescriptorAny>(value: T) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L93)
 
-## isFunctionDescriptor
+## freezeServiceDescriptorEffect
+
+Validate and recursively freeze a descriptor in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(freezeServiceDescriptorEffect(service));
+```
 
 **Signature**
 
 ```ts
-declare const isFunctionDescriptor: (value: unknown) => value is FunctionRefAny;
+declare const freezeServiceDescriptorEffect: <T extends ServiceDescriptorAny>(
+  value: T,
+) => Effect.Effect<T, ServiceValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L85)
-
-## isReservedServiceMemberName
-
-**Signature**
-
-```ts
-declare const isReservedServiceMemberName: (value: unknown) => boolean;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L76)
 
 ## isServiceDescriptor
+
+Check a service descriptor synchronously.
+
+**Example**
+
+```ts
+isServiceDescriptor(candidate);
+```
 
 **Signature**
 
@@ -185,29 +489,35 @@ declare const isReservedServiceMemberName: (value: unknown) => boolean;
 declare const isServiceDescriptor: (value: unknown) => value is ServiceDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L40)
 
-## isServiceRef
+## isServiceDescriptorEffect
+
+Check a service descriptor and every public member in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isServiceDescriptorEffect(candidate));
+```
 
 **Signature**
 
 ```ts
-declare const isServiceRef: (value: unknown) => value is ServiceRefAny;
+declare const isServiceDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L49)
-
-## normalizeServiceMemberName
-
-**Signature**
-
-```ts
-declare const normalizeServiceMemberName: (value: unknown) => string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L15)
 
 ## serviceMemberEntries
+
+Enumerate public descriptor members synchronously.
+
+**Example**
+
+```ts
+serviceMemberEntries(service);
+```
 
 **Signature**
 
@@ -215,7 +525,143 @@ declare const normalizeServiceMemberName: (value: unknown) => string;
 declare const serviceMemberEntries: (service: ServiceDescriptorAny) => [string, unknown][];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L120)
+
+## serviceMemberEntriesEffect
+
+Enumerate public descriptor members in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(serviceMemberEntriesEffect(service));
+```
+
+**Signature**
+
+```ts
+declare const serviceMemberEntriesEffect: (
+  service: ServiceDescriptorAny,
+) => Effect.Effect<Array<[string, unknown]>, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L102)
+
+## `function-guards.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [isFunctionDescriptor](#isfunctiondescriptor)
+  - [isFunctionDescriptorEffect](#isfunctiondescriptoreffect)
+
+---
+
+# utils
+
+## isFunctionDescriptor
+
+Check a function member synchronously.
+
+**Example**
+
+```ts
+isFunctionDescriptor(candidate);
+```
+
+**Signature**
+
+```ts
+declare const isFunctionDescriptor: (value: unknown) => value is FunctionRefAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/function-guards.ts#L34)
+
+## isFunctionDescriptorEffect
+
+Check a function member's descriptor contract in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isFunctionDescriptorEffect(candidate));
+```
+
+**Signature**
+
+```ts
+declare const isFunctionDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/function-guards.ts#L11)
+
+## `guards.ts`
+
+Public guard relay.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - ["./descriptor-guards.js" (namespace export)](#descriptor-guardsjs-namespace-export)
+  - ["./function-guards.js" (namespace export)](#function-guardsjs-namespace-export)
+  - ["./member-name.js" (namespace export)](#member-namejs-namespace-export)
+  - ["./reference-guards.js" (namespace export)](#reference-guardsjs-namespace-export)
+
+---
+
+# utils
+
+## "./descriptor-guards.js" (namespace export)
+
+Re-exports all named exports from the "./descriptor-guards.js" module.
+
+**Signature**
+
+```ts
+export * from "./descriptor-guards.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L2)
+
+## "./function-guards.js" (namespace export)
+
+Re-exports all named exports from the "./function-guards.js" module.
+
+**Signature**
+
+```ts
+export * from "./function-guards.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L3)
+
+## "./member-name.js" (namespace export)
+
+Re-exports all named exports from the "./member-name.js" module.
+
+**Signature**
+
+```ts
+export * from "./member-name.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L4)
+
+## "./reference-guards.js" (namespace export)
+
+Re-exports all named exports from the "./reference-guards.js" module.
+
+**Signature**
+
+```ts
+export * from "./reference-guards.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L5)
 
 ## `index.ts`
 
@@ -226,6 +672,9 @@ declare const serviceMemberEntries: (service: ServiceDescriptorAny) => [string, 
 - [utils](#utils)
   - ["./define-service.js" (namespace export)](#define-servicejs-namespace-export)
   - ["./guards.js" (namespace export)](#guardsjs-namespace-export)
+  - ["./service-context.js" (namespace export)](#service-contextjs-namespace-export)
+  - ["./service-error.js" (namespace export)](#service-errorjs-namespace-export)
+  - ["./service-observability.js" (namespace export)](#service-observabilityjs-namespace-export)
   - ["./types.js" (namespace export)](#typesjs-namespace-export)
 
 ---
@@ -256,6 +705,42 @@ export * from "./guards.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L2)
 
+## "./service-context.js" (namespace export)
+
+Re-exports all named exports from the "./service-context.js" module.
+
+**Signature**
+
+```ts
+export * from "./service-context.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L3)
+
+## "./service-error.js" (namespace export)
+
+Re-exports all named exports from the "./service-error.js" module.
+
+**Signature**
+
+```ts
+export * from "./service-error.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L4)
+
+## "./service-observability.js" (namespace export)
+
+Re-exports all named exports from the "./service-observability.js" module.
+
+**Signature**
+
+```ts
+export * from "./service-observability.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L5)
+
 ## "./types.js" (namespace export)
 
 Re-exports all named exports from the "./types.js" module.
@@ -266,201 +751,323 @@ Re-exports all named exports from the "./types.js" module.
 export * from "./types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L6)
 
-## `service-context.ts`
+## `member-name.ts`
 
 ---
 
 ## Exports Grouped by Category
 
 - [utils](#utils)
-  - [freezeServiceContextValue](#freezeservicecontextvalue)
+  - [RESERVED_SERVICE_MEMBER_NAMES](#reserved_service_member_names)
+  - [SERVICE_RESERVED_MEMBER_NAMES](#service_reserved_member_names)
+  - [assertServiceMemberName](#assertservicemembername)
+  - [assertServiceMemberNameEffect](#assertservicemembernameeffect)
+  - [isReservedServiceMemberName](#isreservedservicemembername)
+  - [isReservedServiceMemberNameEffect](#isreservedservicemembernameeffect)
+  - [normalizeServiceMemberName](#normalizeservicemembername)
+  - [normalizeServiceMemberNameEffect](#normalizeservicemembernameeffect)
 
 ---
 
 # utils
 
-## freezeServiceContextValue
+## RESERVED_SERVICE_MEMBER_NAMES
+
+Compatibility alias for the reserved member list.
 
 **Signature**
 
 ```ts
-declare const freezeServiceContextValue: (value: unknown, seen: WeakMap<object, object>) => unknown;
+declare const RESERVED_SERVICE_MEMBER_NAMES: readonly [
+  "kind",
+  "id",
+  "ref",
+  "functions",
+  "events",
+  "tasks",
+  "jobs",
+  "capability",
+  "title",
+  "description",
+  "tags",
+  "handler",
+  "constructor",
+  "prototype",
+  "__proto__",
+];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-context.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L25)
 
-## `types.ts`
+## SERVICE_RESERVED_MEMBER_NAMES
+
+Names disallowed as service members because they collide with descriptor metadata.
+
+**Signature**
+
+```ts
+declare const SERVICE_RESERVED_MEMBER_NAMES: readonly [
+  "kind",
+  "id",
+  "ref",
+  "functions",
+  "events",
+  "tasks",
+  "jobs",
+  "capability",
+  "title",
+  "description",
+  "tags",
+  "handler",
+  "constructor",
+  "prototype",
+  "__proto__",
+];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L6)
+
+## assertServiceMemberName
+
+Assert a canonical, nonreserved member name synchronously.
+
+**Throws**
+
+TypeError for invalid names.
+
+**Example**
+
+```ts
+assertServiceMemberName("lookup");
+```
+
+**Signature**
+
+```ts
+declare const assertServiceMemberName: (value: unknown) => asserts value is string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L119)
+
+## assertServiceMemberNameEffect
+
+Validate one member name with a tagged Effect failure.
+
+**Example**
+
+```ts
+Effect.runSync(assertServiceMemberNameEffect("lookup"));
+```
+
+**Signature**
+
+```ts
+declare const assertServiceMemberNameEffect: (
+  value: unknown,
+) => Effect.Effect<string, ServiceValidationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L94)
+
+## isReservedServiceMemberName
+
+Check a candidate against the reserved member list.
+
+**Example**
+
+```ts
+isReservedServiceMemberName(" id ");
+```
+
+**Signature**
+
+```ts
+declare const isReservedServiceMemberName: (value: unknown) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L85)
+
+## isReservedServiceMemberNameEffect
+
+Check whether a candidate is a reserved member name in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isReservedServiceMemberNameEffect("id"));
+```
+
+**Signature**
+
+```ts
+declare const isReservedServiceMemberNameEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L66)
+
+## normalizeServiceMemberName
+
+Normalize a service member name synchronously.
+
+**Throws**
+
+TypeError for non-string or empty input.
+
+**Example**
+
+```ts
+normalizeServiceMemberName(" lookup ");
+```
+
+**Signature**
+
+```ts
+declare const normalizeServiceMemberName: (value: unknown) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L57)
+
+## normalizeServiceMemberNameEffect
+
+Normalize a service member name inside Effect.
+
+**Example**
+
+```ts
+Effect.runSync(normalizeServiceMemberNameEffect("lookup"));
+```
+
+**Signature**
+
+```ts
+declare const normalizeServiceMemberNameEffect: (
+  value: unknown,
+) => Effect.Effect<string, ServiceValidationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L32)
+
+## `reference-guards.ts`
 
 ---
 
 ## Exports Grouped by Category
 
 - [utils](#utils)
-  - [DefineService (interface)](#defineservice-interface)
-  - [DefineServiceOptions (interface)](#defineserviceoptions-interface)
-  - [ServiceDescriptor (type alias)](#servicedescriptor-type-alias)
-  - [ServiceDescriptorAny (type alias)](#servicedescriptorany-type-alias)
-  - [ServiceEventMap (type alias)](#serviceeventmap-type-alias)
-  - [ServiceEvents (type alias)](#serviceevents-type-alias)
-  - [ServiceFunctionMap (type alias)](#servicefunctionmap-type-alias)
-  - [ServiceFunctions (type alias)](#servicefunctions-type-alias)
-  - [ServiceJobMap (type alias)](#servicejobmap-type-alias)
-  - [ServiceJobs (type alias)](#servicejobs-type-alias)
+  - [assertServiceRef](#assertserviceref)
+  - [assertServiceRefEffect](#assertservicerefeffect)
+  - [isServiceRef](#isserviceref)
+  - [isServiceRefEffect](#isservicerefeffect)
+
+---
+
+# utils
+
+## assertServiceRef
+
+Require a service reference synchronously.
+
+**Throws**
+
+TypeError when invalid.
+
+**Example**
+
+```ts
+assertServiceRef(candidate);
+```
+
+**Signature**
+
+```ts
+declare const assertServiceRef: (value: unknown) => asserts value is ServiceRefAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.ts#L53)
+
+## assertServiceRefEffect
+
+Require a service reference in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(assertServiceRefEffect(candidate));
+```
+
+**Signature**
+
+```ts
+declare const assertServiceRefEffect: (
+  value: unknown,
+) => Effect.Effect<ServiceRefAny, ServiceValidationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.ts#L36)
+
+## isServiceRef
+
+Check a service reference synchronously.
+
+**Example**
+
+```ts
+isServiceRef({ ref: createRef("service", "orders") });
+```
+
+**Signature**
+
+```ts
+declare const isServiceRef: (value: unknown) => value is ServiceRefAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.ts#L27)
+
+## isServiceRefEffect
+
+Check a service reference in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isServiceRefEffect({ ref: createRef("service", "orders") }));
+```
+
+**Signature**
+
+```ts
+declare const isServiceRefEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.ts#L12)
+
+## `reference-guards.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
   - [ServiceRef (interface)](#serviceref-interface)
   - [ServiceRefAny (type alias)](#servicerefany-type-alias)
-  - [ServiceTaskMap (type alias)](#servicetaskmap-type-alias)
-  - [ServiceTasks (type alias)](#servicetasks-type-alias)
 
 ---
 
 # utils
 
-## DefineService (interface)
-
-**Signature**
-
-```ts
-export interface DefineService {
-  <
-    const Id extends string,
-    const Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
-    const Events extends ServiceEventMap = Readonly<Record<never, never>>,
-    const Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
-    const Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
-  >(
-    options: DefineServiceOptions<Id, Functions, Events, Tasks, Jobs>,
-  ): ServiceDescriptor<Id, Functions, Events, Tasks, Jobs>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L88)
-
-## DefineServiceOptions (interface)
-
-**Signature**
-
-```ts
-export interface DefineServiceOptions<
-  Id extends string,
-  Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
-  Events extends ServiceEventMap = Readonly<Record<never, never>>,
-  Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
-  Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
-> extends DescriptorMetadata {
-  readonly id?: Id;
-  readonly functions?: Functions;
-  readonly events?: Events;
-  readonly tasks?: Tasks;
-  readonly jobs?: Jobs;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L74)
-
-## ServiceDescriptor (type alias)
-
-**Signature**
-
-```ts
-type ServiceDescriptor<
-  Id extends string,
-  Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
-  Events extends ServiceEventMap = Readonly<Record<never, never>>,
-  Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
-  Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
-> = DescriptorBase<"service", Id> &
-  PublicMembers<Functions, Events, Tasks, Jobs> & {
-    readonly [serviceTypes]: ServiceTypeMembers<Functions, Events, Tasks, Jobs>;
-  };
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L37)
-
-## ServiceDescriptorAny (type alias)
-
-**Signature**
-
-```ts
-type ServiceDescriptorAny = DescriptorBase<"service", string>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L48)
-
-## ServiceEventMap (type alias)
-
-**Signature**
-
-```ts
-type ServiceEventMap = Readonly<Record<string, EventDescriptorAny>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L12)
-
-## ServiceEvents (type alias)
-
-**Signature**
-
-```ts
-type ServiceEvents<Service> = Service extends {
-  readonly [serviceTypes]: { readonly events: infer Events };
-}
-  ? Events
-  : never;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L56)
-
-## ServiceFunctionMap (type alias)
-
-**Signature**
-
-```ts
-type ServiceFunctionMap = Readonly<Record<string, FunctionRefAny>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L11)
-
-## ServiceFunctions (type alias)
-
-**Signature**
-
-```ts
-type ServiceFunctions<Service> = Service extends {
-  readonly [serviceTypes]: { readonly functions: infer Functions };
-}
-  ? Functions
-  : never;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L50)
-
-## ServiceJobMap (type alias)
-
-**Signature**
-
-```ts
-type ServiceJobMap = Readonly<Record<string, JobDescriptorAny>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L14)
-
-## ServiceJobs (type alias)
-
-**Signature**
-
-```ts
-type ServiceJobs<Service> = Service extends {
-  readonly [serviceTypes]: { readonly jobs: infer Jobs };
-}
-  ? Jobs
-  : never;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L68)
-
 ## ServiceRef (interface)
+
+A stable reference to one service descriptor.
+
+**Example**
+
+```ts
+const ref: ServiceRef<"orders"> = { ref: createRef("service", "orders") };
+```
 
 **Signature**
 
@@ -470,9 +1077,19 @@ export interface ServiceRef<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.types.ts#L6)
 
 ## ServiceRefAny (type alias)
+
+Any service reference regardless of its stable ID.
+
+**Example**
+
+```ts
+function inspect(value: ServiceRefAny) {
+  return value.ref.id;
+}
+```
 
 **Signature**
 
@@ -480,28 +1097,408 @@ export interface ServiceRef<Id extends string = string> {
 type ServiceRefAny = ServiceRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.types.ts#L13)
 
-## ServiceTaskMap (type alias)
+## `service-context.ts`
 
-**Signature**
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [freezeServiceContextValue](#freezeservicecontextvalue)
+  - [freezeServiceContextValueEffect](#freezeservicecontextvalueeffect)
+
+---
+
+# utils
+
+## freezeServiceContextValue
+
+Copy and freeze a plain service context graph synchronously.
+
+**Throws**
+
+When a proxy or getter prevents graph inspection.
+
+**Example**
 
 ```ts
-type ServiceTaskMap = Readonly<Record<string, TaskDescriptorAny>>;
+freezeServiceContextValue({ enabled: true }, new WeakMap());
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L13)
+**Signature**
 
-## ServiceTasks (type alias)
+```ts
+declare const freezeServiceContextValue: (value: unknown, seen: WeakMap<object, object>) => unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-context.ts#L22)
+
+## freezeServiceContextValueEffect
+
+Copy and freeze a plain service context graph, preserving cycles and identity.
+
+**Example**
+
+```ts
+Effect.runSync(freezeServiceContextValueEffect({ enabled: true }, new WeakMap()));
+```
 
 **Signature**
 
 ```ts
-type ServiceTasks<Service> = Service extends {
-  readonly [serviceTypes]: { readonly tasks: infer Tasks };
+declare const freezeServiceContextValueEffect: (
+  value: unknown,
+  seen: WeakMap<object, object>,
+) => Effect.Effect<unknown, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-context.ts#L10)
+
+## `service-error.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ServiceValidationError (class)](#servicevalidationerror-class)
+
+---
+
+# utils
+
+## ServiceValidationError (class)
+
+Expected malformed service input or dependency rejection in an Effect operation.
+
+**Example**
+
+```ts
+Effect.catchTag(defineServiceEffect(input), "ServiceValidationError", () => Effect.void);
+```
+
+**Signature**
+
+```ts
+declare class ServiceValidationError
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-error.ts#L7)
+
+## `service-members.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [assertUniqueServiceMembersEffect](#assertuniqueservicememberseffect)
+  - [copyServiceMembersEffect](#copyservicememberseffect)
+
+---
+
+# utils
+
+## assertUniqueServiceMembersEffect
+
+Reject member names appearing in more than one category.
+
+**Example**
+
+```ts
+Effect.runSync(assertUniqueServiceMembersEffect({ lookup }, {}));
+```
+
+**Signature**
+
+```ts
+declare const assertUniqueServiceMembersEffect: (
+  ...args: Array<any>
+) => Effect.Effect<undefined, ServiceValidationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-members.ts#L47)
+
+## copyServiceMembersEffect
+
+Copy and validate one category of service members in insertion order.
+
+**Example**
+
+```ts
+Effect.runSync(copyServiceMembersEffect({ lookup }, isFunctionDescriptorEffect, "function"));
+```
+
+**Signature**
+
+```ts
+declare const copyServiceMembersEffect: <T>(
+  value: Readonly<Record<string, T>> | undefined,
+  validate: ServiceMemberValidator<T>,
+  kind: ServiceMemberKind,
+) => Effect.Effect<Record<string, T>, ServiceValidationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-members.ts#L14)
+
+## `service-members.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ServiceMemberKind (type alias)](#servicememberkind-type-alias)
+  - [ServiceMemberValidator (type alias)](#servicemembervalidator-type-alias)
+
+---
+
+# utils
+
+## ServiceMemberKind (type alias)
+
+Kinds accepted by service authoring.
+
+**Example**
+
+```ts
+const kind: ServiceMemberKind = "function";
+```
+
+**Signature**
+
+```ts
+type ServiceMemberKind = "function" | "event" | "task" | "job";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-members.types.ts#L6)
+
+## ServiceMemberValidator (type alias)
+
+Predicate for one member category during Effect validation.
+
+**Example**
+
+```ts
+const valid: ServiceMemberValidator<number> = (value) => Effect.succeed(typeof value === "number");
+```
+
+**Signature**
+
+```ts
+type ServiceMemberValidator<T> = (value: unknown) => Effect.Effect<boolean>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-members.types.ts#L13)
+
+## `service-observability.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ServiceTelemetry (class)](#servicetelemetry-class)
+  - [ServiceTelemetryLive](#servicetelemetrylive)
+  - [observeService](#observeservice)
+  - [runServiceSync](#runservicesync)
+
+---
+
+# utils
+
+## ServiceTelemetry (class)
+
+Substitutable telemetry for all service operations.
+
+**Example**
+
+```ts
+Effect.provide(isServiceRefEffect(value), ServiceTelemetryLive);
+```
+
+**Signature**
+
+```ts
+declare class ServiceTelemetry
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.ts#L8)
+
+## ServiceTelemetryLive
+
+Live span, call, duration, and failure instrumentation.
+
+**Example**
+
+```ts
+Effect.provide(isServiceRefEffect(value), ServiceTelemetryLive);
+```
+
+**Signature**
+
+```ts
+declare const ServiceTelemetryLive: Layer.Layer<ServiceTelemetry, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.ts#L15)
+
+## observeService
+
+Observe one service operation using an injected or live observer.
+
+**Example**
+
+```ts
+observeService("ref.is", Effect.succeed(true));
+```
+
+**Signature**
+
+```ts
+declare const observeService: <A, E, R>(
+  operation: ServiceOperation,
+  effect: Effect.Effect<A, E, R>,
+) => Effect.Effect<A, E, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.ts#L29)
+
+## runServiceSync
+
+Run a dependency-free Effect for a synchronous compatibility caller.
+
+**Throws**
+
+TypeError for local validation, an original dependency error, or a defect.
+
+**Example**
+
+```ts
+runServiceSync(Effect.succeed(1));
+```
+
+**Signature**
+
+```ts
+declare const runServiceSync: <A, E>(effect: Effect.Effect<A, E>) => A;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.ts#L68)
+
+## `service-observability.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ServiceOperation (type alias)](#serviceoperation-type-alias)
+  - [ServiceTelemetryService (interface)](#servicetelemetryservice-interface)
+
+---
+
+# utils
+
+## ServiceOperation (type alias)
+
+Fixed service operation labels keep telemetry dimensions bounded.
+
+**Example**
+
+```ts
+const operation: ServiceOperation = "descriptor.is";
+```
+
+**Signature**
+
+```ts
+type ServiceOperation =
+  | "define"
+  | "members.copy"
+  | "members.unique"
+  | "member.normalize"
+  | "member.is-reserved"
+  | "member.assert"
+  | "ref.is"
+  | "ref.assert"
+  | "descriptor.is"
+  | "descriptor.assert"
+  | "descriptor.freeze"
+  | "descriptor.entries"
+  | "function.is"
+  | "context.freeze";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.types.ts#L6)
+
+## ServiceTelemetryService (interface)
+
+Injectable observation boundary for service operations.
+
+**Example**
+
+```ts
+const telemetry: ServiceTelemetryService = { observe: (_, effect) => effect };
+```
+
+**Signature**
+
+```ts
+export interface ServiceTelemetryService {
+  /** Observe one operation while preserving its channels.
+   * @param operation - Fixed operation label.
+   * @param effect - Operation to measure.
+   * @returns The observed Effect with unchanged success and error channels.
+   * @example telemetry.observe("ref.is", Effect.succeed(true));
+   */
+  readonly observe: <A, E, R>(
+    operation: ServiceOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
 }
-  ? Tasks
-  : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.types.ts#L25)
+
+## `types.ts`
+
+Public declaration relay retained for package source compatibility.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - ["./define-service.types.js" (namespace export)](#define-servicetypesjs-namespace-export)
+  - ["./reference-guards.types.js" (namespace export)](#reference-guardstypesjs-namespace-export)
+
+---
+
+# utils
+
+## "./define-service.types.js" (namespace export)
+
+Re-exports all named exports from the "./define-service.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./define-service.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L2)
+
+## "./reference-guards.types.js" (namespace export)
+
+Re-exports all named exports from the "./reference-guards.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./reference-guards.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L3)

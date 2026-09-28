@@ -1,9 +1,12 @@
 import { StateSchema, type AnyStateSchema } from "@langchain/langgraph";
 import { isFunctionGraphNode } from "@relkit/functions";
 import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
 import { isRecord } from "./agent-validation.js";
 import type { GraphNodeLike } from "./define-graph.js";
 import { assertGraphNodeDestinations, isGraphNodeDescriptor } from "./define-graph-node.js";
+import { graphDefinitionFailure } from "./define-graph-error.js";
 import {
   createGraphEdgeBuilder,
   type GraphEdgeBuilder,
@@ -11,7 +14,53 @@ import {
 } from "./graph-edges.js";
 import { isSubgraphNode } from "./graph-subgraph.js";
 
+/** Validates graph state, nodes, and edge declarations.
+ * @param state - Native graph state schema.
+ * @param input - Graph input schema.
+ * @param output - Graph output schema.
+ * @param sourceNodes - Authored node descriptors.
+ * @param edges - Edge builder callback.
+ * @returns An Effect with nodes, edges, and state keys or GraphDefinitionFailure.
+ * @example Effect.runSync(prepareGraphDefinitionEffect(state, input, output, nodes, edges));
+ */
+export const prepareGraphDefinitionEffect = Effect.fn("Agents.graph.prepareDefinition")((
+  state: AnyStateSchema,
+  input: StandardSchemaV1,
+  output: StandardSchemaV1,
+  sourceNodes: readonly GraphNodeLike[],
+  edges: (builder: GraphEdgeBuilder<string, any>) => unknown,
+) => Effect.try({
+  try: () => prepareGraphDefinitionCore(state, input, output, sourceNodes, edges),
+  catch: graphDefinitionFailure,
+}), (effect) => observeAgent("graph.prepare-definition", effect));
+
+/** Validates graph authoring for existing synchronous callers.
+ * @param state - Native graph state schema.
+ * @param input - Graph input schema.
+ * @param output - Graph output schema.
+ * @param sourceNodes - Authored node descriptors.
+ * @param edges - Edge builder callback.
+ * @returns Frozen nodes, ordered operations, and state keys.
+ * @throws The original graph authoring error.
+ * @example const prepared = prepareGraphDefinition(state, input, output, nodes, edges);
+ */
 export function prepareGraphDefinition(
+  state: AnyStateSchema,
+  input: StandardSchemaV1,
+  output: StandardSchemaV1,
+  sourceNodes: readonly GraphNodeLike[],
+  edges: (builder: GraphEdgeBuilder<string, any>) => unknown,
+): {
+  readonly nodes: readonly GraphNodeLike[];
+  readonly operations: readonly GraphEdgeOperation<string, any>[];
+  readonly stateKeys: Set<string>;
+} {
+  return Effect.runSync(prepareGraphDefinitionEffect(state, input, output, sourceNodes, edges).pipe(
+    Effect.catchTag("GraphDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+  ));
+}
+
+function prepareGraphDefinitionCore(
   state: AnyStateSchema,
   input: StandardSchemaV1,
   output: StandardSchemaV1,

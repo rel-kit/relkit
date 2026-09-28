@@ -27,14 +27,28 @@ import {
  *
  * @example
  * ```ts
- * import { defineEventFunction } from "@relkit/app/events"
+ * import { defineEvent, defineEventFunction } from "@relkit/app/events";
+ * import { z } from "@relkit/app/schema";
  *
- * // After generating the application's event registry:
+ * const orderCreated = defineEvent({
+ *   id: "orders.created",
+ *   input: z.object({ orderId: z.string() }),
+ * });
+ *
+ * // The application normally generates this declaration with `relkit check`.
+ * declare global {
+ *   namespace Relkit {
+ *     interface EventRegistry {
+ *       "orders.created": typeof orderCreated;
+ *     }
+ *   }
+ * }
+ *
  * const receipt = defineEventFunction({
  *   id: "receipt.send",
  *   event: "orders.created",
  *   handler: async () => {},
- * })
+ * });
  * ```
  * @category Events
  * @since 0.1.0

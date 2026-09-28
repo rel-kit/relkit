@@ -1,200 +1,180 @@
-import { normalizeId } from "@relkit/contracts";
-import type { ToolApproval, ToolSideEffect } from "@relkit/tools";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
+import {
+  approveApprovalValue,
+  assertApprovalGrantedValue,
+  createApprovalValue,
+  denyApprovalValue,
+  isApprovalRecordValue,
+  requiresApprovalValue,
+} from "./approval-core.js";
+import { approvalEffectError, type ApprovalEffectError } from "./approval-effect-error.js";
+import type {
+  ApprovalOptions,
+  ApprovalPolicy,
+  ApprovalRecord,
+  ApprovalSideEffect,
+  ApprovedApproval,
+  DeniedApproval,
+} from "./approval.types.js";
 
-export const APPROVAL_STATES = Object.freeze(["pending", "approved", "denied"] as const);
-export type ApprovalState = (typeof APPROVAL_STATES)[number];
-export type ApprovalPolicy = ToolApproval;
-export type ApprovalSideEffect = ToolSideEffect;
+export { APPROVAL_STATES } from "./approval-core.js";
+export { ApprovalDeniedError, ApprovalRequiredError, ApprovalStateError } from "./approval-error.js";
+export { ApprovalEffectError } from "./approval-effect-error.js";
+export type * from "./approval.types.js";
 
-export interface ApprovalOptions {
-  readonly invocationId: string;
-  readonly toolCallId: string;
-  readonly toolId: string;
-  readonly sideEffect: ApprovalSideEffect;
-  readonly policy: ApprovalPolicy;
-}
+/** Tests whether a tool call needs an explicit approval decision.
+ * @param policy - Configured approval policy.
+ * @param sideEffect - Tool's declared side effect.
+ * @returns An Effect with the decision or ApprovalEffectError.
+ * @example Effect.runSync(requiresApprovalEffect("on-write", "write"));
+ */
+export const requiresApprovalEffect = Effect.fn("Agents.approval.requires")(
+  (policy: ApprovalPolicy, sideEffect: ApprovalSideEffect) =>
+    Effect.try({ try: () => requiresApprovalValue(policy, sideEffect), catch: approvalEffectError }),
+  (effect) => observeAgent("approval.requires", effect),
+);
 
-/** Safe, argument-free metadata for one invocation/tool-call approval decision. */
-export interface ApprovalMetadata extends ApprovalOptions {
-  readonly required: boolean;
-  readonly state: ApprovalState;
-}
-
-export interface PendingApproval extends ApprovalMetadata {
-  readonly state: "pending";
-}
-
-export interface ApprovedApproval extends ApprovalMetadata {
-  readonly state: "approved";
-}
-
-export interface DeniedApproval extends ApprovalMetadata {
-  readonly state: "denied";
-}
-
-export type ApprovalRecord = PendingApproval | ApprovedApproval | DeniedApproval;
-
-export class ApprovalStateError extends Error {
-  readonly code = "RELKIT_APPROVAL_STATE_INVALID" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "ApprovalStateError";
-  }
-}
-
-export class ApprovalRequiredError extends Error {
-  readonly code = "RELKIT_APPROVAL_REQUIRED" as const;
-  constructor(readonly approval: PendingApproval) {
-    super(`Approval required for tool "${approval.toolId}"`);
-    this.name = "ApprovalRequiredError";
-  }
-}
-
-export class ApprovalDeniedError extends Error {
-  readonly code = "RELKIT_APPROVAL_DENIED" as const;
-  constructor(readonly approval: DeniedApproval) {
-    super(`Approval denied for tool "${approval.toolId}"`);
-    this.name = "ApprovalDeniedError";
-  }
-}
-
-/** Returns whether a tool call must wait for an explicit approval decision. */
+/** Tests whether a tool call needs an explicit approval decision.
+ * @param policy - Configured approval policy.
+ * @param sideEffect - Tool's declared side effect.
+ * @returns Whether an explicit approval is required.
+ * @throws TypeError for an invalid policy or side effect.
+ * @example requiresApproval("on-write", "write");
+ */
 export function requiresApproval(policy: ApprovalPolicy, sideEffect: ApprovalSideEffect): boolean {
-  assertPolicy(policy);
-  assertSideEffect(sideEffect);
-  return (
-    policy === "always" || (policy === "on-write" && sideEffect !== "none" && sideEffect !== "read")
-  );
+  return runApproval(requiresApprovalEffect(policy, sideEffect));
 }
 
-/** Creates an immutable approval record; non-required calls are policy-approved. */
+/** Creates an immutable pending or policy-approved record.
+ * @param options - Call identity, policy, and side-effect metadata.
+ * @returns An Effect with the record or ApprovalEffectError.
+ * @example Effect.runSync(createApprovalEffect(options));
+ */
+export const createApprovalEffect = Effect.fn("Agents.approval.create")(
+  (options: ApprovalOptions) =>
+    Effect.try({ try: () => createApprovalValue(options), catch: approvalEffectError }),
+  (effect) => observeAgent("approval.create", effect),
+);
+
+/** Creates an immutable pending or policy-approved record.
+ * @param options - Call identity, policy, and side-effect metadata.
+ * @returns A frozen approval record.
+ * @throws TypeError or ApprovalStateError for invalid metadata.
+ * @example createApproval({ invocationId: "run", toolCallId: "call", toolId: "send", sideEffect: "write", policy: "always" });
+ */
 export function createApproval(options: ApprovalOptions): ApprovalRecord {
-  const required = requiresApproval(options.policy, options.sideEffect);
-  return makeApproval(options, required ? "pending" : "approved");
+  return runApproval(createApprovalEffect(options));
 }
 
-/**
- * Moves a pending approval to the approved state.
- *
+/** Moves a pending approval to the approved state.
+ * @param approval - Pending decision to grant.
+ * @returns An Effect with an approved record or ApprovalEffectError.
+ * @example Effect.runSync(approveApprovalEffect(pending));
+ */
+export const approveApprovalEffect = Effect.fn("Agents.approval.approve")(
+  (approval: ApprovalRecord) =>
+    Effect.try({ try: () => approveApprovalValue(approval), catch: approvalEffectError }),
+  (effect) => observeAgent("approval.approve", effect),
+);
+
+/** Moves a pending approval to the approved state.
+ * @param approval - Pending decision to grant.
+ * @returns A frozen approved record.
+ * @throws ApprovalStateError for a malformed or final decision.
  * @example
  * ```ts
- * import { approveApproval, createApproval } from "@relkit/app/agents"
+ * import { approveApproval, createApproval } from "@relkit/app/agents";
+ *
  * const pending = createApproval({
- *   invocationId: "invocation-1", toolCallId: "tool-call-1", toolId: "cancel-order",
- *   sideEffect: "write", policy: "always"
- * })
- * void approveApproval(pending)
+ *   invocationId: "run", toolCallId: "call", toolId: "send",
+ *   sideEffect: "write", policy: "always",
+ * });
+ * const approved = approveApproval(pending);
+ * void approved;
  * ```
  * @category Approvals
- * @since 0.1.0
+ * @since 0.4.0
  */
 export function approveApproval(approval: ApprovalRecord): ApprovedApproval {
-  assertTransitionable(approval);
-  return makeApproval(approval, "approved");
+  return runApproval(approveApprovalEffect(approval));
 }
 
-/**
- * Moves a pending approval to the denied state.
- *
+/** Moves a pending approval to the denied state.
+ * @param approval - Pending decision to deny.
+ * @returns An Effect with a denied record or ApprovalEffectError.
+ * @example Effect.runSync(denyApprovalEffect(pending));
+ */
+export const denyApprovalEffect = Effect.fn("Agents.approval.deny")(
+  (approval: ApprovalRecord) =>
+    Effect.try({ try: () => denyApprovalValue(approval), catch: approvalEffectError }),
+  (effect) => observeAgent("approval.deny", effect),
+);
+
+/** Moves a pending approval to the denied state.
+ * @param approval - Pending decision to deny.
+ * @returns A frozen denied record.
+ * @throws ApprovalStateError for a malformed or final decision.
  * @example
  * ```ts
- * import { createApproval, denyApproval } from "@relkit/app/agents"
- * const approval = createApproval({ invocationId: "invocation-1", toolCallId: "call-1", toolId: "cancel-order", sideEffect: "write", policy: "always" })
- * void denyApproval(approval)
+ * import { createApproval, denyApproval } from "@relkit/app/agents";
+ *
+ * const pending = createApproval({
+ *   invocationId: "run", toolCallId: "call", toolId: "send",
+ *   sideEffect: "write", policy: "always",
+ * });
+ * const denied = denyApproval(pending);
+ * void denied;
  * ```
  * @category Approvals
- * @since 0.1.0
+ * @since 0.4.0
  */
 export function denyApproval(approval: ApprovalRecord): DeniedApproval {
-  assertTransitionable(approval);
-  return makeApproval(approval, "denied");
+  return runApproval(denyApprovalEffect(approval));
 }
 
-/** Rejects execution unless the record is approved. */
-export function assertApprovalGranted(
-  approval: ApprovalRecord,
-): asserts approval is ApprovedApproval {
-  const record = canonicalizeApproval(approval);
-  if (record.state === "pending") throw new ApprovalRequiredError(record);
-  if (record.state === "denied") throw new ApprovalDeniedError(record);
+/** Fails unless the record was approved.
+ * @param approval - Decision to inspect before tool execution.
+ * @returns An Effect with void or ApprovalEffectError.
+ * @example Effect.runSync(assertApprovalGrantedEffect(approved));
+ */
+export const assertApprovalGrantedEffect = Effect.fn("Agents.approval.assertGranted")(
+  (approval: ApprovalRecord) =>
+    Effect.try({ try: () => assertApprovalGrantedValue(approval), catch: approvalEffectError }),
+  (effect) => observeAgent("approval.assert-granted", effect),
+);
+
+/** Rejects execution unless the record is approved.
+ * @param approval - Decision to inspect before tool execution.
+ * @returns An assertion narrowing the record to ApprovedApproval.
+ * @throws ApprovalRequiredError, ApprovalDeniedError, or ApprovalStateError.
+ * @example assertApprovalGranted(approved);
+ */
+export function assertApprovalGranted(approval: ApprovalRecord): asserts approval is ApprovedApproval {
+  runApproval(assertApprovalGrantedEffect(approval));
 }
 
+/** Checks whether a value is a canonical approval record.
+ * @param value - Unknown value to inspect.
+ * @returns An Effect with a boolean and no typed failure.
+ * @example Effect.runSync(isApprovalRecordEffect(value));
+ */
+export const isApprovalRecordEffect = Effect.fn("Agents.approval.isRecord")(
+  (value: unknown) => Effect.sync(() => isApprovalRecordValue(value)),
+  (effect) => observeAgent("approval.is-record", effect),
+);
+
+/** Checks whether a value is a canonical approval record.
+ * @param value - Unknown value to inspect.
+ * @returns True for a valid, canonical record.
+ * @example if (isApprovalRecord(value)) console.log(value.state);
+ */
 export function isApprovalRecord(value: unknown): value is ApprovalRecord {
-  try {
-    canonicalizeApproval(value);
-    return true;
-  } catch {
-    return false;
-  }
+  return Effect.runSync(isApprovalRecordEffect(value));
 }
 
-function assertTransitionable(approval: ApprovalRecord): void {
-  const record = canonicalizeApproval(approval);
-  if (record.state !== "pending") {
-    throw new ApprovalStateError(`Cannot transition ${record.state} approval`);
-  }
-}
-
-function makeApproval(options: ApprovalOptions, state: "pending"): PendingApproval;
-function makeApproval(options: ApprovalOptions, state: "approved"): ApprovedApproval;
-function makeApproval(options: ApprovalOptions, state: "denied"): DeniedApproval;
-function makeApproval(options: ApprovalOptions, state: ApprovalState): ApprovalRecord;
-function makeApproval(options: ApprovalOptions, state: ApprovalState): ApprovalRecord {
-  assertState(state);
-  const invocationId = normalizeId(options.invocationId);
-  const toolCallId = normalizeId(options.toolCallId);
-  const toolId = normalizeId(options.toolId);
-  const required = requiresApproval(options.policy, options.sideEffect);
-  if (!required && state !== "approved") {
-    throw new ApprovalStateError("A non-required approval must be approved by policy");
-  }
-  return Object.freeze({
-    invocationId,
-    toolCallId,
-    toolId,
-    sideEffect: options.sideEffect,
-    policy: options.policy,
-    required,
-    state,
-  }) as ApprovalRecord;
-}
-
-function canonicalizeApproval(value: unknown): ApprovalRecord {
-  if (!isRecord(value)) throw new ApprovalStateError("Approval record must be an object");
-  assertState(value.state);
-  const record = makeApproval(value as unknown as ApprovalOptions, value.state);
-  if (
-    value.required !== record.required ||
-    value.invocationId !== record.invocationId ||
-    value.toolCallId !== record.toolCallId ||
-    value.toolId !== record.toolId ||
-    value.sideEffect !== record.sideEffect ||
-    value.policy !== record.policy ||
-    Reflect.ownKeys(value).length !== 7
-  ) {
-    throw new ApprovalStateError("Approval record metadata is invalid");
-  }
-  return record;
-}
-
-function assertState(value: unknown): asserts value is ApprovalState {
-  if (!APPROVAL_STATES.includes(value as ApprovalState)) {
-    throw new ApprovalStateError("Approval state must be pending, approved, or denied");
-  }
-}
-
-function assertPolicy(value: unknown): asserts value is ApprovalPolicy {
-  if (value !== "never" && value !== "on-write" && value !== "always") {
-    throw new TypeError("Approval policy must be never, on-write, or always");
-  }
-}
-
-function assertSideEffect(value: unknown): asserts value is ApprovalSideEffect {
-  if (value !== "none" && value !== "read" && value !== "write" && value !== "external") {
-    throw new TypeError("Approval side effect must be none, read, write, or external");
-  }
-}
-
-function isRecord(value: unknown): value is Record<PropertyKey, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+function runApproval<A>(effect: Effect.Effect<A, ApprovalEffectError>): A {
+  return Effect.runSync(
+    effect.pipe(Effect.catchTag("ApprovalEffectError", (error) => Effect.fail(error.cause))),
+  );
 }

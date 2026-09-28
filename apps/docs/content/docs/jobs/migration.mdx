@@ -13,8 +13,8 @@ Relkit packages as one set before changing the application graph.
 The migration helper is exposed from the jobs package; run it against the previous and next snapshots before
 activation. It reports identity, binding, schema, history, schedule, dedupe, and client-fingerprint changes.
 
-<include cwd lang="ts" meta='title="packages/jobs/migration.test.ts"'>
-  ../../packages/jobs/migration.test.ts
+<include cwd lang="ts" meta='title="packages/jobs/tests/migration.test.ts"'>
+  ../../packages/jobs/tests/migration.test.ts
 </include>
 
 Diagnostics flag pinned/default-derived ID changes, implicit-to-explicit binding changes, task version or schema incompatibility, history and schedule changes, dedupe changes, and client fingerprint changes. Legacy aliases and function-target definitions must be explicit during the migration window; the compiler does not silently rewrite them.

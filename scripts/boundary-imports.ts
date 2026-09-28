@@ -79,7 +79,7 @@ export const internalRuntimePackages = new Set([
 export const dependencyNeutralPackages = new Set(["@relkit/invocation"]);
 
 export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>>([
-  ["@relkit/agents", new Set(["ai"])],
+  ["@relkit/agents", new Set(["ai", "effect"])],
   ["@relkit/app", new Set(["@relkit/observability/telemetry"])],
   ["@relkit/buckets", new Set(["effect"])],
   ["@relkit/cache", new Set(["effect"])],

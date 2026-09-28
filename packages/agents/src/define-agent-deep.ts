@@ -1,25 +1,37 @@
 import { isAgentDescriptor } from "./define-agent-validation.js";
-import type { AgentDescriptor } from "./define-agent.js";
-import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
-import type { InterruptOnConfig } from "langchain";
-import type { CheckpointerResource, MemoryResource } from "./define-persistence.js";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
+import { agentDefinitionFailure } from "./define-agent-error.js";
+import type { AgentSubagent, DeepAgentCapabilities } from "./define-agent-deep.types.js";
 
-export type AgentSubagent = AgentDescriptor<string, unknown, unknown>;
+export type * from "./define-agent-deep.types.js";
 
-export type AgentFilesystemBackend =
-  object | ((context: { readonly state: unknown; readonly store?: unknown }) => object);
+/** Validates and freezes native DeepAgents options.
+ * @param value - Optional subagents, paths, backend, persistence, and HITL controls.
+ * @returns An Effect with copied capabilities or AgentDefinitionFailure.
+ * @example Effect.runSync(copyDeepAgentCapabilitiesEffect({ skills: ["/skills"] }));
+ */
+export const copyDeepAgentCapabilitiesEffect = Effect.fn("Agents.definition.copyDeep")(
+  (value: DeepAgentCapabilities) => Effect.try({
+    try: () => copyDeepAgentCapabilitiesValue(value),
+    catch: agentDefinitionFailure,
+  }),
+  (effect) => observeAgent("definition.copy-deep", effect),
+);
 
-export interface DeepAgentCapabilities {
-  readonly subagents?: readonly AgentSubagent[];
-  readonly skills?: readonly string[];
-  readonly memory?: readonly string[];
-  readonly backend?: AgentFilesystemBackend;
-  readonly checkpointer?: BaseCheckpointSaver | CheckpointerResource;
-  readonly store?: BaseStore | MemoryResource;
-  readonly interruptOn?: Readonly<Record<string, boolean | InterruptOnConfig>>;
+/** Copies DeepAgents options for existing synchronous authoring callers.
+ * @param value - Optional subagents, paths, backend, persistence, and HITL controls.
+ * @returns Immutable capabilities.
+ * @throws The original invalid capability error.
+ * @example const options = copyDeepAgentCapabilities({ skills: ["/skills"] });
+ */
+export function copyDeepAgentCapabilities(value: DeepAgentCapabilities): DeepAgentCapabilities {
+  return Effect.runSync(copyDeepAgentCapabilitiesEffect(value).pipe(
+    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+  ));
 }
 
-export function copyDeepAgentCapabilities(value: DeepAgentCapabilities): DeepAgentCapabilities {
+function copyDeepAgentCapabilitiesValue(value: DeepAgentCapabilities): DeepAgentCapabilities {
   const subagents = copySubagents(value.subagents);
   const skills = copyPaths(value.skills, "skills");
   const memory = copyPaths(value.memory, "memory");
@@ -46,7 +58,26 @@ export function copyDeepAgentCapabilities(value: DeepAgentCapabilities): DeepAge
   });
 }
 
+/** Checks whether a descriptor enables native DeepAgents capabilities.
+ * @param value - Capabilities to inspect.
+ * @returns An Effect with a boolean and no typed failure.
+ * @example Effect.runSync(hasDeepAgentCapabilitiesEffect({ skills: ["/skills"] }));
+ */
+export const hasDeepAgentCapabilitiesEffect = Effect.fn("Agents.definition.hasDeep")(
+  (value: DeepAgentCapabilities) => Effect.sync(() => hasDeepAgentCapabilitiesValue(value)),
+  (effect) => observeAgent("definition.has-deep", effect),
+);
+
+/** Checks capabilities for existing synchronous authoring callers.
+ * @param value - Capabilities to inspect.
+ * @returns Whether native DeepAgents behavior is requested.
+ * @example if (hasDeepAgentCapabilities(options)) enableDeep();
+ */
 export function hasDeepAgentCapabilities(value: DeepAgentCapabilities): boolean {
+  return Effect.runSync(hasDeepAgentCapabilitiesEffect(value));
+}
+
+function hasDeepAgentCapabilitiesValue(value: DeepAgentCapabilities): boolean {
   return (
     value.subagents !== undefined ||
     value.skills !== undefined ||

@@ -37,6 +37,7 @@
     "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*",
     "@relkit/tools": "workspace:*",
+    "effect": "4.0.0-rc.115",
     "langchain": "1.5.10",
     "langsmith": "0.9.0"
   },
@@ -49,16 +50,20 @@
     }
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "5.0.1",
     "@langchain/langgraph-checkpoint-mongodb": "1.4.1",
     "@langchain/langgraph-checkpoint-postgres": "1.0.5",
     "@langchain/langgraph-checkpoint-redis": "1.0.11",
     "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
     "@relkit/buckets": "workspace:*",
-    "deepagents": "1.13.3"
+    "deepagents": "1.13.3",
+    "vitest": "5.0.1"
   },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --coverage --config vitest.config.ts"
   }
 }

@@ -1,53 +1,78 @@
 import type { ProtocolEvent } from "@langchain/langgraph";
 import type { StandardSchemaV1 } from "@relkit/schema";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
+import { agentInvocationFailure } from "./runtime-effect-error.js";
 import type { AgentExecutionEvent } from "./runtime-events.js";
-import { validateValue } from "./runtime-utils.js";
+import { publicToolValue } from "./runtime-native-public-tools.js";
+import { selectedStateEffect } from "./runtime-native-public-state.js";
+import type { NativeExecutionContext } from "./runtime-native-public.types.js";
+import { validateValueEffect } from "./runtime-utils.js";
 
-export type NativeExecutionContext = Pick<AgentExecutionEvent, "agent" | "parent">;
+export type { NativeExecutionContext } from "./runtime-native-public.types.js";
+export { publicToolValue, publicToolValueEffect } from "./runtime-native-public-tools.js";
 
-export async function nativePublicEvent(
+/** Projects a native protocol event to its public, validated form.
+ * @param event - Native protocol event.
+ * @param stateSchemas - Public state validators.
+ * @param context - Agent and parent context.
+ * @param eventSchemas - Custom event validators.
+ * @returns An Effect with a public event or AgentInvocationFailure.
+ * @example await Effect.runPromise(nativePublicEventEffect(event, schemas));
+ */
+export const nativePublicEventEffect = Effect.fn("Agents.runtime.nativePublicEvent")(
+  function* (
+    event: ProtocolEvent,
+    stateSchemas: ReadonlyMap<string, StandardSchemaV1>,
+    context: NativeExecutionContext = {},
+    eventSchemas: Readonly<Record<string, StandardSchemaV1>> = {},
+  ) {
+    const value = yield* publicValueEffect(event.method, event.params.data, stateSchemas, eventSchemas);
+    return yield* Effect.try({
+      try: (): AgentExecutionEvent => ({
+        nativeSequence: event.seq,
+        kind: event.method,
+        scope: [...event.params.namespace],
+        occurredAt: new Date(event.params.timestamp).toISOString(),
+        ...context,
+        ...(event.params.node === undefined ? {} : { node: event.params.node }),
+        ...(value === undefined ? {} : { value }),
+      }),
+      catch: agentInvocationFailure,
+    });
+  },
+  (effect) => observeAgent("runtime.native-public-event", effect),
+);
+
+/** Projects a native event for existing Promise callers.
+ * @param event - Native protocol event.
+ * @param stateSchemas - Public state validators.
+ * @param context - Agent and parent context.
+ * @param eventSchemas - Custom event validators.
+ * @returns A public event.
+ * @throws The original schema or timestamp error.
+ * @example await nativePublicEvent(event, schemas);
+ */
+export function nativePublicEvent(
   event: ProtocolEvent,
   stateSchemas: ReadonlyMap<string, StandardSchemaV1>,
   context: NativeExecutionContext = {},
   eventSchemas: Readonly<Record<string, StandardSchemaV1>> = {},
 ): Promise<AgentExecutionEvent> {
-  const value = await publicValue(event.method, event.params.data, stateSchemas, eventSchemas);
-  return {
-    nativeSequence: event.seq,
-    kind: event.method,
-    scope: [...event.params.namespace],
-    occurredAt: new Date(event.params.timestamp).toISOString(),
-    ...context,
-    ...(event.params.node === undefined ? {} : { node: event.params.node }),
-    ...(value === undefined ? {} : { value }),
-  };
+  return Effect.runPromise(nativePublicEventEffect(event, stateSchemas, context, eventSchemas).pipe(
+    Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+  ));
 }
 
-export function publicToolValue(value: unknown): unknown {
-  if (typeof value === "string") {
-    try {
-      return JSON.parse(value) as unknown;
-    } catch {
-      return value;
-    }
-  }
-  if (isRecord(value) && value.lg_name === "Command") {
-    const update = value.update;
-    const messages = isRecord(update) && Array.isArray(update.messages) ? update.messages : [];
-    return messages.length === 0 ? { completed: true } : publicToolValue(messages.at(-1));
-  }
-  if (!isRecord(value) || !("content" in value)) return value;
-  return publicToolValue(value.content);
-}
-
-async function publicValue(
+const publicValueEffect = Effect.fn("Agents.runtime.publicEventValue")(
+  function* (
   method: string,
   value: unknown,
   stateSchemas: ReadonlyMap<string, StandardSchemaV1>,
   eventSchemas: Readonly<Record<string, StandardSchemaV1>>,
-): Promise<unknown> {
+  ) {
   if (method === "input") return undefined;
-  if (method === "values" || method === "updates") return selectedState(value, stateSchemas);
+  if (method === "values" || method === "updates") return yield* selectedStateEffect(value, stateSchemas);
   if (method === "tasks") return publicTask(value);
   if (method === "checkpoints") {
     return eventFields(value, ["id", "parent_id", "step", "source"]);
@@ -64,10 +89,10 @@ async function publicValue(
   if (method === "custom" && isRecord(value) && typeof value.name === "string") {
     const schema = eventSchemas[value.name];
     if (schema === undefined) return undefined;
-    return { name: value.name, data: await validateValue(schema, value.data, "output") };
+    return { name: value.name, data: yield* validateValueEffect(schema, value.data, "output") };
   }
   return undefined;
-}
+}, (effect) => observeAgent("runtime.public-event-value", effect));
 
 function publicTask(value: unknown): unknown {
   if (!isRecord(value)) return {};
@@ -145,41 +170,6 @@ function publicDelta(value: unknown): Record<string, unknown> | undefined {
 function publicUsage(value: unknown): Record<string, unknown> | undefined {
   if (!isRecord(value)) return undefined;
   return eventFields(value, ["input_tokens", "output_tokens", "total_tokens"]);
-}
-
-async function selectedState(
-  value: unknown,
-  schemas: ReadonlyMap<string, StandardSchemaV1>,
-): Promise<unknown> {
-  if (!isRecord(value) || schemas.size === 0) return undefined;
-  const direct = await select(value, schemas);
-  if (Object.keys(direct).length > 0) return direct;
-  const nested = Object.fromEntries(
-    (
-      await Promise.all(
-        Object.entries(value).map(async ([name, update]) => {
-          if (!isRecord(update)) return undefined;
-          const selected = await select(update, schemas);
-          return Object.keys(selected).length === 0 ? undefined : ([name, selected] as const);
-        }),
-      )
-    ).filter((entry): entry is readonly [string, Record<string, unknown>] => entry !== undefined),
-  );
-  return Object.keys(nested).length === 0 ? undefined : nested;
-}
-
-async function select(
-  value: Record<string, unknown>,
-  schemas: ReadonlyMap<string, StandardSchemaV1>,
-): Promise<Record<string, unknown>> {
-  const entries = await Promise.all(
-    [...schemas].map(async ([key, schema]) =>
-      value[key] === undefined
-        ? undefined
-        : ([key, await validateValue(schema, value[key], "output")] as const),
-    ),
-  );
-  return Object.fromEntries(entries.filter((entry) => entry !== undefined));
 }
 
 function eventFields(value: unknown, names: readonly string[]): Record<string, unknown> {

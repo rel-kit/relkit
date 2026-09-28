@@ -1,0 +1,24 @@
+import { describe, expect, test } from "vitest";
+import {
+  createGeneratedAgentFunction,
+  generatedAgentFunctionId,
+  isGeneratedAgentFunction,
+} from "../src/generated-function.ts";
+
+describe("generated agent functions", () => {
+  test("keep one stable marked handler and executor", async () => {
+    const calls: unknown[] = [];
+    const handler = createGeneratedAgentFunction("support.order", (input, context) => {
+      calls.push(input, context);
+      return { ok: true };
+    });
+
+    expect(generatedAgentFunctionId(" support.order ")).toBe("relkit.agent.support.order.invoke");
+    expect(isGeneratedAgentFunction(handler)).toBe(true);
+    expect(handler.functionId).toBe("relkit.agent.support.order.invoke");
+    expect(Object.isFrozen(handler)).toBe(true);
+    const context = { invocationId: "invocation-1" };
+    expect(await handler({ id: "order-1" }, context)).toEqual({ ok: true });
+    expect(calls).toEqual([{ id: "order-1" }, context]);
+  });
+});

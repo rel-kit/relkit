@@ -1,8 +1,10 @@
 import { frameworkTrace } from "@relkit/invocation";
 import { isInterrupted } from "@langchain/langgraph";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
 import type { AgentCapturePolicy } from "./observability.js";
-import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
+import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { createLoopTelemetry } from "./runtime-loop-telemetry.js";
 import { collectNativeEvents } from "./runtime-native-events.js";
 import { createNativeAgent, StructuredOutputParsingError } from "./runtime-native-agent.js";
@@ -16,29 +18,90 @@ import {
   graphWaitingResponse,
   publicWaitingRequests,
 } from "./graph-interruption.js";
-import {
-  jsonValue,
-  modelFailure,
-  signalFailure,
-  validateValue,
-  withSignal,
-} from "./runtime-utils.js";
+import { jsonValue, modelFailure, signalFailure, validateValue, withSignal } from "./runtime-utils.js";
 import type { AgentDescriptor } from "./define-agent.js";
+import { nativeMessages, responseValue, unwrapNativeCause } from "./runtime-loop-values.js";
+import type { AgentLoopOptions, NativeModel } from "./runtime-loop.types.js";
 
-type AgentOptions = AgentRuntimeOptions & AgentInvocationOptions;
-type NativeModel = string | import("@langchain/core/language_models/base").LanguageModelLike;
+export type { AgentLoopOptions, NativeModel } from "./runtime-loop.types.js";
 
-export async function runAgentLoop(
-  options: AgentOptions,
+/** Runs one native model loop with linked Effect cancellation.
+ * @param options - Runtime and invocation integrations.
+ * @param model - Resolved native model.
+ * @param modelId - Stable model identity.
+ * @param signal - Invocation cancellation signal.
+ * @param input - Validated invocation input.
+ * @param maxInputBytes - Input byte cap.
+ * @param maxOutputBytes - Output byte cap.
+ * @param invocationId - Stable invocation identity.
+ * @param traceId - Trace identity.
+ * @param capture - Capture policy.
+ * @returns An Effect with validated output or AgentInvocationFailure.
+ * @example await Effect.runPromise(runAgentLoopEffect(options, model, id, signal, input, 1024, 1024, invocation, trace, capture));
+ */
+export const runAgentLoopEffect = Effect.fn("Agents.runtime.runLoop")((
+  options: AgentLoopOptions,
   model: NativeModel,
-  _modelId: string,
+  modelId: string,
   signal: AbortSignal,
   input: unknown,
   maxInputBytes: number,
   maxOutputBytes: number,
   invocationId: string,
   traceId: string,
-  _capture: AgentCapturePolicy,
+  capture: AgentCapturePolicy,
+) => Effect.tryPromise({
+  try: (effectSignal) => runAgentLoopCore(
+    options, model, modelId, AbortSignal.any([signal, effectSignal]), input,
+    maxInputBytes, maxOutputBytes, invocationId, traceId, capture,
+  ),
+  catch: agentInvocationFailure,
+}), (effect) => observeAgent("runtime.run-loop", effect));
+
+/** Runs the native model loop for existing Promise callers.
+ * @param options - Runtime and invocation integrations.
+ * @param model - Resolved native model.
+ * @param modelId - Stable model identity.
+ * @param signal - Invocation cancellation signal.
+ * @param input - Validated invocation input.
+ * @param maxInputBytes - Input byte cap.
+ * @param maxOutputBytes - Output byte cap.
+ * @param invocationId - Stable invocation identity.
+ * @param traceId - Trace identity.
+ * @param capture - Capture policy.
+ * @returns Validated output.
+ * @throws The original model, tool, validation, or cancellation error.
+ * @example await runAgentLoop(options, model, id, signal, input, 1024, 1024, invocation, trace, capture);
+ */
+export function runAgentLoop(
+  options: AgentLoopOptions,
+  model: NativeModel,
+  modelId: string,
+  signal: AbortSignal,
+  input: unknown,
+  maxInputBytes: number,
+  maxOutputBytes: number,
+  invocationId: string,
+  traceId: string,
+  capture: AgentCapturePolicy,
+): Promise<unknown> {
+  return Effect.runPromise(runAgentLoopEffect(
+    options, model, modelId, signal, input, maxInputBytes,
+    maxOutputBytes, invocationId, traceId, capture,
+  ).pipe(Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause))));
+}
+
+async function runAgentLoopCore(
+  options: AgentLoopOptions,
+  model: NativeModel,
+  modelId: string,
+  signal: AbortSignal,
+  input: unknown,
+  maxInputBytes: number,
+  maxOutputBytes: number,
+  invocationId: string,
+  traceId: string,
+  capture: AgentCapturePolicy,
 ): Promise<unknown> {
   const native = await createNativeAgent({
     runtime: {
@@ -51,7 +114,7 @@ export async function runAgentLoop(
     invocationId,
     traceId,
   });
-  const observe = createLoopTelemetry(options, _modelId);
+  const observe = createLoopTelemetry(options, modelId);
   const config =
     options.threadId === undefined ? {} : { configurable: { thread_id: options.threadId } };
   try {
@@ -60,7 +123,7 @@ export async function runAgentLoop(
       {
         input,
         kind: "client",
-        attributes: { "relkit.agent.id": options.agent.id, "relkit.model.id": _modelId },
+        attributes: { "relkit.agent.id": options.agent.id, "relkit.model.id": modelId },
       },
       async () => {
         if (options.resume && options.threadId === undefined) {
@@ -134,45 +197,4 @@ export async function runAgentLoop(
     }
     throw modelFailure(nativeCause, signal);
   }
-}
-
-function nativeMessages(options: AgentOptions, input: unknown, maxInputBytes: number) {
-  return [
-    ...(options.messages ?? []).map((message) => ({
-      role: message.role,
-      content: message.content,
-    })),
-    {
-      role: "user" as const,
-      content: JSON.stringify(jsonValue(input, maxInputBytes, "agent input")),
-    },
-  ];
-}
-
-function responseValue(state: unknown): unknown {
-  if (
-    !isRecord(state) ||
-    !isRecord(state.structuredResponse) ||
-    !("value" in state.structuredResponse)
-  ) {
-    throw new AgentRuntimeError(
-      "RELKIT_AGENT_OUTPUT_VALIDATION",
-      "Structured output is unavailable",
-    );
-  }
-  return state.structuredResponse.value;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function unwrapNativeCause(value: unknown): unknown {
-  const seen = new Set<unknown>();
-  let current = value;
-  while (isRecord(current) && current.cause !== undefined && !seen.has(current.cause)) {
-    seen.add(current);
-    current = current.cause;
-  }
-  return current;
 }

@@ -1,4 +1,6 @@
 import type { AgentClientPolicy } from "./agent-client.js";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
 import {
   clientSchemaMetadata,
   dynamicClientSchema,
@@ -7,46 +9,40 @@ import {
   type ClientSchemaMetadata,
   type ClientTypeField,
 } from "./client-contract-schema.js";
-import type { AgentMiddleware, AgentTool } from "./define-agent-native.js";
+import { agentDefinitionFailure } from "./define-agent-error.js";
+import { graphDefinitionFailure } from "./define-graph-error.js";
 import type { GraphWorkflow } from "./graph-workflow.js";
+import type {
+  AgentClientContractMetadata, AgentClientMetadataOptions, ClientEventMetadata,
+  ClientScopeMetadata, ClientToolMetadata, ClientWaitingMetadata,
+  GraphClientMetadataOptions, SubagentMetadataSource,
+} from "./client-contract-metadata.types.js";
 
-export type ClientEventMetadata = ClientTypeField | { readonly kind: "dynamic" };
-export type ClientToolMetadata =
-  | {
-      readonly id: string;
-      readonly input: ClientSchemaMetadata;
-      readonly output: ClientSchemaMetadata;
-    }
-  | { readonly kind: "dynamic" };
-export interface ClientScopeMetadata {
-  readonly kind: "agent" | "subagent" | "node" | "dynamic";
-  readonly id?: string;
-}
-export interface ClientWaitingMetadata {
-  readonly scope: ClientScopeMetadata;
-  readonly response: ClientSchemaMetadata;
-}
-export interface AgentClientContractMetadata {
-  readonly tools: readonly ClientToolMetadata[];
-  readonly state: readonly ClientTypeField[];
-  readonly events: readonly ClientEventMetadata[];
-  readonly scopes: readonly ClientScopeMetadata[];
-  readonly waiting: readonly ClientWaitingMetadata[];
+export type * from "./client-contract-metadata.types.js";
+
+/** Builds client contract metadata for a native agent.
+ * @param options - Agent tools, middleware, public policy, and nested agents.
+ * @returns An Effect with metadata or AgentDefinitionFailure.
+ * @example Effect.runSync(agentClientContractMetadataEffect(options));
+ */
+export const agentClientContractMetadataEffect = Effect.fn("Agents.client.agentMetadata")((
+  options: AgentClientMetadataOptions,
+) => Effect.try({ try: () => agentClientContractMetadataCore(options), catch: agentDefinitionFailure }),
+  (effect) => observeAgent("client.agent-metadata", effect));
+
+/** Builds native agent metadata for existing synchronous callers.
+ * @param options - Agent tools, middleware, public policy, and nested agents.
+ * @returns Frozen client contract metadata.
+ * @throws The original invalid metadata error.
+ * @example agentClientContractMetadata(options);
+ */
+export function agentClientContractMetadata(options: AgentClientMetadataOptions): AgentClientContractMetadata {
+  return Effect.runSync(agentClientContractMetadataEffect(options).pipe(
+    Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+  ));
 }
 
-interface SubagentMetadataSource {
-  readonly id: string;
-  readonly subagents?: readonly SubagentMetadataSource[];
-}
-
-export function agentClientContractMetadata(options: {
-  readonly id: string;
-  readonly tools: readonly AgentTool[];
-  readonly middleware: readonly AgentMiddleware[];
-  readonly client?: AgentClientPolicy;
-  readonly subagents?: readonly SubagentMetadataSource[];
-  readonly interruptOn?: Readonly<Record<string, unknown>>;
-}): AgentClientContractMetadata {
+function agentClientContractMetadataCore(options: AgentClientMetadataOptions): AgentClientContractMetadata {
   const stateSchema = mergeClientSchemas(options.middleware.map((item) => item.stateSchema));
   const scopes: ClientScopeMetadata[] = [{ kind: "agent", id: options.id }];
   collectSubagents(options.subagents, scopes);
@@ -64,12 +60,29 @@ export function agentClientContractMetadata(options: {
   });
 }
 
-export function graphClientContractMetadata(options: {
-  readonly id: string;
-  readonly state: { readonly getJsonSchema: () => unknown };
-  readonly client?: AgentClientPolicy;
-  readonly workflow: GraphWorkflow;
-}): AgentClientContractMetadata {
+/** Builds client contract metadata for a native graph.
+ * @param options - Graph state, workflow, and public policy.
+ * @returns An Effect with metadata or GraphDefinitionFailure.
+ * @example Effect.runSync(graphClientContractMetadataEffect(options));
+ */
+export const graphClientContractMetadataEffect = Effect.fn("Agents.client.graphMetadata")((
+  options: GraphClientMetadataOptions,
+) => Effect.try({ try: () => graphClientContractMetadataCore(options), catch: graphDefinitionFailure }),
+  (effect) => observeAgent("client.graph-metadata", effect));
+
+/** Builds graph metadata for existing synchronous callers.
+ * @param options - Graph state, workflow, and public policy.
+ * @returns Frozen client contract metadata.
+ * @throws The original invalid graph metadata error.
+ * @example graphClientContractMetadata(options);
+ */
+export function graphClientContractMetadata(options: GraphClientMetadataOptions): AgentClientContractMetadata {
+  return Effect.runSync(graphClientContractMetadataEffect(options).pipe(
+    Effect.catchTag("GraphDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+  ));
+}
+
+function graphClientContractMetadataCore(options: GraphClientMetadataOptions): AgentClientContractMetadata {
   const scopes: ClientScopeMetadata[] = [{ kind: "agent", id: options.id }];
   const waiting: ClientWaitingMetadata[] = [];
   collectWorkflow(options.workflow, scopes, waiting);

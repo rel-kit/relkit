@@ -4,9 +4,40 @@ import type {
   BrowserMessage,
   JournalRecord,
 } from "@relkit/contracts";
+import { Effect, Metric } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
 export type { AgentClientEvent, AgentProgressEvent, AgentToolEvent } from "@relkit/contracts";
 
+const clientEventsCount = Metric.counter("relkit.agents.client_events.project.total");
+
+/**
+ * Projects one journal record into ordered, public client events.
+ *
+ * @param record - Journal record to project.
+ * @returns An Effect with zero or more client events; it has no typed failure.
+ * @example
+ * const events = Effect.runSync(agentClientEventsEffect(record));
+ */
+export const agentClientEventsEffect = Effect.fn("Agents.clientEvents.project")(function* (
+  record: JournalRecord,
+) {
+  yield* Metric.update(clientEventsCount, 1);
+  return yield* Effect.sync(() => projectClientEvents(record));
+}, (effect) => observeAgent("client-events.project", effect));
+
+/**
+ * Projects a journal record for existing synchronous client callers.
+ *
+ * @param record - Journal record to project.
+ * @returns Ordered client events, or an empty array for an invalid message.
+ * @example
+ * const events = agentClientEvents(record);
+ */
 export function agentClientEvents(record: JournalRecord): readonly AgentClientEvent[] {
+  return Effect.runSync(agentClientEventsEffect(record));
+}
+
+function projectClientEvents(record: JournalRecord): readonly AgentClientEvent[] {
   const base = {
     recordId: record.recordId,
     runId: record.runId,

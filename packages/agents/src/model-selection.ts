@@ -1,140 +1,98 @@
-import { normalizeId } from "@relkit/contracts";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
+import {
+  normalizeModelSelectorValue,
+  parseModelProviderConfigurationValue,
+  resolveModelSelectorValue,
+} from "./model-selection-core.js";
+import {
+  modelSelectionEffectError,
+  type ModelSelectionEffectError,
+} from "./model-selection-error.js";
+import type {
+  ModelProviderConfiguration,
+  ResolvedModelSelection,
+} from "./model-selection.types.js";
 
-export type ModelSelectionErrorCode =
-  | "RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID"
-  | "RELKIT_MODEL_SELECTOR_INVALID"
-  | "RELKIT_MODEL_PROVIDER_UNKNOWN"
-  | "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING";
+export { ModelSelectionError, ModelSelectionEffectError } from "./model-selection-error.js";
+export type * from "./model-selection.types.js";
 
-export interface ModelProviderConfiguration {
-  readonly defaultProvider: string;
-  readonly defaultModel: string;
-  readonly providers: Readonly<Record<string, { readonly defaultModel?: string }>>;
-}
+/** Normalizes an optional provider or provider:model selector.
+ * @param value - Unknown selector input.
+ * @returns An Effect with the selector or ModelSelectionEffectError.
+ * @example Effect.runSync(normalizeModelSelectorEffect("openai:gpt"));
+ */
+export const normalizeModelSelectorEffect = Effect.fn("Agents.modelSelector.normalize")(
+  (value: unknown) =>
+    Effect.try({ try: () => normalizeModelSelectorValue(value), catch: modelSelectionEffectError }),
+  (effect) => observeAgent("model-selector.normalize", effect),
+);
 
-export interface ResolvedModelSelection {
-  readonly provider: string;
-  readonly model: string;
-  readonly id: string;
-}
-
-export class ModelSelectionError extends TypeError {
-  readonly name = "ModelSelectionError";
-
-  constructor(
-    readonly code: ModelSelectionErrorCode,
-    message: string,
-  ) {
-    super(message);
-  }
-}
-
+/** Normalizes an optional provider or provider:model selector.
+ * @param value - Unknown selector input.
+ * @returns The canonical selector or undefined.
+ * @throws ModelSelectionError for an invalid selector.
+ * @example normalizeModelSelector("openai:gpt");
+ */
 export function normalizeModelSelector(value: unknown): string | undefined {
-  if (value === undefined) return undefined;
-  if (typeof value !== "string") invalidSelector("Model selector must be serializable text");
-  const selector = value.trim();
-  if (selector === "") invalidSelector("Model selector must be non-empty text");
-  const separator = selector.indexOf(":");
-  if (separator < 0) return providerId(selector);
-  if (separator === 0 || separator !== selector.lastIndexOf(":")) {
-    invalidSelector("Model selector must be a provider ID or provider:model ID");
-  }
-  const provider = providerId(selector.slice(0, separator));
-  const model = selector.slice(separator + 1).trim();
-  if (model === "") invalidSelector("Model selector model ID must be non-empty");
-  return `${provider}:${model}`;
+  return runModelSelection(normalizeModelSelectorEffect(value));
 }
 
+/** Parses and validates configured model providers.
+ * @param value - Unknown provider configuration.
+ * @returns An Effect with frozen configuration or ModelSelectionEffectError.
+ * @example Effect.runSync(parseModelProviderConfigurationEffect(config));
+ */
+export const parseModelProviderConfigurationEffect = Effect.fn("Agents.modelSelector.parse")(
+  (value: unknown) =>
+    Effect.try({
+      try: () => parseModelProviderConfigurationValue(value),
+      catch: modelSelectionEffectError,
+    }),
+  (effect) => observeAgent("model-selector.parse", effect),
+);
+
+/** Parses and validates configured model providers.
+ * @param value - Unknown provider configuration.
+ * @returns Frozen, canonical provider defaults.
+ * @throws ModelSelectionError for missing or invalid settings.
+ * @example parseModelProviderConfiguration(config);
+ */
 export function parseModelProviderConfiguration(value: unknown): ModelProviderConfiguration {
-  if (!isRecord(value)) invalidConfiguration("modelProviders must be an object");
-  const defaultProvider = text(value.defaultProvider, "modelProviders.defaultProvider");
-  const defaultModel = text(value.defaultModel, "modelProviders.defaultModel");
-  const names = Object.keys(value).filter(
-    (name) => name !== "defaultProvider" && name !== "defaultModel",
-  );
-  if (names.length === 0) invalidConfiguration("modelProviders must declare a provider");
-  const providers: Record<string, { readonly defaultModel?: string }> = {};
-  for (const name of names) {
-    const provider = configurationProviderId(name);
-    const entry = value[name];
-    if (!isRecord(entry)) invalidConfiguration(`modelProviders.${name} must be an object`);
-    const entryDefault =
-      entry.defaultModel === undefined
-        ? undefined
-        : text(entry.defaultModel, `modelProviders.${name}.defaultModel`);
-    providers[provider] = Object.freeze(
-      entryDefault === undefined ? {} : { defaultModel: entryDefault },
-    );
-  }
-  const normalizedDefaultProvider = configurationProviderId(defaultProvider);
-  if (providers[normalizedDefaultProvider] === undefined) {
-    invalidConfiguration(
-      `modelProviders.defaultProvider "${normalizedDefaultProvider}" is not configured`,
-    );
-  }
-  return Object.freeze({
-    defaultProvider: normalizedDefaultProvider,
-    defaultModel,
-    providers: Object.freeze(providers),
-  });
+  return runModelSelection(parseModelProviderConfigurationEffect(value));
 }
 
+/** Resolves a selector against provider defaults.
+ * @param selector - Optional provider or provider:model selector.
+ * @param configuration - Validated provider configuration.
+ * @returns An Effect with a resolved model or ModelSelectionEffectError.
+ * @example Effect.runSync(resolveModelSelectorEffect("openai", config));
+ */
+export const resolveModelSelectorEffect = Effect.fn("Agents.modelSelector.resolve")(
+  (selector: unknown, configuration: ModelProviderConfiguration) =>
+    Effect.try({
+      try: () => resolveModelSelectorValue(selector, configuration),
+      catch: modelSelectionEffectError,
+    }),
+  (effect) => observeAgent("model-selector.resolve", effect),
+);
+
+/** Resolves a selector against provider defaults.
+ * @param selector - Optional provider or provider:model selector.
+ * @param configuration - Validated provider configuration.
+ * @returns Provider, model, and combined stable identifier.
+ * @throws ModelSelectionError for missing providers or defaults.
+ * @example resolveModelSelector("openai", config);
+ */
 export function resolveModelSelector(
   selector: unknown,
   configuration: ModelProviderConfiguration,
 ): ResolvedModelSelection {
-  const normalized = normalizeModelSelector(selector);
-  const selected = normalized ?? `${configuration.defaultProvider}:${configuration.defaultModel}`;
-  const separator = selected.indexOf(":");
-  const provider = separator < 0 ? selected : selected.slice(0, separator);
-  const configured = configuration.providers[provider];
-  if (configured === undefined) {
-    throw new ModelSelectionError(
-      "RELKIT_MODEL_PROVIDER_UNKNOWN",
-      `Model provider "${provider}" is not configured.`,
-    );
-  }
-  const model = separator < 0 ? configured.defaultModel : selected.slice(separator + 1).trim();
-  if (model === undefined || model === "") {
-    throw new ModelSelectionError(
-      "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING",
-      `Model provider "${provider}" has no default model.`,
-    );
-  }
-  return Object.freeze({ provider, model, id: `${provider}:${model}` });
+  return runModelSelection(resolveModelSelectorEffect(selector, configuration));
 }
 
-function providerId(value: unknown): string {
-  try {
-    return normalizeId(value);
-  } catch {
-    invalidSelector("Model provider must be a stable ID");
-  }
-}
-
-function configurationProviderId(value: unknown): string {
-  try {
-    return normalizeId(value);
-  } catch {
-    invalidConfiguration("modelProviders provider names must be stable IDs");
-  }
-}
-
-function text(value: unknown, path: string): string {
-  if (typeof value !== "string" || value.trim() === "") {
-    invalidConfiguration(`${path} must be non-empty text`);
-  }
-  return value.trim();
-}
-
-function invalidSelector(message: string): never {
-  throw new ModelSelectionError("RELKIT_MODEL_SELECTOR_INVALID", message);
-}
-
-function invalidConfiguration(message: string): never {
-  throw new ModelSelectionError("RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID", message);
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+function runModelSelection<A>(effect: Effect.Effect<A, ModelSelectionEffectError>): A {
+  return Effect.runSync(
+    effect.pipe(Effect.catchTag("ModelSelectionEffectError", (error) => Effect.fail(error.cause))),
+  );
 }

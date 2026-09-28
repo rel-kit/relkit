@@ -1,73 +1,96 @@
 import { Command } from "@langchain/langgraph";
-import { getJsonSchema } from "@relkit/schema";
-import { graphExecution, type GraphDescriptor, type GraphNodeLike } from "./define-graph.js";
-import { isGraphNodeDescriptor } from "./define-graph-node.js";
-import { isSubgraphNode, subgraphForNode } from "./graph-subgraph.js";
-import type { compileGraph } from "./graph-compile.js";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
+import { graphExecution, type GraphDescriptor } from "./define-graph.js";
+import { graphContinuationFailure } from "./graph-continuation-error.js";
+import type { CompiledGraph, GraphConfig } from "./graph-continuation.types.js";
+import { validateGraphResumeInputEffect } from "./graph-continuation-validation.js";
+import { waitingInterruptsEffect } from "./graph-continuation-waiting.js";
 import type { GraphWaitingInterrupt } from "./graph-interruption.js";
-import type { AgentWaitingRequest } from "./state-types.js";
-import { validateValue } from "./runtime-utils.js";
 
-export type GraphConfig = {} | { readonly configurable: { readonly thread_id: string } };
-type CompiledGraph = ReturnType<typeof compileGraph>;
+export type { GraphConfig } from "./graph-continuation.types.js";
+export { validateGraphResumeInput, validateGraphResumeInputEffect } from "./graph-continuation-validation.js";
+export { waitingInterrupts, waitingInterruptsEffect } from "./graph-continuation-waiting.js";
 
+/** Builds a persistent graph run configuration.
+ * @param descriptor - Graph whose checkpointer determines thread requirements.
+ * @param threadId - Optional persistent thread identity.
+ * @returns An Effect with configuration or GraphContinuationFailure.
+ * @example Effect.runSync(graphConfigEffect(graph, "thread"));
+ */
+export const graphConfigEffect = Effect.fn("Agents.graph.config")(
+  (descriptor: GraphDescriptor, threadId?: string) => Effect.try({
+    try: (): GraphConfig => {
+      const persistent = graphExecution(descriptor).checkpointer !== undefined;
+      if (persistent && (typeof threadId !== "string" || threadId.length === 0)) {
+        throw new TypeError("Graph execution with a checkpointer requires threadId");
+      }
+      return threadId === undefined ? {} : { configurable: { thread_id: threadId } };
+    },
+    catch: graphContinuationFailure,
+  }),
+  (effect) => observeAgent("graph.config", effect),
+);
+
+/** Builds graph run configuration for existing synchronous callers.
+ * @param descriptor - Graph whose checkpointer determines thread requirements.
+ * @param threadId - Optional persistent thread identity.
+ * @returns Run configuration.
+ * @throws The original missing thread error.
+ * @example const config = graphConfig(graph, "thread");
+ */
 export function graphConfig(descriptor: GraphDescriptor, threadId?: string): GraphConfig {
-  const persistent = graphExecution(descriptor).checkpointer !== undefined;
-  if (persistent && (typeof threadId !== "string" || threadId.length === 0)) {
-    throw new TypeError("Graph execution with a checkpointer requires threadId");
-  }
-  return threadId === undefined ? {} : { configurable: { thread_id: threadId } };
+  return Effect.runSync(graphConfigEffect(descriptor, threadId).pipe(
+    Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
+  ));
 }
 
-export async function resumeCommand(
+/** Validates a reply and constructs a native LangGraph resume command.
+ * @param graph - Compiled graph with the waiting snapshot.
+ * @param descriptor - Source graph descriptor.
+ * @param config - Persistent thread configuration.
+ * @param value - User reply or ordered replies.
+ * @returns An Effect with a native command or GraphContinuationFailure.
+ * @example Effect.runPromise(resumeCommandEffect(graph, descriptor, config, reply));
+ */
+export const resumeCommandEffect = Effect.fn("Agents.graph.resumeCommand")(
+  function* (graph: CompiledGraph, descriptor: GraphDescriptor, config: GraphConfig, value: unknown) {
+    yield* Effect.try({
+      try: () => {
+        if (graphExecution(descriptor).checkpointer === undefined) {
+          throw new TypeError("Graph resume requires a checkpointer");
+        }
+      },
+      catch: graphContinuationFailure,
+    });
+    const requests = yield* waitingInterruptsEffect(graph, descriptor, config);
+    const reply = yield* validateGraphResumeInputEffect(descriptor, requests, value);
+    return yield* Effect.try({
+      try: () => new Command({ resume: nativeResume(requests, reply) }),
+      catch: graphContinuationFailure,
+    });
+  },
+  (effect) => observeAgent("graph.resume-command", effect),
+);
+
+/** Constructs a native resume command for existing Promise callers.
+ * @param graph - Compiled graph with the waiting snapshot.
+ * @param descriptor - Source graph descriptor.
+ * @param config - Persistent thread configuration.
+ * @param value - User reply or ordered replies.
+ * @returns A native LangGraph resume command.
+ * @throws The original state or continuation validation error.
+ * @example await resumeCommand(graph, descriptor, config, reply);
+ */
+export function resumeCommand(
   graph: CompiledGraph,
   descriptor: GraphDescriptor,
   config: GraphConfig,
   value: unknown,
 ): Promise<Command> {
-  if (graphExecution(descriptor).checkpointer === undefined) {
-    throw new TypeError("Graph resume requires a checkpointer");
-  }
-  const requests = await waitingInterrupts(graph, descriptor, config);
-  const reply = await validateGraphResumeInput(descriptor, requests, value);
-  return new Command({ resume: nativeResume(requests, reply) });
-}
-
-export async function validateGraphResumeInput(
-  descriptor: GraphDescriptor,
-  requests: readonly AgentWaitingRequest[],
-  value: unknown,
-): Promise<unknown> {
-  if (requests.length === 0) throw new TypeError("Graph has no waiting continuation");
-  if (requests.length === 1) return validateRequest(descriptor, requests[0]!, value);
-  if (!Array.isArray(value) || value.length !== requests.length) {
-    throw new TypeError(`Graph continuation requires ${requests.length} replies`);
-  }
-  return Promise.all(
-    requests.map((request, index) => validateRequest(descriptor, request, value[index])),
-  );
-}
-
-async function validateRequest(
-  descriptor: GraphDescriptor,
-  request: AgentWaitingRequest,
-  value: unknown,
-): Promise<unknown> {
-  const node = resumeNode(descriptor, request.node.split("/"));
-  if (!isGraphNodeDescriptor(node) || node.resume === undefined) {
-    throw new TypeError(`Graph node "${request.node}" has no continuation schema`);
-  }
-  return validateValue(node.resume, value, "input");
-}
-
-function resumeNode(
-  descriptor: GraphDescriptor,
-  path: readonly string[],
-): GraphNodeLike | undefined {
-  const [head, ...tail] = path;
-  const node = descriptor.nodes.find((candidate) => candidate.id === head);
-  if (tail.length === 0) return node;
-  return isSubgraphNode(node) ? resumeNode(subgraphForNode(node), tail) : undefined;
+  return Effect.runPromise(resumeCommandEffect(graph, descriptor, config, value).pipe(
+    Effect.catchTag("GraphContinuationFailure", (failure) => Effect.fail(failure.cause)),
+  ));
 }
 
 function nativeResume(requests: readonly GraphWaitingInterrupt[], value: unknown): unknown {
@@ -77,34 +100,4 @@ function nativeResume(requests: readonly GraphWaitingInterrupt[], value: unknown
     return [request.id, values[index]] as const;
   });
   return Object.fromEntries(entries);
-}
-
-export async function waitingInterrupts(
-  graph: CompiledGraph,
-  descriptor: GraphDescriptor,
-  config: GraphConfig,
-): Promise<readonly GraphWaitingInterrupt[]> {
-  const snapshot = await graph.getState(config, { subgraphs: true });
-  return snapshotInterrupts(snapshot, descriptor, []);
-}
-
-function snapshotInterrupts(
-  snapshot: any,
-  descriptor: GraphDescriptor,
-  path: readonly string[],
-): readonly GraphWaitingInterrupt[] {
-  return snapshot.tasks.flatMap((task: any) => {
-    const node = descriptor.nodes.find((candidate) => candidate.id === task.name);
-    if (isSubgraphNode(node) && task.state?.tasks !== undefined) {
-      return snapshotInterrupts(task.state, subgraphForNode(node), [...path, node.id]);
-    }
-    if (!isGraphNodeDescriptor(node) || node.resume === undefined) return [];
-    const projection = getJsonSchema(node.resume);
-    return task.interrupts.map((entry: { readonly id?: string; readonly value?: unknown }) => ({
-      ...(entry.id === undefined ? {} : { id: entry.id }),
-      node: [...path, task.name].join("/"),
-      ...(entry.value === undefined ? {} : { value: entry.value }),
-      response: projection.ok ? projection.schema : null,
-    }));
-  });
 }
