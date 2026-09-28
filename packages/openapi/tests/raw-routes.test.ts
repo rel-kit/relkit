@@ -1,7 +1,7 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { GRAPH_VERSION } from "@relkit/contracts";
 import type { ApplicationGraph } from "@relkit/graph";
-import { generateOpenApi, generateOpenApiJson } from "./src/index.ts";
+import { generateOpenApi, generateOpenApiJson } from "../src/index.js";
 
 function graph(path = "/users/:id/details", method = "GET", rawHandler = true): ApplicationGraph {
   return {

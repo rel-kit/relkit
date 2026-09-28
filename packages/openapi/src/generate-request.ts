@@ -1,57 +1,70 @@
-import type { JsonValue } from "@relkit/contracts";
+import { Effect } from "effect";
+import { observeOpenApi } from "./generate-observability.js";
 import type {
+  BodyEntry,
+  JsonValue,
   OpenApiMediaType,
-  OpenApiOperation,
   OpenApiParameter,
   OpenApiSchema,
-} from "./generate.js";
+  OpenApiRequest,
+} from "./generate-request.types.js";
 
-type BodyEntry = {
-  readonly kind: "body" | "multipart" | "multipart-all" | "whole-body";
-  readonly name?: string;
-  readonly schema: OpenApiSchema;
-  readonly required: boolean;
-};
+/** Project request mappings into route parameters and media types.
+ * @param mapping - Serializable request mapping.
+ * @param root - Function input schema.
+ * @param routePath - Authored path used to infer path parameters.
+ * @returns Effect containing request metadata; no expected failure.
+ * @example Effect.runSync(buildRequestEffect(mapping, input, "/orders/:id"));
+ */
+export const buildRequestEffect = Effect.fn("OpenApi.buildRequest")(
+  (mapping: JsonValue, root: JsonValue, routePath: string): Effect.Effect<OpenApiRequest> =>
+    observeOpenApi(
+      "request",
+      Effect.sync(() => {
+        const parameters: OpenApiParameter[] = [];
+        const bodies: BodyEntry[] = [];
+        collect(mapping, [], root, parameters, bodies, false, false);
+        const routeNames = routeParameters(routePath);
+        const declared = new Set(routeNames);
+        const matching = parameters.filter(
+          (entry) => entry.in !== "path" || declared.has(entry.name),
+        );
+        const parameterKeys = new Set(matching.map((entry) => `${entry.in}:${entry.name}`));
+        for (const name of routeNames) {
+          if (!parameterKeys.has(`path:${name}`))
+            matching.push({ name, in: "path", required: true, schema: { type: "string" } });
+        }
+        matching.sort((left, right) =>
+          `${left.in}:${left.name}`.localeCompare(`${right.in}:${right.name}`),
+        );
+        if (bodies.length === 0) return { parameters: matching };
+        const groups = new Map<string, BodyEntry[]>();
+        for (const entry of bodies) {
+          const media = entry.kind.startsWith("multipart")
+            ? "multipart/form-data"
+            : "application/json";
+          const group = groups.get(media) ?? [];
+          group.push(entry);
+          groups.set(media, group);
+        }
+        const content: Record<string, OpenApiMediaType> = {};
+        let required = false;
+        for (const [media, entries] of [...groups.entries()].sort(([left], [right]) =>
+          left.localeCompare(right),
+        )) {
+          required ||= entries.some((entry) => entry.required);
+          const whole = entries.length === 1 && entries[0]?.kind === "whole-body";
+          const first = entries[0];
+          content[media] = {
+            schema: whole && first !== undefined ? first.schema : objectSchema(entries),
+          };
+        }
+        return { parameters: matching, body: { required, content } };
+      }),
+    ),
+);
 
-export function buildRequest(
-  mapping: JsonValue,
-  root: JsonValue,
-  routePath: string,
-): { readonly parameters: OpenApiParameter[]; readonly body?: OpenApiOperation["requestBody"] } {
-  const parameters: OpenApiParameter[] = [];
-  const bodies: BodyEntry[] = [];
-  collect(mapping, [], root, parameters, bodies, false, false);
-  const routeNames = routeParameters(routePath);
-  const declared = new Set(routeNames);
-  const matching = parameters.filter((entry) => entry.in !== "path" || declared.has(entry.name));
-  const parameterKeys = new Set(matching.map((entry) => `${entry.in}:${entry.name}`));
-  for (const name of routeNames) {
-    if (!parameterKeys.has(`path:${name}`))
-      matching.push({ name, in: "path", required: true, schema: { type: "string" } });
-  }
-  matching.sort((left, right) =>
-    `${left.in}:${left.name}`.localeCompare(`${right.in}:${right.name}`),
-  );
-  if (bodies.length === 0) return { parameters: matching };
-  const groups = new Map<string, BodyEntry[]>();
-  for (const entry of bodies) {
-    const media = entry.kind.startsWith("multipart") ? "multipart/form-data" : "application/json";
-    const group = groups.get(media) ?? [];
-    group.push(entry);
-    groups.set(media, group);
-  }
-  const content: Record<string, OpenApiMediaType> = {};
-  let required = false;
-  for (const [media, entries] of [...groups.entries()].sort(([left], [right]) =>
-    left.localeCompare(right),
-  )) {
-    required ||= entries.some((entry) => entry.required);
-    const whole = entries.length === 1 && entries[0]?.kind === "whole-body";
-    content[media] = { schema: whole ? entries[0]!.schema : objectSchema(entries) };
-  }
-  return { parameters: matching, body: { required, content } };
-}
-
+/** Walk mapping wrappers into parameter and body entries within the request Effect. */
 function collect(
   value: unknown,
   path: string[],
@@ -104,6 +117,7 @@ function collect(
   }
 }
 
+/** Merge named body fields, preserving an unnamed whole schema when present. */
 function objectSchema(entries: readonly BodyEntry[]): OpenApiSchema {
   const properties: Record<string, JsonValue> = {};
   const required: string[] = [];
@@ -117,6 +131,7 @@ function objectSchema(entries: readonly BodyEntry[]): OpenApiSchema {
   return { type: "object", properties, ...(required.length === 0 ? {} : { required }) };
 }
 
+/** Unwrap a graph-typed JSON schema after a shallow object check. */
 function schemaValue(value: unknown): OpenApiSchema | undefined {
   if (!isRecord(value)) return undefined;
   return value.$relkit === "schema" && isRecord(value.jsonSchema)
@@ -124,6 +139,7 @@ function schemaValue(value: unknown): OpenApiSchema | undefined {
     : (value as OpenApiSchema);
 }
 
+/** Follow a nested input path, returning no schema when properties are absent. */
 function schemaAt(root: JsonValue, path: readonly string[]): OpenApiSchema | undefined {
   let current = schemaValue(root);
   for (const name of path) {
@@ -134,6 +150,7 @@ function schemaAt(root: JsonValue, path: readonly string[]): OpenApiSchema | und
   return current;
 }
 
+/** Read authored path and catch-all parameter names in route order. */
 function routeParameters(path: string): readonly string[] {
   return path.split("/").flatMap((segment, index) => {
     if (segment.startsWith(":")) return [parameterName(segment.slice(1), index)];
@@ -141,15 +158,18 @@ function routeParameters(path: string): readonly string[] {
   });
 }
 
+/** Sanitize a path parameter and supply a positional fallback. */
 function parameterName(value: string, index: number, fallback = "param"): string {
   const result = value.replace(/[^A-Za-z0-9_.-]/g, "_");
   return result || `${fallback}${index}`;
 }
 
+/** Narrow a mapping kind to supported parameter locations. */
 function isParameterKind(value: string): value is OpenApiParameter["in"] | "path-segments" {
   return ["path", "path-segments", "query", "header", "cookie"].includes(value);
 }
 
+/** Narrow an unknown JSON value to a non-array object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

@@ -1,6 +1,11 @@
-import type { JsonValue } from "@relkit/contracts";
-import type { FunctionNode } from "@relkit/graph";
-import type { OpenApiResponse, OpenApiSchema } from "./generate.js";
+import { Effect } from "effect";
+import { observeOpenApi } from "./generate-observability.js";
+import type {
+  FunctionNode,
+  JsonValue,
+  OpenApiResponse,
+  OpenApiSchema,
+} from "./generate-response.types.js";
 
 const validationSchema: OpenApiSchema = {
   type: "object",
@@ -31,43 +36,54 @@ const rateLimitSchema: OpenApiSchema = {
   },
 };
 
-export function buildResponses(
-  values: JsonValue,
-  target: FunctionNode,
-): Record<string, OpenApiResponse> {
-  const result: Record<string, OpenApiResponse> = {};
-  const entries = (Array.isArray(values) ? values : [])
-    .filter(isRecord)
-    .sort(
-      (left, right) =>
-        Number(left.status) - Number(right.status) ||
-        String(left.id).localeCompare(String(right.id)),
-    );
-  const hasValidation = entries.some((entry) => entry.kind === "validation-error");
-  for (const entry of entries) {
-    const status = String(entry.status);
-    const schema =
-      entry.kind === "success"
-        ? (schemaValue(entry.schema) ?? schemaValue(target.output))
-        : entry.kind === "validation-error"
-          ? (schemaValue(entry.schema) ?? validationSchema)
-          : entry.kind === "error"
-            ? errorSchema(entry, target)
-            : schemaValue(entry.schema);
-    const rateLimited = status === "429" && String(entry.id).startsWith("rate-limit");
-    const next = makeResponse(
-      rateLimited ? "Rate limit exceeded" : description(entry),
-      status === "204" || status === "304"
-        ? undefined
-        : (schema ?? (rateLimited ? rateLimitSchema : undefined)),
-      rateLimited,
-    );
-    result[status] = result[status] === undefined ? next : mergeResponses(result[status]!, next);
-  }
-  if (!hasValidation) result["422"] = makeResponse("Validation error", validationSchema);
-  return result;
-}
+/** Project declared responses and the validation fallback for one function.
+ * @param values - Serializable response declarations.
+ * @param target - Target function and error definitions.
+ * @returns Effect containing status-indexed responses; no expected failure.
+ * @example Effect.runSync(buildResponsesEffect(responses, functionNode));
+ */
+export const buildResponsesEffect = Effect.fn("OpenApi.buildResponses")(
+  (values: JsonValue, target: FunctionNode): Effect.Effect<Record<string, OpenApiResponse>> =>
+    observeOpenApi(
+      "responses",
+      Effect.sync(() => {
+        const result: Record<string, OpenApiResponse> = {};
+        const entries = (Array.isArray(values) ? values : [])
+          .filter(isRecord)
+          .sort(
+            (left, right) =>
+              Number(left.status) - Number(right.status) ||
+              String(left.id).localeCompare(String(right.id)),
+          );
+        const hasValidation = entries.some((entry) => entry.kind === "validation-error");
+        for (const entry of entries) {
+          const status = String(entry.status);
+          const schema =
+            entry.kind === "success"
+              ? (schemaValue(entry.schema) ?? schemaValue(target.output))
+              : entry.kind === "validation-error"
+                ? (schemaValue(entry.schema) ?? validationSchema)
+                : entry.kind === "error"
+                  ? errorSchema(entry, target)
+                  : schemaValue(entry.schema);
+          const rateLimited = status === "429" && String(entry.id).startsWith("rate-limit");
+          const next = makeResponse(
+            rateLimited ? "Rate limit exceeded" : description(entry),
+            status === "204" || status === "304"
+              ? undefined
+              : (schema ?? (rateLimited ? rateLimitSchema : undefined)),
+            rateLimited,
+          );
+          const previous = result[status];
+          result[status] = previous === undefined ? next : mergeResponses(previous, next);
+        }
+        if (!hasValidation) result["422"] = makeResponse("Validation error", validationSchema);
+        return result;
+      }),
+    ),
+);
 
+/** Project a declared application error using function metadata when available. */
 function errorSchema(entry: Record<string, unknown>, target: FunctionNode): OpenApiSchema {
   const errorId = typeof entry.errorId === "string" ? entry.errorId : String(entry.id ?? "error");
   const definition = Array.isArray(target.errors)
@@ -105,21 +121,28 @@ function errorSchema(entry: Record<string, unknown>, target: FunctionNode): Open
   };
 }
 
+/** Merge duplicate status responses, including bodies and rate-limit headers. */
 function mergeResponses(left: OpenApiResponse, right: OpenApiResponse): OpenApiResponse {
   const a = left.content?.["application/json"]?.schema;
   const b = right.content?.["application/json"]?.schema;
+  const headers = { ...left.headers, ...right.headers };
+  const responseHeaders = Object.keys(headers).length === 0 ? {} : { headers };
   if (!a || !b) {
+    const content = left.content ?? right.content;
     return {
       description: `${left.description}; ${right.description}`,
-      ...(left.content === undefined ? right.content : { content: left.content }),
+      ...(content === undefined ? {} : { content }),
+      ...responseHeaders,
     };
   }
   return {
     description: `${left.description}; ${right.description}`,
     content: { "application/json": { schema: { oneOf: [a, b] } } },
+    ...responseHeaders,
   };
 }
 
+/** Build a JSON response and optional standard rate-limit headers. */
 function makeResponse(
   description: string,
   schema?: OpenApiSchema,
@@ -155,6 +178,7 @@ const rateLimitHeaders = {
   },
 } satisfies NonNullable<OpenApiResponse["headers"]>;
 
+/** Choose a stable description for each response kind. */
 function description(entry: Record<string, unknown>): string {
   if (entry.kind === "success") return "Successful response";
   if (entry.kind === "validation-error") return "Validation error";
@@ -162,6 +186,7 @@ function description(entry: Record<string, unknown>): string {
   return `Response ${String(entry.id)}`;
 }
 
+/** Unwrap a graph-typed JSON schema after a shallow object check. */
 function schemaValue(value: unknown): OpenApiSchema | undefined {
   if (!isRecord(value)) return undefined;
   return value.$relkit === "schema" && isRecord(value.jsonSchema)
@@ -169,6 +194,7 @@ function schemaValue(value: unknown): OpenApiSchema | undefined {
     : (value as OpenApiSchema);
 }
 
+/** Narrow an unknown response value to a non-array object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

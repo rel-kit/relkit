@@ -42,7 +42,7 @@ void chat;
 declare const copyAgentChat: (value: unknown) => AgentChatMapping | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-chat.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-chat.ts#L64)
 
 ## copyAgentChatEffect
 
@@ -109,7 +109,7 @@ void controls;
 declare const copyAgentControls: (value: unknown) => readonly AgentControl[] | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-controls.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-controls.ts#L76)
 
 ## copyAgentControlsEffect
 
@@ -222,7 +222,7 @@ declare const copyAgentClientPolicy: <StateKey extends string>(
 ) => AgentClientPolicy<(...args: any[]) => unknown, StateKey> | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-policy.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-policy.ts#L71)
 
 ## copyAgentClientPolicyEffect
 
@@ -925,7 +925,7 @@ if (isAgentSchema(value)) value["~standard"].validate(input);
 declare const isAgentSchema: (value: unknown) => value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L83)
 
 ## isAgentSchemaEffect
 
@@ -979,7 +979,7 @@ if (isPositiveInteger(value)) console.log(value + 1);
 declare const isPositiveInteger: (value: unknown) => value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L82)
 
 ## isPositiveIntegerEffect
 
@@ -1015,7 +1015,7 @@ if (isRecord(value)) console.log(value.id);
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L111)
 
 ## isRecordEffect
 
@@ -1033,7 +1033,7 @@ const valid = Effect.runSync(isRecordEffect({ id: "one" }));
 declare const isRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L94)
 
 ## positiveInteger
 
@@ -1156,7 +1156,7 @@ export * from "./agent-validation-value.js";
 declare const APPROVAL_STATES: readonly ["pending", "approved", "denied"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L18)
 
 ## approveApprovalValue
 
@@ -1178,7 +1178,7 @@ approveApprovalValue(pending);
 declare const approveApprovalValue: (approval: ApprovalRecord) => ApprovedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L55)
 
 ## assertApprovalGrantedValue
 
@@ -1202,7 +1202,7 @@ declare const assertApprovalGrantedValue: (
 ) => asserts approval is ApprovedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L77)
 
 ## createApprovalValue
 
@@ -1224,7 +1224,7 @@ createApprovalValue(options);
 declare const createApprovalValue: (options: ApprovalOptions) => ApprovalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L44)
 
 ## denyApprovalValue
 
@@ -1246,7 +1246,7 @@ denyApprovalValue(pending);
 declare const denyApprovalValue: (approval: ApprovalRecord) => DeniedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L66)
 
 ## isApprovalRecordValue
 
@@ -1264,7 +1264,7 @@ isApprovalRecordValue(value);
 declare const isApprovalRecordValue: (value: unknown) => value is ApprovalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L90)
 
 ## requiresApprovalValue
 
@@ -1289,7 +1289,7 @@ declare const requiresApprovalValue: (
 ) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L27)
 
 ## `approval-effect-error.ts`
 
@@ -1315,7 +1315,7 @@ Tagged failure for an invalid approval or denied execution.
 declare class ApprovalEffectError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-effect-error.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-effect-error.ts#L9)
 
 ## approvalEffectError
 
@@ -1333,7 +1333,7 @@ approvalEffectError(new ApprovalStateError("invalid state"));
 declare const approvalEffectError: (cause: unknown) => ApprovalEffectError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-effect-error.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-effect-error.ts#L19)
 
 ## `approval-error.ts`
 
@@ -1500,7 +1500,7 @@ void approved;
 declare const approveApproval: (approval: ApprovalRecord) => ApprovedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L106)
 
 Since v0.4.0
 
@@ -1534,7 +1534,7 @@ void denied;
 declare const denyApproval: (approval: ApprovalRecord) => DeniedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L139)
 
 Since v0.4.0
 
@@ -1550,7 +1550,7 @@ Re-exports all named exports from the "./approval.types.js" module.
 export * from "./approval.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L28)
 
 ## APPROVAL_STATES
 
@@ -1570,7 +1570,7 @@ declare const APPROVAL_STATES: readonly ["pending", "approved", "denied"];
 declare const ApprovalDeniedError: typeof ApprovalDeniedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L23)
 
 ## ApprovalEffectError
 
@@ -1580,7 +1580,7 @@ declare const ApprovalDeniedError: typeof ApprovalDeniedError;
 declare const ApprovalEffectError: typeof ApprovalEffectError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L27)
 
 ## ApprovalRequiredError
 
@@ -1590,7 +1590,7 @@ declare const ApprovalEffectError: typeof ApprovalEffectError;
 declare const ApprovalRequiredError: typeof ApprovalRequiredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L24)
 
 ## ApprovalStateError
 
@@ -1600,7 +1600,7 @@ declare const ApprovalRequiredError: typeof ApprovalRequiredError;
 declare const ApprovalStateError: typeof ApprovalStateError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L25)
 
 ## approveApprovalEffect
 
@@ -1620,7 +1620,7 @@ declare const approveApprovalEffect: (
 ) => Effect.Effect<ApprovedApproval, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L82)
 
 ## assertApprovalGranted
 
@@ -1644,7 +1644,7 @@ declare const assertApprovalGranted: (
 ) => asserts approval is ApprovedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L153)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L160)
 
 ## assertApprovalGrantedEffect
 
@@ -1664,7 +1664,7 @@ declare const assertApprovalGrantedEffect: (
 ) => Effect.Effect<void, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L141)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L148)
 
 ## createApproval
 
@@ -1692,7 +1692,7 @@ createApproval({
 declare const createApproval: (options: ApprovalOptions) => ApprovalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L73)
 
 ## createApprovalEffect
 
@@ -1712,7 +1712,7 @@ declare const createApprovalEffect: (
 ) => Effect.Effect<ApprovalRecord, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L61)
 
 ## denyApprovalEffect
 
@@ -1732,7 +1732,7 @@ declare const denyApprovalEffect: (
 ) => Effect.Effect<DeniedApproval, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L115)
 
 ## isApprovalRecord
 
@@ -1750,7 +1750,7 @@ if (isApprovalRecord(value)) console.log(value.state);
 declare const isApprovalRecord: (value: unknown) => value is ApprovalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L172)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L181)
 
 ## isApprovalRecordEffect
 
@@ -1768,7 +1768,7 @@ Effect.runSync(isApprovalRecordEffect(value));
 declare const isApprovalRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L171)
 
 ## requiresApproval
 
@@ -1790,7 +1790,7 @@ requiresApproval("on-write", "write");
 declare const requiresApproval: (policy: ApprovalPolicy, sideEffect: ApprovalSideEffect) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L52)
 
 ## requiresApprovalEffect
 
@@ -1811,7 +1811,7 @@ declare const requiresApprovalEffect: (
 ) => Effect.Effect<boolean, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L36)
 
 ## `approval.types.ts`
 
@@ -2062,7 +2062,7 @@ declare const createAgentCapturePolicy: (
 ) => AgentCapturePolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture-policy.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture-policy.ts#L89)
 
 ## createAgentCapturePolicyEffect
 
@@ -2341,7 +2341,7 @@ Re-exports all named exports from the "./client-contract-metadata.types.js" modu
 export * from "./client-contract-metadata.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L26)
 
 ## agentClientContractMetadata
 
@@ -2365,7 +2365,7 @@ declare const agentClientContractMetadata: (
 ) => AgentClientContractMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L48)
 
 ## agentClientContractMetadataEffect
 
@@ -2385,7 +2385,7 @@ declare const agentClientContractMetadataEffect: (
 ) => Effect.Effect<AgentClientContractMetadata, AgentDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L33)
 
 ## graphClientContractMetadata
 
@@ -2409,7 +2409,7 @@ declare const graphClientContractMetadata: (
 ) => AgentClientContractMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L98)
 
 ## graphClientContractMetadataEffect
 
@@ -2429,7 +2429,7 @@ declare const graphClientContractMetadataEffect: (
 ) => Effect.Effect<AgentClientContractMetadata, GraphDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L83)
 
 ## `client-contract-metadata.types.ts`
 
@@ -2467,7 +2467,7 @@ export interface AgentClientContractMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L31)
 
 ## AgentClientMetadataOptions (interface)
 
@@ -2486,7 +2486,7 @@ export interface AgentClientMetadataOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L46)
 
 ## ClientEventMetadata (type alias)
 
@@ -2513,7 +2513,7 @@ export interface ClientScopeMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L19)
 
 ## ClientToolMetadata (type alias)
 
@@ -2546,7 +2546,7 @@ export interface ClientWaitingMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L25)
 
 ## GraphClientMetadataOptions (interface)
 
@@ -2563,7 +2563,7 @@ export interface GraphClientMetadataOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L56)
 
 ## SubagentMetadataSource (interface)
 
@@ -2578,7 +2578,7 @@ export interface SubagentMetadataSource {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L40)
 
 ## `client-contract-schema.ts`
 
@@ -2637,7 +2637,7 @@ const metadata = clientSchemaMetadata({ type: "string" });
 declare const clientSchemaMetadata: (value: unknown) => ClientSchemaMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L134)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L136)
 
 ## clientSchemaMetadataEffect
 
@@ -2657,7 +2657,7 @@ declare const clientSchemaMetadataEffect: (
 ) => Effect.Effect<ClientSchemaMetadata, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L112)
 
 ## dynamicClientSchema
 
@@ -2687,7 +2687,7 @@ const schema = mergeClientSchemas([{ type: "object" }]);
 declare const mergeClientSchemas: (values: readonly unknown[]) => ClientSchemaMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L50)
 
 ## mergeClientSchemasEffect
 
@@ -2728,7 +2728,7 @@ declare const selectedClientFields: (
 ) => readonly ClientTypeField[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L97)
 
 ## selectedClientFieldsEffect
 
@@ -2749,7 +2749,7 @@ declare const selectedClientFieldsEffect: (
 ) => Effect.Effect<ReadonlyArray<ClientTypeField>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L63)
 
 ## `client-contract-schema.types.ts`
 
@@ -2856,7 +2856,7 @@ const events = agentClientEvents(record);
 declare const agentClientEvents: (record: JournalRecord) => readonly AgentClientEvent[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-events.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-events.ts#L37)
 
 ## agentClientEventsEffect
 
@@ -2901,7 +2901,7 @@ declare const agentClientEventsEffect: (
 declare const DeepAgentBucketBackendOptions: DeepAgentBucketBackendOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-backend.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-backend.ts#L16)
 
 ## createDeepAgentBucketBackend
 
@@ -2926,7 +2926,7 @@ declare const createDeepAgentBucketBackend: (
 ) => BackendProtocolV2;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-backend.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-backend.ts#L60)
 
 ## createDeepAgentBucketBackendEffect
 
@@ -2972,7 +2972,7 @@ declare const createDeepAgentBucketBackendEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-backend.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-backend.ts#L24)
 
 ## `deepagent-bucket-backend.types.ts`
 
@@ -3041,7 +3041,7 @@ declare const removeBucketPath: (
 ) => Promise<DeleteResult>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-delete.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-delete.ts#L61)
 
 ## removeBucketPathEffect
 
@@ -3152,7 +3152,7 @@ declare const putFileData: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-data.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-data.ts#L106)
 
 ## putFileDataEffect
 
@@ -3173,7 +3173,7 @@ declare const putFileDataEffect: (
 ) => Effect.Effect<void, DeepAgentBucketFailure, DeepAgentBucket>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-data.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-data.ts#L66)
 
 ## readFileData
 
@@ -3198,7 +3198,7 @@ declare const readFileData: (
 ) => Promise<DeepAgentBucketFileData | undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-data.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-data.ts#L48)
 
 ## readFileDataEffect
 
@@ -3226,7 +3226,7 @@ declare const readFileDataEffect: (path: string) => Effect.Effect<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-data.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-data.ts#L17)
 
 ## `deepagent-bucket-file-index.ts`
 
@@ -3267,7 +3267,7 @@ declare const infoFor: (
 ) => Promise<FileInfo | undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-index.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-index.ts#L96)
 
 ## infoForEffect
 
@@ -3287,7 +3287,7 @@ declare const infoForEffect: (
 ) => Effect.Effect<FileInfo | undefined, DeepAgentBucketFailure, DeepAgentBucket>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-index.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-index.ts#L66)
 
 ## scopedKeys
 
@@ -3312,7 +3312,7 @@ declare const scopedKeys: (
 ) => Promise<readonly string[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-index.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-index.ts#L49)
 
 ## scopedKeysEffect
 
@@ -3332,7 +3332,7 @@ declare const scopedKeysEffect: (
 ) => Effect.Effect<Array<string>, DeepAgentBucketFailure, DeepAgentBucket>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-file-index.ts#L17)
 
 ## `deepagent-bucket-files.ts`
 
@@ -3396,7 +3396,7 @@ declare const bucketKeyEffect: (
 ) => Effect<string, DeepAgentBucketFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L4)
 
 ## createBucketContext
 
@@ -3409,7 +3409,7 @@ declare const createBucketContext: (
 ) => DeepAgentBucketContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L5)
 
 ## createBucketContextEffect
 
@@ -3426,7 +3426,7 @@ declare const createBucketContextEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L6)
 
 ## errorMessage
 
@@ -3436,7 +3436,7 @@ declare const createBucketContextEffect: (
 declare const errorMessage: (cause: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L13)
 
 ## errorMessageEffect
 
@@ -3446,7 +3446,7 @@ declare const errorMessage: (cause: unknown) => string;
 declare const errorMessageEffect: (cause: unknown) => Effect<string, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L14)
 
 ## filePath
 
@@ -3456,7 +3456,7 @@ declare const errorMessageEffect: (cause: unknown) => Effect<string, never, neve
 declare const filePath: (context: DeepAgentBucketContext, key: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L7)
 
 ## filePathEffect
 
@@ -3469,7 +3469,7 @@ declare const filePathEffect: (
 ) => Effect<string, DeepAgentBucketFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L8)
 
 ## isControlFailure
 
@@ -3479,7 +3479,7 @@ declare const filePathEffect: (
 declare const isControlFailure: (cause: unknown) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L15)
 
 ## isControlFailureEffect
 
@@ -3489,7 +3489,7 @@ declare const isControlFailure: (cause: unknown) => boolean;
 declare const isControlFailureEffect: (cause: unknown) => Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L16)
 
 ## isTextMimeType
 
@@ -3499,7 +3499,7 @@ declare const isControlFailureEffect: (cause: unknown) => Effect<boolean, never,
 declare const isTextMimeType: (mimeType: string) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L17)
 
 ## isTextMimeTypeEffect
 
@@ -3509,7 +3509,7 @@ declare const isTextMimeType: (mimeType: string) => boolean;
 declare const isTextMimeTypeEffect: (mimeType: string) => Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L18)
 
 ## normalizedPage
 
@@ -3522,7 +3522,7 @@ declare const normalizedPage: (
 ) => { offset: number; limit: number };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L19)
 
 ## normalizedPageEffect
 
@@ -3535,7 +3535,7 @@ declare const normalizedPageEffect: (
 ) => Effect<{ offset: number; limit: number }, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L20)
 
 ## virtualPath
 
@@ -3545,7 +3545,7 @@ declare const normalizedPageEffect: (
 declare const virtualPath: (value: string, directory?: boolean) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L9)
 
 ## virtualPathEffect
 
@@ -3558,7 +3558,7 @@ declare const virtualPathEffect: (
 ) => Effect<string, DeepAgentBucketFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-files.ts#L10)
 
 ## `deepagent-bucket-files.types.ts`
 
@@ -3681,7 +3681,7 @@ errorMessage(error);
 declare const errorMessage: (cause: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L74)
 
 ## errorMessageEffect
 
@@ -3699,7 +3699,7 @@ Effect.runSync(errorMessageEffect(error));
 declare const errorMessageEffect: (cause: unknown) => Effect.Effect<string, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L64)
 
 ## isControlFailure
 
@@ -3717,7 +3717,7 @@ isControlFailure(error);
 declare const isControlFailure: (cause: unknown) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L55)
 
 ## isControlFailureEffect
 
@@ -3735,7 +3735,7 @@ Effect.runSync(isControlFailureEffect(error));
 declare const isControlFailureEffect: (cause: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L36)
 
 ## isTextMimeType
 
@@ -3753,7 +3753,7 @@ isTextMimeType("text/plain");
 declare const isTextMimeType: (mimeType: string) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L94)
 
 ## isTextMimeTypeEffect
 
@@ -3771,7 +3771,7 @@ Effect.runSync(isTextMimeTypeEffect("text/plain"));
 declare const isTextMimeTypeEffect: (mimeType: string) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L83)
 
 ## normalizedPage
 
@@ -3792,7 +3792,7 @@ declare const normalizedPage: (
 ) => { offset: number; limit: number };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-format.ts#L27)
 
 ## normalizedPageEffect
 
@@ -3840,7 +3840,7 @@ Validates and normalizes a user glob without changing match semantics.
 declare const compileGlob: (pattern: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-glob.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-glob.ts#L85)
 
 ## globFiles
 
@@ -3866,7 +3866,7 @@ declare const globFiles: (
 ) => Promise<GlobResult>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-glob.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-glob.ts#L67)
 
 ## globFilesEffect
 
@@ -3929,7 +3929,7 @@ declare const grepFiles: (
 ) => Promise<GrepResult>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-grep.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-grep.ts#L83)
 
 ## grepFilesEffect
 
@@ -3999,7 +3999,7 @@ bucketKey(context, "/readme.md");
 declare const bucketKey: (context: DeepAgentBucketContext, path: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L106)
 
 ## bucketKeyEffect
 
@@ -4020,7 +4020,7 @@ declare const bucketKeyEffect: (
 ) => Effect.Effect<string, DeepAgentBucketFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L90)
 
 ## createBucketContext
 
@@ -4045,7 +4045,7 @@ declare const createBucketContext: (
 ) => DeepAgentBucketContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L34)
 
 ## createBucketContextEffect
 
@@ -4070,7 +4070,7 @@ declare const createBucketContextEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L15)
 
 ## filePath
 
@@ -4092,7 +4092,7 @@ filePath(context, "agents/readme.md");
 declare const filePath: (context: DeepAgentBucketContext, key: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L140)
 
 ## filePathEffect
 
@@ -4113,7 +4113,7 @@ declare const filePathEffect: (
 ) => Effect.Effect<string, DeepAgentBucketFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L120)
 
 ## virtualPath
 
@@ -4135,7 +4135,7 @@ virtualPath("docs/readme.md");
 declare const virtualPath: (value: string, directory?: boolean) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L64)
 
 ## virtualPathEffect
 
@@ -4156,7 +4156,7 @@ declare const virtualPathEffect: (
 ) => Effect.Effect<string, DeepAgentBucketFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-path.ts#L51)
 
 ## `deepagent-bucket-read.ts`
 
@@ -4199,7 +4199,7 @@ declare const readBucket: (
 ) => Promise<ReadResult>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-read.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-read.ts#L96)
 
 ## readBucketEffect
 
@@ -4235,7 +4235,7 @@ declare const readBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-read.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-read.ts#L58)
 
 ## readBucketRaw
 
@@ -4260,7 +4260,7 @@ declare const readBucketRaw: (
 ) => Promise<ReadRawResult>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-read.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-read.ts#L35)
 
 ## readBucketRawEffect
 
@@ -4291,7 +4291,7 @@ declare const readBucketRawEffect: (path: string) => Effect.Effect<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-read.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-read.ts#L19)
 
 ## `deepagent-bucket-scope.ts`
 
@@ -4548,7 +4548,7 @@ declare const downloadBucketFiles: (
 ) => Promise<FileDownloadResponse[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-transfer.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-transfer.ts#L107)
 
 ## downloadBucketFilesEffect
 
@@ -4576,7 +4576,7 @@ declare const downloadBucketFilesEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-transfer.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-transfer.ts#L69)
 
 ## uploadBucketFiles
 
@@ -4601,7 +4601,7 @@ declare const uploadBucketFiles: (
 ) => Promise<FileUploadResponse[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-transfer.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-transfer.ts#L52)
 
 ## uploadBucketFilesEffect
 
@@ -4671,7 +4671,7 @@ declare const editBucket: (
 ) => Promise<EditResult>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-write.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-write.ts#L102)
 
 ## editBucketEffect
 
@@ -4701,7 +4701,7 @@ declare const editBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-write.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/deepagent-bucket-write.ts#L65)
 
 ## writeBucket
 
@@ -4852,7 +4852,7 @@ const options = copyDeepAgentCapabilities({ skills: ["/skills"] });
 declare const copyDeepAgentCapabilities: (value: DeepAgentCapabilities) => DeepAgentCapabilities;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-deep.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-deep.ts#L29)
 
 ## copyDeepAgentCapabilitiesEffect
 
@@ -4890,7 +4890,7 @@ if (hasDeepAgentCapabilities(options)) enableDeep();
 declare const hasDeepAgentCapabilities: (value: DeepAgentCapabilities) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-deep.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-deep.ts#L79)
 
 ## hasDeepAgentCapabilitiesEffect
 
@@ -4910,7 +4910,7 @@ declare const hasDeepAgentCapabilitiesEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-deep.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-deep.ts#L69)
 
 ## `define-agent-deep.types.ts`
 
@@ -5050,7 +5050,7 @@ const limits = copyAgentLimits({ maxSteps: 3, maxToolCalls: 2, timeoutMs: 1000 }
 declare const copyAgentLimits: (value: unknown) => AgentLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-limits.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-limits.ts#L38)
 
 ## copyAgentLimitsEffect
 
@@ -5114,7 +5114,7 @@ declare const copyAgentMiddleware: <Middleware extends readonly AgentMiddleware[
 ) => Middleware;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-middleware.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-middleware.ts#L41)
 
 ## copyAgentMiddlewareEffect
 
@@ -5158,7 +5158,7 @@ declare const middlewareStateKeys: <Middleware extends readonly AgentMiddleware[
 ) => ReadonlySet<AgentClientStateKey<Middleware>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-middleware.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-middleware.ts#L82)
 
 ## middlewareStateKeysEffect
 
@@ -5182,7 +5182,7 @@ declare const middlewareStateKeysEffect: <Middleware extends readonly AgentMiddl
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-middleware.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-middleware.ts#L56)
 
 ## `define-agent-native-model.ts`
 
@@ -5214,7 +5214,7 @@ if (isAgentModel(value)) use(value);
 declare const isAgentModel: (value: unknown) => value is AgentModel;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-model.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-model.ts#L26)
 
 ## isAgentModelEffect
 
@@ -5270,7 +5270,7 @@ const tools = copyAgentTools([]);
 declare const copyAgentTools: <Tools extends readonly AgentTool[]>(value: Tools) => Tools;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-tools.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-tools.ts#L45)
 
 ## copyAgentToolsEffect
 
@@ -5308,7 +5308,7 @@ const refs = relkitToolRefs(tools);
 declare const relkitToolRefs: (tools: readonly AgentTool[]) => readonly ToolRefAny[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-tools.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-tools.ts#L68)
 
 ## relkitToolRefsEffect
 
@@ -5328,7 +5328,7 @@ declare const relkitToolRefsEffect: (
 ) => Effect.Effect<Array<ToolRefAny>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-tools.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native-tools.ts#L58)
 
 ## `define-agent-native.ts`
 
@@ -5565,7 +5565,7 @@ const instructions = copyAgentInstructions("Answer clearly");
 declare const copyAgentInstructions: (value: unknown) => AgentInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L31)
 
 ## copyAgentInstructionsEffect
 
@@ -5603,7 +5603,7 @@ if (isAgentInstructions(value)) use(value);
 declare const isAgentInstructions: (value: unknown) => value is AgentInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L63)
 
 ## isAgentInstructionsEffect
 
@@ -5621,7 +5621,7 @@ Effect.runSync(isAgentInstructionsEffect("Answer clearly"));
 declare const isAgentInstructionsEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L53)
 
 ## `define-agent-validation.ts`
 
@@ -5661,7 +5661,7 @@ assertAgentDescriptor(candidate);
 declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L75)
 
 ## assertAgentDescriptorEffect
 
@@ -5739,7 +5739,7 @@ const model = normalizeAgentModel("openai:gpt");
 declare const normalizeAgentModel: (value: AgentModel | undefined) => AgentModel | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L104)
 
 ## normalizeAgentModelEffect
 
@@ -5763,7 +5763,7 @@ declare const normalizeAgentModelEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L88)
 
 ## `define-agent.ts`
 
@@ -5850,7 +5850,7 @@ declare const defineAgent: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L100)
 
 Since v0.4.0
 
@@ -5912,7 +5912,7 @@ declare const AgentDescriptor: AgentDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L29)
 
 ## AgentFilesystemBackend
 
@@ -5922,7 +5922,7 @@ declare const AgentDescriptor: AgentDescriptor<
 declare const AgentFilesystemBackend: AgentFilesystemBackend;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L24)
 
 ## AgentInstructions
 
@@ -5932,7 +5932,7 @@ declare const AgentFilesystemBackend: AgentFilesystemBackend;
 declare const AgentInstructions: AgentInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L30)
 
 ## AgentLimits
 
@@ -5942,7 +5942,7 @@ declare const AgentInstructions: AgentInstructions;
 declare const AgentLimits: AgentLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L31)
 
 ## AgentMiddleware
 
@@ -5992,7 +5992,7 @@ declare const AgentModelFactory: AgentModelFactory<Environment>;
 declare const AgentSubagent: AgentSubagent;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L25)
 
 ## AgentTool
 
@@ -6012,7 +6012,7 @@ declare const AgentTool: AgentTool;
 declare const DeepAgentCapabilities: DeepAgentCapabilities;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L26)
 
 ## DefineAgentOptions
 
@@ -6028,7 +6028,7 @@ declare const DefineAgentOptions: DefineAgentOptions<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L32)
 
 ## NativeAgentTool
 
@@ -6048,7 +6048,7 @@ declare const NativeAgentTool: NativeAgentTool;
 declare const PromptInstructions: PromptInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L33)
 
 ## PromptTemplate
 
@@ -6058,7 +6058,7 @@ declare const PromptInstructions: PromptInstructions;
 declare const PromptTemplate: PromptTemplate;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L34)
 
 ## assertAgentDescriptor
 
@@ -6134,7 +6134,7 @@ declare const defineAgentEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L42)
 
 ## isAgentDescriptor
 
@@ -6320,7 +6320,7 @@ declare const prepareGraphDescriptor: <
 ) => (id: Id) => GraphDescriptor<Id, InputSchema, OutputSchema, State, Nodes>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-build.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-build.ts#L27)
 
 ## `define-graph-error.ts`
 
@@ -6438,7 +6438,7 @@ declare const defineGraphNode: <
 ) => GraphNodeDescriptor<Id, InputSchema, OutputSchema, ResumeSchema, Ends>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.ts#L126)
 
 ## defineGraphNodeEffect
 
@@ -6468,7 +6468,7 @@ declare const defineGraphNodeEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.ts#L62)
 
 ## isGraphNodeDescriptor
 
@@ -6486,7 +6486,7 @@ if (isGraphNodeDescriptor(value)) useNode(value);
 declare const isGraphNodeDescriptor: (value: unknown) => value is GraphNodeAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.ts#L147)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.ts#L171)
 
 ## isGraphNodeDescriptorEffect
 
@@ -6504,7 +6504,7 @@ Effect.runSync(isGraphNodeDescriptorEffect(value));
 declare const isGraphNodeDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.ts#L147)
 
 ## runGraphNodeHandlerEffect
 
@@ -6583,7 +6583,7 @@ export interface DefineGraphNodeOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L73)
 
 ## GraphNodeAny (type alias)
 
@@ -6601,7 +6601,7 @@ type GraphNodeAny = GraphNodeDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L64)
 
 ## GraphNodeDescriptor (interface)
 
@@ -6628,7 +6628,7 @@ export interface GraphNodeDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L46)
 
 ## GraphNodeHandler (type alias)
 
@@ -6647,7 +6647,7 @@ type GraphNodeHandler<
 ) => MaybePromise<GraphNodeResult<OutputSchema, Ends>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L23)
 
 ## GraphNodeImplementation (type alias)
 
@@ -6669,7 +6669,7 @@ type GraphNodeImplementation<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L33)
 
 ## GraphNodeResult (type alias)
 
@@ -6682,7 +6682,7 @@ type GraphNodeResult<OutputSchema extends StandardSchemaV1, Ends extends readonl
   NodeUpdate<OutputSchema> | Command<unknown, NodeUpdate<OutputSchema>, CommandNodes<Ends>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph-node.types.ts#L19)
 
 ## `define-graph.ts`
 
@@ -6713,7 +6713,7 @@ Re-exports all named exports from the "./define-graph.types.js" module.
 export * from "./define-graph.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L17)
 
 ## defineGraph
 
@@ -6743,7 +6743,7 @@ declare const defineGraph: <
 ) => GraphDescriptor<Id, InputSchema, OutputSchema, State, Nodes>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L61)
 
 ## defineGraphEffect
 
@@ -6773,7 +6773,7 @@ declare const defineGraphEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L24)
 
 ## graphExecution
 
@@ -6791,7 +6791,7 @@ graphExecution(graph);
 declare const graphExecution: (value: GraphDescriptor) => GraphExecution;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L92)
 
 ## graphExecutionEffect
 
@@ -6817,7 +6817,7 @@ declare const graphExecutionEffect: (
 ) => Effect.Effect<GraphExecution<InferStateSchemaValue<any>>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L82)
 
 ## isGraphDescriptor
 
@@ -6835,7 +6835,7 @@ if (isGraphDescriptor(candidate)) invokeGraph(candidate);
 declare const isGraphDescriptor: (value: unknown) => value is GraphDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L120)
 
 ## isGraphDescriptorEffect
 
@@ -6853,7 +6853,7 @@ Effect.runSync(isGraphDescriptorEffect(candidate));
 declare const isGraphDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L101)
 
 ## `define-graph.types.ts`
 
@@ -6907,7 +6907,7 @@ export interface DefineGraphOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L77)
 
 ## GraphDescriptor (interface)
 
@@ -6944,7 +6944,7 @@ export interface GraphDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L49)
 
 ## GraphExecution (interface)
 
@@ -6961,7 +6961,7 @@ export interface GraphExecution<State = any> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L41)
 
 ## GraphInput (type alias)
 
@@ -6973,7 +6973,7 @@ Input inferred from a graph descriptor.
 type GraphInput<Graph extends GraphDescriptor> = InferInput<Graph["input"]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L101)
 
 ## GraphNodeId (type alias)
 
@@ -7009,7 +7009,7 @@ Output inferred from a graph descriptor.
 type GraphOutput<Graph extends GraphDescriptor> = InferOutput<Graph["output"]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.types.ts#L104)
 
 ## GraphState (type alias)
 
@@ -7074,7 +7074,7 @@ declare const assertPersistenceProtocol: (
 ) => asserts value is BaseCheckpointSaver | BaseStore;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence-guards.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence-guards.ts#L66)
 
 ## assertPersistenceProtocolEffect
 
@@ -7095,7 +7095,7 @@ declare const assertPersistenceProtocolEffect: (
 ) => Effect.Effect<void, AgentPersistenceFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence-guards.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence-guards.ts#L42)
 
 ## isPersistenceResource
 
@@ -7113,7 +7113,7 @@ if (isPersistenceResource(value)) await value.acquire(context);
 declare const isPersistenceResource: (value: unknown) => value is PersistenceResource<any, any>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence-guards.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence-guards.ts#L32)
 
 ## isPersistenceResourceEffect
 
@@ -7214,7 +7214,7 @@ declare const defineCheckpointerDb: <Value extends BaseCheckpointSaver>(
 ) => CheckpointerResource<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.ts#L43)
 
 ## defineCheckpointerDbEffect
 
@@ -7258,7 +7258,7 @@ declare const defineMemoryDb: <Value extends BaseStore>(
 ) => MemoryResource<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.ts#L73)
 
 ## defineMemoryDbEffect
 
@@ -7278,7 +7278,7 @@ declare const defineMemoryDbEffect: <Value extends BaseStore>(
 ) => Effect.Effect<PersistenceResource<"memory", Value>, AgentPersistenceFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.ts#L58)
 
 ## isPersistenceResource
 
@@ -7371,7 +7371,7 @@ export interface PersistenceOptions<Value> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.types.ts#L31)
 
 ## PersistenceResource (interface)
 
@@ -7470,7 +7470,7 @@ Re-exports all named exports from the "./generated-function.types.js" module.
 export * from "./generated-function.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L11)
 
 ## GENERATED_AGENT_FUNCTION_PREFIX
 
@@ -7480,7 +7480,7 @@ export * from "./generated-function.types.js";
 declare const GENERATED_AGENT_FUNCTION_PREFIX: "relkit.agent.";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L13)
 
 ## GENERATED_AGENT_FUNCTION_SUFFIX
 
@@ -7490,7 +7490,7 @@ declare const GENERATED_AGENT_FUNCTION_PREFIX: "relkit.agent.";
 declare const GENERATED_AGENT_FUNCTION_SUFFIX: ".invoke";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L14)
 
 ## GeneratedAgentFunctionUnboundError (class)
 
@@ -7504,7 +7504,7 @@ declare class GeneratedAgentFunctionUnboundError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L17)
 
 ### code (property)
 
@@ -7514,7 +7514,7 @@ declare class GeneratedAgentFunctionUnboundError {
 readonly code: "RELKIT_GENERATED_FUNCTION_UNBOUND"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L18)
 
 ## createGeneratedAgentFunction
 
@@ -7539,7 +7539,7 @@ declare const createGeneratedAgentFunction: (
 ) => GeneratedAgentFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L80)
 
 ## createGeneratedAgentFunctionEffect
 
@@ -7560,7 +7560,7 @@ declare const createGeneratedAgentFunctionEffect: (
 ) => Effect.Effect<GeneratedAgentFunction, GeneratedAgentFunctionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L64)
 
 ## generatedAgentFunctionId
 
@@ -7582,7 +7582,7 @@ generatedAgentFunctionId("support");
 declare const generatedAgentFunctionId: (agentId: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L46)
 
 ## generatedAgentFunctionIdEffect
 
@@ -7602,7 +7602,7 @@ declare const generatedAgentFunctionIdEffect: (
 ) => Effect.Effect<string, GeneratedAgentFunctionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L31)
 
 ## isGeneratedAgentFunction
 
@@ -7620,7 +7620,7 @@ if (isGeneratedAgentFunction(candidate)) use(candidate);
 declare const isGeneratedAgentFunction: (value: unknown) => value is GeneratedAgentFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L128)
 
 ## isGeneratedAgentFunctionEffect
 
@@ -7640,7 +7640,7 @@ declare const isGeneratedAgentFunctionEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L118)
 
 ## `generated-function.types.ts`
 
@@ -7781,7 +7781,7 @@ declare const compileGraph: (
 ) => any;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-compile.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-compile.ts#L110)
 
 ## compileGraphEffect
 
@@ -7808,7 +7808,7 @@ declare const compileGraphEffect: (
 ) => Effect.Effect<any, GraphCompilationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-compile.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-compile.ts#L59)
 
 ## runGraphRouteEffect
 
@@ -7916,7 +7916,7 @@ declare const validateGraphResumeInput: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation-validation.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation-validation.ts#L65)
 
 ## validateGraphResumeInputEffect
 
@@ -8065,7 +8065,7 @@ const config = graphConfig(graph, "thread");
 declare const graphConfig: (descriptor: GraphDescriptor, threadId?: string) => GraphConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L46)
 
 ## graphConfigEffect
 
@@ -8092,7 +8092,7 @@ declare const graphConfigEffect: (
 ) => Effect.Effect<GraphConfig, GraphContinuationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L24)
 
 ## resumeCommand
 
@@ -8119,7 +8119,7 @@ declare const resumeCommand: (
 ) => Promise<Command>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L96)
 
 ## resumeCommandEffect
 
@@ -8152,7 +8152,7 @@ declare const resumeCommandEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L62)
 
 ## validateGraphResumeInput
 
@@ -8166,7 +8166,7 @@ declare const validateGraphResumeInput: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L13)
 
 ## validateGraphResumeInputEffect
 
@@ -8186,7 +8186,7 @@ declare const validateGraphResumeInputEffect: (
 ) => Effect.Effect<unknown, GraphContinuationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L14)
 
 ## waitingInterrupts
 
@@ -8200,7 +8200,7 @@ declare const waitingInterrupts: (
 ) => Promise<readonly GraphWaitingInterrupt[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L16)
 
 ## waitingInterruptsEffect
 
@@ -8220,7 +8220,7 @@ declare const waitingInterruptsEffect: (
 ) => Effect.Effect<ReadonlyArray<GraphWaitingInterrupt>, GraphContinuationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-continuation.ts#L16)
 
 ## `graph-continuation.types.ts`
 
@@ -8304,7 +8304,7 @@ declare const prepareGraphDefinition: (
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-definition.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-definition.ts#L51)
 
 ## prepareGraphDefinitionEffect
 
@@ -8392,7 +8392,7 @@ declare const assertGraphDestination: <Id extends string>(
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L130)
 
 ## assertGraphDestinationEffect
 
@@ -8413,7 +8413,7 @@ declare const assertGraphDestinationEffect: <Id extends string>(
 ) => Effect.Effect<void, GraphDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L114)
 
 ## createGraphEdgeBuilder
 
@@ -8436,7 +8436,7 @@ declare const createGraphEdgeBuilder: <Id extends string, State>(
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L99)
 
 ## createGraphEdgeBuilderEffect
 
@@ -8489,7 +8489,7 @@ declare const validateGraphRoute: <Id extends string>(
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L141)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L180)
 
 ## validateGraphRouteEffect
 
@@ -8511,7 +8511,7 @@ declare const validateGraphRouteEffect: <Id extends string>(
 ) => Effect.Effect<void, GraphDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.ts#L159)
 
 ## `graph-edges.types.ts`
 
@@ -8613,7 +8613,7 @@ type GraphEdgeOperation<Id extends string, State> =
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-edges.types.ts#L56)
 
 ## GraphRoute (type alias)
 
@@ -8698,7 +8698,7 @@ declare class GraphInterruptedError { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L113)
 
 ### code (property)
 
@@ -8708,7 +8708,7 @@ declare class GraphInterruptedError { constructor(
 readonly code: "RELKIT_GRAPH_INTERRUPTED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L114)
 
 ## GraphWaitingInterrupt
 
@@ -8752,7 +8752,7 @@ const response = graphWaitingResponse([{ node: "review", response: true }]);
 declare const graphWaitingResponse: (interrupts: readonly GraphWaitingInterrupt[]) => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L61)
 
 ## graphWaitingResponseEffect
 
@@ -8790,7 +8790,7 @@ if (isGraphInterruptedError(error)) console.log(error.threadId);
 declare const isGraphInterruptedError: (value: unknown) => value is GraphInterruptedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L148)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L149)
 
 ## isGraphInterruptedErrorEffect
 
@@ -8810,7 +8810,7 @@ declare const isGraphInterruptedErrorEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L133)
 
 ## publicWaitingRequests
 
@@ -8830,7 +8830,7 @@ declare const publicWaitingRequests: (
 ) => readonly AgentWaitingRequest[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L101)
 
 ## publicWaitingRequestsEffect
 
@@ -8850,7 +8850,7 @@ declare const publicWaitingRequestsEffect: (
 ) => Effect.Effect<Array<{ response: JsonValue; value?: {} | null; node: string }>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-interruption.ts#L81)
 
 ## `graph-interruption.types.ts`
 
@@ -9000,7 +9000,7 @@ commandUpdate([["count", 1]]);
 declare const commandUpdate: (value: unknown) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L73)
 
 ## commandUpdateEffect
 
@@ -9020,7 +9020,7 @@ declare const commandUpdateEffect: (
 ) => Effect.Effect<unknown, GraphNodeValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L61)
 
 ## validateDestinations
 
@@ -9042,7 +9042,7 @@ validateDestinations(["next"], "next");
 declare const validateDestinations: (ends: readonly string[], value: unknown) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L29)
 
 ## validateDestinationsEffect
 
@@ -9088,7 +9088,7 @@ declare const validatedUpdate: <Schema extends StandardSchemaV1>(
 ) => Promise<Extract<InferOutput<Schema>, Record<string, unknown>>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L119)
 
 ## validatedUpdateEffect
 
@@ -9113,7 +9113,7 @@ declare const validatedUpdateEffect: <Schema extends StandardSchemaV1>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L99)
 
 ## validatedValue
 
@@ -9139,7 +9139,7 @@ declare const validatedValue: <Schema extends StandardSchemaV1>(
 ) => Promise<InferOutput<Schema>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L135)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L163)
 
 ## validatedValueEffect
 
@@ -9161,7 +9161,7 @@ declare const validatedValueEffect: <Schema extends StandardSchemaV1>(
 ) => Effect.Effect<InferOutput<Schema>, GraphNodeValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation-value.ts#L137)
 
 ## `graph-node-validation.ts`
 
@@ -9206,7 +9206,7 @@ declare const assertGraphNodeDestinations: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L50)
 
 ## assertGraphNodeDestinationsEffect
 
@@ -9249,7 +9249,7 @@ const ends = copyGraphNodeEnds([END]);
 declare const copyGraphNodeEnds: (value: readonly string[] | undefined) => readonly string[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L91)
 
 ## copyGraphNodeEndsEffect
 
@@ -9269,7 +9269,7 @@ declare const copyGraphNodeEndsEffect: (
 ) => Effect.Effect<ReadonlyArray<string>, GraphNodeValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L66)
 
 ## validateGraphNodeResult
 
@@ -9298,7 +9298,7 @@ declare const validateGraphNodeResult: <
 ) => Promise<GraphNodeResult<OutputSchema, Ends>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L133)
 
 ## validateGraphNodeResultEffect
 
@@ -9323,7 +9323,7 @@ declare const validateGraphNodeResultEffect: <
 ) => Effect.Effect<GraphNodeResult<OutputSchema, Ends>, GraphNodeValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L106)
 
 ## validatedGraphNodeInput
 
@@ -9348,7 +9348,7 @@ declare const validatedGraphNodeInput: <Schema extends StandardSchemaV1>(
 ) => Promise<InferOutput<Schema>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L150)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L163)
 
 ## validatedGraphNodeInputEffect
 
@@ -9369,7 +9369,7 @@ declare const validatedGraphNodeInputEffect: <Schema extends StandardSchemaV1>(
 ) => Effect.Effect<InferOutput<Schema>, GraphNodeValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-node-validation.ts#L150)
 
 ## `graph-persistence-release.ts`
 
@@ -9455,7 +9455,7 @@ declare const releaseAgentPersistenceEffect: (
 declare const AgentPersistenceDeclaration: AgentPersistenceDeclaration;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L15)
 
 ## ResolvedGraphPersistence
 
@@ -9465,7 +9465,7 @@ declare const AgentPersistenceDeclaration: AgentPersistenceDeclaration;
 declare const ResolvedGraphPersistence: ResolvedGraphPersistence;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L16)
 
 ## releaseAgentPersistence
 
@@ -9475,7 +9475,7 @@ declare const ResolvedGraphPersistence: ResolvedGraphPersistence;
 declare const releaseAgentPersistence: (descriptors: readonly unknown[]) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L19)
 
 ## releaseAgentPersistenceEffect
 
@@ -9487,7 +9487,7 @@ declare const releaseAgentPersistenceEffect: (
 ) => Effect.Effect<undefined, AgentPersistenceFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L20)
 
 ## resolveAgentPersistence
 
@@ -9513,7 +9513,7 @@ declare const resolveAgentPersistence: (
 ) => Promise<ResolvedGraphPersistence>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L87)
 
 ## resolveAgentPersistenceEffect
 
@@ -9534,7 +9534,7 @@ declare const resolveAgentPersistenceEffect: (
 ) => Effect.Effect<ResolvedGraphPersistence, AgentPersistenceFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L71)
 
 ## resolveGraphPersistence
 
@@ -9560,7 +9560,7 @@ declare const resolveGraphPersistence: (
 ) => Promise<ResolvedGraphPersistence>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L51)
 
 ## resolveGraphPersistenceEffect
 
@@ -9587,7 +9587,7 @@ declare const resolveGraphPersistenceEffect: (
 ) => Effect.Effect<ResolvedGraphPersistence, AgentPersistenceFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-persistence.ts#L32)
 
 ## `graph-persistence.types.ts`
 
@@ -9747,7 +9747,7 @@ declare const runCompiledGraph: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-runtime-execution.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-runtime-execution.ts#L97)
 
 ## runCompiledGraphEffect
 
@@ -9822,7 +9822,7 @@ Effect.runPromise(Effect.provide(invokeGraphEffect(options), GraphInvocationIden
 declare const GraphInvocationIdentityLive: Layer.Layer<GraphInvocationIdentity, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-runtime-identity.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-runtime-identity.ts#L15)
 
 ## `graph-runtime-identity.types.ts`
 
@@ -9889,7 +9889,7 @@ declare const streamCompiledGraphEffect: (
 ) => Effect.Effect<JsonValue, GraphInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-runtime-stream.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-runtime-stream.ts#L30)
 
 ## `graph-runtime.ts`
 
@@ -9969,7 +9969,7 @@ await invokeGraph(options);
 declare const invokeGraph: (options: GraphRuntimeOptions) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-runtime.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-runtime.ts#L90)
 
 ## invokeGraphEffect
 
@@ -10192,7 +10192,7 @@ declare const createSubgraphNode: <
 ) => SubgraphNodeDescriptor<Id, InputSchema, OutputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L60)
 
 ## createSubgraphNodeEffect
 
@@ -10245,7 +10245,7 @@ if (isSubgraphNode(value)) subgraphForNode(value);
 declare const isSubgraphNode: (value: unknown) => value is SubgraphNodeDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L100)
 
 ## isSubgraphNodeEffect
 
@@ -10263,7 +10263,7 @@ Effect.runSync(isSubgraphNodeEffect(value));
 declare const isSubgraphNodeEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L80)
 
 ## subgraphForNode
 
@@ -10281,7 +10281,7 @@ const nested = subgraphForNode(node);
 declare const subgraphForNode: (value: SubgraphNodeDescriptor) => GraphDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L119)
 
 ## subgraphForNodeEffect
 
@@ -10315,7 +10315,7 @@ declare const subgraphForNodeEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-subgraph.ts#L109)
 
 ## `graph-subgraph.types.ts`
 
@@ -10441,7 +10441,7 @@ Re-exports all named exports from the "./graph-workflow.types.js" module.
 export * from "./graph-workflow.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L17)
 
 ## graphWorkflow
 
@@ -10466,7 +10466,7 @@ declare const graphWorkflow: <Id extends string, State>(
 ) => GraphWorkflow;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L51)
 
 ## graphWorkflowEffect
 
@@ -10504,7 +10504,7 @@ declare const graphWorkflowEffect: <Id extends string, State>(
 ) => Effect.Effect<GraphWorkflow, GraphWorkflowFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L25)
 
 ## graphWorkflowRequiresPersistence
 
@@ -10522,7 +10522,7 @@ graphWorkflowRequiresPersistence(workflow);
 declare const graphWorkflowRequiresPersistence: (workflow: GraphWorkflow) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L77)
 
 ## graphWorkflowRequiresPersistenceEffect
 
@@ -10542,7 +10542,7 @@ declare const graphWorkflowRequiresPersistenceEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/graph-workflow.ts#L67)
 
 ## `graph-workflow.types.ts`
 
@@ -11496,7 +11496,7 @@ Re-exports all named exports from the "./native-agent-interruption-schema.types.
 export * from "./native-agent-interruption-schema.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L10)
 
 ## hitlResponseSchema
 
@@ -11514,7 +11514,7 @@ const schema = hitlResponseSchema(configs);
 declare const hitlResponseSchema: (configs: readonly ReviewConfig[]) => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L45)
 
 ## hitlResponseSchemaEffect
 
@@ -11534,7 +11534,7 @@ declare const hitlResponseSchemaEffect: (
 ) => Effect.Effect<JsonValue, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L17)
 
 ## isDecision
 
@@ -11552,7 +11552,7 @@ if (isDecision(value)) useDecision(value);
 declare const isDecision: (value: unknown) => value is DecisionType;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L130)
 
 ## isDecisionEffect
 
@@ -11570,7 +11570,7 @@ Effect.runSync(isDecisionEffect("approve"));
 declare const isDecisionEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L120)
 
 ## isHitlRequest
 
@@ -11588,7 +11588,7 @@ if (isHitlRequest(value)) handle(value);
 declare const isHitlRequest: (value: unknown) => value is HitlRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L80)
 
 ## isHitlRequestEffect
 
@@ -11606,7 +11606,7 @@ Effect.runSync(isHitlRequestEffect(value));
 declare const isHitlRequestEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L54)
 
 ## isRecord
 
@@ -11624,7 +11624,7 @@ if (isRecord(value)) read(value.name);
 declare const isRecord: (value: unknown) => value is Record<string, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L153)
 
 ## isRecordEffect
 
@@ -11642,7 +11642,7 @@ Effect.runSync(isRecordEffect({ name: "tool" }));
 declare const isRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L135)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L143)
 
 ## publicHitlRequest
 
@@ -11660,7 +11660,7 @@ const request = publicHitlRequest(nativeRequest);
 declare const publicHitlRequest: (value: HitlRequest) => HitlRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L111)
 
 ## publicHitlRequestEffect
 
@@ -11680,7 +11680,7 @@ declare const publicHitlRequestEffect: (
 ) => Effect.Effect<HitlRequest, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-schema.ts#L89)
 
 ## `native-agent-interruption-schema.types.ts`
 
@@ -11798,7 +11798,7 @@ declare const validateNativeAgentResumeInputCore: (
 ) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-validation.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption-validation.ts#L53)
 
 ## `native-agent-interruption.ts`
 
@@ -11842,7 +11842,7 @@ declare const nativeAgentResumeCommand: (
 ) => Promise<Command>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L49)
 
 ## nativeAgentResumeCommandEffect
 
@@ -11868,7 +11868,7 @@ declare const nativeAgentResumeCommandEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L19)
 
 ## nativeAgentWaitingInterrupts
 
@@ -11893,7 +11893,7 @@ declare const nativeAgentWaitingInterrupts: (
 ) => Promise<readonly import("./graph-interruption.js").GraphWaitingInterrupt[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L96)
 
 ## nativeAgentWaitingInterruptsEffect
 
@@ -11914,7 +11914,7 @@ declare const nativeAgentWaitingInterruptsEffect: (
 ) => Effect.Effect<Array<GraphWaitingInterrupt>, NativeAgentInterruptionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L67)
 
 ## validateNativeAgentResumeInput
 
@@ -11939,7 +11939,7 @@ declare const validateNativeAgentResumeInput: (
 ) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L129)
 
 ## validateNativeAgentResumeInputEffect
 
@@ -11960,7 +11960,7 @@ declare const validateNativeAgentResumeInputEffect: (
 ) => Effect.Effect<unknown, NativeAgentInterruptionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/native-agent-interruption.ts#L113)
 
 ## `native-agent-interruption.types.ts`
 
@@ -12039,7 +12039,7 @@ Re-exports all named exports from the "./observability.types.js" module.
 export * from "./observability.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L15)
 
 ## AGENT_OBSERVABILITY_PROTOCOL
 
@@ -12049,7 +12049,7 @@ export * from "./observability.types.js";
 declare const AGENT_OBSERVABILITY_PROTOCOL: "relkit.observability.hooks";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L17)
 
 ## AGENT_OBSERVABILITY_VERSION
 
@@ -12059,7 +12059,7 @@ declare const AGENT_OBSERVABILITY_PROTOCOL: "relkit.observability.hooks";
 declare const AGENT_OBSERVABILITY_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L18)
 
 ## AgentCapturePolicy
 
@@ -12069,7 +12069,7 @@ declare const AGENT_OBSERVABILITY_VERSION: 1;
 declare const AgentCapturePolicy: AgentCapturePolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L14)
 
 ## AgentCapturePolicyError
 
@@ -12079,7 +12079,7 @@ declare const AgentCapturePolicy: AgentCapturePolicy;
 declare const AgentCapturePolicyError: typeof AgentCapturePolicyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L12)
 
 ## AgentCaptureRecord
 
@@ -12089,7 +12089,7 @@ declare const AgentCapturePolicyError: typeof AgentCapturePolicyError;
 declare const AgentCaptureRecord: AgentCaptureRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L14)
 
 ## AgentSpanCapture
 
@@ -12099,7 +12099,7 @@ declare const AgentCaptureRecord: AgentCaptureRecord;
 declare const AgentSpanCapture: AgentSpanCapture;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L14)
 
 ## captureAgentContent
 
@@ -12125,7 +12125,7 @@ declare const captureAgentContentEffect: (
 ) => Effect.Effect<AgentCaptureRecord | undefined, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L7)
 
 ## createAgentCapturePolicy
 
@@ -12137,7 +12137,7 @@ declare const createAgentCapturePolicy: (
 ) => AgentCapturePolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L8)
 
 ## createAgentCapturePolicyEffect
 
@@ -12149,7 +12149,7 @@ declare const createAgentCapturePolicyEffect: (
 ) => Effect.Effect<AgentCapturePolicy, AgentCapturePolicyError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L9)
 
 ## createAgentSpanCapture
 
@@ -12162,7 +12162,7 @@ declare const createAgentSpanCapture: (
 ) => AgentSpanCapture | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L10)
 
 ## createAgentSpanCaptureEffect
 
@@ -12179,7 +12179,7 @@ declare const createAgentSpanCaptureEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L11)
 
 ## emitAgentEdge
 
@@ -12200,7 +12200,7 @@ declare const emitAgentEdge: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L53)
 
 ## emitAgentEdgeEffect
 
@@ -12222,7 +12222,7 @@ declare const emitAgentEdgeEffect: (
 ) => Effect.Effect<void, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L27)
 
 ## `observability.types.ts`
 
@@ -12593,7 +12593,7 @@ declare const nativeMessages: (
 ) => Array<{ role: "user" | "assistant"; content: string }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L37)
 
 ## nativeMessagesEffect
 
@@ -12641,7 +12641,7 @@ responseValue(state);
 declare const responseValue: (state: unknown) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L77)
 
 ## responseValueEffect
 
@@ -12661,7 +12661,7 @@ declare const responseValueEffect: (
 ) => Effect.Effect<unknown, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L50)
 
 ## unwrapNativeCause
 
@@ -12679,7 +12679,7 @@ unwrapNativeCause(error);
 declare const unwrapNativeCause: (value: unknown) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L109)
 
 ## unwrapNativeCauseEffect
 
@@ -12697,7 +12697,7 @@ Effect.runSync(unwrapNativeCauseEffect(error));
 declare const unwrapNativeCauseEffect: (value: unknown) => Effect.Effect<unknown, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-values.ts#L90)
 
 ## `runtime-loop.ts`
 
@@ -12723,7 +12723,7 @@ declare const unwrapNativeCauseEffect: (value: unknown) => Effect.Effect<unknown
 declare const AgentLoopOptions: AgentLoopOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L32)
 
 ## NativeModel
 
@@ -12733,7 +12733,7 @@ declare const AgentLoopOptions: AgentLoopOptions;
 declare const NativeModel: NativeModel;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L32)
 
 ## runAgentLoop
 
@@ -12766,7 +12766,7 @@ declare const runAgentLoop: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L95)
 
 ## runAgentLoopEffect
 
@@ -12797,7 +12797,7 @@ declare const runAgentLoopEffect: (
 ) => Effect.Effect<unknown, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L48)
 
 ## `runtime-loop.types.ts`
 
@@ -12908,7 +12908,7 @@ declare const agentModelResolutionFailure: (cause: unknown) => AgentModelResolut
 declare const AgentContentLimits: AgentContentLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L14)
 
 ## ResolvedRuntimeModel
 
@@ -12918,7 +12918,7 @@ declare const AgentContentLimits: AgentContentLimits;
 declare const ResolvedRuntimeModel: ResolvedRuntimeModel;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L15)
 
 ## RuntimeModelOptions
 
@@ -12928,7 +12928,7 @@ declare const ResolvedRuntimeModel: ResolvedRuntimeModel;
 declare const RuntimeModelOptions: RuntimeModelOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L16)
 
 ## resolveAgentContentLimits
 
@@ -12952,7 +12952,7 @@ declare const resolveAgentContentLimits: (
 ) => AgentContentLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L104)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L120)
 
 ## resolveAgentContentLimitsEffect
 
@@ -12972,7 +12972,7 @@ declare const resolveAgentContentLimitsEffect: (
 ) => Effect.Effect<AgentContentLimits, AgentModelResolutionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L102)
 
 ## resolveRuntimeModel
 
@@ -12994,7 +12994,7 @@ await resolveRuntimeModel({ model: "test", registry: null, environment: {} });
 declare const resolveRuntimeModel: (options: RuntimeModelOptions) => Promise<ResolvedRuntimeModel>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L89)
 
 ## resolveRuntimeModelEffect
 
@@ -13014,7 +13014,7 @@ declare const resolveRuntimeModelEffect: (
 ) => Effect.Effect<ResolvedRuntimeModel, AgentModelResolutionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-model.ts#L27)
 
 ## `runtime-model.types.ts`
 
@@ -13123,7 +13123,7 @@ declare const childModelEffect: (
 ) => Effect.Effect<string | LanguageModelLike, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent-build.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent-build.ts#L82)
 
 ## createSubagentsEffect
 
@@ -13162,7 +13162,7 @@ declare const createSubagentsEffect: (
 ) => Effect.Effect<Array<unknown>, AgentInvocationFailure, NativeToolIdentity>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent-build.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent-build.ts#L111)
 
 ## createToolsForAgentEffect
 
@@ -13192,7 +13192,7 @@ declare const createToolsForAgentEffect: (
 ) => Effect.Effect<NativeTools, AgentInvocationFailure, NativeToolIdentity>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent-build.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent-build.ts#L27)
 
 ## responseFormatEffect
 
@@ -13212,7 +13212,7 @@ declare const responseFormatEffect: (
 ) => Effect.Effect<TypedToolStrategy<Record<string, unknown>>, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent-build.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent-build.ts#L48)
 
 ## `runtime-native-agent.ts`
 
@@ -13239,7 +13239,7 @@ declare const responseFormatEffect: (
 declare const CreateNativeAgentOptions: CreateNativeAgentOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L25)
 
 ## NativeAgent
 
@@ -13258,7 +13258,7 @@ declare const NativeAgent: ReactAgent<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L25)
 
 ## StructuredOutputParsingError
 
@@ -13268,7 +13268,7 @@ declare const NativeAgent: ReactAgent<
 declare const StructuredOutputParsingError: typeof StructuredOutputParsingError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L24)
 
 ## createNativeAgent
 
@@ -13292,7 +13292,7 @@ declare const createNativeAgent: (
 ) => Promise<{ readonly agent: NativeAgent; readonly tools: NativeTools }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L107)
 
 ## createNativeAgentEffect
 
@@ -13331,7 +13331,7 @@ declare const createNativeAgentEffect: (options: CreateNativeAgentOptions) => Ef
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.ts#L32)
 
 ## `runtime-native-agent.types.ts`
 
@@ -13365,7 +13365,7 @@ export interface CreateNativeAgentOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.types.ts#L16)
 
 ## NativeAgent (type alias)
 
@@ -13377,7 +13377,7 @@ Native LangChain agent runnable.
 type NativeAgent = ReturnType<typeof createAgent>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-agent.types.ts#L13)
 
 ## NativeAgentRuntimeOptions (type alias)
 
@@ -13435,7 +13435,7 @@ declare const emitToolEvent: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-event-tools.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-event-tools.ts#L84)
 
 ## emitToolEventEffect
 
@@ -13497,7 +13497,7 @@ declare const executionContext: (
 ) => NativeExecutionContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events-helpers.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events-helpers.ts#L44)
 
 ## isModelStart
 
@@ -13515,7 +13515,7 @@ isModelStart(event);
 declare const isModelStart: (event: ProtocolEvent) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events-helpers.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events-helpers.ts#L64)
 
 ## isToolStart
 
@@ -13533,7 +13533,7 @@ isToolStart(event);
 declare const isToolStart: (event: ProtocolEvent) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events-helpers.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events-helpers.ts#L78)
 
 ## trackExecutionContext
 
@@ -13613,7 +13613,7 @@ declare const collectNativeEvents: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events.ts#L93)
 
 ## collectNativeEventsEffect
 
@@ -13656,7 +13656,7 @@ declare const collectNativeEventsEffect: (
 ) => Effect.Effect<undefined, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-events.ts#L34)
 
 ## `runtime-native-limits.ts`
 
@@ -13692,7 +13692,7 @@ createNativeLimitMiddleware(limits);
 declare const createNativeLimitMiddleware: (limits: AgentLimits) => AnyAgentMiddleware;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-limits.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-limits.ts#L80)
 
 ## createNativeLimitMiddlewareEffect
 
@@ -13858,7 +13858,7 @@ declare const selectEffect: (
 ) => Effect.Effect<{ [k: string]: unknown }, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-public-state.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-public-state.ts#L47)
 
 ## selectedStateEffect
 
@@ -13983,7 +13983,7 @@ declare const nativePublicEvent: (
 ) => Promise<AgentExecutionEvent>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-public.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-public.ts#L61)
 
 ## nativePublicEventEffect
 
@@ -14144,7 +14144,7 @@ declare const assertAgentRuntimeDependencies: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L134)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L157)
 
 ## assertAgentRuntimeDependenciesEffect
 
@@ -14176,7 +14176,7 @@ declare const assertAgentRuntimeDependenciesEffect: (
 ) => Effect.Effect<void, AgentInvocationFailure, DeepAgentsLoader>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L144)
 
 ## combineNativeTools
 
@@ -14198,7 +14198,7 @@ combineNativeTools(groups);
 declare const combineNativeTools: (groups: readonly NativeTools[]) => NativeTools;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L63)
 
 ## combineNativeToolsEffect
 
@@ -14218,7 +14218,7 @@ declare const combineNativeToolsEffect: (
 ) => Effect.Effect<NativeTools, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L34)
 
 ## loadDeepAgents
 
@@ -14240,7 +14240,7 @@ await loadDeepAgents();
 declare const loadDeepAgents: () => Promise<typeof import("deepagents")>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L130)
 
 ## loadDeepAgentsEffect
 
@@ -14262,7 +14262,7 @@ declare const loadDeepAgentsEffect: () => Effect.Effect<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L108)
 
 ## nativeInstructions
 
@@ -14284,7 +14284,7 @@ nativeInstructions(agent);
 declare const nativeInstructions: (agent: AgentDescriptor<string, unknown, unknown>) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L96)
 
 ## nativeInstructionsEffect
 
@@ -14312,7 +14312,7 @@ declare const nativeInstructionsEffect: (
 ) => Effect.Effect<string, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-support.ts#L76)
 
 ## `runtime-native-support.types.ts`
 
@@ -14395,7 +14395,7 @@ Effect.runSync(Effect.provide(effect, NativeToolIdentityLive));
 declare const NativeToolIdentityLive: Layer.Layer<NativeToolIdentity, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-tools-identity.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-tools-identity.ts#L15)
 
 ## `runtime-native-tools.ts`
 
@@ -14470,7 +14470,7 @@ declare const createNativeTools: (
 ) => NativeTools;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-tools.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-native-tools.ts#L125)
 
 ## createNativeToolsEffect
 
@@ -14688,7 +14688,7 @@ declare const selectedStateSchemas: (
 ) => ReadonlyMap<string, StandardSchemaV1>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-state-schemas.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-state-schemas.ts#L28)
 
 ## selectedStateSchemasEffect
 
@@ -14771,7 +14771,7 @@ declare const createAgentInvocationDispatcherEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L22)
 
 ## invokeAgentTool
 
@@ -14802,7 +14802,7 @@ declare const invokeAgentTool: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L127)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L147)
 
 ## invokeAgentToolEffect
 
@@ -14829,7 +14829,7 @@ declare const invokeAgentToolEffect: (
 ) => Effect.Effect<unknown, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L37)
 
 ## `runtime-tool-dispatcher.ts`
 
@@ -14868,7 +14868,7 @@ declare const createAgentInvocationDispatcher: (
 ) => InvocationDispatcher;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-dispatcher.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-dispatcher.ts#L87)
 
 ## createAgentInvocationDispatcherEffect
 
@@ -14901,7 +14901,7 @@ declare const createAgentInvocationDispatcherEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-dispatcher.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-dispatcher.ts#L22)
 
 ## `runtime-tool-events.ts`
 
@@ -14945,7 +14945,7 @@ declare const emitTool: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-events.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-events.ts#L67)
 
 ## emitToolEffect
 
@@ -14969,7 +14969,7 @@ declare const emitToolEffect: (
 ) => Effect.Effect<undefined, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-events.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-events.ts#L26)
 
 ## resolveAgentApproval
 
@@ -14997,7 +14997,7 @@ declare const resolveAgentApproval: (
 ) => Promise<true>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-events.ts#L133)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-events.ts#L169)
 
 ## resolveAgentApprovalEffect
 
@@ -15021,7 +15021,7 @@ declare const resolveAgentApprovalEffect: (
 ) => Effect.Effect<true, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-events.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-events.ts#L91)
 
 ## `runtime-tool-events.types.ts`
 
@@ -15093,7 +15093,7 @@ declare const findModelTool: (
 ) => ToolDescriptor<string> | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L55)
 
 ## findModelToolEffect
 
@@ -15115,7 +15115,7 @@ declare const findModelToolEffect: (
 ) => Effect.Effect<ToolDescriptor<string> | undefined, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L37)
 
 ## findTool
 
@@ -15133,7 +15133,7 @@ findTool(tools, "math.add");
 declare const findTool: (source: ToolSource, id: string) => ToolDescriptor<string> | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L80)
 
 ## findToolEffect
 
@@ -15154,7 +15154,7 @@ declare const findToolEffect: (
 ) => Effect.Effect<ToolDescriptor<string> | undefined, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L69)
 
 ## modelToolName
 
@@ -15172,7 +15172,7 @@ modelToolName("math.add", 0);
 declare const modelToolName: (id: string, index: number) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-lookup.ts#L26)
 
 ## modelToolNameEffect
 
@@ -15252,7 +15252,7 @@ declare const findModelToolEffect: (
 ) => Effect.Effect<ToolDescriptor<string> | undefined, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L18)
 
 ## findTool
 
@@ -15262,7 +15262,7 @@ declare const findModelToolEffect: (
 declare const findTool: (source: ToolSource, id: string) => ToolDescriptor<string> | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L19)
 
 ## findToolEffect
 
@@ -15275,7 +15275,7 @@ declare const findToolEffect: (
 ) => Effect.Effect<ToolDescriptor<string> | undefined, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L20)
 
 ## modelToolName
 
@@ -15285,7 +15285,7 @@ declare const findToolEffect: (
 declare const modelToolName: (id: string, index: number) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L21)
 
 ## modelToolNameEffect
 
@@ -15298,7 +15298,7 @@ declare const modelToolNameEffect: (
 ) => Effect.Effect<string, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L22)
 
 ## runTool
 
@@ -15328,7 +15328,7 @@ declare const runTool: (
 ) => Promise<JsonValue>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L97)
 
 ## runToolEffect
 
@@ -15354,7 +15354,7 @@ declare const runToolEffect: (
 ) => Effect.Effect<JsonValue, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tools.ts#L36)
 
 ## `runtime-tools.types.ts`
 
@@ -15438,7 +15438,7 @@ jsonValue({ ok: true }, 1024, "output");
 declare const jsonValue: (value: unknown, maxBytes: number, label: string) => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-utils.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-utils.ts#L90)
 
 ## jsonValueEffect
 
@@ -15460,7 +15460,7 @@ declare const jsonValueEffect: (
 ) => Effect.Effect<JsonValue, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-utils.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-utils.ts#L76)
 
 ## modelFailure
 
@@ -15478,7 +15478,7 @@ modelFailure(error, signal);
 declare const modelFailure: (cause: unknown, signal: AbortSignal) => AgentRuntimeError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-utils.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-utils.ts#L127)
 
 ## modelFailureEffect
 
@@ -15499,7 +15499,7 @@ declare const modelFailureEffect: (
 ) => Effect.Effect<AgentRuntimeError, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-utils.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-utils.ts#L116)
 
 ## signalFailure
 
@@ -15599,7 +15599,7 @@ Re-exports all named exports from the "./runtime.types.js" module.
 export * from "./runtime.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L14)
 
 ## AgentInvocationFailure
 
@@ -15609,7 +15609,7 @@ export * from "./runtime.types.js";
 declare const AgentInvocationFailure: typeof AgentInvocationFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L17)
 
 ## AgentRuntimeError
 
@@ -15619,7 +15619,7 @@ declare const AgentInvocationFailure: typeof AgentInvocationFailure;
 declare const AgentRuntimeError: typeof AgentRuntimeError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L16)
 
 ## createAgentRuntime
 
@@ -15637,7 +15637,7 @@ const runtime = createAgentRuntime(options);
 declare const createAgentRuntime: (options: AgentRuntimeOptions) => AgentRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L151)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L155)
 
 ## createAgentRuntimeEffect
 
@@ -15657,7 +15657,7 @@ declare const createAgentRuntimeEffect: (
 ) => Effect.Effect<AgentRuntime, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L134)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L138)
 
 ## invokeAgent
 
@@ -15681,7 +15681,7 @@ declare const invokeAgent: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L122)
 
 ## invokeAgentEffect
 
@@ -15701,7 +15701,7 @@ declare const invokeAgentEffect: (
 ) => Effect.Effect<unknown, AgentInvocationFailure, AgentExecution>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L24)
 
 ## runAgent
 
@@ -15711,7 +15711,7 @@ declare const invokeAgentEffect: (
 declare const runAgent: (options: AgentRuntimeOptions & AgentInvocationOptions) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L155)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L159)
 
 ## `runtime.types.ts`
 
@@ -15930,7 +15930,7 @@ Re-exports all named exports from the "./signal.types.js" module.
 export * from "./signal.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L12)
 
 ## ExecutionSignalClock (class)
 
@@ -15948,7 +15948,7 @@ Effect.provide(createExecutionSignalEffect(options), ExecutionSignalClockLive);
 declare class ExecutionSignalClock
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L17)
 
 ## ExecutionSignalClockLive
 
@@ -15966,7 +15966,7 @@ Effect.runSync(Effect.provide(createExecutionSignalEffect(options), ExecutionSig
 declare const ExecutionSignalClockLive: Layer.Layer<ExecutionSignalClock, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L25)
 
 ## acquireExecutionSignalEffect
 
@@ -15990,7 +15990,7 @@ declare const acquireExecutionSignalEffect: (
 ) => Effect.Effect<ExecutionSignalHandle, AgentInvocationFailure, ExecutionSignalClock | Scope>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L123)
 
 ## createExecutionSignal
 
@@ -16017,7 +16017,7 @@ try {
 declare const createExecutionSignal: (options: ExecutionSignalOptions) => ExecutionSignalHandle;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L137)
 
 ## createExecutionSignalEffect
 
@@ -16037,7 +16037,7 @@ declare const createExecutionSignalEffect: (
 ) => Effect.Effect<ExecutionSignalHandle, AgentInvocationFailure, ExecutionSignalClock>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L63)
 
 ## signalFailure
 
@@ -16055,7 +16055,7 @@ signalFailure(signal);
 declare const signalFailure: (signal: AbortSignal) => AgentRuntimeError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L54)
 
 ## signalFailureEffect
 
@@ -16075,7 +16075,7 @@ declare const signalFailureEffect: (
 ) => Effect.Effect<AgentRuntimeError, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L39)
 
 ## withSignal
 
@@ -16097,7 +16097,7 @@ await withSignal(fetchData(), signal);
 declare const withSignal: <T>(work: MaybePromise<T>, signal: AbortSignal) => Promise<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L144)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L170)
 
 ## withSignalEffect
 
@@ -16119,7 +16119,7 @@ declare const withSignalEffect: <T>(
 ) => Effect.Effect<T, AgentInvocationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L129)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/signal.ts#L153)
 
 ## `signal.types.ts`
 

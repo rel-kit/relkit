@@ -3,143 +3,166 @@ import {
   CONTRACT_VERSION,
   GENERATOR_VERSION,
   GRAPH_VERSION,
-  type JsonValue,
 } from "@relkit/contracts";
-import type { ApplicationGraph, FunctionNode, GraphNode, HttpTriggerConfig } from "@relkit/graph";
-import { buildOperation, openApiPath } from "./generate-utils.js";
-import { documentTags, type OpenApiTag } from "./generate-tags.js";
-import { serviceContext, serviceFor } from "./generate-services.js";
+import { Effect, Result } from "effect";
+import { OpenApiGenerationError } from "./generate-error.js";
+import { observeOpenApi } from "./generate-observability.js";
+import { serviceContextEffect, serviceForEffect } from "./generate-services.js";
+import { documentTagsEffect } from "./generate-tags.js";
+import { buildOperationEffect, openApiPathEffect } from "./generate-utils.js";
+import type {
+  ApplicationGraph,
+  FunctionNode,
+  GraphNode,
+  HttpGraphTrigger,
+  JsonValue,
+  OpenApiDocument,
+  OpenApiPathItem,
+} from "./generate.types.js";
 
-export type OpenApiSchema = { readonly [key: string]: JsonValue };
-export interface OpenApiParameter {
-  readonly name: string;
-  readonly in: "path" | "query" | "header" | "cookie";
-  readonly required: boolean;
-  readonly schema: OpenApiSchema;
-}
-export interface OpenApiMediaType {
-  readonly schema: OpenApiSchema;
-}
-export interface OpenApiResponse {
-  readonly description: string;
-  readonly content?: Readonly<Record<string, OpenApiMediaType>>;
-  readonly headers?: Readonly<
-    Record<string, { readonly description: string; readonly schema: OpenApiSchema }>
-  >;
-}
-export interface OpenApiOperation {
-  readonly operationId: string;
-  readonly summary?: string;
-  readonly description?: string;
-  readonly tags?: readonly string[];
-  readonly parameters?: readonly OpenApiParameter[];
-  readonly requestBody?: {
-    readonly required: boolean;
-    readonly content: Readonly<Record<string, OpenApiMediaType>>;
-  };
-  readonly responses: Readonly<Record<string, OpenApiResponse>>;
-  readonly "x-relkit": {
-    readonly routeId: string;
-    readonly functionId?: string;
-    readonly serviceId?: string;
-    readonly middleware: readonly {
-      readonly id: string;
-      readonly path: string;
-      readonly order: number;
-      readonly match: "always" | "conditional";
-    }[];
-    readonly transforms: readonly string[];
-    readonly rateLimit?: JsonValue;
-  };
-}
-export interface OpenApiPathItem {
-  readonly [method: string]: OpenApiOperation | undefined;
-}
-export interface OpenApiDocument {
-  readonly openapi: "3.1.0";
-  readonly info: { readonly title: string; readonly version: string };
-  readonly jsonSchemaDialect: string;
-  readonly tags?: readonly OpenApiTag[];
-  readonly paths: Readonly<Record<string, OpenApiPathItem>>;
-  readonly "x-relkit": {
-    readonly version: number;
-    readonly contractVersion: number;
-    readonly graphVersion: number;
-    readonly generatorVersion: number;
-  };
-}
-export type HttpGraphTrigger = Extract<GraphNode, { readonly kind: "trigger" }> & {
-  readonly triggerType: "http";
-  readonly config: HttpTriggerConfig;
-};
-export type { OpenApiTag } from "./generate-tags.js";
+export type {
+  HttpGraphTrigger,
+  OpenApiDocument,
+  OpenApiMediaType,
+  OpenApiOperation,
+  OpenApiParameter,
+  OpenApiPathItem,
+  OpenApiResponse,
+  OpenApiSchema,
+} from "./generate.types.js";
+export type { OpenApiTag } from "./generate-tags.types.js";
 
-/** Generates a deterministic OpenAPI 3.1 document from the serializable graph contract. */
-export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
-  const functions = new Map(
-    graph.nodes
-      .filter((node): node is FunctionNode => node.kind === "function")
-      .map((node) => [node.id, node]),
-  );
-  const triggers = graph.nodes
-    .filter(isHttpTrigger)
-    .sort(
-      (left, right) =>
-        openApiPath(left.config.path).localeCompare(openApiPath(right.config.path)) ||
-        left.config.method.localeCompare(right.config.method) ||
-        left.id.localeCompare(right.id),
-    );
-  const services = serviceContext(graph);
-  const paths: Record<string, OpenApiPathItem> = {};
-  for (const trigger of triggers) {
-    const target = trigger.config.rawHandler ? undefined : functions.get(trigger.targetFunctionId);
-    if (target === undefined && !trigger.config.rawHandler) {
-      throw new TypeError(
-        `HTTP trigger "${trigger.id}" targets missing function "${trigger.targetFunctionId}".`,
+/** Generate a deterministic OpenAPI 3.1 document from a graph.
+ * @param graph - Serializable RELKIT application graph.
+ * @returns Effect containing the document or an OpenApiGenerationError.
+ * @example Effect.runSync(generateOpenApiEffect(graph));
+ */
+export const generateOpenApiEffect = Effect.fn("OpenApi.generate")((graph: ApplicationGraph) =>
+  observeOpenApi(
+    "generate",
+    Effect.gen(function* () {
+      const functions = new Map(
+        graph.nodes
+          .filter((node): node is FunctionNode => node.kind === "function")
+          .map((node) => [node.id, node]),
       );
-    }
-    const service = target === undefined ? undefined : serviceFor(services, trigger, target);
-    for (const [index, routePath] of openApiPaths(trigger.config.path).entries()) {
-      const path = openApiPath(routePath);
-      const method = trigger.config.method.toLowerCase();
-      const item = paths[path] ?? {};
-      if (item[method] !== undefined)
-        throw new TypeError(`Duplicate OpenAPI route "${method.toUpperCase()} ${path}".`);
-      paths[path] = {
-        ...item,
-        [method]: buildOperation(
-          trigger,
-          target,
-          routePath,
-          index === 0 ? trigger.id : `${trigger.id}.catch-all`,
-          service,
+      const triggers = graph.nodes.filter(isHttpTrigger);
+      const keyed = yield* Effect.forEach(triggers, (trigger) =>
+        Effect.map(openApiPathEffect(trigger.config.path), (path) => ({ trigger, path })),
+      );
+      keyed.sort(
+        (left, right) =>
+          left.path.localeCompare(right.path) ||
+          left.trigger.config.method.localeCompare(right.trigger.config.method) ||
+          left.trigger.id.localeCompare(right.trigger.id),
+      );
+      const services = yield* serviceContextEffect(graph);
+      const paths: Record<string, OpenApiPathItem> = {};
+      for (const { trigger } of keyed) {
+        const target = trigger.config.rawHandler
+          ? undefined
+          : functions.get(trigger.targetFunctionId);
+        if (target === undefined && !trigger.config.rawHandler)
+          return yield* new OpenApiGenerationError({
+            reason: "missing-function",
+            message: `HTTP trigger "${trigger.id}" targets missing function "${trigger.targetFunctionId}".`,
+            triggerId: trigger.id,
+            targetFunctionId: trigger.targetFunctionId,
+          });
+        const service =
+          target === undefined ? undefined : yield* serviceForEffect(services, trigger, target);
+        for (const [index, routePath] of openApiPaths(trigger.config.path).entries()) {
+          const path = yield* openApiPathEffect(routePath);
+          const method = trigger.config.method.toLowerCase();
+          const item = paths[path] ?? {};
+          if (item[method] !== undefined)
+            return yield* new OpenApiGenerationError({
+              reason: "duplicate-route",
+              message: `Duplicate OpenAPI route "${method.toUpperCase()} ${path}".`,
+              triggerId: trigger.id,
+              method: trigger.config.method,
+              path,
+            });
+          paths[path] = {
+            ...item,
+            [method]: yield* buildOperationEffect(
+              trigger,
+              target,
+              routePath,
+              index === 0 ? trigger.id : `${trigger.id}.catch-all`,
+              service,
+            ),
+          };
+        }
+      }
+      const usedTags = new Set(
+        Object.values(paths).flatMap((item) =>
+          Object.values(item).flatMap((operation) => operation?.tags ?? []),
         ),
-      };
-    }
-  }
-  const usedTags = new Set(
-    Object.values(paths).flatMap((item) =>
-      Object.values(item).flatMap((operation) => operation?.tags ?? []),
-    ),
-  );
-  const tags = documentTags(services.sources, [...usedTags]).filter((tag) =>
-    usedTags.has(tag.name),
-  );
-  return {
-    openapi: "3.1.0",
-    info: { title: graph.appId ?? "RelKit application", version: String(CONTRACT_VERSION) },
-    jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
-    ...(tags.length === 0 ? {} : { tags }),
-    paths,
-    "x-relkit": {
-      version: CONTRACT_VERSION,
-      contractVersion: CONTRACT_VERSION,
-      graphVersion: GRAPH_VERSION,
-      generatorVersion: GENERATOR_VERSION,
-    },
-  };
+      );
+      const tags = (yield* documentTagsEffect(services.sources, [...usedTags])).filter((tag) =>
+        usedTags.has(tag.name),
+      );
+      return {
+        openapi: "3.1.0" as const,
+        info: { title: graph.appId ?? "RelKit application", version: String(CONTRACT_VERSION) },
+        jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
+        ...(tags.length === 0 ? {} : { tags }),
+        paths,
+        "x-relkit": {
+          version: CONTRACT_VERSION,
+          contractVersion: CONTRACT_VERSION,
+          graphVersion: GRAPH_VERSION,
+          generatorVersion: GENERATOR_VERSION,
+        },
+      } satisfies OpenApiDocument;
+    }),
+  ),
+);
+
+/** Synchronous compatibility adapter for graph projection.
+ * @param graph - Serializable RELKIT application graph.
+ * @returns Deterministic OpenAPI document.
+ * @throws TypeError for a missing target function or duplicate route.
+ * @example const document = generateOpenApi(graph);
+ */
+export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
+  return runGeneration(generateOpenApiEffect(graph));
 }
 
+/** Serialize a generated document with canonical JSON ordering.
+ * @param graph - Serializable RELKIT application graph.
+ * @returns Effect containing newline-terminated JSON or OpenApiGenerationError.
+ * @example Effect.runSync(generateOpenApiJsonEffect(graph));
+ */
+export const generateOpenApiJsonEffect = Effect.fn("OpenApi.serialize")((graph: ApplicationGraph) =>
+  observeOpenApi(
+    "serialize",
+    Effect.gen(function* () {
+      const document = yield* generateOpenApiEffect(graph);
+      return `${canonicalJson(document as unknown as JsonValue)}\n`;
+    }),
+  ),
+);
+
+/** Synchronous compatibility adapter for canonical OpenAPI JSON.
+ * @param graph - Serializable RELKIT application graph.
+ * @returns Newline-terminated canonical JSON.
+ * @throws TypeError for a missing target function or duplicate route.
+ * @example const json = generateOpenApiJson(graph);
+ */
+export function generateOpenApiJson(graph: ApplicationGraph): string {
+  return runGeneration(generateOpenApiJsonEffect(graph));
+}
+
+/** Runs a pure generation Effect while retaining legacy TypeError failures. */
+function runGeneration<A>(effect: Effect.Effect<A, OpenApiGenerationError>): A {
+  const result = Effect.runSync(Effect.result(effect));
+  if (Result.isFailure(result)) throw new TypeError(result.failure.message);
+  return result.success;
+}
+
+/** Expand an optional catch-all to its base and populated paths. */
 function openApiPaths(path: string): readonly string[] {
   const segments = path.split("/");
   const optional = segments.findIndex(
@@ -150,21 +173,17 @@ function openApiPaths(path: string): readonly string[] {
   return [base, path.replace(/\?$/, "")];
 }
 
-/** Serializes OpenAPI with the repository's canonical JSON ordering. */
-export function generateOpenApiJson(graph: ApplicationGraph): string {
-  return `${canonicalJson(generateOpenApi(graph) as unknown as JsonValue)}\n`;
-}
-
+/** Narrow HTTP triggers while excluding provider-owned ALL handlers. */
 function isHttpTrigger(node: GraphNode): node is HttpGraphTrigger {
   return (
     node.kind === "trigger" &&
     node.triggerType === "http" &&
     isRecord(node.config) &&
-    // Auth's ALL catch-all is not an OpenAPI operation; keep provider-owned auth docs separate.
     node.config.method !== "ALL"
   );
 }
 
+/** Check for a non-array object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

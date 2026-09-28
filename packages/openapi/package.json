@@ -30,11 +30,17 @@
   },
   "dependencies": {
     "@relkit/contracts": "workspace:*",
-    "@relkit/graph": "workspace:*"
+    "@relkit/graph": "workspace:*",
+    "effect": "4.0.0-rc.115"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "5.0.1",
+    "vitest": "5.0.1"
   },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run --config vitest.config.ts"
   }
 }
