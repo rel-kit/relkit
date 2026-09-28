@@ -37,7 +37,7 @@
     "@relkit/jobs": "workspace:*",
     "@relkit/realtime": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
-    "cron-parser": "5.10.0"
+    "cron-parser": "5.10.1"
   },
   "scripts": {
     "build": "tsc -b",

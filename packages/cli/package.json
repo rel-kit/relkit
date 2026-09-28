@@ -36,7 +36,7 @@
     }
   },
   "dependencies": {
-    "@clack/prompts": "1.7.0",
+    "@clack/prompts": "1.8.1",
     "@relkit/agents": "workspace:*",
     "@relkit/app": "workspace:*",
     "@relkit/client": "workspace:*",
@@ -60,9 +60,9 @@
     "@relkit/realtime": "workspace:*",
     "@relkit/supervisor": "workspace:*",
     "effect": "4.0.0-rc.115",
-    "next": "16.3.3",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "next": "16.3.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "vitest": "5.0.1"
