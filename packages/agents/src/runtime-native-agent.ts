@@ -1,122 +1,77 @@
-import {
-  createAgent,
-  StructuredOutputParsingError,
-  toolStrategy,
-  type AnyAgentMiddleware,
-} from "langchain";
-import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
-import type { AgentDescriptor } from "./define-agent.js";
+import { createAgent, StructuredOutputParsingError, type AnyAgentMiddleware } from "langchain";
+import { Effect, Layer } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
 import { hasDeepAgentCapabilities } from "./define-agent-deep.js";
-import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
-import { AgentRuntimeError } from "./runtime-errors.js";
-import { resolveRuntimeModel } from "./runtime-model.js";
-import { createNativeTools, type NativeTools } from "./runtime-native-tools.js";
-import { resolveAgentPersistence } from "./graph-persistence.js";
-import { createThreadBucketBackend } from "./deepagent-bucket-scope.js";
-import { createNativeLimitMiddleware } from "./runtime-native-limits.js";
+import { createThreadBucketBackendEffect } from "./deepagent-bucket-scope.js";
+import { resolveAgentPersistenceEffect } from "./graph-persistence.js";
+import { agentInvocationFailure } from "./runtime-effect-error.js";
 import {
-  combineNativeTools,
-  loadDeepAgents,
-  nativeInstructions,
+  createSubagentsEffect,
+  createToolsForAgentEffect,
+  responseFormatEffect,
+} from "./runtime-native-agent-build.js";
+import type { CreateNativeAgentOptions, NativeAgent } from "./runtime-native-agent.types.js";
+import { createNativeLimitMiddlewareEffect } from "./runtime-native-limits.js";
+import { NativeToolIdentityLive } from "./runtime-native-tools-identity.js";
+import type { NativeTools } from "./runtime-native-tools.js";
+import {
+  combineNativeToolsEffect,
+  DeepAgentsLoaderLive,
+  loadDeepAgentsEffect,
+  nativeInstructionsEffect,
 } from "./runtime-native-support.js";
 
-type RuntimeOptions = Omit<AgentRuntimeOptions, "agent"> &
-  AgentInvocationOptions & { readonly agent: AgentDescriptor<string, unknown, unknown> };
-type NativeAgent = ReturnType<typeof createAgent>;
 export { StructuredOutputParsingError };
+export type { CreateNativeAgentOptions, NativeAgent } from "./runtime-native-agent.types.js";
 
-export async function createNativeAgent(options: {
-  readonly runtime: RuntimeOptions;
-  readonly model: string | import("@langchain/core/language_models/base").LanguageModelLike;
-  readonly signal: AbortSignal;
-  readonly maxOutputBytes: number;
-  readonly invocationId: string;
-  readonly traceId: string;
-}): Promise<{ readonly agent: NativeAgent; readonly tools: NativeTools }> {
-  const { runtime } = options;
-  const tools = createTools(runtime, options, runtime.agent);
-  const persistence = await resolveAgentPersistence(runtime.agent, runtime.environment ?? {});
-  const limitMiddleware = createNativeLimitMiddleware(runtime.agent.limits);
-  const common = {
-    name: runtime.agent.id,
-    model: options.model,
-    systemPrompt: nativeInstructions(runtime.agent),
-    tools: [...tools.values],
-    middleware: [
-      ...(runtime.agent.middleware as unknown as readonly AnyAgentMiddleware[]),
-      limitMiddleware,
-    ],
-    responseFormat: responseFormat(runtime.agent.output),
-    ...persistence,
-  };
-  if (!hasDeepAgentCapabilities(runtime.agent)) {
-    return { agent: createAgent(common), tools };
-  }
-  const deepagents = await loadDeepAgents();
-  const backend =
-    runtime.bucketBackend === undefined
-      ? runtime.agent.backend
-      : createThreadBucketBackend(runtime.bucketBackend, runtime.agent.id, runtime.threadId ?? "");
-  const groups = [tools];
-  const subagents = await createSubagents(
-    runtime.agent.subagents ?? [],
-    options.model,
-    backend,
-    runtime,
-    options,
-    groups,
-    deepagents,
-    limitMiddleware,
-  );
-  const agent = deepagents.createDeepAgent({
-    ...common,
-    subagents,
-    ...(runtime.agent.skills === undefined ? {} : { skills: [...runtime.agent.skills] }),
-    ...(runtime.agent.memory === undefined ? {} : { memory: [...runtime.agent.memory] }),
-    ...(backend === undefined ? {} : { backend }),
-    ...(runtime.agent.interruptOn === undefined ? {} : { interruptOn: runtime.agent.interruptOn }),
-  } as never);
-  return { agent: agent as unknown as NativeAgent, tools: combineNativeTools(groups) };
-}
-
-async function createSubagents(
-  children: readonly AgentDescriptor<string, unknown, unknown>[],
-  inheritedModel: Parameters<typeof childModel>[1],
-  inheritedBackend: unknown,
-  runtime: RuntimeOptions,
-  options: Omit<Parameters<typeof createNativeAgent>[0], "runtime">,
-  groups: NativeTools[],
-  deepagents: typeof import("deepagents"),
-  limitMiddleware: AnyAgentMiddleware,
-): Promise<unknown[]> {
-  const subagents: unknown[] = [];
-  for (const child of children) {
-    const childTools = createTools(runtime, options, child);
-    groups.push(childTools);
-    const model = await childModel(child, inheritedModel, runtime);
+/** Builds a native LangChain or DeepAgents runnable for one invocation.
+ * @param options - Runtime, model, signal, and invocation identity.
+ * @returns An Effect with native agent and tools or AgentInvocationFailure.
+ * @example await Effect.runPromise(Effect.provide(createNativeAgentEffect(options), Layer.merge(DeepAgentsLoaderLive, NativeToolIdentityLive)));
+ */
+export const createNativeAgentEffect = Effect.fn("Agents.runtime.createNativeAgent")(
+  function* (options: CreateNativeAgentOptions) {
+    const { runtime } = options;
+    const tools = yield* createToolsForAgentEffect(runtime, options, runtime.agent);
+    const persistence = yield* resolveAgentPersistenceEffect(
+      runtime.agent,
+      runtime.environment ?? {},
+    ).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)));
+    const limitMiddleware = yield* createNativeLimitMiddlewareEffect(runtime.agent.limits);
+    const instructions = yield* nativeInstructionsEffect(runtime.agent);
+    const format = yield* responseFormatEffect(runtime.agent.output);
     const common = {
-      name: child.id,
-      model,
-      systemPrompt: nativeInstructions(child),
-      tools: [...childTools.values],
+      name: runtime.agent.id,
+      model: options.model,
+      systemPrompt: instructions,
+      tools: [...tools.values],
       middleware: [
-        ...(child.middleware as unknown as readonly AnyAgentMiddleware[]),
+        ...(runtime.agent.middleware as unknown as readonly AnyAgentMiddleware[]),
         limitMiddleware,
       ],
-      responseFormat: responseFormat(child.output),
+      responseFormat: format,
+      ...persistence,
     };
-    if (!hasDeepAgentCapabilities(child)) {
-      subagents.push({
-        ...common,
-        description: child.description ?? child.title ?? child.id,
+    if (!hasDeepAgentCapabilities(runtime.agent)) {
+      const agent = yield* Effect.try({
+        try: () => createAgent(common),
+        catch: agentInvocationFailure,
       });
-      continue;
+      return { agent, tools };
     }
-    const backend = child.backend ?? inheritedBackend;
-    const persistence = await resolveAgentPersistence(child, runtime.environment ?? {});
-    const nested = await createSubagents(
-      child.subagents ?? [],
-      model,
+    const deepagents = yield* loadDeepAgentsEffect();
+    const backend =
+      runtime.bucketBackend === undefined
+        ? runtime.agent.backend
+        : yield* createThreadBucketBackendEffect(
+            runtime.bucketBackend,
+            runtime.agent.id,
+            runtime.threadId ?? "",
+          ).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)));
+    const groups = [tools];
+    const subagents = yield* createSubagentsEffect(
+      runtime.agent.subagents ?? [],
+      options.model,
       backend,
       runtime,
       options,
@@ -124,65 +79,40 @@ async function createSubagents(
       deepagents,
       limitMiddleware,
     );
-    subagents.push({
-      name: child.id,
-      description: child.description ?? child.title ?? child.id,
-      runnable: deepagents.createDeepAgent({
-        ...common,
-        ...persistence,
-        subagents: nested,
-        ...(child.skills === undefined ? {} : { skills: [...child.skills] }),
-        ...(child.memory === undefined ? {} : { memory: [...child.memory] }),
-        ...(backend === undefined ? {} : { backend }),
-        ...(child.interruptOn === undefined ? {} : { interruptOn: child.interruptOn }),
-      } as never),
+    const agent = yield* Effect.try({
+      try: () =>
+        deepagents.createDeepAgent({
+          ...common,
+          subagents,
+          ...(runtime.agent.skills === undefined ? {} : { skills: [...runtime.agent.skills] }),
+          ...(runtime.agent.memory === undefined ? {} : { memory: [...runtime.agent.memory] }),
+          ...(backend === undefined ? {} : { backend }),
+          ...(runtime.agent.interruptOn === undefined
+            ? {}
+            : { interruptOn: runtime.agent.interruptOn }),
+        } as never) as unknown as NativeAgent,
+      catch: agentInvocationFailure,
     });
-  }
-  return subagents;
-}
+    return { agent, tools: yield* combineNativeToolsEffect(groups) };
+  },
+  (effect) => observeAgent("runtime.create-native-agent", effect),
+);
 
-function createTools(
-  runtime: RuntimeOptions,
-  options: Omit<Parameters<typeof createNativeAgent>[0], "runtime">,
-  agent: AgentDescriptor<string, unknown, unknown>,
-): NativeTools {
-  return createNativeTools(
-    { ...runtime, agent },
-    options.signal,
-    options.maxOutputBytes,
-    options.invocationId,
-    options.traceId,
-  );
-}
-
-async function childModel(
-  child: AgentDescriptor<string, unknown, unknown>,
-  inherited: string | import("@langchain/core/language_models/base").LanguageModelLike,
-  runtime: RuntimeOptions,
-) {
-  if (child.model === undefined) return inherited;
-  return (
-    await resolveRuntimeModel({
-      model: child.model,
-      registry: runtime.modelRegistry,
-      environment: runtime.environment ?? {},
-    })
-  ).model;
-}
-
-function responseFormat(schema: StandardSchemaV1) {
-  const projection = getJsonSchema(schema);
-  if (!projection.ok) {
-    throw new AgentRuntimeError("RELKIT_SCHEMA_UNAVAILABLE", "Agent output schema is unavailable");
-  }
-  return toolStrategy(
-    {
-      title: "relkit_output",
-      type: "object",
-      properties: { value: projection.schema },
-      required: ["value"],
-      additionalProperties: false,
-    },
-    { handleError: false },
+/** Builds a native agent for existing Promise callers.
+ * @param options - Runtime, model, signal, and invocation identity.
+ * @returns Native agent and public tool mappings.
+ * @throws The original model, schema, persistence, or dependency error.
+ * @example await createNativeAgent(options);
+ */
+export function createNativeAgent(options: CreateNativeAgentOptions): Promise<{
+  readonly agent: NativeAgent;
+  readonly tools: NativeTools;
+}> {
+  return Effect.runPromise(
+    createNativeAgentEffect(options).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(Layer.merge(DeepAgentsLoaderLive, NativeToolIdentityLive)),
+    ),
+    { signal: options.signal },
   );
 }

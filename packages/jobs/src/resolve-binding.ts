@@ -1,26 +1,66 @@
 import { isRef } from "@relkit/contracts";
+import { Effect, Result, Schema } from "effect";
 import type { JobRefAny, TaskRefAny } from "@relkit/contracts/jobs";
-import type { JobDescriptorAny } from "./job-types.js";
+import type { JobDescriptorAny } from "./job.types.js";
 import { isJobName } from "./job-name.js";
-import {
-  JobBindingResolutionError,
-  type BindingSource,
-  type JobBindingErrorCode,
-  type ResolveBindingOptions,
-  type ResolvedTaskBinding,
-} from "./resolve-binding-types.js";
+import { JobBindingResolutionError } from "./resolve-binding-error.js";
+import type {
+  BindingSource,
+  JobBindingErrorCode,
+  ResolveBindingOptions,
+  ResolvedTaskBinding,
+} from "./resolve-binding.types.js";
 import { selectProfile, taskIdOf } from "./resolve-binding-support.js";
-
+import { observeJobs } from "./jobs-observability.js";
 export type {
   BindingSource,
   JobBindingErrorCode,
   ResolveBindingOptions,
   ResolvedTaskBinding,
-} from "./resolve-binding-types.js";
-export { JobBindingResolutionError } from "./resolve-binding-types.js";
-
-/** Selects the exact explicit, default, or private implicit job for one task. */
+} from "./resolve-binding.types.js";
+export { JobBindingResolutionError } from "./resolve-binding-error.js";
+/** A typed task-to-job binding resolution failure.
+ * @example if (error instanceof JobBindingFailure) console.log(error.message);
+ */
+export class JobBindingFailure extends Schema.TaggedError<JobBindingFailure>()(
+  "Jobs.BindingFailure",
+  { code: Schema.String, reason: Schema.String },
+) {}
+/** Resolves an explicit, default, or private implicit job in Effect.
+ * @param options - Task, candidate jobs, selector, and profiles.
+ * @returns A resolved binding or JobBindingFailure.
+ * @example Effect.runSync(resolveTaskBindingEffect(options));
+ */
+export const resolveTaskBindingEffect = Effect.fn("Jobs.resolveTaskBinding")(
+  (options: ResolveBindingOptions) =>
+    observeJobs(
+      "binding.resolve",
+      Effect.try({
+        try: () => resolveTaskBindingValue(options),
+        catch: (error) => {
+          if (error instanceof JobBindingResolutionError)
+            return new JobBindingFailure({ code: error.code, reason: error.message });
+          throw error;
+        },
+      }),
+    ),
+);
+/** Synchronous compatibility resolver for one task.
+ * @param options - Task, candidate jobs, selector, and profiles.
+ * @returns A resolved binding.
+ * @throws JobBindingResolutionError on ambiguity or invalid selector.
+ * @example resolveTaskBinding(options);
+ */
 export function resolveTaskBinding(options: ResolveBindingOptions): ResolvedTaskBinding {
+  const result = Effect.runSync(Effect.result(resolveTaskBindingEffect(options)));
+  if (Result.isFailure(result))
+    throw new JobBindingResolutionError(
+      result.failure.code as JobBindingErrorCode,
+      result.failure.reason,
+    );
+  return result.success;
+}
+function resolveTaskBindingValue(options: ResolveBindingOptions): ResolvedTaskBinding {
   const taskId = taskIdOf(options.task);
   const allJobs = [...(options.jobs ?? [])];
   validateSelectorTask(options.selector, taskId, allJobs);
@@ -69,9 +109,13 @@ export function resolveTaskBinding(options: ResolveBindingOptions): ResolvedTask
   }
   return makeBinding(options, taskId, selected, "explicit", false, selected.default === true);
 }
-
+/** Compatibility alias for task-to-job binding resolution.
+ * @param options - Task and candidate jobs to resolve.
+ * @returns The resolved task binding.
+ * @throws JobBindingResolutionError for invalid or ambiguous bindings.
+ * @example resolveBinding({ task, implicitName: "send" });
+ */
 export const resolveBinding = resolveTaskBinding;
-
 function makeBinding(
   options: ResolveBindingOptions,
   taskId: string,
@@ -100,7 +144,6 @@ function makeBinding(
     ...(job === undefined ? {} : { job }),
   };
 }
-
 function selectJob(
   jobs: readonly JobDescriptorAny[],
   selector: JobDescriptorAny | JobRefAny | undefined,
@@ -115,7 +158,6 @@ function selectJob(
     );
   return selected;
 }
-
 function validateSelectorTask(
   selector: JobDescriptorAny | JobRefAny | undefined,
   taskId: string,
@@ -144,7 +186,6 @@ function validateSelectorTask(
       `Job selector "${selectedId}" targets another task.`,
     );
 }
-
 function selectorId(selector: JobDescriptorAny | JobRefAny): string {
   return isRef(selector, "job") ? selector.id : selector.ref.id;
 }

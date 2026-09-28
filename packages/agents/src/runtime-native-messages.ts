@@ -1,16 +1,35 @@
 import type { BrowserMessage } from "@relkit/contracts";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
 import type { AgentExecutionEvent } from "./runtime-events.js";
+import type { MessageState } from "./runtime-native-messages.types.js";
 
-interface MessageState {
-  readonly messageId: string;
-  readonly createdAt: string;
-  readonly parts: Map<number, string>;
-}
-
+/** Per-invocation accumulator of streamed native assistant message parts.
+ * @example const messages = new NativeMessageAccumulator();
+ */
 export class NativeMessageAccumulator {
   private readonly messages = new Map<string, MessageState>();
 
+  /** Applies one public event to the message accumulator.
+   * @param event - Public native event.
+   * @returns An Effect with the latest browser message or undefined.
+   * @example Effect.runSync(messages.updateEffect(event));
+   */
+  readonly updateEffect = Effect.fn("Agents.runtime.messageUpdate")(
+    (event: AgentExecutionEvent) => Effect.sync(() => this.updateCore(event)),
+    (effect) => observeAgent("runtime.message-update", effect),
+  );
+
+  /** Applies one event for existing synchronous callers.
+   * @param event - Public native event.
+   * @returns The updated browser message or undefined.
+   * @example messages.update(event);
+   */
   update(event: AgentExecutionEvent): BrowserMessage | undefined {
+    return Effect.runSync(this.updateEffect(event));
+  }
+
+  private updateCore(event: AgentExecutionEvent): BrowserMessage | undefined {
     if (event.kind !== "messages" || !isRecord(event.value)) return undefined;
     const value = event.value;
     const key = [...event.scope, event.node ?? ""].join("\u0000");

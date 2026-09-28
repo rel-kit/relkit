@@ -85,8 +85,19 @@ export async function copyExternalDependencies(
     );
     const manifest = JSON.parse(await readFile(join(resolved, "package.json"), "utf8")) as {
       dependencies?: Record<string, string>;
+      optionalDependencies?: Record<string, string>;
     };
     pending.push(...Object.keys(manifest.dependencies ?? {}).filter((name) => !copied.has(name)));
+    for (const optional of Object.keys(manifest.optionalDependencies ?? {})) {
+      if (copied.has(optional)) continue;
+      for (const root of roots) {
+        try {
+          await access(join(root, ...optional.split("/")));
+          pending.push(optional);
+          break;
+        } catch {}
+      }
+    }
   }
 }
 

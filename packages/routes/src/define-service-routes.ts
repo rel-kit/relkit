@@ -1,12 +1,26 @@
-import type { FunctionRefAny } from "@relkit/functions";
+import { isFunctionDescriptor, type ServiceDescriptor } from "@relkit/services";
+import { Effect } from "effect";
+import { defineRouteEffect } from "./define-route.js";
+import type {
+  ServiceRouteMethod,
+  ServiceRoutesOptions,
+  ServiceRoutesResult,
+} from "./define-service-routes.types.js";
 import {
-  isFunctionDescriptor,
-  type ServiceDescriptor,
-  type ServiceFunctions,
-} from "@relkit/services";
-import { defineRoute } from "./define-route.js";
-import type { HttpRequestMapping } from "./http-dsl.js";
-import type { FunctionRouteDescriptor, FunctionRouteOptions } from "./route-types.js";
+  RouteInputError,
+  RouteOperationError,
+  measureRoute,
+  runRouteSync,
+} from "./route-observability.js";
+import type { FunctionRouteDescriptor } from "./route.types.js";
+
+export type {
+  ServiceRouteMethod,
+  ServiceRouteOptions,
+  ServiceRouteEntry,
+  ServiceRoutesOptions,
+  ServiceRoutesResult,
+} from "./define-service-routes.types.js";
 
 export const SERVICE_ROUTE_METHODS = Object.freeze([
   "GET",
@@ -18,66 +32,58 @@ export const SERVICE_ROUTE_METHODS = Object.freeze([
   "OPTIONS",
 ] as const);
 
-export type ServiceRouteMethod = (typeof SERVICE_ROUTE_METHODS)[number];
+/** Creates explicit service routes through an Effect.
+ * @param service - Service descriptor owning public functions.
+ * @param options - Explicit method to member table.
+ * @returns Frozen route table or tagged validation failure.
+ * @example Effect.runSync(defineServiceRoutesEffect(service, { GET: "list" }));
+ */
+export const defineServiceRoutesEffect = Effect.fn("routes.service-routes.define")(
+  <
+    const Service extends ServiceDescriptor<string, any, any>,
+    const Options extends ServiceRoutesOptions<Service>,
+  >(
+    service: Service,
+    options: Options,
+  ) =>
+    measureRoute(
+      "service-routes.define",
+      Effect.gen(function* () {
+        if (!isRecord(service)) return yield* invalid("Service descriptor must be an object");
+        if (!isRecord(options)) return yield* invalid("Service routes must be an object");
+        const routes: Partial<Record<ServiceRouteMethod, FunctionRouteDescriptor<string>>> = {};
+        for (const [method, entry] of Object.entries(options)) {
+          if (!isServiceRouteMethod(method)) {
+            return yield* invalid(`Invalid service route method "${method}"`);
+          }
+          const route = typeof entry === "string" ? { member: entry } : entry;
+          if (!isRecord(route) || typeof route.member !== "string") {
+            return yield* invalid(`Service route ${method} needs a member`);
+          }
+          const target = (service as Record<string, unknown>)[route.member];
+          if (!isFunctionDescriptor(target)) {
+            return yield* invalid(`Service member "${route.member}" is not a public function`);
+          }
+          const { member: _member, ...routeOptions } = route;
+          routes[method] = yield* defineRouteEffect({ ...routeOptions, target });
+        }
+        return Object.freeze(routes) as ServiceRoutesResult<Service, Options>;
+      }),
+    ),
+);
 
-type ServiceFunctionName<Service> = Extract<keyof ServiceFunctions<Service>, string>;
-type ServiceFunction<Service, Name extends ServiceFunctionName<Service>> = Extract<
-  ServiceFunctions<Service>[Name],
-  FunctionRefAny
->;
-
-export type ServiceRouteOptions<Name extends string, Target extends FunctionRefAny> = Omit<
-  FunctionRouteOptions<string, Target, HttpRequestMapping | undefined>,
-  "target"
-> & {
-  readonly member: Name;
-};
-
-export type ServiceRouteEntry<Service> = {
-  [Name in ServiceFunctionName<Service>]:
-    Name | ServiceRouteOptions<Name, ServiceFunction<Service, Name>>;
-}[ServiceFunctionName<Service>];
-
-export type ServiceRoutesOptions<Service> = Partial<
-  Readonly<Record<ServiceRouteMethod, ServiceRouteEntry<Service>>>
->;
-
-type EntryName<Entry> = Entry extends string
-  ? Entry
-  : Entry extends { readonly member: infer Name extends string }
-    ? Name
-    : never;
-
-export type ServiceRoutesResult<Service, Options> = Readonly<{
-  [Method in keyof Options]: FunctionRouteDescriptor<
-    string,
-    ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>
-  >;
-}>;
-
-/** Creates explicit HTTP route descriptors aligned with a service's public functions. */
+/** Creates explicit HTTP routes for a service synchronously.
+ * @param service - Service descriptor owning public functions.
+ * @param options - Explicit method to member table.
+ * @returns Frozen route table.
+ * @throws TypeError for invalid method or member references.
+ * @example defineServiceRoutes(service, { GET: "list" });
+ */
 export function defineServiceRoutes<
   const Service extends ServiceDescriptor<string, any, any>,
   const Options extends ServiceRoutesOptions<Service>,
 >(service: Service, options: Options): ServiceRoutesResult<Service, Options> {
-  if (!isRecord(options)) throw new TypeError("Service routes must be an object");
-  const routes: Partial<Record<ServiceRouteMethod, FunctionRouteDescriptor<string>>> = {};
-  for (const [method, entry] of Object.entries(options)) {
-    if (!isServiceRouteMethod(method)) {
-      throw new TypeError(`Invalid service route method "${method}"`);
-    }
-    const route = typeof entry === "string" ? { member: entry } : entry;
-    if (!isRecord(route) || typeof route.member !== "string") {
-      throw new TypeError(`Service route ${method} needs a member`);
-    }
-    const target = (service as Record<string, unknown>)[route.member];
-    if (!isFunctionDescriptor(target)) {
-      throw new TypeError(`Service member "${route.member}" is not a public function`);
-    }
-    const { member: _member, ...routeOptions } = route;
-    routes[method] = defineRoute({ ...routeOptions, target });
-  }
-  return Object.freeze(routes) as ServiceRoutesResult<Service, Options>;
+  return runRouteSync(defineServiceRoutesEffect(service, options));
 }
 
 function isServiceRouteMethod(value: string): value is ServiceRouteMethod {
@@ -86,4 +92,14 @@ function isServiceRouteMethod(value: string): value is ServiceRouteMethod {
 
 function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function invalid(reason: string): Effect.Effect<never, RouteOperationError> {
+  return Effect.fail(
+    new RouteOperationError({
+      operation: "service-routes.define",
+      reason,
+      cause: new RouteInputError(reason),
+    }),
+  );
 }

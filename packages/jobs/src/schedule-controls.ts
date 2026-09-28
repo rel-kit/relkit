@@ -1,4 +1,3 @@
-import { assertJsonValue, canonicalJson } from "@relkit/contracts";
 import type {
   ScheduleDefinition,
   ScheduleListOptions,
@@ -6,156 +5,130 @@ import type {
   ScheduleWriteOptions,
   ScheduleWriteReceipt,
   JobScheduleClient,
-} from "./job-types.js";
-import { assertJobsCapability, JobsCapabilityError } from "./capabilities.js";
+} from "./job.types.js";
+import { Effect, Result, Schema } from "effect";
 import type { NativeScheduleOperations } from "./adapter.js";
-import { JobControlUnknownError } from "./control-errors.js";
-import { unknownRecovery } from "./control-support.js";
-import { controlWrite } from "./control-write.js";
+import { JobsCapabilityError } from "./capabilities.js";
+import { observeJobs } from "./jobs-observability.js";
 import { requireJobsRuntime, type JobsRuntime } from "./runtime.js";
-
+import {
+  getScheduleOperationEffect,
+  listSchedulesOperationEffect,
+  writeScheduleOperationEffect,
+} from "./schedule-controls-operations.js";
+/** A native schedule operation failed or returned an invalid receipt.
+ * @example if (error instanceof JobScheduleControlFailure) console.log(error.message);
+ */
+export class JobScheduleControlFailure extends Schema.TaggedError<JobScheduleControlFailure>()(
+  "Jobs.ScheduleControlFailure",
+  { cause: Schema.Defect() },
+) {}
+/** Creates a schedule facade in Effect.
+ * @param runtime - Runtime owning native schedule operations.
+ * @returns A schedule client or JobScheduleControlFailure.
+ * @example Effect.runSync(createScheduleControlsEffect(runtime));
+ */
+export const createScheduleControlsEffect = Effect.fn("Jobs.createScheduleControls")(
+  (runtime: JobsRuntime) =>
+    observeJobs(
+      "schedule.createControls",
+      Effect.gen(function* () {
+        const schedule = runtime.adapter.schedules;
+        if (schedule === undefined)
+          return yield* new JobScheduleControlFailure({
+            cause: new JobsCapabilityError("schedules"),
+          });
+        return Object.freeze({
+          list: (options?: ScheduleListOptions) =>
+            runSchedule(listSchedulesEffect(runtime, schedule, options)),
+          get: (id: string, options?: { readonly signal?: AbortSignal }) =>
+            runSchedule(getScheduleEffect(runtime, schedule, id, options?.signal)),
+          upsert: (definition: ScheduleDefinition, options: ScheduleWriteOptions) =>
+            runSchedule(writeScheduleEffect(runtime, schedule, definition, options, "upsert")),
+          pause: (id: string, options: ScheduleWriteOptions) =>
+            runSchedule(writeScheduleEffect(runtime, schedule, id, options, "pause")),
+          resume: (id: string, options: ScheduleWriteOptions) =>
+            runSchedule(writeScheduleEffect(runtime, schedule, id, options, "resume")),
+          delete: (id: string, options: ScheduleWriteOptions) =>
+            runSchedule(writeScheduleEffect(runtime, schedule, id, options, "delete")),
+        }) as JobScheduleClient;
+      }),
+    ),
+);
+/** Synchronous schedule facade factory.
+ * @param runtime - Runtime owning native schedule operations.
+ * @returns A schedule client.
+ * @throws JobsCapabilityError when native schedules are unavailable.
+ * @example createScheduleControls(runtime);
+ */
 export function createScheduleControls(runtime = requireJobsRuntime()): JobScheduleClient {
-  const schedule = runtime.adapter.schedules;
-  if (schedule === undefined) throw new JobsCapabilityError("schedules");
-  return Object.freeze({
-    list: (options?: ScheduleListOptions) => listSchedules(runtime, schedule, options),
-    get: (id: string, options?: { readonly signal?: AbortSignal }) =>
-      getSchedule(runtime, schedule, id, options?.signal),
-    upsert: (definition: ScheduleDefinition, options: ScheduleWriteOptions) =>
-      writeSchedule(runtime, schedule, definition, options, "upsert"),
-    pause: (id: string, options: ScheduleWriteOptions) =>
-      writeSchedule(runtime, schedule, id, options, "pause"),
-    resume: (id: string, options: ScheduleWriteOptions) =>
-      writeSchedule(runtime, schedule, id, options, "resume"),
-    delete: (id: string, options: ScheduleWriteOptions) =>
-      writeSchedule(runtime, schedule, id, options, "delete"),
-  });
+  const result = Effect.runSync(Effect.result(createScheduleControlsEffect(runtime)));
+  if (Result.isFailure(result)) throw result.failure.cause;
+  return result.success;
 }
-
-async function listSchedules(
-  runtime: JobsRuntime,
-  schedule: NativeScheduleOperations,
-  options: ScheduleListOptions | undefined,
-): Promise<ScheduleReadReceipt> {
-  requireScheduleCapability(runtime);
-  const limit = options?.limit ?? 25;
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100)
-    throw new RangeError("Schedule list limit must be between 1 and 100");
-  const value = await schedule.list(
-    {
-      limit,
-      ...(options?.cursor === undefined ? {} : { cursor: boundedCursor(options.cursor) }),
-    },
-    runtime.operationContext({ signal: options?.signal ?? idleSignal() }),
-  );
-  return normalizeRead(value);
-}
-
-async function getSchedule(
-  runtime: JobsRuntime,
-  schedule: NativeScheduleOperations,
-  id: string,
-  signal: AbortSignal | undefined,
-): Promise<ScheduleReadReceipt> {
-  requireScheduleCapability(runtime);
-  const value = await schedule.get(
-    boundedId(id),
-    runtime.operationContext({ signal: signal ?? idleSignal() }),
-  );
-  return normalizeRead(value);
-}
-
-async function writeSchedule(
-  runtime: JobsRuntime,
-  schedule: NativeScheduleOperations,
-  value: ScheduleDefinition | string,
-  options: ScheduleWriteOptions,
-  operation: "upsert" | "pause" | "resume" | "delete",
-): Promise<ScheduleWriteReceipt> {
-  requireScheduleCapability(runtime);
-  const operationId = boundedId(options.operationId);
-  const scheduleId = typeof value === "string" ? boundedId(value) : boundedId(value.id);
-  if (typeof value !== "string") assertJsonValue(value);
-  const call = () =>
-    operation === "upsert"
-      ? schedule.upsert(
-          JSON.parse(canonicalJson(value)) as never,
-          runtime.operationContext({ signal: options.signal ?? idleSignal(), operationId }),
-        )
-      : schedule[operation](
-          scheduleId,
-          runtime.operationContext({ signal: options.signal ?? idleSignal(), operationId }),
-        );
-  const result = await controlWrite(call, options.signal, operationId);
-  if (isUnknown(result))
-    throw new JobControlUnknownError(
-      result.operationId || operationId,
-      result.idempotencyKey,
-      unknownRecovery(result),
-    );
-  if (
-    !isRecord(result) ||
-    result.operationId !== operationId ||
-    result.scheduleId !== scheduleId ||
-    !isOutcome(result.outcome)
-  ) {
-    throw new TypeError("Native schedule receipt is invalid");
-  }
-  return Object.freeze(result as ScheduleWriteReceipt);
-}
-
-function requireScheduleCapability(runtime: JobsRuntime): void {
-  if (runtime.adapter.schedules === undefined) throw new JobsCapabilityError("schedules");
-  assertJobsCapability(runtime.capabilities, "schedules");
-}
-
-function normalizeRead(value: unknown): ScheduleReadReceipt {
-  if (!isRecord(value) || (value.outcome !== "available" && value.outcome !== "unavailable")) {
-    throw new TypeError("Native schedule read receipt is invalid");
-  }
-  return Object.freeze(value as unknown as ScheduleReadReceipt);
-}
-
-function isOutcome(value: unknown): boolean {
-  return (
-    value === "created" ||
-    value === "updated" ||
-    value === "paused" ||
-    value === "resumed" ||
-    value === "deleted" ||
-    value === "requested" ||
-    value === "unsupported"
-  );
-}
-
-function isUnknown(value: unknown): value is {
-  readonly operationId: string;
-  readonly idempotencyKey?: string;
-  readonly outcome: "unknown";
-} {
-  return isRecord(value) && value.outcome === "unknown" && typeof value.operationId === "string";
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function boundedId(value: string): string {
-  if (
-    typeof value !== "string" ||
-    value.length === 0 ||
-    new TextEncoder().encode(value).byteLength > 256
-  )
-    throw new TypeError("Schedule identifiers must be bounded non-empty strings");
-  return value;
-}
-
-function boundedCursor(value: string): string {
-  if (new TextEncoder().encode(value).byteLength > 4096)
-    throw new RangeError("Schedule cursor is too large");
-  return value;
-}
-
-function idleSignal(): AbortSignal {
-  return new AbortController().signal;
+/** Lists native schedules in Effect.
+ * @param runtime - Jobs runtime.
+ * @param schedule - Native schedule provider.
+ * @param options - Page and signal options.
+ * @returns A read receipt or JobScheduleControlFailure.
+ * @example Effect.runPromise(listSchedulesEffect(runtime, schedule));
+ */
+export const listSchedulesEffect = Effect.fn("Jobs.listSchedules")(
+  (runtime: JobsRuntime, schedule: NativeScheduleOperations, options?: ScheduleListOptions) =>
+    observeJobs(
+      "schedule.list",
+      Effect.mapError(
+        listSchedulesOperationEffect(runtime, schedule, options),
+        (error) => new JobScheduleControlFailure({ cause: error.cause }),
+      ),
+    ),
+);
+/** Reads a single native schedule in Effect.
+ * @param runtime - Jobs runtime.
+ * @param schedule - Native schedule provider.
+ * @param id - Schedule identifier.
+ * @param signal - Optional cancellation signal.
+ * @returns A read receipt or JobScheduleControlFailure.
+ * @example Effect.runPromise(getScheduleEffect(runtime, schedule, "hourly"));
+ */
+export const getScheduleEffect = Effect.fn("Jobs.getSchedule")(
+  (runtime: JobsRuntime, schedule: NativeScheduleOperations, id: string, signal?: AbortSignal) =>
+    observeJobs(
+      "schedule.get",
+      Effect.mapError(
+        getScheduleOperationEffect(runtime, schedule, id, signal),
+        (error) => new JobScheduleControlFailure({ cause: error.cause }),
+      ),
+    ),
+);
+/** Writes or changes a native schedule in Effect.
+ * @param runtime - Jobs runtime.
+ * @param schedule - Native schedule provider.
+ * @param value - Definition or schedule identifier.
+ * @param options - Idempotent operation options.
+ * @param operation - Write operation.
+ * @returns A write receipt or JobScheduleControlFailure.
+ * @example Effect.runPromise(writeScheduleEffect(runtime, schedule, definition, options, "upsert"));
+ */
+export const writeScheduleEffect = Effect.fn("Jobs.writeSchedule")(
+  (
+    runtime: JobsRuntime,
+    schedule: NativeScheduleOperations,
+    value: ScheduleDefinition | string,
+    options: ScheduleWriteOptions,
+    operation: "upsert" | "pause" | "resume" | "delete",
+  ) =>
+    observeJobs(
+      "schedule.write",
+      Effect.mapError(
+        writeScheduleOperationEffect(runtime, schedule, value, options, operation),
+        (error) => new JobScheduleControlFailure({ cause: error.cause }),
+      ),
+    ),
+);
+/** Preserves original Promise failures for schedule client callers. */
+async function runSchedule<A>(effect: Effect.Effect<A, JobScheduleControlFailure>): Promise<A> {
+  const result = await Effect.runPromise(Effect.result(effect));
+  if (Result.isFailure(result)) throw result.failure.cause;
+  return result.success;
 }

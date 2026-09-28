@@ -21,7 +21,6 @@ import {
 } from "./src/jobs/watch-feed-support.ts";
 import type { FeedEvent } from "./src/jobs/watch-feed-types.ts";
 import type { JobWatchOptions } from "./src/jobs/types.ts";
-
 function run(status: RunSnapshot["status"]): RunSnapshot {
   return {
     accepted: true,
@@ -37,7 +36,6 @@ function run(status: RunSnapshot["status"]): RunSnapshot {
     resultAvailability: status === "completed" ? "available" : "pending",
   } as RunSnapshot;
 }
-
 function frame(status: RunSnapshot["status"], kind: RunWatchFrame["kind"] = "update") {
   return {
     kind,
@@ -50,7 +48,6 @@ function frame(status: RunSnapshot["status"], kind: RunWatchFrame["kind"] = "upd
     ...(kind === "reset" ? { reason: "reconnected" as const } : {}),
   } as RunWatchFrame<RunSnapshot>;
 }
-
 test("covers controller state transitions and support helpers", async () => {
   const current = {
     connection: "connected" as const,
@@ -83,7 +80,6 @@ test("covers controller state transitions and support helpers", async () => {
   expect(
     stateFromFeedEvent(current, { kind: "frame", frame: frame("completed", "reset") }, undefined),
   ).toMatchObject({ connection: "completed", isStale: true, resetReason: "reconnected" });
-
   const nested = { child: { value: 1 } } as { child: { value: number } };
   expect(freeze(nested)).toBe(nested);
   expect(Object.isFrozen(nested.child)).toBe(true);
@@ -116,7 +112,6 @@ test("covers controller state transitions and support helpers", async () => {
   expect(isUnauthorized({ cause: { code: "UNAUTHORIZED" } })).toBe(true);
   expect(isUnauthorized({ code: "other" })).toBe(false);
   expect(isUnauthorized(null)).toBe(false);
-
   const aborted = new AbortController();
   aborted.abort("stop");
   await expect(wait(1, aborted.signal)).rejects.toBe("stop");
@@ -132,7 +127,25 @@ test("covers controller state transitions and support helpers", async () => {
     reconnectAfterTeardown(undefined, undefined, async () => undefined),
   ).resolves.toBeUndefined();
 });
-
+test("uses default reconnect bounds and waits for teardown without a prior feed", async () => {
+  expect(backoff(1, { runId: "run" })).toBe(500);
+  expect(backoff(1, { runId: "run", reconnectMinDelayMs: 1500 })).toBe(1500);
+  const noCursor = { ...frame("running"), cursor: undefined };
+  expect(resetFrame(noCursor)).not.toHaveProperty("cursor");
+  let finishTeardown!: () => void;
+  const teardown = new Promise<void>((resolve) => {
+    finishTeardown = resolve;
+  });
+  let started = false;
+  const next = reconnectAfterTeardown(undefined, teardown, async () => {
+    started = true;
+  });
+  await Promise.resolve();
+  expect(started).toBe(false);
+  finishTeardown();
+  await next;
+  expect(started).toBe(true);
+});
 test("covers offline recovery and polling terminal/error transitions", async () => {
   const previousNavigator = Object.getOwnPropertyDescriptor(globalThis, "navigator");
   const previousAddEventListener = Object.getOwnPropertyDescriptor(globalThis, "addEventListener");
@@ -169,7 +182,6 @@ test("covers offline recovery and polling terminal/error transitions", async () 
       delete (globalThis as { removeEventListener?: unknown }).removeEventListener;
     else Object.defineProperty(globalThis, "removeEventListener", previousRemoveEventListener);
   }
-
   const terminal = makeFeed(
     { source: "polling", maxReconnectAttempts: 1 },
     clientWithGet("completed"),
@@ -179,7 +191,6 @@ test("covers offline recovery and polling terminal/error transitions", async () 
     "completed",
   );
   expect(terminal.rejected).toHaveLength(0);
-
   const unauthorized = makeFeed(
     { source: "polling", maxReconnectAttempts: 1 },
     clientWithError({ code: "FORBIDDEN" }),
@@ -187,14 +198,12 @@ test("covers offline recovery and polling terminal/error transitions", async () 
   await runPollingFeed(unauthorized.feed, 1);
   expect(unauthorized.events).toContainEqual(expect.objectContaining({ status: "unauthorized" }));
   expect(unauthorized.rejected).toHaveLength(1);
-
   const failed = makeFeed(
     { source: "polling", maxReconnectAttempts: 1 },
     clientWithError(new Error("down")),
   );
   await runPollingFeed(failed.feed, 1);
   expect(failed.events).toContainEqual(expect.objectContaining({ status: "error" }));
-
   const retried = makeFeed(
     { source: "polling", maxReconnectAttempts: 2, reconnectMinDelayMs: 0, reconnectMaxDelayMs: 0 },
     clientWithError(new Error("down")),
@@ -204,7 +213,6 @@ test("covers offline recovery and polling terminal/error transitions", async () 
     retried.events.filter((event) => event.kind === "status" && event.status === "reconnecting"),
   ).toHaveLength(2);
 });
-
 test("covers polling changes, terminal rechecks and active-generation exits", async () => {
   let abortController: AbortController | undefined;
   const changing = makeFeed({ source: "polling" }, clientWithGet("running"), {
@@ -215,7 +223,6 @@ test("covers polling changes, terminal rechecks and active-generation exits", as
   });
   await runPollingFeed(changing.feed, 1);
   expect(changing.events).toContainEqual(expect.objectContaining({ kind: "frame" }));
-
   let terminalAbort: AbortController | undefined;
   const unconfirmed = makeFeed({ source: "polling" }, clientWithGet("completed"), {
     onAbort: (controller) => {
@@ -228,7 +235,6 @@ test("covers polling changes, terminal rechecks and active-generation exits", as
   });
   await runPollingFeed(unconfirmed.feed, 1);
   expect(unconfirmed.rejected).toHaveLength(0);
-
   const inactive = makeFeed({ source: "polling" }, clientWithGet("running"), {
     onAccepted: (control) => {
       control.active = false;
@@ -238,7 +244,6 @@ test("covers polling changes, terminal rechecks and active-generation exits", as
   await runPollingFeed(inactive.feed, 1);
   expect(inactive.events).toContainEqual(expect.objectContaining({ status: "connected" }));
 });
-
 test("covers native feed frames, reconciliation and retry exits", async () => {
   const reconciled = makeFeed(
     { maxReconnectAttempts: 1 },
@@ -246,7 +251,6 @@ test("covers native feed frames, reconciliation and retry exits", async () => {
   );
   await runWatchFeed(reconciled.feed, 1);
   expect(reconciled.events).toContainEqual(expect.objectContaining({ status: "completed" }));
-
   const notConfirmed = makeFeed(
     { maxReconnectAttempts: 1 },
     clientWithWatch([frame("completed")], "running"),
@@ -259,18 +263,15 @@ test("covers native feed frames, reconciliation and retry exits", async () => {
   );
   await runWatchFeed(notConfirmed.feed, 1);
   expect(notConfirmed.rejected).toHaveLength(0);
-
   const unauthorized = makeFeed(
     { maxReconnectAttempts: 1 },
     clientWithWatchError({ code: "RELKIT_JOB_ACCESS_DENIED" }),
   );
   await runWatchFeed(unauthorized.feed, 1);
   expect(unauthorized.events).toContainEqual(expect.objectContaining({ status: "unauthorized" }));
-
   const exhausted = makeFeed({ maxReconnectAttempts: 1 }, clientWithWatchError(new Error("down")));
   await runWatchFeed(exhausted.feed, 1);
   expect(exhausted.events).toContainEqual(expect.objectContaining({ status: "error" }));
-
   const inactive = makeFeed({ maxReconnectAttempts: 1 }, clientWithWatch([frame("running")]), {
     onIterator: (control) => {
       control.active = false;
@@ -278,12 +279,10 @@ test("covers native feed frames, reconciliation and retry exits", async () => {
   });
   await runWatchFeed(inactive.feed, 1);
   expect(inactive.rejected).toHaveLength(0);
-
   const noSnapshot = makeFeed({ maxReconnectAttempts: 1 }, clientWithWatch([]));
   await runWatchFeed(noSnapshot.feed, 1);
   expect(noSnapshot.events).toContainEqual(expect.objectContaining({ status: "error" }));
 });
-
 type Control = {
   active: boolean;
   failures: number;
@@ -291,7 +290,6 @@ type Control = {
   events: FeedEvent<RunSnapshot>[];
   rejected: unknown[];
 };
-
 function makeFeed(
   options: JobWatchOptions,
   client: unknown,
@@ -336,11 +334,9 @@ function makeFeed(
   };
   return { control, feed, events: control.events, rejected: control.rejected };
 }
-
 function clientWithGet(status: RunSnapshot["status"]): unknown {
   return { jobs: { quality: { runs: { get: async () => run(status) } } } };
 }
-
 function clientWithError(error: unknown): unknown {
   return {
     jobs: {
@@ -354,7 +350,6 @@ function clientWithError(error: unknown): unknown {
     },
   };
 }
-
 function clientWithWatchError(error: unknown): unknown {
   return {
     jobs: {
@@ -368,7 +363,6 @@ function clientWithWatchError(error: unknown): unknown {
     },
   };
 }
-
 function clientWithWatch(values: readonly unknown[], finalStatus?: RunSnapshot["status"]): unknown {
   return {
     jobs: {
@@ -381,7 +375,6 @@ function clientWithWatch(values: readonly unknown[], finalStatus?: RunSnapshot["
     },
   };
 }
-
 function finiteIterator(values: readonly unknown[]): AsyncIterator<unknown> {
   let index = 0;
   return {

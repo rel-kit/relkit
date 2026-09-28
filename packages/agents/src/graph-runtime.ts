@@ -1,163 +1,97 @@
-import { isInterrupted } from "@langchain/langgraph";
 import { normalizeId } from "@relkit/contracts";
-import { currentInvocationScope, frameworkTrace, runInInvocationScope } from "@relkit/invocation";
-import { graphExecution, type GraphDescriptor } from "./define-graph.js";
-import { compileGraph } from "./graph-compile.js";
-import { graphConfig, resumeCommand, waitingInterrupts } from "./graph-continuation.js";
-import {
-  GraphInterruptedError,
-  graphWaitingResponse,
-  publicWaitingRequests,
-} from "./graph-interruption.js";
-import { resolveGraphPersistence } from "./graph-persistence.js";
-import { graphWorkflowRequiresPersistence } from "./graph-workflow.js";
+import { frameworkTrace } from "@relkit/invocation";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
 import { generatedAgentFunctionId } from "./generated-function.js";
-import { collectNativeEvents } from "./runtime-native-events.js";
-import { resolveAgentContentLimits } from "./runtime-model.js";
-import { selectedStateSchemas } from "./runtime-state-schemas.js";
-import { createAgentInvocationDispatcher } from "./runtime-tool-adapter.js";
-import {
-  createExecutionSignal,
-  jsonValue,
-  signalFailure,
-  validateValue,
-  withSignal,
-} from "./runtime-utils.js";
-import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
+import { graphInvocationFailure } from "./graph-runtime-error.js";
+import { runCompiledGraph } from "./graph-runtime-execution.js";
+import { GraphInvocationIdentity, GraphInvocationIdentityLive } from "./graph-runtime-identity.js";
+import type { GraphRuntimeOptions } from "./graph-runtime.types.js";
+import { resolveAgentContentLimitsEffect } from "./runtime-model.js";
+import { signalFailure, validateValue, withSignal } from "./runtime-utils.js";
+import { acquireExecutionSignalEffect, ExecutionSignalClockLive } from "./signal.js";
 
-type GraphRuntimeOptions = AgentRuntimeOptions &
-  AgentInvocationOptions & { readonly agent: GraphDescriptor };
+export type { GraphRuntimeOptions } from "./graph-runtime.types.js";
+export { GraphInvocationFailure } from "./graph-runtime-error.js";
+export { GraphInvocationIdentity, GraphInvocationIdentityLive } from "./graph-runtime-identity.js";
 
-export async function invokeGraph(options: GraphRuntimeOptions): Promise<unknown> {
-  const invocationId = normalizeId(options.invocationId ?? `agent-${crypto.randomUUID()}`);
-  const traceId = normalizeId(options.traceId ?? invocationId);
-  const execution = createExecutionSignal(options);
-  const limits = resolveAgentContentLimits(options);
-  return frameworkTrace.span(
-    `relkit.agent.${options.agent.id}.invoke`,
-    {
-      input: options.input,
-      attributes: {
-        "relkit.agent.id": options.agent.id,
-        "relkit.function.id": generatedAgentFunctionId(options.agent.id),
-        "relkit.invocation.id": invocationId,
-        "relkit.agent.execution": "graph",
-      },
-    },
-    async () => {
-      try {
-        if (execution.signal.aborted) throw signalFailure(execution.signal);
-        const input = options.resume
-          ? options.input
-          : await withSignal(
-              validateValue(options.agent.input, options.input, "input"),
-              execution.signal,
-            );
-        return await runCompiledGraph(
-          options,
-          input,
-          execution.signal,
-          invocationId,
-          traceId,
-          limits.maxOutputBytes,
-        );
-      } finally {
-        execution.close();
-      }
-    },
-  );
-}
-
-async function runCompiledGraph(
-  options: GraphRuntimeOptions,
-  input: unknown,
-  signal: AbortSignal,
-  invocationId: string,
-  traceId: string,
-  maxOutputBytes: number,
-): Promise<unknown> {
-  const persistence = await resolveGraphPersistence(options.agent, options.environment ?? {});
-  if (
-    persistence.checkpointer === undefined &&
-    graphWorkflowRequiresPersistence(options.agent.workflow)
-  ) {
-    throw new TypeError("Graphs with resumable nodes require a checkpointer");
-  }
-  const graph = compileGraph(options.agent, persistence);
-  const config = graphConfig(options.agent, options.threadId);
-  try {
-    return await inAgentScope(options, signal, invocationId, traceId, async () => {
-      const nativeInput = options.resume
-        ? await resumeCommand(graph, options.agent, config, input)
-        : input;
-      const run = await withSignal(
-        graph.streamEvents(nativeInput, {
-          version: "v3",
-          signal,
-          recursionLimit: options.agent.limits.maxSteps,
-          ...config,
-        }),
-        signal,
-      );
-      await collectNativeEvents(
-        run,
-        options.contentSink,
-        new Map(),
-        new Set(),
-        signal,
-        options.agent.limits,
-        selectedStateSchemas(
-          [graphExecution(options.agent).state],
-          options.agent.client?.state ?? [],
-        ),
-        () => undefined,
-        undefined,
-        (reason) => run.abort(reason),
-        options.agent.client?.events,
-      );
-      const state = await withSignal(run.output, signal);
-      if (isInterrupted(state)) {
-        const interrupts = await waitingInterrupts(graph, options.agent, config);
-        await withSignal(
-          options.contentSink?.emitWaiting?.(
-            {
-              response: graphWaitingResponse(interrupts),
-              requests: publicWaitingRequests(interrupts),
-            },
-            signal,
-          ),
-          signal,
-        );
-        throw new GraphInterruptedError(options.threadId!, interrupts);
-      }
-      const validated = await validateValue(options.agent.output, state, "output");
-      const output = jsonValue(validated, maxOutputBytes, "graph output");
-      await withSignal(options.contentSink?.emitOutput(output, signal), signal);
-      await withSignal(options.contentSink?.finishOutput?.(signal), signal);
-      return output;
+/** Invokes a graph with scoped signal cleanup and linked Effect cancellation.
+ * @param options - Graph, engine, input, and invocation integrations.
+ * @returns An Effect with graph output or GraphInvocationFailure.
+ * @example Effect.runPromise(Effect.provide(invokeGraphEffect(options), GraphInvocationIdentityLive));
+ */
+export const invokeGraphEffect = Effect.fn("Agents.graph.invoke")(
+  function* (options: GraphRuntimeOptions) {
+    const identity = yield* GraphInvocationIdentity;
+    const invocationId = yield* Effect.try({
+      try: () => normalizeId(options.invocationId ?? `agent-${identity.randomUUID()}`),
+      catch: graphInvocationFailure,
     });
-  } catch (cause) {
-    if (signal.aborted) throw signalFailure(signal);
-    throw cause;
-  }
-}
+    const traceId = yield* Effect.try({
+      try: () => normalizeId(options.traceId ?? invocationId),
+      catch: graphInvocationFailure,
+    });
+    const limits = yield* resolveAgentContentLimitsEffect(options).pipe(
+      Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
+    );
+    return yield* Effect.scoped(
+      Effect.gen(function* () {
+        const execution = yield* acquireExecutionSignalEffect(options).pipe(
+          Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
+          Effect.provide(ExecutionSignalClockLive),
+        );
+        return yield* Effect.tryPromise({
+          try: (effectSignal) => {
+            const signal = AbortSignal.any([execution.signal, effectSignal]);
+            return frameworkTrace.span(
+              `relkit.agent.${options.agent.id}.invoke`,
+              {
+                input: options.input,
+                attributes: {
+                  "relkit.agent.id": options.agent.id,
+                  "relkit.function.id": generatedAgentFunctionId(options.agent.id),
+                  "relkit.invocation.id": invocationId,
+                  "relkit.agent.execution": "graph",
+                },
+              },
+              async () => {
+                if (signal.aborted) throw signalFailure(signal);
+                const input = options.resume
+                  ? options.input
+                  : await withSignal(
+                      validateValue(options.agent.input, options.input, "input"),
+                      signal,
+                    );
+                return runCompiledGraph(
+                  options,
+                  input,
+                  signal,
+                  invocationId,
+                  traceId,
+                  limits.maxOutputBytes,
+                );
+              },
+            );
+          },
+          catch: graphInvocationFailure,
+        });
+      }),
+    );
+  },
+  (effect) => observeAgent("graph.invoke", effect),
+);
 
-async function inAgentScope<T>(
-  options: GraphRuntimeOptions,
-  signal: AbortSignal,
-  invocationId: string,
-  traceId: string,
-  run: () => Promise<T>,
-): Promise<T> {
-  const current = currentInvocationScope();
-  if (current !== undefined) return runInInvocationScope(current, run);
-  const dispatcher = createAgentInvocationDispatcher(
-    options.engine,
-    options,
-    invocationId,
-    traceId,
-    options.parentSpanId,
-    signal,
+/** Invokes a graph for existing Promise runtime callers.
+ * @param options - Graph, engine, input, and invocation integrations.
+ * @returns Validated graph output.
+ * @throws The original graph, provider, validation, or cancellation error.
+ * @example await invokeGraph(options);
+ */
+export function invokeGraph(options: GraphRuntimeOptions): Promise<unknown> {
+  return Effect.runPromise(
+    invokeGraphEffect(options).pipe(
+      Effect.catchTag("GraphInvocationFailure", (failure) => Effect.fail(failure.cause)),
+      Effect.provide(GraphInvocationIdentityLive),
+    ),
   );
-  return runInInvocationScope({ dispatcher, parent: { id: invocationId, traceId, signal } }, run);
 }

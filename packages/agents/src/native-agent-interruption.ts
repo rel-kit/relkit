@@ -1,137 +1,138 @@
 import { Command } from "@langchain/langgraph";
-import { validate } from "@cfworker/json-schema";
-import type { GraphWaitingInterrupt } from "./graph-interruption.js";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
+import { nativeAgentInterruptionFailure } from "./native-agent-interruption-error.js";
+import type { NativeAgent, NativeAgentConfig } from "./native-agent-interruption.types.js";
 import {
-  hitlResponseSchema,
-  isDecision,
-  isHitlRequest,
-  isRecord,
-  publicHitlRequest,
-  type ReviewConfig,
-} from "./native-agent-interruption-schema.js";
-import type { AgentWaitingRequest } from "./state-types.js";
+  snapshotInterrupts,
+  validateNativeAgentResumeInputCore,
+} from "./native-agent-interruption-validation.js";
+import type { AgentWaitingRequest } from "./state.types.js";
 
-type NativeAgent = Pick<ReturnType<typeof import("langchain").createAgent>, "getState">;
-type NativeAgentConfig = Parameters<NativeAgent["getState"]>[0];
+/** Reads native pending requests and constructs a resume command.
+ * @param agent - Native agent state provider.
+ * @param config - State lookup configuration.
+ * @param value - One reply or an ordered reply list.
+ * @returns An Effect with a native Command or NativeAgentInterruptionFailure.
+ * @example await Effect.runPromise(nativeAgentResumeCommandEffect(agent, config, reply));
+ */
+export const nativeAgentResumeCommandEffect = Effect.fn("Agents.nativeHitl.resumeCommand")(
+  function* (agent: NativeAgent, config: NativeAgentConfig, value: unknown) {
+    const requests = yield* nativeAgentWaitingInterruptsEffect(agent, config);
+    const reply = yield* validateNativeAgentResumeInputEffect(requests, value);
+    const replies = requests.length === 1 ? [reply] : (reply as readonly unknown[]);
+    return yield* Effect.try({
+      try: () =>
+        new Command({
+          resume: Object.fromEntries(
+            requests.map((request, index) => {
+              if (request.id === undefined)
+                throw new TypeError("Agent interruption has no native ID");
+              return [request.id, replies[index]];
+            }),
+          ),
+        }),
+      catch: nativeAgentInterruptionFailure,
+    });
+  },
+  (effect) => observeAgent("native-hitl.resume-command", effect),
+);
 
-export async function nativeAgentResumeCommand(
+/** Builds a native resume command for existing Promise callers.
+ * @param agent - Native agent state provider.
+ * @param config - State lookup configuration.
+ * @param value - Candidate continuation reply.
+ * @returns A native resume command.
+ * @throws The original state or validation error.
+ * @example await nativeAgentResumeCommand(agent, config, reply);
+ */
+export function nativeAgentResumeCommand(
   agent: NativeAgent,
   config: NativeAgentConfig,
   value: unknown,
 ): Promise<Command> {
-  const requests = await nativeAgentWaitingInterrupts(agent, config);
-  const reply = validateNativeAgentResumeInput(requests, value);
-  const replies = requests.length === 1 ? [reply] : (reply as readonly unknown[]);
-  return new Command({
-    resume: Object.fromEntries(
-      requests.map((request, index) => {
-        if (request.id === undefined) throw new TypeError("Agent interruption has no native ID");
-        return [request.id, replies[index]];
-      }),
+  return Effect.runPromise(
+    nativeAgentResumeCommandEffect(agent, config, value).pipe(
+      Effect.catchTag("NativeAgentInterruptionFailure", (failure) => Effect.fail(failure.cause)),
     ),
-  });
+  );
 }
 
-export async function nativeAgentWaitingInterrupts(
+/** Reads and projects waiting native interruptions.
+ * @param agent - Native agent state provider.
+ * @param config - State lookup configuration.
+ * @returns An Effect with ordered waiting requests or NativeAgentInterruptionFailure.
+ * @example await Effect.runPromise(nativeAgentWaitingInterruptsEffect(agent, config));
+ */
+export const nativeAgentWaitingInterruptsEffect = Effect.fn("Agents.nativeHitl.waiting")(
+  (agent: NativeAgent, config: NativeAgentConfig) =>
+    Effect.tryPromise({
+      try: async (effectSignal) =>
+        snapshotInterrupts(
+          await agent.getState(
+            {
+              ...config,
+              signal:
+                config.signal === undefined
+                  ? effectSignal
+                  : AbortSignal.any([config.signal, effectSignal]),
+            },
+            { subgraphs: true },
+          ),
+          [],
+        ),
+      catch: nativeAgentInterruptionFailure,
+    }),
+  (effect) => observeAgent("native-hitl.waiting", effect),
+);
+
+/** Reads waiting native interruptions for existing Promise callers.
+ * @param agent - Native agent state provider.
+ * @param config - State lookup configuration.
+ * @returns Ordered waiting requests.
+ * @throws The original native state provider error.
+ * @example await nativeAgentWaitingInterrupts(agent, config);
+ */
+export function nativeAgentWaitingInterrupts(
   agent: NativeAgent,
   config: NativeAgentConfig,
-): Promise<readonly GraphWaitingInterrupt[]> {
-  return snapshotInterrupts(await agent.getState(config, { subgraphs: true }), []);
+): Promise<readonly import("./graph-interruption.js").GraphWaitingInterrupt[]> {
+  return Effect.runPromise(
+    nativeAgentWaitingInterruptsEffect(agent, config).pipe(
+      Effect.catchTag("NativeAgentInterruptionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
+/** Validates native continuation replies against pending requests.
+ * @param requests - Pending waiting requests.
+ * @param value - One reply or an ordered reply list.
+ * @returns An Effect with validated replies or NativeAgentInterruptionFailure.
+ * @example Effect.runSync(validateNativeAgentResumeInputEffect(requests, reply));
+ */
+export const validateNativeAgentResumeInputEffect = Effect.fn("Agents.nativeHitl.validateReply")(
+  (requests: readonly AgentWaitingRequest[], value: unknown) =>
+    Effect.try({
+      try: () => validateNativeAgentResumeInputCore(requests, value),
+      catch: nativeAgentInterruptionFailure,
+    }),
+  (effect) => observeAgent("native-hitl.validate-reply", effect),
+);
+
+/** Validates native continuation replies for existing synchronous callers.
+ * @param requests - Pending waiting requests.
+ * @param value - Candidate reply or ordered reply list.
+ * @returns Validated reply values.
+ * @throws The original invalid continuation error.
+ * @example const reply = validateNativeAgentResumeInput(requests, value);
+ */
 export function validateNativeAgentResumeInput(
   requests: readonly AgentWaitingRequest[],
   value: unknown,
 ): unknown {
-  if (requests.length === 0) throw new TypeError("Agent has no waiting continuation");
-  if (requests.length === 1) return validateReply(requests[0]!, value);
-  if (!Array.isArray(value) || value.length !== requests.length) {
-    throw new TypeError(`Agent continuation requires ${requests.length} replies`);
-  }
-  return requests.map((request, index) => validateReply(request, value[index]));
-}
-
-function snapshotInterrupts(snapshot: unknown, path: readonly string[]): GraphWaitingInterrupt[] {
-  if (!isRecord(snapshot) || !Array.isArray(snapshot.tasks)) return [];
-  return snapshot.tasks.flatMap((task): GraphWaitingInterrupt[] => {
-    if (!isRecord(task)) return [];
-    const name = typeof task.name === "string" ? task.name : "human-input";
-    if (isRecord(task.state) && Array.isArray(task.state.tasks)) {
-      return snapshotInterrupts(task.state, [...path, name]);
-    }
-    if (!Array.isArray(task.interrupts)) return [];
-    return task.interrupts.flatMap((entry): GraphWaitingInterrupt[] => {
-      if (!isRecord(entry) || !isHitlRequest(entry.value)) return [];
-      const value = publicHitlRequest(entry.value);
-      return [
-        {
-          ...(typeof entry.id === "string" ? { id: entry.id } : {}),
-          node: [...path, name].join("/"),
-          value,
-          response: hitlResponseSchema(value.reviewConfigs),
-        },
-      ];
-    });
-  });
-}
-
-function validateReply(request: AgentWaitingRequest, value: unknown): unknown {
-  const requestValue = request.value;
-  if (!isHitlRequest(requestValue) || !isRecord(value) || !Array.isArray(value.decisions)) {
-    throw new TypeError("Agent continuation requires human decisions");
-  }
-  if (Object.keys(value).some((key) => key !== "decisions")) {
-    throw new TypeError("Agent continuation has unknown fields");
-  }
-  if (value.decisions.length !== requestValue.reviewConfigs.length) {
-    throw new TypeError("Agent continuation decision count is invalid");
-  }
-  return {
-    decisions: value.decisions.map((decision, index) =>
-      validateDecision(decision, requestValue.reviewConfigs[index]!),
+  return Effect.runSync(
+    validateNativeAgentResumeInputEffect(requests, value).pipe(
+      Effect.catchTag("NativeAgentInterruptionFailure", (failure) => Effect.fail(failure.cause)),
     ),
-  };
-}
-
-function validateDecision(value: unknown, config: ReviewConfig): unknown {
-  if (
-    !isRecord(value) ||
-    !isDecision(value.type) ||
-    !config.allowedDecisions.includes(value.type)
-  ) {
-    throw new TypeError("Agent continuation decision is not allowed");
-  }
-  if (value.type === "approve") {
-    exactKeys(value, ["type"]);
-    return { type: "approve" };
-  }
-  if (value.type === "reject") {
-    exactKeys(value, ["type", "message"]);
-    if (value.message !== undefined && typeof value.message !== "string") {
-      throw new TypeError("Agent rejection message must be text");
-    }
-    return { type: "reject", ...(value.message === undefined ? {} : { message: value.message }) };
-  }
-  exactKeys(value, ["type", "editedAction"]);
-  if (
-    !isRecord(value.editedAction) ||
-    value.editedAction.name !== config.actionName ||
-    !isRecord(value.editedAction.args)
-  ) {
-    throw new TypeError("Agent edited action is invalid");
-  }
-  exactKeys(value.editedAction, ["name", "args"]);
-  if (
-    config.argsSchema !== undefined &&
-    !validate(value.editedAction.args, config.argsSchema as never).valid
-  ) {
-    throw new TypeError("Agent edited action arguments are invalid");
-  }
-  return { type: "edit", editedAction: value.editedAction };
-}
-
-function exactKeys(value: Record<string, unknown>, allowed: readonly string[]): void {
-  if (Object.keys(value).some((key) => !allowed.includes(key))) {
-    throw new TypeError("Agent continuation has unknown fields");
-  }
+  );
 }

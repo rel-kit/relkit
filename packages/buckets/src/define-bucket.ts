@@ -1,139 +1,198 @@
 import {
-  createDescriptorBase,
-  deepFreeze,
+  createDescriptorBaseEffect,
+  deepFreezeEffect,
   isDescriptor,
   normalizeId,
-  type DescriptorBase,
-  type DescriptorMetadata,
+  normalizeIdEffect,
 } from "@relkit/contracts";
+import { Cause, Effect, Exit } from "effect";
+import { BucketValidationError } from "./bucket-validation-error.js";
+import { observeBucket } from "./client-observability.js";
+import type {
+  BucketDescriptor,
+  BucketDescriptorAny,
+  DefineBucketOptions,
+} from "./define-bucket.types.js";
 
-export type BucketVisibility = "private" | "public";
+export type * from "./define-bucket.types.js";
+export { BucketValidationError } from "./bucket-validation-error.js";
 
-export interface BucketDescriptor<Id extends string> extends DescriptorBase<"bucket", Id> {
-  readonly profile?: string;
-  readonly visibility: BucketVisibility;
-  readonly maxObjectBytes?: number;
-  readonly allowedContentTypes?: readonly string[];
-}
+const CONTENT_TYPE = /^(?:[A-Za-z0-9!#$&^_.+-]+|\*)\/(?:[A-Za-z0-9!#$&^_.+-]+|\*)$/;
 
-export type BucketDescriptorAny = BucketDescriptor<string>;
-
-export interface DefineBucketOptions<Id extends string> extends DescriptorMetadata {
-  readonly id: Id;
-  readonly profile?: string;
-  readonly visibility: BucketVisibility;
-  readonly maxObjectBytes?: number;
-  readonly allowedContentTypes?: readonly string[];
-}
-
-/**
- * Defines a managed object store with explicit visibility and bounded upload policy.
- *
- * @example
- * ```ts
- * import { defineBucket } from "@relkit/app/buckets"
- *
- * const assets = defineBucket({ id: "assets", visibility: "public", maxObjectBytes: 1_048_576 })
- * void assets
- * ```
+/** Defines a managed object store with explicit visibility and bounded upload policy.
+ * @param options - Bucket identity, visibility, and upload policy.
+ * @returns A frozen bucket descriptor.
+ * @throws TypeError when the authoring input is invalid.
+ * @example defineBucket({ id: "assets", visibility: "public", maxObjectBytes: 1_048_576 });
  * @category Resources
  * @since 0.1.0
  */
 export function defineBucket<const Id extends string>(
   options: DefineBucketOptions<Id>,
 ): BucketDescriptor<Id> {
-  if (!isRecord(options)) throw new TypeError("Bucket options must be an object");
-  if (hasOwn(options, "handler")) throw new TypeError("Buckets cannot own handlers");
-  if (options.visibility !== "private" && options.visibility !== "public") {
-    throw new TypeError("Bucket visibility must be private or public");
-  }
-
-  const profile = options.profile === undefined ? undefined : normalizeId(options.profile);
-  const maxObjectBytes =
-    options.maxObjectBytes === undefined
-      ? undefined
-      : positiveInteger(options.maxObjectBytes, "maxObjectBytes");
-  const allowedContentTypes = copyContentTypes(options.allowedContentTypes);
-  const base = createDescriptorBase("bucket", options.id, options);
-
-  return deepFreeze({
-    ...base,
-    visibility: options.visibility,
-    ...(profile === undefined ? {} : { profile }),
-    ...(maxObjectBytes === undefined ? {} : { maxObjectBytes }),
-    ...(allowedContentTypes === undefined ? {} : { allowedContentTypes }),
-  }) as BucketDescriptor<Id>;
+  return runBucketSync(defineBucketEffect(options));
 }
 
+/** Defines a bucket in Effect, exposing invalid input as a tagged error.
+ * @param options - Bucket identity, visibility, and upload policy.
+ * @returns Effect of a frozen descriptor or BucketValidationError.
+ * @example Effect.runSync(defineBucketEffect({ id: "assets", visibility: "private" }));
+ */
+export const defineBucketEffect = Effect.fn("bucket.define")(
+  <const Id extends string>(options: DefineBucketOptions<Id>) =>
+    observeBucket(
+      "define",
+      Effect.gen(function* () {
+        if (options === null || typeof options !== "object" || Array.isArray(options))
+          return yield* new BucketValidationError({ message: "Bucket options must be an object" });
+        if (Object.prototype.hasOwnProperty.call(options, "handler"))
+          return yield* new BucketValidationError({ message: "Buckets cannot own handlers" });
+        const visibility = options.visibility;
+        if (visibility !== "private" && visibility !== "public")
+          return yield* new BucketValidationError({
+            message: "Bucket visibility must be private or public",
+          });
+        const profileInput = options.profile;
+        const profile =
+          profileInput === undefined
+            ? undefined
+            : yield* Effect.mapError(normalizeIdEffect(profileInput), bucketValidationError);
+        const maxObjectBytes = options.maxObjectBytes;
+        if (
+          maxObjectBytes !== undefined &&
+          (!Number.isSafeInteger(maxObjectBytes) || maxObjectBytes <= 0)
+        )
+          return yield* new BucketValidationError({
+            message: "maxObjectBytes must be a positive integer",
+          });
+        let allowedContentTypes: readonly string[] | undefined;
+        const contentTypes = options.allowedContentTypes;
+        if (contentTypes !== undefined) {
+          if (!Array.isArray(contentTypes))
+            return yield* new BucketValidationError({
+              message: "Bucket allowedContentTypes must be an array",
+            });
+          if (contentTypes.length === 0)
+            return yield* new BucketValidationError({
+              message: "Bucket allowedContentTypes must not be empty",
+            });
+          const types: string[] = [];
+          for (const contentType of contentTypes) {
+            if (typeof contentType !== "string" || !CONTENT_TYPE.test(contentType.trim()))
+              return yield* new BucketValidationError({
+                message: `Invalid bucket content type "${String(contentType)}"`,
+              });
+            types.push(contentType.trim());
+          }
+          if (new Set(types).size !== types.length)
+            return yield* new BucketValidationError({
+              message: "Bucket allowedContentTypes must be unique",
+            });
+          allowedContentTypes = Object.freeze(types);
+        }
+        const base = yield* Effect.mapError(
+          createDescriptorBaseEffect("bucket", options.id, options),
+          bucketValidationError,
+        );
+        return (yield* deepFreezeEffect({
+          ...base,
+          visibility,
+          ...(profile === undefined ? {} : { profile }),
+          ...(maxObjectBytes === undefined ? {} : { maxObjectBytes }),
+          ...(allowedContentTypes === undefined ? {} : { allowedContentTypes }),
+        })) as BucketDescriptor<Id>;
+      }),
+    ),
+);
+
+/** Convert a known stable ID validation failure to the bucket error channel. */
+function bucketValidationError(cause: Error): BucketValidationError {
+  return new BucketValidationError({ message: cause.message });
+}
+
+/** Checks whether a value is a well-formed bucket descriptor.
+ * @param value - Untrusted value to inspect.
+ * @returns True for a valid descriptor.
+ * @example isBucketDescriptor(defineBucket({ id: "assets", visibility: "private" }));
+ */
 export function isBucketDescriptor(value: unknown): value is BucketDescriptorAny {
-  if (!isRecord(value) || !isDescriptor(value, "bucket")) return false;
-  const descriptor = value as BucketDescriptorAny;
-  return (
-    (descriptor.profile === undefined || isStableProfile(descriptor.profile)) &&
-    (descriptor.visibility === "private" || descriptor.visibility === "public") &&
-    (descriptor.maxObjectBytes === undefined || isPositiveInteger(descriptor.maxObjectBytes)) &&
-    (descriptor.allowedContentTypes === undefined ||
-      isContentTypeList(descriptor.allowedContentTypes))
-  );
+  return Effect.runSync(isBucketDescriptorEffect(value));
 }
 
+/** Effectful descriptor predicate for composition inside workflows.
+ * @param value - Untrusted value to inspect.
+ * @returns Effect of a boolean; unexpected getters can defect.
+ * @example Effect.runSync(isBucketDescriptorEffect({}));
+ */
+export const isBucketDescriptorEffect = Effect.fn("bucket.isDescriptor")((value: unknown) =>
+  observeBucket(
+    "isDescriptor",
+    Effect.sync(() => {
+      if (
+        value === null ||
+        typeof value !== "object" ||
+        Array.isArray(value) ||
+        !isDescriptor(value, "bucket")
+      )
+        return false;
+      const descriptor = value as BucketDescriptorAny;
+      let profileValid = true;
+      if (descriptor.profile !== undefined) {
+        try {
+          normalizeId(descriptor.profile);
+        } catch {
+          profileValid = false;
+        }
+      }
+      const allowed = descriptor.allowedContentTypes;
+      return (
+        profileValid &&
+        (descriptor.visibility === "private" || descriptor.visibility === "public") &&
+        (descriptor.maxObjectBytes === undefined ||
+          (Number.isSafeInteger(descriptor.maxObjectBytes) && descriptor.maxObjectBytes > 0)) &&
+        (allowed === undefined ||
+          (Array.isArray(allowed) &&
+            allowed.length > 0 &&
+            new Set(allowed).size === allowed.length &&
+            allowed.every(
+              (contentType) => typeof contentType === "string" && CONTENT_TYPE.test(contentType),
+            )))
+      );
+    }),
+  ),
+);
+
+/** Narrows a value to BucketDescriptorAny or throws a compatibility TypeError.
+ * @param value - Untrusted value to assert.
+ * @returns Nothing after successful validation.
+ * @throws TypeError when value is invalid.
+ * @example assertBucketDescriptor(defineBucket({ id: "assets", visibility: "private" }));
+ */
 export function assertBucketDescriptor(value: unknown): asserts value is BucketDescriptorAny {
-  if (!isBucketDescriptor(value)) throw new TypeError("Invalid bucket descriptor");
+  runBucketSync(assertBucketDescriptorEffect(value));
 }
 
-function copyContentTypes(value: readonly string[] | undefined): readonly string[] | undefined {
-  if (value === undefined) return undefined;
-  if (!Array.isArray(value)) throw new TypeError("Bucket allowedContentTypes must be an array");
-  if (value.length === 0) {
-    throw new TypeError("Bucket allowedContentTypes must not be empty");
-  }
-  const types = value.map((contentType) => {
-    if (typeof contentType !== "string" || !isContentType(contentType.trim())) {
-      throw new TypeError(`Invalid bucket content type "${String(contentType)}"`);
-    }
-    return contentType.trim();
-  });
-  if (new Set(types).size !== types.length) {
-    throw new TypeError("Bucket allowedContentTypes must be unique");
-  }
-  return Object.freeze(types);
-}
+/** Validates a bucket descriptor with a tagged Effect failure.
+ * @param value - Untrusted value to assert.
+ * @returns Effect of void or BucketValidationError.
+ * @example Effect.runSync(assertBucketDescriptorEffect(defineBucket({ id: "a", visibility: "private" })));
+ */
+export const assertBucketDescriptorEffect = Effect.fn("bucket.assertDescriptor")((value: unknown) =>
+  observeBucket(
+    "assertDescriptor",
+    Effect.flatMap(isBucketDescriptorEffect(value), (valid) =>
+      valid
+        ? Effect.void
+        : Effect.fail(new BucketValidationError({ message: "Invalid bucket descriptor" })),
+    ),
+  ),
+);
 
-function isContentTypeList(value: unknown): value is readonly string[] {
-  return (
-    Array.isArray(value) &&
-    value.length > 0 &&
-    new Set(value).size === value.length &&
-    value.every((contentType) => typeof contentType === "string" && isContentType(contentType))
-  );
-}
-
-function isContentType(value: string): boolean {
-  return /^(?:[A-Za-z0-9!#$&^_.+-]+|\*)\/(?:[A-Za-z0-9!#$&^_.+-]+|\*)$/.test(value);
-}
-
-function positiveInteger(value: unknown, name: string): number {
-  if (!isPositiveInteger(value)) throw new TypeError(`${name} must be a positive integer`);
-  return value;
-}
-
-function isPositiveInteger(value: unknown): value is number {
-  return Number.isSafeInteger(value) && (value as number) > 0;
-}
-
-function isStableProfile(value: unknown): value is string {
-  try {
-    normalizeId(value);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function isRecord(value: unknown): value is Record<PropertyKey, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function hasOwn(value: object, key: PropertyKey): boolean {
-  return Object.prototype.hasOwnProperty.call(value, key);
+/** Preserve legacy TypeError behavior at the synchronous authoring boundary. */
+function runBucketSync<A>(effect: Effect.Effect<A, BucketValidationError>): A {
+  const exit = Effect.runSyncExit(effect);
+  if (Exit.isSuccess(exit)) return exit.value;
+  const error = Cause.squash(exit.cause);
+  if (error instanceof BucketValidationError) throw new TypeError(error.message);
+  throw error;
 }

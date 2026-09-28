@@ -1,20 +1,27 @@
-import {
-  createDescriptorBase,
-  deepFreeze,
-  type MaybePromise,
-  type DescriptorBase,
-  type DescriptorMetadata,
-} from "@relkit/contracts";
+import { FunctionInputError } from "./function-input-error.js";
+import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
 import { createUnboundIdentity, resolveDescriptorIdentity } from "@relkit/invocation";
-import { type InferInput, type InferOutput } from "@relkit/schema";
-import type { ErrorDescriptorAny } from "./define-error.js";
-import type { FunctionRef, FunctionRefAny } from "./types.js";
-import type { FunctionContext } from "./function-descriptor-types.js";
-import { createFunctionToolInvoker } from "./function-tool-runtime.js";
+import { Effect } from "effect";
+import { SchemaValidatorLive } from "@relkit/schema";
+import type { FunctionRefAny } from "./types.js";
+import {
+  functionAttempt,
+  functionTry,
+  observeFunction,
+  runFunctionPromise,
+  runFunctionSync,
+} from "./function-observability.js";
+import type {
+  FunctionToolCreateOptions,
+  FunctionToolDescriptor,
+  FunctionToolMetadata,
+  FunctionToolTarget,
+} from "./function-tool.types.js";
+export type * from "./function-tool.types.js";
+import { createFunctionToolInvokerEffect } from "./function-tool-runtime.js";
 import {
   hasOwn,
   copyFunctionToolHooks,
-  isErrorDescriptor,
   isFunctionTarget,
   isRecord,
   positiveInteger,
@@ -22,146 +29,143 @@ import {
   validateApproval,
   validateSideEffect,
 } from "./function-tool-validation.js";
-export { copyFunctionToolHooks } from "./function-tool-validation.js";
-export type FunctionToolSideEffect = "none" | "read" | "write" | "external";
-export type FunctionToolApproval = "never" | "on-write" | "always";
-export interface FunctionToolMetadata extends DescriptorMetadata {
-  readonly description: string;
-  readonly sideEffect: FunctionToolSideEffect;
-  readonly approval: FunctionToolApproval;
-  readonly timeoutMs?: number;
-  readonly mcp?: boolean;
-}
-export type FunctionToolContext = Pick<
-  FunctionContext,
-  "invocation" | "signal" | "env" | "log" | "time"
->;
-export type FunctionToolHook<Value = unknown> = (
-  value: Value,
-  context: FunctionToolContext,
-) => MaybePromise<Value>;
-export interface FunctionToolOptions<
-  Id extends string = string,
-  Input = unknown,
-  Output = unknown,
-> extends FunctionToolMetadata {
-  readonly id?: Id;
-  readonly onBefore?: FunctionToolHook<Input>;
-  readonly onAfter?: FunctionToolHook<Output>;
-}
-export interface FunctionToolApprovalRequest {
-  readonly toolId: string;
-  readonly sideEffect: FunctionToolSideEffect;
-  readonly policy: FunctionToolApproval;
-}
-export type FunctionToolApprovalDecision = "approved" | "denied" | boolean;
-export type FunctionToolApprovalResolver = (
-  approval: FunctionToolApprovalRequest,
-) => MaybePromise<FunctionToolApprovalDecision>;
-export interface FunctionToolInvokeOptions {
-  readonly signal?: AbortSignal;
-  readonly approval?: FunctionToolApprovalResolver;
-}
-export type FunctionToolTarget<Target extends FunctionRefAny> = FunctionRef<
-  Target["ref"]["id"],
-  Target extends { readonly __input?: infer Input } ? Input : unknown,
-  Target extends { readonly __output?: infer Output } ? Output : unknown,
-  TargetErrors<Target>,
-  Target["input"],
-  Target["output"]
->;
-export interface FunctionToolDescriptor<
-  Id extends string,
-  Target extends FunctionRefAny = FunctionRefAny,
-> extends DescriptorBase<"tool", Id> {
-  readonly ref: { readonly kind: "tool"; readonly id: Id };
-  readonly target: FunctionToolTarget<Target>;
-  readonly description: string;
-  readonly sideEffect: FunctionToolSideEffect;
-  readonly approval: FunctionToolApproval;
-  readonly timeoutMs?: number;
-  readonly mcp: boolean;
-  readonly onBefore?: FunctionToolHook<InferInput<Target["input"]>>;
-  readonly onAfter?: FunctionToolHook<InferOutput<Target["output"]>>;
-  /** Invokes the target through the common tool and function runtime. */
-  readonly invoke: (
-    input: InferInput<Target["input"]>,
-    options?: FunctionToolInvokeOptions,
-  ) => Promise<InferOutput<Target["output"]>>;
-}
-type FunctionToolCreateOptions<
-  Id extends string,
-  Target extends FunctionRefAny,
-> = FunctionToolOptions<Id, InferInput<Target["input"]>, InferOutput<Target["output"]>> & {
-  readonly id?: Id;
-  readonly target: Target;
-};
+export { copyFunctionToolHooks, copyFunctionToolHooksEffect } from "./function-tool-validation.js";
+/** Creates a tool descriptor through Effect.
+ * @param options - Target function and tool metadata.
+ * @returns Frozen tool descriptor or tagged validation failure.
+ * @example Effect.runSync(createFunctionToolEffect({ target: fn, description: "Get order", sideEffect: "read", approval: "never" }));
+ */
+export const createFunctionToolEffect = Effect.fn("functions.tool.create")(
+  <const Id extends string, const Target extends FunctionRefAny>(
+    options: FunctionToolCreateOptions<Id, Target>,
+  ): Effect.Effect<
+    FunctionToolDescriptor<Id, Target>,
+    import("./function-observability.js").FunctionOperationError
+  > =>
+    observeFunction(
+      "tool.create",
+      Effect.gen(function* () {
+        const { descriptor, metadata, hooks, id } = yield* functionAttempt("tool.create", () => {
+          if (!isRecord(options)) throw new FunctionInputError("Tool options must be an object");
+          if (hasOwn(options, "handler")) throw new FunctionInputError("Tools cannot own handlers");
+          const target = copyFunctionTarget(options.target);
+          const metadata = copyFunctionToolMetadata(options);
+          const hooks = copyFunctionToolHooks(options);
+          const id = options.id === undefined ? createUnboundIdentity() : options.id;
+          const base = createDescriptorBase("tool", id, metadata);
+          const descriptor = {
+            ...base,
+            target,
+            description: metadata.description,
+            sideEffect: metadata.sideEffect,
+            approval: metadata.approval,
+            mcp: metadata.mcp ?? true,
+            ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
+            ...hooks,
+          };
+          return { descriptor, metadata, hooks, id };
+        });
+        const invokeEffect = yield* createFunctionToolInvokerEffect(
+          options.target,
+          {
+            id,
+            sideEffect: metadata.sideEffect,
+            approval: metadata.approval,
+            ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
+            ...hooks,
+          },
+          descriptor,
+        );
+        return yield* functionAttempt("tool.create", () => {
+          Object.defineProperty(descriptor, "invokeEffect", {
+            value: invokeEffect,
+            enumerable: false,
+            writable: false,
+            configurable: false,
+          });
+          Object.defineProperty(descriptor, "invoke", {
+            value: (
+              input: unknown,
+              options?: import("./function-tool.types.js").FunctionToolInvokeOptions,
+            ) =>
+              runFunctionPromise(
+                Effect.provide(invokeEffect(input as never, options), SchemaValidatorLive),
+              ),
+            enumerable: false,
+            writable: false,
+            configurable: false,
+          });
+          return deepFreeze(descriptor) as FunctionToolDescriptor<Id, Target>;
+        });
+      }),
+    ),
+);
+
+/** Creates a frozen tool descriptor.
+ * @param options - Target function and tool metadata.
+ * @returns Frozen tool descriptor.
+ * @throws TypeError for malformed target or metadata.
+ * @example const tool = createFunctionTool({ target: fn, description: "Get order", sideEffect: "read", approval: "never" });
+ */
 export function createFunctionTool<const Id extends string, const Target extends FunctionRefAny>(
   options: FunctionToolCreateOptions<Id, Target>,
 ): FunctionToolDescriptor<Id, Target> {
-  if (!isRecord(options)) throw new TypeError("Tool options must be an object");
-  if (hasOwn(options, "handler")) throw new TypeError("Tools cannot own handlers");
-  const target = copyFunctionTarget(options.target);
-  const metadata = copyFunctionToolMetadata(options);
-  const hooks = copyFunctionToolHooks(options);
-  const id = options.id === undefined ? createUnboundIdentity() : options.id;
-  const base = createDescriptorBase("tool", id, metadata);
-  const descriptor = {
-    ...base,
-    target,
-    description: metadata.description,
-    sideEffect: metadata.sideEffect,
-    approval: metadata.approval,
-    mcp: metadata.mcp ?? true,
-    ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
-    ...hooks,
-  };
-  Object.defineProperty(descriptor, "invoke", {
-    value: createFunctionToolInvoker(
-      options.target,
-      {
-        id,
-        sideEffect: metadata.sideEffect,
-        approval: metadata.approval,
-        ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
-        ...hooks,
-      },
-      descriptor,
-    ),
-    enumerable: false,
-    writable: false,
-    configurable: false,
-  });
-  return deepFreeze(descriptor) as FunctionToolDescriptor<Id, Target>;
+  return runFunctionSync(createFunctionToolEffect(options));
 }
+
+/** Copies and validates tool metadata through Effect.
+ * @param value - Untrusted metadata.
+ * @returns Normalized metadata or tagged validation failure.
+ * @example Effect.runSync(copyFunctionToolMetadataEffect(raw));
+ */
+export const copyFunctionToolMetadataEffect = Effect.fn("functions.tool.copy-metadata")(
+  (
+    value: unknown,
+  ): Effect.Effect<
+    FunctionToolMetadata,
+    import("./function-observability.js").FunctionOperationError
+  > =>
+    functionTry("tool.copy-metadata", () => {
+      if (!isRecord(value))
+        throw new FunctionInputError("Function tool metadata must be an object");
+      const description = requiredText(value.description, "Tool description");
+      const sideEffect = validateSideEffect(value.sideEffect);
+      const approval = validateApproval(value.approval);
+      if (value.timeoutMs !== undefined) positiveInteger(value.timeoutMs, "timeoutMs");
+      if (value.mcp !== undefined && typeof value.mcp !== "boolean") {
+        throw new FunctionInputError("Tool mcp must be a boolean");
+      }
+      const title = value.title;
+      if (title !== undefined && typeof title !== "string") {
+        throw new FunctionInputError("Tool title must be a string");
+      }
+      const tags = copyTags(value.tags);
+      return {
+        ...(title === undefined ? {} : { title }),
+        description,
+        ...(tags === undefined ? {} : { tags }),
+        sideEffect,
+        approval,
+        ...(value.mcp === undefined ? {} : { mcp: value.mcp }),
+        ...(value.timeoutMs === undefined ? {} : { timeoutMs: value.timeoutMs }),
+      };
+    }),
+);
+
+/** Copies and validates tool metadata.
+ * @param value - Untrusted metadata.
+ * @returns Normalized metadata.
+ * @throws TypeError for invalid fields.
+ * @example copyFunctionToolMetadata({ description: "Get order", sideEffect: "read", approval: "never" });
+ */
 export function copyFunctionToolMetadata(value: unknown): FunctionToolMetadata {
-  if (!isRecord(value)) throw new TypeError("Function tool metadata must be an object");
-  const description = requiredText(value.description, "Tool description");
-  const sideEffect = validateSideEffect(value.sideEffect);
-  const approval = validateApproval(value.approval);
-  if (value.timeoutMs !== undefined) positiveInteger(value.timeoutMs, "timeoutMs");
-  if (value.mcp !== undefined && typeof value.mcp !== "boolean") {
-    throw new TypeError("Tool mcp must be a boolean");
-  }
-  const title = value.title;
-  if (title !== undefined && typeof title !== "string") {
-    throw new TypeError("Tool title must be a string");
-  }
-  const tags = copyTags(value.tags);
-  return {
-    ...(title === undefined ? {} : { title }),
-    description,
-    ...(tags === undefined ? {} : { tags }),
-    sideEffect,
-    approval,
-    ...(value.mcp === undefined ? {} : { mcp: value.mcp }),
-    ...(value.timeoutMs === undefined ? {} : { timeoutMs: value.timeoutMs }),
-  };
+  return runFunctionSync(copyFunctionToolMetadataEffect(value));
 }
 function copyFunctionTarget<Target extends FunctionRefAny>(
   target: Target,
 ): FunctionToolTarget<Target> {
-  if (!isFunctionTarget(target)) throw new TypeError("Tool target must be a function reference");
+  if (!isFunctionTarget(target))
+    throw new FunctionInputError("Tool target must be a function reference");
   const identity = resolveDescriptorIdentity(target);
   return deepFreeze({
     ref: Object.freeze({
@@ -173,14 +177,10 @@ function copyFunctionTarget<Target extends FunctionRefAny>(
     ...(target.errors === undefined ? {} : { errors: Object.freeze([...target.errors]) }),
   }) as FunctionToolTarget<Target>;
 }
-type TargetErrors<Target extends FunctionRefAny> =
-  NonNullable<Target["errors"]> extends readonly ErrorDescriptorAny[]
-    ? NonNullable<Target["errors"]>
-    : readonly ErrorDescriptorAny[];
 function copyTags(value: unknown): readonly string[] | undefined {
   if (value === undefined) return undefined;
   if (!Array.isArray(value) || !value.every((tag) => typeof tag === "string")) {
-    throw new TypeError("Tool tags must be an array of strings");
+    throw new FunctionInputError("Tool tags must be an array of strings");
   }
   return Object.freeze([...value]);
 }

@@ -1,6 +1,7 @@
 export * from "./config.js";
 export * from "./context-descriptors.js";
 export * from "./context-resolver.js";
+export { AppConstantRunner, AppConstantRunnerLive } from "./context-resolution-service.js";
 export * from "@relkit/agents";
 export * from "@relkit/buckets";
 export * from "@relkit/cache";

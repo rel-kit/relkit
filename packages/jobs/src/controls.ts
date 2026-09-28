@@ -1,192 +1,198 @@
 import type {
   RunCancellationReceipt,
-  RunHandle,
   RunListQuery,
   RunPage,
   RunRetryReceipt,
   RunSnapshot,
-  RunWatchFrame,
 } from "@relkit/contracts/jobs";
-import type { NativeCancelRequest, NativeRetryRequest, NativeWatchRequest } from "./adapter.js";
-import { requireJobsRuntime, type JobsRuntime } from "./runtime.js";
-import type { RunResultOptions } from "./trigger-types.js";
-import { JobControlUnknownError } from "./control-errors.js";
-import { createScheduleControls } from "./schedule-controls.js";
-import type { JobScheduleClient } from "./job-types.js";
+import { Effect, Result, Schema } from "effect";
+import { observeJobs } from "./jobs-observability.js";
 import {
-  isTerminal,
-  isUnknown,
-  normalizeCancellationReceipt,
-  normalizeRetryReceipt,
-  observeWithTimeout,
-  observerTimeout,
-  operationContext,
-  requireMethod,
-  requireOperationId,
-  unknownKey,
-  unknownRecovery,
-  type JobObserveOptions,
-} from "./control-support.js";
-import { controlWrite } from "./control-write.js";
-import { retryOperationIdentity } from "./identity.js";
-import { waitForResult as waitForResultInternal } from "./control-result.js";
-
+  resultRunReaderLayer,
+  waitForResultEffect as waitForResultInternalEffect,
+} from "./control-result.js";
+import type { JobsRuntime } from "./runtime.js";
+import type { RunResultOptions } from "./trigger.types.js";
+import type { JobCancelOptions, JobRetryOptions } from "./controls.types.js";
+import { cancelRunOperationEffect, retryRunOperationEffect } from "./controls-write-operations.js";
+import { getRunOperationEffect, getRunValue, listRunsOperationEffect } from "./controls-read.js";
+export type { JobCancelOptions, JobRetryOptions, JobsControls } from "./controls.types.js";
 export type { JobObserveOptions } from "./control-support.js";
-export interface JobCancelOptions {
-  readonly operationId: string;
-  readonly reason?: string;
-  readonly signal?: AbortSignal;
-}
-
-export interface JobRetryOptions {
-  readonly operationId: string;
-  readonly signal?: AbortSignal;
-}
-
-export interface JobsControls {
-  readonly get: (
-    locator: string,
-    options?: { readonly signal?: AbortSignal },
-  ) => Promise<RunSnapshot>;
-  readonly list: (
-    query?: RunListQuery,
-    options?: { readonly signal?: AbortSignal },
-  ) => Promise<RunPage<RunSnapshot>>;
-  readonly observe: (
-    request: NativeWatchRequest,
-    options?: JobObserveOptions,
-  ) => AsyncIterable<RunWatchFrame<RunSnapshot>>;
-  readonly cancel: (runId: string, options: JobCancelOptions) => Promise<RunCancellationReceipt>;
-  readonly retry: (runId: string, options: JobRetryOptions) => Promise<RunRetryReceipt>;
-  readonly result: (runId: string, options: RunResultOptions) => Promise<unknown>;
-  readonly schedules?: JobScheduleClient;
-}
-
-export function createJobsControls(runtime = requireJobsRuntime()): JobsControls {
-  return Object.freeze({
-    get: (locator: string, options?: { readonly signal?: AbortSignal }) =>
-      getRun(runtime, locator, options?.signal),
-    list: (query?: RunListQuery, options?: { readonly signal?: AbortSignal }) =>
-      listRuns(runtime, query, options?.signal),
-    observe: (request: NativeWatchRequest, options?: JobObserveOptions) =>
-      observeRun(runtime, request, options),
-    cancel: (runId: string, options: JobCancelOptions) => cancelRun(runtime, runId, options),
-    retry: (runId: string, options: JobRetryOptions) => retryRun(runtime, runId, options),
-    result: (runId: string, options: RunResultOptions) => waitForResult(runtime, runId, options),
-    ...(runtime.adapter.schedules === undefined
-      ? {}
-      : { schedules: createScheduleControls(runtime) }),
-  });
-}
-
-export async function getRun(
+/** Expected failure while reading or changing a job run.
+ * @example if (error instanceof JobControlFailure) console.log(error.message);
+ */
+export class JobControlFailure extends Schema.TaggedError<JobControlFailure>()(
+  "Jobs.ControlFailure",
+  { cause: Schema.Defect() },
+) {}
+export { createJobsControls, createJobsControlsEffect } from "./controls-factory.js";
+/** Reads a native run in Effect.
+ * @param runtime - Jobs runtime.
+ * @param locator - Native run locator.
+ * @param signal - Optional cancellation signal.
+ * @returns A snapshot or JobControlFailure.
+ * @example Effect.runPromise(getRunEffect(runtime, "run-1"));
+ */
+export const getRunEffect = Effect.fn("Jobs.getRun")(
+  (runtime: JobsRuntime, locator: string, signal?: AbortSignal) =>
+    observeJobs(
+      "control.get",
+      Effect.mapError(
+        getRunOperationEffect(runtime, locator, signal),
+        (error) => new JobControlFailure({ cause: error.cause }),
+      ),
+    ),
+);
+/** Promise compatibility adapter for native run reads.
+ * @param runtime - Jobs runtime.
+ * @param locator - Native run locator.
+ * @param signal - Optional cancellation signal.
+ * @returns A snapshot.
+ * @throws The original provider or capability error.
+ * @example await getRun(runtime, "run-1");
+ */
+export function getRun(
   runtime: JobsRuntime,
   locator: string,
   signal?: AbortSignal,
 ): Promise<RunSnapshot> {
-  requireMethod(runtime, "read", "get");
-  const context = operationContext(runtime, signal);
-  return runtime.adapter.get(locator, context);
+  return runControl(getRunEffect(runtime, locator, signal));
 }
-
-export async function listRuns(
+/** Lists native runs in Effect.
+ * @param runtime - Jobs runtime.
+ * @param query - Run filters and page limit.
+ * @param signal - Optional cancellation signal.
+ * @returns A page or JobControlFailure.
+ * @example Effect.runPromise(listRunsEffect(runtime));
+ */
+export const listRunsEffect = Effect.fn("Jobs.listRuns")(
+  (runtime: JobsRuntime, query: RunListQuery = {}, signal?: AbortSignal) =>
+    observeJobs(
+      "control.list",
+      Effect.mapError(
+        listRunsOperationEffect(runtime, query, signal),
+        (error) => new JobControlFailure({ cause: error.cause }),
+      ),
+    ),
+);
+/** Promise compatibility adapter for native run listings.
+ * @param runtime - Jobs runtime.
+ * @param query - Run filters and page limit.
+ * @param signal - Optional cancellation signal.
+ * @returns A page of runs.
+ * @throws The original provider, capability, or limit error.
+ * @example await listRuns(runtime);
+ */
+export function listRuns(
   runtime: JobsRuntime,
   query: RunListQuery = {},
   signal?: AbortSignal,
 ): Promise<RunPage<RunSnapshot>> {
-  requireMethod(runtime, "list", "list");
-  const limit = query.limit ?? 25;
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100)
-    throw new RangeError("Run list limit must be between 1 and 100");
-  return runtime.adapter.list({ ...query, limit }, operationContext(runtime, signal));
+  return runControl(listRunsEffect(runtime, query, signal));
 }
-
-export function observeRun(
-  runtime: JobsRuntime,
-  request: NativeWatchRequest,
-  options: JobObserveOptions = {},
-): AsyncIterable<RunWatchFrame<RunSnapshot>> {
-  requireMethod(runtime, "observation", "observe");
-  const signal = options.signal ?? new AbortController().signal;
-  return observeWithTimeout(
-    runtime.adapter.observe(request, operationContext(runtime, signal)),
-    signal,
-    observerTimeout(runtime, options.timeout),
-  );
-}
-
-export async function cancelRun(
+export { observeRun, observeRunEffect } from "./controls-observe.js";
+/** Cancels a run in Effect.
+ * @param runtime - Jobs runtime.
+ * @param runId - Run identifier.
+ * @param options - Idempotent control options.
+ * @returns A cancellation receipt or JobControlFailure.
+ * @example Effect.runPromise(cancelRunEffect(runtime, "run-1", { operationId: "op" }));
+ */
+export const cancelRunEffect = Effect.fn("Jobs.cancelRun")(
+  (runtime: JobsRuntime, runId: string, options: JobCancelOptions) =>
+    observeJobs(
+      "control.cancel",
+      Effect.mapError(
+        cancelRunOperationEffect(runtime, runId, options),
+        (error) => new JobControlFailure({ cause: error.cause }),
+      ),
+    ),
+);
+/** Promise compatibility adapter for cancellation.
+ * @param runtime - Jobs runtime.
+ * @param runId - Run identifier.
+ * @param options - Idempotent control options.
+ * @returns A cancellation receipt.
+ * @throws The original provider or control error.
+ * @example await cancelRun(runtime, "run-1", { operationId: "op" });
+ */
+export function cancelRun(
   runtime: JobsRuntime,
   runId: string,
   options: JobCancelOptions,
 ): Promise<RunCancellationReceipt> {
-  requireOperationId(options.operationId);
-  requireMethod(runtime, "cancel", "cancel");
-  const request: NativeCancelRequest = {
-    runId,
-    operationId: options.operationId,
-    ...(options.reason === undefined ? {} : { reason: options.reason }),
-  };
-  const value: unknown = await controlWrite(
-    () =>
-      runtime.adapter.cancel(
-        request,
-        operationContext(runtime, options.signal, options.operationId),
-      ),
-    options.signal,
-    options.operationId,
-  );
-  if (isUnknown(value))
-    throw new JobControlUnknownError(value.operationId, unknownKey(value), unknownRecovery(value));
-  return normalizeCancellationReceipt(value, runId, options.operationId);
+  return runControl(cancelRunEffect(runtime, runId, options));
 }
-
-export async function retryRun(
+/** Retries a run in Effect.
+ * @param runtime - Jobs runtime.
+ * @param runId - Original run identifier.
+ * @param options - Idempotent control options.
+ * @returns A retry receipt or JobControlFailure.
+ * @example Effect.runPromise(retryRunEffect(runtime, "run-1", { operationId: "op" }));
+ */
+export const retryRunEffect = Effect.fn("Jobs.retryRun")(
+  (runtime: JobsRuntime, runId: string, options: JobRetryOptions) =>
+    observeJobs(
+      "control.retry",
+      Effect.mapError(
+        retryRunOperationEffect(runtime, runId, options),
+        (error) => new JobControlFailure({ cause: error.cause }),
+      ),
+    ),
+);
+/** Promise compatibility adapter for retry.
+ * @param runtime - Jobs runtime.
+ * @param runId - Original run identifier.
+ * @param options - Idempotent control options.
+ * @returns A retry receipt.
+ * @throws The original provider or control error.
+ * @example await retryRun(runtime, "run-1", { operationId: "op" });
+ */
+export function retryRun(
   runtime: JobsRuntime,
   runId: string,
   options: JobRetryOptions,
 ): Promise<RunRetryReceipt> {
-  requireOperationId(options.operationId);
-  requireMethod(runtime, "retry", "retry");
-  const retry = runtime.adapter.retry;
-  if (typeof retry !== "function") throw new TypeError("Native retry operation is unavailable");
-  const original = await getRun(runtime, runId, options.signal);
-  const request: NativeRetryRequest = {
-    runId,
-    operationId: options.operationId,
-    retryIdentity: retryOperationIdentity(runId, options.operationId),
-    ...(original.taskId === undefined ? {} : { taskId: original.taskId }),
-    ...(original.jobId === undefined ? {} : { jobId: original.jobId }),
-    ...(original.taskVersion === undefined ? {} : { taskVersion: original.taskVersion }),
-    ...(original.buildId === undefined ? {} : { buildId: original.buildId }),
-    ...(original.scope === undefined ? {} : { scope: original.scope }),
-    ...(original.inputHash === undefined ? {} : { inputHash: original.inputHash }),
-    ...(original.inputSchemaHash === undefined
-      ? {}
-      : { inputSchemaHash: original.inputSchemaHash }),
-    ...(original.acceptanceIdentity === undefined
-      ? {}
-      : { acceptanceIdentity: original.acceptanceIdentity }),
-    canonicalAdmission: {
-      validatePinnedInput: true,
-      allocateFreshBudget: true,
-      clearInitialDelay: true,
-    },
-  };
-  const value: unknown = await controlWrite(
-    () => retry(request, operationContext(runtime, options.signal, options.operationId)),
-    options.signal,
-    options.operationId,
-  );
-  if (isUnknown(value))
-    throw new JobControlUnknownError(value.operationId, unknownKey(value), unknownRecovery(value));
-  return normalizeRetryReceipt(value, runId);
+  return runControl(retryRunEffect(runtime, runId, options));
 }
-
-export async function waitForResult(
+/** Waits for a run result in Effect.
+ * @param runtime - Jobs runtime.
+ * @param runId - Run identifier.
+ * @param options - Timeout and signal options.
+ * @returns The result or JobControlFailure.
+ * @example Effect.runPromise(waitForResultEffect(runtime, "run-1", { timeout: "1 second" }));
+ */
+export const waitForResultEffect = Effect.fn("Jobs.waitForResult")(
+  (runtime: JobsRuntime, runId: string, options: RunResultOptions) =>
+    observeJobs(
+      "control.result",
+      Effect.mapError(
+        Effect.provide(
+          waitForResultInternalEffect(runtime, runId, options),
+          resultRunReaderLayer(getRunValue),
+        ),
+        (failure) => new JobControlFailure({ cause: failure.cause }),
+      ),
+    ),
+);
+/** Promise compatibility adapter for result waiting.
+ * @param runtime - Jobs runtime.
+ * @param runId - Run identifier.
+ * @param options - Timeout and signal options.
+ * @returns The result value.
+ * @throws The original observation or result error.
+ * @example await waitForResult(runtime, "run-1", { timeout: "1 second" });
+ */
+export function waitForResult(
   runtime: JobsRuntime,
   runId: string,
   options: RunResultOptions,
 ): Promise<unknown> {
-  return waitForResultInternal(runtime, runId, options, getRun);
+  return runControl(waitForResultEffect(runtime, runId, options));
+}
+/** Preserves original errors for Promise compatibility callers. */
+async function runControl<A>(effect: Effect.Effect<A, JobControlFailure>): Promise<A> {
+  const result = await Effect.runPromise(Effect.result(effect));
+  if (Result.isFailure(result)) throw result.failure.cause;
+  return result.success;
 }

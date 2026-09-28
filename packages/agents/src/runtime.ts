@@ -1,177 +1,159 @@
-import { normalizeId, type MaybePromise } from "@relkit/contracts";
+import { normalizeId } from "@relkit/contracts";
 import { frameworkTrace } from "@relkit/invocation";
-import { type AgentDescriptor } from "./define-agent.js";
-import { resolveRuntimeModel } from "./runtime-model.js";
-import {
-  createExecutionSignal,
-  signalFailure,
-  validateValue,
-  withSignal,
-} from "./runtime-utils.js";
-import { AgentRuntimeError } from "./runtime-errors.js";
-import {
-  createAgentCapturePolicy,
-  type AgentCapturePolicy,
-  type AgentRuntimeHooks,
-} from "./observability.js";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
+import { createAgentCapturePolicyEffect } from "./capture-policy.js";
+import { signalFailure, validateValue, withSignal } from "./runtime-utils.js";
+import { acquireExecutionSignalEffect, ExecutionSignalClockLive } from "./signal.js";
+import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { generatedAgentFunctionId } from "./generated-function.js";
-import { runAgentLoop } from "./runtime-loop.js";
-import { isGraphDescriptor, type GraphDescriptor } from "./define-graph.js";
-import { invokeGraph } from "./graph-runtime.js";
+import { isGraphDescriptor } from "./define-graph.js";
+import { AgentExecution, AgentExecutionLive } from "./runtime-service.js";
+import type { AgentInvocationOptions, AgentRuntime, AgentRuntimeOptions } from "./runtime.types.js";
 
-type AgentAny = AgentDescriptor<string, unknown, unknown> | GraphDescriptor;
-type ApprovalDecision = "approved" | "denied" | boolean | import("./approval.js").ApprovalRecord;
-export type AgentApprovalHandler = (
-  approval: import("./approval.js").PendingApproval,
-) => MaybePromise<ApprovalDecision>;
-
-export interface AgentSteeringSource {
-  readonly drain: () => MaybePromise<readonly string[]>;
-}
-
-export interface AgentConversationMessage {
-  readonly role: "user" | "assistant";
-  readonly content: string;
-}
-
-export interface AgentContentSink {
-  readonly emitOutput: (value: unknown, signal: AbortSignal) => MaybePromise<void>;
-  readonly finishOutput?: (signal: AbortSignal) => MaybePromise<void>;
-  readonly progressSinkForTool?: (tool: {
-    readonly toolCallId: string;
-    readonly toolId: string;
-  }) => import("@relkit/invocation").ProgressSink;
-  readonly emitTool?: (
-    value: {
-      readonly toolCallId: string;
-      readonly toolId: string;
-      readonly state: import("./state-types.js").ToolPartState;
-      readonly value?: unknown;
-    },
-    signal: AbortSignal,
-  ) => MaybePromise<void>;
-  readonly emitEvent?: (
-    value: import("./runtime-events.js").AgentExecutionEvent,
-    signal: AbortSignal,
-  ) => MaybePromise<void>;
-  readonly emitMessage?: (
-    value: import("@relkit/contracts").BrowserMessage,
-    signal: AbortSignal,
-  ) => MaybePromise<void>;
-  readonly emitWaiting?: (
-    value: Omit<import("./state-types.js").AgentWaitingState, "revision" | "runId">,
-    signal: AbortSignal,
-  ) => MaybePromise<void>;
-}
-
-interface AgentRuntimeBaseOptions {
-  readonly agent: AgentAny;
-  readonly tools: import("@relkit/tools").ToolSource;
-  readonly bucketBackend?: import("./deepagent-bucket-files.js").DeepAgentBucketClient;
-  readonly engine: import("@relkit/tools").ToolEngine;
-  readonly maxInputBytes?: number;
-  readonly maxOutputBytes?: number;
-  readonly approval?: AgentApprovalHandler;
-  readonly messages?: readonly AgentConversationMessage[];
-  readonly steering?: AgentSteeringSource;
-  readonly contentSink?: AgentContentSink;
-  readonly hooks?: AgentRuntimeHooks;
-  readonly capture?: AgentCapturePolicy;
-  readonly environment?: Readonly<Record<string, unknown>>;
-}
-
-export type AgentRuntimeOptions = AgentRuntimeBaseOptions & {
-  readonly modelRegistry?: unknown;
-};
-
-export interface AgentInvocationOptions {
-  readonly input: unknown;
-  readonly invocationId?: string;
-  readonly signal?: AbortSignal;
-  readonly deadlineMs?: number;
-  readonly timeoutMs?: number;
-  readonly approval?: AgentApprovalHandler;
-  readonly traceId?: string;
-  readonly parentSpanId?: string;
-  readonly hooks?: AgentRuntimeHooks;
-  readonly capture?: AgentCapturePolicy;
-  readonly threadId?: string;
-  readonly resume?: boolean;
-}
-
-export interface AgentRuntime {
-  readonly invoke: (
-    input: unknown,
-    options?: Omit<AgentInvocationOptions, "input">,
-  ) => Promise<unknown>;
-}
+export type * from "./runtime.types.js";
 
 export { AgentRuntimeError } from "./runtime-errors.js";
+export { AgentInvocationFailure } from "./runtime-effect-error.js";
 
-/** Runs one validated agent invocation through the supplied function-engine seam. */
-export async function invokeAgent(
+/** Invokes an agent with typed failures and interruption linked to its work.
+ * @param options - Runtime dependencies and invocation input.
+ * @returns An Effect with the agent result or AgentInvocationFailure.
+ * @example Effect.runPromise(Effect.provide(invokeAgentEffect(options), AgentExecutionLive));
+ */
+export const invokeAgentEffect = Effect.fn("Agents.runtime.invoke")(
+  function* (options: AgentRuntimeOptions & AgentInvocationOptions) {
+    const service = yield* AgentExecution;
+    const agent = options.agent;
+    if (isGraphDescriptor(agent)) {
+      return yield* Effect.tryPromise({
+        try: (effectSignal) =>
+          service.invokeGraph({
+            ...options,
+            agent,
+            signal:
+              options.signal === undefined
+                ? effectSignal
+                : AbortSignal.any([options.signal, effectSignal]),
+          }),
+        catch: agentInvocationFailure,
+      });
+    }
+    const capture = yield* createAgentCapturePolicyEffect(options.capture).pipe(
+      Effect.mapError((error) => agentInvocationFailure(new TypeError(error.message))),
+    );
+    const invocationId = yield* Effect.try({
+      try: () => normalizeId(options.invocationId ?? `agent-${service.randomUUID()}`),
+      catch: agentInvocationFailure,
+    });
+    const traceId = yield* Effect.try({
+      try: () => normalizeId(options.traceId ?? invocationId),
+      catch: agentInvocationFailure,
+    });
+    const runtimeModel = yield* Effect.tryPromise({
+      try: () =>
+        service.resolveModel({
+          ...(agent.model === undefined ? {} : { model: agent.model }),
+          registry: options.modelRegistry,
+          environment: options.environment ?? {},
+          ...(options.maxInputBytes === undefined ? {} : { maxInputBytes: options.maxInputBytes }),
+          ...(options.maxOutputBytes === undefined
+            ? {}
+            : { maxOutputBytes: options.maxOutputBytes }),
+        }),
+      catch: agentInvocationFailure,
+    });
+    return yield* Effect.scoped(
+      Effect.gen(function* () {
+        const execution = yield* acquireExecutionSignalEffect(options).pipe(
+          Effect.provide(ExecutionSignalClockLive),
+        );
+        return yield* Effect.tryPromise({
+          try: (effectSignal) => {
+            const signal = AbortSignal.any([execution.signal, effectSignal]);
+            return frameworkTrace.span(
+              `relkit.agent.${options.agent.id}.invoke`,
+              {
+                input: options.input,
+                attributes: {
+                  "relkit.agent.id": options.agent.id,
+                  "relkit.function.id": generatedAgentFunctionId(options.agent.id),
+                  "relkit.invocation.id": invocationId,
+                  "relkit.model.id": runtimeModel.id,
+                },
+              },
+              async () => {
+                if (signal.aborted) throw signalFailure(signal);
+                const input = options.resume
+                  ? options.input
+                  : await withSignal(
+                      validateValue(options.agent.input, options.input, "input"),
+                      signal,
+                    );
+                return service.runLoop(
+                  options,
+                  runtimeModel.model,
+                  runtimeModel.id,
+                  signal,
+                  input,
+                  runtimeModel.maxInputBytes,
+                  runtimeModel.maxOutputBytes,
+                  invocationId,
+                  traceId,
+                  capture,
+                );
+              },
+            );
+          },
+          catch: agentInvocationFailure,
+        });
+      }),
+    );
+  },
+  (effect) => observeAgent("runtime.invoke", effect),
+);
+
+/** Runs an agent through the live Effect Layer for existing Promise callers.
+ * @param options - Runtime dependencies and invocation input.
+ * @returns The agent result.
+ * @throws The original validation, provider, cancellation, or runtime error.
+ * @example await invokeAgent({ ...options, input: { message: "hi" } });
+ */
+export function invokeAgent(
   options: AgentRuntimeOptions & AgentInvocationOptions,
 ): Promise<unknown> {
-  if (isGraphDescriptor(options.agent)) {
-    return invokeGraph({ ...options, agent: options.agent });
-  }
-  const hooks = options.hooks;
-  const capture = createAgentCapturePolicy(options.capture);
-  const invocationId = normalizeId(options.invocationId ?? `agent-${crypto.randomUUID()}`);
-  const traceId = normalizeId(options.traceId ?? invocationId);
-  const runtimeModel = await resolveRuntimeModel({
-    ...(options.agent.model === undefined ? {} : { model: options.agent.model }),
-    registry: options.modelRegistry,
-    environment: options.environment ?? {},
-    ...(options.maxInputBytes === undefined ? {} : { maxInputBytes: options.maxInputBytes }),
-    ...(options.maxOutputBytes === undefined ? {} : { maxOutputBytes: options.maxOutputBytes }),
-  });
-  const execution = createExecutionSignal(options);
-  return frameworkTrace.span(
-    `relkit.agent.${options.agent.id}.invoke`,
-    {
-      input: options.input,
-      attributes: {
-        "relkit.agent.id": options.agent.id,
-        "relkit.function.id": generatedAgentFunctionId(options.agent.id),
-        "relkit.invocation.id": invocationId,
-        "relkit.model.id": runtimeModel.id,
-      },
-    },
-    async () => {
-      try {
-        if (execution.signal.aborted) throw signalFailure(execution.signal);
-        const input = options.resume
-          ? options.input
-          : await withSignal(
-              validateValue(options.agent.input, options.input, "input"),
-              execution.signal,
-            );
-        return await runAgentLoop(
-          options,
-          runtimeModel.model,
-          runtimeModel.id,
-          execution.signal,
-          input,
-          runtimeModel.maxInputBytes,
-          runtimeModel.maxOutputBytes,
-          invocationId,
-          traceId,
-          capture,
-        );
-      } finally {
-        execution.close();
-      }
-    },
+  return Effect.runPromise(
+    invokeAgentEffect(options).pipe(
+      Effect.catchTag("AgentInvocationFailure", (error) => Effect.fail(error.cause)),
+      Effect.provide(AgentExecutionLive),
+    ),
   );
 }
 
-/** Creates a reusable runtime for one immutable agent/provider/tool catalog. */
+/** Creates a reusable runtime through an observable Effect.
+ * @param options - Agent, model, tool, and engine dependencies.
+ * @returns An Effect with a frozen runtime and no typed failure.
+ * @example Effect.runSync(createAgentRuntimeEffect(options));
+ */
+export const createAgentRuntimeEffect = Effect.fn("Agents.runtime.create")(
+  function* (options: AgentRuntimeOptions) {
+    return yield* Effect.sync((): AgentRuntime =>
+      Object.freeze({
+        invoke: (input: unknown, invocation: Omit<AgentInvocationOptions, "input"> = {}) =>
+          invokeAgent({ ...options, ...invocation, input }),
+      }),
+    );
+  },
+  (effect) => observeAgent("runtime.create", effect),
+);
+
+/** Binds one agent catalog for existing synchronous callers.
+ * @param options - Agent, model, tool, and engine dependencies.
+ * @returns A frozen reusable runtime.
+ * @example const runtime = createAgentRuntime(options);
+ */
 export function createAgentRuntime(options: AgentRuntimeOptions): AgentRuntime {
-  return Object.freeze({
-    invoke: (input: unknown, invocation: Omit<AgentInvocationOptions, "input"> = {}) =>
-      invokeAgent({ ...options, ...invocation, input }),
-  });
+  return Effect.runSync(createAgentRuntimeEffect(options));
 }
 
 export const runAgent = invokeAgent;

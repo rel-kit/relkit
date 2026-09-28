@@ -1,14 +1,53 @@
 import { assertJsonValue, canonicalJson, normalizeId } from "@relkit/contracts";
+import { Effect, Result, Schema } from "effect";
 import { validateSync, type StandardSchemaV1 } from "@relkit/schema";
-import type { ScheduleDefinition } from "./job-types.js";
+import type { ScheduleDefinition } from "./job.types.js";
 import { duration } from "./task-validation.js";
-
-export interface ScheduleValidationOptions {
-  readonly callerSchema?: StandardSchemaV1;
-  readonly canonicalSchema?: StandardSchemaV1;
-}
-
+import { observeJobs } from "./jobs-observability.js";
+import type { ScheduleValidationOptions } from "./schedule-validation.types.js";
+export type { ScheduleValidationOptions } from "./schedule-validation.types.js";
+/** Invalid authored schedule definitions.
+ * @example if (error instanceof ScheduleValidationError) console.log(error.message);
+ */
+export class ScheduleValidationError extends Schema.TaggedError<ScheduleValidationError>()(
+  "Jobs.ScheduleValidationError",
+  { reason: Schema.String },
+) {}
+/** Copies and validates authored schedules in Effect.
+ * @param value - Untrusted schedule list.
+ * @param options - Caller and canonical task schemas.
+ * @returns Frozen schedules or ScheduleValidationError.
+ * @example Effect.runSync(copySchedulesEffect([{ id: "hourly", every: "1 hour", input: null }]));
+ */
+export const copySchedulesEffect = Effect.fn("Jobs.copySchedules")(
+  <CanonicalInput>(value: unknown, options: ScheduleValidationOptions = {}) =>
+    observeJobs(
+      "schedule.copyDefinitions",
+      Effect.try({
+        try: () => copySchedulesValue<CanonicalInput>(value, options),
+        catch: (error) => {
+          if (error instanceof Error) return new ScheduleValidationError({ reason: error.message });
+          throw error;
+        },
+      }),
+    ),
+);
+/** Synchronous schedule validation adapter.
+ * @param value - Untrusted schedule list.
+ * @param options - Caller and canonical task schemas.
+ * @returns Frozen schedules.
+ * @throws TypeError when a schedule is invalid.
+ * @example copySchedules([{ id: "hourly", every: "1 hour", input: null }]);
+ */
 export function copySchedules<CanonicalInput>(
+  value: unknown,
+  options: ScheduleValidationOptions = {},
+): readonly ScheduleDefinition<CanonicalInput>[] | undefined {
+  const result = Effect.runSync(Effect.result(copySchedulesEffect<CanonicalInput>(value, options)));
+  if (Result.isFailure(result)) throw new TypeError(result.failure.reason);
+  return result.success;
+}
+function copySchedulesValue<CanonicalInput>(
   value: unknown,
   options: ScheduleValidationOptions = {},
 ): readonly ScheduleDefinition<CanonicalInput>[] | undefined {
@@ -73,20 +112,17 @@ export function copySchedules<CanonicalInput>(
   });
   return Object.freeze(schedules);
 }
-
 function validateScheduleInput(schema: StandardSchemaV1, value: unknown, name: string): unknown {
   const result = validateSync(schema, value as never);
   if (!("value" in result)) throw new TypeError(`schedule.input does not match ${name}`);
   return result.value;
 }
-
 function assertCron(value: string): void {
   const fields = value.trim().split(/\s+/u);
   if (fields.length !== 5 || fields.some((field) => !/^[0-9*/?,\-]+$/u.test(field))) {
     throw new TypeError("schedule.cron must be a five-field cron expression");
   }
 }
-
 function isIanaTimezone(value: unknown): value is string {
   if (typeof value !== "string" || value.length === 0 || value.trim() !== value) return false;
   try {
@@ -96,11 +132,9 @@ function isIanaTimezone(value: unknown): value is string {
     return false;
   }
 }
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
-
 function hasOwn(value: object, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);
 }

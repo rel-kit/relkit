@@ -26,6 +26,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./effect": {
+      "types": "./dist/effect.d.ts",
+      "import": "./dist/effect.js"
     }
   },
   "dependencies": {
@@ -33,11 +37,18 @@
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/jobs": "workspace:*",
-    "@relkit/schema": "workspace:*"
+    "@relkit/schema": "workspace:*",
+    "effect": "4.0.0-rc.115"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "5.0.1",
+    "vitest": "5.0.1"
   },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
   }
 }

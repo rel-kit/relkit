@@ -1,5 +1,5 @@
-import { createDescriptorBase, deepFreeze, isDescriptor, isRef } from "@relkit/contracts";
-import { createUnboundIdentity } from "@relkit/invocation";
+import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
+import { createUnboundIdentityEffect } from "@relkit/invocation";
 import {
   createFunctionToolInvoker,
   copyFunctionToolHooks,
@@ -7,38 +7,34 @@ import {
   FunctionToolApprovalRequiredError,
   FunctionToolArgumentValidationError,
   FunctionToolOperationCancelledError,
-  type FunctionToolApproval,
-  type FunctionToolApprovalDecision,
-  type FunctionToolApprovalRequest,
-  type FunctionToolApprovalResolver,
-  type FunctionToolDescriptor,
-  type FunctionToolInvokeOptions,
-  type FunctionToolMetadata,
-  type FunctionToolSideEffect,
-  type FunctionToolTarget,
-  type FunctionRefAny,
 } from "@relkit/functions";
+import { Effect } from "effect";
 import {
-  copyFunctionTarget,
-  hasOwn,
-  isFunctionTarget,
-  isNonEmptyString,
-  isPositiveInteger,
-  isRecord,
-  isToolApproval,
-  isToolSideEffect,
-  positiveInteger,
-  requiredText,
-  validateApproval,
-  validateSideEffect,
+  copyFunctionTargetEffect,
+  positiveIntegerEffect,
+  requiredTextEffect,
+  validateApprovalEffect,
+  validateSideEffectEffect,
 } from "./define-tool-validation.js";
+import { isRecordEffect } from "./tool-predicates.js";
+import {
+  observeTool,
+  runToolSync,
+  ToolOperationFailure,
+  toolAttempt,
+} from "./tool-observability.js";
+import type { DefineToolOptions, ToolDescriptor } from "./define-tool.types.js";
+import type { FunctionRefAny } from "@relkit/functions";
 
-export type ToolSideEffect = FunctionToolSideEffect;
-export type ToolApproval = FunctionToolApproval;
-export type ToolApprovalDecision = FunctionToolApprovalDecision;
-export type ToolApprovalRequest = FunctionToolApprovalRequest;
-export type ToolApprovalResolver = FunctionToolApprovalResolver;
-export type ToolInvokeOptions = FunctionToolInvokeOptions;
+export type * from "./define-tool.types.js";
+export {
+  assertToolDescriptor,
+  assertToolDescriptorEffect,
+  isToolDescriptor,
+  isToolDescriptorEffect,
+  isToolRef,
+  isToolRefEffect,
+} from "./define-tool-predicates.js";
 export {
   FunctionToolApprovalDeniedError as ToolApprovalDeniedError,
   FunctionToolApprovalRequiredError as ToolApprovalRequiredError,
@@ -46,117 +42,86 @@ export {
   FunctionToolOperationCancelledError as ToolOperationCancelledError,
 };
 
-export interface ToolRef<Id extends string = string> {
-  readonly ref: {
-    readonly kind: "tool";
-    readonly id: Id;
-  };
-}
+/** Defines a frozen, handler-free tool view through Effect.
+ * @param options - Function target and tool policy.
+ * @returns Descriptor or tagged authoring failure.
+ * @example Effect.runSync(defineToolEffect({ id: "orders.lookup", target, description: "Read order", sideEffect: "read", approval: "never" }));
+ */
+export const defineToolEffect = Effect.fn("tools.define")(
+  <const Id extends string, const Target extends FunctionRefAny>(
+    options: DefineToolOptions<Id, Target>,
+  ) =>
+    observeTool(
+      "define",
+      Effect.gen(function* () {
+        const validOptions = yield* isRecordEffect(options);
+        yield* toolAttempt("define", () => {
+          if (!validOptions) throw new TypeError("Tool options must be an object");
+          if (Object.prototype.hasOwnProperty.call(options, "handler"))
+            throw new TypeError("Tools cannot own handlers");
+        });
+        const target = yield* copyFunctionTargetEffect(options.target);
+        const description = yield* requiredTextEffect(options.description, "Tool description");
+        const sideEffect = yield* validateSideEffectEffect(options.sideEffect);
+        const approval = yield* validateApprovalEffect(options.approval);
+        const hooks = yield* toolAttempt("define", () => copyFunctionToolHooks(options));
+        if (options.timeoutMs !== undefined)
+          yield* positiveIntegerEffect(options.timeoutMs, "timeoutMs");
+        const id =
+          options.id === undefined
+            ? yield* createUnboundIdentityEffect().pipe(
+                Effect.mapError(
+                  (failure) =>
+                    new ToolOperationFailure({
+                      operation: "define",
+                      reason: failure.message,
+                      cause: failure.cause,
+                    }),
+                ),
+              )
+            : options.id;
+        const base = yield* toolAttempt("define", () => createDescriptorBase("tool", id, options));
+        return yield* toolAttempt("define", () => {
+          const descriptor = {
+            ...base,
+            target,
+            description,
+            sideEffect,
+            approval,
+            mcp: options.mcp ?? true,
+            ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
+            ...hooks,
+          };
+          Object.defineProperty(descriptor, "invoke", {
+            value: createFunctionToolInvoker(
+              options.target,
+              {
+                id,
+                sideEffect,
+                approval,
+                ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
+                ...hooks,
+              },
+              descriptor,
+            ),
+            enumerable: false,
+            writable: false,
+            configurable: false,
+          });
+          return deepFreeze(descriptor) as ToolDescriptor<Id, Target>;
+        });
+      }),
+    ),
+);
 
-export type ToolRefAny = ToolRef;
-
-export type ToolTarget<Target extends FunctionRefAny> = FunctionToolTarget<Target>;
-
-export type ToolDescriptor<
-  Id extends string,
-  Target extends FunctionRefAny = FunctionRefAny,
-> = FunctionToolDescriptor<Id, Target>;
-
-export interface DefineToolOptions<
-  Id extends string,
-  Target extends FunctionRefAny,
-> extends FunctionToolMetadata {
-  readonly id?: Id;
-  readonly target: Target;
-  readonly onBefore?: import("@relkit/functions").FunctionToolHook<
-    import("@relkit/schema").InferInput<Target["input"]>
-  >;
-  readonly onAfter?: import("@relkit/functions").FunctionToolHook<
-    import("@relkit/schema").InferOutput<Target["output"]>
-  >;
-}
-
-/**
- * Defines a handler-free tool view over one function with side-effect and approval
- * metadata for safe invocation. Tool IDs may be inferred; `invoke` validates the
- * inherited input and fails closed when required approval is unavailable.
- *
- * @example
- * ```ts
- * import { defineFunction } from "@relkit/app/functions"
- * import { z } from "@relkit/app/schema"
- * import { defineTool } from "@relkit/app/tools"
- *
- * const target = defineFunction({ id: "lookup", input: z.string(), output: z.string(), handler: async (id) => id })
- * const tool = defineTool({ id: "lookup", target, description: "Look up an order", sideEffect: "read", approval: "never" })
- * void tool
- * ```
- * @category Tools
- * @since 0.1.0
+/** Defines a frozen, handler-free tool view over one function.
+ * @param options - Function target and policy metadata.
+ * @returns Frozen tool descriptor.
+ * @throws TypeError for malformed target, metadata, or ID.
+ * @example const tool = defineTool({ id: "orders.lookup", target, description: "Read order", sideEffect: "read", approval: "never" });
  */
 export function defineTool<const Id extends string, const Target extends FunctionRefAny>(
   options: DefineToolOptions<Id, Target>,
 ): ToolDescriptor<Id, Target> {
-  if (!isRecord(options)) throw new TypeError("Tool options must be an object");
-  if (hasOwn(options, "handler")) throw new TypeError("Tools cannot own handlers");
-  const target = copyFunctionTarget(options.target);
-  const description = requiredText(options.description, "Tool description");
-  const sideEffect = validateSideEffect(options.sideEffect);
-  const approval = validateApproval(options.approval);
-  const hooks = copyFunctionToolHooks(options);
-  if (options.timeoutMs !== undefined) positiveInteger(options.timeoutMs, "timeoutMs");
-  const id = options.id === undefined ? createUnboundIdentity() : options.id;
-  const base = createDescriptorBase("tool", id, options);
-
-  const descriptor = {
-    ...base,
-    target,
-    description,
-    sideEffect,
-    approval,
-    mcp: options.mcp ?? true,
-    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
-    ...hooks,
-  };
-  Object.defineProperty(descriptor, "invoke", {
-    value: createFunctionToolInvoker(
-      options.target,
-      {
-        id,
-        sideEffect,
-        approval,
-        ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
-        ...hooks,
-      },
-      descriptor,
-    ),
-    enumerable: false,
-    writable: false,
-    configurable: false,
-  });
-  return deepFreeze(descriptor) as ToolDescriptor<Id, Target>;
-}
-
-export function isToolDescriptor(value: unknown): value is ToolDescriptor<string> {
-  if (!isRecord(value) || hasOwn(value, "handler") || !isDescriptor(value, "tool")) {
-    return false;
-  }
-  const descriptor = value as ToolDescriptor<string>;
-  return (
-    isFunctionTarget(descriptor.target) &&
-    typeof descriptor.invoke === "function" &&
-    isNonEmptyString(descriptor.description) &&
-    isToolSideEffect(descriptor.sideEffect) &&
-    isToolApproval(descriptor.approval) &&
-    typeof descriptor.mcp === "boolean" &&
-    (descriptor.timeoutMs === undefined || isPositiveInteger(descriptor.timeoutMs))
-  );
-}
-
-export function assertToolDescriptor(value: unknown): asserts value is ToolDescriptor<string> {
-  if (!isToolDescriptor(value)) throw new TypeError("Invalid tool descriptor");
-}
-
-export function isToolRef(value: unknown): value is ToolRefAny {
-  return isRecord(value) && isRef(value.ref, "tool");
+  return runToolSync(defineToolEffect(options));
 }

@@ -1,20 +1,39 @@
-import { normalizeId, type MaybePromise, type TracePropagation } from "@relkit/contracts";
-import { currentTracePropagation, frameworkTrace } from "@relkit/invocation";
-import type { EventPublishOptions, EventPublishResult } from "@relkit/functions";
-import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
+import { normalizeId } from "@relkit/contracts";
+import { Effect } from "effect";
 import {
+  EventClientValidationError,
   EventDependencyError,
-  EventOperationCancelledError,
-  assertOptionalText,
-  assertVersion,
-  normalizeOptions,
-  normalizeResult,
-  notify,
-  parsePayload,
-  resolveProvider,
-  resolveValue,
-} from "./client-utils.js";
-import { runAbortable } from "./client-operation.js";
+  EventPayloadValidationError,
+  EventPayloadValidationFailure,
+  EventProfileError,
+  EventProviderError,
+} from "./client-errors.js";
+import { EventWorkFailed } from "./client-operation.js";
+import { eventPublisherLayer, publishEventEffect } from "./client-publish.js";
+import type { EventPublishSetup } from "./client-publish.types.js";
+import { notifyEffect, resolveProviderEffect } from "./client-provider.js";
+import { assertVersionEffect } from "./client-validation.js";
+import { observeEvent, runEventSync } from "./event-observability.js";
+import type {
+  EventClient,
+  EventClientOptions,
+  EventProvider,
+  EventPublishOptions,
+  InferInput,
+  InferOutput,
+  StandardSchemaV1,
+} from "./client.types.js";
+export type {
+  EventClient,
+  EventClientOptions,
+  EventDeclaredEdge,
+  EventInvocationBridge,
+  EventInvocationBridgeOptions,
+  EventObservedEdge,
+  EventOperationContext,
+  EventProvider,
+  EventProviderResult,
+} from "./client.types.js";
 export type {
   EventAttributeValue,
   EventPublishOptions,
@@ -27,84 +46,14 @@ export {
   EventPayloadValidationError,
   EventProfileError,
   EventProviderError,
-} from "./client-utils.js";
-export interface EventOperationContext {
-  readonly operation: "publish";
-  readonly eventId: string;
-  readonly version: number;
-  readonly signal: AbortSignal;
-  readonly profile: string;
-  readonly deadlineMs?: number;
-  readonly propagation?: TracePropagation;
-}
-export type EventProviderResult<
-  Id extends string = string,
-  Version extends number = number,
-  Payload = unknown,
-> = Pick<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted"> &
-  Partial<Omit<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted">>;
-export interface EventProvider {
-  readonly publish: (
-    payload: unknown,
-    options: EventPublishOptions,
-    context: EventOperationContext,
-  ) => MaybePromise<EventProviderResult>;
-}
-export interface EventInvocationBridgeOptions {
-  readonly name?: string;
-  readonly attributes?: Readonly<Record<string, unknown>>;
-  readonly signal?: AbortSignal;
-  readonly kind?: "producer";
-  readonly input?: unknown;
-}
-export interface EventInvocationBridge {
-  readonly run: <A>(
-    operation: () => MaybePromise<A>,
-    options?: EventInvocationBridgeOptions,
-  ) => Promise<A>;
-}
-export interface EventClientOptions<
-  Id extends string = string,
-  Version extends number = number,
-  PayloadSchema extends StandardSchemaV1 = StandardSchemaV1,
-> {
-  readonly ownerId: string;
-  readonly eventId: Id;
-  readonly version: Version;
-  readonly source: unknown;
-  readonly payloadSchema?: PayloadSchema;
-  readonly profile?: string;
-  readonly resolveProfile?: (profile: string) => unknown;
-  readonly bridge?: EventInvocationBridge;
-  readonly signal?: () => AbortSignal;
-  readonly deadline?: () => number | undefined;
-  readonly correlationId?: string | (() => string | undefined);
-  readonly now?: () => Date;
-  readonly declared?: boolean;
-  readonly onDeclaredEdge?: (edge: EventDeclaredEdge) => void;
-  readonly onObservedEdge?: (edge: EventObservedEdge) => void;
-}
-export interface EventClient<
-  Input = unknown,
-  Id extends string = string,
-  Version extends number = number,
-  Payload = Input,
-> {
-  readonly publish: (
-    payload: Input,
-    options?: EventPublishOptions,
-  ) => Promise<EventPublishResult<Id, Version, Payload>>;
-}
-export interface EventDeclaredEdge {
-  readonly kind: "publishes-event";
-  readonly from: string;
-  readonly to: string;
-}
-export interface EventObservedEdge {
-  readonly relationship: "publishes-event";
-  readonly from: string;
-  readonly to: string;
-}
+} from "./client-errors.js";
+
+/** Creates a Promise publisher from a validated event contract.
+ * @param options - Client dependencies and publication policy.
+ * @returns A frozen client exposing a Promise publish operation.
+ * @throws TypeError for malformed client configuration, or a provider profile error.
+ * @example createEventClient({ ownerId: "orders.create", eventId: "orders.created", version: 1, source: provider })
+ */
 export function createEventClient<
   const Id extends string,
   const Version extends number,
@@ -112,86 +61,83 @@ export function createEventClient<
 >(
   options: EventClientOptions<Id, Version, PayloadSchema>,
 ): EventClient<InferInput<PayloadSchema>, Id, Version, InferOutput<PayloadSchema>> {
-  const ownerId = normalizeId(options.ownerId);
-  const eventId = normalizeId(options.eventId) as unknown as Id;
-  const version = options.version;
-  assertVersion(version);
-  const profile = normalizeId(options.profile ?? "default");
-  const declared = options.declared !== false;
-  const provider = declared
-    ? resolveProvider(options.source, profile, options.resolveProfile)
-    : ({} as EventProvider);
-  notify(options.onDeclaredEdge, { kind: "publishes-event", from: ownerId, to: eventId }, declared);
-  const publish = async (
-    payload: InferInput<PayloadSchema>,
-    request: EventPublishOptions = {},
-  ): Promise<EventPublishResult<Id, Version, InferOutput<PayloadSchema>>> => {
-    const publishOptions = normalizeOptions(request);
-    const signal = options.signal?.() ?? new AbortController().signal;
-    const deadlineMs = options.deadline?.();
-    const correlationId = resolveValue(options.correlationId);
-    assertOptionalText(correlationId, "correlationId");
-    notify(
-      options.onObservedEdge,
-      { relationship: "publishes-event", from: ownerId, to: eventId },
-      declared,
-    );
-    const work = async (): Promise<EventPublishResult<Id, Version, InferOutput<PayloadSchema>>> => {
-      if (!declared) throw new EventDependencyError(eventId);
-      if (signal.aborted) throw new EventOperationCancelledError();
-      const value = await parsePayload(options.payloadSchema, payload);
-      const propagation = currentTracePropagation();
-      const context = Object.freeze({
-        operation: "publish" as const,
-        eventId,
-        version,
-        signal,
-        profile,
-        ...(deadlineMs === undefined ? {} : { deadlineMs }),
-        ...(propagation === undefined ? {} : { propagation }),
-      });
-      const result = await provider.publish(value, publishOptions, context);
-      return normalizeResult(
-        result,
-        value as InferOutput<PayloadSchema>,
-        publishOptions,
-        context,
-        options.now,
-        eventId,
-        version,
+  try {
+    return runEventSync(createEventClientEffect(options));
+  } catch (error) {
+    if (error instanceof EventClientValidationError && Object.hasOwn(error, "cause"))
+      throw error.cause;
+    if (error instanceof EventClientValidationError) throw new TypeError(error.message);
+    throw error;
+  }
+}
+
+/** Creates an Effect-backed event publisher with typed configuration failures.
+ * @param options - Client dependencies and publication policy.
+ * @returns An Effect succeeding with a frozen Promise client or failing with a tagged configuration error.
+ * @example Effect.runSync(createEventClientEffect({ ownerId: "orders.create", eventId: "orders.created", version: 1, source: provider }))
+ */
+export function createEventClientEffect<
+  const Id extends string,
+  const Version extends number,
+  const PayloadSchema extends StandardSchemaV1 = StandardSchemaV1,
+>(
+  options: EventClientOptions<Id, Version, PayloadSchema>,
+): Effect.Effect<
+  EventClient<InferInput<PayloadSchema>, Id, Version, InferOutput<PayloadSchema>>,
+  EventClientValidationError | EventProfileError | EventProviderError
+> {
+  return observeEvent(
+    "client.create",
+    Effect.fn("Events.createClient")(function* () {
+      const ownerId = yield* stableId(options.ownerId);
+      const eventId = (yield* stableId(options.eventId)) as Id;
+      const version = (yield* assertVersionEffect(options.version)) as Version;
+      const profile = yield* stableId(options.profile ?? "default");
+      const declared = options.declared !== false;
+      const provider = declared
+        ? yield* resolveProviderEffect(options.source, profile, options.resolveProfile)
+        : undefined;
+      yield* notifyEffect(
+        options.onDeclaredEdge,
+        { kind: "publishes-event", from: ownerId, to: eventId } as const,
+        declared,
       );
-    };
-    const bridged = options.bridge?.run(work, {
-      name: `relkit.event.${eventId}.publish`,
-      attributes: {
-        "relkit.event.id": eventId,
-        "relkit.event.version": version,
-        "relkit.event.profile": profile,
-      },
-      input: payload,
-      signal,
-      kind: "producer",
-    });
-    return bridged === undefined
-      ? frameworkTrace.span(
-          `relkit.event.${eventId}.publish`,
-          {
-            input: payload,
-            kind: "producer",
-            attributes: {
-              "relkit.event.id": eventId,
-              "relkit.event.version": version,
-              "relkit.event.profile": profile,
-            },
-          },
-          () => runAbortable(signal, deadlineMs, work),
-        )
-      : bridged;
-  };
-  return Object.freeze({ publish }) as EventClient<
-    InferInput<PayloadSchema>,
-    Id,
-    Version,
-    InferOutput<PayloadSchema>
-  >;
+      const setup: EventPublishSetup<Id, Version, PayloadSchema> = {
+        options,
+        ownerId,
+        eventId,
+        version,
+        profile,
+        declared,
+      };
+      const layer = eventPublisherLayer(provider ?? undeclaredProvider(eventId));
+      const publish = (payload: InferInput<PayloadSchema>, request?: EventPublishOptions) =>
+        Effect.runPromise(
+          publishEventEffect(setup, payload, request).pipe(Effect.provide(layer)),
+        ).catch((error: unknown) => {
+          if (error instanceof EventClientValidationError && Object.hasOwn(error, "cause"))
+            throw error.cause;
+          if (error instanceof EventClientValidationError) throw new TypeError(error.message);
+          if (error instanceof EventPayloadValidationFailure)
+            throw new EventPayloadValidationError(error.issues);
+          if (error instanceof EventWorkFailed) throw error.cause;
+          throw error;
+        });
+      return Object.freeze({ publish });
+    })(),
+  );
+}
+
+function stableId(value: unknown): Effect.Effect<string, EventClientValidationError> {
+  return Effect.try({
+    try: () => normalizeId(value),
+    catch: (cause) =>
+      new EventClientValidationError({
+        message: cause instanceof Error ? cause.message : "Invalid event ID",
+      }),
+  });
+}
+
+function undeclaredProvider(eventId: string): EventProvider {
+  return { publish: () => Promise.reject(new EventDependencyError(eventId)) };
 }

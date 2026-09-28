@@ -1,124 +1,172 @@
 import {
   currentInvocationScope,
-  currentExecutionContext,
-  resolveDescriptorIdentity,
   runInInvocationScope,
   type InvocationDispatchRequest,
   type InvocationDispatcher,
 } from "@relkit/invocation";
 import { validate } from "@relkit/schema";
-import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
-import type { AgentToolCall } from "./runtime-tools.js";
-import { AgentRuntimeError } from "./runtime-errors.js";
-import { ApprovalDeniedError } from "./approval.js";
-import { emitTool, resolveAgentApproval } from "./runtime-tool-events.js";
 import type { ToolDescriptor, ToolEngine, ToolEngineInvocation } from "@relkit/tools";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
+import { ApprovalDeniedError } from "./approval.js";
+import { agentInvocationFailure } from "./runtime-effect-error.js";
+import { AgentRuntimeError } from "./runtime-errors.js";
+import { signalFailure } from "./signal.js";
+import { createAgentInvocationDispatcherEffect } from "./runtime-tool-dispatcher.js";
+import { emitToolEffect, resolveAgentApproval } from "./runtime-tool-events.js";
+import type { RuntimeToolOptions } from "./runtime-tool-events.types.js";
+import type { AgentToolCall } from "./runtime-tools.types.js";
 
-export async function invokeAgentTool(
+export {
+  createAgentInvocationDispatcher,
+  createAgentInvocationDispatcherEffect,
+} from "./runtime-tool-dispatcher.js";
+
+/** Invokes an allowed tool with validated input and public lifecycle events.
+ * @param engine - Function tool engine.
+ * @param tool - Registered tool descriptor.
+ * @param turn - Requested tool call.
+ * @param options - Runtime and invocation integrations.
+ * @param signal - Invocation cancellation signal.
+ * @param invocationId - Current invocation identity.
+ * @param traceId - Optional trace identity.
+ * @param parentSpanId - Optional parent span identity.
+ * @returns An Effect with the tool result or AgentInvocationFailure.
+ * @example await Effect.runPromise(invokeAgentToolEffect(engine, tool, turn, options, signal, id));
+ */
+export const invokeAgentToolEffect = Effect.fn("Agents.runtime.invokeTool")(
+  function* (
+    engine: ToolEngine,
+    tool: ToolDescriptor<string>,
+    turn: AgentToolCall,
+    options: RuntimeToolOptions,
+    signal: AbortSignal,
+    invocationId: string,
+    traceId?: string,
+    parentSpanId?: string,
+  ) {
+    if (signal.aborted) return yield* Effect.fail(agentInvocationFailure(signalFailure(signal)));
+    const parsed = yield* Effect.tryPromise({
+      try: () => Promise.resolve(validate(tool.target.input, turn.input as never)),
+      catch: agentInvocationFailure,
+    });
+    if (!("value" in parsed)) {
+      return yield* Effect.fail(
+        agentInvocationFailure(
+          new AgentRuntimeError("RELKIT_AGENT_INPUT_VALIDATION", "Tool input validation failed"),
+        ),
+      );
+    }
+    yield* emitToolEffect(options, turn, "started", undefined, signal);
+    yield* emitToolEffect(options, turn, "input-ready", parsed.value, signal);
+    const approvalRequired =
+      tool.approval === "always" || (tool.approval === "on-write" && tool.sideEffect === "write");
+    if (!approvalRequired) yield* emitToolEffect(options, turn, "running", undefined, signal);
+    const progressSink = yield* Effect.try({
+      try: () =>
+        options.contentSink?.progressSinkForTool?.({
+          toolCallId: turn.callId,
+          toolId: turn.toolId,
+        }),
+      catch: agentInvocationFailure,
+    });
+    const outcome = yield* Effect.gen(function* () {
+      const current = yield* Effect.sync(() => currentInvocationScope());
+      const baseDispatcher =
+        current?.dispatcher ??
+        (yield* createAgentInvocationDispatcherEffect(
+          engine,
+          options,
+          invocationId,
+          traceId,
+          parentSpanId,
+          signal,
+        ));
+      const dispatcher =
+        progressSink === undefined
+          ? baseDispatcher
+          : withProgressSink(baseDispatcher, progressSink);
+      const result = yield* Effect.tryPromise({
+        try: (effectSignal) => {
+          const combined = AbortSignal.any([signal, effectSignal]);
+          return Promise.resolve(
+            runInInvocationScope(
+              current === undefined
+                ? {
+                    dispatcher,
+                    parent: {
+                      id: invocationId,
+                      traceId: traceId ?? invocationId,
+                      signal: combined,
+                      ...(parentSpanId === undefined ? {} : { spanId: parentSpanId }),
+                    },
+                  }
+                : { ...current, dispatcher },
+              () =>
+                tool.invoke(turn.input, {
+                  signal: combined,
+                  approval: (request) =>
+                    resolveAgentApproval(options, request, turn.callId, invocationId, combined),
+                }),
+            ),
+          );
+        },
+        catch: agentInvocationFailure,
+      });
+      yield* emitToolEffect(options, turn, "succeeded", result, signal);
+      return result;
+    }).pipe(
+      Effect.catchTag("AgentInvocationFailure", (failure) =>
+        Effect.gen(function* () {
+          const state = failure.cause instanceof ApprovalDeniedError ? "denied" : "failed";
+          yield* emitToolEffect(options, turn, state, undefined, signal).pipe(
+            Effect.catchTag("AgentInvocationFailure", () => Effect.void),
+          );
+          return yield* Effect.fail(failure);
+        }),
+      ),
+    );
+    return outcome;
+  },
+  (effect) => observeAgent("runtime.invoke-tool", effect),
+);
+
+/** Invokes an allowed tool for existing Promise callers.
+ * @param engine - Function tool engine.
+ * @param tool - Registered tool descriptor.
+ * @param turn - Requested tool call.
+ * @param options - Runtime and invocation integrations.
+ * @param signal - Invocation cancellation signal.
+ * @param invocationId - Current invocation identity.
+ * @param traceId - Optional trace identity.
+ * @param parentSpanId - Optional parent span identity.
+ * @returns A Promise of the tool result.
+ * @throws The original validation, sink, approval, or tool error.
+ * @example await invokeAgentTool(engine, tool, turn, options, signal, id);
+ */
+export function invokeAgentTool(
   engine: ToolEngine,
   tool: ToolDescriptor<string>,
   turn: AgentToolCall,
-  options: AgentRuntimeOptions & AgentInvocationOptions,
+  options: RuntimeToolOptions,
   signal: AbortSignal,
   invocationId: string,
   traceId?: string,
   parentSpanId?: string,
 ): Promise<unknown> {
-  const parsed = await validate(tool.target.input, turn.input as never);
-  if (!("value" in parsed))
-    throw new AgentRuntimeError("RELKIT_AGENT_INPUT_VALIDATION", "Tool input validation failed");
-  await emitTool(options, turn, "started", undefined, signal);
-  await emitTool(options, turn, "input-ready", parsed.value, signal);
-  const approvalRequired =
-    tool.approval === "always" || (tool.approval === "on-write" && tool.sideEffect === "write");
-  if (!approvalRequired) await emitTool(options, turn, "running", undefined, signal);
-  const invoke = () =>
-    tool.invoke(turn.input, {
+  return Effect.runPromise(
+    invokeAgentToolEffect(
+      engine,
+      tool,
+      turn,
+      options,
       signal,
-      approval: (request) =>
-        resolveAgentApproval(options, request, turn.callId, invocationId, signal),
-    });
-  const progressSink = options.contentSink?.progressSinkForTool?.({
-    toolCallId: turn.callId,
-    toolId: turn.toolId,
-  });
-  try {
-    const current = currentInvocationScope();
-    const baseDispatcher =
-      current?.dispatcher ??
-      createAgentInvocationDispatcher(engine, options, invocationId, traceId, parentSpanId, signal);
-    const dispatcher =
-      progressSink === undefined ? baseDispatcher : withProgressSink(baseDispatcher, progressSink);
-    const result = await runInInvocationScope(
-      current === undefined
-        ? {
-            dispatcher,
-            parent: {
-              id: invocationId,
-              traceId: traceId ?? invocationId,
-              signal,
-              ...(parentSpanId === undefined ? {} : { spanId: parentSpanId }),
-            },
-          }
-        : { ...current, dispatcher },
-      invoke,
-    );
-    await emitTool(options, turn, "succeeded", result, signal);
-    return result;
-  } catch (error) {
-    const state = error instanceof ApprovalDeniedError ? "denied" : "failed";
-    await emitTool(options, turn, state, undefined, signal).catch(() => undefined);
-    throw error;
-  }
-}
-
-export function createAgentInvocationDispatcher(
-  engine: ToolEngine,
-  options: AgentRuntimeOptions & AgentInvocationOptions,
-  invocationId: string,
-  traceId: string | undefined,
-  parentSpanId: string | undefined,
-  signal: AbortSignal,
-): InvocationDispatcher {
-  const active = currentExecutionContext();
-  const parent = {
-    id: invocationId,
-    traceId: active?.span.traceId ?? traceId ?? invocationId,
-    signal,
-    ...(active?.span.spanId === undefined && parentSpanId === undefined
-      ? {}
-      : { spanId: active?.span.spanId ?? parentSpanId }),
-  };
-  return Object.freeze({
-    dispatch: <Input, Output, Context extends { readonly signal: AbortSignal }>(
-      request: InvocationDispatchRequest<Input, Output, Context>,
-    ) => {
-      const target = request.target;
-      const invocation = {
-        functionId: resolveDescriptorIdentity(target).id,
-        input: request.input,
-        source: "tool" as const,
-        inputSchema: target.input,
-        outputSchema: target.output,
-        ...(target.errors === undefined
-          ? {}
-          : { errors: target.errors as NonNullable<ToolEngineInvocation["errors"]> }),
-        ...(request.options?.timeoutMs === undefined
-          ? {}
-          : { timeoutMs: request.options.timeoutMs }),
-        signal: request.options?.signal ?? signal,
-        ...(options.hooks === undefined ? {} : { hooks: options.hooks }),
-        ...(request.options?.toolHooks === undefined
-          ? {}
-          : { toolHooks: request.options.toolHooks }),
-        ...(request.options?.progressSink === undefined
-          ? {}
-          : { progressSink: request.options.progressSink }),
-        parent,
-      } satisfies ToolEngineInvocation;
-      return engine.invoke(invocation) as Promise<Output>;
-    },
-  });
+      invocationId,
+      traceId,
+      parentSpanId,
+    ).pipe(Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause))),
+    { signal },
+  );
 }
 
 function withProgressSink(

@@ -1,58 +1,88 @@
 import { END, START } from "@langchain/langgraph";
 import type { JsonValue } from "@relkit/contracts";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
 import { isFunctionGraphNode, type FunctionGraphNodeDescriptor } from "@relkit/functions";
 import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
 import type { GraphNodeAny } from "./define-graph-node.js";
 import { isSubgraphNode, subgraphForNode, type SubgraphNodeDescriptor } from "./graph-subgraph.js";
 import type { GraphEdgeOperation } from "./graph-edges.js";
+import { graphWorkflowFailure } from "./graph-workflow-error.js";
+import type {
+  GraphWorkflow,
+  GraphWorkflowEdge,
+  GraphWorkflowNode,
+} from "./graph-workflow.types.js";
 
-export interface GraphWorkflowNode {
-  readonly id: string;
-  readonly kind: "node" | "function" | "subgraph";
-  readonly input: JsonValue;
-  readonly output: JsonValue;
-  readonly resume?: JsonValue;
-  readonly ends: readonly string[];
-  readonly targetFunctionId?: string;
-  readonly workflow?: GraphWorkflow;
-}
+export type * from "./graph-workflow.types.js";
 
-export type GraphWorkflowEdge =
-  | { readonly kind: "edge"; readonly from: string; readonly to: string }
-  | { readonly kind: "join"; readonly from: readonly string[]; readonly to: string }
-  | {
-      readonly kind: "conditional";
-      readonly from: string;
-      readonly routes: readonly { readonly label: string; readonly to: string }[];
-      readonly dynamic: boolean;
-    };
+/** Projects a frozen serializable graph workflow from authoring nodes and edges.
+ * @param nodes - Validated graph nodes.
+ * @param edges - Validated graph edge operations.
+ * @returns An Effect with a workflow or GraphWorkflowFailure.
+ * @example Effect.runSync(graphWorkflowEffect(nodes, edges));
+ */
+export const graphWorkflowEffect = Effect.fn("Agents.graph.workflow")(
+  <Id extends string, State>(
+    nodes: readonly (GraphNodeAny | FunctionGraphNodeDescriptor | SubgraphNodeDescriptor)[],
+    edges: readonly GraphEdgeOperation<Id, State>[],
+  ) =>
+    Effect.try({
+      try: (): GraphWorkflow =>
+        Object.freeze({
+          version: 1 as const,
+          start: START,
+          end: END,
+          nodes: Object.freeze(nodes.map(workflowNode)),
+          edges: Object.freeze(edges.map(workflowEdge)),
+        }),
+      catch: graphWorkflowFailure,
+    }),
+  (effect) => observeAgent("graph.workflow", effect),
+);
 
-export interface GraphWorkflow {
-  readonly version: 1;
-  readonly start: typeof START;
-  readonly end: typeof END;
-  readonly nodes: readonly GraphWorkflowNode[];
-  readonly edges: readonly GraphWorkflowEdge[];
-}
-
+/** Projects a workflow for existing synchronous graph callers.
+ * @param nodes - Validated graph nodes.
+ * @param edges - Validated graph edge operations.
+ * @returns A frozen serializable workflow.
+ * @throws The original node or schema projection error.
+ * @example graphWorkflow(nodes, edges);
+ */
 export function graphWorkflow<Id extends string, State>(
   nodes: readonly (GraphNodeAny | FunctionGraphNodeDescriptor | SubgraphNodeDescriptor)[],
   edges: readonly GraphEdgeOperation<Id, State>[],
 ): GraphWorkflow {
-  return Object.freeze({
-    version: 1 as const,
-    start: START,
-    end: END,
-    nodes: Object.freeze(nodes.map(workflowNode)),
-    edges: Object.freeze(edges.map(workflowEdge)),
-  });
+  return Effect.runSync(
+    graphWorkflowEffect(nodes, edges).pipe(
+      Effect.catchTag("GraphWorkflowFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
 }
 
+/** Checks whether any graph node has a resumable continuation.
+ * @param workflow - Frozen graph workflow.
+ * @returns An Effect with a boolean and no typed failure.
+ * @example Effect.runSync(graphWorkflowRequiresPersistenceEffect(workflow));
+ */
+export const graphWorkflowRequiresPersistenceEffect = Effect.fn("Agents.graph.requiresPersistence")(
+  (workflow: GraphWorkflow) => Effect.sync(() => requiresPersistence(workflow)),
+  (effect) => observeAgent("graph.requires-persistence", effect),
+);
+
+/** Checks persistence needs for existing synchronous graph callers.
+ * @param workflow - Frozen graph workflow.
+ * @returns Whether any node has a resumable continuation.
+ * @example graphWorkflowRequiresPersistence(workflow);
+ */
 export function graphWorkflowRequiresPersistence(workflow: GraphWorkflow): boolean {
+  return Effect.runSync(graphWorkflowRequiresPersistenceEffect(workflow));
+}
+
+function requiresPersistence(workflow: GraphWorkflow): boolean {
   return workflow.nodes.some(
     (node) =>
       node.resume !== undefined ||
-      (node.workflow !== undefined && graphWorkflowRequiresPersistence(node.workflow)),
+      (node.workflow !== undefined && requiresPersistence(node.workflow)),
   );
 }
 

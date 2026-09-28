@@ -330,6 +330,7 @@
         "@relkit/invocation": "workspace:*",
         "@relkit/schema": "workspace:*",
         "@relkit/tools": "workspace:*",
+        "effect": "4.0.0-rc.115",
         "langchain": "1.5.10",
         "langsmith": "0.9.0",
       },
@@ -339,7 +340,9 @@
         "@langchain/langgraph-checkpoint-redis": "1.0.11",
         "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
         "@relkit/buckets": "workspace:*",
+        "@vitest/coverage-v8": "5.0.1",
         "deepagents": "1.13.3",
+        "vitest": "5.0.1",
       },
       "peerDependencies": {
         "deepagents": "1.13.3",
@@ -368,6 +371,11 @@
         "@relkit/schema": "workspace:*",
         "@relkit/services": "workspace:*",
         "@relkit/tools": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/better-auth": {
@@ -395,6 +403,11 @@
       "version": "0.5.1",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/cache": {
@@ -403,6 +416,11 @@
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/schema": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/cli": {
@@ -610,6 +628,11 @@
         "@relkit/invocation": "workspace:*",
         "@relkit/jobs": "workspace:*",
         "@relkit/schema": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/functions": {
@@ -621,6 +644,11 @@
         "@relkit/contracts": "workspace:*",
         "@relkit/invocation": "workspace:*",
         "@relkit/schema": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/graph": {
@@ -665,6 +693,9 @@
         "@relkit/invocation": "workspace:*",
         "@relkit/schema": "workspace:*",
         "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "vitest": "5.0.1",
       },
     },
     "packages/local-service": {
@@ -738,6 +769,11 @@
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/schema": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/routes": {
@@ -749,10 +785,13 @@
         "@relkit/invocation": "workspace:*",
         "@relkit/schema": "workspace:*",
         "@relkit/services": "workspace:*",
+        "effect": "4.0.0-rc.115",
         "hono": "4.13.5",
       },
       "devDependencies": {
         "@relkit/events": "workspace:*",
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/runtime-effect": {
@@ -823,9 +862,12 @@
         "@relkit/functions": "workspace:*",
         "@relkit/invocation": "workspace:*",
         "@relkit/jobs": "workspace:*",
+        "effect": "4.0.0-rc.115",
       },
       "devDependencies": {
         "@relkit/schema": "workspace:*",
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/supervisor": {
@@ -872,6 +914,11 @@
         "@relkit/functions": "workspace:*",
         "@relkit/invocation": "workspace:*",
         "@relkit/schema": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
   },

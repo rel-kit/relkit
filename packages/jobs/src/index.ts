@@ -19,7 +19,13 @@ export * from "./schedule-controls.js";
 export * from "./schedule-reconciliation.js";
 export * from "./service-options.js";
 export * from "./migration.js";
-export { assertRfc3339Instant, isRfc3339Instant } from "./instant-validation.js";
+export {
+  assertRfc3339Instant,
+  assertRfc3339InstantEffect,
+  InstantValidationError,
+  isRfc3339Instant,
+  isRfc3339InstantEffect,
+} from "./instant-validation.js";
 export { copyTriggerOptions, validateResultOptions } from "./trigger-validation.js";
 export {
   TASK_INPUT_MAX_BYTES,
@@ -74,15 +80,28 @@ export type {
   ScheduleWriteOptions,
   ScheduleWriteOutcome,
   ScheduleWriteReceipt,
-} from "./job-types.js";
-export { durationToMillis, isDurationInput, parseDuration, validateDuration } from "./duration.js";
+} from "./job.types.js";
+export {
+  DurationValidationError,
+  durationToMillis,
+  durationToMillisEffect,
+  isDurationInput,
+  isDurationInputEffect,
+  parseDuration,
+  validateDuration,
+} from "./duration.js";
+export { JobsTelemetry, JobsTelemetryLive } from "./jobs-observability.js";
 export type { DurationInput, DurationUnit } from "./duration.js";
 export {
   assertJobName,
+  assertJobNameEffect,
   isJobName,
+  isJobNameEffect,
   isValidJobName,
   normalizeJobName,
+  JobNameValidationError,
   validateJobName,
+  validateJobNameEffect,
   JOB_NAME_PATTERN,
   JOB_NAME_RESERVED,
 } from "./job-name.js";

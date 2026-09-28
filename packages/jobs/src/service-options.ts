@@ -1,82 +1,56 @@
-import { assertJsonValue, isStableId, type JsonValue } from "@relkit/contracts";
-import type { DurationInput, MemoryInput } from "./task-core-types.js";
+import { assertJsonValue, type JsonValue } from "@relkit/contracts";
+import { Effect, Result } from "effect";
+import { observeJobs } from "./jobs-observability.js";
+import type { JobsServiceOptions, JobsServiceOptionName } from "./service-options.types.js";
 import {
-  TASK_INPUT_MAX_BYTES,
-  TASK_ITEM_MAX_BYTES,
-  TASK_OUTPUT_MAX_BYTES,
-  memoryBytes,
-} from "./task-policy-validation.js";
-import { durationToMillis } from "./duration.js";
-
-export interface JobsServiceOptions {
-  readonly limits?: {
-    readonly inputBytes?: number;
-    readonly outputBytes?: number;
-    readonly progressItemBytes?: number;
-    readonly streamItemBytes?: number;
-  };
-  readonly workers?: {
-    readonly classes: readonly {
-      readonly id: string;
-      readonly cpu: number;
-      readonly memory: MemoryInput;
-      readonly nativeClass?: string;
-    }[];
-  };
-  readonly observation?: {
-    readonly pollInterval?: DurationInput;
-    readonly readTimeout?: DurationInput;
-  };
-  readonly maxElapsed?: DurationInput;
-  readonly hookTimeout?: DurationInput;
-  readonly shutdownGrace?: DurationInput;
-}
-
-export type JobsServiceBehavior = Readonly<Record<string, JsonValue>>;
-
-export type JobsServiceOptionName =
-  "limits" | "workers" | "observation" | "maxElapsed" | "hookTimeout" | "shutdownGrace";
-
-export function validateJobsServiceOptions(value: JobsServiceOptions | undefined): void {
-  if (value === undefined) return;
-  if (value.limits !== undefined) {
-    assertLimit(value.limits.inputBytes, TASK_INPUT_MAX_BYTES, "limits.inputBytes");
-    assertLimit(value.limits.outputBytes, TASK_OUTPUT_MAX_BYTES, "limits.outputBytes");
-    assertLimit(value.limits.progressItemBytes, TASK_ITEM_MAX_BYTES, "limits.progressItemBytes");
-    assertLimit(value.limits.streamItemBytes, TASK_ITEM_MAX_BYTES, "limits.streamItemBytes");
-  }
-  for (const [name, duration] of [
-    ["maxElapsed", value.maxElapsed],
-    ["hookTimeout", value.hookTimeout],
-    ["shutdownGrace", value.shutdownGrace],
-    ["observation.pollInterval", value.observation?.pollInterval],
-    ["observation.readTimeout", value.observation?.readTimeout],
-  ] as const) {
-    if (duration !== undefined) {
-      const milliseconds = durationToMillis(duration);
-      if (milliseconds < 1) throw new TypeError(name + " must be positive");
-      if (name === "observation.pollInterval" && milliseconds < 2_000)
-        throw new TypeError(name + " must be at least 2 seconds");
-      if (name === "observation.readTimeout" && milliseconds > 10_000)
-        throw new TypeError(name + " must be at most 10 seconds");
-    }
-  }
-  if (value.workers !== undefined) {
-    const ids = new Set<string>();
-    for (const worker of value.workers.classes) {
-      if (!isStableId(worker.id) || ids.has(worker.id))
-        throw new TypeError("workers.classes ids must be unique stable ids");
-      ids.add(worker.id);
-      if (!Number.isFinite(worker.cpu) || worker.cpu <= 0)
-        throw new TypeError("workers.classes.cpu must be positive");
-      memoryBytes(worker.memory);
-      if (worker.nativeClass !== undefined && !isStableId(worker.nativeClass))
-        throw new TypeError("workers.classes.nativeClass is invalid");
-    }
-  }
-}
-
+  JobsServiceOptionsError,
+  validateJobsServiceOptionsEffect,
+} from "./service-options-validation.js";
+export type {
+  JobsServiceOptions,
+  JobsServiceBehavior,
+  JobsServiceOptionName,
+} from "./service-options.types.js";
+export {
+  validateJobsServiceOptions,
+  validateJobsServiceOptionsEffect,
+  JobsServiceOptionsError,
+} from "./service-options-validation.js";
+/** Serializes validated service options into a provider neutral record.
+ * @param value - Common service options.
+ * @param native - Optional provider native JSON.
+ * @returns A frozen record or JobsServiceOptionsError.
+ * @example Effect.runSync(serializeJobsServiceOptionsEffect({}, undefined));
+ */
+export const serializeJobsServiceOptionsEffect = Effect.fn("Jobs.serializeServiceOptions")(
+  (value: JobsServiceOptions | undefined, native: JsonValue | undefined) =>
+    observeJobs(
+      "serviceOptions.serialize",
+      Effect.try({
+        try: () => serializeValue(value, native),
+        catch: (error) => {
+          if (error instanceof Error) return new JobsServiceOptionsError({ reason: error.message });
+          throw error;
+        },
+      }),
+    ),
+);
+/** Synchronously serializes service options.
+ * @param value - Common service options.
+ * @param native - Optional provider native JSON.
+ * @returns A frozen JSON record.
+ * @throws TypeError when a field is not JSON.
+ * @example serializeJobsServiceOptions({}, undefined);
+ */
 export function serializeJobsServiceOptions(
+  value: JobsServiceOptions | undefined,
+  native: JsonValue | undefined,
+): Readonly<Record<string, JsonValue>> {
+  const result = Effect.runSync(Effect.result(serializeJobsServiceOptionsEffect(value, native)));
+  if (Result.isFailure(result)) throw new TypeError(result.failure.reason);
+  return result.success;
+}
+function serializeValue(
   value: JobsServiceOptions | undefined,
   native: JsonValue | undefined,
 ): Readonly<Record<string, JsonValue>> {
@@ -93,44 +67,78 @@ export function serializeJobsServiceOptions(
     ...(native === undefined ? {} : { native }),
   });
 }
-
+/** Parses common options from a stored service behavior record.
+ * @param value - Stored behavior record.
+ * @returns Frozen common options or JobsServiceOptionsError.
+ * @example Effect.runSync(deserializeJobsServiceOptionsEffect({}));
+ */
+export const deserializeJobsServiceOptionsEffect = Effect.fn("Jobs.deserializeServiceOptions")(
+  function* (value: unknown) {
+    if (value === undefined) return {};
+    if (value === null || typeof value !== "object" || Array.isArray(value))
+      return yield* new JobsServiceOptionsError({
+        reason: "Jobs service behavior must be an object",
+      });
+    const { native: _native, ...common } = value as Record<string, unknown>;
+    const options = common as JobsServiceOptions;
+    yield* validateJobsServiceOptionsEffect(options);
+    return Object.freeze(options);
+  },
+  (effect) => observeJobs("serviceOptions.deserialize", effect),
+);
+/** Synchronously reads common options from stored service behavior.
+ * @param value - Stored behavior record.
+ * @returns Frozen common options.
+ * @throws TypeError when the record or an option is invalid.
+ * @example deserializeJobsServiceOptions({});
+ */
 export function deserializeJobsServiceOptions(value: unknown): JobsServiceOptions {
-  if (value === undefined) return {};
-  if (value === null || typeof value !== "object" || Array.isArray(value)) {
-    throw new TypeError("Jobs service behavior must be an object");
-  }
-  const { native: _native, ...common } = value as Record<string, unknown>;
-  const options = common as JobsServiceOptions;
-  validateJobsServiceOptions(options);
-  return Object.freeze(options);
+  const result = Effect.runSync(Effect.result(deserializeJobsServiceOptionsEffect(value)));
+  if (Result.isFailure(result)) throw new TypeError(result.failure.reason);
+  return result.success;
 }
-
+/** Checks a provider's supported service option names in Effect.
+ * @param value - Authored service options.
+ * @param supported - Names supported by the provider.
+ * @returns Void or JobsServiceOptionsError.
+ * @example Effect.runSync(assertSupportedJobsServiceOptionsEffect({}, []));
+ */
+export const assertSupportedJobsServiceOptionsEffect = Effect.fn("Jobs.assertServiceOptions")(
+  function* (value: JobsServiceOptions, supported: readonly JobsServiceOptionName[]) {
+    const allowed = new Set(supported);
+    for (const name of [
+      "limits",
+      "workers",
+      "observation",
+      "maxElapsed",
+      "hookTimeout",
+      "shutdownGrace",
+    ] as const) {
+      if (value[name] !== undefined && !allowed.has(name))
+        return yield* new JobsServiceOptionsError({
+          reason: `RELKIT_JOBS_SERVICE_OPTION_UNSUPPORTED:${name}`,
+        });
+    }
+  },
+  (effect) => observeJobs("serviceOptions.assertSupported", effect),
+);
+/** Synchronously checks a provider's supported option names.
+ * @param value - Authored service options.
+ * @param supported - Names supported by the provider.
+ * @returns Void when every option is supported.
+ * @throws Error with the unsupported option name.
+ * @example assertSupportedJobsServiceOptions({}, []);
+ */
 export function assertSupportedJobsServiceOptions(
   value: JobsServiceOptions,
   supported: readonly JobsServiceOptionName[],
 ): void {
-  const allowed = new Set(supported);
-  for (const name of [
-    "limits",
-    "workers",
-    "observation",
-    "maxElapsed",
-    "hookTimeout",
-    "shutdownGrace",
-  ] as const) {
-    if (value[name] !== undefined && !allowed.has(name)) {
-      throw new Error(`RELKIT_JOBS_SERVICE_OPTION_UNSUPPORTED:${name}`);
-    }
-  }
+  const result = Effect.runSync(
+    Effect.result(assertSupportedJobsServiceOptionsEffect(value, supported)),
+  );
+  if (Result.isFailure(result)) throw new Error(result.failure.reason);
 }
-
 function json(value: unknown): JsonValue {
   assertJsonValue(value);
   return value;
-}
-
-function assertLimit(value: number | undefined, maximum: number, name: string): void {
-  if (value !== undefined && (!Number.isSafeInteger(value) || value < 1 || value > maximum)) {
-    throw new TypeError(name + " must be a positive integer no greater than " + maximum);
-  }
 }

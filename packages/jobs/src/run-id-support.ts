@@ -2,6 +2,14 @@ import { createHash } from "node:crypto";
 import type { RunLocatorKeyRing, RunLocatorPayload } from "./run-id.js";
 import { RunLocatorError } from "./run-id-errors.js";
 
+/** Hashes the trusted deployment namespace used to bind durable run locators.
+ * @param application - Application identity.
+ * @param environment - Environment identity.
+ * @param scope - Trusted scope identity.
+ * @returns A SHA-256 namespace identity.
+ * @throws RunLocatorError when an identity is empty or exceeds its byte limit.
+ * @example namespaceHash("shop", "production", "orders");
+ */
 export function namespaceHash(application: string, environment: string, scope: string): string {
   assertBoundedText(application);
   assertBoundedText(environment);
@@ -9,6 +17,12 @@ export function namespaceHash(application: string, environment: string, scope: s
   return `sha256:${createHash("sha256").update(`${application}\0${environment}\0${scope}`).digest("hex")}`;
 }
 
+/** Validates and freezes the payload before it is signed or returned to callers.
+ * @param value - Untrusted locator payload.
+ * @returns A normalized immutable payload.
+ * @throws RunLocatorError for malformed identities or a mismatched namespace.
+ * @example normalizePayload(payload);
+ */
 export function normalizePayload(value: RunLocatorPayload): RunLocatorPayload {
   if (!isRecord(value) || !isRecord(value.native)) throw new RunLocatorError();
   const fields = [
@@ -48,6 +62,12 @@ export function normalizePayload(value: RunLocatorPayload): RunLocatorPayload {
   });
 }
 
+/** Verifies the active key and every key identifier and secret in a key ring.
+ * @param ring - Signing or verification keys.
+ * @returns Nothing when the ring is usable.
+ * @throws RunLocatorError for missing, oversized, or malformed keys.
+ * @example validateRunLocatorKeyRing({ activeKeyId: "v1", keys: { v1: "secret" } });
+ */
 export function validateRunLocatorKeyRing(ring: RunLocatorKeyRing): void {
   if (!isRecord(ring) || typeof ring.activeKeyId !== "string" || !isRecord(ring.keys))
     throw new RunLocatorError();
@@ -59,6 +79,11 @@ export function validateRunLocatorKeyRing(ring: RunLocatorKeyRing): void {
   if (ring.keys[ring.activeKeyId] === undefined) throw new RunLocatorError();
 }
 
+/** Checks canonical unpadded base64url encoding for one locator segment.
+ * @param value - Candidate encoded segment.
+ * @returns True only for a nonempty canonical base64url string.
+ * @example isBase64Url("YQ");
+ */
 export function isBase64Url(value: string | undefined): value is string {
   if (value === undefined || value.length === 0 || !/^[A-Za-z0-9_-]+$/u.test(value)) return false;
   try {
@@ -68,6 +93,12 @@ export function isBase64Url(value: string | undefined): value is string {
   }
 }
 
+/** Validates a bounded printable locator key identifier.
+ * @param value - Candidate key identifier.
+ * @returns Nothing when the segment is valid.
+ * @throws RunLocatorError for unsupported characters or length.
+ * @example assertSegment("key-v1");
+ */
 export function assertSegment(value: string): void {
   if (!/^[A-Za-z0-9._-]{1,256}$/u.test(value)) throw new RunLocatorError();
 }

@@ -1,6 +1,17 @@
 import { JOB_NAME_MAX_LENGTH } from "@relkit/contracts/jobs";
+import { Effect, Result, Schema } from "effect";
+import { observeJobs } from "./jobs-observability.js";
+import type { JobName, ValidJobName } from "./job-name.types.js";
 
+export type { JobName, ValidJobName } from "./job-name.types.js";
+
+/** ASCII job names start with a lowercase letter and continue with letters or digits.
+ * @example JOB_NAME_PATTERN.test("sendEmail");
+ */
 export const JOB_NAME_PATTERN = /^[a-z][A-Za-z0-9]*$/u;
+/** JavaScript promise and object keys that cannot name callable jobs.
+ * @example JOB_NAME_RESERVED.includes("then");
+ */
 export const JOB_NAME_RESERVED = [
   "then",
   "constructor",
@@ -15,91 +26,110 @@ export const JOB_NAME_RESERVED = [
   "__proto__",
 ] as const;
 
-type LowercaseLetter =
-  | "a"
-  | "b"
-  | "c"
-  | "d"
-  | "e"
-  | "f"
-  | "g"
-  | "h"
-  | "i"
-  | "j"
-  | "k"
-  | "l"
-  | "m"
-  | "n"
-  | "o"
-  | "p"
-  | "q"
-  | "r"
-  | "s"
-  | "t"
-  | "u"
-  | "v"
-  | "w"
-  | "x"
-  | "y"
-  | "z";
-type NameCharacter = LowercaseLetter | UppercaseLetter | Digit;
-type UppercaseLetter = Uppercase<LowercaseLetter>;
-type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-type ValidCharacters<Value extends string> = Value extends ""
-  ? true
-  : Value extends `${infer Character}${infer Rest}`
-    ? Character extends NameCharacter
-      ? ValidCharacters<Rest>
-      : false
-    : false;
-type AtMost64<Value extends string, Count extends readonly unknown[] = []> = Value extends ""
-  ? true
-  : Count["length"] extends typeof JOB_NAME_MAX_LENGTH
-    ? false
-    : Value extends `${infer _Character}${infer Rest}`
-      ? AtMost64<Rest, [...Count, unknown]>
-      : false;
+/** A rejected authored job name with a stable validation tag.
+ * @example new JobNameValidationError({ source: "job name", reason: "Invalid name" });
+ */
+export class JobNameValidationError extends Schema.TaggedError<JobNameValidationError>()(
+  "Jobs.JobNameValidationError",
+  { source: Schema.String, reason: Schema.String },
+) {}
 
-export type ValidJobName<Name extends string = string> = string extends Name
-  ? never
-  : Name extends (typeof JOB_NAME_RESERVED)[number]
-    ? never
-    : Name extends `${LowercaseLetter}${infer Rest}`
-      ? ValidCharacters<Rest> extends true
-        ? AtMost64<Name> extends true
-          ? Name
-          : never
-        : never
-      : never;
+/** Tests a candidate against the job-name grammar in Effect.
+ * @param value - Untrusted candidate.
+ * @returns An Effect of a boolean with no typed failure.
+ * @example Effect.runSync(isJobNameEffect("sendEmail"));
+ */
+export const isJobNameEffect = Effect.fn("Jobs.isJobName")(
+  function* (value: unknown) {
+    return (
+      typeof value === "string" &&
+      value.length >= 1 &&
+      value.length <= JOB_NAME_MAX_LENGTH &&
+      JOB_NAME_PATTERN.test(value) &&
+      !JOB_NAME_RESERVED.some((reserved) => reserved === value)
+    );
+  },
+  (effect) => observeJobs("jobName.is", effect),
+);
 
-export type JobName<Name extends string = string> = string extends Name
-  ? string
-  : ValidJobName<Name>;
-
+/** Tests a candidate against the job-name grammar.
+ * @param value - Untrusted candidate.
+ * @returns Whether the candidate is a JobName.
+ * @throws A runtime defect if the Effect cannot execute synchronously.
+ * @example isJobName("sendEmail");
+ */
 export function isJobName(value: unknown): value is JobName {
-  return (
-    typeof value === "string" &&
-    value.length >= 1 &&
-    value.length <= JOB_NAME_MAX_LENGTH &&
-    JOB_NAME_PATTERN.test(value) &&
-    !JOB_NAME_RESERVED.includes(value as (typeof JOB_NAME_RESERVED)[number])
-  );
+  return Effect.runSync(isJobNameEffect(value));
 }
 
+/** Alias for isJobName.
+ * @param value - Untrusted candidate.
+ * @returns Whether the candidate is a JobName.
+ * @throws A runtime defect if the Effect cannot execute synchronously.
+ * @example isValidJobName("sendEmail");
+ */
 export const isValidJobName = isJobName;
 
+/** Validates a job name in the Effect error channel.
+ * @param value - Untrusted candidate.
+ * @param source - Name of the field for diagnostics.
+ * @returns An Effect succeeding with void or JobNameValidationError.
+ * @example Effect.runPromise(assertJobNameEffect("sendEmail"));
+ */
+export const assertJobNameEffect = Effect.fn("Jobs.assertJobName")(
+  function* (value: unknown, source = "job name") {
+    if (yield* isJobNameEffect(value)) return;
+    return yield* Effect.fail(
+      new JobNameValidationError({
+        source,
+        reason: `${source} must be 1–64 ASCII characters matching ^[a-z][A-Za-z0-9]*$ and not a reserved name`,
+      }),
+    );
+  },
+  (effect) => observeJobs("jobName.assert", effect),
+);
+
+/** Asserts the job-name grammar for synchronous callers.
+ * @param value - Untrusted candidate.
+ * @param source - Name of the field for diagnostics.
+ * @returns Nothing when valid.
+ * @throws TypeError when the candidate is not a valid job name.
+ * @example assertJobName("sendEmail");
+ */
 export function assertJobName(value: unknown, source = "job name"): asserts value is JobName {
-  if (isJobName(value)) return;
-  throw new TypeError(
-    `${source} must be 1–64 ASCII characters matching ^[a-z][A-Za-z0-9]*$ and not a reserved name`,
-  );
+  const result = Effect.runSync(Effect.result(assertJobNameEffect(value, source)));
+  if (Result.isFailure(result)) throw new TypeError(result.failure.reason);
 }
 
+/** Validates a literal name in Effect while retaining its literal type.
+ * @param value - Authored name.
+ * @returns An Effect of the validated literal or JobNameValidationError.
+ * @example Effect.runPromise(validateJobNameEffect("sendEmail"));
+ */
+export const validateJobNameEffect = Effect.fn("Jobs.validateJobName")(
+  function* <const Name extends string>(value: Name) {
+    yield* assertJobNameEffect(value);
+    return value as ValidJobName<Name>;
+  },
+  (effect) => observeJobs("jobName.validate", effect),
+);
+
+/** Validates a literal job name for synchronous authors.
+ * @param value - Authored name.
+ * @returns The validated literal.
+ * @throws TypeError when the name is invalid.
+ * @example validateJobName("sendEmail");
+ */
 export function validateJobName<const Name extends string>(value: Name): ValidJobName<Name> {
-  assertJobName(value);
-  return value as ValidJobName<Name>;
+  const result = Effect.runSync(Effect.result(validateJobNameEffect(value)));
+  if (Result.isFailure(result)) throw new TypeError(result.failure.reason);
+  return result.success;
 }
 
-export function normalizeJobName<const Name extends string>(value: Name): ValidJobName<Name> {
-  return validateJobName(value);
-}
+/** Alias for validateJobName.
+ * @param value - Authored name.
+ * @returns The validated literal.
+ * @throws TypeError when the name is invalid.
+ * @example normalizeJobName("sendEmail");
+ */
+export const normalizeJobName = validateJobName;

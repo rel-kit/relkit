@@ -14,11 +14,14 @@ description: Generated public TypeScript reference for @relkit/routes.
 - [Routes](#routes)
   - [defineMiddleware](#definemiddleware)
 - [utils](#utils)
-  - [MiddlewareContext (interface)](#middlewarecontext-interface)
-  - [MiddlewareDescriptor (interface)](#middlewaredescriptor-interface)
-  - [MiddlewareHandler (type alias)](#middlewarehandler-type-alias)
+  - [MiddlewareContext](#middlewarecontext)
+  - [MiddlewareDescriptor](#middlewaredescriptor)
+  - [MiddlewareHandler](#middlewarehandler)
+  - [defineMiddlewareEffect](#definemiddlewareeffect)
   - [isMiddlewareDescriptor](#ismiddlewaredescriptor)
+  - [isMiddlewareDescriptorEffect](#ismiddlewaredescriptoreffect)
   - [isMiddlewarePath](#ismiddlewarepath)
+  - [isMiddlewarePathEffect](#ismiddlewarepatheffect)
 
 ---
 
@@ -27,6 +30,10 @@ description: Generated public TypeScript reference for @relkit/routes.
 ## defineMiddleware
 
 Defines one automatically discovered path-scoped HTTP middleware handler.
+
+**Throws**
+
+TypeError for an invalid path or handler.
 
 **Example**
 
@@ -50,13 +57,163 @@ declare const defineMiddleware: (
 ) => MiddlewareDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L72)
 
 Since v0.1.0
 
 # utils
 
+## MiddlewareContext
+
+**Signature**
+
+```ts
+declare const MiddlewareContext: MiddlewareContext;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L15)
+
+## MiddlewareDescriptor
+
+**Signature**
+
+```ts
+declare const MiddlewareDescriptor: MiddlewareDescriptor<Id>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L16)
+
+## MiddlewareHandler
+
+**Signature**
+
+```ts
+declare const MiddlewareHandler: MiddlewareHandler;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L17)
+
+## defineMiddlewareEffect
+
+Defines path-scoped middleware through a typed Effect.
+
+**Example**
+
+```ts
+Effect.runSync(defineMiddlewareEffect("/orders/*", handler));
+```
+
+**Signature**
+
+```ts
+declare const defineMiddlewareEffect: (
+  path: string,
+  handler: MiddlewareHandler,
+) => Effect.Effect<MiddlewareDescriptor<string>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L26)
+
+## isMiddlewareDescriptor
+
+Checks a middleware descriptor synchronously.
+
+**Example**
+
+```ts
+isMiddlewareDescriptor(value);
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewareDescriptor: (value: unknown) => value is MiddlewareDescriptor;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L94)
+
+## isMiddlewareDescriptorEffect
+
+Checks a middleware descriptor through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isMiddlewareDescriptorEffect(value));
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewareDescriptorEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L84)
+
+## isMiddlewarePath
+
+Checks a middleware path synchronously.
+
+**Example**
+
+```ts
+isMiddlewarePath("/orders/*");
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewarePath: (value: unknown) => value is string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L122)
+
+## isMiddlewarePathEffect
+
+Checks an HTTP middleware path through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isMiddlewarePathEffect("/orders/*"));
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewarePathEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L113)
+
+## `define-middleware.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [MiddlewareContext (interface)](#middlewarecontext-interface)
+  - [MiddlewareDescriptor (interface)](#middlewaredescriptor-interface)
+  - [MiddlewareHandler (type alias)](#middlewarehandler-type-alias)
+
+---
+
+# utils
+
 ## MiddlewareContext (interface)
+
+Invocation-scoped capabilities provided to middleware.
+
+**Example**
+
+```ts
+const context: MiddlewareContext = relkit;
+```
 
 **Signature**
 
@@ -71,9 +228,17 @@ export interface MiddlewareContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.types.ts#L9)
 
 ## MiddlewareDescriptor (interface)
+
+Frozen descriptor for one middleware handler.
+
+**Example**
+
+```ts
+const descriptor: MiddlewareDescriptor = defineMiddleware("/orders", handler);
+```
 
 **Signature**
 
@@ -87,9 +252,17 @@ export interface MiddlewareDescriptor<Id extends string = string> extends Descri
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.types.ts#L30)
 
 ## MiddlewareHandler (type alias)
+
+A path-scoped HTTP middleware callback.
+
+**Example**
+
+```ts
+const handler: MiddlewareHandler = async (_context, next) => next();
+```
 
 **Signature**
 
@@ -101,27 +274,7 @@ type MiddlewareHandler = (
 ) => MaybePromise<Response | void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L26)
-
-## isMiddlewareDescriptor
-
-**Signature**
-
-```ts
-declare const isMiddlewareDescriptor: (value: unknown) => value is MiddlewareDescriptor;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L71)
-
-## isMiddlewarePath
-
-**Signature**
-
-```ts
-declare const isMiddlewarePath: (value: unknown) => value is string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.types.ts#L21)
 
 ## `define-route.ts`
 
@@ -132,7 +285,8 @@ declare const isMiddlewarePath: (value: unknown) => value is string;
 - [HTTP](#http)
   - [defineRoute](#defineroute)
 - [utils](#utils)
-  - ["./route-types.js" (namespace export)](#route-typesjs-namespace-export)
+  - ["./route.types.js" (namespace export)](#routetypesjs-namespace-export)
+  - [defineRouteEffect](#definerouteeffect)
 
 ---
 
@@ -147,6 +301,10 @@ file. Omit `id` for a source-derived route identity, and omit `request` and
 `responses` when schema-based inference represents the transport; explicit
 mappings replace inference completely. Matching path names map into reusable
 function input.
+
+**Throws**
+
+TypeError for invalid authoring input.
 
 **Example**
 
@@ -175,23 +333,52 @@ export const GET = defineRoute({ target: listOrders })
 declare const defineRoute: { <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>; <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>; }
 ````
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L103)
 
 Since v0.1.0
 
 # utils
 
-## "./route-types.js" (namespace export)
+## "./route.types.js" (namespace export)
 
-Re-exports all named exports from the "./route-types.js" module.
+Re-exports all named exports from the "./route.types.js" module.
 
 **Signature**
 
 ```ts
-export * from "./route-types.js";
+export * from "./route.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L20)
+
+## defineRouteEffect
+
+Defines a raw or function route through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(defineRouteEffect({ target: listOrders }));
+```
+
+**Signature**
+
+```ts
+declare const defineRouteEffect: {
+  <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(
+    options: RawRouteOptions<Id, Handler>,
+  ): Effect.Effect<RawRouteDescriptor<Id, Handler>, RouteOperationError>;
+  <
+    const Id extends string,
+    const Target extends FunctionRefAny,
+    const Request extends HttpRequestMapping | undefined = undefined,
+  >(
+    options: FunctionRouteOptions<Id, Target, Request>,
+  ): Effect.Effect<FunctionRouteDescriptor<Id, Target, Request>, RouteOperationError>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L55)
 
 ## `define-service-routes.ts`
 
@@ -201,12 +388,13 @@ export * from "./route-types.js";
 
 - [utils](#utils)
   - [SERVICE_ROUTE_METHODS](#service_route_methods)
-  - [ServiceRouteEntry (type alias)](#servicerouteentry-type-alias)
-  - [ServiceRouteMethod (type alias)](#serviceroutemethod-type-alias)
-  - [ServiceRouteOptions (type alias)](#servicerouteoptions-type-alias)
-  - [ServiceRoutesOptions (type alias)](#serviceroutesoptions-type-alias)
-  - [ServiceRoutesResult (type alias)](#serviceroutesresult-type-alias)
+  - [ServiceRouteEntry](#servicerouteentry)
+  - [ServiceRouteMethod](#serviceroutemethod)
+  - [ServiceRouteOptions](#servicerouteoptions)
+  - [ServiceRoutesOptions](#serviceroutesoptions)
+  - [ServiceRoutesResult](#serviceroutesresult)
   - [defineServiceRoutes](#defineserviceroutes)
+  - [defineServiceRoutesEffect](#defineservicerouteseffect)
 
 ---
 
@@ -228,76 +416,85 @@ declare const SERVICE_ROUTE_METHODS: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L25)
 
-## ServiceRouteEntry (type alias)
+## ServiceRouteEntry
 
 **Signature**
 
 ```ts
-type ServiceRouteEntry<Service> = {
-  [Name in ServiceFunctionName<Service>]:
-    Name | ServiceRouteOptions<Name, ServiceFunction<Service, Name>>;
-}[ServiceFunctionName<Service>];
+declare const ServiceRouteEntry: ServiceRouteEntry<Service>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L20)
 
-## ServiceRouteMethod (type alias)
+## ServiceRouteMethod
 
 **Signature**
 
 ```ts
-type ServiceRouteMethod = (typeof SERVICE_ROUTE_METHODS)[number];
+declare const ServiceRouteMethod: ServiceRouteMethod;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L18)
 
-## ServiceRouteOptions (type alias)
+## ServiceRouteOptions
 
 **Signature**
 
 ```ts
-type ServiceRouteOptions<Name extends string, Target extends FunctionRefAny> = Omit<
-  FunctionRouteOptions<string, Target, HttpRequestMapping | undefined>,
-  "target"
-> & {
-  readonly member: Name;
-};
+declare const ServiceRouteOptions: ServiceRouteOptions<Name, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L19)
 
-## ServiceRoutesOptions (type alias)
+## ServiceRoutesOptions
 
 **Signature**
 
 ```ts
-type ServiceRoutesOptions<Service> = Partial<
+declare const ServiceRoutesOptions: Partial<
   Readonly<Record<ServiceRouteMethod, ServiceRouteEntry<Service>>>
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L21)
 
-## ServiceRoutesResult (type alias)
+## ServiceRoutesResult
 
 **Signature**
 
 ```ts
-type ServiceRoutesResult<Service, Options> = Readonly<{
+declare const ServiceRoutesResult: Readonly<{
   [Method in keyof Options]: FunctionRouteDescriptor<
     string,
-    ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>
+    Extract<
+      ServiceFunctions<Service>[Extract<
+        EntryName<Options[Method]>,
+        Extract<keyof ServiceFunctions<Service>, string>
+      >],
+      FunctionRefAny
+    >,
+    HttpRequestMapping | undefined
   >;
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L22)
 
 ## defineServiceRoutes
 
-Creates explicit HTTP route descriptors aligned with a service's public functions.
+Creates explicit HTTP routes for a service synchronously.
+
+**Throws**
+
+TypeError for invalid method or member references.
+
+**Example**
+
+```ts
+defineServiceRoutes(service, { GET: "list" });
+```
 
 **Signature**
 
@@ -311,45 +508,1875 @@ declare const defineServiceRoutes: <
 ) => ServiceRoutesResult<Service, Options>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L82)
 
-## `http-dsl-types.ts`
+## defineServiceRoutesEffect
+
+Creates explicit service routes through an Effect.
+
+**Example**
+
+```ts
+Effect.runSync(defineServiceRoutesEffect(service, { GET: "list" }));
+```
+
+**Signature**
+
+```ts
+declare const defineServiceRoutesEffect: <
+  const Service extends ServiceDescriptor<string, any, any>,
+  const Options extends Partial<Readonly<Record<ServiceRouteMethod, ServiceRouteEntry<Service>>>>,
+>(
+  service: Service,
+  options: Options,
+) => Effect.Effect<
+  Readonly<{
+    [Method in keyof Options]: FunctionRouteDescriptor<
+      string,
+      Extract<
+        ServiceFunctions<Service>[Extract<
+          EntryName<Options[Method]>,
+          Extract<keyof ServiceFunctions<Service>, string>
+        >],
+        FunctionRefAny
+      >,
+      HttpRequestMapping | undefined
+    >;
+  }>,
+  RouteOperationError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L41)
+
+## `define-service-routes.types.ts`
 
 ---
 
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - [ServiceRouteEntry (type alias)](#servicerouteentry-type-alias)
+  - [ServiceRouteMethod (type alias)](#serviceroutemethod-type-alias)
+  - [ServiceRouteOptions (type alias)](#servicerouteoptions-type-alias)
+  - [ServiceRoutesOptions (type alias)](#serviceroutesoptions-type-alias)
+  - [ServiceRoutesResult (type alias)](#serviceroutesresult-type-alias)
+
+---
+
+# utils
+
+## ServiceRouteEntry (type alias)
+
+Member name or options for a service route.
+
+**Example**
+
+```ts
+type Entry = ServiceRouteEntry<typeof service>;
+```
+
+**Signature**
+
+```ts
+type ServiceRouteEntry<Service> = {
+  [Name in ServiceFunctionName<Service>]:
+    Name | ServiceRouteOptions<Name, ServiceFunction<Service, Name>>;
+}[ServiceFunctionName<Service>];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L27)
+
+## ServiceRouteMethod (type alias)
+
+Explicit HTTP methods supported by a service route table.
+
+**Example**
+
+```ts
+const method: ServiceRouteMethod = "GET";
+```
+
+**Signature**
+
+```ts
+type ServiceRouteMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L9)
+
+## ServiceRouteOptions (type alias)
+
+Expanded options selecting one service function.
+
+**Example**
+
+```ts
+type Options = ServiceRouteOptions<"list", typeof list>;
+```
+
+**Signature**
+
+```ts
+type ServiceRouteOptions<Name extends string, Target extends FunctionRefAny> = Omit<
+  FunctionRouteOptions<string, Target, HttpRequestMapping | undefined>,
+  "target"
+> & { readonly member: Name };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L19)
+
+## ServiceRoutesOptions (type alias)
+
+Partial HTTP method table for a service.
+
+**Example**
+
+```ts
+type Options = ServiceRoutesOptions<typeof service>;
+```
+
+**Signature**
+
+```ts
+type ServiceRoutesOptions<Service> = Partial<
+  Readonly<Record<ServiceRouteMethod, ServiceRouteEntry<Service>>>
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L35)
+
+## ServiceRoutesResult (type alias)
+
+Route descriptors inferred from a service route table.
+
+**Example**
+
+```ts
+type Routes = ServiceRoutesResult<typeof service, { GET: "list" }>;
+```
+
+**Signature**
+
+```ts
+type ServiceRoutesResult<Service, Options> = Readonly<{
+  [Method in keyof Options]: FunctionRouteDescriptor<
+    string,
+    ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>
+  >;
+}>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L48)
+
+## `http-dsl-mapping-validation.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [assertMapping](#assertmapping)
+  - [assertMappingEffect](#assertmappingeffect)
+  - [assertMappingValue](#assertmappingvalue)
+  - [assertRequestMapping](#assertrequestmapping)
+  - [assertRequestMappingEffect](#assertrequestmappingeffect)
+  - [assertRequestMappingValue](#assertrequestmappingvalue)
+  - [isHttpMapping](#ishttpmapping)
+  - [isHttpMappingEffect](#ishttpmappingeffect)
+  - [isHttpRequestMapping](#ishttprequestmapping)
+  - [isHttpRequestMappingEffect](#ishttprequestmappingeffect)
+  - [isMappingValue](#ismappingvalue)
+
+---
+
+# utils
+
+## assertMapping
+
+Asserts a serializable mapping synchronously.
+
+**Throws**
+
+TypeError for invalid mapping values.
+
+**Example**
+
+```ts
+assertMapping(http.path("id"));
+```
+
+**Signature**
+
+```ts
+declare const assertMapping: (value: unknown) => asserts value is HttpMappingNode;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L79)
+
+## assertMappingEffect
+
+Asserts a serializable mapping through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(assertMappingEffect(http.path("id")));
+```
+
+**Signature**
+
+```ts
+declare const assertMappingEffect: (
+  value: unknown,
+) => Effect.Effect<void, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L69)
+
+## assertMappingValue
+
+Validates a mapping inside an already observed operation.
+
+**Throws**
+
+RouteInputError for an invalid mapping.
+
+**Example**
+
+```ts
+assertMappingValue({ kind: "path", name: "id" });
+```
+
+**Signature**
+
+```ts
+declare const assertMappingValue: (value: unknown) => asserts value is HttpMappingNode;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L89)
+
+## assertRequestMapping
+
+Asserts a request input mapping synchronously.
+
+**Throws**
+
+TypeError for invalid request mappings.
+
+**Example**
+
+```ts
+assertRequestMapping(http.input({}));
+```
+
+**Signature**
+
+```ts
+declare const assertRequestMapping: (value: unknown) => asserts value is HttpRequestMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L130)
+
+## assertRequestMappingEffect
+
+Asserts a request input mapping through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(assertRequestMappingEffect(http.input({})));
+```
+
+**Signature**
+
+```ts
+declare const assertRequestMappingEffect: (
+  value: unknown,
+) => Effect.Effect<void, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L120)
+
+## assertRequestMappingValue
+
+Validates a request mapping inside an already observed operation.
+
+**Throws**
+
+RouteInputError for an invalid request mapping.
+
+**Example**
+
+```ts
+assertRequestMappingValue({ kind: "input", fields: {} });
+```
+
+**Signature**
+
+```ts
+declare const assertRequestMappingValue: (value: unknown) => asserts value is HttpRequestMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L140)
+
+## isHttpMapping
+
+Checks a serializable mapping synchronously.
+
+**Example**
+
+```ts
+isHttpMapping(http.path("id"));
+```
+
+**Signature**
+
+```ts
+declare const isHttpMapping: (value: unknown) => value is HttpMappingNode;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L21)
+
+## isHttpMappingEffect
+
+Checks a serializable mapping through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isHttpMappingEffect(http.path("id")));
+```
+
+**Signature**
+
+```ts
+declare const isHttpMappingEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L12)
+
+## isHttpRequestMapping
+
+Checks a request input mapping synchronously.
+
+**Example**
+
+```ts
+isHttpRequestMapping(http.input({}));
+```
+
+**Signature**
+
+```ts
+declare const isHttpRequestMapping: (value: unknown) => value is HttpRequestMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L108)
+
+## isHttpRequestMappingEffect
+
+Checks a request input mapping through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isHttpRequestMappingEffect(http.input({})));
+```
+
+**Signature**
+
+```ts
+declare const isHttpRequestMappingEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L99)
+
+## isMappingValue
+
+Checks a non-root mapping during recursive validation.
+
+**Example**
+
+```ts
+isMappingValue(http.path("id"));
+```
+
+**Signature**
+
+```ts
+declare const isMappingValue: (value: unknown) => value is HttpMappingNode;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L149)
+
+## `http-dsl-methods.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [HttpDslMethods (interface)](#httpdslmethods-interface)
+
+---
+
+# utils
+
+## HttpDslMethods (interface)
+
+Constructor methods for serializable HTTP mappings.
+
+**Example**
+
+```ts
+const request = http.input({ id: http.path("id") });
+```
+
+**Signature**
+
+```ts
+export interface HttpDslMethods extends HttpDslSources {
+  /** Named request fields.
+   * @param fields - Serializable field mappings.
+   * @returns An input mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.input({ id: http.path("id") });
+   */
+  input<const S extends HttpMappingShape>(fields: S): HttpInputMapping<S>;
+  /** Named nested fields.
+   * @param fields - Serializable field mappings.
+   * @returns A nested object mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.nested({ id: http.path("id") });
+   */
+  nested<const S extends HttpMappingShape>(fields: S): HttpNestedMapping<S>;
+  /** A serializable constant.
+   * @param value - JSON-compatible value.
+   * @returns A constant mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.constant("all");
+   */
+  constant<const V extends JsonValue>(value: V): HttpConstantMapping<V>;
+  /** An optional source value.
+   * @param value - Existing mapping node.
+   * @returns An optional mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.optional(http.query("page"));
+   */
+  optional<const M extends HttpMappingNode>(value: M): HttpOptionalMapping<M>;
+  /** A source value with a fallback.
+   * @param value - Existing mapping node
+   * @param fallback - JSON-compatible default.
+   * @returns A default mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.default(http.query("page"), "1");
+   */
+  default<const M extends HttpMappingNode, const V extends JsonValue>(
+    value: M,
+    fallback: V,
+  ): HttpDefaultMapping<M, V>;
+  /** A registered transformation.
+   * @param transform - Reference or stable ID
+   * @param value - Optional input mapping.
+   * @returns A transform mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.transform("text.upper", http.body("name"));
+   */
+  transform<const T extends HttpTransformRef | string, const M extends HttpMappingNode>(
+    transform: T,
+    value?: M,
+  ): HttpTransformMapping<TransformOutput<T>>;
+  /** A successful response.
+   * @param status - HTTP status
+   * @param schema - Optional body schema.
+   * @returns A response mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.success(200);
+   */
+  success(status: number, schema?: StandardSchemaV1): HttpResponseMapping;
+  /** An error response.
+   * @param errorId - Stable error ID
+   * @param status - HTTP status
+   * @param schema - Optional body schema.
+   * @returns An error response mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.error("not-found", 404);
+   */
+  error(errorId: string, status: number, schema?: StandardSchemaV1): HttpResponseMapping;
+  /** A validation failure response.
+   * @param status - HTTP status
+   * @param schema - Optional body schema.
+   * @returns A validation-error mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.validationError(422);
+   */
+  validationError(status?: number, schema?: StandardSchemaV1): HttpResponseMapping;
+  /** A named response.
+   * @param id - Stable response ID
+   * @param status - HTTP status
+   * @param schema - Optional body schema.
+   * @returns A named response mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.response("accepted", 202);
+   */
+  response(id: string, status: number, schema?: StandardSchemaV1): HttpResponseMapping;
+  /** A middleware continue decision.
+   * @returns A continue decision.
+   * @example http.continue();
+   */
+  continue(): ContinueMapping;
+  /** A middleware response decision.
+   * @param response - Mapping or stable response ID
+   * @param body - Optional body mapping.
+   * @returns A respond decision.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.respond("accepted");
+   */
+  respond(response: HttpResponseMapping | string, body?: HttpMappingNode): RespondMapping;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-methods.types.ts#L25)
+
+## `http-dsl-operations.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [httpEffects](#httpeffects)
+
+---
+
+# utils
+
+## httpEffects
+
+Effect implementations for each HTTP mapping constructor.
+
+**Example**
+
+```ts
+Effect.runSync(httpEffects.input({ id: httpEffects.path("id") }));
+```
+
+**Signature**
+
+```ts
+declare const httpEffects: {
+  constant: <const V extends JsonValue>(
+    value: V,
+  ) => Effect.Effect<HttpConstantMapping<V>, RouteOperationError, never>;
+  optional: <const M extends HttpMappingNode>(
+    value: M,
+  ) => Effect.Effect<HttpOptionalMapping<M>, RouteOperationError, never>;
+  default: <const M extends HttpMappingNode, const V extends JsonValue>(
+    value: M,
+    fallback: V,
+  ) => Effect.Effect<HttpDefaultMapping<M, V>, RouteOperationError, never>;
+  transform: <const T extends HttpTransformRef | string, const M extends HttpMappingNode>(
+    transform: T,
+    value?: M | undefined,
+  ) => Effect.Effect<HttpTransformMapping<TransformOutput<T>>, RouteOperationError, never>;
+  success: (
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+  error: (
+    errorId: string,
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+  validationError: (
+    status?: number | undefined,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+  response: (
+    id: string,
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+  continue: () => Effect.Effect<ContinueMapping, RouteOperationError, never>;
+  respond: (
+    response: string | HttpResponseMapping,
+    body?: HttpMappingNode | undefined,
+  ) => Effect.Effect<RespondMapping, RouteOperationError, never>;
+  input: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect.Effect<HttpInputMapping<S>, RouteOperationError, never>;
+  nested: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect.Effect<HttpNestedMapping<S>, RouteOperationError, never>;
+  path: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  pathSegments: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  query: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  header: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  cookie: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  body: (
+    name?: string | undefined,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  wholeBody: () => Effect.Effect<HttpWholeBodyMapping<unknown>, RouteOperationError, never>;
+  multipart: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  multipartAll: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-operations.ts#L12)
+
+## `http-dsl-response-validation.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [assertResponse](#assertresponse)
+  - [assertResponseEffect](#assertresponseeffect)
+  - [assertResponseValue](#assertresponsevalue)
+  - [isHttpResponseMapping](#ishttpresponsemapping)
+  - [isHttpResponseMappingEffect](#ishttpresponsemappingeffect)
+  - [isMiddlewareDecision](#ismiddlewaredecision)
+  - [isMiddlewareDecisionEffect](#ismiddlewaredecisioneffect)
+
+---
+
+# utils
+
+## assertResponse
+
+Asserts a response mapping synchronously.
+
+**Throws**
+
+TypeError for invalid response mappings.
+
+**Example**
+
+```ts
+assertResponse(http.success(200));
+```
+
+**Signature**
+
+```ts
+declare const assertResponse: (value: unknown) => HttpResponseMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L56)
+
+## assertResponseEffect
+
+Asserts a response mapping through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(assertResponseEffect(http.success(200)));
+```
+
+**Signature**
+
+```ts
+declare const assertResponseEffect: (
+  value: unknown,
+) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L46)
+
+## assertResponseValue
+
+Validates a response inside an already observed operation.
+
+**Throws**
+
+RouteInputError for an invalid response.
+
+**Example**
+
+```ts
+assertResponseValue({ kind: "success", id: "success.200", status: 200 });
+```
+
+**Signature**
+
+```ts
+declare const assertResponseValue: (value: unknown) => HttpResponseMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L66)
+
+## isHttpResponseMapping
+
+Checks a response mapping synchronously.
+
+**Example**
+
+```ts
+isHttpResponseMapping(http.success(200));
+```
+
+**Signature**
+
+```ts
+declare const isHttpResponseMapping: (value: unknown) => value is HttpResponseMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L27)
+
+## isHttpResponseMappingEffect
+
+Checks a response mapping through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isHttpResponseMappingEffect(http.success(200)));
+```
+
+**Signature**
+
+```ts
+declare const isHttpResponseMappingEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L18)
+
+## isMiddlewareDecision
+
+Checks a middleware response decision synchronously.
+
+**Example**
+
+```ts
+isMiddlewareDecision(http.continue());
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewareDecision: (value: unknown) => value is MiddlewareDecisionMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L85)
+
+## isMiddlewareDecisionEffect
+
+Checks a middleware response decision through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isMiddlewareDecisionEffect(http.continue()));
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewareDecisionEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L76)
+
+## `http-dsl-source-operations.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [httpSourceEffects](#httpsourceeffects)
+
+---
+
+# utils
+
+## httpSourceEffects
+
+Effect constructors for request input and source mappings.
+
+**Example**
+
+```ts
+Effect.runSync(httpSourceEffects.path("id"));
+```
+
+**Signature**
+
+```ts
+declare const httpSourceEffects: {
+  input: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect.Effect<HttpInputMapping<S>, RouteOperationError, never>;
+  nested: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect.Effect<HttpNestedMapping<S>, RouteOperationError, never>;
+  path: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  pathSegments: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  query: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  header: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  cookie: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  body: (
+    name?: string | undefined,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  wholeBody: () => Effect.Effect<HttpWholeBodyMapping<unknown>, RouteOperationError, never>;
+  multipart: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  multipartAll: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-source-operations.ts#L9)
+
+## `http-dsl-sources.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [HttpDslSources (interface)](#httpdslsources-interface)
+
+---
+
+# utils
+
+## HttpDslSources (interface)
+
+Source constructors for serializable HTTP request mappings.
+
+**Example**
+
+```ts
+const id = http.path("id");
+```
+
+**Signature**
+
+```ts
+export interface HttpDslSources {
+  /** One path parameter.
+   * @param name - Path parameter name
+   * @returns A path source mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.path("id");
+   */
+  path(name: string): HttpPathMapping;
+  /** Maps a named path parameter with optionality or a default.
+   * @param name - Source name.
+   * @param options - Optionality or JSON fallback.
+   * @returns A source mapping, optionally wrapped by a default or optional node.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.path("id", { optional: true });
+   */
+  path(name: string, options: HttpSourceOptions): HttpMappingNode;
+  /** Captured path segments.
+   * @param name - Segment parameter name
+   * @returns A path segments mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.pathSegments("parts");
+   */
+  pathSegments(name: string): HttpPathSegmentsMapping;
+  /** Maps a captured path segments with optionality or a default.
+   * @param name - Source name.
+   * @param options - Optionality or JSON fallback.
+   * @returns A source mapping, optionally wrapped by a default or optional node.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.pathSegments("parts", { optional: true });
+   */
+  pathSegments(name: string, options: HttpSourceOptions): HttpMappingNode;
+  /** One query parameter.
+   * @param name - Query parameter name
+   * @returns A query source mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.query("page");
+   */
+  query(name: string): HttpQueryMapping;
+  /** Maps a named query parameter with optionality or a default.
+   * @param name - Source name.
+   * @param options - Optionality or JSON fallback.
+   * @returns A source mapping, optionally wrapped by a default or optional node.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.query("page", { default: "1" });
+   */
+  query(name: string, options: HttpSourceOptions): HttpMappingNode;
+  /** One request header.
+   * @param name - Header name
+   * @returns A header source mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.header("authorization");
+   */
+  header(name: string): HttpHeaderMapping;
+  /** Maps a named request header with optionality or a default.
+   * @param name - Source name.
+   * @param options - Optionality or JSON fallback.
+   * @returns A source mapping, optionally wrapped by a default or optional node.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.header("authorization", { optional: true });
+   */
+  header(name: string, options: HttpSourceOptions): HttpMappingNode;
+  /** One request cookie.
+   * @param name - Cookie name
+   * @returns A cookie source mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.cookie("session");
+   */
+  cookie(name: string): HttpCookieMapping;
+  /** Maps a named request cookie with optionality or a default.
+   * @param name - Source name.
+   * @param options - Optionality or JSON fallback.
+   * @returns A source mapping, optionally wrapped by a default or optional node.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.cookie("session", { optional: true });
+   */
+  cookie(name: string, options: HttpSourceOptions): HttpMappingNode;
+  /** The whole body or one body field.
+   * @param name - Optional body field name
+   * @param options - Optionality or fallback.
+   * @returns A body source mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.body("name");
+   */
+  /** The complete request body.
+   * @returns A whole-body mapping.
+   * @example http.body();
+   */
+  body(): HttpWholeBodyMapping;
+  /** Maps one named body field.
+   * @param name - Body field name.
+   * @returns A body field mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.body("name");
+   */
+  body(name: string): HttpBodyMapping;
+  /** Maps a named body field with optionality or a default.
+   * @param name - Source name.
+   * @param options - Optionality or JSON fallback.
+   * @returns A source mapping, optionally wrapped by a default or optional node.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.body("name", { optional: true });
+   */
+  body(name: string, options: HttpSourceOptions): HttpMappingNode;
+  /** The complete request body.
+   * @returns A whole-body mapping.
+   * @example http.wholeBody();
+   */
+  wholeBody(): HttpWholeBodyMapping;
+  /** One multipart form field.
+   * @param name - Form field name
+   * @returns A multipart source mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.multipart("photo");
+   */
+  multipart(name: string): HttpMultipartMapping;
+  /** Maps a named multipart field with optionality or a default.
+   * @param name - Source name.
+   * @param options - Optionality or JSON fallback.
+   * @returns A source mapping, optionally wrapped by a default or optional node.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.multipart("photo", { optional: true });
+   */
+  multipart(name: string, options: HttpSourceOptions): HttpMappingNode;
+  /** All values of one multipart field.
+   * @param name - Form field name
+   * @returns A multipart-array source mapping.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.multipartAll("files");
+   */
+  multipartAll(name: string): HttpMultipartAllMapping;
+  /** Maps a all values of a multipart field with optionality or a default.
+   * @param name - Source name.
+   * @param options - Optionality or JSON fallback.
+   * @returns A source mapping, optionally wrapped by a default or optional node.
+   * @throws TypeError when the mapping input is invalid.
+   * @example http.multipartAll("files", { optional: true });
+   */
+  multipartAll(name: string, options: HttpSourceOptions): HttpMappingNode;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-sources.types.ts#L18)
+
+## `http-dsl-validation.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - ["./http-dsl-mapping-validation.js" (namespace export)](#http-dsl-mapping-validationjs-namespace-export)
+  - ["./http-dsl-response-validation.js" (namespace export)](#http-dsl-response-validationjs-namespace-export)
+  - ["./http-dsl-value-validation.js" (namespace export)](#http-dsl-value-validationjs-namespace-export)
+
+---
+
+# utils
+
+## "./http-dsl-mapping-validation.js" (namespace export)
+
+Re-exports all named exports from the "./http-dsl-mapping-validation.js" module.
+
+**Signature**
+
+```ts
+export * from "./http-dsl-mapping-validation.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L2)
+
+## "./http-dsl-response-validation.js" (namespace export)
+
+Re-exports all named exports from the "./http-dsl-response-validation.js" module.
+
+**Signature**
+
+```ts
+export * from "./http-dsl-response-validation.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L3)
+
+## "./http-dsl-value-validation.js" (namespace export)
+
+Re-exports all named exports from the "./http-dsl-value-validation.js" module.
+
+**Signature**
+
+```ts
+export * from "./http-dsl-value-validation.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L1)
+
+## `http-dsl-value-validation.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [assertSchema](#assertschema)
+  - [assertSchemaEffect](#assertschemaeffect)
+  - [assertSchemaValue](#assertschemavalue)
+  - [isJsonValue](#isjsonvalue)
+  - [isRecord](#isrecord)
+  - [isRecordEffect](#isrecordeffect)
+  - [isRecordValue](#isrecordvalue)
+  - [isSchema](#isschema)
+  - [isSchemaEffect](#isschemaeffect)
+  - [isSchemaValue](#isschemavalue)
+  - [isStatus](#isstatus)
+  - [isStatusEffect](#isstatuseffect)
+  - [isStatusValue](#isstatusvalue)
+  - [ownKeys](#ownkeys)
+
+---
+
+# utils
+
+## assertSchema
+
+Asserts a Standard Schema validator synchronously.
+
+**Throws**
+
+TypeError for invalid schemas.
+
+**Example**
+
+```ts
+assertSchema(schema, "response schema");
+```
+
+**Signature**
+
+```ts
+declare const assertSchema: (value: unknown, name: string) => asserts value is StandardSchemaV1;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L55)
+
+## assertSchemaEffect
+
+Asserts a Standard Schema validator through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(assertSchemaEffect(schema, "response schema"));
+```
+
+**Signature**
+
+```ts
+declare const assertSchemaEffect: (
+  value: unknown,
+  name: string,
+) => Effect.Effect<void, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L43)
+
+## assertSchemaValue
+
+Validates a schema inside an already observed operation.
+
+**Throws**
+
+RouteInputError for an invalid schema.
+
+**Example**
+
+```ts
+assertSchemaValue(schema, "response schema");
+```
+
+**Signature**
+
+```ts
+declare const assertSchemaValue: (
+  value: unknown,
+  name: string,
+) => asserts value is StandardSchemaV1;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L66)
+
+## isJsonValue
+
+Checks JSON compatibility without leaking a validation exception.
+
+**Example**
+
+```ts
+isJsonValue({ ok: true });
+```
+
+**Signature**
+
+```ts
+declare const isJsonValue: (value: unknown) => value is JsonValue;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L101)
+
+## isRecord
+
+Checks an ordinary non-array object synchronously.
+
+**Example**
+
+```ts
+isRecord({});
+```
+
+**Signature**
+
+```ts
+declare const isRecord: (value: unknown) => value is Record<string, any>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L132)
+
+## isRecordEffect
+
+Checks an ordinary non-array object through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isRecordEffect({}));
+```
+
+**Signature**
+
+```ts
+declare const isRecordEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L123)
+
+## isRecordValue
+
+Checks the object shape inside another observed operation.
+
+**Example**
+
+```ts
+isRecordValue({ kind: "path" });
+```
+
+**Signature**
+
+```ts
+declare const isRecordValue: (value: unknown) => value is Record<string, any>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L140)
+
+## isSchema
+
+Checks a Standard Schema validator synchronously.
+
+**Example**
+
+```ts
+isSchema(schema);
+```
+
+**Signature**
+
+```ts
+declare const isSchema: (value: unknown) => value is StandardSchemaV1;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L21)
+
+## isSchemaEffect
+
+Checks a Standard Schema validator through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isSchemaEffect(schema));
+```
+
+**Signature**
+
+```ts
+declare const isSchemaEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L12)
+
+## isSchemaValue
+
+Checks the Standard Schema shape inside a parent operation.
+
+**Example**
+
+```ts
+isSchemaValue(z.string());
+```
+
+**Signature**
+
+```ts
+declare const isSchemaValue: (value: unknown) => value is StandardSchemaV1;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L29)
+
+## isStatus
+
+Checks an HTTP response status synchronously.
+
+**Example**
+
+```ts
+isStatus(200);
+```
+
+**Signature**
+
+```ts
+declare const isStatus: (value: unknown) => value is number;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L85)
+
+## isStatusEffect
+
+Checks an HTTP response status through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isStatusEffect(200));
+```
+
+**Signature**
+
+```ts
+declare const isStatusEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L76)
+
+## isStatusValue
+
+Checks an HTTP status inside response validation.
+
+**Example**
+
+```ts
+isStatusValue(200);
+```
+
+**Signature**
+
+```ts
+declare const isStatusValue: (value: unknown) => value is number;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L93)
+
+## ownKeys
+
+Checks that a mapping has only its allowed own property names.
+
+**Example**
+
+```ts
+ownKeys({ kind: "continue" }, "kind");
+```
+
+**Signature**
+
+```ts
+declare const ownKeys: (value: object, ...keys: string[]) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L115)
+
+## `http-dsl-values.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [httpValue](#httpvalue)
+  - [isTransformRefValue](#istransformrefvalue)
+
+---
+
+# utils
+
+## httpValue
+
+Internal pure constructors evaluated only inside the public Effect operations.
+
+**Signature**
+
+```ts
+declare const httpValue: HttpDsl;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-values.ts#L26)
+
+## isTransformRefValue
+
+Checks a transform reference without running another Effect adapter.
+
+**Example**
+
+```ts
+isTransformRefValue({ ref: { kind: "transform", id: "x" }, schema });
+```
+
+**Signature**
+
+```ts
+declare const isTransformRefValue: (value: unknown) => value is HttpTransformRef;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-values.ts#L137)
+
+## `http-dsl.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - ["./http-dsl.types.js" (namespace export)](#http-dsltypesjs-namespace-export)
+  - [assertRequestMapping](#assertrequestmapping)
+  - [assertRequestMappingEffect](#assertrequestmappingeffect)
+  - [assertResponse](#assertresponse)
+  - [assertResponseEffect](#assertresponseeffect)
+  - [defineRequestTransform](#definerequesttransform)
+  - [defineRequestTransformEffect](#definerequesttransformeffect)
+  - [defineTransform](#definetransform)
+  - [defineTransformEffect](#definetransformeffect)
+  - [http](#http)
+  - [httpEffects](#httpeffects)
+  - [isHttpMapping](#ishttpmapping)
+  - [isHttpMappingEffect](#ishttpmappingeffect)
+  - [isHttpRequestMapping](#ishttprequestmapping)
+  - [isHttpRequestMappingEffect](#ishttprequestmappingeffect)
+  - [isHttpResponseMapping](#ishttpresponsemapping)
+  - [isHttpResponseMappingEffect](#ishttpresponsemappingeffect)
+  - [isMiddlewareDecision](#ismiddlewaredecision)
+  - [isMiddlewareDecisionEffect](#ismiddlewaredecisioneffect)
+  - [isTransformRef](#istransformref)
+  - [isTransformRefEffect](#istransformrefeffect)
+
+---
+
+# utils
+
+## "./http-dsl.types.js" (namespace export)
+
+Re-exports all named exports from the "./http-dsl.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./http-dsl.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L23)
+
+## assertRequestMapping
+
+**Signature**
+
+```ts
+declare const assertRequestMapping: (value: unknown) => asserts value is HttpRequestMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L25)
+
+## assertRequestMappingEffect
+
+**Signature**
+
+```ts
+declare const assertRequestMappingEffect: (
+  value: unknown,
+) => Effect.Effect<void, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L26)
+
+## assertResponse
+
+**Signature**
+
+```ts
+declare const assertResponse: (value: unknown) => HttpResponseMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L27)
+
+## assertResponseEffect
+
+**Signature**
+
+```ts
+declare const assertResponseEffect: (
+  value: unknown,
+) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L28)
+
+## defineRequestTransform
+
+Alias for request transform definitions.
+
+**Throws**
+
+TypeError for invalid transform input.
+
+**Example**
+
+```ts
+defineRequestTransform({ schema });
+```
+
+**Signature**
+
+```ts
+declare const defineRequestTransform: <
+  const Id extends string,
+  const Schema extends StandardSchemaV1,
+>(
+  options: DefineTransformOptions<Id, Schema>,
+) => HttpTransformDescriptor<Id, Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L84)
+
+## defineRequestTransformEffect
+
+Effect alias for request transform definitions.
+
+**Example**
+
+```ts
+Effect.runSync(defineRequestTransformEffect({ schema }));
+```
+
+**Signature**
+
+```ts
+declare const defineRequestTransformEffect: <
+  const Id extends string,
+  const Schema extends StandardSchemaV1,
+>(
+  options: DefineTransformOptions<Id, Schema>,
+) => Effect.Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L91)
+
+## defineTransform
+
+Defines a serializable HTTP transform.
+
+**Throws**
+
+TypeError for invalid input or a closure-bearing transform.
+
+**Example**
+
+```ts
+defineTransform({ schema });
+```
+
+**Signature**
+
+```ts
+declare const defineTransform: <const Id extends string, const Schema extends StandardSchemaV1>(
+  options: DefineTransformOptions<Id, Schema>,
+) => HttpTransformDescriptor<Id, Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L72)
+
+## defineTransformEffect
+
+Defines a serializable transform through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(defineTransformEffect({ schema }));
+```
+
+**Signature**
+
+```ts
+declare const defineTransformEffect: <
+  const Id extends string,
+  const Schema extends StandardSchemaV1,
+>(
+  options: DefineTransformOptions<Id, Schema>,
+) => Effect.Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L45)
+
+## http
+
+Creates serializable HTTP request and response mappings.
+
+**Example**
+
+```ts
+const request = http.input({ id: http.path("id") });
+```
+
+**Signature**
+
+```ts
+declare const http: HttpDsl;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L131)
+
+## httpEffects
+
+**Signature**
+
+```ts
+declare const httpEffects: {
+  constant: <const V extends JsonValue>(
+    value: V,
+  ) => Effect.Effect<HttpConstantMapping<V>, RouteOperationError, never>;
+  optional: <const M extends HttpMappingNode>(
+    value: M,
+  ) => Effect.Effect<HttpOptionalMapping<M>, RouteOperationError, never>;
+  default: <const M extends HttpMappingNode, const V extends JsonValue>(
+    value: M,
+    fallback: V,
+  ) => Effect.Effect<HttpDefaultMapping<M, V>, RouteOperationError, never>;
+  transform: <const T extends HttpTransformRef | string, const M extends HttpMappingNode>(
+    transform: T,
+    value?: M | undefined,
+  ) => Effect.Effect<HttpTransformMapping<TransformOutput<T>>, RouteOperationError, never>;
+  success: (
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+  error: (
+    errorId: string,
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+  validationError: (
+    status?: number | undefined,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+  response: (
+    id: string,
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
+  continue: () => Effect.Effect<ContinueMapping, RouteOperationError, never>;
+  respond: (
+    response: string | HttpResponseMapping,
+    body?: HttpMappingNode | undefined,
+  ) => Effect.Effect<RespondMapping, RouteOperationError, never>;
+  input: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect.Effect<HttpInputMapping<S>, RouteOperationError, never>;
+  nested: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect.Effect<HttpNestedMapping<S>, RouteOperationError, never>;
+  path: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  pathSegments: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  query: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  header: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  cookie: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  body: (
+    name?: string | undefined,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  wholeBody: () => Effect.Effect<HttpWholeBodyMapping<unknown>, RouteOperationError, never>;
+  multipart: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+  multipartAll: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect.Effect<HttpMappingNode, RouteOperationError, never>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L38)
+
+## isHttpMapping
+
+**Signature**
+
+```ts
+declare const isHttpMapping: (value: unknown) => value is HttpMappingNode;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L29)
+
+## isHttpMappingEffect
+
+**Signature**
+
+```ts
+declare const isHttpMappingEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L30)
+
+## isHttpRequestMapping
+
+**Signature**
+
+```ts
+declare const isHttpRequestMapping: (value: unknown) => value is HttpRequestMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L31)
+
+## isHttpRequestMappingEffect
+
+**Signature**
+
+```ts
+declare const isHttpRequestMappingEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L32)
+
+## isHttpResponseMapping
+
+**Signature**
+
+```ts
+declare const isHttpResponseMapping: (value: unknown) => value is HttpResponseMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L33)
+
+## isHttpResponseMappingEffect
+
+**Signature**
+
+```ts
+declare const isHttpResponseMappingEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L34)
+
+## isMiddlewareDecision
+
+**Signature**
+
+```ts
+declare const isMiddlewareDecision: (value: unknown) => value is MiddlewareDecisionMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L35)
+
+## isMiddlewareDecisionEffect
+
+**Signature**
+
+```ts
+declare const isMiddlewareDecisionEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L36)
+
+## isTransformRef
+
+Checks a transform reference synchronously.
+
+**Example**
+
+```ts
+isTransformRef(transform);
+```
+
+**Signature**
+
+```ts
+declare const isTransformRef: (value: unknown) => value is HttpTransformRef;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L123)
+
+## isTransformRefEffect
+
+Checks a transform reference through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isTransformRefEffect(transform));
+```
+
+**Signature**
+
+```ts
+declare const isTransformRefEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L114)
+
+## `http-dsl.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - ["./http-mapping.types.js" (namespace export)](#http-mappingtypesjs-namespace-export)
   - [ContinueMapping (interface)](#continuemapping-interface)
   - [DefineTransformOptions (interface)](#definetransformoptions-interface)
-  - [HttpBodyMapping (interface)](#httpbodymapping-interface)
-  - [HttpConstantMapping (interface)](#httpconstantmapping-interface)
-  - [HttpCookieMapping (interface)](#httpcookiemapping-interface)
-  - [HttpDefaultMapping (interface)](#httpdefaultmapping-interface)
   - [HttpDsl (interface)](#httpdsl-interface)
-  - [HttpHeaderMapping (interface)](#httpheadermapping-interface)
-  - [HttpInputMapping (interface)](#httpinputmapping-interface)
-  - [HttpMapping (interface)](#httpmapping-interface)
-  - [HttpMappingNode (type alias)](#httpmappingnode-type-alias)
-  - [HttpMappingOutput (type alias)](#httpmappingoutput-type-alias)
-  - [HttpMappingShape (type alias)](#httpmappingshape-type-alias)
   - [HttpMethod (type alias)](#httpmethod-type-alias)
-  - [HttpMultipartAllMapping (interface)](#httpmultipartallmapping-interface)
-  - [HttpMultipartMapping (interface)](#httpmultipartmapping-interface)
-  - [HttpNestedMapping (interface)](#httpnestedmapping-interface)
-  - [HttpOptionalMapping (interface)](#httpoptionalmapping-interface)
-  - [HttpPathMapping (interface)](#httppathmapping-interface)
-  - [HttpPathSegmentsMapping (interface)](#httppathsegmentsmapping-interface)
-  - [HttpQueryMapping (interface)](#httpquerymapping-interface)
   - [HttpRequestContentType (type alias)](#httprequestcontenttype-type-alias)
-  - [HttpRequestMapping (type alias)](#httprequestmapping-type-alias)
   - [HttpResponseMapping (interface)](#httpresponsemapping-interface)
-  - [HttpSourceOptions (interface)](#httpsourceoptions-interface)
   - [HttpTransformDescriptor (interface)](#httptransformdescriptor-interface)
-  - [HttpTransformMapping (interface)](#httptransformmapping-interface)
   - [HttpTransformRef (interface)](#httptransformref-interface)
-  - [HttpWholeBodyMapping (interface)](#httpwholebodymapping-interface)
-  - [MappingShapeOutput (type alias)](#mappingshapeoutput-type-alias)
   - [MiddlewareDecisionMapping (type alias)](#middlewaredecisionmapping-type-alias)
   - [RespondMapping (interface)](#respondmapping-interface)
   - [TransformOutput (type alias)](#transformoutput-type-alias)
@@ -359,7 +2386,27 @@ declare const defineServiceRoutes: <
 
 # utils
 
+## "./http-mapping.types.js" (namespace export)
+
+Re-exports all named exports from the "./http-mapping.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./http-mapping.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L6)
+
 ## ContinueMapping (interface)
+
+Middleware decision that delegates to the next handler.
+
+**Example**
+
+```ts
+const decision: ContinueMapping = http.continue();
+```
 
 **Signature**
 
@@ -369,9 +2416,17 @@ export interface ContinueMapping {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L148)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L75)
 
 ## DefineTransformOptions (interface)
+
+Authoring options for a serializable transform.
+
+**Example**
+
+```ts
+type Options = DefineTransformOptions<"text.upper", typeof schema>;
+```
 
 **Signature**
 
@@ -385,9 +2440,260 @@ export interface DefineTransformOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L133)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L54)
+
+## HttpDsl (interface)
+
+Synchronous HTTP mapping constructor API.
+
+**Example**
+
+```ts
+const request = http.input({ id: http.path("id") });
+```
+
+**Signature**
+
+```ts
+export interface HttpDsl extends HttpDslMethods {}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L94)
+
+## HttpMethod (type alias)
+
+HTTP methods recognized by the compiler.
+
+**Example**
+
+```ts
+const method: HttpMethod = "GET";
+```
+
+**Signature**
+
+```ts
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "ALL";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L11)
+
+## HttpRequestContentType (type alias)
+
+Supported explicit request content types.
+
+**Example**
+
+```ts
+const accept: HttpRequestContentType = "application/json";
+```
+
+**Signature**
+
+```ts
+type HttpRequestContentType = "application/json" | "multipart/form-data";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L15)
+
+## HttpResponseMapping (interface)
+
+Serializable response status and schema mapping.
+
+**Example**
+
+```ts
+const response: HttpResponseMapping = http.success(200);
+```
+
+**Signature**
+
+```ts
+export interface HttpResponseMapping {
+  readonly kind: "success" | "error" | "validation-error" | "response";
+  readonly id: string;
+  readonly status: number;
+  readonly errorId?: string;
+  readonly schema?: StandardSchemaV1;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L65)
+
+## HttpTransformDescriptor (interface)
+
+Frozen authoring descriptor for a transform.
+
+**Example**
+
+```ts
+type Upper = HttpTransformDescriptor<"text.upper", typeof schema>;
+```
+
+**Signature**
+
+```ts
+export interface HttpTransformDescriptor<
+  Id extends string,
+  Schema extends StandardSchemaV1,
+> extends HttpTransformRef<Id, Schema> {
+  readonly kind: "transform";
+  readonly id: Id;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L36)
+
+## HttpTransformRef (interface)
+
+Transform reference paired with its output schema.
+
+**Example**
+
+```ts
+const ref: HttpTransformRef = { ref: transform.ref, schema: transform.schema };
+```
+
+**Signature**
+
+```ts
+export interface HttpTransformRef<
+  Id extends string = string,
+  Schema extends StandardSchemaV1 = StandardSchemaV1,
+> {
+  readonly ref: TransformReference<Id>;
+  readonly schema: Schema;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L26)
+
+## MiddlewareDecisionMapping (type alias)
+
+Union of middleware response decisions.
+
+**Example**
+
+```ts
+const decision: MiddlewareDecisionMapping = http.continue();
+```
+
+**Signature**
+
+```ts
+type MiddlewareDecisionMapping = ContinueMapping | RespondMapping;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L89)
+
+## RespondMapping (interface)
+
+Middleware decision selecting a response mapping.
+
+**Example**
+
+```ts
+const decision: RespondMapping = http.respond("success.200");
+```
+
+**Signature**
+
+```ts
+export interface RespondMapping {
+  readonly kind: "respond";
+  readonly responseId: string;
+  readonly body?: HttpMappingNode;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L81)
+
+## TransformOutput (type alias)
+
+Output type inferred from a transform schema.
+
+**Example**
+
+```ts
+type Output = TransformOutput<typeof transform>;
+```
+
+**Signature**
+
+```ts
+type TransformOutput<T> = T extends { readonly schema: infer Schema }
+  ? Schema extends StandardSchemaV1
+    ? InferOutput<Schema>
+    : unknown
+  : unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L46)
+
+## TransformReference (interface)
+
+Stable serializable transform identity.
+
+**Example**
+
+```ts
+const ref: TransformReference = { kind: "transform", id: "text.upper" };
+```
+
+**Signature**
+
+```ts
+export interface TransformReference<Id extends string = string> {
+  readonly kind: "transform";
+  readonly id: Id;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L19)
+
+## `http-mapping.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [HttpBodyMapping (interface)](#httpbodymapping-interface)
+  - [HttpConstantMapping (interface)](#httpconstantmapping-interface)
+  - [HttpCookieMapping (interface)](#httpcookiemapping-interface)
+  - [HttpDefaultMapping (interface)](#httpdefaultmapping-interface)
+  - [HttpHeaderMapping (interface)](#httpheadermapping-interface)
+  - [HttpInputMapping (interface)](#httpinputmapping-interface)
+  - [HttpMapping (interface)](#httpmapping-interface)
+  - [HttpMappingNode (type alias)](#httpmappingnode-type-alias)
+  - [HttpMappingOutput (type alias)](#httpmappingoutput-type-alias)
+  - [HttpMappingShape (type alias)](#httpmappingshape-type-alias)
+  - [HttpMultipartAllMapping (interface)](#httpmultipartallmapping-interface)
+  - [HttpMultipartMapping (interface)](#httpmultipartmapping-interface)
+  - [HttpNestedMapping (interface)](#httpnestedmapping-interface)
+  - [HttpOptionalMapping (interface)](#httpoptionalmapping-interface)
+  - [HttpPathMapping (interface)](#httppathmapping-interface)
+  - [HttpPathSegmentsMapping (interface)](#httppathsegmentsmapping-interface)
+  - [HttpQueryMapping (interface)](#httpquerymapping-interface)
+  - [HttpRequestMapping (type alias)](#httprequestmapping-type-alias)
+  - [HttpSourceOptions (interface)](#httpsourceoptions-interface)
+  - [HttpTransformMapping (interface)](#httptransformmapping-interface)
+  - [HttpWholeBodyMapping (interface)](#httpwholebodymapping-interface)
+  - [MappingShapeOutput (type alias)](#mappingshapeoutput-type-alias)
+
+---
+
+# utils
 
 ## HttpBodyMapping (interface)
+
+One named field from a request body.
+
+**Example**
+
+```ts
+const mapping: HttpBodyMapping = http.body("name");
+```
 
 **Signature**
 
@@ -398,9 +2704,17 @@ export interface HttpBodyMapping<Output = unknown> extends HttpMapping<Output> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L61)
 
 ## HttpConstantMapping (interface)
+
+A serializable constant input.
+
+**Example**
+
+```ts
+const mapping: HttpConstantMapping<string> = http.constant("all");
+```
 
 **Signature**
 
@@ -413,9 +2727,17 @@ export interface HttpConstantMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L90)
 
 ## HttpCookieMapping (interface)
+
+One named request cookie.
+
+**Example**
+
+```ts
+const mapping: HttpCookieMapping = http.cookie("session");
+```
 
 **Signature**
 
@@ -426,9 +2748,17 @@ export interface HttpCookieMapping<Output = string> extends HttpMapping<Output> 
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L54)
 
 ## HttpDefaultMapping (interface)
+
+A source mapping with a serializable fallback.
+
+**Example**
+
+```ts
+const mapping: HttpDefaultMapping = http.default(http.query("page"), "1");
+```
 
 **Signature**
 
@@ -443,56 +2773,17 @@ export interface HttpDefaultMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L75)
-
-## HttpDsl (interface)
-
-**Signature**
-
-```ts
-export interface HttpDsl {
-  input<const S extends HttpMappingShape>(fields: S): HttpInputMapping<S>;
-  nested<const S extends HttpMappingShape>(fields: S): HttpNestedMapping<S>;
-  path(name: string): HttpPathMapping;
-  path(name: string, options: HttpSourceOptions): HttpMappingNode;
-  pathSegments(name: string): HttpPathSegmentsMapping;
-  pathSegments(name: string, options: HttpSourceOptions): HttpMappingNode;
-  query(name: string): HttpQueryMapping;
-  query(name: string, options: HttpSourceOptions): HttpMappingNode;
-  header(name: string): HttpHeaderMapping;
-  header(name: string, options: HttpSourceOptions): HttpMappingNode;
-  cookie(name: string): HttpCookieMapping;
-  cookie(name: string, options: HttpSourceOptions): HttpMappingNode;
-  body(): HttpWholeBodyMapping;
-  body(name: string): HttpBodyMapping;
-  body(name: string, options: HttpSourceOptions): HttpMappingNode;
-  wholeBody(): HttpWholeBodyMapping;
-  multipart(name: string): HttpMultipartMapping;
-  multipart(name: string, options: HttpSourceOptions): HttpMappingNode;
-  multipartAll(name: string): HttpMultipartAllMapping;
-  multipartAll(name: string, options: HttpSourceOptions): HttpMappingNode;
-  constant<const V extends JsonValue>(value: V): HttpConstantMapping<V>;
-  optional<const M extends HttpMappingNode>(value: M): HttpOptionalMapping<M>;
-  default<const M extends HttpMappingNode, const V extends JsonValue>(
-    value: M,
-    fallback: V,
-  ): HttpDefaultMapping<M, V>;
-  transform<const T extends HttpTransformRef | string, const M extends HttpMappingNode>(
-    transform: T,
-    value?: M,
-  ): HttpTransformMapping<TransformOutput<T>>;
-  success(status: number, schema?: StandardSchemaV1): HttpResponseMapping;
-  error(errorId: string, status: number, schema?: StandardSchemaV1): HttpResponseMapping;
-  validationError(status?: number, schema?: StandardSchemaV1): HttpResponseMapping;
-  response(id: string, status: number, schema?: StandardSchemaV1): HttpResponseMapping;
-  continue(): ContinueMapping;
-  respond(response: HttpResponseMapping | string, body?: HttpMappingNode): RespondMapping;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L158)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L126)
 
 ## HttpHeaderMapping (interface)
+
+One named request header.
+
+**Example**
+
+```ts
+const mapping: HttpHeaderMapping = http.header("authorization");
+```
 
 **Signature**
 
@@ -503,9 +2794,17 @@ export interface HttpHeaderMapping<Output = string> extends HttpMapping<Output> 
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L47)
 
 ## HttpInputMapping (interface)
+
+The root request input assembled from field mappings.
+
+**Example**
+
+```ts
+const mapping: HttpInputMapping = http.input({ id: http.path("id") });
+```
 
 **Signature**
 
@@ -518,9 +2817,17 @@ export interface HttpInputMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L108)
 
 ## HttpMapping (interface)
+
+Base phantom output contract for every HTTP mapping.
+
+**Example**
+
+```ts
+const mapping: HttpMapping<string> = http.path("id");
+```
 
 **Signature**
 
@@ -530,9 +2837,17 @@ export interface HttpMapping<Output = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L6)
 
 ## HttpMappingNode (type alias)
+
+Union of supported serializable request mapping nodes.
+
+**Example**
+
+```ts
+const mapping: HttpMappingNode = http.path("id");
+```
 
 **Signature**
 
@@ -555,9 +2870,17 @@ type HttpMappingNode =
   | HttpTransformMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L145)
 
 ## HttpMappingOutput (type alias)
+
+Output value inferred from one mapping node.
+
+**Example**
+
+```ts
+type Output = HttpMappingOutput<HttpPathMapping>;
+```
 
 **Signature**
 
@@ -565,9 +2888,17 @@ type HttpMappingNode =
 type HttpMappingOutput<M> = M extends HttpMapping<infer Output> ? Output : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L22)
 
 ## HttpMappingShape (type alias)
+
+Named fields in a nested or request input mapping.
+
+**Example**
+
+```ts
+const fields: HttpMappingShape = { id: http.path("id") };
+```
 
 **Signature**
 
@@ -575,19 +2906,17 @@ type HttpMappingOutput<M> = M extends HttpMapping<infer Output> ? Output : never
 type HttpMappingShape = Readonly<Record<string, HttpMappingNode>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L9)
-
-## HttpMethod (type alias)
-
-**Signature**
-
-```ts
-type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "ALL";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L12)
 
 ## HttpMultipartAllMapping (interface)
+
+All values of a multipart form field.
+
+**Example**
+
+```ts
+const mapping: HttpMultipartAllMapping = http.multipartAll("files");
+```
 
 **Signature**
 
@@ -600,9 +2929,17 @@ export interface HttpMultipartAllMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L81)
 
 ## HttpMultipartMapping (interface)
+
+One multipart form field.
+
+**Example**
+
+```ts
+const mapping: HttpMultipartMapping = http.multipart("photo");
+```
 
 **Signature**
 
@@ -613,9 +2950,17 @@ export interface HttpMultipartMapping<Output = string | File> extends HttpMappin
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L74)
 
 ## HttpNestedMapping (interface)
+
+A nested object assembled from field mappings.
+
+**Example**
+
+```ts
+const mapping: HttpNestedMapping = http.nested({ id: http.path("id") });
+```
 
 **Signature**
 
@@ -628,9 +2973,17 @@ export interface HttpNestedMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L99)
 
 ## HttpOptionalMapping (interface)
+
+A source mapping whose absence is allowed.
+
+**Example**
+
+```ts
+const mapping: HttpOptionalMapping = http.optional(http.query("page"));
+```
 
 **Signature**
 
@@ -643,9 +2996,17 @@ export interface HttpOptionalMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L117)
 
 ## HttpPathMapping (interface)
+
+One named route path parameter.
+
+**Example**
+
+```ts
+const mapping: HttpPathMapping = http.path("id");
+```
 
 **Signature**
 
@@ -656,9 +3017,17 @@ export interface HttpPathMapping<Output = string> extends HttpMapping<Output> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L26)
 
 ## HttpPathSegmentsMapping (interface)
+
+All segments captured by a route path parameter.
+
+**Example**
+
+```ts
+const mapping: HttpPathSegmentsMapping = http.pathSegments("parts");
+```
 
 **Signature**
 
@@ -669,9 +3038,17 @@ export interface HttpPathSegmentsMapping<Output = readonly string[]> extends Htt
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L33)
 
 ## HttpQueryMapping (interface)
+
+One named query parameter.
+
+**Example**
+
+```ts
+const mapping: HttpQueryMapping = http.query("page");
+```
 
 **Signature**
 
@@ -682,19 +3059,17 @@ export interface HttpQueryMapping<Output = string> extends HttpMapping<Output> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L22)
-
-## HttpRequestContentType (type alias)
-
-**Signature**
-
-```ts
-type HttpRequestContentType = "application/json" | "multipart/form-data";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L40)
 
 ## HttpRequestMapping (type alias)
+
+The required root shape for explicit request mapping.
+
+**Example**
+
+```ts
+const mapping: HttpRequestMapping = http.input({ id: http.path("id") });
+```
 
 **Signature**
 
@@ -702,25 +3077,17 @@ type HttpRequestContentType = "application/json" | "multipart/form-data";
 type HttpRequestMapping = HttpInputMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L104)
-
-## HttpResponseMapping (interface)
-
-**Signature**
-
-```ts
-export interface HttpResponseMapping {
-  readonly kind: "success" | "error" | "validation-error" | "response";
-  readonly id: string;
-  readonly status: number;
-  readonly errorId?: string;
-  readonly schema?: StandardSchemaV1;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L141)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L164)
 
 ## HttpSourceOptions (interface)
+
+Optionality and fallback options for one request source.
+
+**Example**
+
+```ts
+const options: HttpSourceOptions = { optional: true };
+```
 
 **Signature**
 
@@ -731,25 +3098,17 @@ export interface HttpSourceOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L105)
-
-## HttpTransformDescriptor (interface)
-
-**Signature**
-
-```ts
-export interface HttpTransformDescriptor<
-  Id extends string,
-  Schema extends StandardSchemaV1,
-> extends HttpTransformRef<Id, Schema> {
-  readonly kind: "transform";
-  readonly id: Id;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L168)
 
 ## HttpTransformMapping (interface)
+
+A value transformed by a registered transform ID.
+
+**Example**
+
+```ts
+const mapping: HttpTransformMapping = http.transform("upper", http.body("name"));
+```
 
 **Signature**
 
@@ -761,25 +3120,17 @@ export interface HttpTransformMapping<Output = unknown> extends HttpMapping<Outp
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L83)
-
-## HttpTransformRef (interface)
-
-**Signature**
-
-```ts
-export interface HttpTransformRef<
-  Id extends string = string,
-  Schema extends StandardSchemaV1 = StandardSchemaV1,
-> {
-  readonly ref: TransformReference<Id>;
-  readonly schema: Schema;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L137)
 
 ## HttpWholeBodyMapping (interface)
+
+The complete request body.
+
+**Example**
+
+```ts
+const mapping: HttpWholeBodyMapping = http.wholeBody();
+```
 
 **Signature**
 
@@ -789,9 +3140,17 @@ export interface HttpWholeBodyMapping<Output = unknown> extends HttpMapping<Outp
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L68)
 
 ## MappingShapeOutput (type alias)
+
+Output shape inferred from named mapping fields.
+
+**Example**
+
+```ts
+type Output = MappingShapeOutput<{ id: HttpPathMapping }>;
+```
 
 **Signature**
 
@@ -801,349 +3160,7 @@ type MappingShapeOutput<S extends HttpMappingShape> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L10)
-
-## MiddlewareDecisionMapping (type alias)
-
-**Signature**
-
-```ts
-type MiddlewareDecisionMapping = ContinueMapping | RespondMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L156)
-
-## RespondMapping (interface)
-
-**Signature**
-
-```ts
-export interface RespondMapping {
-  readonly kind: "respond";
-  readonly responseId: string;
-  readonly body?: HttpMappingNode;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L151)
-
-## TransformOutput (type alias)
-
-**Signature**
-
-```ts
-type TransformOutput<T> = T extends { readonly schema: infer Schema }
-  ? Schema extends StandardSchemaV1
-    ? InferOutput<Schema>
-    : unknown
-  : unknown;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L128)
-
-## TransformReference (interface)
-
-**Signature**
-
-```ts
-export interface TransformReference<Id extends string = string> {
-  readonly kind: "transform";
-  readonly id: Id;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-types.ts#L110)
-
-## `http-dsl-validation.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [assertMapping](#assertmapping)
-  - [assertRequestMapping](#assertrequestmapping)
-  - [assertResponse](#assertresponse)
-  - [assertSchema](#assertschema)
-  - [isHttpMapping](#ishttpmapping)
-  - [isHttpRequestMapping](#ishttprequestmapping)
-  - [isHttpResponseMapping](#ishttpresponsemapping)
-  - [isMiddlewareDecision](#ismiddlewaredecision)
-  - [isRecord](#isrecord)
-  - [isSchema](#isschema)
-  - [isStatus](#isstatus)
-
----
-
-# utils
-
-## assertMapping
-
-**Signature**
-
-```ts
-declare const assertMapping: (value: unknown) => asserts value is HttpMappingNode;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L49)
-
-## assertRequestMapping
-
-**Signature**
-
-```ts
-declare const assertRequestMapping: (value: unknown) => asserts value is HttpRequestMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L56)
-
-## assertResponse
-
-**Signature**
-
-```ts
-declare const assertResponse: (value: unknown) => HttpResponseMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L71)
-
-## assertSchema
-
-**Signature**
-
-```ts
-declare const assertSchema: (value: unknown, name: string) => asserts value is StandardSchemaV1;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L93)
-
-## isHttpMapping
-
-**Signature**
-
-```ts
-declare const isHttpMapping: (value: unknown) => value is HttpMappingNode;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L10)
-
-## isHttpRequestMapping
-
-**Signature**
-
-```ts
-declare const isHttpRequestMapping: (value: unknown) => value is HttpRequestMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L53)
-
-## isHttpResponseMapping
-
-**Signature**
-
-```ts
-declare const isHttpResponseMapping: (value: unknown) => value is HttpResponseMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L60)
-
-## isMiddlewareDecision
-
-**Signature**
-
-```ts
-declare const isMiddlewareDecision: (value: unknown) => value is MiddlewareDecisionMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L75)
-
-## isRecord
-
-**Signature**
-
-```ts
-declare const isRecord: (value: unknown) => value is Record<string, any>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L120)
-
-## isSchema
-
-**Signature**
-
-```ts
-declare const isSchema: (value: unknown) => value is StandardSchemaV1;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L85)
-
-## isStatus
-
-**Signature**
-
-```ts
-declare const isStatus: (value: unknown) => value is number;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L96)
-
-## `http-dsl.ts`
-
----
-
-## Exports Grouped by Category
-
-- [HTTP](#http)
-  - [http](#http-1)
-- [utils](#utils)
-  - ["./http-dsl-types.js" (namespace export)](#http-dsl-typesjs-namespace-export)
-  - [assertRequestMapping](#assertrequestmapping)
-  - [assertResponse](#assertresponse)
-  - [defineRequestTransform](#definerequesttransform)
-  - [defineTransform](#definetransform)
-  - [isHttpMapping](#ishttpmapping)
-  - [isHttpRequestMapping](#ishttprequestmapping)
-  - [isHttpResponseMapping](#ishttpresponsemapping)
-  - [isMiddlewareDecision](#ismiddlewaredecision)
-  - [isTransformRef](#istransformref)
-
----
-
-# HTTP
-
-## http
-
-Creates serializable HTTP request, response, transform, and policy mappings.
-
-**Example**
-
-```ts
-import { http } from "@relkit/app/routes";
-
-const request = http.input({ id: http.path("id"), token: http.header("authorization") });
-void request;
-```
-
-**Signature**
-
-```ts
-declare const http: HttpDsl;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L94)
-
-Since v0.1.0
-
-# utils
-
-## "./http-dsl-types.js" (namespace export)
-
-Re-exports all named exports from the "./http-dsl-types.js" module.
-
-**Signature**
-
-```ts
-export * from "./http-dsl-types.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L40)
-
-## assertRequestMapping
-
-**Signature**
-
-```ts
-declare const assertRequestMapping: (value: unknown) => asserts value is HttpRequestMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L42)
-
-## assertResponse
-
-**Signature**
-
-```ts
-declare const assertResponse: (value: unknown) => HttpResponseMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L43)
-
-## defineRequestTransform
-
-**Signature**
-
-```ts
-declare const defineRequestTransform: <
-  const Id extends string,
-  const Schema extends StandardSchemaV1,
->(
-  options: DefineTransformOptions<Id, Schema>,
-) => HttpTransformDescriptor<Id, Schema>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L69)
-
-## defineTransform
-
-**Signature**
-
-```ts
-declare const defineTransform: <const Id extends string, const Schema extends StandardSchemaV1>(
-  options: DefineTransformOptions<Id, Schema>,
-) => HttpTransformDescriptor<Id, Schema>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L50)
-
-## isHttpMapping
-
-**Signature**
-
-```ts
-declare const isHttpMapping: (value: unknown) => value is HttpMappingNode;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L44)
-
-## isHttpRequestMapping
-
-**Signature**
-
-```ts
-declare const isHttpRequestMapping: (value: unknown) => value is HttpRequestMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L45)
-
-## isHttpResponseMapping
-
-**Signature**
-
-```ts
-declare const isHttpResponseMapping: (value: unknown) => value is HttpResponseMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L46)
-
-## isMiddlewareDecision
-
-**Signature**
-
-```ts
-declare const isMiddlewareDecision: (value: unknown) => value is MiddlewareDecisionMapping;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L47)
-
-## isTransformRef
-
-**Signature**
-
-```ts
-declare const isTransformRef: (value: unknown) => value is HttpTransformRef;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L16)
 
 ## `index.ts`
 
@@ -1156,9 +3173,15 @@ declare const isTransformRef: (value: unknown) => value is HttpTransformRef;
   - ["./define-route.js" (namespace export)](#define-routejs-namespace-export)
   - ["./define-service-routes.js" (namespace export)](#define-service-routesjs-namespace-export)
   - ["./http-dsl.js" (namespace export)](#http-dsljs-namespace-export)
-  - ["./route-types.js" (namespace export)](#route-typesjs-namespace-export)
+  - ["./route.types.js" (namespace export)](#routetypesjs-namespace-export)
   - [HttpRateLimitKey](#httpratelimitkey)
+  - [RouteInputError](#routeinputerror)
+  - [RouteOperation](#routeoperation)
+  - [RouteOperationError](#routeoperationerror)
   - [RouteRateLimit](#routeratelimit)
+  - [RouteTelemetry](#routetelemetry)
+  - [RouteTelemetryLive](#routetelemetrylive)
+  - [RouteTelemetryService](#routetelemetryservice)
 
 ---
 
@@ -1212,17 +3235,17 @@ export * from "./http-dsl.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L1)
 
-## "./route-types.js" (namespace export)
+## "./route.types.js" (namespace export)
 
-Re-exports all named exports from the "./route-types.js" module.
+Re-exports all named exports from the "./route.types.js" module.
 
 **Signature**
 
 ```ts
-export * from "./route-types.js";
+export * from "./route.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L12)
 
 ## HttpRateLimitKey
 
@@ -1232,7 +3255,37 @@ export * from "./route-types.js";
 declare const HttpRateLimitKey: HttpRateLimitKey;
 ```
 
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L13)
+
+## RouteInputError
+
+**Signature**
+
+```ts
+declare const RouteInputError: typeof RouteInputError;
+```
+
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L6)
+
+## RouteOperation
+
+**Signature**
+
+```ts
+declare const RouteOperation: RouteOperation;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L11)
+
+## RouteOperationError
+
+**Signature**
+
+```ts
+declare const RouteOperationError: typeof RouteOperationError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L7)
 
 ## RouteRateLimit
 
@@ -1242,7 +3295,37 @@ declare const HttpRateLimitKey: HttpRateLimitKey;
 declare const RouteRateLimit: RouteRateLimit;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L13)
+
+## RouteTelemetry
+
+**Signature**
+
+```ts
+declare const RouteTelemetry: typeof RouteTelemetry;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L8)
+
+## RouteTelemetryLive
+
+**Signature**
+
+```ts
+declare const RouteTelemetryLive: Layer<RouteTelemetry, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L9)
+
+## RouteTelemetryService
+
+**Signature**
+
+```ts
+declare const RouteTelemetryService: RouteTelemetryService;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L11)
 
 ## `route-auth.ts`
 
@@ -1251,15 +3334,192 @@ declare const RouteRateLimit: RouteRateLimit;
 ## Exports Grouped by Category
 
 - [utils](#utils)
-  - [BetterAuthRegistration (interface)](#betterauthregistration-interface)
+  - [BetterAuthRegistration](#betterauthregistration)
   - [copyProtectedPaths](#copyprotectedpaths)
+  - [copyProtectedPathsEffect](#copyprotectedpathseffect)
+  - [copyProtectedValues](#copyprotectedvalues)
   - [readBetterAuthRegistration](#readbetterauthregistration)
+  - [readBetterAuthRegistrationEffect](#readbetterauthregistrationeffect)
+  - [readRegistrationValue](#readregistrationvalue)
+
+---
+
+# utils
+
+## BetterAuthRegistration
+
+**Signature**
+
+```ts
+declare const BetterAuthRegistration: BetterAuthRegistration;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L6)
+
+## copyProtectedPaths
+
+Validates and copies protected route patterns synchronously.
+
+**Throws**
+
+TypeError for invalid patterns.
+
+**Example**
+
+```ts
+copyProtectedPaths(["/admin/*"]);
+```
+
+**Signature**
+
+```ts
+declare const copyProtectedPaths: (values: readonly string[] | undefined) => readonly string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L67)
+
+## copyProtectedPathsEffect
+
+Validates and copies protected paths through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(copyProtectedPathsEffect(["/admin/*"]));
+```
+
+**Signature**
+
+```ts
+declare const copyProtectedPathsEffect: (
+  values: ReadonlyArray<string> | undefined,
+) => Effect.Effect<ReadonlyArray<string>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L56)
+
+## copyProtectedValues
+
+Copies protected paths inside an already observed operation.
+
+**Throws**
+
+RouteInputError for an invalid pattern.
+
+**Example**
+
+```ts
+copyProtectedValues(["/admin/*"]);
+```
+
+**Signature**
+
+```ts
+declare const copyProtectedValues: (values: readonly string[] | undefined) => readonly string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L77)
+
+## readBetterAuthRegistration
+
+Reads a Better Auth handler registration synchronously.
+
+**Throws**
+
+TypeError for malformed handler input.
+
+**Example**
+
+```ts
+readBetterAuthRegistration(handler);
+```
+
+**Signature**
+
+```ts
+declare const readBetterAuthRegistration: (
+  handler: RawRouteOptions<string>["handler"],
+) => BetterAuthRegistration | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L24)
+
+## readBetterAuthRegistrationEffect
+
+Reads a Better Auth handler registration through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(readBetterAuthRegistrationEffect(handler));
+```
+
+**Signature**
+
+```ts
+declare const readBetterAuthRegistrationEffect: (
+  handler: RawHttpHandler,
+) => Effect.Effect<BetterAuthRegistration | undefined, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L13)
+
+## readRegistrationValue
+
+Reads registration metadata inside an already observed operation.
+
+**Example**
+
+```ts
+readRegistrationValue(handler);
+```
+
+**Signature**
+
+```ts
+declare const readRegistrationValue: (
+  handler: RawRouteOptions<string>["handler"],
+) => BetterAuthRegistration | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L35)
+
+## `route-auth.types.ts`
+
+Better Auth identity attached to a raw handler.
+
+**Example**
+
+```ts
+const registration: BetterAuthRegistration = {
+  kind: "better-auth",
+  service: { ref: { kind: "service", id: "auth" } },
+};
+```
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [BetterAuthRegistration (interface)](#betterauthregistration-interface)
 
 ---
 
 # utils
 
 ## BetterAuthRegistration (interface)
+
+Better Auth identity attached to a raw handler.
+
+**Example**
+
+```ts
+const registration: BetterAuthRegistration = {
+  kind: "better-auth",
+  service: { ref: { kind: "service", id: "auth" } },
+};
+```
 
 **Signature**
 
@@ -1270,29 +3530,7 @@ export interface BetterAuthRegistration {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L3)
-
-## copyProtectedPaths
-
-**Signature**
-
-```ts
-declare const copyProtectedPaths: (values: readonly string[] | undefined) => readonly string[];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L24)
-
-## readBetterAuthRegistration
-
-**Signature**
-
-```ts
-declare const readBetterAuthRegistration: (
-  handler: RawRouteOptions<string>["handler"],
-) => BetterAuthRegistration | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.types.ts#L4)
 
 ## `route-client.ts`
 
@@ -1302,7 +3540,11 @@ declare const readBetterAuthRegistration: (
 
 - [utils](#utils)
   - [copyClient](#copyclient)
+  - [copyClientEffect](#copyclienteffect)
+  - [copyClientValue](#copyclientvalue)
   - [copyStream](#copystream)
+  - [copyStreamEffect](#copystreameffect)
+  - [copyStreamValue](#copystreamvalue)
 
 ---
 
@@ -1310,15 +3552,81 @@ declare const readBetterAuthRegistration: (
 
 ## copyClient
 
+Copies a client policy for synchronous authoring.
+
+**Throws**
+
+TypeError when the policy is invalid.
+
+**Example**
+
+```ts
+copyClient({ operation: "query" });
+```
+
 **Signature**
 
 ```ts
 declare const copyClient: (value: unknown) => RouteClientPolicy | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L22)
+
+## copyClientEffect
+
+Copies a client policy through a typed Effect.
+
+**Example**
+
+```ts
+Effect.runSync(copyClientEffect({ operation: "query" }));
+```
+
+**Signature**
+
+```ts
+declare const copyClientEffect: (
+  value: unknown,
+) => Effect.Effect<RouteClientPolicy | undefined, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L12)
+
+## copyClientValue
+
+Copies client policy inside an already observed operation.
+
+**Throws**
+
+RouteInputError for an invalid policy.
+
+**Example**
+
+```ts
+copyClientValue({ operation: "query" });
+```
+
+**Signature**
+
+```ts
+declare const copyClientValue: (value: unknown) => RouteClientPolicy | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L32)
 
 ## copyStream
+
+Copies a native stream policy for synchronous authoring.
+
+**Throws**
+
+TypeError when the policy or output schema is incompatible.
+
+**Example**
+
+```ts
+copyStream(undefined, output);
+```
 
 **Signature**
 
@@ -1329,7 +3637,436 @@ declare const copyStream: (
 ) => { readonly format: NativeStreamFormat } | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L65)
+
+## copyStreamEffect
+
+Copies a native stream policy through a typed Effect.
+
+**Example**
+
+```ts
+Effect.runSync(copyStreamEffect(undefined, output));
+```
+
+**Signature**
+
+```ts
+declare const copyStreamEffect: (
+  value: unknown,
+  output: StandardSchemaV1<unknown, unknown>,
+) => Effect.Effect<{ readonly format: NativeStreamFormat } | undefined, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L53)
+
+## copyStreamValue
+
+Copies stream policy inside an already observed operation.
+
+**Throws**
+
+RouteInputError for invalid stream settings.
+
+**Example**
+
+```ts
+copyStreamValue({ format: "sse" }, streamOutput);
+```
+
+**Signature**
+
+```ts
+declare const copyStreamValue: (
+  value: unknown,
+  output: StandardSchemaV1,
+) => { readonly format: NativeStreamFormat } | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L79)
+
+## `route-definition.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [prepareRouteValue](#prepareroutevalue)
+
+---
+
+# utils
+
+## prepareRouteValue
+
+Validates route options before acquiring an unbound identity.
+
+**Throws**
+
+RouteInputError for invalid route inputs.
+
+**Example**
+
+```ts
+prepareRouteValue({ target })("orders.get");
+```
+
+**Signature**
+
+```ts
+declare const prepareRouteValue: (
+  options:
+    | FunctionRouteOptions<string, FunctionRefAny, HttpRequestMapping | undefined>
+    | RawRouteOptions<string>,
+) => (id: string) => RouteDescriptor<string>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-definition.ts#L30)
+
+## `route-observability.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [RouteInputError (class)](#routeinputerror-class)
+  - [RouteOperation](#routeoperation)
+  - [RouteOperationError (class)](#routeoperationerror-class)
+  - [RouteTelemetry (class)](#routetelemetry-class)
+  - [RouteTelemetryLive](#routetelemetrylive)
+  - [RouteTelemetryService](#routetelemetryservice)
+  - [measureRoute](#measureroute)
+  - [observeRoute](#observeroute)
+  - [routeAttempt](#routeattempt)
+  - [routeIdentity](#routeidentity)
+  - [routeTry](#routetry)
+  - [runRouteSync](#runroutesync)
+
+---
+
+# utils
+
+## RouteInputError (class)
+
+Marks invalid route authoring input while preserving TypeError compatibility.
+
+**Example**
+
+```ts
+throw new RouteInputError("Route target is invalid");
+```
+
+**Signature**
+
+```ts
+declare class RouteInputError
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L11)
+
+## RouteOperation
+
+**Signature**
+
+```ts
+declare const RouteOperation: RouteOperation;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L6)
+
+## RouteOperationError (class)
+
+Expected failure from a route authoring Effect.
+
+**Example**
+
+```ts
+const error = new RouteOperationError({
+  operation: "route.define",
+  reason: "Invalid route",
+  cause: new TypeError("Invalid route"),
+});
+```
+
+**Signature**
+
+```ts
+declare class RouteOperationError
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L16)
+
+## RouteTelemetry (class)
+
+Injectable observer for route authoring operations.
+
+**Example**
+
+```ts
+Effect.provide(defineRouteEffect(options), RouteTelemetryLive);
+```
+
+**Signature**
+
+```ts
+declare class RouteTelemetry
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L24)
+
+## RouteTelemetryLive
+
+Default route observer with an Effect span, counters, and duration histogram.
+
+**Example**
+
+```ts
+Effect.runSync(Effect.provide(Effect.void, RouteTelemetryLive));
+```
+
+**Signature**
+
+```ts
+declare const RouteTelemetryLive: Layer.Layer<RouteTelemetry, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L37)
+
+## RouteTelemetryService
+
+**Signature**
+
+```ts
+declare const RouteTelemetryService: RouteTelemetryService;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L6)
+
+## measureRoute
+
+Records route metrics without creating a second span inside named Effect functions.
+
+**Example**
+
+```ts
+measureRoute("route.define", Effect.succeed(route));
+```
+
+**Signature**
+
+```ts
+declare const measureRoute: <A, E, R>(
+  operation: RouteOperation,
+  effect: Effect.Effect<A, E, R>,
+) => Effect.Effect<A, E, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L58)
+
+## observeRoute
+
+Observes a route operation with an injectable test observer.
+
+**Example**
+
+```ts
+observeRoute("route.define", Effect.succeed(route));
+```
+
+**Signature**
+
+```ts
+declare const observeRoute: <A, E, R>(
+  operation: RouteOperation,
+  effect: Effect.Effect<A, E, R>,
+) => Effect.Effect<A, E, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L45)
+
+## routeAttempt
+
+Evaluates a calculation inside an already observed route operation.
+
+**Example**
+
+```ts
+yield * routeAttempt("route.define", () => descriptor);
+```
+
+**Signature**
+
+```ts
+declare const routeAttempt: <A>(
+  operation: RouteOperation,
+  evaluate: () => A,
+) => Effect.Effect<A, RouteOperationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L107)
+
+## routeIdentity
+
+Acquires an unbound route identity through the caller's IdentityStore Layer.
+
+**Example**
+
+```ts
+yield * routeIdentity("middleware.define");
+```
+
+**Signature**
+
+```ts
+declare const routeIdentity: (
+  operation: RouteOperation,
+) => Effect.Effect<string, RouteOperationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L128)
+
+## routeTry
+
+Evaluates synchronous authoring logic inside a typed and observed Effect.
+
+**Example**
+
+```ts
+routeTry("route.define", () => descriptor);
+```
+
+**Signature**
+
+```ts
+declare const routeTry: <A>(
+  operation: RouteOperation,
+  evaluate: () => A,
+) => Effect.Effect<A, RouteOperationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L94)
+
+## runRouteSync
+
+Runs a synchronous compatibility API and restores its original error.
+
+**Throws**
+
+The original validation error or an unexpected defect.
+
+**Example**
+
+```ts
+runRouteSync(Effect.succeed(true));
+```
+
+**Signature**
+
+```ts
+declare const runRouteSync: <A, E>(effect: Effect.Effect<A, E>) => A;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L149)
+
+## `route-observability.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [RouteOperation (type alias)](#routeoperation-type-alias)
+  - [RouteTelemetryService (interface)](#routetelemetryservice-interface)
+
+---
+
+# utils
+
+## RouteOperation (type alias)
+
+Bounded name for a route authoring operation.
+
+**Example**
+
+```ts
+const operation: RouteOperation = "route.define";
+```
+
+**Signature**
+
+```ts
+type RouteOperation =
+  | "middleware.define"
+  | "middleware.is-descriptor"
+  | "middleware.is-path"
+  | "route.define"
+  | "service-routes.define"
+  | "auth.read-registration"
+  | "auth.copy-protected"
+  | "client.copy"
+  | "stream.copy"
+  | "options.copy-rate-limit"
+  | "options.positive"
+  | "options.success-status"
+  | "dsl.define-transform"
+  | "dsl.is-transform-ref"
+  | "dsl.input"
+  | "dsl.nested"
+  | "dsl.source"
+  | "dsl.whole-body"
+  | "dsl.constant"
+  | "dsl.optional"
+  | "dsl.default"
+  | "dsl.transform"
+  | "dsl.response"
+  | "dsl.continue"
+  | "dsl.respond"
+  | "validation.is-mapping"
+  | "validation.assert-mapping"
+  | "validation.is-request"
+  | "validation.assert-request"
+  | "validation.is-response"
+  | "validation.assert-response"
+  | "validation.is-decision"
+  | "validation.is-schema"
+  | "validation.assert-schema"
+  | "validation.is-status"
+  | "validation.is-record";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.types.ts#L6)
+
+## RouteTelemetryService (interface)
+
+Replaceable observer for route operations.
+
+**Example**
+
+```ts
+const telemetry: RouteTelemetryService = { observe: (_operation, effect) => effect };
+```
+
+**Signature**
+
+```ts
+export interface RouteTelemetryService {
+  /**
+   * Measures an operation without changing its success or failure channel.
+   * @param operation - Fixed route operation name.
+   * @param effect - Work to observe.
+   * @returns The observed Effect with unchanged channels.
+   * @example telemetry.observe("route.define", Effect.succeed(route));
+   */
+  readonly observe: <A, E, R>(
+    operation: RouteOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.types.ts#L47)
 
 ## `route-options.ts`
 
@@ -1338,17 +4075,258 @@ declare const copyStream: (
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - [HttpRateLimitKey](#httpratelimitkey)
+  - [RouteRateLimit](#routeratelimit)
+  - [copyRateLimit](#copyratelimit)
+  - [copyRateLimitEffect](#copyratelimiteffect)
+  - [copyRateLimitValue](#copyratelimitvalue)
+  - [positive](#positive)
+  - [positiveEffect](#positiveeffect)
+  - [positiveValue](#positivevalue)
+  - [successStatus](#successstatus)
+  - [successStatusEffect](#successstatuseffect)
+  - [successStatusValue](#successstatusvalue)
+
+---
+
+# utils
+
+## HttpRateLimitKey
+
+**Signature**
+
+```ts
+declare const HttpRateLimitKey: HttpRateLimitKey;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L8)
+
+## RouteRateLimit
+
+**Signature**
+
+```ts
+declare const RouteRateLimit: RouteRateLimit;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L8)
+
+## copyRateLimit
+
+Copies a route rate-limit policy synchronously.
+
+**Throws**
+
+TypeError for invalid policy fields.
+
+**Example**
+
+```ts
+copyRateLimit(undefined);
+```
+
+**Signature**
+
+```ts
+declare const copyRateLimit: (value: RouteRateLimit | undefined) => RouteRateLimit | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L26)
+
+## copyRateLimitEffect
+
+Copies a rate-limit policy through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(copyRateLimitEffect(undefined));
+```
+
+**Signature**
+
+```ts
+declare const copyRateLimitEffect: (
+  value: RouteRateLimit | undefined,
+) => Effect.Effect<RouteRateLimit | undefined, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L15)
+
+## copyRateLimitValue
+
+Copies a rate limit inside an already observed operation.
+
+**Throws**
+
+RouteInputError for invalid policy fields.
+
+**Example**
+
+```ts
+copyRateLimitValue(undefined);
+```
+
+**Signature**
+
+```ts
+declare const copyRateLimitValue: (value: RouteRateLimit | undefined) => RouteRateLimit | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L36)
+
+## positive
+
+Validates an optional positive integer synchronously.
+
+**Throws**
+
+TypeError for nonpositive or unsafe integers.
+
+**Example**
+
+```ts
+positive(5, "timeoutMs");
+```
+
+**Signature**
+
+```ts
+declare const positive: (value: number | undefined, name: string) => number | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L75)
+
+## positiveEffect
+
+Validates an optional positive integer through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(positiveEffect(5, "timeoutMs"));
+```
+
+**Signature**
+
+```ts
+declare const positiveEffect: (
+  value: number | undefined,
+  name: string,
+) => Effect.Effect<number | undefined, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L63)
+
+## positiveValue
+
+Checks an optional positive integer inside an already observed operation.
+
+**Throws**
+
+RouteInputError for invalid integers.
+
+**Example**
+
+```ts
+positiveValue(5, "timeoutMs");
+```
+
+**Signature**
+
+```ts
+declare const positiveValue: (value: number | undefined, name: string) => number | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L86)
+
+## successStatus
+
+Validates an optional HTTP success status synchronously.
+
+**Throws**
+
+TypeError for values outside 200–299.
+
+**Example**
+
+```ts
+successStatus(201);
+```
+
+**Signature**
+
+```ts
+declare const successStatus: (value: number | undefined) => number | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L109)
+
+## successStatusEffect
+
+Validates a success status through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(successStatusEffect(201));
+```
+
+**Signature**
+
+```ts
+declare const successStatusEffect: (
+  value: number | undefined,
+) => Effect.Effect<number | undefined, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L98)
+
+## successStatusValue
+
+Checks an optional success status inside an already observed operation.
+
+**Throws**
+
+RouteInputError for invalid statuses.
+
+**Example**
+
+```ts
+successStatusValue(201);
+```
+
+**Signature**
+
+```ts
+declare const successStatusValue: (value: number | undefined) => number | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L119)
+
+## `route-options.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
   - [HttpRateLimitKey (type alias)](#httpratelimitkey-type-alias)
   - [RouteRateLimit (interface)](#routeratelimit-interface)
-  - [copyRateLimit](#copyratelimit)
-  - [positive](#positive)
-  - [successStatus](#successstatus)
 
 ---
 
 # utils
 
 ## HttpRateLimitKey (type alias)
+
+Scalar request source used for rate-limit keys.
+
+**Example**
+
+```ts
+const key: HttpRateLimitKey = http.header("x-api-key");
+```
 
 **Signature**
 
@@ -1357,9 +4335,17 @@ type HttpRateLimitKey =
   HttpPathMapping | HttpQueryMapping | HttpHeaderMapping | HttpCookieMapping | HttpConstantMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.types.ts#L13)
 
 ## RouteRateLimit (interface)
+
+Immutable per-route rate-limit policy.
+
+**Example**
+
+```ts
+const policy: RouteRateLimit = { limit: 10, windowMs: 60_000, key: http.header("x-api-key") };
+```
 
 **Signature**
 
@@ -1372,39 +4358,9 @@ export interface RouteRateLimit {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.types.ts#L19)
 
-## copyRateLimit
-
-**Signature**
-
-```ts
-declare const copyRateLimit: (value: RouteRateLimit | undefined) => RouteRateLimit | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L22)
-
-## positive
-
-**Signature**
-
-```ts
-declare const positive: (value: number | undefined, name: string) => number | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L41)
-
-## successStatus
-
-**Signature**
-
-```ts
-declare const successStatus: (value: number | undefined) => number | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L48)
-
-## `route-types.ts`
+## `route.types.ts`
 
 ---
 
@@ -1425,6 +4381,14 @@ declare const successStatus: (value: number | undefined) => number | undefined;
 # utils
 
 ## FunctionRouteDescriptor (interface)
+
+Frozen descriptor for a function-backed route.
+
+**Example**
+
+```ts
+type Route = FunctionRouteDescriptor<"orders.get">;
+```
 
 **Signature**
 
@@ -1450,9 +4414,17 @@ export interface FunctionRouteDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L66)
 
 ## FunctionRouteOptions (interface)
+
+Authoring options for a function-backed route.
+
+**Example**
+
+```ts
+type Options = FunctionRouteOptions<"orders.get", typeof getOrder>;
+```
 
 **Signature**
 
@@ -1476,9 +4448,17 @@ export interface FunctionRouteOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L31)
 
 ## NativeStreamFormat (type alias)
+
+Native streaming transport formats.
+
+**Example**
+
+```ts
+const format: NativeStreamFormat = "sse";
+```
 
 **Signature**
 
@@ -1486,9 +4466,17 @@ export interface FunctionRouteOptions<
 type NativeStreamFormat = "sse" | "text" | "bytes";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L22)
 
 ## RawHttpHandler (type alias)
+
+A raw HTTP handler receiving the incoming Request.
+
+**Example**
+
+```ts
+const handler: RawHttpHandler = () => new Response("ok");
+```
 
 **Signature**
 
@@ -1496,9 +4484,17 @@ type NativeStreamFormat = "sse" | "text" | "bytes";
 type RawHttpHandler = (request: Request) => MaybePromise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L14)
 
 ## RawRouteDescriptor (interface)
+
+Frozen descriptor for a raw HTTP route.
+
+**Example**
+
+```ts
+type Route = RawRouteDescriptor<"health">;
+```
 
 **Signature**
 
@@ -1520,9 +4516,17 @@ export interface RawRouteDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L89)
 
 ## RawRouteOptions (interface)
+
+Authoring options for a raw HTTP route.
+
+**Example**
+
+```ts
+const options: RawRouteOptions<"health"> = { handler: () => new Response("ok") };
+```
 
 **Signature**
 
@@ -1539,9 +4543,17 @@ export interface RawRouteOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L52)
 
 ## RouteClientPolicy (type alias)
+
+Client exposure and operation policy for a route.
+
+**Example**
+
+```ts
+const policy: RouteClientPolicy = { operation: "query" };
+```
 
 **Signature**
 
@@ -1549,9 +4561,17 @@ export interface RawRouteOptions<
 type RouteClientPolicy = false | { readonly operation?: "query" | "mutation" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L18)
 
 ## RouteDescriptor (type alias)
+
+Union of function-backed and raw route descriptors.
+
+**Example**
+
+```ts
+type Route = RouteDescriptor<"orders.get">;
+```
 
 **Signature**
 
@@ -1563,4 +4583,4 @@ type RouteDescriptor<
 > = FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L108)

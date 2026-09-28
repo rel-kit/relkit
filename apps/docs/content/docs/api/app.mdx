@@ -30,6 +30,528 @@ export * from "@relkit/agents";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/agents.ts#L1)
 
+## `app-config.types.ts`
+
+API documentation visibility and domain exclusions.
+
+**Example**
+
+```ts
+const docs: ApiDocsConfig = { enabledInProduction: false };
+```
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ApiDocsConfig (interface)](#apidocsconfig-interface)
+  - [AppCompatibilityConfig (interface)](#appcompatibilityconfig-interface)
+  - [InspectorConfig (interface)](#inspectorconfig-interface)
+  - [ServerConfig (interface)](#serverconfig-interface)
+
+---
+
+# utils
+
+## ApiDocsConfig (interface)
+
+API documentation visibility and domain exclusions.
+
+**Example**
+
+```ts
+const docs: ApiDocsConfig = { enabledInProduction: false };
+```
+
+**Signature**
+
+```ts
+export interface ApiDocsConfig {
+  readonly enabledInProduction?: boolean;
+  readonly excludeDomains?: readonly string[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L4)
+
+## AppCompatibilityConfig (interface)
+
+Transitional compatibility switches for application authoring.
+
+**Example**
+
+```ts
+const compatibility: AppCompatibilityConfig = { legacyJobs: true };
+```
+
+**Signature**
+
+```ts
+export interface AppCompatibilityConfig {
+  readonly legacyJobs?: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L32)
+
+## InspectorConfig (interface)
+
+Inspector settings attached to an application descriptor.
+
+**Example**
+
+```ts
+const inspector: InspectorConfig = { port: 3210 };
+```
+
+**Signature**
+
+```ts
+export interface InspectorConfig {
+  readonly port?: number;
+  readonly enabledInProduction?: boolean;
+  readonly maxPreviewBytes?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L23)
+
+## ServerConfig (interface)
+
+HTTP server settings attached to an application descriptor.
+
+**Example**
+
+```ts
+const server: ServerConfig = { port: 3000, apiDocs: { enabledInProduction: false } };
+```
+
+**Signature**
+
+```ts
+export interface ServerConfig {
+  readonly port?: number;
+  readonly maxBodyBytes?: number;
+  readonly apiDocs?: ApiDocsConfig;
+  readonly clientContract?: boolean;
+  readonly mcp?: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L12)
+
+## `app-observability.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [AppTelemetry (class)](#apptelemetry-class)
+  - [AppTelemetryLive](#apptelemetrylive)
+  - [observeApp](#observeapp)
+
+---
+
+# utils
+
+## AppTelemetry (class)
+
+Injectable observer for application authoring operations.
+
+**Example**
+
+```ts
+Effect.provide(defineAppEffect(options), AppTelemetryLive);
+```
+
+**Signature**
+
+```ts
+declare class AppTelemetry
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.ts#L7)
+
+## AppTelemetryLive
+
+Live spans, counts, failures, and durations for application operations.
+
+**Example**
+
+```ts
+Effect.provide(defineAppEffect(options), AppTelemetryLive);
+```
+
+**Signature**
+
+```ts
+declare const AppTelemetryLive: Layer.Layer<AppTelemetry, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.ts#L14)
+
+## observeApp
+
+Applies an injected observer or the live observer to one operation.
+
+**Example**
+
+```ts
+observeApp("define", Effect.succeed(app));
+```
+
+**Signature**
+
+```ts
+declare const observeApp: <A, E, R>(
+  operation: AppOperation,
+  effect: Effect.Effect<A, E, R>,
+) => Effect.Effect<A, E, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.ts#L28)
+
+## `app-observability.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [AppOperation (type alias)](#appoperation-type-alias)
+  - [AppTelemetryService (interface)](#apptelemetryservice-interface)
+
+---
+
+# utils
+
+## AppOperation (type alias)
+
+Fixed operation labels used for application authoring telemetry.
+
+**Example**
+
+```ts
+const operation: AppOperation = "define";
+```
+
+**Signature**
+
+```ts
+type AppOperation =
+  | "define"
+  | "env.isDefinition"
+  | "id.derive"
+  | "compatibility.normalize"
+  | "alias.assertExclusive"
+  | "constants.define"
+  | "prompt.define"
+  | "context.create"
+  | "context.resolve";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.types.ts#L6)
+
+## AppTelemetryService (interface)
+
+A replaceable observer for application authoring operations.
+
+**Example**
+
+```ts
+const observer: AppTelemetryService = { observe: (_name, effect) => effect };
+```
+
+**Signature**
+
+```ts
+export interface AppTelemetryService {
+  /** Surrounds one operation without changing its result.
+   * @param operation - A fixed operation label.
+   * @param effect - The operation to observe.
+   * @returns The observed Effect with its success and error channels intact.
+   * @example observer.observe("define", Effect.succeed(app));
+   */
+  readonly observe: <A, E, R>(
+    operation: AppOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.types.ts#L20)
+
+## `app-provider-capabilities.ts`
+
+Provider capabilities accepted by application descriptors.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [APP_PROVIDER_CAPABILITIES](#app_provider_capabilities)
+
+---
+
+# utils
+
+## APP_PROVIDER_CAPABILITIES
+
+Provider capabilities accepted by application descriptors.
+
+**Signature**
+
+```ts
+declare const APP_PROVIDER_CAPABILITIES: readonly [
+  "bucket",
+  "cache",
+  "job",
+  "event",
+  "model",
+  "realtime",
+  "agent-state",
+];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider-capabilities.ts#L2)
+
+## `app-provider-normalization.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [copyEffect](#copyeffect)
+  - [normalizeDefaultsEffect](#normalizedefaultseffect)
+  - [normalizeProvidersEffect](#normalizeproviderseffect)
+
+---
+
+# utils
+
+## copyEffect
+
+Copies a serializable configuration value through RELKIT's serializer.
+
+**Example**
+
+```ts
+Effect.runSync(copyEffect({ port: 3000 }));
+```
+
+**Signature**
+
+```ts
+declare const copyEffect: <Value>(
+  value: Value,
+) => Effect.Effect<Value, AppValidationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider-normalization.ts#L74)
+
+## normalizeDefaultsEffect
+
+Checks default profile selections and returns an immutable copy.
+
+**Example**
+
+```ts
+Effect.runSync(normalizeDefaultsEffect({}, undefined));
+```
+
+**Signature**
+
+```ts
+declare const normalizeDefaultsEffect: <Providers extends AppProviderInputs>(
+  providers: Partial<
+    Record<
+      "bucket" | "cache" | "job" | "event" | "model" | "realtime" | "agent-state",
+      NormalizedProviderProfiles<ProviderAdapter>
+    >
+  >,
+  defaults: AppProviderDefaults<Providers> | undefined,
+) => Effect.Effect<
+  Readonly<{
+    bucket?: ProfileFor<Providers, "bucket">;
+    cache?: ProfileFor<Providers, "cache">;
+    job?: ProfileFor<Providers, "job">;
+    event?: ProfileFor<Providers, "event">;
+    model?: ProfileFor<Providers, "model">;
+    realtime?: ProfileFor<Providers, "realtime">;
+    "agent-state"?: ProfileFor<Providers, "agent-state">;
+  }>,
+  AppValidationFailure,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider-normalization.ts#L45)
+
+## normalizeProvidersEffect
+
+Normalizes configured provider profiles in capability order.
+
+**Example**
+
+```ts
+Effect.runSync(normalizeProvidersEffect({}));
+```
+
+**Signature**
+
+```ts
+declare const normalizeProvidersEffect: (
+  options: AppProviderInputs,
+) => Effect.Effect<
+  Partial<
+    Record<
+      "bucket" | "cache" | "job" | "event" | "model" | "realtime" | "agent-state",
+      NormalizedProviderProfiles<ProviderAdapter>
+    >
+  >,
+  AppValidationFailure,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider-normalization.ts#L19)
+
+## `app-provider.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [AppProviderCapability (type alias)](#appprovidercapability-type-alias)
+  - [AppProviderDefaults (type alias)](#appproviderdefaults-type-alias)
+  - [AppProviderInputs (interface)](#appproviderinputs-interface)
+  - [NormalizedAppProviderDefaults (type alias)](#normalizedappproviderdefaults-type-alias)
+  - [NormalizedProviders (type alias)](#normalizedproviders-type-alias)
+
+---
+
+# utils
+
+## AppProviderCapability (type alias)
+
+Provider capabilities accepted by the application descriptor.
+
+**Example**
+
+```ts
+const capability: AppProviderCapability = "cache";
+```
+
+**Signature**
+
+```ts
+type AppProviderCapability = (typeof APP_PROVIDER_CAPABILITIES)[number];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L13)
+
+## AppProviderDefaults (type alias)
+
+Public default-profile spellings; normalized descriptors use `job`.
+
+**Example**
+
+```ts
+const defaults: AppProviderDefaults<typeof providers> = { cache: "default" };
+```
+
+**Signature**
+
+```ts
+type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
+  [Capability in Exclude<AppProviderCapability, "job">]?: ProfileFor<Providers, Capability>;
+}> & {
+  readonly jobs?: ProfileFor<Providers, "job">;
+  /** @deprecated Use `jobs`. */
+  readonly job?: ProfileFor<Providers, "job">;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L59)
+
+## AppProviderInputs (interface)
+
+Optional provider bindings for every supported capability.
+
+**Example**
+
+```ts
+const providers: AppProviderInputs = { cache: redisAdapter };
+```
+
+**Signature**
+
+```ts
+export interface AppProviderInputs {
+  readonly bucket?: CapabilityInput<"bucket">;
+  readonly cache?: CapabilityInput<"cache">;
+  /** Public plural spelling for the jobs provider capability. */
+  readonly jobs?: CapabilityInput<"job">;
+  /** @deprecated Use `jobs`. */
+  readonly job?: CapabilityInput<"job">;
+  readonly event?: CapabilityInput<"event">;
+  readonly model?: CapabilityInput<"model">;
+  readonly realtime?: CapabilityInput<"realtime">;
+  readonly "agent-state"?: CapabilityInput<"agent-state">;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L22)
+
+## NormalizedAppProviderDefaults (type alias)
+
+Validated default profiles keyed by normalized capability names.
+
+**Example**
+
+```ts
+const defaults: NormalizedAppProviderDefaults<typeof providers> = { cache: "default" };
+```
+
+**Signature**
+
+```ts
+type NormalizedAppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
+  [Capability in AppProviderCapability]?: ProfileFor<Providers, Capability>;
+}>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L70)
+
+## NormalizedProviders (type alias)
+
+Provider profiles inferred from the authored provider bindings.
+
+**Example**
+
+```ts
+type Profiles = NormalizedProviders<typeof providers>;
+```
+
+**Signature**
+
+```ts
+type NormalizedProviders<Providers extends AppProviderInputs> = {
+  readonly [
+    Capability in AppProviderCapability as [ProviderInputFor<Providers, Capability>] extends [never]
+      ? never
+      : Capability
+  ]: NormalizedProviderProfiles<AdapterOf<ProviderInputFor<Providers, Capability>>>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L77)
+
 ## `app-validation.ts`
 
 ---
@@ -37,16 +559,51 @@ export * from "@relkit/agents";
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - [AppValidationFailure (class)](#appvalidationfailure-class)
   - [assertExclusiveAlias](#assertexclusivealias)
+  - [assertExclusiveAliasEffect](#assertexclusivealiaseffect)
   - [deriveApplicationId](#deriveapplicationid)
+  - [deriveApplicationIdEffect](#deriveapplicationideffect)
   - [isEnvDefinition](#isenvdefinition)
+  - [isEnvDefinitionEffect](#isenvdefinitioneffect)
   - [normalizeCompatibility](#normalizecompatibility)
+  - [normalizeCompatibilityEffect](#normalizecompatibilityeffect)
 
 ---
 
 # utils
 
+## AppValidationFailure (class)
+
+Expected invalid application input with the original cause preserved.
+
+**Example**
+
+```ts
+if (error._tag === "AppValidationFailure") console.error(error.message);
+```
+
+**Signature**
+
+```ts
+declare class AppValidationFailure
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L10)
+
 ## assertExclusiveAlias
+
+Synchronous alias exclusivity adapter.
+
+**Throws**
+
+TypeError when both aliases are present.
+
+**Example**
+
+```ts
+assertExclusiveAlias(options, "jobs", "job", "defineApp");
+```
 
 **Signature**
 
@@ -59,9 +616,44 @@ declare const assertExclusiveAlias: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L146)
+
+## assertExclusiveAliasEffect
+
+Rejects simultaneous current and legacy aliases in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(assertExclusiveAliasEffect(options, "jobs", "job", "defineApp"));
+```
+
+**Signature**
+
+```ts
+declare const assertExclusiveAliasEffect: (
+  value: Record<string, unknown>,
+  primary: string,
+  legacy: string,
+  label: string,
+) => Effect.Effect<void, AppValidationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L123)
 
 ## deriveApplicationId
+
+Synchronous package-name ID adapter.
+
+**Throws**
+
+The original normalization error for invalid input.
+
+**Example**
+
+```ts
+deriveApplicationId("@acme/orders");
+```
 
 **Signature**
 
@@ -69,9 +661,37 @@ declare const assertExclusiveAlias: (
 declare const deriveApplicationId: (packageName: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L75)
+
+## deriveApplicationIdEffect
+
+Derives an application ID from a package name in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(deriveApplicationIdEffect("@acme/orders"));
+```
+
+**Signature**
+
+```ts
+declare const deriveApplicationIdEffect: (
+  packageName: string,
+) => Effect.Effect<StableId, AppValidationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L55)
 
 ## isEnvDefinition
+
+Synchronous environment descriptor guard.
+
+**Example**
+
+```ts
+if (isEnvDefinition(value)) console.log(value.shape);
+```
 
 **Signature**
 
@@ -79,9 +699,39 @@ declare const deriveApplicationId: (packageName: string) => string;
 declare const isEnvDefinition: (value: unknown) => value is EnvDefinition<EnvShape>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L46)
+
+## isEnvDefinitionEffect
+
+Checks the complete environment descriptor shape in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isEnvDefinitionEffect(value));
+```
+
+**Signature**
+
+```ts
+declare const isEnvDefinitionEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L20)
 
 ## normalizeCompatibility
+
+Synchronous compatibility normalizer.
+
+**Throws**
+
+TypeError for an invalid compatibility flag.
+
+**Example**
+
+```ts
+normalizeCompatibility({ legacyJobs: true });
+```
 
 **Signature**
 
@@ -91,7 +741,27 @@ declare const normalizeCompatibility: (value: AppCompatibilityConfig | undefined
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L109)
+
+## normalizeCompatibilityEffect
+
+Normalizes the legacy jobs compatibility flag in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(normalizeCompatibilityEffect({ legacyJobs: true }));
+```
+
+**Signature**
+
+```ts
+declare const normalizeCompatibilityEffect: (
+  value: AppCompatibilityConfig | undefined,
+) => Effect.Effect<Readonly<{ legacyJobs: boolean }>, AppValidationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L84)
 
 ## `buckets.ts`
 
@@ -150,13 +820,27 @@ export * from "@relkit/cache";
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - ["./app-validation.js" (namespace export)](#app-validationjs-namespace-export)
   - ["./define-app.js" (namespace export)](#define-appjs-namespace-export)
   - ["@relkit/config" (namespace export)](#relkitconfig-namespace-export)
-  - [deriveApplicationId](#deriveapplicationid)
+  - [AppTelemetry](#apptelemetry)
+  - [AppTelemetryLive](#apptelemetrylive)
 
 ---
 
 # utils
+
+## "./app-validation.js" (namespace export)
+
+Re-exports all named exports from the "./app-validation.js" module.
+
+**Signature**
+
+```ts
+export * from "./app-validation.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L1)
 
 ## "./define-app.js" (namespace export)
 
@@ -168,7 +852,7 @@ Re-exports all named exports from the "./define-app.js" module.
 export * from "./define-app.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L3)
 
 ## "@relkit/config" (namespace export)
 
@@ -180,19 +864,169 @@ Re-exports all named exports from the "@relkit/config" module.
 export * from "@relkit/config";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L4)
 
-## deriveApplicationId
+## AppTelemetry
 
 **Signature**
 
 ```ts
-declare const deriveApplicationId: (packageName: string) => string;
+declare const AppTelemetry: typeof AppTelemetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L2)
+
+## AppTelemetryLive
+
+**Signature**
+
+```ts
+declare const AppTelemetryLive: Layer<AppTelemetry, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L2)
 
 ## `context-descriptors.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - ["./context-descriptors.types.js" (namespace export)](#context-descriptorstypesjs-namespace-export)
+  - [ContextDescriptorFailure (class)](#contextdescriptorfailure-class)
+  - [defineConstants](#defineconstants)
+  - [defineConstantsEffect](#defineconstantseffect)
+  - [definePrompt](#defineprompt)
+  - [definePromptEffect](#defineprompteffect)
+
+---
+
+# utils
+
+## "./context-descriptors.types.js" (namespace export)
+
+Re-exports all named exports from the "./context-descriptors.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./context-descriptors.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L13)
+
+## ContextDescriptorFailure (class)
+
+Expected invalid constant or prompt descriptor input.
+
+**Example**
+
+```ts
+if (error._tag === "ContextDescriptorFailure") console.error(error.message);
+```
+
+**Signature**
+
+```ts
+declare class ContextDescriptorFailure
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L17)
+
+## defineConstants
+
+Synchronous constants descriptor adapter.
+
+**Throws**
+
+The original validation error for invalid values.
+
+**Example**
+
+```ts
+defineConstants({ region: "eu" });
+```
+
+**Signature**
+
+```ts
+declare const defineConstants: <const Values extends ConstantsShape>(
+  values: Values,
+  options?: ContextDescriptorOptions,
+) => ConstantsDescriptor<Values>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L62)
+
+## defineConstantsEffect
+
+Defines a frozen constants descriptor in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(defineConstantsEffect({ region: "eu" }));
+```
+
+**Signature**
+
+```ts
+declare const defineConstantsEffect: <const Values extends ConstantsShape>(
+  values: Values,
+  options?: ContextDescriptorOptions | undefined,
+) => Effect.Effect<ConstantsDescriptor<Values>, ContextDescriptorFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L27)
+
+## definePrompt
+
+Synchronous prompt descriptor adapter.
+
+**Throws**
+
+The original validation error for invalid text.
+
+**Example**
+
+```ts
+definePrompt("Be concise.");
+```
+
+**Signature**
+
+```ts
+declare const definePrompt: <const Value extends PromptValue>(
+  value: Value,
+  options?: ContextDescriptorOptions,
+) => PromptDescriptor<Value>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L108)
+
+## definePromptEffect
+
+Defines a frozen prompt descriptor in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(definePromptEffect("Be concise."));
+```
+
+**Signature**
+
+```ts
+declare const definePromptEffect: <const Value extends PromptValue>(
+  value: Value,
+  options?: ContextDescriptorOptions | undefined,
+) => Effect.Effect<PromptDescriptor<Value>, ContextDescriptorFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L74)
+
+## `context-descriptors.types.ts`
 
 ---
 
@@ -209,8 +1043,6 @@ declare const deriveApplicationId: (packageName: string) => string;
   - [PromptValue (type alias)](#promptvalue-type-alias)
   - [ResolvedConstants (type alias)](#resolvedconstants-type-alias)
   - [ResolvedPrompt (type alias)](#resolvedprompt-type-alias)
-  - [defineConstants](#defineconstants)
-  - [definePrompt](#defineprompt)
 
 ---
 
@@ -218,15 +1050,31 @@ declare const deriveApplicationId: (packageName: string) => string;
 
 ## ConstantResolver (type alias)
 
+Computes one constant for each context resolution.
+
+**Example**
+
+```ts
+const region: ConstantResolver<string> = ({ env }) => String(env.REGION);
+```
+
 **Signature**
 
 ```ts
 type ConstantResolver<Value = unknown> = (options: ContextResolverOptions) => MaybePromise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L17)
 
 ## ConstantValue (type alias)
+
+Accepted static, environment, or dynamic constant input.
+
+**Example**
+
+```ts
+const value: ConstantValue = "eu-west-1";
+```
 
 **Signature**
 
@@ -234,9 +1082,17 @@ type ConstantResolver<Value = unknown> = (options: ContextResolverOptions) => Ma
 type ConstantValue = JsonValue | EnvRef | ConstantResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L24)
 
 ## ConstantsDescriptor (interface)
+
+Immutable descriptor for one set of constants.
+
+**Example**
+
+```ts
+const descriptor: ConstantsDescriptor = defineConstants({ region: "eu" });
+```
 
 **Signature**
 
@@ -248,9 +1104,17 @@ export interface ConstantsDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L34)
 
 ## ConstantsShape (type alias)
+
+Named constant inputs for one descriptor.
+
+**Example**
+
+```ts
+const values: ConstantsShape = { region: "eu-west-1" };
+```
 
 **Signature**
 
@@ -258,9 +1122,17 @@ export interface ConstantsDescriptor<
 type ConstantsShape = Readonly<Record<string, ConstantValue>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L29)
 
 ## ContextDescriptorOptions (interface)
+
+Optional stable identity for a context descriptor.
+
+**Example**
+
+```ts
+const options: ContextDescriptorOptions = { id: "support.prompt" };
+```
 
 **Signature**
 
@@ -270,9 +1142,17 @@ export interface ContextDescriptorOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L58)
 
 ## ContextResolverOptions (interface)
+
+Inputs available to a dynamic constant resolver.
+
+**Example**
+
+```ts
+const options: ContextResolverOptions = { env: {}, signal, log };
+```
 
 **Signature**
 
@@ -284,9 +1164,17 @@ export interface ContextResolverOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L8)
 
 ## PromptDescriptor (interface)
+
+Immutable descriptor for one prompt.
+
+**Example**
+
+```ts
+const descriptor: PromptDescriptor = definePrompt("Be concise.");
+```
 
 **Signature**
 
@@ -299,9 +1187,17 @@ export interface PromptDescriptor<Value extends PromptValue = PromptValue> exten
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L48)
 
 ## PromptValue (type alias)
+
+Prompt text or an ordered list of prompt fragments.
+
+**Example**
+
+```ts
+const prompt: PromptValue = ["Be concise.", "Use tools."];
+```
 
 **Signature**
 
@@ -309,9 +1205,17 @@ export interface PromptDescriptor<Value extends PromptValue = PromptValue> exten
 type PromptValue = string | readonly string[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L43)
 
 ## ResolvedConstants (type alias)
+
+Resolved values inferred from a constants descriptor.
+
+**Example**
+
+```ts
+type Values = ResolvedConstants<typeof constants>;
+```
 
 **Signature**
 
@@ -321,9 +1225,17 @@ type ResolvedConstants<Descriptor extends ConstantsDescriptor> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L65)
 
 ## ResolvedPrompt (type alias)
+
+Resolved prompt text inferred from a prompt descriptor.
+
+**Example**
+
+```ts
+type Text = ResolvedPrompt<typeof prompt>;
+```
 
 **Signature**
 
@@ -331,33 +1243,127 @@ type ResolvedConstants<Descriptor extends ConstantsDescriptor> = {
 type ResolvedPrompt<Descriptor extends PromptDescriptor> = Descriptor["value"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L72)
 
-## defineConstants
+## `context-resolution-service.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [AppConstantRunner (class)](#appconstantrunner-class)
+  - [AppConstantRunnerLive](#appconstantrunnerlive)
+  - [AppConstantRunnerPromiseLive](#appconstantrunnerpromiselive)
+  - [AppConstantRunnerService](#appconstantrunnerservice)
+
+---
+
+# utils
+
+## AppConstantRunner (class)
+
+Replaceable boundary for dynamic constant callback execution.
+
+**Example**
+
+```ts
+Effect.provide(resolver.resolveEffect(context), AppConstantRunnerLive);
+```
 
 **Signature**
 
 ```ts
-declare const defineConstants: <const Values extends ConstantsShape>(
-  values: Values,
-  options?: ContextDescriptorOptions,
-) => ConstantsDescriptor<Values>;
+declare class AppConstantRunner
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L8)
 
-## definePrompt
+## AppConstantRunnerLive
+
+Live runner that propagates Effect interruption into callback AbortSignals.
+
+**Example**
+
+```ts
+Effect.provide(resolver.resolveEffect(context), AppConstantRunnerLive);
+```
 
 **Signature**
 
 ```ts
-declare const definePrompt: <const Value extends PromptValue>(
-  value: Value,
-  options?: ContextDescriptorOptions,
-) => PromptDescriptor<Value>;
+declare const AppConstantRunnerLive: Layer.Layer<AppConstantRunner, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L15)
+
+## AppConstantRunnerPromiseLive
+
+Compatibility runner that passes the caller's exact signal to callbacks.
+
+**Signature**
+
+```ts
+declare const AppConstantRunnerPromiseLive: Layer.Layer<AppConstantRunner, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L27)
+
+## AppConstantRunnerService
+
+**Signature**
+
+```ts
+declare const AppConstantRunnerService: AppConstantRunnerService;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L4)
+
+## `context-resolution-service.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [AppConstantRunnerService (interface)](#appconstantrunnerservice-interface)
+
+---
+
+# utils
+
+## AppConstantRunnerService (interface)
+
+Replaceable execution boundary for dynamic constant callbacks.
+
+**Example**
+
+```ts
+const runner: AppConstantRunnerService = { run: () => Effect.succeed("eu") };
+```
+
+**Signature**
+
+```ts
+export interface AppConstantRunnerService {
+  /** Invokes a dynamic constant resolver.
+   * @param resolver - User supplied constant callback.
+   * @param options - Environment, logger, and caller signal available to the callback.
+   * @returns The callback result or ContextResolutionFailure.
+   * @example runner.run(() => "eu", { env: {}, log });
+   */
+  readonly run: (
+    resolver: ConstantResolver,
+    options: {
+      readonly env: Readonly<Record<string, unknown>>;
+      readonly log: PublicLogger;
+      readonly signal: AbortSignal;
+    },
+  ) => Effect.Effect<unknown, ContextResolutionFailure>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.types.ts#L9)
 
 ## `context-resolver.ts`
 
@@ -366,69 +1372,264 @@ declare const definePrompt: <const Value extends PromptValue>(
 ## Exports Grouped by Category
 
 - [utils](#utils)
-  - [ApplicationContextResolver (interface)](#applicationcontextresolver-interface)
+  - ["./context-resolver.types.js" (namespace export)](#context-resolvertypesjs-namespace-export)
+  - [ContextResolutionFailure (class)](#contextresolutionfailure-class)
   - [createApplicationContextResolver](#createapplicationcontextresolver)
+  - [createApplicationContextResolverEffect](#createapplicationcontextresolvereffect)
 
 ---
 
 # utils
 
-## ApplicationContextResolver (interface)
+## "./context-resolver.types.js" (namespace export)
+
+Re-exports all named exports from the "./context-resolver.types.js" module.
 
 **Signature**
 
 ```ts
-export interface ApplicationContextResolver {
-  readonly resolve: (options: {
-    readonly signal: AbortSignal;
-    readonly log: PublicLogger;
-  }) => Promise<{
-    readonly constants: Readonly<Record<string, unknown>>;
-    readonly prompts: Readonly<Record<string, PromptValue>>;
-  }>;
-}
+export * from "./context-resolver.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L12)
+
+## ContextResolutionFailure (class)
+
+Expected context registration or resolution failure with its original cause.
+
+**Example**
+
+```ts
+if (error._tag === "ContextResolutionFailure") console.error(error.message);
+```
+
+**Signature**
+
+```ts
+declare class ContextResolutionFailure
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L16)
 
 ## createApplicationContextResolver
 
+Builds a context resolver synchronously for existing application callers.
+
+**Throws**
+
+TypeError when constant names collide.
+
+**Example**
+
+```ts
+createApplicationContextResolver({ env: {} });
+```
+
 **Signature**
 
 ```ts
-declare const createApplicationContextResolver: (options: {
-  readonly constants?: Readonly<Record<string, ConstantsDescriptor>>;
-  readonly prompts?: Readonly<Record<string, PromptDescriptor>>;
-  readonly env: Readonly<Record<string, unknown>>;
-}) => ApplicationContextResolver;
+declare const createApplicationContextResolver: (
+  options: ApplicationContextOptions,
+) => ApplicationContextResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L111)
 
-## `define-app-types.ts`
+## createApplicationContextResolverEffect
+
+Builds an application context resolver in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(createApplicationContextResolverEffect({ env: {} }));
+```
+
+**Signature**
+
+```ts
+declare const createApplicationContextResolverEffect: (
+  options: ApplicationContextOptions,
+) => Effect.Effect<ApplicationContextResolver, ContextResolutionFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L25)
+
+## `context-resolver.types.ts`
 
 ---
 
 ## Exports Grouped by Category
 
 - [utils](#utils)
-  - [APP_PROVIDER_CAPABILITIES](#app_provider_capabilities)
-  - [ApiDocsConfig (interface)](#apidocsconfig-interface)
-  - [AppCompatibilityConfig (interface)](#appcompatibilityconfig-interface)
-  - [AppDeploymentConfig (type alias)](#appdeploymentconfig-type-alias)
-  - [AppProviderCapability (type alias)](#appprovidercapability-type-alias)
-  - [AppProviderDefaults (type alias)](#appproviderdefaults-type-alias)
-  - [AppProviderInputs (interface)](#appproviderinputs-interface)
-  - [AppTelemetryConfig (type alias)](#apptelemetryconfig-type-alias)
-  - [ApplicationDescriptor (type alias)](#applicationdescriptor-type-alias)
-  - [DefineAppOptions (type alias)](#defineappoptions-type-alias)
-  - [InspectorConfig (interface)](#inspectorconfig-interface)
-  - [NormalizedAppProviderDefaults (type alias)](#normalizedappproviderdefaults-type-alias)
-  - [ServerConfig (interface)](#serverconfig-interface)
+  - [ApplicationContextOptions (interface)](#applicationcontextoptions-interface)
+  - [ApplicationContextResolver (interface)](#applicationcontextresolver-interface)
+  - [ApplicationResolveOptions (interface)](#applicationresolveoptions-interface)
+  - [ResolvedApplicationContext (interface)](#resolvedapplicationcontext-interface)
 
 ---
 
 # utils
+
+## ApplicationContextOptions (interface)
+
+Static and dynamic descriptor inputs for one context resolver.
+
+**Example**
+
+```ts
+const options: ApplicationContextOptions = { env: {} };
+```
+
+**Signature**
+
+```ts
+export interface ApplicationContextOptions {
+  readonly constants?: Readonly<Record<string, ConstantsDescriptor>>;
+  readonly prompts?: Readonly<Record<string, PromptDescriptor>>;
+  readonly env: Readonly<Record<string, unknown>>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.types.ts#L14)
+
+## ApplicationContextResolver (interface)
+
+Resolves the current application constants and prompts.
+
+**Example**
+
+```ts
+const resolver: ApplicationContextResolver = createApplicationContextResolver({ env: {} });
+```
+
+**Signature**
+
+```ts
+export interface ApplicationContextResolver {
+  /** Resolves values in Effect with a replaceable constant runner.
+   * @param options - Logger and cancellation signal.
+   * @returns Resolved values or ContextResolutionFailure; requires AppConstantRunner.
+   * @example Effect.runPromise(resolver.resolveEffect(context).pipe(Effect.provide(AppConstantRunnerLive)));
+   */
+  readonly resolveEffect: (
+    options: ApplicationResolveOptions,
+  ) => Effect.Effect<ResolvedApplicationContext, ContextResolutionFailure, AppConstantRunner>;
+  /** Promise compatibility adapter for application handlers.
+   * @param options - Logger and cancellation signal.
+   * @returns Resolved values or a rejection with the original resolver error.
+   * @example await resolver.resolve({ signal, log });
+   */
+  readonly resolve: (options: ApplicationResolveOptions) => Promise<ResolvedApplicationContext>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.types.ts#L39)
+
+## ApplicationResolveOptions (interface)
+
+Invocation inputs required to resolve dynamic constants.
+
+**Example**
+
+```ts
+const context: ApplicationResolveOptions = { signal, log };
+```
+
+**Signature**
+
+```ts
+export interface ApplicationResolveOptions {
+  readonly signal: AbortSignal;
+  readonly log: PublicLogger;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.types.ts#L23)
+
+## ResolvedApplicationContext (interface)
+
+Context values produced by a resolver invocation.
+
+**Example**
+
+```ts
+const constants = resolved.constants;
+```
+
+**Signature**
+
+```ts
+export interface ResolvedApplicationContext {
+  readonly constants: Readonly<Record<string, unknown>>;
+  readonly prompts: Readonly<Record<string, PromptValue>>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.types.ts#L31)
+
+## `define-app.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [Application](#application)
+  - [defineApp](#defineapp)
+- [utils](#utils)
+  - ["./define-app.types.js" (namespace export)](#define-apptypesjs-namespace-export)
+  - [APP_PROVIDER_CAPABILITIES](#app_provider_capabilities)
+  - [defineAppEffect](#defineappeffect)
+
+---
+
+# Application
+
+## defineApp
+
+Defines one immutable application topology synchronously.
+
+**Throws**
+
+The original validation error for invalid options.
+
+**Example**
+
+```ts
+defineApp({ env: defineEnv({}), server: { port: 3000 } });
+```
+
+**Signature**
+
+```ts
+declare const defineApp: <
+  const Shape extends EnvShape,
+  const Providers extends AppProviderInputs,
+  const Exporters extends TelemetryExporterMap = Readonly<
+    Record<string, TelemetryExporterDescriptor<string, string, object>>
+  >,
+>(
+  options: DefineAppOptions<Shape, Providers, Exporters>,
+) => ApplicationDescriptor<Shape, Providers, Exporters>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L118)
+
+Since v0.2.0
+
+# utils
+
+## "./define-app.types.js" (namespace export)
+
+Re-exports all named exports from the "./define-app.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./define-app.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L28)
 
 ## APP_PROVIDER_CAPABILITIES
 
@@ -446,34 +1647,87 @@ declare const APP_PROVIDER_CAPABILITIES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L29)
 
-## ApiDocsConfig (interface)
+## defineAppEffect
+
+Defines one immutable application topology in Effect.
+
+**Example**
+
+```ts
+Effect.runSync(defineAppEffect({ env: defineEnv({}) }));
+```
 
 **Signature**
 
 ```ts
-export interface ApiDocsConfig {
-  readonly enabledInProduction?: boolean;
-  readonly excludeDomains?: readonly string[];
-}
+declare const defineAppEffect: <
+  const Shape extends EnvShape,
+  const Providers extends AppProviderInputs,
+  const Exporters extends TelemetryExporterMap = Readonly<
+    Record<string, TelemetryExporterDescriptor<string, string, object>>
+  >,
+>(
+  options: DefineAppOptions<Shape, Providers, Exporters>,
+) => Effect.Effect<ApplicationDescriptor<Shape, Providers, Exporters>, AppValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L52)
 
-## AppCompatibilityConfig (interface)
+## `define-app.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ApiDocsConfig](#apidocsconfig)
+  - [AppCompatibilityConfig](#appcompatibilityconfig)
+  - [AppDeploymentConfig (type alias)](#appdeploymentconfig-type-alias)
+  - [AppProviderCapability](#appprovidercapability)
+  - [AppProviderDefaults](#appproviderdefaults)
+  - [AppProviderInputs](#appproviderinputs)
+  - [AppTelemetryConfig (type alias)](#apptelemetryconfig-type-alias)
+  - [ApplicationDescriptor (type alias)](#applicationdescriptor-type-alias)
+  - [DefineAppOptions (type alias)](#defineappoptions-type-alias)
+  - [InspectorConfig](#inspectorconfig)
+  - [NormalizedAppProviderDefaults](#normalizedappproviderdefaults)
+  - [ServerConfig](#serverconfig)
+
+---
+
+# utils
+
+## ApiDocsConfig
 
 **Signature**
 
 ```ts
-export interface AppCompatibilityConfig {
-  readonly legacyJobs?: boolean;
-}
+declare const ApiDocsConfig: ApiDocsConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L13)
+
+## AppCompatibilityConfig
+
+**Signature**
+
+```ts
+declare const AppCompatibilityConfig: AppCompatibilityConfig;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L16)
 
 ## AppDeploymentConfig (type alias)
+
+JSON deployment metadata attached to the application descriptor.
+
+**Example**
+
+```ts
+const deployment: AppDeploymentConfig = { engine: "pulumi" };
+```
 
 **Signature**
 
@@ -481,58 +1735,48 @@ export interface AppCompatibilityConfig {
 type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L34)
 
-## AppProviderCapability (type alias)
-
-**Signature**
-
-```ts
-type AppProviderCapability = (typeof APP_PROVIDER_CAPABILITIES)[number];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L45)
-
-## AppProviderDefaults (type alias)
-
-Public provider-default spellings. The normalized descriptor uses `job`.
+## AppProviderCapability
 
 **Signature**
 
 ```ts
-type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
-  [Capability in Exclude<AppProviderCapability, "job">]?: ProfileFor<Providers, Capability>;
-}> & {
-  readonly jobs?: ProfileFor<Providers, "job">;
-  /** @deprecated Use `jobs`. */
-  readonly job?: ProfileFor<Providers, "job">;
-};
+declare const AppProviderCapability:
+  "bucket" | "cache" | "job" | "event" | "model" | "realtime" | "agent-state";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L19)
 
-## AppProviderInputs (interface)
+## AppProviderDefaults
 
 **Signature**
 
 ```ts
-export interface AppProviderInputs {
-  readonly bucket?: CapabilityInput<"bucket">;
-  readonly cache?: CapabilityInput<"cache">;
-  /** Public plural spelling for the jobs provider capability. */
-  readonly jobs?: CapabilityInput<"job">;
-  /** @deprecated Use `jobs`. */
-  readonly job?: CapabilityInput<"job">;
-  readonly event?: CapabilityInput<"event">;
-  readonly model?: CapabilityInput<"model">;
-  readonly realtime?: CapabilityInput<"realtime">;
-  readonly "agent-state"?: CapabilityInput<"agent-state">;
-}
+declare const AppProviderDefaults: AppProviderDefaults<Providers>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L21)
+
+## AppProviderInputs
+
+**Signature**
+
+```ts
+declare const AppProviderInputs: AppProviderInputs;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L20)
 
 ## AppTelemetryConfig (type alias)
+
+Application telemetry settings parameterized by exporters.
+
+**Example**
+
+```ts
+const telemetry: AppTelemetryConfig = { redaction: { mode: "off" } };
+```
 
 **Signature**
 
@@ -541,9 +1785,17 @@ type AppTelemetryConfig<Exporters extends TelemetryExporterMap = TelemetryExport
   TelemetryConfiguration<Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L28)
 
 ## ApplicationDescriptor (type alias)
+
+Immutable normalized application descriptor returned by `defineApp`.
+
+**Example**
+
+```ts
+const descriptor: ApplicationDescriptor = defineApp({ env: defineEnv({}) });
+```
 
 **Signature**
 
@@ -564,9 +1816,17 @@ type ApplicationDescriptor<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L135)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L58)
 
 ## DefineAppOptions (type alias)
+
+Authored application topology and runtime settings.
+
+**Example**
+
+```ts
+const options: DefineAppOptions<{}, {}> = { env: defineEnv({}) };
+```
 
 **Signature**
 
@@ -588,112 +1848,45 @@ type DefineAppOptions<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L39)
 
-## InspectorConfig (interface)
+## InspectorConfig
 
 **Signature**
 
 ```ts
-export interface InspectorConfig {
-  readonly port?: number;
-  readonly enabledInProduction?: boolean;
-  readonly maxPreviewBytes?: number;
-}
+declare const InspectorConfig: InspectorConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L15)
 
-## NormalizedAppProviderDefaults (type alias)
+## NormalizedAppProviderDefaults
 
 **Signature**
 
 ```ts
-type NormalizedAppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
-  [Capability in AppProviderCapability]?: ProfileFor<Providers, Capability>;
+declare const NormalizedAppProviderDefaults: Readonly<{
+  bucket?: ProfileFor<Providers, "bucket">;
+  cache?: ProfileFor<Providers, "cache">;
+  job?: ProfileFor<Providers, "job">;
+  event?: ProfileFor<Providers, "event">;
+  model?: ProfileFor<Providers, "model">;
+  realtime?: ProfileFor<Providers, "realtime">;
+  "agent-state"?: ProfileFor<Providers, "agent-state">;
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L22)
 
-## ServerConfig (interface)
-
-**Signature**
-
-```ts
-export interface ServerConfig {
-  readonly port?: number;
-  readonly maxBodyBytes?: number;
-  readonly apiDocs?: ApiDocsConfig;
-  readonly clientContract?: boolean;
-  readonly mcp?: boolean;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L17)
-
-## `define-app.ts`
-
----
-
-## Exports Grouped by Category
-
-- [Application](#application)
-  - [defineApp](#defineapp)
-- [utils](#utils)
-  - ["./define-app-types.js" (namespace export)](#define-app-typesjs-namespace-export)
-
----
-
-# Application
-
-## defineApp
-
-Defines one immutable application topology.
-
-**Example**
-
-```ts
-import { defineApp, defineEnv } from "@relkit/app";
-export default defineApp({
-  id: "orders-api",
-  env: defineEnv({}),
-  server: { port: 3000 },
-  inspector: { port: 3210 },
-});
-```
+## ServerConfig
 
 **Signature**
 
 ```ts
-declare const defineApp: <
-  const Shape extends EnvShape,
-  const Providers extends AppProviderInputs,
-  const Exporters extends TelemetryExporterMap = Readonly<
-    Record<string, TelemetryExporterDescriptor<string, string, object>>
-  >,
->(
-  options: DefineAppOptions<Shape, Providers, Exporters>,
-) => ApplicationDescriptor<Shape, Providers, Exporters>;
+declare const ServerConfig: ServerConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L59)
-
-Since v0.2.0
-
-# utils
-
-## "./define-app-types.js" (namespace export)
-
-Re-exports all named exports from the "./define-app-types.js" module.
-
-**Signature**
-
-```ts
-export * from "./define-app-types.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L14)
 
 ## `events.ts`
 
@@ -766,6 +1959,8 @@ export * from "@relkit/functions";
   - ["@relkit/routes" (namespace export)](#relkitroutes-namespace-export)
   - ["@relkit/services" (namespace export)](#relkitservices-namespace-export)
   - ["@relkit/tools" (namespace export)](#relkittools-namespace-export)
+  - [AppConstantRunner](#appconstantrunner)
+  - [AppConstantRunnerLive](#appconstantrunnerlive)
   - [EventAttributeValue](#eventattributevalue)
   - [EventPublishOptions](#eventpublishoptions)
   - [EventPublishResult](#eventpublishresult)
@@ -824,7 +2019,7 @@ Re-exports all named exports from the "./tasks.js" module.
 export * from "./tasks.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
 
 ## "@relkit/agents" (namespace export)
 
@@ -836,7 +2031,7 @@ Re-exports all named exports from the "@relkit/agents" module.
 export * from "@relkit/agents";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L5)
 
 ## "@relkit/buckets" (namespace export)
 
@@ -848,7 +2043,7 @@ Re-exports all named exports from the "@relkit/buckets" module.
 export * from "@relkit/buckets";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L6)
 
 ## "@relkit/cache" (namespace export)
 
@@ -860,7 +2055,7 @@ Re-exports all named exports from the "@relkit/cache" module.
 export * from "@relkit/cache";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L7)
 
 ## "@relkit/events" (namespace export)
 
@@ -872,7 +2067,7 @@ Re-exports all named exports from the "@relkit/events" module.
 export * from "@relkit/events";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L8)
 
 ## "@relkit/functions" (namespace export)
 
@@ -884,7 +2079,7 @@ Re-exports all named exports from the "@relkit/functions" module.
 export * from "@relkit/functions";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L9)
 
 ## "@relkit/jobs" (namespace export)
 
@@ -896,7 +2091,7 @@ Re-exports all named exports from the "@relkit/jobs" module.
 export * from "@relkit/jobs";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
 
 ## "@relkit/realtime" (namespace export)
 
@@ -908,7 +2103,7 @@ Re-exports all named exports from the "@relkit/realtime" module.
 export * from "@relkit/realtime";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L15)
 
 ## "@relkit/routes" (namespace export)
 
@@ -920,7 +2115,7 @@ Re-exports all named exports from the "@relkit/routes" module.
 export * from "@relkit/routes";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L16)
 
 ## "@relkit/services" (namespace export)
 
@@ -932,7 +2127,7 @@ Re-exports all named exports from the "@relkit/services" module.
 export * from "@relkit/services";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L17)
 
 ## "@relkit/tools" (namespace export)
 
@@ -944,7 +2139,27 @@ Re-exports all named exports from the "@relkit/tools" module.
 export * from "@relkit/tools";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L18)
+
+## AppConstantRunner
+
+**Signature**
+
+```ts
+declare const AppConstantRunner: typeof AppConstantRunner;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L4)
+
+## AppConstantRunnerLive
+
+**Signature**
+
+```ts
+declare const AppConstantRunnerLive: Layer<AppConstantRunner, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L4)
 
 ## EventAttributeValue
 
@@ -954,7 +2169,7 @@ export * from "@relkit/tools";
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
 
 ## EventPublishOptions
 
@@ -964,7 +2179,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
 
 ## EventPublishResult
 
@@ -974,7 +2189,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
 
 ## TaskClientFor
 
@@ -984,7 +2199,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const TaskClientFor: TaskClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
 
 ## TaskClients
 
@@ -994,7 +2209,7 @@ declare const TaskClientFor: TaskClientFor<T>;
 declare const TaskClients: TaskClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
 
 ## TaskTriggerOptions
 
@@ -1004,7 +2219,7 @@ declare const TaskClients: TaskClients<M>;
 declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
 
 ## bindDescriptorIdentity
 
@@ -1014,7 +2229,7 @@ declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
 
 ## `jobs-legacy.ts`
 

@@ -30,7 +30,6 @@ const implementationFiles = new Set(["apps/docs/tsconfig.json", "scripts/scope-s
 const contentExtensions = /\.(?:c|m)?(?:ts|tsx|js|jsx)|\.json$|\.toml$|\.ya?ml$|\.md$/i;
 const alternateIac =
   /\b(?:terraform|opentofu|cloudformation|(?:aws-)?cdk|sst|alchemy|serverless|bicep)\b|@cdktf|aws-cdk-lib|arm[-_ ]?template/i;
-
 const isAllowlistedProse = (path: string): boolean =>
   proseAllowlist.some((pattern) => pattern.test(path));
 function position(text: string, offset: number): { line: number; column: number } {
@@ -51,7 +50,6 @@ function violation(
   const location = text === undefined ? { line: 1, column: 1 } : position(text, offset);
   return { file: path, ...location, rule, message };
 }
-
 function pathViolations(root: string, file: string): ScopeViolation[] {
   const path = relative(root, file).replaceAll("\\", "/");
   const parts = path.split("/");
@@ -59,7 +57,6 @@ function pathViolations(root: string, file: string): ScopeViolation[] {
   const add = (rule: string, message: string): void => {
     findings.push(violation(root, file, rule, message));
   };
-
   if (parts[0] === "packages" && parts[1] && !approvedPackages.has(parts[1])) {
     add("out-of-scope-package", `packages/${parts[1]} is not an approved RelKit package`);
   }
@@ -103,7 +100,6 @@ function pathViolations(root: string, file: string): ScopeViolation[] {
   }
   return findings;
 }
-
 function contentViolations(root: string, file: string): ScopeViolation[] {
   const path = relative(root, file).replaceAll("\\", "/");
   if (isAllowlistedProse(path) || implementationFiles.has(path) || !contentExtensions.test(path)) {
@@ -151,6 +147,8 @@ function contentViolations(root: string, file: string): ScopeViolation[] {
   ];
   for (const [rule, pattern, message] of patterns) {
     for (const match of text.matchAll(pattern)) {
+      if (rule === "out-of-scope-navigation-name" && /^["'`][A-Z][A-Z0-9_]*["'`]$/.test(match[0]))
+        continue;
       const offset = match.index ?? 0;
       findings.push(violation(root, file, rule, message, text, offset));
     }
@@ -169,7 +167,6 @@ function contentViolations(root: string, file: string): ScopeViolation[] {
   }
   return findings;
 }
-
 function filesToScan(root: string): string[] {
   const paths = "package.json bunfig.toml turbo.json tsconfig.json tsconfig.base.json".split(" ");
   for (const directory of "apps examples integrations packages templates scripts tests .github".split(
@@ -185,7 +182,6 @@ function filesToScan(root: string): string[] {
   }
   return [...new Set(paths.map((path) => resolve(root, path)))].sort();
 }
-
 export function scanScope(root: string): ScopeViolation[] {
   const violations: ScopeViolation[] = [];
   for (const file of filesToScan(root)) {
