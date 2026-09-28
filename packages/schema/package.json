@@ -1,6 +1,6 @@
 {
   "name": "@relkit/schema",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "RELKIT schema API; prefer @relkit/app/schema in applications.",
   "license": "MIT",
   "repository": {
@@ -13,8 +13,7 @@
     "url": "https://github.com/rel-kit/relkit/issues"
   },
   "files": [
-    "dist",
-    "docs"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"

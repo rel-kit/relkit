@@ -1,6 +1,6 @@
 {
   "name": "@relkit/app",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "The primary typed application-authoring API for RELKIT.",
   "license": "MIT",
   "repository": {
