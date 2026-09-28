@@ -1,6 +1,6 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { z } from "@relkit/schema";
-import { defineChannel, runWithRealtimeDispatcher } from "./src/index.ts";
+import { defineChannel, runWithRealtimeDispatcher } from "../src/index.js";
 
 describe("defineChannel", () => {
   test("distinguishes internal, public, and protected declarations", () => {

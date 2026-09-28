@@ -86,6 +86,7 @@ export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>
   ["@relkit/events", new Set(["effect"])],
   ["@relkit/functions", new Set(["effect"])],
   ["@relkit/jobs", new Set(["effect"])],
+  ["@relkit/realtime", new Set(["effect"])],
   ["@relkit/routes", new Set(["effect", "hono"])],
   ["@relkit/tools", new Set(["effect"])],
 ]);
