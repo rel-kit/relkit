@@ -1,7 +1,7 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { defineEnv, env } from "@relkit/config";
-import { createApplicationContextResolver } from "./src/context-resolver.ts";
-import { defineConstants, definePrompt } from "./src/context-descriptors.ts";
+import { createApplicationContextResolver } from "../src/context-resolver.js";
+import { defineConstants, definePrompt } from "../src/context-descriptors.js";
 
 const noop = (): void => undefined;
 const log = { trace: noop, debug: noop, info: noop, warn: noop, error: noop };

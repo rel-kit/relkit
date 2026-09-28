@@ -1,6 +1,6 @@
-import { expect, test } from "bun:test";
-import * as app from "./src/index.ts";
-import * as config from "./src/config.ts";
+import { expect, test } from "vitest";
+import * as app from "../src/index.js";
+import * as config from "../src/config.js";
 
 const removed = [
   "defineConfig",
@@ -30,4 +30,5 @@ test("does not expose legacy provider authoring or compatibility exports", () =>
   }
   expect(typeof app.defineApp).toBe("function");
   expect(typeof config.defineApp).toBe("function");
+  expect(app.APP_PROVIDER_CAPABILITIES).toContain("cache");
 });

@@ -371,6 +371,11 @@
         "@relkit/schema": "workspace:*",
         "@relkit/services": "workspace:*",
         "@relkit/tools": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/better-auth": {

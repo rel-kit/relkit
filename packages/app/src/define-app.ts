@@ -1,28 +1,32 @@
 import type { EnvShape } from "@relkit/config";
-import { createDescriptorBase, deepFreeze, serializeJson } from "@relkit/contracts";
-import { createUnboundIdentity } from "@relkit/invocation";
+import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
+import { createUnboundIdentityEffect, DescriptorIdentityFailure } from "@relkit/invocation";
 import {
   normalizeTelemetryConfiguration,
   type TelemetryExporterMap,
 } from "@relkit/observability/telemetry";
+import { Effect, Result } from "effect";
+import { observeApp } from "./app-observability.js";
+import { APP_PROVIDER_CAPABILITIES } from "./app-provider-capabilities.js";
 import {
-  defineProviderCapability,
-  normalizeProviderProfiles,
-  type NormalizedProviderProfiles,
-  type ProviderSourceInput,
-} from "@relkit/provider";
-import { assertExclusiveAlias, isEnvDefinition, normalizeCompatibility } from "./app-validation.js";
+  copyEffect,
+  normalizeDefaultsEffect,
+  normalizeProvidersEffect,
+} from "./app-provider-normalization.js";
 import {
-  APP_PROVIDER_CAPABILITIES,
-  type ApplicationDescriptor,
-  type AppProviderCapability,
-  type AppProviderDefaults,
-  type AppProviderInputs,
-  type DefineAppOptions,
-  type NormalizedAppProviderDefaults,
-} from "./define-app-types.js";
+  AppValidationFailure,
+  assertExclusiveAliasEffect,
+  isEnvDefinitionEffect,
+  normalizeCompatibilityEffect,
+} from "./app-validation.js";
+import type {
+  ApplicationDescriptor,
+  AppProviderInputs,
+  DefineAppOptions,
+} from "./define-app.types.js";
 
-export * from "./define-app-types.js";
+export * from "./define-app.types.js";
+export { APP_PROVIDER_CAPABILITIES } from "./app-provider-capabilities.js";
 
 const OPTION_KEYS = new Set([
   "id",
@@ -40,19 +44,74 @@ const OPTION_KEYS = new Set([
   "jobs",
 ]);
 
-/**
- * Defines one immutable application topology.
- *
- * @example
- * ```ts
- * import { defineApp, defineEnv } from "@relkit/app";
- * export default defineApp({
- *   id: "orders-api",
- *   env: defineEnv({}),
- *   server: { port: 3000 },
- *   inspector: { port: 3210 },
- * });
- * ```
+/** Defines one immutable application topology in Effect.
+ * @param options - Environment, providers, defaults, and runtime metadata.
+ * @returns An application descriptor or AppValidationFailure.
+ * @example Effect.runSync(defineAppEffect({ env: defineEnv({}) }));
+ */
+export const defineAppEffect = Effect.fn("App.defineApp")(
+  <
+    const Shape extends EnvShape,
+    const Providers extends AppProviderInputs,
+    const Exporters extends TelemetryExporterMap = TelemetryExporterMap,
+  >(
+    options: DefineAppOptions<Shape, Providers, Exporters>,
+  ) =>
+    observeApp(
+      "define",
+      Effect.gen(function* () {
+        if (!isRecord(options) || !(yield* isEnvDefinitionEffect(options.env)))
+          return yield* invalid("RELKIT app requires an environment definition");
+        for (const key of Object.keys(options))
+          if (!OPTION_KEYS.has(key)) return yield* invalid(`Unknown defineApp option "${key}"`);
+        yield* assertExclusiveAliasEffect(options, "jobs", "job", "defineApp");
+        yield* assertExclusiveAliasEffect(
+          options.defaults ?? {},
+          "jobs",
+          "job",
+          "defineApp defaults",
+        );
+        const providers = yield* normalizeProvidersEffect(options);
+        const defaults = yield* normalizeDefaultsEffect(providers, options.defaults);
+        const id =
+          options.id ?? (yield* createUnboundIdentityEffect().pipe(Effect.mapError(fromCause)));
+        const base = yield* Effect.try({
+          try: () => createDescriptorBase("app", id, options),
+          catch: fromCause,
+        });
+        const compatibility = yield* normalizeCompatibilityEffect(options.compatibility);
+        const telemetry =
+          options.telemetry === undefined
+            ? undefined
+            : yield* Effect.try({
+                try: () => normalizeTelemetryConfiguration(options.telemetry),
+                catch: fromCause,
+              });
+        const server = options.server === undefined ? undefined : yield* copyEffect(options.server);
+        const inspector =
+          options.inspector === undefined ? undefined : yield* copyEffect(options.inspector);
+        const deployment =
+          options.deployment === undefined ? undefined : yield* copyEffect(options.deployment);
+        return deepFreeze({
+          ...base,
+          env: options.env,
+          compatibility,
+          ...providers,
+          defaults,
+          ...(telemetry === undefined ? {} : { telemetry }),
+          ...(server === undefined ? {} : { server }),
+          ...(inspector === undefined ? {} : { inspector }),
+          ...(deployment === undefined ? {} : { deployment }),
+        }) as unknown as ApplicationDescriptor<Shape, Providers, Exporters>;
+      }),
+    ),
+);
+
+/** Defines one immutable application topology synchronously.
+ * @param options - Environment, providers, defaults, and runtime metadata.
+ * @returns A frozen application descriptor.
+ * @throws The original validation error for invalid options.
+ * @example defineApp({ env: defineEnv({}), server: { port: 3000 } });
  * @category Application
  * @since 0.2.0
  */
@@ -63,71 +122,26 @@ export function defineApp<
 >(
   options: DefineAppOptions<Shape, Providers, Exporters>,
 ): ApplicationDescriptor<Shape, Providers, Exporters> {
-  if (!isRecord(options) || !isEnvDefinition(options.env))
-    throw new TypeError("RELKIT app requires an environment definition");
-  for (const key of Object.keys(options))
-    if (!OPTION_KEYS.has(key)) throw new TypeError(`Unknown defineApp option "${key}"`);
-  assertExclusiveAlias(options as unknown as Record<string, unknown>, "jobs", "job", "defineApp");
-  assertExclusiveAlias(
-    (options.defaults ?? {}) as unknown as Record<string, unknown>,
-    "jobs",
-    "job",
-    "defineApp defaults",
-  );
-  const providers = normalizeProviders(options);
-  const defaults = normalizeDefaults(providers, options.defaults);
-  const base = createDescriptorBase("app", options.id ?? createUnboundIdentity(), options);
-  return deepFreeze({
-    ...base,
-    env: options.env,
-    compatibility: normalizeCompatibility(options.compatibility),
-    ...providers,
-    defaults,
-    ...(options.telemetry === undefined
-      ? {}
-      : { telemetry: normalizeTelemetryConfiguration(options.telemetry) }),
-    ...(options.server === undefined ? {} : { server: copy(options.server) }),
-    ...(options.inspector === undefined ? {} : { inspector: copy(options.inspector) }),
-    ...(options.deployment === undefined ? {} : { deployment: copy(options.deployment) }),
-  }) as unknown as ApplicationDescriptor<Shape, Providers, Exporters>;
+  const result = Effect.runSync(Effect.result(defineAppEffect(options)));
+  if (Result.isFailure(result)) throw result.failure.cause;
+  return result.success;
 }
 
-function normalizeProviders(
-  options: AppProviderInputs,
-): Partial<Record<AppProviderCapability, NormalizedProviderProfiles>> {
-  const result: Partial<Record<AppProviderCapability, NormalizedProviderProfiles>> = {};
-  for (const capability of APP_PROVIDER_CAPABILITIES) {
-    const input = capability === "job" ? (options.jobs ?? options.job) : options[capability];
-    if (input !== undefined)
-      result[capability] = normalizeProviderProfiles(
-        defineProviderCapability(capability),
-        input as ProviderSourceInput | Readonly<Record<string, ProviderSourceInput>>,
-      );
-  }
-  return result;
+/** Constructs a typed invalid-input failure. */
+function invalid(message: string): Effect.Effect<never, AppValidationFailure> {
+  return Effect.fail(fromCause(new TypeError(message)));
 }
 
-function normalizeDefaults<Providers extends AppProviderInputs>(
-  providers: Partial<Record<AppProviderCapability, NormalizedProviderProfiles>>,
-  defaults: AppProviderDefaults<Providers> | undefined,
-): NormalizedAppProviderDefaults<Providers> {
-  const result: Partial<Record<AppProviderCapability, string>> = {};
-  for (const [rawCapability, selected] of Object.entries(defaults ?? {})) {
-    const capability = rawCapability === "jobs" ? "job" : rawCapability;
-    if (!APP_PROVIDER_CAPABILITIES.includes(capability as AppProviderCapability))
-      throw new TypeError(`Unknown default capability "${capability}"`);
-    const profiles = providers[capability as AppProviderCapability]?.profiles;
-    if (typeof selected !== "string" || profiles?.[selected] === undefined)
-      throw new TypeError(`defaults.${capability} must reference a configured profile`);
-    result[capability as AppProviderCapability] = selected;
-  }
-  return copy(result) as NormalizedAppProviderDefaults<Providers>;
+/** Preserves the cause for the synchronous adapter. */
+function fromCause(cause: unknown): AppValidationFailure {
+  if (cause instanceof DescriptorIdentityFailure) cause = cause.cause;
+  return new AppValidationFailure({
+    message: cause instanceof Error ? cause.message : String(cause),
+    cause,
+  });
 }
 
-function copy<Value>(value: Value): Value {
-  return JSON.parse(serializeJson(value)) as Value;
-}
-
+/** Checks for a non-array record. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

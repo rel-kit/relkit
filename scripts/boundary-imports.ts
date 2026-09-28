@@ -80,7 +80,7 @@ export const dependencyNeutralPackages = new Set(["@relkit/invocation"]);
 
 export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>>([
   ["@relkit/agents", new Set(["ai", "effect"])],
-  ["@relkit/app", new Set(["@relkit/observability/telemetry"])],
+  ["@relkit/app", new Set(["@relkit/observability/telemetry", "effect"])],
   ["@relkit/buckets", new Set(["effect"])],
   ["@relkit/cache", new Set(["effect"])],
   ["@relkit/events", new Set(["effect"])],
@@ -88,6 +88,7 @@ export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>
   ["@relkit/jobs", new Set(["effect"])],
   ["@relkit/realtime", new Set(["effect"])],
   ["@relkit/routes", new Set(["effect", "hono"])],
+  ["@relkit/services", new Set(["effect"])],
   ["@relkit/tools", new Set(["effect"])],
 ]);
 

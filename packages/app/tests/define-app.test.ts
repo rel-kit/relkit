@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { defineEnv } from "@relkit/config";
 import {
   createBindingValueRef,
@@ -8,7 +8,7 @@ import {
   defineProviderBehavior,
   defineProviderCapability,
 } from "@relkit/provider";
-import { defineApp } from "./src/define-app.ts";
+import { defineApp } from "../src/define-app.js";
 
 const cache = (url: string | ReturnType<typeof createBindingValueRef>) =>
   defineProviderAdapter({
