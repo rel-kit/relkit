@@ -1,8 +1,5 @@
-import { expect, test } from "bun:test";
 import { GRAPH_VERSION } from "@relkit/contracts";
 import type { ApplicationGraph } from "@relkit/graph";
-import { generateClient, generateClientContractDocument, generateContract } from "./src/index.ts";
-import { clientRoutes, responseType } from "./src/generate-types.ts";
 
 const stringSchema = { type: "string" };
 const input = {
@@ -16,56 +13,7 @@ const input = {
   },
 };
 
-test("generates a stable oRPC contract and shared client entry", () => {
-  const first = generateClient(graph(false));
-  const second = generateClient(graph(true));
-
-  expect(first).toBe(second);
-  expect(first).toContain('export { createClient, ORPCError } from "@relkit/client";');
-  const contract = generateContract(graph(false));
-  expect(contract).toBe(generateContract(graph(true)));
-  expect(contract).toContain('\"orders.get\": oc.errors({ \"orders.not-found\"');
-  expect(contract).toContain(
-    'schema<{ \"authorization\": string; \"id\": string; \"sku\": string; \"tag\"?: string }>()',
-  );
-});
-
-test("keeps REST-only path metadata out of the function-backed procedure input", () => {
-  const generated = generateContract(unmappedPathGraph());
-  const document = generateClientContractDocument(unmappedPathGraph(), "sha256:test");
-  expect(generated).toContain('\"reports.read\": oc.input(schema<{ \"payload\": string }>()');
-  expect(document).toContain('\"path\":\"/reports/:reportId\"');
-});
-
-test("keeps the envelope status optional when an error has no HTTP mapping", () => {
-  const inputGraph = graph(false);
-  const target = inputGraph.nodes.find((node) => node.kind === "function") as any;
-  const trigger = inputGraph.nodes.find((node) => node.kind === "trigger") as any;
-  target.errors.push({
-    kind: "error",
-    id: "orders.unavailable",
-    data: { type: "object", properties: {} },
-    retry: "later",
-  });
-  trigger.config.responses.push({
-    kind: "error",
-    id: "error.orders.unavailable.500",
-    errorId: "orders.unavailable",
-    status: 500,
-  });
-
-  const route = clientRoutes(inputGraph)[0]!;
-  const response = route.responses.find((entry) => entry.errorId === "orders.unavailable")!;
-  expect(responseType(route, response)).toContain('"status"?: number');
-});
-
-test("preserves catch-all REST metadata in the client-safe document", () => {
-  const document = generateClientContractDocument(catchAllGraph(), "sha256:test");
-  expect(document).toContain('\"path\":\"/files/*parts\"');
-  expect(document).toContain('\"path\":\"/docs/*parts?\"');
-});
-
-function catchAllGraph(): ApplicationGraph {
+export function catchAllGraph(): ApplicationGraph {
   const functionNode = (id: string) => ({
     kind: "function" as const,
     id,
@@ -111,7 +59,7 @@ function catchAllGraph(): ApplicationGraph {
   };
 }
 
-function unmappedPathGraph(): ApplicationGraph {
+export function unmappedPathGraph(): ApplicationGraph {
   return {
     contractVersion: GRAPH_VERSION,
     nodes: [
@@ -150,7 +98,7 @@ function unmappedPathGraph(): ApplicationGraph {
   };
 }
 
-function graph(reverse: boolean): ApplicationGraph {
+export function graph(reverse: boolean): ApplicationGraph {
   const nodes = [
     {
       kind: "function",

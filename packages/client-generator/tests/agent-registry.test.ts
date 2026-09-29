@@ -1,14 +1,18 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
+import { Effect } from "effect";
 import { GRAPH_VERSION } from "@relkit/contracts";
-import type { ApplicationGraph } from "@relkit/graph";
+import type { AgentNode, ApplicationGraph } from "@relkit/graph";
 import {
   agentProcedureEntriesFromDocument,
+  agentProcedureEntriesEffect,
   generateContract,
   generateClientContractDocument,
   generateClientRegistry,
   generateClientRegistryFromDocument,
   generateContractFromDocument,
-} from "./src/index.ts";
+  generateContractFromDocumentEffect,
+} from "../src/index.ts";
+import { agentRegistryTypeEffect } from "../src/generate-registry-types.js";
 
 test("generates a recursive union of graph continuation replies", () => {
   const graph = graphWithInterrupts();
@@ -16,6 +20,11 @@ test("generates a recursive union of graph continuation replies", () => {
     'ClientAgentContract<{ "orderId": string }, { "done": boolean }, "stop", false, boolean | { "reason": string }, { readonly kind: "tool"; readonly id: "lookup"; readonly input: { "id": string }; readonly output: { "found": boolean } }, { readonly "todos": readonly { "content": string; "status": "pending" | "completed" }[] }, { readonly kind: "custom"; readonly name: "notice"; readonly data: { "message": string } }';
 
   expect(generateClientRegistry(graph)).toContain(expected);
+  expect(Effect.runSync(agentProcedureEntriesEffect(graph)).join("\n")).toContain(
+    'readonly agentId: "orders.review"',
+  );
+  const agent = graph.nodes.find((node): node is AgentNode => node.kind === "agent")!;
+  expect(Effect.runSync(agentRegistryTypeEffect(agent))).toContain("ClientAgentContract");
 
   const document = generateClientContractDocument(graph, "sha256:graph");
   const parsed = JSON.parse(document);
@@ -25,9 +34,10 @@ test("generates a recursive union of graph continuation replies", () => {
   });
   expect(parsed.agents[0].workflow).toBeDefined();
   expect(generateClientRegistryFromDocument(parsed)).toContain(expected);
-  expect(
-    generateContractFromDocument([], agentProcedureEntriesFromDocument(parsed.agents)),
-  ).toContain('readonly agentId: "orders.review"');
+  const entries = agentProcedureEntriesFromDocument(parsed.agents);
+  const fromDocument = Effect.runSync(generateContractFromDocumentEffect([], entries));
+  expect(fromDocument).toBe(generateContractFromDocument([], entries));
+  expect(fromDocument).toContain('readonly agentId: "orders.review"');
   expect(generateClientRegistry(graph)).not.toContain("langchain");
 
   const contract = generateContract(graph);

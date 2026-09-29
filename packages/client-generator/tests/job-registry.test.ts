@@ -1,4 +1,5 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
+import { Effect } from "effect";
 import { GRAPH_VERSION } from "@relkit/contracts";
 import type { ApplicationGraph } from "@relkit/graph";
 import {
@@ -6,8 +7,11 @@ import {
   generateClientRegistry,
   generateClientRegistryFromDocument,
   generateContract,
+  generateJobRegistry,
+  generateJobRegistryEffect,
+  generateJobRegistryFromDocumentEffect,
   jobProcedureSourcesFromDocument,
-} from "./src/index.ts";
+} from "../src/index.ts";
 
 test("generates public jobs from graph and serialized contract with stable paths", () => {
   const graph = jobGraph();
@@ -41,6 +45,26 @@ test("generates public jobs from graph and serialized contract with stable paths
   ).toContain('readonly "jobs.exportOrders.runs.stream":');
   expect(generateContract(jobGraph())).toContain('"exportOrders": {');
   expect(jobProcedureSourcesFromDocument(document.jobs).length).toBe(1);
+  const jobRegistry = Effect.runSync(generateJobRegistryEffect(graph));
+  expect(jobRegistry).toBe(generateJobRegistry(graph));
+  expect(jobRegistry).toContain('readonly "jobs.exportOrders.runs.watch":');
+  expect(jobRegistry).not.toContain("hiddenJob");
+  const unnamedStream = Effect.runSync(
+    generateJobRegistryFromDocumentEffect([
+      {
+        name: "emptyStreams",
+        jobId: "empty.streams",
+        taskId: "empty.streams",
+        taskVersion: "1",
+        input: {},
+        output: {},
+        operations: ["stream"],
+        fields: [],
+        streamNames: [],
+      },
+    ]),
+  );
+  expect(unnamedStream).toContain("readonly name: never");
 });
 
 function jobGraph(): ApplicationGraph {
