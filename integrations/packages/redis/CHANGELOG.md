@@ -1,5 +1,5 @@
 # @relkit/redis
 
-## 0.5.2
+## 0.5.3
 
 See the root CHANGELOG.md for this fixed release train.
