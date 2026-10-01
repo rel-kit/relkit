@@ -1,0 +1,32 @@
+bun test v1.3.10 (30e609e0)
+
+tests/compiler/route-module-exclusions.test.ts:
+(pass) generated route contracts omit discovery's excluded test and fixture modules [18.62ms]
+(pass) shared route findings skip excluded files while preserving errors in application routes [49.45ms]
+(pass) route eligibility ignores excluded folders only beneath the source route directory [0.07ms]
+
+tests/compiler/route-module-types.test.ts:
+(pass) installed public declarations validate individual routes and service-route destructuring [7630.42ms]
+(pass) tsc rejects bad route exports even with skipLibCheck and generated files excluded [7158.66ms]
+(pass) module checking follows reexports instead of relying on initializer syntax [1080.73ms]
+(pass) module findings locate invalid star reexports in the route module [1965.25ms]
+(pass) source rules recognize import aliases, namespaces and wrapped expressions with a precise fix [19.06ms]
+(pass) route validators sort, deduplicate and support custom output directories [1.83ms]
+(pass) service route destructuring rejects renamed methods, rest bindings and ALL [1.99ms]
+(pass) aliased service-route factories retain static route identity evidence [19.78ms]
+
+tests/compiler/route-path-types.test.ts:
+(pass) built declarations and editor findings reject missing inferred input while accepting explicit mappings [4876.69ms]
+
+packages/cli/editor.test.ts:
+(pass) the packaged editor plugin reports unsaved route mistakes and offers a working code fix [5390.82ms]
+(pass) the editor entry point loads through Node and TypeScript's plugin resolver [343.74ms]
+(pass) the packaged editor excludes test and fixture routes but diagnoses application routes [11.45ms]
+
+packages/cli/editor-compatibility.test.ts:
+(pass) the packaged plugin uses the editor's TypeScript for dynamic route inputs and recovery [9888.04ms]
+
+ 16 pass
+ 0 fail
+ 99 expect() calls
+Ran 16 tests across 5 files. [38.90s]

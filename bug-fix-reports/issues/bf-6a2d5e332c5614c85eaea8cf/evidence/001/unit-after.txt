@@ -1,0 +1,11 @@
+bun test v1.3.10 (30e609e0)
+
+tests/compiler/route-module-exclusions.test.ts:
+(pass) generated route contracts omit discovery's excluded test and fixture modules [19.58ms]
+(pass) shared route findings skip excluded files while preserving errors in application routes [98.92ms]
+(pass) route eligibility ignores excluded folders only beneath the source route directory [0.60ms]
+
+ 3 pass
+ 0 fail
+ 28 expect() calls
+Ran 3 tests across 1 file. [1017.00ms]
