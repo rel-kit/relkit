@@ -44,7 +44,7 @@ export const defineServiceRoutesEffect = Effect.fn("routes.service-routes.define
     const Options extends ServiceRoutesOptions<Service>,
   >(
     service: Service,
-    options: Options,
+    options: Options & Record<Exclude<keyof Options, ServiceRouteMethod>, never>,
   ) =>
     measureRoute(
       "service-routes.define",
@@ -82,7 +82,10 @@ export const defineServiceRoutesEffect = Effect.fn("routes.service-routes.define
 export function defineServiceRoutes<
   const Service extends ServiceDescriptor<string, any, any>,
   const Options extends ServiceRoutesOptions<Service>,
->(service: Service, options: Options): ServiceRoutesResult<Service, Options> {
+>(
+  service: Service,
+  options: Options & Record<Exclude<keyof Options, ServiceRouteMethod>, never>,
+): ServiceRoutesResult<Service, Options> {
   return runRouteSync(defineServiceRoutesEffect(service, options));
 }
 

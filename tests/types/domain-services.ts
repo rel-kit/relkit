@@ -2,7 +2,7 @@ import { defineBetterAuthService } from "@relkit/better-auth";
 import { defineDrizzleService, defineModel, type DatabaseContext } from "@relkit/drizzle";
 import { defineEvent } from "@relkit/events";
 import { defineFunction, type AuthContext } from "@relkit/functions";
-import { defineServiceRoutes } from "@relkit/routes";
+import { defineServiceRoutes, defineServiceRoutesEffect } from "@relkit/routes";
 import { z } from "@relkit/schema";
 import { defineService } from "@relkit/services";
 import {
@@ -36,6 +36,12 @@ defineService({ events: { created } });
 defineServiceRoutes(orders, { GET: "getOrder", POST: { member: "getOrder", successStatus: 201 } });
 // @ts-expect-error ALL is reserved for raw handlers
 defineServiceRoutes(orders, { ALL: "getOrder" });
+// @ts-expect-error unsupported keys must be rejected even alongside a valid method
+defineServiceRoutes(orders, { GET: "getOrder", TRACE: "getOrder" });
+// @ts-expect-error Effect authoring also rejects mixed valid and invalid methods
+defineServiceRoutesEffect(orders, { GET: "getOrder", TRACE: "getOrder" });
+// @ts-expect-error ALL remains reserved when mixed with supported methods
+defineServiceRoutes(orders, { GET: "getOrder", ALL: "getOrder" });
 // @ts-expect-error events cannot be route targets
 defineServiceRoutes(orders, { GET: "created" });
 // @ts-expect-error functions outside the public service facade cannot be selected
