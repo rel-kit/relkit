@@ -1,4 +1,8 @@
-import { middlewareForRoute } from "./middleware-coverage.js";
+import type { GraphEdgeAdder } from "./normalize-graph-edge-helpers.types.js";
+export type { GraphEdgeAdder } from "./normalize-graph-edge-helpers.types.js";
+import { middlewareForRouteEffect } from "./middleware-coverage.js";
+import { Effect } from "effect";
+import { runCompilerSync } from "./compatibility.js";
 import { requestedProviderProfile, selectedProviderProfile } from "./normalize-graph-app.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
@@ -12,13 +16,14 @@ const dependencyEdges: Readonly<Record<string, string>> = {
   agents: "invokes-agent",
 };
 
-export type GraphEdgeAdder = (
-  kind: string,
-  from: string,
-  to: string,
-  metadata?: string | Record<string, unknown>,
-) => void;
-
+/**
+ * Adds an edge to the selected provider profile.
+ * @param add - Graph edge accumulator owned by this operation.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param value - Declared metadata inspected without coercion.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 export function addProviderEdge(
   add: GraphEdgeAdder,
   descriptor: NormalizedDescriptor,
@@ -35,6 +40,13 @@ export function addProviderEdge(
   }
 }
 
+/**
+ * Adds graph edges for declared executable lifecycle hooks.
+ * @param add - Graph edge accumulator owned by this operation.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 export function addHookEdges(
   add: GraphEdgeAdder,
   descriptor: NormalizedDescriptor,
@@ -63,6 +75,13 @@ export function addHookEdges(
   }
 }
 
+/**
+ * Adds event consumption edges for a descriptor.
+ * @param add - Graph edge accumulator owned by this operation.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 export function addEventEdges(
   add: GraphEdgeAdder,
   descriptor: NormalizedDescriptor,
@@ -72,6 +91,13 @@ export function addEventEdges(
   if (typeof value.eventId === "string") add("listens-to-event", descriptor.id, value.eventId);
 }
 
+/**
+ * Adds publication edges for declared events.
+ * @param add - Graph edge accumulator owned by this operation.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param publishes - Declared event publication references.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 export function addPublicationEdges(
   add: GraphEdgeAdder,
   descriptor: NormalizedDescriptor,
@@ -84,6 +110,14 @@ export function addPublicationEdges(
   }
 }
 
+/**
+ * Adds typed graph edges for declared descriptor dependencies.
+ * @param add - Graph edge accumulator owned by this operation.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param dependencies - Declared descriptor dependency groups.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 export function addDependencyEdges(
   add: GraphEdgeAdder,
   descriptor: NormalizedDescriptor,
@@ -101,10 +135,22 @@ export function addDependencyEdges(
   }
 }
 
+/**
+ * Selects the graph edge category for a task dependency group.
+ * @param name - Declared binding or parameter name.
+ * @returns The graph edge kind for the dependency group, or undefined.
+ */
 function taskDependencyEdge(name: string): string | undefined {
   return ({ tasks: "triggers-task", jobs: "triggers-job" } as Record<string, string>)[name];
 }
 
+/**
+ * Adds graph edges to an agent's declared tools.
+ * @param add - Graph edge accumulator owned by this operation.
+ * @param agentId - Stable ID of the owning agent.
+ * @param tools - Declared agent tools or normalized tool descriptors.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 export function addToolEdges(add: GraphEdgeAdder, agentId: string, tools: unknown): void {
   if (!Array.isArray(tools)) return;
   for (const tool of tools) {
@@ -113,13 +159,21 @@ export function addToolEdges(add: GraphEdgeAdder, agentId: string, tools: unknow
   }
 }
 
-export function addRouteEdges(
+/**
+ * Adds HTTP target, middleware, and transform edges for a route.
+ * @param add - Graph edge accumulator owned by this operation.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param value - Declared metadata inspected without coercion.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns A lazy effect appending route edges in the caller's runtime.
+ */
+export const addRouteEdgesEffect = Effect.fnUntraced(function* (
   add: GraphEdgeAdder,
   descriptor: NormalizedDescriptor,
   value: Record<string, unknown>,
   work: NormalizationWork,
-): void {
-  for (const middleware of middlewareForRoute(descriptor, work)) {
+) {
+  for (const middleware of yield* middlewareForRouteEffect(descriptor, work)) {
     add("uses-middleware", descriptor.id, middleware.id, {
       order: middleware.order,
       match: middleware.match,
@@ -129,12 +183,33 @@ export function addRouteEdges(
   if (store !== undefined) add("uses-cache", descriptor.id, store);
   const mountedService = isRecord(value.auth) ? refId(value.auth.service) : undefined;
   if (mountedService !== undefined) add("mounts-service", descriptor.id, mountedService);
+});
+
+/** Appends route edges at the synchronous compatibility boundary. */
+export function addRouteEdges(
+  add: GraphEdgeAdder,
+  descriptor: NormalizedDescriptor,
+  value: Record<string, unknown>,
+  work: NormalizationWork,
+): void {
+  runCompilerSync(addRouteEdgesEffect(add, descriptor, value, work));
 }
 
+/**
+ * Recognizes descriptor kinds that bind an executable target.
+ * @param kind - Descriptor or syntax category.
+ * @returns True when this descriptor kind owns an executable target edge.
+ */
 export function isTargetingDescriptor(kind: string): boolean {
   return kind === "route" || kind === "event-trigger" || kind === "job" || kind === "tool";
 }
 
+/**
+ * Selects provider capabilities required by a descriptor kind.
+ * @param kind - Descriptor or syntax category.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Required capabilities paired with their selected profile names.
+ */
 function providerCapabilities(
   kind: string,
   value: Record<string, unknown>,

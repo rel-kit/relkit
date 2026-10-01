@@ -5,6 +5,14 @@ import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.
 import { isRecord, refId, refKind } from "./normalize-utils.js";
 import { agentResources, agentSubagents, workflowTopology } from "./normalize-agent-topology.js";
 
+/**
+ * Projects agent tools, backend, workflow, and provider metadata.
+ * @param value - Declared metadata inspected without coercion.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @param application - Application descriptor metadata.
+ * @returns Serializable tool, backend, workflow, and provider metadata.
+ */
 export function agentNodeData(
   value: Record<string, unknown>,
   descriptor: NormalizedDescriptor,
@@ -55,6 +63,11 @@ export function agentNodeData(
   };
 }
 
+/**
+ * Collects stable tool references from agent metadata.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Stable tool IDs declared by the agent.
+ */
 function toolIds(value: unknown): readonly string[] {
   return Array.isArray(value)
     ? value.flatMap((entry) => {
@@ -64,6 +77,11 @@ function toolIds(value: unknown): readonly string[] {
     : [];
 }
 
+/**
+ * Classifies public or protected client agent exposure.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns The public or protected agent exposure.
+ */
 function agentClient(value: unknown): "public" | "protected" {
   return isRecord(value) && value.public === true ? "public" : "protected";
 }

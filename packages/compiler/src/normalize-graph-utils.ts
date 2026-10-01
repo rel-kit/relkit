@@ -1,7 +1,11 @@
 import type { JsonValue } from "@relkit/contracts";
 import { isErrorDescriptorLike } from "./normalize-utils.js";
 
-/** Replaces executable/non-JSON fields with deterministic nulls for graph data. */
+/**
+ * Replaces executable/non-JSON fields with deterministic nulls for graph data.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns JSON-safe graph metadata with executable fields replaced by null.
+ */
 export function clean(value: unknown): JsonValue {
   if (value === undefined || typeof value === "symbol") return null;
   if (typeof value === "function") {

@@ -7,6 +7,28 @@ import {
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { ImportBinding } from "./generate-manifest-utils.js";
 
+/**
+ * Renders deterministic imports, identity bindings, and executable manifest registries.
+ * @param input - Compiler input and source provenance.
+ * @param bindings - Source modules indexed by their deterministic import aliases.
+ * @param functions - Executable function descriptors.
+ * @param targets - Declared event target bindings.
+ * @param middleware - Middleware descriptor or path being compared.
+ * @param hooks - Executable lifecycle hook bindings.
+ * @param transforms - Transform descriptors participating in generation.
+ * @param application - Application descriptor metadata.
+ * @param agents - Agent descriptors participating in generation.
+ * @param channels - Channel descriptors participating in generation.
+ * @param tools - Declared agent tools or normalized tool descriptors.
+ * @param routes - Route descriptors participating in generation.
+ * @param constants - Constants descriptors participating in generation.
+ * @param prompts - Prompt descriptors participating in generation.
+ * @param services - Domain services indexed by owning domain identity.
+ * @param tasks - Task descriptors participating in generation.
+ * @param jobs - Job bindings participating in generation.
+ * @param identityBindings - Source identity rebinding statements.
+ * @returns Deterministic executable manifest TypeScript source.
+ */
 export function renderManifest(
   input: ManifestGenerationInput,
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -84,11 +106,22 @@ export function renderManifest(
   ].join("\n");
 }
 
+/**
+ * Renders a readonly executable registry map in insertion order.
+ * @param values - Ordered values to inspect without coercion.
+ * @returns A readonly registry expression preserving map insertion order.
+ */
 function renderMap(values: ReadonlyMap<string, string>): string {
   const entries = [...values.entries()].sort(([left], [right]) => left.localeCompare(right));
   return `{ ${entries.map(([key, value]) => `${JSON.stringify(key)}: ${value}`).join(", ")} }`;
 }
 
+/**
+ * Computes a portable relative import between generated output and authored source.
+ * @param module - Authored source module path.
+ * @param input - Compiler input and source provenance.
+ * @returns A POSIX relative import specifier with the required module extension.
+ */
 function importPath(module: string, input: ManifestGenerationInput): string {
   const generated = (input.generatedDirectory ?? ".relkit/generated")
     .replaceAll("\\", "/")

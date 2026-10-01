@@ -1,3 +1,4 @@
+import type { BindingProjection } from "./normalize-graph-providers.types.js";
 import type {
   DeploymentRoleProjection,
   ProviderAdapterProjection,
@@ -14,8 +15,11 @@ import { clean } from "./normalize-graph-utils.js";
 import type { GraphNode, NormalizedDescriptor } from "./normalize-types.js";
 import { isRecord } from "./normalize-utils.js";
 
-type BindingProjection = Omit<ProviderBindingNode, "kind" | "id" | "source">;
-
+/**
+ * Projects application provider bindings into canonical graph nodes.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @returns Canonical provider binding graph nodes.
+ */
 export function providerNodes(descriptor: NormalizedDescriptor): GraphNode[] {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   return providerMaps(value)
@@ -41,10 +45,23 @@ export function providerNodes(descriptor: NormalizedDescriptor): GraphNode[] {
     );
 }
 
+/**
+ * Creates a stable provider identity from capability and profile.
+ * @param capability - Required provider capability.
+ * @param profile - Selected provider profile identity.
+ * @returns A capability/profile-scoped stable provider node ID.
+ */
 export function providerBindingId(capability: string, profile: string): string {
   return `provider.${capability}.${profile}`;
 }
 
+/**
+ * Projects a selected adapter and its provider configuration.
+ * @param capability - Required provider capability.
+ * @param profile - Selected provider profile identity.
+ * @param candidate - Untrusted candidate binding metadata.
+ * @returns The selected adapter's data-only binding projection, or undefined.
+ */
 function projectBinding(
   capability: string,
   profile: string,
@@ -69,6 +86,12 @@ function projectBinding(
   };
 }
 
+/**
+ * Projects adapter identity and protocol metadata for a capability.
+ * @param capability - Required provider capability.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Adapter identity and protocol metadata, or undefined when invalid.
+ */
 function projectAdapter(
   capability: string,
   value: unknown,
@@ -106,6 +129,11 @@ function projectAdapter(
   };
 }
 
+/**
+ * Projects provider source metadata without retaining executable values.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Data-only provider source metadata, or undefined.
+ */
 function projectSource(value: unknown): ProviderSourceProjection | undefined {
   if (!isRecord(value)) return undefined;
   if (value.kind === "connected" || value.kind === "local-only") return { kind: value.kind };
@@ -114,6 +142,11 @@ function projectSource(value: unknown): ProviderSourceProjection | undefined {
     : undefined;
 }
 
+/**
+ * Projects local provider service metadata.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns The provider's local service projection, or undefined.
+ */
 function projectLocal(value: unknown): ProviderBindingNode["local"] {
   return isRecord(value) &&
     typeof value.integrationId === "string" &&
@@ -127,6 +160,12 @@ function projectLocal(value: unknown): ProviderBindingNode["local"] {
     : undefined;
 }
 
+/**
+ * Projects infrastructure and access role metadata for a provider.
+ * @param source - Source provenance or exact generated content.
+ * @param access - Selected access deployment role metadata.
+ * @returns Infrastructure and access roles declared for the selected provider.
+ */
 function providerDeploymentRoles(
   source: ProviderSourceProjection,
   access: ReturnType<typeof clean> | undefined,

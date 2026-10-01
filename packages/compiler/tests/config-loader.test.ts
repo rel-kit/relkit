@@ -1,8 +1,8 @@
-import { describe, expect, test } from "bun:test";
-import { CONFIG_CODES, ConfigValidationError, loadConfig, validateConfig } from "./src/index.ts";
+import { describe, expect, it } from "@effect/vitest";
+import { CONFIG_CODES, ConfigValidationError, loadConfig, validateConfig } from "../src/index.js";
 
 describe("RELKIT configuration", () => {
-  test("uses fixed project conventions and typed server defaults", () => {
+  it("uses fixed project conventions and typed server defaults", () => {
     const input = {
       server: {
         port: 4100,
@@ -29,7 +29,7 @@ describe("RELKIT configuration", () => {
     );
   });
 
-  test("rejects legacy keys with direct migration guidance", () => {
+  it("rejects legacy keys with direct migration guidance", () => {
     const issues = validateConfig(
       {
         entry: "custom.ts",
@@ -54,7 +54,7 @@ describe("RELKIT configuration", () => {
     );
   });
 
-  test("rejects invalid API docs domain exclusions", () => {
+  it("rejects invalid API docs domain exclusions", () => {
     for (const excludeDomains of ["navigation", [""], ["  "], [1], null]) {
       expect(
         validateConfig({ server: { apiDocs: { excludeDomains } } }, "/workspace/app"),
@@ -62,7 +62,7 @@ describe("RELKIT configuration", () => {
     }
   });
 
-  test("accepts singular provider keys and rejects removed plural keys", () => {
+  it("accepts singular provider keys and rejects removed plural keys", () => {
     expect(
       validateConfig({ bucket: {}, cache: {}, job: {}, event: {}, model: {} }, "/workspace/app"),
     ).toEqual([]);
@@ -74,7 +74,7 @@ describe("RELKIT configuration", () => {
     );
   });
 
-  test("accepts generic deployment roles and rejects the removed AWS/Pulumi shape", () => {
+  it("accepts generic deployment roles and rejects the removed AWS/Pulumi shape", () => {
     expect(
       loadConfig({ deployment: { engine: "pulumi", host: "aws" } }, "/workspace/app").deployment,
     ).toEqual({ engine: "pulumi", host: "aws" });

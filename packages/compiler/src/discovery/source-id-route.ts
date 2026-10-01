@@ -1,23 +1,56 @@
-import { normalizeId } from "@relkit/contracts";
+import { normalizeIdEffect } from "@relkit/contracts";
+import { Effect } from "effect";
+import { observeCompiler } from "../observability.js";
+import { runDiscoverySync } from "./discovery-sync.js";
+import { kebab } from "./source-id-helpers.js";
 
 const HTTP_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"]);
 
-/** Encodes a route identity without placing slashes or transport punctuation in the ID. */
+/**
+ * Derives route identity from method and normalized path segments.
+ * @param method - HTTP operation name, normalized case-insensitively.
+ * @param routePath - Absolute route path with optional named/catch-all segments.
+ * @param explicitId - Overrides route derivation when supplied.
+ * @returns A lazy effect yielding identity or undefined for unsupported syntax; invalid IDs fail with StableIdError.
+ */
+export const encodeRouteIdEffect = Effect.fn("discovery.identity.route")(
+  function* (method: string, routePath: string, explicitId?: unknown) {
+    if (explicitId !== undefined) return yield* normalizeIdEffect(explicitId);
+    const normalizedMethod = method.trim().toUpperCase();
+    if (!HTTP_METHODS.has(normalizedMethod)) return undefined;
+    const segments = yield* routeSegmentsEffect(routePath);
+    if (segments === undefined) return undefined;
+    return yield* normalizeIdEffect(
+      ["route", normalizedMethod.toLowerCase(), ...segments].join("."),
+    );
+  },
+  (effect) => observeCompiler("discovery", "encodeRouteId", effect, () => ({}), false),
+);
+
+/**
+ * Synchronous route identity compatibility boundary.
+ * @param method - HTTP operation name.
+ * @param routePath - Absolute route path.
+ * @param explicitId - Optional authoritative identity.
+ * @returns The derived identity or undefined for unsupported syntax.
+ * @throws StableIdError when the explicit or derived identity is invalid.
+ */
 export function encodeRouteId(
   method: string,
   routePath: string,
   explicitId?: unknown,
 ): string | undefined {
-  if (explicitId !== undefined) return normalizeId(explicitId);
-  const normalizedMethod = method.trim().toUpperCase();
-  if (!HTTP_METHODS.has(normalizedMethod)) return undefined;
-  const segments = routeSegments(routePath);
-  if (segments === undefined) return undefined;
-  const value = ["route", normalizedMethod.toLowerCase(), ...segments].join(".");
-  return normalizeId(value);
+  return runDiscoverySync(encodeRouteIdEffect(method, routePath, explicitId));
 }
 
-function routeSegments(value: string): readonly string[] | undefined {
+/**
+ * Normalizes route segments in order while rejecting unrepresentable parameters.
+ * @param value - Absolute route path.
+ * @returns A lazy effect yielding normalized identity segments or undefined.
+ */
+const routeSegmentsEffect = Effect.fn("discovery.identity.route-segments")(function* (
+  value: string,
+) {
   const normalized = value.trim().replaceAll("\\", "/");
   if (!normalized.startsWith("/")) return undefined;
   const raw = normalized.split("/").filter(Boolean);
@@ -43,17 +76,4 @@ function routeSegments(value: string): readonly string[] | undefined {
     result.push(staticSegment);
   }
   return result;
-}
-
-function kebab(value: string | undefined): string | undefined {
-  if (value === undefined) return undefined;
-  const normalized = value
-    .normalize("NFKC")
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
-    .replace(/[^A-Za-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .replace(/-+/g, "-")
-    .toLowerCase();
-  return normalized === "" ? undefined : normalized;
-}
+});

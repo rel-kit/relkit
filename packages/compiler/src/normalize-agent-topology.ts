@@ -5,6 +5,11 @@ import type {
 } from "@relkit/graph";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
 
+/**
+ * Projects declared subagent references and invocation policies.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Declared subagent references and invocation policies, or undefined.
+ */
 export function agentSubagents(value: unknown): readonly AgentSubagentTopology[] | undefined {
   if (!Array.isArray(value)) return undefined;
   return value.flatMap((entry) => {
@@ -13,6 +18,13 @@ export function agentSubagents(value: unknown): readonly AgentSubagentTopology[]
   });
 }
 
+/**
+ * Projects agent resource policies and selected provider profiles.
+ * @param value - Declared metadata inspected without coercion.
+ * @param modelProfile - Selected model provider profile.
+ * @param stateProfile - Selected agent state provider profile.
+ * @returns Resource access policies and selected provider profiles.
+ */
 export function agentResources(
   value: Record<string, unknown>,
   modelProfile: string,
@@ -37,6 +49,11 @@ export function agentResources(
   return resources;
 }
 
+/**
+ * Projects workflow stages, routes, and graph reachability.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns The workflow's stage, route, and reachability projection, or undefined.
+ */
 export function workflowTopology(value: unknown): AgentWorkflowTopology | undefined {
   if (!isRecord(value) || typeof value.start !== "string" || typeof value.end !== "string") {
     return undefined;
@@ -93,6 +110,13 @@ export function workflowTopology(value: unknown): AgentWorkflowTopology | undefi
   };
 }
 
+/**
+ * Appends a selected persistence resource to agent graph metadata.
+ * @param output - Generated output filename.
+ * @param kind - Descriptor or syntax category.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 function addPersistence(
   output: AgentResourceDependency[],
   kind: "checkpointer" | "memory",
@@ -108,6 +132,11 @@ function addPersistence(
   });
 }
 
+/**
+ * Projects workflow edges into portable graph links.
+ * @param edges - Declared workflow or graph edges.
+ * @returns Portable from/to workflow links.
+ */
 function edgeLinks(edges: readonly Record<string, unknown>[]): { from: string; to: string }[] {
   return edges.flatMap((edge) => {
     if (edge.kind === "edge" && typeof edge.from === "string" && typeof edge.to === "string")
@@ -124,6 +153,11 @@ function edgeLinks(edges: readonly Record<string, unknown>[]): { from: string; t
   });
 }
 
+/**
+ * Selects workflow route names from declared metadata.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Declared workflow route labels and targets.
+ */
 function routeList(value: readonly unknown[]): { label: string; to: string }[] {
   return value.flatMap((route) =>
     isRecord(route) && typeof route.label === "string" && typeof route.to === "string"
@@ -132,6 +166,13 @@ function routeList(value: readonly unknown[]): { label: string; to: string }[] {
   );
 }
 
+/**
+ * Checks directed workflow reachability with cycle detection.
+ * @param start - Starting workflow vertex.
+ * @param target - Target contract or metadata being checked.
+ * @param outgoing - Directed graph adjacency index.
+ * @returns True when the workflow graph has a path between the selected stages.
+ */
 function reachable(
   start: string,
   target: string,

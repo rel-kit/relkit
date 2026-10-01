@@ -14,6 +14,7 @@ export * from "./integration-package-resolution.js";
 export * from "./local-service-plan.js";
 export * from "./normalize.js";
 export * from "./project-typecheck.js";
+export * from "./route-module-checks.js";
 export * from "./route-file.js";
 export * from "./runtime-integration-plan.js";
 export * from "./runtime-integration-imports.js";

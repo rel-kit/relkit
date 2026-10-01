@@ -1,66 +1,126 @@
-import { schema, schemaEntries } from "./normalize-compat.js";
+import { Effect } from "effect";
+import { runCompilerSync } from "./compatibility.js";
+import { observeCompiler } from "./observability.js";
+import { schemaEntries, schemaEffect } from "./normalize-compat.js";
 import { add } from "./normalize-pass-utils.js";
 import { NORMALIZE_CODES, type NormalizationWork } from "./normalize-types.js";
 import { schemaKey, taskSchemaKey } from "./normalize-utils.js";
 
-export function passSchemas(work: NormalizationWork): void {
-  const seen = new Set<unknown>();
-  const descriptors = [...work.descriptors, ...work.transformReferences.values()];
-  for (const descriptor of descriptors) {
-    if (seen.has(descriptor.value)) continue;
-    seen.add(descriptor.value);
-    for (const [key, value, direction] of schemaEntries(descriptor)) {
-      validateSchema(work, descriptor, key, value, direction);
-    }
-    if (descriptor.kind === "task") validateTaskProjections(work, descriptor);
-    const value = isRecord(descriptor.value) ? descriptor.value : {};
-    if (
-      descriptor.kind === "function" &&
-      value.invocationMode === "event-only" &&
-      typeof value.event === "string"
-    ) {
-      const event = work.descriptors.find(
-        (entry) => entry.kind === "event" && entry.id === value.event,
-      );
-      const eventValue = isRecord(event?.value) ? event.value : {};
-      if (eventValue.input !== undefined) {
-        validateSchema(work, descriptor, schemaKey(descriptor.id, "input"), eventValue.input);
-      }
-    }
-    for (const field of requiredSchemaFields(descriptor.kind)) {
-      if (descriptor.kind === "job" && isRecord(value.task)) continue;
-      const candidate =
-        descriptor.kind === "task" && field === "input"
-          ? (value.inputWire ?? value.input)
-          : value[field];
-      if (value[field] === undefined)
-        validateSchema(
-          work,
-          descriptor,
-          descriptor.kind === "task"
-            ? taskSchemaKey(descriptor.id, field, "output")
-            : schemaKey(descriptor.id, field),
-          candidate,
-          descriptor.kind === "task" ? "output" : undefined,
-        );
-    }
-    if (descriptor.kind === "transform")
-      validateSchema(work, descriptor, `${descriptor.id}:transform`, value.schema);
-    if (descriptor.kind === "route" && Array.isArray(value.responses)) {
-      for (const response of value.responses) {
-        if (isRecord(response) && response.schema !== undefined) {
-          validateSchema(
-            work,
-            descriptor,
-            `${descriptor.id}:response:${String(response.id)}`,
-            response.schema,
+/**
+ * Projects directional schema contracts and records their hashes.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns A lazy effect that projects directional schema contracts and records their hashes; unexpected access failures remain defects.
+ * @see {@link normalizeCompilationEffect} for shared lazy composition and the execution boundary.
+ */
+export const passSchemasEffect = Effect.fn("Compiler.passSchemas")(
+  function* (work: NormalizationWork) {
+    const seen = new Set<unknown>();
+    const descriptors = [...work.descriptors, ...work.transformReferences.values()];
+    yield* Effect.forEach(
+      descriptors,
+      (descriptor) =>
+        Effect.gen(function* () {
+          if (seen.has(descriptor.value)) return;
+          seen.add(descriptor.value);
+          yield* Effect.forEach(
+            schemaEntries(descriptor),
+            ([key, value, direction]) =>
+              Effect.gen(function* () {
+                yield* validateSchemaEffect(work, descriptor, key, value, direction);
+              }),
+            { discard: true },
           );
-        }
-      }
-    }
-  }
+          if (descriptor.kind === "task") yield* validateTaskProjectionsEffect(work, descriptor);
+          const value = isRecord(descriptor.value) ? descriptor.value : {};
+          if (
+            descriptor.kind === "function" &&
+            value.invocationMode === "event-only" &&
+            typeof value.event === "string"
+          ) {
+            const event = work.descriptors.find(
+              (entry) => entry.kind === "event" && entry.id === value.event,
+            );
+            const eventValue = isRecord(event?.value) ? event.value : {};
+            if (eventValue.input !== undefined) {
+              yield* validateSchemaEffect(
+                work,
+                descriptor,
+                schemaKey(descriptor.id, "input"),
+                eventValue.input,
+              );
+            }
+          }
+          yield* Effect.forEach(
+            requiredSchemaFields(descriptor.kind),
+            (field) =>
+              Effect.gen(function* () {
+                if (descriptor.kind === "job" && isRecord(value.task)) return;
+                const candidate =
+                  descriptor.kind === "task" && field === "input"
+                    ? (value.inputWire ?? value.input)
+                    : value[field];
+                if (value[field] === undefined)
+                  yield* validateSchemaEffect(
+                    work,
+                    descriptor,
+                    descriptor.kind === "task"
+                      ? taskSchemaKey(descriptor.id, field, "output")
+                      : schemaKey(descriptor.id, field),
+                    candidate,
+                    descriptor.kind === "task" ? "output" : undefined,
+                  );
+              }),
+            { discard: true },
+          );
+          if (descriptor.kind === "transform")
+            yield* validateSchemaEffect(
+              work,
+              descriptor,
+              `${descriptor.id}:transform`,
+              value.schema,
+            );
+          if (descriptor.kind === "route" && Array.isArray(value.responses)) {
+            yield* Effect.forEach(
+              value.responses,
+              (response) =>
+                Effect.gen(function* () {
+                  if (isRecord(response) && response.schema !== undefined) {
+                    yield* validateSchemaEffect(
+                      work,
+                      descriptor,
+                      `${descriptor.id}:response:${String(response.id)}`,
+                      response.schema,
+                    );
+                  }
+                }),
+              { discard: true },
+            );
+          }
+        }),
+      { discard: true },
+    );
+  },
+  (effect, work) =>
+    observeCompiler("normalization", "passSchemas", effect, () => ({
+      descriptors: work.descriptors.length,
+      diagnostics: work.diagnostics.length,
+    })),
+);
+
+/**
+ * Projects directional schema contracts and records their hashes.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
+export function passSchemas(work: NormalizationWork): void {
+  return runCompilerSync(passSchemasEffect(work));
 }
 
+/**
+ * Selects mandatory schema fields for a descriptor kind.
+ * @param kind - Descriptor or syntax category.
+ * @returns Schema fields required by the descriptor kind.
+ */
 function requiredSchemaFields(kind: string): readonly string[] {
   return (
     (
@@ -78,14 +138,23 @@ function requiredSchemaFields(kind: string): readonly string[] {
   );
 }
 
-function validateSchema(
+/**
+ * Projects and indexes a directional schema or records unavailable evidence.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param key - Property or stable lookup key.
+ * @param value - Declared metadata inspected without coercion.
+ * @param direction - Selected input, output, or legacy wire direction.
+ * @returns A lazy effect that projects and indexes a directional schema or records unavailable evidence; unexpected access failures remain defects.
+ */
+const validateSchemaEffect = Effect.fn("Compiler.validateSchema")(function* (
   work: NormalizationWork,
   descriptor: NormalizationWork["descriptors"][number],
   key: string,
   value: unknown,
   direction: import("./normalize-schema-projection.js").SchemaDirection = "legacy",
-): void {
-  const result = schema(value, direction);
+) {
+  const result = yield* schemaEffect(value, direction);
   if (!result.ok)
     add(
       work,
@@ -97,16 +166,22 @@ function validateSchema(
     work.schemas.set(key, result.schema);
     if (result.contractHash !== undefined) work.schemaHashes.set(key, result.contractHash);
   }
-}
+});
 
-function validateTaskProjections(
+/**
+ * Checks task wire projections and canonical input requirements.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @returns A lazy effect that checks task wire projections and canonical input requirements; unexpected access failures remain defects.
+ */
+const validateTaskProjectionsEffect = Effect.fn("Compiler.validateTaskProjections")(function* (
   work: NormalizationWork,
   descriptor: NormalizationWork["descriptors"][number],
-): void {
+) {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
-  const input = schema(value.input, "input");
-  const canonicalInput = schema(value.inputWire ?? value.input, "output");
-  const output = schema(value.output, "output");
+  const input = yield* schemaEffect(value.input, "input");
+  const canonicalInput = yield* schemaEffect(value.inputWire ?? value.input, "output");
+  const output = yield* schemaEffect(value.output, "output");
   if (input.transformed === true && value.inputWire === undefined) {
     add(
       work,
@@ -134,8 +209,13 @@ function validateTaskProjections(
       "Task output must validate canonical values without a transformation.",
     );
   }
-}
+});
 
+/**
+ * Recognizes nonnull nonarray objects for metadata inspection.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns True for a nonnull, nonarray metadata object.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

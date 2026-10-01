@@ -1,8 +1,8 @@
-import { expect, test } from "bun:test";
-import type { ExtractedDescriptor } from "./src/discovery/extract.ts";
-import { generateEventRegistry } from "./src/event-registry.ts";
+import { expect, it } from "@effect/vitest";
+import type { ExtractedDescriptor } from "../src/discovery/extract.js";
+import { generateEventRegistry } from "../src/event-registry.js";
 
-test("generates a deterministic event registry with project-relative imports", () => {
+it("generates a deterministic event registry with project-relative imports", () => {
   const descriptors = [
     event("orders.updated", "src/events/updated.event.ts", "updated"),
     event("orders.created", "src/events/created.event.ts", "created"),

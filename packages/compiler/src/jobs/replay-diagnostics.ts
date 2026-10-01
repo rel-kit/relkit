@@ -1,3 +1,7 @@
+import { observeJobs } from "./observability.js";
+import { Effect } from "effect";
+import { runJobsSync } from "./compatibility.js";
+import type { ReplaySource } from "./replay-diagnostics.types.js";
 import { createSourceLocation } from "@relkit/contracts";
 import { createDiagnostic } from "@relkit/diagnostics";
 import * as ts from "typescript";
@@ -5,42 +9,80 @@ import { NORMALIZE_CODES } from "../normalize-codes.js";
 import type { NormalizedDescriptor, NormalizationWork } from "../normalize-types.js";
 import { isRecord } from "../normalize-utils.js";
 
-const WAIT_NAMES = new Set(["sleep", "sleepUntil"]);
-const EXTERNAL_METHODS = new Set([
-  "charge",
-  "delete",
-  "insert",
-  "publish",
-  "send",
-  "update",
-  "write",
-]);
-const ORDER_METHODS = new Set(["keys", "entries", "values"]);
+import { callName, waitKey, hasUnstableKey, isExternalCall } from "./replay-syntax.js";
 
-/** Emits bounded, warning-only replay advice from source text already supplied to the compiler. */
+const WAIT_NAMES = new Set(["sleep", "sleepUntil"]);
+
+/**
+ * Adds bounded warning-only replay advice from caller-supplied source text.
+ * @param work - Mutable caller-owned normalization workspace and authoritative indexes.
+ * @returns A lazy effect yielding void after appending advisories for durable task sources.
+ * @remarks Requires no services. Unexpected exceptions remain defects.
+ * @example
+ * ```ts
+ * import { Effect } from "effect";
+ * import { validateReplayAdvisoriesEffect } from "./replay-diagnostics.js";
+ * // work.input.sources supplies source text; this operation performs no filesystem reads.
+ * Effect.runSync(validateReplayAdvisoriesEffect(work));
+ * ```
+ */
+export const validateReplayAdvisoriesEffect = Effect.fn("Jobs.validateReplayAdvisories")(
+  function* (work: NormalizationWork) {
+    yield* Effect.forEach(
+      work.descriptors.filter((entry) => entry.kind === "task"),
+      (task) =>
+        Effect.gen(function* () {
+          const value = isRecord(task.value) ? task.value : {};
+          if (value.execution === "retryable") return;
+          const source = sourceFor(work, task);
+          if (source === undefined) return;
+          yield* inspectWaitsEffect(work, task, source.file, source.text);
+        }),
+      { discard: true },
+    );
+  },
+  (effect, work) =>
+    observeJobs("replayAdvisories", effect, () => ({ descriptors: work.descriptors.length })),
+);
+
+/**
+ * Adds bounded warning-only replay advice from caller-supplied source text.
+ * @param work - Mutable caller-owned normalization workspace and authoritative indexes.
+ * @returns void after appending advisories for durable task sources.
+ * @see {@link validateReplayAdvisoriesEffect} for composition and execution examples.
+ */
 export function validateReplayAdvisories(work: NormalizationWork): void {
-  for (const task of work.descriptors.filter((entry) => entry.kind === "task")) {
-    const value = isRecord(task.value) ? task.value : {};
-    if (value.execution === "retryable") continue;
-    const source = sourceFor(work, task);
-    if (source === undefined) continue;
-    inspectWaits(work, task, source.file, source.text);
-  }
+  return runJobsSync(validateReplayAdvisoriesEffect(work));
 }
 
-function inspectWaits(
+/**
+ * Examines durable waits for unstable identity and preceding external operations.
+ * @param work - Mutable caller-owned normalization workspace and authoritative indexes.
+ * @param descriptor - Descriptor whose identity or source is being inspected.
+ * @param file - Source path supplied by the compiler input.
+ * @param source - Caller-supplied source text, or serialized manifest bytes.
+ * @returns A lazy effect yielding void after appending source-positioned replay warnings.
+ * @remarks Requires no services. Validation findings append diagnostics; unexpected exceptions remain defects.
+ */
+const inspectWaitsEffect = Effect.fn("Jobs.inspectWaits")(function* (
   work: NormalizationWork,
   descriptor: NormalizedDescriptor,
   file: string,
   source: string,
-): void {
+) {
   const sourceFile = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true);
   const calls: ts.CallExpression[] = [];
   const waits: ts.CallExpression[] = [];
+  /**
+   * Collects calls in syntactic source order for warning-only replay analysis.
+   * @param node - Current TypeScript syntax node.
+   * @returns Nothing; calls and waits are accumulated without evaluating source.
+   */
   const visit = (node: ts.Node): void => {
     if (ts.isCallExpression(node)) {
       calls.push(node);
-      if (callName(node) !== undefined && WAIT_NAMES.has(callName(node)!)) waits.push(node);
+      const name = callName(node);
+      if (name !== undefined && WAIT_NAMES.has(name)) waits.push(node);
     }
     ts.forEachChild(node, visit);
   };
@@ -71,71 +113,19 @@ function inspectWaits(
       );
     }
   }
-}
+});
 
-function callName(call: ts.CallExpression): string | undefined {
-  const expression = call.expression;
-  if (ts.isIdentifier(expression)) return expression.text;
-  return ts.isPropertyAccessExpression(expression) ? expression.name.text : undefined;
-}
-
-function waitKey(call: ts.CallExpression): ts.Expression | undefined {
-  for (const argument of call.arguments) {
-    if (!ts.isObjectLiteralExpression(argument)) continue;
-    for (const property of argument.properties) {
-      if (!ts.isPropertyAssignment(property)) continue;
-      const name = property.name;
-      if (ts.isIdentifier(name) && name.text === "key") return property.initializer;
-      if (ts.isStringLiteral(name) && name.text === "key") return property.initializer;
-    }
-  }
-  return undefined;
-}
-
-function hasUnstableKey(value: ts.Node): boolean {
-  let unstable = false;
-  const visit = (node: ts.Node): void => {
-    if (unstable) return;
-    if (
-      ts.isNewExpression(node) &&
-      ts.isIdentifier(node.expression) &&
-      node.expression.text === "Date"
-    ) {
-      unstable = true;
-      return;
-    }
-    if (ts.isIdentifier(node) && ["randomUUID", "randomBytes"].includes(node.text)) {
-      unstable = true;
-      return;
-    }
-    if (ts.isPropertyAccessExpression(node)) {
-      const object = node.expression;
-      if (
-        (ts.isIdentifier(object) &&
-          ["Date", "Math", "crypto"].includes(object.text) &&
-          ["now", "random", "randomUUID", "randomBytes"].includes(node.name.text)) ||
-        ORDER_METHODS.has(node.name.text)
-      ) {
-        unstable = true;
-        return;
-      }
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(value);
-  return unstable;
-}
-
-function isExternalCall(call: ts.CallExpression): boolean {
-  const expression = call.expression;
-  if (ts.isIdentifier(expression)) return expression.text === "fetch";
-  if (!ts.isPropertyAccessExpression(expression)) return false;
-  return (
-    EXTERNAL_METHODS.has(expression.name.text) ||
-    (ts.isIdentifier(expression.expression) && expression.expression.text === "axios")
-  );
-}
-
+/**
+ * Appends a replay advisory with the supplied source offset.
+ * @param work - Mutable caller-owned normalization workspace and authoritative indexes.
+ * @param descriptor - Descriptor whose identity or source is being inspected.
+ * @param file - Source path supplied by the compiler input.
+ * @param source - Caller-supplied source text, or serialized manifest bytes.
+ * @param offset - Zero-based UTF-16 position of the advisory.
+ * @param message - Human-readable replay advisory.
+ * @param suggestion - Actionable replay recovery guidance.
+ * @returns nothing; work receives a warning diagnostic.
+ */
 function warning(
   work: NormalizationWork,
   descriptor: NormalizedDescriptor,
@@ -158,10 +148,16 @@ function warning(
   );
 }
 
+/**
+ * Finds source text already supplied for a descriptor's normalized path.
+ * @param work - Mutable caller-owned normalization workspace and authoritative indexes.
+ * @param descriptor - Descriptor whose identity or source is being inspected.
+ * @returns the matching file and text, or undefined when no source was supplied.
+ */
 function sourceFor(
   work: NormalizationWork,
   descriptor: NormalizedDescriptor,
-): { readonly file: string; readonly text: string } | undefined {
+): ReplaySource | undefined {
   const target = descriptor.source.file.replaceAll("\\", "/").replace(/^\.\//u, "");
   return work.input.sources
     ?.map((source) => ({

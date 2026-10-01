@@ -1,16 +1,17 @@
+import { SourceLocationError } from "@relkit/contracts";
+import type { IdentityBinding } from "./generate-manifest-identities.types.js";
 import { normalizeSourcePath } from "@relkit/contracts";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { ImportBinding } from "./generate-manifest-utils.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";
 
-interface IdentityBinding {
-  readonly module: string;
-  readonly exportName: string;
-  readonly path: readonly (string | number)[];
-  readonly id: string;
-}
-
-/** Emits deterministic runtime bindings for imported descriptors and nested errors. */
+/**
+ * Emits deterministic runtime bindings for imported descriptors and nested errors.
+ * @param descriptors - Ordered normalized descriptors.
+ * @param bindings - Source modules indexed by their deterministic import aliases.
+ * @param input - Compiler input and source provenance.
+ * @returns Deterministically ordered runtime identity binding statements.
+ */
 export function identityBindingStatements(
   descriptors: readonly NormalizedDescriptor[],
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -43,6 +44,13 @@ export function identityBindingStatements(
   );
 }
 
+/**
+ * Collects executable identity bindings for one descriptor and nested metadata.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param bindings - Source modules indexed by their deterministic import aliases.
+ * @param input - Compiler input and source provenance.
+ * @returns Identity bindings for the descriptor and source-local nested metadata.
+ */
 function descriptorBindings(
   descriptor: NormalizedDescriptor,
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -64,6 +72,16 @@ function descriptorBindings(
   return entries;
 }
 
+/**
+ * Collects nested executable bindings with ancestor ownership and cycle detection.
+ * @param value - Declared metadata inspected without coercion.
+ * @param path - Portable source, property, or runtime path.
+ * @param module - Authored source module path.
+ * @param exportName - Declared source export name.
+ * @param entries - Ordered entries to validate or index.
+ * @param active - Ancestor identities owned by the current recursive branch.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 function collectNested(
   value: unknown,
   path: readonly (string | number)[],
@@ -97,6 +115,11 @@ function collectNested(
   active.delete(value);
 }
 
+/**
+ * Recognizes graph-visible descriptor identity metadata.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns True when the value carries an identity that can be bound at runtime.
+ */
 function isIdentityRecord(value: object): value is { readonly kind: string; readonly id: string } {
   const candidate = value as Record<string, unknown>;
   const ref = candidate.ref;
@@ -109,6 +132,11 @@ function isIdentityRecord(value: object): value is { readonly kind: string; read
   );
 }
 
+/**
+ * Recognizes a function reference used by generated executable targets.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns True when the reference identifies an executable function target.
+ */
 function isFunctionTarget(value: object): value is {
   readonly ref: { readonly kind: "function"; readonly id: string };
 } {
@@ -122,18 +150,36 @@ function isFunctionTarget(value: object): value is {
   );
 }
 
+/**
+ * Recognizes objects and functions that support own-property inspection.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns True for a nonnull object or function.
+ */
 function isObjectLike(value: unknown): value is Record<string, unknown> {
   return value !== null && (typeof value === "object" || typeof value === "function");
 }
 
+/**
+ * Normalizes executable reference module paths against the project root.
+ * @param module - Authored source module path.
+ * @param input - Compiler input and source provenance.
+ * @returns A portable source module path, or undefined for an invalid reference.
+ */
 function modulePath(module: string, input: ManifestGenerationInput): string | undefined {
   try {
     return normalizeSourcePath(module, input.projectRoot);
-  } catch {
+  } catch (error) {
+    if (!(error instanceof SourceLocationError)) throw error;
     return undefined;
   }
 }
 
+/**
+ * Orders identity bindings by source module, export, and property path.
+ * @param left - First value to compare.
+ * @param right - Second value to compare.
+ * @returns The ordering result or precedence rank.
+ */
 function compareBindings(left: IdentityBinding, right: IdentityBinding): number {
   return (
     left.module.localeCompare(right.module) ||
@@ -143,6 +189,11 @@ function compareBindings(left: IdentityBinding, right: IdentityBinding): number 
   );
 }
 
+/**
+ * Encodes a nested metadata property path as a stable lookup key.
+ * @param path - Portable source, property, or runtime path.
+ * @returns A stable lookup key for a nested metadata property path.
+ */
 function pathKey(path: readonly (string | number)[]): string {
   return path.map((segment) => String(segment)).join("\0");
 }

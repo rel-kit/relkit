@@ -1,6 +1,19 @@
-import { CONFIG_CODES, DEFAULT_TOOLING_CONFIG, type ConfigIssue } from "./config-loader-types.js";
+import {
+  CONFIG_CODES,
+  ConfigPort,
+  ConfigPositive,
+  DEFAULT_TOOLING_CONFIG,
+  type ConfigIssue,
+} from "./config-loader-types.js";
+import { Schema } from "effect";
 import { readRecord } from "./config-loader-utils.js";
 
+/**
+ * Validates inspector settings and applies tooling defaults.
+ * @param value - Declared metadata inspected without coercion.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns Normalized inspector settings after issues are collected.
+ */
 export function readInspector(value: unknown, issues: ConfigIssue[]) {
   if (value === undefined) return DEFAULT_TOOLING_CONFIG.inspector;
   const record = readRecord(value, "inspector", issues);
@@ -15,10 +28,7 @@ export function readInspector(value: unknown, issues: ConfigIssue[]) {
     }
   }
   const port = record.port;
-  if (
-    port !== undefined &&
-    (typeof port !== "number" || !Number.isInteger(port) || port < 1 || port > 65535)
-  ) {
+  if (port !== undefined && !Schema.is(ConfigPort)(port)) {
     issues.push({
       code: CONFIG_CODES.port,
       path: "inspector.port",
@@ -40,6 +50,12 @@ export function readInspector(value: unknown, issues: ConfigIssue[]) {
   return { port: typeof port === "number" ? port : 3210, enabledInProduction, maxPreviewBytes };
 }
 
+/**
+ * Validates server settings and applies tooling defaults.
+ * @param value - Declared metadata inspected without coercion.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns Normalized server settings after issues are collected.
+ */
 export function readServer(value: unknown, issues: ConfigIssue[]) {
   if (value === undefined) return DEFAULT_TOOLING_CONFIG.server;
   const record = readRecord(value, "server", issues);
@@ -63,6 +79,14 @@ export function readServer(value: unknown, issues: ConfigIssue[]) {
   return { port, maxBodyBytes, apiDocs, clientContract, mcp };
 }
 
+/**
+ * Checks a boolean option while retaining its fallback and diagnostic path.
+ * @param value - Declared metadata inspected without coercion.
+ * @param path - Portable source, property, or runtime path.
+ * @param fallback - Value retained when metadata is absent.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns The validated boolean or its default, with invalid settings recorded as issues.
+ */
 function readBoolean(
   value: unknown,
   path: string,
@@ -77,6 +101,12 @@ function readBoolean(
   return value;
 }
 
+/**
+ * Validates API documentation exposure settings.
+ * @param value - Declared metadata inspected without coercion.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns Normalized API documentation exposure settings.
+ */
 function readApiDocs(value: unknown, issues: ConfigIssue[]) {
   if (value === undefined) return DEFAULT_TOOLING_CONFIG.server.apiDocs;
   const record = readRecord(value, "server.apiDocs", issues);
@@ -115,9 +145,17 @@ function readApiDocs(value: unknown, issues: ConfigIssue[]) {
   };
 }
 
+/**
+ * Checks a valid TCP port and retains the configured fallback.
+ * @param value - Declared metadata inspected without coercion.
+ * @param path - Portable source, property, or runtime path.
+ * @param fallback - Value retained when metadata is absent.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns The validated TCP port, or its fallback after recording an issue.
+ */
 function readPort(value: unknown, path: string, fallback: number, issues: ConfigIssue[]): number {
   if (value === undefined) return fallback;
-  if (!Number.isSafeInteger(value) || Number(value) < 1 || Number(value) > 65_535) {
+  if (!Schema.is(ConfigPort)(value)) {
     issues.push({
       code: CONFIG_CODES.port,
       path,
@@ -128,6 +166,14 @@ function readPort(value: unknown, path: string, fallback: number, issues: Config
   return Number(value);
 }
 
+/**
+ * Checks a positive integer tooling limit and retains its fallback.
+ * @param value - Declared metadata inspected without coercion.
+ * @param path - Portable source, property, or runtime path.
+ * @param fallback - Value retained when metadata is absent.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns The positive integer limit, or its fallback after recording an issue.
+ */
 function readPositive(
   value: unknown,
   path: string,
@@ -135,13 +181,21 @@ function readPositive(
   issues: ConfigIssue[],
 ): number {
   if (value === undefined) return fallback;
-  if (!Number.isSafeInteger(value) || Number(value) < 1) {
+  if (!Schema.is(ConfigPositive)(value) || !Number.isSafeInteger(value)) {
     issues.push({ code: CONFIG_CODES.behavior, path, message: `${path} must be positive.` });
     return fallback;
   }
   return Number(value);
 }
 
+/**
+ * Records unsupported nested configuration keys.
+ * @param record - Validated configuration record whose keys are inspected.
+ * @param path - Portable source, property, or runtime path.
+ * @param allowed - Supported nested configuration keys.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 function rejectUnknown(
   record: Record<string, unknown>,
   path: string,

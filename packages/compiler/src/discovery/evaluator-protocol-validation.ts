@@ -1,61 +1,75 @@
-import {
-  EVALUATOR_PROTOCOL,
-  EVALUATOR_PROTOCOL_VERSION,
-  type EvaluatorCandidate,
-  type EvaluatorDetectorCoverage,
-  type EvaluatorRequest,
-  type EvaluatorResponse,
-} from "./evaluator-protocol.js";
+import { Effect, Schema } from "effect";
+import { observeCompiler } from "../observability.js";
+import { runDiscoverySync } from "./discovery-sync.js";
+import { EvaluatorRequest, EvaluatorResponse } from "./evaluator-protocol-schema.js";
+import type * as Wire from "./evaluator-protocol.types.js";
 
-export function isEvaluatorRequest(value: unknown): value is EvaluatorRequest {
-  if (!isRecord(value)) return false;
-  return (
-    value.protocol === EVALUATOR_PROTOCOL &&
-    value.version === EVALUATOR_PROTOCOL_VERSION &&
-    typeof value.generationId === "string" &&
-    typeof value.projectRoot === "string" &&
-    Array.isArray(value.candidates) &&
-    value.candidates.every(isCandidate) &&
-    Array.isArray(value.environmentAllowlist) &&
-    value.environmentAllowlist.every((name) => typeof name === "string") &&
-    typeof value.generatedDirectory === "string" &&
-    Array.isArray(value.networkAllowlist) &&
-    value.networkAllowlist.every((host) => typeof host === "string") &&
-    typeof value.sourceMaps === "boolean" &&
-    typeof value.timeoutMs === "number"
-  );
+/**
+ * Checks the complete request wire shape without importing candidate modules.
+ * @param value - Unknown request payload.
+ * @returns Whether the payload is supported and structurally valid.
+ */
+export function isEvaluatorRequest(value: unknown): value is Wire.EvaluatorRequest {
+  return runDiscoverySync(isEvaluatorRequestEffect(value));
 }
 
-export function isEvaluatorResponse(value: unknown): value is EvaluatorResponse {
-  if (!isRecord(value)) return false;
-  return (
-    value.protocol === EVALUATOR_PROTOCOL &&
-    value.version === EVALUATOR_PROTOCOL_VERSION &&
-    typeof value.generationId === "string" &&
-    typeof value.sourceMaps === "boolean" &&
-    isDetectorCoverage(value.detectorCoverage) &&
-    (value.status === "ok" || value.status === "failed") &&
-    Array.isArray(value.modules) &&
-    Array.isArray(value.failures) &&
-    typeof value.stdout === "string" &&
-    typeof value.stderr === "string"
-  );
+/**
+ * Checks the supported request shape within a composable validation stage.
+ * @param value - Unknown request payload.
+ * @returns A lazy effect yielding whether the request wire contract is satisfied.
+ */
+export const isEvaluatorRequestEffect = Effect.fn("Discovery.isEvaluatorRequest")(
+  function* (value: unknown) {
+    return Schema.is(EvaluatorRequest)(value);
+  },
+  (effect, value) =>
+    observeCompiler("discovery", "isEvaluatorRequest", effect, () => ({ schemas: 1 }), false),
+);
+
+/**
+ * Checks response snapshots and diagnostic evidence recursively.
+ * @param value - Unknown response payload.
+ * @returns Whether all fields satisfy the supported wire contract.
+ */
+export function isEvaluatorResponse(value: unknown): value is Wire.EvaluatorResponse {
+  return runDiscoverySync(isEvaluatorResponseEffect(value));
 }
 
-function isCandidate(value: unknown): value is EvaluatorCandidate {
-  return isRecord(value) && typeof value.file === "string";
-}
+/**
+ * Checks nested snapshots and diagnostics within a composable validation stage.
+ * @param value - Unknown response payload.
+ * @returns A lazy effect yielding whether the response wire contract is satisfied.
+ */
+export const isEvaluatorResponseEffect = Effect.fn("Discovery.isEvaluatorResponse")(
+  function* (value: unknown) {
+    return Schema.is(EvaluatorResponse)(value);
+  },
+  (effect) =>
+    observeCompiler("discovery", "isEvaluatorResponse", effect, () => ({ schemas: 1 }), false),
+);
 
-function isDetectorCoverage(value: unknown): value is EvaluatorDetectorCoverage {
-  return (
-    isRecord(value) &&
-    Array.isArray(value.supported) &&
-    value.supported.every((entry) => typeof entry === "string") &&
-    Array.isArray(value.unsupported) &&
-    value.unsupported.every((entry) => typeof entry === "string")
-  );
-}
+/**
+ * Decodes an unknown child request before evaluation begins.
+ * @param value - Untrusted parsed JSON.
+ * @returns A lazy effect yielding a request or failing with SchemaError.
+ */
+export const decodeEvaluatorRequest = Effect.fn("Discovery.decodeEvaluatorRequest")(
+  function* (value: unknown) {
+    return yield* Schema.decodeUnknownEffect(EvaluatorRequest)(value);
+  },
+  (effect, value) =>
+    observeCompiler("discovery", "decodeEvaluatorRequest", effect, () => ({ schemas: 1 }), false),
+);
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
+/**
+ * Decodes unknown response data before compiler consumers access nested values.
+ * @param value - Untrusted parsed JSON.
+ * @returns A lazy effect yielding a response or failing with SchemaError.
+ */
+export const decodeEvaluatorResponse = Effect.fn("Discovery.decodeEvaluatorResponse")(
+  function* (value: unknown) {
+    return yield* Schema.decodeUnknownEffect(EvaluatorResponse)(value);
+  },
+  (effect) =>
+    observeCompiler("discovery", "decodeEvaluatorResponse", effect, () => ({ schemas: 1 }), false),
+);

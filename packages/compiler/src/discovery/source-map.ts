@@ -1,15 +1,16 @@
-import { createSourceLocation, normalizeSourcePath, type SourceLocation } from "@relkit/contracts";
-import { existsSync, readFileSync } from "node:fs";
+import { createContextEffect } from "./source-map-context.js";
+import { observeCompiler } from "../observability.js";
+import { createSourceLocationEffect, normalizeSourcePathEffect } from "@relkit/contracts";
+import { Effect } from "effect";
 import { resolve } from "node:path";
 import * as ts from "typescript";
 import type { EvaluatorModuleResult } from "./evaluator-protocol.js";
-import {
-  readFacts,
-  resolveImport,
-  type ExportFact,
-  type ExportFacts,
-  type ParsedSource,
-} from "./source-map-utils.js";
+import { readFactsEffect, resolveImportEffect, sourceScriptKind } from "./source-map-utils.js";
+import { DiscoverySourceReader, nodeSourceReader } from "./source-map-source.js";
+import * as Models from "./source-map-schema.js";
+import type * as Mapping from "./source-map.types.js";
+import type { ParsedSource } from "./source-map-utils.types.js";
+import { runDiscoverySync } from "./discovery-sync.js";
 
 export type {
   ErrorBindingFact,
@@ -22,126 +23,166 @@ export type {
   SourceFacts,
   SourceFactoryKind,
 } from "./source-map-utils.js";
+export type {
+  ExportKind,
+  SourceMapSource,
+  SourceMapOptions,
+  SourceMapEntry,
+} from "./source-map.types.js";
 
-export type ExportKind = "default" | "named";
+/**
+ * Maps evaluated exports to sorted, immutable project-relative source positions.
+ * @param modules - Evaluator snapshots to locate.
+ * @param options - Project root and optional supplemental source text.
+ * @returns A lazy effect yielding stable source entries or SourceLocationError.
+ * @remarks Requires DiscoverySourceReader. Missing/unreadable sources use line one;
+ * reader and AST defects and interruption remain visible. Caches belong to this run.
+ * @example
+ * ```ts
+ * import { Effect } from "effect";
+ * import { mapSourceLocationsEffect } from "./source-map.js";
+ * import { DiscoverySourceReader, nodeSourceReader } from "./source-map-source.js";
+ * const locations = Effect.runSync(mapSourceLocationsEffect([], { projectRoot: process.cwd() })
+ *   .pipe(Effect.provideService(DiscoverySourceReader, nodeSourceReader)));
+ * ```
+ */
+export const mapSourceLocationsEffect = Effect.fn("discovery.source.map")(
+  function* (modules: readonly EvaluatorModuleResult[], options: Mapping.SourceMapOptions = {}) {
+    const context = yield* createContextEffect(options);
+    const entries: Mapping.SourceMapEntry[] = [];
+    yield* Effect.forEach(
+      modules,
+      (module) =>
+        Effect.gen(function* () {
+          const file = yield* normalizeSourcePathEffect(module.file, context.root);
+          yield* Effect.forEach(
+            module.exports,
+            (exported) =>
+              Effect.gen(function* () {
+                const located = yield* locateEffect(file, exported.exportName, context, new Set());
+                const source =
+                  located?.source ?? (yield* createSourceLocationEffect(file, 1, 1, context.root));
+                entries.push(
+                  Object.freeze(
+                    Models.SourceMapEntry.make({
+                      module: file,
+                      exportName: exported.exportName,
+                      exportKind: exported.exportName === "default" ? "default" : "named",
+                      source: Object.freeze(source),
+                      ...(located?.facts === undefined ? {} : { facts: located.facts }),
+                      ...(located?.exportFact === undefined
+                        ? {}
+                        : { exportFact: located.exportFact }),
+                    }),
+                  ),
+                );
+              }),
+            { discard: true },
+          );
+        }),
+      { discard: true },
+    );
+    return Object.freeze(
+      entries.sort(
+        (left, right) =>
+          left.module.localeCompare(right.module) ||
+          left.exportName.localeCompare(right.exportName),
+      ),
+    );
+  },
+  (effect, modules, options: Mapping.SourceMapOptions = {}) =>
+    observeCompiler(
+      "discovery",
+      "mapSourceLocations",
+      effect,
+      () => ({ files: modules.length }),
+      true,
+    ),
+);
 
-export interface SourceMapSource {
-  readonly fileName: string;
-  readonly text: string;
-}
-
-export interface SourceMapOptions {
-  readonly projectRoot?: string;
-  readonly sources?: readonly SourceMapSource[];
-}
-
-export interface SourceMapEntry {
-  readonly module: string;
-  readonly exportName: string;
-  readonly exportKind: ExportKind;
-  readonly source: SourceLocation;
-  readonly facts?: ExportFacts;
-  readonly exportFact?: ExportFact;
-}
-
-interface LocatedSource {
-  readonly source: SourceLocation;
-  readonly facts?: ExportFacts;
-  readonly exportFact?: ExportFact;
-}
-
-interface MapContext {
-  readonly root: string;
-  readonly texts: Map<string, string>;
-  readonly parsed: Map<string, ParsedSource | undefined>;
-}
-
-/** Maps evaluated export facts to stable project-relative source positions. */
+/**
+ * Synchronous compatibility boundary for source mapping.
+ * @param modules - Evaluator snapshots to locate.
+ * @param options - Project root and supplemental sources.
+ * @returns Immutable entries sorted by module and export name.
+ * @throws SourceLocationError for invalid evaluated module paths; preserves defects.
+ */
 export function mapSourceLocations(
   modules: readonly EvaluatorModuleResult[],
-  options: SourceMapOptions = {},
-): readonly SourceMapEntry[] {
-  const context = createContext(options);
-  const entries = modules.flatMap((module) =>
-    module.exports.map((exported) => {
-      const file = relativeFile(module.file, context.root);
-      const located = locate(file, exported.exportName, context, new Set());
-      const source = located?.source ?? createSourceLocation(file, 1, 1, context.root);
-      return Object.freeze({
-        module: file,
-        exportName: exported.exportName,
-        exportKind: exportKind(exported.exportName),
-        source: Object.freeze(source),
-        ...(located?.facts === undefined ? {} : { facts: located.facts }),
-        ...(located?.exportFact === undefined ? {} : { exportFact: located.exportFact }),
-      });
-    }),
-  );
-  return Object.freeze(
-    entries.sort(
-      (left, right) =>
-        left.module.localeCompare(right.module) || left.exportName.localeCompare(right.exportName),
+  options: Mapping.SourceMapOptions = {},
+): readonly Mapping.SourceMapEntry[] {
+  return runDiscoverySync(
+    mapSourceLocationsEffect(modules, options).pipe(
+      Effect.provideService(DiscoverySourceReader, nodeSourceReader),
     ),
   );
 }
 
-/** Alias used by compiler callers that treat the entries as a source map. */
+/** {@inheritDoc mapSourceLocations} */
 export const createSourceMap = mapSourceLocations;
 
-function createContext(options: SourceMapOptions): MapContext {
-  const root = resolve(options.projectRoot ?? process.cwd());
-  const texts = new Map<string, string>();
-  for (const source of options.sources ?? []) {
-    try {
-      texts.set(relativeFile(source.fileName, root), source.text);
-    } catch {
-      // Invalid supplemental paths cannot be source locations in this project.
-    }
-  }
-  return { root, texts, parsed: new Map() };
-}
-
-function locate(
+/**
+ * Traverses explicit and star re-exports with cycle detection.
+ * @param file - Normalized source file.
+ * @param exportName - Export binding sought in that file.
+ * @param context - Run-local caches and source root.
+ * @param visited - Traversal-owned binding keys; prevents re-export cycles.
+ * @returns A lazy effect yielding source provenance, or undefined for missing/cyclic origins.
+ */
+const locateEffect = Effect.fn("discovery.source.locate")(function* (
   file: string,
   exportName: string,
-  context: MapContext,
+  context: Mapping.MapContext,
   visited: Set<string>,
-): LocatedSource | undefined {
-  if (visited.has(`${file}\0${exportName}`)) return undefined;
-  visited.add(`${file}\0${exportName}`);
-  const parsed = parseSource(file, context);
+): Effect.fn.Return<
+  Mapping.LocatedSource | undefined,
+  import("@relkit/contracts").SourceLocationError,
+  DiscoverySourceReader
+> {
+  const key = `${file}\0${exportName}`;
+  if (visited.has(key)) return undefined;
+  visited.add(key);
+  const parsed = yield* parseSourceEffect(file, context);
   if (parsed === undefined) return undefined;
   const fact = parsed.facts.exports.get(exportName);
   if (fact?.origin !== undefined) {
-    const originFile = resolveImport(file, fact.origin.module, context.root, context.texts);
-    if (originFile !== undefined) {
-      return locate(originFile, fact.origin.name, context, visited);
-    }
+    const originFile = yield* resolveImportEffect(
+      file,
+      fact.origin.module,
+      context.root,
+      context.texts,
+    );
+    if (originFile !== undefined)
+      return yield* locateEffect(originFile, fact.origin.name, context, visited);
   }
-  if (fact !== undefined) {
-    return {
-      source: position(file, parsed.sourceFile, fact.position, context.root),
+  if (fact !== undefined)
+    return Models.LocatedSource.make({
+      source: yield* positionEffect(file, parsed.sourceFile, fact.position, context.root),
       facts: parsed.facts,
       exportFact: fact,
-    };
-  }
+    });
   for (const star of parsed.facts.stars) {
-    const originFile = resolveImport(file, star.module, context.root, context.texts);
+    const originFile = yield* resolveImportEffect(file, star.module, context.root, context.texts);
     if (originFile !== undefined) {
-      const origin = locate(originFile, exportName, context, visited);
+      const origin = yield* locateEffect(originFile, exportName, context, visited);
       if (origin !== undefined) return origin;
     }
-    return {
-      source: position(file, parsed.sourceFile, star.position, context.root),
-      facts: parsed.facts,
-    };
   }
-  return { source: position(file, parsed.sourceFile, 0, context.root), facts: parsed.facts };
-}
+  return undefined;
+});
 
-function parseSource(file: string, context: MapContext): ParsedSource | undefined {
+/**
+ * Parses a source once per invocation, including negative lookup memoization.
+ * @param file - Normalized source file.
+ * @param context - Invocation-owned mutable caches.
+ * @returns A lazy effect yielding a trusted TypeScript AST and facts, or undefined.
+ */
+const parseSourceEffect = Effect.fn("discovery.source.parse")(function* (
+  file: string,
+  context: Mapping.MapContext,
+) {
   if (context.parsed.has(file)) return context.parsed.get(file);
-  const text = sourceText(file, context);
+  const text = yield* sourceTextEffect(file, context);
   if (text === undefined) {
     context.parsed.set(file, undefined);
     return undefined;
@@ -151,46 +192,50 @@ function parseSource(file: string, context: MapContext): ParsedSource | undefine
     text,
     ts.ScriptTarget.Latest,
     true,
-    scriptKind(file),
+    sourceScriptKind(file),
   );
-  const parsed = { sourceFile, facts: readFacts(sourceFile) } satisfies ParsedSource;
+  const parsed = { sourceFile, facts: yield* readFactsEffect(sourceFile) } satisfies ParsedSource;
   context.parsed.set(file, parsed);
   return parsed;
-}
+});
 
-function sourceText(file: string, context: MapContext): string | undefined {
+/**
+ * Reads supplemental text or delegates a single native source lookup.
+ * @param file - Normalized source file.
+ * @param context - Root and supplemental sources owned by this invocation.
+ * @returns A lazy effect yielding text or undefined for known missing/unreadable sources.
+ * @remarks Typed SourceMapReadError is the sole read recovery; defects are preserved.
+ */
+const sourceTextEffect = Effect.fn("discovery.source.text")(function* (
+  file: string,
+  context: Mapping.MapContext,
+) {
   const supplied = context.texts.get(file);
   if (supplied !== undefined) return supplied;
+  const reader = yield* DiscoverySourceReader;
   const absolute = resolve(context.root, file);
-  if (!existsSync(absolute)) return undefined;
-  try {
-    return readFileSync(absolute, "utf8");
-  } catch {
-    return undefined;
-  }
-}
+  if (!(yield* reader.exists(absolute))) return undefined;
+  return yield* reader
+    .read(absolute)
+    .pipe(Effect.catchTag("SourceMapReadError", () => Effect.succeed(undefined)));
+});
 
-function position(
+/**
+ * Converts an AST offset to portable one-based coordinates.
+ * @param file - Normalized source file.
+ * @param sourceFile - Trusted TypeScript AST containing the offset.
+ * @param offset - Candidate UTF-16 character position, clamped to the AST bounds.
+ * @param root - Absolute project root.
+ * @returns A lazy effect yielding a validated source location.
+ */
+const positionEffect = Effect.fn("discovery.source.position")(function* (
   file: string,
   sourceFile: ts.SourceFile,
   offset: number,
   root: string,
-): SourceLocation {
-  const safeOffset = Math.max(0, Math.min(offset, sourceFile.end));
-  const line = sourceFile.getLineAndCharacterOfPosition(safeOffset);
-  return createSourceLocation(file, line.line + 1, line.character + 1, root);
-}
-
-function relativeFile(file: string, root: string): string {
-  return normalizeSourcePath(file, root);
-}
-
-function exportKind(name: string): ExportKind {
-  return name === "default" ? "default" : "named";
-}
-
-function scriptKind(file: string): ts.ScriptKind {
-  if (file.endsWith(".tsx")) return ts.ScriptKind.TSX;
-  if (file.endsWith(".jsx")) return ts.ScriptKind.JSX;
-  return ts.ScriptKind.TS;
-}
+) {
+  const line = sourceFile.getLineAndCharacterOfPosition(
+    Math.max(0, Math.min(offset, sourceFile.end)),
+  );
+  return yield* createSourceLocationEffect(file, line.line + 1, line.character + 1, root);
+});

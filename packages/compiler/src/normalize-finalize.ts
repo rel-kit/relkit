@@ -1,78 +1,112 @@
-import type { RuntimeIntegrationPlan } from "@relkit/contracts";
+import type { CompilerGenerationFailure } from "./normalize-output.types.js";
+import { Effect } from "effect";
+import { runCompilerSync } from "./compatibility.js";
+import { observeCompiler } from "./observability.js";
+
 import { createDiagnostic } from "@relkit/diagnostics";
-import { hashGraph } from "./normalize-graph.js";
-import { generateManifest } from "./generate-manifest.js";
-import { generateJobsManifest } from "./jobs/manifest.js";
-import { makeOutputs } from "./normalize-output.js";
+import { hashGraphEffect } from "./normalize-graph.js";
+import { generateManifestEffect } from "./generate-manifest.js";
+import { generateJobsManifestEffect } from "./jobs/manifest.js";
+import { makeOutputsEffect } from "./normalize-output.js";
 import type { NormalizationWork } from "./normalize-types.js";
-import { generateLocalServicePlan } from "./local-service-plan.js";
+import { generateLocalServicePlanEffect } from "./local-service-plan.js";
 import {
-  generateRuntimeIntegrationPlan,
   RuntimeIntegrationPlanError,
+  generateRuntimeIntegrationPlanEffect,
 } from "./runtime-integration-plan.js";
 
-export function passOutputs(work: NormalizationWork): void {
-  if (work.graph === undefined) return;
-  const hash = hashGraph(work.graph);
-  work.graphHash = hash;
-  let runtimeIntegrations: RuntimeIntegrationPlan | undefined;
-  try {
-    runtimeIntegrations = generateRuntimeIntegrationPlan(
+/**
+ * Generates activation and runtime artifacts from the validated graph.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns A lazy effect that generates activation and runtime artifacts from the validated graph; unexpected access failures remain defects.
+ * @see {@link normalizeCompilationEffect} for shared lazy composition and the execution boundary.
+ */
+export const passOutputsEffect = Effect.fn("Compiler.passOutputs")(
+  function* (work: NormalizationWork): Effect.fn.Return<void, CompilerGenerationFailure> {
+    if (work.graph === undefined) return;
+    const hash = yield* hashGraphEffect(work.graph);
+    work.graphHash = hash;
+    const runtimeIntegrations = yield* generateRuntimeIntegrationPlanEffect(
       work.graph,
       hash,
       work.input.runtimeIntegrationPackages,
+    ).pipe(
+      Effect.catchTag("RuntimeIntegrationPlanFailure", (failure) =>
+        Effect.sync(() => {
+          const error = failure.cause;
+          if (!(error instanceof RuntimeIntegrationPlanError)) throw error;
+          work.diagnostics.push(
+            createDiagnostic({ code: error.code, severity: "error", message: error.message }),
+          );
+          return undefined;
+        }),
+      ),
     );
-  } catch (error) {
-    if (!(error instanceof RuntimeIntegrationPlanError)) throw error;
-    work.diagnostics.push(
-      createDiagnostic({ code: error.code, severity: "error", message: error.message }),
-    );
-  }
-  const manifest = generateManifest({
-    graph: work.graph,
-    graphHash: hash,
-    descriptors: work.descriptors,
-    middleware: [...work.middlewareReferences.values()],
-    transforms: [...work.transformReferences.values()],
-    diagnostics: work.diagnostics,
-    ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
-  });
-  work.diagnostics.push(...manifest.diagnostics);
-  const jobsManifest = hasTaskJobs(work)
-    ? generateJobsManifest({
-        graph: work.graph,
-        graphHash: hash,
-        descriptors: work.descriptors,
-        diagnostics: work.diagnostics,
-        work,
-        ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
-      })
-    : undefined;
-  if (jobsManifest !== undefined) work.diagnostics.push(...jobsManifest.diagnostics);
-  const localServices = generateLocalServicePlan(work.graph, hash);
-  work.outputs = makeOutputs(
-    work.graph,
-    hash,
-    sortDiagnostics(work.diagnostics),
-    work,
-    manifest,
-    jobsManifest,
-    runtimeIntegrations,
-    localServices,
-  );
-  if (work.diagnostics.some((diagnostic) => diagnostic.severity === "error")) {
-    work.outputs = Object.freeze({
-      ...work.outputs,
-      manifest: "",
-      ...(hasTaskJobs(work) ? { jobsManifest: "" } : {}),
-      runtimeActivation: "",
-      runtimeIntegrations: "",
-      runtimeIntegrationImports: "",
-      localServices: "",
+    const manifest = yield* generateManifestEffect({
+      graph: work.graph,
+      graphHash: hash,
+      descriptors: work.descriptors,
+      middleware: [...work.middlewareReferences.values()],
+      transforms: [...work.transformReferences.values()],
+      diagnostics: work.diagnostics,
+      ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
     });
-  }
+    work.diagnostics.push(...manifest.diagnostics);
+    const jobsManifest = hasTaskJobs(work)
+      ? yield* generateJobsManifestEffect({
+          graph: work.graph,
+          graphHash: hash,
+          descriptors: work.descriptors,
+          diagnostics: work.diagnostics,
+          work,
+          ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
+        })
+      : undefined;
+    if (jobsManifest !== undefined) work.diagnostics.push(...jobsManifest.diagnostics);
+    const localServices = yield* generateLocalServicePlanEffect(work.graph, hash);
+    work.outputs = yield* makeOutputsEffect(
+      work.graph,
+      hash,
+      sortDiagnostics(work.diagnostics),
+      work,
+      manifest,
+      jobsManifest,
+      runtimeIntegrations,
+      localServices,
+    );
+    if (work.diagnostics.some((diagnostic) => diagnostic.severity === "error")) {
+      work.outputs = Object.freeze({
+        ...work.outputs,
+        manifest: "",
+        ...(hasTaskJobs(work) ? { jobsManifest: "" } : {}),
+        runtimeActivation: "",
+        runtimeIntegrations: "",
+        runtimeIntegrationImports: "",
+        localServices: "",
+      });
+    }
+  },
+  (effect, work) =>
+    observeCompiler("normalization", "passOutputs", effect, () => ({
+      descriptors: work.descriptors.length,
+      diagnostics: work.diagnostics.length,
+    })),
+);
+
+/**
+ * Generates activation and runtime artifacts from the validated graph.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
+export function passOutputs(work: NormalizationWork): void {
+  return runCompilerSync(passOutputsEffect(work));
 }
 
+/**
+ * Checks whether a compilation contains task-backed job artifacts.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns True when task descriptors or task-backed jobs require job artifacts.
+ */
 export function hasTaskJobs(work: NormalizationWork): boolean {
   return work.descriptors.some(
     (descriptor) =>
@@ -85,6 +119,12 @@ export function hasTaskJobs(work: NormalizationWork): boolean {
   );
 }
 
+/**
+ * Orders diagnostics by source position, code, severity, and message.
+ * @typeParam T - Type of the values preserved by this operation.
+ * @param diagnostics - Ordered compiler diagnostics.
+ * @returns Diagnostics ordered by source, code, severity, and message.
+ */
 export function sortDiagnostics<
   T extends {
     code: string;

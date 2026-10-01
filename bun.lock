@@ -7,6 +7,7 @@
       "devDependencies": {
         "@changesets/cli": "3.0.1",
         "@effect/sql-pg": "4.0.0-rc.115",
+        "@effect/vitest": "4.0.0-rc.115",
         "@hughescr/stryker-bun-runner": "1.4.0",
         "@playwright/test": "1.62.1",
         "@stryker-mutator/core": "10.0.0",
@@ -524,7 +525,12 @@
         "@relkit/local-service": "workspace:*",
         "@relkit/openapi": "workspace:*",
         "@relkit/schema": "workspace:*",
+        "effect": "4.0.0-rc.115",
         "typescript": "5.9.3",
+      },
+      "devDependencies": {
+        "@effect/vitest": "4.0.0-rc.115",
+        "vitest": "5.0.1",
       },
     },
     "packages/config": {
@@ -1144,6 +1150,8 @@
     "@effect/platform-node-shared": ["@effect/platform-node-shared@4.0.0-rc.115", "", { "dependencies": { "@types/ws": "^8.18.1", "ws": "^8.21.3" }, "peerDependencies": { "effect": "^4.0.0-rc.115" } }, "sha512-rcBwhDIfb82akJoTv7Vwh8K5x9vC/XfuePS7JjOr+z+dORXzsmKqI1BUQF27ARCN9fTAbDh7I6YvBlWhLjnqNg=="],
 
     "@effect/sql-pg": ["@effect/sql-pg@4.0.0-rc.115", "", { "peerDependencies": { "effect": "^4.0.0-rc.115" } }, "sha512-TLdzqBvGF/HwAKpWTw/5ih7JqVkkakVSb4aD6amzMaavFfFl4vsqqeKjSBijwuzbOMANNN0HqnEt/9fgjTsFEA=="],
+
+    "@effect/vitest": ["@effect/vitest@4.0.0-rc.115", "", { "peerDependencies": { "effect": "^4.0.0-rc.115", "vitest": ">=5.0.0 <6.0.0" } }, "sha512-DJR0hfdr3HNXAkzW8AzfvUz6VmrNFLrKk9tZGDURi33faMyxkc7ZewxELMMZwGpOTGN4mfqYVbX2CXgI+ZJBeQ=="],
 
     "@electric-sql/client": ["@electric-sql/client@1.0.14", "", { "dependencies": { "@microsoft/fetch-event-source": "^2.0.1" }, "optionalDependencies": { "@rollup/rollup-darwin-arm64": "^4.18.1" } }, "sha512-LtPAfeMxXRiYS0hyDQ5hue2PjljUiK9stvzsVyVb4nwxWQxfOWTSF42bHTs/o5i3x1T4kAQ7mwHpxa4A+f8X7Q=="],
 

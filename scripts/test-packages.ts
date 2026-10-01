@@ -22,7 +22,7 @@ export async function runPackageTests(environment: NodeJS.ProcessEnv = process.e
   if (files.length === 0) throw new Error("No package tests were discovered.");
   const importsVitest = await Promise.all(
     files.map(async (file) =>
-      /from ["']vitest["']/.test(await Bun.file(resolve(root, file)).text()),
+      /from ["'](?:vitest|@effect\/vitest)["']/.test(await Bun.file(resolve(root, file)).text()),
     ),
   );
   const vitestFiles = files.filter((_, index) => importsVitest[index]);

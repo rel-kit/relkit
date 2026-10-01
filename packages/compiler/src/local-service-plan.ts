@@ -1,42 +1,59 @@
+import { Effect } from "effect";
+import { runCompilerSync } from "./compatibility.js";
+import { observeCompiler } from "./observability.js";
+import type { LocalServiceGraph, LocalProviderNode } from "./local-service-plan.types.js";
 import {
   LOCAL_SERVICE_PLAN_VERSION,
   type LocalServicePlan,
   type LocalServicePlanEntry,
 } from "@relkit/local-service";
 
-interface LocalServiceGraph {
-  readonly nodes: readonly { readonly kind: string; readonly id: string }[];
-  readonly edges: readonly { readonly kind: string; readonly from: string; readonly to: string }[];
-}
+/**
+ * Projects selected local provider services and their dependants.
+ * @param graph - Canonical normalized graph.
+ * @param graphHash - Hash identifying the accepted graph.
+ * @returns A lazy effect that projects selected local provider services and their dependants; unexpected access failures remain defects.
+ * @see {@link normalizeCompilationEffect} for shared lazy composition and the execution boundary.
+ */
+export const generateLocalServicePlanEffect = Effect.fn("Compiler.generateLocalServicePlan")(
+  function* (graph: LocalServiceGraph, graphHash: string) {
+    const requirements = requiredBy(graph);
+    const services = graph.nodes
+      .filter(isLocalProvider)
+      .map((node) => service(node, requirements.get(node.id) ?? []))
+      .sort((left, right) => left.bindingId.localeCompare(right.bindingId));
+    return Object.freeze({
+      version: LOCAL_SERVICE_PLAN_VERSION,
+      graphHash,
+      services: Object.freeze(services.map((entry) => Object.freeze(entry))),
+    });
+  },
+  (effect, graph, graphHash) =>
+    observeCompiler("generation", "generateLocalServicePlan", effect, () => ({
+      nodes: graph.nodes.length,
+      edges: graph.edges.length,
+    })),
+);
 
-interface LocalProviderNode {
-  readonly kind: "provider";
-  readonly id: string;
-  readonly capability: string;
-  readonly profile: string;
-  readonly local: {
-    readonly integrationId: string;
-    readonly recipeId: string;
-    readonly recipeVersion: number;
-  };
-}
-
+/**
+ * Projects selected local provider services and their dependants.
+ * @param graph - Canonical normalized graph.
+ * @param graphHash - Hash identifying the accepted graph.
+ * @returns Selected local services with provider profiles and dependants.
+ */
 export function generateLocalServicePlan(
   graph: LocalServiceGraph,
   graphHash: string,
 ): LocalServicePlan {
-  const requirements = requiredBy(graph);
-  const services = graph.nodes
-    .filter(isLocalProvider)
-    .map((node) => service(node, requirements.get(node.id) ?? []))
-    .sort((left, right) => left.bindingId.localeCompare(right.bindingId));
-  return Object.freeze({
-    version: LOCAL_SERVICE_PLAN_VERSION,
-    graphHash,
-    services: Object.freeze(services.map((entry) => Object.freeze(entry))),
-  });
+  return runCompilerSync(generateLocalServicePlanEffect(graph, graphHash));
 }
 
+/**
+ * Projects one local provider node into its service plan entry.
+ * @param node - Parsed source node or normalized graph node.
+ * @param requiredBy - Graph identities depending on this provider.
+ * @returns The local service entry for the provider node.
+ */
 function service(node: LocalProviderNode, requiredBy: readonly string[]): LocalServicePlanEntry {
   return {
     bindingId: node.id,
@@ -49,6 +66,11 @@ function service(node: LocalProviderNode, requiredBy: readonly string[]): LocalS
   };
 }
 
+/**
+ * Collects graph dependants for each selected provider profile.
+ * @param graph - Canonical normalized graph.
+ * @returns Provider identities mapped to sorted dependant descriptor IDs.
+ */
 function requiredBy(graph: LocalServiceGraph): ReadonlyMap<string, readonly string[]> {
   const result = new Map<string, Set<string>>();
   for (const edge of graph.edges) {
@@ -62,6 +84,11 @@ function requiredBy(graph: LocalServiceGraph): ReadonlyMap<string, readonly stri
   );
 }
 
+/**
+ * Recognizes a provider configured with a local service capability.
+ * @param node - Parsed source node or normalized graph node.
+ * @returns True when the provider node declares a local service projection.
+ */
 function isLocalProvider(node: LocalServiceGraph["nodes"][number]): node is LocalProviderNode {
   if (node.kind !== "provider") return false;
   const value = node as unknown as Record<string, unknown>;
