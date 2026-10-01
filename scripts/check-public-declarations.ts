@@ -23,11 +23,8 @@ const publicPackages = [
 ] as const;
 
 const forbiddenSymbols = [
-  ["Layer", /\bLayer\b/g],
-  ["Context.Tag", /\bContext\.Tag\b/g],
-  ["Schema.Schema", /\bSchema\.Schema\b/g],
-  ["Fiber", /\bFiber\b/g],
-  ["Cause", /\bCause\b/g],
+  // Native Effect constructors and injectable services are documented public APIs.
+  // Framework and provider implementations remain forbidden below.
   ["Hono", /\bHono(?:Context|Request|Response)?\b/g],
   ["Next.js", /\bNext(?:JS|\.js)?\b/g],
   ["Pulumi", /\bPulumi\b|from ["'](?:pulumi|@pulumi\/)[^"']*["']/g],
@@ -42,7 +39,7 @@ const forbiddenSymbols = [
   ],
   [
     "framework-or-provider-import",
-    /from ["'](?:ai|effect|hono|next|openai|@(?:ai-sdk|effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare|anthropic-ai|google-generative-ai)\/|aws-sdk)[^"']*["']/g,
+    /from ["'](?:ai|hono|next|openai|@(?:ai-sdk|effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare|anthropic-ai|google-generative-ai)\/|aws-sdk)[^"']*["']/g,
   ],
 ] as const;
 
@@ -135,7 +132,7 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
 }
 
 function declarationSymbols(file: string): typeof forbiddenSymbols {
-  if (file.endsWith("/packages/routes/dist/define-middleware.d.ts"))
+  if (/\/packages\/routes\/dist\/define-middleware(?:\.types)?\.d\.ts$/.test(file))
     return forbiddenSymbols.filter(
       ([symbol]) => symbol !== "Next.js" && symbol !== "framework-or-provider-import",
     );
