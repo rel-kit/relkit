@@ -32,11 +32,17 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
       message = f.previousActive
         ? "Reload failed; previous version is still serving"
         : "Application failed to start";
-      details = [
-        options.verbose
-          ? String(f.message ?? "Unknown error")
-          : String(f.message ?? "Unknown error").split("\n")[0]!,
-      ];
+      const diagnosticLines = String(f.message ?? "")
+        .split("\n")
+        .filter((line) => /\b(?:error|warning) (?:RELKIT_[A-Z_]+|TS\d+):/.test(line));
+      details =
+        diagnosticLines.length > 0 && !options.verbose
+          ? diagnosticLines
+          : [
+              options.verbose
+                ? String(f.message ?? "Unknown error")
+                : String(f.message ?? "Unknown error").split("\n")[0]!,
+            ];
       if (!options.verbose && (f.error || String(f.message).includes("\n")))
         details.push("Use --verbose for diagnostic details.");
     } else if (event === "dev.ready") {
