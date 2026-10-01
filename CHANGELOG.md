@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.5.3
+
+### Changes
+
+- chore(deps): bump next from 16.3.3 to 16.3.6 in /packages/cli
+- Refactor compilation and generated contracts and enforce route authoring
+- Refactor RELKIT authoring packages and refresh API docs
+
 ## 0.5.2
 
 ### Changes
