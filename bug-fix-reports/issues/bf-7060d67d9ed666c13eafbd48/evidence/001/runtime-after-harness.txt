@@ -1,0 +1,16 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/route-review-regressions.test.ts:
+ENOENT: no such file or directory, open '/Users/mustafaelsayed/Workspace/relkit/.relkit/route-review-3ywyPq/app/.relkit/generated/graph.json'
+    path: "/Users/mustafaelsayed/Workspace/relkit/.relkit/route-review-3ywyPq/app/.relkit/generated/graph.json",
+ syscall: "open",
+   errno: -2,
+    code: "ENOENT"
+
+(fail) the real CLI accepts annotated explicit path mappings and still rejects missing inferred inputs [5195.23ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 3 expect() calls
+Ran 1 test across 1 file. [5.72s]

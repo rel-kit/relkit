@@ -1,0 +1,23 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/route-review-regressions.test.ts:
+55 | const mapped: ServiceRouteOptions<"example", typeof service.example> = {
+56 |   member: "example", request: http.input({ value: http.path("id") })
+57 | };
+58 | export const { GET } = defineServiceRoutes(service, { GET: mapped });`);
+59 |   const accepted = await check(root);
+60 |   expect(accepted.exitCode, JSON.stringify(accepted.result.diagnostics)).toBe(0);
+                                                                              ^
+error: [{"code":"TS2344","column":75,"file":".relkit/generated/route-module-checks.ts","line":11,"message":"Type 'typeof import(\"/Users/mustafaelsayed/Workspace/relkit/.relkit/route-review-rgy6AT/app/src/routes/users/[id]/route\")' does not satisfy the constraint '{ readonly GET: { readonly __relkit_missing_path_input: \"id\"; }; }'.\n  Types of property 'GET' are incompatible.\n    Property '__relkit_missing_path_input' is missing in type 'FunctionRouteDescriptor<string, FunctionDescriptor<\"users.example\", ObjectOutput<{ value: StringSchema; }>, ObjectOutput<{ value: StringSchema; }>, {}, readonly [], ... 4 more ..., undefined>, undefined>' but required in type '{ readonly __relkit_missing_path_input: \"id\"; }'.","severity":"error"},{"code":"RELKIT_ROUTE_MODULE_TYPE","column":16,"file":"src/routes/users/[id]/route.ts","line":6,"message":"Route GET infers path input \"id\", but the target function input schema does not declare it. Add the input field or define an explicit request mapping.","severity":"error"}]
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/route-review-regressions.test.ts:60:74)
+(fail) the real CLI accepts annotated explicit path mappings and still rejects missing inferred inputs [6938.72ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [7.50s]

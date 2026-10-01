@@ -1,0 +1,10 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/route-review-regressions.test.ts:
+(pass) the real CLI accepts annotated explicit path mappings and still rejects missing inferred inputs [13356.69ms]
+
+ 1 pass
+ 1 filtered out
+ 0 fail
+ 7 expect() calls
+Ran 1 test across 1 file. [13.71s]
