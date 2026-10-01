@@ -1,0 +1,51 @@
+bun test v1.3.10 (30e609e0)
+
+tests/phase0.test.ts:
+(pass) Phase 0 guardrails > allows a declared public-package dependency [157.18ms]
+(pass) Phase 0 guardrails > allows integration, catalog, and application dependency direction [157.79ms]
+(pass) Phase 0 guardrails > rejects undeclared dependencies [146.91ms]
+(pass) Phase 0 guardrails > rejects cross-package relative imports [135.84ms]
+(pass) Phase 0 guardrails > rejects descriptor runtime imports [138.67ms]
+(pass) Phase 0 guardrails > rejects core dependencies on standalone integrations [142.41ms]
+(pass) Phase 0 guardrails > rejects engine dependencies on local provider implementations [147.49ms]
+(pass) Phase 0 guardrails > rejects integration dependencies on non-protocol core packages [147.68ms]
+(pass) Phase 0 guardrails > rejects catalog dependencies on core protocols [168.98ms]
+(pass) Phase 0 guardrails > rejects graph imports hono [137.91ms]
+(pass) Phase 0 guardrails > rejects graph imports @pulumi/pulumi [139.69ms]
+(pass) Phase 0 guardrails > rejects inspector imports @relkit/app [145.88ms]
+(pass) Phase 0 guardrails > rejects inspector imports @relkit/engine [143.76ms]
+(pass) Phase 0 guardrails > rejects fixture imports effect [148.10ms]
+(pass) Phase 0 guardrails > rejects fixture imports hono [142.92ms]
+(pass) Phase 0 guardrails > rejects fixture imports next [148.22ms]
+(pass) Phase 0 guardrails > rejects fixture imports @pulumi/pulumi [140.36ms]
+(pass) Phase 0 guardrails > rejects fixture imports @aws-sdk/client-s3 [144.33ms]
+(pass) Phase 0 guardrails > rejects fixture imports @relkit/compiler [147.18ms]
+(pass) Phase 0 guardrails > rejects template imports an internal package [141.69ms]
+354 |       assertBoundaryViolation(boundaryCase.files, boundaryCase.expected));
+355 |   }
+356 |
+357 |   test("package exports resolve only through the public entry", { timeout: 180_000 }, async () => {
+358 |     const result = await execute(process.execPath, ["run", "scripts/pack-and-smoke-exports.ts"]);
+359 |     expect(result.exitCode).toBe(0);
+                                  ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/phase0.test.ts:359:29)
+(fail) Phase 0 guardrails > package exports resolve only through the public entry [23.61ms]
+(pass) Phase 0 guardrails > scope exclusions report each affected path and rule [9.49ms]
+(pass) Phase 0 guardrails > reports implementation files over the 250-line limit [2.04ms]
+(pass) Phase 0 guardrails > repository guidance has current commands and topology [1.12ms]
+(pass) Phase 0 guardrails > ignores only RelKit generated and local runtime roots [123.23ms]
+(pass) Phase 0 guardrails > rejects lockfile drift in an isolated workspace [25.92ms]
+(pass) Phase 0 guardrails > frozen install and typecheck leave lockfile/generated state unchanged [9428.59ms]
+
+1 tests failed:
+(fail) Phase 0 guardrails > package exports resolve only through the public entry [23.61ms]
+
+ 26 pass
+ 1 fail
+ 159 expect() calls
+Ran 27 tests across 1 file. [12.93s]
