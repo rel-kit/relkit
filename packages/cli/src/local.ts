@@ -1,6 +1,7 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { lstat, readFile, unlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import cliManifest from "../package.json" with { type: "json" };
 import {
   applyScaffoldPlan,
   generateProject,
@@ -9,7 +10,7 @@ import {
 } from "create-relkit";
 import { runCli } from "./main.js";
 import { loadCreateRelkit, type CliCommandContext } from "./main-support.js";
-import { workspacePackageRoots } from "./local-workspaces.js";
+import { workspaceDependencyLinks } from "./local-workspaces.js";
 
 const root = resolve(import.meta.dir, "../../..");
 const cli = fileURLToPath(import.meta.url);
@@ -23,15 +24,25 @@ type Manifest = {
 export async function useWorkspaceDependencies(projectRoot: string): Promise<string[]> {
   const path = join(projectRoot, "package.json");
   const manifest = JSON.parse(await readFile(path, "utf8")) as Manifest;
-  const direct = new Set<string>();
-  for (const dependencies of [manifest.dependencies, manifest.devDependencies]) {
-    if (dependencies === undefined) continue;
-    for (const name of Object.keys(dependencies)) {
-      if (!name.startsWith("@relkit/")) continue;
-      direct.add(name);
+  const links = await workspaceDependencyLinks(
+    root,
+    { ...manifest.dependencies, ...manifest.devDependencies },
+    manifest.dependencies ?? {},
+  );
+  const names = [...links.keys()].sort();
+  for (const [name, version] of Object.entries(manifest.dependencies ?? {})) {
+    const cliVersion = cliManifest.dependencies[name as keyof typeof cliManifest.dependencies];
+    if (version === `link:${name}` && !links.has(name) && cliVersion !== undefined) {
+      manifest.dependencies![name] = cliVersion;
+      const installed = join(projectRoot, "node_modules", name);
+      try {
+        // Bun can reuse a stale link when its target already has the requested version.
+        if ((await lstat(installed)).isSymbolicLink()) await unlink(installed);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      }
     }
   }
-  const names = await workspaceDependencyClosure(direct);
   manifest.devDependencies ??= {};
   for (const name of names) {
     if (manifest.dependencies?.[name] !== undefined) manifest.dependencies[name] = `link:${name}`;
@@ -41,30 +52,19 @@ export async function useWorkspaceDependencies(projectRoot: string): Promise<str
   return names;
 }
 
-async function workspaceDependencyClosure(direct: ReadonlySet<string>): Promise<string[]> {
-  const paths = await workspacePackageRoots(root);
-  const names = new Set(direct);
-  const pending = [...direct];
-  while (pending.length > 0) {
-    const name = pending.pop()!;
-    const manifest = JSON.parse(
-      await readFile(join(paths.get(name) ?? missingWorkspace(name), "package.json"), "utf8"),
-    ) as Manifest;
-    for (const dependency of Object.keys(manifest.dependencies ?? {})) {
-      if (!dependency.startsWith("@relkit/") || names.has(dependency)) continue;
-      names.add(dependency);
-      pending.push(dependency);
-    }
-  }
-  return [...names].sort();
-}
-
 export async function prepareWorkspaceLinks(
   projectRoot: string,
   signal?: AbortSignal,
 ): Promise<GenerateCommandResult> {
   const names = await useWorkspaceDependencies(projectRoot);
-  const paths = await workspacePackageRoots(root);
+  const manifest = JSON.parse(
+    await readFile(join(projectRoot, "package.json"), "utf8"),
+  ) as Manifest;
+  const paths = await workspaceDependencyLinks(
+    root,
+    { ...manifest.dependencies, ...manifest.devDependencies },
+    manifest.dependencies ?? {},
+  );
   for (const name of names) {
     const result = await runCommand(
       [process.execPath, "link", "--silent"],
