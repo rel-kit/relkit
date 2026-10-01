@@ -110,7 +110,7 @@ for (const directory of workspacePackageDirectories(root)) {
     repository: { type: "git", url: `${repository}.git`, directory: relative(root, directory) },
     homepage: `${repository}#readme`,
     bugs: { url: `${repository}/issues` },
-    files: ["dist"],
+    files: name === "@relkit/cli" ? ["dist", "editor"] : ["dist"],
     publishConfig: { access: "public" },
     engines: { bun: ">=1.3.10" },
     ...rest,
