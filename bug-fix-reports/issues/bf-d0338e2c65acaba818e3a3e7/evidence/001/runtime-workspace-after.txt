@@ -1,0 +1,4 @@
+{"probes":[],"success":true,"diagnostics":[{"message":"Route GET infers path input \"id\", but the target function input schema does not declare it. Add the input field or define an explicit request mapping.","start":124,"length":3,"category":"error","code":99001,"source":"relkit","startLocation":{"line":4,"offset":16},"endLocation":{"line":4,"offset":19}}]}
+
+Exit code: 0
+Command: rtk bun /tmp/relkit-editor-diagnostic-repro.ts --workspace
