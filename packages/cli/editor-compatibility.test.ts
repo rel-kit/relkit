@@ -2,16 +2,15 @@ import { expect, test } from "bun:test";
 import { createRequire } from "node:module";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { resolve, join } from "node:path";
-import type TypeScript from "typescript";
+import ts from "typescript";
 
 const require = createRequire(import.meta.url);
-const ts: typeof TypeScript = require(process.env.RELKIT_EDITOR_TYPESCRIPT_PATH ?? "typescript");
 
 test("the packaged plugin uses the editor's TypeScript for dynamic route inputs and recovery", async () => {
   const repository = resolve(import.meta.dir, "../..");
   await mkdir(join(repository, ".relkit"), { recursive: true });
   const root = await mkdtemp(join(repository, ".relkit/editor-typescript-"));
-  let service: TypeScript.LanguageService | undefined;
+  let service: ts.LanguageService | undefined;
   try {
     await mkdir(join(root, "src/routes/users/[id]"), { recursive: true });
     await mkdir(join(root, "src/users"), { recursive: true });
@@ -36,7 +35,7 @@ export const { GET } = defineServiceRoutes(service, { GET: { member: "example" }
     await writeFile(routeFile, routeSource);
     let source = valid.replace(", id: z.string()", "");
     let version = 0;
-    const options: TypeScript.CompilerOptions = {
+    const options: ts.CompilerOptions = {
       target: ts.ScriptTarget.ES2022,
       module: ts.ModuleKind.ESNext,
       moduleResolution: ts.ModuleResolutionKind.Bundler,
@@ -65,8 +64,8 @@ export const { GET } = defineServiceRoutes(service, { GET: { member: "example" }
     const findings = () =>
       plugin
         .getSemanticDiagnostics(routeFile)
-        .filter((diagnostic: TypeScript.Diagnostic) => diagnostic.source === "relkit");
-    expect(findings().map((diagnostic: TypeScript.Diagnostic) => diagnostic.messageText)).toContain(
+        .filter((diagnostic: ts.Diagnostic) => diagnostic.source === "relkit");
+    expect(findings().map((diagnostic: ts.Diagnostic) => diagnostic.messageText)).toContain(
       'Route GET infers path input "id", but the target function input schema does not declare it. Add the input field or define an explicit request mapping.',
     );
     source = valid;
@@ -82,7 +81,7 @@ export const { GET } = defineServiceRoutes(service, { GET: { member: "example" }
     routeSource = routeSource.replace("export const { GET }", "export const GET");
     version++;
     expect(
-      findings().some((diagnostic: TypeScript.Diagnostic) =>
+      findings().some((diagnostic: ts.Diagnostic) =>
         String(diagnostic.messageText).includes("returns a method table"),
       ),
     ).toBe(true);
