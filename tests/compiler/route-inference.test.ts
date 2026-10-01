@@ -53,7 +53,7 @@ describe("route contract inference", () => {
     expect(result.diagnostics).toEqual([]);
   });
 
-  test("maps only matching path fields and leaves unmatched params on the request", () => {
+  test("maps matching path fields and rejects unmatched parameters during inference", () => {
     const target = defineFunction({
       id: "orders.read",
       input: z.object({ orderId: z.string() }),
@@ -70,10 +70,16 @@ describe("route contract inference", () => {
       kind: "input",
       fields: { orderId: { kind: "path", name: "orderId" } },
     });
-    expect(result.diagnostics).toEqual([]);
+    expect(result.activatable).toBe(false);
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: "RELKIT_MAPPING_INCOMPATIBLE",
+        message: expect.stringContaining('"productId"'),
+      }),
+    );
   });
 
-  test("does not infer unmatched catch-all params into reusable input", () => {
+  test("rejects unmatched catch-all parameters during inference", () => {
     const target = defineFunction({
       id: "docs.read",
       input: z.object({}),
@@ -83,7 +89,13 @@ describe("route contract inference", () => {
     const result = compile(target, "GET", "src/routes/docs/[...parts]/route.ts");
 
     expect(routeValue(result).request).toEqual({ kind: "input", fields: {} });
-    expect(result.diagnostics).toEqual([]);
+    expect(result.activatable).toBe(false);
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: "RELKIT_MAPPING_INCOMPATIBLE",
+        message: expect.stringContaining('"parts"'),
+      }),
+    );
   });
 
   test("keeps explicit request mappings as complete overrides", () => {
