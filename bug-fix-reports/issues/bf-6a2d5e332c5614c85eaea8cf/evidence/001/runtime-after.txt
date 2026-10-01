@@ -1,0 +1,10 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/route-review-regressions.test.ts:
+(pass) the real CLI ignores excluded route fixtures without suppressing invalid application routes [9688.87ms]
+
+ 1 pass
+ 1 filtered out
+ 0 fail
+ 10 expect() calls
+Ran 1 test across 1 file. [10.09s]

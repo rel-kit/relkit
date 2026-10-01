@@ -10,4 +10,5 @@ export {
 } from "./route-observability.js";
 export type { RouteOperation, RouteTelemetryService } from "./route-observability.types.js";
 export type * from "./route.types.js";
+export type * from "./route-module.types.js";
 export type { HttpRateLimitKey, RouteRateLimit } from "./route-options.js";

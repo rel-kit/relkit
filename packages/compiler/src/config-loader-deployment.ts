@@ -1,12 +1,15 @@
+import type { LoadedDeploymentConfig } from "./config-loader-deployment.types.js";
+export type { LoadedDeploymentConfig } from "./config-loader-deployment.types.js";
 import { isStableId } from "@relkit/contracts";
 import { CONFIG_CODES, type ConfigIssue } from "./config-loader-types.js";
 import { readRecord } from "./config-loader-utils.js";
 
-export interface LoadedDeploymentConfig {
-  readonly engine: string;
-  readonly host: string;
-}
-
+/**
+ * Validates tooling deployment engine and host integration identities.
+ * @param value - Declared metadata inspected without coercion.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns Validated deployment settings, or undefined when absent.
+ */
 export function readDeployment(
   value: unknown,
   issues: ConfigIssue[],
@@ -28,6 +31,13 @@ export function readDeployment(
   return engine === undefined || host === undefined ? undefined : Object.freeze({ engine, host });
 }
 
+/**
+ * Validates a deployment integration identity with its configuration path.
+ * @param value - Declared metadata inspected without coercion.
+ * @param path - Portable source, property, or runtime path.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns The stable integration identity, or undefined with a configuration issue.
+ */
 function integrationId(value: unknown, path: string, issues: ConfigIssue[]): string | undefined {
   if (isStableId(value)) return value;
   issues.push({

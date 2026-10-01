@@ -4,10 +4,20 @@ import { clean } from "./normalize-graph-utils.js";
 import type { GraphNode, NormalizedDescriptor } from "./normalize-types.js";
 import { isRecord } from "./normalize-utils.js";
 
+/**
+ * Projects data-only application environment metadata.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Serializable application environment metadata.
+ */
 export function environmentMetadata(value: unknown): JsonValue {
   return isRecord(value) && isRecord(value.metadata) ? clean(value.metadata) : {};
 }
 
+/**
+ * Selects application provider maps including supported legacy aliases.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Provider capability names paired with their declared profile maps.
+ */
 export function providerMaps(value: Record<string, unknown>): [string, unknown][] {
   return ["bucket", "cache", "job", "event", "model", "realtime", "agent-state"].flatMap(
     (capability) => {
@@ -25,6 +35,13 @@ export function providerMaps(value: Record<string, unknown>): [string, unknown][
   );
 }
 
+/**
+ * Resolves an explicit or default provider profile selection.
+ * @param application - Application descriptor metadata.
+ * @param capability - Required provider capability.
+ * @param requested - Explicit provider profile selection, when supplied.
+ * @returns The selected provider profile, or undefined when no selection exists.
+ */
 export function selectedProviderProfile(
   application: unknown,
   capability: string,
@@ -41,6 +58,12 @@ export function selectedProviderProfile(
   return names.length === 1 ? names[0] : undefined;
 }
 
+/**
+ * Reads a descriptor's requested provider profile.
+ * @param descriptorKind - Descriptor kind whose deployment requirements are projected.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns The descriptor's explicit profile name, or undefined.
+ */
 export function requestedProviderProfile(
   descriptorKind: string,
   value: Record<string, unknown>,
@@ -54,6 +77,11 @@ export function requestedProviderProfile(
   return typeof selected === "string" ? selected.split(":", 1)[0] : undefined;
 }
 
+/**
+ * Projects the deployment role contracts selected by the application.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Declared deployment roles and their data-only contracts.
+ */
 export function deploymentRoleProjections(value: unknown): readonly DeploymentRoleProjection[] {
   if (!isRecord(value)) return [];
   return (["engine", "host"] as const).flatMap((role) => {
@@ -81,6 +109,11 @@ export function deploymentRoleProjections(value: unknown): readonly DeploymentRo
   });
 }
 
+/**
+ * Projects named environment declarations into graph nodes.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @returns Graph nodes for named environment declarations.
+ */
 export function environmentNodes(descriptor: NormalizedDescriptor): GraphNode[] {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   const env = isRecord(value.env) && isRecord(value.env.metadata) ? value.env.metadata : {};
@@ -100,6 +133,11 @@ export function environmentNodes(descriptor: NormalizedDescriptor): GraphNode[] 
   });
 }
 
+/**
+ * Retains textual items from an optional metadata array.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Only string-valued entries, preserving input order.
+ */
 function textList(value: unknown): readonly string[] {
   return Array.isArray(value)
     ? value.filter((entry): entry is string => typeof entry === "string")

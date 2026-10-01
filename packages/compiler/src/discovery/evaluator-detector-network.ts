@@ -1,3 +1,4 @@
+import { observeCompiler } from "../observability.js";
 import childProcess from "node:child_process";
 import dgram from "node:dgram";
 import dns from "node:dns";
@@ -5,113 +6,135 @@ import http from "node:http";
 import https from "node:https";
 import net from "node:net";
 import tls from "node:tls";
+import { Effect } from "effect";
+import { runDiscoverySync } from "./discovery-sync.js";
+import { replaceNative } from "./evaluator-detector-native.js";
+import { isAllowed, targetFor } from "./evaluator-detector-network-utils.js";
+import type {
+  GenericFunction,
+  MutableRecord,
+  Restore,
+  Violate,
+} from "./evaluator-detector-native.types.js";
 import type { EvaluatorSideEffectKind } from "./evaluator-protocol.js";
 
-type MutableRecord = Record<string, unknown>;
-type GenericFunction = (...args: unknown[]) => unknown;
-type Restore = () => void;
-type Violate = (kind: EvaluatorSideEffectKind, operation: string, target: string) => never;
+/**
+ * Installs outbound, listener and process guards for a scoped candidate.
+ * @param allowlist - Explicit destinations or hostnames approved by the request.
+ * @param restores - Session-owned rollback capabilities.
+ * @param violate - Synchronous rejection boundary recording blocked native calls.
+ * @returns A lazy effect installing all available native hooks; assignment failures are defects.
+ */
+export const installNetworkDetectorsEffect = Effect.fn("Discovery.installNetworkDetectors")(
+  function* (allowlist: readonly string[], restores: Restore[], violate: Violate) {
+    const bun = (typeof Bun === "undefined" ? {} : Bun) as unknown as MutableRecord;
+    yield* Effect.forEach(
+      ["listen", "serve"],
+      (name) => Effect.sync(() => patchReject(bun, name, "listening-socket", restores, violate)),
+      { discard: true },
+    );
+    yield* Effect.forEach(
+      ["spawn", "spawnSync", "$"],
+      (name) => Effect.sync(() => patchReject(bun, name, "child-process", restores, violate)),
+      { discard: true },
+    );
+    yield* Effect.sync(() => patchChecked(bun, "connect", allowlist, restores, violate));
+    const globals = globalThis as unknown as MutableRecord;
+    yield* Effect.forEach(
+      ["fetch", "WebSocket", "EventSource", "XMLHttpRequest"],
+      (name) => Effect.sync(() => patchChecked(globals, name, allowlist, restores, violate)),
+      { discard: true },
+    );
+    yield* Effect.forEach(
+      ["spawn", "spawnSync", "exec", "execFile", "fork"],
+      (name) =>
+        Effect.sync(() =>
+          patchReject(
+            childProcess as unknown as MutableRecord,
+            name,
+            "child-process",
+            restores,
+            violate,
+          ),
+        ),
+      { discard: true },
+    );
+    yield* Effect.forEach(
+      [http, https],
+      (target) =>
+        Effect.forEach(
+          ["request", "get"],
+          (name) =>
+            Effect.sync(() =>
+              patchChecked(target as unknown as MutableRecord, name, allowlist, restores, violate),
+            ),
+          { discard: true },
+        ),
+      { discard: true },
+    );
+    yield* Effect.forEach(
+      [
+        [tls, "connect"],
+        [net, "connect"],
+        [net, "createConnection"],
+        [dgram.Socket.prototype, "connect"],
+        [dns, "lookup"],
+        [dns, "resolve"],
+        [dns, "reverse"],
+      ] as const,
+      ([target, name]) =>
+        Effect.sync(() =>
+          patchChecked(target as unknown as MutableRecord, name, allowlist, restores, violate),
+        ),
+      { discard: true },
+    );
+    yield* Effect.sync(() =>
+      patchReject(
+        net.Server.prototype as unknown as MutableRecord,
+        "listen",
+        "listening-socket",
+        restores,
+        violate,
+      ),
+    );
+    yield* Effect.sync(() =>
+      patchReject(
+        dgram.Socket.prototype as unknown as MutableRecord,
+        "bind",
+        "listening-socket",
+        restores,
+        violate,
+      ),
+    );
+  },
+  (effect, allowlist, restores, violate) =>
+    observeCompiler("discovery", "installNetworkDetectors", effect, () => ({}), false),
+);
 
+/**
+ * Synchronous compatibility boundary for manually owned network hooks.
+ * @param allowlist - Approved destinations or hostnames.
+ * @param restores - Rollback capabilities retained by the caller.
+ * @param violate - Native blocked-operation callback.
+ * @returns Nothing after installation; caller must roll back partial failures.
+ */
 export function installNetworkDetectors(
   allowlist: readonly string[],
   restores: Restore[],
   violate: Violate,
 ): void {
-  const bun = Bun as unknown as MutableRecord;
-  for (const name of ["listen", "serve"])
-    patchReject(bun, name, "listening-socket", restores, violate);
-  for (const name of ["spawn", "spawnSync", "$"])
-    patchReject(bun, name, "child-process", restores, violate);
-  patchChecked(bun, "connect", "unapproved-network", allowlist, restores, violate);
-  patchGlobalNetwork(allowlist, restores, violate);
-  for (const name of ["spawn", "spawnSync", "exec", "execFile", "fork"])
-    patchReject(childProcess as unknown as MutableRecord, name, "child-process", restores, violate);
-  for (const name of ["request", "get"])
-    patchChecked(
-      http as unknown as MutableRecord,
-      name,
-      "unapproved-network",
-      allowlist,
-      restores,
-      violate,
-    );
-  for (const name of ["request", "get"])
-    patchChecked(
-      https as unknown as MutableRecord,
-      name,
-      "unapproved-network",
-      allowlist,
-      restores,
-      violate,
-    );
-  patchChecked(
-    tls as unknown as MutableRecord,
-    "connect",
-    "unapproved-network",
-    allowlist,
-    restores,
-    violate,
-  );
-  patchReject(
-    net.Server.prototype as unknown as MutableRecord,
-    "listen",
-    "listening-socket",
-    restores,
-    violate,
-  );
-  patchChecked(
-    net as unknown as MutableRecord,
-    "connect",
-    "unapproved-network",
-    allowlist,
-    restores,
-    violate,
-  );
-  patchChecked(
-    net as unknown as MutableRecord,
-    "createConnection",
-    "unapproved-network",
-    allowlist,
-    restores,
-    violate,
-  );
-  patchReject(
-    dgram.Socket.prototype as unknown as MutableRecord,
-    "bind",
-    "listening-socket",
-    restores,
-    violate,
-  );
-  patchChecked(
-    dgram.Socket.prototype as unknown as MutableRecord,
-    "connect",
-    "unapproved-network",
-    allowlist,
-    restores,
-    violate,
-  );
-  for (const name of ["lookup", "resolve", "reverse"])
-    patchChecked(
-      dns as unknown as MutableRecord,
-      name,
-      "unapproved-network",
-      allowlist,
-      restores,
-      violate,
-    );
+  runDiscoverySync(installNetworkDetectorsEffect(allowlist, restores, violate));
 }
 
-function patchGlobalNetwork(
-  allowlist: readonly string[],
-  restores: Restore[],
-  violate: Violate,
-): void {
-  const globalRecord = globalThis as unknown as MutableRecord;
-  patchChecked(globalRecord, "fetch", "unapproved-network", allowlist, restores, violate);
-  for (const name of ["WebSocket", "EventSource", "XMLHttpRequest"])
-    patchChecked(globalRecord, name, "unapproved-network", allowlist, restores, violate);
-}
-
+/**
+ * Replaces a native listener or process API with a synchronous rejection adapter.
+ * @param target - Native API object.
+ * @param name - Method to intercept.
+ * @param kind - Report category for this forbidden capability.
+ * @param restores - Session's rollback capabilities.
+ * @param violate - Recording rejection boundary.
+ * @returns Nothing after registering the native replacement.
+ */
 function patchReject(
   target: MutableRecord,
   name: string,
@@ -119,20 +142,27 @@ function patchReject(
   restores: Restore[],
   violate: Violate,
 ): void {
-  const original = target[name];
-  if (typeof original !== "function") return;
-  target[name] = function (...args: unknown[]) {
-    violate(kind, name, targetFor(kind, args));
-  };
-  restores.push(() => {
-    target[name] = original;
-  });
+  if (typeof target[name] !== "function") return;
+  replaceNative(
+    target,
+    name,
+    (...args: unknown[]) => violate(kind, name, targetFor(kind, args)),
+    restores,
+  );
 }
 
+/**
+ * Adapts an outbound native API, preserving its receiver and approved invocations.
+ * @param target - Native API object.
+ * @param name - Method to intercept.
+ * @param allowlist - Explicit destination permissions.
+ * @param restores - Session's rollback capabilities.
+ * @param violate - Recording rejection boundary.
+ * @returns Nothing; synchronous native validation runs only within the owning session.
+ */
 function patchChecked(
   target: MutableRecord,
   name: string,
-  kind: EvaluatorSideEffectKind,
   allowlist: readonly string[],
   restores: Restore[],
   violate: Violate,
@@ -140,50 +170,14 @@ function patchChecked(
   const original = target[name];
   if (typeof original !== "function") return;
   const method = original as GenericFunction;
-  target[name] = function (this: unknown, ...args: unknown[]) {
-    const targetValue = targetFor(kind, args);
-    if (!isAllowed(targetValue, allowlist)) {
-      violate(kind, name, targetValue);
-    }
-    return method.apply(this, args);
-  };
-  restores.push(() => {
-    target[name] = original;
-  });
-}
-
-function targetFor(kind: EvaluatorSideEffectKind, args: readonly unknown[]): string {
-  if (kind === "child-process") return commandTarget(args);
-  if (kind === "listening-socket") return "listener";
-  const first = args[0];
-  if (first instanceof URL) return first.toString();
-  if (typeof first === "string") return first;
-  if (isRecord(first)) {
-    if (typeof first.url === "string") return first.url;
-    if (typeof first.hostname === "string") return `${first.hostname}:${String(first.port ?? "")}`;
-    if (typeof first.host === "string") return `${first.host}:${String(first.port ?? "")}`;
-  }
-  if (typeof first === "number") return `${String(args[1] ?? "localhost")}:${first}`;
-  return "unknown";
-}
-
-function commandTarget(args: readonly unknown[]): string {
-  const first = args[0];
-  if (Array.isArray(first)) return first.map(String).join(" ");
-  if (typeof first === "string") return first;
-  return "child-process";
-}
-
-function isAllowed(target: string, allowlist: readonly string[]): boolean {
-  if (allowlist.length === 0 || target === "unknown") return false;
-  if (allowlist.includes(target)) return true;
-  try {
-    return allowlist.includes(new URL(target).hostname);
-  } catch {
-    return allowlist.includes(target.split(":", 1)[0] ?? target);
-  }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  replaceNative(
+    target,
+    name,
+    function (this: unknown, ...args: unknown[]) {
+      const destination = targetFor("unapproved-network", args);
+      if (!isAllowed(destination, allowlist)) violate("unapproved-network", name, destination);
+      return method.apply(this, args);
+    },
+    restores,
+  );
 }

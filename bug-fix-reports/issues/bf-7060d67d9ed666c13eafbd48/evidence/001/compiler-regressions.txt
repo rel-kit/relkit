@@ -1,0 +1,38 @@
+bun test v1.3.10 (30e609e0)
+
+tests/compiler/route-file.test.ts:
+(pass) route-file paths > parses root, static, and dynamic routes [9.19ms]
+(pass) route-file paths > parses required and optional catch-all variants [0.42ms]
+(pass) route-file paths > converts canonical route paths back to source files [3.31ms]
+(pass) route-file paths > sorts route kinds by documented precedence [1.00ms]
+(pass) route-file paths > rejects unsupported and ambiguous route files [4.27ms]
+
+tests/compiler/ast-prefilter.test.ts:
+(pass) AST discovery prefilter > finds syntax candidates without evaluating ordinary source [20.92ms]
+(pass) AST discovery prefilter > ignores type-only RelKit references and uses default exclusions [1.09ms]
+
+tests/compiler/route-inference.test.ts:
+(pass) route contract inference > rejects framework-reserved route paths [62.83ms]
+(pass) route contract inference > maps path and remaining GET fields and infers success, errors, and validation [45.33ms]
+(pass) route contract inference > maps matching path fields and rejects unmatched parameters during inference [25.50ms]
+(pass) route contract inference > rejects unmatched catch-all parameters during inference [14.98ms]
+(pass) route contract inference > keeps explicit request mappings as complete overrides [28.16ms]
+(pass) route contract inference > includes declared errors without explicit HTTP status mappings [14.41ms]
+(pass) route contract inference > maps write fields to JSON and infers void as 204 [10.77ms]
+(pass) route contract inference > maps write fields to multipart when the route accepts form data [10.94ms]
+(pass) route contract inference > preserves schema defaults in inferred request mappings [9.64ms]
+(pass) route contract inference > infers catch-all arrays and reports unusable input projections [23.93ms]
+
+tests/compiler/route-file-discovery.test.ts:
+(pass) route-file discovery > binds every named method export to one file-derived path [22.18ms]
+(pass) route-file discovery > reports legacy files, default exports, and transport fields at the route source [9.78ms]
+(pass) route-file discovery > checks collisions across optional catch-all runtime variants [11.79ms]
+(pass) route-file discovery > allows method-scoped raw routes and reserves ALL for Better Auth [8.10ms]
+
+tests/compiler/route-path-input.test.ts:
+(pass) inferred routes reject path parameters absent from the target input schema [12.51ms]
+
+ 22 pass
+ 0 fail
+ 68 expect() calls
+Ran 22 tests across 5 files. [755.00ms]

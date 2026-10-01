@@ -475,7 +475,7 @@ declare const ServiceRoutesResult: Readonly<{
       >],
       FunctionRefAny
     >,
-    HttpRequestMapping | undefined
+    EntryRequest<Options[Method]>
   >;
 }>;
 ```
@@ -504,7 +504,7 @@ declare const defineServiceRoutes: <
   const Options extends ServiceRoutesOptions<Service>,
 >(
   service: Service,
-  options: Options,
+  options: Options & Record<Exclude<keyof Options, ServiceRouteMethod>, never>,
 ) => ServiceRoutesResult<Service, Options>;
 ```
 
@@ -528,7 +528,7 @@ declare const defineServiceRoutesEffect: <
   const Options extends Partial<Readonly<Record<ServiceRouteMethod, ServiceRouteEntry<Service>>>>,
 >(
   service: Service,
-  options: Options,
+  options: Options & Record<Exclude<keyof Options, ServiceRouteMethod>, never>,
 ) => Effect.Effect<
   Readonly<{
     [Method in keyof Options]: FunctionRouteDescriptor<
@@ -540,7 +540,7 @@ declare const defineServiceRoutesEffect: <
         >],
         FunctionRefAny
       >,
-      HttpRequestMapping | undefined
+      EntryRequest<Options[Method]>
     >;
   }>,
   RouteOperationError,
@@ -663,12 +663,13 @@ type Routes = ServiceRoutesResult<typeof service, { GET: "list" }>;
 type ServiceRoutesResult<Service, Options> = Readonly<{
   [Method in keyof Options]: FunctionRouteDescriptor<
     string,
-    ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>
+    ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>,
+    EntryRequest<Options[Method]>
   >;
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L54)
 
 ## `http-dsl-mapping-validation.ts`
 
@@ -3173,6 +3174,7 @@ type MappingShapeOutput<S extends HttpMappingShape> = {
   - ["./define-route.js" (namespace export)](#define-routejs-namespace-export)
   - ["./define-service-routes.js" (namespace export)](#define-service-routesjs-namespace-export)
   - ["./http-dsl.js" (namespace export)](#http-dsljs-namespace-export)
+  - ["./route-module.types.js" (namespace export)](#route-moduletypesjs-namespace-export)
   - ["./route.types.js" (namespace export)](#routetypesjs-namespace-export)
   - [HttpRateLimitKey](#httpratelimitkey)
   - [RouteInputError](#routeinputerror)
@@ -3235,6 +3237,18 @@ export * from "./http-dsl.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L1)
 
+## "./route-module.types.js" (namespace export)
+
+Re-exports all named exports from the "./route-module.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./route-module.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L13)
+
 ## "./route.types.js" (namespace export)
 
 Re-exports all named exports from the "./route.types.js" module.
@@ -3255,7 +3269,7 @@ export * from "./route.types.js";
 declare const HttpRateLimitKey: HttpRateLimitKey;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L14)
 
 ## RouteInputError
 
@@ -3295,7 +3309,7 @@ declare const RouteOperationError: typeof RouteOperationError;
 declare const RouteRateLimit: RouteRateLimit;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L14)
 
 ## RouteTelemetry
 
@@ -3723,6 +3737,51 @@ declare const prepareRouteValue: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-definition.ts#L30)
+
+## `route-module.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [RouteModuleContract (type alias)](#routemodulecontract-type-alias)
+  - [RouteModuleMethod (type alias)](#routemodulemethod-type-alias)
+
+---
+
+# utils
+
+## RouteModuleContract (type alias)
+
+Expected types for a route module's exports, used by generated module validators.
+Rejects untyped exports and requires at least one named HTTP method.
+
+**Signature**
+
+```ts
+type RouteModuleContract<Module, Parameters extends string = never> = keyof Module extends never
+  ? { readonly __relkit_route_method_required: never }
+  : {
+      readonly [Method in keyof Module]: Method extends RouteModuleMethod
+        ? CheckedRoute<Module[Method], Method, Parameters>
+        : never;
+    };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-module.types.ts#L29)
+
+## RouteModuleMethod (type alias)
+
+Value exports accepted by a filesystem route module.
+
+**Signature**
+
+```ts
+type RouteModuleMethod = ServiceRouteMethod | "ALL";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-module.types.ts#L6)
 
 ## `route-observability.ts`
 

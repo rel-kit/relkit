@@ -1,0 +1,10 @@
+{
+  "oldProcessExited": true,
+  "status": 200,
+  "body": {
+    "value": "probe-value",
+    "id": "probe-user"
+  },
+  "frameworkRestartCompleted": true,
+  "note": "Observed after a framework source change in the existing local watcher session. Old dev PID 19809 exited, replacement backend PID 20230 and inspector PID 20238 listened on the same ports. The bounded process-exit and API assertions exited 0."
+}

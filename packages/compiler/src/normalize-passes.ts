@@ -6,6 +6,14 @@ export {
   passIndex,
   passReferences,
   passSchemas,
+  passExtractEffect,
+  passExtractWithSourcesEffect,
+  passSourcesEffect,
+  passNormalizeEffect,
+  passLocalEffect,
+  passIndexEffect,
+  passReferencesEffect,
+  passSchemasEffect,
 } from "./normalize-pass-core.js";
 export {
   passRoutes,
@@ -16,5 +24,13 @@ export {
   passAgents,
   passCollisions,
   passGraph,
+  passRoutesEffect,
+  passJobsEffect,
+  passEventsEffect,
+  passEventTargetsEffect,
+  passToolsEffect,
+  passAgentsEffect,
+  passCollisionsEffect,
+  passGraphEffect,
 } from "./normalize-pass-semantic.js";
-export { passProviders } from "./normalize-pass-providers.js";
+export { passProviders, passProvidersEffect } from "./normalize-pass-providers.js";

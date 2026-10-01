@@ -1,90 +1,54 @@
-import type { AgentClientContractMetadata } from "@relkit/graph";
-import { agentResumeType } from "./generate-agent-resume.js";
-import { schemaType } from "./generate-schema.js";
-
-const dynamicType = 'import("@relkit/client/react").ClientAgentDynamic';
-
-interface AgentContractSource {
-  readonly input?: unknown;
-  readonly output?: unknown;
-  readonly controls?: unknown;
-  readonly chat?: unknown;
-  readonly workflow?: unknown;
-  readonly clientContract?: AgentClientContractMetadata;
+import { Effect } from "effect";
+import type { AgentContractSource } from "./generate-agent-contract-types.types.js";
+import { schemaCalculations } from "./generate-schema.js";
+import { makeGeneratorOperation } from "./generator-operation.js";
+import {
+  eventTypeEffect,
+  resumeTypeEffect,
+  scopeTypeEffect,
+  stateTypeEffect,
+  toolTypeEffect,
+  waitingTypeEffect,
+} from "./generate-agent-contract-fragments.js";
+/** Composes the input, output, control, resume, and React contract types for one agent.
+ * @param agent - Public agent metadata and optional client contract.
+ * @returns An Effect yielding a contract type; it has no expected failure.
+ * @example Effect.runSync(agentContractCalculations.type({ input: {}, output: {} }));
+ */
+function agentContractTypeCore(agent: AgentContractSource): Effect.Effect<string> {
+  return Effect.gen(function* () {
+    const controls = Array.isArray(agent.controls)
+      ? agent.controls.map((control) => JSON.stringify(control)).join(" | ") || "never"
+      : "never";
+    const contract = agent.clientContract;
+    const input = yield* schemaCalculations.typeEffect(agent.input);
+    const output = yield* schemaCalculations.typeEffect(agent.output);
+    const resume = yield* resumeTypeEffect(contract, agent.workflow);
+    const tools = yield* toolTypeEffect(contract);
+    const state = yield* stateTypeEffect(contract);
+    const events = yield* eventTypeEffect(contract);
+    const scopes = yield* scopeTypeEffect(contract);
+    const waiting = yield* waitingTypeEffect(contract);
+    return `import("@relkit/client/react").ClientAgentContract<${input}, ${output}, ${controls}, ${agent.chat === null || agent.chat === undefined ? "false" : "true"}, ${resume}, ${tools}, ${state}, ${events}, ${scopes}, ${waiting}>`;
+  });
 }
+const agentContractTypeOperation = makeGeneratorOperation(
+  "agentContractType",
+  agentContractTypeCore,
+);
+/** Renders the TypeScript client contract for an agent in an observed Effect.
+ * @param agent - Public agent metadata and optional client contract.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(agentContractTypeEffect(agent));
+ */
+export const agentContractTypeEffect = agentContractTypeOperation.effect;
+/** Renders the TypeScript client contract for an agent synchronously for existing callers.
+ * @param agent - Public agent metadata and optional client contract.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example agentContractType(agent);
+ */
+export const agentContractType = agentContractTypeOperation.run;
 
-export function agentContractType(agent: AgentContractSource): string {
-  const controls = Array.isArray(agent.controls)
-    ? agent.controls.map((control) => JSON.stringify(control)).join(" | ") || "never"
-    : "never";
-  const contract = agent.clientContract;
-  return `import("@relkit/client/react").ClientAgentContract<${schemaType(agent.input)}, ${schemaType(agent.output)}, ${controls}, ${agent.chat === null || agent.chat === undefined ? "false" : "true"}, ${resumeType(contract, agent.workflow)}, ${toolType(contract)}, ${stateType(contract)}, ${eventType(contract)}, ${scopeType(contract)}, ${waitingType(contract)}>`;
-}
-
-function resumeType(contract: AgentClientContractMetadata | undefined, workflow: unknown): string {
-  const types = contract?.waiting.map((entry) => metadataType(entry.response)) ?? [];
-  if (types.length > 0) return union(types);
-  return agentResumeType(workflow);
-}
-
-function toolType(contract: AgentClientContractMetadata | undefined): string {
-  return union(
-    (contract?.tools ?? []).map((tool) =>
-      "kind" in tool
-        ? dynamicType
-        : `{ readonly kind: "tool"; readonly id: ${JSON.stringify(tool.id)}; readonly input: ${metadataType(tool.input)}; readonly output: ${metadataType(tool.output)} }`,
-    ),
-  );
-}
-
-function stateType(contract: AgentClientContractMetadata | undefined): string {
-  const fields = (contract?.state ?? []).map(
-    (field) =>
-      `${JSON.stringify(field.name)}${field.optional ? "?" : ""}: ${metadataType(field.schema)}`,
-  );
-  return fields.length === 0
-    ? "Readonly<Record<never, never>>"
-    : `{ readonly ${fields.join("; readonly ")} }`;
-}
-
-function eventType(contract: AgentClientContractMetadata | undefined): string {
-  const declared = (contract?.events ?? []).map((event) =>
-    "kind" in event
-      ? dynamicType
-      : `{ readonly kind: "custom"; readonly name: ${JSON.stringify(event.name)}; readonly data: ${metadataType(event.schema)} }`,
-  );
-  return union(declared);
-}
-
-function scopeType(contract: AgentClientContractMetadata | undefined): string {
-  return union((contract?.scopes ?? [{ kind: "dynamic" }]).map(scopeMember));
-}
-
-function waitingType(contract: AgentClientContractMetadata | undefined): string {
-  return union(
-    (contract?.waiting ?? []).map(
-      (waiting) =>
-        `{ readonly node: ${waiting.scope.kind === "dynamic" ? "string" : JSON.stringify(waiting.scope.id)}; readonly value?: unknown; readonly response: import("@relkit/contracts").JsonValue }`,
-    ),
-  );
-}
-
-function scopeMember(scope: { readonly kind: string; readonly id?: string }): string {
-  return scope.kind === "dynamic"
-    ? dynamicType
-    : `{ readonly kind: ${JSON.stringify(scope.kind)}; readonly id: ${JSON.stringify(scope.id)} }`;
-}
-
-function metadataType(value: unknown): string {
-  return isRecord(value) && value.kind === "dynamic" && Object.keys(value).length === 1
-    ? dynamicType
-    : schemaType(value);
-}
-
-function union(types: readonly string[]): string {
-  return [...new Set(types)].sort().join(" | ") || "never";
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
+/** Effect calculation reused within parent generator operations without starting another runtime. @internal */
+export const agentContractCalculations = { type: agentContractTypeCore } as const;

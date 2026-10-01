@@ -1,0 +1,1 @@
+{"request":"GET /users/probe-user?value=probe-value","status":200,"body":{"value":"probe-value"},"expectedId":"probe-user","exit_code":1,"observation":"The declared output schema omits id, although the handler returns it."}

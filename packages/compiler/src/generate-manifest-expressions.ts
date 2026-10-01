@@ -6,10 +6,17 @@ import { functionEventTargetExpression } from "./generate-manifest-event.js";
 import {
   executableExpression,
   isGeneratedFunction,
-  isExecutableProperty,
-  isExecutableSchema,
 } from "./generate-manifest-expression-support.js";
 
+/**
+ * Renders executable function registry expressions and validates their bindings.
+ * @param functions - Executable function descriptors.
+ * @param functionById - Authoritative functions indexed by stable identity.
+ * @param bindings - Source modules indexed by their deterministic import aliases.
+ * @param input - Compiler input and source provenance.
+ * @param diagnostics - Ordered compiler diagnostics.
+ * @returns Function IDs mapped to validated executable registry expressions.
+ */
 export function functionExpressionsFor(
   functions: readonly NormalizedDescriptor[],
   functionById: ReadonlyMap<string, NormalizedDescriptor>,
@@ -38,6 +45,14 @@ export function functionExpressionsFor(
   for (const id of functionById.keys()) if (!expressions.has(id)) expressions.set(id, "undefined");
   return expressions;
 }
+
+/**
+ * Renders function target references for executable manifest generation.
+ * @param functions - Executable function descriptors.
+ * @param bindings - Source modules indexed by their deterministic import aliases.
+ * @param input - Compiler input and source provenance.
+ * @returns Function IDs mapped to executable target references.
+ */
 export function functionTargetExpressionsFor(
   functions: readonly NormalizedDescriptor[],
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -56,6 +71,13 @@ export function functionTargetExpressionsFor(
   return expressions;
 }
 
+/**
+ * Renders task executable registry expressions.
+ * @param tasks - Task descriptors participating in generation.
+ * @param bindings - Source modules indexed by their deterministic import aliases.
+ * @param input - Compiler input and source provenance.
+ * @returns Task IDs mapped to executable registry expressions.
+ */
 export function taskExpressionsFor(
   tasks: readonly NormalizedDescriptor[],
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -69,6 +91,14 @@ export function taskExpressionsFor(
   );
 }
 
+/**
+ * Renders task-backed and legacy job registry expressions.
+ * @param jobs - Job bindings participating in generation.
+ * @param bindings - Source modules indexed by their deterministic import aliases.
+ * @param input - Compiler input and source provenance.
+ * @param tasks - Task descriptors participating in generation.
+ * @returns Job IDs mapped to task-backed or legacy executable expressions.
+ */
 export function jobExpressionsFor(
   jobs: readonly NormalizedDescriptor[],
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -92,6 +122,13 @@ export function jobExpressionsFor(
   );
 }
 
+/**
+ * Renders the selected application executable binding.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param bindings - Source modules indexed by their deterministic import aliases.
+ * @param input - Compiler input and source provenance.
+ * @returns The selected application binding expression, or undefined.
+ */
 export function applicationExpressionFor(
   descriptor: NormalizedDescriptor | undefined,
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -102,6 +139,13 @@ export function applicationExpressionFor(
     : executableExpression(descriptor, "descriptor", bindings, input);
 }
 
+/**
+ * Renders registry expressions for source-bound descriptors.
+ * @param descriptors - Ordered normalized descriptors.
+ * @param bindings - Source modules indexed by their deterministic import aliases.
+ * @param input - Compiler input and source provenance.
+ * @returns Descriptor IDs mapped to their source-bound registry expressions.
+ */
 export function descriptorExpressionsFor(
   descriptors: readonly NormalizedDescriptor[],
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -114,74 +158,9 @@ export function descriptorExpressionsFor(
     }),
   );
 }
-export function transformExpressionsFor(
-  transforms: readonly NormalizedDescriptor[],
-  bindings: ReadonlyMap<string, ImportBinding>,
-  input: ManifestGenerationInput,
-  diagnostics: Diagnostic[],
-): ReadonlyMap<string, string> {
-  const expressions = new Map<string, string>();
-  for (const descriptor of transforms) {
-    const expression = executableExpression(descriptor, "schema", bindings, input);
-    const liveSchema = isExecutableSchema(descriptor.value);
-    if (expression !== undefined) expressions.set(descriptor.id, expression);
-    else if (descriptor.reference === undefined && liveSchema)
-      expressions.set(descriptor.id, "undefined");
-    else missingReference(diagnostics, descriptor, "transform");
-  }
-  return expressions;
-}
 
-export function middlewareExpressionsFor(
-  middleware: readonly NormalizedDescriptor[],
-  bindings: ReadonlyMap<string, ImportBinding>,
-  input: ManifestGenerationInput,
-  diagnostics: Diagnostic[],
-): ReadonlyMap<string, string> {
-  const expressions = new Map<string, string>();
-  for (const descriptor of middleware) {
-    const expression = executableExpression(descriptor, "descriptor", bindings, input);
-    if (expression !== undefined) expressions.set(descriptor.id, expression);
-    else if (
-      descriptor.reference === undefined &&
-      isExecutableProperty(descriptor.value, "handler")
-    )
-      expressions.set(descriptor.id, "undefined");
-    else missingReference(diagnostics, descriptor, "middleware");
-  }
-  return expressions;
-}
-
-export function hookExpressionsFor(
-  descriptors: readonly NormalizedDescriptor[],
-  bindings: ReadonlyMap<string, ImportBinding>,
-  input: ManifestGenerationInput,
-): ReadonlyMap<string, string> {
-  const expressions = new Map<string, string>();
-  for (const descriptor of descriptors) {
-    if (descriptor.kind === "task") {
-      const target = executableExpression(descriptor, "descriptor", bindings, input);
-      for (const phase of ["start", "success", "failure"] as const) {
-        const property =
-          phase === "start" ? "onStart" : phase === "success" ? "onSuccess" : "onFailure";
-        if (!isExecutableProperty(descriptor.value, property)) continue;
-        expressions.set(
-          `${descriptor.id}.${phase}`,
-          target === undefined ? "undefined" : `${target}.${property}`,
-        );
-      }
-      continue;
-    }
-    if (descriptor.kind !== "function" && descriptor.kind !== "tool") continue;
-    const target = executableExpression(descriptor, "descriptor", bindings, input);
-    for (const phase of ["before", "after"] as const) {
-      const property = phase === "before" ? "onBefore" : "onAfter";
-      if (!isExecutableProperty(descriptor.value, property)) continue;
-      expressions.set(
-        `${descriptor.id}.${phase}`,
-        target === undefined ? "undefined" : `${target}.${property}`,
-      );
-    }
-  }
-  return expressions;
-}
+export {
+  transformExpressionsFor,
+  middlewareExpressionsFor,
+  hookExpressionsFor,
+} from "./generate-manifest-handlers.js";

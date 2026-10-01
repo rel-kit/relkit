@@ -1,14 +1,18 @@
+import { SourceLocationError } from "@relkit/contracts";
+import type { ImportBinding } from "./generate-manifest-utils.types.js";
+export type { ImportBinding } from "./generate-manifest-utils.types.js";
 import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
 import { normalizeSourcePath } from "@relkit/contracts";
 import type { EvaluatorManifestReference } from "./discovery/evaluator-protocol.js";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";
 
-export interface ImportBinding {
-  readonly module: string;
-  readonly alias: string;
-}
-
+/**
+ * Selects descriptors of one kind without changing their order.
+ * @param descriptors - Ordered normalized descriptors.
+ * @param kind - Descriptor or syntax category.
+ * @returns Matching descriptors in their original order.
+ */
 export function descriptorsOf(
   descriptors: readonly NormalizedDescriptor[],
   kind: string,
@@ -16,6 +20,11 @@ export function descriptorsOf(
   return descriptors.filter((descriptor) => descriptor.kind === kind).sort(compareDescriptors);
 }
 
+/**
+ * Selects graph-generated functions requiring manifest expressions.
+ * @param descriptors - Ordered normalized descriptors.
+ * @returns Functions synthesized by graph normalization.
+ */
 export function generatedFunctionDescriptors(
   descriptors: readonly NormalizedDescriptor[],
 ): readonly NormalizedDescriptor[] {
@@ -32,6 +41,12 @@ export function generatedFunctionDescriptors(
   });
 }
 
+/**
+ * Orders descriptors by identity and portable source position.
+ * @param left - First value to compare.
+ * @param right - Second value to compare.
+ * @returns The ordering result or precedence rank.
+ */
 function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescriptor): number {
   return (
     left.id.localeCompare(right.id) ||
@@ -42,6 +57,12 @@ function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescrip
   );
 }
 
+/**
+ * Deduplicates descriptor bindings and records conflicting identities.
+ * @param descriptors - Ordered normalized descriptors.
+ * @param diagnostics - Ordered compiler diagnostics.
+ * @returns One binding per ID, with conflicts recorded in the supplied diagnostic list.
+ */
 export function uniqueById(
   descriptors: readonly NormalizedDescriptor[],
   diagnostics: Diagnostic[],
@@ -67,6 +88,16 @@ export function uniqueById(
   return result;
 }
 
+/**
+ * Collects sorted source modules required by executable manifest bindings.
+ * @param functions - Executable function descriptors.
+ * @param middleware - Middleware descriptor or path being compared.
+ * @param transforms - Transform descriptors participating in generation.
+ * @param input - Compiler input and source provenance.
+ * @param application - Application descriptor metadata.
+ * @param runtimeDescriptors - Runtime-bound descriptors required by the manifest.
+ * @returns Sorted, unique executable source module paths.
+ */
 export function collectModules(
   functions: readonly NormalizedDescriptor[],
   middleware: readonly NormalizedDescriptor[],
@@ -90,23 +121,40 @@ export function collectModules(
   return [...modules].sort();
 }
 
+/**
+ * Assigns deterministic import aliases to source modules.
+ * @param modules - Sorted source module paths requiring import aliases.
+ * @returns Module paths mapped to deterministic import aliases.
+ */
 export function importBindings(modules: readonly string[]): ReadonlyMap<string, ImportBinding> {
   return new Map(
     modules.map((module, index) => [module, { module, alias: `__relkit_module_${index}` }]),
   );
 }
 
+/**
+ * Normalizes executable reference module paths against the project root.
+ * @param reference - Executable source reference carrying module and export provenance.
+ * @param input - Compiler input and source provenance.
+ * @returns A portable source module path, or undefined for an invalid reference.
+ */
 function modulePath(
   reference: EvaluatorManifestReference,
   input: ManifestGenerationInput,
 ): string | undefined {
   try {
     return normalizeSourcePath(reference.module, input.projectRoot);
-  } catch {
+  } catch (error) {
+    if (!(error instanceof SourceLocationError)) throw error;
     return undefined;
   }
 }
 
+/**
+ * Reads the identity from a generated executable reference.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns The executable reference ID, or undefined.
+ */
 export function referenceId(value: unknown): string | undefined {
   return isRecord(value) &&
     isRecord(value.target) &&
@@ -117,6 +165,13 @@ export function referenceId(value: unknown): string | undefined {
     : undefined;
 }
 
+/**
+ * Records a missing executable source binding.
+ * @param diagnostics - Ordered compiler diagnostics.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param kind - Descriptor or syntax category.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 export function missingReference(
   diagnostics: Diagnostic[],
   descriptor: NormalizedDescriptor | undefined,
@@ -140,10 +195,20 @@ export function missingReference(
   );
 }
 
+/**
+ * Recognizes nonnull nonarray objects for metadata inspection.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns True for a nonnull, nonarray metadata object.
+ */
 export function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+/**
+ * Constructs a data-only marker for an agent's generated function.
+ * @param agentId - Stable ID of the owning agent.
+ * @returns A data-only marker identifying the generated agent function.
+ */
 export function generatedAgentMarker(agentId: string): {
   readonly generated: true;
   readonly generatedBy: "agent";

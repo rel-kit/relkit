@@ -1,0 +1,40 @@
+{
+  "key": "packages/compiler/src/route-source-checks.ts",
+  "matches": {
+    "bf-d0338e2c65acaba818e3a3e7": {
+      "id": "bf-d0338e2c65acaba818e3a3e7",
+      "status": "unverified",
+      "what": "The live demo editor does not report a users/[id] route whose target input omits id, although check and typecheck reject it.",
+      "root_cause": "VS Code's TypeScript plugin resolver searches its own installation/plugin probe roots, and typescript.tsdk only offers a workspace SDK rather than activating it. Separately, packages/compiler/src/route-path-input-checks.ts used its imported TypeScript 5.9 TypeFlags.Never against editor TypeScript 6 types; Never changed",
+      "fixed_by": "The CLI plugin now passes modules.typescript into shared source/module/path-input checks, including flags and AST guards. Rebuilt compiler and editor bundles; verified the packaged plugin under workspace 5.9 and editor 6.0.3, including unsaved missing/valid input, explicit mapping and malformed export recovery. A fresh",
+      "files": [
+        "packages/cli/src/editor.ts",
+        "packages/compiler/src/route-source-checks.ts",
+        "packages/compiler/src/route-module-diagnostics.ts",
+        "packages/compiler/src/route-path-input-checks.ts",
+        "packages/cli/editor-compatibility.test.ts",
+        "docs/records/route-module-type-safety.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-01T09:56:39+00:00",
+      "report": "bug-fix-reports/issues/bf-d0338e2c65acaba818e3a3e7/report.md"
+    },
+    "bf-6a2d5e332c5614c85eaea8cf": {
+      "id": "bf-6a2d5e332c5614c85eaea8cf",
+      "status": "verified",
+      "what": "Excluded route fixtures are imported and diagnosed as application routes.",
+      "root_cause": "packages/compiler/src/route-module-checks.ts:14 and route-source-checks.ts:20-21 only match route.ts filenames without discovery's exclusion directory conventions.",
+      "fixed_by": "Make isRouteModule ignore exact __tests__ and __fixtures__ directory segments within src/routes and reuse that predicate in generated contracts. Keep the generator's root route-directory restriction. Actual CLI and packaged editor regressions, including invalid application routes, pass.",
+      "files": [
+        "packages/compiler/src/route-source-checks.ts",
+        "packages/compiler/src/route-module-checks.ts",
+        "tests/compiler/route-module-exclusions.test.ts",
+        "packages/cli/route-review-regressions.test.ts",
+        "packages/cli/editor.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-01T11:17:45+00:00",
+      "report": "bug-fix-reports/issues/bf-6a2d5e332c5614c85eaea8cf/report.md"
+    }
+  }
+}

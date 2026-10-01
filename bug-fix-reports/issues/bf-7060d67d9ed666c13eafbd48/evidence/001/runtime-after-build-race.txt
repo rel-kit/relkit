@@ -1,0 +1,51 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/route-review-regressions.test.ts:
+36 |   const [output, errors, exitCode] = await Promise.all([
+37 |     new Response(child.stdout).text(),
+38 |     new Response(child.stderr).text(),
+39 |     child.exited,
+40 |   ]);
+41 |   expect(errors).toBe("");
+                      ^
+error: expect(received).toBe(expected)
+
+- ""
++ "• Packages in scope: @relkit/agents, @relkit/app, @relkit/better-auth, @relkit/buckets, @relkit/cache, @relkit/cli, @relkit/client, @relkit/client-generator, @relkit/cloud-aws, @relkit/compiler, @relkit/config, @relkit/contracts, @relkit/deploy, @relkit/deploy-pulumi, @relkit/diagnostics, @relkit/drizzle, @relkit/engine, @relkit/events, @relkit/functions, @relkit/graph, @relkit/inspector-api, @relkit/invocation, @relkit/jobs, @relkit/local-service, @relkit/observability, @relkit/openapi, @relkit/provider, @relkit/providers-local, @relkit/providers-standard, @relkit/realtime, @relkit/routes, @relkit/runtime-effect, @relkit/runtime-hono, @relkit/schema, @relkit/services, @relkit/supervisor, @relkit/testing, @relkit/tools, create-relkit
++    • Running typecheck in 39 packages
++    • Remote caching disabled
++
++ create-relkit:typecheck: cache miss, executing 4282a8fc8b62d892
++ create-relkit:typecheck: $ tsc -b --pretty false && bun ../../scripts/package-create-relkit-templates.ts
++ create-relkit:typecheck: ENOENT: no such file or directory, rename '/Users/mustafaelsayed/Workspace/relkit/packages/create-relkit/dist/templates/default/v1/tasks/.gitignore' -> '/Users/mustafaelsayed/Workspace/relkit/packages/create-relkit/dist/templates/default/v1/tasks/gitignore'
++ create-relkit:typecheck:     path: "/Users/mustafaelsayed/Workspace/relkit/packages/create-relkit/dist/templates/default/v1/tasks/.gitignore",
++ create-relkit:typecheck:     dest: "/Users/mustafaelsayed/Workspace/relkit/packages/create-relkit/dist/templates/default/v1/tasks/gitignore",
++ create-relkit:typecheck:  syscall: "rename",
++ create-relkit:typecheck:    errno: -2,
++ create-relkit:typecheck:     code: "ENOENT"
++ create-relkit:typecheck:
++ create-relkit:typecheck:
++ create-relkit:typecheck: Bun v1.3.10 (macOS arm64)
++ create-relkit:typecheck: error: script "typecheck" exited with code 1
++
++  Tasks:    33 successful, 35 total
++ Cached:    29 cached, 35 total
++   Time:    615ms
++ Failed:    create-relkit#typecheck
++ • turbo 2.10.12
++ create-relkit#typecheck:  ERROR  command (/Users/mustafaelsayed/Workspace/relkit/packages/create-relkit) /Users/mustafaelsayed/.bun/bin/bun run typecheck exited (1)
++  ERROR  run failed: command  exited (1)
++ "
+
+- Expected  - 1
++ Received  + 25
+
+      at check (/Users/mustafaelsayed/Workspace/relkit/packages/cli/route-review-regressions.test.ts:41:18)
+      at async <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/route-review-regressions.test.ts:75:26)
+(fail) the real CLI accepts annotated explicit path mappings and still rejects missing inferred inputs [2317.76ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [2.68s]

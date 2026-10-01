@@ -2,6 +2,13 @@ import { clean } from "./normalize-graph-utils.js";
 import { isRecord, refId } from "./normalize-utils.js";
 import type { NormalizationWork, NormalizedDescriptor } from "./normalize-types.js";
 
+/**
+ * Projects public members and specialized capability metadata for a service.
+ * @param value - Declared metadata inspected without coercion.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Serializable public member and specialized capability metadata.
+ */
 export function serviceNodeData(
   value: Record<string, unknown>,
   descriptor: NormalizedDescriptor,
@@ -42,6 +49,12 @@ export function serviceNodeData(
   };
 }
 
+/**
+ * Selects service member entries with stable function identities.
+ * @param value - Declared metadata inspected without coercion.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @returns Service names paired with their stable public function members.
+ */
 export function serviceEntries(
   value: Record<string, unknown>,
   descriptor: NormalizedDescriptor,
@@ -56,6 +69,13 @@ export function serviceEntries(
   );
 }
 
+/**
+ * Projects graph-visible specialized service capability metadata.
+ * @param value - Declared metadata inspected without coercion.
+ * @param serviceId - Stable identity of the service owning these graph members.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Serializable specialized service capability metadata.
+ */
 function capability(
   value: Record<string, unknown>,
   serviceId: string,

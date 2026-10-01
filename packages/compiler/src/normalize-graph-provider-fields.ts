@@ -6,6 +6,11 @@ import type {
 import { clean } from "./normalize-graph-utils.js";
 import { isRecord } from "./normalize-utils.js";
 
+/**
+ * Projects data-only connection contract field metadata.
+ * @param fields - Contract field names to project.
+ * @returns Serializable connection field contracts keyed by name.
+ */
 export function projectConnectionContract(
   fields: Record<string, unknown>,
 ): Readonly<Record<string, ProviderConnectionFieldProjection>> {
@@ -32,6 +37,12 @@ export function projectConnectionContract(
   );
 }
 
+/**
+ * Projects the adapter connection values declared by its contract.
+ * @param adapter - Selected integration adapter.
+ * @param projection - Declared adapter connection projection.
+ * @returns Connection values declared by the adapter contract.
+ */
 export function projectConnection(
   adapter: unknown,
   projection: Omit<ProviderAdapterProjection, "connection">,
@@ -49,6 +60,12 @@ export function projectConnection(
   );
 }
 
+/**
+ * Projects named adapter values against their declared binding contract.
+ * @param adapter - Selected integration adapter.
+ * @param contract - Declared binding value contract.
+ * @returns Named adapter values projected against the binding contract.
+ */
 export function projectNamedValues(
   adapter: unknown,
   contract: Readonly<Record<string, ProviderConnectionFieldProjection>>,
@@ -62,6 +79,11 @@ export function projectNamedValues(
     });
 }
 
+/**
+ * Recognizes a binding value reference without evaluating it.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns True when the value declares a provider binding field reference.
+ */
 function isBindingValueRef(value: unknown): value is {
   readonly name: string;
   readonly type: string;

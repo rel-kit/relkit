@@ -46,6 +46,14 @@ export function expectedExports(
         import: "./dist/jobs.js",
       },
     };
+  if (directoryName === "events")
+    return {
+      ".": rootExport,
+      "./effect": {
+        types: "./dist/effect.d.ts",
+        import: "./dist/effect.js",
+      },
+    };
   if (directoryName === "jobs")
     return {
       ".": rootExport,
@@ -78,6 +86,18 @@ export function expectedExports(
       "./help": {
         types: "./dist/cli-help-model.d.ts",
         import: "./dist/cli-help-model.js",
+      },
+      "./editor": {
+        types: "./dist/editor.d.ts",
+        require: "./dist/editor.cjs",
+      },
+    };
+  if (directoryName === "compiler")
+    return {
+      ".": rootExport,
+      "./editor": {
+        types: "./dist/editor.d.ts",
+        import: "./dist/editor.js",
       },
     };
   if (directoryName === "config")

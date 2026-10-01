@@ -1,39 +1,42 @@
-import { canonicalJson } from "@relkit/contracts";
-import type { JsonValue } from "@relkit/contracts";
-import { isEvaluatorResponse } from "./evaluator-protocol-validation.js";
-export { isEvaluatorRequest, isEvaluatorResponse } from "./evaluator-protocol-validation.js";
+import { observeCompiler } from "../observability.js";
+import { serializeJsonEffect } from "@relkit/contracts";
+import { Effect } from "effect";
+import { EVALUATOR_FRAME } from "./evaluator-protocol-schema.js";
+import { decodeEvaluatorResponse } from "./evaluator-protocol-validation.js";
+import { runDiscoverySync } from "./discovery-sync.js";
+import type * as Wire from "./evaluator-protocol.types.js";
 
-export const EVALUATOR_PROTOCOL = "relkit.evaluator" as const;
-export const EVALUATOR_PROTOCOL_VERSION = 1 as const;
-export const EVALUATOR_FRAME = "\u001erelkit-evaluator-response:";
+export {
+  EVALUATOR_FRAME,
+  EVALUATOR_PROTOCOL,
+  EVALUATOR_PROTOCOL_VERSION,
+} from "./evaluator-protocol-schema.js";
+export type {
+  EvaluatorCandidate,
+  EvaluatorDescriptorSnapshot,
+  EvaluatorDetectorCoverage,
+  EvaluatorExportSnapshot,
+  EvaluatorFailure,
+  EvaluatorFailureCode,
+  EvaluatorFrame,
+  EvaluatorManifestReference,
+  EvaluatorModuleResult,
+  EvaluatorRequest,
+  EvaluatorResponse,
+  EvaluatorSchemaSnapshot,
+  EvaluatorSideEffect,
+  EvaluatorSideEffectKind,
+} from "./evaluator-protocol.types.js";
+export {
+  isEvaluatorRequest,
+  isEvaluatorResponse,
+  isEvaluatorRequestEffect,
+  isEvaluatorResponseEffect,
+  decodeEvaluatorRequest,
+  decodeEvaluatorResponse,
+} from "./evaluator-protocol-validation.js";
 
-export type EvaluatorFailureCode =
-  | "RELKIT_EVALUATOR_REQUEST_INVALID"
-  | "RELKIT_EVALUATOR_ROOT_INVALID"
-  | "RELKIT_EVALUATOR_IMPORT_FAILED"
-  | "RELKIT_EVALUATOR_TIMEOUT"
-  | "RELKIT_EVALUATOR_PROCESS_FAILED"
-  | "RELKIT_EVALUATOR_PROTOCOL_INVALID"
-  | "RELKIT_EVALUATOR_SIDE_EFFECT";
-
-export type EvaluatorSideEffectKind =
-  | "listening-socket"
-  | "live-timer"
-  | "write-outside-generated-sandbox"
-  | "child-process"
-  | "direct-output"
-  | "unapproved-network";
-
-export interface EvaluatorSideEffect {
-  readonly kind: EvaluatorSideEffectKind;
-  readonly operation: string;
-  readonly target: string;
-}
-
-/**
- * Coverage is deliberately explicit: these hooks are fault detectors, not a
- * security sandbox. Unsupported bypasses still run inside the killed child.
- */
+/** Explicit supported hooks and bypasses; candidate imports are isolated in the child. */
 export const EVALUATOR_DETECTOR_COVERAGE = Object.freeze({
   supported: Object.freeze([
     "Bun and common Node socket/process/network entry points",
@@ -48,112 +51,78 @@ export const EVALUATOR_DETECTOR_COVERAGE = Object.freeze({
   ]),
 });
 
-export interface EvaluatorDetectorCoverage {
-  readonly supported: readonly string[];
-  readonly unsupported: readonly string[];
+/**
+ * Serializes a trusted response using the versioned output frame.
+ * @param response - Data-only evaluator response.
+ * @returns A lazy effect yielding canonical framed JSON, or JsonValueError for invalid wire data.
+ */
+export const encodeEvaluatorFrameEffect = Effect.fn("Discovery.encodeEvaluatorFrame")(
+  function* (response: Wire.EvaluatorResponse) {
+    return `${EVALUATOR_FRAME}${yield* serializeJsonEffect(response)}\n`;
+  },
+  (effect, response) =>
+    observeCompiler(
+      "discovery",
+      "encodeEvaluatorFrame",
+      effect,
+      () => ({ files: response.modules.length, diagnostics: response.failures.length }),
+      false,
+    ),
+);
+
+/**
+ * Frames a response at the synchronous process-output boundary.
+ * @param response - Data-only evaluator response.
+ * @returns Canonical framed JSON with a trailing newline.
+ * @throws JsonValueError when the response contains unsupported JSON data.
+ */
+export function encodeEvaluatorFrame(response: Wire.EvaluatorResponse): string {
+  return runDiscoverySync(encodeEvaluatorFrameEffect(response));
 }
 
-export interface EvaluatorCandidate {
-  readonly file: string;
-}
-
-export interface EvaluatorRequest {
-  readonly protocol: typeof EVALUATOR_PROTOCOL;
-  readonly version: typeof EVALUATOR_PROTOCOL_VERSION;
-  readonly generationId: string;
-  readonly projectRoot: string;
-  readonly candidates: readonly EvaluatorCandidate[];
-  readonly environmentAllowlist: readonly string[];
-  readonly generatedDirectory: string;
-  readonly networkAllowlist: readonly string[];
-  readonly sourceMaps: boolean;
-  readonly timeoutMs: number;
-}
-
-export interface EvaluatorManifestReference {
-  readonly generationId: string;
-  readonly descriptorId: string;
-  readonly kind: string;
-  readonly module: string;
-  readonly exportName: string;
-}
-
-/** Data-only schema provenance carried across the evaluator process boundary. */
-export interface EvaluatorSchemaSnapshot {
-  readonly $relkit: "schema" | "schema-unavailable";
-  readonly jsonSchema?: JsonValue;
-  readonly inputJsonSchema?: JsonValue;
-  readonly outputJsonSchema?: JsonValue;
-  readonly contractHash?: string;
-  readonly transformed?: boolean;
-  readonly refined?: boolean;
-  readonly reason?: string;
-}
-
-export interface EvaluatorDescriptorSnapshot {
-  readonly kind: string;
-  readonly id: string;
-  readonly ref: { readonly kind: string; readonly id: string };
-  readonly metadata: JsonValue;
-}
-
-export interface EvaluatorExportSnapshot {
-  readonly exportName: string;
-  readonly descriptor: EvaluatorDescriptorSnapshot;
-}
-
-export interface EvaluatorModuleResult {
-  readonly file: string;
-  readonly exports: readonly EvaluatorExportSnapshot[];
-  readonly manifestReferences: readonly EvaluatorManifestReference[];
-}
-
-export interface EvaluatorFailure {
-  readonly code: EvaluatorFailureCode;
-  readonly message: string;
-  readonly generationId: string;
-  readonly module?: string;
-  readonly stack?: string;
-  readonly sideEffects?: readonly EvaluatorSideEffect[];
-  readonly exitCode?: number;
-  readonly timedOut?: boolean;
-  readonly stdout?: string;
-  readonly stderr?: string;
-}
-
-export interface EvaluatorResponse {
-  readonly protocol: typeof EVALUATOR_PROTOCOL;
-  readonly version: typeof EVALUATOR_PROTOCOL_VERSION;
-  readonly generationId: string;
-  readonly sourceMaps: boolean;
-  readonly detectorCoverage: EvaluatorDetectorCoverage;
-  readonly status: "ok" | "failed";
-  readonly modules: readonly EvaluatorModuleResult[];
-  readonly failures: readonly EvaluatorFailure[];
-  readonly stdout: string;
-  readonly stderr: string;
-}
-
-export function encodeEvaluatorFrame(response: EvaluatorResponse): string {
-  return `${EVALUATOR_FRAME}${canonicalJson(response)}\n`;
-}
-
-export function decodeEvaluatorFrame(
-  stdout: string,
-): { readonly response: EvaluatorResponse; readonly stdout: string } | undefined {
-  const start = stdout.lastIndexOf(EVALUATOR_FRAME);
-  if (start < 0) return undefined;
-  const payloadStart = start + EVALUATOR_FRAME.length;
-  const payloadEnd = stdout.indexOf("\n", payloadStart);
-  const payload = stdout.slice(payloadStart, payloadEnd < 0 ? stdout.length : payloadEnd);
-  try {
-    const value: unknown = JSON.parse(payload);
-    if (!isEvaluatorResponse(value)) return undefined;
+/**
+ * Decodes the last frame, retaining all output surrounding that frame.
+ * @param stdout - Complete child stdout containing zero or more frames.
+ * @returns A lazy effect yielding the valid final frame, or undefined for malformed input.
+ * @remarks Only JSON syntax and schema failures become absence; defects remain visible.
+ */
+export const decodeEvaluatorFrameEffect = Effect.fn("Discovery.decodeEvaluatorFrame")(
+  function* (stdout: string) {
+    const start = stdout.lastIndexOf(EVALUATOR_FRAME);
+    if (start < 0) return undefined;
+    const payloadStart = start + EVALUATOR_FRAME.length;
+    const payloadEnd = stdout.indexOf("\n", payloadStart);
+    const payload = stdout.slice(payloadStart, payloadEnd < 0 ? stdout.length : payloadEnd);
+    const parsed = yield* Effect.try({
+      try: () => JSON.parse(payload) as unknown,
+      catch: (error) => {
+        if (error instanceof SyntaxError) return error;
+        throw error;
+      },
+    }).pipe(Effect.result);
+    if (parsed._tag === "Failure") return undefined;
+    const decoded = yield* decodeEvaluatorResponse(parsed.success).pipe(Effect.result);
+    if (decoded._tag === "Failure") return undefined;
     return {
-      response: value,
+      response: decoded.success,
       stdout: `${stdout.slice(0, start)}${payloadEnd < 0 ? "" : stdout.slice(payloadEnd + 1)}`,
-    };
-  } catch {
-    return undefined;
-  }
+    } satisfies Wire.EvaluatorFrame;
+  },
+  (effect, stdout) =>
+    observeCompiler(
+      "discovery",
+      "decodeEvaluatorFrame",
+      effect,
+      () => ({ bytes: Buffer.byteLength(stdout, "utf8") }),
+      false,
+    ),
+);
+
+/**
+ * Reads the final response frame at the synchronous compatibility boundary.
+ * @param stdout - Complete child stdout.
+ * @returns The valid final response with surrounding output, or undefined.
+ */
+export function decodeEvaluatorFrame(stdout: string): Wire.EvaluatorFrame | undefined {
+  return runDiscoverySync(decodeEvaluatorFrameEffect(stdout));
 }

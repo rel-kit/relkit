@@ -4,6 +4,14 @@ import { clean } from "./normalize-graph-utils.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord } from "./normalize-utils.js";
 
+/**
+ * Projects event, presence, client, and provider contracts for a channel.
+ * @param value - Declared metadata inspected without coercion.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @param application - Application descriptor metadata.
+ * @returns Serializable channel event, presence, client, and provider metadata.
+ */
 export function channelNodeData(
   value: Record<string, unknown>,
   descriptor: NormalizedDescriptor,
@@ -28,6 +36,13 @@ export function channelNodeData(
   };
 }
 
+/**
+ * Projects declared channel event schemas from the compiler index.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Declared channel events mapped to their projected schemas.
+ */
 function channelEvents(
   work: NormalizationWork,
   descriptor: NormalizedDescriptor,
@@ -41,11 +56,23 @@ function channelEvents(
   );
 }
 
+/**
+ * Classifies internal, public, or protected channel exposure.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns The channel's internal, public, or protected exposure.
+ */
 function channelClient(value: unknown): "internal" | "public" | "protected" {
   if (!isRecord(value)) return "internal";
   return value.public === true ? "public" : "protected";
 }
 
+/**
+ * Projects a channel's declared presence schema.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns The projected presence schema, or undefined.
+ */
 function channelPresence(
   work: NormalizationWork,
   descriptor: NormalizedDescriptor,

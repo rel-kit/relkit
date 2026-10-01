@@ -1,0 +1,8 @@
+(pass) the packaged plugin uses the editor's TypeScript for dynamic route inputs and recovery [6033.40ms]
+
+ 1 pass
+ 0 fail
+ 4 expect() calls
+Ran 1 test across 1 file. [6.42s]
+
+Exit code: 0

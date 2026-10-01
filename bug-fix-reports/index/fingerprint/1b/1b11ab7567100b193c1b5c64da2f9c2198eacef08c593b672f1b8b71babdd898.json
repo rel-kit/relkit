@@ -1,0 +1,22 @@
+{
+  "key": "6a2d5e332c5614c85eaea8cf885d862ffcb71abeb8c0c711d2b3a35c3f75dd90",
+  "matches": {
+    "bf-6a2d5e332c5614c85eaea8cf": {
+      "id": "bf-6a2d5e332c5614c85eaea8cf",
+      "status": "verified",
+      "what": "Excluded route fixtures are imported and diagnosed as application routes.",
+      "root_cause": "packages/compiler/src/route-module-checks.ts:14 and route-source-checks.ts:20-21 only match route.ts filenames without discovery's exclusion directory conventions.",
+      "fixed_by": "Make isRouteModule ignore exact __tests__ and __fixtures__ directory segments within src/routes and reuse that predicate in generated contracts. Keep the generator's root route-directory restriction. Actual CLI and packaged editor regressions, including invalid application routes, pass.",
+      "files": [
+        "packages/compiler/src/route-source-checks.ts",
+        "packages/compiler/src/route-module-checks.ts",
+        "tests/compiler/route-module-exclusions.test.ts",
+        "packages/cli/route-review-regressions.test.ts",
+        "packages/cli/editor.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-01T11:17:45+00:00",
+      "report": "bug-fix-reports/issues/bf-6a2d5e332c5614c85eaea8cf/report.md"
+    }
+  }
+}

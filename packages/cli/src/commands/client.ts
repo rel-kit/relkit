@@ -4,6 +4,7 @@ import {
   agentProcedureEntriesFromDocument,
   generateContractFromDocument,
   generateClientRegistryFromDocument,
+  InvalidClientContract,
   jobProcedureSourcesFromDocument,
   type ContractProcedureDocument,
 } from "@relkit/client-generator";
@@ -11,9 +12,7 @@ import { CONTRACT_VERSION, canonicalJson, type JsonValue } from "@relkit/contrac
 import { writeIfChanged } from "@relkit/compiler";
 import { CLI_EXIT_CODES, fail, type CliCommandContext } from "../main-support.js";
 import { checkClientContract, clientManifest } from "./client-check.js";
-
 const MAX_CONTRACT_BYTES = 4 * 1_024 * 1_024;
-
 export async function runClient(
   args: readonly string[],
   context: CliCommandContext,
@@ -27,32 +26,26 @@ export async function runClient(
   const command = args[0];
   const options = parse(args.slice(1));
   const document = await download(options.baseUrl, context.signal);
-  const procedures = validate(document);
+  const { procedures, registry } = validate(document);
   const directory = resolve(options.out);
   if (command === "check") return checkClientContract(document, directory, context, validate);
+  const contract = generateContractFromDocument(
+    procedures,
+    agentProcedureEntriesFromDocument(document.agents),
+    jobProcedureSourcesFromDocument(document.jobs),
+  );
+  const manifest = clientManifest(document);
+  const serialized = `${canonicalJson(document as unknown as JsonValue)}\n`;
   await mkdir(directory, { recursive: true });
   const writes = await Promise.all([
-    writeIfChanged(
-      `${directory}/client-contract.json`,
-      `${canonicalJson(document as unknown as JsonValue)}\n`,
-    ),
-    writeIfChanged(
-      `${directory}/contract.ts`,
-      generateContractFromDocument(
-        procedures,
-        agentProcedureEntriesFromDocument(document.agents),
-        jobProcedureSourcesFromDocument(document.jobs),
-      ),
-    ),
+    writeIfChanged(`${directory}/client-contract.json`, serialized),
+    writeIfChanged(`${directory}/contract.ts`, contract),
     writeIfChanged(
       `${directory}/client.ts`,
       'export { createClient, ORPCError } from "@relkit/client";\nexport { contract } from "./contract.js";\n',
     ),
-    writeIfChanged(
-      `${directory}/client-registry.d.ts`,
-      generateClientRegistryFromDocument(document as unknown as Record<string, unknown>),
-    ),
-    writeIfChanged(`${directory}/client-manifest.json`, clientManifest(document)),
+    writeIfChanged(`${directory}/client-registry.d.ts`, registry),
+    writeIfChanged(`${directory}/client-manifest.json`, manifest),
   ]);
   const result = {
     directory,
@@ -62,7 +55,6 @@ export async function runClient(
   context.reporter.output(result, `Pulled client contract ${document.graphHash} to ${directory}`);
   return CLI_EXIT_CODES.success;
 }
-
 function parse(args: readonly string[]): { readonly baseUrl: string; readonly out: string } {
   const baseUrl = args[0];
   let out: string | undefined;
@@ -81,7 +73,6 @@ function parse(args: readonly string[]): { readonly baseUrl: string; readonly ou
   }
   return { baseUrl: url.toString(), out };
 }
-
 async function download(baseUrl: string, signal: AbortSignal): Promise<ContractDocument> {
   const url = new URL("_relkit/v1/client-contract.json", ensureSlash(new URL(baseUrl)));
   const headers = new Headers();
@@ -102,7 +93,6 @@ async function download(baseUrl: string, signal: AbortSignal): Promise<ContractD
     throw fail("RELKIT_CLIENT_CONTRACT_INVALID", "Client contract is not valid JSON");
   }
 }
-
 async function boundedBytes(response: Response): Promise<Uint8Array> {
   if (response.body === null) return new Uint8Array();
   const reader = response.body.getReader();
@@ -126,7 +116,6 @@ async function boundedBytes(response: Response): Promise<Uint8Array> {
   }
   return output;
 }
-
 export interface ContractDocument {
   readonly protocol: string;
   readonly version: number;
@@ -140,8 +129,10 @@ export interface ContractDocument {
   readonly capabilities?: unknown;
   readonly nameToId?: unknown;
 }
-
-function validate(document: ContractDocument): ContractProcedureDocument[] {
+function validate(document: ContractDocument): {
+  readonly procedures: ContractProcedureDocument[];
+  readonly registry: string;
+} {
   if (document.protocol !== "relkit.client-contract")
     throw fail(
       "RELKIT_CLIENT_PROTOCOL_UNSUPPORTED",
@@ -160,7 +151,7 @@ function validate(document: ContractDocument): ContractProcedureDocument[] {
   ) {
     throw fail("RELKIT_CLIENT_CONTRACT_INVALID", "Client contract hash or procedures are invalid");
   }
-  return document.procedures.map((value) => {
+  const procedures = document.procedures.map((value) => {
     if (!isRecord(value) || typeof value.name !== "string" || !Array.isArray(value.errors)) {
       throw fail("RELKIT_CLIENT_CONTRACT_INVALID", "Client contract procedure is invalid");
     }
@@ -172,12 +163,24 @@ function validate(document: ContractDocument): ContractProcedureDocument[] {
     });
     return { name: value.name, input: value.input, output: value.output, errors };
   });
+  try {
+    const registry = generateClientRegistryFromDocument(
+      document as unknown as Record<string, unknown>,
+    );
+    return { procedures, registry };
+  } catch (error) {
+    if (error instanceof InvalidClientContract) {
+      throw fail(
+        "RELKIT_CLIENT_CONTRACT_INVALID",
+        `Invalid agent client metadata at ${error.path}`,
+      );
+    }
+    throw error;
+  }
 }
-
 function ensureSlash(url: URL): URL {
   return url.pathname.endsWith("/") ? url : new URL(`${url.pathname}/`, url);
 }
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

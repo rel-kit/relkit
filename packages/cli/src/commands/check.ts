@@ -17,6 +17,7 @@ import {
 import { sortDiagnostics } from "@relkit/diagnostics";
 import { writeEventRegistry } from "./check-event-registry.js";
 import { writeContextRegistry } from "./check-context-registry.js";
+import { writeRouteModuleChecks } from "./check-route-modules.js";
 import { emitCheckResult, type CheckResult } from "./check-result.js";
 import {
   checkFailureDiagnostics,
@@ -48,6 +49,11 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
     const config = loadConfig(input, projectRoot);
     const outputDirectory = join(projectRoot, config.generatedDirectory);
     const sources = await readSources(projectRoot, config.source);
+    await writeRouteModuleChecks(
+      sources.map((source) => source.fileName),
+      projectRoot,
+      config.generatedDirectory,
+    );
     const configPath = resolve(projectRoot, options.configPath ?? "relkit.config.ts");
     const configSource = relative(projectRoot, configPath).replaceAll("\\", "/");
     const discoverySources = [
@@ -75,7 +81,7 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
     });
     if (evaluator.status !== "ok") {
       return emitCheckResult(projectRoot, outputDirectory, [
-        ...typecheckProject(projectRoot),
+        ...typecheckProject(projectRoot, config.generatedDirectory),
         ...evaluatorDiagnostics(evaluator.failures),
       ]);
     }
@@ -85,7 +91,7 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
       writeEventRegistry(extracted, projectRoot, config.generatedDirectory),
       writeContextRegistry(extracted, projectRoot, config.generatedDirectory),
     ]);
-    const typeDiagnostics = typecheckProject(projectRoot);
+    const typeDiagnostics = typecheckProject(projectRoot, config.generatedDirectory);
     const runtimeIntegrationPackages = resolveRuntimeIntegrationPackages({
       projectRoot,
       imports: prefiltered.candidates.flatMap((candidate) => candidate.imports),

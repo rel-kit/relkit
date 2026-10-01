@@ -1,39 +1,89 @@
-import { existsSync } from "node:fs";
-import { dirname, resolve } from "node:path";
 import { createDiagnostic, type Diagnostic, type DiagnosticSeverity } from "@relkit/diagnostics";
+import { Effect } from "effect";
+import { existsSync } from "node:fs";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import ts from "typescript";
-import { eventSourceDiagnostics } from "./event-source-diagnostics.js";
+import { runCompilerSync } from "./compatibility.js";
+import { eventSourceDiagnosticsEffect } from "./event-source-diagnostics.js";
+import { observeCompiler } from "./observability.js";
+import { ROUTE_MODULE_CHECKS_FILE } from "./route-module-checks.js";
+import { routeModuleDiagnostics } from "./route-module-diagnostics.js";
 
-/** Type-checks a project with its own tsconfig after generated declarations exist. */
-export function typecheckProject(projectRoot: string): readonly Diagnostic[] {
-  const configPath = resolve(projectRoot, "tsconfig.json");
-  if (!existsSync(configPath)) return [];
+/**
+ * Checks an authored project after generated declarations are available.
+ * @param projectRoot - Absolute project root for portable source paths.
+ * @returns A lazy effect that checks an authored project after generated declarations are available; unexpected access failures remain defects.
+ */
+export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
+  function* (projectRoot: string, generatedDirectory = ".relkit/generated") {
+    const configPath = resolve(projectRoot, "tsconfig.json");
+    if (!existsSync(configPath)) return [];
 
-  const loaded = ts.readConfigFile(configPath, ts.sys.readFile);
-  if (loaded.error) return [typescriptDiagnostic(loaded.error, projectRoot)];
+    const loaded = ts.readConfigFile(configPath, ts.sys.readFile);
+    if (loaded.error) return [typescriptDiagnostic(loaded.error, projectRoot)];
 
-  const parsed = ts.parseJsonConfigFileContent(
-    loaded.config,
-    ts.sys,
-    dirname(configPath),
-    {
-      noEmit: true,
-    },
-    configPath,
-  );
-  const program = ts.createProgram({
-    rootNames: parsed.fileNames,
-    options: parsed.options,
-    ...(parsed.projectReferences ? { projectReferences: parsed.projectReferences } : {}),
-  });
-  return [
-    ...eventSourceDiagnostics(program, projectRoot),
-    ...[...parsed.errors, ...ts.getPreEmitDiagnostics(program)].map((diagnostic) =>
-      typescriptDiagnostic(diagnostic, projectRoot),
-    ),
-  ];
+    const parsed = ts.parseJsonConfigFileContent(
+      loaded.config,
+      ts.sys,
+      dirname(configPath),
+      {
+        noEmit: true,
+      },
+      configPath,
+    );
+    const routeChecks = resolve(projectRoot, generatedDirectory, ROUTE_MODULE_CHECKS_FILE);
+    const hasRouteChecks = existsSync(routeChecks);
+    const options = { ...parsed.options };
+    if (hasRouteChecks && options.rootDir !== undefined)
+      options.rootDir = routeValidationRoot(options.rootDir, routeChecks);
+    const program = ts.createProgram({
+      rootNames: [...parsed.fileNames, ...(hasRouteChecks ? [routeChecks] : [])],
+      options,
+      ...(parsed.projectReferences ? { projectReferences: parsed.projectReferences } : {}),
+    });
+    return [
+      ...program
+        .getSourceFiles()
+        .flatMap((source) => routeModuleDiagnostics(program, source, projectRoot)),
+      ...(yield* eventSourceDiagnosticsEffect(program, projectRoot)),
+      ...[...parsed.errors, ...ts.getPreEmitDiagnostics(program)].map((diagnostic) =>
+        typescriptDiagnostic(diagnostic, projectRoot),
+      ),
+    ];
+  },
+  (effect, projectRoot, _generatedDirectory = ".relkit/generated") =>
+    observeCompiler("configuration", "typecheckProject", effect, () => ({})),
+);
+
+/**
+ * Checks an authored project after generated declarations are available.
+ * @param projectRoot - Absolute project root for portable source paths.
+ * @returns Ordered TypeScript diagnostics converted to compiler evidence.
+ */
+export function typecheckProject(
+  projectRoot: string,
+  generatedDirectory = ".relkit/generated",
+): readonly Diagnostic[] {
+  return runCompilerSync(typecheckProjectEffect(projectRoot, generatedDirectory));
 }
 
+/** Widens only the no-emit validation root to include the generated TypeScript assertions. */
+function routeValidationRoot(rootDir: string, routeChecks: string): string {
+  for (;;) {
+    const path = relative(rootDir, routeChecks);
+    if (path !== ".." && !path.startsWith(`..${sep}`) && !isAbsolute(path)) return rootDir;
+    const parent = dirname(rootDir);
+    if (parent === rootDir) return rootDir;
+    rootDir = parent;
+  }
+}
+
+/**
+ * Converts a TypeScript diagnostic to portable compiler evidence.
+ * @param diagnostic - Compiler diagnostic whose source or severity is inspected.
+ * @param projectRoot - Absolute project root for portable source paths.
+ * @returns A compiler diagnostic retaining TypeScript severity, message, and source position.
+ */
 function typescriptDiagnostic(diagnostic: ts.Diagnostic, projectRoot: string): Diagnostic {
   const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
   if (!diagnostic.file || diagnostic.start === undefined) {
@@ -57,6 +107,11 @@ function typescriptDiagnostic(diagnostic: ts.Diagnostic, projectRoot: string): D
   );
 }
 
+/**
+ * Maps a TypeScript diagnostic category to compiler severity.
+ * @param category - TypeScript diagnostic category or dependency group.
+ * @returns The compiler severity corresponding to the TypeScript category.
+ */
 function severity(category: ts.DiagnosticCategory): DiagnosticSeverity {
   if (category === ts.DiagnosticCategory.Error) return "error";
   if (category === ts.DiagnosticCategory.Warning) return "warning";

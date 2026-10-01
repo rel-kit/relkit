@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
+import { isTypeScriptPluginSetting } from "./scope-typescript-settings.js";
 export type ScopeViolation = {
   file: string;
   line: number;
@@ -26,7 +27,12 @@ const proseAllowlist = [
   /^openspec\/changes\/implement-relkit-typescript-poc-v3\//,
   /^tests\/jobs\/compatibility\/evidence\//,
 ];
-const implementationFiles = new Set(["apps/docs/tsconfig.json", "scripts/scope-scan.ts"]);
+const implementationFiles = new Set([
+  "apps/docs/tsconfig.json",
+  "scripts/scope-scan.ts",
+  "scripts/scope-typescript-settings.ts",
+  "scripts/scope-typescript-settings.test.ts",
+]);
 const contentExtensions = /\.(?:c|m)?(?:ts|tsx|js|jsx)|\.json$|\.toml$|\.ya?ml$|\.md$/i;
 const alternateIac =
   /\b(?:terraform|opentofu|cloudformation|(?:aws-)?cdk|sst|alchemy|serverless|bicep)\b|@cdktf|aws-cdk-lib|arm[-_ ]?template/i;
@@ -150,6 +156,8 @@ function contentViolations(root: string, file: string): ScopeViolation[] {
       if (rule === "out-of-scope-navigation-name" && /^["'`][A-Z][A-Z0-9_]*["'`]$/.test(match[0]))
         continue;
       const offset = match.index ?? 0;
+      if (rule === "out-of-scope-navigation-name" && isTypeScriptPluginSetting(path, text, offset))
+        continue;
       findings.push(violation(root, file, rule, message, text, offset));
     }
   }

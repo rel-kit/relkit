@@ -10,8 +10,9 @@ export async function shutdownDev(session: DevSession, reason: unknown): Promise
   session.abortController.abort(reason);
   session.options.onStopping?.();
   for (const controller of session.controllers) controller.abort(reason);
-  await session.proxy.stop().catch(() => undefined);
+  // Stop request-producing children while the listener closes their active requests.
   const tasks = [
+    session.proxy.stop().catch(() => undefined),
     session.inspectorChild?.stop(),
     session.inspectorChild?.output,
     session.pendingActivations,

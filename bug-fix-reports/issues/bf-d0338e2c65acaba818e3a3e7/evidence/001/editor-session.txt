@@ -1,0 +1,6 @@
+Actual demo editor window: route.ts — relkit-demo-4.
+Observed SDK status: 6.0.3, from the VS Code Insiders bundled tsserver.js.
+Version picker showed the selected bullet on Use VS Code's Version (6.0.3), and offered Use Workspace Version (5.9.3).
+The user replied Still no error after being asked to select the workspace version/restart.
+A follow-up selected-version question remains pending.
+UI input during version selection accidentally selected Ask in Chat, creating a Copilot message containing only the command name. Copilot read package.json and paused for confirmation of its proposed command; no command approval was sent. Cancellation was attempted, but the user switched windows before completion could be confirmed. No screenshot or unrelated window content retained.

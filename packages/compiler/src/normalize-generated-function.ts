@@ -3,6 +3,12 @@ import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.
 import { clean } from "./normalize-graph-utils.js";
 import { isRecord, refKind } from "./normalize-utils.js";
 
+/**
+ * Projects an agent's generated function node and schema contracts.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns The generated function's graph node and schema contracts.
+ */
 export function generatedFunctionNode(
   descriptor: NormalizedDescriptor,
   work: NormalizationWork,
@@ -26,6 +32,11 @@ export function generatedFunctionNode(
   };
 }
 
+/**
+ * Constructs a data-only marker for an agent's generated function.
+ * @param agentId - Stable ID of the owning agent.
+ * @returns A data-only marker identifying the generated agent function.
+ */
 export function generatedAgentMarker(agentId: string): {
   readonly generated: true;
   readonly generatedBy: "agent";

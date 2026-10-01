@@ -1,0 +1,23 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/route-review-regressions.test.ts:
+83 |   for (const file of fixtureFiles) {
+84 |     await mkdir(join(root, file, ".."), { recursive: true });
+85 |     await writeFile(join(root, file), 'export const GET = "fixture data";\n');
+86 |   }
+87 |   const accepted = await check(root);
+88 |   expect(accepted.exitCode, JSON.stringify(accepted.result.diagnostics)).toBe(0);
+                                                                              ^
+error: [{"code":"TS2344","column":69,"file":".relkit/generated/route-module-checks.ts","line":7,"message":"Type 'typeof import(\"/Users/mustafaelsayed/Workspace/relkit/.relkit/route-review-WlxzsF/app/src/routes/__fixtures__/route\")' does not satisfy the constraint '{ readonly GET: \"fixture data\"; }'.\n  Types of property 'GET' are incompatible.\n    Type 'string' is not assignable to type 'RouteDescriptor<string>'.","severity":"error"},{"code":"TS2344","column":69,"file":".relkit/generated/route-module-checks.ts","line":15,"message":"Type 'typeof import(\"/Users/mustafaelsayed/Workspace/relkit/.relkit/route-review-WlxzsF/app/src/routes/users/__tests__/route\")' does not satisfy the constraint '{ readonly GET: \"fixture data\"; }'.\n  Types of property 'GET' are incompatible.\n    Type 'string' is not assignable to type 'RouteDescriptor<string>'.","severity":"error"},{"code":"RELKIT_ROUTE_MODULE_TYPE","column":14,"file":"src/routes/__fixtures__/route.ts","line":1,"message":"Route export GET must be a typed route descriptor, not a method table, handler, or untyped value.","severity":"error"},{"code":"RELKIT_ROUTE_MODULE_TYPE","column":14,"file":"src/routes/users/__tests__/route.ts","line":1,"message":"Route export GET must be a typed route descriptor, not a method table, handler, or untyped value.","severity":"error"}]
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/route-review-regressions.test.ts:88:74)
+(fail) the real CLI ignores excluded route fixtures without suppressing invalid application routes [10170.15ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 4 expect() calls
+Ran 1 test across 1 file. [10.76s]

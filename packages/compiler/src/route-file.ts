@@ -1,74 +1,130 @@
-export type RouteFileSegment =
-  | { readonly kind: "static"; readonly value: string }
-  | { readonly kind: "dynamic"; readonly name: string }
-  | { readonly kind: "catch-all"; readonly name: string }
-  | { readonly kind: "optional-catch-all"; readonly name: string };
+import {
+  routePathSegmentToFileSegmentEffect,
+  parseSegmentEffect,
+  assertSegmentsEffect,
+  pathFrom,
+  segmentRank,
+} from "./route-file-segments.js";
+import { RouteFileError } from "./route-file-schema.js";
+import { Effect } from "effect";
+import { runCompilerSync } from "./compatibility.js";
+import { observeCompiler } from "./observability.js";
 
-export interface ParsedRouteFilePath {
-  readonly sourcePath: string;
-  readonly canonicalPath: string;
-  readonly runtimePaths: readonly string[];
-  readonly segments: readonly RouteFileSegment[];
-  readonly parameters: readonly {
-    readonly name: string;
-    readonly kind: "dynamic" | "catch-all" | "optional-catch-all";
-  }[];
-  readonly precedence: 0 | 1 | 2 | 3;
-}
+import type { ParsedRouteFilePath } from "./route-file.types.js";
+export type { RouteFileSegment, ParsedRouteFilePath } from "./route-file.types.js";
 
-/** Converts a canonical route path into its nested source-file convention. */
-export function routePathToFilePath(routePath: string): string {
-  if (routePath === "/") return "src/routes/route.ts";
-  if (!routePath.startsWith("/") || routePath.endsWith("/")) {
-    throw new TypeError(`Route path must start with / and omit a trailing slash: ${routePath}`);
-  }
-
-  const segments = routePath.slice(1).split("/").map(routePathSegmentToFileSegment);
-  const sourcePath = `src/routes/${segments.join("/")}/route.ts`;
-  parseRouteFilePath(sourcePath);
-  return sourcePath;
-}
-
-/** Parses the required nested route-file convention without executing source. */
-export function parseRouteFilePath(sourcePath: string): ParsedRouteFilePath {
-  const normalized = sourcePath.replaceAll("\\", "/").replace(/^\.\/+/, "");
-  const prefix = "src/routes/";
-  if (!normalized.startsWith(prefix) || !normalized.endsWith("/route.ts")) {
-    if (normalized !== "src/routes/route.ts") {
-      throw new TypeError(`Route source must match ${prefix}**/route.ts: ${sourcePath}`);
+/**
+ * Converts a canonical route path into its nested source-file convention.
+ * @param routePath - Canonical HTTP route path.
+ * @returns A lazy effect that converts a canonical route path into its nested source-file convention; unexpected access failures remain defects.
+ * @see {@link normalizeCompilationEffect} for shared lazy composition and the execution boundary.
+ */
+export const routePathToFilePathEffect = Effect.fn("Compiler.routePathToFilePath")(
+  function* (routePath: string) {
+    if (routePath === "/") return "src/routes/route.ts";
+    if (!routePath.startsWith("/") || routePath.endsWith("/")) {
+      return yield* new RouteFileError({
+        cause: new TypeError(
+          `Route path must start with / and omit a trailing slash: ${routePath}`,
+        ),
+      });
     }
-  }
 
-  const relative = normalized.slice(prefix.length, -"route.ts".length).replace(/\/$/, "");
-  const rawSegments = relative === "" ? [] : relative.split("/");
-  const segments = rawSegments.map(parseSegment);
-  assertSegments(segments);
+    const segments = yield* Effect.forEach(
+      routePath.slice(1).split("/"),
+      routePathSegmentToFileSegmentEffect,
+    );
+    const sourcePath = `src/routes/${segments.join("/")}/route.ts`;
+    yield* parseRouteFilePathEffect(sourcePath);
+    return sourcePath;
+  },
+  (effect) => observeCompiler("normalization", "routePathToFilePath", effect),
+);
 
-  const canonicalPath = pathFrom(segments, "canonical");
-  const optionalIndex = segments.findIndex((segment) => segment.kind === "optional-catch-all");
-  const runtimePaths =
-    optionalIndex === -1
-      ? [pathFrom(segments, "runtime")]
-      : [pathFrom(segments.slice(0, optionalIndex), "runtime"), pathFrom(segments, "runtime")];
-  const parameters = segments.flatMap((segment) =>
-    segment.kind === "static" ? [] : [{ name: segment.name, kind: segment.kind }],
+/**
+ * Encodes a canonical HTTP path using the nested route filename convention.
+ * @param routePath - Canonical HTTP route path.
+ * @returns The conventional nested route filename under src/routes.
+ */
+export function routePathToFilePath(routePath: string): string {
+  return runCompilerSync(
+    routePathToFilePathEffect(routePath).pipe(Effect.mapError((error) => error.cause)),
   );
-  const precedence = segments.reduce<0 | 1 | 2 | 3>(
-    (rank, segment) => Math.max(rank, segmentRank(segment)) as 0 | 1 | 2 | 3,
-    0,
-  );
-
-  return Object.freeze({
-    sourcePath: normalized,
-    canonicalPath,
-    runtimePaths: Object.freeze(runtimePaths),
-    segments: Object.freeze(segments),
-    parameters: Object.freeze(parameters),
-    precedence,
-  });
 }
 
-/** Orders static, dynamic, required catch-all, then optional catch-all routes. */
+/**
+ * Parses the required nested route-file convention without executing source.
+ * @param sourcePath - Authored source filename.
+ * @returns A lazy effect that parses the required nested route-file convention without executing source; unexpected access failures remain defects.
+ * @remarks Unsupported syntax fails with RouteFileError; no services are required.
+ * @example
+ * ```ts
+ * import { Effect } from "effect";
+ * import { parseRouteFilePathEffect } from "./route-file.js";
+ * const route = Effect.runSync(parseRouteFilePathEffect("src/routes/[id]/route.ts"));
+ * const invalid = Effect.runSync(Effect.flip(parseRouteFilePathEffect("src/flat.route.ts")));
+ * ```
+ */
+export const parseRouteFilePathEffect = Effect.fn("Compiler.parseRouteFilePath")(
+  function* (sourcePath: string) {
+    const normalized = sourcePath.replaceAll("\\", "/").replace(/^\.\/+/, "");
+    const prefix = "src/routes/";
+    if (!normalized.startsWith(prefix) || !normalized.endsWith("/route.ts")) {
+      if (normalized !== "src/routes/route.ts") {
+        return yield* new RouteFileError({
+          cause: new TypeError(`Route source must match ${prefix}**/route.ts: ${sourcePath}`),
+        });
+      }
+    }
+
+    const relative = normalized.slice(prefix.length, -"route.ts".length).replace(/\/$/, "");
+    const rawSegments = relative === "" ? [] : relative.split("/");
+    const segments = yield* Effect.forEach(rawSegments, parseSegmentEffect);
+    yield* assertSegmentsEffect(segments);
+
+    const canonicalPath = pathFrom(segments, "canonical");
+    const optionalIndex = segments.findIndex((segment) => segment.kind === "optional-catch-all");
+    const runtimePaths =
+      optionalIndex === -1
+        ? [pathFrom(segments, "runtime")]
+        : [pathFrom(segments.slice(0, optionalIndex), "runtime"), pathFrom(segments, "runtime")];
+    const parameters = segments.flatMap((segment) =>
+      segment.kind === "static" ? [] : [{ name: segment.name, kind: segment.kind }],
+    );
+    const precedence = segments.reduce<0 | 1 | 2 | 3>(
+      (rank, segment) => Math.max(rank, segmentRank(segment)) as 0 | 1 | 2 | 3,
+      0,
+    );
+
+    return Object.freeze({
+      sourcePath: normalized,
+      canonicalPath,
+      runtimePaths: Object.freeze(runtimePaths),
+      segments: Object.freeze(segments),
+      parameters: Object.freeze(parameters),
+      precedence,
+    });
+  },
+  (effect) => observeCompiler("normalization", "parseRouteFilePath", effect),
+);
+
+/**
+ * Parses a conventional route filename into canonical and runtime path variants.
+ * @param sourcePath - Authored source filename.
+ * @returns Canonical and runtime paths, named parameters, and precedence for the source file.
+ */
+export function parseRouteFilePath(sourcePath: string): ParsedRouteFilePath {
+  return runCompilerSync(
+    parseRouteFilePathEffect(sourcePath).pipe(Effect.mapError((error) => error.cause)),
+  );
+}
+
+/**
+ * Orders static, dynamic, required catch-all, then optional catch-all routes.
+ * @param left - First value to compare.
+ * @param right - Second value to compare.
+ * @returns The ordering result or precedence rank.
+ */
 export function compareRouteFilePaths(
   left: ParsedRouteFilePath,
   right: ParsedRouteFilePath,
@@ -78,73 +134,4 @@ export function compareRouteFilePaths(
   );
 }
 
-function parseSegment(value: string): RouteFileSegment {
-  if (value === "" || value === "." || value === "..") invalid(value);
-  if (value.startsWith("@") || value.includes("(") || value.includes(")")) {
-    throw new TypeError(`Unsupported route segment "${value}"`);
-  }
-  const optional = /^\[\[\.\.\.([^\]]+)\]\]$/.exec(value);
-  if (optional !== null) return named("optional-catch-all", optional[1] ?? "");
-  const catchAll = /^\[\.\.\.([^\]]+)\]$/.exec(value);
-  if (catchAll !== null) return named("catch-all", catchAll[1] ?? "");
-  const dynamic = /^\[([^\]]+)\]$/.exec(value);
-  if (dynamic !== null) return named("dynamic", dynamic[1] ?? "");
-  if (value.includes("[") || value.includes("]")) invalid(value);
-  return { kind: "static", value };
-}
-
-function routePathSegmentToFileSegment(value: string): string {
-  if (value.startsWith(":")) return `[${value.slice(1)}]`;
-  if (value.startsWith("*") && value.endsWith("?")) {
-    return `[[...${value.slice(1, -1)}]]`;
-  }
-  if (value.startsWith("*")) return `[...${value.slice(1)}]`;
-  if (value.includes(":") || value.includes("*")) {
-    throw new TypeError(`Malformed route path segment "${value}"`);
-  }
-  return value;
-}
-
-function named(
-  kind: "dynamic" | "catch-all" | "optional-catch-all",
-  name: string,
-): RouteFileSegment {
-  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) {
-    throw new TypeError(`Invalid route parameter name "${name}"`);
-  }
-  return { kind, name };
-}
-
-function assertSegments(segments: readonly RouteFileSegment[]): void {
-  const names = new Set<string>();
-  segments.forEach((segment, index) => {
-    if (segment.kind === "static") return;
-    if (names.has(segment.name)) throw new TypeError(`Duplicate route parameter "${segment.name}"`);
-    names.add(segment.name);
-    if (segment.kind !== "dynamic" && index !== segments.length - 1) {
-      throw new TypeError(`Catch-all route parameter "${segment.name}" must be the final segment`);
-    }
-  });
-}
-
-function pathFrom(segments: readonly RouteFileSegment[], mode: "canonical" | "runtime"): string {
-  if (segments.length === 0) return "/";
-  return `/${segments
-    .map((segment) => {
-      if (segment.kind === "static") return segment.value;
-      if (segment.kind === "dynamic") return `:${segment.name}`;
-      if (mode === "runtime") return `:${segment.name}{.+}`;
-      return segment.kind === "catch-all" ? `*${segment.name}` : `*${segment.name}?`;
-    })
-    .join("/")}`;
-}
-
-function segmentRank(segment: RouteFileSegment): 0 | 1 | 2 | 3 {
-  if (segment.kind === "static") return 0;
-  if (segment.kind === "dynamic") return 1;
-  return segment.kind === "catch-all" ? 2 : 3;
-}
-
-function invalid(value: string): never {
-  throw new TypeError(`Malformed route segment "${value}"`);
-}
+export { RouteFileError, RouteFileSegmentSchema } from "./route-file-schema.js";

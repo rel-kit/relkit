@@ -26,6 +26,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./editor": {
+      "types": "./dist/editor.d.ts",
+      "import": "./dist/editor.js"
     }
   },
   "dependencies": {
@@ -36,7 +40,12 @@
     "@relkit/local-service": "workspace:*",
     "@relkit/openapi": "workspace:*",
     "@relkit/schema": "workspace:*",
+    "effect": "4.0.0-rc.115",
     "typescript": "5.9.3"
+  },
+  "devDependencies": {
+    "@effect/vitest": "4.0.0-rc.115",
+    "vitest": "5.0.1"
   },
   "scripts": {
     "build": "tsc -b",

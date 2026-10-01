@@ -3,6 +3,7 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "plugins": [{ "name": "@relkit/cli/editor" }],
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
@@ -10,5 +11,6 @@
     "baseUrl": ".",
     "paths": { "@app/*": ["src/*"] }
   },
+  "files": [".relkit/generated/route-module-checks.ts"],
   "include": ["src", "tests", "examples"]
 }

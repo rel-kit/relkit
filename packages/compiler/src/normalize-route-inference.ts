@@ -1,4 +1,8 @@
-import { schema, schemaProperties } from "./normalize-compat.js";
+import { Effect } from "effect";
+import { runCompilerSync } from "./compatibility.js";
+import { observeCompiler } from "./observability.js";
+import type { PathParameter } from "./normalize-route-inference.types.js";
+import { schemaPropertiesEffect, schemaEffect } from "./normalize-compat.js";
 import { add } from "./normalize-pass-utils.js";
 import { isErrorDescriptorLike, isRecord } from "./normalize-utils.js";
 import {
@@ -9,25 +13,66 @@ import {
 
 const QUERY_METHODS = new Set(["GET", "HEAD", "DELETE", "OPTIONS"]);
 
-/** Infers the routine route mapping from the target's runtime schemas. */
+/**
+ * Derives route schemas and response mappings from the target function.
+ * @param work - Invocation-owned descriptors, indexes, and diagnostics.
+ * @param descriptor - Descriptor whose contract is checked.
+ * @param value - Declared metadata to inspect without coercion.
+ * @returns A lazy effect yielding the checked result; findings append to the workspace diagnostics.
+ * @remarks Unexpected metadata access failures remain defects.
+ * @see {@link normalizeCompilationEffect} for ordered stage composition.
+ */
+export const inferRouteContractEffect = Effect.fn("Compiler.inferRouteContract")(
+  function* (
+    work: NormalizationWork,
+    descriptor: NormalizedDescriptor,
+    value: Record<string, any>,
+  ) {
+    if (value.raw === true) return;
+    const target = isRecord(value.target) ? value.target : {};
+    if (value.request === undefined)
+      value.request = yield* inferRequestEffect(work, descriptor, value, target);
+    if (value.responses === undefined) value.responses = yield* inferResponsesEffect(value, target);
+  },
+  (effect, work, descriptor, value) =>
+    observeCompiler("normalization", "inferRouteContract", effect, () => ({
+      descriptors: work.descriptors.length,
+      diagnostics: work.diagnostics.length,
+    })),
+);
+
+/**
+ * Derives route schemas and response mappings from the target function.
+ * @param work - Invocation-owned descriptors, indexes, and diagnostics.
+ * @param descriptor - Descriptor whose contract is checked.
+ * @param value - Declared metadata to inspect without coercion.
+ * @returns The checked result after executing the Effect at the compatibility boundary.
+ * @remarks Unexpected metadata access failures remain defects.
+ * @see {@link normalizeCompilationEffect} for ordered stage composition.
+ */
 export function inferRouteContract(
   work: NormalizationWork,
   descriptor: NormalizedDescriptor,
   value: Record<string, any>,
 ): void {
-  if (value.raw === true) return;
-  const target = isRecord(value.target) ? value.target : {};
-  if (value.request === undefined) value.request = inferRequest(work, descriptor, value, target);
-  if (value.responses === undefined) value.responses = inferResponses(value, target);
+  return runCompilerSync(inferRouteContractEffect(work, descriptor, value));
 }
 
-function inferRequest(
+/**
+ * Derives request field mappings from target schema and route parameters.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param route - Route descriptor being checked or projected.
+ * @param target - Target contract or metadata being checked.
+ * @returns A lazy effect that derives request field mappings from target schema and route parameters; unexpected access failures remain defects.
+ */
+const inferRequestEffect = Effect.fn("Compiler.inferRequest")(function* (
   work: NormalizationWork,
   descriptor: NormalizedDescriptor,
   route: Record<string, any>,
   target: Record<string, any>,
-): Record<string, unknown> {
-  const projection = schemaProperties(target.input);
+) {
+  const projection = yield* schemaPropertiesEffect(target.input);
   if (projection === undefined) {
     add(
       work,
@@ -41,7 +86,15 @@ function inferRequest(
   const parameters = pathParameters(String(route.path ?? ""));
   for (const parameter of parameters) {
     const property = projection.properties[parameter.name];
-    if (property === undefined) continue;
+    if (property === undefined) {
+      add(
+        work,
+        descriptor,
+        NORMALIZE_CODES.mapping,
+        `Inferred path parameter "${parameter.name}" is missing from the target function input schema. Add the field or define an explicit request mapping.`,
+      );
+      continue;
+    }
     if (parameter.catchAll && !allowsArray(property)) {
       add(
         work,
@@ -71,8 +124,15 @@ function inferRequest(
         : { kind: "default", value: source, default: defaultValue };
   }
   return { kind: "input", fields };
-}
+});
 
+/**
+ * Selects body or multipart mapping syntax for one input property.
+ * @param accept - HTTP request content type.
+ * @param name - Declared binding or parameter name.
+ * @param property - Declared property to inspect.
+ * @returns The selected body or multipart mapping source and field name.
+ */
 function bodySource(
   accept: unknown,
   name: string,
@@ -82,11 +142,17 @@ function bodySource(
   return { kind: allowsArray(property) ? "multipart-all" : "multipart", name };
 }
 
-function inferResponses(
+/**
+ * Derives success, error, validation, and rate-limit responses.
+ * @param route - Route descriptor being checked or projected.
+ * @param target - Target contract or metadata being checked.
+ * @returns A lazy effect that derives success, error, validation, and rate-limit responses; unexpected access failures remain defects.
+ */
+const inferResponsesEffect = Effect.fn("Compiler.inferResponses")(function* (
   route: Record<string, any>,
   target: Record<string, any>,
-): readonly Record<string, unknown>[] {
-  const output = schema(target.output);
+) {
+  const output = yield* schemaEffect(target.output);
   const status = route.successStatus ?? (isVoidSchema(output.schema) ? 204 : 200);
   const responses: Record<string, unknown>[] = [
     {
@@ -113,14 +179,13 @@ function inferResponses(
     responses.push({ kind: "response", id: "rate-limit.429", status: 429 });
   }
   return responses;
-}
+});
 
-interface PathParameter {
-  readonly name: string;
-  readonly catchAll: boolean;
-  readonly optional: boolean;
-}
-
+/**
+ * Reads named and catch-all parameters from a canonical route path.
+ * @param path - Portable source, property, or runtime path.
+ * @returns Named and catch-all parameters from the canonical HTTP path.
+ */
 function pathParameters(path: string): readonly PathParameter[] {
   const result: PathParameter[] = [];
   for (const segment of path.split("/")) {
@@ -138,6 +203,11 @@ function pathParameters(path: string): readonly PathParameter[] {
   return result;
 }
 
+/**
+ * Checks direct and union JSON Schema array projections.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns True when the schema accepts an array-valued route parameter.
+ */
 function allowsArray(value: unknown): boolean {
   if (!isRecord(value)) return false;
   if (value.type === "array") return true;
@@ -146,10 +216,20 @@ function allowsArray(value: unknown): boolean {
   );
 }
 
+/**
+ * Reads an explicitly declared JSON Schema default.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns The explicitly declared schema default, including falsy values.
+ */
 function schemaDefault(value: unknown): unknown {
   return isRecord(value) && "default" in value ? value.default : undefined;
 }
 
+/**
+ * Recognizes a JSON Schema marker for a void output.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns True when the schema describes an absent response value.
+ */
 function isVoidSchema(value: unknown): boolean {
   return isRecord(value) && value["x-relkit-void"] === true;
 }

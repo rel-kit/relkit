@@ -1,78 +1,95 @@
-import { normalizeSourcePath } from "@relkit/contracts";
+import { observeCompiler } from "../observability.js";
+import { normalizeSourcePathEffect } from "@relkit/contracts";
+import { Effect } from "effect";
 import { DEFAULT_TOOLING_CONFIG } from "../config-loader-types.js";
-import { matchesExclude, scanSource } from "./ast-prefilter-utils.js";
-import type { SourceFacts } from "./source-facts.js";
+import { matchesExcludeEffect, scanSourceEffect } from "./ast-prefilter-utils.js";
+import { runDiscoverySync } from "./discovery-sync.js";
+import type {
+  AstPrefilterCandidate,
+  AstPrefilterOptions,
+  AstPrefilterResult,
+  AstPrefilterSkipped,
+  AstSourceModule,
+} from "./ast-prefilter.types.js";
 
-export type AstCandidateIndicator =
-  "relkit-import" | "factory" | "default-export" | "brand-access" | "re-export";
+export type {
+  AstCandidateIndicator,
+  AstSourceModule,
+  AstReExport,
+  AstPrefilterCandidate,
+  AstPrefilterSkipped,
+  AstPrefilterOptions,
+  AstPrefilterResult,
+} from "./ast-prefilter.types.js";
 
-export interface AstSourceModule {
-  readonly fileName: string;
-  readonly text: string;
-}
+/**
+ * Finds possible descriptor modules without importing or evaluating their text.
+ * @param modules - Source modules to normalize and inspect.
+ * @param options - Optional project root and glob exclusion override.
+ * @returns A lazy effect yielding filename-ordered candidates and skipped modules.
+ * @remarks Path failures remain in the SourceLocationError channel. Syntax scans
+ * run sequentially, so their mutable accumulators remain owned by one execution.
+ * @example
+ * ```ts
+ * import { Effect } from "effect";
+ * import { prefilterSourcesEffect } from "./ast-prefilter.js";
+ * const candidates = Effect.runSync(prefilterSourcesEffect([], { projectRoot: process.cwd() }));
+ * ```
+ */
+export const prefilterSourcesEffect = Effect.fn("Discovery.prefilterSources")(
+  function* (modules: readonly AstSourceModule[], options: AstPrefilterOptions = {}) {
+    const excludes = options.exclude ?? DEFAULT_TOOLING_CONFIG.exclude;
+    const ordered = yield* Effect.forEach(modules, (module) =>
+      Effect.map(normalizeSourcePathEffect(module.fileName, options.projectRoot), (fileName) => ({
+        fileName,
+        text: module.text,
+      })),
+    );
+    ordered.sort((left, right) => left.fileName.localeCompare(right.fileName));
+    const candidates: AstPrefilterCandidate[] = [];
+    const skipped: AstPrefilterSkipped[] = [];
+    yield* Effect.forEach(
+      ordered,
+      (module) =>
+        Effect.gen(function* () {
+          if (yield* matchesExcludeEffect(module.fileName, excludes)) {
+            skipped.push({ fileName: module.fileName, reason: "excluded" });
+            return;
+          }
+          const facts = yield* scanSourceEffect(module.fileName, module.text);
+          if (facts.indicators.length === 0) {
+            skipped.push({ fileName: module.fileName, reason: "no-candidate-indicator" });
+          } else {
+            candidates.push(facts);
+          }
+        }),
+      { discard: true },
+    );
+    return Object.freeze({
+      candidates: Object.freeze(candidates),
+      skipped: Object.freeze(skipped),
+    }) satisfies AstPrefilterResult;
+  },
+  (effect, modules, options: AstPrefilterOptions = {}) =>
+    observeCompiler(
+      "discovery",
+      "prefilterSources",
+      effect,
+      () => ({ files: modules.length }),
+      true,
+    ),
+);
 
-export interface AstReExport {
-  readonly moduleSpecifier: string;
-  readonly names: readonly string[];
-  readonly exportAll: boolean;
-}
-
-export interface AstPrefilterCandidate {
-  readonly fileName: string;
-  readonly imports: readonly string[];
-  readonly factories: readonly string[];
-  readonly defaultExports: readonly string[];
-  readonly brandAccess: boolean;
-  readonly reExports: readonly AstReExport[];
-  readonly facts: SourceFacts;
-  readonly indicators: readonly AstCandidateIndicator[];
-}
-
-export interface AstPrefilterSkipped {
-  readonly fileName: string;
-  readonly reason: "excluded" | "no-candidate-indicator";
-}
-
-export interface AstPrefilterOptions {
-  readonly projectRoot?: string;
-  readonly exclude?: readonly string[];
-}
-
-export interface AstPrefilterResult {
-  readonly candidates: readonly AstPrefilterCandidate[];
-  readonly skipped: readonly AstPrefilterSkipped[];
-}
-
-/** Finds possible descriptor modules from syntax only; it never imports source files. */
+/**
+ * Runs source candidate discovery for synchronous compiler callers.
+ * @param modules - Source modules to normalize and inspect.
+ * @param options - Optional project root and glob exclusion override.
+ * @returns Filename-ordered candidates and skipped modules.
+ * @throws SourceLocationError when a filename or project root is invalid.
+ */
 export function prefilterSources(
   modules: readonly AstSourceModule[],
   options: AstPrefilterOptions = {},
 ): AstPrefilterResult {
-  const excludes = options.exclude ?? DEFAULT_TOOLING_CONFIG.exclude;
-  const ordered = modules
-    .map((module) => ({
-      fileName: normalizeSourcePath(module.fileName, options.projectRoot),
-      text: module.text,
-    }))
-    .sort((left, right) => left.fileName.localeCompare(right.fileName));
-  const candidates: AstPrefilterCandidate[] = [];
-  const skipped: AstPrefilterSkipped[] = [];
-
-  for (const module of ordered) {
-    if (matchesExclude(module.fileName, excludes)) {
-      skipped.push({ fileName: module.fileName, reason: "excluded" });
-      continue;
-    }
-    const facts = scanSource(module.fileName, module.text);
-    if (facts.indicators.length === 0) {
-      skipped.push({ fileName: module.fileName, reason: "no-candidate-indicator" });
-    } else {
-      candidates.push(facts);
-    }
-  }
-
-  return Object.freeze({
-    candidates: Object.freeze(candidates),
-    skipped: Object.freeze(skipped),
-  });
+  return runDiscoverySync(prefilterSourcesEffect(modules, options));
 }

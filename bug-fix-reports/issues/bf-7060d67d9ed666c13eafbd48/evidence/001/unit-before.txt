@@ -1,0 +1,3 @@
+tests/types/route-path-input.ts(36,74): error TS2344: Type 'Readonly<{ readonly GET: FunctionRouteDescriptor<string, FunctionDescriptor<"users.example", ObjectOutput<{ value: StringSchema; }>, ObjectOutput<{ value: StringSchema; }>, ... 6 more ..., undefined>, undefined>; }>' does not satisfy the constraint '{ readonly GET: { readonly __relkit_missing_path_input: "id"; }; }'.
+  Types of property 'GET' are incompatible.
+    Property '__relkit_missing_path_input' is missing in type 'FunctionRouteDescriptor<string, FunctionDescriptor<"users.example", ObjectOutput<{ value: StringSchema; }>, ObjectOutput<{ value: StringSchema; }>, {}, readonly [], ... 4 more ..., undefined>, undefined>' but required in type '{ readonly __relkit_missing_path_input: "id"; }'.

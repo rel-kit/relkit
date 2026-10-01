@@ -1,0 +1,12 @@
+53 |   }
+54 |   if (
+55 |     JSON.stringify(manifest.exports) !==
+56 |     JSON.stringify(expectedExports(packageDirectoryName, manifest.name))
+57 |   ) {
+58 |     throw new Error(`Unsupported export map in ${packageDirectory}`);
+                   ^
+error: Unsupported export map in /Users/mustafaelsayed/Workspace/relkit/packages/events
+      at assertPackageManifest (/Users/mustafaelsayed/Workspace/relkit/scripts/pack-and-smoke-exports.ts:58:15)
+      at main (/Users/mustafaelsayed/Workspace/relkit/scripts/pack-and-smoke-exports.ts:93:5)
+
+Bun v1.3.10 (macOS arm64)

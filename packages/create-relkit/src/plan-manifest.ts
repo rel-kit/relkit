@@ -18,7 +18,12 @@ export function mergeScaffoldManifest(
   for (const name of [...dependencies].sort()) {
     const wanted = SCAFFOLD_DEPENDENCIES[name];
     const current = manifest.dependencies?.[name] ?? manifest.devDependencies?.[name];
-    if (current !== undefined && current !== wanted.version && current !== "workspace:*") {
+    if (
+      current !== undefined &&
+      current !== wanted.version &&
+      current !== "workspace:*" &&
+      current !== `link:${name}`
+    ) {
       collision(`package.json already declares ${name}@${current}.`);
     }
     if (current !== undefined) continue;

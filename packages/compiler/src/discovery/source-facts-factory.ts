@@ -1,15 +1,14 @@
+import { observeCompiler } from "../observability.js";
 import * as ts from "typescript";
+import { Effect } from "effect";
+import { runDiscoverySync } from "./discovery-sync.js";
+import { idPresenceEffect, optionNamesEffect, optionPathsEffect } from "./source-facts-options.js";
+import { factoryName, memberTarget, propertyName, unwrap } from "./source-facts-syntax.js";
 import type {
+  FactoryDefinition,
   FactoryBindingFact,
-  FactoryIdPresence,
   ServiceMemberFact,
-  SourceFactoryKind,
-} from "./source-facts-types.js";
-
-interface FactoryDefinition {
-  readonly kind: SourceFactoryKind;
-  readonly idOptional: boolean;
-}
+} from "./source-facts.types.js";
 
 const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
   asTool: { kind: "tool", idOptional: true },
@@ -39,147 +38,124 @@ const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
   defineRequestTransform: { kind: "transform", idOptional: true },
 });
 
+/**
+ * Reads recognized factory-call identity for synchronous compiler callers.
+ * @param initializer - Declaration initializer, possibly wrapped in syntax assertions.
+ * @param binding - Local identifier when the declaration supplies one.
+ * @param position - TypeScript character offset retained in the evidence.
+ * @returns Factory identity, or undefined when syntax names no recognized factory.
+ */
 export function factoryFor(
   initializer: ts.Expression | undefined,
   binding: string | undefined,
   position: number,
 ): FactoryBindingFact | undefined {
-  const call = unwrap(initializer);
-  if (!call || !ts.isCallExpression(call)) return undefined;
-  const factory = lastSegment(call.expression);
-  const definition = factory === undefined ? undefined : FACTORIES[factory];
-  if (definition === undefined || factory === undefined) return undefined;
-  return Object.freeze({
-    ...(binding === undefined ? {} : { binding }),
-    factory,
-    kind: definition.kind,
-    idOptional: definition.idOptional,
-    id:
-      factory === "defineServiceRoutes"
-        ? "omitted"
-        : idPresence(
-            factory === "definePrompt" || factory === "defineConstants"
-              ? call.arguments[1]
-              : call.arguments[0],
-          ),
-    position,
-    options: optionNames(call.arguments[0]),
-    ...(factory === "defineConfig" || factory === "defineApp"
-      ? { optionPaths: optionPaths(call.arguments[0]) }
-      : {}),
-  });
+  return runDiscoverySync(factoryForEffect(initializer, binding, position));
 }
 
-function optionNames(argument: ts.Expression | undefined): readonly string[] {
-  const value = unwrap(argument);
-  if (!value || !ts.isObjectLiteralExpression(value)) return [];
-  return Object.freeze(
-    value.properties.flatMap((property) => {
-      if (ts.isSpreadAssignment(property)) return [];
-      const name = propertyName(property.name);
-      return name === undefined ? [] : [name];
-    }),
-  );
-}
+/**
+ * Classifies a declaration's factory call and its source-only ID/options evidence.
+ * @param initializer - Unevaluated initializer to unwrap and inspect.
+ * @param binding - Local binding associated with the call, if known.
+ * @param position - Source character offset associated with the declaration.
+ * @returns A lazy effect yielding factory evidence or undefined for unrelated syntax.
+ */
+export const factoryForEffect = Effect.fn("Discovery.factoryFor")(
+  function* (
+    initializer: ts.Expression | undefined,
+    binding: string | undefined,
+    position: number,
+  ) {
+    const call = unwrap(initializer);
+    if (!call || !ts.isCallExpression(call)) return undefined;
+    const factory = factoryName(call.expression);
+    const definition = factory === undefined ? undefined : FACTORIES[factory];
+    if (definition === undefined || factory === undefined) return undefined;
+    return Object.freeze({
+      ...(binding === undefined ? {} : { binding }),
+      factory,
+      kind: definition.kind,
+      idOptional: definition.idOptional,
+      id:
+        factory === "defineServiceRoutes"
+          ? "omitted"
+          : yield* idPresenceEffect(
+              factory === "definePrompt" || factory === "defineConstants"
+                ? call.arguments[1]
+                : call.arguments[0],
+            ),
+      position,
+      options: yield* optionNamesEffect(call.arguments[0]),
+      ...(factory === "defineConfig" || factory === "defineApp"
+        ? { optionPaths: yield* optionPathsEffect(call.arguments[0]) }
+        : {}),
+    } satisfies FactoryBindingFact);
+  },
+  (effect, initializer, binding, position) =>
+    observeCompiler("discovery", "factoryFor", effect, () => ({}), false),
+);
 
-function optionPaths(argument: ts.Expression | undefined): readonly string[] {
-  const value = unwrap(argument);
-  if (!value || !ts.isObjectLiteralExpression(value)) return [];
-  const paths: string[] = [];
-  for (const property of value.properties) {
-    if (ts.isSpreadAssignment(property)) continue;
-    const name = propertyName(property.name);
-    if (name === undefined) continue;
-    paths.push(name);
-    if (name !== "defaults" && name !== "compatibility") continue;
-    if (!ts.isPropertyAssignment(property)) continue;
-    const nested = unwrap(property.initializer);
-    if (!nested || !ts.isObjectLiteralExpression(nested)) continue;
-    for (const child of nested.properties) {
-      const childName = propertyName(child.name);
-      if (childName !== undefined) paths.push(`${name}.${childName}`);
-    }
-  }
-  return Object.freeze(paths);
-}
-
+/**
+ * Reads service-member evidence for synchronous compiler callers.
+ * @param factory - Factory evidence for the owning declaration.
+ * @param initializer - Unevaluated service initializer.
+ * @param sourceFile - AST supplying character offsets.
+ * @returns Source-ordered service members; non-service declarations yield an empty list.
+ */
 export function membersFor(
   factory: FactoryBindingFact,
   initializer: ts.Expression | undefined,
   sourceFile: ts.SourceFile,
 ): readonly ServiceMemberFact[] {
-  if (factory.kind !== "service" || factory.binding === undefined) return [];
-  const call = unwrap(initializer);
-  const options = call && ts.isCallExpression(call) ? unwrap(call.arguments[0]) : undefined;
-  if (!options || !ts.isObjectLiteralExpression(options)) return [];
-  return options.properties.flatMap((property) => {
-    const category = propertyName(property.name);
-    if (
-      category !== "functions" &&
-      category !== "events" &&
-      category !== "tasks" &&
-      category !== "jobs"
-    ) {
-      return [];
-    }
-    if (!ts.isPropertyAssignment(property)) return [];
-    const map = unwrap(property.initializer);
-    if (!map || !ts.isObjectLiteralExpression(map)) return [];
-    return map.properties.flatMap((member) => {
-      const name = propertyName(member.name);
-      if (name === undefined || ts.isSpreadAssignment(member)) return [];
-      const targetBinding = memberTarget(member);
-      return [
-        Object.freeze({
-          service: factory.binding!,
-          member: name,
-          ...(targetBinding === undefined ? {} : { targetBinding }),
-          position: member.name?.getStart(sourceFile) ?? member.getStart(sourceFile),
-        }),
-      ];
-    });
-  });
+  return runDiscoverySync(membersForEffect(factory, initializer, sourceFile));
 }
 
-function memberTarget(property: ts.ObjectLiteralElementLike): string | undefined {
-  if (ts.isShorthandPropertyAssignment(property)) return property.name.text;
-  return ts.isPropertyAssignment(property) && ts.isIdentifier(property.initializer)
-    ? property.initializer.text
-    : undefined;
-}
-
-function idPresence(argument: ts.Expression | undefined): FactoryIdPresence {
-  const value = unwrap(argument);
-  if (!value || !ts.isObjectLiteralExpression(value)) return "unknown";
-  return value.properties.some((property) => propertyName(property.name) === "id")
-    ? "explicit"
-    : "omitted";
-}
-
-function propertyName(name: ts.PropertyName | undefined): string | undefined {
-  if (name === undefined) return undefined;
-  if (ts.isIdentifier(name) || ts.isStringLiteralLike(name) || ts.isNumericLiteral(name)) {
-    return name.text;
-  }
-  return undefined;
-}
-
-function lastSegment(expression: ts.Expression): string | undefined {
-  if (ts.isIdentifier(expression)) return expression.text;
-  if (ts.isPropertyAccessExpression(expression)) return expression.name.text;
-  return undefined;
-}
-
-function unwrap(value: ts.Expression | undefined): ts.Expression | undefined {
-  let current = value;
-  while (
-    current !== undefined &&
-    (ts.isParenthesizedExpression(current) ||
-      ts.isAsExpression(current) ||
-      ts.isTypeAssertionExpression(current) ||
-      ts.isSatisfiesExpression(current))
+/**
+ * Collects declared function, event, task, and job members of a service factory.
+ * @param factory - Factory identity including the service's local binding.
+ * @param initializer - Unevaluated initializer containing literal options.
+ * @param sourceFile - AST used to read member character offsets.
+ * @returns A lazy effect yielding member evidence without resolving or evaluating targets.
+ */
+export const membersForEffect = Effect.fn("Discovery.membersFor")(
+  function* (
+    factory: FactoryBindingFact,
+    initializer: ts.Expression | undefined,
+    sourceFile: ts.SourceFile,
   ) {
-    current = current.expression;
-  }
-  return current;
-}
+    if (factory.kind !== "service" || factory.binding === undefined) return [];
+    const service = factory.binding;
+    const call = unwrap(initializer);
+    const options = call && ts.isCallExpression(call) ? unwrap(call.arguments[0]) : undefined;
+    if (!options || !ts.isObjectLiteralExpression(options)) return [];
+    return options.properties.flatMap((property) => {
+      const category = propertyName(property.name);
+      if (
+        category !== "functions" &&
+        category !== "events" &&
+        category !== "tasks" &&
+        category !== "jobs"
+      ) {
+        return [];
+      }
+      if (!ts.isPropertyAssignment(property)) return [];
+      const map = unwrap(property.initializer);
+      if (!map || !ts.isObjectLiteralExpression(map)) return [];
+      return map.properties.flatMap((member) => {
+        const name = propertyName(member.name);
+        if (name === undefined || ts.isSpreadAssignment(member)) return [];
+        const targetBinding = memberTarget(member);
+        return [
+          Object.freeze({
+            service,
+            member: name,
+            ...(targetBinding === undefined ? {} : { targetBinding }),
+            position: member.name?.getStart(sourceFile) ?? member.getStart(sourceFile),
+          } satisfies ServiceMemberFact),
+        ];
+      });
+    });
+  },
+  (effect, factory, initializer, sourceFile) =>
+    observeCompiler("discovery", "membersFor", effect, () => ({}), false),
+);

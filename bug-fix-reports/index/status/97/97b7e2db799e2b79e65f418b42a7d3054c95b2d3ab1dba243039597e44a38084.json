@@ -1,0 +1,50 @@
+{
+  "key": "unverified",
+  "matches": {
+    "bf-cf7dd657070a0c1bc95c3060": {
+      "id": "bf-cf7dd657070a0c1bc95c3060",
+      "status": "unverified",
+      "what": "Inferred users/[id] routes accepted a function without id input; the demo response omitted id and a framework restart later stalled.",
+      "root_cause": "normalize-route-inference.ts:89 silently continued when a path field was absent. The generated route contract and editor did not carry filename path parameters. The demo's output schema declared only value despite returning id. dev-shutdown.ts:13 awaited proxy closure before stopping the inspector that could keep proxy",
+      "fixed_by": "Require inferred path fields during normalization, generated TypeScript route contracts and editor diagnostics, preserving explicit mapping overrides. Added id to the demo output schema. Stop the proxy and inspector concurrently. Focused tests, actual CLI rejection, live response, and real framework restart pass. Full-",
+      "files": [
+        "packages/compiler/src/normalize-route-inference.ts",
+        "packages/routes/src/define-service-routes.types.ts",
+        "packages/routes/src/route-module.types.ts",
+        "packages/compiler/src/route-path-parameters.ts",
+        "packages/compiler/src/route-module-checks.ts",
+        "packages/compiler/src/route-path-input-checks.ts",
+        "packages/compiler/src/route-module-diagnostics.ts",
+        "packages/cli/src/commands/dev-shutdown.ts",
+        "packages/cli/dev-shutdown.test.ts",
+        "packages/cli/route-path-input.test.ts",
+        "tests/types/route-path-input.ts",
+        "tests/compiler/route-path-input.test.ts",
+        "tests/compiler/route-path-types.test.ts",
+        "tests/compiler/route-inference.test.ts",
+        "docs/records/route-module-type-safety.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-01T09:27:22+00:00",
+      "report": "bug-fix-reports/issues/bf-cf7dd657070a0c1bc95c3060/report.md"
+    },
+    "bf-d0338e2c65acaba818e3a3e7": {
+      "id": "bf-d0338e2c65acaba818e3a3e7",
+      "status": "unverified",
+      "what": "The live demo editor does not report a users/[id] route whose target input omits id, although check and typecheck reject it.",
+      "root_cause": "VS Code's TypeScript plugin resolver searches its own installation/plugin probe roots, and typescript.tsdk only offers a workspace SDK rather than activating it. Separately, packages/compiler/src/route-path-input-checks.ts used its imported TypeScript 5.9 TypeFlags.Never against editor TypeScript 6 types; Never changed",
+      "fixed_by": "The CLI plugin now passes modules.typescript into shared source/module/path-input checks, including flags and AST guards. Rebuilt compiler and editor bundles; verified the packaged plugin under workspace 5.9 and editor 6.0.3, including unsaved missing/valid input, explicit mapping and malformed export recovery. A fresh",
+      "files": [
+        "packages/cli/src/editor.ts",
+        "packages/compiler/src/route-source-checks.ts",
+        "packages/compiler/src/route-module-diagnostics.ts",
+        "packages/compiler/src/route-path-input-checks.ts",
+        "packages/cli/editor-compatibility.test.ts",
+        "docs/records/route-module-type-safety.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-01T09:56:39+00:00",
+      "report": "bug-fix-reports/issues/bf-d0338e2c65acaba818e3a3e7/report.md"
+    }
+  }
+}

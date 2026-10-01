@@ -1,15 +1,24 @@
 import type { JsonValue } from "@relkit/contracts";
 import { clean } from "./normalize-graph-utils.js";
-import { middlewareForRoute } from "./middleware-coverage.js";
+import { middlewareForRouteEffect } from "./middleware-coverage.js";
+import { Effect } from "effect";
+import { runCompilerSync } from "./compatibility.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
 import { selectedProviderProfile } from "./normalize-graph-app.js";
 
-export function httpConfig(
+/**
+ * Projects the route's target, policy, response, and transform graph metadata.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param value - Declared metadata inspected without coercion.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns A lazy effect yielding HTTP metadata; middleware selection composes in the caller's runtime.
+ */
+export const httpConfigEffect = Effect.fnUntraced(function* (
   descriptor: NormalizedDescriptor,
   value: Record<string, unknown>,
   work: NormalizationWork,
-): JsonValue {
+) {
   return clean({
     method: value.method,
     path: value.path,
@@ -20,7 +29,7 @@ export function httpConfig(
     runtimePaths: value.runtimePaths,
     request: value.request,
     responses: responses(value.responses, descriptor.id, work),
-    middleware: middlewareForRoute(descriptor, work),
+    middleware: yield* middlewareForRouteEffect(descriptor, work),
     transforms: transforms(value.request, work),
     rateLimit: rateLimit(value.rateLimit),
     maxBodyBytes: value.maxBodyBytes,
@@ -29,8 +38,23 @@ export function httpConfig(
     stream: value.stream,
     auth: authConfig(value.auth),
   });
+});
+
+/** Projects HTTP metadata at the synchronous compatibility boundary. */
+export function httpConfig(
+  descriptor: NormalizedDescriptor,
+  value: Record<string, unknown>,
+  work: NormalizationWork,
+): JsonValue {
+  return runCompilerSync(httpConfigEffect(descriptor, value, work));
 }
 
+/**
+ * Projects the client invocation policy for an HTTP operation.
+ * @param value - Declared metadata inspected without coercion.
+ * @param method - Normalized HTTP method.
+ * @returns Serializable client invocation policy, or undefined when omitted.
+ */
 function clientPolicy(value: unknown, method: unknown): JsonValue | undefined {
   if (value === false) return false;
   const operation =
@@ -42,6 +66,11 @@ function clientPolicy(value: unknown, method: unknown): JsonValue | undefined {
   return { operation };
 }
 
+/**
+ * Projects route authentication metadata without executable values.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Serializable route authentication settings, or undefined when omitted.
+ */
 function authConfig(value: unknown): JsonValue | undefined {
   if (!isRecord(value) || value.kind !== "better-auth") return undefined;
   return clean({
@@ -51,6 +80,11 @@ function authConfig(value: unknown): JsonValue | undefined {
   });
 }
 
+/**
+ * Projects normalized HTTP rate-limit metadata.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns Normalized rate-limit metadata, or undefined when omitted.
+ */
 function rateLimit(value: unknown): JsonValue | undefined {
   if (!isRecord(value)) return undefined;
   return clean({
@@ -61,6 +95,13 @@ function rateLimit(value: unknown): JsonValue | undefined {
   });
 }
 
+/**
+ * Projects event contract and target graph metadata.
+ * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param value - Declared metadata inspected without coercion.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Serializable event contract and target metadata.
+ */
 export function eventConfig(
   descriptor: NormalizedDescriptor,
   value: Record<string, unknown>,
@@ -82,6 +123,13 @@ export function eventConfig(
   });
 }
 
+/**
+ * Projects declared response schemas and identities for a route.
+ * @param value - Declared metadata inspected without coercion.
+ * @param descriptorId - Stable descriptor identity.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Response status contracts and schema references.
+ */
 function responses(value: unknown, descriptorId: string, work: NormalizationWork): JsonValue {
   if (!Array.isArray(value)) return [];
   return value.map((entry) => {
@@ -94,6 +142,12 @@ function responses(value: unknown, descriptorId: string, work: NormalizationWork
   });
 }
 
+/**
+ * Projects transform identities in a mapping.
+ * @param value - Declared metadata inspected without coercion.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @returns Transform identities without retaining executable functions.
+ */
 function transforms(value: unknown, work: NormalizationWork): JsonValue {
   const ids: string[] = [];
   collectTransforms(value, ids);
@@ -103,6 +157,12 @@ function transforms(value: unknown, work: NormalizationWork): JsonValue {
   }));
 }
 
+/**
+ * Collects nested transform descriptors without losing ownership evidence.
+ * @param value - Declared metadata inspected without coercion.
+ * @param ids - Stable identities in declaration order.
+ * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ */
 function collectTransforms(value: unknown, ids: string[]): void {
   if (!isRecord(value)) return;
   if (value.kind === "transform" && typeof value.transformId === "string") {

@@ -1,0 +1,6 @@
+packages/compiler/coverage/coverage-final.json:20:3029 [out-of-scope-navigation-name] out-of-scope navigation or route name
+Boundary/scope check failed with 1 violation(s).
+error: script "check" exited with code 1
+
+Exit code: 1
+Command: rtk bun run check

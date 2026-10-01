@@ -1,162 +1,159 @@
-import type { ApplicationGraph, TaskJobNode } from "@relkit/graph";
-import { jobProcedureEntrySources } from "./generate-job-types.js";
-
-export const JOB_PROCEDURE_OPERATIONS = [
-  "trigger",
-  "get",
-  "list",
-  "watch",
-  "cancel",
-  "retry",
-  "stream",
-] as const;
-
-export type JobProcedureOperation = (typeof JOB_PROCEDURE_OPERATIONS)[number];
-
-export interface JobProcedureSource {
-  readonly name: string;
-  readonly jobId: string;
-  readonly taskId: string;
-  readonly taskVersion: string;
-  readonly buildId?: string;
-  readonly input: unknown;
-  readonly output: unknown;
-  readonly errors?: unknown;
-  readonly progress?: unknown;
-  readonly streams?: unknown;
-  readonly operations: readonly JobProcedureOperation[];
-  readonly fields: readonly string[];
-  readonly streamNames: readonly string[];
+import type { ApplicationGraph, JobProcedureSource } from "./generate-job-procedures.types.js";
+import { Effect } from "effect";
+import { makeGeneratorOperation } from "./generator-operation.js";
+export { JOB_PROCEDURE_OPERATIONS } from "./generate-job-sources.js";
+import { jobTypeCalculations } from "./generate-job-types.js";
+import {
+  jobProcedureSourcesCore,
+  jobProcedureSourcesFromDocumentCore,
+} from "./generate-job-procedure-sources.js";
+export {
+  jobProcedureDocument,
+  jobProcedureDocumentEffect,
+  jobProcedurePaths,
+  jobProcedurePathsEffect,
+} from "./generate-job-paths.js";
+export type {
+  JobProcedureDocument,
+  JobProcedureOperation,
+  JobProcedureSource,
+} from "./generate-job-procedures.types.js";
+/** Builds procedure declarations for exposed graph jobs.
+ * @param graph - Validated application graph.
+ * @returns An Effect yielding job entries; it has no expected failure.
+ * @example Effect.runSync(jobProcedureEntriesEffect(graph));
+ */
+function jobProcedureEntriesCore(graph: ApplicationGraph): Effect.Effect<readonly string[]> {
+  return Effect.gen(function* () {
+    const sources = yield* jobProcedureSourcesCore(graph);
+    return yield* jobTypeCalculations.entriesEffect(sources);
+  });
 }
-
-export interface JobProcedureDocument extends JobProcedureSource {
-  readonly procedurePaths?: Readonly<Record<JobProcedureOperation, readonly string[]>>;
-}
-
-export function jobProcedureSources(graph: ApplicationGraph): readonly JobProcedureSource[] {
-  return graph.nodes
-    .filter(isExposedJob)
-    .map((job) => source(job))
-    .sort(
-      (left, right) => left.name.localeCompare(right.name) || left.jobId.localeCompare(right.jobId),
-    );
-}
-
-export function jobProcedureSourcesFromDocument(value: unknown): readonly JobProcedureSource[] {
-  return (Array.isArray(value) ? value : [])
-    .filter(isRecord)
-    .flatMap((job) => {
-      if (
-        typeof job.name !== "string" ||
-        typeof job.jobId !== "string" ||
-        typeof job.taskId !== "string" ||
-        typeof job.taskVersion !== "string"
-      )
-        return [];
-      const operations = supportedOperations(job.operations);
-      if (operations.length === 0) return [];
-      return [
-        {
-          name: job.name,
-          jobId: job.jobId,
-          taskId: job.taskId,
-          taskVersion: job.taskVersion,
-          ...(typeof job.buildId === "string" ? { buildId: job.buildId } : {}),
-          input: job.input,
-          output: job.output,
-          ...(job.errors === undefined ? {} : { errors: job.errors }),
-          ...(job.progress === undefined ? {} : { progress: job.progress }),
-          ...(job.streams === undefined ? {} : { streams: job.streams }),
-          operations,
-          fields: stringArray(job.fields),
-          streamNames: stringArray(job.streamNames ?? recordKeys(job.streams)),
-        },
-      ];
-    })
-    .sort(
-      (left, right) => left.name.localeCompare(right.name) || left.jobId.localeCompare(right.jobId),
-    );
-}
-
-export function jobProcedureEntries(graph: ApplicationGraph): readonly string[] {
-  return jobProcedureEntrySources(jobProcedureSources(graph));
-}
-
-export function jobProcedureEntriesFromSources(
+/** Builds procedure declarations from normalized job sources.
+ * @param sources - Normalized public jobs.
+ * @returns An Effect yielding job entries; it has no expected failure.
+ * @example Effect.runSync(jobProcedureEntriesFromSourcesEffect([]));
+ */
+function jobProcedureEntriesFromSourcesCore(
   sources: readonly JobProcedureSource[],
-): readonly string[] {
-  return jobProcedureEntrySources(sources);
+): Effect.Effect<readonly string[]> {
+  return jobTypeCalculations.entriesEffect(sources);
 }
-
-export function jobProcedureEntriesFromDocument(value: unknown): readonly string[] {
-  return jobProcedureEntrySources(jobProcedureSourcesFromDocument(value));
+/** Builds procedure declarations from serialized job metadata.
+ * @param value - Unknown job document list.
+ * @returns An Effect yielding job entries; it has no expected failure.
+ * @example Effect.runSync(jobProcedureEntriesFromDocumentEffect([]));
+ */
+function jobProcedureEntriesFromDocumentCore(value: unknown): Effect.Effect<readonly string[]> {
+  return Effect.gen(function* () {
+    const sources = yield* jobProcedureSourcesFromDocumentCore(value);
+    return yield* jobTypeCalculations.entriesEffect(sources);
+  });
 }
-
-export function jobProcedurePaths(
-  source: Pick<JobProcedureSource, "name" | "operations">,
-): Readonly<Record<JobProcedureOperation, readonly string[]>> {
-  return Object.fromEntries(
-    source.operations.map((operation) => [
-      operation,
-      operation === "trigger"
-        ? ["jobs", source.name, "trigger"]
-        : ["jobs", source.name, "runs", operation],
-    ]),
-  ) as unknown as Readonly<Record<JobProcedureOperation, readonly string[]>>;
-}
-
-export function jobProcedureDocument(source: JobProcedureSource): JobProcedureDocument {
-  return Object.freeze({ ...source, procedurePaths: jobProcedurePaths(source) });
-}
-
-function source(job: TaskJobNode): JobProcedureSource {
-  const client = isRecord(job.client) ? job.client : {};
-  return {
-    name: job.name,
-    jobId: job.jobId,
-    taskId: job.taskId,
-    taskVersion: job.taskVersion,
-    ...(job.buildId === undefined ? {} : { buildId: job.buildId }),
-    input: job.input,
-    output: job.output,
-    ...(job.errors === undefined ? {} : { errors: job.errors }),
-    ...(job.progress === undefined ? {} : { progress: job.progress }),
-    ...(job.streams === undefined ? {} : { streams: job.streams }),
-    operations: supportedOperations(client.operations),
-    fields: stringArray(client.fields),
-    streamNames: stringArray(client.streams),
-  };
-}
-
-function isExposedJob(node: ApplicationGraph["nodes"][number]): node is TaskJobNode {
-  if (node.kind !== "job" || node.executionModel !== "task" || node.implicit) return false;
-  if (!isRecord(node.client)) return false;
-  return supportedOperations(node.client.operations).length > 0;
-}
-
-function supportedOperations(value: unknown): JobProcedureOperation[] {
-  return JOB_PROCEDURE_OPERATIONS.filter(
-    (operation) => Array.isArray(value) && value.includes(operation),
-  );
-}
-
-function stringArray(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((entry): entry is string => typeof entry === "string")
-    : [];
-}
-
-function recordKeys(value: unknown): string[] {
-  return isRecord(value) ? Object.keys(value) : [];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
 export {
   jobFailureType,
+  jobFailureTypeEffect,
   jobFieldsType,
+  jobFieldsTypeEffect,
   jobSnapshotType,
+  jobSnapshotTypeEffect,
   jobStreamItemType,
+  jobStreamItemTypeEffect,
 } from "./generate-job-types.js";
+const jobProcedureSourcesOperation = makeGeneratorOperation(
+  "jobProcedureSources",
+  jobProcedureSourcesCore,
+);
+/** Collects exposed task jobs from an application graph in an observed Effect.
+ * @param graph - Application graph to inspect.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(jobProcedureSourcesEffect(graph));
+ */
+export const jobProcedureSourcesEffect = jobProcedureSourcesOperation.effect;
+/** Collects exposed task jobs from an application graph synchronously for existing callers.
+ * @param graph - Application graph to inspect.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example jobProcedureSources(graph);
+ */
+export const jobProcedureSources = jobProcedureSourcesOperation.run;
+const jobProcedureSourcesFromDocumentOperation = makeGeneratorOperation(
+  "jobProcedureSourcesFromDocument",
+  jobProcedureSourcesFromDocumentCore,
+);
+/** Normalizes serialized job procedure sources in an observed Effect.
+ * @param value - Document or schema value to render.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(jobProcedureSourcesFromDocumentEffect(value));
+ */
+export const jobProcedureSourcesFromDocumentEffect =
+  jobProcedureSourcesFromDocumentOperation.effect;
+/** Normalizes serialized job procedure sources synchronously for existing callers.
+ * @param value - Document or schema value to render.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example jobProcedureSourcesFromDocument(value);
+ */
+export const jobProcedureSourcesFromDocument = jobProcedureSourcesFromDocumentOperation.run;
+const jobProcedureEntriesOperation = makeGeneratorOperation(
+  "jobProcedureEntries",
+  jobProcedureEntriesCore,
+);
+/** Builds job procedure entries from graph nodes in an observed Effect.
+ * @param graph - Application graph to inspect.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(jobProcedureEntriesEffect(graph));
+ */
+export const jobProcedureEntriesEffect = jobProcedureEntriesOperation.effect;
+/** Builds job procedure entries from graph nodes synchronously for existing callers.
+ * @param graph - Application graph to inspect.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example jobProcedureEntries(graph);
+ */
+export const jobProcedureEntries = jobProcedureEntriesOperation.run;
+const jobProcedureEntriesFromSourcesOperation = makeGeneratorOperation(
+  "jobProcedureEntriesFromSources",
+  jobProcedureEntriesFromSourcesCore,
+);
+/** Builds job procedure entries from normalized sources in an observed Effect.
+ * @param sources - Normalized job sources.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(jobProcedureEntriesFromSourcesEffect(sources));
+ */
+export const jobProcedureEntriesFromSourcesEffect = jobProcedureEntriesFromSourcesOperation.effect;
+/** Builds job procedure entries from normalized sources synchronously for existing callers.
+ * @param sources - Normalized job sources.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example jobProcedureEntriesFromSources(sources);
+ */
+export const jobProcedureEntriesFromSources = jobProcedureEntriesFromSourcesOperation.run;
+const jobProcedureEntriesFromDocumentOperation = makeGeneratorOperation(
+  "jobProcedureEntriesFromDocument",
+  jobProcedureEntriesFromDocumentCore,
+);
+/** Builds job procedure entries from a document in an observed Effect.
+ * @param value - Document or schema value to render.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(jobProcedureEntriesFromDocumentEffect(value));
+ */
+export const jobProcedureEntriesFromDocumentEffect =
+  jobProcedureEntriesFromDocumentOperation.effect;
+/** Builds job procedure entries from a document synchronously for existing callers.
+ * @param value - Document or schema value to render.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example jobProcedureEntriesFromDocument(value);
+ */
+export const jobProcedureEntriesFromDocument = jobProcedureEntriesFromDocumentOperation.run;
+
+/** Job procedure calculations shared by composed generator operations. @internal */
+export const jobProcedureCalculations = {
+  graphSources: jobProcedureSourcesOperation.run,
+  graphSourcesEffect: jobProcedureSourcesCore,
+  documentSources: jobProcedureSourcesFromDocumentOperation.run,
+  documentSourcesEffect: jobProcedureSourcesFromDocumentCore,
+  entries: jobProcedureEntriesFromSourcesOperation.run,
+  entriesEffect: jobProcedureEntriesFromSourcesCore,
+} as const;

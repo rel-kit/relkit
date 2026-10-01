@@ -1,0 +1,32 @@
+{
+  "key": "tests/compiler/route-inference.test.ts",
+  "matches": {
+    "bf-cf7dd657070a0c1bc95c3060": {
+      "id": "bf-cf7dd657070a0c1bc95c3060",
+      "status": "unverified",
+      "what": "Inferred users/[id] routes accepted a function without id input; the demo response omitted id and a framework restart later stalled.",
+      "root_cause": "normalize-route-inference.ts:89 silently continued when a path field was absent. The generated route contract and editor did not carry filename path parameters. The demo's output schema declared only value despite returning id. dev-shutdown.ts:13 awaited proxy closure before stopping the inspector that could keep proxy",
+      "fixed_by": "Require inferred path fields during normalization, generated TypeScript route contracts and editor diagnostics, preserving explicit mapping overrides. Added id to the demo output schema. Stop the proxy and inspector concurrently. Focused tests, actual CLI rejection, live response, and real framework restart pass. Full-",
+      "files": [
+        "packages/compiler/src/normalize-route-inference.ts",
+        "packages/routes/src/define-service-routes.types.ts",
+        "packages/routes/src/route-module.types.ts",
+        "packages/compiler/src/route-path-parameters.ts",
+        "packages/compiler/src/route-module-checks.ts",
+        "packages/compiler/src/route-path-input-checks.ts",
+        "packages/compiler/src/route-module-diagnostics.ts",
+        "packages/cli/src/commands/dev-shutdown.ts",
+        "packages/cli/dev-shutdown.test.ts",
+        "packages/cli/route-path-input.test.ts",
+        "tests/types/route-path-input.ts",
+        "tests/compiler/route-path-input.test.ts",
+        "tests/compiler/route-path-types.test.ts",
+        "tests/compiler/route-inference.test.ts",
+        "docs/records/route-module-type-safety.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-01T09:27:22+00:00",
+      "report": "bug-fix-reports/issues/bf-cf7dd657070a0c1bc95c3060/report.md"
+    }
+  }
+}

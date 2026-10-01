@@ -1,121 +1,85 @@
-import type { ApplicationGraph } from "@relkit/graph";
-import { schemaType } from "./generate-schema.js";
+import { Effect } from "effect";
+import { makeGeneratorOperation } from "./generator-operation.js";
 import {
-  jobFailureType,
-  jobFieldsType,
-  jobSnapshotType,
-  jobStreamItemType,
-} from "./generate-job-types.js";
+  generateJobRegistryCore,
+  generateJobRegistryFromDocumentCore,
+} from "./generate-job-registry-render.js";
 import {
-  jobProcedureSources,
-  jobProcedureSourcesFromDocument,
-  type JobProcedureSource,
-} from "./generate-job-procedures.js";
+  jobClientRegistryEntriesCore,
+  jobRegistryTypeCore,
+} from "./generate-job-registry-calculations.js";
 
-/** Generates the sole browser-safe JobRegistry plus React selector entries. */
-export function generateJobRegistry(graph: ApplicationGraph): string {
-  return generateJobRegistryFromSources(jobProcedureSources(graph));
-}
+const generateJobRegistryOperation = makeGeneratorOperation(
+  "generateJobRegistry",
+  generateJobRegistryCore,
+);
+/** Renders the graph-backed job registry declarations in an observed Effect.
+ * @param graph - Application graph to inspect.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(generateJobRegistryEffect(graph));
+ */
+export const generateJobRegistryEffect = generateJobRegistryOperation.effect;
+/** Renders the graph-backed job registry declarations synchronously for existing callers.
+ * @param graph - Application graph to inspect.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example generateJobRegistry(graph);
+ */
+export const generateJobRegistry = generateJobRegistryOperation.run;
+const generateJobRegistryFromDocumentOperation = makeGeneratorOperation(
+  "generateJobRegistryFromDocument",
+  generateJobRegistryFromDocumentCore,
+);
+/** Renders job registry declarations from serialized sources in an observed Effect.
+ * @param value - Document or schema value to render.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(generateJobRegistryFromDocumentEffect(value));
+ */
+export const generateJobRegistryFromDocumentEffect =
+  generateJobRegistryFromDocumentOperation.effect;
+/** Renders job registry declarations from serialized sources synchronously for existing callers.
+ * @param value - Document or schema value to render.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example generateJobRegistryFromDocument(value);
+ */
+export const generateJobRegistryFromDocument = generateJobRegistryFromDocumentOperation.run;
+const jobRegistryTypeOperation = makeGeneratorOperation("jobRegistryType", jobRegistryTypeCore);
+/** Renders the JobContract type for a job source in an observed Effect.
+ * @param source - Normalized job source.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(jobRegistryTypeEffect(source));
+ */
+export const jobRegistryTypeEffect = jobRegistryTypeOperation.effect;
+/** Renders the JobContract type for a job source synchronously for existing callers.
+ * @param source - Normalized job source.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example jobRegistryType(source);
+ */
+export const jobRegistryType = jobRegistryTypeOperation.run;
+const jobClientRegistryEntriesOperation = makeGeneratorOperation(
+  "jobClientRegistryEntries",
+  jobClientRegistryEntriesCore,
+);
+/** Builds React client registry entries for job operations in an observed Effect.
+ * @param source - Normalized job source.
+ * @returns An Effect with the generated value and no expected typed failures.
+ * @example Effect.runSync(jobClientRegistryEntriesEffect(source));
+ */
+export const jobClientRegistryEntriesEffect = jobClientRegistryEntriesOperation.effect;
+/** Builds React client registry entries for job operations synchronously for existing callers.
+ * @param source - Normalized job source.
+ * @returns The generated value.
+ * @throws If malformed trusted input causes a defect.
+ * @example jobClientRegistryEntries(source);
+ */
+export const jobClientRegistryEntries = jobClientRegistryEntriesOperation.run;
 
-export function generateJobRegistryFromDocument(value: unknown): string {
-  return generateJobRegistryFromSources(jobProcedureSourcesFromDocument(value));
-}
-
-export function jobRegistryType(source: JobProcedureSource): string {
-  return `import("@relkit/client/jobs").JobContract<${JSON.stringify(source.name)}, ${JSON.stringify(source.jobId)}, ${schemaType(source.input)}, ${schemaType(source.output)}, ${jobFailureType(source.errors)}, ${schemaType(source.progress)}, ${streamRecordType(source)}, ${operationsType(source)}, ${jobFieldsType(source.fields)}>`;
-}
-
-export function jobClientRegistryEntries(source: JobProcedureSource): readonly string[] {
-  return source.operations.map((operation) => {
-    const selector =
-      operation === "trigger"
-        ? `jobs.${source.name}.trigger`
-        : `jobs.${source.name}.runs.${operation}`;
-    const type = jobProcedureType(source, operation);
-    return `    readonly ${JSON.stringify(selector)}: ${type};`;
-  });
-}
-
-function generateJobRegistryFromSources(sources: readonly JobProcedureSource[]): string {
-  const jobs = sources.map(
-    (source) => `    readonly ${JSON.stringify(source.name)}: ${jobRegistryType(source)};`,
-  );
-  const procedures = sources.flatMap(jobClientRegistryEntries);
-  return [
-    "/* generated by @relkit/client-generator; do not edit */",
-    'declare module "@relkit/client/jobs" {',
-    "  interface JobRegistry {",
-    ...jobs,
-    "  }",
-    "}",
-    'declare module "@relkit/client/react" {',
-    "  interface ClientRegistry {",
-    ...procedures,
-    "  }",
-    "}",
-    "export {};",
-    "",
-  ].join("\n");
-}
-
-function jobProcedureType(
-  source: JobProcedureSource,
-  operation: JobProcedureSource["operations"][number],
-): string {
-  const error = jobFailureType(source.errors);
-  if (operation === "trigger") {
-    return `import("@relkit/client/jobs").JobProcedureContract<${triggerInputType(source)}, import("@relkit/contracts/jobs").RunHandle, ${error}> & { readonly operation: "mutation" }`;
-  }
-  if (operation === "get") {
-    return `import("@relkit/client/jobs").JobProcedureContract<${getInputType}, ${jobSnapshotType(source)}, ${error}> & { readonly operation: "query" }`;
-  }
-  if (operation === "list") {
-    return `import("@relkit/client/jobs").JobProcedureContract<${listInputType}, import("@relkit/contracts/jobs").RunPage<${jobSnapshotType(source)}>, ${error}> & { readonly operation: "query" }`;
-  }
-  if (operation === "watch") {
-    return `import("@relkit/client/jobs").JobStreamProcedureContract<${watchInputType}, import("@relkit/contracts/jobs").RunWatchFrame<${jobSnapshotType(source)}>, ${error}> & { readonly operation: "query" }`;
-  }
-  if (operation === "stream") {
-    return `import("@relkit/client/jobs").JobStreamProcedureContract<${streamInputType(source)}, import("@relkit/contracts/jobs").NamedStreamFrame<${jobStreamItemType(source)}>, ${error}> & { readonly operation: "query" }`;
-  }
-  if (operation === "cancel") {
-    return `import("@relkit/client/jobs").JobProcedureContract<${cancelInputType}, import("@relkit/contracts/jobs").RunCancellationReceipt, ${error}> & { readonly operation: "mutation" }`;
-  }
-  return `import("@relkit/client/jobs").JobProcedureContract<${retryInputType}, import("@relkit/contracts/jobs").RunRetryReceipt, ${error}> & { readonly operation: "mutation" }`;
-}
-
-function streamRecordType(source: JobProcedureSource): string {
-  const streams = isRecord(source.streams) ? source.streams : {};
-  const entries = source.streamNames.map(
-    (name) => `${JSON.stringify(name)}: ${schemaType(streams[name])}`,
-  );
-  return entries.length === 0 ? "Readonly<Record<never, never>>" : `{ ${entries.join("; ")} }`;
-}
-
-function operationsType(source: JobProcedureSource): string {
-  return `readonly [${source.operations.map((operation) => JSON.stringify(operation)).join(", ")}]`;
-}
-
-function triggerInputType(source: JobProcedureSource): string {
-  return `{ readonly input: ${schemaType(source.input)}; readonly options?: import("@relkit/client/jobs").JobTriggerOptions; readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity }`;
-}
-
-const getInputType =
-  '{ readonly runId: string; readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity }';
-const listInputType =
-  '{ readonly query?: import("@relkit/client/jobs").JobListQuery; readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity }';
-const watchInputType =
-  '{ readonly runId: string; readonly after?: string; readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity }';
-const cancelInputType =
-  '{ readonly runId: string; readonly operationId: import("@relkit/contracts").OperationId | string; readonly reason?: string; readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity }';
-const retryInputType =
-  '{ readonly runId: string; readonly operationId: import("@relkit/contracts").OperationId | string; readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity }';
-
-function streamInputType(source: JobProcedureSource): string {
-  const names = source.streamNames.map((name) => JSON.stringify(name)).join(" | ") || "never";
-  return `{ readonly runId: string; readonly name: ${names}; readonly after?: string; readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity }`;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
+/** Job registry calculations shared by composed generator operations. @internal */
+export const jobRegistryCalculations = {
+  graph: generateJobRegistryOperation.run,
+  graphEffect: generateJobRegistryCore,
+  document: generateJobRegistryFromDocumentOperation.run,
+  documentEffect: generateJobRegistryFromDocumentCore,
+} as const;

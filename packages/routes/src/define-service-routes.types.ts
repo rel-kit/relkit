@@ -42,12 +42,19 @@ type EntryName<Entry> = Entry extends string
     ? Name
     : never;
 
+type EntryRequest<Entry> = Entry extends {
+  readonly request?: infer Request extends HttpRequestMapping | undefined;
+}
+  ? Request
+  : undefined;
+
 /** Route descriptors inferred from a service route table.
  * @example type Routes = ServiceRoutesResult<typeof service, { GET: "list" }>;
  */
 export type ServiceRoutesResult<Service, Options> = Readonly<{
   [Method in keyof Options]: FunctionRouteDescriptor<
     string,
-    ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>
+    ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>,
+    EntryRequest<Options[Method]>
   >;
 }>;

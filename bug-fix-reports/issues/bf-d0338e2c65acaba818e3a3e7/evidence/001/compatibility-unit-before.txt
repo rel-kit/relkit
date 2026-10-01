@@ -1,0 +1,21 @@
+63 |     const initialize = require("@relkit/cli/editor");
+64 |     const plugin = initialize({ typescript: ts }).create({ languageService: service });
+65 |     const findings = () => plugin.getSemanticDiagnostics(routeFile)
+66 |       .filter((diagnostic: TypeScript.Diagnostic) => diagnostic.source === "relkit");
+67 |     expect(findings().map((diagnostic: TypeScript.Diagnostic) => diagnostic.messageText))
+68 |       .toContain('Route GET infers path input "id", but the target function input schema does not declare it. Add the input field or define an explicit request mapping.');
+            ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "Route GET infers path input \"id\", but the target function input schema does not declare it. Add the input field or define an explicit request mapping."
+Received: []
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/editor-compatibility.test.ts:68:8)
+(fail) the packaged plugin uses the editor's TypeScript for dynamic route inputs and recovery [1124.41ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [1348.00ms]
+
+Exit code: 1

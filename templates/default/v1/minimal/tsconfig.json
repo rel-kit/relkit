@@ -8,6 +8,7 @@
     "paths": { "@app/*": ["src/*"] },
     "lib": ["ES2022"],
     "types": ["bun"],
+    "plugins": [{ "name": "@relkit/cli/editor" }],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -17,6 +18,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
+  "files": [".relkit/generated/route-module-checks.ts"],
   "include": ["src/**/*.ts", "tests/**/*.ts", "relkit.config.ts"],
   "exclude": ["node_modules", ".relkit"]
 }

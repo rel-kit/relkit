@@ -1,0 +1,8 @@
+SUMMARY:
+   4 pass
+   0 fail
+  Ran 4 tests across 4 files. [5.92s]
+
+
+Exit code: 0
+Command: rtk bun test tests/compiler/route-path-input.test.ts tests/compiler/route-path-types.test.ts packages/cli/route-path-input.test.ts packages/cli/dev-shutdown.test.ts

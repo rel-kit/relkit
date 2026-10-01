@@ -103,6 +103,29 @@ test("dev JSON uses only the supplied stderr sink after redaction", () => {
   expect(JSON.parse(lines[0]!)).toMatchObject({ component: "app", message: "password=[REDACTED]" });
 });
 
+test("normal reload failures show every compiler diagnostic and preserve the serving status", () => {
+  const message = [
+    "src/routes/users/route.ts:3:14 - error RELKIT_ROUTE_MODULE_TYPE: Expected a route descriptor.",
+    "src/users/service.ts:5:10 - error TS2322: Invalid output type.",
+  ].join("\n");
+  const output = formatDevLog(
+    {
+      version: 2,
+      signal: "log",
+      timestamp: new Date().toISOString(),
+      level: "error",
+      component: "cli.dev",
+      message: "dev.generation.failed",
+      fields: { message, previousActive: true },
+    },
+    { columns: 200 },
+  );
+  expect(output).toContain("previous version is still serving");
+  expect(output).toContain("RELKIT_ROUTE_MODULE_TYPE");
+  expect(output).toContain("TS2322");
+  expect(output.match(/Invalid output type/g)).toHaveLength(1);
+});
+
 test("dev severity is presentation only; raw and structured child logs are distinct", () => {
   const stored: LogRecord[] = [];
   const json: LogRecord[] = [];
