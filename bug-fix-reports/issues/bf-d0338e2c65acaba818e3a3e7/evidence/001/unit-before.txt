@@ -1,0 +1,15 @@
+[FAIL] FAILURES:
+  (fail) starters let bundled editor TypeScript resolve the project's route plugin [1.77ms]
+  error: minimal
+  Expected to contain: "."
+  Received: []
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/editor-settings.test.ts:13:73)
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [46.00ms]
+
+[full output: rtk recall bdd6006e7d80]
+
+Exit code: 1
