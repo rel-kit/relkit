@@ -50,10 +50,11 @@ async function stagePackages(items: PackageInfo[]): Promise<string> {
   for (const item of items) {
     const target = join(staging, "packages", basename(item.directory));
     await mkdir(target);
-    await cp(join(item.directory, "dist"), join(target, "dist"), {
-      recursive: true,
-      filter: (path) => !/(?:^|\/)tsconfig\.tsbuildinfo$/.test(path),
-    });
+    for (const file of item.manifest.files as string[])
+      await cp(join(item.directory, file), join(target, file), {
+        recursive: true,
+        filter: (path) => !/(?:^|\/)tsconfig\.tsbuildinfo$/.test(path),
+      });
     await cp(join(item.directory, "package.json"), join(target, "package.json"));
     await cp(join(root, "LICENSE"), join(target, "LICENSE"));
     try {
@@ -75,6 +76,8 @@ function assertListing(item: PackageInfo, listing: string[], packed: RecordValue
   for (const required of ["package/LICENSE", "package/README.md", "package/package.json"])
     if (!listing.includes(required))
       throw new Error(`Packed file is missing: ${item.name} -> ${required}`);
+  if (item.name === "@relkit/cli" && !listing.includes("package/editor/package.json"))
+    throw new Error("Packed CLI editor resolver entry is missing.");
   const forbidden = listing.filter(
     (path) =>
       !(item.name === "create-relkit" && path.startsWith("package/dist/templates/")) &&
@@ -124,7 +127,7 @@ export async function packAll(
         for (const [name, spec] of Object.entries(packed[field] ?? {}))
           if (items.some((candidate) => candidate.name === name) && spec !== version)
             throw new Error(`Packed internal version mismatch: ${item.name} -> ${name}@${spec}`);
-      if (JSON.stringify(stable(packed.files)) !== JSON.stringify(["dist"]))
+      if (JSON.stringify(stable(packed.files)) !== JSON.stringify(stable(item.manifest.files)))
         throw new Error(`Packed files allowlist mismatch: ${item.name}`);
       assertListing(item, listing, packed);
       const bytes = await readFile(artifact);

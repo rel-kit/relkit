@@ -125,7 +125,8 @@ export function checkManifests(items: PackageInfo[]): {
       item.manifest.repository?.directory !== relative(root, item.directory) ||
       item.manifest.homepage !== "https://github.com/rel-kit/relkit#readme" ||
       item.manifest.bugs?.url !== "https://github.com/rel-kit/relkit/issues" ||
-      JSON.stringify(item.manifest.files) !== JSON.stringify(["dist"]) ||
+      JSON.stringify(item.manifest.files) !==
+        JSON.stringify(directoryName === "cli" ? ["dist", "editor"] : ["dist"]) ||
       item.manifest.publishConfig?.access !== "public" ||
       item.manifest.engines?.bun !== ">=1.3.10" ||
       item.manifest.private === true
