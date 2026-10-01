@@ -1,0 +1,14 @@
+Exit code: 1
+[FAIL] FAILURES:
+  (fail) inferred routes reject path parameters absent from the target input schema [52.53ms]
+  error: expect(received).toBe(expected)
+  Expected: false
+  Received: true
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/compiler/route-path-input.test.ts:27:30)
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [347.00ms]
+
+[full output: rtk recall beb68e3a66a9]
