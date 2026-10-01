@@ -1,11 +1,11 @@
-import { Effect } from "effect";
-import { runCompilerSync } from "./compatibility.js";
-import { observeCompiler } from "./observability.js";
-import { existsSync } from "node:fs";
-import { dirname, resolve } from "node:path";
 import { createDiagnostic, type Diagnostic, type DiagnosticSeverity } from "@relkit/diagnostics";
+import { Effect } from "effect";
+import { existsSync } from "node:fs";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import ts from "typescript";
+import { runCompilerSync } from "./compatibility.js";
 import { eventSourceDiagnosticsEffect } from "./event-source-diagnostics.js";
+import { observeCompiler } from "./observability.js";
 import { ROUTE_MODULE_CHECKS_FILE } from "./route-module-checks.js";
 import { routeModuleDiagnostics } from "./route-module-diagnostics.js";
 
@@ -32,9 +32,13 @@ export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
       configPath,
     );
     const routeChecks = resolve(projectRoot, generatedDirectory, ROUTE_MODULE_CHECKS_FILE);
+    const hasRouteChecks = existsSync(routeChecks);
+    const options = { ...parsed.options };
+    if (hasRouteChecks && options.rootDir !== undefined)
+      options.rootDir = routeValidationRoot(options.rootDir, routeChecks);
     const program = ts.createProgram({
-      rootNames: [...parsed.fileNames, ...(existsSync(routeChecks) ? [routeChecks] : [])],
-      options: parsed.options,
+      rootNames: [...parsed.fileNames, ...(hasRouteChecks ? [routeChecks] : [])],
+      options,
       ...(parsed.projectReferences ? { projectReferences: parsed.projectReferences } : {}),
     });
     return [
@@ -61,6 +65,17 @@ export function typecheckProject(
   generatedDirectory = ".relkit/generated",
 ): readonly Diagnostic[] {
   return runCompilerSync(typecheckProjectEffect(projectRoot, generatedDirectory));
+}
+
+/** Widens only the no-emit validation root to include the generated TypeScript assertions. */
+function routeValidationRoot(rootDir: string, routeChecks: string): string {
+  for (;;) {
+    const path = relative(rootDir, routeChecks);
+    if (path !== ".." && !path.startsWith(`..${sep}`) && !isAbsolute(path)) return rootDir;
+    const parent = dirname(rootDir);
+    if (parent === rootDir) return rootDir;
+    rootDir = parent;
+  }
 }
 
 /**
