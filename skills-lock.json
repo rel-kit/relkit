@@ -1,6 +1,18 @@
 {
   "version": 1,
   "skills": {
+    "add-lang": {
+      "source": "colbymchenry/codegraph",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/add-lang/SKILL.md",
+      "computedHash": "58fa1bb5728a750f2456d667dad91c8f16395cc07aebf9a07db7a8e1417e9977"
+    },
+    "agent-eval": {
+      "source": "colbymchenry/codegraph",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/agent-eval/SKILL.md",
+      "computedHash": "557d1ffe86c2f1b9b4654713cd5acbfb3e0511a9e61b629573abc9a9c582d23b"
+    },
     "blume": {
       "source": "haydenbleasel/blume",
       "sourceType": "github",
