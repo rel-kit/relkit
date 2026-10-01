@@ -35,7 +35,7 @@
     "@relkit/schema": "workspace:*",
     "@relkit/services": "workspace:*",
     "effect": "4.0.0-rc.115",
-    "hono": "4.13.5"
+    "hono": "4.13.7"
   },
   "devDependencies": {
     "@relkit/events": "workspace:*",
