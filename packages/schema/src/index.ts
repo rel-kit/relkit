@@ -23,7 +23,12 @@ export {
 export type { SchemaProjectorService } from "./json-schema-effect.types.js";
 export { SchemaTelemetry, SchemaTelemetryLive } from "./schema-observability.js";
 export type { SchemaTelemetryService } from "./schema-observability.types.js";
-export { getSchemaMetadata, isSchemaTransformed } from "./schema-metadata.js";
+export {
+  getSchemaMetadata,
+  getSchemaMetadataEffect,
+  isSchemaTransformed,
+  isSchemaTransformedEffect,
+} from "./schema-metadata.js";
 export {
   getJsonSchema,
   isJsonSchemaAvailable,
