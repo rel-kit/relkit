@@ -1,0 +1,14 @@
+Exit code: 1
+[FAIL] FAILURES:
+  (fail) the real check pipeline rejects an inferred users path without id input [5175.00ms]
+  error: expect(received).toBe(expected)
+  Expected: 1
+  Received: 0
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/route-path-input.test.ts:42:28)
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [5.68s]
+
+[full output: rtk recall e0839ab05aba]

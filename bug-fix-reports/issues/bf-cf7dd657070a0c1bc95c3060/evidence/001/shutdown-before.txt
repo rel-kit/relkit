@@ -1,0 +1,14 @@
+Exit code: 1
+[FAIL] FAILURES:
+  (fail) shutdown stops the inspector while the proxy waits for its requests to close [107.28ms]
+  error: expect(received).toBe(expected)
+  Expected: true
+  Received: false
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/dev-shutdown.test.ts:20:30)
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [244.00ms]
+
+[full output: rtk recall 5ef871d0a9ac]

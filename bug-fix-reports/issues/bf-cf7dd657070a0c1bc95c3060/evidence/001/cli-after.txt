@@ -1,0 +1,5 @@
+Exit code: 0
+SUMMARY:
+   1 pass
+   0 fail
+  Ran 1 test across 1 file. [4.41s]

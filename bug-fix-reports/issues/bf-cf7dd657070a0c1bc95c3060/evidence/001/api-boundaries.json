@@ -1,0 +1,10 @@
+{
+  "url": "http://127.0.0.1:3210/_relkit/backend/users/probe-user?value=probe-value",
+  "status": 200,
+  "body": {
+    "value": "probe-value",
+    "id": "probe-user"
+  },
+  "missingPathStatus": 404,
+  "exit_code": 0
+}
