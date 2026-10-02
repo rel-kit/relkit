@@ -1,0 +1,264 @@
+# bf-b7ee23d5a794f98a368839bd: Generated fullstack projects cannot build or start without the optional DeepAgents peer.
+
+Status: **verified**
+Attempt: 1 · Updated: 2026-10-02T11:59:25+00:00
+
+## What
+
+Generated fullstack projects cannot build or start without the optional DeepAgents peer.
+
+## Expected
+
+Ordinary LangChain starters build and serve their routes without DeepAgents; installed DeepAgents stays bundled for standalone containers.
+
+## Observed before
+
+The published CLI fails with RELKIT_BUILD_FAILED at the unused import("deepagents") in @relkit/agents.
+
+## Root cause
+
+packages/cli/src/commands/build-support.ts:52 invokes Bun's bundler without handling the optional peer. Bun follows the literal dynamic import in packages/agents/src/runtime-native-support.ts:25 even for ordinary agents, so an absent optional dependency becomes a compile-time failure. Workspace devDependencies conceal this in linked projects.
+
+## Fixed by
+
+Conditionally externalize the unavailable DeepAgents peer after resolving it from the actual @relkit/agents module location. Installed hoisted/nested peers stay bundled; missing required imports still fail. Unit regressions, live CLI/development replay, 21 CLI checks, six native-agent tests, 27 guardrail tests, typecheck, lint, formatting and the complete 44-package packed scaffold smoke pass. Added CLI patch changeset. The unrelated existing compiler coverage artifact still fails the repository boundary check.
+
+## Changed files
+
+- packages/cli/src/commands/build-support.ts
+- packages/cli/build-support.test.ts
+- scripts/pack-and-smoke-create-relkit.ts
+- .changeset/optional-deepagents-bundling.md
+
+## Reproduction
+
+- Copy the reported fullstack starter into a scratch directory without changing user files; share its installed 0.5.3 dependencies
+- Run its published relkit build --project-root <copy> --json and observe the unresolved optional DeepAgents import
+- Run the focused isolated bundler fixtures without workspace dependencies and observe the same development/production failures
+- Compile the edited repository bundler into an isolated copy of the published CLI using bun build --packages=external
+- Replay the same build and run relkit dev against the same starter; assert greeting content, ordinary agent graph, OpenAPI, validation rejection and shutdown
+- Run the repository's packed scaffold smoke suite using locally built package tarballs
+
+## Evidence
+
+- before: [integration](evidence/001/runtime-before.txt) — Actual published CLI fails with RELKIT_BUILD_FAILED at the optional import
+- before: [unit](evidence/001/unit-before.txt) — Absent peer development/production regressions fail against original helper
+- after: [integration](evidence/001/runtime-after.txt) — Same starter builds with ok=true and no diagnostics
+- after: [integration](evidence/001/live-dev.txt) — Live development greeting, graph, OpenAPI, validation and shutdown assertions
+- after: [unit](evidence/001/unit-after.txt) — Absent peer, installed hoisted/nested peer, standalone bundle, required import and cleanup regressions pass
+- after: [e2e](evidence/001/packed-smoke.txt) — All packed scaffolds pass using 44 locally built packages
+
+## Scope
+
+```json
+{
+  "modules": [
+    "CLI server bundler",
+    "@relkit/agents optional native loader",
+    "generated fullstack application",
+    "packed scaffold acceptance"
+  ],
+  "entrypoints": [
+    "relkit dev",
+    "relkit build",
+    "bundled server/index.js"
+  ],
+  "invariants": [
+    "Ordinary starters work without DeepAgents",
+    "Installed peers remain in standalone production bundles",
+    "Missing required packages still fail builds",
+    "Temporary module links are removed after success and failure"
+  ]
+}
+```
+
+## Environment
+
+```json
+{
+  "package": "packages/cli",
+  "revision": "0ef0d3b86e0f628059bd8f3d7e52182338f0c4c0 plus scoped bundler/test/smoke/changeset edits",
+  "target": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-optional-peer-repro-DSfEbg",
+  "api_exposed": false,
+  "e2e_available": true,
+  "monitoring": "Existing development CLI/build/HTTP logs and local RELKIT observability are active during replay. Before compilation fails there is no running backend. No remote monitoring access is needed or used."
+}
+```
+
+## Verification
+
+```json
+{
+  "unit": {
+    "before": {
+      "status": "failed",
+      "command": "rtk bun test packages/cli/build-support.test.ts",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Development and production bundle without the optional DeepAgents peer",
+      "output": "evidence/001/unit-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk bun test packages/cli/build-support.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Development and production bundle without the optional DeepAgents peer",
+      "output": "evidence/001/unit-after.txt"
+    }
+  },
+  "runtime": {
+    "kind": "integration",
+    "reason": "The reported failure occurs at the real CLI compilation boundary before an HTTP server exists; HTTP assertions additionally cover the resulting runtime.",
+    "boundary": "Published CLI -> checkProject -> buildProject -> Bun bundler -> actual @relkit/agents optional import -> generated fullstack server",
+    "dependencies": [
+      "Actual installed RELKIT 0.5.3 application/runtime/native dependencies from the reported starter",
+      "Unmodified published CLI for baseline, isolated CLI copy with repository-compiled bundler for replay",
+      "No DeepAgents installed; no model API or credentials required"
+    ],
+    "steps": [
+      "Run published CLI build on the isolated starter",
+      "Compile only the edited bundler into an isolated published CLI copy",
+      "Replay CLI build on the same starter",
+      "Start dev and assert the actual greeting route, graph, OpenAPI and invalid-name response"
+    ],
+    "before": {
+      "status": "failed",
+      "command": "rtk bun /Users/mustafaelsayed/Workspace/typescripts/relkit-npm-demo/node_modules/@relkit/cli/dist/index.js build --project-root /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-optional-peer-repro-DSfEbg --json",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Fullstack starter builds without DeepAgents installed",
+      "output": "evidence/001/runtime-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk bun /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-optional-peer-repro-DSfEbg/cli/dist/index.js build --project-root /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-optional-peer-repro-DSfEbg --json",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Fullstack starter builds without DeepAgents installed",
+      "output": "evidence/001/runtime-after.txt"
+    }
+  },
+  "e2e": {
+    "status": "passed",
+    "command": "rtk bun scripts/pack-and-smoke-create-relkit.ts",
+    "cwd": ".",
+    "exit_code": 0,
+    "assertion": "Minimal, API, agent, fullstack and all local job variants build and run from packed packages; fullstack explicitly lacks DeepAgents; routes, live additions, inspector and API reference work",
+    "output": "evidence/001/packed-smoke.txt"
+  },
+  "checks": [
+    {
+      "name": "typecheck",
+      "status": "passed",
+      "command": "rtk bun x tsc -b --pretty false",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/typecheck.txt"
+    },
+    {
+      "name": "lint",
+      "status": "passed",
+      "command": "rtk bun run lint",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/lint.txt"
+    },
+    {
+      "name": "format",
+      "status": "passed",
+      "command": "rtk bun x prettier --check packages/cli/src/commands/build-support.ts packages/cli/build-support.test.ts scripts/pack-and-smoke-create-relkit.ts .changeset/optional-deepagents-bundling.md",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/format.txt"
+    },
+    {
+      "name": "CLI adjacent tests",
+      "status": "passed",
+      "command": "rtk bun test packages/cli/build-support.test.ts packages/cli/build-server.test.ts packages/cli/build-activation.test.ts packages/cli/commands-core.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/cli-checks.txt"
+    },
+    {
+      "name": "native-agent adjacent tests",
+      "status": "passed",
+      "command": "rtk bun x vitest run --config packages/agents/vitest.config.ts packages/agents/tests/runtime-native-support-effect.test.ts packages/agents/tests/runtime-native-agent-effect.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/agents-checks.txt"
+    },
+    {
+      "name": "repository boundaries",
+      "status": "pre-existing",
+      "command": "rtk bun run check",
+      "cwd": ".",
+      "exit_code": 1,
+      "baseline_exit_code": 1,
+      "baseline": "evidence/001/boundaries-baseline.txt",
+      "output": "evidence/001/boundaries.txt",
+      "reason": "Original HEAD archive with the existing ignored compiler coverage file produces the identical out-of-scope-navigation-name violation at packages/compiler/coverage/coverage-final.json:20:3029. No coverage files changed."
+    },
+    {
+      "name": "repository guardrails",
+      "status": "passed",
+      "command": "rtk bun test tests/phase0.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/guardrails.txt"
+    }
+  ],
+  "regressions": [
+    {
+      "kind": "integration",
+      "boundary": "Live CLI -> generated application -> HTTP route and inspector graph",
+      "status": "passed",
+      "command": "rtk bun bug-fix-reports/issues/bf-b7ee23d5a794f98a368839bd/evidence/001/runtime-replay.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Greeting returns Hello, RelKit!, ordinary agents appear in the graph and OpenAPI describes /hello",
+      "output": "evidence/001/live-dev.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "HTTP route -> schema validation",
+      "status": "passed",
+      "command": "rtk bun bug-fix-reports/issues/bf-b7ee23d5a794f98a368839bd/evidence/001/runtime-replay.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Empty name returns 422; development process shuts down with 0 or expected SIGTERM 143",
+      "output": "evidence/001/live-dev.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "Real Bun bundler -> isolated optional peer fixtures -> standalone JS process",
+      "status": "passed",
+      "command": "rtk bun test packages/cli/build-support.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Hoisted and nested installed peer fixtures still work after removing node_modules; required missing imports fail and temporary links are removed",
+      "output": "evidence/001/unit-after.txt"
+    }
+  ],
+  "limitations": [
+    "No package has been published; existing npm CLI releases still require an update.",
+    "Synthetic peer fixtures prove bundling mechanics; no external model invocation, cloud spend or Docker acceptance was required for this defect."
+  ]
+}
+```
+
+## Related reports
+
+```json
+[]
+```
+
+## Notes
+
+```json
+[
+  "User-owned starter files and dependency installation were preserved.",
+  "Repository source is version 0.5.2; the direct starter replay uses the reported installed 0.5.3 CLI/application with only the repository-compiled build-support replacement.",
+  "The existing compiler coverage artifact causes an unrelated repository boundary check failure in both baseline and modified trees."
+]
+```
