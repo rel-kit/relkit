@@ -1,0 +1,24 @@
+[FAIL] FAILURES:
+  (fail) bundles without optional DeepAgents in development [122.80ms]
+  (fail) bundles without optional DeepAgents in production [65.54ms]
+  error: Could not resolve: "deepagents". Maybe you need to "bun install"?
+  at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-build-optional-peer-b4NzzV/cli/node_modules/@fixture/agents/index.js:1:34
+  at bundleServer (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-build-optional-peer-b4NzzV/cli/src/commands/build-support.ts:72:17)
+  Bun v1.3.10 (macOS arm64)
+  Expected: 0
+  Received: 1
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/build-support.test.ts:11:40)
+  error: Could not resolve: "deepagents". Maybe you need to "bun install"?
+  at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-build-optional-peer-sGvNkn/cli/node_modules/@fixture/agents/index.js:1:34
+  at bundleServer (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-build-optional-peer-sGvNkn/cli/src/commands/build-support.ts:72:17)
+  Bun v1.3.10 (macOS arm64)
+  Expected: 0
+  Received: 1
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/build-support.test.ts:11:40)
+
+SUMMARY:
+   2 pass
+   2 fail
+  Ran 4 tests across 1 file. [573.00ms]
+
+[full output: rtk recall f3944a3c4eb0]
