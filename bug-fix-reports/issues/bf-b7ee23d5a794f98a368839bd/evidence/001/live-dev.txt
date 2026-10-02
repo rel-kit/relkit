@@ -1,0 +1,22 @@
+PASS: development greeting is Hello, RelKit! without DeepAgents installed
+PASS: graph contains ordinary agent descriptors
+PASS: OpenAPI describes the greeting route
+PASS: empty name still fails route validation
+
+14:44:54.955 INFO  relkit            Starting development server
+14:44:54.971 INFO  build             Compiling application
+14:44:58.530 INFO  build             Compiled in 3560ms
+14:44:58.531 INFO  server            Ready
+                                     API        http://127.0.0.1:55794
+                                     Inspector  http://127.0.0.1:55795
+                                     Reference  http://127.0.0.1:55794/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:55794/_relkit/v1/openapi.json
+14:44:58.643 INFO  http              GET /hello → 200 in 71ms
+14:44:58.698 INFO  relkit            Stopping development server
+14:44:58.697 WARN  http              GET /hello → 422 in 40ms
+                                     request: request-31380b87-1afd-4475-93a8-98c24ffb8205
+                                     trace: cca12b2da1419e4cfcb2296c2db19134
+14:44:58.735 INFO  relkit            Development server stopped
+RELKIT_INTERRUPTED: Received SIGTERM.
+
+PASS: clean shutdown
