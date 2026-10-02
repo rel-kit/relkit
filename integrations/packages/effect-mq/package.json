@@ -1,6 +1,6 @@
 {
   "name": "@relkit/effect-mq",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Effect MQ retryable-jobs integration for RELKIT.",
   "license": "MIT",
   "repository": {

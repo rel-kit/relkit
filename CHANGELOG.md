@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.5.4
+
+### Changes
+
+- Allow development and production builds without the optional DeepAgents peer installed. Keep installed DeepAgents dependencies bundled for standalone production containers.
+
 ## 0.5.3
 
 ### Changes
