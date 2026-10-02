@@ -56,6 +56,7 @@ export async function bundleServer(
         "build",
         "--target=bun",
         "--format=esm",
+        ...optionalAgentExternals(serverDirectory),
         ...(development ? ["--sourcemap=inline"] : ["--minify", "--sourcemap=none"]),
         "--env=disable",
         `--outfile=${join(serverDirectory, "index.js")}`,
@@ -73,6 +74,18 @@ export async function bundleServer(
     }
   } finally {
     await unlink(moduleLink);
+  }
+}
+
+function optionalAgentExternals(serverDirectory: string): string[] {
+  try {
+    const agents = Bun.resolveSync("@relkit/agents", serverDirectory);
+    Bun.resolveSync("deepagents", dirname(agents));
+    return [];
+  } catch {
+    // Ordinary agents do not need this optional peer. Keep installed peers bundled
+    // so DeepAgents applications still run in containers without node_modules.
+    return ["--external=deepagents"];
   }
 }
 

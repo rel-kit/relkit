@@ -2,6 +2,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { strict as assert } from "node:assert";
 import { exerciseScaffoldRoutes, verifyScaffoldBuild } from "./scaffold-smoke-workflows.js";
 import { verifyInteractiveResolver, verifyScaffoldTerminal } from "./scaffold-smoke-terminal.js";
 import { addArtifacts } from "./pack-and-smoke-create-relkit-artifacts.js";
@@ -130,8 +131,15 @@ async function main(): Promise<void> {
         if (JSON.stringify(directBytes) !== JSON.stringify(cliBytes))
           throw new Error(`Packed ${projectTemplate} generators generated different bytes.`);
         // Starter tests isolate provider credentials/replacements; additions are exercised live below.
-        for (const root of [direct.destination, cli.destination])
+        for (const root of [direct.destination, cli.destination]) {
+          if (template === "fullstack")
+            assert.throws(
+              () => Bun.resolveSync("deepagents", root),
+              /Cannot find|Could not resolve/,
+              "Fullstack smoke must exercise the starter without the optional DeepAgents peer.",
+            );
           for (const script of ["test", "build"]) await runCommand(["run", script], root);
+        }
         await addArtifacts(relkitBin, direct.destination, registry, cacheDir);
         await addArtifacts(relkitBin, cli.destination, registry, cacheDir);
         const directAfterAdd = await snapshotProject(direct.destination);

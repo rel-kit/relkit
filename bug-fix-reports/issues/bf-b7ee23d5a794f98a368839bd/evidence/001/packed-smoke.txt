@@ -1,0 +1,8 @@
+packed minimal smoke passed
+packed tasks-inngest-docker smoke passed
+packed tasks-effect-mq-docker smoke passed
+packed tasks-trigger-docker smoke passed
+packed api smoke passed
+packed agent smoke passed
+packed fullstack smoke passed
+packed create smoke passed (44 packages)

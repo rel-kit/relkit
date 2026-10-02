@@ -1,0 +1,21 @@
+{
+  "key": "b7ee23d5a794f98a368839bdc7b0b5af391cd70b4c2d2188942bb136abe3a824",
+  "matches": {
+    "bf-b7ee23d5a794f98a368839bd": {
+      "id": "bf-b7ee23d5a794f98a368839bd",
+      "status": "verified",
+      "what": "Generated fullstack projects cannot build or start without the optional DeepAgents peer.",
+      "root_cause": "packages/cli/src/commands/build-support.ts:52 invokes Bun's bundler without handling the optional peer. Bun follows the literal dynamic import in packages/agents/src/runtime-native-support.ts:25 even for ordinary agents, so an absent optional dependency becomes a compile-time failure. Workspace devDependencies conceal ",
+      "fixed_by": "Conditionally externalize the unavailable DeepAgents peer after resolving it from the actual @relkit/agents module location. Installed hoisted/nested peers stay bundled; missing required imports still fail. Unit regressions, live CLI/development replay, 21 CLI checks, six native-agent tests, 27 guardrail tests, typeche",
+      "files": [
+        "packages/cli/src/commands/build-support.ts",
+        "packages/cli/build-support.test.ts",
+        "scripts/pack-and-smoke-create-relkit.ts",
+        ".changeset/optional-deepagents-bundling.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T11:59:25+00:00",
+      "report": "bug-fix-reports/issues/bf-b7ee23d5a794f98a368839bd/report.md"
+    }
+  }
+}
