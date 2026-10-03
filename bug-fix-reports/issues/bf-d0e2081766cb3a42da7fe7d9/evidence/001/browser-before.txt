@@ -1,0 +1,823 @@
+- link "Skip to content" [ref=e1]
+- list
+  - listitem [level=1]
+    - link "RELKIT Inspector overview" [ref=e14]
+      - StaticText "RELKIT"
+      - StaticText "Inspector"
+- generic
+  - generic
+    - StaticText "Workspace"
+    - list
+      - listitem [level=1]
+        - link "Overview" [ref=e43]
+          - StaticText "Overview"
+      - listitem [level=1]
+        - link "Graphs" [ref=e44]
+          - StaticText "Graphs"
+      - listitem [level=1]
+        - link "Application graph" [ref=e45]
+          - StaticText "Application graph"
+      - listitem [level=1]
+        - link "Domains" [ref=e46]
+          - StaticText "Domains"
+      - listitem [level=1]
+        - link "Routes" [ref=e47]
+          - StaticText "Routes"
+      - listitem [level=1]
+        - link "Middleware" [ref=e48]
+          - StaticText "Middleware"
+      - listitem [level=1]
+        - link "API Reference" [ref=e49]
+          - StaticText "API Reference"
+      - listitem [level=1]
+        - link "Functions" [ref=e50]
+          - StaticText "Functions"
+      - listitem [level=1]
+        - link "Errors" [ref=e51]
+          - StaticText "Errors"
+  - generic
+    - StaticText "Runtime"
+    - list
+      - listitem [level=1]
+        - link "Jobs" [ref=e52]
+          - StaticText "Jobs"
+      - listitem [level=1]
+        - link "Events & listeners" [ref=e53]
+          - StaticText "Events & listeners"
+      - listitem [level=1]
+        - link "Buckets" [ref=e54]
+          - StaticText "Buckets"
+      - listitem [level=1]
+        - link "Cache" [ref=e55]
+          - StaticText "Cache"
+      - listitem [level=1]
+        - link "Providers" [ref=e56]
+          - StaticText "Providers"
+      - listitem [level=1]
+        - link "Tools" [ref=e57]
+          - StaticText "Tools"
+      - listitem [level=1]
+        - link "Agents" [ref=e58]
+          - StaticText "Agents"
+      - listitem [level=1]
+        - link "Channels" [ref=e59]
+          - StaticText "Channels"
+  - generic
+    - StaticText "Signals"
+    - list
+      - listitem [level=1]
+        - link "Requests" [ref=e60]
+          - StaticText "Requests"
+      - listitem [level=1]
+        - link "Logs" [ref=e61]
+          - StaticText "Logs"
+      - listitem [level=1]
+        - link "Traces" [ref=e62]
+          - StaticText "Traces"
+      - listitem [level=1]
+        - link "Environment" [ref=e63]
+          - StaticText "Environment"
+      - listitem [level=1]
+        - link "Diagnostics" [ref=e64]
+          - StaticText "Diagnostics"
+- list
+  - listitem [level=1]
+    - generic [ref=e15] clickable [onclick]
+      - StaticText "Backend healthy"
+- main
+  - sectionheader
+    - button "Toggle navigation" [ref=e3]
+      - StaticText "Toggle Sidebar"
+    - navigation "Breadcrumb" [ref=e4]
+      - list
+        - listitem [level=1]
+          - link "Overview" [ref=e65]
+        - listitem [level=1]
+          - StaticText "Application graph"
+    - button "Search inspector" [expanded=false, ref=e5]
+      - StaticText "Search"
+      - StaticText "⌘K"
+    - StaticText "connected"
+    - button "Use dark theme" [ref=e6]
+    - button "Open resources" [expanded=false, ref=e7]
+  - StaticText "Generation "
+  - code
+    - StaticText "generation.runtime"
+  - StaticText "Graph "
+  - code
+    - StaticText "sha256:db8e5…dcb0046e"
+  - link "API reference" [ref=e2]
+  - sectionheader
+    - paragraph
+      - StaticText "ACTIVE WORKSPACE"
+    - heading "Graph" [level=1, ref=e16]
+    - paragraph
+      - StaticText "Read the active versioned graph without reconstructing application or provider state."
+    - status
+      - StaticText "Connected"
+      - StaticText "3011 dropped events"
+  - region "Active graph identity" [ref=e8]
+    - paragraph
+      - StaticText "LAST KNOWN GOOD"
+    - heading "Active graph identity" [level=2, ref=e17]
+    - StaticText "Versioned API"
+    - DescriptionList
+      - term "GENERATION ID"
+      - definition
+        - StaticText "generation.runtime"
+      - term "GRAPH HASH"
+      - definition
+        - StaticText "sha256:db8e5a1c97bd58e5dca2e85737e2bc38d81dd4924a64c5abea42d8a9dcb0046e"
+  - region "Graph summary" [ref=e9]
+    - term "NODES"
+    - definition
+      - StaticText "34"
+    - term "DECLARED EDGES"
+    - definition
+      - StaticText "37"
+    - term "OBSERVED EDGES"
+    - definition
+      - StaticText "0"
+  - region "Graph filters" [ref=e10]
+    - LabelText
+      - StaticText "Search graph"
+    - textbox "Search graph" [ref=e18]
+    - group "Filter graph by node kind"
+      - button "All 34" [ref=e21]
+        - StaticText "All"
+        - StaticText "34"
+      - button "Agent 1" [ref=e22]
+        - StaticText "Agent"
+        - StaticText "1"
+      - button "App 1" [ref=e23]
+        - StaticText "App"
+        - StaticText "1"
+      - button "Bucket 1" [ref=e24]
+        - StaticText "Bucket"
+        - StaticText "1"
+      - button "Cache 1" [ref=e25]
+        - StaticText "Cache"
+        - StaticText "1"
+      - button "Env 1" [ref=e26]
+        - StaticText "Env"
+        - StaticText "1"
+      - button "Event 1" [ref=e27]
+        - StaticText "Event"
+        - StaticText "1"
+      - button "Function 9" [ref=e28]
+        - StaticText "Function"
+        - StaticText "9"
+      - button "Job 1" [ref=e29]
+        - StaticText "Job"
+        - StaticText "1"
+      - button "Provider 4" [ref=e30]
+        - StaticText "Provider"
+        - StaticText "4"
+      - button "Resource model 1" [ref=e31]
+        - StaticText "Resource model"
+        - StaticText "1"
+      - button "Service 4" [ref=e32]
+        - StaticText "Service"
+        - StaticText "4"
+      - button "Task 1" [ref=e33]
+        - StaticText "Task"
+        - StaticText "1"
+      - button "Tool 1" [ref=e34]
+        - StaticText "Tool"
+        - StaticText "1"
+      - button "Trigger 7" [ref=e35]
+        - StaticText "Trigger"
+        - StaticText "7"
+    - group "Filter graph by domain"
+      - button "All 34" [ref=e36]
+        - StaticText "All"
+        - StaticText "34"
+      - button "Demo 14" [ref=e37]
+        - StaticText "Demo"
+        - StaticText "14"
+      - button "Echo 2" [ref=e38]
+        - StaticText "Echo"
+        - StaticText "2"
+      - button "Hello 2" [ref=e39]
+        - StaticText "Hello"
+        - StaticText "2"
+      - button "Orders 3" [ref=e40]
+        - StaticText "Orders"
+        - StaticText "3"
+    - StaticText "34"
+    - StaticText " of "
+    - StaticText "34"
+    - StaticText " nodes"
+    - form
+      - LabelText
+        - StaticText "Agent"
+        - combobox "Agent" [expanded=false, ref=e66]: demo.example-agent
+          - MenuListPopup
+            - option "demo.example-agent" [selected, ref=e254]
+      - LabelText
+        - StaticText "Thread ID"
+        - textbox "Thread ID" [required, ref=e67]
+      - LabelText
+        - StaticText "Runs"
+        - combobox "Runs" [expanded=false, ref=e68]: Live
+          - MenuListPopup
+            - option "Live" [selected, ref=e255]
+            - option "History" [ref=e256]
+      - button "Show execution" [ref=e41]
+  - region "Capability graph" [ref=e11]
+    - paragraph
+      - StaticText "REACT FLOW"
+    - heading "Capability graph" [level=2, ref=e19]
+    - generic "Relationship legend"
+      - StaticText "Declared"
+      - StaticText "Observed"
+    - paragraph
+      - StaticText "Deterministic positions with keyboard-focusable nodes, pan, zoom, fit view, and a minimap."
+    - alert
+      - StaticText "org.eclipse.elk.graph.json.JsonImportException: Referenced shape does not exist: demo.example-error"
+  - region "Relationship table" [ref=e12]
+    - paragraph
+      - StaticText "ACCESSIBLE FALLBACK"
+    - heading "Relationship table" [level=2, ref=e20]
+    - StaticText "36"
+    - StaticText " edges"
+    - paragraph
+      - StaticText "The table preserves every visible relationship for keyboard and screen-reader navigation."
+    - table
+      - rowgroup
+        - row
+          - columnheader "Type" [ref=e249]
+          - columnheader "From" [ref=e250]
+          - columnheader "To" [ref=e251]
+          - columnheader "Relationship" [ref=e252]
+          - columnheader "Context" [ref=e253]
+      - row
+        - cell "declared" [ref=e69]
+        - cell "demo.example" [ref=e70]
+          - code
+            - StaticText "demo.example"
+        - cell "demo.example-tool" [ref=e71]
+          - code
+            - StaticText "demo.example-tool"
+        - cell "exposes as tool" [ref=e72]
+        - cell "—" [ref=e73]
+      - row
+        - cell "declared" [ref=e74]
+        - cell "demo" [ref=e75]
+          - code
+            - StaticText "demo"
+        - cell "demo.example-event" [ref=e76]
+          - code
+            - StaticText "demo.example-event"
+        - cell "exposes event" [ref=e77]
+        - cell "member exampleEvent, order 0" [ref=e78]
+      - row
+        - cell "declared" [ref=e79]
+        - cell "demo" [ref=e80]
+          - code
+            - StaticText "demo"
+        - cell "demo.example" [ref=e81]
+          - code
+            - StaticText "demo.example"
+        - cell "exposes function" [ref=e82]
+        - cell "member example, order 0" [ref=e83]
+      - row
+        - cell "declared" [ref=e84]
+        - cell "demo" [ref=e85]
+          - code
+            - StaticText "demo"
+        - cell "demo.inspect" [ref=e86]
+          - code
+            - StaticText "demo.inspect"
+        - cell "exposes function" [ref=e87]
+        - cell "member inspect, order 1" [ref=e88]
+      - row
+        - cell "declared" [ref=e89]
+        - cell "demo" [ref=e90]
+          - code
+            - StaticText "demo"
+        - cell "demo.delete" [ref=e91]
+          - code
+            - StaticText "demo.delete"
+        - cell "exposes function" [ref=e92]
+        - cell "member remove, order 2" [ref=e93]
+      - row
+        - cell "declared" [ref=e94]
+        - cell "echo" [ref=e95]
+          - code
+            - StaticText "echo"
+        - cell "echo.echo" [ref=e96]
+          - code
+            - StaticText "echo.echo"
+        - cell "exposes function" [ref=e97]
+        - cell "member echo, order 0" [ref=e98]
+      - row
+        - cell "declared" [ref=e99]
+        - cell "hello" [ref=e100]
+          - code
+            - StaticText "hello"
+        - cell "hello.hello" [ref=e101]
+          - code
+            - StaticText "hello.hello"
+        - cell "exposes function" [ref=e102]
+        - cell "member hello, order 0" [ref=e103]
+      - row
+        - cell "declared" [ref=e104]
+        - cell "orders" [ref=e105]
+          - code
+            - StaticText "orders"
+        - cell "orders.create-order" [ref=e106]
+          - code
+            - StaticText "orders.create-order"
+        - cell "exposes function" [ref=e107]
+        - cell "member createOrder, order 0" [ref=e108]
+      - row
+        - cell "declared" [ref=e109]
+        - cell "orders" [ref=e110]
+          - code
+            - StaticText "orders"
+        - cell "orders.price-order" [ref=e111]
+          - code
+            - StaticText "orders.price-order"
+        - cell "exposes function" [ref=e112]
+        - cell "member priceOrder, order 1" [ref=e113]
+      - row
+        - cell "declared" [ref=e114]
+        - cell "demo" [ref=e115]
+          - code
+            - StaticText "demo"
+        - cell "job.demo.example-job" [ref=e116]
+          - code
+            - StaticText "job.demo.example-job"
+        - cell "exposes job" [ref=e117]
+        - cell "member exampleJob, order 0" [ref=e118]
+      - row
+        - cell "declared" [ref=e119]
+        - cell "demo" [ref=e120]
+          - code
+            - StaticText "demo"
+        - cell "task.demo.example-task" [ref=e121]
+          - code
+            - StaticText "task.demo.example-task"
+        - cell "exposes task" [ref=e122]
+        - cell "member exampleTask, order 0" [ref=e123]
+      - row
+        - cell "declared" [ref=e124]
+        - cell "relkit.event.demo.on-example.trigger" [ref=e125]
+          - code
+            - StaticText "relkit.event.demo.on-example.trigger"
+        - cell "demo.example-event" [ref=e126]
+          - code
+            - StaticText "demo.example-event"
+        - cell "listens to event" [ref=e127]
+        - cell "—" [ref=e128]
+      - row
+        - cell "declared" [ref=e129]
+        - cell "demo.example-agent::resource::model:model%201" [ref=e130]
+          - code
+            - StaticText "demo.example-agent::resource::model:model%201"
+        - cell "demo.example-agent" [ref=e131]
+          - code
+            - StaticText "demo.example-agent"
+        - cell "provides resource" [ref=e132]
+        - cell "—" [ref=e133]
+      - row
+        - cell "declared" [ref=e134]
+        - cell "demo.example" [ref=e135]
+          - code
+            - StaticText "demo.example"
+        - cell "demo.example-event" [ref=e136]
+          - code
+            - StaticText "demo.example-event"
+        - cell "publishes event" [ref=e137]
+        - cell "—" [ref=e138]
+      - row
+        - cell "declared" [ref=e139]
+        - cell "demo.example-tool" [ref=e140]
+          - code
+            - StaticText "demo.example-tool"
+        - cell "demo.example" [ref=e141]
+          - code
+            - StaticText "demo.example"
+        - cell "targets function" [ref=e142]
+        - cell "role primary" [ref=e143]
+      - row
+        - cell "declared" [ref=e144]
+        - cell "relkit.event.demo.on-example.trigger" [ref=e145]
+          - code
+            - StaticText "relkit.event.demo.on-example.trigger"
+        - cell "demo.on-example" [ref=e146]
+          - code
+            - StaticText "demo.on-example"
+        - cell "targets function" [ref=e147]
+        - cell "role primary" [ref=e148]
+      - row
+        - cell "declared" [ref=e149]
+        - cell "route.delete.demo" [ref=e150]
+          - code
+            - StaticText "route.delete.demo"
+        - cell "demo.delete" [ref=e151]
+          - code
+            - StaticText "demo.delete"
+        - cell "targets function" [ref=e152]
+        - cell "role primary" [ref=e153]
+      - row
+        - cell "declared" [ref=e154]
+        - cell "route.get.demo" [ref=e155]
+          - code
+            - StaticText "route.get.demo"
+        - cell "demo.inspect" [ref=e156]
+          - code
+            - StaticText "demo.inspect"
+        - cell "targets function" [ref=e157]
+        - cell "role primary" [ref=e158]
+      - row
+        - cell "declared" [ref=e159]
+        - cell "route.get.hello" [ref=e160]
+          - code
+            - StaticText "route.get.hello"
+        - cell "hello.hello" [ref=e161]
+          - code
+            - StaticText "hello.hello"
+        - cell "targets function" [ref=e162]
+        - cell "role primary" [ref=e163]
+      - row
+        - cell "declared" [ref=e164]
+        - cell "route.post.demo" [ref=e165]
+          - code
+            - StaticText "route.post.demo"
+        - cell "demo.example" [ref=e166]
+          - code
+            - StaticText "demo.example"
+        - cell "targets function" [ref=e167]
+        - cell "role primary" [ref=e168]
+      - row
+        - cell "declared" [ref=e169]
+        - cell "route.post.echo" [ref=e170]
+          - code
+            - StaticText "route.post.echo"
+        - cell "echo.echo" [ref=e171]
+          - code
+            - StaticText "echo.echo"
+        - cell "targets function" [ref=e172]
+        - cell "role primary" [ref=e173]
+      - row
+        - cell "declared" [ref=e174]
+        - cell "route.post.orders" [ref=e175]
+          - code
+            - StaticText "route.post.orders"
+        - cell "orders.create-order" [ref=e176]
+          - code
+            - StaticText "orders.create-order"
+        - cell "targets function" [ref=e177]
+        - cell "role primary" [ref=e178]
+      - row
+        - cell "declared" [ref=e179]
+        - cell "job.demo.example-job" [ref=e180]
+          - code
+            - StaticText "job.demo.example-job"
+        - cell "task.demo.example-task" [ref=e181]
+          - code
+            - StaticText "task.demo.example-task"
+        - cell "targets task" [ref=e182]
+        - cell "role primary" [ref=e183]
+      - row
+        - cell "declared" [ref=e184]
+        - cell "demo.delete" [ref=e185]
+          - code
+            - StaticText "demo.delete"
+        - cell "demo.example-bucket" [ref=e186]
+          - code
+            - StaticText "demo.example-bucket"
+        - cell "uses bucket" [ref=e187]
+        - cell "—" [ref=e188]
+      - row
+        - cell "declared" [ref=e189]
+        - cell "demo.example" [ref=e190]
+          - code
+            - StaticText "demo.example"
+        - cell "demo.example-bucket" [ref=e191]
+          - code
+            - StaticText "demo.example-bucket"
+        - cell "uses bucket" [ref=e192]
+        - cell "—" [ref=e193]
+      - row
+        - cell "declared" [ref=e194]
+        - cell "demo.inspect" [ref=e195]
+          - code
+            - StaticText "demo.inspect"
+        - cell "demo.example-bucket" [ref=e196]
+          - code
+            - StaticText "demo.example-bucket"
+        - cell "uses bucket" [ref=e197]
+        - cell "—" [ref=e198]
+      - row
+        - cell "declared" [ref=e199]
+        - cell "demo.delete" [ref=e200]
+          - code
+            - StaticText "demo.delete"
+        - cell "demo.example-cache" [ref=e201]
+          - code
+            - StaticText "demo.example-cache"
+        - cell "uses cache" [ref=e202]
+        - cell "—" [ref=e203]
+      - row
+        - cell "declared" [ref=e204]
+        - cell "demo.example" [ref=e205]
+          - code
+            - StaticText "demo.example"
+        - cell "demo.example-cache" [ref=e206]
+          - code
+            - StaticText "demo.example-cache"
+        - cell "uses cache" [ref=e207]
+        - cell "—" [ref=e208]
+      - row
+        - cell "declared" [ref=e209]
+        - cell "demo.inspect" [ref=e210]
+          - code
+            - StaticText "demo.inspect"
+        - cell "demo.example-cache" [ref=e211]
+          - code
+            - StaticText "demo.example-cache"
+        - cell "uses cache" [ref=e212]
+        - cell "—" [ref=e213]
+      - row
+        - cell "declared" [ref=e214]
+        - cell "demo.on-example" [ref=e215]
+          - code
+            - StaticText "demo.on-example"
+        - cell "demo.example-cache" [ref=e216]
+          - code
+            - StaticText "demo.example-cache"
+        - cell "uses cache" [ref=e217]
+        - cell "—" [ref=e218]
+      - row
+        - cell "declared" [ref=e219]
+        - cell "demo.example-bucket" [ref=e220]
+          - code
+            - StaticText "demo.example-bucket"
+        - cell "provider.bucket.local" [ref=e221]
+          - code
+            - StaticText "provider.bucket.local"
+        - cell "uses provider profile" [ref=e222]
+        - cell "—" [ref=e223]
+      - row
+        - cell "declared" [ref=e224]
+        - cell "demo.example-cache" [ref=e225]
+          - code
+            - StaticText "demo.example-cache"
+        - cell "provider.cache.local" [ref=e226]
+          - code
+            - StaticText "provider.cache.local"
+        - cell "uses provider profile" [ref=e227]
+        - cell "—" [ref=e228]
+      - row
+        - cell "declared" [ref=e229]
+        - cell "demo.example-event" [ref=e230]
+          - code
+            - StaticText "demo.example-event"
+        - cell "provider.event.local" [ref=e231]
+          - code
+            - StaticText "provider.event.local"
+        - cell "uses provider profile" [ref=e232]
+        - cell "—" [ref=e233]
+      - row
+        - cell "declared" [ref=e234]
+        - cell "job.demo.example-job" [ref=e235]
+          - code
+            - StaticText "job.demo.example-job"
+        - cell "provider.job.local" [ref=e236]
+          - code
+            - StaticText "provider.job.local"
+        - cell "uses provider profile" [ref=e237]
+        - cell "—" [ref=e238]
+      - row
+        - cell "declared" [ref=e239]
+        - cell "relkit.event.demo.on-example.trigger" [ref=e240]
+          - code
+            - StaticText "relkit.event.demo.on-example.trigger"
+        - cell "provider.event.local" [ref=e241]
+          - code
+            - StaticText "provider.event.local"
+        - cell "uses provider profile" [ref=e242]
+        - cell "—" [ref=e243]
+      - row
+        - cell "declared" [ref=e244]
+        - cell "demo.example-agent" [ref=e245]
+          - code
+            - StaticText "demo.example-agent"
+        - cell "demo.example-tool" [ref=e246]
+          - code
+            - StaticText "demo.example-tool"
+        - cell "uses tool" [ref=e247]
+        - cell "—" [ref=e248]
+  - button "Open node details" [expanded=false, ref=e13]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e42]
+  - image
+- alert
+- link "Skip to content" [ref=e257]
+- list
+  - listitem [level=1]
+    - link "RELKIT Inspector overview" [ref=e268]
+      - StaticText "RELKIT"
+      - StaticText "Inspector"
+- generic
+  - generic
+    - StaticText "Workspace"
+    - list
+      - listitem [level=1]
+        - link "Overview" [ref=e282]
+          - StaticText "Overview"
+      - listitem [level=1]
+        - link "Graphs" [ref=e283]
+          - StaticText "Graphs"
+      - listitem [level=1]
+        - link "Application graph" [ref=e284]
+          - StaticText "Application graph"
+      - listitem [level=1]
+        - link "Domains" [ref=e285]
+          - StaticText "Domains"
+      - listitem [level=1]
+        - link "Routes" [ref=e286]
+          - StaticText "Routes"
+      - listitem [level=1]
+        - link "Middleware" [ref=e287]
+          - StaticText "Middleware"
+      - listitem [level=1]
+        - link "API Reference" [ref=e288]
+          - StaticText "API Reference"
+      - listitem [level=1]
+        - link "Functions" [ref=e289]
+          - StaticText "Functions"
+      - listitem [level=1]
+        - link "Errors" [ref=e290]
+          - StaticText "Errors"
+  - generic
+    - StaticText "Runtime"
+    - list
+      - listitem [level=1]
+        - link "Jobs" [ref=e291]
+          - StaticText "Jobs"
+      - listitem [level=1]
+        - link "Events & listeners" [ref=e292]
+          - StaticText "Events & listeners"
+      - listitem [level=1]
+        - link "Buckets" [ref=e293]
+          - StaticText "Buckets"
+      - listitem [level=1]
+        - link "Cache" [ref=e294]
+          - StaticText "Cache"
+      - listitem [level=1]
+        - link "Providers" [ref=e295]
+          - StaticText "Providers"
+      - listitem [level=1]
+        - link "Tools" [ref=e296]
+          - StaticText "Tools"
+      - listitem [level=1]
+        - link "Agents" [ref=e297]
+          - StaticText "Agents"
+      - listitem [level=1]
+        - link "Channels" [ref=e298]
+          - StaticText "Channels"
+  - generic
+    - StaticText "Signals"
+    - list
+      - listitem [level=1]
+        - link "Requests" [ref=e299]
+          - StaticText "Requests"
+      - listitem [level=1]
+        - link "Logs" [ref=e300]
+          - StaticText "Logs"
+      - listitem [level=1]
+        - link "Traces" [ref=e301]
+          - StaticText "Traces"
+      - listitem [level=1]
+        - link "Environment" [ref=e302]
+          - StaticText "Environment"
+      - listitem [level=1]
+        - link "Diagnostics" [ref=e303]
+          - StaticText "Diagnostics"
+- list
+  - listitem [level=1]
+    - generic [ref=e269] clickable [onclick]
+      - StaticText "Backend healthy"
+- main
+  - sectionheader
+    - button "Toggle navigation" [ref=e259]
+      - StaticText "Toggle Sidebar"
+    - navigation "Breadcrumb" [ref=e260]
+      - list
+        - listitem [level=1]
+          - link "Overview" [ref=e304]
+        - listitem [level=1]
+          - link "Buckets" [ref=e305]
+        - listitem [level=1]
+          - StaticText "demo.example-bucket"
+    - button "Search inspector" [expanded=false, ref=e261]
+      - StaticText "Search"
+      - StaticText "⌘K"
+    - StaticText "connected"
+    - button "Use dark theme" [ref=e262]
+    - button "Open resources" [expanded=false, ref=e263]
+  - StaticText "Generation "
+  - code
+    - StaticText "generation.runtime"
+  - StaticText "Graph "
+  - code
+    - StaticText "sha256:db8e5…dcb0046e"
+  - link "API reference" [ref=e258]
+  - sectionheader
+    - paragraph
+      - StaticText "ACTIVE WORKSPACE"
+    - heading "Bucket detail" [level=1, ref=e270]
+      - StaticText "Bucket detail"
+    - paragraph
+      - StaticText "Provider storage remains behind the versioned API; this page is read-only metadata."
+    - StaticText "demo.example-bucket"
+  - region "demo.example-bucket" [ref=e264]
+    - paragraph
+      - StaticText "RESOURCE IDENTITY"
+    - heading "demo.example-bucket" [level=2, ref=e271]
+    - StaticText "local"
+    - DescriptionList
+      - term "PROFILE"
+      - definition
+        - StaticText "local"
+      - term "CAPABILITIES"
+      - definition
+        - StaticText "None advertised"
+      - term "SOURCE"
+      - definition
+        - StaticText "src/demo/buckets/example.bucket.ts:3:23"
+  - region "Bucket objects" [ref=e265]
+    - paragraph
+      - StaticText "READ-ONLY EXPLORER"
+    - heading "Bucket objects" [level=2, ref=e272]
+    - button "Refresh" [ref=e273]
+    - search
+      - LabelText
+        - StaticText "Object key prefix"
+      - textbox "Object key prefix" [ref=e277]
+      - button "Search" [ref=e278]
+    - status
+      - StaticText "Loading objects…"
+    - navigation "objects pagination" [ref=e274]
+      - button "Previous" [disabled, ref=e279]
+      - StaticText "Page "
+      - StaticText "1"
+      - button "Next" [disabled, ref=e280]
+  - region "Provider operation metadata" [ref=e266]
+    - paragraph
+      - StaticText "SAFE OPERATIONS"
+    - heading "Provider operation metadata" [level=2, ref=e275]
+    - StaticText "8"
+    - list
+      - listitem [level=1]
+        - code
+          - StaticText "put"
+        - StaticText "Contract operation"
+      - listitem [level=1]
+        - code
+          - StaticText "get"
+        - StaticText "Contract operation"
+      - listitem [level=1]
+        - code
+          - StaticText "head"
+        - StaticText "Contract operation"
+      - listitem [level=1]
+        - code
+          - StaticText "delete"
+        - StaticText "Contract operation"
+      - listitem [level=1]
+        - code
+          - StaticText "exists"
+        - StaticText "Contract operation"
+      - listitem [level=1]
+        - code
+          - StaticText "list"
+        - StaticText "Contract operation"
+      - listitem [level=1]
+        - code
+          - StaticText "createReadUrl"
+        - StaticText "Not advertised"
+      - listitem [level=1]
+        - code
+          - StaticText "createWriteUrl"
+        - StaticText "Not advertised"
+  - region "Bucket object policy" [ref=e267]
+    - paragraph
+      - StaticText "DECLARED POLICY"
+    - heading "Bucket object policy" [level=2, ref=e276]
+    - DescriptionList
+      - term "VISIBILITY"
+      - definition
+        - StaticText "private"
+      - term "MAXIMUM OBJECT BYTES"
+      - definition
+        - StaticText "5,000,000"
+      - term "ALLOWED CONTENT TYPES"
+      - definition
+        - StaticText "application/json"
+- button "Open Next.js Dev Tools" [expanded=false, ref=e281]
+  - image
+- alert
