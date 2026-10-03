@@ -1,0 +1,10 @@
+{
+  "agentId": "demo.example-agent",
+  "model": "gpt-6-luna",
+  "output": {
+    "answer": "Luna demo verified."
+  },
+  "boundary": "Actual demo agent declaration through native RELKIT agent runtime; no provider-backed write tool requested.",
+  "command": "rtk env RELKIT_DEMO_ONLY=1 bun /tmp/relkit-luna-runner.mjs",
+  "exit_code": 0
+}
