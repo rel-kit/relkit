@@ -1,3 +1,4 @@
+import type { JobAdminOptions, JobAdmin } from "./admin.types.js";
 import { randomUUID } from "node:crypto";
 import { normalizeId } from "@relkit/contracts";
 import type { JobQueue } from "./queue-utils.js";
@@ -34,39 +35,35 @@ import {
   versioned,
 } from "./admin-utils.js";
 
+export type { JobAdminOptions, JobAdmin } from "./admin.types.js";
+
 export * from "./admin-contracts.js";
 export { JobAdminError } from "./admin-errors.js";
 
-export interface JobAdminOptions {
-  readonly mode?: JobAdminMode;
-  readonly environment?: JobAdminMode;
-  readonly enabled?: boolean;
-  readonly now?: () => number;
-  readonly createActionId?: () => string;
-  readonly onAction?: JobAdminActionSink;
-}
-
-export interface JobAdmin {
-  readonly protocol: typeof JOB_ADMIN_PROTOCOL;
-  readonly version: typeof JOB_ADMIN_VERSION;
-  readonly status: (instanceId: string) => JobStatusContract | undefined;
-  readonly query: (request?: JobQueryRequest) => JobQueryContract;
-  readonly retry: (request: string | JobActionRequest) => Promise<JobActionContract>;
-  readonly cancel: (request: string | JobActionRequest) => Promise<JobActionContract>;
-  readonly deadLetter: (request: string | JobActionRequest) => Promise<JobActionContract>;
-  readonly actions: () => readonly JobAdminActionRecord[];
-}
-
-/** Exposes versioned local job inspection and explicitly audited mutations. */
+/** Exposes versioned local job inspection and explicitly audited mutations.
+ * @param queue - Owning durable queue operations.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @returns Versioned inspection and audited local mutation methods.
+ */
 export function createJobAdmin(queue: JobQueue, options: JobAdminOptions = {}): JobAdmin {
   const mode = options.environment ?? options.mode ?? "development";
   assertMode(mode);
   const enabled = options.enabled ?? mode !== "production";
   const records: JobAdminActionRecord[] = [];
+  /**
+   * Reads one safe versioned job status by normalized identity.
+   * @param instanceId - Queue instance identity.
+   * @returns The public status or undefined when the job is absent.
+   */
   const status = (instanceId: string): JobStatusContract | undefined => {
     const entry = queue.get(normalizeId(instanceId));
     return entry === undefined ? undefined : toStatus(entry);
   };
+  /**
+   * Validates filters and collects a bounded versioned inspection response.
+   * @param request - Validated scoped domain request.
+   * @returns The immutable inspection page with its continuation cursor when needed.
+   */
   const query = (request: JobQueryRequest = {}): JobQueryContract => {
     assertVersion(request);
     validateQuery(request);
@@ -83,7 +80,17 @@ export function createJobAdmin(queue: JobQueue, options: JobAdminOptions = {}): 
       ...(next === undefined ? {} : { nextCursor: cursor(next) }),
     });
   };
+  /**
+   * Copies retained audit records without exposing the mutable collection.
+   * @returns The immutable action history.
+   */
   const actions = (): readonly JobAdminActionRecord[] => Object.freeze([...records]);
+  /**
+   * Executes a development administration action and records its accepted or rejected outcome.
+   * @param action - Requested administration action.
+   * @param request - Validated scoped domain request.
+   * @returns The public action response, or the established audited rejection.
+   */
   const run = (action: JobAdminAction, request: string | JobActionRequest) =>
     applyAction(action, request, {
       queue,
@@ -106,6 +113,12 @@ export function createJobAdmin(queue: JobQueue, options: JobAdminOptions = {}): 
   });
 }
 
+/** Applies a permitted admin mutation and records both accepted and rejected outcomes.
+ * @param action - Requested administration action.
+ * @param input - Caller-provided domain input.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @returns The accepted action response; rejected actions throw their public audited error.
+ */
 async function applyAction(
   action: JobAdminAction,
   input: string | JobActionRequest,

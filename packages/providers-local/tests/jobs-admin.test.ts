@@ -1,10 +1,10 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createJobAdmin } from "./src/jobs/admin.ts";
-import { createJobQueue } from "./src/jobs/queue.ts";
-import { createJobStore } from "./src/jobs/store.ts";
+import { createJobAdmin } from "../src/jobs/admin.ts";
+import { createJobQueue } from "../src/jobs/queue.ts";
+import { createJobStore } from "../src/jobs/store.ts";
 
 const roots: string[] = [];
 
@@ -60,6 +60,7 @@ describe("local job administration", () => {
     const firstPage = admin.query({ limit: 1 });
     expect(firstPage.items).toHaveLength(1);
     expect(firstPage.nextCursor).toBeDefined();
+    if (firstPage.nextCursor === undefined) throw new Error("Expected a next page cursor");
     expect(admin.query({ cursor: firstPage.nextCursor, limit: 1 }).items).toHaveLength(1);
     expect(admin.actions()).toHaveLength(3);
 

@@ -1,10 +1,18 @@
+import {
+  pageLimit,
+  validateQuery,
+  assertVersion,
+  assertMode,
+  safeId,
+  readReason,
+  safeReason,
+  safeError,
+  newAdminError,
+} from "./admin-validation.js";
 import { deepFreeze, normalizeId } from "@relkit/contracts";
-import { JobAdminError } from "./admin-errors.js";
 import {
   JOB_ADMIN_PROTOCOL,
   JOB_ADMIN_VERSION,
-  type JobActionRequest,
-  type JobActionContract,
   type JobAdminAction,
   type JobAdminActionRecord,
   type JobAdminActionSink,
@@ -15,6 +23,21 @@ import {
 } from "./admin-contracts.js";
 import type { JobQueueEntry } from "./queue-utils.js";
 
+export {
+  pageLimit,
+  validateQuery,
+  assertVersion,
+  assertMode,
+  safeId,
+  readReason,
+  safeReason,
+  safeError,
+} from "./admin-validation.js";
+
+/** Projects a queue entry into versioned inspection fields without exposing payloads.
+ * @param entry - Current queue or storage entry.
+ * @returns The immutable public status projection.
+ */
 export function toStatus(entry: JobQueueEntry): JobStatusContract {
   return versioned({
     instanceId: entry.instanceId,
@@ -32,6 +55,11 @@ export function toStatus(entry: JobQueueEntry): JobStatusContract {
   });
 }
 
+/** Applies optional identity and state filters to a candidate record.
+ * @param entry - Current queue or storage entry.
+ * @param request - Caller domain request.
+ * @returns Whether the candidate satisfies all supplied filters.
+ */
 export function matches(entry: JobQueueEntry, request: JobQueryRequest): boolean {
   if (request.instanceId !== undefined && entry.instanceId !== normalizeId(request.instanceId))
     return false;
@@ -39,6 +67,11 @@ export function matches(entry: JobQueueEntry, request: JobQueryRequest): boolean
   return states === undefined || states.includes(entry.state);
 }
 
+/** Validates the cursor and selects records strictly after its stable ordering key.
+ * @param entry - Current queue or storage entry.
+ * @param value - Value to validate, normalize or project.
+ * @returns Whether the record sorts strictly after the validated cursor.
+ */
 export function afterCursor(entry: JobQueueEntry, value: string | undefined): boolean {
   if (value === undefined) return true;
   const [order, instanceId] = value.split(":", 2);
@@ -48,27 +81,18 @@ export function afterCursor(entry: JobQueueEntry, value: string | undefined): bo
   return entry.order > parsed || (entry.order === parsed && entry.instanceId > instanceId);
 }
 
+/** Encodes an entry ordering key for the next inspection page.
+ * @param entry - Current queue or storage entry.
+ * @returns The stable continuation cursor.
+ */
 export function cursor(entry: JobQueueEntry): string {
   return `${entry.order}:${entry.instanceId}`;
 }
 
-export function pageLimit(value: number | undefined): number {
-  if (value === undefined) return 50;
-  if (!Number.isSafeInteger(value) || value < 1)
-    throw newAdminError("RELKIT_JOB_ADMIN_QUERY_INVALID", "Job query limit is invalid");
-  return Math.min(value, 100);
-}
-
-export function validateQuery(request: JobQueryRequest): void {
-  if (request.state !== undefined && !isState(request.state))
-    throw newAdminError("RELKIT_JOB_ADMIN_QUERY_INVALID", "Job query state is invalid");
-  if (
-    request.states !== undefined &&
-    (!Array.isArray(request.states) || request.states.some((state) => !isState(state)))
-  )
-    throw newAdminError("RELKIT_JOB_ADMIN_QUERY_INVALID", "Job query states are invalid");
-}
-
+/** Builds the safe public failure describing an administrator cancellation or dead-letter action.
+ * @param action - Requested administration action.
+ * @returns Safe failure metadata for the requested administrative action.
+ */
 export function failureFor(action: JobAdminAction) {
   return {
     kind: action === "cancel" ? "cancellation" : "provider",
@@ -82,6 +106,19 @@ export function failureFor(action: JobAdminAction) {
   } as const;
 }
 
+/** Builds the versioned audit record with prior/next state and a bounded rejection code.
+ * @param action - Requested administration action.
+ * @param actionId - Stable audit action identity.
+ * @param instanceId - Queue or journal instance identity.
+ * @param requestedAt - Action request clock time in milliseconds.
+ * @param outcome - Recorded operation outcome.
+ * @param mode - Local administration environment mode.
+ * @param before - State before the attempted transition.
+ * @param after - State after the attempted transition.
+ * @param errorCode - Safe public failure code.
+ * @param reason - Optional bounded audit reason.
+ * @returns The validated immutable durable or audit record.
+ */
 export function makeRecord(
   action: JobAdminAction,
   actionId: string,
@@ -108,6 +145,11 @@ export function makeRecord(
   });
 }
 
+/** Stores the audit record before invoking its isolated optional sink.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @param record - Durable record or audit entry.
+ * @returns The recorded audit entry, even if the optional sink fails.
+ */
 export async function recordAction(
   options: { readonly onAction?: JobAdminActionSink; readonly records: JobAdminActionRecord[] },
   record: JobAdminActionRecord,
@@ -121,64 +163,11 @@ export async function recordAction(
   return record;
 }
 
+/** Adds protocol/version identity and freezes the public response.
+ * @param value - Value to validate, normalize or project.
+ * @returns The frozen value carrying the administration protocol identity.
+ * @typeParam T - Shape preserved by this operation.
+ */
 export function versioned<T extends object>(value: T): T & JobAdminVersion {
   return deepFreeze({ protocol: JOB_ADMIN_PROTOCOL, version: JOB_ADMIN_VERSION, ...value });
-}
-
-export function assertVersion(value: unknown): void {
-  if (!isRecord(value))
-    throw newAdminError("RELKIT_JOB_ADMIN_REQUEST_INVALID", "Job admin request is invalid");
-  if (
-    (value.protocol !== undefined && value.protocol !== JOB_ADMIN_PROTOCOL) ||
-    (value.version !== undefined && value.version !== JOB_ADMIN_VERSION)
-  )
-    throw newAdminError("RELKIT_JOB_ADMIN_PROTOCOL_MISMATCH", "Unsupported job admin protocol");
-}
-
-export function assertMode(value: string): asserts value is JobAdminMode {
-  if (value !== "development" && value !== "test" && value !== "production")
-    throw newAdminError("RELKIT_JOB_ADMIN_MODE_INVALID", "Job admin mode is invalid");
-}
-
-export function safeId(value: unknown): string | undefined {
-  try {
-    return normalizeId(value);
-  } catch {
-    return undefined;
-  }
-}
-
-export function readReason(value: unknown): string | undefined {
-  if (!isRecord(value) || value.reason === undefined) return undefined;
-  if (typeof value.reason !== "string" || value.reason.trim() === "")
-    throw newAdminError("RELKIT_JOB_ADMIN_REQUEST_INVALID", "Job action reason is invalid");
-  return value.reason.trim().slice(0, 256);
-}
-
-export function safeReason(value: unknown): string | undefined {
-  try {
-    return readReason(value);
-  } catch {
-    return undefined;
-  }
-}
-
-export function safeError(value: unknown): JobAdminError {
-  return value instanceof JobAdminError
-    ? value
-    : newAdminError("RELKIT_JOB_ADMIN_ACTION_FAILED", "Job admin action failed");
-}
-
-function isState(value: unknown): value is JobQueueEntry["state"] {
-  return ["accepted", "available", "leased", "delayed", "completed", "dead-lettered"].includes(
-    value as string,
-  );
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function newAdminError(code: string, message: string): JobAdminError {
-  return new JobAdminError(code, message);
 }
