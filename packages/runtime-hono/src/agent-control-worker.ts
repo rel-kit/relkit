@@ -1,19 +1,30 @@
-import { REALTIME_RUNTIME_LIMITS, type OperationId } from "@relkit/contracts";
+import { applyControlEffect } from "./agent-control-application.js";
+import { Context, Effect, Layer } from "effect";
+import { httpBoundary, observeHttp, runHttp } from "./http-effect.js";
+import type { ResolvedAgent } from "./agent-control-worker.types.js";
+
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
-import type { agentContext } from "./agent-rpc-support.js";
+
 import { AgentApprovalCoordinator } from "./agent-approval-coordinator.js";
 import type { ActiveAgentExecution } from "./agent-active-execution.js";
 
-type ResolvedAgent = Awaited<ReturnType<typeof agentContext>>;
-
-export async function consumeAgentControls(
+/** Processes accepted controls sequentially until its generation-owned observer is cancelled.
+ * @param resolved - Authorized agent descriptor, provider and durable request scope.
+ * @param active - Mutable state owned by the accepted run and its continuation chain.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param runController - Controller owning cancellation of the accepted execution.
+ * @param approvals - Run-owned approval coordinator retaining unresolved decisions.
+ * @param signal - Cancellation signal inherited from the caller or owning scope.
+ * @returns Completion when the control iterator closes or its owning signal aborts.
+ */
+const consumeAgentControlsEffect = Effect.fn("AgentControls.consumeAgentControls")(function* (
   resolved: ResolvedAgent,
   active: ActiveAgentExecution,
   options: RouteMaterializationOptions,
   runController: AbortController,
   approvals: AgentApprovalCoordinator,
   signal: AbortSignal,
-): Promise<void> {
+) {
   let afterSequence: string | undefined;
   let runId = active.receipt.runId;
   while (!signal.aborted) {
@@ -21,15 +32,17 @@ export async function consumeAgentControls(
       runId = active.receipt.runId;
       afterSequence = undefined;
     }
-    const page = await resolved.provider.readControls({
-      ...resolved.scope,
-      threadId: active.receipt.threadId,
-      runId,
-      ...(afterSequence === undefined ? {} : { afterSequence }),
-      limit: 32,
-    });
+    const page = yield* httpBoundary("agent.controls.consumeAgentControls", () =>
+      resolved.provider.readControls({
+        ...resolved.scope,
+        threadId: active.receipt.threadId,
+        runId,
+        ...(afterSequence === undefined ? {} : { afterSequence }),
+        limit: 32,
+      }),
+    );
     for (const operationId of page.operationIds) {
-      await applyControl(
+      yield* applyControlEffect(
         resolved,
         active.receipt.threadId,
         runId,
@@ -38,123 +51,60 @@ export async function consumeAgentControls(
         runController,
         approvals,
         active,
-      ).catch(() => undefined);
+      ).pipe(
+        Effect.catch(() =>
+          Effect.logWarning("Agent control could not be applied; continuing observation"),
+        ),
+      );
     }
     afterSequence = page.nextSequence;
     if (!page.hasMore)
-      await resolved.provider.waitForControls({
-        ...resolved.scope,
-        threadId: active.receipt.threadId,
-        runId,
-        afterSequence: page.nextSequence,
-        deadlineMs: Date.now() + 15_000,
-        signal,
-      });
+      yield* httpBoundary("agent.controls.consumeAgentControls", () =>
+        resolved.provider.waitForControls({
+          ...resolved.scope,
+          threadId: active.receipt.threadId,
+          runId,
+          afterSequence: page.nextSequence,
+          deadlineMs: Date.now() + 15_000,
+          signal,
+        }),
+      );
   }
-}
+});
 
-async function applyControl(
+/** Processes controls sequentially under the accepted run lifetime. */
+export class AgentControls extends Context.Service<
+  AgentControls,
+  { readonly consume: typeof consumeAgentControlsEffect }
+>()("@relkit/runtime-hono/AgentControls") {}
+
+/** Live control processing keeps claim, effect-start and settlement ordering. */
+export const AgentControlsLive = Layer.succeed(AgentControls, {
+  consume: (...args) => observeHttp("agent.controls.consume", consumeAgentControlsEffect(...args)),
+});
+
+/** Native compatibility edge for the scoped control supervisor.
+ * @param resolved - Authorized agent descriptor, provider and durable request scope.
+ * @param active - Mutable state owned by the accepted run and its continuation chain.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param runController - Controller owning cancellation of the accepted execution.
+ * @param approvals - Run-owned approval coordinator retaining unresolved decisions.
+ * @param signal - Cancellation signal inherited from the caller or owning scope.
+ * @returns Completion when the control iterator closes or its owning signal aborts.
+ */
+export function consumeAgentControls(
   resolved: ResolvedAgent,
-  threadId: string,
-  runId: string,
+  active: ActiveAgentExecution,
   options: RouteMaterializationOptions,
-  operationId: OperationId,
   runController: AbortController,
   approvals: AgentApprovalCoordinator,
-  active: ActiveAgentExecution,
-) {
-  const snapshot = await resolved.provider.loadThread({
-    ...resolved.scope,
-    threadId,
-    maxEncodedBytes: REALTIME_RUNTIME_LIMITS.initialSnapshotBytes,
-  });
-  const record = snapshot.controls.find((candidate) => candidate.controlId === operationId);
-  if (record === undefined) return;
-  if (record.kind === "follow-up") return;
-  const claim = await resolved.provider.claimControl({
-    ...resolved.scope,
-    threadId,
-    runId,
-    operationId,
-    workerId: crypto.randomUUID(),
-    generationId: options.agentRuntime!.generationId,
-    expiresAt: new Date(Date.now() + 45_000).toISOString(),
-  });
-  const now = new Date().toISOString();
-  if (record.kind === "stop") {
-    await resolved.provider.markControlEffectStarted({
-      ...resolved.scope,
-      threadId,
-      runId,
-      operationId,
-      claim,
-    });
-    runController.abort(new Error("Agent stopped."));
-    await resolved.provider.settleControl({
-      ...resolved.scope,
-      threadId,
-      runId,
-      operationId,
-      claim,
-      status: "applied",
-      effect: "confirmed",
-      settledAt: now,
-    });
-    return;
-  }
-  if (record.kind === "approve") {
-    await approvals.continue(operationId, record.publicPayload, async () => {
-      await resolved.provider.markControlEffectStarted({
-        ...resolved.scope,
-        threadId,
-        runId,
-        operationId,
-        claim,
-        downstreamOperationId: operationId,
-      });
-      await resolved.provider.settleControl({
-        ...resolved.scope,
-        threadId,
-        runId,
-        operationId,
-        claim,
-        status: "applied",
-        effect: "confirmed",
-        downstreamOperationId: operationId,
-        settledAt: now,
-      });
-    });
-    return;
-  }
-  if (record.kind === "steer" && typeof record.publicPayload === "string") {
-    await resolved.provider.markControlEffectStarted({
-      ...resolved.scope,
-      threadId,
-      runId,
-      operationId,
-      claim,
-    });
-    active.steering.push(record.publicPayload);
-    await resolved.provider.settleControl({
-      ...resolved.scope,
-      threadId,
-      runId,
-      operationId,
-      claim,
-      status: "applied",
-      effect: "confirmed",
-      settledAt: now,
-    });
-    return;
-  }
-  await resolved.provider.settleControl({
-    ...resolved.scope,
-    threadId,
-    runId,
-    operationId,
-    claim,
-    status: "rejected",
-    effect: "not-started",
-    settledAt: now,
-  });
+  signal: AbortSignal,
+): Promise<void> {
+  return runHttp(
+    Effect.gen(function* () {
+      const service = yield* AgentControls;
+      yield* service.consume(resolved, active, options, runController, approvals, signal);
+    }).pipe(Effect.provide(AgentControlsLive)),
+    signal,
+  );
 }
