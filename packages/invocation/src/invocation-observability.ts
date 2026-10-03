@@ -22,10 +22,59 @@ export class InvocationTelemetry extends Context.Service<
  */
 export const InvocationTelemetryLive = Layer.succeed(InvocationTelemetry, { observe: observeLive });
 
-const calls = Metric.counter("relkit_invocation_operations_total", { incremental: true });
-const failures = Metric.counter("relkit_invocation_failures_total", { incremental: true });
-const duration = Metric.histogram("relkit_invocation_duration_ms", {
-  boundaries: [0.01, 0.1, 1, 5, 10, 50, 100],
+// Operation names are a closed declaration-owned union. Reuse immutable metric
+// handles so Effect can cache hooks per registry; never retain a caller context.
+const operationMetrics = new Map<InvocationOperation, ReturnType<typeof createOperationMetrics>>();
+
+/** Builds metric handles for one bounded invocation operation.
+ * @param operation - Declaration-owned operation name.
+ * @returns Handles whose contextual registry and attributes resolve at execution.
+ */
+function createOperationMetrics(operation: InvocationOperation) {
+  const attributes = { operation };
+  return {
+    calls: Metric.counter("relkit_invocation_operations_total", { incremental: true, attributes }),
+    failures: Metric.counter("relkit_invocation_failures_total", { incremental: true, attributes }),
+    duration: Metric.histogram("relkit_invocation_duration_ms", {
+      boundaries: [0.01, 0.1, 1, 5, 10, 50, 100],
+      attributes,
+    }),
+  };
+}
+
+/** Updates a cached handle while retaining declaration-owned label precedence.
+ * @typeParam Input - Metric input value.
+ * @typeParam State - Metric snapshot state.
+ * @param metric - Immutable handle with an intrinsic operation label.
+ * @param input - Counter increment or measured duration.
+ * @param operation - Bounded label that overrides a colliding caller attribute.
+ * @returns Lazy mutation in the caller's registry, without changing workflow attributes.
+ */
+function updateOperationMetric<Input, State>(
+  metric: Metric.Metric<Input, State>,
+  input: Input,
+  operation: InvocationOperation,
+): Effect.Effect<void> {
+  return Effect.withFiber((fiber) => {
+    const attributes = Context.get(fiber.context, Metric.CurrentMetricAttributes);
+    const context = Object.hasOwn(attributes, "operation")
+      ? Context.add(fiber.context, Metric.CurrentMetricAttributes, { ...attributes, operation })
+      : fiber.context;
+    metric.updateUnsafe(input, context);
+    return Effect.void;
+  });
+}
+
+/** Retains the instrumentation stack boundary without redefining it per operation.
+ * @typeParam A - Successful operation value.
+ * @typeParam E - Typed operation failure.
+ * @typeParam R - Required operation dependencies.
+ * @param effect - Lazy operation carrying the original result and failure channels.
+ * @returns The same operation under the shared instrumentation stack frame.
+ * @remarks The owning observer supplies the operation span; this helper adds no span.
+ */
+const executeObserved = Effect.fn(function* <A, E, R>(effect: Effect.Effect<A, E, R>) {
+  return yield* effect;
 });
 
 /** Observes an operation with a fixed span and bounded metric labels.
@@ -38,13 +87,10 @@ export function observeInvocation<A, E, R>(
   operation: InvocationOperation,
   effect: Effect.Effect<A, E, R>,
 ): Effect.Effect<A, E, R> {
-  const execute = Effect.fn(function* () {
-    return yield* effect;
-  });
   return Effect.flatMap(Effect.serviceOption(InvocationTelemetry), (service) =>
     Option.isSome(service)
-      ? service.value.observe(operation, execute())
-      : observeLive(operation, execute()),
+      ? service.value.observe(operation, executeObserved(effect))
+      : observeLive(operation, executeObserved(effect)),
   );
 }
 
@@ -52,16 +98,16 @@ function observeLive<A, E, R>(
   operation: InvocationOperation,
   effect: Effect.Effect<A, E, R>,
 ): Effect.Effect<A, E, R> {
-  const attributes = { operation };
+  const metrics = operationMetrics.get(operation) ?? createOperationMetrics(operation);
+  operationMetrics.set(operation, metrics);
   const measured = Effect.gen(function* () {
     const started = yield* Clock.monotonicTimeNanos;
-    yield* Metric.update(Metric.withAttributes(calls, attributes), 1);
+    yield* updateOperationMetric(metrics.calls, 1, operation);
     return yield* Effect.onExit(effect, (exit) =>
       Effect.gen(function* () {
         const elapsed = Number((yield* Clock.monotonicTimeNanos) - started) / 1_000_000;
-        yield* Metric.update(Metric.withAttributes(duration, attributes), Math.max(0, elapsed));
-        if (Exit.isFailure(exit))
-          yield* Metric.update(Metric.withAttributes(failures, attributes), 1);
+        yield* updateOperationMetric(metrics.duration, Math.max(0, elapsed), operation);
+        if (Exit.isFailure(exit)) yield* updateOperationMetric(metrics.failures, 1, operation);
       }),
     );
   });

@@ -17,6 +17,12 @@ export interface HandlerBridgeOptions<Input, Output, Context extends object> {
   readonly publicContext: Context;
   readonly deadline?: number;
   readonly timeoutMs?: number;
+  /** Internal lifecycle flag for declared stream output. Defaults to false.
+   * Retains platform-managed parent cancellation after handler settlement;
+   * the stream consumer owns deferred work and its eventual cleanup.
+   * @internal
+   */
+  readonly deferredStream?: boolean;
   /** Observes the linked handler signal before work starts.
    * @param signal - Handler cancellation signal.
    * @returns Void.
