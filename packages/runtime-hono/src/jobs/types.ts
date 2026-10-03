@@ -1,67 +1,28 @@
-import type { MaybePromise } from "@relkit/contracts";
-import type {
-  JobAccessGrant,
-  JobAccessRequest,
-  JobClientOperation,
-  JobRunStatus,
-  RunSnapshot,
-} from "@relkit/contracts/jobs";
-import type { JobDescriptorAny, JobAuthorizationContext, JobsRuntime } from "@relkit/jobs";
+import type { JobClientOperation } from "@relkit/contracts/jobs";
 import type { TaskJobNode } from "@relkit/graph";
-import type { HttpAuthInvocation } from "../auth.js";
-import type { ManifestEntries, RouteMaterializationOptions } from "../materialize-routes.js";
+import type { JobAuthorizationContext } from "@relkit/jobs";
+import type { RouteMaterializationOptions } from "../materialize-routes.js";
+import type { JobPolicyProjection, JobsRpcRuntime } from "./runtime.types.js";
+export type {
+  JobPolicyProjection,
+  JobRpcOptions,
+  JobsRpcRuntime,
+  JobsScopeRequest,
+  TrustedJobScope,
+} from "./runtime.types.js";
 
-export interface JobsScopeRequest {
-  readonly request: Request;
-  readonly auth: HttpAuthInvocation | undefined;
-  readonly job: TaskJobNode;
-  readonly operation: JobClientOperation;
-  readonly input?: import("@relkit/contracts").JsonValue;
-  readonly run?: RunSnapshot;
-}
-
-export interface JobsRpcRuntime {
-  readonly runtimes?:
-    | JobsRuntime
-    | ReadonlyMap<string, JobsRuntime>
-    | Readonly<Record<string, JobsRuntime>>
-    | (() =>
-        JobsRuntime | ReadonlyMap<string, JobsRuntime> | Readonly<Record<string, JobsRuntime>>);
-  readonly resolveRuntime?: (job: TaskJobNode) => MaybePromise<JobsRuntime | undefined>;
-  readonly descriptors?: ManifestEntries<unknown>;
-  readonly tasks?: ManifestEntries<unknown>;
-  readonly resolveDescriptor?: (job: TaskJobNode) => MaybePromise<JobDescriptorAny | undefined>;
-  readonly resolveScope?: (input: JobsScopeRequest) => MaybePromise<TrustedJobScope>;
-  readonly application?: string;
-  readonly environment?: string;
-  readonly publicScope?: string;
-  readonly publicFingerprint?: string;
-  readonly protocolVersion?: number;
-  readonly cursorSecret?: string | Uint8Array;
-  readonly authTimeoutMs?: number;
-}
-
-export interface TrustedJobScope {
-  readonly application: string;
-  readonly environment: string;
-  readonly scope: string;
-  readonly subject?: string;
-}
-
-export interface JobPolicyProjection {
-  readonly operations: readonly JobClientOperation[];
-  readonly fields: readonly ("status" | "input" | "progress" | "output" | "error")[];
-  readonly streams: readonly string[];
-}
-
-export interface JobRpcOptions extends RouteMaterializationOptions {
-  readonly jobs: JobsRpcRuntime;
-}
-
+/** Resolve the preferred jobs configuration and its compatibility alias.
+ * @param options - Runtime configuration and dependencies for this operation.
+ * @returns The configured jobs runtime, or undefined.
+ */
 export function jobsRuntime(options: RouteMaterializationOptions): JobsRpcRuntime | undefined {
   return options.jobs ?? options.jobsRuntime;
 }
 
+/** Filter a job's client declaration to supported operations, fields and streams.
+ * @param job - Compiled task job registration.
+ * @returns The public projection and operation policy.
+ */
 export function jobPolicy(job: TaskJobNode): JobPolicyProjection {
   const value = isRecord(job.client) ? job.client : {};
   const operations = Array.isArray(value.operations) ? value.operations.filter(isJobOperation) : [];
@@ -72,14 +33,26 @@ export function jobPolicy(job: TaskJobNode): JobPolicyProjection {
   return { operations, fields, streams };
 }
 
+/** Recognize operations supported by the public jobs client.
+ * @param value - Value to validate or project.
+ * @returns Whether the value names a supported operation.
+ */
 export function isJobOperation(value: unknown): value is JobClientOperation {
   return ["trigger", "get", "list", "watch", "cancel", "retry", "stream"].includes(String(value));
 }
 
+/** Recognize job fields permitted in a public projection.
+ * @param value - Value to validate or project.
+ * @returns Whether the value is status, input, progress, output or error.
+ */
 function isJobField(value: unknown): value is "status" | "input" | "progress" | "output" | "error" {
   return ["status", "input", "progress", "output", "error"].includes(String(value));
 }
 
+/** Check whether a value is a non-null object suitable for field inspection.
+ * @param value - Value to validate or project.
+ * @returns Whether object fields can be inspected.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

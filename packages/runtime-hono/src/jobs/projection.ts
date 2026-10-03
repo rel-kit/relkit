@@ -8,10 +8,16 @@ import type {
 import type { TaskJobNode } from "@relkit/graph";
 import type { JobDescriptorAny } from "@relkit/jobs";
 import { projectRunPage, projectRunSnapshot } from "@relkit/jobs";
-import type { JobPolicyProjection } from "./types.js";
-import { jobError } from "./support.js";
 import { assertSafeRun, assertSafeWatchFrame, safeAvailability } from "./projection-validation.js";
+import { jobError } from "./support.js";
+import type { JobPolicyProjection } from "./types.js";
 
+/** Validate and redact a run according to its public field policy.
+ * @param run - Persisted run being inspected.
+ * @param policy - Allowed public fields and operations.
+ * @param descriptor - Job descriptor supplying canonical schemas and declared errors.
+ * @returns The public run snapshot with only selected fields.
+ */
 export function projectSnapshot(
   run: RunSnapshot,
   policy: JobPolicyProjection,
@@ -25,6 +31,12 @@ export function projectSnapshot(
   }
 }
 
+/** Validate page metadata and apply the job's field projection.
+ * @param page - Provider page to validate or project.
+ * @param policy - Allowed public fields and operations.
+ * @param descriptor - Job descriptor supplying canonical schemas and declared errors.
+ * @returns The public page with safe service availability metadata.
+ */
 export function projectPage(
   page: RunPage<RunSnapshot>,
   policy: JobPolicyProjection,
@@ -44,6 +56,12 @@ export function projectPage(
   );
 }
 
+/** Validate a watch frame and project its embedded run.
+ * @param frame - Native frame to validate or encode.
+ * @param policy - Allowed public fields and operations.
+ * @param descriptor - Job descriptor supplying canonical schemas and declared errors.
+ * @returns A frozen frame containing only supported metadata and public run fields.
+ */
 export function projectWatchFrame(
   frame: RunWatchFrame<RunSnapshot>,
   policy: JobPolicyProjection,
@@ -83,6 +101,12 @@ export function projectWatchFrame(
   });
 }
 
+/** Project the optional run in a cancellation receipt.
+ * @param receipt - Provider cancellation or retry receipt.
+ * @param policy - Allowed public fields and operations.
+ * @param descriptor - Job descriptor supplying canonical schemas and declared errors.
+ * @returns A frozen receipt with any run restricted to public fields.
+ */
 export function projectCancellation(
   receipt: RunCancellationReceipt,
   policy: JobPolicyProjection,
@@ -97,6 +121,11 @@ export function projectCancellation(
   });
 }
 
+/** Verify retry identity and expose only supported acceptance fields.
+ * @param receipt - Provider cancellation or retry receipt.
+ * @param job - Compiled task job registration.
+ * @returns A frozen retry receipt matching the selected job/task version.
+ */
 export function projectRetry(
   receipt: RunRetryReceipt,
   job: Pick<TaskJobNode, "jobId" | "taskId" | "taskVersion">,
@@ -123,6 +152,10 @@ export function projectRetry(
   });
 }
 
+/** Collect declared task error IDs for safe failure projection.
+ * @param descriptor - Job descriptor supplying canonical schemas and declared errors.
+ * @returns Projection options allowing only the descriptor's declared errors.
+ */
 function projectionOptions(descriptor: JobDescriptorAny | undefined) {
   const errors = descriptor?.task.errors;
   return errors === undefined ? {} : { declaredErrorIds: errors.map((error) => error.id) };
