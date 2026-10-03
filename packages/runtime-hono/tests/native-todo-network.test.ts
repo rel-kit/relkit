@@ -1,50 +1,24 @@
+import { setTimeout as sleep } from "node:timers/promises";
 import { EventType } from "@ag-ui/core";
 import { oc } from "@orpc/contract";
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createClient, createWebSocketClient } from "@relkit/client";
-import {
-  defineAgent,
-  invokeAgent,
-  type AgentContentSink,
-  type AgentExecutionEvent,
-  type AgentObservation,
-  type JournalCheckpoint,
-  type ThreadSnapshot,
-} from "@relkit/agents";
-import type { RegistrationPlan } from "@relkit/graph";
-import { createLocalAgentStateProvider } from "@relkit/providers-local";
+import { type AgentObservation, type JournalCheckpoint, type ThreadSnapshot } from "@relkit/agents";
 import { createOperationId } from "@relkit/realtime";
-import { z } from "@relkit/schema";
 import { AGENT_CAPABILITY_HEADER, AGENT_CAPABILITY_VALUE } from "@relkit/contracts";
-import { todoListMiddleware } from "langchain";
-import { createTodoTestModel } from "./deepagent-test-model.ts";
-import { createApp, type RuntimeManifest } from "./src/index.ts";
-import { runtimeCohort } from "./test-cohort.ts";
-import { upgradeWebSocket, websocket } from "hono/bun";
+import { startBunFixture, type BunFixture } from "./bun-fixture.ts";
 
-const pending = [
-  { content: "Find the order", status: "in_progress" },
-  { content: "Explain its state", status: "pending" },
-] as const;
-const progressing = [
-  { content: "Find the order", status: "completed" },
-  { content: "Explain its state", status: "in_progress" },
-] as const;
-const completed = [
-  { content: "Find the order", status: "completed" },
-  { content: "Explain its state", status: "completed" },
-] as const;
-const expectedStates = [pending, progressing, completed] as const;
+import { expectedStates } from "./fixtures/todo-setup.ts";
 const identityHeaders = {
   "x-relkit-identity-scope": "viewer",
   "x-relkit-session-epoch": "session",
 };
 const networkFetch = globalThis.fetch.bind(globalThis);
 const roots: string[] = [];
-const servers: Bun.Server<unknown>[] = [];
+const servers: BunFixture[] = [];
 
 const clientContract = {
   "relkit.agent.run": oc
@@ -61,82 +35,15 @@ const clientContract = {
 } as const;
 
 afterEach(async () => {
-  servers.splice(0).forEach((server) => server.stop(true));
+  await Promise.all(servers.splice(0).map((server) => server.stop()));
   await Promise.all(roots.splice(0).map((root) => rm(root, { force: true, recursive: true })));
 });
 
 test("native todo values cross HTTP, SSE, and WebSocket before terminal completion", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-native-todo-network-"));
   roots.push(root);
-  const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
-  const scripted = createTodoTestModel(expectedStates);
-  const agent = defineAgent({
-    id: "support.echo",
-    input: z.object({ message: z.string() }),
-    output: z.object({ answer: z.string() }),
-    model: scripted.model,
-    instructions: "Track the order with the todo list, then answer.",
-    tools: [],
-    middleware: [todoListMiddleware()],
-    limits: { maxSteps: 5, maxToolCalls: 4, timeoutMs: 10_000 },
-    stateProfile: "default",
-    client: { authorize: () => true, state: ["todos"] },
-    chat: { input: "message", output: "answer" },
-  });
-  const plan = agentPlan();
-  const start = Promise.withResolvers<void>();
-  const releases = expectedStates.map(() => Promise.withResolvers<void>());
-  let executions = 0;
-  const app = createApp({
-    plan,
-    manifest: manifest(plan, agent),
-    engine: {
-      invoke: async (request) => {
-        executions += 1;
-        await start.promise;
-        const trigger = request.trigger as {
-          readonly threadId: string;
-          readonly contentSink: AgentContentSink;
-        };
-        const sink = trigger.contentSink;
-        const emitEvent = sink.emitEvent;
-        if (emitEvent === undefined) throw new Error("Agent event sink is missing.");
-        return invokeAgent({
-          agent,
-          input: request.input,
-          threadId: trigger.threadId,
-          tools: {},
-          engine: { invoke: () => Promise.reject(new Error("Unexpected RELKIT tool.")) },
-          contentSink: {
-            ...sink,
-            emitEvent: async (event: AgentExecutionEvent, signal: AbortSignal) => {
-              await emitEvent(event, signal);
-              const index = expectedStateIndex(event);
-              if (index >= 0) await releases[index]!.promise;
-            },
-          },
-        });
-      },
-    },
-    clientIdentity: {
-      applicationId: "fixture",
-      publicFingerprint: "sha256:public",
-      resolve: () => ({ identityScope: "viewer", sessionEpoch: "session" }),
-    },
-    agentRuntime: {
-      applicationId: "fixture",
-      environment: "test",
-      generationId: "generation-a",
-      publicFingerprint: "sha256:public",
-      provider: () => provider,
-    },
-    upgradeWebSocket,
-  });
-  const server = Bun.serve({
-    port: 0,
-    websocket,
-    fetch: (request, bunServer) => app.fetch(request, bunServer),
-  });
+  const server = await startBunFixture("native-todo", { root });
+  const agent = { id: "support.echo" };
   servers.push(server);
   const baseUrl = `http://127.0.0.1:${server.port}`;
   const httpWire: string[] = [];
@@ -191,14 +98,14 @@ test("native todo values cross HTTP, SSE, and WebSocket before terminal completi
   const sseDone = collectSse(sse, captures[1]!, sseFrames);
 
   await within(Promise.all(captures.map(({ ready }) => ready.promise)), "observers ready");
-  start.resolve();
+  await networkFetch(`${baseUrl}/__fixture/start`);
   for (let index = 0; index < expectedStates.length; index += 1) {
     await within(
       Promise.all(captures.map(({ seen }) => seen[index]!.promise)),
       `todo state ${index + 1}`,
     );
     expect(captures.every(({ terminal }) => !terminal)).toBe(true);
-    releases[index]!.resolve();
+    await networkFetch(`${baseUrl}/__fixture/release/${index}`);
   }
   await within(Promise.all([httpDone, sseDone, websocketDone]), "terminal frames");
 
@@ -206,8 +113,10 @@ test("native todo values cross HTTP, SSE, and WebSocket before terminal completi
     expect(capture.states).toEqual(expectedStates);
     expect(capture.terminal).toBe(true);
   }
-  expect(executions).toBe(1);
-  expect(scripted.calls).toHaveLength(4);
+  expect(await (await networkFetch(`${baseUrl}/__fixture/state`)).json()).toEqual({
+    executions: 1,
+    calls: 4,
+  });
   expect(httpWire.join("")).toContain("Find the order");
   expect(websocketWire.join("")).toContain("Find the order");
   expect(sseFrames.join("\n")).toContain(EventType.STATE_SNAPSHOT);
@@ -215,8 +124,8 @@ test("native todo values cross HTTP, SSE, and WebSocket before terminal completi
 }, 15_000);
 
 interface Capture {
-  readonly ready: PromiseWithResolvers<void>;
-  readonly seen: readonly PromiseWithResolvers<void>[];
+  readonly ready: ReturnType<typeof Promise.withResolvers<void>>;
+  readonly seen: readonly ReturnType<typeof Promise.withResolvers<void>>[];
   readonly states: unknown[];
   terminal: boolean;
 }
@@ -297,38 +206,43 @@ function recordObservation(capture: Capture, observation: AgentObservation): voi
   capture.seen[index]!.resolve();
 }
 
-function expectedStateIndex(event: AgentExecutionEvent): number {
-  if (event.kind !== "values" || event.scope.length !== 0 || !isRecord(event.value)) return -1;
-  return expectedStates.findIndex(
-    (state) => JSON.stringify(state) === JSON.stringify(event.value.todos),
-  );
-}
-
 function recordingFetch(frames: string[], fetcher: typeof fetch): typeof fetch {
-  return async (input, init) => {
-    const response = await fetcher(input, init);
-    if (response.body === null) return response;
-    const decoder = new TextDecoder();
-    const body = response.body.pipeThrough(
-      new TransformStream<Uint8Array, Uint8Array>({
-        transform(chunk, controller) {
-          frames.push(decoder.decode(chunk, { stream: true }));
-          controller.enqueue(chunk);
-        },
-      }),
-    );
-    return new Response(body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-    });
-  };
+  return Object.assign(
+    async (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+      const response = await fetcher(input, init);
+      if (response.body === null) return response;
+      const decoder = new TextDecoder();
+      const body = response.body.pipeThrough(
+        new TransformStream<Uint8Array, Uint8Array>({
+          transform(chunk, controller) {
+            frames.push(decoder.decode(chunk, { stream: true }));
+            controller.enqueue(chunk);
+          },
+        }),
+      );
+      return new Response(body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      });
+    },
+    { preconnect: fetcher.preconnect },
+  );
 }
 
 function recordingWebSocket(frames: string[]): typeof WebSocket {
   return class extends WebSocket {
-    constructor(url: string | URL, protocols?: string | string[]) {
-      super(url, protocols);
+    constructor(url: string | URL, options?: string | string[] | Bun.WebSocketOptions) {
+      super(
+        url,
+        typeof options === "object" && !Array.isArray(options)
+          ? "protocols" in options
+            ? options.protocols
+            : "protocol" in options
+              ? options.protocol
+              : undefined
+          : options,
+      );
       this.addEventListener("message", (event) => {
         if (typeof event.data === "string") frames.push(event.data);
       });
@@ -339,7 +253,7 @@ function recordingWebSocket(frames: string[]): typeof WebSocket {
 async function within<T>(promise: Promise<T>, label: string): Promise<T> {
   return Promise.race([
     promise,
-    Bun.sleep(5_000).then(() => Promise.reject(new Error(`Timed out waiting for ${label}.`))),
+    sleep(5_000).then(() => Promise.reject(new Error(`Timed out waiting for ${label}.`))),
   ]);
 }
 
@@ -380,49 +294,5 @@ function schema<Value>() {
       types: undefined as unknown as { input: Value; output: Value },
       validate: (value: unknown) => ({ value: value as Value }),
     },
-  };
-}
-
-function agentPlan(): RegistrationPlan {
-  return {
-    graphHash: "sha256:native-todo-network",
-    functions: [],
-    httpTriggers: [],
-    queues: [],
-    schedules: [],
-    eventTriggers: [],
-    buckets: [],
-    caches: [],
-    tools: [],
-    channels: [],
-    agents: [
-      {
-        kind: "agent",
-        id: "support.echo",
-        source: { file: "agent.ts", line: 1, column: 1 },
-        input: {},
-        output: {},
-        instructions: "redacted",
-        toolIds: [],
-        limits: {},
-        generatedFunction: { functionId: "relkit.agent.support.echo.invoke" },
-        profile: "default",
-        stateProfile: "default",
-        client: "protected",
-        chat: { input: "message", output: "answer" },
-        controls: [],
-      },
-    ],
-    middlewares: [],
-  };
-}
-
-function manifest(plan: RegistrationPlan, agent: unknown): RuntimeManifest {
-  return {
-    ...runtimeCohort(plan.graphHash),
-    functions: {},
-    agents: { "support.echo": agent },
-    middleware: {},
-    requestTransforms: {},
   };
 }
