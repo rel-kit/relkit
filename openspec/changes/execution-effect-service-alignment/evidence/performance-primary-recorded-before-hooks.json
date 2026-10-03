@@ -1,0 +1,194 @@
+{
+  "protocol": "relkit.execution-recorded-comparison",
+  "initialWarmups": 200,
+  "iterations": 200,
+  "rounds": 3,
+  "results": [
+    {
+      "round": 0,
+      "name": "original",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2157.035,
+        "averageMs": 10.785,
+        "p50Ms": 10.253,
+        "p95Ms": 14.6,
+        "opsPerSecond": 92.72
+      },
+      "operations": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2634.073,
+        "averageMs": 13.17,
+        "p50Ms": 12.445,
+        "p95Ms": 17.554,
+        "opsPerSecond": 75.928
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2736.363,
+        "averageMs": 13.682,
+        "p50Ms": 12.819,
+        "p95Ms": 18.785,
+        "opsPerSecond": 73.09
+      }
+    },
+    {
+      "round": 0,
+      "name": "candidate",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2323.303,
+        "averageMs": 11.617,
+        "p50Ms": 10.673,
+        "p95Ms": 16.355,
+        "opsPerSecond": 86.084
+      },
+      "operations": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2706.723,
+        "averageMs": 13.534,
+        "p50Ms": 12.43,
+        "p95Ms": 18.761,
+        "opsPerSecond": 73.89
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 3128.181,
+        "averageMs": 15.641,
+        "p50Ms": 14.37,
+        "p95Ms": 22.407,
+        "opsPerSecond": 63.935
+      }
+    },
+    {
+      "round": 1,
+      "name": "candidate",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2335.551,
+        "averageMs": 11.678,
+        "p50Ms": 10.689,
+        "p95Ms": 16.479,
+        "opsPerSecond": 85.633
+      },
+      "operations": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2785.628,
+        "averageMs": 13.928,
+        "p50Ms": 12.617,
+        "p95Ms": 19.189,
+        "opsPerSecond": 71.797
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 3220.624,
+        "averageMs": 16.103,
+        "p50Ms": 14.635,
+        "p95Ms": 22.735,
+        "opsPerSecond": 62.1
+      }
+    },
+    {
+      "round": 1,
+      "name": "original",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2273.037,
+        "averageMs": 11.365,
+        "p50Ms": 10.602,
+        "p95Ms": 16.31,
+        "opsPerSecond": 87.988
+      },
+      "operations": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 3022.256,
+        "averageMs": 15.111,
+        "p50Ms": 13.882,
+        "p95Ms": 21.385,
+        "opsPerSecond": 66.176
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2972.351,
+        "averageMs": 14.862,
+        "p50Ms": 13.511,
+        "p95Ms": 20.941,
+        "opsPerSecond": 67.287
+      }
+    },
+    {
+      "round": 2,
+      "name": "original",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2384.787,
+        "averageMs": 11.924,
+        "p50Ms": 10.854,
+        "p95Ms": 17.788,
+        "opsPerSecond": 83.865
+      },
+      "operations": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 3063.307,
+        "averageMs": 15.317,
+        "p50Ms": 14.003,
+        "p95Ms": 22.141,
+        "opsPerSecond": 65.289
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2958.158,
+        "averageMs": 14.791,
+        "p50Ms": 13.377,
+        "p95Ms": 21.666,
+        "opsPerSecond": 67.61
+      }
+    },
+    {
+      "round": 2,
+      "name": "candidate",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2495.495,
+        "averageMs": 12.477,
+        "p50Ms": 11.082,
+        "p95Ms": 18.332,
+        "opsPerSecond": 80.144
+      },
+      "operations": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2921.883,
+        "averageMs": 14.609,
+        "p50Ms": 13.285,
+        "p95Ms": 20.957,
+        "opsPerSecond": 68.449
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 3349.903,
+        "averageMs": 16.75,
+        "p50Ms": 14.927,
+        "p95Ms": 24.299,
+        "opsPerSecond": 59.703
+      }
+    }
+  ]
+}

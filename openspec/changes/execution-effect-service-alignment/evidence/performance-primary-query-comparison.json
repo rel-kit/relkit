@@ -1,0 +1,195 @@
+{
+  "protocol": "relkit.execution-query-comparison",
+  "timestamp": "2026-10-02T18:42:09.965Z",
+  "bun": "1.3.10",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M1 Pro",
+  "originalRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-head-ae4etj17",
+  "candidateRoot": "/Users/mustafaelsayed/Workspace/relkit",
+  "originalCommit": "56cb00a4e09f7908d456848e69f6b623bd859c84",
+  "entrypoint": "packages/observability/src/index.ts",
+  "fixture": {
+    "version": 2,
+    "records": 513,
+    "spans": 512,
+    "sha256": "4ea0d4d95579308dd47bd453d23c26ba7b37d783dcde056625c372ed03354f1e"
+  },
+  "iterations": 1000,
+  "rounds": 5,
+  "initialWarmups": 200,
+  "perMeasurementWarmups": 10,
+  "statistic": "same scripts/performance-support.ts measure function as full harness",
+  "context": "same process, default clock/metric registry, no logger or recording overrides",
+  "sourceParity": [
+    {
+      "path": "packages/observability/src/execution-assembly.ts",
+      "identical": true,
+      "sha256": "d4473e9f84f7412e65b879f247cca6387eb8033c9174e71a31fe3a15641944b6"
+    },
+    {
+      "path": "packages/observability/src/execution-assembly-effect.ts",
+      "identical": true,
+      "sha256": "3b1f523f0ce4e673c134550edcd742ce056486012c727efe3fc73058a753e864"
+    },
+    {
+      "path": "packages/observability/src/execution-assembly-core.ts",
+      "identical": true,
+      "sha256": "6f48873f2cc8f97313cb5af13a7108a79e331e3fcde301ed11cd6bb13dc949a7"
+    },
+    {
+      "path": "scripts/performance-instrumentation.ts",
+      "identical": true,
+      "sha256": "a9a7662ec2997e00e3d60bb6b97a90afd72d01438071aa6c441af673dd8f5333"
+    },
+    {
+      "path": "scripts/performance-support.ts",
+      "identical": true,
+      "sha256": "266565f3c9a251f4476f54f6a07bf7fe94f4b8394031d85027025862c4866ea8"
+    }
+  ],
+  "effect": [
+    {
+      "root": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-head-ae4etj17",
+      "path": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect"
+    },
+    {
+      "root": "/Users/mustafaelsayed/Workspace/relkit",
+      "path": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect"
+    }
+  ],
+  "outputEqual": true,
+  "outputSha256": "6ac7618065164f59768029252839aaa3abebd69569309582369282720eba9e84",
+  "results": [
+    {
+      "round": 0,
+      "name": "original",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 580.477,
+        "averageMs": 0.58,
+        "p50Ms": 0.525,
+        "p95Ms": 0.774,
+        "opsPerSecond": 1722.72
+      }
+    },
+    {
+      "round": 0,
+      "name": "candidate",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 983.607,
+        "averageMs": 0.984,
+        "p50Ms": 0.542,
+        "p95Ms": 1.961,
+        "opsPerSecond": 1016.667
+      }
+    },
+    {
+      "round": 1,
+      "name": "candidate",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 562.936,
+        "averageMs": 0.563,
+        "p50Ms": 0.512,
+        "p95Ms": 0.723,
+        "opsPerSecond": 1776.401
+      }
+    },
+    {
+      "round": 1,
+      "name": "original",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 570.052,
+        "averageMs": 0.57,
+        "p50Ms": 0.523,
+        "p95Ms": 0.706,
+        "opsPerSecond": 1754.225
+      }
+    },
+    {
+      "round": 2,
+      "name": "original",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 581.753,
+        "averageMs": 0.582,
+        "p50Ms": 0.538,
+        "p95Ms": 0.705,
+        "opsPerSecond": 1718.943
+      }
+    },
+    {
+      "round": 2,
+      "name": "candidate",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 569.093,
+        "averageMs": 0.569,
+        "p50Ms": 0.515,
+        "p95Ms": 0.73,
+        "opsPerSecond": 1757.182
+      }
+    },
+    {
+      "round": 3,
+      "name": "candidate",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 605.129,
+        "averageMs": 0.605,
+        "p50Ms": 0.524,
+        "p95Ms": 0.987,
+        "opsPerSecond": 1652.539
+      }
+    },
+    {
+      "round": 3,
+      "name": "original",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 674.309,
+        "averageMs": 0.674,
+        "p50Ms": 0.588,
+        "p95Ms": 1.356,
+        "opsPerSecond": 1483
+      }
+    },
+    {
+      "round": 4,
+      "name": "original",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 651.563,
+        "averageMs": 0.652,
+        "p50Ms": 0.579,
+        "p95Ms": 0.992,
+        "opsPerSecond": 1534.772
+      }
+    },
+    {
+      "round": 4,
+      "name": "candidate",
+      "query": {
+        "iterations": 1000,
+        "warmups": 10,
+        "totalMs": 550.129,
+        "averageMs": 0.55,
+        "p50Ms": 0.508,
+        "p95Ms": 0.637,
+        "opsPerSecond": 1817.756
+      }
+    }
+  ]
+}
