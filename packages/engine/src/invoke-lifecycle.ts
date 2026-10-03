@@ -1,27 +1,20 @@
-import { Effect } from "effect";
 import type { MaybePromise } from "@relkit/contracts";
 import {
   baseExecutionContext,
   findNativeSuspension,
   invokeFunctionLifecycle,
   invokeValueHook,
-  type InvocationValueHooks,
 } from "@relkit/invocation";
-import type { InvocationTarget, TaskLifecycleHooks } from "./invoke-types.js";
+import { Clock, Effect, Option } from "effect";
+import { enginePromise } from "./engine-runtime.js";
+import type { LifecycleOptions } from "./invoke-lifecycle.types.js";
 
-interface LifecycleOptions<Context extends { readonly signal: AbortSignal }> {
-  readonly target: InvocationTarget<unknown, unknown, Context>;
-  readonly input: unknown;
-  readonly context: Context;
-  readonly toolHooks?: InvocationValueHooks<Context>;
-  readonly deadline?: number;
-  readonly onSignal: (signal: AbortSignal) => void;
-  readonly isSuspension?: (cause: unknown) => boolean;
-  readonly skipInputValidation?: boolean;
-  readonly taskLifecycle?: TaskLifecycleHooks<Context>;
-}
-
-export const runConfiguredLifecycle = Effect.fnUntraced(function* <
+/** Run shared validation and handler lifecycle with bounded native task hooks.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns A lazy Effect of validated handler output, preserving failure and suspension semantics.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
+export const runConfiguredLifecycle = Effect.fn("Engine.invocation.lifecycle")(function* <
   Context extends { readonly signal: AbortSignal },
 >(options: LifecycleOptions<Context>) {
   const hookContext = baseExecutionContext(options.context) as unknown as Context;
@@ -93,55 +86,71 @@ export const runConfiguredLifecycle = Effect.fnUntraced(function* <
 
 const TASK_HOOK_TIMEOUT_MS = 5_000;
 
-function runTaskHook<Context extends { readonly signal: AbortSignal }>(
+/** Execute observational hooks with a bounded, interruptible Effect timeout.
+ * @typeParam Context - Handler context retaining its public AbortSignal.
+ * @param hook - Optional lifecycle observer.
+ * @param name - Bounded hook identity.
+ * @param value - Hook value, never copied into diagnostics.
+ * @param context - Public handler context.
+ * @param deadline - Absolute invocation deadline in milliseconds.
+ * @returns A lazy diagnostic-only hook; absent hooks create no span and interruption remains interruption.
+ */
+export function runTaskHook<Context extends { readonly signal: AbortSignal }>(
   hook: ((value: unknown, context: Context) => MaybePromise<void>) | undefined,
   name: "start" | "success" | "failure",
   value: unknown,
   context: Context,
   deadline: number | undefined,
-): Effect.Effect<void, never> {
-  if (hook === undefined) return Effect.void;
-  return Effect.tryPromise({
-    try: () => boundedTaskHook(hook, name, value, context, deadline),
-    catch: () => undefined,
-  }).pipe(
-    Effect.asVoid,
-    Effect.catchCause(() => Effect.void),
-  );
+) {
+  return hook === undefined
+    ? Effect.void
+    : runDefinedTaskHook(hook, name, value, context, deadline);
 }
 
-async function boundedTaskHook<Context extends { readonly signal: AbortSignal }>(
+/** Run a configured observer within its named span and bounded timeout.
+ * @typeParam Context - Handler context retaining its public AbortSignal.
+ * @param hook - Configured lifecycle observer.
+ * @param name - Bounded hook identity.
+ * @param value - Hook value, never copied into diagnostics.
+ * @param context - Public handler context.
+ * @param deadline - Absolute invocation deadline in milliseconds.
+ * @returns A lazy diagnostic-only hook; interruption remains interruption.
+ */
+const runDefinedTaskHook = Effect.fn("Engine.task.hook")(function* <
+  Context extends { readonly signal: AbortSignal },
+>(
   hook: (value: unknown, context: Context) => MaybePromise<void>,
   name: "start" | "success" | "failure",
   value: unknown,
   context: Context,
   deadline: number | undefined,
-): Promise<void> {
-  const remaining =
-    deadline === undefined ? TASK_HOOK_TIMEOUT_MS : Math.max(0, deadline - Date.now());
+) {
+  const now = yield* Clock.currentTimeMillis;
+  const remaining = deadline === undefined ? TASK_HOOK_TIMEOUT_MS : Math.max(0, deadline - now);
   const limit = Math.min(TASK_HOOK_TIMEOUT_MS, remaining);
   if (limit === 0) {
     warnHook(context, name, "deadline");
     return;
   }
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    await Promise.race([
-      Promise.resolve().then(() => hook(value, context)),
-      new Promise<void>((resolve) => {
-        timer = setTimeout(() => {
-          warnHook(context, name, "timeout");
-          resolve();
-        }, limit);
-      }),
-    ]);
-  } catch {
-    warnHook(context, name, "error");
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-  }
-}
+  yield* enginePromise((signal) => Promise.resolve(hook(value, { ...context, signal }))).pipe(
+    Effect.timeoutOption(limit),
+    Effect.matchEffect({
+      onFailure: () => Effect.sync(() => warnHook(context, name, "error")),
+      onSuccess: (result) =>
+        Effect.sync(() => {
+          if (Option.isNone(result)) warnHook(context, name, "timeout");
+        }),
+    }),
+  );
+});
 
+/** Report a bounded task hook diagnostic through the handler's public logger.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns Nothing; reports only a bounded diagnostic through the caller's logger.
+ * @param context - Active native invocation or task context.
+ * @param name - Declared operation, dependency or field name.
+ * @param reason - Bounded diagnostic reason without native payload data.
+ */
 function warnHook<Context extends { readonly signal: AbortSignal }>(
   context: Context,
   name: string,
