@@ -5,7 +5,12 @@ import type { FailureTelemetry, FailureTelemetryOptions } from "./failure-types.
 
 export type { FailureTelemetry, FailureTelemetryOptions } from "./failure-types.js";
 
-/** Adds bounded, redacted detail only for development telemetry. */
+/**
+ * Adds bounded development detail to the safe public failure envelope.
+ * @param value - Original failure or error.
+ * @param options - Mode and optional redaction policy.
+ * @returns A safe failure envelope with internal detail only in development.
+ */
 export function toFailureTelemetry(
   value: unknown,
   options: FailureTelemetryOptions = {},

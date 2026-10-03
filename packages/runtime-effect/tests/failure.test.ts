@@ -1,14 +1,62 @@
 import { Cause } from "effect";
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   applicationFailure,
   normalizeFailure,
   providerFailure,
   toPublicEnvelope,
-} from "./src/failure.js";
-import { toFailureTelemetry } from "./src/failure-telemetry.js";
+} from "../src/failure.js";
+import { toFailureTelemetry } from "../src/failure-telemetry.js";
+import { redactFailureDetail } from "../src/failure-redaction.js";
 
 describe("runtime failure normalization", () => {
+  test("redaction avoids error and array getters and isolates inaccessible proxies", () => {
+    let getters = 0;
+    const error = new Error("secret=hidden");
+    Object.defineProperty(error, "name", {
+      get: () => {
+        getters += 1;
+        throw new Error("getter");
+      },
+    });
+    const array: unknown[] = ["value"];
+    Object.defineProperty(array, "0", {
+      get: () => {
+        getters += 1;
+        return "password=hidden";
+      },
+    });
+    expect(redactFailureDetail(error)).toEqual({
+      name: "[unavailable]",
+      message: "secret=[REDACTED]",
+    });
+    expect(redactFailureDetail(array)).toEqual(["[unavailable]"]);
+    const customStack = new Error("password=hidden");
+    Object.defineProperty(customStack, "stack", {
+      get: () => {
+        getters += 1;
+        throw new Error("stack getter");
+      },
+    });
+    expect(redactFailureDetail(customStack)).toEqual({
+      name: "Error",
+      message: "password=[REDACTED]",
+    });
+    expect(
+      redactFailureDetail(
+        new Proxy(
+          {},
+          {
+            ownKeys: () => {
+              throw new Error("proxy");
+            },
+          },
+        ),
+      ),
+    ).toBe("[unavailable]");
+    expect(getters).toBe(0);
+  });
+
   test("maps declared errors to their safe application envelope", () => {
     const error = Object.assign(new Error("Order missing"), {
       name: "DeclaredError",

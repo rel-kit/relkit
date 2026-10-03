@@ -1,15 +1,19 @@
-import { Cause, Effect, References } from "effect";
+import { test, expect } from "vitest";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { Cause, Effect, Logger, References } from "effect";
 import { normalizeProtocolId } from "@relkit/contracts";
 import { createObservabilityCollector } from "@relkit/observability";
 import {
   createLoggerLayer,
+  createEffectLogger,
   formatHumanLog,
   type HumanLogSink,
   type JsonLogSink,
   type LogRecord,
-} from "./src/logger.js";
-import { IdSource } from "./src/services.js";
-import { withRootSpan } from "./src/tracing.js";
+} from "../src/logger.js";
+import { IdSource } from "../src/services.js";
+import { withRootSpan } from "../src/tracing.js";
 
 function capture(): {
   readonly records: LogRecord[];
@@ -117,7 +121,7 @@ test("admits versioned records and projects causes before sinks", async () => {
   );
   const [record] = collector.read();
   expect(record).toMatchObject({ version: 2, signal: "log", level: "error" });
-  expect(record?.fields.cause).toMatchObject({
+  expect(record?.signal === "log" ? record.fields.cause : undefined).toMatchObject({
     reasons: [{ kind: "defect", detail: { message: "password=[REDACTED]" } }],
   });
   expect(output.records[0]).toEqual(record);
@@ -151,10 +155,112 @@ test("runs redaction before either sink", async () => {
 });
 
 test("source scan allows direct output only in logger sinks", async () => {
-  const child = Bun.spawn([process.execPath, "run", "scripts/check-logger-sinks.ts"], {
-    stdout: "pipe",
-    stderr: "pipe",
+  const result = await promisify(execFile)("bun", ["run", "scripts/check-logger-sinks.ts"]);
+  expect(result.stderr).toBe("");
+});
+
+test("projects immutable input and sanitizes nested changes from a custom redactor", async () => {
+  const output = capture();
+  const detail = Object.defineProperty({ message: "safe" }, "hidden", {
+    enumerable: true,
+    get: () => {
+      throw new Error("annotation getter must not run");
+    },
   });
-  expect(await child.exited).toBe(0);
-  await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text()]);
+  let deep: unknown = new Error("depth boundary");
+  for (let index = 0; index < 5; index++) deep = { value: deep };
+  await Effect.runPromise(
+    Effect.logInfo("projection").pipe(
+      Effect.annotateLogs({
+        detail,
+        deep,
+        prototypePayload: JSON.parse('{"__proto__":{"marker":"injected"}}'),
+      }),
+      Effect.provide(
+        createLoggerLayer({
+          human: false,
+          json: output.json,
+          redact: (record) => {
+            expect(Object.isFrozen(record)).toBe(true);
+            expect(Object.isFrozen(record.fields)).toBe(true);
+            expect(Object.getPrototypeOf(record.fields.prototypePayload)).toBe(Object.prototype);
+            expect(Reflect.get(record.fields.prototypePayload as object, "marker")).toBeUndefined();
+            let projectedError: unknown = record.fields.deep;
+            for (let index = 0; index < 5; index++)
+              projectedError = (projectedError as { value: unknown }).value;
+            expect(projectedError).toMatchObject({ name: "[truncated]", message: "[truncated]" });
+            expect(record.fields.detail).toEqual({ hidden: "[unavailable]", message: "safe" });
+            const projected = record.fields.detail as Record<string, string>;
+            projected.message = "password=custom-secret";
+            return record;
+          },
+        }),
+      ),
+    ),
+  );
+  expect(output.records[0]?.fields.detail).toEqual({
+    hidden: "[unavailable]",
+    message: "password=[REDACTED]",
+  });
+  expect(detail.message).toBe("safe");
+  expect(JSON.stringify(output.records)).not.toContain("custom-secret");
+});
+
+test("direct logger construction preserves its configured minimum", async () => {
+  const output = capture();
+  await Effect.runPromise(
+    Effect.gen(function* () {
+      yield* Effect.logInfo("hidden");
+      yield* Effect.logWarning("visible");
+    }).pipe(
+      Effect.provide(
+        Logger.layer([
+          createEffectLogger({ minimumLevel: "warn", human: output.human, json: false }),
+        ]),
+      ),
+    ),
+  );
+  expect(output.records.map((record) => record.message)).toEqual(["visible"]);
+});
+
+test("redaction recovery and sink failures preserve sibling delivery", async () => {
+  const output = capture();
+  await Effect.runPromise(
+    Effect.logInfo("password=secret").pipe(
+      Effect.provide(
+        createLoggerLayer({
+          human: {
+            write: () => {
+              throw new Error("human unavailable");
+            },
+          },
+          json: output.json,
+          redact: () => {
+            throw new Error("redactor unavailable");
+          },
+        }),
+      ),
+    ),
+  );
+  expect(output.records).toHaveLength(1);
+  expect(output.records[0]?.message).toBe("Log redaction failed");
+  expect(JSON.stringify(output.records)).not.toContain("secret");
+});
+
+test("configured none and all levels reach the actual sink", async () => {
+  const output = capture();
+  for (const minimumLevel of ["none", "all"] as const) {
+    await Effect.runPromise(
+      Effect.logTrace(minimumLevel).pipe(
+        Effect.provide(
+          createLoggerLayer({
+            minimumLevel,
+            human: output.human,
+            json: false,
+          }),
+        ),
+      ),
+    );
+  }
+  expect(output.records.map((record) => record.message)).toEqual(["all"]);
 });
