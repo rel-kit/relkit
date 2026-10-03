@@ -1,11 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { createSpanId, createTraceId } from "@relkit/contracts";
 import type { EventNode, FunctionNode, RegistrationPlan } from "@relkit/graph";
+import { describe, expect, test } from "vitest";
 import {
   materializeEvents,
   type EventEngine,
   type EventInvocationOptions,
   type EventRuntimeProvider,
-} from "./src/materialize-events.ts";
+} from "../src/materialize-events.js";
+import { providerBinding } from "./fixtures.js";
 
 const source = { file: "src/events.ts", line: 1, column: 1 } as const;
 
@@ -14,7 +16,9 @@ describe("event materialization", () => {
     const calls: string[] = [];
     let binding: Parameters<EventRuntimeProvider["registerTrigger"]>[0] | undefined;
     const provider: EventRuntimeProvider = {
-      registerContract: (contract) => calls.push(`${contract.id}@${contract.version}`),
+      registerContract: (contract) => {
+        calls.push(`${contract.id}@${contract.version}`);
+      },
       registerTrigger: (registered) => {
         binding = registered;
         calls.push(registered.id);
@@ -34,7 +38,12 @@ describe("event materialization", () => {
         resolve: (capability, profile) => {
           expect(capability).toBe("event");
           expect(profile).toBe("default");
-          return { capability, profile, value: provider };
+          return {
+            capability,
+            profile,
+            binding: providerBinding(capability, profile),
+            value: provider,
+          };
         },
       },
     });
@@ -56,8 +65,8 @@ describe("event materialization", () => {
       propagation: {
         version: 2,
         producer: {
-          traceId: "10000000000000000000000000000001",
-          spanId: "1000000000000001",
+          traceId: createTraceId(),
+          spanId: createSpanId(),
           traceFlags: 1,
         },
         originRequestId: "request-1",
@@ -125,9 +134,11 @@ describe("event materialization", () => {
         resolve: (capability, profile) => ({
           capability,
           profile,
+          binding: providerBinding(capability, profile),
           value: {
-            registerContract: (contract: EventNode) =>
-              registrations.push(`${profile}:${contract.id}`),
+            registerContract: (contract: EventNode) => {
+              registrations.push(`${profile}:${contract.id}`);
+            },
             registerTrigger: () => undefined,
           },
         }),
@@ -180,5 +191,7 @@ function plan(targetFunctionId = "orders.handle"): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
+    middlewares: [],
   };
 }

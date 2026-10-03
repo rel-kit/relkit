@@ -1,22 +1,25 @@
-import { describe, expect, test } from "bun:test";
-import { applicationFailure } from "@relkit/runtime-effect";
 import { createSpanId, createTraceId } from "@relkit/contracts";
-import { SpanRuntime, type SpanLifecycle } from "@relkit/invocation";
 import type { FunctionNode, JobNode, RegistrationPlan } from "@relkit/graph";
+import { SpanRuntime, type SpanLifecycle } from "@relkit/invocation";
+import { applicationFailure } from "@relkit/runtime-effect";
+import { describe, expect, test } from "vitest";
+import { readPolicy } from "../src/materialize-jobs-utils.js";
 import type {
   JobInvocationOptions,
   JobQueueEntry,
   JobQueueHandle,
   JobScheduler,
-} from "./src/materialize-jobs.ts";
-import { materializeJobs } from "./src/materialize-jobs.ts";
-import { readPolicy } from "./src/materialize-jobs-utils.ts";
+} from "../src/materialize-jobs.js";
+import { materializeJobs } from "../src/materialize-jobs.js";
 
 const source = { file: "src/jobs.ts", line: 1, column: 1 } as const;
 
 describe("job materialization", () => {
   test("accepts absent idempotency but still validates explicit policies", () => {
-    const job = { ...(plan().queues[0] as JobNode) };
+    const planned = plan().queues[0];
+    if (planned === undefined || planned.kind !== "job" || !("targetFunctionId" in planned))
+      throw new Error("Legacy job required");
+    const job = { ...planned };
     delete job.idempotency;
     const queue = {
       kind: "trigger",
@@ -58,7 +61,9 @@ describe("job materialization", () => {
     );
     const spanRuntime = new SpanRuntime({
       ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
-      observer: (event) => spans.push(event),
+      observer: (event) => {
+        spans.push(event);
+      },
     });
     const materialized = await materializeJobs({
       plan: plan({ schedule: true }),
@@ -177,8 +182,8 @@ describe("job materialization", () => {
       },
     });
     const producer = {
-      traceId: "10000000000000000000000000000001",
-      spanId: "1000000000000001",
+      traceId: createTraceId(),
+      spanId: createSpanId(),
       traceFlags: 1,
     } as const;
     const accepted = await materialized.jobs.get("orders.send")!.enqueue(
@@ -262,6 +267,8 @@ function plan(options: { readonly schedule?: boolean } = {}): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
+    middlewares: [],
   };
 }
 

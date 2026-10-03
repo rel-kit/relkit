@@ -1,5 +1,4 @@
 import type { ScheduleRegistration } from "@relkit/graph";
-import type { ScheduleDefinition } from "@relkit/jobs/legacy";
 import {
   completeSpan,
   currentTracePropagation,
@@ -7,9 +6,17 @@ import {
   startRootSpan,
   type SpanRuntime,
 } from "@relkit/invocation";
+import type { ScheduleDefinition } from "@relkit/jobs/legacy";
 import type { JobScheduler, MaterializedJob } from "./materialize-jobs-types.js";
 import { JobMaterializationError } from "./materialize-jobs-types.js";
 
+/** Bind a schedule to enqueue with detached producer tracing and persisted propagation.
+ * @returns Nothing; the scheduler retains the registered enqueue callback.
+ * @param scheduler - Generation-owned schedule registrar.
+ * @param registration - Validated provider or schedule registration.
+ * @param jobs - Materialized queues indexed by job identifier.
+ * @param runtime - Optional tracing runtime for detached producer spans.
+ */
 export function bindSchedule(
   scheduler: JobScheduler,
   registration: ScheduleRegistration,
@@ -47,6 +54,10 @@ export function bindSchedule(
   });
 }
 
+/** Validate a queue schedule and retain its overlap/timezone settings.
+ * @returns A validated native schedule definition.
+ * @param registration - Validated provider or schedule registration.
+ */
 function scheduleDefinition(registration: ScheduleRegistration): ScheduleDefinition {
   if (!isRecord(registration.schedule))
     throw new JobMaterializationError(`Schedule "${registration.id}" is not an object`);
@@ -57,6 +68,10 @@ function scheduleDefinition(registration: ScheduleRegistration): ScheduleDefinit
   return { ...registration.schedule, id: scheduleId } as unknown as ScheduleDefinition;
 }
 
+/** Recognize non-null object records before reading native fields.
+ * @returns Whether the native value satisfies this guard.
+ * @param value - Native value being validated or projected.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
