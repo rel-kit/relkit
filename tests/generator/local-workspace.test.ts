@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { versionChecks } from "../../packages/cli/src/commands/doctor-compat.js";
 import { useWorkspaceDependencies } from "../../packages/cli/src/local.js";
 import appManifest from "../../packages/app/package.json" with { type: "json" };
+import cliManifest from "../../packages/cli/package.json" with { type: "json" };
 import { generateProject, normalizeCreateOptions } from "../../packages/create-relkit/src/index.ts";
 import { runScaffoldTerminal } from "../../scripts/scaffold-smoke-terminal.ts";
 
@@ -129,7 +130,7 @@ test("local links keep web dependencies local and repair previously linked inspe
     expect(names).not.toContain("react-dom");
     expect(manifest.dependencies).toMatchObject({
       langchain: "link:langchain",
-      next: "16.3.3",
+      next: linked ? cliManifest.dependencies.next : "16.3.3",
       react: "19.2.8",
       "react-dom": "19.2.8",
     });

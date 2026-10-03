@@ -17,7 +17,7 @@ import { z } from "../../packages/schema/src/index.ts";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { createApp, type RuntimeManifest } from "../../packages/runtime-hono/src/index.ts";
-import { runtimeCohort } from "../../packages/runtime-hono/test-cohort.ts";
+import { runtimeCohort } from "../../packages/runtime-hono/tests/test-cohort.ts";
 
 const todo = z.object({
   content: z.string(),
