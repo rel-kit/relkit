@@ -10,6 +10,11 @@ import {
   type LocalCacheProviderOptions,
 } from "./types.js";
 
+/**
+ * Validates provider limits and normalizes effective policy defaults.
+ * @param options - Caller policy, pagination or construction settings.
+ * @returns An immutable validated provider policy.
+ */
 export function normalizePolicy(options: LocalCacheProviderOptions): LocalCachePolicy {
   const defaultTtlMs = positiveInteger(options.defaultTtlMs, "defaultTtlMs");
   const maxTtlMs = positiveInteger(options.maxTtlMs, "maxTtlMs");
@@ -30,6 +35,12 @@ export function normalizePolicy(options: LocalCacheProviderOptions): LocalCacheP
   });
 }
 
+/**
+ * Resolves entry TTL against defaults and the maximum allowed lifetime.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @param policy - Validated effective provider policy.
+ * @returns The validated TTL in milliseconds, when configured.
+ */
 export function normalizeTtl(value: unknown, policy: LocalCachePolicy): number | undefined {
   const ttlMs = value === undefined ? policy.defaultTtlMs : value;
   if (ttlMs === undefined) return undefined;
@@ -42,6 +53,12 @@ export function normalizeTtl(value: unknown, policy: LocalCachePolicy): number |
   return ttlMs;
 }
 
+/**
+ * Rejects an aborted or expired operation before cache or bucket IO.
+ * @param context - Caller cancellation, deadline and operation metadata.
+ * @param clock - Injected clock used for TTL and deadline checks.
+ * @returns The checked clock time when used by the cache, otherwise nothing.
+ */
 export function assertActive(
   context: CacheOperationContext | undefined,
   clock: () => number,
@@ -54,6 +71,11 @@ export function assertActive(
   return now;
 }
 
+/**
+ * Checks that the injected clock returns a usable finite timestamp.
+ * @param clock - Injected clock used for TTL and deadline checks.
+ * @returns The current provider time in milliseconds.
+ */
 export function readClock(clock: () => number): number {
   const now = clock();
   if (typeof now !== "number" || !Number.isFinite(now)) {
@@ -62,14 +84,30 @@ export function readClock(clock: () => number): number {
   return now;
 }
 
+/**
+ * Measures UTF-8 bytes for cache key and value capacity accounting.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns The encoded byte length.
+ */
 export function byteLength(value: string): number {
   return new TextEncoder().encode(value).byteLength;
 }
 
+/**
+ * Copies cache values through their supported JSON representation.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns An isolated copy of the stored value.
+ */
 export function clone(value: unknown): unknown {
   return structuredClone(value);
 }
 
+/**
+ * Requires a positive safe integer for a named policy limit.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @param name - Policy field used in validation errors.
+ * @returns The validated integer.
+ */
 function positiveInteger(value: unknown, name: string): number | undefined {
   if (value === undefined) return undefined;
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value <= 0) {

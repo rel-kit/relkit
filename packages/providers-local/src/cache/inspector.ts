@@ -1,6 +1,12 @@
 import { LocalCacheKeyError, type LocalCacheProvider } from "./types.js";
 import type { LocalCacheStore } from "./store.js";
 
+/**
+ * Projects bounded cache metadata and previews from the same byte-LRU store.
+ * @param store - Provider-owned byte-LRU state.
+ * @param clock - Injected clock used for TTL and deadline checks.
+ * @returns Read-only Promise inspector operations.
+ */
 export function createLocalCacheInspector(
   store: LocalCacheStore,
   clock: () => number,
@@ -49,6 +55,11 @@ export function createLocalCacheInspector(
   });
 }
 
+/**
+ * Removes the provider namespace from an encoded cache key for inspection.
+ * @param encoded - Canonical namespaced cache key.
+ * @returns The serialized application key.
+ */
 function publicKey(encoded: string): string {
   try {
     const value = JSON.parse(encoded) as { readonly key?: unknown };
@@ -58,6 +69,11 @@ function publicKey(encoded: string): string {
   }
 }
 
+/**
+ * Classifies values for safe cache inspection metadata.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns A bounded public value-type label.
+ */
 function valueType(value: unknown): string {
   return value === null ? "null" : Array.isArray(value) ? "array" : typeof value;
 }

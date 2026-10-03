@@ -1,3 +1,5 @@
+import { Schema } from "effect";
+import { CacheSnapshot } from "./persistence.schemas.js";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { rename, rm, writeFile } from "node:fs/promises";
@@ -9,10 +11,22 @@ import type { LocalCacheStoreState } from "./store.js";
 
 const SNAPSHOT_VERSION = 1;
 
+/**
+ * Resolves the durable snapshot inside the owned cache root.
+ * @param root - Provider-owned root directory.
+ * @returns The validated snapshot path.
+ */
 export function snapshotPath(root: string): string {
   return join(ensureOwnedDirectory(root), "snapshot.json");
 }
 
+/**
+ * Restores a matching versioned snapshot and quarantines invalid data.
+ * @param path - Filesystem path within provider ownership.
+ * @param cacheId - Expected cache namespace.
+ * @param schemaVersion - Expected cache schema namespace.
+ * @returns Validated cache state or undefined when absent or quarantined.
+ */
 export function readCacheState(
   path: string,
   cacheId: string,
@@ -26,11 +40,7 @@ export function readCacheState(
     throw new LocalCacheStateError("Cache snapshot cannot be read");
   }
   try {
-    const state = JSON.parse(contents) as LocalCacheStoreState & {
-      readonly cacheId?: unknown;
-      readonly schemaVersion?: unknown;
-      readonly version?: unknown;
-    };
+    const state = Schema.decodeUnknownSync(CacheSnapshot)(JSON.parse(contents));
     assertState(state, cacheId, schemaVersion);
     return state;
   } catch (cause) {
@@ -43,6 +53,14 @@ export function readCacheState(
   }
 }
 
+/**
+ * Commits the complete cache snapshot by atomic file replacement.
+ * @param path - Filesystem path within provider ownership.
+ * @param state - Complete byte-LRU snapshot to persist or validate.
+ * @param cacheId - Expected cache namespace.
+ * @param schemaVersion - Expected cache schema namespace.
+ * @returns A Promise resolving after the snapshot rename.
+ */
 export async function writeCacheState(
   path: string,
   state: LocalCacheStoreState,
@@ -61,6 +79,13 @@ export async function writeCacheState(
   }
 }
 
+/**
+ * Validates cache namespace, canonical keys, byte totals and access counters.
+ * @param state - Complete byte-LRU snapshot to persist or validate.
+ * @param cacheId - Expected cache namespace.
+ * @param schemaVersion - Expected cache schema namespace.
+ * @returns Nothing when the complete snapshot is consistent.
+ */
 function assertState(
   state: unknown,
   cacheId: string,
@@ -105,6 +130,11 @@ function assertState(
   }
 }
 
+/**
+ * Checks persisted entry fields and its JSON-compatible payload.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns Whether the value is a restorable cache entry.
+ */
 function validEntry(value: unknown): value is LocalCacheStoreState["entries"][number] {
   return (
     isRecord(value) &&
@@ -116,6 +146,11 @@ function validEntry(value: unknown): value is LocalCacheStoreState["entries"][nu
   );
 }
 
+/**
+ * Checks that a persisted cache key uses canonical JSON encoding.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns Whether parsing and canonical serialization preserve the key.
+ */
 function isCanonicalKey(value: string): boolean {
   try {
     return canonicalJson(JSON.parse(value)) === value;
@@ -124,6 +159,11 @@ function isCanonicalKey(value: string): boolean {
   }
 }
 
+/**
+ * Checks that a value can use the cache canonical JSON representation.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns Whether the value is supported cache data.
+ */
 function isCanonicalValue(value: unknown): boolean {
   try {
     canonicalJson(value);
@@ -133,10 +173,20 @@ function isCanonicalValue(value: unknown): boolean {
   }
 }
 
+/**
+ * Checks nonnegative safe integer counters and offsets.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns Whether the value is a valid persisted count.
+ */
 function isCount(value: unknown): value is number {
   return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
 }
 
+/**
+ * Checks whether a value is a non-array object.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns Whether the value has record shape.
+ */
 function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
