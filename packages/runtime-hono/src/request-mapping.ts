@@ -1,55 +1,55 @@
-import { MISSING, type BodyIssueCode, type Missing } from "./request-mapping-body.js";
-import { applyTransform } from "./request-mapping-transform.js";
-import { readCookie, readHeader, readPathSegments, readScalar } from "./request-mapping-sources.js";
-import { mapObject, type MappingState } from "./request-mapping-object.js";
+import { Context, Effect, Layer } from "effect";
+import { httpBoundary, observeHttp, runHttp } from "./http-effect.js";
+import { MISSING } from "./request-mapping-body.js";
 import {
   addMappingIssue as add,
   bodyField,
+  mappingFailure as failure,
   formField,
   jsonValue,
-  mappingFailure as failure,
   validatedSource,
 } from "./request-mapping-fields.js";
-
-export type MappingValue = string | readonly string[];
-export interface MappingRequest {
-  readonly request: Request;
-  readonly pathPattern?: string;
-  readonly params: Readonly<Record<string, MappingValue>>;
-  readonly query: Readonly<Record<string, MappingValue>>;
-  readonly headers: Readonly<Record<string, MappingValue>>;
-  readonly validated?: Readonly<Record<string, unknown>>;
-}
-export type RequestIssueCode = "missing" | "duplicate" | "transform" | "mapping" | BodyIssueCode;
-export interface RequestMappingIssue {
-  readonly code: RequestIssueCode;
-  readonly message: string;
-  readonly path: readonly (string | number)[];
-}
-export interface RequestMappingSuccess {
-  readonly ok: true;
-  readonly value: unknown;
-}
-export interface RequestMappingFailure {
-  readonly ok: false;
-  readonly issues: readonly RequestMappingIssue[];
-}
-export type RequestMappingResult = RequestMappingSuccess | RequestMappingFailure;
-export interface RequestMappingOptions {
-  readonly transforms?: Readonly<Record<string, unknown>> | ReadonlyMap<string, unknown>;
-  readonly maxBodyBytes?: number;
-}
+import { mapObjectEffect, type MappingState } from "./request-mapping-object.js";
+import type { EffectVisit } from "./request-mapping-object.types.js";
+import { readCookie, readHeader, readPathSegments, readScalar } from "./request-mapping-sources.js";
+import { applyTransform } from "./request-mapping-transform.js";
+import type {
+  MappingRequest,
+  RequestMappingFailure,
+  RequestMappingOptions,
+  RequestMappingResult,
+} from "./request-mapping.types.js";
+export type {
+  MappingRequest,
+  MappingValue,
+  RequestIssueCode,
+  RequestMappingFailure,
+  RequestMappingIssue,
+  RequestMappingOptions,
+  RequestMappingResult,
+  RequestMappingSuccess,
+} from "./request-mapping.types.js";
 export const DEFAULT_MAX_BODY_BYTES = 1_048_576;
 
+/** Recognizes the public request-mapping failure envelope.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns Whether the value is a public mapping-failure envelope.
+ */
 export function isRequestMappingFailure(value: unknown): value is RequestMappingFailure {
   return isRecord(value) && value.ok === false && Array.isArray(value.issues);
 }
 
-export async function mapRequest(
+/** Evaluates declared mapping fields sequentially with one bounded body state.
+ * @param request - Native request whose headers, body and cancellation signal define this operation.
+ * @param mapping - mapping supplied by the caller.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns An effect yielding the mapped input or an immutable envelope of accumulated mapping issues.
+ */
+const mapRequestEffect = Effect.fn("RequestMapping.map")(function* (
   request: MappingRequest,
   mapping: unknown,
   options: RequestMappingOptions = {},
-): Promise<RequestMappingResult> {
+) {
   const state: MappingState = {
     request,
     body: {
@@ -67,16 +67,22 @@ export async function mapRequest(
     add(state, "mapping", "Request mapping must be an input node", []);
     return failure(state);
   }
-  const value = await visit(mapping, state, []);
+  const value = yield* visit(mapping, state, []);
   if (value === MISSING) add(state, "mapping", "Request mapping produced no input", []);
-  return state.issues.length === 0 ? { ok: true, value } : failure(state);
-}
+  return state.issues.length === 0 ? { ok: true as const, value } : failure(state);
+});
 
-async function visit(
+/** Evaluate one serialized mapping node with shared bounded body and issue state.
+ * @param node - Declarative field, nested object, default or transform node.
+ * @param state - Request sources, cached body parsing and accumulated issues.
+ * @param path - Output field path attached to any mapping issue.
+ * @returns The mapped value or missing sentinel, recording unsupported input in state.
+ */
+const visit: EffectVisit = Effect.fn("RequestMapping.visit")(function* (
   node: unknown,
   state: MappingState,
   path: readonly (string | number)[],
-): Promise<unknown | Missing> {
+) {
   if (!isRecord(node) || typeof node.kind !== "string") {
     add(state, "mapping", "Invalid serialized request mapping", path);
     return MISSING;
@@ -84,7 +90,7 @@ async function visit(
   switch (node.kind) {
     case "input":
     case "nested":
-      return mapObject(node.fields, state, path, visit, add.bind(null, state));
+      return yield* mapObjectEffect(node.fields, state, path, visit, add.bind(null, state));
     case "path":
     case "path-segments":
     case "query":
@@ -137,35 +143,76 @@ async function visit(
           ? value.value
           : readCookie(name, state.request.headers, path, add.bind(null, state));
       }
-      if (node.kind === "body") return bodyField(name, state, path);
-      return formField(name, state, path, node.kind === "multipart-all");
+      if (node.kind === "body")
+        return yield* httpBoundary("request.mapping.body", () => bodyField(name, state, path));
+      return yield* httpBoundary("request.mapping.form", () =>
+        formField(name, state, path, node.kind === "multipart-all"),
+      );
     }
     case "whole-body":
-      return jsonValue(state, path);
+      return yield* httpBoundary("request.mapping.json", () => jsonValue(state, path));
     case "constant":
       return node.value;
     case "optional": {
-      const value = await visit(node.value, state, path);
+      const value = yield* visit(node.value, state, path);
       return value === MISSING ? undefined : value;
     }
     case "default": {
-      const value = await visit(node.value, state, path);
+      const value = yield* visit(node.value, state, path);
       return value === MISSING ? node.default : value;
     }
-    case "transform":
-      return applyTransform(
-        node.transformId,
-        await visit(node.value, state, path),
-        state.options.transforms,
-        path,
-        (message, issuePath) => add(state, "transform", message, issuePath),
+    case "transform": {
+      const value = yield* visit(node.value, state, path);
+      return yield* httpBoundary("request.mapping.transform", () =>
+        applyTransform(
+          node.transformId,
+          value,
+          state.options.transforms,
+          path,
+          (message, issuePath) => add(state, "transform", message, issuePath),
+        ),
       );
+    }
     default:
       add(state, "mapping", `Unsupported mapping node "${node.kind}"`, path);
       return MISSING;
   }
+});
+
+/** Materializes a declarative request mapping with shared bounded body state. */
+export class RequestMapping extends Context.Service<
+  RequestMapping,
+  { readonly map: typeof mapRequestEffect }
+>()("@relkit/runtime-hono/RequestMapping") {}
+
+/** Live request mapping preserves sequential field order and accumulated issues. */
+export const RequestMappingLive = Layer.succeed(RequestMapping, {
+  map: (...args) => observeHttp("request.mapping", mapRequestEffect(...args)),
+});
+
+/** Native route compatibility edge for lazy request mapping.
+ * @param request - Native request whose headers, body and cancellation signal define this operation.
+ * @param mapping - mapping supplied by the caller.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The successful mapped value or the existing accumulated issue envelope.
+ */
+export function mapRequest(
+  request: MappingRequest,
+  mapping: unknown,
+  options: RequestMappingOptions = {},
+): Promise<RequestMappingResult> {
+  return runHttp(
+    Effect.flatMap(RequestMapping, (service) => service.map(request, mapping, options)).pipe(
+      Effect.provide(RequestMappingLive),
+    ),
+    request.request.signal,
+  );
 }
 
+/** Recognizes a non-null object before reading its named properties.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns Whether the inspected value satisfies the declared type guard.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
