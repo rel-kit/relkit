@@ -1,0 +1,7 @@
+$ bun scripts/validation-regressions.mjs
+PASS graph contains declared error and no dangling edges
+PASS event inspector retains accepted publication and completed delivery
+PASS bucket runtime advertises signed URL features
+PASS requests return one lifecycle row per request ID
+PASS declared-error HTTP outcome survives response completion
+5/5 validation regressions passed

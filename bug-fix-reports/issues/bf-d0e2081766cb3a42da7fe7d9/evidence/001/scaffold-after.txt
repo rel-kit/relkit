@@ -1,0 +1,4 @@
+SUMMARY:
+   1 pass
+   0 fail
+  Ran 1 test across 1 file. [3.83s]
