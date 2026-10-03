@@ -1,12 +1,11 @@
-import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import type { RegistrationPlan } from "@relkit/graph";
-import { createApp } from "./src/index.js";
-import { runtimeCohort } from "./test-cohort.ts";
+import { startBunFixture, type BunFixture } from "./bun-fixture.ts";
 
 let root = "";
+let fixture: BunFixture;
 
 beforeAll(async () => {
   root = await mkdtemp(join(tmpdir(), "relkit-static-"));
@@ -14,24 +13,20 @@ beforeAll(async () => {
   await writeFile(join(root, "hello.txt"), "hello world");
   await writeFile(join(root, "docs", "index.html"), "<h1>Docs</h1>");
   await writeFile(join(root, ".secret"), "hidden");
+  fixture = await startBunFixture("static-files", { root });
 });
 
-afterAll(async () => rm(root, { recursive: true, force: true }));
+afterAll(async () => {
+  await fixture?.stop();
+  await rm(root, { recursive: true, force: true });
+});
 
 describe("static files", () => {
   test("serves safe files, indexes, HEAD, ETags, and ranges after declared routes", async () => {
-    const app = createApp({
-      plan: routePlan(),
-      manifest: {
-        ...runtimeCohort("sha256:static"),
-        functions: {},
-        middleware: {},
-        requestTransforms: {},
-      },
-      engine: { invoke: async () => ({ declared: true }) },
-      mapInput: () => ({}),
-      staticFiles: { root },
-    });
+    const app = {
+      request: (url: string, init?: RequestInit) =>
+        fetch(url.replace("http://localhost", `http://127.0.0.1:${fixture.port}`), init),
+    };
     expect(await (await app.request("http://localhost/hello.txt")).json()).toEqual({
       declared: true,
     });
@@ -58,35 +53,3 @@ describe("static files", () => {
     expect((await app.request("http://localhost/%2e%2e/package.json")).status).toBe(404);
   });
 });
-
-function routePlan(): RegistrationPlan {
-  return {
-    graphHash: "sha256:static",
-    functions: [],
-    httpTriggers: [
-      {
-        kind: "trigger",
-        id: "hello.route",
-        source: { file: "src/routes/hello.ts", line: 1, column: 1 },
-        triggerType: "http",
-        targetFunctionId: "hello",
-        config: {
-          method: "GET",
-          path: "/hello.txt",
-          request: { kind: "input" },
-          responses: [],
-          middleware: [],
-          transforms: [],
-        },
-      },
-    ],
-    queues: [],
-    schedules: [],
-    eventTriggers: [],
-    buckets: [],
-    caches: [],
-    tools: [],
-    agents: [],
-    middlewares: [],
-  };
-}

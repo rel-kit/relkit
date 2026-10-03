@@ -1,6 +1,6 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import type { RegistrationPlan } from "@relkit/graph";
-import { createApp } from "./src/index.ts";
+import { createApp } from "../src/index.ts";
 import { runtimeCohort } from "./test-cohort.ts";
 
 test("native SSE emits explicit item, completion, and sanitized failure events", async () => {
@@ -80,6 +80,7 @@ function streamPlan(format: "sse" | "text" | "bytes"): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }
