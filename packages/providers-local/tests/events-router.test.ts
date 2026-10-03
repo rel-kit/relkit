@@ -1,8 +1,8 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createEventRouter } from "./src/events/router.ts";
+import { createEventRouter } from "../src/events/router.ts";
 
 const roots: string[] = [];
 
@@ -63,7 +63,6 @@ describe("local event router", () => {
       payload: { orderId: "order-1" },
       occurredAt: "2026-08-15T00:00:00.000Z",
       publishedAt: "2026-08-15T00:00:01.000Z",
-      traceId: "trace-1",
       attributes: {},
     });
 

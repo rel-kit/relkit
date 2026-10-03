@@ -1,8 +1,9 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import { appendFile, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createEventLog } from "./src/events/log.ts";
+import { createEventLog } from "../src/events/log.ts";
+import { parseTracePropagation } from "@relkit/contracts";
 
 const roots: string[] = [];
 
@@ -75,6 +76,18 @@ describe("local durable event log", () => {
 });
 
 function makeEnvelope() {
+  const propagation = parseTracePropagation({
+    version: 2,
+    producer: {
+      traceId: "10000000000000000000000000000001",
+      spanId: "1000000000000001",
+      traceFlags: 1,
+      remote: true,
+    },
+    correlationId: "request-1",
+    invocationId: "invocation-1",
+  });
+  if (propagation === undefined) throw new Error("Expected a valid propagation fixture");
   return {
     instanceId: "event-1",
     eventId: "orders.created",
@@ -82,17 +95,7 @@ function makeEnvelope() {
     payload: { orderId: "order-1", totalCents: 100 },
     occurredAt: "2026-08-15T00:00:00.000Z",
     publishedAt: "2026-08-15T00:00:01.000Z",
-    propagation: {
-      version: 2,
-      producer: {
-        traceId: "10000000000000000000000000000001",
-        spanId: "1000000000000001",
-        traceFlags: 1,
-        remote: true,
-      },
-      correlationId: "request-1",
-      invocationId: "invocation-1",
-    },
+    propagation,
     attributes: { source: "checkout" },
   } as const;
 }
