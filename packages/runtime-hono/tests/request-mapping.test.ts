@@ -1,6 +1,7 @@
+import { expect, test } from "vitest";
 import { z } from "@relkit/schema";
-import { createApp } from "./src/index.js";
-import { mapRequest, type MappingRequest } from "./src/request-mapping.js";
+import { createApp } from "../src/index.js";
+import { mapRequest, type MappingRequest } from "../src/request-mapping.js";
 import type { RegistrationPlan } from "@relkit/graph";
 import { runtimeCohort } from "./test-cohort.ts";
 
@@ -262,6 +263,7 @@ function routePlan(): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }

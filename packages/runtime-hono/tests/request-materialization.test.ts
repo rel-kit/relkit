@@ -1,11 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import type { RegistrationPlan } from "@relkit/graph";
-import { createApp } from "./src/index.ts";
+import { createApp } from "../src/index.ts";
 import { runtimeCohort } from "./test-cohort.ts";
 
 describe("framework-neutral HTTP request materialization", () => {
   test("keeps params, repeated values, and headers inside HTTP input mapping", async () => {
-    let mapped: import("./src/index.ts").HttpRouteRequest | undefined;
+    let mapped: import("../src/index.ts").HttpRouteRequest | undefined;
     const plan = routePlan();
     const app = createApp({
       plan,
@@ -71,6 +71,7 @@ function routePlan(): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }
