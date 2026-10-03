@@ -18,7 +18,10 @@ test("route type failures retain the last valid manifest and recover after the e
   await generateProject(
     normalizeCreateOptions(["app", "--directory", root, "--no-install", "--no-git", "--examples"]),
   );
-  await symlink(join(repository, "node_modules"), join(root, "node_modules"));
+  // Link the generated project's dependencies without relying on workspace hoisting.
+  await mkdir(join(root, "node_modules/@relkit"), { recursive: true });
+  await symlink(join(repository, "packages/app"), join(root, "node_modules/@relkit/app"));
+  await symlink(join(repository, "packages/testing"), join(root, "node_modules/@relkit/testing"));
   const initial = await checkProject({ projectRoot: root });
   expect(initial.ok, JSON.stringify(initial.diagnostics)).toBe(true);
   const manifest = join(root, ".relkit/generated/runtime.manifest.ts");

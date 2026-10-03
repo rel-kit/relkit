@@ -14,7 +14,9 @@ test("the packaged plugin uses the editor's TypeScript for dynamic route inputs 
   try {
     await mkdir(join(root, "src/routes/users/[id]"), { recursive: true });
     await mkdir(join(root, "src/users"), { recursive: true });
-    await symlink(join(repository, "node_modules"), join(root, "node_modules"));
+    // Fresh workspace installs do not hoist the generated app's @relkit/app dependency.
+    await mkdir(join(root, "node_modules/@relkit"), { recursive: true });
+    await symlink(join(repository, "packages/app"), join(root, "node_modules/@relkit/app"));
     const functionFile = join(root, "src/users/example.function.ts");
     const routeFile = join(root, "src/routes/users/[id]/route.ts");
     const valid = `import { defineFunction } from "@relkit/app/functions";

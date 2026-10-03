@@ -17,7 +17,10 @@ test("the real check pipeline rejects an inferred users path without id input", 
   await generateProject(
     normalizeCreateOptions(["app", "--directory", root, "--no-install", "--no-git"]),
   );
-  await symlink(join(repository, "node_modules"), join(root, "node_modules"));
+  // Link the generated project's dependencies without relying on workspace hoisting.
+  await mkdir(join(root, "node_modules/@relkit"), { recursive: true });
+  await symlink(join(repository, "packages/app"), join(root, "node_modules/@relkit/app"));
+  await symlink(join(repository, "packages/testing"), join(root, "node_modules/@relkit/testing"));
   await mkdir(join(root, "src/routes/users/[id]"), { recursive: true });
   await mkdir(join(root, "src/users/functions"), { recursive: true });
   await writeFile(
