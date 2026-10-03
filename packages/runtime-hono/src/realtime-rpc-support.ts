@@ -1,21 +1,22 @@
-import { createHash } from "node:crypto";
-import { canonicalJson } from "@relkit/contracts";
-import type { ChannelDescriptorAny, ChannelCheckpoint, RealtimeScope } from "@relkit/realtime";
-import { validate, type StandardSchemaV1 } from "@relkit/schema";
-import type { RpcContext } from "./rpc.js";
-import { resolveClientIdentity } from "./client-identity.js";
-import type { RouteMaterializationOptions } from "./materialize-routes.js";
-import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import { ORPCError } from "@orpc/server";
+import { canonicalJson } from "@relkit/contracts";
+import type { ChannelDescriptorAny, RealtimeScope } from "@relkit/realtime";
+import { validate, type StandardSchemaV1 } from "@relkit/schema";
+import { createHash } from "node:crypto";
 import { requireClientAuthorization } from "./client-authorization.js";
+import { resolveClientIdentity } from "./client-identity.js";
+import { getEntry, isRecord } from "./materialize-routes-utils.js";
+import type { RouteMaterializationOptions } from "./materialize-routes.js";
+import type { SubscribeInput } from "./realtime-rpc-support.types.js";
+import type { RpcContext } from "./rpc.js";
+export type { SubscribeInput } from "./realtime-rpc-support.types.js";
 
-export interface SubscribeInput {
-  readonly channel: string;
-  readonly params: unknown;
-  readonly after?: ChannelCheckpoint;
-  readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity;
-}
-
+/** Resolves channel identity, partition, authorization and provider state for an observation.
+ * @param input - Submitted operation input; validation and authorization occur before effects are admitted.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The authorized descriptor, validated params, provider, scoped identity and trusted context.
+ */
 export async function channelContext(
   input: SubscribeInput,
   context: RpcContext,
@@ -30,7 +31,9 @@ export async function channelContext(
     throw new ORPCError("NOT_FOUND", { message: "Channel resource was not found." });
   }
   const parsed = await validate(descriptor.params, input.params as never);
-  if (!("value" in parsed)) throw new TypeError("Channel params validation failed.");
+  if (!("value" in parsed)) {
+    throw new ORPCError("BAD_REQUEST", { message: "Channel params validation failed." });
+  }
   const identity = await resolveClientIdentity(
     options.clientIdentity,
     context.hono.req.raw,
@@ -71,6 +74,11 @@ export async function channelContext(
   };
 }
 
+/** Validates a public realtime payload against the declared Standard Schema.
+ * @param schema - Foreign Standard Schema declaration used to validate public data.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns The schema-validated value, rejecting when stored public data violates its schema.
+ */
 export async function validatePublicValue(
   schema: StandardSchemaV1,
   value: unknown,
@@ -80,10 +88,18 @@ export async function validatePublicValue(
   return result.value;
 }
 
+/** Recognizes a runtime channel descriptor with its declared event schemas.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns Whether the inspected value satisfies the declared type guard.
+ */
 function isChannel(value: unknown): value is ChannelDescriptorAny {
   return isRecord(value) && value.kind === "channel" && isSchema(value.params);
 }
 
+/** Recognizes the Standard Schema contract required by runtime validation.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns Whether the inspected value satisfies the declared type guard.
+ */
 function isSchema(value: unknown): value is StandardSchemaV1 {
   return isRecord(value) && isRecord(value["~standard"]) && value["~standard"].version === 1;
 }
