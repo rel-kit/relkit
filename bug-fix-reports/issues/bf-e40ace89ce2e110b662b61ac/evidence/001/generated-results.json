@@ -1,0 +1,283 @@
+{
+  "results": [
+    {
+      "name": "generated agent executes a RELKIT tool and persists its consumed response",
+      "status": "passed",
+      "evidence": {
+        "runStatus": "succeeded",
+        "duplicate": true,
+        "observationKinds": [
+          "message-updated",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "message-updated",
+          "execution-event",
+          "message-updated",
+          "execution-event",
+          "message-updated",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "tool-started",
+          "tool-input-ready",
+          "tool-executing",
+          "tool-succeeded",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "message-updated",
+          "execution-event",
+          "message-updated",
+          "execution-event",
+          "message-updated",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "message-updated",
+          "execution-event",
+          "message-updated",
+          "execution-event",
+          "message-updated",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "execution-event",
+          "message-updated",
+          "message-updated",
+          "run-finished",
+          "snapshot"
+        ]
+      }
+    },
+    {
+      "name": "generated AG-UI stream emits native state and a completed assistant response",
+      "status": "passed",
+      "evidence": {
+        "types": [
+          "RUN_STARTED",
+          "CUSTOM",
+          "CUSTOM",
+          "STATE_SNAPSHOT",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "TEXT_MESSAGE_START",
+          "TEXT_MESSAGE_CONTENT",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "STATE_SNAPSHOT",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "STATE_SNAPSHOT",
+          "CUSTOM",
+          "CUSTOM",
+          "TOOL_CALL_START",
+          "TOOL_CALL_ARGS",
+          "TOOL_CALL_END",
+          "CUSTOM",
+          "CUSTOM",
+          "TOOL_CALL_RESULT",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "STATE_SNAPSHOT",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "TEXT_MESSAGE_START",
+          "TEXT_MESSAGE_CONTENT",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "TEXT_MESSAGE_START",
+          "TEXT_MESSAGE_CONTENT",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "STATE_SNAPSHOT",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "CUSTOM",
+          "STATE_SNAPSHOT",
+          "CUSTOM",
+          "TEXT_MESSAGE_START",
+          "TEXT_MESSAGE_CONTENT",
+          "TOOL_CALL_RESULT",
+          "TEXT_MESSAGE_END",
+          "TEXT_MESSAGE_END",
+          "TEXT_MESSAGE_END",
+          "TEXT_MESSAGE_END",
+          "RUN_FINISHED"
+        ],
+        "runStatus": "succeeded",
+        "todos": [
+          {
+            "content": "Answer the greeting",
+            "status": "completed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "generated agent rejects invalid input before acceptance",
+      "status": "passed",
+      "evidence": {
+        "rejectedCode": "BAD_REQUEST",
+        "httpStatus": 400
+      }
+    },
+    {
+      "name": "generated SSE function emits ordered items and one completion",
+      "status": "passed",
+      "evidence": {
+        "items": [
+          1,
+          2,
+          3
+        ],
+        "completions": 1
+      }
+    },
+    {
+      "name": "generated SSE failure stays explicit and redacts private error details",
+      "status": "passed",
+      "evidence": {
+        "firstItem": true,
+        "errorFrame": true,
+        "privateDetailsRedacted": true
+      }
+    },
+    {
+      "name": "generated stream delivers incrementally and records consumer cancellation",
+      "status": "passed",
+      "evidence": {
+        "firstItemMs": 32,
+        "outcome": "cancelled",
+        "requestId": "request-c25cd0c8-4376-4790-94ec-d9da54730620"
+      }
+    },
+    {
+      "name": "generated realtime fans out, isolates topics, replays and releases presence on abort",
+      "status": "passed",
+      "evidence": {
+        "subscribers": 2,
+        "lateReplay": [
+          1,
+          2
+        ],
+        "resumedReplay": [
+          2
+        ],
+        "finalConnections": 0
+      }
+    },
+    {
+      "name": "generated realtime publishes and consumes the same event over WebSocket",
+      "status": "passed",
+      "evidence": {
+        "event": "changed",
+        "payload": {
+          "value": 7
+        },
+        "transport": "WebSocket"
+      }
+    },
+    {
+      "name": "generated realtime rejects invalid channel parameters",
+      "status": "passed",
+      "evidence": {
+        "rejectedCode": "BAD_REQUEST"
+      }
+    }
+  ],
+  "failures": 0,
+  "httpResponses": [
+    {
+      "path": "/rpc/relkit.agent.run",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.agent.run",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.agent.load",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.agent.observe",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.agent.load",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.agent.run",
+      "status": 400
+    },
+    {
+      "path": "/rpc/relkit.realtime.subscribe",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.realtime.subscribe",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.realtime.subscribe",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.realtime.subscribe",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.realtime.subscribe",
+      "status": 200
+    },
+    {
+      "path": "/rpc/relkit.realtime.subscribe",
+      "status": 200
+    }
+  ]
+}
