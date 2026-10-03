@@ -416,6 +416,32 @@ describe.serial("Phase 0 guardrails", () => {
     }
   });
 
+  test("ignores workspace coverage reports but still checks authored coverage files", async () => {
+    const report = JSON.stringify({ name: ["pers", "istence"].join("") });
+    const generated = "packages/compiler/coverage/coverage-final.json";
+    const authored = "packages/compiler/src/coverage/coverage-final.json";
+    const fixture = await createFixture({
+      "packages/compiler/package.json": manifest("@relkit/compiler"),
+      [generated]: report,
+    });
+    try {
+      expect(scanScope(fixture)).toEqual([]);
+      expect((await execute(process.execPath, ["run", boundaryScript, fixture])).exitCode).toBe(0);
+      await mkdir(dirname(join(fixture, authored)), { recursive: true });
+      await writeFile(join(fixture, authored), report);
+      expect(scanScope(fixture)).toEqual([
+        expect.objectContaining({ file: authored, rule: "out-of-scope-navigation-name" }),
+      ]);
+      const result = await execute(process.execPath, ["run", boundaryScript, fixture]);
+      expect(result.exitCode).not.toBe(0);
+      expect(result.stderr).toContain(authored);
+      expect(result.stderr).not.toContain(generated);
+      expect(readFileSync(join(fixture, generated), "utf8")).toBe(report);
+    } finally {
+      await rm(fixture, { recursive: true, force: true });
+    }
+  });
+
   test("reports implementation files over the 250-line limit", async () => {
     const fixture = await createFixture({
       "packages/app/src/too-long.ts": Array.from({ length: 251 }, () => "export {};\n").join(""),

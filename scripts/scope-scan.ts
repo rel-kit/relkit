@@ -34,6 +34,9 @@ const implementationFiles = new Set([
   "scripts/scope-typescript-settings.test.ts",
 ]);
 const contentExtensions = /\.(?:c|m)?(?:ts|tsx|js|jsx)|\.json$|\.toml$|\.ya?ml$|\.md$/i;
+// Test runners emit these workspace-root directories; authored src/coverage stays in scope.
+const generatedCoverage =
+  /^(?:(?:apps|examples|packages|templates)\/[^/]+|integrations\/(?:catalog|packages\/[^/]+))\/coverage\//;
 const alternateIac =
   /\b(?:terraform|opentofu|cloudformation|(?:aws-)?cdk|sst|alchemy|serverless|bicep)\b|@cdktf|aws-cdk-lib|arm[-_ ]?template/i;
 const isAllowlistedProse = (path: string): boolean =>
@@ -185,7 +188,8 @@ function filesToScan(root: string): string[] {
     paths.push(
       ...[...new Bun.Glob("**/*").scanSync({ cwd: absolute, onlyFiles: true })]
         .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.relkit)(\/|$)/.test(path))
-        .map((path) => `${directory}/${path}`),
+        .map((path) => `${directory}/${path}`)
+        .filter((path) => !generatedCoverage.test(path)),
     );
   }
   return [...new Set(paths.map((path) => resolve(root, path)))].sort();
