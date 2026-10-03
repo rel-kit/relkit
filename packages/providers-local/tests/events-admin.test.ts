@@ -1,10 +1,10 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { applicationFailure } from "@relkit/runtime-effect";
-import { createEventAdmin } from "./src/events/admin.ts";
-import { createEventRouter } from "./src/events/router.ts";
+import { createEventAdmin } from "../src/events/admin.ts";
+import { createEventRouter } from "../src/events/router.ts";
 
 const roots: string[] = [];
 
@@ -59,7 +59,8 @@ describe("local event admin contracts", () => {
     });
     expect(query.publications[0]).not.toHaveProperty("payload");
 
-    const deliveryId = failed.deliveries[0].deliveryId;
+    const deliveryId = failed.deliveries[0]?.deliveryId;
+    if (deliveryId === undefined) throw new Error("Expected a durable delivery identifier");
     await expect(admin.retry({ deliveryId, reason: "inspect and retry" })).resolves.toMatchObject({
       action: "retry",
       status: { deliveryId, state: "available" },
