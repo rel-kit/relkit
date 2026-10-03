@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import type { RegistrationPlan } from "@relkit/graph";
 import {
   API_REFERENCE_PATH,
@@ -6,7 +6,7 @@ import {
   createApp,
   OPENAPI_PATH,
   type RuntimeManifest,
-} from "./src/index.js";
+} from "../src/index.js";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/routes/hello/route.ts", line: 1, column: 1 } as const;
@@ -48,6 +48,7 @@ const plan: RegistrationPlan = {
   caches: [],
   tools: [],
   agents: [],
+  channels: [],
   middlewares: [],
   services: [
     {
@@ -103,7 +104,12 @@ describe("OpenAPI and Scalar endpoints", () => {
     const response = await service.request("/users/123/details");
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
-    const document = await (await service.request(OPENAPI_PATH)).json();
+    const document = (await (await service.request(OPENAPI_PATH)).json()) as {
+      paths: {
+        "/users/{id}/details": { get: { responses: unknown; "x-relkit": unknown } };
+        "/hello": { get: { responses: Record<string, unknown> } };
+      };
+    };
     expect(document.paths["/users/{id}/details"].get.responses).toEqual({
       default: { description: "Response returned by the route handler" },
     });
@@ -177,7 +183,7 @@ describe("OpenAPI and Scalar endpoints", () => {
     };
     const service = app({ document, excludeDomains: ["navigation"] });
     const response = await service.request(OPENAPI_PATH);
-    const filtered = await response.json();
+    const filtered = (await response.json()) as { tags: unknown; paths: unknown };
     expect(filtered.tags).toEqual([{ name: "orders" }]);
     expect(filtered.paths).toEqual({
       "/hello": {

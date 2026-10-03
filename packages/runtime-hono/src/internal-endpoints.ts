@@ -2,6 +2,10 @@ import * as contracts from "@relkit/contracts";
 import type { RegistrationPlan } from "@relkit/graph";
 import type { Context, Hono } from "hono";
 import {
+  INTERNAL_ENDPOINT_PROTOCOL,
+  INTERNAL_ENDPOINT_VERSION,
+} from "./internal-endpoint-paths.js";
+import {
   isAuthorized,
   isInvalidQueryError,
   jsonResponse,
@@ -11,67 +15,23 @@ import {
   resolveValue,
   streamBody,
 } from "./internal-endpoints-utils.js";
-import {
-  INTERNAL_ENDPOINT_PROTOCOL,
-  INTERNAL_ENDPOINT_VERSION,
-} from "./internal-endpoint-paths.js";
+import type { InternalEndpointMode, InternalEndpointOptions } from "./internal-endpoints.types.js";
+export type {
+  InternalEndpointMode,
+  InternalEndpointOptions,
+  InternalPage,
+  InternalQuery,
+  InternalReadiness,
+  InternalStreamEvent,
+  QuerySource,
+  ValueSource,
+} from "./internal-endpoints.types.js";
 
 export {
   INTERNAL_ENDPOINT_PATHS,
   INTERNAL_ENDPOINT_PROTOCOL,
   INTERNAL_ENDPOINT_VERSION,
 } from "./internal-endpoint-paths.js";
-
-export type InternalEndpointMode = "development" | "test" | "production";
-export interface InternalQuery {
-  readonly cursor?: string;
-  readonly limit: number;
-  readonly from?: string;
-  readonly to?: string;
-  readonly severity?: string;
-  readonly routeId?: string;
-  readonly functionId?: string;
-  readonly outcome?: string;
-  readonly requestId?: string;
-  readonly traceId?: string;
-}
-export interface InternalPage {
-  readonly [key: string]: contracts.JsonValue;
-  readonly items: readonly contracts.JsonValue[];
-  readonly nextCursor?: string;
-}
-export interface InternalReadiness {
-  readonly ready: boolean;
-  readonly reason?: string;
-}
-export interface InternalStreamEvent {
-  readonly [key: string]: contracts.JsonValue;
-  readonly cursor: string;
-  readonly type: string;
-  readonly data: contracts.JsonValue;
-}
-export type QuerySource =
-  | contracts.JsonValue
-  | InternalPage
-  | ((query: InternalQuery) => contracts.MaybePromise<contracts.JsonValue | InternalPage>);
-export type ValueSource<T> = T | (() => contracts.MaybePromise<T>);
-export interface InternalEndpointOptions {
-  readonly mode?: InternalEndpointMode;
-  readonly environment?: InternalEndpointMode;
-  readonly enabled?: boolean;
-  readonly bearerToken?: string;
-  readonly authorize?: (request: Request) => contracts.MaybePromise<boolean>;
-  readonly graph?: ValueSource<contracts.JsonValue>;
-  readonly readiness?: ValueSource<InternalReadiness>;
-  readonly ready?: ValueSource<InternalReadiness>;
-  readonly requests?: QuerySource;
-  readonly logs?: QuerySource;
-  readonly traces?: QuerySource;
-  readonly diagnostics?: QuerySource;
-  readonly stream?:
-    | ValueSource<readonly InternalStreamEvent[]>
-    | ((query: InternalQuery) => contracts.MaybePromise<readonly InternalStreamEvent[]>);
-}
 
 export class InternalEndpointConfigurationError extends TypeError {
   constructor(message: string) {
@@ -80,13 +40,21 @@ export class InternalEndpointConfigurationError extends TypeError {
   }
 }
 
-/** Installs the versioned inspector stubs used before the full API package exists. */
+/** Install the versioned inspector endpoints backed by configured runtime sources.
+ * @param app - Hono application receiving the configured endpoints or middleware.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Nothing; installs enabled, authorized inspector health, graph, query and stream endpoints.
+ */
 export function installInternalEndpoints(app: Hono, options: InternalEndpointOptions = {}): void {
   const mode = options.environment ?? options.mode ?? "development";
   const enabled = options.enabled ?? mode !== "production";
   validateConfiguration(mode, enabled, options);
   if (!enabled) return;
 
+  /** Protect inspector handlers and map query/native failures to stable JSON errors.
+   * @param handler - Inspector endpoint callback invoked only after authorization.
+   * @returns A handler yielding the endpoint response or a sanitized 4xx/5xx response.
+   */
   const handle =
     (handler: (context: Context) => Promise<Response>) =>
     async (context: Context): Promise<Response> => {
@@ -140,6 +108,10 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
       handle(async (context) => streamResponse(options.stream, context)),
     );
 }
+/** Builds the structural graph snapshot exposed by internal inspection.
+ * @param plan - Validated application registration plan.
+ * @returns Versioned structural graph metadata for the active registration plan.
+ */
 export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
   return {
     protocol: INTERNAL_ENDPOINT_PROTOCOL,
@@ -164,6 +136,12 @@ export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
   } as unknown as contracts.JsonValue;
 }
 
+/** Checks internal endpoint exposure policy before route registration.
+ * @param mode - Configured runtime exposure or response-validation mode.
+ * @param enabled - Whether the feature is enabled by application configuration.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Nothing for a valid exposure policy; otherwise throws the existing configuration error.
+ */
 function validateConfiguration(
   mode: InternalEndpointMode,
   enabled: boolean,
@@ -183,6 +161,11 @@ function validateConfiguration(
   if (options.bearerToken !== undefined && options.bearerToken.trim().length === 0)
     throw new InternalEndpointConfigurationError("bearerToken must not be empty.");
 }
+/** Encode the resolved inspector event batch as an SSE response.
+ * @param source - Native iterable or declared request-key source.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @returns An SSE response containing the resolved inspector event batch.
+ */
 async function streamResponse(
   source: InternalEndpointOptions["stream"],
   context: Context,

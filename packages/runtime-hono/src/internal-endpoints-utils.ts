@@ -1,5 +1,6 @@
 import { canonicalJson, isJsonValue, type JsonValue, type MaybePromise } from "@relkit/contracts";
 import type { Context } from "hono";
+import { InternalQueryError, queryPage } from "./internal-endpoint-query.js";
 import {
   INTERNAL_ENDPOINT_PROTOCOL,
   INTERNAL_ENDPOINT_VERSION,
@@ -10,18 +11,13 @@ import {
   type QuerySource,
   type ValueSource,
 } from "./internal-endpoints.js";
+export { InternalQueryError, isInvalidQueryError } from "./internal-endpoint-query.js";
 
-export class InternalQueryError extends TypeError {
-  constructor() {
-    super("Invalid internal endpoint query.");
-    this.name = "InternalQueryError";
-  }
-}
-
-export function isInvalidQueryError(value: unknown): value is InternalQueryError {
-  return value instanceof InternalQueryError;
-}
-
+/** Authorize an inspector request using the callback or bearer-token fallback.
+ * @param request - Incoming HTTP request.
+ * @param options - Runtime configuration and dependencies for this operation.
+ * @returns Whether the configured authorization rule accepts the request.
+ */
 export async function isAuthorized(
   request: Request,
   options: InternalEndpointOptions,
@@ -39,6 +35,11 @@ export async function isAuthorized(
     : request.headers.get("authorization") === `Bearer ${options.bearerToken}`;
 }
 
+/** Resolve inspector rows, apply query filters and encode a versioned page.
+ * @param source - Fixed data or a callback producing the data.
+ * @param context - Current Hono or RPC request context.
+ * @returns A JSON response containing items and any continuation cursor.
+ */
 export async function listResponse(
   source: QuerySource | undefined,
   context: Context,
@@ -52,6 +53,10 @@ export async function listResponse(
   });
 }
 
+/** Parse supported inspector filters and clamp valid page sizes to 100.
+ * @param request - Incoming HTTP request.
+ * @returns A query with a default limit of 50; invalid limits throw.
+ */
 export function readQuery(request: Request): InternalQuery {
   const url = new URL(request.url);
   const rawLimit = url.searchParams.get("limit");
@@ -75,10 +80,20 @@ export function readQuery(request: Request): InternalQuery {
   return query as unknown as InternalQuery;
 }
 
+/** Resolve a fixed inspector value or a lazy value callback.
+ * @typeParam T - Value produced by the source or selected by the predicate.
+ * @param source - Fixed data or a callback producing the data.
+ * @returns The resolved value after any callback Promise settles.
+ */
 export async function resolveValue<T>(source: ValueSource<T>): Promise<T> {
   return typeof source === "function" ? await (source as () => MaybePromise<T>)() : source;
 }
 
+/** Resolve a fixed inspector source or call it with a parsed query.
+ * @param source - Fixed data or a callback producing the data.
+ * @param query - Validated inspector query.
+ * @returns The source result after any callback Promise settles.
+ */
 export async function resolveQuery(
   source: QuerySource | NonNullable<InternalEndpointOptions["stream"]>,
   query: InternalQuery,
@@ -88,6 +103,10 @@ export async function resolveQuery(
     : source;
 }
 
+/** Normalize an inspector array, page or scalar into a page shape.
+ * @param value - Value to validate or project.
+ * @returns Items and any supplied string continuation cursor.
+ */
 export function toPage(value: JsonValue | InternalPage): InternalPage {
   if (Array.isArray(value)) return { items: value };
   if (isRecord(value) && Array.isArray(value.items)) {
@@ -99,54 +118,10 @@ export function toPage(value: JsonValue | InternalPage): InternalPage {
   return { items: [value] };
 }
 
-function queryPage(page: InternalPage, query: InternalQuery): InternalPage {
-  const from = query.from === undefined ? undefined : Date.parse(query.from);
-  const to = query.to === undefined ? undefined : Date.parse(query.to);
-  if ((from !== undefined && !Number.isFinite(from)) || (to !== undefined && !Number.isFinite(to)))
-    throw new InternalQueryError();
-  if (from !== undefined && to !== undefined && from > to) throw new InternalQueryError();
-  const filtered = page.items.filter((item) => matchesQuery(item, query, from, to));
-  const start = page.nextCursor === undefined ? cursorOffset(query.cursor) : 0;
-  const items = filtered.slice(start, start + query.limit);
-  const next = start + items.length < filtered.length ? String(start + items.length) : undefined;
-  const nextCursor = next ?? page.nextCursor;
-  return { items, ...(nextCursor === undefined ? {} : { nextCursor }) };
-}
-
-function matchesQuery(item: JsonValue, query: InternalQuery, from?: number, to?: number): boolean {
-  if (!isRecord(item))
-    return Object.keys(query).every((key) => key === "limit" || key === "cursor");
-  const timestamp = [item.timestamp, item.startedAt, item.occurredAt, item.completedAt].find(
-    (value) => typeof value === "string",
-  );
-  const time = typeof timestamp === "string" ? Date.parse(timestamp) : Number.NaN;
-  return (
-    exact(item, query.routeId, "routeId") &&
-    exact(item, query.functionId, "functionId") &&
-    exact(item, query.outcome, "outcome") &&
-    exact(item, query.traceId, "traceId") &&
-    (query.requestId === undefined ||
-      item.requestId === query.requestId ||
-      item.correlationId === query.requestId) &&
-    (query.severity === undefined ||
-      item.level === query.severity ||
-      item.severity === query.severity) &&
-    (from === undefined || (Number.isFinite(time) && time >= from)) &&
-    (to === undefined || (Number.isFinite(time) && time <= to))
-  );
-}
-
-function exact(item: Record<string, JsonValue>, value: string | undefined, key: string): boolean {
-  return value === undefined || item[key] === value;
-}
-
-function cursorOffset(value: string | undefined): number {
-  if (value === undefined) return 0;
-  const offset = Number(value);
-  if (!Number.isSafeInteger(offset) || offset < 0) throw new InternalQueryError();
-  return offset;
-}
-
+/** Encode supported inspector events as versioned SSE blocks.
+ * @param value - Value to validate or project.
+ * @returns Serialized events, or an empty string for a non-array input.
+ */
 export function streamBody(value: unknown): string {
   if (!Array.isArray(value)) return "";
   return value
@@ -158,6 +133,12 @@ export function streamBody(value: unknown): string {
     .join("");
 }
 
+/** Encode a JSON value with the transport's required response metadata.
+ * @param value - Value to validate or project.
+ * @param status - HTTP response status.
+ * @param headers - Response or request header values.
+ * @returns The HTTP response with the supplied status and JSON content type.
+ */
 export function jsonResponse(
   value: JsonValue,
   status = 200,
@@ -177,6 +158,10 @@ export function jsonResponse(
   });
 }
 
+/** Recognize inspector events with a string cursor, type and JSON payload.
+ * @param value - Value to validate or project.
+ * @returns Whether the value can be serialized as an inspector stream event.
+ */
 function isStreamEvent(value: unknown): value is InternalStreamEvent {
   return (
     isRecord(value) &&
@@ -186,6 +171,10 @@ function isStreamEvent(value: unknown): value is InternalStreamEvent {
   );
 }
 
+/** Check whether a value is a non-null object suitable for field inspection.
+ * @param value - Value to validate or project.
+ * @returns Whether object fields can be inspected.
+ */
 function isRecord(value: unknown): value is { readonly [key: string]: JsonValue } {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

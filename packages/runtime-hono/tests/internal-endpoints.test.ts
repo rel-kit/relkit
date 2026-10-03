@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   API_BASE_PATH,
   GENERATOR_VERSION,
@@ -11,7 +11,7 @@ import {
   InternalEndpointConfigurationError,
   type InternalQuery,
   type RuntimeManifest,
-} from "./src/index.js";
+} from "../src/index.js";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const plan: RegistrationPlan = {
@@ -25,6 +25,7 @@ const plan: RegistrationPlan = {
   caches: [],
   tools: [],
   agents: [],
+  channels: [],
   middlewares: [],
 };
 const manifest: RuntimeManifest = {
@@ -48,7 +49,7 @@ describe("versioned internal endpoints", () => {
     let query: InternalQuery | undefined;
     const service = app({
       readiness: { ready: false, reason: "provider-starting" },
-      requests: (value) => {
+      requests: (value: InternalQuery) => {
         query = value;
         return { items: [{ id: "request-1" }], nextCursor: "cursor-2" };
       },

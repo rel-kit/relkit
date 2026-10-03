@@ -1,12 +1,8 @@
-import { expect, test } from "bun:test";
-import {
-  createObservabilityCollector,
-  type RequestRecord,
-  type SpanRecord,
-} from "@relkit/observability";
+import { expect, test } from "vitest";
+import { createObservabilityCollector } from "@relkit/observability";
 import { Hono } from "hono";
-import { instrumentHttpRequest } from "./src/http-span.js";
-import { createFrameworkMiddleware } from "./src/middleware.js";
+import { instrumentHttpRequest } from "../src/http-span.js";
+import { createFrameworkMiddleware } from "../src/middleware.js";
 
 const controlPlanePaths = [
   "/_relkit",
@@ -29,7 +25,9 @@ test("keeps the RELKIT control plane out of application telemetry", async () => 
     generationId: "generation.test",
     graphHash: "sha256:control-plane",
     maxBodyBytes: 1,
-    onLifecycleEvent: (event: { readonly type: string }) => lifecycle.push(event.type),
+    onLifecycleEvent: (event: { readonly type: string }) => {
+      lifecycle.push(event.type);
+    },
   };
   const app = new Hono();
   for (const middleware of createFrameworkMiddleware(options)) app.use("*", middleware.handler);
@@ -67,7 +65,7 @@ test("keeps the RELKIT control plane out of application telemetry", async () => 
     collector
       .read()
       .filter(
-        (record): record is RequestRecord =>
+        (record): record is Extract<typeof record, { signal: "request" }> =>
           record.signal === "request" && record.phase === "completed",
       ),
   ).toHaveLength(1);
@@ -75,7 +73,8 @@ test("keeps the RELKIT control plane out of application telemetry", async () => 
     collector
       .read()
       .filter(
-        (record): record is SpanRecord => record.signal === "span" && record.status === "completed",
+        (record): record is Extract<typeof record, { signal: "span" }> =>
+          record.signal === "span" && record.status === "completed",
       ),
   ).toHaveLength(1);
   expect(lifecycle).toEqual(["request.started", "request.completed"]);
