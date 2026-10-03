@@ -1,8 +1,8 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createLocalNativeJobProvider } from "./src/jobs/native-adapter.ts";
+import { createLocalNativeJobProvider } from "../src/jobs/native-adapter.ts";
 import type { OperationContext, NativeSubmission } from "@relkit/jobs/adapter";
 
 test("persists scoped native runs, honors schedules, and retries retryable tasks", async () => {
@@ -34,6 +34,7 @@ test("persists scoped native runs, honors schedules, and retries retryable tasks
   try {
     const first = createLocalNativeJobProvider(root, "default");
     const accepted = await first.submit(request, context);
+    if (!("runId" in accepted)) throw new Error("Expected an accepted native run");
     expect(await first.worker!.next(context)).toBeUndefined();
     await first.close();
 
@@ -52,6 +53,7 @@ test("persists scoped native runs, honors schedules, and retries retryable tasks
       operationId: "operation-2",
     };
     const retried = await reopened.submit(retriedRequest, context);
+    if (!("runId" in retried)) throw new Error("Expected an accepted retry run");
     const work = await reopened.worker!.next(context);
     expect(work?.envelope.runId).toBe(retried.runId);
     await reopened.worker!.fail(retried.runId, new Error("temporary"), context);
@@ -87,6 +89,7 @@ test("parks durable sleeps and persists the continuation checkpoint", async () =
       },
       context,
     );
+    if (!("runId" in accepted)) throw new Error("Expected an accepted durable run");
     const work = await adapter.worker!.next(context);
     await expect(work?.binding.sleep?.sleep("pause", 20)).rejects.toMatchObject({
       code: "RELKIT_LOCAL_TASK_SLEEP",
