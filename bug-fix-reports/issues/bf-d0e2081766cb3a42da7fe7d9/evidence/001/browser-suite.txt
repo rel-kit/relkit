@@ -1,0 +1,3 @@
+$ bun run scripts/test-inspector-browser.ts
+$ next dev --hostname 127.0.0.1 --port "3225"
+Inspector browser acceptance passed.

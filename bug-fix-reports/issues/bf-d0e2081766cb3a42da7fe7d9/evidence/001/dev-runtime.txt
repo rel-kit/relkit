@@ -1,0 +1,270 @@
+$ relkit dev --local on --no-color
+00:52:18.874 INFO  relkit            Starting development server
+00:52:18.892 INFO  build             Compiling application
+00:52:27.988 INFO  build             Compiled in 9096ms
+00:52:27.991 INFO  server            Ready
+                                     API        http://127.0.0.1:3000
+                                     Inspector  http://127.0.0.1:3210
+                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json
+00:52:47.545 INFO  demo.example      demo.write.started
+                                     {"value":"validation-384b3b1a-3c17-49d0-9ffc-a9153b8ed977"}
+00:52:47.703 INFO  demo.example      demo.write.completed
+                                     {"value":"validation-384b3b1a-3c17-49d0-9ffc-a9153b8ed977"}
+00:52:47.717 INFO  http              POST /demo → 201 in 221ms
+00:52:47.775 INFO  demo.on-example   on-example
+                                     {"value":"validation-384b3b1a-3c17-49d0-9ffc-a9153b8ed977"}
+00:52:47.882 INFO  http              GET /demo → 200 in 157ms
+00:52:48.243 ERROR http              POST /demo → 500 in 35ms
+                                     request: request-5b7f825c-d43c-4007-ad07-3282752827bd
+                                     trace: c4837d7f871ca0c7f1d545c761767471
+00:52:52.472 WARN  inspector         [browser] React Flow: It seems like you are hiding the
+                                     attribution. Please only do this when you are subscribed to
+                                     React Flow Pro: https://reactflow.dev/remove-attr
+00:52:52.502 WARN  inspector         You can ignore this warning if you are subscribed.
+00:53:43.736 INFO  demo.example      demo.write.started
+                                     {"value":"validation-4d081a73-cde4-492c-8e33-351e61b7f75a"}
+00:53:43.848 INFO  demo.example      demo.write.completed
+                                     {"value":"validation-4d081a73-cde4-492c-8e33-351e61b7f75a"}
+00:53:43.859 INFO  http              POST /demo → 201 in 154ms
+00:53:43.922 INFO  demo.on-example   on-example
+                                     {"value":"validation-4d081a73-cde4-492c-8e33-351e61b7f75a"}
+00:53:43.995 INFO  http              GET /demo → 200 in 131ms
+00:53:44.835 ERROR http              POST /demo → 500 in 34ms
+                                     request: request-3e290dfd-8d9e-4619-b73b-5f1056adcc85
+                                     trace: da37401e48bb22ae047593478d65836a
+00:54:28.430 INFO  hello.hello       hello invoked
+                                     {"name":"Regression"}
+00:54:28.439 INFO  http              GET /hello → 200 in 37ms
+00:54:28.487 INFO  http              POST /echo → 200 in 36ms
+00:54:28.536 INFO  http              POST /orders → 201 in 45ms
+00:54:28.561 INFO  demo.example      demo.write.started
+                                     {"value":"regression-1790978068385"}
+00:54:28.662 INFO  demo.example      demo.write.completed
+                                     {"value":"regression-1790978068385"}
+00:54:28.671 INFO  http              POST /demo → 201 in 130ms
+00:54:28.734 INFO  demo.on-example   on-example
+                                     {"value":"regression-1790978068385"}
+00:54:28.812 INFO  http              GET /demo → 200 in 136ms
+00:54:28.852 WARN  http              POST /demo → 422 in 20ms
+                                     request: request-144020d6-8795-4b7c-8d38-c198e1d142a1
+                                     trace: b7597dea3ae4ba149250e562eda6f338
+00:54:28.892 ERROR http              POST /demo → 500 in 35ms
+                                     request: request-925593f8-7277-4df5-8a31-7777f0981705
+                                     trace: a0ba177f968ec62ad2d0e54d19f0d276
+00:54:28.906 WARN  http              GET /missing-regression-route → 404 in 8ms
+                                     request: request-1a1ef44a-2e6d-4ee8-bc91-81f026fcaa86
+                                     trace: 52ec07e650bdfa4bce00faa5c5b71f10
+00:54:28.981 INFO  demo.delete       demo.deleted
+                                     {"value":"regression-1790978068385"}
+00:54:28.991 INFO  http              DELETE /demo → 200 in 78ms
+00:54:29.099 INFO  http              GET /demo → 200 in 103ms
+00:54:29.127 INFO  demo.example      demo.write.started
+                                     {"value":"inspector-sample"}
+00:54:29.252 INFO  demo.example      demo.write.completed
+                                     {"value":"inspector-sample"}
+00:54:29.264 INFO  http              POST /demo → 201 in 160ms
+00:54:29.290 INFO  demo.on-example   on-example
+                                     {"value":"inspector-sample"}
+00:58:22.835 INFO  build             Rebuilding application (1 changed file)
+00:58:28.467 INFO  build             Reloaded in 5632ms
+01:00:07.602 INFO  demo.example      demo.write.started
+                                     {"value":"validation-a71c2efe-04ff-4e3c-a2b9-a7d5e363360b"}
+01:00:07.824 INFO  demo.example      demo.write.completed
+                                     {"value":"validation-a71c2efe-04ff-4e3c-a2b9-a7d5e363360b"}
+01:00:07.835 INFO  http              POST /demo → 201 in 286ms
+01:00:07.910 INFO  demo.on-example   on-example
+                                     {"value":"validation-a71c2efe-04ff-4e3c-a2b9-a7d5e363360b"}
+01:00:07.973 INFO  http              GET /demo → 200 in 132ms
+01:00:08.470 ERROR http              POST /demo → 500 in 35ms
+                                     request: request-b8819639-ba09-49f8-8827-ac232a9a27ea
+                                     trace: 27e86d0f89ecc6a7992251f535d047d3
+01:01:09.796 INFO  demo.example      demo.write.started
+                                     {"value":"browser-validation-7ab4e2ba-47eb-4000-8817-ca662194d7b3"}
+01:01:09.921 INFO  demo.on-example   on-example
+                                     {"value":"browser-validation-7ab4e2ba-47eb-4000-8817-ca662194d7b3"}
+01:01:09.938 INFO  demo.example      demo.write.completed
+                                     {"value":"browser-validation-7ab4e2ba-47eb-4000-8817-ca662194d7b3"}
+01:01:09.947 INFO  http              POST /demo → 201 in 192ms
+01:06:24.659 INFO  hello.hello       hello invoked
+                                     {"name":"Regression"}
+01:06:24.671 INFO  http              GET /hello → 200 in 42ms
+01:06:24.705 INFO  http              POST /echo → 200 in 28ms
+01:06:24.780 INFO  http              POST /orders → 201 in 56ms
+01:06:24.805 INFO  demo.example      demo.write.started
+                                     {"value":"regression-1790978784617"}
+01:06:24.944 INFO  demo.example      demo.write.completed
+                                     {"value":"regression-1790978784617"}
+01:06:24.959 INFO  http              POST /demo → 201 in 175ms
+01:06:25.096 INFO  demo.on-example   on-example
+                                     {"value":"regression-1790978784617"}
+01:06:25.201 INFO  http              GET /demo → 200 in 217ms
+01:06:25.228 WARN  http              POST /demo → 422 in 21ms
+                                     request: request-c8a7b265-d026-453b-8beb-86de03ea7505
+                                     trace: b0a2828fbccdadcb750a1b69a8dce838
+01:06:25.274 ERROR http              POST /demo → 500 in 29ms
+                                     request: request-3f1fe4ac-94f1-482a-bde3-8cfe3add90aa
+                                     trace: caf789c1951027619f73a5203e8e7e27
+01:06:25.288 WARN  http              GET /missing-regression-route → 404 in 7ms
+                                     request: request-55f29f0b-9561-4ca6-bfe3-59d7b84c8761
+                                     trace: 5f029f94adb70337fef97dfe401b9347
+01:06:25.363 INFO  demo.delete       demo.deleted
+                                     {"value":"regression-1790978784617"}
+01:06:25.373 INFO  http              DELETE /demo → 200 in 78ms
+01:06:25.455 INFO  http              GET /demo → 200 in 77ms
+01:06:25.479 INFO  demo.example      demo.write.started
+                                     {"value":"inspector-sample"}
+01:06:25.597 INFO  demo.example      demo.write.completed
+                                     {"value":"inspector-sample"}
+01:06:25.609 INFO  http              POST /demo → 201 in 150ms
+01:06:25.655 INFO  demo.on-example   on-example
+                                     {"value":"inspector-sample"}
+01:06:25.803 INFO  demo.example      demo.write.started
+                                     {"value":"validation-1ede1396-cd2f-4fe2-ab44-b818f05fd6a2"}
+01:06:25.927 INFO  demo.example      demo.write.completed
+                                     {"value":"validation-1ede1396-cd2f-4fe2-ab44-b818f05fd6a2"}
+01:06:25.943 INFO  http              POST /demo → 201 in 165ms
+01:06:25.998 INFO  demo.on-example   on-example
+                                     {"value":"validation-1ede1396-cd2f-4fe2-ab44-b818f05fd6a2"}
+01:06:26.201 INFO  http              GET /demo → 200 in 164ms
+01:06:27.227 ERROR http              POST /demo → 500 in 45ms
+                                     request: request-a86d3ead-5e7b-4a92-b5f2-98164d8079cb
+                                     trace: 6223b27f15cca41ed43e7bbac9553ae4
+01:06:30.208 INFO  demo.example      demo.write.started
+                                     {"value":"browser-validation-0b4bcaf9-e1a9-4dd0-99d3-a1f1d90fa2b1"}
+01:06:30.348 INFO  demo.example      demo.write.completed
+                                     {"value":"browser-validation-0b4bcaf9-e1a9-4dd0-99d3-a1f1d90fa2b1"}
+01:06:30.357 INFO  http              POST /demo → 201 in 179ms
+01:06:30.376 INFO  demo.on-example   on-example
+                                     {"value":"browser-validation-0b4bcaf9-e1a9-4dd0-99d3-a1f1d90fa2b1"}
+01:07:47.344 INFO  demo.example      demo.write.started
+                                     {"value":"browser-validation-8fc34cda-c10a-4df6-bfc7-2d4c7964668c"}
+01:07:47.439 INFO  demo.example      demo.write.completed
+                                     {"value":"browser-validation-8fc34cda-c10a-4df6-bfc7-2d4c7964668c"}
+01:07:47.448 INFO  http              POST /demo → 201 in 149ms
+01:07:47.486 INFO  demo.on-example   on-example
+                                     {"value":"browser-validation-8fc34cda-c10a-4df6-bfc7-2d4c7964668c"}
+01:08:57.423 INFO  demo.example      demo.write.started
+                                     {"value":"browser-validation-e162eae8-7dcb-4e5a-b324-a4391947f171"}
+01:08:57.642 INFO  demo.example      demo.write.completed
+                                     {"value":"browser-validation-e162eae8-7dcb-4e5a-b324-a4391947f171"}
+01:08:57.653 INFO  http              POST /demo → 201 in 305ms
+01:08:57.680 INFO  demo.on-example   on-example
+                                     {"value":"browser-validation-e162eae8-7dcb-4e5a-b324-a4391947f171"}
+01:09:51.873 INFO  demo.example      demo.write.started
+                                     {"value":"browser-validation-9c0f6399-c2f5-43da-aa04-f3d66ffd09ac"}
+01:09:52.039 INFO  demo.example      demo.write.completed
+                                     {"value":"browser-validation-9c0f6399-c2f5-43da-aa04-f3d66ffd09ac"}
+01:09:52.049 INFO  http              POST /demo → 201 in 230ms
+01:09:52.128 INFO  demo.on-example   on-example
+                                     {"value":"browser-validation-9c0f6399-c2f5-43da-aa04-f3d66ffd09ac"}
+01:12:49.550 INFO  hello.hello       hello invoked
+                                     {"name":"Regression"}
+01:12:49.793 INFO  http              GET /hello → 200 in 937ms
+01:12:50.528 INFO  http              POST /echo → 200 in 419ms
+01:12:51.328 INFO  http              POST /orders → 201 in 418ms
+01:12:51.636 INFO  demo.example      demo.write.started
+                                     {"value":"regression-1790979168121"}
+01:12:52.255 INFO  demo.example      demo.write.completed
+                                     {"value":"regression-1790979168121"}
+01:12:52.265 INFO  http              POST /demo → 201 in 837ms
+01:12:52.694 INFO  demo.on-example   on-example
+                                     {"value":"regression-1790979168121"}
+01:12:53.169 INFO  http              GET /demo → 200 in 799ms
+01:12:53.217 WARN  http              POST /demo → 422 in 32ms
+                                     request: request-e70987d0-ce86-459a-ad1b-e7e46824b5a8
+                                     trace: f6c05f3b7988d2961d63ad665265865b
+01:12:53.269 ERROR http              POST /demo → 500 in 42ms
+                                     request: request-77456337-f74f-4754-a102-854dcd814961
+                                     trace: 3f63b70e7f0f3cc7e1940426c4ce3469
+01:12:53.334 WARN  http              GET /missing-regression-route → 404 in 25ms
+                                     request: request-7917c5b7-009c-444e-ace4-ec33285dadb5
+                                     trace: c4cde251f691b87bc8a03ffef1a77d5f
+01:12:53.456 INFO  demo.delete       demo.deleted
+                                     {"value":"regression-1790979168121"}
+01:12:53.468 INFO  http              DELETE /demo → 200 in 110ms
+01:12:53.596 INFO  http              GET /demo → 200 in 121ms
+01:12:53.622 INFO  demo.example      demo.write.started
+                                     {"value":"inspector-sample"}
+01:12:53.765 INFO  demo.example      demo.write.completed
+                                     {"value":"inspector-sample"}
+01:12:53.774 INFO  http              POST /demo → 201 in 173ms
+01:12:53.802 INFO  demo.on-example   on-example
+                                     {"value":"inspector-sample"}
+01:13:25.913 INFO  demo.example      demo.write.started
+                                     {"value":"validation-4291ba84-1c64-437e-add2-82a22c0ba5bc"}
+01:13:26.080 INFO  demo.example      demo.write.completed
+                                     {"value":"validation-4291ba84-1c64-437e-add2-82a22c0ba5bc"}
+01:13:26.092 INFO  http              POST /demo → 201 in 213ms
+01:13:26.178 INFO  demo.on-example   on-example
+                                     {"value":"validation-4291ba84-1c64-437e-add2-82a22c0ba5bc"}
+01:13:26.278 INFO  http              GET /demo → 200 in 146ms
+01:13:27.092 ERROR http              POST /demo → 500 in 62ms
+                                     request: request-b9f31fb8-650b-4e21-98ac-ef7a87c446f8
+                                     trace: ddf2d34dc21093b9ece347ad53702568
+01:14:53.212 ERROR relkit            Telemetry storage unavailable; restart dev to recover
+                                     Telemetry worker timed out; restart dev to recover
+[Bun.serve]: request timed out after 10 seconds. Pass `idleTimeout` to configure.
+01:18:23.102 INFO  demo.example      demo.write.started
+                                     {"value":"validation-d73d755b-cbed-4b12-87ef-579aa7351e04"}
+01:18:23.328 INFO  demo.example      demo.write.completed
+                                     {"value":"validation-d73d755b-cbed-4b12-87ef-579aa7351e04"}
+01:18:23.338 INFO  http              POST /demo → 201 in 287ms
+01:18:23.390 INFO  demo.on-example   on-example
+                                     {"value":"validation-d73d755b-cbed-4b12-87ef-579aa7351e04"}
+01:18:23.494 INFO  http              GET /demo → 200 in 151ms
+01:18:23.727 ERROR http              POST /demo → 500 in 42ms
+                                     request: request-d19fdf08-0b22-4e07-906d-3a918ea9dda6
+                                     trace: 79648cccf45a6e09ba312b6129fd5a8d
+01:19:05.049 INFO  demo.example      demo.write.started
+                                     {"value":"validation-6e65a5b4-9397-460f-9793-eb9c649866fb"}
+01:19:05.647 INFO  demo.example      demo.write.completed
+                                     {"value":"validation-6e65a5b4-9397-460f-9793-eb9c649866fb"}
+01:19:05.657 INFO  http              POST /demo → 201 in 652ms
+01:19:05.742 INFO  demo.on-example   on-example
+                                     {"value":"validation-6e65a5b4-9397-460f-9793-eb9c649866fb"}
+01:19:05.862 INFO  http              GET /demo → 200 in 163ms
+01:19:06.117 ERROR http              POST /demo → 500 in 34ms
+                                     request: request-0f0e38a6-2ac9-4508-b766-510c975ae263
+                                     trace: 657cd8e1863c277221c81ae8943ca74f
+01:51:37.464 INFO  hello.hello       hello invoked
+                                     {"name":"Origin validation"}
+01:51:37.871 WARN  app               91 | export function assertWebSocketOrigin(request, options) {
+01:51:37.884 WARN  app               92 | const origin = request.headers.get("origin");
+01:51:37.888 WARN  app               93 | if (origin === null ||
+01:51:37.890 WARN  app               94 | origin === "null" ||
+01:51:37.892 WARN  app               95 | (origin !== new URL(request.url).origin &&
+                                     !allowedOrigins(options.allowedOrigins).has(origin))) {
+01:51:37.898 WARN  app               96 | throw new TransportSecurityError("ORIGIN_DENIED",
+                                     "WebSocket origin is not allowed.");
+                                     ^
+01:51:37.929 WARN  app               TransportSecurityError: WebSocket origin is not allowed.
+                                     code: "ORIGIN_DENIED"
+                                     at assertWebSocketOrigin
+                                     (/Users/mustafaelsayed/Workspace/relkit-regression-demo/.relkit/generated/.dev-9zDCnT/generation-2/relkit/packages/runtime-hono/dist/transport-security.js:96:15)
+                                     at assertWebSocketRequest
+                                     (/Users/mustafaelsayed/Workspace/relkit-regression-demo/.relkit/generated/.dev-9zDCnT/generation-2/relkit/packages/runtime-hono/dist/transport-security.js:107:5)
+01:51:37.876 ERROR http              GET /rpc → 500 in 315ms
+                                     request: request-639c6f3f-1be8-4690-b339-6f8b161e9baf
+                                     trace: 6a67e1dd4a7b5a503f5cabf2cec7ae26
+Framework changed; syncing local packages...
+Framework synced; restarting dev.
+02:18:51.047 INFO  relkit            Stopping development server
+Framework changed; syncing local packages...
+Framework synced; restarting dev.
+02:33:27.054 INFO  relkit            Starting development server
+02:33:27.070 INFO  build             Compiling application
+02:33:36.893 INFO  build             Compiled in 9823ms
+02:33:36.903 INFO  server            Ready
+                                     API        http://127.0.0.1:3000
+                                     Inspector  http://127.0.0.1:3210
+                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json
+02:34:02.085 INFO  hello.hello       hello invoked
+                                     {"name":"Origin validation"}
+02:34:02.143 INFO  hello.hello       hello invoked
+                                     {"name":"Origin validation"}
+02:34:02.169 INFO  http              GET /rpc → 200 in 8ms
+error: script "dev" exited with code 130
+02:36:57.984 INFO  relkit            Stopping development server
+02:36:58.781 INFO  relkit            Development server stopped

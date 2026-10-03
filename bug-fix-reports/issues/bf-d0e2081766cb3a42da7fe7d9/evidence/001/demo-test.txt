@@ -1,0 +1,25 @@
+$ bun test
+bun test v1.3.10 (30e609e0)
+
+tests/unit/orders.function.test.ts:
+(pass) createOrder invokes pricing [50.42ms]
+
+tests/unit/echo.function.test.ts:
+(pass) echo returns its input [13.25ms]
+
+tests/unit/hello.function.test.ts:
+(pass) hello returns a greeting [14.95ms]
+
+tests/integration/orders.route.test.ts:
+(pass) POST /orders [30.11ms]
+
+tests/integration/hello.route.test.ts:
+(pass) GET /hello [12.01ms]
+
+tests/integration/echo.route.test.ts:
+(pass) POST /echo [11.71ms]
+
+ 6 pass
+ 0 fail
+ 9 expect() calls
+Ran 6 tests across 6 files. [1142.00ms]

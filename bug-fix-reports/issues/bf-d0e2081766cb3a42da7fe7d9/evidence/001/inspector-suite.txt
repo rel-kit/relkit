@@ -1,0 +1,26 @@
+$ bun test ./tests/inspector
+bun test v1.3.10 (30e609e0)
+
+tests/inspector/job-name-filters.test.ts:
+(pass) Inspector job name filters > resolves names before bounded native queries [13.77ms]
+(pass) Inspector job name filters > rejects a cursor after a filter change [5.64ms]
+(pass) Inspector job name filters > rejects browser-controlled scope filters before native listing [0.59ms]
+
+tests/inspector/fixture-backend.test.ts:
+(pass) deterministic inspector fixture backend > serves the versioned graph, collections, and redacted source metadata [82.26ms]
+(pass) deterministic inspector fixture backend > keeps active identity while exposing a deterministic invalid candidate [4.68ms]
+(pass) deterministic inspector fixture backend > applies a local dead-letter retry through the protected action contract [3.10ms]
+(pass) deterministic inspector fixture backend > streams todo and tool state through a durable human-input resume [341.69ms]
+
+tests/inspector/inspector-scans.test.ts:
+(pass) inspector protocol boundary scans > keeps imports and network access behind the local protocol clients [461.04ms]
+(pass) inspector protocol boundary scans > detects forbidden handler, provider, and secret payloads [0.23ms]
+
+tests/inspector/generated-runtime-wiring.test.ts:
+(pass) generated host connects event runtime inspection [3.06ms]
+(pass) generated host projects bucket binding features [1.58ms]
+
+ 11 pass
+ 0 fail
+ 42 expect() calls
+Ran 11 tests across 4 files. [1.53s]
