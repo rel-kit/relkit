@@ -18,6 +18,7 @@ import type {
 } from "./evaluator-protocol.types.js";
 import { snapshotDescriptorEffect } from "./evaluator-snapshot.js";
 import type { SnapshotDescriptorLike } from "./evaluator-snapshot.types.js";
+import { isSnapshotErrorDescriptorEffect } from "./evaluator-snapshot-capabilities.js";
 
 /**
  * Snapshots descriptor exports in deterministic name order without executable metadata.
@@ -99,6 +100,9 @@ const selectCompilerDescriptor = Effect.fn("Discovery.selectCompilerDescriptor")
   if (yield* isDescriptorEffect(value)) {
     // isDescriptorEffect validated the external descriptor identity and matching reference.
     return value as SnapshotDescriptorLike;
+  }
+  if (typeof value === "function" && (yield* isSnapshotErrorDescriptorEffect(value))) {
+    return value as unknown as SnapshotDescriptorLike;
   }
   if (
     !isRecord(value) ||

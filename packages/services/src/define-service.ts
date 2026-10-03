@@ -98,7 +98,16 @@ export const defineServiceEffect = Effect.fn("Services.define")(
  * @param options - Metadata and named functions, events, tasks, and jobs.
  * @returns A frozen service descriptor.
  * @throws TypeError for malformed local input, or the original identity/ID error.
- * @example const orders = defineService({ id: "orders", functions: { lookup } });
+ * @example
+ * ```ts
+ * import { defineFunction } from "@relkit/functions";
+ * import { z } from "@relkit/schema";
+ * import { defineService } from "@relkit/services";
+ * const lookup = defineFunction({
+ *   input: z.string(), output: z.string(), handler: (id) => id,
+ * });
+ * const orders = defineService({ id: "orders", functions: { lookup } });
+ * ```
  * @category Services
  * @since 0.1.0
  */

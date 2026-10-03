@@ -82,7 +82,12 @@ export const defineCacheEffect = Effect.fn("cache.define")(
  * @param options - Identifier, schemas, metadata, and TTL policy.
  * @returns A frozen descriptor.
  * @throws TypeError for invalid options and IDs.
- * @example defineCache({ id: "prices", key: z.string(), value: z.number() });
+ * @example
+ * ```ts
+ * import { defineCache } from "@relkit/cache";
+ * import { z } from "@relkit/schema";
+ * const prices = defineCache({ id: "prices", key: z.string(), value: z.number() });
+ * ```
  * @category Resources
  * @since 0.1.0
  */

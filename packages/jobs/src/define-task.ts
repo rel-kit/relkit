@@ -62,7 +62,15 @@ export const defineTaskEffect = Effect.fn("Jobs.defineTask")(
  * @param options - Task identity, schemas, handler, and execution policy.
  * @returns A frozen task descriptor.
  * @throws Original validation error for invalid definitions.
- * @example defineTask({ id: "send", version: "1", input, output, handler });
+ * @example
+ * ```ts
+ * import { defineTask } from "@relkit/jobs";
+ * import { z } from "@relkit/schema";
+ * const echo = defineTask({
+ *   id: "echo", version: "1", input: z.string(), output: z.string(),
+ *   execution: "retryable", handler: async (input) => input,
+ * });
+ * ```
  * @category Jobs
  * @since 0.4.1
  */

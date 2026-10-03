@@ -191,7 +191,17 @@ export const defineErrorEffect = Effect.fn("functions.error.define")(
  * @param options - Error schema, message, and transport metadata.
  * @returns Callable frozen error descriptor.
  * @throws TypeError for invalid schema, retry, HTTP status, or message.
- * @example const NotFound = defineError({ id: "orders.not-found", data: z.object({ id: z.string() }), message: "Missing" });
+ * @example
+ * ```ts
+ * import { defineError } from "@relkit/functions";
+ * import { z } from "@relkit/schema";
+ * const NotFound = defineError({
+ *   id: "orders.not-found", data: z.object({ id: z.string() }), message: "Missing",
+ * });
+ * const error = new NotFound({ id: "order-1" });
+ * ```
+ * @category Errors
+ * @since 0.1.0
  */
 export function defineError<const Id extends string, const DataSchema extends StandardSchemaV1>(
   options: DefineErrorOptions<Id, DataSchema>,

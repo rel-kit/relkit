@@ -94,7 +94,13 @@ export function defineEnvEffect<const S extends EnvShape>(
  * @param shape - Field builders keyed by public environment names.
  * @returns Immutable declaration and typed references.
  * @throws TypeError for a reserved name or invalid builder.
- * @example defineEnv({ MODE: env.string() });
+ * @example
+ * ```ts
+ * import { defineEnv, env } from "@relkit/config";
+ * const environment = defineEnv({ MODE: env.string().default("development") });
+ * ```
+ * @category Configuration
+ * @since 0.1.0
  */
 export function defineEnv<const S extends EnvShape>(
   shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
