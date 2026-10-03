@@ -1,6 +1,6 @@
-import { describe, expect, test } from "bun:test";
-import { createGenerationLifecycle } from "./src/lifecycle.ts";
-import { createConcurrencyAdmission, effectiveConcurrencyLimit } from "./src/concurrency.ts";
+import { describe, expect, test } from "vitest";
+import { createConcurrencyAdmission, effectiveConcurrencyLimit } from "../src/concurrency.js";
+import { createGenerationLifecycle } from "../src/lifecycle.js";
 
 const request = (
   admission: ReturnType<typeof createConcurrencyAdmission>,
