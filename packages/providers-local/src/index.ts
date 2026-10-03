@@ -14,13 +14,33 @@ export type {
   JobStoreSnapshot,
 } from "./jobs/store.js";
 export * from "./jobs/retry.js";
-export * from "./jobs/scheduler.js";
+export { compileSchedule, createScheduler, ScheduleValidationError } from "./jobs/scheduler.js";
+export type {
+  CompiledSchedule,
+  ScheduleEnqueueContext,
+  ScheduleEnqueue,
+  SchedulerRegistration,
+  SchedulerClock,
+  SchedulerOptions,
+  ScheduleRun,
+  Scheduler,
+} from "./jobs/scheduler.js";
 export * from "./jobs/admin.js";
 export * from "./events/log.js";
 export * from "./events/router.js";
-export * from "./events/provider.js";
+export { createLocalEventProvider } from "./events/provider.js";
+export type { LocalEventProvider } from "./events/provider.js";
 export * from "./events/admin.js";
-export * from "./events/ephemeral.js";
+export {
+  createEphemeralDelivery,
+  DEFAULT_EPHEMERAL_CAPACITY,
+  EPHEMERAL_DELIVERY_CAPABILITIES,
+} from "./events/ephemeral.js";
+export type {
+  EphemeralDelivery,
+  EphemeralDeliveryResult,
+  EphemeralDeliverySnapshot,
+} from "./events/ephemeral.js";
 export { EVENT_DELIVERY_CAPABILITIES, createEventDelivery } from "./events/delivery.js";
 export type {
   EventDelivery,

@@ -1,59 +1,62 @@
-import { join } from "node:path";
+import type { LocalJobProvider } from "./runtime-capabilities.types.js";
 import type { JsonValue } from "@relkit/contracts";
 import type { JobsAdapterRuntime } from "@relkit/jobs/adapter";
-import { createJobQueue, type JobQueue } from "./jobs/queue.js";
-import type { JobIdempotencyDefinition } from "./jobs/queue-utils.js";
-import { createJobStore, type JobStore } from "./jobs/store.js";
 import { createLocalNativeJobProvider } from "./jobs/native-adapter.js";
+import { makeLegacyJobService, makeObservabilityService } from "./runtime-capabilities.service.js";
+import { runLocal, runLocalSync } from "./local-effect.js";
 
-export interface LocalJobProvider {
-  readonly createQueue: (context: {
-    readonly jobId: string;
-    readonly idempotency?: JobIdempotencyDefinition;
-  }) => Promise<JobQueue>;
-  readonly close: () => Promise<void>;
-}
+export type { LocalJobProvider } from "./runtime-capabilities.types.js";
 
+/** Creates a profile-owned durable queue provider through its established synchronous constructor.
+ * @param root - Owned state directory.
+ * @param profile - Local provider profile partition.
+ * @returns The profile-owned legacy queue provider.
+ */
 export function createLocalJobProvider(root: string, profile: string): LocalJobProvider;
+/** Composes the selected local job model behind its existing public runtime contract.
+ * @param root - Owned state directory.
+ * @param profile - Local provider profile partition.
+ * @param executionModel - Requested local job execution model.
+ * @returns The native task adapter for this profile.
+ */
 export function createLocalJobProvider(
   root: string,
   profile: string,
   executionModel: "task",
 ): JobsAdapterRuntime;
+/**
+ * Constructs the selected local job model through its existing public overloads.
+ * @param root - Owned local state directory.
+ * @param profile - Local job profile partition.
+ * @param executionModel - Optional native task execution selector.
+ * @returns The selected legacy queue provider or native task adapter.
+ */
 export function createLocalJobProvider(
   root: string,
   profile: string,
   executionModel?: "task",
 ): LocalJobProvider | JobsAdapterRuntime {
   if (executionModel === "task") return createLocalNativeJobProvider(root, profile);
-  const stores = new Map<string, JobStore>();
+  const service = runLocalSync(makeLegacyJobService(root, profile));
   return Object.freeze({
-    createQueue: async (context: {
-      readonly jobId: string;
-      readonly idempotency?: JobIdempotencyDefinition;
-    }) => {
-      const existing = stores.get(context.jobId);
-      const store = existing ?? (await createJobStore(join(root, "jobs", profile, context.jobId)));
-      stores.set(context.jobId, store);
-      return createJobQueue(store, {
-        ...(context.idempotency === undefined ? {} : { idempotency: context.idempotency }),
-      });
-    },
-    close: async () => {
-      await Promise.all([...stores.values()].map((store) => store.close()));
-    },
+    createQueue: (context: Parameters<LocalJobProvider["createQueue"]>[0]) =>
+      runLocal(service.createQueue(context)),
+    close: () => runLocal(service.close()),
   });
 }
 
+/** Creates an isolated synchronous JSON collector without recursively observing sink writes.
+ * @returns The isolated synchronous collector and snapshot reader.
+ */
 export function createLocalObservabilityProvider() {
-  const records: JsonValue[] = [];
+  const service = runLocalSync(makeObservabilityService);
   return Object.freeze({
     collect: (record: JsonValue): void => {
-      records.push(record);
+      runLocalSync(service.collect(record));
     },
     emit: (record: JsonValue): void => {
-      records.push(record);
+      runLocalSync(service.collect(record));
     },
-    read: (): readonly JsonValue[] => Object.freeze([...records]),
+    read: (): readonly JsonValue[] => runLocalSync(service.read()),
   });
 }
