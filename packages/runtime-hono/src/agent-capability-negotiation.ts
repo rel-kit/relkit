@@ -5,6 +5,10 @@ import {
   AGENT_STREAM_CAPABILITIES,
 } from "@relkit/contracts";
 
+/** Reject requests missing required native agent stream capabilities.
+ * @param request - Incoming HTTP request.
+ * @returns Nothing when every required capability is offered.
+ */
 export function assertAgentCapabilities(request: Request): void {
   const value =
     request.headers.get(AGENT_CAPABILITY_HEADER) ??

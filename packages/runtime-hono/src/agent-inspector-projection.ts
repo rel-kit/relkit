@@ -1,6 +1,10 @@
 import type { AgentExecutionEvent, JournalRecord, StoredRun, ThreadSnapshot } from "@relkit/agents";
 import { agentRunCompatibility } from "./agent-compatibility.js";
 
+/** Project run identity, status and compatibility into inspector rows.
+ * @param snapshot - Current thread snapshot.
+ * @returns Run rows with optional completion timestamps.
+ */
 export function inspectorRuns(snapshot: ThreadSnapshot): readonly Record<string, unknown>[] {
   return snapshot.currentRuns.map((run) => ({
     runId: run.runId,
@@ -11,6 +15,10 @@ export function inspectorRuns(snapshot: ThreadSnapshot): readonly Record<string,
   }));
 }
 
+/** Project nested agent execution state into inspector rows.
+ * @param snapshot - Current thread snapshot.
+ * @returns Execution scope, parent, node and latest sequence rows.
+ */
 export function inspectorExecutions(snapshot: ThreadSnapshot): readonly Record<string, unknown>[] {
   return snapshot.executions.map((execution) => ({
     scope: execution.scope,
@@ -22,6 +30,11 @@ export function inspectorExecutions(snapshot: ThreadSnapshot): readonly Record<s
   }));
 }
 
+/** Fold task journal events into numbered attempts for the selected runs.
+ * @param records - Ordered journal records.
+ * @param runs - Run IDs included in this projection.
+ * @returns One row per attempt, updated with its latest task status.
+ */
 export function inspectorAttempts(
   records: readonly JournalRecord[],
   runs: ReadonlySet<string>,
@@ -75,6 +88,11 @@ export function inspectorAttempts(
   return [...attempts.values()];
 }
 
+/** Project lifecycle journal events into inspector transition rows.
+ * @param records - Ordered journal records.
+ * @param runs - Run IDs included in this projection.
+ * @returns Selected transitions with available source and destination nodes.
+ */
 export function inspectorTransitions(
   records: readonly JournalRecord[],
   runs: ReadonlySet<string>,
@@ -98,18 +116,31 @@ export function inspectorTransitions(
   });
 }
 
+/** Select all historical runs or the active set for a live inspector view.
+ * @param snapshot - Current thread snapshot.
+ * @param mode - Live or historical inspector view.
+ * @returns Run IDs, falling back to the last stored run when none are active.
+ */
 export function inspectedRunIds(snapshot: ThreadSnapshot, mode: "live" | "history"): Set<string> {
   if (mode === "history") return new Set(snapshot.currentRuns.map((run) => run.runId));
   const live = snapshot.currentRuns.filter((run) => !terminal(run)).map((run) => run.runId);
   return new Set(live.length > 0 ? live : snapshot.currentRuns.slice(-1).map((run) => run.runId));
 }
 
+/** Recognize execution journal events before reading their scoped metadata.
+ * @param value - Value to validate or project.
+ * @returns The execution event when its required fields are present.
+ */
 function executionEvent(value: unknown): AgentExecutionEvent | undefined {
   if (!isRecord(value) || !Array.isArray(value.scope) || typeof value.kind !== "string") return;
   if (typeof value.nativeSequence !== "number" || typeof value.occurredAt !== "string") return;
   return value as unknown as AgentExecutionEvent;
 }
 
+/** Read optional task identifiers and a required status from journal data.
+ * @param value - Value to validate or project.
+ * @returns Task metadata, or undefined for unsupported values.
+ */
 function taskValue(value: unknown): { id?: string; name?: string; status: string } | undefined {
   if (!isRecord(value) || typeof value.status !== "string") return;
   return {
@@ -119,10 +150,18 @@ function taskValue(value: unknown): { id?: string; name?: string; status: string
   };
 }
 
+/** Recognize settled run statuses that no longer produce live execution.
+ * @param run - Persisted run being inspected.
+ * @returns Whether the run succeeded, failed, cancelled or lost its worker.
+ */
 function terminal(run: StoredRun): boolean {
   return ["succeeded", "failed", "cancelled", "worker-interrupted"].includes(run.status);
 }
 
+/** Check whether a value is a non-null object suitable for field inspection.
+ * @param value - Value to validate or project.
+ * @returns Whether object fields can be inspected.
+ */
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
