@@ -13,6 +13,10 @@ import { acceptAgentControl, acceptAgentRun } from "./agent-rpc-write.js";
 import { agentRpcCall, agentRpcStream } from "./agent-rpc-errors.js";
 import { assertAgentCapabilities } from "./agent-capability-negotiation.js";
 
+/** Builds the negotiated agent command and observation procedures.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The agent command, query and observation procedures for this application.
+ */
 export function agentProcedures(
   options: RouteMaterializationOptions,
 ): Readonly<Record<string, AnyProcedure>> {
@@ -75,6 +79,12 @@ export const agentErrorStatuses = {
   PROVIDER_STATE_LOST: 503,
 } as const;
 
+/** Executes an agent protocol action under its negotiated capability contract.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param action - Lazy protocol action executed after capability negotiation.
+ * @typeParam Value - Value type retained by this operation.
+ * @returns The action result after required protocol capabilities have been checked.
+ */
 function negotiated<Value>(context: RpcContext, action: () => Value): Value {
   assertAgentCapabilities(context.hono.req.raw);
   return action();

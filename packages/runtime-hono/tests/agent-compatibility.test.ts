@@ -1,10 +1,10 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import {
   AGENT_STATE_SCHEMA_VERSION,
   AGENT_STREAM_VERSION,
   type ThreadSnapshot,
 } from "@relkit/contracts";
-import { assertAgentRunWritable, clientAgentSnapshot } from "./src/agent-compatibility.ts";
+import { assertAgentRunWritable, clientAgentSnapshot } from "../src/agent-compatibility.ts";
 
 test("historical AI SDK snapshots are inspectable but not resumable", () => {
   const projected = clientAgentSnapshot(snapshot(1, 1));

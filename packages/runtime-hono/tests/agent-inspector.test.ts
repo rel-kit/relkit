@@ -1,10 +1,10 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import type { AgentStateProvider, JournalCheckpoint, JournalRecord } from "@relkit/agents";
 import type { RegistrationPlan } from "@relkit/graph";
 import { z } from "@relkit/schema";
 import { Hono } from "hono";
-import { installAgentInspectorEndpoints } from "./src/agent-inspector.ts";
-import type { RouteMaterializationOptions } from "./src/materialize-routes.ts";
+import { installAgentInspectorEndpoints } from "../src/agent-inspector.ts";
+import type { RouteMaterializationOptions } from "../src/materialize-routes.ts";
 import { runtimeCohort } from "./test-cohort.ts";
 
 test("Inspector workflow and execution endpoints expose safe structural metadata", async () => {
@@ -108,7 +108,12 @@ function plan(): RegistrationPlan {
         instructions: "safe",
         toolIds: [],
         limits: {},
-        generatedFunction: { functionId: "relkit.agent.review.invoke" },
+        generatedFunction: {
+          functionId: "relkit.agent.review.invoke",
+          generated: true,
+          generatedBy: "agent",
+          agentId: "review",
+        },
         profile: "default",
         stateProfile: "default",
         client: "protected",
@@ -141,6 +146,8 @@ function provider(): AgentStateProvider {
         threadId: "thread-1",
         agentId: "review",
         ownerScope: "viewer",
+        identityScope: "viewer",
+        sessionEpoch: "session",
         status: "idle",
         revision: "4",
         createdAt: time(0),

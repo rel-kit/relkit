@@ -1,5 +1,5 @@
 import { EventSchemas, EventType } from "@ag-ui/core";
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -18,13 +18,17 @@ import {
   AGENT_STREAM_VERSION,
 } from "@relkit/contracts";
 import { z } from "@relkit/schema";
-import { createApp, type RuntimeManifest } from "./src/index.ts";
-import { agUiFrames } from "./src/agent-protocol-encoding.ts";
-import { snapshotFrames } from "./src/agent-protocol-frame-state.ts";
+import { createApp, type RuntimeManifest } from "../src/index.ts";
+import { agUiFrames } from "../src/agent-protocol-encoding.ts";
+import { snapshotFrames } from "../src/agent-protocol-frame-state.ts";
 import { runtimeCohort } from "./test-cohort.ts";
+import { trackFixtureRun, trackFixtureProvider, joinFixtureRuns } from "./fixture-lifetime.js";
 
 const roots: string[] = [];
-afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true }))));
+afterEach(async () => {
+  await joinFixtureRuns();
+  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true })));
+});
 
 test("AG-UI preserves canonical state, nested, and custom events across cursor replay", async () => {
   let executions = 0;
@@ -32,7 +36,10 @@ test("AG-UI preserves canonical state, nested, and custom events across cursor r
     executions += 1;
     const signal = request.signal ?? new AbortController().signal;
     for (const event of canonicalEvents()) {
-      await request.trigger?.contentSink?.emitEvent?.(event, signal);
+      await (
+        request.trigger as
+          { readonly contentSink?: import("@relkit/agents").AgentContentSink } | undefined
+      )?.contentSink?.emitEvent?.(event, signal);
     }
     return `reply:${String(request.input)}`;
   });
@@ -78,7 +85,7 @@ test("AG-UI preserves canonical state, nested, and custom events across cursor r
     value: { kind: "custom", value: { name: "orders.notice", status: "ready" } },
   });
   const stateCursor = frames[1]?.id;
-  expect(stateCursor).toBeString();
+  expect(stateCursor).toEqual(expect.any(String));
 
   const replay = await fixture.app.request(fixture.url, {
     method: "POST",
@@ -107,12 +114,14 @@ test("AG-UI preserves canonical state, nested, and custom events across cursor r
 });
 
 test("cancelling the SSE iterator leaves detached execution running", async () => {
+  const started = Promise.withResolvers<void>();
   const release = Promise.withResolvers<void>();
   const completed = Promise.withResolvers<void>();
   let executionSignal: AbortSignal | undefined;
   const fixture = await protocolFixture(
     async (request) => {
       executionSignal = request.signal;
+      started.resolve();
       await release.promise;
       return "done";
     },
@@ -132,6 +141,7 @@ test("cancelling the SSE iterator leaves detached execution running", async () =
   });
   const reader = response.body!.getReader();
   expect(new TextDecoder().decode((await reader.read()).value)).toContain("RUN_STARTED");
+  await started.promise;
   await reader.cancel();
   expect(executionSignal?.aborted).toBe(false);
   release.resolve();
@@ -144,7 +154,10 @@ test("observe-only AG-UI replays an existing run without accepting another execu
   const fixture = await protocolFixture(async (request) => {
     executions += 1;
     for (const event of canonicalEvents()) {
-      await request.trigger?.contentSink?.emitEvent?.(event, request.signal);
+      await (
+        request.trigger as
+          { readonly contentSink?: import("@relkit/agents").AgentContentSink } | undefined
+      )?.contentSink?.emitEvent?.(event, request.signal ?? new AbortController().signal);
     }
     return "done";
   });
@@ -232,7 +245,9 @@ async function protocolFixture(
     chat: { input: "message", output: "answer" },
   });
   const plan = agentPlan();
-  const provider = wrap(createLocalAgentStateProvider(root, { pollingMs: 50 }));
+  const provider = trackFixtureProvider(
+    wrap(createLocalAgentStateProvider(root, { pollingMs: 50 })),
+  );
   return {
     app: createApp({
       plan,
@@ -244,6 +259,7 @@ async function protocolFixture(
         resolve: () => ({ identityScope: "viewer", sessionEpoch: "session" }),
       },
       agentRuntime: {
+        track: trackFixtureRun,
         applicationId: "fixture",
         environment: "test",
         generationId: "generation-a",
@@ -334,7 +350,12 @@ function agentPlan(): RegistrationPlan {
         instructions: "redacted",
         toolIds: [],
         limits: {},
-        generatedFunction: { functionId: "relkit.agent.support.echo.invoke" },
+        generatedFunction: {
+          functionId: "relkit.agent.support.echo.invoke",
+          generated: true,
+          generatedBy: "agent",
+          agentId: "support.echo",
+        },
         profile: "default",
         stateProfile: "default",
         client: "protected",

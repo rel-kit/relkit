@@ -1,5 +1,6 @@
+import { trackFixtureRun, trackFixtureProvider, joinFixtureRuns } from "./fixture-lifetime.js";
 import { EventSchemas } from "@ag-ui/core";
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -8,17 +9,20 @@ import type { RegistrationPlan } from "@relkit/graph";
 import { z } from "@relkit/schema";
 import { AGENT_CAPABILITY_HEADER, AGENT_CAPABILITY_VALUE } from "@relkit/contracts";
 import { createLocalAgentStateProvider } from "@relkit/providers-local";
-import { createApp, type RuntimeManifest } from "./src/index.ts";
+import { createApp, type RuntimeManifest } from "../src/index.ts";
 import { createOperationId } from "@relkit/realtime";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const roots: string[] = [];
-afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true }))));
+afterEach(async () => {
+  await joinFixtureRuns();
+  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true })));
+});
 
 test("AG-UI endpoint emits a parser-compatible stream", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-agent-protocol-"));
   roots.push(root);
-  const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
+  const provider = trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 }));
   const agent = defineAgent({
     id: "support.echo",
     input: z.string(),
@@ -48,6 +52,7 @@ test("AG-UI endpoint emits a parser-compatible stream", async () => {
     },
     transportSecurity: { allowedOrigins: ["http://relkit.test"] },
     agentRuntime: {
+      track: trackFixtureRun,
       applicationId: "fixture",
       environment: "test",
       generationId: "generation-a",
@@ -171,7 +176,12 @@ function agentPlan(): RegistrationPlan {
         instructions: "redacted",
         toolIds: [],
         limits: {},
-        generatedFunction: { functionId: "relkit.agent.support.echo.invoke" },
+        generatedFunction: {
+          functionId: "relkit.agent.support.echo.invoke",
+          generated: true,
+          generatedBy: "agent",
+          agentId: "support.echo",
+        },
         profile: "default",
         stateProfile: "default",
         client: "protected",
