@@ -1,8 +1,12 @@
 import type { AgentProgressScope } from "@relkit/agents";
-import type { AgentProtocolFrame } from "./agent-protocol-stream.js";
+import type { ProgressFrame } from "./agent-protocol-progress.types.js";
 
-type ProgressFrame = Extract<AgentProtocolFrame, { kind: "progress" }>;
-
+/** Preserve tool scope metadata when constructing a progress frame.
+ * @param partId - Stable progress part identifier.
+ * @param value - Value to validate or project.
+ * @param scope - Execution scope used to partition the operation.
+ * @returns A tool-scoped frame or a frame explicitly scoped to the run.
+ */
 export function progressFrame(
   partId: string,
   value: unknown,

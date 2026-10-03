@@ -22,6 +22,11 @@ import { assertAgentCapabilities } from "./agent-capability-negotiation.js";
 
 const AGENT_STREAM_HEADERS = { [AGENT_CAPABILITY_HEADER]: AGENT_CAPABILITY_VALUE };
 
+/** Registers the existing agent protocol endpoints over generation-owned execution.
+ * @param app - Hono application receiving the configured endpoints or middleware.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Nothing; the requested update is applied to the owned state.
+ */
 export function installAgentProtocolEndpoints(
   app: Hono,
   options: RouteMaterializationOptions,
@@ -32,6 +37,11 @@ export function installAgentProtocolEndpoints(
   );
 }
 
+/** Admits an agent request and returns its negotiated AG-UI event stream.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns An SSE response containing the negotiated run frames, or a sanitized protocol error response.
+ */
 async function agUi(context: Context, options: RouteMaterializationOptions): Promise<Response> {
   assertAgentCapabilities(context.req.raw);
   const body = await context.req.json().catch(() => undefined);
@@ -87,6 +97,12 @@ async function agUi(context: Context, options: RouteMaterializationOptions): Pro
   }, AGENT_STREAM_HEADERS);
 }
 
+/** Resumes protocol observation from the supplied checkpoint without owning accepted execution.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param body - body supplied by the caller.
+ * @returns An SSE response resuming authorized observation from its checkpoint.
+ */
 async function observeAgUi(
   context: Context,
   options: RouteMaterializationOptions,
@@ -130,6 +146,11 @@ async function observeAgUi(
   }, AGENT_STREAM_HEADERS);
 }
 
+/** Attaches the observation acknowledgement metadata to a protocol frame.
+ * @param frame - frame supplied by the caller.
+ * @param observation - Observation metadata attached to public protocol frames.
+ * @returns The frame with its observation checkpoint and acknowledgement metadata.
+ */
 function withObservation(frame: unknown, observation: unknown): unknown {
   if (!isRecord(frame) || observation === undefined) return frame;
   const metadata = isRecord(frame.metadata) ? frame.metadata : {};
@@ -137,10 +158,19 @@ function withObservation(frame: unknown, observation: unknown): unknown {
   return { ...frame, metadata: { ...metadata, relkit: { ...relkit, observation } } };
 }
 
+/** Builds the trusted oRPC context from Hono request state and authentication.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The request's Hono context, state and optional authenticated principal.
+ */
 function rpcContext(context: Context, options: RouteMaterializationOptions): RpcContext {
   return { hono: context, auth: options.auth?.contextFor(context.req.raw) };
 }
 
+/** Reads the route agent identifier and rejects a missing value.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @returns The agent route identifier; missing identifiers throw a public validation error.
+ */
 function requiredAgentId(context: Context): string {
   const value = context.req.param("agentId");
   if (value === undefined || value === "") throw new TypeError("Agent ID is required.");

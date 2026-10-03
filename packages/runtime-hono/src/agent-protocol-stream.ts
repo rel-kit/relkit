@@ -1,4 +1,6 @@
-import type { AgentObservation, JournalCheckpoint, JournalRecord } from "@relkit/agents";
+import type { AgentProtocolFrame, AgentProtocolEmission } from "./agent-protocol-stream.types.js";
+export type { AgentProtocolFrame, AgentProtocolEmission } from "./agent-protocol-stream.types.js";
+import type { AgentObservation, JournalCheckpoint } from "@relkit/agents";
 import { expectedClientIdentity } from "./client-identity.js";
 import { loadAgent, observeAgent } from "./agent-rpc-read.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
@@ -12,49 +14,16 @@ import {
   terminalRun,
 } from "./agent-protocol-frame-state.js";
 
-export type AgentProtocolFrame =
-  | { readonly kind: "state"; readonly value: unknown }
-  | { readonly kind: "text-start"; readonly messageId: string }
-  | { readonly kind: "text-delta"; readonly messageId: string; readonly delta: string }
-  | { readonly kind: "text-end"; readonly messageId: string }
-  | ({
-      readonly kind: "progress";
-      readonly partId: string;
-      readonly value: unknown;
-    } & import("@relkit/agents").AgentProgressScope)
-  | { readonly kind: "approval"; readonly approvalId: string; readonly value: unknown }
-  | {
-      readonly kind: "event";
-      readonly event: JournalRecord["kind"] | "execution" | "execution-snapshot" | "observation";
-      readonly value: unknown;
-      readonly eventId?: string;
-      readonly recordId?: string;
-      readonly runId?: string;
-      readonly createdAt?: string;
-    }
-  | {
-      readonly kind: "tool";
-      readonly toolCallId: string;
-      readonly toolId: string;
-      readonly state: import("@relkit/agents").ToolPartState;
-      readonly value?: unknown;
-      readonly inputStarted?: boolean;
-      readonly inputDelta?: string;
-    }
-  | {
-      readonly kind: "terminal";
-      readonly threadId: string;
-      readonly runId: string;
-      readonly status: string;
-      readonly text?: string;
-    };
-
-export interface AgentProtocolEmission {
-  readonly frame: AgentProtocolFrame;
-  readonly checkpoint?: JournalCheckpoint;
-  readonly observation?: AgentObservation;
-}
-
+/** Projects durable agent state into negotiated protocol frames while observation remains authorized.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param agentId - agent id supplied by the caller.
+ * @param receipt - Durable accepted-run receipt identifying the thread and run.
+ * @param after - Resume checkpoint after which observation continues.
+ * @param signal - Cancellation signal inherited from the caller or owning scope.
+ * @param includeEmptyObservations - Whether empty observations still produce checkpoint acknowledgements.
+ * @returns Lazy protocol frames with resumable checkpoints and per-frame authorization.
+ */
 export async function* agentProtocolFrames(
   context: RpcContext,
   options: RouteMaterializationOptions,
@@ -137,6 +106,13 @@ export async function* agentProtocolFrames(
   }
 }
 
+/** Adds resumable observation checkpoints to one batch of projected frames.
+ * @param frames - Ordered projected protocol frames for one durable observation.
+ * @param checkpoint - Resumable observation checkpoint bound to the resource scope.
+ * @param observation - Observation metadata attached to public protocol frames.
+ * @param includeEmptyObservation - Whether this empty frame batch produces an observation acknowledgement.
+ * @returns Protocol emissions paired with the durable checkpoint for this batch.
+ */
 function* emissions(
   frames: Iterable<AgentProtocolFrame>,
   checkpoint: JournalCheckpoint,
@@ -156,6 +132,11 @@ function* emissions(
   }
 }
 
+/** Compares observation checkpoints without relying on object identity.
+ * @param left - First value or path participating in the comparison.
+ * @param right - Second value or path participating in the comparison.
+ * @returns Whether the value satisfies the required public contract.
+ */
 function samePoint(left: JournalCheckpoint, right: JournalCheckpoint): boolean {
   return (
     left.applicationId === right.applicationId &&

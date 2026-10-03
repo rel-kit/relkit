@@ -1,8 +1,13 @@
 import { EventType } from "@ag-ui/core";
-import { AGENT_STREAM_VERSION } from "@relkit/contracts";
 import type { AgentExecutionEvent } from "@relkit/agents";
+import { AGENT_STREAM_VERSION } from "@relkit/contracts";
+import type { ToolFrame } from "./agent-protocol-encoding.types.js";
 import type { AgentProtocolFrame } from "./agent-protocol-stream.js";
 
+/** Translate one native agent frame into AG-UI protocol events.
+ * @param frame - Native frame to validate or encode.
+ * @returns Ordered AG-UI events for state, text, tools and terminal outcomes.
+ */
 export function* agUiFrames(frame: AgentProtocolFrame): Iterable<unknown> {
   if (frame.kind === "state") {
     yield { type: EventType.STATE_SNAPSHOT, snapshot: frame.value };
@@ -37,8 +42,10 @@ export function* agUiFrames(frame: AgentProtocolFrame): Iterable<unknown> {
   }
 }
 
-type ToolFrame = Extract<AgentProtocolFrame, { kind: "tool" }>;
-
+/** Translate tool input and result phases into AG-UI tool events.
+ * @param frame - Native frame to validate or encode.
+ * @returns Tool start, argument, end, result or custom events.
+ */
 function* agUiToolFrames(frame: ToolFrame): Iterable<unknown> {
   if (["started", "input-streaming", "input-ready"].includes(frame.state)) {
     if (frame.inputStarted)
@@ -68,6 +75,10 @@ function* agUiToolFrames(frame: ToolFrame): Iterable<unknown> {
   }
 }
 
+/** Encode execution events with native journal metadata for replay correlation.
+ * @param frame - Native frame to validate or encode.
+ * @returns An AG-UI state snapshot or custom event with RELKIT metadata.
+ */
 function executionEvent(frame: Extract<AgentProtocolFrame, { readonly kind: "event" }>): unknown {
   const value = frame.value;
   if (!isExecutionEvent(value)) {
@@ -101,12 +112,20 @@ function executionEvent(frame: Extract<AgentProtocolFrame, { readonly kind: "eve
   };
 }
 
+/** Read a nonempty custom event name or use the RELKIT fallback.
+ * @param value - Value to validate or project.
+ * @returns The custom name, defaulting to relkit.custom.
+ */
 function customName(value: unknown): string {
   return isRecord(value) && typeof value.name === "string" && value.name !== ""
     ? value.name
     : "relkit.custom";
 }
 
+/** Validate the metadata needed to encode native execution events.
+ * @param value - Value to validate or project.
+ * @returns Whether sequence, scope, kind and timestamp have supported shapes.
+ */
 function isExecutionEvent(value: unknown): value is AgentExecutionEvent {
   return (
     isRecord(value) &&
@@ -118,6 +137,10 @@ function isExecutionEvent(value: unknown): value is AgentExecutionEvent {
   );
 }
 
+/** Check whether a value is a non-null object suitable for field inspection.
+ * @param value - Value to validate or project.
+ * @returns Whether object fields can be inspected.
+ */
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
