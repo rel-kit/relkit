@@ -1,3 +1,5 @@
+import type { InvocationTraceOptions, InvocationTraceContext } from "./tracing.types.js";
+export type { InvocationTraceOptions, InvocationTraceContext } from "./tracing.types.js";
 import { Context, Effect, Option, Tracer as EffectTracer } from "effect";
 import { RelkitSpan } from "@relkit/invocation";
 import { IdSource } from "./services.js";
@@ -7,39 +9,17 @@ export { createRelkitTracer } from "./tracing-span.js";
 export type { SpanLifecycle, SpanLifecycleObserver } from "./tracing-span.js";
 export * from "./tracing-bridge.js";
 
-export interface InvocationTraceOptions {
-  readonly name: string;
-  readonly invocationId: string;
-  readonly functionId?: string;
-  readonly serviceId?: string;
-  readonly parentInvocationId?: string;
-  readonly correlationId?: string;
-  readonly source?: string;
-  readonly signal?: AbortSignal;
-  readonly attributes?: Readonly<Record<string, unknown>>;
-  readonly kind?: EffectTracer.SpanKind;
-  readonly observer?: SpanLifecycleObserver;
-  readonly input?: unknown;
-}
-
-export interface InvocationTraceContext {
-  readonly invocationId: string;
-  readonly functionId?: string;
-  readonly serviceId?: string;
-  readonly parentInvocationId?: string;
-  readonly traceId: string;
-  readonly spanId: string;
-  readonly parentSpanId?: string;
-  readonly correlationId?: string;
-  readonly source?: string;
-  readonly signal?: AbortSignal;
-}
-
+/** Ambient invocation correlation; children inherit it without a separate resource owner. */
 export const InvocationTrace = Context.Reference<InvocationTraceContext | undefined>(
   "relkit/runtime/InvocationTrace",
   { defaultValue: () => undefined },
 );
 
+/**
+ * Projects invocation identifiers into span attributes.
+ * @param options - Invocation metadata and explicit safe attributes.
+ * @returns Attributes using the established RELKIT keys.
+ */
 function spanAttributes(
   options: Pick<
     InvocationTraceOptions,
@@ -67,6 +47,12 @@ function spanAttributes(
   };
 }
 
+/**
+ * Captures invocation context from the newly created span.
+ * @param span - Active Effect span.
+ * @param options - Invocation metadata.
+ * @returns Frozen invocation context with trace and parent identifiers.
+ */
 function contextFromSpan(
   span: EffectTracer.Span,
   options: InvocationTraceOptions,
@@ -88,6 +74,23 @@ function contextFromSpan(
   });
 }
 
+/**
+ * Runs an invocation in a correlated root span.
+ * @typeParam A - Successful workflow value.
+ * @typeParam E - Typed workflow failure.
+ * @typeParam R - Workflow services where applicable.
+ * @param effect - Lazy invocation work.
+ * @param options - Root span and invocation metadata.
+ * @returns Work preserving values, failures and interruption within the span.
+ * @example
+ * ```ts
+ * import { Effect } from "effect";
+ * import { withRootSpan } from "@relkit/runtime-effect";
+ * const traced = withRootSpan(Effect.succeed("done"), {
+ *   name: "example.invoke", invocationId: "invocation-1", source: "direct" });
+ * const result = await Effect.runPromise(traced);
+ * ```
+ */
 export function withRootSpan<A, E, R>(
   effect: Effect.Effect<A, E, R>,
   options: InvocationTraceOptions,
@@ -120,6 +123,12 @@ export function withRootSpan<A, E, R>(
   });
 }
 
+/**
+ * Inherits parent metadata while respecting explicit child fields.
+ * @param options - Explicit child metadata.
+ * @param parent - Optional parent invocation context.
+ * @returns Resolved child metadata without replacing explicit fields.
+ */
 function childOptions(
   options: InvocationTraceOptions,
   parent: InvocationTraceContext | undefined,
@@ -155,6 +164,16 @@ function childOptions(
   };
 }
 
+/**
+ * Runs child work with inherited invocation correlation.
+ * @typeParam A - Successful workflow value.
+ * @typeParam E - Typed workflow failure.
+ * @typeParam R - Workflow services where applicable.
+ * @param effect - Lazy child workflow.
+ * @param options - Explicit child span metadata.
+ * @returns Work preserving its original value and failure channels.
+ * @see withRootSpan for root provisioning; children retain its correlation context.
+ */
 export function withChildSpan<A, E, R>(
   effect: Effect.Effect<A, E, R>,
   options: InvocationTraceOptions,
