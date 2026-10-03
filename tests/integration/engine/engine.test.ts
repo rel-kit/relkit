@@ -118,6 +118,18 @@ function eventTypes(captureState: EngineCapture): readonly string[] {
   return captureState.observability.read().map((event) => event.type);
 }
 
+function invocationEventTypes(captureState: EngineCapture): readonly string[] {
+  return captureState.observability
+    .read()
+    .filter((event) => {
+      if (event.type === "span.updated") return false;
+      if (event.type === "span.started" || event.type === "span.completed")
+        return event.record.name.startsWith("relkit.invoke.");
+      return true;
+    })
+    .map((event) => event.type);
+}
+
 function declaredError(id: string): Error {
   return Object.assign(new Error("Order unavailable"), {
     name: "DeclaredError",
@@ -152,14 +164,28 @@ describe("engine integration matrix", () => {
       fields: { functionId: "engine.success" },
     });
     expect(successCapture.completions[0]?.outcome).toBe("success");
-    expect(eventTypes(successCapture)).toEqual([
+    expect(invocationEventTypes(successCapture)).toEqual([
       "invocation.started",
       "span.started",
-      "span.updated",
       "span.completed",
       "invocation.completed",
       "invocation.released",
     ]);
+    const completedSpans = successCapture.observability
+      .read()
+      .filter((event) => event.type === "span.completed")
+      .map((event) => event.record);
+    expect(completedSpans.map((span) => span.name)).toEqual(
+      expect.arrayContaining(["Engine.invocation.lifecycle", "relkit.invoke.engine.success"]),
+    );
+    expect(completedSpans.map((span) => span.name)).not.toContain("Engine.task.hook");
+    expect(eventTypes(successCapture)).toContain("span.updated");
+    const startedSpanIds = successCapture.observability
+      .read()
+      .filter((event) => event.type === "span.started")
+      .map((event) => event.record.spanId)
+      .sort();
+    expect(completedSpans.map((span) => span.spanId).sort()).toEqual(startedSpanIds);
 
     const inputCapture = capture();
     let inputCalled = false;
@@ -296,7 +322,9 @@ describe("engine integration matrix", () => {
 
     const startedSpans = state.observability
       .read()
-      .filter((event) => event.type === "span.started")
+      .filter(
+        (event) => event.type === "span.started" && event.record.name.startsWith("relkit.invoke."),
+      )
       .map((event) => event.record);
     expect(startedSpans).toHaveLength(2);
     const rootSpan = startedSpans.find((span) => span.functionId === "engine.parent");
@@ -507,7 +535,9 @@ describe("engine integration matrix", () => {
     expect(admission.waitingCount("engine.queued")).toBe(0);
     expect(queueCapture.completions.map(({ outcome }) => outcome)).toEqual(["success", "success"]);
     expect(queueCapture.logs).toHaveLength(2);
-    expect(eventTypes(queueCapture).filter((type) => type === "span.completed")).toHaveLength(2);
+    expect(
+      invocationEventTypes(queueCapture).filter((type) => type === "span.completed"),
+    ).toHaveLength(2);
   });
 
   test("interrupts shutdown work and rejects undeclared dependency access", async () => {

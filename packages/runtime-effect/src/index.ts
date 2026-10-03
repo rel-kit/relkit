@@ -10,3 +10,6 @@ export * from "./tracing.js";
 export * from "./failure.js";
 export * from "./failure-redaction.js";
 export * from "./failure-telemetry.js";
+export * from "./operation.js";
+export * from "./operation-stream.js";
+export * from "./native-context.js";

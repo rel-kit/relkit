@@ -736,6 +736,7 @@ declare const validateErrorHttpEffect: (
 ## Exports Grouped by Category
 
 - [Errors](#errors)
+  - [defineError](#defineerror)
   - [defineErrorEffect](#defineerroreffect)
 - [utils](#utils)
   - [DeclaredError (class)](#declarederror-class)
@@ -753,13 +754,45 @@ declare const validateErrorHttpEffect: (
   - [ErrorRetry](#errorretry)
   - [ErrorRetryInput](#errorretryinput)
   - [NormalizedErrorRetry](#normalizederrorretry)
-  - [defineError](#defineerror)
   - [isErrorDescriptor](#iserrordescriptor)
   - [isErrorDescriptorEffect](#iserrordescriptoreffect)
 
 ---
 
 # Errors
+
+## defineError
+
+Defines a typed application error.
+
+**Throws**
+
+TypeError for invalid schema, retry, HTTP status, or message.
+
+**Example**
+
+```ts
+import { defineError } from "@relkit/functions";
+import { z } from "@relkit/schema";
+const NotFound = defineError({
+  id: "orders.not-found",
+  data: z.object({ id: z.string() }),
+  message: "Missing",
+});
+const error = new NotFound({ id: "order-1" });
+```
+
+**Signature**
+
+```ts
+declare const defineError: <const Id extends string, const DataSchema extends StandardSchemaV1>(
+  options: DefineErrorOptions<Id, DataSchema>,
+) => ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L206)
+
+Since v0.1.0
 
 ## defineErrorEffect
 
@@ -968,34 +1001,6 @@ declare const NormalizedErrorRetry: NormalizedErrorRetry;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L33)
 
-## defineError
-
-Defines a typed application error.
-
-**Throws**
-
-TypeError for invalid schema, retry, HTTP status, or message.
-
-**Example**
-
-```ts
-const NotFound = defineError({
-  id: "orders.not-found",
-  data: z.object({ id: z.string() }),
-  message: "Missing",
-});
-```
-
-**Signature**
-
-```ts
-declare const defineError: <const Id extends string, const DataSchema extends StandardSchemaV1>(
-  options: DefineErrorOptions<Id, DataSchema>,
-) => ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L196)
-
 ## isErrorDescriptor
 
 **Signature**
@@ -1147,6 +1152,14 @@ export interface ErrorRef<Id extends string = string> {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.types.ts#L16)
+
+## `define-function-inference.types.ts`
+
+---
+
+## Exports Grouped by Category
+
+---
 
 ## `define-function-validation.ts`
 
@@ -2122,7 +2135,7 @@ export interface DefineFunction {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.types.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.types.ts#L27)
 
 ## DefineFunctionEffect (interface)
 
@@ -2212,7 +2225,7 @@ export interface DefineFunctionEffect {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.types.ts#L178)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.types.ts#L112)
 
 ## FunctionImplementationOptions (type alias)
 

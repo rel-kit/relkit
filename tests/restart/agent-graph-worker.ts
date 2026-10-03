@@ -9,7 +9,7 @@ import { createLocalAgentStateProvider } from "../../packages/providers-local/sr
 import { createOperationId } from "../../packages/realtime/src/index.ts";
 import { createApp, type RuntimeManifest } from "../../packages/runtime-hono/src/index.ts";
 import { digest } from "../../packages/runtime-hono/src/agent-rpc-support.ts";
-import { runtimeCohort } from "../../packages/runtime-hono/test-cohort.ts";
+import { runtimeCohort } from "../../packages/runtime-hono/tests/test-cohort.ts";
 import { createRestartGraph, waitForAgentStatus } from "./agent-graph-fixture.ts";
 import { resolveRestartStateRoot } from "./state-root.ts";
 

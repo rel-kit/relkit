@@ -1,3 +1,4 @@
+import type { RegisteredTriggerView } from "./router-inspection.types.js";
 import { deepFreeze, isJsonValue, normalizeId } from "@relkit/contracts";
 import type { EventContractInput } from "./admin-contracts.js";
 import type { EventLogRecord } from "./log.js";
@@ -11,14 +12,13 @@ import type {
   EventTriggerSnapshot,
 } from "./router-types.js";
 import { EventRouterStateError } from "./router-records.js";
-import type { EphemeralDelivery } from "./ephemeral.js";
 
-export interface RegisteredTriggerView {
-  readonly binding: EventRouterTrigger;
-  readonly durable?: EventDelivery;
-  readonly ephemeral?: EphemeralDelivery;
-}
+export type { RegisteredTriggerView } from "./router-inspection.types.js";
 
+/** Validates a declared event contract before registering its identity.
+ * @param value - Value to validate, normalize or project.
+ * @returns The validated event contract.
+ */
 export function normalizeContract(value: unknown): EventContractInput {
   if (!isRecord(value) || value.kind !== "event")
     throw new EventRouterStateError("Event contract is invalid");
@@ -44,6 +44,13 @@ export function normalizeContract(value: unknown): EventContractInput {
   });
 }
 
+/** Projects a routed publication and its fanout outcomes for inspection.
+ * @param input - Caller-provided domain input.
+ * @param envelope - Validated event envelope.
+ * @param fallbackSequence - Sequence used when no explicit position is available.
+ * @param now - Current clock time in milliseconds.
+ * @returns The safe publication inspection record.
+ */
 export function publication(
   input: EventRouterInput,
   envelope: UnknownEventEnvelope,
@@ -61,6 +68,10 @@ export function publication(
   });
 }
 
+/** Copies one registered trigger into safe status and capability fields.
+ * @param binding - Registered target and its delivery configuration.
+ * @returns The safe trigger snapshot.
+ */
 export function triggerSnapshot(binding: EventRouterTrigger): EventTriggerSnapshot {
   return deepFreeze({
     id: binding.id,
@@ -77,6 +88,12 @@ export function triggerSnapshot(binding: EventRouterTrigger): EventTriggerSnapsh
   });
 }
 
+/** Collects immutable contracts, triggers, publications and delivery inspection records.
+ * @param triggers - Registered trigger collection.
+ * @param contracts - Registered event contract index.
+ * @param publications - Retained publication inspection records.
+ * @returns The immutable router inspection snapshot.
+ */
 export function createSnapshot(
   triggers: ReadonlyMap<string, RegisteredTriggerView>,
   contracts: ReadonlyMap<string, EventContractInput>,
@@ -121,6 +138,11 @@ export function createSnapshot(
   });
 }
 
+/** Requeues a dead-letter delivery through the durable queue transition owner.
+ * @param triggers - Registered trigger collection.
+ * @param deliveryId - Stable delivery identity.
+ * @returns The requeued delivery outcome after durable transition.
+ */
 export async function retryDelivery(
   triggers: ReadonlyMap<string, RegisteredTriggerView>,
   deliveryId: string,
@@ -132,6 +154,11 @@ export async function retryDelivery(
   throw new EventRouterStateError(`Unknown event delivery ${deliveryId}`);
 }
 
+/** Runs one ready durable delivery for the requested trigger.
+ * @param triggers - Registered trigger collection.
+ * @param triggerId - Registered trigger identity.
+ * @returns The next delivery outcome, or undefined when no work is ready.
+ */
 export async function runNextDelivery(
   triggers: ReadonlyMap<string, RegisteredTriggerView>,
   triggerId?: string,
@@ -152,6 +179,10 @@ export async function runNextDelivery(
   return undefined;
 }
 
+/** Drains admitted work across the registered delivery owners.
+ * @param triggers - Registered trigger collection.
+ * @returns A Promise completing after admitted handlers finish.
+ */
 export async function drainDeliveries(
   triggers: ReadonlyMap<string, RegisteredTriggerView>,
 ): Promise<readonly EventDeliveryResult[]> {
@@ -163,10 +194,18 @@ export async function drainDeliveries(
   }
 }
 
+/** Distinguishes a persisted log record from a raw event envelope.
+ * @param value - Value to validate, normalize or project.
+ * @returns Whether the value carries a durable event log record.
+ */
 function isEventLogRecord(value: EventRouterInput): value is EventLogRecord {
   return "kind" in value && value.kind === "accepted" && "sequence" in value;
 }
 
+/** Checks for a non-null, non-array object before inspecting unknown fields.
+ * @param value - Value to validate, normalize or project.
+ * @returns Whether the value is a non-null, non-array object.
+ */
 function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

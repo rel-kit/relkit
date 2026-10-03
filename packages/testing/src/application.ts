@@ -22,6 +22,8 @@ import { bindTestRealtime } from "./application-realtime.js";
 export type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
   readonly projectRoot?: string;
   readonly bindingValues?: Readonly<Record<string, JsonValue>>;
+  /** Explicitly replace bucket/cache profiles with isolated in-memory resources. */
+  readonly resourceProviders?: "configured" | "fake";
 };
 
 export interface TestApplication {
@@ -52,7 +54,12 @@ export async function createTestApplication(
   app: { readonly env: object },
   options: TestApplicationOptions = {},
 ): Promise<TestApplication> {
-  const { projectRoot: configuredRoot, bindingValues, ...runtimeOptions } = options;
+  const {
+    projectRoot: configuredRoot,
+    bindingValues,
+    resourceProviders,
+    ...runtimeOptions
+  } = options;
   const projectRoot = configuredRoot ?? process.cwd();
   const artifacts = await loadTestApplicationArtifacts(projectRoot);
   const registry = runtimeOptions.registry ?? artifacts?.registry;
@@ -71,6 +78,7 @@ export async function createTestApplication(
       runtime.providers,
       bindingValues,
       runtime.fakes,
+      resourceProviders === "fake",
     );
   } catch (error) {
     await runtime.close({ failed: true });

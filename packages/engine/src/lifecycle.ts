@@ -1,135 +1,85 @@
-export const GENERATION_LIFECYCLE_STATES = [
-  "constructing",
-  "ready",
-  "draining",
-  "shutting-down",
-  "shutdown",
-] as const;
+import { runEnginePromise, runEngineSync } from "./engine-runtime.js";
+import { makeGeneration } from "./lifecycle.service.js";
+import type {
+  GenerationLease,
+  GenerationLifecycleSnapshot,
+  GenerationLifecycleState,
+} from "./lifecycle.types.js";
+export * from "./lifecycle.service.js";
 
-export type GenerationLifecycleState = (typeof GENERATION_LIFECYCLE_STATES)[number];
-export type GenerationState = GenerationLifecycleState;
-
-export interface GenerationLifecycleSnapshot {
-  readonly state: GenerationLifecycleState;
-  readonly activeCount: number;
-  readonly accepting: boolean;
-}
-
-export interface GenerationLease {
-  readonly release: () => void;
-}
-
-export class GenerationLifecycleError extends Error {
-  readonly state: GenerationLifecycleState;
-
-  constructor(state: GenerationLifecycleState, message: string) {
-    super(`Generation ${message} in state ${state}`);
-    this.name = "GenerationLifecycleError";
-    this.state = state;
-  }
-}
-
-/** Tracks generation readiness, admission, draining, and final shutdown. */
+/** Synchronous facade over one Effect-owned generation state. */
 export class GenerationLifecycle {
-  private currentState: GenerationLifecycleState = "constructing";
-  private activeCountValue = 0;
-  private readonly idleResolvers = new Set<() => void>();
+  private readonly service = runEngineSync(makeGeneration());
 
+  /** Current generation lifecycle state. */
   get state(): GenerationLifecycleState {
-    return this.currentState;
+    return this.snapshot().state;
   }
 
+  /** Number of admitted, unreleased operations. */
   get activeCount(): number {
-    return this.activeCountValue;
+    return this.snapshot().activeCount;
   }
 
+  /** Whether new work may acquire a generation lease. */
   get accepting(): boolean {
-    return this.currentState === "ready";
+    return this.snapshot().accepting;
   }
 
+  /** Read the immutable generation snapshot.
+   * @returns Current state, admission flag and active count.
+   */
   snapshot(): GenerationLifecycleSnapshot {
-    return Object.freeze({
-      state: this.currentState,
-      activeCount: this.activeCountValue,
-      accepting: this.accepting,
-    });
+    return runEngineSync(this.service.snapshot());
   }
 
+  /** Enable admission after successful startup.
+   * @returns Nothing; throws GenerationLifecycleError for an invalid transition.
+   */
   markReady(): void {
-    this.requireState("mark ready", "constructing");
-    this.currentState = "ready";
+    runEngineSync(this.service.markReady());
   }
 
+  /** Stop new admission while existing work drains.
+   * @returns Nothing; repeated drain/shutdown requests are harmless.
+   */
   beginDrain(): void {
-    if (this.currentState === "draining" || this.currentState === "shutting-down") return;
-    if (this.currentState === "shutdown") return;
-    this.requireState("begin drain", "ready");
-    this.currentState = "draining";
+    runEngineSync(this.service.beginDrain());
   }
 
+  /** Enter shutdown, including partial startup cleanup.
+   * @returns Nothing; repeating shutdown is harmless.
+   */
   beginShutdown(): void {
-    if (this.currentState === "shutting-down" || this.currentState === "shutdown") return;
-    if (
-      this.currentState !== "constructing" &&
-      this.currentState !== "ready" &&
-      this.currentState !== "draining"
-    ) {
-      throw new GenerationLifecycleError(this.currentState, "cannot begin shutdown");
-    }
-    this.currentState = "shutting-down";
+    runEngineSync(this.service.beginShutdown());
   }
 
+  /** Finish shutdown after every admitted operation releases.
+   * @returns Nothing; throws while active work remains.
+   */
   completeShutdown(): void {
-    if (this.currentState === "shutdown") return;
-    this.requireState("complete shutdown", "shutting-down");
-    if (this.activeCountValue > 0) {
-      throw new GenerationLifecycleError(
-        this.currentState,
-        "cannot complete shutdown with active work",
-      );
-    }
-    this.currentState = "shutdown";
+    runEngineSync(this.service.completeShutdown());
   }
 
-  /** Admits work only while ready and returns an idempotent release lease. */
+  /** Admit work only while ready.
+   * @returns An idempotent lease whose release decrements the active count.
+   */
   acquire(): GenerationLease {
-    if (!this.accepting) {
-      throw new GenerationLifecycleError(this.currentState, "cannot accept new work");
-    }
-    this.activeCountValue += 1;
-    let released = false;
-    return Object.freeze({
-      release: () => {
-        if (released) return;
-        released = true;
-        this.activeCountValue -= 1;
-        this.resolveIdle();
-      },
-    });
+    return runEngineSync(this.service.acquire());
   }
 
+  /** Wait without timers for all admitted work to finish.
+   * @returns A Promise resolved when the active count becomes zero.
+   */
   waitForIdle(): Promise<void> {
-    if (this.activeCountValue === 0) return Promise.resolve();
-    return new Promise((resolve) => this.idleResolvers.add(resolve));
-  }
-
-  private requireState(action: string, expected: GenerationLifecycleState): void {
-    if (this.currentState !== expected) {
-      throw new GenerationLifecycleError(
-        this.currentState,
-        `cannot ${action}; expected ${expected}`,
-      );
-    }
-  }
-
-  private resolveIdle(): void {
-    if (this.activeCountValue !== 0) return;
-    const resolvers = [...this.idleResolvers];
-    this.idleResolvers.clear();
-    for (const resolve of resolvers) resolve();
+    return runEnginePromise(this.service.waitForIdle());
   }
 }
 
+/** Construct a fresh generation facade.
+ * @returns An isolated generation in the constructing state.
+ * @see {@link GenerationService} for Effect composition.
+ */
 export function createGenerationLifecycle(): GenerationLifecycle {
   return new GenerationLifecycle();
 }

@@ -6671,7 +6671,17 @@ Original validation error for invalid definitions.
 **Example**
 
 ```ts
-defineJob({ name: "sendReceipt", task });
+import { defineJob, defineTask } from "@relkit/jobs";
+import { z } from "@relkit/schema";
+const echo = defineTask({
+  id: "echo",
+  version: "1",
+  input: z.string(),
+  output: z.string(),
+  execution: "retryable",
+  handler: async (input) => input,
+});
+const echoJob = defineJob({ name: "echoJob", task: echo });
 ```
 
 **Signature**
@@ -6686,7 +6696,7 @@ declare const defineJob: <
 ) => JobDescriptor<Name, Id, Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L49)
 
 Since v0.4.1
 
@@ -6760,7 +6770,7 @@ assertJobDescriptor(job);
 declare const assertJobDescriptor: (value: unknown) => asserts value is JobDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L97)
 
 ## assertJobDescriptorEffect
 
@@ -6780,7 +6790,7 @@ declare const assertJobDescriptorEffect: (
 ) => Effect.Effect<undefined, JobDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L82)
 
 ## defineJobEffect
 
@@ -6822,7 +6832,7 @@ if (isJobDescriptor(value)) console.log(value.name);
 declare const isJobDescriptor: (value: unknown) => value is JobDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L74)
 
 ## isJobDescriptorEffect
 
@@ -6840,7 +6850,7 @@ Effect.runSync(isJobDescriptorEffect(value));
 declare const isJobDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-job.ts#L63)
 
 ## `define-task-support.ts`
 
@@ -7222,7 +7232,16 @@ Original validation error for invalid definitions.
 **Example**
 
 ```ts
-defineTask({ id: "send", version: "1", input, output, handler });
+import { defineTask } from "@relkit/jobs";
+import { z } from "@relkit/schema";
+const echo = defineTask({
+  id: "echo",
+  version: "1",
+  input: z.string(),
+  output: z.string(),
+  execution: "retryable",
+  handler: async (input) => input,
+});
 ```
 
 **Signature**
@@ -7266,7 +7285,7 @@ declare const defineTask: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L77)
 
 Since v0.4.1
 
@@ -7310,7 +7329,7 @@ assertTaskDescriptor(task);
 declare const assertTaskDescriptor: (value: unknown) => asserts value is TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L150)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L158)
 
 ## assertTaskDescriptorEffect
 
@@ -7330,7 +7349,7 @@ declare const assertTaskDescriptorEffect: (
 ) => Effect.Effect<undefined, TaskDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L133)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L141)
 
 ## defineTaskEffect
 
@@ -7405,7 +7424,7 @@ if (isTaskDescriptor(value)) console.log(value.id);
 declare const isTaskDescriptor: (value: unknown) => value is TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L125)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L133)
 
 ## isTaskDescriptorEffect
 
@@ -7423,7 +7442,7 @@ Effect.runSync(isTaskDescriptorEffect(value));
 declare const isTaskDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task.ts#L122)
 
 ## `duration.ts`
 

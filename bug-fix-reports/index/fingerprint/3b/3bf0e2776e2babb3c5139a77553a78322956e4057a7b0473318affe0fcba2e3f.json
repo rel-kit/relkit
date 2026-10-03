@@ -1,0 +1,20 @@
+{
+  "key": "19f2be712a48c039f8a3730afc126d589b37facf62c2584c447982234d64d491",
+  "matches": {
+    "bf-19f2be712a48c039f8a3730a": {
+      "id": "bf-19f2be712a48c039f8a3730a",
+      "status": "verified",
+      "what": "Malformed realtime channel params become an internal-server error.",
+      "root_cause": "channelContext threw a native TypeError for client schema rejection. The Effect/native stream boundary retained it, and oRPC redacted it as an internal error.",
+      "fixed_by": "Throw an explicit ORPCError BAD_REQUEST at the client parameter validation boundary; retain stored-value validation behavior. Same real API reproduction and regression tests now pass.",
+      "files": [
+        "packages/runtime-hono/src/realtime-rpc-support.ts",
+        "packages/runtime-hono/tests/realtime-rpc.test.ts",
+        "tests/e2e-commerce/generated-ai-regressions.spec.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T23:32:16+00:00",
+      "report": "bug-fix-reports/issues/bf-19f2be712a48c039f8a3730a/report.md"
+    }
+  }
+}

@@ -1,3 +1,11 @@
+import { nativeNow, nativeRandom } from "../native-services.js";
+import type {
+  RetryClassification,
+  RetryState,
+  RandomSource,
+  RetryPlan,
+  RetryOptions,
+} from "./retry.types.js";
 import { canonicalJson, deepFreeze } from "@relkit/contracts";
 import type { RetryPolicy } from "@relkit/jobs/legacy";
 import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
@@ -9,24 +17,18 @@ import {
   type JobQueueEntry,
 } from "./queue-utils.js";
 
-export type RetryClassification = "retryable" | "non-retryable";
-export type RetryState = "delayed" | "dead-lettered";
-export type RandomSource = () => number;
+export type {
+  RetryClassification,
+  RetryState,
+  RandomSource,
+  RetryPlan,
+  RetryOptions,
+} from "./retry.types.js";
 
-export interface RetryPlan {
-  readonly classification: RetryClassification;
-  readonly state: RetryState;
-  readonly attempt: number;
-  readonly delayMs: number;
-  readonly failure: JobFailureMetadata;
-}
-
-export interface RetryOptions {
-  readonly now?: () => number;
-  readonly random?: RandomSource;
-}
-
-/** Uses the declared error policy; non-declared failures are not retried. */
+/** Uses the declared error policy; non-declared failures are not retried.
+ * @param value - Value to validate, normalize or project.
+ * @returns The retryability classification for the normalized failure.
+ */
 export function classifyFailure(value: unknown): RetryClassification {
   const failure = normalizeFailure(value);
   return failure._tag === "ApplicationFailure" && failure.retry === "later"
@@ -34,11 +36,16 @@ export function classifyFailure(value: unknown): RetryClassification {
     : "non-retryable";
 }
 
-/** Calculates a bounded, integer delay for a one-based completed attempt. */
+/** Calculates a bounded, integer delay for a one-based completed attempt.
+ * @param policy - Validated effective domain policy.
+ * @param attempt - One-based completed attempt number.
+ * @param random - Replaceable source of jitter samples in [0, 1).
+ * @returns The bounded integer retry delay in milliseconds.
+ */
 export function calculateRetryDelay(
   policy: RetryPolicy,
   attempt: number,
-  random: RandomSource = Math.random,
+  random: RandomSource = nativeRandom,
 ): number {
   assertPolicy(policy);
   assertAttempt(attempt);
@@ -55,6 +62,13 @@ export function calculateRetryDelay(
     : Math.floor(capped / 2 + sample * (capped / 2));
 }
 
+/** Combines normalized failure classification, attempt limits and retry jitter into a retry plan.
+ * @param policy - Validated effective domain policy.
+ * @param attempt - One-based completed attempt number.
+ * @param failure - Attempt failure to classify.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @returns The retry classification, delay and safe failure metadata.
+ */
 export function planRetry(
   policy: RetryPolicy,
   attempt: number,
@@ -76,7 +90,14 @@ export function planRetry(
   });
 }
 
-/** Applies one leased attempt's retry/dead-letter outcome durably. */
+/** Applies one leased attempt's retry/dead-letter outcome durably.
+ * @param queue - Owning durable queue operations.
+ * @param instanceId - Queue or journal instance identity.
+ * @param policy - Validated effective domain policy.
+ * @param failure - Attempt failure to classify.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @returns The durable retry result after recording its outcome.
+ */
 export async function applyRetry(
   queue: Pick<JobQueue, "get" | "transition">,
   instanceId: string,
@@ -88,7 +109,7 @@ export async function applyRetry(
   if (current === undefined) throw new JobQueueStateError(`Job ${instanceId} is unknown`);
   if (current.state !== "leased") throw new JobQueueStateError(`Job ${instanceId} is not leased`);
   const plan = planRetry(policy, current.attempt, failure, options);
-  const now = options.now?.() ?? Date.now();
+  const now = options.now?.() ?? nativeNow();
   assertTime(now, "retry time");
   const availableAt = plan.state === "delayed" ? addTime(now, plan.delayMs) : undefined;
   return queue.transition(instanceId, plan.state, {
@@ -98,12 +119,20 @@ export async function applyRetry(
   });
 }
 
+/** Copies the public failure envelope so persisted metadata cannot retain arbitrary error objects.
+ * @param value - Value to validate, normalize or project.
+ * @returns The immutable public failure metadata.
+ */
 export function safeFailureMetadata(value: unknown): JobFailureMetadata {
   return deepFreeze(
     JSON.parse(canonicalJson(toPublicEnvelope(normalizeFailure(value)))) as JobFailureMetadata,
   );
 }
 
+/** Validates retry attempt, delay, multiplier and jitter bounds.
+ * @param policy - Validated effective domain policy.
+ * @returns Nothing; rejects invalid input with the established domain error.
+ */
 function assertPolicy(policy: RetryPolicy): void {
   if (!Number.isSafeInteger(policy.maxAttempts) || policy.maxAttempts < 1)
     throw new TypeError("retry.maxAttempts must be a positive integer");
@@ -117,11 +146,20 @@ function assertPolicy(policy: RetryPolicy): void {
     throw new TypeError("retry.jitter must be none, full, or equal");
 }
 
+/** Rejects an invalid one-based attempt counter.
+ * @param value - Value to validate, normalize or project.
+ * @returns Nothing; rejects invalid input with the established domain error.
+ */
 function assertAttempt(value: number): void {
   if (!Number.isSafeInteger(value) || value < 1)
     throw new JobQueueStateError("Retry attempt must be a positive integer");
 }
 
+/** Adds a retry delay while rejecting overflow beyond safe millisecond precision.
+ * @param now - Current clock time in milliseconds.
+ * @param delayMs - Delay in milliseconds.
+ * @returns The safe resulting millisecond time.
+ */
 function addTime(now: number, delayMs: number): number {
   if (delayMs > Number.MAX_SAFE_INTEGER - now)
     throw new JobQueueStateError("Retry availability time is invalid");

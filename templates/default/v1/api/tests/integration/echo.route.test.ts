@@ -2,7 +2,7 @@ import { afterAll, expect, test } from "bun:test";
 import { createTestApplication } from "@relkit/testing";
 import config from "../../relkit.config.js";
 
-const testApp = await createTestApplication(config);
+const testApp = await createTestApplication(config, { resourceProviders: "fake" });
 
 test("POST /echo", async () => {
   const response = await testApp.http.request("/echo", {

@@ -2,6 +2,7 @@ import { asyncIteratorObject, ORPCError, os, type AnyProcedure, type ErrorMap } 
 import type { TaskJobNode } from "@relkit/graph";
 import type { RouteMaterializationOptions } from "../materialize-routes.js";
 import type { RpcContext } from "../rpc.js";
+import { jobEnvelopeSchema, jobItemSchema } from "./common.js";
 import {
   cancelJobRun,
   getJobRun,
@@ -11,12 +12,15 @@ import {
   triggerJob,
   watchJobRun,
 } from "./handlers.js";
-import { jobEnvelopeSchema, jobItemSchema } from "./common.js";
 import { exposedJobNodes, jobNodeFor, jobsErrorStatuses } from "./support.js";
 import { jobPolicy, jobsRuntime } from "./types.js";
 
 export { jobsErrorStatuses };
 
+/** Builds declared job procedures without exposing unavailable client operations.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The exposed jobs procedure tree, or an empty object when none are available.
+ */
 export function jobsProcedures(
   options: RouteMaterializationOptions,
 ): Readonly<Record<string, unknown>> {
@@ -27,6 +31,11 @@ export function jobsProcedures(
   return Object.keys(jobs).length === 0 ? {} : { jobs };
 }
 
+/** Creates the enabled procedure set for one registered job.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param job - Registered job declaration and its client operation policy.
+ * @returns The trigger and run procedures enabled by the job's declared client policy.
+ */
 function proceduresFor(
   options: RouteMaterializationOptions,
   job: TaskJobNode,
@@ -50,6 +59,13 @@ function proceduresFor(
   return result;
 }
 
+/** Builds a job request procedure with capability negotiation and error projection.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param job - Registered job declaration and its client operation policy.
+ * @param operation - Bounded domain operation or public capability name.
+ * @param handler - Native handler executed within the configured boundary.
+ * @returns An oRPC procedure validating its input envelope before the job handler runs.
+ */
 function call(
   options: RouteMaterializationOptions,
   job: TaskJobNode,
@@ -71,6 +87,13 @@ function call(
     ) as AnyProcedure;
 }
 
+/** Builds a streaming job procedure retaining lazy frame error projection.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param job - Registered job declaration and its client operation policy.
+ * @param operation - Bounded domain operation or public capability name.
+ * @param handler - Native handler executed within the configured boundary.
+ * @returns An oRPC procedure exposing a validated asynchronous stream of job items.
+ */
 function streamCall(
   options: RouteMaterializationOptions,
   job: TaskJobNode,
@@ -95,6 +118,13 @@ function streamCall(
     ) as AnyProcedure;
 }
 
+/** Runs a negotiated job action and projects its failure into the public protocol.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param job - Registered job declaration and its client operation policy.
+ * @param operation - Bounded domain operation or public capability name.
+ * @param action - Lazy protocol action executed after capability negotiation.
+ * @returns The job handler result, with recognized job failures projected to oRPC errors.
+ */
 async function invoke(
   options: RouteMaterializationOptions,
   job: TaskJobNode,
@@ -120,6 +150,10 @@ async function invoke(
   }
 }
 
+/** Extracts bounded structured metadata from a public job error.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns Recovery metadata for an unknown submission or control outcome, otherwise undefined.
+ */
 function errorData(value: unknown): unknown {
   if (!isRecord(value)) return undefined;
   if (
@@ -152,10 +186,18 @@ const jobErrors = Object.fromEntries(
   Object.keys(jobsErrorStatuses).map((code) => [code, {}]),
 ) as ErrorMap;
 
+/** Normalizes a job stream value to its required native iterator contract.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns The native async iterator supplied by the job observation iterable.
+ */
 function asAsyncIterator(value: AsyncIterable<unknown>): AsyncIteratorObject<unknown> {
   return value[Symbol.asyncIterator]() as AsyncIteratorObject<unknown>;
 }
 
+/** Selects the stable public job error code from an unknown failure.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns The failure's string code, or undefined when it has no public code.
+ */
 function errorCode(value: unknown): string | undefined {
   return value !== null &&
     typeof value === "object" &&
@@ -164,10 +206,18 @@ function errorCode(value: unknown): string | undefined {
     : undefined;
 }
 
+/** Selects a safe job error message without serializing private causes.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns The Error message, or the fixed job-failure message for other thrown values.
+ */
 function errorMessage(value: unknown): string {
   return value instanceof Error ? value.message : "Job operation failed.";
 }
 
+/** Recognizes a non-null object before reading its named properties.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns Whether the inspected value satisfies the declared type guard.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object";
 }

@@ -11,6 +11,11 @@ import { optionalCursor, recordInput } from "./common.js";
 import { assertSafeRun } from "./projection-validation.js";
 import { jobError, scopedRuntime } from "./support.js";
 
+/** Validate safe run metadata and declared input/progress/output schemas.
+ * @param descriptor - Job descriptor supplying canonical schemas and declared errors.
+ * @param run - Persisted run being inspected.
+ * @returns Nothing for valid run data; otherwise a public access-denied failure.
+ */
 export async function validateCanonicalRun(
   descriptor: JobDescriptorAny,
   run: RunSnapshot,
@@ -31,6 +36,13 @@ export async function validateCanonicalRun(
   }
 }
 
+/** Read a run through controls constrained to the trusted scope.
+ * @param runtime - Native jobs runtime.
+ * @param scope - Execution scope used to partition the operation.
+ * @param runId - Selected run identifier.
+ * @param signal - Optional caller cancellation signal.
+ * @returns The snapshot; missing reads become a public not-found error.
+ */
 export async function readRun(
   runtime: JobsRuntime,
   scope: string,
@@ -48,6 +60,10 @@ export async function readRun(
   }
 }
 
+/** Validate supported list filters, bounded text, statuses and page size.
+ * @param value - Value to validate or project.
+ * @returns The accepted list query or an access-denied failure.
+ */
 export function queryInput(value: unknown): RunListQuery {
   if (value === undefined) return {};
   const query = recordInput(value);
@@ -133,6 +149,11 @@ const RUN_STATUSES = new Set([
   "unknown",
 ]);
 
+/** Require a nonempty list filter bounded to 256 UTF-8 bytes.
+ * @param value - Value to validate or project.
+ * @param name - Field, job or stream name.
+ * @returns The validated query text.
+ */
 function boundedQueryText(value: unknown, name: string): string {
   if (
     typeof value !== "string" ||

@@ -3,6 +3,7 @@ import { restoreFile, snapshotFile } from "./preserve-build-state.ts";
 
 const root = resolve(import.meta.dir, "..");
 const inspectorNextEnv = await snapshotFile(join(root, "apps/inspector/next-env.d.ts"));
+const docsNextEnv = await snapshotFile(join(root, "apps/docs/next-env.d.ts"));
 const child = Bun.spawn([process.execPath, "x", "turbo", "run", "build"], {
   cwd: root,
   stdout: "inherit",
@@ -13,6 +14,7 @@ try {
   exitCode = await child.exited;
 } finally {
   await restoreFile(inspectorNextEnv);
+  await restoreFile(docsNextEnv);
 }
 if (exitCode !== 0) throw new Error(`Workspace build failed with exit code ${exitCode}.`);
 

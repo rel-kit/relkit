@@ -10,6 +10,11 @@ import type { JobWireEnvelope } from "@relkit/contracts/jobs";
 
 const NATIVE_STATE_VERSION = 1 as const;
 
+/** Recovers durable native run and control records into the in-memory service indexes.
+ * @param root - Owned state directory.
+ * @param state - Current service-owned state.
+ * @returns The recovered native journal owner.
+ */
 export async function openNativeStore(root: string, state: LocalNativeState): Promise<JobStore> {
   const store = await createJobStore(root, { validateData: validateNativeData });
   for (const record of store.snapshot().records) applyRecord(state, record);
@@ -17,6 +22,11 @@ export async function openNativeStore(root: string, state: LocalNativeState): Pr
   return store;
 }
 
+/** Appends the canonical native run state before acknowledging its transition.
+ * @param store - Owning persisted-state or journal operations.
+ * @param run - Current persisted native or agent run.
+ * @returns A Promise completing after the run-state record is durably appended.
+ */
 export function persistNativeRun(store: JobStore, run: LocalNativeRun): Promise<void> {
   return store
     .append({
@@ -45,6 +55,13 @@ export function persistNativeRun(store: JobStore, run: LocalNativeRun): Promise<
     .then(() => undefined);
 }
 
+/** Appends a replayable cancellation or retry receipt for idempotent controls.
+ * @param store - Owning persisted-state or journal operations.
+ * @param kind - Declared record or control kind.
+ * @param key - Application or durable-storage key.
+ * @param receipt - Stored acceptance or control receipt.
+ * @returns A Promise completing after the control receipt is durably appended.
+ */
 export function persistNativeControl(
   store: JobStore,
   kind: "cancel" | "retry",
@@ -60,6 +77,11 @@ export function persistNativeControl(
     .then(() => undefined);
 }
 
+/** Replays one validated native record into its owning run or control index.
+ * @param state - Current service-owned state.
+ * @param record - Durable record or audit entry.
+ * @returns Nothing; the validated record updates its run or control index.
+ */
 function applyRecord(state: LocalNativeState, record: JobRecord): void {
   if (record.kind === "native-run") {
     const run = readRun(record.data);
@@ -78,6 +100,10 @@ function applyRecord(state: LocalNativeState, record: JobRecord): void {
   }
 }
 
+/** Reconstructs a native run while resetting nonserializable attempt resources.
+ * @param value - Value to validate, normalize or project.
+ * @returns The recovered native run state.
+ */
 function readRun(value: JsonValue): LocalNativeRun {
   if (!isRecord(value) || value.version !== NATIVE_STATE_VERSION || value.kind !== "run") {
     throw new Error("Native run record is invalid");
@@ -118,6 +144,10 @@ function readRun(value: JsonValue): LocalNativeRun {
   };
 }
 
+/** Rejects unsupported or malformed native journal payloads during recovery.
+ * @param value - Value to validate, normalize or project.
+ * @returns Nothing; rejects invalid input with the established domain error.
+ */
 function validateNativeData(value: JsonValue): void {
   if (!isRecord(value) || value.version !== NATIVE_STATE_VERSION) {
     throw new Error("Native state record is invalid");
@@ -128,10 +158,18 @@ function validateNativeData(value: JsonValue): void {
   else throw new Error("Native state record kind is invalid");
 }
 
+/** Copies an unknown value through canonical JSON before persistence.
+ * @param value - Value to validate, normalize or project.
+ * @returns The canonical JSON copy.
+ */
 function json(value: unknown): JsonValue {
   return JSON.parse(canonicalJson(value)) as JsonValue;
 }
 
+/** Checks for a non-null, non-array object before inspecting unknown fields.
+ * @param value - Value to validate, normalize or project.
+ * @returns Whether the value is a non-null, non-array object.
+ */
 function isRecord(value: unknown): value is { readonly [key: string]: JsonValue } {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

@@ -1,7 +1,10 @@
 import { API_BASE_PATH, API_VERSION } from "@relkit/contracts";
 
+/** Protocol discriminator included in inspector responses and SSE events. */
 export const INTERNAL_ENDPOINT_PROTOCOL = "relkit.inspector" as const;
+/** Inspector response version shared with the contracts package. */
 export const INTERNAL_ENDPOINT_VERSION = API_VERSION;
+/** Reserved inspector routes installed by the runtime. */
 export const INTERNAL_ENDPOINT_PATHS = Object.freeze([
   `${API_BASE_PATH}/health/live`,
   `${API_BASE_PATH}/health/ready`,

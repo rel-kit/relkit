@@ -23,7 +23,13 @@ const CONTENT_TYPE = /^(?:[A-Za-z0-9!#$&^_.+-]+|\*)\/(?:[A-Za-z0-9!#$&^_.+-]+|\*
  * @param options - Bucket identity, visibility, and upload policy.
  * @returns A frozen bucket descriptor.
  * @throws TypeError when the authoring input is invalid.
- * @example defineBucket({ id: "assets", visibility: "public", maxObjectBytes: 1_048_576 });
+ * @example
+ * ```ts
+ * import { defineBucket } from "@relkit/buckets";
+ * const assets = defineBucket({
+ *   id: "assets", visibility: "public", maxObjectBytes: 1_048_576,
+ * });
+ * ```
  * @category Resources
  * @since 0.1.0
  */

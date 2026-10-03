@@ -21,6 +21,11 @@ export function inspectorEndpointsSource(configuration: ServerSourceConfiguratio
       counters: telemetry.exportCounters(),
       exporters: telemetry.exporterStats(),
     }),
+    runtime: {
+      events: { query: queryEventRuntime },
+      buckets: () => resourceRuntimeMetadata("bucket", plan.buckets),
+      cache: () => resourceRuntimeMetadata("cache", plan.caches),
+    },
     ...((plan.jobs ?? []).length === 0 ? {} : {
       jobs: {
       bindings: () => [...nativeJobsRuntimes.values()].map((runtime) => ({

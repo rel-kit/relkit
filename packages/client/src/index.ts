@@ -111,6 +111,42 @@ function httpLink(options: CreateClientOptions): RPCLink<Record<PropertyKey, unk
     origin: endpoint.origin,
     url: endpoint.pathname as `/${string}`,
     headers: () => resolveHeaders(options.headers),
+    interceptors: [
+      async (call) => {
+        const controller = new AbortController();
+        const signal =
+          call.signal === undefined
+            ? controller.signal
+            : AbortSignal.any([call.signal, controller.signal]);
+        const output = await call.next({ ...call, signal });
+        if (
+          output === null ||
+          typeof output !== "object" ||
+          !("next" in output) ||
+          typeof output.next !== "function" ||
+          !("return" in output) ||
+          typeof output.return !== "function" ||
+          !(Symbol.asyncIterator in output)
+        )
+          return output;
+        const iterator = output as AsyncIterableIterator<unknown>;
+        const wrapped: AsyncIterableIterator<unknown> = {
+          next: (value?: unknown) => iterator.next(value),
+          return: (value?: unknown) => {
+            // Cancelling the decoder alone can leave the HTTP connection open.
+            // Abort its owning request before waiting for an in-flight pull.
+            controller.abort();
+            return iterator.return?.(value) ?? Promise.resolve({ done: true, value });
+          },
+          throw: (error?: unknown) => {
+            controller.abort();
+            return iterator.throw?.(error) ?? Promise.reject(error);
+          },
+          [Symbol.asyncIterator]: () => wrapped,
+        };
+        return wrapped;
+      },
+    ],
     fetch: (url, init) => fetcher(url, { ...init, credentials: options.credentials ?? "include" }),
   });
 }

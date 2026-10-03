@@ -1,0 +1,105 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+ ❯ packages/runtime-hono/tests/rpc-error-status.test.ts (6 tests | 5 failed) 14ms
+   × RPC retains the standard BAD_REQUEST status 9ms
+   × RPC retains the standard UNAUTHORIZED status 1ms
+   × RPC retains the standard FORBIDDEN status 1ms
+   × RPC retains the standard NOT_FOUND status 1ms
+   × RPC retains the standard TOO_MANY_REQUESTS status 1ms
+ ❯ packages/runtime-hono/tests/realtime-rpc.test.ts (2 tests | 1 failed) 579ms
+   × managed realtime iterator tails an authorized retained channel 118ms
+ Test Files  2 failed (2)
+      Tests  6 failed | 2 passed (8)
+   Start at  02:16:45
+   Duration  3.67s (transform 64%, import 27%, tests 9%)
+  Transform  transforming modules took 4.06s · 64% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  packages/runtime-hono/tests/realtime-rpc.test.ts > managed realtime iterator tails an authorized retained channel
+AssertionError: expected ORPCError: Internal Server Error { …(4) } to match object { code: 'BAD_REQUEST' }
+(4 matching properties omitted from actual)
+- Expected
++ Received
+- {
+-   "code": "BAD_REQUEST",
++ ORPCError {
++   "code": "INTERNAL_SERVER_ERROR",
+  }
+ ❯ packages/runtime-hono/tests/realtime-rpc.test.ts:78:55
+     76|     params: { id: 42 },
+     77|   });
+     78|   await expect(invalid[Symbol.asyncIterator]().next()).rejects.toMatch…
+       |                                                       ^
+     79| });
+     80|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+ FAIL  packages/runtime-hono/tests/rpc-error-status.test.ts > RPC retains the standard BAD_REQUEST status
+AssertionError: expected 500 to be 400 // Object.is equality
+- Expected
++ Received
+- 400
++ 500
+ ❯ packages/runtime-hono/tests/rpc-error-status.test.ts:20:35
+     18|   }));
+     19|   expect(result.matched).toBe(true);
+     20|   expect(result.response?.status).toBe(status);
+       |                                   ^
+     21| });
+     22|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+ FAIL  packages/runtime-hono/tests/rpc-error-status.test.ts > RPC retains the standard UNAUTHORIZED status
+AssertionError: expected 500 to be 401 // Object.is equality
+- Expected
++ Received
+- 401
++ 500
+ ❯ packages/runtime-hono/tests/rpc-error-status.test.ts:20:35
+     18|   }));
+     19|   expect(result.matched).toBe(true);
+     20|   expect(result.response?.status).toBe(status);
+       |                                   ^
+     21| });
+     22|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+ FAIL  packages/runtime-hono/tests/rpc-error-status.test.ts > RPC retains the standard FORBIDDEN status
+AssertionError: expected 500 to be 403 // Object.is equality
+- Expected
++ Received
+- 403
++ 500
+ ❯ packages/runtime-hono/tests/rpc-error-status.test.ts:20:35
+     18|   }));
+     19|   expect(result.matched).toBe(true);
+     20|   expect(result.response?.status).toBe(status);
+       |                                   ^
+     21| });
+     22|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+ FAIL  packages/runtime-hono/tests/rpc-error-status.test.ts > RPC retains the standard NOT_FOUND status
+AssertionError: expected 500 to be 404 // Object.is equality
+- Expected
++ Received
+- 404
++ 500
+ ❯ packages/runtime-hono/tests/rpc-error-status.test.ts:20:35
+     18|   }));
+     19|   expect(result.matched).toBe(true);
+     20|   expect(result.response?.status).toBe(status);
+       |                                   ^
+     21| });
+     22|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+ FAIL  packages/runtime-hono/tests/rpc-error-status.test.ts > RPC retains the standard TOO_MANY_REQUESTS status
+AssertionError: expected 500 to be 429 // Object.is equality
+- Expected
++ Received
+- 429
++ 500
+ ❯ packages/runtime-hono/tests/rpc-error-status.test.ts:20:35
+     18|   }));
+     19|   expect(result.matched).toBe(true);
+     20|   expect(result.response?.status).toBe(status);
+       |                                   ^
+     21| });
+     22|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯

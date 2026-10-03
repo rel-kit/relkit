@@ -15,7 +15,7 @@ import {
 } from "../../packages/providers-local/src/index.ts";
 import { createProviderRealtimeDispatcher } from "../../packages/realtime/src/index.ts";
 import { createApp, type RuntimeManifest } from "../../packages/runtime-hono/src/index.ts";
-import { runtimeCohort } from "../../packages/runtime-hono/test-cohort.ts";
+import { runtimeCohort } from "../../packages/runtime-hono/tests/test-cohort.ts";
 
 const AGENT_ID = "orders.order-support";
 const stateRoot = mkdtempSync(join(tmpdir(), "relkit-commerce-browser-"));

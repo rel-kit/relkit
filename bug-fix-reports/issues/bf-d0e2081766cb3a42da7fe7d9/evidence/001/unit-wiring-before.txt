@@ -1,0 +1,31 @@
+[FAIL] FAILURES:
+  (fail) generated host connects event runtime inspection [10.72ms]
+  (fail) generated host projects bucket binding features [2.05ms]
+  error: expect(received).toMatchObject(expected)
+  {
+  -   "deliveries": [
+  -     {
+  -       "state": "completed",
+  -     },
+  -   ],
+  -   "publications": [
+  -     {
+  -       "instanceId": "publication",
+  -     },
+  -   ],
+  +   "capabilities": [],
+  +   "deadLetters": [],
+  +   "deliveries": [],
+  +   "eventProtocol": "relkit.events.admin",
+  +   "eventVersion": 1,
+  +   "events": [],
+  +   "generationId": "test",
+  +   "graphHash": "sha256:test",
+  ... +13 more
+
+SUMMARY:
+   0 pass
+   2 fail
+  Ran 2 tests across 1 file. [186.00ms]
+
+[full output: rtk recall f0ca73c9bc77]

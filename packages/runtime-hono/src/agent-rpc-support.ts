@@ -1,12 +1,8 @@
-import { createHash } from "node:crypto";
-import {
-  AGENT_STATE_SCHEMA_VERSION,
-  AGENT_STREAM_VERSION,
-  canonicalJson,
-  REALTIME_RUNTIME_LIMITS,
-  type OperationId,
-} from "@relkit/contracts";
-import type { AgentRequestScope, AgentStateLimits, RunOwner } from "@relkit/agents";
+import { Context, Effect, Layer } from "effect";
+import { httpBoundary, HttpBoundaryError, observeHttp, runHttp } from "./http-effect.js";
+import type { AgentInput } from "./agent-rpc-support.types.js";
+
+import type { AgentRequestScope } from "@relkit/agents";
 import { validate, type StandardSchemaV1 } from "@relkit/schema";
 import { resolveClientIdentity } from "./client-identity.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
@@ -14,90 +10,162 @@ import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import type { RpcContext } from "./rpc.js";
 import { ORPCError } from "@orpc/server";
 import { requireClientAuthorization } from "./client-authorization.js";
+import { digest, isAgent } from "./agent-request-validation.js";
+export {
+  requireAgentThreadId,
+  agentLimits,
+  digest,
+  verifiedAgentRequestDigest,
+  encodedBytes,
+  agentOwner,
+} from "./agent-request-validation.js";
+export type { AgentInput } from "./agent-rpc-support.types.js";
 
-export interface AgentInput {
-  readonly agentId: string;
-  readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity;
-  readonly threadId?: string;
-  readonly resume?: boolean;
-  readonly waitingRevision?: string;
-  readonly runId?: string;
-  readonly operationId?: OperationId;
-  readonly kind?: string;
-  readonly payload?: unknown;
-  readonly after?: unknown;
-  readonly requestDigest?: string;
-  readonly snapshotId?: string;
-  readonly cursor?: string;
-}
-
-export function requireAgentThreadId(value: unknown): string {
-  if (typeof value !== "string" || value.length === 0 || value !== value.trim()) {
-    throw new TypeError("threadId must be a non-empty string without surrounding whitespace.");
-  }
-  return value;
-}
-
-export async function agentContext(
+/** Resolves the current principal, authorization and durable provider scope for an agent operation.
+ * @param input - Submitted operation input; validation and authorization occur before effects are admitted.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param operation - Bounded domain operation or public capability name.
+ * @returns The authorized agent descriptor, plan node, provider, durable scope and trusted context.
+ */
+const agentContextEffect = Effect.fn("AgentAccess.agentContext")(function* (
   input: AgentInput,
   context: RpcContext,
   options: RouteMaterializationOptions,
   operation: string,
 ) {
   if (options.agentRuntime === undefined || options.clientIdentity === undefined)
-    throw new Error("Agent client runtime is unavailable.");
+    return yield* Effect.fail(
+      new HttpBoundaryError({
+        operation: "agent.agentContext",
+        cause: new Error("Agent client runtime is unavailable."),
+      }),
+    );
+  const { agentRuntime, clientIdentity } = options;
   const node = options.plan.agents.find((candidate) => candidate.id === input.agentId);
   const descriptor = getEntry(options.manifest.agents ?? {}, input.agentId);
   if (node === undefined || node.client === undefined || !isAgent(descriptor))
-    throw new ORPCError("NOT_FOUND", { message: "Agent resource was not found." });
-  const identity = await resolveClientIdentity(
-    options.clientIdentity,
-    context.hono.req.raw,
-    context.auth,
-    true,
+    return yield* Effect.fail(
+      new HttpBoundaryError({
+        operation: "agent.agentContext",
+        cause: new ORPCError("NOT_FOUND", { message: "Agent resource was not found." }),
+      }),
+    );
+  const identity = yield* httpBoundary("agent.agentContext", () =>
+    Promise.resolve(
+      resolveClientIdentity(clientIdentity, context.hono.req.raw, context.auth, true),
+    ),
   );
-  const trusted = await options.agentRuntime.trustedContext?.({
-    request: context.hono.req.raw,
-    ...(context.auth === undefined ? {} : { auth: context.auth }),
-  });
+  const trusted = yield* httpBoundary("agent.agentContext", () =>
+    Promise.resolve(
+      agentRuntime.trustedContext?.({
+        request: context.hono.req.raw,
+        ...(context.auth === undefined ? {} : { auth: context.auth }),
+      }),
+    ),
+  );
   const authorize = isRecord(descriptor.client) ? descriptor.client.authorize : undefined;
   if (typeof authorize === "function") {
-    await requireClientAuthorization(
-      () =>
-        authorize(
-          {
-            agentId: input.agentId,
-            threadId: input.threadId,
-            runId: input.runId,
-            operation,
-            input: input.payload,
-          },
-          trusted,
+    yield* httpBoundary("agent.agentContext", () =>
+      Promise.resolve(
+        requireClientAuthorization(
+          () =>
+            authorize(
+              {
+                agentId: input.agentId,
+                threadId: input.threadId,
+                runId: input.runId,
+                operation,
+                input: input.payload,
+              },
+              trusted,
+            ),
+          "agent",
         ),
-      "agent",
+      ),
     );
   }
   const profile = node.stateProfile ?? "default";
-  const provider = await options.agentRuntime.provider(profile);
+  const provider = yield* httpBoundary("agent.agentContext", () =>
+    Promise.resolve(agentRuntime.provider(profile)),
+  );
   const scope: AgentRequestScope = {
     ...identity,
     applicationId: options.agentRuntime.applicationId,
     environment: options.agentRuntime.environment,
     profile,
-    providerEpoch: await provider.getEpoch(),
+    providerEpoch: yield* httpBoundary("agent.agentContext", () =>
+      Promise.resolve(provider.getEpoch()),
+    ),
     agentId: input.agentId,
     ownerScope: identity.identityScope,
     authorizationGrantId: digest({ identity, agentId: input.agentId }),
   };
   return { descriptor, node, provider, scope, trusted };
+});
+
+/** Executes agentContext at the native Promise boundary.
+ * @param input - Submitted operation input; validation and authorization occur before effects are admitted.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param operation - Bounded domain operation or public capability name.
+ * @returns The authorized agent descriptor, plan node, provider, durable scope and trusted context.
+ */
+export function agentContext(
+  input: AgentInput,
+  context: RpcContext,
+  options: RouteMaterializationOptions,
+  operation: string,
+) {
+  return runHttp(
+    Effect.gen(function* () {
+      const service = yield* AgentAccess;
+      return yield* service.agentContext(input, context, options, operation);
+    }).pipe(Effect.provide(AgentAccessLive)),
+  );
 }
 
-export async function validateAgentValue(schema: StandardSchemaV1, value: unknown) {
-  const result = await validate(schema, value as never);
-  if (!("value" in result)) throw new TypeError("Agent value validation failed.");
+/** Validates foreign Standard Schema input and preserves its public failure contract.
+ * @param schema - Foreign Standard Schema declaration used to validate public data.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns The value accepted by the declared Standard Schema; invalid values fail validation.
+ */
+const validateAgentValueEffect = Effect.fn("AgentAccess.validateAgentValue")(function* (
+  schema: StandardSchemaV1,
+  value: unknown,
+) {
+  const result = yield* httpBoundary("agent.validateAgentValue", () =>
+    Promise.resolve(validate(schema, value as never)),
+  );
+  if (!("value" in result))
+    return yield* Effect.fail(
+      new HttpBoundaryError({
+        operation: "agent.validateAgentValue",
+        cause: new TypeError("Agent value validation failed."),
+      }),
+    );
   return result.value;
+});
+
+/** Executes validateAgentValue at the native Promise boundary.
+ * @param schema - Foreign Standard Schema declaration used to validate public data.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns The value accepted by the declared Standard Schema; invalid values fail validation.
+ */
+export function validateAgentValue(schema: StandardSchemaV1, value: unknown) {
+  return runHttp(
+    Effect.gen(function* () {
+      const service = yield* AgentAccess;
+      return yield* service.validateAgentValue(schema, value);
+    }).pipe(Effect.provide(AgentAccessLive)),
+  );
 }
 
+/** Validates agent input with the declared chat-message fallback.
+ * @param resolved - Authorized agent descriptor, provider and durable request scope.
+ * @param payload - Untrusted public payload validated before application use.
+ * @returns Validated input, with a message-field fallback only for declared string chat input.
+ */
 export async function validateAgentInput(
   resolved: Awaited<ReturnType<typeof agentContext>>,
   payload: unknown,
@@ -110,60 +178,18 @@ export async function validateAgentInput(
   }
 }
 
-export const agentLimits: AgentStateLimits = {
-  maxSnapshotBytes: REALTIME_RUNTIME_LIMITS.initialSnapshotBytes,
-  maxHistoryPageBytes: REALTIME_RUNTIME_LIMITS.snapshotHistoryPageBytes,
-  maxJournalRecordBytes: REALTIME_RUNTIME_LIMITS.progressRecordBytes,
-  maxJournalBytesPerThread: REALTIME_RUNTIME_LIMITS.journalBytesPerThread,
-  maxStateBytesPerApplication: REALTIME_RUNTIME_LIMITS.agentStateBytes,
-  maxThreadsPerPrincipal: REALTIME_RUNTIME_LIMITS.threadsPerPrincipal,
-  maxActiveRunsPerPrincipal: REALTIME_RUNTIME_LIMITS.activeRunsPerPrincipal,
-  maxActiveRunsPerApplication: REALTIME_RUNTIME_LIMITS.activeRunsPerApplication,
-  terminalReserveBytes: REALTIME_RUNTIME_LIMITS.terminalReserveBytes,
-  terminalReserveRecords: REALTIME_RUNTIME_LIMITS.terminalReserveRecords,
-};
-
-export function digest(value: unknown): string {
-  return `sha256:${createHash("sha256")
-    .update(canonicalJson(value as never))
-    .digest("hex")}`;
-}
-
-export function verifiedAgentRequestDigest(input: AgentInput): string {
-  const value =
-    input.resume === true
-      ? { payload: input.payload, waitingRevision: input.waitingRevision }
-      : input.payload;
-  const actual = digest(value);
-  if (input.requestDigest !== undefined && input.requestDigest !== actual) {
-    throw new TypeError("Agent request digest does not match its payload.");
+/** Lazy agent domain workflows with typed native failures. */
+export class AgentAccess extends Context.Service<
+  AgentAccess,
+  {
+    readonly agentContext: typeof agentContextEffect;
+    readonly validateAgentValue: typeof validateAgentValueEffect;
   }
-  return actual;
-}
+>()("@relkit/runtime-hono/AgentAccess") {}
 
-export function encodedBytes(value: unknown): number {
-  return new TextEncoder().encode(JSON.stringify(value)).byteLength;
-}
-
-export function agentOwner(options: RouteMaterializationOptions, profile: string): RunOwner {
-  return {
-    generationId: options.agentRuntime!.generationId,
-    publicFingerprint: options.agentRuntime!.publicFingerprint,
-    protocolVersion: AGENT_STREAM_VERSION,
-    schemaVersion: AGENT_STATE_SCHEMA_VERSION,
-    providerScope: profile,
-  };
-}
-
-function isAgent(value: unknown): value is {
-  readonly input: StandardSchemaV1;
-  readonly output: StandardSchemaV1;
-  readonly client?: unknown;
-  readonly chat?: { readonly input?: unknown; readonly output?: unknown };
-} {
-  return isRecord(value) && isSchema(value.input) && isSchema(value.output);
-}
-
-function isSchema(value: unknown): value is StandardSchemaV1 {
-  return isRecord(value) && isRecord(value["~standard"]) && value["~standard"].version === 1;
-}
+/** Live operations; tests can replace the same contract. */
+export const AgentAccessLive = Layer.succeed(AgentAccess, {
+  agentContext: (...args) => observeHttp("agent.agentContext", agentContextEffect(...args)),
+  validateAgentValue: (...args) =>
+    observeHttp("agent.validateAgentValue", validateAgentValueEffect(...args)),
+});

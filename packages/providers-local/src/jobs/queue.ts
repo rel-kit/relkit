@@ -1,4 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { Effect } from "effect";
+import { nativeNow } from "../native-services.js";
+import { localOperation, localSync, runLocalSync } from "../local-effect.js";
 import { normalizeId } from "@relkit/contracts";
 import type { JobStore } from "./store.js";
 import { readEntry } from "./queue-entry.js";
@@ -25,9 +28,13 @@ import {
 export { JOB_QUEUE_STATES, JobQueueStateError } from "./queue-utils.js";
 export type * from "./queue-utils.js";
 
-/** Provides durable queue state plus process-owned leases. */
+/** Provides durable queue state plus process-owned leases.
+ * @param store - Owning persisted-state or journal operations.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @returns The durable queue mutation and inspection interface.
+ */
 export function createJobQueue(store: JobStore, options: JobQueueOptions = {}): JobQueue {
-  const clock = options.now ?? Date.now;
+  const clock = options.now ?? nativeNow;
   const ownerToken = normalizeOwnerToken(options.ownerToken ?? randomUUID());
   const leaseDurationMs = options.leaseDurationMs ?? DEFAULT_LEASE_DURATION_MS;
   const idempotency =
@@ -56,10 +63,20 @@ export function createJobQueue(store: JobStore, options: JobQueueOptions = {}): 
     leaseDurationMs,
     idempotency,
   });
+  /**
+   * Sorts queue entries by acceptance order and stable instance identity.
+   * @returns A new ordered entry array.
+   */
   const ordered = (): JobQueueEntry[] =>
     [...state.entries.values()].sort(
       (a, b) => a.order - b.order || a.instanceId.localeCompare(b.instanceId),
     );
+  /**
+   * Selects currently eligible available entries using validated time and bounds.
+   * @param limit - Maximum number of selected entries.
+   * @param time - Clock time in milliseconds.
+   * @returns The immutable bounded selection.
+   */
   const selectAvailable = (
     limit = Number.MAX_SAFE_INTEGER,
     time = clock(),
@@ -73,6 +90,10 @@ export function createJobQueue(store: JobStore, options: JobQueueOptions = {}): 
         .slice(0, limit),
     );
   };
+  /**
+   * Counts entries by their current durable queue lifecycle state.
+   * @returns The immutable state-count record.
+   */
   const counts = (): JobQueueCounts => {
     const result = Object.fromEntries(JOB_QUEUE_STATES.map((state) => [state, 0])) as Record<
       JobQueueState,
@@ -92,9 +113,27 @@ export function createJobQueue(store: JobStore, options: JobQueueOptions = {}): 
     adminDeadLetter: mutations.adminDeadLetter,
     recover: mutations.recover,
     expire: mutations.expire,
-    selectAvailable,
-    get: (instanceId: string) => state.entries.get(normalizeId(instanceId)),
-    counts,
-    snapshot: () => Object.freeze(ordered()),
+    selectAvailable: (limit?: number, time?: number) =>
+      runLocalSync(
+        localOperation(
+          "JobQueue.selectAvailable",
+          localSync(() => selectAvailable(limit, time)),
+        ),
+      ),
+    get: (instanceId: string) =>
+      runLocalSync(
+        localOperation(
+          "JobQueue.get",
+          localSync(() => state.entries.get(normalizeId(instanceId))),
+        ),
+      ),
+    counts: () => runLocalSync(localOperation("JobQueue.counts", Effect.sync(counts))),
+    snapshot: () =>
+      runLocalSync(
+        localOperation(
+          "JobQueue.snapshot",
+          Effect.sync(() => Object.freeze(ordered())),
+        ),
+      ),
   });
 }

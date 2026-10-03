@@ -6,8 +6,11 @@ import {
   startRootSpan,
 } from "@relkit/invocation";
 import type { JobOperationContext } from "@relkit/jobs/legacy";
-import { Tracer } from "effect";
+import { observeExecution } from "@relkit/runtime-effect";
+import { Cause, Effect, Exit, Tracer } from "effect";
+import { enginePromise, runEnginePromise } from "./engine-runtime.js";
 import type { InvocationAdmit } from "./invoke-types.js";
+import { transitionJobFailure } from "./materialize-jobs-retry.js";
 import type {
   JobEnqueueOptions,
   JobInvocationOptions,
@@ -18,8 +21,15 @@ import type {
   JobRunResult,
   MaterializedJob,
 } from "./materialize-jobs-types.js";
-import { transitionJobFailure } from "./materialize-jobs-retry.js";
 
+/** Bind native queue acceptance and durable attempt transitions to one validated policy.
+ * @returns Queue enqueue and attempt operations sharing one validated policy.
+ * @param queue - Native durable queue handle.
+ * @param policy - Validated queue retry and idempotency policy.
+ * @param admit - Generation-local coordinated admission callback.
+ * @param triggerLimit - Optional capacity limit for this trigger.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 export function createBinding(
   queue: JobQueueHandle,
   policy: JobPolicy,
@@ -27,6 +37,12 @@ export function createBinding(
   triggerLimit: number | undefined,
   options: JobMaterializationOptions,
 ): MaterializedJob {
+  /** Accept a queue entry and make newly accepted work immediately available.
+   * @param input - Canonical JSON payload for the queued invocation.
+   * @param request - Native acceptance, scheduling and idempotency options.
+   * @param context - Producer propagation retained on the durable entry.
+   * @returns The accepted entry after its initial availability transition.
+   */
   const enqueue = async (
     input: JsonValue,
     request: JobEnqueueOptions = {},
@@ -46,12 +62,22 @@ export function createBinding(
         })
       : accepted;
   };
+  /** Lease and execute one entry under its own optional consumer trace.
+   * @param instanceId - Specific entry to acquire, or undefined for the next available entry.
+   * @returns The persisted attempt outcome, or undefined when no entry can be leased.
+   */
   const runNext = async (instanceId?: string): Promise<JobRunResult | undefined> => {
     const leased = await queue.acquire(instanceId);
     if (leased === undefined) return undefined;
     const propagation = parseTracePropagation(leased.propagation);
-    const run = (traceId?: string) =>
-      runAttempt(queue, policy, admit, triggerLimit, options, leased, propagation, traceId);
+    /** Execute the leased attempt using the selected consumer trace identity.
+     * @param traceId - Optional trace created by this queue's configured span runtime.
+     * @returns The invocation result and persisted queue transition.
+     */
+    const run = (traceId?: string): Promise<JobRunResult> =>
+      runEnginePromise(
+        runAttemptEffect(queue, policy, admit, triggerLimit, options, leased, propagation, traceId),
+      );
     if (options.spanRuntime === undefined) return runDetachedExecution(run);
     return runDetachedExecution(() => {
       const runtime = options.spanRuntime!;
@@ -108,61 +134,90 @@ export function createBinding(
   });
 }
 
-async function runAttempt(
-  queue: JobQueueHandle,
-  policy: JobPolicy,
-  admit: InvocationAdmit,
-  triggerLimit: number | undefined,
-  options: JobMaterializationOptions,
-  leased: JobQueueEntry,
-  propagation: ReturnType<typeof parseTracePropagation>,
-  traceId?: string,
-): Promise<JobRunResult> {
-  let value: unknown;
-  try {
-    value = await options.engine.invoke({
-      functionId: policy.targetFunctionId,
-      input: leased.input,
-      source: "job",
-      attempt: leased.attempt,
-      ...(triggerLimit === undefined ? {} : { triggerLimit }),
-      ...(policy.timeoutMs === undefined ? {} : { timeoutMs: policy.timeoutMs }),
-      ...({ admit } satisfies Pick<JobInvocationOptions, "admit">),
-      ...(propagation?.correlationId === undefined
-        ? {}
-        : { correlationId: propagation.correlationId }),
-      ...(propagation?.originRequestId === undefined
-        ? {}
-        : { originRequestId: propagation.originRequestId }),
-      ...(traceId === undefined ? {} : { traceId }),
-      ...(traceId !== undefined || propagation === undefined
-        ? {}
-        : { links: [propagation.producer] }),
-    });
-  } catch (cause) {
-    const failed = await transitionJobFailure(queue, leased, policy.retry, cause, {
-      ...(options.now === undefined ? {} : { now: options.now }),
-      ...(options.random === undefined ? {} : { random: options.random }),
-    });
-    if (failed.entry.state !== "delayed" && failed.entry.state !== "dead-lettered")
-      throw new Error("Retry did not produce a terminal queue outcome");
+/** Invoke one leased attempt and persist its completion or retry outcome.
+ * @param queue - Durable queue that owns the leased entry.
+ * @param policy - Validated invocation and retry policy.
+ * @param admit - Coordinated function and trigger admission callback.
+ * @param triggerLimit - Optional trigger capacity limit.
+ * @param options - Engine, clock, and randomness dependencies.
+ * @param leased - Entry acquired for this attempt.
+ * @param propagation - Validated producer trace and request context.
+ * @param traceId - Trace started by the optional job span runtime.
+ * @returns The persisted queue outcome and invocation value or classified failure.
+ */
+const runAttemptEffect = Effect.fn("Engine.jobs.runAttempt")(
+  function* (
+    queue: JobQueueHandle,
+    policy: JobPolicy,
+    admit: InvocationAdmit,
+    triggerLimit: number | undefined,
+    options: JobMaterializationOptions,
+    leased: JobQueueEntry,
+    propagation: ReturnType<typeof parseTracePropagation>,
+    traceId?: string,
+  ) {
+    let value: unknown;
+    const attempted = yield* Effect.exit(
+      Effect.gen(function* () {
+        return yield* enginePromise(() =>
+          Promise.resolve(
+            options.engine.invoke({
+              functionId: policy.targetFunctionId,
+              input: leased.input,
+              source: "job",
+              attempt: leased.attempt,
+              ...(triggerLimit === undefined ? {} : { triggerLimit }),
+              ...(policy.timeoutMs === undefined ? {} : { timeoutMs: policy.timeoutMs }),
+              ...({ admit } satisfies Pick<JobInvocationOptions, "admit">),
+              ...(propagation?.correlationId === undefined
+                ? {}
+                : { correlationId: propagation.correlationId }),
+              ...(propagation?.originRequestId === undefined
+                ? {}
+                : { originRequestId: propagation.originRequestId }),
+              ...(traceId === undefined ? {} : { traceId }),
+              ...(traceId !== undefined || propagation === undefined
+                ? {}
+                : { links: [propagation.producer] }),
+            }),
+          ),
+        );
+      }),
+    );
+    if (Exit.isFailure(attempted)) {
+      const cause = Cause.squash(attempted.cause);
+      const failed = yield* enginePromise(() =>
+        Promise.resolve(
+          transitionJobFailure(queue, leased, policy.retry, cause, {
+            ...(options.now === undefined ? {} : { now: options.now }),
+            ...(options.random === undefined ? {} : { random: options.random }),
+          }),
+        ),
+      );
+      if (failed.entry.state !== "delayed" && failed.entry.state !== "dead-lettered")
+        return yield* Effect.fail(new Error("Retry did not produce a terminal queue outcome"));
+      return {
+        instanceId: leased.instanceId,
+        attempt: leased.attempt,
+        state: failed.entry.state,
+        entry: failed.entry,
+        classification: failed.classification,
+        failure: failed.failure,
+      };
+    }
+    value = attempted.value;
+    const entry = yield* enginePromise(() =>
+      queue.transition(leased.instanceId, "completed", {
+        expectedState: "leased",
+      }),
+    );
     return {
       instanceId: leased.instanceId,
       attempt: leased.attempt,
-      state: failed.entry.state,
-      entry: failed.entry,
-      classification: failed.classification,
-      failure: failed.failure,
+      state: "completed" as const,
+      entry,
+      value,
     };
-  }
-  const entry = await queue.transition(leased.instanceId, "completed", {
-    expectedState: "leased",
-  });
-  return {
-    instanceId: leased.instanceId,
-    attempt: leased.attempt,
-    state: "completed",
-    entry,
-    value,
-  };
-}
+  },
+  (effect) => observeExecution("engine", "jobs.runAttempt", effect),
+);

@@ -1,3 +1,11 @@
+import {
+  pageLimit,
+  validateQuery,
+  assertVersion,
+  assertMode,
+  safeId,
+  readReason,
+} from "./admin-validation.js";
 import { deepFreeze, normalizeId, parseTracePropagation } from "@relkit/contracts";
 import type { EventDeliveryLedgerRecord } from "./delivery-types.js";
 import {
@@ -6,8 +14,6 @@ import {
   type EventContract,
   type EventContractInput,
   type EventDeliveryContract,
-  type EventAdminMode,
-  type EventVersioned,
   type EventPublicationContract,
   type EventQueryRequest,
   type EventTriggerCapabilityContract,
@@ -17,6 +23,20 @@ import { EventAdminError } from "./admin-errors.js";
 import type { EventTriggerSnapshot } from "./router-types.js";
 import type { EventLogRecord } from "./log.js";
 
+export {
+  pageLimit,
+  validateQuery,
+  assertVersion,
+  assertMode,
+  safeId,
+  readReason,
+} from "./admin-validation.js";
+
+/** Adds the event-admin protocol identity and freezes the response.
+ * @param value - Value to validate, normalize or project.
+ * @returns The frozen value carrying the administration protocol identity.
+ * @typeParam T - Shape preserved by this operation.
+ */
 export function versioned<T extends object>(
   value: T,
 ): T & {
@@ -25,6 +45,11 @@ export function versioned<T extends object>(
 } {
   return deepFreeze({ protocol: EVENT_ADMIN_PROTOCOL, version: EVENT_ADMIN_VERSION, ...value });
 }
+/** Adds the event protocol identity and freezes the contract projection.
+ * @param value - Value to validate, normalize or project.
+ * @returns The frozen value carrying the event protocol identity.
+ * @typeParam T - Shape preserved by this operation.
+ */
 export function eventVersioned<T extends object>(
   value: T,
 ): T & {
@@ -37,9 +62,17 @@ export function eventVersioned<T extends object>(
     ...value,
   });
 }
+/** Projects a declared event contract into the versioned inspector representation.
+ * @param value - Value to validate, normalize or project.
+ * @returns The versioned event contract projection.
+ */
 export function toEvent(value: EventContractInput): EventContract {
   return eventVersioned({ ...value });
 }
+/** Projects trigger identity, target and delivery mode into inspection fields.
+ * @param value - Value to validate, normalize or project.
+ * @returns The safe trigger inspection projection.
+ */
 export function toTrigger(value: EventTriggerSnapshot): EventTriggerContract {
   return versioned({
     id: value.id,
@@ -53,6 +86,10 @@ export function toTrigger(value: EventTriggerSnapshot): EventTriggerContract {
     ...(value.timeoutMs === undefined ? {} : { timeoutMs: value.timeoutMs }),
   });
 }
+/** Projects the actual persistence, recovery and overflow guarantees of a trigger.
+ * @param value - Value to validate, normalize or project.
+ * @returns The actual declared trigger capabilities.
+ */
 export function toCapability(value: EventTriggerSnapshot): EventTriggerCapabilityContract {
   const durable = value.delivery === "durable";
   return versioned({
@@ -67,6 +104,10 @@ export function toCapability(value: EventTriggerSnapshot): EventTriggerCapabilit
   });
 }
 
+/** Projects a publication record into bounded inspection metadata.
+ * @param value - Value to validate, normalize or project.
+ * @returns The safe publication inspection record.
+ */
 export function toPublication(value: EventLogRecord): EventPublicationContract {
   const envelope = value.envelope;
   const propagation = parseTracePropagation(envelope.propagation);
@@ -91,6 +132,10 @@ export function toPublication(value: EventLogRecord): EventPublicationContract {
   });
 }
 
+/** Projects a delivery ledger record into its versioned public status.
+ * @param value - Value to validate, normalize or project.
+ * @returns The immutable delivery status projection.
+ */
 export function toDelivery(value: EventDeliveryLedgerRecord): EventDeliveryContract {
   const envelope = value.envelope;
   return eventVersioned({
@@ -110,6 +155,11 @@ export function toDelivery(value: EventDeliveryLedgerRecord): EventDeliveryContr
   });
 }
 
+/** Applies optional event, trigger and state filters to an inspected delivery.
+ * @param value - Value to validate, normalize or project.
+ * @param request - Caller domain request.
+ * @returns Whether the candidate satisfies all supplied filters.
+ */
 export function matches(value: EventDeliveryContract, request: EventQueryRequest): boolean {
   if (request.eventId !== undefined && value.eventId !== normalizeId(request.eventId)) return false;
   if (request.eventVersion !== undefined && value.version !== request.eventVersion) return false;
@@ -119,6 +169,11 @@ export function matches(value: EventDeliveryContract, request: EventQueryRequest
   return states === undefined || states.includes(value.state);
 }
 
+/** Validates the cursor and selects deliveries after its stable ordering key.
+ * @param value - Value to validate, normalize or project.
+ * @param cursor - Opaque continuation cursor from a previous page.
+ * @returns Whether the record sorts strictly after the validated cursor.
+ */
 export function afterCursor(value: EventDeliveryContract, cursor: string | undefined): boolean {
   if (cursor === undefined) return true;
   const [raw, id] = cursor.split(":", 2);
@@ -128,73 +183,10 @@ export function afterCursor(value: EventDeliveryContract, cursor: string | undef
   return value.cursor > sequence || (value.cursor === sequence && value.deliveryId > id);
 }
 
+/** Encodes the stable ordering key for the next delivery page.
+ * @param value - Value to validate, normalize or project.
+ * @returns The stable continuation cursor.
+ */
 export function nextCursor(value: EventDeliveryContract): string {
   return `${value.cursor}:${value.deliveryId}`;
-}
-
-export function pageLimit(value: number | undefined): number {
-  if (value === undefined) return 50;
-  if (!Number.isSafeInteger(value) || value < 1)
-    throw new EventAdminError("RELKIT_EVENT_ADMIN_QUERY_INVALID", "Event query limit is invalid");
-  return Math.min(value, 100);
-}
-
-export function validateQuery(request: EventQueryRequest): void {
-  if (request.eventId !== undefined) normalizeId(request.eventId);
-  if (request.triggerId !== undefined) normalizeId(request.triggerId);
-  if (
-    request.eventVersion !== undefined &&
-    (!Number.isSafeInteger(request.eventVersion) || request.eventVersion < 1)
-  )
-    throw new EventAdminError("RELKIT_EVENT_ADMIN_QUERY_INVALID", "Event version is invalid");
-  const states = request.states ?? (request.state === undefined ? [] : [request.state]);
-  if (states.some((state) => !isState(state)))
-    throw new EventAdminError("RELKIT_EVENT_ADMIN_QUERY_INVALID", "Event query state is invalid");
-}
-
-export function assertVersion(value: unknown): void {
-  if (!isRecord(value))
-    throw new EventAdminError(
-      "RELKIT_EVENT_ADMIN_REQUEST_INVALID",
-      "Event admin request is invalid",
-    );
-  if (
-    (value.protocol !== undefined && value.protocol !== EVENT_ADMIN_PROTOCOL) ||
-    (value.version !== undefined && value.version !== EVENT_ADMIN_VERSION)
-  )
-    throw new EventAdminError(
-      "RELKIT_EVENT_ADMIN_PROTOCOL_MISMATCH",
-      "Unsupported event admin protocol",
-    );
-}
-
-export function assertMode(value: string): asserts value is EventAdminMode {
-  if (value !== "development" && value !== "test" && value !== "production")
-    throw new EventAdminError("RELKIT_EVENT_ADMIN_MODE_INVALID", "Event admin mode is invalid");
-}
-
-export function safeId(value: unknown): string | undefined {
-  try {
-    return normalizeId(value);
-  } catch {
-    return undefined;
-  }
-}
-
-export function readReason(value: unknown): string | undefined {
-  if (!isRecord(value) || value.reason === undefined) return undefined;
-  if (typeof value.reason !== "string" || value.reason.trim() === "")
-    throw new EventAdminError(
-      "RELKIT_EVENT_ADMIN_REQUEST_INVALID",
-      "Event action reason is invalid",
-    );
-  return value.reason.trim().slice(0, 256);
-}
-
-function isState(value: unknown): boolean {
-  return ["available", "leased", "delayed", "completed", "dead-lettered"].includes(value as string);
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

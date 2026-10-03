@@ -1,0 +1,30 @@
+[FAIL] FAILURES:
+  (fail) API starter integration tests run after adding a full service without Docker [3797.14ms]
+  error: expect(received).toMatchObject(expected)
+  {
+  -   "code": 0,
+  +   "code": 1,
+  +   "error":
+  + "
+  + tests/integration/orders.route.test.ts:
+  +
+  + # Unhandled error between tests
+  + -------------------------------
+  + 121 |  * @param code - Bounded public provider diagnostic code.
+  + 122 |  * @param requirement - Verified logical-resource provider requirement.
+  + 123 |  * @param message - Safe compatibility diagnostic.
+  + 124 |  */
+  + 125 | export function issue(code, requirement, message) {
+  + 126 |     return new ProviderRegistryError([
+  +                  ^
+  + ProviderRegistryError: RELKIT_PROVIDER_CONFIGURATION_INVALID: provider.bucket.local connection field "bucketName" is required
+  +  issues: [
+  +   [Object ...]
+  ... +99 more
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [4.11s]
+
+[full output: rtk recall 719e40ea6d4b]

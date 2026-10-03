@@ -5,23 +5,28 @@ import {
   type RuntimeIntegrationPlan,
   type RuntimeIntegrationPlanEntry,
 } from "@relkit/contracts";
+import type { LoadedRuntimeIntegrationModule } from "./runtime-integrations.types.js";
+export type { LoadedRuntimeIntegrationModule } from "./runtime-integrations.types.js";
 
-export interface LoadedRuntimeIntegrationModule {
-  readonly packageName: string;
-  readonly packageVersion: string;
-  readonly exportName: string;
-  readonly module: unknown;
-}
-
+/** Stable public failure for invalid runtime-integration metadata. */
 export class RuntimeIntegrationMetadataError extends TypeError {
   readonly code = "RELKIT_RUNTIME_INTEGRATION_METADATA_INVALID" as const;
 
+  /** Retain the stable public diagnostic fields for this compatibility error.
+   * @param message - Safe compatibility diagnostic.
+   * @returns undefined
+   */
   constructor(message: string) {
     super(message);
     this.name = "RuntimeIntegrationMetadataError";
   }
 }
 
+/** Verify explicitly loaded integration exports before provider construction.
+ * @returns Nothing; invalid module metadata throws RuntimeIntegrationMetadataError.
+ * @param plan - Verified registration or runtime integration plan.
+ * @param modules - Explicitly loaded runtime integration exports.
+ */
 export function assertRuntimeIntegrationModules(
   plan: RuntimeIntegrationPlan,
   modules: readonly LoadedRuntimeIntegrationModule[],
@@ -51,6 +56,10 @@ export function assertRuntimeIntegrationModules(
     if (!loaded.has(key)) fail(`Planned module ${label(entries[0]!)} was not loaded.`);
 }
 
+/** Group runtime integration plan entries by exact module identity.
+ * @returns group runtime integration plan entries by exact module identity.
+ * @param entries - Normalized manifest or integration entries.
+ */
 function groupPlan(
   entries: readonly RuntimeIntegrationPlanEntry[],
 ): ReadonlyMap<string, readonly RuntimeIntegrationPlanEntry[]> {
@@ -64,6 +73,10 @@ function groupPlan(
   return result;
 }
 
+/** Read a valid runtime-integration export without coercing native metadata.
+ * @returns read a valid runtime-integration export without coercing native metadata.
+ * @param value - Native value being validated or projected.
+ */
 function metadataOf(value: unknown): RuntimeIntegrationModuleMetadata | undefined {
   if (!isRecord(value)) return undefined;
   const metadata = value.runtimeIntegration;
@@ -78,6 +91,10 @@ function metadataOf(value: unknown): RuntimeIntegrationModuleMetadata | undefine
   return metadata as unknown as RuntimeIntegrationModuleMetadata;
 }
 
+/** Recognize provider registration metadata before indexing it.
+ * @returns Whether the native value satisfies this guard.
+ * @param value - Native value being validated or projected.
+ */
 function isRegistration(value: unknown): boolean {
   return (
     isRecord(value) &&
@@ -88,6 +105,10 @@ function isRegistration(value: unknown): boolean {
   );
 }
 
+/** Build an exact package/version/export identity for module matching.
+ * @returns build an exact package/version/export identity for module matching.
+ * @param value - Native value being validated or projected.
+ */
 function moduleKey(value: {
   readonly packageName: string;
   readonly packageVersion: string;
@@ -96,6 +117,10 @@ function moduleKey(value: {
   return `${value.packageName}\0${value.packageVersion}\0${value.exportName}`;
 }
 
+/** Build a deterministic runtime registration lookup key.
+ * @returns build a deterministic runtime registration lookup key.
+ * @param value - Native value being validated or projected.
+ */
 function registrationKey(value: {
   readonly capability: string;
   readonly adapterId: string;
@@ -104,10 +129,18 @@ function registrationKey(value: {
   return `${value.capability}\0${value.adapterId}\0${value.protocolVersion}`;
 }
 
+/** Format a safe runtime registration identity for diagnostics.
+ * @returns format a safe runtime registration identity for diagnostics.
+ * @param value - Native value being validated or projected.
+ */
 function registrationLabel(value: RuntimeIntegrationPlanEntry): string {
   return `${value.capability}:${value.adapterId} protocol ${value.protocolVersion}`;
 }
 
+/** Format a safe integration identity for diagnostics.
+ * @returns format a safe integration identity for diagnostics.
+ * @param value - Native value being validated or projected.
+ */
 function label(value: {
   readonly packageName: string;
   readonly packageVersion: string;
@@ -116,12 +149,20 @@ function label(value: {
   return `${JSON.stringify(value.packageName)}@${value.packageVersion} ${JSON.stringify(value.exportName)}`;
 }
 
+/** Reject invalid runtime integration metadata with its public compatibility error.
+ * @returns Never; throws the stable compatibility error.
+ * @param message - Safe compatibility diagnostic.
+ */
 function fail(message: string): never {
   throw new RuntimeIntegrationMetadataError(
     `${message} Rebuild with \`relkit build\` or reinstall the integration package.`,
   );
 }
 
+/** Recognize non-null object records before reading native fields.
+ * @returns Whether the native value satisfies this guard.
+ * @param value - Native value being validated or projected.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

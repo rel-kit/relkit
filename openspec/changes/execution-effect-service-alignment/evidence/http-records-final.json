@@ -1,0 +1,385 @@
+[
+  {
+    "name": "original",
+    "status": 200,
+    "body": "{\"value\":\"1\"}",
+    "count": 25,
+    "counts": {
+      "request:started": 1,
+      "span:started": 2,
+      "span:updated": 19,
+      "span:completed": 2,
+      "request:completed": 1
+    },
+    "records": [
+      {
+        "signal": "request",
+        "phase": "started"
+      },
+      {
+        "signal": "span",
+        "status": "started",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "started",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "span",
+        "status": "completed",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "request",
+        "phase": "completed",
+        "status": 200
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "completed",
+        "name": "GET /bench/:value"
+      }
+    ],
+    "completedSpans": []
+  },
+  {
+    "name": "candidate",
+    "status": 200,
+    "body": "{\"value\":\"1\"}",
+    "count": 37,
+    "counts": {
+      "request:started": 1,
+      "span:started": 3,
+      "span:updated": 23,
+      "log:info": 6,
+      "span:completed": 3,
+      "request:completed": 1
+    },
+    "records": [
+      {
+        "signal": "request",
+        "phase": "started"
+      },
+      {
+        "signal": "span",
+        "status": "started",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "HTTP GET"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "log",
+        "level": "info",
+        "message": "Execution operation completed",
+        "component": "http",
+        "fields": {
+          "domain": "http",
+          "duration_ms": 1.006125,
+          "operation": "request.mapping",
+          "outcome": "success"
+        }
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "log",
+        "level": "info",
+        "message": "Execution operation completed",
+        "component": "http",
+        "fields": {
+          "domain": "engine",
+          "duration_ms": 0.830125,
+          "operation": "startInvocation",
+          "outcome": "success"
+        }
+      },
+      {
+        "signal": "span",
+        "status": "started",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "span",
+        "status": "started",
+        "name": "Engine.invocation.lifecycle"
+      },
+      {
+        "signal": "span",
+        "status": "completed",
+        "name": "Engine.invocation.lifecycle"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "span",
+        "status": "completed",
+        "name": "relkit.invoke.bench.route"
+      },
+      {
+        "signal": "log",
+        "level": "info",
+        "message": "Execution operation completed",
+        "component": "http",
+        "fields": {
+          "domain": "engine",
+          "duration_ms": 29.100292,
+          "operation": "invocation.invoke",
+          "outcome": "success"
+        }
+      },
+      {
+        "signal": "log",
+        "level": "info",
+        "message": "Execution operation completed",
+        "component": "http",
+        "fields": {
+          "domain": "http",
+          "duration_ms": 30.434291,
+          "operation": "invocation.invoke",
+          "outcome": "success"
+        }
+      },
+      {
+        "signal": "log",
+        "level": "info",
+        "message": "Execution operation completed",
+        "component": "http",
+        "fields": {
+          "domain": "http",
+          "duration_ms": 0.283459,
+          "operation": "response.success",
+          "outcome": "success"
+        }
+      },
+      {
+        "signal": "log",
+        "level": "info",
+        "message": "Execution operation completed",
+        "component": "http",
+        "fields": {
+          "domain": "http",
+          "duration_ms": 37.941667,
+          "operation": "route.handle",
+          "outcome": "success"
+        }
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "request",
+        "phase": "completed",
+        "status": 200
+      },
+      {
+        "signal": "span",
+        "status": "updated",
+        "name": "GET /bench/:value"
+      },
+      {
+        "signal": "span",
+        "status": "completed",
+        "name": "GET /bench/:value"
+      }
+    ],
+    "completedSpans": []
+  }
+]

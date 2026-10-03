@@ -1,0 +1,1 @@
+{"evidence": {"before": [{"kind": "api", "path": "evidence/001/api-before.txt"}], "after": []}, "environment": {"target": "http://127.0.0.1:3330", "api_exposed": true, "e2e_available": true, "package": "CLI-generated agent starter"}}

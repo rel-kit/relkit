@@ -1,6 +1,11 @@
-import type { MappingValue, RequestIssueCode } from "./request-mapping.js";
 import { MISSING, type Missing } from "./request-mapping-body.js";
+import type { MappingValue, RequestIssueCode } from "./request-mapping.js";
 
+/** Read a request header using case-insensitive field names.
+ * @param headers - Response or request header values.
+ * @param name - Field, job or stream name.
+ * @returns The first matching header value, or undefined.
+ */
 export function readHeader(
   headers: Readonly<Record<string, MappingValue>>,
   name: string,
@@ -11,6 +16,13 @@ export function readHeader(
   return key === undefined ? undefined : headers[key];
 }
 
+/** Read a single request value and reject repeated values.
+ * @param value - Value to validate or project.
+ * @param source - Fixed data or a callback producing the data.
+ * @param path - Request path or issue location.
+ * @param report - Callback recording a request mapping issue.
+ * @returns The scalar value or the missing-value sentinel.
+ */
 export function readScalar(
   value: MappingValue | undefined,
   source: string,
@@ -25,6 +37,14 @@ export function readScalar(
   return value;
 }
 
+/** Decode the route's named catch-all path segments.
+ * @param url - Absolute request URL.
+ * @param pattern - Declared route path pattern.
+ * @param name - Field, job or stream name.
+ * @param path - Request path or issue location.
+ * @param report - Callback recording a request mapping issue.
+ * @returns Frozen decoded segments, or the missing-value sentinel on absence/error.
+ */
 export function readPathSegments(
   url: string,
   pattern: string | undefined,
@@ -49,6 +69,13 @@ export function readPathSegments(
   }
 }
 
+/** Read one URI-decoded cookie and report duplicates or invalid escapes.
+ * @param name - Field, job or stream name.
+ * @param headers - Response or request header values.
+ * @param path - Request path or issue location.
+ * @param report - Callback recording a request mapping issue.
+ * @returns The cookie value or the missing-value sentinel.
+ */
 export function readCookie(
   name: string,
   headers: Readonly<Record<string, MappingValue>>,

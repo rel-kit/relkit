@@ -1,3 +1,4 @@
+import type { ObservedEdge } from "@relkit/graph";
 import {
   currentInvocationScope,
   resolveDescriptorIdentity,
@@ -6,10 +7,17 @@ import {
   type InvocationDispatcher,
   type InvocationTarget as SharedInvocationTarget,
 } from "@relkit/invocation";
-import type { ObservedEdge } from "@relkit/graph";
 import type { InvocationContext, InvocationTarget, InvokeOptions } from "./invoke-types.js";
 
-/** Adapts the generation-aware engine to the dependency-neutral dispatch scope. */
+/** Adapts the generation-aware engine to the dependency-neutral dispatch scope.
+ * @typeParam BaseInput - Input accepted by the generation's invocation runner.
+ * @typeParam BaseOutput - Output produced by the generation's invocation runner.
+ * @typeParam BaseContext - Handler context retaining cancellation authority.
+ * @returns A frozen dispatcher resolving canonical generation targets for child calls.
+ * @param baseOptions - Generation dependencies and parent invocation defaults.
+ * @param run - Recursive engine boundary validating and executing each child call.
+ * @param onObservedEdge - Optional advisory observer for runtime call relationships.
+ */
 export function createEngineDispatcher<
   BaseInput = unknown,
   BaseOutput = unknown,
@@ -50,6 +58,11 @@ export function createEngineDispatcher<
   return Object.freeze(dispatcher);
 }
 
+/** Deliver advisory edge telemetry without replacing the authoritative result.
+ * @returns Nothing; failures from advisory callbacks are isolated.
+ * @param hook - Optional advisory callback; observer failures cannot change execution.
+ * @param edge - Declared or observed dependency relationship.
+ */
 function notify(hook: ((edge: ObservedEdge) => void) | undefined, edge: ObservedEdge): void {
   try {
     hook?.(edge);
@@ -58,6 +71,14 @@ function notify(hook: ((edge: ObservedEdge) => void) | undefined, edge: Observed
   }
 }
 
+/** Prefer the verified generation's target while retaining shared descriptor identity.
+ * @typeParam Input - Validated handler input type.
+ * @typeParam Output - Validated handler output type.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns The verified generation target or the provided descriptor when no replacement exists.
+ * @param target - Declared target whose schema and metadata govern execution.
+ * @param registry - Verified generation registry used for canonical target lookup.
+ */
 function resolveGenerationTarget<Input, Output, Context extends { readonly signal: AbortSignal }>(
   target: SharedInvocationTarget<Input, Output, Context>,
   registry: InvokeOptions["registry"],
@@ -78,6 +99,11 @@ function resolveGenerationTarget<Input, Output, Context extends { readonly signa
   };
 }
 
+/** Retain generation dependencies while removing parent request data from child options.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns Only generation dependencies safe to inherit in a direct child.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 function engineOptions<Context extends { readonly signal: AbortSignal }>(
   options: InvocationDispatchOptions<Context> | undefined,
 ): Partial<InvokeOptions<unknown, unknown, Context>> {

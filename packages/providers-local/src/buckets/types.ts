@@ -1,10 +1,25 @@
 import type {
-  BucketCapabilities,
-  BucketCapability,
-  BucketObjectMetadata,
-  BucketOperation,
-  BucketProvider,
-} from "@relkit/buckets";
+  LocalBucketPolicy,
+  LocalBucketProviderOptions,
+  LocalBucketListOptions,
+  LocalBucketListPage,
+  LocalBucketObjectMetadata,
+  StoredLocalBucketObject,
+  LocalBucketProvider,
+  LocalBucketUnsupportedCapability,
+} from "./buckets.types.js";
+import type { BucketCapabilities } from "@relkit/buckets";
+
+export type {
+  LocalBucketPolicy,
+  LocalBucketProviderOptions,
+  LocalBucketListOptions,
+  LocalBucketListPage,
+  LocalBucketObjectMetadata,
+  StoredLocalBucketObject,
+  LocalBucketProvider,
+  LocalBucketUnsupportedCapability,
+} from "./buckets.types.js";
 
 export const LOCAL_BUCKET_CAPABILITIES: Readonly<BucketCapabilities> = Object.freeze({
   signedReadUrl: false,
@@ -13,83 +28,7 @@ export const LOCAL_BUCKET_CAPABILITIES: Readonly<BucketCapabilities> = Object.fr
 
 export const LOCAL_BUCKET_RESERVED_PREFIXES = Object.freeze([".relkit", "__relkit"]);
 
-export interface LocalBucketPolicy {
-  readonly maxObjectBytes?: number;
-  readonly allowedContentTypes?: readonly string[];
-}
-
-export interface LocalBucketProviderOptions extends LocalBucketPolicy {
-  readonly root?: string;
-  readonly stateRoot?: string;
-  readonly policy?: LocalBucketPolicy;
-  readonly pageSize?: number;
-}
-
-export interface LocalBucketListOptions {
-  readonly cursor?: string;
-  readonly limit?: number;
-}
-
-export interface LocalBucketListPage {
-  readonly items: readonly string[];
-  readonly nextCursor?: string;
-}
-
-export interface LocalBucketObjectMetadata extends BucketObjectMetadata {
-  readonly contentHash: string;
-}
-
-export interface StoredLocalBucketObject {
-  readonly version: 1;
-  readonly key: string;
-  readonly size: number;
-  readonly contentHash: string;
-  readonly etag: string;
-  readonly contentType?: string;
-  readonly metadata: Readonly<Record<string, string>>;
-  readonly data: string;
-}
-
-export type LocalBucketProvider = Omit<BucketProvider, "list"> & {
-  readonly capabilities: Readonly<BucketCapabilities>;
-  readonly root: string;
-  readonly policy: Readonly<LocalBucketPolicy>;
-  readonly list: {
-    (prefix?: string): Promise<readonly string[]>;
-    (prefix: string | undefined, options: LocalBucketListOptions): Promise<LocalBucketListPage>;
-  };
-  readonly listPage: (
-    prefix?: string,
-    options?: LocalBucketListOptions,
-  ) => Promise<LocalBucketListPage>;
-  readonly ready: () => Promise<void>;
-  readonly close: () => Promise<void>;
-  readonly inspector: {
-    readonly list: (request: {
-      readonly prefix?: string;
-      readonly cursor?: string;
-      readonly limit: number;
-      readonly signal: AbortSignal;
-    }) => Promise<{
-      readonly items: readonly { readonly key: string; readonly metadata?: BucketObjectMetadata }[];
-      readonly nextCursor?: string;
-    }>;
-    readonly preview: (request: {
-      readonly key: string;
-      readonly offset: number;
-      readonly limit: number;
-      readonly signal: AbortSignal;
-    }) => Promise<
-      | {
-          readonly bytes: Uint8Array;
-          readonly metadata: BucketObjectMetadata;
-          readonly totalBytes: number;
-        }
-      | undefined
-    >;
-  };
-};
-
+/** Preserves the public local bucket key error identity and stable error code. */
 export class LocalBucketKeyError extends TypeError {
   readonly code = "RELKIT_BUCKET_KEY_INVALID" as const;
 
@@ -99,6 +38,7 @@ export class LocalBucketKeyError extends TypeError {
   }
 }
 
+/** Preserves the public local bucket policy error identity and stable error code. */
 export class LocalBucketPolicyError extends TypeError {
   readonly code = "RELKIT_BUCKET_POLICY_INVALID" as const;
 
@@ -108,6 +48,7 @@ export class LocalBucketPolicyError extends TypeError {
   }
 }
 
+/** Preserves the public local bucket state error identity and stable error code. */
 export class LocalBucketStateError extends Error {
   readonly code = "RELKIT_BUCKET_STATE_INVALID" as const;
 
@@ -117,6 +58,7 @@ export class LocalBucketStateError extends Error {
   }
 }
 
+/** Preserves the public local bucket pagination error identity and stable error code. */
 export class LocalBucketPaginationError extends TypeError {
   readonly code = "RELKIT_BUCKET_CURSOR_INVALID" as const;
 
@@ -125,8 +67,3 @@ export class LocalBucketPaginationError extends TypeError {
     this.name = "LocalBucketPaginationError";
   }
 }
-
-export type LocalBucketUnsupportedCapability = {
-  readonly capability: BucketCapability;
-  readonly operation: BucketOperation;
-};

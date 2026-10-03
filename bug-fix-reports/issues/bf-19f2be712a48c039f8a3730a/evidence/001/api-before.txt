@@ -1,0 +1,30 @@
+PASS generated agent executes a RELKIT tool and persists its consumed response
+{"runStatus":"succeeded","duplicate":true,"observationKinds":["message-updated","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","message-updated","execution-event","message-updated","execution-event","message-updated","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","tool-started","tool-input-ready","tool-executing","tool-succeeded","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","message-updated","execution-event","message-updated","execution-event","message-updated","execution-event","execution-event","execution-event","message-updated","execution-event","message-updated","execution-event","message-updated","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","message-updated","message-updated","run-finished","snapshot"]}
+PASS generated AG-UI stream emits native state and a completed assistant response
+{"types":["RUN_STARTED","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","TEXT_MESSAGE_START","TEXT_MESSAGE_CONTENT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","TOOL_CALL_START","TOOL_CALL_ARGS","TOOL_CALL_END","CUSTOM","CUSTOM","TOOL_CALL_RESULT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","TEXT_MESSAGE_START","TEXT_MESSAGE_CONTENT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","TEXT_MESSAGE_START","TEXT_MESSAGE_CONTENT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","TEXT_MESSAGE_START","TEXT_MESSAGE_CONTENT","TOOL_CALL_RESULT","TEXT_MESSAGE_END","TEXT_MESSAGE_END","TEXT_MESSAGE_END","TEXT_MESSAGE_END","RUN_FINISHED"],"runStatus":"succeeded","todos":[{"content":"Answer the greeting","status":"completed"}]}
+FAIL generated agent rejects invalid input before acceptance: AssertionError [ERR_ASSERTION]: BAD_REQUEST should use HTTP 400
+
+500 !== 400
+
+    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/ai-verification/agents.mjs:137:14)
+    at processTicksAndRejections (native:7:39)
+PASS generated SSE function emits ordered items and one completion
+{"items":[1,2,3],"completions":1}
+PASS generated SSE failure stays explicit and redacts private error details
+{"firstItem":true,"errorFrame":true,"privateDetailsRedacted":true}
+PASS generated stream delivers incrementally and records consumer cancellation
+{"firstItemMs":34,"outcome":"cancelled","requestId":"request-397198f2-f1db-46d4-96c9-4587f75a9d8b"}
+PASS generated realtime fans out, isolates topics, replays and releases presence on abort
+{"subscribers":2,"lateReplay":[1,2],"resumedReplay":[2],"finalConnections":0}
+PASS generated realtime publishes and consumes the same event over WebSocket
+{"event":"changed","payload":{"value":7},"transport":"WebSocket"}
+Invalid realtime parameters received: {"code":"INTERNAL_SERVER_ERROR","message":"Internal Server Error"}
+FAIL generated realtime rejects invalid channel parameters: AssertionError [ERR_ASSERTION]: {"code":"INTERNAL_SERVER_ERROR","message":"Internal Server Error"}
++ actual - expected
+
++ 'INTERNAL_SERVER_ERROR'
+- 'BAD_REQUEST'
+
+    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/ai-verification/realtime.mjs:160:16)
+    at processTicksAndRejections (native:7:39)
+7/9 generated-host checks passed

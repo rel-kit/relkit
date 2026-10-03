@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "id": "bf-d0e2081766cb3a42da7fe7d9",
+  "fingerprint": "d0e2081766cb3a42da7fe7d9d5776faf8349c57bfc3b4c4ce6b7908d6d4b8fb9",
+  "identity": {
+    "entrypoint": "regression-demo validation",
+    "module": "compiler inspector runtime scaffolding",
+    "symptom": "six validation failures",
+    "scenario": "full service local docker demo",
+    "error": ""
+  },
+  "attempt": 1,
+  "created_at": "2026-10-02T21:40:38+00:00",
+  "updated_at": "2026-10-02T22:10:23+00:00",
+  "status": "verified",
+  "what": "Six validation failures in the locally scaffolded full-service demo have been corrected.",
+  "expected": "Error graph nodes and edges agree; event state and bucket features reach the inspector; request pages contain one lifecycle row per ID; domain outcomes survive HTTP completion; starter tests can isolate Docker resources.",
+  "observed": "The same five live API assertions and the fresh-scaffold test scenario now pass; browser checks confirm graph, errors, events, bucket capabilities, request uniqueness and declared-error display.",
+  "root_cause": "Compiler evaluator selection rejected callable error descriptors. Generated server omitted event/resource runtime inspection. Local event provider hid its administration query. DuckDB listed request lifecycle records without coalescing them. HTTP response completion inferred defect from 500 and overwrote declared outcomes. Starter tests instantiated configured Docker providers without test replacements.",
+  "fixed_by": "Recognize safe error constructors; expose read-only local event queries and connect generated event/resource runtime sources; rank completed requests before filtering/paging; preserve classified outcomes at response EOF; add explicit resourceProviders: fake setup to starter tests. Live Redis/MinIO/event replay, fresh CLI scaffold tests, unit regressions, browser assertions, typecheck, lint and repository checks pass.",
+  "files": [
+    "packages/compiler/src/discovery/evaluator-child-utils.ts",
+    "packages/cli/src/commands/build-server.ts",
+    "packages/cli/src/commands/build-server-http-inspector.ts",
+    "packages/cli/src/commands/build-server-runtime-support.ts",
+    "packages/providers-local/src/events/provider.ts",
+    "packages/providers-local/src/events/provider.types.ts",
+    "packages/observability/src/local/duckdb-query-effect.ts",
+    "packages/runtime-hono/src/http-response.ts",
+    "packages/testing/src/application.ts",
+    "packages/testing/src/provider-replacements.ts",
+    "packages/testing/provider-replacements.test.ts",
+    "templates/default/v1/api/tests/integration/hello.route.test.ts",
+    "templates/default/v1/api/tests/integration/echo.route.test.ts",
+    "templates/default/v1/api/tests/integration/orders.route.test.ts",
+    "templates/default/v1/minimal/tests/integration/hello.route.test.ts",
+    "templates/default/v1/agent/tests/integration/hello.route.test.ts",
+    "templates/default/v1/fullstack/tests/integration/hello.route.test.ts",
+    "tests/compiler/evaluator-error-export.test.ts",
+    "tests/inspector/generated-runtime-wiring.test.ts",
+    "packages/observability/tests/duckdb-request-pages.test.ts",
+    "packages/runtime-hono/tests/http-declared-outcome.test.ts",
+    "tests/generator/add-acceptance.test.ts"
+  ],
+  "tags": [
+    "inspector",
+    "compiler",
+    "scaffolding",
+    "observability"
+  ],
+  "related": [],
+  "scope": {
+    "modules": [
+      "compiler evaluator",
+      "generated Bun host",
+      "local event provider",
+      "inspector API",
+      "DuckDB query",
+      "HTTP response lifecycle",
+      "testing provider replacements",
+      "starter templates"
+    ],
+    "entrypoints": [
+      "GET /_relkit/v1/graph",
+      "GET /_relkit/v1/runtime/events",
+      "GET /_relkit/v1/runtime/buckets",
+      "GET /_relkit/v1/requests",
+      "POST /demo",
+      "relkit add service --full"
+    ],
+    "invariants": [
+      "Declared graph references resolve",
+      "Successful deliveries remain visible without payload disclosure",
+      "Capabilities agree with the selected binding",
+      "Completed requests replace started rows before pagination",
+      "Declared HTTP outcomes survive a 500 response",
+      "Explicit test mode isolates bucket/cache resources; default configuration checks remain enforced"
+    ]
+  },
+  "environment": {
+    "package": "packages/compiler, packages/cli, packages/providers-local, packages/observability, packages/runtime-hono, packages/testing",
+    "revision": "56cb00a4e09f7908d456848e69f6b623bd859c84 plus preserved pre-existing local changes and scoped validation fixes",
+    "target": "Local regression-demo: http://127.0.0.1:3000; inspector http://localhost:3210; independent fixture browser acceptance on 3225",
+    "api_exposed": true,
+    "e2e_available": true,
+    "monitoring": "Active local structured logs, request records and spans collected in project DuckDB through dev telemetry. No external exporter configured in this demo; runtime replay checks stored request outcomes and published/delivered event metadata."
+  },
+  "reproduction": [
+    "Run the sibling regression demo with bun run dev --local on --no-color",
+    "Run bun scripts/validation-regressions.mjs against ports 3000/3210",
+    "Create an API starter, add Billing --full, compile, and run unmodified starter integration tests",
+    "Replay affected browser pages with scripts/inspector-regressions.mjs"
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "api",
+        "path": "evidence/001/runtime-before.txt"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/scaffold-before.txt"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-graph-before.txt"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-wiring-before.txt"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-requests-before.txt"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-http-before.txt"
+      },
+      {
+        "kind": "browser",
+        "path": "evidence/001/browser-before.txt"
+      },
+      {
+        "kind": "browser",
+        "path": "evidence/001/browser-before.png"
+      }
+    ],
+    "after": [
+      {
+        "kind": "api",
+        "path": "evidence/001/runtime-after.txt"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/scaffold-after.txt"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-core-after.txt"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-requests-after.txt"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-http-after.txt"
+      },
+      {
+        "kind": "browser",
+        "path": "evidence/001/browser-after.txt"
+      },
+      {
+        "kind": "browser",
+        "path": "evidence/001/browser-after.png"
+      },
+      {
+        "kind": "browser",
+        "path": "evidence/001/browser-regressions.txt"
+      },
+      {
+        "kind": "browser",
+        "path": "evidence/001/browser-suite.txt"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/demo-live.txt"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/http-adjacent.txt"
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "rtk bun test tests/compiler/evaluator-error-export.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Exported callable error is retained in evaluator module discovery",
+        "output": "evidence/001/unit-graph-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk bun test tests/compiler/evaluator-error-export.test.ts tests/inspector/generated-runtime-wiring.test.ts packages/testing/provider-replacements.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Exported callable error is retained; generated runtime wiring and explicit fake provider mode pass",
+        "output": "evidence/001/unit-core-after.txt"
+      }
+    },
+    "runtime": {
+      "kind": "api",
+      "boundary": "Real Bun HTTP host -> engine -> Redis/MinIO/local event provider -> inspector and DuckDB telemetry",
+      "dependencies": [
+        "Actual local Docker Redis and MinIO",
+        "Actual local event log/router and delivery worker",
+        "Actual compiler graph, generated host, inspector endpoints and telemetry service"
+      ],
+      "steps": [
+        "Issue a fresh POST /demo and wait for event handling",
+        "Query graph, event runtime, bucket metadata and request pages",
+        "Issue declared error and wait for its own newly persisted request record"
+      ],
+      "before": {
+        "status": "failed",
+        "command": "rtk bun /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/validation-regressions.mjs",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Five inspector/runtime invariants hold",
+        "output": "evidence/001/runtime-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk bun run --cwd /Users/mustafaelsayed/Workspace/relkit-regression-demo test:regressions",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Five inspector/runtime invariants hold",
+        "output": "evidence/001/runtime-after.txt"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "RELKIT_INSPECTOR_BROWSER_PORT=3225 rtk bun run test:inspector:browser",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Existing inspector browser acceptance passes with real Next rendering and fixture backend",
+      "output": "evidence/001/browser-suite.txt"
+    },
+    "regressions": [
+      {
+        "kind": "integration",
+        "boundary": "CLI full-service scaffold -> generated API starter -> test application -> explicit resource fakes",
+        "status": "passed",
+        "command": "rtk bun test tests/generator/add-acceptance.test.ts -t 'API starter integration tests'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "All three unmodified API starter integration tests pass after adding a full service without Docker",
+        "output": "evidence/001/scaffold-after.txt"
+      },
+      {
+        "kind": "api",
+        "boundary": "Demo HTTP routes -> engine -> nested function, Redis, MinIO, event delivery",
+        "status": "passed",
+        "command": "rtk bun run --cwd /Users/mustafaelsayed/Workspace/relkit-regression-demo test:live",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Eleven assertions cover success, validation 422, declared error 500, missing route 404, signed download, event delivery and deletion",
+        "output": "evidence/001/demo-live.txt"
+      },
+      {
+        "kind": "e2e",
+        "boundary": "Real regression demo -> inspector API -> Next browser pages",
+        "status": "passed",
+        "command": "rtk bun run --cwd /Users/mustafaelsayed/Workspace/relkit-regression-demo test:inspector:regressions",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Graph renders, error appears, fresh publication/completed delivery visible, signed URL features advertised, 50 request links unique, declared 500 filter displays domain outcome",
+        "output": "evidence/001/browser-regressions.txt"
+      }
+    ],
+    "checks": [
+      {
+        "name": "typecheck/build",
+        "status": "passed",
+        "command": "rtk bun run typecheck",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Full repository TypeScript build and commerce compilation pass",
+        "output": "evidence/001/repo-typecheck.txt"
+      },
+      {
+        "name": "boundary",
+        "status": "passed",
+        "command": "rtk bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Repository dependency/scope boundaries pass",
+        "output": "evidence/001/repo-check.txt"
+      },
+      {
+        "name": "lint",
+        "status": "passed",
+        "command": "rtk bun run lint",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Public authoring scan passes",
+        "output": "evidence/001/lint.txt"
+      },
+      {
+        "name": "guardrails",
+        "status": "passed",
+        "command": "rtk bun test tests/phase0.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "28 repository guardrail tests pass",
+        "output": "evidence/001/guardrails.txt"
+      },
+      {
+        "name": "scaffold acceptance",
+        "status": "passed",
+        "command": "rtk bun test tests/generator/add-acceptance.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Nine scaffold acceptance tests pass",
+        "output": "evidence/001/scaffold-suite.txt"
+      },
+      {
+        "name": "inspector",
+        "status": "passed",
+        "command": "rtk bun run test:inspector",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "11 inspector tests pass",
+        "output": "evidence/001/inspector-suite.txt"
+      },
+      {
+        "name": "adjacent compiler/inspector",
+        "status": "passed",
+        "command": "rtk bun test tests/compiler/evaluator.test.ts tests/compiler/graph-construction.test.ts packages/inspector-api/*.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "50 adjacent tests pass",
+        "output": "evidence/001/adjacent-tests.txt"
+      },
+      {
+        "name": "HTTP outcomes and lifetimes",
+        "status": "passed",
+        "command": "rtk bun x vitest run packages/runtime-hono/tests/http-declared-outcome.test.ts packages/runtime-hono/tests/http-span.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Seven declared-outcome and body-lifetime tests pass",
+        "output": "evidence/001/unit-http-after.txt"
+      },
+      {
+        "name": "DuckDB pages",
+        "status": "passed",
+        "command": "rtk bun x vitest run tests/duckdb-request-pages.test.ts",
+        "cwd": "packages/observability",
+        "exit_code": 0,
+        "assertion": "Request ranking, pagination and filters pass",
+        "output": "evidence/001/unit-requests-after.txt"
+      },
+      {
+        "name": "HTTP adjacent",
+        "status": "passed",
+        "command": "rtk bun x vitest run packages/runtime-hono/tests/response-mapping.test.ts packages/runtime-hono/tests/middleware.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "17 HTTP mapping/middleware tests pass",
+        "output": "evidence/001/http-adjacent.txt"
+      },
+      {
+        "name": "format",
+        "status": "passed",
+        "command": "rtk bun x prettier --check tests/inspector/generated-runtime-wiring.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Final moved test matches formatting; other changed files were checked and formatted",
+        "output": "evidence/001/format.txt"
+      },
+      {
+        "name": "demo tests",
+        "status": "passed",
+        "command": "rtk bun run --cwd /Users/mustafaelsayed/Workspace/relkit-regression-demo test",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Six demo tests pass",
+        "output": "evidence/001/demo-test.txt"
+      },
+      {
+        "name": "demo typecheck",
+        "status": "passed",
+        "command": "rtk bun run --cwd /Users/mustafaelsayed/Workspace/relkit-regression-demo typecheck",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Demo TypeScript check passes",
+        "output": "evidence/001/demo-typecheck.txt"
+      },
+      {
+        "name": "demo check",
+        "status": "passed",
+        "command": "rtk bun run --cwd /Users/mustafaelsayed/Workspace/relkit-regression-demo check",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Demo compilation passes",
+        "output": "evidence/001/demo-check.txt"
+      }
+    ],
+    "limitations": [
+      "Release build/start/deployment were not exercised: the demo intentionally uses Docker-only development bindings and has no connected/infrastructure release sources. No cloud or paid-model calls were made.",
+      "Historical request/span records retain their original classifications; after assertions select fresh requests and wait for telemetry ingestion.",
+      "No baseline commit checkout was used; reproduction compares original and edited code within the existing dirty checkout.",
+      "The local upstream Effect checkout lacks core Effect.ts; compatible rc.115 installed source and available upstream Effectable/StackCapture tests were inspected."
+    ]
+  },
+  "notes": [
+    "Retained all reported before failures and regression outputs. Initial test setup errors were repaired before counting failure evidence.",
+    "The old demo CLI did not release its lease on SIGINT/SIGTERM; its obsolete process and telemetry worker were stopped before restarting. Current dev session and Docker services remain running.",
+    "Browser regression runner seeds a fresh publication before inspection, since a dev reload begins a new in-memory publication snapshot. Current delivery state remains persisted. It uses fresh browser contexts for separate page assertions; repeated hard navigations in a reused agent-browser context stalled script loading while inspector streams remained open. Existing inspector navigation acceptance also passed independently.",
+    "Additional sibling-demo files: VALIDATION.md, package.json, scripts/validation-regressions.mjs, scripts/inspector-regressions.mjs."
+  ]
+}

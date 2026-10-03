@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "id": "bf-b6fb29be5d2d6bd71cdfde3b",
+  "fingerprint": "b6fb29be5d2d6bd71cdfde3bd5ac9d5346a50a3ed377003bab2621f00d38bef1",
+  "identity": {
+    "entrypoint": "dev proxy HTTP and WebSocket",
+    "module": "supervisor",
+    "symptom": "own public origin denied",
+    "scenario": "default-generated-dev",
+    "error": ""
+  },
+  "attempt": 1,
+  "created_at": "2026-10-02T23:14:23+00:00",
+  "updated_at": "2026-10-02T23:38:55+00:00",
+  "status": "verified",
+  "what": "Public dev-origin HTTP mutations and WebSockets are rejected.",
+  "expected": "Browser requests from the public dev origin succeed; foreign origins remain denied.",
+  "observed": "Same-origin function invocation returned 403 ORIGIN_DENIED and WebSocket closed 1011.",
+  "root_cause": "proxy-forward.ts removed Host and proxy-websocket.ts did not retain public Host. Bun reconstructed request.url using the private child authority, so transport-security.ts compared the public Origin with the wrong port.",
+  "fixed_by": "Preserve the public request URL authority in Host for HTTP and WebSocket forwarding. Same real API reproduction and regression tests now pass.",
+  "files": [
+    "packages/supervisor/src/proxy-forward.ts",
+    "packages/supervisor/src/proxy-websocket.ts",
+    "packages/supervisor/proxy-origin.test.ts",
+    "tests/e2e-commerce/generated-ai-regressions.spec.ts"
+  ],
+  "tags": [
+    "AI-01",
+    "ai-validation",
+    "transport"
+  ],
+  "related": [],
+  "scope": {
+    "modules": [
+      "supervisor",
+      "client",
+      "runtime-hono",
+      "engine",
+      "providers-local"
+    ],
+    "entrypoints": [
+      "rtk env RELKIT_ORIGIN_PROBE_URL=http://127.0.0.1:3330 bun scripts/verify-dev-origin.mjs"
+    ],
+    "invariants": [
+      "Browser requests from the public dev origin succeed; foreign origins remain denied.",
+      "Foreign origins remain rejected; successful tools and event streams retain their contracts."
+    ]
+  },
+  "environment": {
+    "package": "CLI-generated agent starter",
+    "revision": "56cb00a4e09f7908d456848e69f6b623bd859c84 plus existing dirty checkout and scoped repair",
+    "target": "http://127.0.0.1:3330",
+    "api_exposed": true,
+    "e2e_available": true,
+    "dependencies": "Actual CLI builder, supervisor proxy, engine, Hono/oRPC, local persistence and public client. Offline LangChain models for deterministic regression; gpt-6-luna used separately."
+  },
+  "reproduction": [
+    "Start retained fixture on 3330/3331 without RELKIT_ALLOWED_ORIGINS.",
+    "rtk env RELKIT_ORIGIN_PROBE_URL=http://127.0.0.1:3330 bun scripts/verify-dev-origin.mjs",
+    "Use fresh thread/operation IDs and channel topics; pull lazy iterators."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "api",
+        "path": "evidence/001/api-before.txt"
+      }
+    ],
+    "after": [
+      {
+        "kind": "api",
+        "path": "evidence/001/api-after.txt"
+      },
+      {
+        "kind": "api",
+        "path": "evidence/001/demo-origin-after.txt"
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "rtk bun test packages/client/http-cancellation.test.ts packages/supervisor/proxy-origin.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "output": "evidence/001/unit-before.txt",
+        "assertion": "Same-origin HTTP returns the actual greeting; browser-origin WebSocket remains open; foreign-origin unit probe remains denied."
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk bun test packages/client/http-cancellation.test.ts packages/supervisor/proxy-origin.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/unit-after.txt",
+        "assertion": "Same-origin HTTP returns the actual greeting; browser-origin WebSocket remains open; foreign-origin unit probe remains denied."
+      }
+    },
+    "runtime": {
+      "kind": "api",
+      "boundary": "CLI public proxy -> actual transport/engine/local providers -> persisted state or presence",
+      "dependencies": [
+        "Actual CLI-generated server",
+        "Actual public HTTP/WebSocket clients",
+        "Actual local providers and engine",
+        "Deterministic offline LangChain model for baseline and regression"
+      ],
+      "steps": [
+        "rtk env RELKIT_ORIGIN_PROBE_URL=http://127.0.0.1:3330 bun scripts/verify-dev-origin.mjs",
+        "Same-origin HTTP returns the actual greeting; browser-origin WebSocket remains open; foreign-origin unit probe remains denied."
+      ],
+      "before": {
+        "status": "failed",
+        "command": "rtk env RELKIT_ORIGIN_PROBE_URL=http://127.0.0.1:3330 bun /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/verify-dev-origin.mjs",
+        "cwd": ".",
+        "exit_code": 1,
+        "output": "evidence/001/api-before.txt",
+        "assertion": "Same-origin HTTP returns the actual greeting; browser-origin WebSocket remains open; foreign-origin unit probe remains denied."
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk env RELKIT_ORIGIN_PROBE_URL=http://127.0.0.1:3330 bun /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/verify-dev-origin.mjs",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/api-after.txt",
+        "assertion": "Same-origin HTTP returns the actual greeting; browser-origin WebSocket remains open; foreign-origin unit probe remains denied."
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "rtk env RELKIT_GENERATED_HOST_URL=http://127.0.0.1:3330 bun x playwright test --config=playwright.commerce.config.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/browser.txt",
+      "assertion": "Three browser cases pass: actual generated-host origin/validation, commerce agent streaming, two-tab fanout and late-tab restore."
+    },
+    "regressions": [
+      {
+        "kind": "api",
+        "boundary": "Actual generated-host integration",
+        "status": "passed",
+        "command": "rtk env RELKIT_ORIGIN_PROBE_URL=http://127.0.0.1:3330 bun /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/verify-dev-origin.mjs",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/api-after.txt",
+        "assertion": "Same-origin HTTP returns the actual greeting; browser-origin WebSocket remains open; foreign-origin unit probe remains denied."
+      },
+      {
+        "kind": "integration",
+        "boundary": "HTTP/auto clients, supervisor forwarding, agent acceptance, auth, WebSockets",
+        "status": "passed",
+        "command": "rtk bun test packages/client packages/supervisor",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/adjacent-bun.txt",
+        "assertion": "131 client/supervisor tests pass."
+      },
+      {
+        "kind": "integration",
+        "boundary": "Hono agent, realtime, transport security and RPC error handling",
+        "status": "passed",
+        "command": "rtk bun x vitest run packages/runtime-hono/tests/agent-rpc.test.ts packages/runtime-hono/tests/realtime-rpc.test.ts packages/runtime-hono/tests/transport-security.test.ts packages/runtime-hono/tests/rpc-websocket.test.ts packages/runtime-hono/tests/rpc-error-status.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/adjacent-vitest.txt",
+        "assertion": "20 runtime cases pass."
+      }
+    ],
+    "checks": [
+      {
+        "name": "typecheck",
+        "status": "passed",
+        "command": "rtk bun x tsc -b packages/client packages/supervisor packages/runtime-hono --pretty false",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/typecheck.txt"
+      },
+      {
+        "name": "test-types",
+        "status": "passed",
+        "command": "rtk bun x tsc -p packages/runtime-hono/tsconfig.tests.json --pretty false",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/test-typecheck.txt"
+      },
+      {
+        "name": "boundaries",
+        "status": "passed",
+        "command": "rtk bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/check.txt"
+      },
+      {
+        "name": "lint",
+        "status": "passed",
+        "command": "rtk bun run lint",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/lint.txt"
+      },
+      {
+        "name": "format",
+        "status": "passed",
+        "command": "rtk bun node_modules/prettier/bin/prettier.cjs --check <changed files>",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/format.txt"
+      },
+      {
+        "name": "guardrails",
+        "status": "passed",
+        "command": "rtk bun test tests/phase0.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/guardrails.txt"
+      }
+    ],
+    "limitations": [
+      "No cloud deployment, commits, pushes, or full-repository acceptance were requested or run.",
+      "Commerce browser harness substitutes engine dispatch/backing behavior; generated-host browser and API checks use the actual engine/providers.",
+      "Existing HTTP execution logging/local telemetry is reused. No remote APM was configured for this fixture; HTTP responses and persisted state/presence provide the behavioral assertions.",
+      "The read-only Effect checkout lacks the relevant core Stream source/test files; installed pinned effect 4.0.0-rc.115 source was inspected. No Effect implementation was modified."
+    ]
+  },
+  "notes": [
+    "Actual demo public-origin HTTP/WebSocket probe passes on 3000; actual demo generated agent function returns HTTP 200 with gpt-6-luna. Credentials retained only in running process memory."
+  ]
+}

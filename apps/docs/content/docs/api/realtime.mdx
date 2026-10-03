@@ -549,6 +549,8 @@ TypeError for invalid channel options.
 **Example**
 
 ```ts
+import { defineChannel } from "@relkit/realtime";
+import { z } from "@relkit/schema";
 const alerts = defineChannel({
   id: "alerts",
   params: z.object({}),
@@ -570,7 +572,7 @@ declare const defineChannel: <
 ) => ChannelDescriptor<Id, ParamsSchema, Events, Client, Presence>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L125)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L132)
 
 Since v0.4.0
 
@@ -651,7 +653,7 @@ isChannelDescriptor(channel);
 declare const isChannelDescriptor: (value: unknown) => value is ChannelDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L155)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L162)
 
 ## isChannelDescriptorEffect
 
@@ -669,7 +671,7 @@ Effect.runSync(isChannelDescriptorEffect(channel));
 declare const isChannelDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L143)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L150)
 
 ## triggerChannelEffect
 

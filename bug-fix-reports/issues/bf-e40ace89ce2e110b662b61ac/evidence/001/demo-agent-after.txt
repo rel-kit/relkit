@@ -1,0 +1,9 @@
+{
+  "model": "gpt-6-luna",
+  "status": 200,
+  "output": {
+    "answer": "Luna demo verified."
+  }
+}
+PASS existing demo agent executes through its generated engine function
+{"demoClientPolicy":null,"demoStateProfile":null,"demoChannelCount":0}

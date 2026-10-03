@@ -1,0 +1,139 @@
+{
+  "protocol": "relkit.execution-comparison",
+  "iterations": 200,
+  "rounds": 3,
+  "results": [
+    {
+      "round": 0,
+      "name": "original",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 1997.655,
+        "averageMs": 9.988,
+        "p50Ms": 9.421,
+        "p95Ms": 13.005,
+        "opsPerSecond": 100.117
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2268.94,
+        "averageMs": 11.345,
+        "p50Ms": 10.627,
+        "p95Ms": 15.156,
+        "opsPerSecond": 88.147
+      }
+    },
+    {
+      "round": 0,
+      "name": "candidate",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2929.678,
+        "averageMs": 14.648,
+        "p50Ms": 13.291,
+        "p95Ms": 18.142,
+        "opsPerSecond": 68.267
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 3220.579,
+        "averageMs": 16.103,
+        "p50Ms": 15.051,
+        "p95Ms": 20.614,
+        "opsPerSecond": 62.101
+      }
+    },
+    {
+      "round": 1,
+      "name": "candidate",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2838.055,
+        "averageMs": 14.19,
+        "p50Ms": 13.171,
+        "p95Ms": 18.656,
+        "opsPerSecond": 70.471
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 3237.514,
+        "averageMs": 16.188,
+        "p50Ms": 14.92,
+        "p95Ms": 21.501,
+        "opsPerSecond": 61.776
+      }
+    },
+    {
+      "round": 1,
+      "name": "original",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2293.115,
+        "averageMs": 11.466,
+        "p50Ms": 9.93,
+        "p95Ms": 16.262,
+        "opsPerSecond": 87.218
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2421.285,
+        "averageMs": 12.106,
+        "p50Ms": 10.889,
+        "p95Ms": 17.252,
+        "opsPerSecond": 82.601
+      }
+    },
+    {
+      "round": 2,
+      "name": "original",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2131.569,
+        "averageMs": 10.658,
+        "p50Ms": 9.67,
+        "p95Ms": 14.949,
+        "opsPerSecond": 93.828
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2394.55,
+        "averageMs": 11.973,
+        "p50Ms": 10.709,
+        "p95Ms": 17.505,
+        "opsPerSecond": 83.523
+      }
+    },
+    {
+      "round": 2,
+      "name": "candidate",
+      "direct": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 2920.596,
+        "averageMs": 14.603,
+        "p50Ms": 13.113,
+        "p95Ms": 20.117,
+        "opsPerSecond": 68.479
+      },
+      "route": {
+        "iterations": 200,
+        "warmups": 10,
+        "totalMs": 3314.31,
+        "averageMs": 16.572,
+        "p50Ms": 14.752,
+        "p95Ms": 22.973,
+        "opsPerSecond": 60.344
+      }
+    }
+  ]
+}

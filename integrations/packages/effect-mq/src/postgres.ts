@@ -1,5 +1,6 @@
 import { PgClient, PgTypes } from "@effect/sql-pg";
 import { Effect, Layer, Redacted, Result } from "effect";
+import { EffectMqPgCompatibility } from "./postgres-listen.js";
 import {
   DrizzleJobStore,
   mqDedupe,
@@ -58,6 +59,8 @@ export function createEffectMqPostgresLayer(
     );
   }
   const pg = PgClient.layer({ url: Redacted.make(postgresUrl), types });
-  return DrizzleJobStore.layer(schema).pipe(Layer.provide(pg));
+  return DrizzleJobStore.layer(schema).pipe(
+    Layer.provide(EffectMqPgCompatibility.pipe(Layer.provide(pg))),
+  );
 }
 export const runEffectMq = Effect.runPromise;

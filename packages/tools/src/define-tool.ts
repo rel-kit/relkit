@@ -118,7 +118,21 @@ export const defineToolEffect = Effect.fn("tools.define")(
  * @param options - Function target and policy metadata.
  * @returns Frozen tool descriptor.
  * @throws TypeError for malformed target, metadata, or ID.
- * @example const tool = defineTool({ id: "orders.lookup", target, description: "Read order", sideEffect: "read", approval: "never" });
+ * @example
+ * ```ts
+ * import { defineFunction } from "@relkit/functions";
+ * import { z } from "@relkit/schema";
+ * import { defineTool } from "@relkit/tools";
+ * const lookup = defineFunction({
+ *   id: "orders.lookup", input: z.string(), output: z.string(), handler: (id) => id,
+ * });
+ * const tool = defineTool({
+ *   id: "orders.lookup-tool", target: lookup, description: "Read order",
+ *   sideEffect: "read", approval: "never",
+ * });
+ * ```
+ * @category Tools
+ * @since 0.1.0
  */
 export function defineTool<const Id extends string, const Target extends FunctionRefAny>(
   options: DefineToolOptions<Id, Target>,

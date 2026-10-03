@@ -2214,7 +2214,9 @@ TypeError for invalid options and IDs.
 **Example**
 
 ```ts
-defineCache({ id: "prices", key: z.string(), value: z.number() });
+import { defineCache } from "@relkit/cache";
+import { z } from "@relkit/schema";
+const prices = defineCache({ id: "prices", key: z.string(), value: z.number() });
 ```
 
 **Signature**
@@ -2229,7 +2231,7 @@ declare const defineCache: <
 ) => CacheDescriptor<Id, InferInput<KeySchema>, InferOutput<ValueSchema>, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L94)
 
 Since v0.1.0
 
@@ -2295,7 +2297,7 @@ assertCacheDescriptor(value);
 declare const assertCacheDescriptor: (value: unknown) => asserts value is CacheDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L142)
 
 ## assertCacheDescriptorEffect
 
@@ -2315,7 +2317,7 @@ declare const assertCacheDescriptorEffect: (
 ) => Effect.Effect<undefined, CacheDescriptorError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L127)
 
 ## defineCacheEffect
 
@@ -2361,7 +2363,7 @@ if (isCacheDescriptor(value)) console.log(value.id);
 declare const isCacheDescriptor: (value: unknown) => value is CacheDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L119)
 
 ## isCacheDescriptorEffect
 
@@ -2379,7 +2381,7 @@ Effect.runSync(isCacheDescriptorEffect(value));
 declare const isCacheDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L108)
 
 ## `define-cache.types.ts`
 

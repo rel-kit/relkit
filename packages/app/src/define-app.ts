@@ -111,7 +111,12 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
  * @param options - Environment, providers, defaults, and runtime metadata.
  * @returns A frozen application descriptor.
  * @throws The original validation error for invalid options.
- * @example defineApp({ env: defineEnv({}), server: { port: 3000 } });
+ * @example
+ * ```ts
+ * import { defineApp } from "@relkit/app";
+ * import { defineEnv } from "@relkit/config";
+ * const app = defineApp({ env: defineEnv({}), server: { port: 3000 } });
+ * ```
  * @category Application
  * @since 0.2.0
  */

@@ -5,7 +5,8 @@ export default {
   reporters: ["clear-text", "json"],
   buildCommand: "bun scripts/jobs-coverage/link-sandbox-dependencies.ts",
   disableTypeChecks: false,
-  ignorePatterns: [".relkit", ".relkit-*", "repos/effect/**"],
+  // Local CodeGraph state includes a live daemon socket that cannot be copied.
+  ignorePatterns: [".relkit", ".relkit-*", "repos/effect/**", "/.codegraph"],
   mutate: [
     "packages/jobs/src/authorization-grant.ts:20-42",
     "packages/jobs/src/authorization.ts:100-111",

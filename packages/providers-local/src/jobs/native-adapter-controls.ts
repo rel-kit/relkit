@@ -1,3 +1,4 @@
+import { nativeNow } from "../native-services.js";
 import type { RunCancellationReceipt, RunRetryReceipt } from "@relkit/contracts/jobs";
 import type {
   NativeCancelRequest,
@@ -10,6 +11,12 @@ import { controlKey, sameNamespace, terminal } from "./native-adapter-support.js
 import { createRun, handle, newRunId } from "./native-adapter-runs.js";
 import type { LocalNativeState } from "./native-adapter-types.js";
 
+/** Deduplicates cancellation, settles active state and signals the current native attempt.
+ * @param state - Current service-owned state.
+ * @param request - Caller domain request.
+ * @param context - Caller scope, cancellation and operation metadata.
+ * @returns The retained or newly accepted cancellation receipt.
+ */
 export async function cancelRun(
   state: LocalNativeState,
   request: NativeCancelRequest,
@@ -27,17 +34,23 @@ export async function cancelRun(
         runId: run.runId,
         operationId: request.operationId,
         outcome: "requested",
-        requestedAt: new Date().toISOString(),
+        requestedAt: new Date(nativeNow()).toISOString(),
       };
   if (receipt.outcome === "requested") {
     run.status = "cancelled";
-    run.completedAt = new Date().toISOString();
+    run.completedAt = new Date(nativeNow()).toISOString();
     run.controller?.abort(request.reason);
   }
   state.cancelControls.set(key, receipt);
   return receipt;
 }
 
+/** Deduplicates manual retry and creates a new run linked to the terminal original.
+ * @param state - Current service-owned state.
+ * @param request - Caller domain request.
+ * @param context - Caller scope, cancellation and operation metadata.
+ * @returns The retained or newly accepted manual retry receipt.
+ */
 export async function retryRun(
   state: LocalNativeState,
   request: NativeRetryRequest,

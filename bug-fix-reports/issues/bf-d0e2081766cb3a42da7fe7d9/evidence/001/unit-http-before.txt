@@ -1,0 +1,29 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+ ❯ packages/runtime-hono/tests/http-declared-outcome.test.ts (2 tests | 2 failed) 42ms
+   × preserves declared 500 outcomes with body=true 32ms
+   × preserves declared 500 outcomes with body=false 9ms
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  00:43:37
+   Duration  2.43s (transform 76%, import 22%, tests 2%)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  packages/runtime-hono/tests/http-declared-outcome.test.ts > preserves declared 500 outcomes with body=true
+ FAIL  packages/runtime-hono/tests/http-declared-outcome.test.ts > preserves declared 500 outcomes with body=false
+AssertionError: expected { …(21) } to match object { outcome: 'declared-error', …(2) }
+(18 matching properties omitted from actual)
+- Expected
++ Received
+  {
+    "errorId": "demo.example-error",
+-   "outcome": "declared-error",
++   "outcome": "defect",
+    "status": 500,
+  }
+ ❯ packages/runtime-hono/tests/http-declared-outcome.test.ts:19:21
+     17|   await (await app.request("http://localhost/declared")).text();
+     18|   const completed = collector.read().find((record) => record.signal ==…
+     19|   expect(completed).toMatchObject({ outcome: "declared-error", status:…
+       |                     ^
+     20|   expect(collector.read().find((record) => record.signal === "span" &&…
+     21|     .toMatchObject({ attributes: { "relkit.outcome": "declared-error" …
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯

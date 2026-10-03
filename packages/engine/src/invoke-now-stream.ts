@@ -4,11 +4,12 @@ import {
   runInInvocationScope,
   type InvocationCallStack,
   type InvocationDispatcher,
-  type TaskAncestry,
   type InvocationFailure,
+  type TaskAncestry,
 } from "@relkit/invocation";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { completeInvocation } from "./invoke-completion.js";
+import type { InvocationExecution } from "./invoke-now-stream.types.js";
 import type {
   InvocationOutcome,
   InvocationParent,
@@ -16,11 +17,13 @@ import type {
   InvokeOptions,
 } from "./invoke-types.js";
 
-interface InvocationExecution {
-  run<A>(callback: () => A): A;
-  complete(outcome: string, error?: unknown): void;
-}
-
+/** Transfer validation, admission and observation ownership to stream consumption.
+ * @typeParam Input - Validated handler input type.
+ * @typeParam Output - Validated handler output type.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns Lazy validated output whose settlement releases admission and observation scope.
+ * @param args - Execution metadata and resources whose ownership is retained by this operation.
+ */
 export function createInvocationStream<
   Input,
   Output,
@@ -40,6 +43,7 @@ export function createInvocationStream<
   readonly lease: { readonly release: () => unknown } | undefined;
   readonly admitted: boolean;
   readonly unlink: () => void;
+  readonly closeObservations?: () => Promise<void>;
 }): Output {
   return managedValidatedStream({
     source: args.source,
@@ -67,15 +71,19 @@ export function createInvocationStream<
           : normalizeFailure(streamCause, { signal: args.controller.signal });
       const streamOutcome: InvocationOutcome = streamError?.outcome ?? "success";
       args.execution.complete(streamOutcome, streamError);
-      await completeInvocation({
-        record: args.record,
-        outcome: streamOutcome,
-        error: streamError as InvocationFailure | undefined,
-        options: args.options,
-        lease: args.lease,
-        admitted: args.admitted,
-        unlink: args.unlink,
-      });
+      try {
+        await completeInvocation({
+          record: args.record,
+          outcome: streamOutcome,
+          error: streamError as InvocationFailure | undefined,
+          options: args.options,
+          lease: args.lease,
+          admitted: args.admitted,
+          unlink: args.unlink,
+        });
+      } finally {
+        await args.closeObservations?.();
+      }
     },
   }) as Output;
 }

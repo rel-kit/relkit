@@ -3,6 +3,15 @@ import { progressFrame } from "./agent-protocol-progress.js";
 import type { AgentProtocolFrame } from "./agent-protocol-stream.js";
 import { toolEventFrame, toolFrame } from "./agent-protocol-tool.js";
 
+/** Recover message, tool and approval frames for selected runs.
+ * @param snapshot - Current thread snapshot.
+ * @param runIds - Selected run IDs; continuation handling may extend this set.
+ * @param sentText - Previously emitted text indexed by message ID.
+ * @param sentParts - Previously emitted part digests indexed by part ID.
+ * @param toolInputs - Accumulated tool input text indexed by call ID.
+ * @param recoverState - Whether to include snapshot state and execution recovery frames.
+ * @returns Deduplicated frames while updating the supplied replay maps.
+ */
 export function* snapshotFrames(
   snapshot: ThreadSnapshot,
   runIds: ReadonlySet<string>,
@@ -33,6 +42,14 @@ export function* snapshotFrames(
   }
 }
 
+/** Translate an accepted run event while retaining replay deduplication state.
+ * @param event - Native event to translate.
+ * @param runIds - Selected run IDs; continuation handling may extend this set.
+ * @param sentText - Previously emitted text indexed by message ID.
+ * @param sentParts - Previously emitted part digests indexed by part ID.
+ * @param toolInputs - Accumulated tool input text indexed by call ID.
+ * @returns Protocol frames for the event, or none for unselected runs.
+ */
 export function* eventFrames(
   event: AgentClientEvent,
   runIds: ReadonlySet<string>,
@@ -61,6 +78,12 @@ export function* eventFrames(
     };
   else if ("toolCallId" in event) yield toolEventFrame(event, toolInputs);
 }
+/** Close emitted text messages and report the selected run's terminal status.
+ * @param snapshot - Current thread snapshot.
+ * @param runId - Selected run identifier.
+ * @param sentText - Previously emitted text indexed by message ID.
+ * @returns Text-end frames followed by one terminal frame.
+ */
 export function* terminalFrames(
   snapshot: ThreadSnapshot,
   runId: string,
@@ -78,6 +101,11 @@ export function* terminalFrames(
   };
 }
 
+/** Check whether a selected run has reached a terminal status.
+ * @param snapshot - Current thread snapshot.
+ * @param runId - Selected run identifier.
+ * @returns False for unknown or still-active runs.
+ */
 export function terminalRun(snapshot: ThreadSnapshot, runId: string): boolean {
   const run = snapshot.currentRuns.find((candidate) => candidate.runId === runId);
   return (
@@ -86,6 +114,12 @@ export function terminalRun(snapshot: ThreadSnapshot, runId: string): boolean {
   );
 }
 
+/** Follow an approval-interrupted run to its newly active continuation.
+ * @param snapshot - Current thread snapshot.
+ * @param currentRunId - Run currently followed by the stream.
+ * @param runIds - Selected run IDs; continuation handling may extend this set.
+ * @returns The active continuation ID, also added to the selected run set.
+ */
 export function continuationRun(
   snapshot: ThreadSnapshot,
   currentRunId: string,
@@ -104,6 +138,13 @@ export function continuationRun(
   return currentRunId;
 }
 
+/** Translate changed message parts and suppress repeated part content.
+ * @param message - Public diagnostic message or browser message.
+ * @param sentText - Previously emitted text indexed by message ID.
+ * @param sentParts - Previously emitted part digests indexed by part ID.
+ * @param toolInputs - Accumulated tool input text indexed by call ID.
+ * @returns Text deltas and changed progress or tool frames.
+ */
 function* browserMessageFrames(
   message: BrowserMessage,
   sentText: Map<string, string>,
@@ -124,6 +165,11 @@ function* browserMessageFrames(
   }
 }
 
+/** Track assistant text and emit only its newly appended suffix.
+ * @param message - Public diagnostic message or browser message.
+ * @param sent - Previously emitted text indexed by message ID.
+ * @returns An initial text-start and any nonempty text delta.
+ */
 function* messageFrames(
   message: BrowserMessage,
   sent: Map<string, string>,
@@ -139,6 +185,11 @@ function* messageFrames(
   if (delta !== "") yield { kind: "text-delta", messageId: message.messageId, delta };
 }
 
+/** Find the latest assistant text accepted during the selected run.
+ * @param snapshot - Current thread snapshot.
+ * @param acceptedAt - Earliest message timestamp belonging to this run.
+ * @returns The first text part of that message, or undefined.
+ */
 function latestText(snapshot: ThreadSnapshot, acceptedAt: string): string | undefined {
   for (let index = snapshot.currentMessages.length - 1; index >= 0; index -= 1) {
     const message = snapshot.currentMessages[index]!;

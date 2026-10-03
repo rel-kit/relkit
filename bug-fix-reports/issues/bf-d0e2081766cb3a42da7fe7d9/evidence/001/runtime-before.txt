@@ -1,0 +1,18 @@
+FAIL graph contains declared error and no dangling edges: false == true
+FAIL event inspector retains accepted publication and completed delivery: no publications
+FAIL bucket runtime advertises signed URL features: runtime/buckets/demo.example-bucket
+
+404 !== 200
+
+FAIL requests return one lifecycle row per request ID: Expected values to be strictly equal:
+
+39 !== 77
+
+FAIL declared-error HTTP outcome survives response completion: Expected values to be strictly equal:
++ actual - expected
+
++ 'defect'
+- 'declared-error'
+     ^
+
+0/5 validation regressions passed

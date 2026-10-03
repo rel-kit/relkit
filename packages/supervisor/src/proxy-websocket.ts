@@ -43,7 +43,7 @@ export function upgradeProxyWebSocket(
   targetUrl.hostname = target.hostname;
   targetUrl.port = String(target.port);
   const upstream = new WebSocket(targetUrl, {
-    headers: websocketHeaders(request.headers),
+    headers: { ...websocketHeaders(request.headers), host: new URL(request.url).host },
     protocols: protocols(request.headers.get("sec-websocket-protocol")),
   });
   let released = false;

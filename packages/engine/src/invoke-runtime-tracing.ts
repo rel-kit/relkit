@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import type { ProtocolId } from "@relkit/contracts";
 import { currentExecutionContext, type InvocationRunner } from "@relkit/invocation";
 import {
@@ -10,6 +9,7 @@ import {
   type CapturedInvocationTrace,
   type InvocationTraceOptions,
 } from "@relkit/runtime-effect";
+import { Effect } from "effect";
 import type {
   InvocationIdSource,
   InvocationRecord,
@@ -17,6 +17,13 @@ import type {
   InvokeOptions,
 } from "./invoke-types.js";
 
+/** Run the handler Effect using the shared parent span and configured runtime.
+ * @typeParam Input - Validated handler input type.
+ * @typeParam Output - Validated handler output type.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns The configured runner's Promise for traced handler execution.
+ * @param args - Execution metadata and resources whose ownership is retained by this operation.
+ */
 export function runTracedInvocation<
   Input,
   Output,

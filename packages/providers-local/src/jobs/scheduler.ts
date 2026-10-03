@@ -1,116 +1,99 @@
+import { compileSchedule, ScheduleValidationError, validDate } from "./schedule-definition.js";
+import { nativeNow } from "../native-services.js";
+import type {
+  CompiledSchedule,
+  ScheduleEnqueueContext,
+  ScheduleEnqueue,
+  SchedulerRegistration,
+  SchedulerClock,
+  SchedulerOptions,
+  ScheduleRun,
+  ScheduleState,
+  Scheduler,
+  SchedulerEffects,
+} from "./scheduler.types.js";
+import { Context, Effect, Layer, Ref } from "effect";
 import {
-  canonicalJson,
-  deepFreeze,
-  normalizeId,
-  type JsonValue,
-  type MaybePromise,
-} from "@relkit/contracts";
-import type { ScheduleDefinition, ScheduleOverlap } from "@relkit/jobs/legacy";
-import { nextCronFire } from "./cron.js";
-export class ScheduleValidationError extends TypeError {
-  readonly code = "RELKIT_SCHEDULE_INVALID" as const;
+  localOperation,
+  localPromise,
+  localSync,
+  runLocal,
+  runLocalSync,
+  type LocalOperationError,
+} from "../local-effect.js";
+import { normalizeId } from "@relkit/contracts";
+import type { ScheduleDefinition } from "@relkit/jobs/legacy";
 
-  constructor(message: string) {
-    super(message);
-    this.name = "ScheduleValidationError";
-  }
-}
+export { compileSchedule, ScheduleValidationError } from "./schedule-definition.js";
+export type {
+  CompiledSchedule,
+  ScheduleEnqueueContext,
+  ScheduleEnqueue,
+  SchedulerRegistration,
+  SchedulerClock,
+  SchedulerOptions,
+  ScheduleRun,
+  Scheduler,
+} from "./scheduler.types.js";
 
-export interface CompiledSchedule {
-  readonly id: string;
-  readonly cron: string;
-  readonly timezone: string;
-  readonly input: JsonValue;
-  readonly overlap: ScheduleOverlap;
-  readonly nextFireAt: Date;
-  readonly nextFire: (currentDate: Date) => Date;
-}
-
-export interface ScheduleEnqueueContext {
-  readonly scheduleId: string;
-  readonly fireAt: Date;
-}
-
-/** The scheduler only emits work through the common job enqueue/invocation seam. */
-export type ScheduleEnqueue = (
-  input: JsonValue,
-  context: ScheduleEnqueueContext,
-) => MaybePromise<unknown>;
-
-export interface SchedulerRegistration {
-  readonly schedule: ScheduleDefinition;
-  readonly enqueue: ScheduleEnqueue;
-}
-
-export interface SchedulerClock {
-  readonly now: () => Date | number;
-}
-
-export interface SchedulerOptions {
-  readonly clock?: SchedulerClock;
-  readonly now?: () => Date | number;
-  readonly schedules?: readonly SchedulerRegistration[];
-}
-
-export interface ScheduleRun {
-  readonly scheduleId: string;
-  readonly fireAt: Date;
-  readonly status: "enqueued" | "skipped";
-  readonly result?: unknown;
-}
-
-interface ScheduleState {
-  readonly compiled: CompiledSchedule;
-  readonly enqueue: ScheduleEnqueue;
-  nextFireAt: number;
-  active: number;
-}
-
-export interface Scheduler {
-  readonly register: (schedule: ScheduleDefinition, enqueue: ScheduleEnqueue) => CompiledSchedule;
-  readonly nextFire: (scheduleId: string) => Date | undefined;
-  readonly runDue: (currentDate?: Date | number) => Promise<readonly ScheduleRun[]>;
-  readonly tick: (currentDate?: Date | number) => Promise<readonly ScheduleRun[]>;
-}
-
-/** Validates a static schedule and hides the cron parser behind native dates. */
-export function compileSchedule(
-  schedule: ScheduleDefinition,
-  options: { readonly currentDate?: Date } = {},
-): CompiledSchedule {
-  try {
-    if (!isRecord(schedule)) throw new Error("Schedule must be an object");
-    const id = normalizeId(schedule.id);
-    const cron = requiredText(schedule.cron, "cron").replace(/\s+/g, " ");
-    if (cron.split(" ").length !== 5) throw new Error("cron must have five fields");
-    const timezone = requiredText(schedule.timezone, "timezone");
-    if (!Object.prototype.hasOwnProperty.call(schedule, "input"))
-      throw new Error("schedule.input is required");
-    const input = JSON.parse(canonicalJson(schedule.input)) as JsonValue;
-    const overlap = schedule.overlap;
-    if (overlap !== "skip" && overlap !== "allow") throw new Error("overlap must be skip or allow");
-    const currentDate = validDate(options.currentDate ?? new Date(0), "current date");
-    const first = parseNext(cron, timezone, currentDate);
-    return deepFreeze({
-      id,
-      cron,
-      timezone,
-      input: deepFreeze(input),
-      overlap,
-      nextFireAt: first,
-      nextFire: (date: Date) => parseNext(cron, timezone, validDate(date, "current date")),
-    });
-  } catch (cause) {
-    if (cause instanceof ScheduleValidationError) throw cause;
-    throw new ScheduleValidationError(cause instanceof Error ? cause.message : String(cause));
-  }
-}
-
-/** Runs due schedules against an injected clock without owning or calling handlers. */
+/** Runs due schedules against an injected clock without owning or calling handlers.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @returns The synchronous registration and Promise execution compatibility interface.
+ */
 export function createScheduler(options: SchedulerOptions = {}): Scheduler {
-  const readClock = options.clock?.now ?? options.now ?? (() => new Date());
-  const states = new Map<string, ScheduleState>();
+  const service = runLocalSync(makeSchedulerService(options));
+  return Object.freeze({
+    register: (schedule: ScheduleDefinition, enqueue: ScheduleEnqueue) =>
+      runLocalSync(service.register(schedule, enqueue)),
+    nextFire: (scheduleId: string) => runLocalSync(service.nextFire(scheduleId)),
+    runDue: (currentDate?: Date | number) => runLocal(service.runDue(currentDate)),
+    tick: (currentDate?: Date | number) => runLocal(service.tick(currentDate)),
+  });
+}
 
+/** Owns schedule registrations, next-fire positions and active overlap counters. */
+export class LocalSchedulerService extends Context.Service<
+  LocalSchedulerService,
+  SchedulerEffects
+>()("@relkit/providers-local/Scheduler") {}
+
+/** Provides an explicitly driven scheduler without starting an automatic timer.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @returns The live scheduler layer without automatic background timers.
+ * @example
+ * ```ts
+ * import { Effect } from "effect";
+ * import { LocalSchedulerService, schedulerLayer } from "./scheduler.js";
+ *
+ * const program = Effect.gen(function* () {
+ *   const scheduler = yield* LocalSchedulerService;
+ *     return yield* scheduler.runDue();
+ * });
+ * await Effect.runPromise(program.pipe(Effect.provide(schedulerLayer())));
+ * ```
+ */
+export function schedulerLayer(options: SchedulerOptions = {}) {
+  return Layer.effect(LocalSchedulerService, makeSchedulerService(options));
+}
+
+/**
+ * Creates lazy registration, inspection and due-work operations over one owned state.
+ * @param options - Explicit clock and initial schedule registrations.
+ * @returns The service; independent enqueue calls retain the existing overlap semantics.
+ */
+export const makeSchedulerService = Effect.fn("Scheduler.create")(function* (
+  options: SchedulerOptions = {},
+) {
+  const readClock = options.clock?.now ?? options.now ?? (() => new Date(nativeNow()));
+  const stateRef = yield* Ref.make(new Map<string, ScheduleState>());
+  const states = Ref.getUnsafe(stateRef);
+
+  /**
+   * Validates and registers a schedule with its enqueue target and next occurrence.
+   * @param schedule - Declared cron schedule.
+   * @param enqueue - Native callback accepting a due occurrence.
+   * @returns The compiled schedule after registration.
+   */
   const register = (schedule: ScheduleDefinition, enqueue: ScheduleEnqueue): CompiledSchedule => {
     if (typeof enqueue !== "function") throw new TypeError("Schedule enqueue target is required");
     const compiled = compileSchedule(schedule, { currentDate: readDate(readClock()) });
@@ -126,16 +109,26 @@ export function createScheduler(options: SchedulerOptions = {}): Scheduler {
   };
 
   for (const registration of options.schedules ?? [])
-    register(registration.schedule, registration.enqueue);
+    yield* localSync(() => register(registration.schedule, registration.enqueue));
 
+  /**
+   * Reads the next occurrence of a registered schedule.
+   * @param scheduleId - Registered schedule identity.
+   * @returns A copied date or undefined for an unknown schedule.
+   */
   const nextFire = (scheduleId: string): Date | undefined => {
     const state = states.get(normalizeId(scheduleId));
     return state === undefined ? undefined : new Date(state.nextFireAt);
   };
 
-  const runDue = async (currentDate?: Date | number): Promise<readonly ScheduleRun[]> => {
-    const now = readDate(currentDate ?? readClock()).getTime();
-    const runs: Promise<ScheduleRun>[] = [];
+  /**
+   * Advances due occurrences and runs admitted enqueue callbacks with overlap tracking.
+   * @param currentDate - Explicit clock override for this scheduler tick.
+   * @returns A lazy effect yielding ordered enqueue and skip outcomes.
+   */
+  const runDueEffect = Effect.fn("Scheduler.runDue")(function* (currentDate?: Date | number) {
+    const now = yield* localSync(() => readDate(currentDate ?? readClock()).getTime());
+    const runs: Effect.Effect<ScheduleRun, LocalOperationError>[] = [];
     for (const state of [...states.values()].sort((a, b) =>
       a.compiled.id.localeCompare(b.compiled.id),
     )) {
@@ -143,58 +136,60 @@ export function createScheduler(options: SchedulerOptions = {}): Scheduler {
         const fireAt = new Date(state.nextFireAt);
         state.nextFireAt = state.compiled.nextFire(fireAt).getTime();
         if (state.compiled.overlap === "skip" && state.active > 0) {
-          runs.push(Promise.resolve({ scheduleId: state.compiled.id, fireAt, status: "skipped" }));
+          runs.push(Effect.succeed({ scheduleId: state.compiled.id, fireAt, status: "skipped" }));
           continue;
         }
         state.active += 1;
         runs.push(
-          Promise.resolve()
-            .then(() =>
-              state.enqueue(state.compiled.input, { scheduleId: state.compiled.id, fireAt }),
-            )
-            .then((result) => ({
+          localPromise(async () =>
+            state.enqueue(state.compiled.input, { scheduleId: state.compiled.id, fireAt }),
+          ).pipe(
+            Effect.map((result) => ({
               scheduleId: state.compiled.id,
               fireAt,
               status: "enqueued" as const,
               result,
-            }))
-            .finally(() => {
-              state.active -= 1;
-            }),
+            })),
+            Effect.ensuring(
+              Effect.sync(() => {
+                state.active -= 1;
+              }),
+            ),
+            Effect.uninterruptible,
+          ),
         );
       }
     }
-    return Promise.all(runs);
-  };
+    return yield* Effect.all(runs, { concurrency: "unbounded" });
+  });
+  /**
+   * Exposes the scheduler due-work operation through its owning instrumentation.
+   * @param currentDate - Explicit clock override for this scheduler tick.
+   * @returns The lazy effect yielding the due occurrence outcomes.
+   */
+  const runDue = (currentDate?: Date | number) =>
+    localOperation("Scheduler.runDue", runDueEffect(currentDate));
 
-  return Object.freeze({ register, nextFire, runDue, tick: runDue });
-}
+  return LocalSchedulerService.of({
+    register: (schedule, enqueue) =>
+      localOperation(
+        "Scheduler.register",
+        localSync(() => register(schedule, enqueue)),
+      ),
+    nextFire: (scheduleId) =>
+      localOperation(
+        "Scheduler.nextFire",
+        localSync(() => nextFire(scheduleId)),
+      ),
+    runDue,
+    tick: runDue,
+  });
+});
 
-function parseNext(cron: string, timezone: string, currentDate: Date): Date {
-  try {
-    return nextCronFire(cron, { timezone, currentDate });
-  } catch (cause) {
-    throw new ScheduleValidationError(
-      `Invalid cron/timezone: ${cause instanceof Error ? cause.message : String(cause)}`,
-    );
-  }
-}
-
-function requiredText(value: unknown, name: string): string {
-  if (typeof value !== "string" || value.trim() === "") throw new Error(`${name} is required`);
-  return value.trim();
-}
-
-function validDate(value: Date, name: string): Date {
-  const date = new Date(value.getTime());
-  if (!Number.isFinite(date.getTime())) throw new ScheduleValidationError(`${name} is invalid`);
-  return date;
-}
-
+/** Reads and validates the scheduler clock value.
+ * @param value - Value to validate, normalize or project.
+ * @returns The validated clock date.
+ */
 function readDate(value: Date | number): Date {
   return validDate(typeof value === "number" ? new Date(value) : value, "clock date");
-}
-
-function isRecord(value: unknown): value is Record<string, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

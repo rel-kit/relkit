@@ -50,6 +50,7 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
           options.deadline,
           options.onSignal,
           options.isSuspension,
+          "kind" in options.target.output && options.target.output.kind === "stream",
         ),
       ),
       Effect.flatMap((value) =>
@@ -69,6 +70,7 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
           options.deadline,
           options.onSignal,
           options.isSuspension,
+          "kind" in options.target.output && options.target.output.kind === "stream",
         ),
       ),
       Effect.flatMap((value) =>
@@ -94,13 +96,16 @@ export function invokeValueHook<Context extends { readonly signal: AbortSignal }
 ): Effect.Effect<unknown, InvocationFailure> {
   return observeInvocation(
     "lifecycle.value-hook",
-    invokeValue(
-      options.hook,
-      options.value,
-      options.context,
-      options.deadline,
-      options.onSignal,
-      options.isSuspension,
+    Effect.suspend(() =>
+      invokeValue(
+        options.hook,
+        options.value,
+        options.context,
+        options.deadline,
+        options.onSignal,
+        options.isSuspension,
+        "kind" in options.schema && options.schema.kind === "stream",
+      ),
     ).pipe(Effect.flatMap((value) => validateOutput(options.schema, value))),
   );
 }
@@ -135,6 +140,17 @@ export function baseExecutionContext(value: unknown): BaseExecutionContext {
   return runInvocationSync(baseExecutionContextEffect(value));
 }
 
+/** Invoke one declared handler or hook with its output lifetime policy.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @param handler - Optional handler or hook; absent hooks preserve the input value.
+ * @param value - Validated value supplied to the callback.
+ * @param context - Public context inherited by the callback.
+ * @param deadline - Optional absolute execution deadline.
+ * @param onSignal - Callback receiving the linked execution signal.
+ * @param isSuspension - Predicate recognizing nonterminal native continuation.
+ * @param deferredStream - Whether declared output requires cancellation during later pulls.
+ * @returns Callback output or normalized failure through the shared handler bridge.
+ */
 function invokeValue<Context extends { readonly signal: AbortSignal }>(
   handler: ((value: unknown, context: Context) => unknown) | undefined,
   value: unknown,
@@ -142,12 +158,14 @@ function invokeValue<Context extends { readonly signal: AbortSignal }>(
   deadline: number | undefined,
   onSignal: ((signal: AbortSignal) => void) | undefined,
   isSuspension: ((cause: unknown) => boolean) | undefined,
+  deferredStream = false,
 ): Effect.Effect<unknown, InvocationFailure> {
   if (handler === undefined) return Effect.succeed(value);
   return invokeUserHandler({
     handler,
     input: value,
     publicContext: context,
+    ...(deferredStream ? { deferredStream: true } : {}),
     ...(deadline === undefined ? {} : { deadline }),
     ...(onSignal === undefined ? {} : { onSignal }),
     ...(isSuspension === undefined ? {} : { isSuspension }),

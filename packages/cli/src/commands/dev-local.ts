@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import type { LocalServiceRecipeInput } from "@relkit/local-service";
 import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
 import { buildProject } from "./build.js";
-import { checkProject } from "./check.js";
+import { checkDevProject } from "./dev-check.js";
 import { localPlanFrom, reconcileLocalServices } from "./dev-local-services.js";
 export { checkedLocalArtifacts } from "./dev-local-services.js";
 import type { DevLocalServiceOwner } from "./dev-local-runtime.js";
@@ -27,12 +27,13 @@ export function createDevLocalCompiler(
   const recipes = new Map<string, LocalServiceRecipeInput>();
   return Object.freeze({
     compile: async (request: CandidateCompileRequest) => {
-      const checked = await checkProject({
-        projectRoot,
-        mode: "development",
-        generationId: `dev-${request.token.sourceToken}-${request.token.generationToken}`,
-        signal: request.signal,
-      });
+      const checked = await checkDevProject(
+        {
+          projectRoot,
+          generationId: `dev-${request.token.sourceToken}-${request.token.generationToken}`,
+        },
+        request.signal,
+      );
       if (!checked.ok)
         throw new Error(formatDevDiagnostics(projectRoot, checked.diagnostics, color));
       if (configureTelemetry) {

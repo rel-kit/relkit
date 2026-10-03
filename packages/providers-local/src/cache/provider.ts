@@ -1,196 +1,230 @@
-import { type CacheOperationContext, type CacheOperationOptions } from "@relkit/cache";
-import { createLocalCacheKey, normalizeCacheId, normalizeSchemaVersion } from "./keys.js";
-import { assertActive, clone, normalizePolicy, readClock } from "./policy.js";
-import { LocalCacheStore, MISSING } from "./store.js";
+import { promiseCacheProvider } from "./provider.adapter.js";
+import { makeCacheOperations } from "./operations.js";
+import { Clock, Context, Deferred, Effect, Layer, Ref, Semaphore } from "effect";
+import {
+  localOperation,
+  localPromise,
+  localSync,
+  runLocal,
+  runLocalSync,
+  type LocalOperationError,
+} from "../local-effect.js";
+import { normalizeCacheId, normalizeSchemaVersion } from "./keys.js";
+import { normalizePolicy, readClock } from "./policy.js";
+import { LocalCacheStore } from "./store.js";
 import {
   LOCAL_CACHE_CAPABILITIES,
   LOCAL_CACHE_DURABLE_CAPABILITIES,
-  LocalCachePolicyError,
   LocalCacheStateError,
   type LocalCacheProvider,
   type LocalCacheProviderOptions,
-  type LocalCacheSnapshot,
 } from "./types.js";
 import { readCacheState, snapshotPath, writeCacheState } from "./persistence.js";
 import { ensureOwnedDirectory, quarantineStateFile } from "../state.js";
-import { writeCacheEntry } from "./write.js";
 import { createLocalCacheInspector } from "./inspector.js";
+import type { LocalCacheEffects } from "./provider.types.js";
 
+/** Cache state, producer admission and durable writes share one owner. */
+export class LocalCacheService extends Context.Service<LocalCacheService, LocalCacheEffects>()(
+  "@relkit/providers-local/Cache",
+) {}
+
+/**
+ * Creates the existing Promise cache API over an Effect service.
+ * @param options - Namespace, byte-LRU policy, persistence and test clock settings.
+ * @returns A provider whose close operation stops further mutation.
+ */
 export function createLocalCacheProvider(
   options: LocalCacheProviderOptions = {},
 ): LocalCacheProvider {
-  const cacheId = normalizeCacheId(options.cacheId ?? "default");
-  const schemaVersion = normalizeSchemaVersion(options.schemaVersion ?? 1);
-  const policy = normalizePolicy(options);
-  const clock = options.clock ?? options.now ?? Date.now;
-  const store = new LocalCacheStore(policy);
-  const stateRoot =
-    options.stateRoot === undefined ? undefined : ensureOwnedDirectory(options.stateRoot);
-  const stateSnapshot = stateRoot === undefined ? undefined : snapshotPath(stateRoot);
-  if (stateSnapshot !== undefined) {
-    const restored = readCacheState(stateSnapshot, cacheId, schemaVersion);
-    if (restored !== undefined) {
-      try {
-        store.restore(restored);
-      } catch {
-        quarantineStateFile(stateSnapshot, stateRoot!);
-      }
-    }
-  }
-  const flights = new Map<string, Promise<unknown>>();
-  let pendingWrite: Promise<void> = Promise.resolve();
-  let closed = false;
+  return promiseCacheProvider(runLocalSync(makeLocalCacheService(options)));
+}
 
-  const snapshot = (): LocalCacheSnapshot => {
-    store.purgeExpired(readClock(clock));
-    return Object.freeze({
-      version: 1,
+/**
+ * Provides a cache and commits its final snapshot at scope exit.
+ * @param options - Cache configuration.
+ * @returns A substitutable live cache layer.
+ * @example
+ * ```ts
+ * import { Effect } from "effect";
+ * import { LocalCacheService, localCacheLayer } from "./provider.js";
+ *
+ * const program = Effect.gen(function* () {
+ *   const cache = yield* LocalCacheService;
+ *     yield* cache.set("answer", 42);
+ *     return yield* cache.get("answer");
+ * });
+ * await Effect.runPromise(program.pipe(Effect.provide(localCacheLayer())));
+ * ```
+ */
+export function localCacheLayer(options: LocalCacheProviderOptions = {}) {
+  return Layer.effect(
+    LocalCacheService,
+    Effect.acquireRelease(makeLocalCacheService(options), (service) =>
+      service.close().pipe(Effect.orDie),
+    ),
+  );
+}
+
+/**
+ * Acquires the cache's indexes, serialization permit and producer coordination.
+ * @param options - Namespace, policy, persistence and optional legacy clock.
+ * @returns A synchronous construction effect with lazy operation methods.
+ * @remarks The persisted byte-LRU representation is retained; in-flight producers are never persisted.
+ */
+export const makeLocalCacheService: (
+  options?: LocalCacheProviderOptions,
+) => Effect.Effect<LocalCacheEffects, LocalOperationError> = Effect.fn("Cache.create")(
+  function* (options: LocalCacheProviderOptions = {}) {
+    const cacheId = yield* localSync(() => normalizeCacheId(options.cacheId ?? "default"));
+    const schemaVersion = yield* localSync(() =>
+      normalizeSchemaVersion(options.schemaVersion ?? 1),
+    );
+    const policy = yield* localSync(() => normalizePolicy(options));
+    const store = new LocalCacheStore(policy);
+    const requestedRoot = options.stateRoot;
+    const stateRoot =
+      requestedRoot === undefined
+        ? undefined
+        : yield* localSync(() => ensureOwnedDirectory(requestedRoot));
+    const path = stateRoot === undefined ? undefined : snapshotPath(stateRoot);
+    if (path !== undefined) {
+      const restored = yield* localSync(() => readCacheState(path, cacheId, schemaVersion));
+      if (restored !== undefined && stateRoot !== undefined)
+        yield* localSync(() => {
+          try {
+            store.restore(restored);
+          } catch {
+            quarantineStateFile(path, stateRoot);
+          }
+        });
+    }
+    const closed = yield* Ref.make(false);
+    const flights = yield* Ref.make(
+      new Map<string, Deferred.Deferred<unknown, LocalOperationError>>(),
+    );
+    const writes = yield* Semaphore.make(1);
+    const configuredClock = options.clock ?? options.now;
+    /**
+     * Reads the configured cache clock or the caller Effect Clock.
+     * @returns A lazy effect yielding current milliseconds.
+     */
+    const time = () =>
+      configuredClock !== undefined
+        ? localSync(() => readClock(configuredClock))
+        : Clock.currentTimeMillis;
+    /**
+     * Checks whether the owner still admits new operations.
+     * @returns A lazy validation effect failing with the established closed-owner error.
+     */
+    const ensureOpen = () =>
+      Effect.flatMap(Ref.get(closed), (value) =>
+        localSync(() => {
+          if (value) throw new LocalCacheStateError("Cache provider is closed");
+        }),
+      );
+    /**
+     * Copies owner state into its safe immutable inspection representation.
+     * @returns The snapshot operation without exposing mutable owner state.
+     */
+    const snapshot = Effect.fn("Cache.snapshot")(
+      function* () {
+        const now = yield* time();
+        store.purgeExpired(now);
+        return Object.freeze({
+          version: 1 as const,
+          cacheId,
+          schemaVersion,
+          ...store.snapshot(),
+          inFlight: (yield* Ref.get(flights)).size,
+        });
+      },
+      (effect) => localOperation("Cache.snapshot", effect),
+    );
+    /**
+     * Notifies the optional cache observer without allowing its failure to alter cache results.
+     * @returns A lazy effect completing after isolated observation.
+     */
+    const changed = () =>
+      Effect.flatMap(snapshot(), (value) => localSync(() => options.onSnapshot?.(value))).pipe(
+        Effect.ignore,
+      );
+    /**
+     * Serializes cache snapshot writes through the persistence permit.
+     * @returns A lazy effect completing after the captured snapshot is committed.
+     */
+    const persist = () =>
+      path === undefined
+        ? Effect.void
+        : Effect.gen(function* () {
+            const value = store.exportState();
+            yield* writes.withPermits(1)(
+              localPromise(() => writeCacheState(path, value, cacheId, schemaVersion)).pipe(
+                Effect.uninterruptible,
+              ),
+            );
+          });
+    const operations = makeCacheOperations({
       cacheId,
       schemaVersion,
-      ...store.snapshot(),
-      inFlight: flights.size,
+      policy,
+      store,
+      flights,
+      time,
+      ensureOpen,
+      changed,
+      persist,
     });
-  };
-  const changed = (): void => {
-    try {
-      options.onSnapshot?.(snapshot());
-    } catch {
-      // Snapshot observers are advisory and cannot change cache behavior.
-    }
-  };
-  const ensureOpen = (): void => {
-    if (closed) throw new LocalCacheStateError("Cache provider is closed");
-  };
-  const read = (key: unknown, context?: CacheOperationContext): unknown | typeof MISSING => {
-    ensureOpen();
-    const encoded = createLocalCacheKey(cacheId, schemaVersion, key);
-    const result = store.read(encoded, assertActive(context, clock));
-    if (result.expired) changed();
-    return result.value;
-  };
-  const get = async (
-    key: unknown,
-    context?: CacheOperationContext,
-  ): Promise<unknown | undefined> => {
-    const value = read(key, context);
-    return value === MISSING ? undefined : clone(value);
-  };
-  const set = async (
-    key: unknown,
-    value: unknown,
-    optionsValue?: CacheOperationOptions,
-    context?: CacheOperationContext,
-  ): Promise<void> => {
-    ensureOpen();
-    const encoded = createLocalCacheKey(cacheId, schemaVersion, key);
-    writeCacheEntry(store, policy, encoded, value, optionsValue, assertActive(context, clock));
-    await persist();
-    changed();
-  };
-  const remove = async (key: unknown, context?: CacheOperationContext): Promise<void> => {
-    ensureOpen();
-    const encoded = createLocalCacheKey(cacheId, schemaVersion, key);
-    assertActive(context, clock);
-    if (store.remove(encoded)) {
-      await persist();
-      changed();
-    }
-  };
-  const has = async (key: unknown, context?: CacheOperationContext): Promise<boolean> =>
-    (await get(key, context)) !== undefined;
-  const getOrSet = async (
-    key: unknown,
-    produce: () => unknown | Promise<unknown>,
-    optionsValue?: CacheOperationOptions,
-    context?: CacheOperationContext,
-  ): Promise<unknown> => {
-    const cached = read(key, context);
-    if (cached !== MISSING) return clone(cached);
-    const encoded = createLocalCacheKey(cacheId, schemaVersion, key);
-    const existing = flights.get(encoded);
-    if (existing !== undefined) return existing.then(clone);
-    const flight = produceAndStore(produce, encoded, optionsValue, context);
-    flights.set(encoded, flight);
-    try {
-      return await flight;
-    } finally {
-      if (flights.get(encoded) === flight) flights.delete(encoded);
-    }
-  };
-  const increment = async (
-    key: unknown,
-    delta: number,
-    optionsValue?: CacheOperationOptions,
-    context?: CacheOperationContext,
-  ): Promise<number> => {
-    if (typeof delta !== "number" || !Number.isFinite(delta)) {
-      throw new LocalCachePolicyError("Cache increment delta must be finite");
-    }
-    const current = read(key, context);
-    const value = current === MISSING ? 0 : current;
-    if (typeof value !== "number" || !Number.isFinite(value)) {
-      throw new LocalCachePolicyError("Cache increment requires a finite numeric value");
-    }
-    const result = value + delta;
-    if (!Number.isFinite(result)) throw new LocalCachePolicyError("Cache increment overflowed");
-    await set(key, result, optionsValue, context);
-    return result;
-  };
-  const close = async (): Promise<void> => {
-    if (closed) return;
-    if (stateSnapshot !== undefined) {
-      store.purgeExpired(readClock(clock));
-      await persist();
-    }
-    closed = true;
-    await pendingWrite;
-    store.clear();
-    flights.clear();
-  };
-
-  const capabilities =
-    stateRoot === undefined ? LOCAL_CACHE_CAPABILITIES : LOCAL_CACHE_DURABLE_CAPABILITIES;
-  const inspector = createLocalCacheInspector(store, () => readClock(clock));
-
-  return Object.freeze({
-    capabilities,
-    cacheId,
-    schemaVersion,
-    policy,
-    snapshot,
-    ...(stateRoot === undefined ? {} : { stateRoot }),
-    ready: async () => undefined,
-    get,
-    set,
-    delete: remove,
-    has,
-    getOrSet,
-    increment,
-    inspector,
-    close,
-  });
-
-  async function produceAndStore(
-    produce: () => unknown | Promise<unknown>,
-    encoded: string,
-    optionsValue: CacheOperationOptions | undefined,
-    context: CacheOperationContext | undefined,
-  ): Promise<unknown> {
-    const value = await produce();
-    ensureOpen();
-    const now = assertActive(context, clock);
-    writeCacheEntry(store, policy, encoded, value, optionsValue, now);
-    await persist();
-    changed();
-    return clone(value);
-  }
-
-  function persist(): Promise<void> {
-    if (stateSnapshot === undefined) return Promise.resolve();
-    const state = store.exportState();
-    pendingWrite = pendingWrite.then(() =>
-      writeCacheState(stateSnapshot, state, cacheId, schemaVersion),
+    const close = yield* Effect.cached(
+      Effect.fn("Cache.close")(
+        function* () {
+          if (yield* Ref.get(closed)) return;
+          yield* Ref.set(closed, true);
+          if (path !== undefined) {
+            store.purgeExpired(yield* time());
+            yield* persist();
+          }
+          yield* writes.withPermits(1)(Effect.void);
+          store.clear();
+        },
+        (effect) => localOperation("Cache.close", effect),
+      )(),
     );
-    return pendingWrite;
-  }
-}
+    const inspector = createLocalCacheInspector(store, () =>
+      readClock(options.clock ?? options.now ?? Date.now),
+    );
+    return LocalCacheService.of({
+      metadata: {
+        cacheId,
+        schemaVersion,
+        policy,
+        capabilities:
+          stateRoot === undefined ? LOCAL_CACHE_CAPABILITIES : LOCAL_CACHE_DURABLE_CAPABILITIES,
+        ...(stateRoot === undefined ? {} : { stateRoot }),
+      },
+      snapshot,
+      ...operations,
+      close: () => close,
+      ready: Effect.fn("Cache.ready")(() => localOperation("Cache.ready", Effect.void)),
+      inspector: {
+        scan: (request) =>
+          runLocal(
+            localOperation(
+              "Cache.inspectScan",
+              localPromise(() => inspector.scan(request)),
+            ),
+            request.signal,
+          ),
+        value: (request) =>
+          runLocal(
+            localOperation(
+              "Cache.inspectValue",
+              localPromise(() => inspector.value(request)),
+            ),
+            request.signal,
+          ),
+      },
+    });
+  },
+  (effect) => localOperation("Cache.create", effect),
+);

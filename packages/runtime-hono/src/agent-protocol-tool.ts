@@ -1,9 +1,11 @@
-import type { AgentToolEvent, BrowserMessage, ToolPartState } from "@relkit/agents";
-import type { AgentProtocolFrame } from "./agent-protocol-stream.js";
+import type { AgentToolEvent, ToolPartState } from "@relkit/agents";
+import type { ToolFrame, ToolPart } from "./agent-protocol-tool.types.js";
 
-type ToolFrame = Extract<AgentProtocolFrame, { kind: "tool" }>;
-type ToolPart = Extract<BrowserMessage["parts"][number], { kind: "tool" }>;
-
+/** Map a native tool event to its public tool phase and input delta.
+ * @param event - Native event to translate.
+ * @param inputs - Accumulated tool input text indexed by call ID.
+ * @returns A tool frame while updating the accumulated input text.
+ */
 export function toolEventFrame(event: AgentToolEvent, inputs: Map<string, string>): ToolFrame {
   const states = {
     "tool-started": "started",
@@ -32,6 +34,16 @@ export function toolEventFrame(event: AgentToolEvent, inputs: Map<string, string
   );
 }
 
+/** Project a tool part and compute only newly received input text.
+ * @param part - Tool message part to project.
+ * @param inputs - Accumulated tool input text indexed by call ID.
+ * @returns A frame retaining tool identity, phase, value and optional input delta.
+ * @example
+ * const inputs = new Map<string, string>([["call-1", "hel"]]);
+ * const frame = toolFrame({ kind: "tool", partId: "part-1", toolCallId: "call-1",
+ *   toolId: "search", state: "input-streaming", inputText: "hello" }, inputs);
+ * // frame.inputDelta === "lo"
+ */
 export function toolFrame(part: ToolPart, inputs: Map<string, string>): ToolFrame {
   const prior = inputs.get(part.toolCallId);
   if (part.state === "started") inputs.set(part.toolCallId, "");

@@ -1,9 +1,17 @@
+import { nativeNow } from "../native-services.js";
 import { randomUUID } from "node:crypto";
 import type { RunHandle, RunListQuery, RunPage, RunSnapshot } from "@relkit/contracts/jobs";
 import type { NativeRunQuery, NativeSubmission, OperationContext } from "@relkit/jobs/adapter";
 import { namespaceOf, sameNamespace, snapshotOf } from "./native-adapter-support.js";
 import type { LocalNativeRun, LocalNativeState } from "./native-adapter-types.js";
 
+/** Builds a queued native run with scoped identity, acceptance time and empty sleep checkpoints.
+ * @param request - Caller domain request.
+ * @param context - Caller scope, cancellation and operation metadata.
+ * @param runId - Run identity within its namespace.
+ * @param retryOfRunId - Original terminal run linked to this retry.
+ * @returns The initial queued native run.
+ */
 export function createRun(
   request: NativeSubmission,
   context: OperationContext,
@@ -15,7 +23,7 @@ export function createRun(
     namespace: namespaceOf(context),
     service: context.service,
     runId,
-    acceptedAt: new Date().toISOString(),
+    acceptedAt: new Date(nativeNow()).toISOString(),
     status: "queued",
     attempt: 1,
     canonicalInput: request.canonicalInput ?? { version: 1, kind: "json", value: request.input },
@@ -24,10 +32,18 @@ export function createRun(
   };
 }
 
+/** Generates a service-prefixed cryptographic run identifier.
+ * @param service - Owning service contract or service identity.
+ * @returns A service-prefixed cryptographic run identifier.
+ */
 export function newRunId(service: string): string {
   return `${service}-${randomUUID()}`;
 }
 
+/** Projects the accepted run identity into the public submission receipt.
+ * @param run - Current persisted native or agent run.
+ * @returns The accepted run receipt.
+ */
 export function handle(run: LocalNativeRun): RunHandle {
   return {
     accepted: true,
@@ -39,11 +55,21 @@ export function handle(run: LocalNativeRun): RunHandle {
   };
 }
 
+/** Resolves a native run into its public snapshot or raises the established missing-run error.
+ * @param run - Current persisted native or agent run.
+ * @returns The public state projection.
+ */
 export function snapshot(run: LocalNativeRun | undefined): RunSnapshot {
   if (run === undefined) throw new Error("Native run was not found");
   return snapshotOf(run);
 }
 
+/** Filters native runs to the caller namespace and returns a bounded ordered snapshot page.
+ * @param state - Current service-owned state.
+ * @param query - Caller inspection filters.
+ * @param context - Caller scope, cancellation and operation metadata.
+ * @returns The bounded page of namespace-visible run snapshots.
+ */
 export function listRuns(
   state: LocalNativeState,
   query: NativeRunQuery,
@@ -66,6 +92,11 @@ export function listRuns(
   };
 }
 
+/** Applies optional identity and state filters to a candidate record.
+ * @param run - Current persisted native or agent run.
+ * @param query - Caller inspection filters.
+ * @returns Whether the candidate satisfies all supplied filters.
+ */
 function matches(run: LocalNativeRun, query: RunListQuery): boolean {
   return (
     (query.runId === undefined || query.runId === run.runId) &&

@@ -1,3 +1,4 @@
+import type { IdempotencyPreparation } from "./idempotency.types.js";
 import type { JsonValue } from "@relkit/contracts";
 import {
   assertTime,
@@ -8,12 +9,12 @@ import {
   type JobQueueEntry,
 } from "./queue-utils.js";
 
-export interface IdempotencyPreparation {
-  readonly record?: JobIdempotencyRecord;
-  readonly duplicate?: JobQueueAcceptance;
-}
+export type { IdempotencyPreparation } from "./idempotency.types.js";
 
-/** Validates the static idempotency policy supplied by a job descriptor. */
+/** Validates the static idempotency policy supplied by a job descriptor.
+ * @param value - Value to validate, normalize or project.
+ * @returns The normalized deduplication policy.
+ */
 export function validateIdempotencyDefinition(value: unknown): JobIdempotencyDefinition {
   if (!isRecord(value)) throw new JobQueueStateError("Idempotency definition is invalid");
   if (typeof value.key !== "string" || value.key.trim() === "")
@@ -24,7 +25,12 @@ export function validateIdempotencyDefinition(value: unknown): JobIdempotencyDef
   return Object.freeze({ key: value.key.trim(), retentionMs });
 }
 
-/** Extracts and validates the non-empty string value used as a job idempotency key. */
+/** Extracts and validates the non-empty string value used as a job idempotency key.
+ * @param input - Caller-provided domain input.
+ * @param definition - Declared domain policy or identity configuration.
+ * @param acceptedAt - Acceptance clock time in milliseconds.
+ * @returns The validated stored acceptance identity when present.
+ */
 export function extractIdempotencyRecord(
   input: JsonValue,
   definition: JobIdempotencyDefinition,
@@ -45,7 +51,10 @@ export function extractIdempotencyRecord(
   return Object.freeze({ key: value.trim(), expiresAt: acceptedAt + policy.retentionMs });
 }
 
-/** Validates the compact durable record stored alongside its accepted job. */
+/** Validates the compact durable record stored alongside its accepted job.
+ * @param value - Value to validate, normalize or project.
+ * @returns Nothing; rejects invalid input with the established domain error.
+ */
 export function assertIdempotencyRecord(value: JobIdempotencyRecord): void {
   if (
     typeof value.key !== "string" ||
@@ -57,6 +66,10 @@ export function assertIdempotencyRecord(value: JobIdempotencyRecord): void {
     throw new JobQueueStateError("Job idempotency record is invalid");
 }
 
+/** Validates persisted deduplication identity and its expiry window.
+ * @param value - Value to validate, normalize or project.
+ * @returns The validated stored deduplication metadata.
+ */
 export function readIdempotencyRecord(
   value: JsonValue | undefined,
 ): JobIdempotencyRecord | undefined {
@@ -67,7 +80,12 @@ export function readIdempotencyRecord(
   return record;
 }
 
-/** Finds the oldest still-retained acceptance for a key. Expired records are ignored. */
+/** Finds the oldest still-retained acceptance for a key. Expired records are ignored.
+ * @param entries - Persisted entries in the owning index.
+ * @param key - Application or durable-storage key.
+ * @param now - Current clock time in milliseconds.
+ * @returns The matching unexpired acceptance, or undefined.
+ */
 export function findActiveIdempotency(
   entries: Iterable<JobQueueEntry>,
   key: string,
@@ -82,6 +100,14 @@ export function findActiveIdempotency(
   return match;
 }
 
+/** Resolves an existing acceptance or constructs a new bounded deduplication record.
+ * @param input - Caller-provided domain input.
+ * @param definition - Declared domain policy or identity configuration.
+ * @param entries - Persisted entries in the owning index.
+ * @param now - Current clock time in milliseconds.
+ * @param acceptedAt - Acceptance clock time in milliseconds.
+ * @returns The prior acceptance or newly prepared deduplication record.
+ */
 export function prepareIdempotency(
   input: JsonValue,
   definition: JobIdempotencyDefinition | undefined,
@@ -95,6 +121,11 @@ export function prepareIdempotency(
   return duplicate === undefined ? { record } : { duplicate: acceptance(duplicate, true) };
 }
 
+/** Projects a queue entry into its acceptance receipt.
+ * @param entry - Current queue or storage entry.
+ * @param duplicate - Whether an existing acceptance satisfied this request.
+ * @returns The public acceptance receipt.
+ */
 export function acceptance(entry: JobQueueEntry, duplicate: boolean): JobQueueAcceptance {
   return Object.freeze({
     ...entry,
@@ -109,6 +140,10 @@ export function acceptance(entry: JobQueueEntry, duplicate: boolean): JobQueueAc
   });
 }
 
+/** Checks for a non-null, non-array object before inspecting unknown fields.
+ * @param value - Value to validate, normalize or project.
+ * @returns Whether the value is a non-null, non-array object.
+ */
 function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

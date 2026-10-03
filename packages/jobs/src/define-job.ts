@@ -33,7 +33,16 @@ export const defineJobEffect = Effect.fn("Jobs.defineJob")(
  * @param options - Job identity, task, schedules, and client policy.
  * @returns A frozen job descriptor.
  * @throws Original validation error for invalid definitions.
- * @example defineJob({ name: "sendReceipt", task });
+ * @example
+ * ```ts
+ * import { defineJob, defineTask } from "@relkit/jobs";
+ * import { z } from "@relkit/schema";
+ * const echo = defineTask({
+ *   id: "echo", version: "1", input: z.string(), output: z.string(),
+ *   execution: "retryable", handler: async (input) => input,
+ * });
+ * const echoJob = defineJob({ name: "echoJob", task: echo });
+ * ```
  * @category Jobs
  * @since 0.4.1
  */

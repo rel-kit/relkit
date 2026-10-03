@@ -38,9 +38,14 @@
     "@relkit/observability": "workspace:*",
     "effect": "4.0.0-rc.115"
   },
+  "devDependencies": {
+    "@effect/vitest": "4.0.0-rc.115",
+    "vitest": "5.0.1"
+  },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "test:typecheck": "tsc -p tsconfig.tests.json --pretty false"
   }
 }

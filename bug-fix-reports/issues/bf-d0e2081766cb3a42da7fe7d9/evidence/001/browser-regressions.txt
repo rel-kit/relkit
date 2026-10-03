@@ -1,0 +1,13 @@
+$ bun scripts/inspector-regressions.mjs
+PASS /graph
+PASS /errors
+PASS /events/demo.example-event
+PASS /buckets/demo.example-bucket
+PASS /requests
+{
+  "requestRows": 50,
+  "uniqueRows": 50
+}
+
+PASS declared-error request filter displays HTTP 500 with its domain outcome
+Inspector regression browser assertions passed.

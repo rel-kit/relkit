@@ -1,11 +1,12 @@
-import type { AgentExecutionEvent, AgentExecutionSnapshot, ThreadSnapshot } from "@relkit/agents";
+import type { Projection, MutableExecution } from "./snapshot-projection.types.js";
+import type { AgentExecutionEvent, AgentExecutionSnapshot } from "@relkit/agents";
 import type { LocalAgentThread } from "./state.js";
 
-type Projection = Pick<ThreadSnapshot, "values" | "output" | "executions">;
-type MutableExecution = Omit<AgentExecutionSnapshot, "status"> & {
-  status?: AgentExecutionSnapshot["status"];
-};
-
+/**
+ * Replays journal entries into browser-visible messages, approvals and execution state.
+ * @param local - Thread state owned by the current transaction.
+ * @returns The messages, approvals and execution state obtained by replaying the journal.
+ */
 export function journalProjection(local: LocalAgentThread): Projection {
   let values: unknown;
   const executions = new Map<string, MutableExecution>();
@@ -42,6 +43,11 @@ export function journalProjection(local: LocalAgentThread): Projection {
   };
 }
 
+/**
+ * Extracts the final output exposed by the journal projection.
+ * @param local - Thread state owned by the current transaction.
+ * @returns The final projected output when available.
+ */
 function finalOutput(local: LocalAgentThread): unknown {
   if (local.activeRunId !== undefined) return undefined;
   const terminal = [...local.journal].reverse().find((record) => record.kind === "terminal");
@@ -53,6 +59,11 @@ function finalOutput(local: LocalAgentThread): unknown {
     : undefined;
 }
 
+/**
+ * Projects an execution event into the mutable execution summary.
+ * @param value - Untrusted or projected value to inspect.
+ * @returns The updated execution projection.
+ */
 function executionEvent(value: unknown): AgentExecutionEvent | undefined {
   if (
     !isRecord(value) ||
@@ -66,6 +77,11 @@ function executionEvent(value: unknown): AgentExecutionEvent | undefined {
   return value as unknown as AgentExecutionEvent;
 }
 
+/**
+ * Maps execution lifecycle events to public execution status.
+ * @param event - Journal event to project.
+ * @returns The public lifecycle status corresponding to the event.
+ */
 function lifecycleStatus(event: AgentExecutionEvent): AgentExecutionSnapshot["status"] | undefined {
   if (event.kind !== "lifecycle" || !isRecord(event.value)) return undefined;
   switch (event.value.event) {
@@ -91,27 +107,58 @@ function lifecycleStatus(event: AgentExecutionEvent): AgentExecutionSnapshot["st
   }
 }
 
+/**
+ * Merges record-shaped projected values while preserving replacement semantics.
+ * @param value - Untrusted or projected value to inspect.
+ * @param prior - Previously retained state or receipt.
+ * @returns The merged record or replacement value.
+ */
 function mergeValues(prior: unknown, value: unknown): unknown {
   if (!isRecord(value)) return prior;
   return { ...(isRecord(prior) ? prior : {}), ...value };
 }
 
+/**
+ * Reads an optional agent identifier from an execution payload.
+ * @param value - Untrusted or projected value to inspect.
+ * @returns The optional agent identifier.
+ */
 function agentField(value: MutableExecution | undefined) {
   return value?.agent === undefined ? {} : { agent: value.agent };
 }
 
+/**
+ * Reads an optional parent identifier from an execution payload.
+ * @param value - Untrusted or projected value to inspect.
+ * @returns The optional parent identifier.
+ */
 function parentField(value: MutableExecution | undefined) {
   return value?.parent === undefined ? {} : { parent: value.parent };
 }
 
+/**
+ * Reads an optional node identifier from an execution payload.
+ * @param value - Untrusted or projected value to inspect.
+ * @returns The optional node identifier.
+ */
 function nodeField(value: MutableExecution | undefined) {
   return value?.node === undefined ? {} : { node: value.node };
 }
 
+/**
+ * Reads the value carried by a projected execution payload.
+ * @param value - Untrusted or projected value to inspect.
+ * @returns The projected payload value.
+ */
 function valueField(value: unknown) {
   return value === undefined ? {} : { values: value };
 }
 
+/**
+ * Checks for a non-null, non-array object before reading unknown fields.
+ * @param value - Untrusted or projected value to inspect.
+ * @returns Whether the value is a non-null, non-array object.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

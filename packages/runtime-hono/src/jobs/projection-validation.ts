@@ -25,6 +25,10 @@ const RESULT_AVAILABILITY = new Set([
   "unavailable",
 ]);
 
+/** Validate run metadata, status, result consistency and cancellation fields.
+ * @param value - Value to validate or project.
+ * @returns Nothing when the value satisfies the supported public snapshot shape.
+ */
 export function assertSafeRun(value: unknown): asserts value is RunSnapshot {
   if (!isRecord(value) || value.accepted !== true) invalidRun();
   for (const key of [
@@ -74,6 +78,10 @@ export function assertSafeRun(value: unknown): asserts value is RunSnapshot {
   if (value.cancellation !== undefined) assertCancellation(value.cancellation);
 }
 
+/** Validate and project per-service run availability metadata.
+ * @param value - Value to validate or project.
+ * @returns Frozen service availability entries containing supported fields.
+ */
 export function safeAvailability(value: readonly unknown[]): readonly RunAvailability[] {
   return value.map((entry) => {
     if (!isRecord(entry)) invalidPage();
@@ -88,6 +96,10 @@ export function safeAvailability(value: readonly unknown[]): readonly RunAvailab
   });
 }
 
+/** Validate run observation metadata and snapshot/reset-specific fields.
+ * @param value - Value to validate or project.
+ * @returns Nothing when the watch frame is safe to project.
+ */
 export function assertSafeWatchFrame(value: unknown): asserts value is RunWatchFrame<RunSnapshot> {
   if (!isRecord(value) || !isWatchKind(value.kind)) invalidFrame();
   assertSafeRun(value.run);
@@ -111,6 +123,10 @@ export function assertSafeWatchFrame(value: unknown): asserts value is RunWatchF
     invalidFrame();
 }
 
+/** Validate cancellation receipt identity, outcome and optional timestamp.
+ * @param value - Value to validate or project.
+ * @returns Nothing when cancellation metadata has the supported shape.
+ */
 function assertCancellation(value: unknown): void {
   if (!isRecord(value)) invalidRun();
   boundedText(value.runId, "cancellation run ID");
@@ -124,6 +140,12 @@ function assertCancellation(value: unknown): void {
   if (value.requestedAt !== undefined) boundedText(value.requestedAt, "cancellation timestamp");
 }
 
+/** Require nonempty metadata within the supplied UTF-8 byte bound.
+ * @param value - Value to validate or project.
+ * @param name - Field, job or stream name.
+ * @param maxBytes - Maximum encoded UTF-8 byte length.
+ * @returns The validated text; unsupported metadata throws a public job error.
+ */
 function boundedText(value: unknown, name: string, maxBytes = 256): asserts value is string {
   if (
     typeof value !== "string" ||
@@ -134,26 +156,48 @@ function boundedText(value: unknown, name: string, maxBytes = 256): asserts valu
   }
 }
 
+/** Reject unavailable or malformed public run data.
+ * @returns Never; throws a public access-denied error.
+ */
 function invalidRun(): never {
   throw jobError("RELKIT_JOB_ACCESS_DENIED", "Job run data is not available.");
 }
 
+/** Reject malformed service availability or page metadata.
+ * @returns Never; throws a public run-not-found error.
+ */
 function invalidPage(): never {
   throw jobError("RELKIT_JOB_RUN_NOT_FOUND", "Job run page is unavailable.");
 }
 
+/** Reject malformed watch observation metadata.
+ * @returns Never; throws a public run-not-found error.
+ */
 function invalidFrame(): never {
   throw jobError("RELKIT_JOB_RUN_NOT_FOUND", "Job observation frame is invalid.");
 }
 
+/** Recognize the supported run watch frame kinds.
+ * @param value - Value to validate or project.
+ * @returns Whether the kind is snapshot, update or reset.
+ */
 function isWatchKind(value: unknown): value is RunWatchFrame["kind"] {
   return value === "snapshot" || value === "update" || value === "reset";
 }
 
+/** Check whether a value is a non-null object suitable for field inspection.
+ * @param value - Value to validate or project.
+ * @returns Whether object fields can be inspected.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+/** Check a field without accepting inherited properties.
+ * @param value - Value to validate or project.
+ * @param key - Property or profile key to inspect.
+ * @returns Whether the object owns the requested key.
+ */
 function hasOwn(value: object, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);
 }

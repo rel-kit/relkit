@@ -118,7 +118,14 @@ export const defineChannelEffect = Effect.fn("Realtime.defineChannel")(
  * @param options - Authored schema, event, policy, and presence options.
  * @returns A frozen channel descriptor.
  * @throws TypeError for invalid channel options.
- * @example const alerts = defineChannel({ id: "alerts", params: z.object({}), events: { posted: z.string() } });
+ * @example
+ * ```ts
+ * import { defineChannel } from "@relkit/realtime";
+ * import { z } from "@relkit/schema";
+ * const alerts = defineChannel({
+ *   id: "alerts", params: z.object({}), events: { posted: z.string() },
+ * });
+ * ```
  * @category Realtime
  * @since 0.4.0
  */

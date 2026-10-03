@@ -1,4 +1,7 @@
+import { Effect } from "effect";
 import type { MiddlewareHandler } from "hono";
+import { isRelkitControlPlanePath } from "./control-plane.js";
+import { httpBoundary, runHttp } from "./http-effect.js";
 import {
   createFallbackState,
   emitLifecycle,
@@ -9,8 +12,11 @@ import {
   type HttpMiddlewareOptions,
 } from "./middleware-utils.js";
 import { ensureRequestRecord, finishRequestRecord } from "./request-record-middleware.js";
-import { isRelkitControlPlanePath } from "./control-plane.js";
 
+/** Enforces declared body and timeout limits while cleaning up request listeners.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns A handler rejecting oversized requests and forwarding cancellation with scoped timeout cleanup.
+ */
 export function limitsMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
   validateLimit(options.maxBodyBytes, "maxBodyBytes");
   validateLimit(options.timeoutMs, "timeoutMs");
@@ -53,6 +59,9 @@ export function limitsMiddleware(options: HttpMiddlewareOptions = {}): Middlewar
     }
     const controller = new AbortController();
     const source = context.req.raw.signal;
+    /** Propagate native request cancellation to the middleware-owned controller.
+     * @returns Nothing; preserves the original cancellation reason.
+     */
     const abort = (): void => controller.abort(source.reason);
     if (source.aborted) abort();
     else source.addEventListener("abort", abort, { once: true });
@@ -66,17 +75,25 @@ export function limitsMiddleware(options: HttpMiddlewareOptions = {}): Middlewar
           : { ...current, signal: controller.signal, deadlineMs },
       ),
     );
-    const timer =
-      deadlineMs === undefined
-        ? undefined
-        : setTimeout(
-            () => controller.abort(new DOMException("HTTP request timeout", "TimeoutError")),
-            options.timeoutMs,
-          );
     try {
-      await next();
+      await runHttp(
+        Effect.scoped(
+          Effect.gen(function* () {
+            if (options.timeoutMs !== undefined) {
+              yield* Effect.sleep(options.timeoutMs).pipe(
+                Effect.andThen(
+                  Effect.sync(() =>
+                    controller.abort(new DOMException("HTTP request timeout", "TimeoutError")),
+                  ),
+                ),
+                Effect.forkScoped,
+              );
+            }
+            yield* httpBoundary("http.middleware.next", next);
+          }),
+        ),
+      );
     } finally {
-      if (timer !== undefined) clearTimeout(timer);
       source.removeEventListener("abort", abort);
     }
   };

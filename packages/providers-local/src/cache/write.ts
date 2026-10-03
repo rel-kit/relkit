@@ -4,6 +4,16 @@ import { byteLength, normalizeTtl } from "./policy.js";
 import type { LocalCacheStore } from "./store.js";
 import { LocalCachePolicyError, type LocalCachePolicy } from "./types.js";
 
+/**
+ * Validates and clones a value before enforcing byte-LRU and TTL policy.
+ * @param store - Provider-owned byte-LRU state.
+ * @param policy - Validated effective provider policy.
+ * @param encoded - Canonical namespaced cache key.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @param options - Caller policy, pagination or construction settings.
+ * @param now - Current time used for TTL and deadline decisions.
+ * @returns Nothing after insertion or the existing policy/value error.
+ */
 export function writeCacheEntry(
   store: LocalCacheStore,
   policy: LocalCachePolicy,

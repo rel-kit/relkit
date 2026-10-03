@@ -1,16 +1,20 @@
-import { ProviderBindingResolutionError, type RuntimeProviderRegistration } from "@relkit/provider";
 import { assertJobsAdapterRuntime, isJobsAdapterRuntime } from "@relkit/jobs/adapter";
+import { ProviderBindingResolutionError, type RuntimeProviderRegistration } from "@relkit/provider";
 import { resolveProviderBindingConfiguration } from "./provider-binding-resolution.js";
-import { optional, key } from "./provider-registry-validation.js";
 import {
   ProviderRegistryError,
   type AcquiredProvider,
-  type ProviderHandle,
   type ProviderRegistryErrorCode,
   type ProviderRegistryOptions,
   type ProviderRequirement,
 } from "./provider-registry-types.js";
+import { optional } from "./provider-registry-validation.js";
 
+/** Check that a constructed provider exposes its required runtime capability.
+ * @returns Nothing; invalid native capability values throw ProviderRegistryError.
+ * @param value - Native value being validated or projected.
+ * @param requirement - Verified logical-resource provider requirement.
+ */
 export function validateRuntimeValue(value: unknown, requirement: ProviderRequirement): void {
   if (requirement.executionModel === "task") {
     try {
@@ -32,6 +36,11 @@ export function validateRuntimeValue(value: unknown, requirement: ProviderRequir
     );
 }
 
+/** Resolve a requirement's explicit connection configuration.
+ * @returns Frozen behavior and explicitly resolved connection values.
+ * @param requirement - Verified logical-resource provider requirement.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 export function configurationFor(
   requirement: ProviderRequirement,
   options: ProviderRegistryOptions,
@@ -49,6 +58,13 @@ export function configurationFor(
   }
 }
 
+/** Call the selected native provider factory with validated generation configuration.
+ * @returns The native provider factory's generation result.
+ * @param registration - Validated provider or schedule registration.
+ * @param requirement - Verified logical-resource provider requirement.
+ * @param configuration - Resolved explicit connection configuration.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 export async function create(
   registration: RuntimeProviderRegistration,
   requirement: ProviderRequirement,
@@ -76,6 +92,12 @@ export async function create(
   }
 }
 
+/** Await native provider readiness with cancellation support.
+ * @returns A Promise completing after readiness or rejecting on readiness failure/cancellation.
+ * @param generation - Acquired native provider generation.
+ * @param requirement - Verified logical-resource provider requirement.
+ * @param signal - Caller cancellation signal.
+ */
 export async function ready(
   generation: Awaited<ReturnType<RuntimeProviderRegistration["create"]>>,
   requirement: ProviderRequirement,
@@ -103,6 +125,10 @@ export async function ready(
     throw issue("RELKIT_PROVIDER_ABORTED", requirement, "Provider startup was aborted.");
 }
 
+/** Release acquired compatibility providers in reverse acquisition order.
+ * @returns A Promise completing after all providers have been released in reverse order.
+ * @param acquired - Acquired providers in construction order.
+ */
 export async function releaseAll(acquired: readonly AcquiredProvider[]): Promise<void> {
   let failed = false;
   for (const { generation } of [...acquired].reverse()) {
@@ -116,6 +142,10 @@ export async function releaseAll(acquired: readonly AcquiredProvider[]): Promise
   if (failed) throw issue("RELKIT_PROVIDER_RELEASE_FAILED", undefined, "Provider release failed.");
 }
 
+/** Reject malformed generation or graph configuration before startup.
+ * @returns Nothing; invalid startup inputs throw safe provider diagnostics.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 export function validateOptions(options: ProviderRegistryOptions): void {
   if (options.generationId.trim() === "")
     throw issue("RELKIT_PROVIDER_METADATA_INVALID", undefined, "Generation ID is required.");
@@ -123,6 +153,12 @@ export function validateOptions(options: ProviderRegistryOptions): void {
     throw issue("RELKIT_PROVIDER_ABORTED", undefined, "Provider startup was aborted.");
 }
 
+/** Construct a safe public provider issue without native exception details.
+ * @returns A ProviderRegistryError containing safe immutable diagnostic data.
+ * @param code - Bounded public provider diagnostic code.
+ * @param requirement - Verified logical-resource provider requirement.
+ * @param message - Safe compatibility diagnostic.
+ */
 export function issue(
   code: ProviderRegistryErrorCode,
   requirement: ProviderRequirement | undefined,

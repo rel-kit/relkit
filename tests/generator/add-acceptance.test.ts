@@ -29,6 +29,13 @@ test("the full bundle compiles in every starter and preserves its graph relation
     const result = await checkProject({ projectRoot: root });
     expect(result.diagnostics).toEqual([]);
     const graph = JSON.parse(result.outputs.graph) as ApplicationGraph;
+    expect(graph.nodes).toContainEqual(
+      expect.objectContaining({
+        kind: "error",
+        id: "billing.example-error",
+        data: expect.objectContaining({ type: "object" }),
+      }),
+    );
     const plan = createRegistrationPlan(graph);
     expect(plan.queues).toEqual([]);
     expect(plan.tasks).toContainEqual(expect.objectContaining({ id: "task.billing.example-task" }));
@@ -130,6 +137,24 @@ test("reused Docker profiles retain the post-scaffold startup reminder", async (
   await linkDependencies(root);
   expect((await checkProject({ projectRoot: root })).diagnostics).toEqual([]);
 });
+
+test("API starter integration tests run after adding a full service without Docker", async () => {
+  const root = await project("api");
+  await add(root, ["service", "Billing", "--full", "--no-install"]);
+  await linkDependencies(root);
+  expect((await checkProject({ projectRoot: root })).diagnostics).toEqual([]);
+  const child = Bun.spawn([process.execPath, "test", "tests/integration"], {
+    cwd: root,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const [code, output, error] = await Promise.all([
+    child.exited,
+    new Response(child.stdout).text(),
+    new Response(child.stderr).text(),
+  ]);
+  expect({ code, output, error }).toMatchObject({ code: 0 });
+}, 30_000);
 
 test("route platform and singleton additions compile in every starter", async () => {
   for (const template of ["minimal", "api", "agent", "fullstack"] as const) {

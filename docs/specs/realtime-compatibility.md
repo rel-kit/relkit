@@ -27,16 +27,16 @@ it does not create a second normative specification.
 
 ## Executable evidence
 
-- `packages/runtime-hono/rpc.test.ts` and `native-stream.test.ts` exercise the real
+- `packages/runtime-hono/tests/rpc-websocket.test.ts` and `tests/native-stream.test.ts` exercise the real
   Hono Fetch transport, iterator cancellation, terminal SSE events, and post-header
   failures.
-- `packages/runtime-hono/agent-protocol.test.ts` parses emitted AG-UI events with
+- `packages/runtime-hono/tests/agent-protocol.test.ts` parses emitted AG-UI events with
   the pinned external package and verifies the native agent event profile.
 - `tests/types/client-react.ts` verifies finite, stream, presence, and conditional
   agent hook inference, including negative fixtures.
-- `packages/runtime-hono/realtime-rpc.test.ts` verifies retained channel delivery
+- `packages/runtime-hono/tests/realtime-rpc.test.ts` verifies retained channel delivery
   through the managed iterator transport.
-- `packages/runtime-hono/agent-rpc.test.ts` verifies durable run acceptance,
+- `packages/runtime-hono/tests/agent-rpc.test.ts` verifies durable run acceptance,
   same-thread reuse, and cross-generation control admission/consumption.
 
 No Pi package is installed. Pi-derived behavior is represented only by Relkit-owned

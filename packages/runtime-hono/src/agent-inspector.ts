@@ -14,6 +14,12 @@ import {
   inspectorTransitions,
 } from "./agent-inspector-projection.js";
 
+/** Registers internal agent inspection endpoints under the configured access policy.
+ * @param app - Hono application receiving the configured endpoints or middleware.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param internal - internal supplied by the caller.
+ * @returns Nothing; the requested update is applied to the owned state.
+ */
 export function installAgentInspectorEndpoints(
   app: Hono,
   options: RouteMaterializationOptions,
@@ -46,6 +52,11 @@ export function installAgentInspectorEndpoints(
   });
 }
 
+/** Builds the authorized structural execution inspection response.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The authorized structural execution response with private content omitted.
+ */
 async function executionResponse(
   context: Context,
   options: RouteMaterializationOptions,
@@ -75,6 +86,12 @@ async function executionResponse(
   } as unknown as JsonValue);
 }
 
+/** Reads bounded historical agent state without exposing private payloads.
+ * @param provider - Foreign provider whose native API owns durable state.
+ * @param scope - Authorized provider scope or lifetime scope owning the operation.
+ * @param checkpoint - Resumable observation checkpoint bound to the resource scope.
+ * @returns The bounded historical structural records available to the inspector.
+ */
 async function structuralHistory(
   provider: Awaited<ReturnType<typeof agentContext>>["provider"],
   scope: Awaited<ReturnType<typeof agentContext>>["scope"],
@@ -98,12 +115,20 @@ async function structuralHistory(
   return { records, truncated: true };
 }
 
+/** Parses the supported agent execution inspection mode.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns The recognized inspection mode, or undefined for an unsupported query.
+ */
 function executionMode(value: string | undefined): "live" | "history" {
   if (value === undefined || value === "live") return "live";
   if (value === "history") return value;
   throw new TypeError("mode is invalid");
 }
 
+/** Projects a protocol error into an internal inspection HTTP status.
+ * @param error - Failure metadata recorded or projected at this boundary.
+ * @returns The HTTP status associated with the public RPC error code.
+ */
 function rpcStatus(error: ORPCError<string, unknown>): 401 | 403 | 404 | 409 {
   if (error.code === "UNAUTHORIZED") return 401;
   if (error.code === "NOT_FOUND") return 404;
@@ -111,6 +136,9 @@ function rpcStatus(error: ORPCError<string, unknown>): 401 | 403 | 404 | 409 {
   return 403;
 }
 
+/** Creates the safe internal-inspection authorization failure response.
+ * @returns A JSON authorization failure that omits private provider details.
+ */
 function unauthorized(): Response {
   return jsonResponse({ error: "RELKIT_INSPECTOR_UNAUTHORIZED" }, 401, {
     "www-authenticate": "Bearer",

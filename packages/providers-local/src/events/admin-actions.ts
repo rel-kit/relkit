@@ -7,6 +7,19 @@ import type {
 } from "./admin-contracts.js";
 import { versioned } from "./admin-utils.js";
 
+/** Builds the immutable administration audit record with bounded identity and outcome fields.
+ * @param action - Requested administration action.
+ * @param actionId - Stable audit action identity.
+ * @param deliveryId - Stable delivery identity.
+ * @param requestedAt - Action request clock time in milliseconds.
+ * @param outcome - Recorded operation outcome.
+ * @param mode - Local administration environment mode.
+ * @param before - State before the attempted transition.
+ * @param after - State after the attempted transition.
+ * @param errorCode - Safe public failure code.
+ * @param reason - Optional bounded audit reason.
+ * @returns The validated immutable durable or audit record.
+ */
 export function makeRecord(
   action: EventAdminAction,
   actionId: string,
@@ -35,6 +48,11 @@ export function makeRecord(
   });
 }
 
+/** Stores the local audit record and isolates errors from its optional external sink.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @param record - Durable record or audit entry.
+ * @returns The recorded audit entry, even if the optional sink fails.
+ */
 export async function recordAction(
   options: { readonly records: EventAdminActionRecord[]; readonly onAction?: EventAdminActionSink },
   record: EventAdminActionRecord,

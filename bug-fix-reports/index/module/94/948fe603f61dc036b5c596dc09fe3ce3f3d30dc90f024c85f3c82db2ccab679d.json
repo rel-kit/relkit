@@ -1,0 +1,20 @@
+{
+  "key": "client",
+  "matches": {
+    "bf-f3a184488ae7788d49dc7f5b": {
+      "id": "bf-f3a184488ae7788d49dc7f5b",
+      "status": "verified",
+      "what": "Returning an HTTP realtime iterator retains owned presence.",
+      "root_cause": "httpLink delegated stream closure to the oRPC decoder without aborting its fetch. Decoder closure did not promptly disconnect the upstream request, leaving the runtime presence lease active.",
+      "fixed_by": "Give each HTTP call a private AbortController, combine it with caller cancellation, and abort before delegating return/throw. Cover pending pulls and preserve caller signal ownership. Same real API reproduction and regression tests now pass.",
+      "files": [
+        "packages/client/src/index.ts",
+        "packages/client/http-cancellation.test.ts",
+        "tests/e2e-commerce/generated-ai-regressions.spec.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T23:32:16+00:00",
+      "report": "bug-fix-reports/issues/bf-f3a184488ae7788d49dc7f5b/report.md"
+    }
+  }
+}

@@ -1093,6 +1093,8 @@ readonly name: "EnvResolutionError"
 
 ## Exports Grouped by Category
 
+- [Configuration](#configuration)
+  - [defineEnv](#defineenv)
 - [utils](#utils)
   - [BindingValueRef](#bindingvalueref)
   - [EnvBuilder](#envbuilder)
@@ -1108,12 +1110,40 @@ readonly name: "EnvResolutionError"
   - [InferEnvValues](#inferenvvalues)
   - [JsonValue](#jsonvalue)
   - [LiteralValue](#literalvalue)
-  - [defineEnv](#defineenv)
   - [defineEnvEffect](#defineenveffect)
   - [env](#env)
   - [isEnvRef](#isenvref)
 
 ---
+
+# Configuration
+
+## defineEnv
+
+Build a declaration synchronously for existing callers.
+
+**Throws**
+
+TypeError for a reserved name or invalid builder.
+
+**Example**
+
+```ts
+import { defineEnv, env } from "@relkit/config";
+const environment = defineEnv({ MODE: env.string().default("development") });
+```
+
+**Signature**
+
+```ts
+declare const defineEnv: <const S extends EnvShape>(
+  shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
+) => EnvDefinition<S>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L105)
+
+Since v0.1.0
 
 # utils
 
@@ -1256,30 +1286,6 @@ declare const LiteralValue: LiteralValue;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L23)
-
-## defineEnv
-
-Build a declaration synchronously for existing callers.
-
-**Throws**
-
-TypeError for a reserved name or invalid builder.
-
-**Example**
-
-```ts
-defineEnv({ MODE: env.string() });
-```
-
-**Signature**
-
-```ts
-declare const defineEnv: <const S extends EnvShape>(
-  shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
-) => EnvDefinition<S>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L99)
 
 ## defineEnvEffect
 

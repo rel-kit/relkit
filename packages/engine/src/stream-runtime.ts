@@ -1,6 +1,6 @@
 export {
+  RelkitStreamError,
   isStreamOutput,
   lazySingleConsumerStream,
   managedValidatedStream,
-  RelkitStreamError,
 } from "@relkit/invocation";

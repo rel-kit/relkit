@@ -1,11 +1,16 @@
-import { resolve, relative, sep } from "node:path";
-import { realpath, stat } from "node:fs/promises";
+import { Effect, Layer } from "effect";
 import type { Context, Hono } from "hono";
+import { relative, resolve, sep } from "node:path";
+import { runHttp } from "./http-effect.js";
+import { StaticFiles, StaticFilesLive, StaticFileSystemLive } from "./static-file-service.js";
+import type { StaticFilesOptions } from "./static-files.types.js";
+export type { StaticFilesOptions } from "./static-files.types.js";
 
-export interface StaticFilesOptions {
-  readonly root: string;
-}
-
+/** Registers declared assets while retaining route precedence and confinement checks.
+ * @param app - Hono application receiving the configured endpoints or middleware.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Nothing; the requested update is applied to the owned state.
+ */
 export function installStaticFiles(app: Hono, options: StaticFilesOptions | undefined): void {
   if (options === undefined) return;
   const root = resolve(options.root);
@@ -18,6 +23,11 @@ export function installStaticFiles(app: Hono, options: StaticFilesOptions | unde
   });
 }
 
+/** Resolves a URL path beneath the configured public root and rejects traversal.
+ * @param root - Configured filesystem root that bounds served files.
+ * @param pathname - Decoded URL pathname resolved under the public root.
+ * @returns The confined absolute path, or undefined for malformed, hidden or traversing paths.
+ */
 function safePath(root: string, pathname: string): string | undefined {
   let decoded: string;
   try {
@@ -34,27 +44,24 @@ function safePath(root: string, pathname: string): string | undefined {
     : undefined;
 }
 
+/** Finds an existing confined file through the static-file service.
+ * @param root - Configured filesystem root that bounds served files.
+ * @param path - Ordered validation path or confined resource path.
+ * @returns The existing confined Bun file, or undefined when no public file matches.
+ */
 async function publicFile(root: string, path: string): Promise<Bun.BunFile | undefined> {
-  const actualRoot = await realpath(root).catch(() => root);
-  for (const candidate of [path, resolve(path, "index.html")]) {
-    try {
-      const actual = await realpath(candidate);
-      const child = relative(actualRoot, actual);
-      if (
-        child === ".." ||
-        child.startsWith(`..${sep}`) ||
-        (await stat(actual)).isFile() === false
-      ) {
-        continue;
-      }
-      return Bun.file(actual);
-    } catch {
-      continue;
-    }
-  }
-  return undefined;
+  return runHttp(
+    Effect.gen(function* () {
+      return yield* (yield* StaticFiles).find(root, path);
+    }).pipe(Effect.provide(StaticFilesLive.pipe(Layer.provide(StaticFileSystemLive)))),
+  );
 }
 
+/** Creates a range-aware file response with the established cache and content headers.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param file - Confined native file selected by the static-file service.
+ * @returns A full, partial, not-modified or unsatisfiable-range response for the request.
+ */
 async function fileResponse(context: Context, file: Bun.BunFile): Promise<Response> {
   const etag = `"${file.size.toString(16)}-${file.lastModified.toString(16)}"`;
   const headers = new Headers({
@@ -82,6 +89,11 @@ async function fileResponse(context: Context, file: Bun.BunFile): Promise<Respon
   return new Response(context.req.method === "HEAD" ? null : file, { headers });
 }
 
+/** Parses one satisfiable byte range within the known file size.
+ * @param header - Raw header value parsed without trusting malformed input.
+ * @param size - Known total byte length of the selected file.
+ * @returns Inclusive byte offsets, undefined for no range, or "invalid" for an unsatisfiable range.
+ */
 function parseRange(
   header: string | undefined,
   size: number,

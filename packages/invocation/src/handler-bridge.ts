@@ -16,6 +16,7 @@ export type { HandlerBridgeOptions } from "./handler-bridge.types.js";
 /** Converts one handler call into an abortable Effect without creating a runtime.
  * @param options - Handler, input, public context, deadlines, and signal hook.
  * @returns Handler output or an invocation failure, with native suspension preserved.
+ * @remarks Declared streams retain cancellation after handler settlement; other results release linkage.
  * @example Effect.runPromise(invokeUserHandler({ handler, input, publicContext }));
  */
 export function invokeUserHandler<Input, Output, Context extends { readonly signal: AbortSignal }>(
@@ -23,6 +24,12 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
 ): Effect.Effect<Output, InvocationFailure> {
   const execution = Effect.callback<Output, InvocationFailure>((resume, fiberSignal) => {
     const bridge = createAbortBridge(fiberSignal, options.publicContext.signal);
+    // The callback bridge owns only handler execution. Platform signal linkage
+    // remains valid for deferred output without wrapping or mutating that output.
+    const signal =
+      options.deferredStream === true
+        ? AbortSignal.any([options.publicContext.signal, fiberSignal])
+        : bridge.signal;
     let completed = false;
 
     const cleanup = (): void => {
@@ -44,7 +51,7 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
       );
 
     try {
-      options.onSignal?.(bridge.signal);
+      options.onSignal?.(signal);
     } catch (cause) {
       complete(Effect.fail(normalizeFailure(cause, { signal: bridge.signal })));
       return Effect.sync(cleanup);
@@ -59,7 +66,7 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
       onAbort();
       return Effect.sync(cleanup);
     }
-    const context = Object.freeze({ ...options.publicContext, signal: bridge.signal }) as Context;
+    const context = Object.freeze({ ...options.publicContext, signal }) as Context;
 
     let result: unknown;
     try {

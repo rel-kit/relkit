@@ -17,10 +17,60 @@ import {
 } from "./src/commands/dev-inspector.js";
 import { createDevLogger } from "./src/commands/dev-logger.js";
 import { startDevSourceWatcher } from "./src/commands/dev-watch.js";
+import { checkDevProject } from "./src/commands/dev-check.js";
 import { applyScaffoldPlan, type ScaffoldPlan } from "create-relkit";
 
 const sessions: Array<Awaited<ReturnType<typeof startDev>>> = [];
 const roots: string[] = [];
+
+test("serves the active generation throughout a CPU-heavy failed check and recovers", async () => {
+  const root = await makeRoot();
+  await writeFile(
+    join(root, "relkit.config.ts"),
+    // Models synchronous configuration and TypeScript work without a machine-dependent project size.
+    'const deadline = performance.now() + 1_500; while (performance.now() < deadline) {}\nthrow new Error("invalid changed config");',
+  );
+  let builds = 0;
+  const session = await startDev({
+    ...options(root, "sha256:responsive"),
+    compile: async (request) => {
+      if (++builds === 2) {
+        const checked = await checkDevProject(
+          { projectRoot: root, generationId: "heavy-reload" },
+          request.signal,
+        );
+        expect(checked.ok).toBe(false);
+        throw new Error("invalid changed config");
+      }
+      return options(root, "sha256:responsive").compile(request);
+    },
+  });
+  sessions.push(session);
+  const active = session.active;
+  let rebuilding = true;
+  const cycleDurations: number[] = [];
+  const requests = (async () => {
+    while (rebuilding) {
+      const started = performance.now();
+      expect(await (await fetch(`http://127.0.0.1:${session.backendPort}/hello`)).text()).toBe(
+        "hello",
+      );
+      await Bun.sleep(25);
+      cycleDurations.push(performance.now() - started);
+    }
+  })();
+  try {
+    expect(await session.notifySourceChange(1, ["relkit.config.ts"])).toBe(false);
+  } finally {
+    rebuilding = false;
+    await requests;
+  }
+  expect(session.active).toBe(active);
+  expect(Math.max(...cycleDurations)).toBeLessThan(1_000);
+  expect(cycleDurations.length).toBeGreaterThan(1);
+  expect(await session.notifySourceChange(2, ["relkit.config.ts"])).toBe(true);
+  expect(session.active).not.toBe(active);
+}, 15_000);
 
 test("holds reload until a real scaffold transaction finishes installation or rollback", async () => {
   const root = await makeRoot();

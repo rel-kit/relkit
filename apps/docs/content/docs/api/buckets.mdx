@@ -1880,7 +1880,12 @@ TypeError when the authoring input is invalid.
 **Example**
 
 ```ts
-defineBucket({ id: "assets", visibility: "public", maxObjectBytes: 1_048_576 });
+import { defineBucket } from "@relkit/buckets";
+const assets = defineBucket({
+  id: "assets",
+  visibility: "public",
+  maxObjectBytes: 1_048_576,
+});
 ```
 
 **Signature**
@@ -1891,7 +1896,7 @@ declare const defineBucket: <const Id extends string>(
 ) => BucketDescriptor<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L36)
 
 Since v0.1.0
 
@@ -1939,7 +1944,7 @@ assertBucketDescriptor(defineBucket({ id: "assets", visibility: "private" }));
 declare const assertBucketDescriptor: (value: unknown) => asserts value is BucketDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L171)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L177)
 
 ## assertBucketDescriptorEffect
 
@@ -1959,7 +1964,7 @@ declare const assertBucketDescriptorEffect: (
 ) => Effect.Effect<void, BucketValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L180)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L186)
 
 ## defineBucketEffect
 
@@ -1979,7 +1984,7 @@ declare const defineBucketEffect: <const Id extends string>(
 ) => Effect.Effect<BucketDescriptor<Id>, BucketValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L47)
 
 ## isBucketDescriptor
 
@@ -1997,7 +2002,7 @@ isBucketDescriptor(defineBucket({ id: "assets", visibility: "private" }));
 declare const isBucketDescriptor: (value: unknown) => value is BucketDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L124)
 
 ## isBucketDescriptorEffect
 
@@ -2015,7 +2020,7 @@ Effect.runSync(isBucketDescriptorEffect({}));
 declare const isBucketDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L127)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L133)
 
 ## `define-bucket.types.ts`
 

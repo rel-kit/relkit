@@ -1,46 +1,35 @@
-import type {
-  InvocationContextFactory,
-  InvocationIdSource,
-  InvocationRunner,
-  TaskAncestry,
-} from "@relkit/invocation";
-import { currentJobsRuntime } from "@relkit/jobs";
 import type { JsonValue } from "@relkit/contracts";
+import { observeExecution } from "@relkit/runtime-effect";
+import type { TaskAncestry } from "@relkit/invocation";
 import {
+  currentJobsRuntime,
   decodeJobWire,
+  submitTask,
   validateCanonicalInput,
   type TaskContextBase,
-  type TaskDescriptorAny,
 } from "@relkit/jobs";
 import type {
   TaskExecutionBinding,
   TaskExecutionEnvelope,
   TaskExecutor,
 } from "@relkit/jobs/adapter";
-import type { DependencyClientSources, DirectTaskInvoker } from "./dependencies.js";
-import { submitTask } from "@relkit/jobs";
-import type { FunctionRegistry } from "./registry.js";
-import type { InvocationContext, InvocationTarget, InvokeOptions } from "./invoke-types.js";
-import { invoke } from "./invoke.js";
+import { Effect } from "effect";
+import { enginePromise, engineTry, runEnginePromise } from "./engine-runtime.js";
+import type { InvokeOptions } from "./invoke-types.js";
+import { invokeEffect } from "./invoke.js";
 import { materializeTaskContext } from "./task-context.js";
-import { assertEnvelope, enrichBinding, lookupTask } from "./task-executor-support.js";
-
-export interface TaskExecutorOptions {
-  readonly tasks:
-    Readonly<Record<string, TaskDescriptorAny>> | ReadonlyMap<string, TaskDescriptorAny>;
-  readonly registry?: FunctionRegistry;
-  readonly clients?: DependencyClientSources;
-  readonly invokeTask?: DirectTaskInvoker;
-  readonly env?: Readonly<Record<string, unknown>>;
-  readonly context?: InvocationContextFactory<TaskContextBase>;
-  readonly idSource?: InvocationIdSource;
-  readonly effectRunner?: InvocationRunner;
-  readonly now?: () => number;
-  readonly publications?: Readonly<Record<string, import("./dependencies.js").DependencyRefLike>>;
-}
+import { assertEnvelopeEffect, enrichBinding, lookupTask } from "./task-executor-support.js";
+import type { TaskExecutorOptions } from "./task-executor.types.js";
+import { taskTarget } from "./task-executor-target.js";
+import { invocationTerminal } from "./invocation-observation.js";
+export type { TaskExecutorOptions } from "./task-executor.types.js";
 
 export { TaskExecutionError } from "./task-executor-errors.js";
 
+/** Expose the native task executor contract backed by engine Effects.
+ * @returns A native TaskExecutor forwarding execution into the engine Effect.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 export function createTaskExecutor(options: TaskExecutorOptions): TaskExecutor {
   return Object.freeze({
     execute: (envelope: TaskExecutionEnvelope, binding: TaskExecutionBinding) =>
@@ -48,16 +37,50 @@ export function createTaskExecutor(options: TaskExecutorOptions): TaskExecutor {
   });
 }
 
-export async function executeTask(
+/** Validate and execute a native task envelope without treating suspension as terminal failure.
+ * @param options - Explicit generation dependencies and operation configuration.
+ * @returns A lazy Effect yielding task output or the original failure/continuation; native suspension stays nonterminal.
+ * @param envelope - Persisted execution or event-delivery envelope.
+ * @param binding - Verified provider or native task binding.
+ */
+export const executeTaskEffect = Effect.fn("Engine.executeTask")((
   envelope: TaskExecutionEnvelope,
   binding: TaskExecutionBinding,
   options: TaskExecutorOptions,
-): Promise<unknown> {
-  const task = lookupTask(options.tasks, envelope.taskId);
-  await assertEnvelope(task, envelope, binding);
+) => {
+  let suspended = false;
+  return observeExecution(
+    "engine",
+    "task.execute",
+    executeTaskWorkflow(envelope, binding, options, () => {
+      suspended = true;
+    }),
+    undefined,
+    (exit) => invocationTerminal(exit, suspended),
+  );
+});
+
+/**
+ * Composes envelope validation, task context and invocation under one task operation.
+ * @param envelope - Persisted execution or delivery input.
+ * @param binding - Verified native provider authority.
+ * @param options - Generation dependencies.
+ * @param onSuspension - Marks a continuation before its opaque value leaves the invocation.
+ * @returns A lazy workflow preserving failures, defects and nonterminal continuation values.
+ */
+const executeTaskWorkflow = Effect.fn("Engine.executeTask.workflow")(function* (
+  envelope: TaskExecutionEnvelope,
+  binding: TaskExecutionBinding,
+  options: TaskExecutorOptions,
+  onSuspension: () => void,
+) {
+  const task = yield* engineTry(() => lookupTask(options.tasks, envelope.taskId));
+  yield* assertEnvelopeEffect(task, envelope, binding);
   const executionBinding = enrichBinding(binding, envelope);
   const decoded = decodeJobWire(envelope.input);
-  const input = await validateCanonicalInput(task.input, decoded, task.inputWire);
+  const input = yield* enginePromise(() =>
+    Promise.resolve(validateCanonicalInput(task.input, decoded, task.inputWire)),
+  );
   const ancestry: TaskAncestry = {
     runId: envelope.runId,
     taskId: envelope.taskId,
@@ -155,34 +178,30 @@ export async function executeTask(
           }),
     },
   };
-  return invoke(invokeOptions);
-}
+  return yield* invokeEffect(invokeOptions, onSuspension);
+});
 
-function taskTarget(
-  task: TaskDescriptorAny,
+/** Validate and execute a native task envelope without treating suspension as terminal failure.
+ * @returns A Promise of task output; native suspension retains its original continuation value.
+ * @param envelope - Persisted execution or event-delivery envelope.
+ * @param binding - Verified provider or native task binding.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
+export async function executeTask(
+  envelope: TaskExecutionEnvelope,
+  binding: TaskExecutionBinding,
   options: TaskExecutorOptions,
-): InvocationTarget<unknown, unknown, TaskContextBase> {
-  const target: InvocationTarget<unknown, unknown, TaskContextBase> = {
-    id: `task.${task.id}`,
-    input: task.input,
-    output: task.output,
-    ...(task.dependencies === undefined
-      ? {}
-      : {
-          dependencies:
-            task.dependencies as unknown as import("./dependencies.js").DependencyDeclarations,
-        }),
-    ...(options.publications === undefined ? {} : { publications: options.publications }),
-    ...(task.publishes === undefined ? {} : { publishes: task.publishes }),
-    handler: (input, context) =>
-      (task.handler as (value: never, context: TaskContextBase) => unknown)(
-        input as never,
-        context as TaskContextBase,
-      ),
-  };
-  return target;
+): Promise<unknown> {
+  return runEnginePromise(
+    executeTaskEffect(envelope, binding, options),
+    undefined,
+    options.effectRunner,
+  );
 }
 
+/** Read the task executor from the current native jobs runtime.
+ * @returns The active native task executor, or undefined outside a jobs runtime.
+ */
 export function executorFromCurrentRuntime(): TaskExecutor | undefined {
   return currentJobsRuntime()?.taskExecutor;
 }

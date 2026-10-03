@@ -1,0 +1,21 @@
+{
+  "key": "supervisor",
+  "matches": {
+    "bf-b6fb29be5d2d6bd71cdfde3b": {
+      "id": "bf-b6fb29be5d2d6bd71cdfde3b",
+      "status": "verified",
+      "what": "Public dev-origin HTTP mutations and WebSockets are rejected.",
+      "root_cause": "proxy-forward.ts removed Host and proxy-websocket.ts did not retain public Host. Bun reconstructed request.url using the private child authority, so transport-security.ts compared the public Origin with the wrong port.",
+      "fixed_by": "Preserve the public request URL authority in Host for HTTP and WebSocket forwarding. Same real API reproduction and regression tests now pass.",
+      "files": [
+        "packages/supervisor/src/proxy-forward.ts",
+        "packages/supervisor/src/proxy-websocket.ts",
+        "packages/supervisor/proxy-origin.test.ts",
+        "tests/e2e-commerce/generated-ai-regressions.spec.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T23:38:55+00:00",
+      "report": "bug-fix-reports/issues/bf-b6fb29be5d2d6bd71cdfde3b/report.md"
+    }
+  }
+}
