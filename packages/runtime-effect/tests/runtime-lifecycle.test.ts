@@ -1,5 +1,7 @@
-import { Effect } from "effect";
-import { describe, expect, test } from "bun:test";
+import { Effect, Layer } from "effect";
+import { it } from "@effect/vitest";
+import { resolveEnvWithEffectEffect } from "@relkit/config/internal/config";
+import { describe, expect, test } from "vitest";
 import { defineEnv } from "@relkit/config";
 import {
   GENERATOR_VERSION,
@@ -9,9 +11,19 @@ import {
   RUNTIME_INTEGRATION_PLAN_VERSION,
 } from "@relkit/contracts";
 import type { ApplicationGraph } from "@relkit/graph";
-import { createGenerationRuntime, type GenerationRuntimeOptions } from "./src/runtime.js";
-import type { RuntimeManifest } from "./src/services.js";
-import type { GenerationServiceDefinition } from "./src/scope.js";
+import {
+  createGenerationRuntime,
+  generationLayer,
+  Generation,
+  GenerationEnvironmentResolver,
+  type GenerationRuntimeOptions,
+} from "../src/runtime.js";
+import type { RuntimeManifest } from "../src/services.js";
+import type { GenerationServiceDefinition } from "../src/scope.js";
+import { interruptOnSignal } from "../src/scope.js";
+import { validateGenerationOptionsEffect } from "../src/runtime-validation.js";
+import { Cause, Exit } from "effect";
+import type { LogRecord } from "../src/logger.js";
 
 const graph = {
   contractVersion: GRAPH_VERSION,
@@ -43,7 +55,7 @@ const environment = defineEnv({});
 function options(
   services: readonly GenerationServiceDefinition[],
   signal?: AbortSignal,
-): GenerationRuntimeOptions {
+): GenerationRuntimeOptions<{}> {
   return {
     environment: "test",
     env: environment,
@@ -82,6 +94,101 @@ async function rejects(promise: Promise<unknown>): Promise<void> {
 }
 
 describe("generation runtime resource ownership", () => {
+  test("managed startup and release use the configured structured logger", async () => {
+    const records: LogRecord[] = [];
+    const events: string[] = [];
+    const generation = await createGenerationRuntime({
+      ...options([resource("provider", events)]),
+      logger: {
+        minimumLevel: "info",
+        human: false,
+        json: { write: (record) => records.push(record) },
+      },
+    });
+    await generation.dispose();
+    expect(records.some((record) => record.fields?.operation === "generation.acquire")).toBe(true);
+    expect(records.some((record) => record.fields?.operation === "service.release")).toBe(true);
+    expect(records.every((record) => record.level === "info")).toBe(true);
+  });
+
+  it.effect("configuration errors retain their public cause in the typed channel", () =>
+    Effect.gen(function* () {
+      const result = yield* Effect.exit(
+        validateGenerationOptionsEffect({
+          ...options([]),
+          environment: "production",
+          allowImplicitDotEnv: true,
+        }),
+      );
+      expect(Exit.isFailure(result)).toBe(true);
+      if (Exit.isFailure(result)) {
+        const reason = result.cause.reasons.find(Cause.isFailReason);
+        expect(reason?.error._tag).toBe("GenerationConfigurationError");
+        expect(reason?.error.cause).toBeInstanceOf(TypeError);
+      }
+    }),
+  );
+
+  it.effect("reads pre-aborted signals lazily before starting work", () =>
+    Effect.gen(function* () {
+      const controller = new AbortController();
+      let ran = false;
+      const effect = interruptOnSignal(
+        Effect.sync(() => {
+          ran = true;
+        }),
+        controller.signal,
+      );
+      controller.abort("cancelled before execution");
+      const result = yield* Effect.exit(effect);
+      expect(ran).toBe(false);
+      expect(Exit.isFailure(result)).toBe(true);
+    }),
+  );
+
+  test("invalid resource order preserves the public TypeError before acquisition", async () => {
+    const events: string[] = [];
+    await expect(
+      createGenerationRuntime(
+        options([{ ...resource("provider", events), dependencies: ["missing"] }]),
+      ),
+    ).rejects.toBeInstanceOf(TypeError);
+    expect(events).toEqual([]);
+  });
+
+  it.effect("builds lazily with a substituted resolver acquired once", () =>
+    Effect.gen(function* () {
+      let calls = 0;
+      const events: string[] = [];
+      const testLayer = Layer.succeed(
+        GenerationEnvironmentResolver,
+        GenerationEnvironmentResolver.of({
+          resolve: (definition, source, environment) =>
+            Effect.suspend(() => {
+              calls += 1;
+              return resolveEnvWithEffectEffect(definition, source, environment);
+            }),
+        }),
+      );
+      const layer = generationLayer(options([resource("provider", events)]), testLayer);
+      expect(calls).toBe(0);
+      expect(events).toEqual([]);
+      const generation = yield* Effect.scoped(Effect.provide(Generation, layer));
+      expect(calls).toBe(1);
+      expect(generation.services.get("provider")).toBe("provider");
+      expect(events).toEqual(["acquire:provider", "release:provider"]);
+    }),
+  );
+
+  test("disposal is idempotent for concurrent callers", async () => {
+    const events: string[] = [];
+    const generation = await createGenerationRuntime(options([resource("provider", events)]));
+    const first = generation.dispose();
+    expect(generation.dispose()).toBe(first);
+    await first;
+    expect(events).toEqual(["acquire:provider", "release:provider"]);
+  });
+
   test("rejects a previous runtime cohort before acquiring resources", async () => {
     await expect(
       createGenerationRuntime({
