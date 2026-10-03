@@ -1,0 +1,238 @@
+# bf-f3a184488ae7788d49dc7f5b: Returning an HTTP realtime iterator retains owned presence.
+
+Status: **verified**
+Attempt: 1 · Updated: 2026-10-02T23:32:16+00:00
+
+## What
+
+Returning an HTTP realtime iterator retains owned presence.
+
+## Expected
+
+Iterator return and explicit abort release upstream presence within five seconds.
+
+## Observed before
+
+Return-only retained one connection after 5.2 seconds; explicit abort released it.
+
+## Root cause
+
+httpLink delegated stream closure to the oRPC decoder without aborting its fetch. Decoder closure did not promptly disconnect the upstream request, leaving the runtime presence lease active.
+
+## Fixed by
+
+Give each HTTP call a private AbortController, combine it with caller cancellation, and abort before delegating return/throw. Cover pending pulls and preserve caller signal ownership. Same real API reproduction and regression tests now pass.
+
+## Changed files
+
+- packages/client/src/index.ts
+- packages/client/http-cancellation.test.ts
+- tests/e2e-commerce/generated-ai-regressions.spec.ts
+
+## Reproduction
+
+- Start retained fixture on 3330/3331 without RELKIT_ALLOWED_ORIGINS.
+- rtk bun scripts/verify-realtime-disconnect.mjs
+- Use fresh thread/operation IDs and channel topics; pull lazy iterators.
+
+## Evidence
+
+- before: [api](evidence/001/api-before.txt) —
+- after: [api](evidence/001/api-after.txt) —
+
+## Scope
+
+```json
+{
+  "modules": [
+    "supervisor",
+    "client",
+    "runtime-hono",
+    "engine",
+    "providers-local"
+  ],
+  "entrypoints": [
+    "rtk bun scripts/verify-realtime-disconnect.mjs"
+  ],
+  "invariants": [
+    "Iterator return and explicit abort release upstream presence within five seconds.",
+    "Foreign origins remain rejected; successful tools and event streams retain their contracts."
+  ]
+}
+```
+
+## Environment
+
+```json
+{
+  "package": "CLI-generated agent starter",
+  "revision": "56cb00a4e09f7908d456848e69f6b623bd859c84 plus existing dirty checkout and scoped repair",
+  "target": "http://127.0.0.1:3330",
+  "api_exposed": true,
+  "e2e_available": true,
+  "dependencies": "Actual CLI builder, supervisor proxy, engine, Hono/oRPC, local persistence and public client. Offline LangChain models for deterministic regression; gpt-6-luna used separately."
+}
+```
+
+## Verification
+
+```json
+{
+  "unit": {
+    "before": {
+      "status": "failed",
+      "command": "rtk bun test packages/client/http-cancellation.test.ts packages/supervisor/proxy-origin.test.ts",
+      "cwd": ".",
+      "exit_code": 1,
+      "output": "evidence/001/unit-before.txt",
+      "assertion": "Both closure modes release actual local-provider presence by the first ~33ms sample; HTTP and auto-fallback tests close pending pulls without aborting the caller controller."
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk bun test packages/client/http-cancellation.test.ts packages/supervisor/proxy-origin.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/unit-after.txt",
+      "assertion": "Both closure modes release actual local-provider presence by the first ~33ms sample; HTTP and auto-fallback tests close pending pulls without aborting the caller controller."
+    }
+  },
+  "runtime": {
+    "kind": "api",
+    "boundary": "CLI public proxy -> actual transport/engine/local providers -> persisted state or presence",
+    "dependencies": [
+      "Actual CLI-generated server",
+      "Actual public HTTP/WebSocket clients",
+      "Actual local providers and engine",
+      "Deterministic offline LangChain model for baseline and regression"
+    ],
+    "steps": [
+      "rtk bun scripts/verify-realtime-disconnect.mjs",
+      "Both closure modes release actual local-provider presence by the first ~33ms sample; HTTP and auto-fallback tests close pending pulls without aborting the caller controller."
+    ],
+    "before": {
+      "status": "failed",
+      "command": "rtk bun /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/verify-realtime-disconnect.mjs",
+      "cwd": ".",
+      "exit_code": 1,
+      "output": "evidence/001/api-before.txt",
+      "assertion": "Both closure modes release actual local-provider presence by the first ~33ms sample; HTTP and auto-fallback tests close pending pulls without aborting the caller controller."
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk bun /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/verify-realtime-disconnect.mjs",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/api-after.txt",
+      "assertion": "Both closure modes release actual local-provider presence by the first ~33ms sample; HTTP and auto-fallback tests close pending pulls without aborting the caller controller."
+    }
+  },
+  "e2e": {
+    "status": "passed",
+    "command": "rtk env RELKIT_GENERATED_HOST_URL=http://127.0.0.1:3330 bun x playwright test --config=playwright.commerce.config.ts",
+    "cwd": ".",
+    "exit_code": 0,
+    "output": "evidence/001/browser.txt",
+    "assertion": "Three browser cases pass: actual generated-host origin/validation, commerce agent streaming, two-tab fanout and late-tab restore."
+  },
+  "regressions": [
+    {
+      "kind": "api",
+      "boundary": "Actual generated-host integration",
+      "status": "passed",
+      "command": "rtk bun /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/verify-realtime-disconnect.mjs",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/api-after.txt",
+      "assertion": "Both closure modes release actual local-provider presence by the first ~33ms sample; HTTP and auto-fallback tests close pending pulls without aborting the caller controller."
+    },
+    {
+      "kind": "integration",
+      "boundary": "HTTP/auto clients, supervisor forwarding, agent acceptance, auth, WebSockets",
+      "status": "passed",
+      "command": "rtk bun test packages/client packages/supervisor",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/adjacent-bun.txt",
+      "assertion": "131 client/supervisor tests pass."
+    },
+    {
+      "kind": "integration",
+      "boundary": "Hono agent, realtime, transport security and RPC error handling",
+      "status": "passed",
+      "command": "rtk bun x vitest run packages/runtime-hono/tests/agent-rpc.test.ts packages/runtime-hono/tests/realtime-rpc.test.ts packages/runtime-hono/tests/transport-security.test.ts packages/runtime-hono/tests/rpc-websocket.test.ts packages/runtime-hono/tests/rpc-error-status.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/adjacent-vitest.txt",
+      "assertion": "20 runtime cases pass."
+    }
+  ],
+  "checks": [
+    {
+      "name": "typecheck",
+      "status": "passed",
+      "command": "rtk bun x tsc -b packages/client packages/supervisor packages/runtime-hono --pretty false",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/typecheck.txt"
+    },
+    {
+      "name": "test-types",
+      "status": "passed",
+      "command": "rtk bun x tsc -p packages/runtime-hono/tsconfig.tests.json --pretty false",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/test-typecheck.txt"
+    },
+    {
+      "name": "boundaries",
+      "status": "passed",
+      "command": "rtk bun run check",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/check.txt"
+    },
+    {
+      "name": "lint",
+      "status": "passed",
+      "command": "rtk bun run lint",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/lint.txt"
+    },
+    {
+      "name": "format",
+      "status": "passed",
+      "command": "rtk bun node_modules/prettier/bin/prettier.cjs --check <changed files>",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/format.txt"
+    },
+    {
+      "name": "guardrails",
+      "status": "passed",
+      "command": "rtk bun test tests/phase0.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/guardrails.txt"
+    }
+  ],
+  "limitations": [
+    "No cloud deployment, commits, pushes, or full-repository acceptance were requested or run.",
+    "Commerce browser harness substitutes engine dispatch/backing behavior; generated-host browser and API checks use the actual engine/providers.",
+    "Existing HTTP execution logging/local telemetry is reused. No remote APM was configured for this fixture; HTTP responses and persisted state/presence provide the behavioral assertions.",
+    "The read-only Effect checkout lacks the relevant core Stream source/test files; installed pinned effect 4.0.0-rc.115 source was inspected. No Effect implementation was modified."
+  ]
+}
+```
+
+## Related reports
+
+```json
+[]
+```
+
+## Notes
+
+```json
+[]
+```
