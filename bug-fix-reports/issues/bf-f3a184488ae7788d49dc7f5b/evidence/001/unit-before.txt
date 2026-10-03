@@ -1,0 +1,23 @@
+[FAIL] FAILURES:
+  (fail) HTTP iterator return cancels its request [15.25ms]
+  (fail) HTTP iterator return cancels its request [5.63ms]
+  (fail) HTTP and WebSocket forwarding retain the public authority without admitting foreign origins [10.88ms]
+  error: expect(received).toBe(expected)
+  Expected: true
+  Received: undefined
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/client/http-cancellation.test.ts:32:27)
+  error: expect(received).toBe(expected)
+  Expected: true
+  Received: undefined
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/client/http-cancellation.test.ts:32:27)
+  error: expect(received).toBe(expected)
+  Expected: 200
+  Received: 403
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/supervisor/proxy-origin.test.ts:23:29)
+
+SUMMARY:
+   0 pass
+   3 fail
+  Ran 3 tests across 2 files. [330.00ms]
+
+[full output: rtk recall d6d17c99a43a]
