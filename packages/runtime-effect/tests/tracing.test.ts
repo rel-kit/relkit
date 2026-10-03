@@ -1,5 +1,5 @@
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   InvocationTrace,
   captureInvocationTrace,
@@ -7,8 +7,8 @@ import {
   type SpanLifecycle,
   withChildSpan,
   withRootSpan,
-} from "./src/tracing.js";
-import { IdSource } from "./src/services.js";
+} from "../src/tracing.js";
+import { IdSource } from "../src/services.js";
 
 function ids() {
   let next = 0;
@@ -98,9 +98,9 @@ describe("runtime tracing", () => {
       );
 
       expect(runnerCalls).toBe(1);
-      expect(result.traceId).toBe("00000000000000000000000000000001");
-      expect(result.correlationId).toBe("request-1");
-      expect(result.invocationId).toBe("invoke-1");
+      expect(result?.traceId).toBe("00000000000000000000000000000001");
+      expect(result?.correlationId).toBe("request-1");
+      expect(result?.invocationId).toBe("invoke-1");
     } finally {
       await runtime.dispose();
     }

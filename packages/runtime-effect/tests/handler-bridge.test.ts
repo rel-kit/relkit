@@ -1,7 +1,7 @@
 import { Cause, Effect } from "effect";
-import { describe, expect, test } from "bun:test";
-import { invokeUserHandler } from "./src/handler-bridge.js";
-import { normalizeFailure, toPublicEnvelope } from "./src/failure.js";
+import { describe, expect, test } from "vitest";
+import { invokeUserHandler } from "../src/handler-bridge.js";
+import { normalizeFailure, toPublicEnvelope } from "../src/failure.js";
 
 const context = () => ({ signal: new AbortController().signal });
 

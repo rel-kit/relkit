@@ -1,7 +1,7 @@
 import { Cause, Effect } from "effect";
-import { describe, expect, test } from "bun:test";
-import { abortablePromise, invokeUserHandler } from "./src/index.js";
-import { normalizeFailure } from "./src/failure.js";
+import { describe, expect, test } from "vitest";
+import { abortablePromise, invokeUserHandler } from "../src/index.js";
+import { normalizeFailure } from "../src/failure.js";
 
 describe("runtime abort bridge", () => {
   test("aborts the public signal and provider Promise on fiber interruption", async () => {
