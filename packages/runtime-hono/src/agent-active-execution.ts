@@ -1,17 +1,9 @@
-import type { AcceptRunReceipt, ExecutionClaim } from "@relkit/agents";
+import type { ActiveAgentExecution, AgentSteeringBuffer } from "./agent-active-execution.types.js";
+export type { ActiveAgentExecution, AgentSteeringBuffer } from "./agent-active-execution.types.js";
 
-export interface ActiveAgentExecution {
-  receipt: AcceptRunReceipt;
-  claim: ExecutionClaim;
-  readonly controlRunIds: string[];
-  readonly steering: AgentSteeringBuffer;
-}
-
-export interface AgentSteeringBuffer {
-  readonly push: (message: string) => void;
-  readonly drain: () => readonly string[];
-}
-
+/** Creates the run-owned buffer used to exchange steering input with execution.
+ * @returns An independent run-owned steering buffer.
+ */
 export function createAgentSteeringBuffer(): AgentSteeringBuffer {
   const pending: string[] = [];
   return Object.freeze({
