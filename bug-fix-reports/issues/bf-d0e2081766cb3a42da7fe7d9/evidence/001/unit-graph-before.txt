@@ -1,0 +1,13 @@
+[FAIL] FAILURES:
+  (fail) exported error constructors survive evaluator discovery [15.30ms]
+  error: expect(received).toHaveLength(expected)
+  Expected length: 1
+  Received length: 0
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/compiler/evaluator-error-export.test.ts:17:26)
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [1297.00ms]
+
+[full output: rtk recall 6a6e959e5750]

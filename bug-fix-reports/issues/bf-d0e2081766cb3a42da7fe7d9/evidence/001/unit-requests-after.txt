@@ -1,0 +1,5 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit/packages/observability
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  00:48:14
+   Duration  765ms (import 55%, transform 26%, tests 19%)

@@ -1,0 +1,5 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+No test files found, exiting with code 1
+filter: packages/observability/tests/duckdb-request-pages.test.ts, packages/runtime-hono/tests/http-declared-outcome.test.ts
+include: tests/**/*.test.ts
+exclude:  **/node_modules/**, **/.git/**
