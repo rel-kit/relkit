@@ -1,8 +1,15 @@
 import { parseTracePropagation } from "@relkit/contracts";
-import { runDetachedExecution } from "@relkit/invocation";
 import type { UnknownEventEnvelope } from "@relkit/events";
+import { runDetachedExecution } from "@relkit/invocation";
 import type { EventEngine, EventInvocationContext } from "./materialize-events.js";
 
+/** Invoke an event target with a detached consumer linked to its persisted producer.
+ * @returns The native engine Promise for event-delivery execution.
+ * @param functionId - Stable function identity used for generation lookup.
+ * @param envelope - Persisted execution or event-delivery envelope.
+ * @param context - Active native invocation or task context.
+ * @param engine - Generation engine resolving and executing the target function.
+ */
 export function invokeEventFunction(
   functionId: string,
   envelope: UnknownEventEnvelope,
