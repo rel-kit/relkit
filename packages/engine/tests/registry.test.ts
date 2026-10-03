@@ -1,4 +1,3 @@
-import { describe, expect, test } from "bun:test";
 import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
@@ -7,11 +6,12 @@ import {
   RUNTIME_INTEGRATION_PLAN_VERSION,
 } from "@relkit/contracts";
 import { hashGraph, type ApplicationGraph } from "@relkit/graph";
+import { describe, expect, test } from "vitest";
 import {
   createFunctionRegistry,
   type FunctionHandler,
   type RuntimeManifestInput,
-} from "./src/registry.ts";
+} from "../src/registry.js";
 
 const source = { file: "src/functions.ts", line: 1, column: 1 } as const;
 const create = (() => ({ ok: true })) as FunctionHandler;
@@ -103,9 +103,12 @@ describe("function registry", () => {
     expect(() =>
       createFunctionRegistry(graph(), { ...manifest(), graphHash: "sha256:wrong" }),
     ).toThrow("RELKIT_GRAPH_MANIFEST_MISMATCH");
-    expect(() => createFunctionRegistry(graph(), { ...manifest(), generatorVersion: 99 })).toThrow(
-      "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED",
-    );
+    expect(() =>
+      createFunctionRegistry(graph(), {
+        ...manifest(),
+        generatorVersion: 99,
+      } as unknown as RuntimeManifestInput),
+    ).toThrow("RELKIT_MANIFEST_GENERATOR_UNSUPPORTED");
     expect(() =>
       createFunctionRegistry(graph(), {
         ...manifest(),

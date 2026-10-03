@@ -1,9 +1,9 @@
-import { expect, test } from "bun:test";
 import type { RuntimeIntegrationPlan } from "@relkit/contracts";
+import { expect, test } from "vitest";
 import {
   assertRuntimeIntegrationModules,
   RuntimeIntegrationMetadataError,
-} from "./src/runtime-integrations.ts";
+} from "../src/runtime-integrations.js";
 
 const plan: RuntimeIntegrationPlan = {
   version: 1,

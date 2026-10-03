@@ -1,5 +1,5 @@
-import { expect, test } from "bun:test";
-import { parseInfrastructureBindingValues } from "./src/infrastructure-binding-values.ts";
+import { expect, test } from "vitest";
+import { parseInfrastructureBindingValues } from "../src/infrastructure-binding-values.js";
 
 test("parses deterministic deployment connection outputs and rejects malformed values", () => {
   const parsed = parseInfrastructureBindingValues(

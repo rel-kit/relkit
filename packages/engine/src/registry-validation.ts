@@ -1,11 +1,18 @@
 import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
-import type { ApplicationGraph } from "@relkit/graph";
 import { isEventFunctionDescriptor } from "@relkit/events";
+import type { ApplicationGraph } from "@relkit/graph";
 import { getDescriptorIdentity } from "@relkit/invocation";
-import type { RegistryIssue, RuntimeManifestInput } from "./registry.js";
 import type { InvocationTarget } from "./invoke-types.js";
 import { artifactIssues } from "./registry-artifacts.js";
+import type { HandlerEntry } from "./registry-validation.types.js";
+import type { RegistryIssue, RuntimeManifestInput } from "./registry.js";
+export type { HandlerEntry } from "./registry-validation.types.js";
 
+/** Collect unsupported graph and manifest version diagnostics.
+ * @returns Safe diagnostics for unsupported graph/manifest versions.
+ * @param graph - Application graph being verified for this generation.
+ * @param manifest - Generated executable manifest paired with the graph.
+ */
 export function versionIssues(
   graph: ApplicationGraph,
   manifest: RuntimeManifestInput,
@@ -33,11 +40,11 @@ export function versionIssues(
   return issues;
 }
 
-export interface HandlerEntry {
-  readonly id: unknown;
-  readonly handler: unknown;
-}
-
+/** Normalize supported manifest collections while retaining malformed entries for diagnostics.
+ * @returns Normalized entries, preserving malformed identities for diagnostics.
+ * @param value - Native value being validated or projected.
+ * @param issues - Mutable safe diagnostics collected during verification.
+ */
 export function collectHandlerEntries(value: unknown, issues: RegistryIssue[]): HandlerEntry[] {
   if (value instanceof Map) return [...value.entries()].map(([id, handler]) => ({ id, handler }));
   if (Array.isArray(value)) {
@@ -71,6 +78,12 @@ export function collectHandlerEntries(value: unknown, issues: RegistryIssue[]): 
   return [];
 }
 
+/** Check handler callability, duplicates and exact graph membership.
+ * @returns Nothing; appends handler mismatch diagnostics to issues.
+ * @param functionIds - Sorted function identities declared by the graph.
+ * @param entries - Normalized manifest or integration entries.
+ * @param issues - Mutable safe diagnostics collected during verification.
+ */
 export function validateHandlers(
   functionIds: readonly string[],
   entries: readonly HandlerEntry[],
@@ -124,10 +137,21 @@ export function validateHandlers(
   }
 }
 
+/** Compare stable identities lexically for deterministic generation output.
+ * @returns A negative, zero or positive lexical comparison result.
+ * @param left - First stable identity to compare.
+ * @param right - Second stable identity to compare.
+ */
 export function compareIds(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
+/** Validate canonical target descriptors against graph functions.
+ * @returns Validated canonical invocation targets keyed by identity.
+ * @param graph - Application graph being verified for this generation.
+ * @param candidates - Registered descriptors indexed by canonical function identifier.
+ * @param issues - Mutable safe diagnostics collected during verification.
+ */
 export function validateTargets(
   graph: ApplicationGraph,
   candidates: Readonly<Record<string, unknown>> | undefined,
@@ -175,6 +199,10 @@ export function validateTargets(
   return Object.freeze(targets);
 }
 
+/** Recognize non-null object records before reading native fields.
+ * @returns Whether the native value satisfies this guard.
+ * @param value - Native value being validated or projected.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

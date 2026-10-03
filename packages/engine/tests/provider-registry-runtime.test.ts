@@ -1,4 +1,3 @@
-import { expect, test } from "bun:test";
 import { GRAPH_VERSION } from "@relkit/contracts";
 import type { ApplicationGraph, GraphNode, ProviderBindingNode } from "@relkit/graph";
 import type {
@@ -6,7 +5,8 @@ import type {
   RuntimeProviderGeneration,
   RuntimeProviderRegistration,
 } from "@relkit/provider";
-import { createProviderRegistry } from "./src/provider-registry.ts";
+import { expect, test } from "vitest";
+import { createProviderRegistry } from "../src/provider-registry.js";
 
 const source = { file: "src/app.ts", line: 1, column: 1 } as const;
 
@@ -198,7 +198,9 @@ test("isolates binding values and lifecycle across concurrent applications", asy
       await gate.promise;
       return {
         value: context.connection.url,
-        release: () => released.push(context.generationId),
+        release: () => {
+          released.push(context.generationId);
+        },
       };
     }),
   ]);
@@ -234,8 +236,12 @@ test("runs readiness once and releases constructed bindings in reverse order", a
     runtimeIntegrationModules: modules([
       registration("cache", "redis", ({ bindingId }) => ({
         value: {},
-        ready: () => lifecycle.push(`ready:${bindingId}`),
-        release: () => lifecycle.push(`release:${bindingId}`),
+        ready: () => {
+          lifecycle.push(`ready:${bindingId}`);
+        },
+        release: () => {
+          lifecycle.push(`release:${bindingId}`);
+        },
       })),
     ]),
   });
@@ -289,7 +295,9 @@ test("cleans up a readiness failure without exposing its cause", async () => {
           ready: () => {
             if (bindingId === second.id) throw new Error("synthetic-secret-readiness");
           },
-          release: () => released.push(bindingId),
+          release: () => {
+            released.push(bindingId);
+          },
         })),
       ]),
     });
@@ -445,7 +453,8 @@ function logicalNode(binding: ProviderBindingNode, index: number): GraphNode {
           functionId: `relkit.agent.${base.id}.invoke`,
         },
       };
-    case "observability":
+    case "realtime":
+    case "agent-state":
       throw new Error("Observability has no logical profile consumer in this runtime cohort");
   }
 }

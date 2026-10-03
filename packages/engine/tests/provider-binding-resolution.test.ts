@@ -1,6 +1,6 @@
-import { expect, test } from "bun:test";
 import type { ProviderBindingNode } from "@relkit/graph";
-import { resolveProviderBindingConfiguration } from "./src/provider-binding-resolution.ts";
+import { expect, test } from "vitest";
+import { resolveProviderBindingConfiguration } from "../src/provider-binding-resolution.js";
 
 test("keeps local provider values scoped by binding and outside application environment", () => {
   const applicationEnvironment = Object.freeze({ CACHE_URL: "handler-visible" });
