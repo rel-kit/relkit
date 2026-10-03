@@ -9,6 +9,22 @@ import {
   type JobQueueState,
 } from "./queue-utils.js";
 
+/** Validates and constructs the initial durable queue entry.
+ * @param instanceId - Queue or journal instance identity.
+ * @param state - Current service-owned state.
+ * @param input - Caller-provided domain input.
+ * @param profile - Local provider profile partition.
+ * @param acceptedAt - Acceptance clock time in milliseconds.
+ * @param order - Stable acceptance ordering number.
+ * @param attempt - One-based completed attempt number.
+ * @param propagation - Validated trace propagation metadata.
+ * @param availableAt - Earliest eligibility time in milliseconds.
+ * @param leaseExpiresAt - Lease deadline in milliseconds.
+ * @param leaseOwner - Token identifying the lease owner.
+ * @param idempotency - Deduplication policy or retained acceptance record.
+ * @param failure - Attempt failure to classify.
+ * @returns The validated initial queue entry.
+ */
 export function makeEntry(
   instanceId: string,
   state: JobQueueState,
@@ -52,6 +68,10 @@ export function makeEntry(
   });
 }
 
+/** Validates the public failure metadata retained by a queue transition.
+ * @param value - Value to validate, normalize or project.
+ * @returns Nothing; rejects invalid input with the established domain error.
+ */
 export function assertFailure(value: JobFailureMetadata): void {
   const kinds = ["application", "provider", "cancellation", "timeout", "defect"];
   const outcomes = ["declared-error", "provider-failure", "cancelled", "timeout", "defect"];

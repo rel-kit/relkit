@@ -1,3 +1,4 @@
+import type { JobQueueAdminMutations } from "./queue-admin.types.js";
 import { normalizeId } from "@relkit/contracts";
 import type { JobStore } from "./store.js";
 import { nextEntry, persist } from "./queue-entry.js";
@@ -10,18 +11,14 @@ import {
   type JobQueueEntry,
 } from "./queue-utils.js";
 
-export interface JobQueueAdminMutations {
-  readonly adminRetry: (
-    instanceId: string,
-    options?: JobQueueAdminRetryOptions,
-  ) => Promise<JobQueueEntry>;
-  readonly adminDeadLetter: (
-    instanceId: string,
-    failure: JobFailureMetadata,
-  ) => Promise<JobQueueEntry>;
-}
+export type { JobQueueAdminMutations } from "./queue-admin.types.js";
 
-/** Adds explicit administrative transitions without changing worker transitions. */
+/** Adds explicit administrative transitions without changing worker transitions.
+ * @param store - Owning persisted-state or journal operations.
+ * @param entries - Persisted entries in the owning index.
+ * @param options - Operation-specific policy, hooks and configuration.
+ * @returns Serialized administrative queue transition methods.
+ */
 export function createJobQueueAdminMutations(
   store: JobStore,
   entries: Map<string, JobQueueEntry>,
@@ -30,6 +27,12 @@ export function createJobQueueAdminMutations(
     readonly serialize: <T>(work: () => Promise<T>) => Promise<T>;
   },
 ): JobQueueAdminMutations {
+  /**
+   * Validates retry eligibility and commits an administrative queue retry.
+   * @param instanceId - Queue instance identity.
+   * @param retryOptions - Retry preconditions and availability settings.
+   * @returns The updated queue entry after durable acknowledgement.
+   */
   const adminRetry = (
     instanceId: string,
     retryOptions: JobQueueAdminRetryOptions = {},
@@ -49,6 +52,12 @@ export function createJobQueueAdminMutations(
       return next;
     });
 
+  /**
+   * Validates and commits an administrative dead-letter transition.
+   * @param instanceId - Queue instance identity.
+   * @param failure - Safe failure metadata to retain.
+   * @returns The updated terminal queue entry.
+   */
   const adminDeadLetter = (
     instanceId: string,
     failure: JobFailureMetadata,
@@ -69,6 +78,11 @@ export function createJobQueueAdminMutations(
   return { adminRetry, adminDeadLetter };
 }
 
+/** Resolves the requested queue entry or raises the established missing-entry error.
+ * @param entries - Persisted entries in the owning index.
+ * @param instanceId - Queue or journal instance identity.
+ * @returns The requested queue entry.
+ */
 function getEntry(entries: Map<string, JobQueueEntry>, instanceId: string): JobQueueEntry {
   const normalized = normalizeId(instanceId);
   const entry = entries.get(normalized);
