@@ -1,9 +1,9 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createOperationId } from "@relkit/realtime";
-import { createLocalRealtimeProvider } from "./src/index.ts";
+import { createLocalRealtimeProvider } from "../src/index.ts";
 
 test("local realtime persists receipts and discovers events through polling", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-realtime-"));
@@ -43,7 +43,7 @@ test("local realtime persists receipts and discovers events through polling", as
       deadlineMs: Date.now() + 1_000,
       signal: controller.signal,
     });
-    await Bun.sleep(75);
+    await new Promise((resolve) => setTimeout(resolve, 75));
     await provider.append(eventRequest(undefined, undefined, "two", first.providerEpoch));
     await waiting;
     const page = await provider.readAfter({

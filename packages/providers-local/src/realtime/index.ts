@@ -1,4 +1,5 @@
-export * from "./provider.js";
+export { createLocalRealtimeProvider, createRealtimeProviderFromStore } from "./provider.js";
+export type { LocalRealtimeProviderOptions } from "./provider.js";
 export * from "./common.js";
 export type { RealtimeStateStore } from "./storage.js";
 export type { LocalRealtimeState } from "./state.js";

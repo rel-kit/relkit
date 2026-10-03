@@ -1,48 +1,26 @@
-import type { TriggerReceipt } from "@relkit/realtime";
+import type {
+  StoredRealtimeEvent,
+  StoredPresenceLease,
+  StoredRealtimePartition,
+  StoredAppendReceipt,
+  LocalRealtimeState,
+} from "./state.types.js";
+export type {
+  StoredRealtimeEvent,
+  StoredPresenceLease,
+  StoredRealtimePartition,
+  StoredAppendReceipt,
+  LocalRealtimeState,
+} from "./state.types.js";
 
 export const LOCAL_REALTIME_STATE_VERSION = 2;
 
-export interface StoredRealtimeEvent {
-  readonly sequence: number;
-  readonly eventId: string;
-  readonly event: string;
-  readonly payload: unknown;
-  readonly encodedBytes: number;
-  readonly createdAt: string;
-  readonly expiresAt: string;
-}
-
-export interface StoredPresenceLease {
-  readonly leaseId: string;
-  readonly connectionId: string;
-  readonly opaqueMemberId?: string;
-  readonly memberInfo?: unknown;
-  readonly expiresAt: string;
-}
-
-export interface StoredRealtimePartition {
-  readonly historyStart: number;
-  readonly events: readonly StoredRealtimeEvent[];
-  readonly presence: readonly StoredPresenceLease[];
-}
-
-export interface StoredAppendReceipt {
-  readonly semanticDigest: string;
-  readonly expiresAt: string;
-  readonly receipt: TriggerReceipt;
-}
-
-export interface LocalRealtimeState {
-  readonly version: typeof LOCAL_REALTIME_STATE_VERSION;
-  readonly providerEpoch: string;
-  readonly sequence: number;
-  readonly revision: number;
-  readonly retainedBytes: number;
-  readonly partitions: Readonly<Record<string, StoredRealtimePartition>>;
-  readonly receipts: Readonly<Record<string, StoredAppendReceipt>>;
-}
-
-export function emptyRealtimeState(epoch = crypto.randomUUID()): LocalRealtimeState {
+/**
+ * Creates format-v1 realtime state with an epoch and empty partition/receipt indexes.
+ * @param epoch - Provider generation identity.
+ * @returns An empty format-v1 realtime snapshot with its epoch.
+ */
+export function emptyRealtimeState(epoch: string = crypto.randomUUID()): LocalRealtimeState {
   return {
     version: LOCAL_REALTIME_STATE_VERSION,
     providerEpoch: epoch,

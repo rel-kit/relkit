@@ -1,108 +1,79 @@
-import { randomUUID } from "node:crypto";
-import { mkdir, readFile, rename, rmdir, stat, writeFile } from "node:fs/promises";
-import { join } from "node:path";
-import { ensureOwnedDirectory } from "../state.js";
-import {
-  emptyRealtimeState,
-  LOCAL_REALTIME_STATE_VERSION,
-  type LocalRealtimeState,
-  type StoredAppendReceipt,
-} from "./state.js";
+import type { RealtimeStateStore, RealtimeStateStoreEffects } from "./storage.types.js";
+import { Effect, Schema } from "effect";
+import { makeLocalStateStore } from "../state-store.service.js";
+import { runLocal, runLocalSync } from "../local-effect.js";
+import { emptyRealtimeState, type LocalRealtimeState } from "./state.js";
+import { RealtimeState } from "./state.schemas.js";
+import { LocalRealtimeError } from "./common.js";
 
-export interface RealtimeStateStore {
-  readonly read: () => Promise<LocalRealtimeState>;
-  readonly update: <Value>(
-    change: (state: LocalRealtimeState) => {
-      readonly state: LocalRealtimeState;
-      readonly value: Value;
-    },
-  ) => Promise<Value>;
-}
+export type { RealtimeStateStore, RealtimeStateStoreEffects } from "./storage.types.js";
 
-export function createRealtimeStateStore(root: string): RealtimeStateStore {
-  const owned = ensureOwnedDirectory(root);
-  const statePath = join(owned, "realtime.json");
-  const lockPath = join(owned, ".realtime.lock");
-  const ready = initializeState(statePath, lockPath);
-  return {
-    read: async () => {
-      await ready;
-      return readState(statePath);
-    },
-    update: async (change) => {
-      await ready;
-      return withLock(lockPath, async () => {
-        const current = pruneReceipts(await readState(statePath));
-        const result = change(current);
-        await writeState(statePath, result.state);
-        return result.value;
-      });
-    },
-  };
-}
-
-function pruneReceipts(state: LocalRealtimeState): LocalRealtimeState {
-  const now = Date.now();
-  const receipts = Object.fromEntries(
-    Object.entries(state.receipts).filter(([, receipt]) => Date.parse(receipt.expiresAt) > now),
-  ) as Readonly<Record<string, StoredAppendReceipt>>;
-  return { ...state, receipts };
-}
-
-async function initializeState(statePath: string, lockPath: string): Promise<void> {
-  await withLock(lockPath, async () => {
-    try {
-      await readState(statePath);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-      await writeState(statePath, emptyRealtimeState());
-    }
+/**
+ * Creates a lazy Effect store with the established snapshot and lock names.
+ * @param root - Owned directory containing realtime state.
+ * @returns The effect that constructs shared storage operations.
+ */
+export function makeRealtimeStateStore(root: string) {
+  return Effect.gen(function* () {
+    const store = yield* makeLocalStateStore({
+      root,
+      filename: "realtime.json",
+      lockname: ".realtime.lock",
+      empty: emptyRealtimeState,
+      decode: decodeState,
+      prune: pruneReceipts,
+      isExpectedFailure: (cause) =>
+        cause instanceof LocalRealtimeError ||
+        (cause instanceof Error &&
+          ["Presence lease does not exist.", "PRESENCE_CAPACITY_EXCEEDED"].includes(cause.message)),
+    });
+    return {
+      read: store.read,
+      update: <Value>(
+        change: (state: LocalRealtimeState) => {
+          readonly state: LocalRealtimeState;
+          readonly value: Value;
+        },
+      ) =>
+        store.update((state) => {
+          const next = change(state);
+          return [next.state, next.value] as const;
+        }),
+    } satisfies RealtimeStateStoreEffects;
   });
 }
 
-async function readState(path: string): Promise<LocalRealtimeState> {
-  try {
-    const value = JSON.parse(await readFile(path, "utf8")) as LocalRealtimeState;
-    if (value.version !== LOCAL_REALTIME_STATE_VERSION || typeof value.providerEpoch !== "string") {
-      throw new TypeError("Local realtime state version is invalid.");
-    }
-    return value;
-  } catch (error) {
-    throw error;
-  }
+/**
+ * Exposes the Promise transaction contract at an external adapter boundary.
+ * @param root - Owned state directory.
+ * @returns The lazily initialized store.
+ */
+export function createRealtimeStateStore(root: string): RealtimeStateStore {
+  const store = runLocalSync(makeRealtimeStateStore(root));
+  return { read: () => runLocal(store.read()), update: (change) => runLocal(store.update(change)) };
 }
 
-async function writeState(path: string, state: LocalRealtimeState): Promise<void> {
-  const temporary = `${path}.${process.pid}.${randomUUID()}.tmp`;
-  await writeFile(temporary, JSON.stringify(state), { flag: "wx", mode: 0o600 });
-  await rename(temporary, path);
+/**
+ * Validates the stored format before domain operations inspect records.
+ * @param value - Parsed snapshot.
+ * @returns The current version's state.
+ */
+function decodeState(value: unknown): LocalRealtimeState {
+  if (Schema.is(RealtimeState)(value)) return value;
+  return Schema.decodeUnknownSync(RealtimeState)(value);
 }
 
-async function withLock<Value>(path: string, action: () => Promise<Value>): Promise<Value> {
-  const deadline = Date.now() + 5_000;
-  while (!(await claimLock(path))) {
-    if (Date.now() >= deadline) throw new Error("Local realtime state lock timed out.");
-    await Bun.sleep(10);
-  }
-  try {
-    return await action();
-  } finally {
-    await rmdir(path).catch(() => undefined);
-  }
-}
-
-async function claimLock(path: string): Promise<boolean> {
-  try {
-    await mkdir(path);
-    return true;
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-    try {
-      const age = Date.now() - (await stat(path)).mtimeMs;
-      if (age > 30_000) await rmdir(path).catch(() => undefined);
-    } catch (statError) {
-      if ((statError as NodeJS.ErrnoException).code !== "ENOENT") throw statError;
-    }
-    return false;
-  }
+/**
+ * Removes expired receipts without changing retained event state.
+ * @param state - Committed snapshot.
+ * @param now - Clock time in milliseconds.
+ * @returns The snapshot with active receipts.
+ */
+function pruneReceipts(state: LocalRealtimeState, now: number): LocalRealtimeState {
+  return {
+    ...state,
+    receipts: Object.fromEntries(
+      Object.entries(state.receipts).filter(([, receipt]) => Date.parse(receipt.expiresAt) > now),
+    ),
+  };
 }
