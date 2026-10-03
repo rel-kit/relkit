@@ -4,7 +4,10 @@ import { LOCAL_BUCKET_RESERVED_PREFIXES, LocalBucketKeyError } from "./types.js"
 const WINDOWS_DRIVE = /^[A-Za-z]:/;
 const MAX_KEY_BYTES = 4_096;
 
-/** Validates an object key without normalizing away an attempted escape. */
+/** Validates an object key without normalizing away an attempted escape.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns The result described by the operation contract.
+ */
 export function normalizeBucketKey(value: unknown): string {
   if (typeof value !== "string" || value.length === 0) throw new LocalBucketKeyError();
   if (
@@ -26,7 +29,10 @@ export function normalizeBucketKey(value: unknown): string {
   return value;
 }
 
-/** Validates a list prefix while allowing the conventional trailing slash. */
+/** Validates a list prefix while allowing the conventional trailing slash.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns The result described by the operation contract.
+ */
 export function normalizeBucketPrefix(value: unknown): string {
   if (value === undefined || value === "") return "";
   if (typeof value !== "string") throw new LocalBucketKeyError();
@@ -53,15 +59,31 @@ export function normalizeBucketPrefix(value: unknown): string {
   return value;
 }
 
+/**
+ * Encodes a normalized key into a filesystem-safe object identity.
+ * @param key - Application key to validate and resolve.
+ * @returns The encoded key used in object filenames.
+ */
 export function encodeBucketKey(key: string): string {
   return Buffer.from(key, "utf8").toString("base64url");
 }
 
+/**
+ * Rejects a resolved path that escapes the owned root.
+ * @param root - Provider-owned root directory.
+ * @param candidate - Resolved path that must remain beneath the root.
+ * @returns Nothing for a contained path.
+ */
 export function assertContainedPath(root: string, candidate: string): void {
   const path = relative(resolve(root), resolve(candidate));
   if (path === "" || path.startsWith("..") || isAbsolute(path)) throw new LocalBucketKeyError();
 }
 
+/**
+ * Recognizes provider-owned path segments that callers cannot write.
+ * @param segment - One normalized path segment.
+ * @returns Whether the segment is reserved.
+ */
 function isReserved(segment: string | undefined): boolean {
   return (
     segment !== undefined &&

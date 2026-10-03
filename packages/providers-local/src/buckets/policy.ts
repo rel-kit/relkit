@@ -7,6 +7,11 @@ import {
 
 const CONTENT_TYPE = /^(?:[A-Za-z0-9!#$&^_.+-]+|\*)\/(?:[A-Za-z0-9!#$&^_.+-]+|\*)$/;
 
+/**
+ * Validates provider limits and normalizes effective policy defaults.
+ * @param options - Caller policy, pagination or construction settings.
+ * @returns An immutable validated provider policy.
+ */
 export function normalizePolicy(options: LocalBucketProviderOptions): Readonly<LocalBucketPolicy> {
   const source = options.policy ?? {};
   const maxObjectBytes = options.maxObjectBytes ?? source.maxObjectBytes;
@@ -25,6 +30,13 @@ export function normalizePolicy(options: LocalBucketProviderOptions): Readonly<L
   });
 }
 
+/**
+ * Checks object size, content type and metadata before storage.
+ * @param bytes - Caller-provided object bytes.
+ * @param options - Caller policy, pagination or construction settings.
+ * @param policy - Validated effective provider policy.
+ * @returns Normalized content type and metadata fields.
+ */
 export function validatePut(
   bytes: Uint8Array,
   options: BucketPutOptions | undefined,
@@ -47,6 +59,11 @@ export function validatePut(
   };
 }
 
+/**
+ * Validates configured MIME patterns and removes duplicate entries.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns The normalized allowed MIME patterns.
+ */
 function normalizeContentTypes(value: readonly string[]): readonly string[] {
   if (!Array.isArray(value) || value.length === 0) {
     throw new LocalBucketPolicyError("allowedContentTypes must not be empty");
@@ -63,6 +80,11 @@ function normalizeContentTypes(value: readonly string[]): readonly string[] {
   return Object.freeze(result);
 }
 
+/**
+ * Validates and normalizes an optional object content type.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns A normalized MIME type or undefined.
+ */
 function normalizeContentType(value: unknown): string | undefined {
   if (value === undefined) return undefined;
   if (typeof value !== "string" || !CONTENT_TYPE.test(value.trim())) {
@@ -71,6 +93,11 @@ function normalizeContentType(value: unknown): string | undefined {
   return value.trim().toLowerCase();
 }
 
+/**
+ * Validates object metadata names and string values.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @returns An immutable string metadata record.
+ */
 function normalizeMetadata(value: BucketPutOptions["metadata"]): Readonly<Record<string, string>> {
   if (value === undefined) return Object.freeze({});
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
@@ -85,6 +112,12 @@ function normalizeMetadata(value: BucketPutOptions["metadata"]): Readonly<Record
   return Object.freeze(Object.fromEntries(entries.sort(([a], [b]) => a.localeCompare(b))));
 }
 
+/**
+ * Checks a content type against exact and wildcard MIME policies.
+ * @param value - Candidate value to validate, normalize or encode.
+ * @param allowed - Configured exact or wildcard MIME patterns.
+ * @returns Whether an allowed pattern matches.
+ */
 function matchesContentType(value: string, allowed: string): boolean {
   return (
     allowed === "*/*" ||
