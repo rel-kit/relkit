@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.5.5
+
+### Changes
+
+- Refactor execution services with Effect and fix runtime regressions
+
 ## 0.5.4
 
 ### Changes
