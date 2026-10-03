@@ -1,6 +1,15 @@
 import type { HttpTriggerRegistration } from "@relkit/graph";
 import type { HttpRequestState } from "./middleware.js";
 
+/** Records the limiter's duration, response status and blocked outcome.
+ * @param trigger - Registered route declaration with its target and transport contract.
+ * @param state - State owned by the current request or operation.
+ * @param startedAt - Operation start timestamp used for elapsed-time telemetry.
+ * @param status - HTTP status associated with the observed response or lifecycle event.
+ * @param blocked - Whether the limiter rejected the request.
+ * @param continued - Whether control reached the downstream handler.
+ * @returns Nothing; the requested update is applied to the owned state.
+ */
 export function recordRateLimitResult(
   trigger: HttpTriggerRegistration,
   state: HttpRequestState | undefined,

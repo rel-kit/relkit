@@ -6,6 +6,8 @@ import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { getRequestState } from "./middleware.js";
 import { createRateLimitStore, type RateLimitStoreResolver } from "./rate-limit-store.js";
 import { recordRateLimitResult } from "./rate-limit-telemetry.js";
+import type { RouteHandler } from "./rate-limit.types.js";
+export type { RateLimitRuntimeOptions } from "./rate-limit.types.js";
 
 export const ROUTE_MIDDLEWARE_ORDER = Object.freeze([
   "rate-limit",
@@ -13,14 +15,14 @@ export const ROUTE_MIDDLEWARE_ORDER = Object.freeze([
   "request-mapping",
   "target",
 ] as const);
-
-export interface RateLimitRuntimeOptions {
-  readonly resolveStore?: RateLimitStoreResolver;
-}
-
-type RouteHandler = (context: Context) => Promise<Response>;
 const INFO_KEY = "relkit.rateLimit";
 
+/** Applies the declared fixed-window policy before invoking a route handler.
+ * @param trigger - Registered route declaration with its target and transport contract.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param handler - Native handler executed within the configured boundary.
+ * @returns The original handler without a policy, or a handler enforcing the declared limit.
+ */
 export function withRateLimit(
   trigger: HttpTriggerRegistration,
   options: RouteMaterializationOptions,
@@ -88,6 +90,13 @@ export function withRateLimit(
   };
 }
 
+/** Adds standard rate-limit headers while preserving the original response body.
+ * @param response - Native response whose status, headers and body lifetime are preserved.
+ * @param policy - Declared route rate-limit policy.
+ * @param info - Limiter result used to write standard response headers.
+ * @param blocked - Whether the limiter rejected the request.
+ * @returns A response preserving the body and status with limit, remaining and reset headers.
+ */
 function withStandardHeaders(
   response: Response,
   policy: NonNullable<HttpTriggerRegistration["config"]["rateLimit"]>,
@@ -114,6 +123,11 @@ function withStandardHeaders(
   });
 }
 
+/** Resolves the configured counter provider or reports a missing store.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param storeId - Declared provider binding supplying the counter store.
+ * @returns The configured store resolver, or a resolver that reports the missing binding when used.
+ */
 function requiredResolver(
   options: RouteMaterializationOptions,
   storeId: string,
@@ -125,11 +139,21 @@ function requiredResolver(
   };
 }
 
+/** Builds the declared rate-limit identity from trusted request sources.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param source - Native iterable or declared request-key source.
+ * @returns A serialized tuple of source kind, source name and the extracted request value.
+ */
 function requestKey(context: Context, source: unknown): string {
   const value = sourceValue(context, source);
   return JSON.stringify([projection(source, "kind"), projection(source, "name"), value]);
 }
 
+/** Reads one supported rate-limit key source from the active request.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param source - Native iterable or declared request-key source.
+ * @returns The configured constant or request value, or null when the source is unavailable.
+ */
 function sourceValue(context: Context, source: unknown): unknown {
   const kind = projection(source, "kind");
   const name = projection(source, "name");
@@ -144,6 +168,11 @@ function sourceValue(context: Context, source: unknown): unknown {
   return kind === "cookie" ? cookie(context.req.header("cookie"), name) : null;
 }
 
+/** Reads a named cookie without exposing unrelated cookie values.
+ * @param header - Raw header value parsed without trusting malformed input.
+ * @param name - Declared field, header, stream or configuration key.
+ * @returns The decoded cookie value, its raw value for malformed encoding, or null when absent.
+ */
 function cookie(header: string | undefined, name: string): string | null {
   const value = header
     ?.split(";")
@@ -158,12 +187,21 @@ function cookie(header: string | undefined, name: string): string | null {
   }
 }
 
+/** Selects the declared property from a structured rate-limit key source.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @param key - Declared property or field key.
+ * @returns The named object property, or undefined for a non-object source.
+ */
 function projection(value: unknown, key: string): unknown {
   return value !== null && typeof value === "object"
     ? (value as Record<string, unknown>)[key]
     : undefined;
 }
 
+/** Reads the limiter result stored on the Hono request context.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @returns The limiter metadata stored on the context, or undefined before a result is available.
+ */
 function rateInfo(context: Context): RateLimitInfo | undefined {
   const value = (context.var as Record<string, unknown>)[INFO_KEY];
   return value !== null && typeof value === "object" ? (value as RateLimitInfo) : undefined;

@@ -1,17 +1,13 @@
-import { afterEach, describe, expect, setSystemTime, test } from "bun:test";
-import {
-  createObservabilityCollector,
-  type RequestRecord,
-  type SpanRecord,
-} from "@relkit/observability";
+import { afterEach, describe, expect, vi, test } from "vitest";
+import { createObservabilityCollector } from "@relkit/observability";
 import type { RegistrationPlan } from "@relkit/graph";
-import { createApp, type RateLimitCounter, type RuntimeManifest } from "./src/index.js";
+import { createApp, type RateLimitCounter, type RuntimeManifest } from "../src/index.js";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/routes/limited/route.ts", line: 1, column: 1 } as const;
 
 describe("route rate limiting", () => {
-  afterEach(() => setSystemTime());
+  afterEach(() => vi.useRealTimers());
 
   test("uses generation-local memory with standard headers and a safe response", async () => {
     const calls: string[] = [];
@@ -45,7 +41,7 @@ describe("route rate limiting", () => {
 
   test("shares counters across runtimes, isolates keys, expires windows, and records telemetry", async () => {
     const now = new Date("2026-01-01T00:00:00Z");
-    setSystemTime(now);
+    vi.setSystemTime(now);
     const counter = memoryCounter();
     const collector = createObservabilityCollector();
     const events: string[] = [];
@@ -92,7 +88,7 @@ describe("route rate limiting", () => {
       (await secondRuntime.request("http://localhost/limited", { headers: { "x-api-key": "b" } }))
         .status,
     ).toBe(200);
-    setSystemTime(now.getTime() + 50);
+    vi.setSystemTime(now.getTime() + 50);
     expect(
       (await secondRuntime.request("http://localhost/limited", { headers: { "x-api-key": "a" } }))
         .status,
@@ -101,10 +97,11 @@ describe("route rate limiting", () => {
     expect(events.slice(0, 2)).toEqual(["rate-limit", "hello"]);
     const records = collector.read();
     const blocked = records.find(
-      (record): record is RequestRecord => record.signal === "request" && record.status === 429,
+      (record): record is Extract<typeof record, { signal: "request" }> =>
+        record.signal === "request" && record.status === 429,
     );
     const span = records.find(
-      (record): record is SpanRecord =>
+      (record): record is Extract<typeof record, { signal: "span" }> =>
         record.signal === "span" &&
         record.status === "completed" &&
         record.attributes?.["relkit.rate_limit.blocked"] === true,
@@ -160,6 +157,7 @@ function plan(
       : [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }
