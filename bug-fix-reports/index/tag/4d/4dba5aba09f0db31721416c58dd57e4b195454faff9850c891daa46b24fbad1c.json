@@ -1,39 +1,6 @@
 {
-  "key": "compiler",
+  "key": "scaffolding",
   "matches": {
-    "bf-7060d67d9ed666c13eafbd48": {
-      "id": "bf-7060d67d9ed666c13eafbd48",
-      "status": "verified",
-      "what": "Annotated ServiceRouteOptions falsely reject a valid explicit path mapping.",
-      "root_cause": "packages/routes/src/define-service-routes.types.ts:45-49 requires a request property while ServiceRouteOptions declares it optional, dropping its request mapping type to undefined.",
-      "fixed_by": "Infer EntryRequest from the public optional request property and include undefined in the constraint, preserving explicitly undefined requests. Focused type, installed declaration, editor, CLI graph/activation and failure-preservation regressions pass.",
-      "files": [
-        "packages/routes/src/define-service-routes.types.ts",
-        "tests/types/route-path-input.ts",
-        "tests/compiler/route-path-types.test.ts",
-        "packages/cli/route-review-regressions.test.ts"
-      ],
-      "attempt": 1,
-      "updated_at": "2026-10-01T11:17:45+00:00",
-      "report": "bug-fix-reports/issues/bf-7060d67d9ed666c13eafbd48/report.md"
-    },
-    "bf-6a2d5e332c5614c85eaea8cf": {
-      "id": "bf-6a2d5e332c5614c85eaea8cf",
-      "status": "verified",
-      "what": "Excluded route fixtures are imported and diagnosed as application routes.",
-      "root_cause": "packages/compiler/src/route-module-checks.ts:14 and route-source-checks.ts:20-21 only match route.ts filenames without discovery's exclusion directory conventions.",
-      "fixed_by": "Make isRouteModule ignore exact __tests__ and __fixtures__ directory segments within src/routes and reuse that predicate in generated contracts. Keep the generator's root route-directory restriction. Actual CLI and packaged editor regressions, including invalid application routes, pass.",
-      "files": [
-        "packages/compiler/src/route-source-checks.ts",
-        "packages/compiler/src/route-module-checks.ts",
-        "tests/compiler/route-module-exclusions.test.ts",
-        "packages/cli/route-review-regressions.test.ts",
-        "packages/cli/editor.test.ts"
-      ],
-      "attempt": 1,
-      "updated_at": "2026-10-01T11:17:45+00:00",
-      "report": "bug-fix-reports/issues/bf-6a2d5e332c5614c85eaea8cf/report.md"
-    },
     "bf-d0e2081766cb3a42da7fe7d9": {
       "id": "bf-d0e2081766cb3a42da7fe7d9",
       "status": "verified",

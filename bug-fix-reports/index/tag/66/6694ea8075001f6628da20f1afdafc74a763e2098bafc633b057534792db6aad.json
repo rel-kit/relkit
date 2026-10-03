@@ -1,0 +1,66 @@
+{
+  "key": "transport",
+  "matches": {
+    "bf-19f2be712a48c039f8a3730a": {
+      "id": "bf-19f2be712a48c039f8a3730a",
+      "status": "verified",
+      "what": "Malformed realtime channel params become an internal-server error.",
+      "root_cause": "channelContext threw a native TypeError for client schema rejection. The Effect/native stream boundary retained it, and oRPC redacted it as an internal error.",
+      "fixed_by": "Throw an explicit ORPCError BAD_REQUEST at the client parameter validation boundary; retain stored-value validation behavior. Same real API reproduction and regression tests now pass.",
+      "files": [
+        "packages/runtime-hono/src/realtime-rpc-support.ts",
+        "packages/runtime-hono/tests/realtime-rpc.test.ts",
+        "tests/e2e-commerce/generated-ai-regressions.spec.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T23:32:16+00:00",
+      "report": "bug-fix-reports/issues/bf-19f2be712a48c039f8a3730a/report.md"
+    },
+    "bf-f3a184488ae7788d49dc7f5b": {
+      "id": "bf-f3a184488ae7788d49dc7f5b",
+      "status": "verified",
+      "what": "Returning an HTTP realtime iterator retains owned presence.",
+      "root_cause": "httpLink delegated stream closure to the oRPC decoder without aborting its fetch. Decoder closure did not promptly disconnect the upstream request, leaving the runtime presence lease active.",
+      "fixed_by": "Give each HTTP call a private AbortController, combine it with caller cancellation, and abort before delegating return/throw. Cover pending pulls and preserve caller signal ownership. Same real API reproduction and regression tests now pass.",
+      "files": [
+        "packages/client/src/index.ts",
+        "packages/client/http-cancellation.test.ts",
+        "tests/e2e-commerce/generated-ai-regressions.spec.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T23:32:16+00:00",
+      "report": "bug-fix-reports/issues/bf-f3a184488ae7788d49dc7f5b/report.md"
+    },
+    "bf-b6fb29be5d2d6bd71cdfde3b": {
+      "id": "bf-b6fb29be5d2d6bd71cdfde3b",
+      "status": "verified",
+      "what": "Public dev-origin HTTP mutations and WebSockets are rejected.",
+      "root_cause": "proxy-forward.ts removed Host and proxy-websocket.ts did not retain public Host. Bun reconstructed request.url using the private child authority, so transport-security.ts compared the public Origin with the wrong port.",
+      "fixed_by": "Preserve the public request URL authority in Host for HTTP and WebSocket forwarding. Same real API reproduction and regression tests now pass.",
+      "files": [
+        "packages/supervisor/src/proxy-forward.ts",
+        "packages/supervisor/src/proxy-websocket.ts",
+        "packages/supervisor/proxy-origin.test.ts",
+        "tests/e2e-commerce/generated-ai-regressions.spec.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T23:38:55+00:00",
+      "report": "bug-fix-reports/issues/bf-b6fb29be5d2d6bd71cdfde3b/report.md"
+    },
+    "bf-e40ace89ce2e110b662b61ac": {
+      "id": "bf-e40ace89ce2e110b662b61ac",
+      "status": "verified",
+      "what": "Invalid agent payload is classified BAD_REQUEST but sent as HTTP 500.",
+      "root_cause": "createRpcRouter supplied a custom errorStatusMap without COMMON_ERROR_STATUS_MAP. oRPC treats that map as a replacement, so unmapped standard errors defaulted to 500.",
+      "fixed_by": "Merge oRPC standard error statuses before configured domain overrides. Same real API reproduction and regression tests now pass.",
+      "files": [
+        "packages/runtime-hono/src/rpc.ts",
+        "packages/runtime-hono/tests/rpc-error-status.test.ts",
+        "tests/e2e-commerce/generated-ai-regressions.spec.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T23:38:55+00:00",
+      "report": "bug-fix-reports/issues/bf-e40ace89ce2e110b662b61ac/report.md"
+    }
+  }
+}
