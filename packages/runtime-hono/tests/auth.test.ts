@@ -1,6 +1,6 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { Hono } from "hono";
-import { createHttpAuthRuntime, registerAuthMiddleware } from "./src/auth.ts";
+import { createHttpAuthRuntime, registerAuthMiddleware } from "../src/auth.ts";
 
 test("auth sessions are lazy, header-bound, and memoized per request", async () => {
   let calls = 0;

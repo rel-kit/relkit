@@ -1,7 +1,8 @@
-import { expect, test } from "bun:test";
-import { createClient } from "@relkit/client";
+import { createFixtureClient, appFetch } from "./fixture-client.js";
+import { expect, test } from "vitest";
+
 import type { RegistrationPlan } from "@relkit/graph";
-import { createApp, type RuntimeManifest } from "./src/index.ts";
+import { createApp, type RuntimeManifest } from "../src/index.ts";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const schema = {
@@ -35,13 +36,13 @@ test("serves non-cacheable identity and rejects a stale mutation before executio
   expect(identity.headers.get("cache-control")).toBe("no-store, private");
   expect(await identity.json()).toMatchObject({ sessionEpoch: "session-a" });
 
-  const client = createClient<any>({
+  const client = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers: {
       "x-relkit-identity-scope": "user-1",
       "x-relkit-session-epoch": "session-a",
     },
-    fetch: (request, init) => app.fetch(new Request(request, init)),
+    fetch: appFetch(app),
   });
   epoch = "session-b";
   await expect(client["mutate.route"]({ value: 1 })).rejects.toMatchObject({
@@ -67,9 +68,9 @@ test("registers method/path aliases and excludes client false routes", async () 
     manifest: manifest(plan),
     engine: { invoke: async () => ({ ok: true }) },
   });
-  const client = createClient<any>({
+  const client = createFixtureClient({
     baseUrl: "http://relkit.test",
-    fetch: (request, init) => app.fetch(new Request(request, init)),
+    fetch: appFetch(app),
   });
   expect(await client["POST /mutate"]({})).toEqual({ ok: true });
   await expect(client["private.route"]({})).rejects.toHaveProperty("code", "NOT_FOUND");
@@ -105,6 +106,7 @@ function mutationPlan(): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }

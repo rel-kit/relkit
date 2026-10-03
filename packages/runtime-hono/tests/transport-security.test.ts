@@ -1,7 +1,7 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { AGENT_CAPABILITY_HEADER } from "@relkit/contracts";
 import type { RegistrationPlan } from "@relkit/graph";
-import { assertWebSocketOrigin, createApp } from "./src/index.ts";
+import { assertWebSocketOrigin, createApp } from "../src/index.ts";
 import { runtimeCohort } from "./test-cohort.ts";
 
 test("state-changing routes reject bad origins and require cross-origin CSRF", async () => {
@@ -139,6 +139,7 @@ function rawPlan(): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }
