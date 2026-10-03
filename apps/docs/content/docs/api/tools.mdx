@@ -542,6 +542,8 @@ declare const validateSideEffectEffect: (
 
 ## Exports Grouped by Category
 
+- [Tools](#tools)
+  - [defineTool](#definetool)
 - [utils](#utils)
   - ["./define-tool.types.js" (namespace export)](#define-tooltypesjs-namespace-export)
   - [ToolApprovalDeniedError](#toolapprovaldeniederror)
@@ -550,7 +552,6 @@ declare const validateSideEffectEffect: (
   - [ToolOperationCancelledError](#tooloperationcancellederror)
   - [assertToolDescriptor](#asserttooldescriptor)
   - [assertToolDescriptorEffect](#asserttooldescriptoreffect)
-  - [defineTool](#definetool)
   - [defineToolEffect](#definetooleffect)
   - [isToolDescriptor](#istooldescriptor)
   - [isToolDescriptorEffect](#istooldescriptoreffect)
@@ -558,6 +559,49 @@ declare const validateSideEffectEffect: (
   - [isToolRefEffect](#istoolrefeffect)
 
 ---
+
+# Tools
+
+## defineTool
+
+Defines a frozen, handler-free tool view over one function.
+
+**Throws**
+
+TypeError for malformed target, metadata, or ID.
+
+**Example**
+
+```ts
+import { defineFunction } from "@relkit/functions";
+import { z } from "@relkit/schema";
+import { defineTool } from "@relkit/tools";
+const lookup = defineFunction({
+  id: "orders.lookup",
+  input: z.string(),
+  output: z.string(),
+  handler: (id) => id,
+});
+const tool = defineTool({
+  id: "orders.lookup-tool",
+  target: lookup,
+  description: "Read order",
+  sideEffect: "read",
+  approval: "never",
+});
+```
+
+**Signature**
+
+```ts
+declare const defineTool: <const Id extends string, const Target extends FunctionRefAny>(
+  options: DefineToolOptions<Id, Target>,
+) => ToolDescriptor<Id, Target>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L137)
+
+Since v0.1.0
 
 # utils
 
@@ -634,36 +678,6 @@ declare const assertToolDescriptorEffect: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L32)
-
-## defineTool
-
-Defines a frozen, handler-free tool view over one function.
-
-**Throws**
-
-TypeError for malformed target, metadata, or ID.
-
-**Example**
-
-```ts
-const tool = defineTool({
-  id: "orders.lookup",
-  target,
-  description: "Read order",
-  sideEffect: "read",
-  approval: "never",
-});
-```
-
-**Signature**
-
-```ts
-declare const defineTool: <const Id extends string, const Target extends FunctionRefAny>(
-  options: DefineToolOptions<Id, Target>,
-) => ToolDescriptor<Id, Target>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L123)
 
 ## defineToolEffect
 

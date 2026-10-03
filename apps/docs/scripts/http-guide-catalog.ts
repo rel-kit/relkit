@@ -65,7 +65,7 @@ export const httpGuideRelations = [
   {
     path: "http/streaming",
     api: ["routes", "functions", "client"],
-    examples: ["packages/runtime-hono/native-stream.test.ts"],
+    examples: ["packages/runtime-hono/tests/native-stream.test.ts"],
   },
   {
     path: "http/raw-handlers",

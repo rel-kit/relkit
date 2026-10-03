@@ -786,7 +786,7 @@ declare const createTestApplication: (
 ) => Promise<TestApplication>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L53)
 
 Since v0.1.0
 
@@ -807,7 +807,7 @@ export interface TestApplication {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L29)
 
 ## TestApplicationOptions (type alias)
 
@@ -817,6 +817,8 @@ export interface TestApplication {
 type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
   readonly projectRoot?: string;
   readonly bindingValues?: Readonly<Record<string, JsonValue>>;
+  /** Explicitly replace bucket/cache profiles with isolated in-memory resources. */
+  readonly resourceProviders?: "configured" | "fake";
 };
 ```
 
@@ -3623,6 +3625,7 @@ declare const activateTestProviders: (
   replacements: TestProviderReplacements,
   bindingValues: Readonly<Record<string, JsonValue>> | undefined,
   fakes: TestFakes,
+  fakeResources?: boolean,
 ) => Promise<ProviderRegistry | undefined>;
 ```
 

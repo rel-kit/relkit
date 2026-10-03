@@ -150,7 +150,7 @@ const relations = [
   relation(
     "operations/realtime-agents-streaming",
     ["realtime", "agents", "client"],
-    ["packages/runtime-hono/realtime-rpc.test.ts"],
+    ["packages/runtime-hono/tests/realtime-rpc.test.ts"],
   ),
   relation(
     "operations/testing",

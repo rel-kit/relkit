@@ -404,7 +404,7 @@
     {
       "path": "http/streaming",
       "api": ["routes", "functions", "client"],
-      "examples": ["packages/runtime-hono/native-stream.test.ts"]
+      "examples": ["packages/runtime-hono/tests/native-stream.test.ts"]
     },
     {
       "path": "http/raw-handlers",
@@ -942,7 +942,7 @@
     {
       "path": "operations/realtime-agents-streaming",
       "api": ["realtime", "agents", "client"],
-      "examples": ["packages/runtime-hono/realtime-rpc.test.ts"]
+      "examples": ["packages/runtime-hono/tests/realtime-rpc.test.ts"]
     },
     {
       "path": "operations/testing",
