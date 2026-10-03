@@ -1,0 +1,23 @@
+{"operation":"generated function invocation","origin":"absent","status":200,"output":{"message":"Hello, Origin validation!"}}
+{"operation":"generated function invocation","origin":"http://127.0.0.1:3330","status":403,"error":{"id":"ORIGIN_DENIED","message":"Request rejected."}}
+{"operation":"same-origin WebSocket","origin":"http://127.0.0.1:3330","open":false,"close":{"code":1011,"reason":"Upstream failed."}}
+58 |     import.meta.url,
+59 |   ),
+60 |   JSON.stringify({ base, results }, null, 2),
+61 | );
+62 | assert.equal(results[0].status, 200, "trusted local invocation");
+63 | assert.equal(results[1].status, 200, "same-origin public invocation");
+            ^
+AssertionError: same-origin public invocation
+
+403 !== 200
+
+ generatedMessage: false,
+     actual: 403,
+   expected: 200,
+   operator: "strictEqual",
+       code: "ERR_ASSERTION"
+
+      at /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/verify-dev-origin.mjs:63:8
+
+Bun v1.3.10 (macOS arm64)
