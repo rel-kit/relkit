@@ -1,16 +1,17 @@
-import { describe, expect, test } from "bun:test";
-import { Effect } from "effect";
 import { bindDescriptorIdentity, createUnboundIdentity } from "@relkit/invocation";
-import { z } from "@relkit/schema";
 import type { InvocationRunner } from "@relkit/runtime-effect";
+import { z } from "@relkit/schema";
+import { Effect } from "effect";
+import { describe, expect, test } from "vitest";
 import {
   DependencyAccessError,
   buildDependencyClients,
   type DependencyBridge,
+  type DependencyBridgeOptions,
   type DependencyClientSources,
-} from "./src/dependencies.ts";
-import { dependencyId } from "./src/dependency-clients.ts";
-import { invokeFunction, type InvocationContext, type InvocationTarget } from "./src/index.ts";
+} from "../src/dependencies.js";
+import { dependencyId } from "../src/dependency-clients.js";
+import { invokeFunction, type InvocationContext, type InvocationTarget } from "../src/index.js";
 
 const ref = (kind: string, id: string) => ({ ref: { kind, id } });
 
@@ -50,7 +51,7 @@ describe("declared dependency clients", () => {
     const observed: unknown[] = [];
     const operations: unknown[] = [];
     const bridge: DependencyBridge = {
-      run: async <A>(operation, options) => {
+      run: async <A>(operation: () => A | Promise<A>, options?: DependencyBridgeOptions) => {
         bridged.push(options?.name ?? "missing");
         return operation();
       },
@@ -59,11 +60,11 @@ describe("declared dependency clients", () => {
       },
     };
     const sources: DependencyClientSources = {
-      jobs: { send: { enqueue: async (input) => ({ input }) } },
-      events: { "orders.created": { publish: async (payload) => ({ payload }) } },
+      jobs: { send: { enqueue: async (input: unknown) => ({ input }) } },
+      events: { "orders.created": { publish: async (payload: unknown) => ({ payload }) } },
       buckets: { files: { put: async () => undefined, get: async () => new Uint8Array() } },
       cache: { prices: { get: async () => 3, set: async () => undefined } },
-      agents: { summarize: async (input) => ({ input }) },
+      agents: { summarize: async (input: unknown) => ({ input }) },
     };
     const clients = buildDependencyClients({
       ownerId: "orders.handle",
@@ -76,9 +77,15 @@ describe("declared dependency clients", () => {
       },
       sources,
       bridge,
-      onDeclaredEdge: (edge) => declared.push(edge),
-      onObservedEdge: (edge) => observed.push(edge),
-      onOperation: (operation) => operations.push(operation),
+      onDeclaredEdge: (edge) => {
+        declared.push(edge);
+      },
+      onObservedEdge: (edge) => {
+        observed.push(edge);
+      },
+      onOperation: (operation) => {
+        operations.push(operation);
+      },
     });
 
     await (clients.jobs.send as { enqueue: (input: unknown) => Promise<unknown> }).enqueue({});
@@ -159,8 +166,12 @@ describe("declared dependency clients", () => {
         effectRunner: runner,
         clients: { jobs: { "orders.send": { enqueue: async () => ({}) } } },
         hooks: {
-          onDeclaredEdge: (edge) => declared.push(edge),
-          onObservedEdge: (edge) => observed.push(edge),
+          onDeclaredEdge: (edge) => {
+            declared.push(edge);
+          },
+          onObservedEdge: (edge) => {
+            observed.push(edge);
+          },
         },
       },
     );
@@ -183,7 +194,9 @@ describe("declared dependency clients", () => {
         calls.push(request);
         return { answer: "ok" };
       },
-      onObservedEdge: (edge) => observed.push(edge),
+      onObservedEdge: (edge) => {
+        observed.push(edge);
+      },
     });
 
     await (clients.agents.support as (input: unknown) => Promise<unknown>)({ question: "status" });

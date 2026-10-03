@@ -1,8 +1,8 @@
-import { describe, expect, test } from "bun:test";
 import type { ProtocolId } from "@relkit/contracts";
 import { dispatchInvocation } from "@relkit/invocation";
 import { z } from "@relkit/schema";
-import { InvocationValidationError, invokeFunction, type InvocationTarget } from "./src/index.ts";
+import { describe, expect, test } from "vitest";
+import { InvocationValidationError, invokeFunction, type InvocationTarget } from "../src/index.js";
 const valueInput = z.object({ value: z.number() });
 const valueOutput = z.object({ value: z.number() });
 
@@ -20,8 +20,8 @@ function ids() {
 
 describe("direct child descriptor invocation", () => {
   test("invokes a child with independent identity and inherited trace state", async () => {
-    const records: Array<Record<string, unknown>> = [];
-    const spans: Array<Record<string, unknown>> = [];
+    const records: import("../src/index.js").InvocationRecord[] = [];
+    const spans: import("../src/index.js").SpanRecord[] = [];
     const now = Date.now();
     let childSignal: AbortSignal | undefined;
     const child: InvocationTarget = {
@@ -53,8 +53,12 @@ describe("direct child descriptor invocation", () => {
         now: () => now,
         timeoutMs: 500,
         hooks: {
-          onInvocationStart: (record) => records.push(record),
-          onSpanStart: (span) => spans.push(span),
+          onInvocationStart: (record) => {
+            records.push(record);
+          },
+          onSpanStart: (span) => {
+            spans.push(span);
+          },
         },
       },
     );
@@ -123,8 +127,9 @@ describe("direct child descriptor invocation", () => {
         {
           idSource: ids(),
           hooks: {
-            onCompletion: (event) =>
-              outcomes.push({ functionId: event.record.functionId, outcome: event.outcome }),
+            onCompletion: (event) => {
+              outcomes.push({ functionId: event.record.functionId, outcome: event.outcome });
+            },
           },
         },
       );

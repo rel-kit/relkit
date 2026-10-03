@@ -2,6 +2,13 @@ import type { MaybePromise } from "@relkit/contracts";
 import type { DependencyBridgeOptions, DependencyClientBuildOptions } from "./dependencies.js";
 import { DependencyNotConfiguredError } from "./dependency-clients.js";
 
+/** Bridge declared task submission while retaining native durable execution ownership.
+ * @returns A native task submission client with the active invocation propagation.
+ * @param name - Declared operation, dependency or field name.
+ * @param source - Explicit native source or source collection.
+ * @param options - Explicit configuration and dependencies for this operation.
+ * @param taskId - Canonical task identifier passed to the durable submitter and producer span.
+ */
 export function createTaskDependencyClient(
   name: string,
   source: unknown,
@@ -16,6 +23,11 @@ export function createTaskDependencyClient(
   if (source !== undefined && !isTrigger(source) && typeof source !== "function") {
     throw new TypeError(`Invalid task client "${name}"`);
   }
+  /** Submit a declared task while propagating the current invocation's cancellation and trace.
+   * @param input - Task input forwarded to the authoritative native submitter.
+   * @param request - Explicit durable submission options and optional signal.
+   * @returns A Promise containing the native task submission result.
+   */
   const trigger = (input: unknown, request: Readonly<Record<string, unknown>> = {}) => {
     const signal = options.signal?.();
     const bridgeOptions: DependencyBridgeOptions = {
@@ -25,6 +37,9 @@ export function createTaskDependencyClient(
       input,
       kind: "producer",
     };
+    /** Resolve the configured submitter and pass the declared task identity and options.
+     * @returns The native submission result, or a missing-dependency error before submission.
+     */
     const work = (): MaybePromise<unknown> => {
       if (source === undefined && options.invokeTask === undefined) {
         throw new DependencyNotConfiguredError("tasks", name);
@@ -54,6 +69,10 @@ export function createTaskDependencyClient(
   return Object.freeze({ trigger });
 }
 
+/** Recognize native durable task submission capability.
+ * @returns Whether the native value satisfies this guard.
+ * @param value - Native value being validated or projected.
+ */
 function isTrigger(
   value: unknown,
 ): value is { readonly trigger: (input: unknown, options?: unknown) => MaybePromise<unknown> } {

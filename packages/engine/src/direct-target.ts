@@ -1,7 +1,13 @@
 import type { DirectFunctionRequest } from "./dependencies.js";
-import { unknownSchema } from "./invoke-utils.js";
 import type { InvocationTarget, InvokeOptions } from "./invoke-types.js";
+import { unknownSchema } from "./invoke-utils.js";
 
+/** Resolve a declared child against canonical generation targets and schemas.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns The canonical generation target for a declared direct call.
+ * @param request - Declared operation identity, limits and cancellation metadata.
+ * @param registry - Verified generation registry used for canonical target lookup.
+ */
 export function resolveDirectTarget<Context extends { readonly signal: AbortSignal }>(
   request: DirectFunctionRequest,
   registry: InvokeOptions["registry"],
@@ -37,6 +43,10 @@ export function resolveDirectTarget<Context extends { readonly signal: AbortSign
   };
 }
 
+/** Recognize an executable child descriptor before dynamic dispatch.
+ * @returns Whether the native value satisfies this guard.
+ * @param value - Native value being validated or projected.
+ */
 function isInvocationTarget(value: unknown): value is InvocationTarget {
   if (value === null || typeof value !== "object") return false;
   const candidate = value as Record<string, unknown>;

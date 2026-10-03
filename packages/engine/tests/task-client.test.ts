@@ -1,5 +1,5 @@
-import { expect, test } from "bun:test";
-import { createTaskDependencyClient } from "./src/task-client.ts";
+import { expect, test } from "vitest";
+import { createTaskDependencyClient } from "../src/task-client.js";
 
 test("forwards task trigger options without injecting unsupported trace fields", async () => {
   const signal = new AbortController().signal;

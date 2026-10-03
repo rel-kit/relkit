@@ -2,6 +2,13 @@ import { createEventClient, type EventObservedEdge } from "@relkit/events";
 import type { ObservedEdge } from "@relkit/graph";
 import type { DependencyClientBuildOptions } from "./dependencies.js";
 
+/** Bridge declared event publication with the active producer propagation context.
+ * @returns A declared event publication client with invocation propagation.
+ * @param name - Declared operation, dependency or field name.
+ * @param source - Explicit native source or source collection.
+ * @param options - Explicit configuration and dependencies for this operation.
+ * @param eventId - Canonical event identifier bound to the declared publication.
+ */
 export function createEventDependencyClient(
   name: string,
   source: unknown,
