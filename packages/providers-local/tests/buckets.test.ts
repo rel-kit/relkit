@@ -2,14 +2,14 @@ import { createHash } from "node:crypto";
 import { access, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import {
   createLocalBucketProviderForTest,
   LocalBucketKeyError,
   LocalBucketPolicyError,
   type LocalBucketProviderOptions,
   type LocalBucketProvider,
-} from "./src/buckets/index.ts";
+} from "../src/buckets/index.ts";
 
 const roots: string[] = [];
 
@@ -80,6 +80,7 @@ describe("local bucket provider", () => {
     expect(second).toEqual({ items: ["c"] });
 
     const reopened = await createLocalBucketProviderForTest(provider.root);
+    if (reopened.get === undefined) throw new Error("Expected local object reading");
     expect(await reopened.get("b")).toEqual(new Uint8Array([2]));
     const files = await readdir(join(provider.root, "objects"));
     expect(files.every((file) => !file.startsWith(".relkit-tmp-"))).toBe(true);
@@ -87,6 +88,8 @@ describe("local bucket provider", () => {
 
   test("reports signed URL support explicitly instead of simulating it", async () => {
     const provider = await makeProvider();
+    if (!provider.createReadUrl || !provider.createWriteUrl)
+      throw new Error("Expected capability rejection methods");
     await expect(provider.createReadUrl("asset.bin")).rejects.toMatchObject({
       code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED",
       capability: "signedReadUrl",
@@ -114,10 +117,17 @@ describe("local bucket provider", () => {
 
 async function makeProvider(
   options: Partial<LocalBucketProviderOptions> = {},
-): Promise<LocalBucketProvider> {
+): Promise<
+  LocalBucketProvider &
+    Required<Pick<LocalBucketProvider, "put" | "get" | "head" | "delete" | "exists">>
+> {
   const root = await mkdtemp(join(tmpdir(), "relkit-bucket-"));
   roots.push(root);
-  return createLocalBucketProviderForTest({ ...options, root });
+  const provider = createLocalBucketProviderForTest({ ...options, root });
+  const { put, get, head, delete: remove, exists } = provider;
+  if (!put || !get || !head || !remove || !exists)
+    throw new Error("Expected local bucket operations");
+  return { ...provider, put, get, head, delete: remove, exists };
 }
 
 afterEach(async () => {
