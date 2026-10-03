@@ -26,7 +26,7 @@ export function forwardProxyRequest(
   url.port = String(target.port);
   const init: RequestInit = {
     method: request.method,
-    headers: forwardedHeaders(request.headers),
+    headers: forwardedHeaders(request),
     redirect: "manual",
     signal: lease === undefined ? request.signal : AbortSignal.any([request.signal, lease.signal]),
   };
@@ -41,10 +41,13 @@ export function drainResponse(): Response {
   });
 }
 
-function forwardedHeaders(source: Headers): Headers {
-  const headers = new Headers(source);
+function forwardedHeaders(request: Request): Headers {
+  const headers = new Headers(request.headers);
   const connection = headers.get("connection");
   for (const name of connection?.split(",") ?? []) headers.delete(name.trim());
   for (const name of HOP_BY_HOP_HEADERS) headers.delete(name);
+  // Bun derives the upstream request URL from Host. Retain the public authority
+  // so origin checks see the browser's URL rather than the private child port.
+  headers.set("host", new URL(request.url).host);
   return headers;
 }
