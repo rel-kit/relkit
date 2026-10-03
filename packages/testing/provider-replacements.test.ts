@@ -43,6 +43,20 @@ test("does not invent a fake for an unreplaced required profile", async () => {
   }
 });
 
+test("explicit resource fake mode replaces required profiles without integration setup", async () => {
+  const root = mkdtempSync(join(tmpdir(), "relkit-provider-fake-"));
+  const fakes = createTestFakes(root);
+  const registry = await activateTestProviders(artifacts(), {}, undefined, fakes, true);
+  try {
+    expect(registry?.resolve("cache", "requests").value).toBe(
+      fakes.createCache("provider.cache.requests").provider,
+    );
+  } finally {
+    await registry?.release();
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 function artifacts() {
   return {
     graph: graph(),

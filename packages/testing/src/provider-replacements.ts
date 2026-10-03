@@ -39,6 +39,7 @@ export async function activateTestProviders(
   replacements: TestProviderReplacements,
   bindingValues: Readonly<Record<string, JsonValue>> | undefined,
   fakes: TestFakes,
+  fakeResources = false,
 ): Promise<ProviderRegistry | undefined> {
   if (artifacts === undefined) {
     if (Object.keys(replacements).length > 0)
@@ -50,10 +51,31 @@ export async function activateTestProviders(
     graph: artifacts.graph,
     runtimeIntegrationModules: artifacts.runtimeIntegrationModules,
     ...(bindingValues === undefined ? {} : { bindingValues }),
-    replacements: runtimeReplacements(replacements),
+    replacements: runtimeReplacements(
+      fakeResources
+        ? resourceReplacements(artifacts.graph.nodes, replacements, fakes)
+        : replacements,
+    ),
   });
   wireProviderClients(artifacts.graph.nodes, artifacts.graph.edges, registry, fakes);
   return registry;
+}
+
+function resourceReplacements(
+  nodes: readonly GraphNode[],
+  replacements: TestProviderReplacements,
+  fakes: TestFakes,
+): TestProviderReplacements {
+  const bucket = { ...replacements.bucket };
+  const cache = { ...replacements.cache };
+  for (const binding of nodes) {
+    if (binding.kind !== "provider") continue;
+    if (binding.capability === "bucket" && bucket[binding.profile] === undefined)
+      bucket[binding.profile] = fakes.createBucket(binding.id);
+    if (binding.capability === "cache" && cache[binding.profile] === undefined)
+      cache[binding.profile] = fakes.createCache(binding.id);
+  }
+  return { ...replacements, bucket, cache };
 }
 
 function runtimeReplacements(input: TestProviderReplacements): ProviderReplacements {

@@ -11,6 +11,7 @@ import config from "../../relkit.config.js";
 
 const providerRoot = await mkdtemp(join(tmpdir(), "relkit-agent-template-"));
 const testApp = await createTestApplication(config, {
+  resourceProviders: "fake",
   providers: {
     "agent-state": { default: createTestAgentStateProvider(join(providerRoot, "agents")) },
     realtime: { default: createTestRealtimeProvider(join(providerRoot, "realtime")) },
