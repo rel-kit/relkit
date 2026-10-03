@@ -1,14 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { appFetch } from "./fixture-client.js";
+import { describe, expect, test } from "vitest";
 import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
-import type { RegistrationPlan, ToolRegistration } from "@relkit/graph";
-import { z } from "@relkit/schema";
-import { createApp } from "./src/index.js";
+import { createApp } from "../src/index.js";
 import { runtimeCohort } from "./test-cohort.ts";
 
-const source = { file: "src/tools.ts", line: 1, column: 1 };
-const input = z.object({ value: z.string() });
-const output = z.object({ echoed: z.string() });
-
+import { input, output, tool, toolPlan } from "./fixtures/mcp-setup.ts";
+import { startBunFixture } from "./bun-fixture.ts";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 describe("MCP", () => {
   test("lists and invokes visible tools through the official client", async () => {
     const calls: unknown[] = [];
@@ -37,7 +36,7 @@ describe("MCP", () => {
     });
     const client = new Client({ name: "test", version: "1" });
     const transport = new StreamableHTTPClientTransport(new URL("http://localhost/mcp"), {
-      fetch: (request, init) => app.fetch(new Request(request, init)),
+      fetch: appFetch(app),
     });
     await client.connect(transport);
     expect((await client.listTools()).tools.map((entry) => entry.name)).toEqual([
@@ -58,23 +57,11 @@ describe("MCP", () => {
   inspectorTest(
     "lists tools through the MCP Inspector CLI",
     async () => {
-      const plan = toolPlan([tool("echo", true, "never")]);
-      const app = createApp({
-        plan,
-        manifest: {
-          ...runtimeCohort(plan.graphHash),
-          functions: {},
-          middleware: {},
-          requestTransforms: {},
-          tools: { echo: { target: { input, output } } },
-        },
-        engine: { invoke: async () => ({ echoed: "hello" }) },
-      });
-      const server = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch: app.fetch });
+      const server = await startBunFixture("mcp");
       try {
-        const child = Bun.spawn(
+        const { stdout } = await promisify(execFile)(
+          "bun",
           [
-            process.execPath,
             "x",
             "@modelcontextprotocol/inspector@2.3.0",
             "--cli",
@@ -84,14 +71,8 @@ describe("MCP", () => {
             "--method",
             "tools/list",
           ],
-          { stdout: "pipe", stderr: "pipe" },
+          { timeout: 25_000 },
         );
-        const [exitCode, stdout, stderr] = await Promise.all([
-          child.exited,
-          new Response(child.stdout).text(),
-          new Response(child.stderr).text(),
-        ]);
-        expect(exitCode, stderr).toBe(0);
         expect(stdout).toContain('"name": "echo"');
       } finally {
         await server.stop();
@@ -100,32 +81,3 @@ describe("MCP", () => {
     30_000,
   );
 });
-
-function tool(id: string, mcp: boolean, approval: ToolRegistration["approval"]): ToolRegistration {
-  return {
-    kind: "tool",
-    id,
-    source,
-    targetFunctionId: `${id}.function`,
-    description: `${id} tool`,
-    sideEffect: "read",
-    approval,
-    mcp,
-  };
-}
-
-function toolPlan(tools: readonly ToolRegistration[]): RegistrationPlan {
-  return {
-    graphHash: "sha256:mcp",
-    functions: [],
-    httpTriggers: [],
-    queues: [],
-    schedules: [],
-    eventTriggers: [],
-    buckets: [],
-    caches: [],
-    tools,
-    agents: [],
-    middlewares: [],
-  };
-}
