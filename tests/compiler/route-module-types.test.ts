@@ -24,7 +24,8 @@ async function fixture(route: string) {
   await mkdir(join(root, "src/routes/users"), { recursive: true });
   await mkdir(join(root, "src/users"), { recursive: true });
   await mkdir(join(root, ".relkit/generated"), { recursive: true });
-  await symlink(join(repository, "node_modules"), join(root, "node_modules"));
+  await mkdir(join(root, "node_modules/@relkit"), { recursive: true });
+  await symlink(join(repository, "packages/app"), join(root, "node_modules/@relkit/app"));
   await writeFile(
     join(root, "src/users/service.ts"),
     `

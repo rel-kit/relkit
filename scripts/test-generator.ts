@@ -3,7 +3,8 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dir, "..");
 const testRoot = resolve(root, "tests/generator");
 const acceptance = "tests/generator/add-acceptance.test.ts";
-const compilationNames = "(?:the full bundle|route platform|database and auth)";
+const compilationNames =
+  "(?:the full bundle|route platform|database and auth|reused Docker profiles)";
 const otherFiles = [...new Bun.Glob("**/*.test.ts").scanSync({ cwd: testRoot, onlyFiles: true })]
   .map((file) => `tests/generator/${file}`)
   .filter((file) => file !== acceptance)

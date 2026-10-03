@@ -18,7 +18,8 @@ async function fixture(rootDir = "src", generatedDirectory = ".relkit/generated"
   const root = join(parent, "app");
   await mkdir(join(root, "src/routes"), { recursive: true });
   await mkdir(join(root, generatedDirectory), { recursive: true });
-  await symlink(join(repository, "node_modules"), join(root, "node_modules"));
+  await mkdir(join(root, "node_modules/@relkit"), { recursive: true });
+  await symlink(join(repository, "packages/app"), join(root, "node_modules/@relkit/app"));
   await writeFile(join(root, "src/example.ts"), "export const example = 1;\n");
   await writeFile(
     join(root, "tsconfig.json"),

@@ -110,7 +110,7 @@ export async function measureWorkloads(modules: PerformanceRecord): Promise<Perf
     to: node.id,
   }));
   const layoutStarted = performance.now();
-  const graphLayout = layoutModule.layoutGraph({
+  const graphLayout = await layoutModule.layoutGraph({
     generationId: "bench",
     graphHash: "sha256:performance",
     nodes,
