@@ -1,12 +1,12 @@
 import { applicationFailure } from "@relkit/runtime-effect";
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createEventDelivery } from "./src/events/delivery.ts";
-import { admitDelivery } from "./src/events/delivery-utils.ts";
-import { createJobQueue } from "./src/jobs/queue.ts";
-import { createJobStore } from "./src/jobs/store.ts";
+import { createEventDelivery } from "../src/events/delivery.ts";
+import { admitDelivery } from "../src/events/delivery-utils.ts";
+import { createJobQueue } from "../src/jobs/queue.ts";
+import { createJobStore } from "../src/jobs/store.ts";
 
 const roots: string[] = [];
 

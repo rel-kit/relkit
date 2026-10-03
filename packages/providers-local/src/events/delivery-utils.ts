@@ -1,5 +1,5 @@
-import { canonicalJson, normalizeId, type JsonValue } from "@relkit/contracts";
-import type { RetryPolicy } from "@relkit/jobs/legacy";
+import { normalizeRetry, positive, json, validateStoredData } from "./delivery-validation.js";
+import { normalizeId } from "@relkit/contracts";
 import type { JobStore, JobRecord } from "../jobs/store.js";
 import { readEntry } from "../jobs/queue-entry.js";
 import type { JobQueue, JobQueueEntry } from "../jobs/queue-utils.js";
@@ -7,14 +7,20 @@ import type { UnknownEventEnvelope } from "@relkit/events";
 import { makeDeliveryId, normalizeEnvelope, type EventDeliveryRecord } from "./router-records.js";
 import type { EventDeliveryLedgerRecord, EventDeliveryResult } from "./delivery-types.js";
 
-export const DEFAULT_RETRY: RetryPolicy = Object.freeze({
-  maxAttempts: 1,
-  initialDelayMs: 0,
-  maxDelayMs: 0,
-  multiplier: 1,
-  jitter: "none",
-});
+export { validateStoredData, normalizeRetry, positive, json } from "./delivery-validation.js";
 
+export { DEFAULT_RETRY } from "./delivery-validation.js";
+
+/** Projects a durable queue entry into the public delivery outcome.
+ * @param entry - Current queue or storage entry.
+ * @param triggerId - Registered trigger identity.
+ * @param duplicate - Whether an existing acceptance satisfied this request.
+ * @param status - Public lifecycle status.
+ * @param error - Failure value to normalize or audit.
+ * @param failure - Attempt failure to classify.
+ * @param value - Value to validate, normalize or project.
+ * @returns The public delivery outcome corresponding to queue state.
+ */
 export function resultFrom(
   entry: JobQueueEntry,
   triggerId: string,
@@ -40,6 +46,13 @@ export function resultFrom(
   });
 }
 
+/** Requeues a dead-letter delivery through the durable queue transition owner.
+ * @param queue - Owning durable queue operations.
+ * @param triggerId - Registered trigger identity.
+ * @param deliveryId - Stable delivery identity.
+ * @param now - Current clock time in milliseconds.
+ * @returns The requeued delivery outcome after durable transition.
+ */
 export async function retryDelivery(
   queue: JobQueue,
   triggerId: string,
@@ -52,6 +65,11 @@ export async function retryDelivery(
   return resultFrom(entry, triggerId, false, "queued");
 }
 
+/** Promotes due delayed deliveries before selecting worker work.
+ * @param queue - Owning durable queue operations.
+ * @param now - Current clock time in milliseconds.
+ * @returns A Promise completing after due entries are promoted.
+ */
 export async function promoteDue(queue: JobQueue, now: () => number): Promise<void> {
   const time = now();
   for (const entry of queue.snapshot()) {
@@ -64,6 +82,12 @@ export async function promoteDue(queue: JobQueue, now: () => number): Promise<vo
   }
 }
 
+/** Selects validated event-delivery records from the journal snapshot.
+ * @param raw - Untrusted input before validation.
+ * @param triggerId - Registered trigger identity.
+ * @param queue - Owning durable queue operations.
+ * @returns Validated delivery records from the journal.
+ */
 export function records(
   raw: readonly JobRecord[],
   triggerId: string,
@@ -84,6 +108,12 @@ export function records(
   });
 }
 
+/** Projects durable queue state and envelopes into inspection ledger records.
+ * @param store - Owning persisted-state or journal operations.
+ * @param triggerId - Registered trigger identity.
+ * @param queue - Owning durable queue operations.
+ * @returns The delivery inspection ledger.
+ */
 export function ledger(
   store: Pick<JobStore, "snapshot">,
   triggerId: string,
@@ -118,57 +148,13 @@ export function ledger(
   );
 }
 
-export function validateStoredData(value: JsonValue): void {
-  if (isRecord(value) && value.input !== undefined) {
-    readEntry({
-      version: 1,
-      sequence: 1,
-      instanceId: "delivery.validation",
-      kind: "available",
-      timestamp: 0,
-      data: value,
-    });
-    normalizeEnvelope(value.input);
-    return;
-  }
-  if (isRecord(value) && value.envelope !== undefined) {
-    normalizeEnvelope(value.envelope);
-    return;
-  }
-  normalizeEnvelope(value);
-}
-
-export function normalizeRetry(value: RetryPolicy | undefined): RetryPolicy {
-  const policy = value ?? DEFAULT_RETRY;
-  positive(policy.maxAttempts, "retry.maxAttempts");
-  nonNegative(policy.initialDelayMs, "retry.initialDelayMs");
-  nonNegative(policy.maxDelayMs, "retry.maxDelayMs");
-  if (policy.maxDelayMs < policy.initialDelayMs || policy.multiplier < 1)
-    throw new TypeError("Event retry policy is invalid");
-  if (!["none", "full", "equal"].includes(policy.jitter))
-    throw new TypeError("Event retry policy jitter is invalid");
-  return Object.freeze({ ...policy });
-}
-
-export function positive(value: number, name: string): number {
-  if (!Number.isSafeInteger(value) || value < 1) throw new TypeError(`${name} must be positive`);
-  return value;
-}
-
-export function json(value: unknown): JsonValue {
-  return JSON.parse(canonicalJson(value)) as JsonValue;
-}
-
-function nonNegative(value: number, name: string): number {
-  if (!Number.isSafeInteger(value) || value < 0)
-    throw new TypeError(`${name} must be non-negative`);
-  return value;
-}
-
-function isRecord(value: JsonValue): value is { readonly [key: string]: JsonValue } {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
+/** Applies configured backlog overflow admission before durable acceptance.
+ * @param queue - Owning durable queue operations.
+ * @param envelope - Validated event envelope.
+ * @param triggerId - Registered trigger identity.
+ * @param profile - Local provider profile partition.
+ * @returns The admission decision after enforcing backlog policy.
+ */
 export async function admitDelivery(
   queue: JobQueue,
   envelope: UnknownEventEnvelope,

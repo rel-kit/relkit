@@ -1,14 +1,50 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import { existsSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createEphemeralDelivery } from "./src/events/ephemeral.ts";
-import { createEventRouter } from "./src/events/router.ts";
+import { createEphemeralDelivery } from "../src/events/ephemeral.ts";
+import { createEventRouter } from "../src/events/router.ts";
 
 const roots: string[] = [];
 
+function gate() {
+  let resolve: () => void = () => {
+    throw new Error("Gate was not initialized");
+  };
+  const promise = new Promise<void>((complete) => {
+    resolve = complete;
+  });
+  return { promise, resolve };
+}
+
 describe("local ephemeral event delivery", () => {
+  test("close leaves an in-flight ephemeral publish owned by its caller", async () => {
+    const root = await mkdtemp(join(tmpdir(), "relkit-ephemeral-close-"));
+    roots.push(root);
+    const started = gate();
+    const release = gate();
+    const router = await createEventRouter(root);
+    await router.registerTrigger({
+      id: "transient",
+      eventId: "orders.created",
+      eventVersion: 1,
+      delivery: "ephemeral",
+      invoke: async () => {
+        started.resolve();
+        await release.promise;
+      },
+    });
+    const publishing = router.route(envelope("pending"));
+    await started.promise;
+    try {
+      await router.close();
+    } finally {
+      release.resolve();
+      await publishing;
+    }
+  });
+
   test("reports bounded in-process counters", async () => {
     let release!: () => void;
     const gate = new Promise<void>((resolve) => {
