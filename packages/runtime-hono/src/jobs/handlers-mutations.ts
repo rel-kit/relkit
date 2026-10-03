@@ -1,184 +1,91 @@
 import type { RunCancellationReceipt, RunHandle, RunRetryReceipt } from "@relkit/contracts/jobs";
-import {
-  createJobsControls,
-  decodeJobWire,
-  prepareCanonicalSubmission,
-  submitPreparedSubmission,
-  validateTaskInput,
-} from "@relkit/jobs";
 import type { TaskJobNode } from "@relkit/graph";
+import { Context, Effect, Layer } from "effect";
+import { observeHttp, runHttp } from "../http-effect.js";
 import type { RouteMaterializationOptions } from "../materialize-routes.js";
 import type { RpcContext } from "../rpc.js";
-import { assertGrantLive, authorizeJobOperation } from "./authorization.js";
-import {
-  configFor,
-  envelopeInput,
-  guardJobRequest,
-  operationOptions,
-  requiredText,
-} from "./common.js";
-import {
-  assertRunForJob,
-  descriptorFor,
-  jobError,
-  runtimeFor,
-  scopedRuntime,
-  trustedScopeFor,
-} from "./support.js";
-import { projectCancellation, projectRetry } from "./projection.js";
-import { readRun, validateCanonicalRun } from "./handlers-validation.js";
-import { jobPolicy } from "./types.js";
+import { cancelJobRunEffect } from "./handlers-mutations-cancel.js";
+import { retryJobRunEffect } from "./handlers-mutations-retry.js";
+import { triggerJobEffect } from "./handlers-mutations-trigger.js";
+import type { JobsMutationOperations } from "./handlers-mutations.types.js";
 
-export async function triggerJob(
+/** Invoke the trigger job service through its native Promise boundary.
+ * @param options - Compiled route plan, manifest and jobs runtime configuration.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param job - Registered job declaration and its client operation policy.
+ * @param value - Untrusted request envelope for this job operation.
+ * @param signal - Cancellation signal inherited from the caller or owning scope.
+ * @returns The accepted run handle after scoped authorization and submission.
+ */
+export function triggerJob(
   options: RouteMaterializationOptions,
   context: RpcContext,
   job: TaskJobNode,
   value: unknown,
   signal?: AbortSignal,
 ): Promise<RunHandle> {
-  const input = envelopeInput(value, ["input", "options", "expectedIdentity"]);
-  await guardJobRequest(options, context, input, "trigger");
-  const config = configFor(options);
-  const descriptor = await descriptorFor(config, job);
-  const runtime = await runtimeFor(config, job);
-  const validated = await validateTaskInput(descriptor.task.input, input.input);
-  const canonicalInput = decodeJobWire(validated.wire);
-  const trusted = await trustedScopeFor(config, context, job, "trigger", canonicalInput ?? null);
-  const admission = await prepareCanonicalSubmission(
-    scopedRuntime(runtime, trusted.scope),
-    descriptor.task,
-    validated.wire,
-    operationOptions(input.options),
-    descriptor,
+  return runHttp(
+    Effect.gen(function* () {
+      const service = yield* JobsMutations;
+      return yield* service.triggerJob(options, context, job, value, signal);
+    }).pipe(Effect.provide(JobsMutationsLive)),
   );
-  const authorized = await authorizeJobOperation(
-    config,
-    context,
-    job,
-    descriptor,
-    "trigger",
-    admission.input,
-    undefined,
-    signal,
-  );
-  const finalRuntime = scopedRuntime(runtime, authorized.grant.scope);
-  const finalAdmission =
-    authorized.grant.scope === trusted.scope
-      ? admission
-      : await prepareCanonicalSubmission(
-          finalRuntime,
-          descriptor.task,
-          validated.wire,
-          operationOptions(input.options),
-          descriptor,
-        );
-  assertGrantLive(authorized.grant);
-  return submitPreparedSubmission(finalRuntime, finalAdmission, signal);
 }
 
-export async function cancelJobRun(
+/** Invoke the cancel job run service through its native Promise boundary.
+ * @param options - Compiled route plan, manifest and jobs runtime configuration.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param job - Registered job declaration and its client operation policy.
+ * @param value - Untrusted request envelope for this job operation.
+ * @param signal - Cancellation signal inherited from the caller or owning scope.
+ * @returns The cancellation receipt with any attached run projected to public fields.
+ */
+export function cancelJobRun(
   options: RouteMaterializationOptions,
   context: RpcContext,
   job: TaskJobNode,
   value: unknown,
   signal?: AbortSignal,
 ): Promise<RunCancellationReceipt> {
-  const input = envelopeInput(value, ["runId", "operationId", "reason", "expectedIdentity"]);
-  await guardJobRequest(options, context, input, "cancel");
-  const config = configFor(options);
-  const descriptor = await descriptorFor(config, job);
-  const runtime = await runtimeFor(config, job);
-  const runId = requiredText(input.runId, "run ID");
-  const operationId = requiredText(input.operationId, "operation ID");
-  const trusted = await trustedScopeFor(config, context, job, "cancel");
-  const initial = await authorizeJobOperation(
-    config,
-    context,
-    job,
-    descriptor,
-    "cancel",
-    undefined,
-    undefined,
-    signal,
-    runId,
+  return runHttp(
+    Effect.gen(function* () {
+      const service = yield* JobsMutations;
+      return yield* service.cancelJobRun(options, context, job, value, signal);
+    }).pipe(Effect.provide(JobsMutationsLive)),
   );
-  const observed = await readRun(runtime, initial.grant.scope, runId, signal);
-  const authorized = await authorizeJobOperation(
-    config,
-    context,
-    job,
-    descriptor,
-    "cancel",
-    undefined,
-    observed,
-    signal,
-    runId,
-  );
-  assertRunForJob(observed, job, { ...trusted, scope: authorized.grant.scope });
-  assertGrantLive(authorized.grant);
-  const receipt = await createJobsControls(scopedRuntime(runtime, authorized.grant.scope)).cancel(
-    runId,
-    {
-      operationId,
-      ...(input.reason === undefined ? {} : { reason: requiredText(input.reason, "reason") }),
-      ...(signal === undefined ? {} : { signal }),
-    },
-  );
-  if (receipt.run !== undefined) {
-    if (receipt.run.runId !== runId)
-      throw jobError("RELKIT_JOB_ACCESS_DENIED", "Job cancellation receipt is unavailable.");
-    assertRunForJob(receipt.run, job, { ...trusted, scope: authorized.grant.scope });
-    await validateCanonicalRun(descriptor, receipt.run);
-  }
-  return projectCancellation(receipt, jobPolicy(job), descriptor);
 }
 
-export async function retryJobRun(
+/** Invoke the retry job run service through its native Promise boundary.
+ * @param options - Compiled route plan, manifest and jobs runtime configuration.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param job - Registered job declaration and its client operation policy.
+ * @param value - Untrusted request envelope for this job operation.
+ * @param signal - Cancellation signal inherited from the caller or owning scope.
+ * @returns The validated retry receipt matching the declared job and task version.
+ */
+export function retryJobRun(
   options: RouteMaterializationOptions,
   context: RpcContext,
   job: TaskJobNode,
   value: unknown,
   signal?: AbortSignal,
 ): Promise<RunRetryReceipt> {
-  const input = envelopeInput(value, ["runId", "operationId", "expectedIdentity"]);
-  await guardJobRequest(options, context, input, "retry");
-  const config = configFor(options);
-  const descriptor = await descriptorFor(config, job);
-  const runtime = await runtimeFor(config, job);
-  const runId = requiredText(input.runId, "run ID");
-  const operationId = requiredText(input.operationId, "operation ID");
-  const trusted = await trustedScopeFor(config, context, job, "retry");
-  const initial = await authorizeJobOperation(
-    config,
-    context,
-    job,
-    descriptor,
-    "retry",
-    undefined,
-    undefined,
-    signal,
-    runId,
+  return runHttp(
+    Effect.gen(function* () {
+      const service = yield* JobsMutations;
+      return yield* service.retryJobRun(options, context, job, value, signal);
+    }).pipe(Effect.provide(JobsMutationsLive)),
   );
-  const observed = await readRun(runtime, initial.grant.scope, runId, signal);
-  const authorized = await authorizeJobOperation(
-    config,
-    context,
-    job,
-    descriptor,
-    "retry",
-    undefined,
-    observed,
-    signal,
-    runId,
-  );
-  assertRunForJob(observed, job, { ...trusted, scope: authorized.grant.scope });
-  assertGrantLive(authorized.grant);
-  const receipt = await createJobsControls(scopedRuntime(runtime, authorized.grant.scope)).retry(
-    runId,
-    {
-      operationId,
-      ...(signal === undefined ? {} : { signal }),
-    },
-  );
-  return projectRetry(receipt, job);
 }
+
+/** Durable submission, cancellation and retry authority with scoped authorization. */
+export class JobsMutations extends Context.Service<JobsMutations, JobsMutationOperations>()(
+  "@relkit/runtime-hono/JobsMutations",
+) {}
+
+/** Live mutation workflows with one operation observation per service call. */
+export const JobsMutationsLive = Layer.succeed(JobsMutations, {
+  triggerJob: (...args) => observeHttp("jobs.triggerJob", triggerJobEffect(...args)),
+  cancelJobRun: (...args) => observeHttp("jobs.cancelJobRun", cancelJobRunEffect(...args)),
+  retryJobRun: (...args) => observeHttp("jobs.retryJobRun", retryJobRunEffect(...args)),
+});
