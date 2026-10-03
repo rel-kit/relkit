@@ -1,0 +1,20 @@
+{
+  "key": "e40ace89ce2e110b662b61ac1ac2edeac1baa15636e931ae3f613e16640c361f",
+  "matches": {
+    "bf-e40ace89ce2e110b662b61ac": {
+      "id": "bf-e40ace89ce2e110b662b61ac",
+      "status": "verified",
+      "what": "Invalid agent payload is classified BAD_REQUEST but sent as HTTP 500.",
+      "root_cause": "createRpcRouter supplied a custom errorStatusMap without COMMON_ERROR_STATUS_MAP. oRPC treats that map as a replacement, so unmapped standard errors defaulted to 500.",
+      "fixed_by": "Merge oRPC standard error statuses before configured domain overrides. Same real API reproduction and regression tests now pass.",
+      "files": [
+        "packages/runtime-hono/src/rpc.ts",
+        "packages/runtime-hono/tests/rpc-error-status.test.ts",
+        "tests/e2e-commerce/generated-ai-regressions.spec.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T23:38:55+00:00",
+      "report": "bug-fix-reports/issues/bf-e40ace89ce2e110b662b61ac/report.md"
+    }
+  }
+}
