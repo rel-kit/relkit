@@ -10,6 +10,14 @@ import {
 
 const completedStates = new WeakSet<HttpRequestState>();
 
+/** Transfers request finalization to body EOF, failure or cancellation exactly once.
+ * @param request - Native request whose headers, body and cancellation signal define this operation.
+ * @param response - Native response whose status, headers and body lifetime are preserved.
+ * @param state - State owned by the current request or operation.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param handlerError - Native handler failure observed before response-body ownership transfers.
+ * @returns The original response when already finalizable, otherwise a body-tracking response wrapper.
+ */
 export function observeHttpResponse(
   request: Request,
   response: Response,
@@ -24,6 +32,11 @@ export function observeHttpResponse(
   });
   let done = false;
   let bytes = 0;
+  /** Finalize byte counts, request record, span and lifecycle notification exactly once.
+   * @param outcome - Terminal body outcome before request-level cancellation precedence.
+   * @param error - Optional body or handler failure attributed to the terminal span.
+   * @returns Nothing; repeated completion attempts leave the finalized record unchanged.
+   */
   const finish = (outcome: RequestOutcome, error?: unknown): void => {
     if (done || completedStates.has(state)) return;
     done = true;
@@ -32,17 +45,17 @@ export function observeHttpResponse(
     (state.runtimeSignal?.current ?? request.signal).removeEventListener("abort", abort);
     span.attribute("http.response.status_code", response.status);
     span.attribute("http.response.body.size", bytes);
-    span.event(`http.${outcome}`, BigInt(Date.now()) * 1_000_000n);
-    const effective = state.requestRecord?.setOutcome(
-      outcome === "success" && response.status >= 500 ? "defect" : outcome,
-    );
+    const prior = state.requestRecord?.setOutcome(outcome) ?? outcome;
+    const effective =
+      prior === "success" && response.status >= 500
+        ? (state.requestRecord?.setOutcome("defect") ?? "defect")
+        : prior;
+    span.event(`http.${effective}`, BigInt(Date.now()) * 1_000_000n);
     const status =
-      response.status >= 400
-        ? response.status
-        : fallbackStatus(effective ?? outcome, response.status);
+      response.status >= 400 ? response.status : fallbackStatus(effective, response.status);
     const record = state.requestRecord?.finish({ status, responseBytes: bytes });
     if (record) options.observability?.collect(record);
-    const finalOutcome = record?.outcome ?? outcome;
+    const finalOutcome = record?.outcome ?? effective;
     span.attribute("relkit.outcome", finalOutcome);
     if (error instanceof Error) {
       span.attribute("error.type", error.name);
@@ -63,6 +76,9 @@ export function observeHttpResponse(
     );
   };
   const observedSignal = state.runtimeSignal?.current ?? request.signal;
+  /** Finalize the response when its owning request signal aborts.
+   * @returns Nothing; forwards the signal reason to the idempotent finalizer.
+   */
   const abort = (): void => finish("cancelled", observedSignal.reason);
   observedSignal.addEventListener("abort", abort, { once: true });
   if (handlerError !== undefined) {
@@ -75,17 +91,21 @@ export function observeHttpResponse(
     response.status === 204 ||
     response.status === 304
   ) {
-    finish(response.status >= 500 ? "defect" : "success");
+    finish("success");
     return response;
   }
   const reader = response.body.getReader();
   return new Response(
     new ReadableStream<Uint8Array>({
+      /** Reads one downstream-requested chunk and finalizes the body at its terminal condition.
+       * @param controller - Native response-body controller used to emit and terminate chunks.
+       * @returns A Promise settling after one chunk is forwarded or the response body terminates.
+       */
       async pull(controller) {
         try {
           const result = await reader.read();
           if (result.done) {
-            finish(response.status >= 500 ? "defect" : "success");
+            finish("success");
             controller.close();
             return;
           }
@@ -96,6 +116,10 @@ export function observeHttpResponse(
           controller.error(error);
         }
       },
+      /** Returns the source iterator so cancellation releases its owned resources.
+       * @param reason - Cancellation or interruption reason supplied by the owning boundary.
+       * @returns The underlying reader's cancellation Promise after terminal cancellation is recorded.
+       */
       cancel(reason) {
         finish("cancelled", reason);
         return reader.cancel(reason);
@@ -105,12 +129,21 @@ export function observeHttpResponse(
   );
 }
 
+/** Records cancellation before a response body becomes available.
+ * @param request - Native request whose headers, body and cancellation signal define this operation.
+ * @param state - State owned by the current request or operation.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns A cleanup callback that removes the early-abort listener.
+ */
 export function observeEarlyHttpAbort(
   request: Request,
   state: HttpRequestState,
   options: HttpMiddlewareOptions,
 ): () => void {
   const signal = state.signal;
+  /** Record cancellation before headers exist using the synthetic HTTP 499 boundary.
+   * @returns Nothing; terminal state prevents later response finalization from repeating it.
+   */
   const abort = (): void => {
     const error = signal.reason ?? new DOMException("Request cancelled", "AbortError");
     observeHttpResponse(request, new Response(null, { status: 499 }), state, options, error);
@@ -120,6 +153,14 @@ export function observeEarlyHttpAbort(
   return () => signal.removeEventListener("abort", abort);
 }
 
+/** Builds a lifecycle event from native boundary state and terminal metadata.
+ * @param request - Native request whose headers, body and cancellation signal define this operation.
+ * @param state - State owned by the current request or operation.
+ * @param type - Lifecycle event kind describing the current request boundary.
+ * @param status - HTTP status associated with the observed response or lifecycle event.
+ * @param error - Failure metadata recorded or projected at this boundary.
+ * @returns An immutable lifecycle event with request identity and optional terminal timing metadata.
+ */
 export function boundaryEvent(
   request: Request,
   state: HttpRequestState,
@@ -146,6 +187,11 @@ export function boundaryEvent(
   });
 }
 
+/** Chooses a status consistent with the terminal outcome when no response status is available.
+ * @param outcome - Terminal classification used for durable state and telemetry.
+ * @param status - HTTP status associated with the observed response or lifecycle event.
+ * @returns The response status for success, or the status associated with its terminal failure class.
+ */
 function fallbackStatus(outcome: RequestOutcome, status: number): number {
   return outcome === "success"
     ? status || 200

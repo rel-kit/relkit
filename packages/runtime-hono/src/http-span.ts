@@ -2,6 +2,9 @@ import { createSpanId, createTraceId, parseTraceParent, toRequestId } from "@rel
 import { runInExecutionContext, SpanRuntime, startRootSpan } from "@relkit/invocation";
 import { createRequestRecordBuilder } from "@relkit/observability";
 import type { MiddlewareHandler } from "hono";
+import { isRelkitControlPlanePath } from "./control-plane.js";
+import { boundaryEvent, observeEarlyHttpAbort, observeHttpResponse } from "./http-response.js";
+import { collectHttpSpan } from "./http-span-record.js";
 import {
   emitLifecycle,
   getRequestState,
@@ -10,12 +13,13 @@ import {
   type HttpMiddlewareOptions,
   type HttpRequestState,
 } from "./middleware-utils.js";
-import { collectHttpSpan } from "./http-span-record.js";
-import { boundaryEvent, observeEarlyHttpAbort, observeHttpResponse } from "./http-response.js";
-import { isRelkitControlPlanePath } from "./control-plane.js";
 
 const outerStates = new WeakMap<Request, HttpRequestState>();
 
+/** Creates the HTTP trace runtime using configured identifiers and admitted record sinks.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The configured span runtime, or a new runtime connected to the request record sink.
+ */
 export function createHttpSpanRuntime(options: HttpMiddlewareOptions): SpanRuntime {
   return (
     options.spanRuntime ??
@@ -30,10 +34,18 @@ export function createHttpSpanRuntime(options: HttpMiddlewareOptions): SpanRunti
   );
 }
 
+/** Finds the request state owned by the outer native HTTP boundary.
+ * @param request - Native request whose headers, body and cancellation signal define this operation.
+ * @returns The active outer-boundary request state, or undefined outside that boundary.
+ */
 export function outerHttpState(request: Request): HttpRequestState | undefined {
   return outerStates.get(request);
 }
 
+/** Runs Hono middleware inside one server span and transfers finalization to the response body.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Hono middleware that runs downstream handlers in the request server span.
+ */
 export function httpSpanMiddleware(options: HttpMiddlewareOptions): MiddlewareHandler {
   return async (context, next) => {
     const state = getRequestState(context);
@@ -65,6 +77,12 @@ export function httpSpanMiddleware(options: HttpMiddlewareOptions): MiddlewareHa
   };
 }
 
+/** Owns the server span from native request admission through response-body termination.
+ * @param request - Native request whose headers, body and cancellation signal define this operation.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param handler - Native handler executed within the configured boundary.
+ * @returns The handler response with request identity headers and body-owned span finalization.
+ */
 export async function instrumentHttpRequest(
   request: Request,
   options: HttpMiddlewareOptions,
@@ -129,6 +147,12 @@ export async function instrumentHttpRequest(
   }
 }
 
+/** Adds request identity and method metadata before route matching.
+ * @param span - Active server span receiving request metadata.
+ * @param requestId - Stable request identifier propagated to tracing and response headers.
+ * @param method - Normalized native HTTP request method.
+ * @returns Nothing; the requested update is applied to the owned state.
+ */
 function prepareSpan(
   span: import("@relkit/invocation").RelkitSpan,
   requestId: string,
@@ -140,12 +164,22 @@ function prepareSpan(
   span.event("http.received", span.startTime);
 }
 
+/** Reads a valid nonnegative content length without trusting malformed headers.
+ * @param request - Native request whose headers, body and cancellation signal define this operation.
+ * @returns The declared byte length, or undefined when the header is absent or invalid.
+ */
 function contentLength(request: Request): number | undefined {
   const header = request.headers.get("content-length");
   if (header === null || !/^\d+$/.test(header)) return undefined;
   const value = Number(header);
   return Number.isSafeInteger(value) && value >= 0 ? value : undefined;
 }
+/** Copies the response while preserving its body and adding the configured request identifier.
+ * @param response - Native response whose status, headers and body lifetime are preserved.
+ * @param options - Application dependencies and configuration for this domain.
+ * @param requestId - Stable request identifier propagated to tracing and response headers.
+ * @returns A response sharing the original body and carrying the configured request ID header.
+ */
 function withRequestId(
   response: Response,
   options: HttpMiddlewareOptions,

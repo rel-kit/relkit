@@ -1,11 +1,7 @@
-import { expect, test } from "bun:test";
-import {
-  createObservabilityCollector,
-  type RequestRecord,
-  type SpanRecord,
-} from "@relkit/observability";
+import { expect, test } from "vitest";
+import { createObservabilityCollector } from "@relkit/observability";
 import type { RegistrationPlan } from "@relkit/graph";
-import { createApp, type RuntimeManifest } from "./src/index.js";
+import { createApp, type RuntimeManifest } from "../src/index.js";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/request-record.test.ts", line: 1, column: 1 } as const;
@@ -31,9 +27,12 @@ test("records a correlated HTTP timeline without request values", async () => {
   const record = collector
     .read()
     .find(
-      (value): value is RequestRecord => value.signal === "request" && value.phase === "completed",
+      (value): value is Extract<typeof value, { signal: "request" }> =>
+        value.signal === "request" && value.phase === "completed",
     );
-  const spans = collector.read().filter((value): value is SpanRecord => value.signal === "span");
+  const spans = collector
+    .read()
+    .filter((value): value is Extract<typeof value, { signal: "span" }> => value.signal === "span");
 
   expect(response.status).toBe(200);
   expect(record).toMatchObject({
@@ -76,14 +75,17 @@ test("records mapping failures as validation outcomes", async () => {
   const record = collector
     .read()
     .find(
-      (value): value is RequestRecord => value.signal === "request" && value.phase === "completed",
+      (value): value is Extract<typeof value, { signal: "request" }> =>
+        value.signal === "request" && value.phase === "completed",
     );
 
   expect(response.status).toBe(422);
   expect(record).toMatchObject({ status: 422, outcome: "validation-error" });
 });
 
-function plan(options: { readonly request?: unknown } = {}): RegistrationPlan {
+function plan(
+  options: { readonly request?: import("@relkit/contracts").JsonValue } = {},
+): RegistrationPlan {
   return {
     graphHash: "sha256:request-record",
     functions: [],
@@ -112,6 +114,7 @@ function plan(options: { readonly request?: unknown } = {}): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }

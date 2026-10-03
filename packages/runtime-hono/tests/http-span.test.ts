@@ -1,13 +1,16 @@
-import { expect, test } from "bun:test";
+import { setTimeout as sleep } from "node:timers/promises";
+import { expect, test } from "vitest";
 import {
   createObservabilityCollector,
   type RequestRecord,
   type SpanRecord,
 } from "@relkit/observability";
 import { Hono } from "hono";
-import { createFrameworkMiddleware } from "./src/middleware.js";
-import { createHttpSpanRuntime, instrumentHttpRequest } from "./src/http-span.js";
+import { createFrameworkMiddleware } from "../src/middleware.js";
+import { instrumentHttpRequest } from "../src/http-span.js";
 import { frameworkTrace } from "@relkit/invocation";
+
+import { startBunFixture } from "./bun-fixture.ts";
 
 const parent = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
 
@@ -33,7 +36,10 @@ test("keeps a request active until the response body reaches EOF", async () => {
   });
   const started = collector
     .read()
-    .filter((record): record is RequestRecord => record.signal === "request");
+    .filter(
+      (record): record is Extract<typeof record, { signal: "request" }> =>
+        record.signal === "request",
+    );
   expect(started).toHaveLength(1);
   expect(started[0]?.phase).toBe("started");
   expect(started[0]?.requestId).not.toBe("attacker-controlled");
@@ -45,11 +51,12 @@ test("keeps a request active until the response body reaches EOF", async () => {
   expect(await response.text()).toBe("firstsecond");
   const records = collector.read();
   const completed = records.find(
-    (record): record is RequestRecord =>
+    (record): record is Extract<typeof record, { signal: "request" }> =>
       record.signal === "request" && record.phase === "completed",
   );
   const root = records.find(
-    (record): record is SpanRecord => record.signal === "span" && record.status === "completed",
+    (record): record is Extract<typeof record, { signal: "span" }> =>
+      record.signal === "span" && record.status === "completed",
   );
   expect(completed?.traceId).toBe(started[0]?.traceId);
   expect(root?.parentSpanId).toBe("00f067aa0ba902b7");
@@ -70,7 +77,10 @@ test("completes bodyless responses immediately and body cancellation once", asyn
   await response.body?.cancel("client-left");
   const requests = collector
     .read()
-    .filter((record): record is RequestRecord => record.signal === "request");
+    .filter(
+      (record): record is Extract<typeof record, { signal: "request" }> =>
+        record.signal === "request",
+    );
   expect(requests.filter((record) => record.phase === "completed")).toHaveLength(2);
   expect(
     requests.find((record) => record.rawPath === "/cancel" && record.phase === "completed")
@@ -79,7 +89,8 @@ test("completes bodyless responses immediately and body cancellation once", asyn
   const spans = collector
     .read()
     .filter(
-      (record): record is SpanRecord => record.signal === "span" && record.status === "completed",
+      (record): record is Extract<typeof record, { signal: "span" }> =>
+        record.signal === "span" && record.status === "completed",
     );
   expect(spans).toHaveLength(2);
 });
@@ -107,11 +118,15 @@ test("the generated-host boundary owns early and nested Hono requests without du
 
   const requests = collector
     .read()
-    .filter((record): record is RequestRecord => record.signal === "request");
+    .filter(
+      (record): record is Extract<typeof record, { signal: "request" }> =>
+        record.signal === "request",
+    );
   const spans = collector
     .read()
     .filter(
-      (record): record is SpanRecord => record.signal === "span" && record.status === "completed",
+      (record): record is Extract<typeof record, { signal: "span" }> =>
+        record.signal === "span" && record.status === "completed",
     );
   expect(requests.filter((record) => record.phase === "started")).toHaveLength(2);
   expect(requests.filter((record) => record.phase === "completed")).toHaveLength(2);
@@ -135,87 +150,61 @@ test("keeps raw dynamic paths out of server span names", async () => {
     },
   );
   await response.text();
-  const spans = collector.read().filter((record): record is SpanRecord => record.signal === "span");
+  const spans = collector
+    .read()
+    .filter(
+      (record): record is Extract<typeof record, { signal: "span" }> => record.signal === "span",
+    );
   expect(spans.at(-1)?.name).toBe("GET /orders/:orderId");
   expect(JSON.stringify(spans)).not.toContain(rawId);
 });
 
 test("observes real Bun response EOF, client abort, HEAD, and runtime shutdown once", async () => {
-  const collector = createObservabilityCollector();
-  const baseOptions = {
-    observability: collector,
-    generationId: "generation.bun",
-    graphHash: "sha256:http-span-bun",
-  };
-  const spanRuntime = createHttpSpanRuntime(baseOptions);
-  const options = { ...baseOptions, spanRuntime };
-  let release!: () => void;
-  const server = Bun.serve({
-    port: 0,
-    fetch: (request) =>
-      instrumentHttpRequest(request, options, () =>
-        request.method === "HEAD"
-          ? new Response(null, { status: 204 })
-          : new Response(
-              new ReadableStream({
-                start(controller) {
-                  controller.enqueue(new TextEncoder().encode("first"));
-                  release = () => {
-                    controller.enqueue(new TextEncoder().encode("second"));
-                    controller.close();
-                  };
-                },
-              }),
-            ),
-      ),
-  });
+  const server = await startBunFixture("http-span");
+  const base = `http://127.0.0.1:${server.port}`;
+  const records = async (): Promise<readonly (RequestRecord | SpanRecord)[]> =>
+    (await fetch(`${base}/__fixture/records`)).json() as Promise<
+      readonly (RequestRecord | SpanRecord)[]
+    >;
+  const completed = async () =>
+    (await records()).filter(
+      (record): record is Extract<typeof record, { signal: "request" }> =>
+        record.signal === "request" && record.phase === "completed",
+    );
+  const spans = async () =>
+    (await records()).filter(
+      (record): record is Extract<typeof record, { signal: "span" }> =>
+        record.signal === "span" && record.status === "completed",
+    );
   try {
-    const base = `http://127.0.0.1:${server.port}`;
     expect((await fetch(`${base}/head`, { method: "HEAD" })).status).toBe(204);
     const response = await fetch(`${base}/stream`);
     const reader = response.body!.getReader();
     expect(new TextDecoder().decode((await reader.read()).value)).toBe("first");
-    expect(completedRequests(collector)).toHaveLength(1);
-    release();
+    expect(await completed()).toHaveLength(1);
+    await fetch(`${base}/__fixture/release`);
     await reader.read();
     await reader.read();
-    await waitFor(() => completedRequests(collector).length === 2);
-
+    await waitFor(async () => (await completed()).length === 2);
     const abort = new AbortController();
     const cancelled = await fetch(`${base}/abort`, { signal: abort.signal });
     await cancelled.body!.getReader().read();
     abort.abort("client-left");
-    await waitFor(() =>
-      completedRequests(collector).some(
+    await waitFor(async () =>
+      (await completed()).some(
         (record) => record.rawPath === "/abort" && record.outcome === "cancelled",
       ),
     );
-    expect(
-      collector
-        .read()
-        .filter((record) => record.signal === "span" && record.status === "completed"),
-    ).toHaveLength(3);
-
+    expect(await spans()).toHaveLength(3);
     const shutdown = await fetch(`${base}/shutdown`);
     await shutdown.body!.getReader().read();
-    spanRuntime.close();
-    await waitFor(() =>
-      collector
-        .read()
-        .some(
-          (record) =>
-            record.signal === "span" &&
-            record.status === "completed" &&
-            record.attributes?.["relkit.incomplete"] === true,
-        ),
+    await fetch(`${base}/__fixture/close`);
+    await waitFor(async () =>
+      (await spans()).some((record) => record.attributes?.["relkit.incomplete"] === true),
     );
-    expect(
-      collector
-        .read()
-        .filter((record) => record.signal === "span" && record.status === "completed"),
-    ).toHaveLength(4);
+    expect(await spans()).toHaveLength(4);
   } finally {
-    server.stop(true);
+    await server.stop();
   }
 });
 
@@ -230,19 +219,10 @@ function appWith(collector: ReturnType<typeof createObservabilityCollector>): Ho
   return app;
 }
 
-function completedRequests(collector: ReturnType<typeof createObservabilityCollector>) {
-  return collector
-    .read()
-    .filter(
-      (record): record is RequestRecord =>
-        record.signal === "request" && record.phase === "completed",
-    );
-}
-
-async function waitFor(predicate: () => boolean): Promise<void> {
+async function waitFor(predicate: () => Promise<boolean>): Promise<void> {
   for (let attempt = 0; attempt < 100; attempt++) {
-    if (predicate()) return;
-    await Bun.sleep(10);
+    if (await predicate()) return;
+    await sleep(10);
   }
   throw new Error("Timed out waiting for HTTP telemetry");
 }
