@@ -1,6 +1,13 @@
 import { createCacheClient } from "@relkit/cache";
 import type { DependencyClientBuildOptions } from "./dependencies.js";
 
+/** Build a declared cache client that observes reads/writes through the invocation bridge.
+ * @returns A guarded cache client whose methods retain the active invocation bridge.
+ * @param name - Declared operation, dependency or field name.
+ * @param cacheId - Canonical cache identifier bound to its schema and storage source.
+ * @param source - Explicit native source or source collection.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 export function createCacheDependencyClient(
   name: string,
   cacheId: string,

@@ -1,13 +1,31 @@
-import type { MaybePromise } from "@relkit/contracts";
-import type { BucketOperationObservation } from "@relkit/buckets";
-import type { CacheOperationObservation } from "@relkit/cache";
-import type { GraphEdge, ObservedEdge } from "@relkit/graph";
-import type { StandardSchemaV1 } from "@relkit/schema";
-import type { InvocationErrorDefinition } from "./invoke-types.js";
+import type { GraphEdge } from "@relkit/graph";
+import { observeExecution } from "@relkit/runtime-effect";
+import { Effect } from "effect";
+import type {
+  DependencyCategory,
+  DependencyClientBuildOptions,
+  DependencyClientMaps,
+} from "./dependencies.types.js";
 import { createClient, dependencyId, edgeKind, guardedMap } from "./dependency-clients.js";
+import { runEngineSync } from "./engine-runtime.js";
+export type {
+  DependencyBridge,
+  DependencyBridgeOptions,
+  DependencyCategory,
+  DependencyClientBuildOptions,
+  DependencyClientMaps,
+  DependencyClientSources,
+  DependencyDeclarations,
+  DependencyRefLike,
+  DirectFunctionInvoker,
+  DirectFunctionRequest,
+  DirectTaskInvoker,
+  DirectTaskRequest,
+} from "./dependencies.types.js";
 
 export { DependencyAccessError, DependencyNotConfiguredError } from "./dependency-clients.js";
 
+/** Client families exposed by guarded invocation contexts. */
 export const DEPENDENCY_CATEGORIES = [
   "tasks",
   "jobs",
@@ -16,120 +34,49 @@ export const DEPENDENCY_CATEGORIES = [
   "cache",
   "agents",
 ] as const;
-export type DependencyCategory = (typeof DEPENDENCY_CATEGORIES)[number];
 
-export interface DependencyRefLike {
-  readonly ref?: { readonly kind: string; readonly id: string };
-  readonly kind?: string;
-  readonly id?: string;
-  readonly input?: StandardSchemaV1;
-  readonly version?: number;
-  readonly output?: StandardSchemaV1;
-  readonly key?: StandardSchemaV1;
-  readonly value?: StandardSchemaV1;
-  readonly defaultTtlMs?: number;
-  readonly maxTtlMs?: number;
-  readonly profile?: string;
-  readonly errors?: readonly InvocationErrorDefinition[];
-  readonly dependencies?: DependencyDeclarations;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-}
-
-export type DependencyDeclarations = Partial<{
-  readonly [Category in Exclude<DependencyCategory, "events">]: Readonly<
-    Record<string, DependencyRefLike>
-  >;
-}>;
-
-/** Runtime provider/client values keyed by names declared on a function. */
-export type DependencyClientSources = Partial<{
-  readonly [Category in DependencyCategory]: Readonly<Record<string, unknown>>;
-}>;
-
-export type DependencyClientMaps = {
-  readonly [Category in DependencyCategory]: Readonly<Record<string, unknown>>;
-};
-
-export interface DependencyBridgeOptions {
-  readonly name?: string;
-  readonly attributes?: Readonly<Record<string, unknown>>;
-  readonly signal?: AbortSignal;
-  readonly kind?: "internal" | "server" | "client" | "producer" | "consumer";
-  readonly input?: unknown;
-}
-
-export interface DependencyBridge {
-  readonly run: <A>(
-    operation: () => MaybePromise<A>,
-    options?: DependencyBridgeOptions,
-  ) => Promise<A>;
-  readonly runVoid: (
-    operation: () => MaybePromise<void>,
-    options?: DependencyBridgeOptions,
-  ) => Promise<void>;
-}
-
-export interface DirectFunctionRequest {
-  readonly functionId: string;
-  readonly name: string;
-  readonly declaration: DependencyRefLike;
-  readonly source: unknown;
-  readonly input: unknown;
-  readonly signal?: AbortSignal;
-}
-
-export interface DirectTaskRequest {
-  readonly taskId: string;
-  readonly name: string;
-  readonly declaration: DependencyRefLike;
-  readonly source: unknown;
-  readonly input: unknown;
-  readonly options?: Readonly<Record<string, unknown>>;
-  readonly signal?: AbortSignal;
-}
-
-export type DirectFunctionInvoker = (request: DirectFunctionRequest) => MaybePromise<unknown>;
-export type DirectTaskInvoker = (request: DirectTaskRequest) => MaybePromise<unknown>;
-
-export interface DependencyClientBuildOptions {
-  readonly ownerId: string;
-  readonly dependencies?: DependencyDeclarations;
-  readonly publications?: Readonly<Record<string, DependencyRefLike>>;
-  readonly sources?: DependencyClientSources;
-  readonly bridge?: DependencyBridge;
-  readonly signal?: () => AbortSignal;
-  readonly deadline?: () => number | undefined;
-  readonly correlationId?: () => string | undefined;
-  readonly causationInvocationId?: () => string | undefined;
-  readonly traceId?: () => string | undefined;
-  readonly now?: () => Date;
-  readonly invokeFunction?: DirectFunctionInvoker;
-  readonly invokeTask?: DirectTaskInvoker;
-  readonly onDeclaredEdge?: (edge: GraphEdge) => void;
-  readonly onObservedEdge?: (edge: ObservedEdge) => void;
-  readonly onOperation?: (
-    operation: BucketOperationObservation | CacheOperationObservation,
-  ) => void;
-}
-
-/** Builds frozen, declared-only client maps for one invocation. */
+/** Builds frozen, declared-only client maps for one invocation.
+ * @returns Frozen maps exposing only declared clients and publications.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 export function buildDependencyClients(
   options: DependencyClientBuildOptions,
 ): DependencyClientMaps {
-  if (options.dependencies !== undefined && Object.hasOwn(options.dependencies, "events")) {
-    throw new TypeError("Event dependencies are not supported; declare publishes instead");
-  }
-  return Object.freeze({
-    tasks: buildCategory("tasks", options),
-    jobs: buildCategory("jobs", options),
-    events: buildCategory("events", options),
-    buckets: buildCategory("buckets", options),
-    cache: buildCategory("cache", options),
-    agents: buildCategory("agents", options),
-  });
+  return runEngineSync(buildDependencyClientsEffect(options));
 }
 
+/** Compose buildDependencyClients with the caller's Effect diagnostics and dependencies.
+ * @param options - Explicit operation configuration.
+ * @returns A lazy Effect yielding guarded client maps; unsupported event dependencies fail with TypeError.
+ */
+export const buildDependencyClientsEffect = Effect.fn("Engine.buildDependencyClients")(
+  (options: DependencyClientBuildOptions) =>
+    observeExecution(
+      "engine",
+      "buildDependencyClients",
+      Effect.gen(function* () {
+        if (options.dependencies !== undefined && Object.hasOwn(options.dependencies, "events")) {
+          return yield* Effect.fail(
+            new TypeError("Event dependencies are not supported; declare publishes instead"),
+          );
+        }
+        return Object.freeze({
+          tasks: buildCategory("tasks", options),
+          jobs: buildCategory("jobs", options),
+          events: buildCategory("events", options),
+          buckets: buildCategory("buckets", options),
+          cache: buildCategory("cache", options),
+          agents: buildCategory("agents", options),
+        });
+      }),
+    ),
+);
+
+/** Build one declared client map with identity-bound sources and edge observations.
+ * @returns A frozen client map denying undeclared names.
+ * @param category - Declared client capability family.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 function buildCategory(
   category: DependencyCategory,
   options: DependencyClientBuildOptions,
@@ -151,6 +98,12 @@ function buildCategory(
   return guardedMap(category, clients);
 }
 
+/** Deliver advisory edge telemetry without replacing the authoritative result.
+ * @typeParam T - Observed callback value.
+ * @returns Nothing; failures from advisory callbacks are isolated.
+ * @param hook - Optional advisory callback; observer failures cannot change execution.
+ * @param value - Native value being validated or projected.
+ */
 function notify<T>(hook: ((value: T) => void) | undefined, value: T): void {
   try {
     hook?.(value);

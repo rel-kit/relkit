@@ -1,83 +1,81 @@
-import type {
-  DependencyBridge,
-  DependencyClientSources,
-  DependencyDeclarations,
-  DirectFunctionInvoker,
-  DirectTaskInvoker,
-} from "./dependencies.js";
-import { buildDependencyClients } from "./dependencies.js";
+import { observeExecution } from "@relkit/runtime-effect";
+import { Effect } from "effect";
+import type { ContextBuildOptions, InvocationContextBase } from "./context.types.js";
+import type { DependencyClientSources } from "./dependencies.js";
+import { buildDependencyClientsEffect } from "./dependencies.js";
+import { runEngineSync } from "./engine-runtime.js";
+export type { ContextBuildOptions, InvocationContextBase } from "./context.types.js";
 
-export interface InvocationContextBase {
-  readonly invocation: unknown;
-  readonly signal: AbortSignal;
-  readonly env: Readonly<Record<string, unknown>>;
-  readonly log: unknown;
-  readonly time: unknown;
-}
-
-export interface ContextBuildOptions {
-  readonly ownerId: string;
-  readonly dependencies?: DependencyDeclarations;
-  readonly publications?: Readonly<Record<string, import("./dependencies.js").DependencyRefLike>>;
-  readonly clients?: DependencyClientSources;
-  readonly bridge?: DependencyBridge;
-  readonly signal?: () => AbortSignal;
-  readonly deadline?: () => number | undefined;
-  readonly correlationId?: () => string | undefined;
-  readonly causationInvocationId?: () => string | undefined;
-  readonly traceId?: () => string | undefined;
-  readonly now?: () => Date;
-  readonly invokeFunction?: DirectFunctionInvoker;
-  readonly invokeTask?: DirectTaskInvoker;
-  readonly onDeclaredEdge?: (edge: import("@relkit/graph").GraphEdge) => void;
-  readonly onObservedEdge?: (edge: import("@relkit/graph").ObservedEdge) => void;
-  readonly onOperation?: (
-    operation:
-      | import("@relkit/buckets").BucketOperationObservation
-      | import("@relkit/cache").CacheOperationObservation,
-  ) => void;
-  readonly trigger?: unknown;
-  readonly progress?: import("@relkit/invocation").ProgressEmitter;
-}
-
-/** Replaces the six client maps with frozen maps derived only from declarations. */
+/** Replaces the six client maps with frozen maps derived only from declarations.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns The frozen base context with guarded dependency maps and optional trigger/progress fields.
+ * @param base - Base handler context before guarded client maps are installed.
+ * @param options - Explicit configuration and dependencies for this operation.
+ */
 export function createContext<Context extends { readonly signal: AbortSignal }>(
   base: Context,
   options: ContextBuildOptions,
 ): Context {
-  const clients = buildDependencyClients({
-    ownerId: options.ownerId,
-    ...(options.dependencies === undefined ? {} : { dependencies: options.dependencies }),
-    ...(options.publications === undefined ? {} : { publications: options.publications }),
-    sources: options.clients ?? sourceMaps(base as unknown as InvocationContextBase),
-    ...(options.bridge === undefined ? {} : { bridge: options.bridge }),
-    ...(options.signal === undefined ? {} : { signal: options.signal }),
-    ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
-    ...(options.correlationId === undefined ? {} : { correlationId: options.correlationId }),
-    ...(options.causationInvocationId === undefined
-      ? {}
-      : { causationInvocationId: options.causationInvocationId }),
-    ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
-    ...(options.now === undefined ? {} : { now: options.now }),
-    ...(options.invokeFunction === undefined ? {} : { invokeFunction: options.invokeFunction }),
-    ...(options.invokeTask === undefined ? {} : { invokeTask: options.invokeTask }),
-    ...(options.onDeclaredEdge === undefined ? {} : { onDeclaredEdge: options.onDeclaredEdge }),
-    ...(options.onObservedEdge === undefined ? {} : { onObservedEdge: options.onObservedEdge }),
-    ...(options.onOperation === undefined ? {} : { onOperation: options.onOperation }),
-  });
-  return Object.freeze({
-    ...base,
-    tasks: clients.tasks,
-    jobs: clients.jobs,
-    events: clients.events,
-    buckets: clients.buckets,
-    cache: clients.cache,
-    agents: clients.agents,
-    ...(options.trigger === undefined ? {} : { trigger: options.trigger }),
-    ...(options.progress === undefined ? {} : { progress: options.progress }),
-  }) as Context;
+  return runEngineSync(createContextEffect<Context>(base, options));
 }
 
+/** Compose createContext with the caller's Effect diagnostics and dependencies.
+ * @param base - Validated base handler context.
+ * @param options - Explicit operation configuration.
+ * @returns A lazy Effect yielding the frozen context and propagating declared-client validation failures.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ */
+export const createContextEffect = Effect.fn("Engine.createContext")(
+  <Context extends { readonly signal: AbortSignal }>(base: Context, options: ContextBuildOptions) =>
+    observeExecution(
+      "engine",
+      "createContext",
+      Effect.gen(function* () {
+        const clients = yield* buildDependencyClientsEffect({
+          ownerId: options.ownerId,
+          ...(options.dependencies === undefined ? {} : { dependencies: options.dependencies }),
+          ...(options.publications === undefined ? {} : { publications: options.publications }),
+          sources: options.clients ?? sourceMaps(base as unknown as InvocationContextBase),
+          ...(options.bridge === undefined ? {} : { bridge: options.bridge }),
+          ...(options.signal === undefined ? {} : { signal: options.signal }),
+          ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
+          ...(options.correlationId === undefined ? {} : { correlationId: options.correlationId }),
+          ...(options.causationInvocationId === undefined
+            ? {}
+            : { causationInvocationId: options.causationInvocationId }),
+          ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
+          ...(options.now === undefined ? {} : { now: options.now }),
+          ...(options.invokeFunction === undefined
+            ? {}
+            : { invokeFunction: options.invokeFunction }),
+          ...(options.invokeTask === undefined ? {} : { invokeTask: options.invokeTask }),
+          ...(options.onDeclaredEdge === undefined
+            ? {}
+            : { onDeclaredEdge: options.onDeclaredEdge }),
+          ...(options.onObservedEdge === undefined
+            ? {}
+            : { onObservedEdge: options.onObservedEdge }),
+          ...(options.onOperation === undefined ? {} : { onOperation: options.onOperation }),
+        });
+        return Object.freeze({
+          ...base,
+          tasks: clients.tasks,
+          jobs: clients.jobs,
+          events: clients.events,
+          buckets: clients.buckets,
+          cache: clients.cache,
+          agents: clients.agents,
+          ...(options.trigger === undefined ? {} : { trigger: options.trigger }),
+          ...(options.progress === undefined ? {} : { progress: options.progress }),
+        }) as Context;
+      }),
+    ),
+);
+
+/** Extract native client sources before replacing them with guarded declarations.
+ * @returns Native sources for the supported dependency categories.
+ * @param base - Base handler context before guarded client maps are installed.
+ */
 function sourceMaps(base: InvocationContextBase): DependencyClientSources {
   const value = base as InvocationContextBase & Record<string, unknown>;
   return {
