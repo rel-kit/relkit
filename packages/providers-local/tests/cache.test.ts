@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import { createLocalCacheKey, createLocalCacheProviderForTest } from "./src/cache/index.ts";
+import { describe, expect, test } from "vitest";
+import { createLocalCacheKey, createLocalCacheProviderForTest } from "../src/cache/index.ts";
 
 describe("local cache provider", () => {
   test("uses canonical namespaced keys and deterministic expiry", async () => {
