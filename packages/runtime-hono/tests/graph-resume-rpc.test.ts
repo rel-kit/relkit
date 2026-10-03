@@ -1,25 +1,31 @@
-import { afterEach, expect, test } from "bun:test";
+import { trackFixtureRun, trackFixtureProvider, joinFixtureRuns } from "./fixture-lifetime.js";
+import { createFixtureClient, appFetch } from "./fixture-client.js";
+import { setTimeout as sleep } from "node:timers/promises";
+import { afterEach, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command, END, MemorySaver, START, StateSchema, interrupt } from "@langchain/langgraph";
-import { createClient } from "@relkit/client";
+
 import { defineGraph, defineGraphNode, invokeAgent } from "@relkit/agents";
 import type { RegistrationPlan } from "@relkit/graph";
 import { createLocalAgentStateProvider } from "@relkit/providers-local";
 import { createOperationId } from "@relkit/realtime";
 import { z } from "@relkit/schema";
-import { createApp, type RuntimeManifest } from "./src/index.ts";
-import { digest } from "./src/agent-rpc-support.ts";
+import { createApp, type RuntimeManifest } from "../src/index.ts";
+import { digest } from "../src/agent-rpc-support.ts";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const roots: string[] = [];
-afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true }))));
+afterEach(async () => {
+  await joinFixtureRuns();
+  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true })));
+});
 
 test("persists a graph wait and resumes a falsy typed reply on the same thread", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-graph-resume-"));
   roots.push(root);
-  const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
+  const provider = trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 }));
   const state = new StateSchema({ orderId: z.string(), approved: z.boolean().optional() });
   let entries = 0;
   const review = defineGraphNode({
@@ -30,7 +36,9 @@ test("persists a graph wait and resumes a falsy typed reply on the same thread",
     ends: [END],
     handler: () => {
       entries += 1;
-      return new Command({ update: { approved: interrupt({ question: "Approve?" }) } });
+      return new Command<unknown, { approved: boolean }, typeof END>({
+        update: { approved: interrupt({ question: "Approve?" }) },
+      });
     },
   });
   const graph = defineGraph({
@@ -63,6 +71,8 @@ test("persists a graph wait and resumes a falsy typed reply on the same thread",
     manifest: {
       ...runtimeCohort(plan.graphHash),
       functions: {},
+      middleware: {},
+      requestTransforms: {},
       agents: { [graph.id]: graph },
     } as RuntimeManifest,
     engine,
@@ -75,6 +85,7 @@ test("persists a graph wait and resumes a falsy typed reply on the same thread",
       }),
     },
     agentRuntime: {
+      track: trackFixtureRun,
       applicationId: "fixture",
       environment: "test",
       generationId: "generation-a",
@@ -82,10 +93,10 @@ test("persists a graph wait and resumes a falsy typed reply on the same thread",
       provider: () => provider,
     },
   });
-  const client = createClient<any>({
+  const client = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers: { "x-relkit-identity-scope": "viewer", "x-relkit-session-epoch": "session" },
-    fetch: (request, init) => app.fetch(new Request(request, init)),
+    fetch: appFetch(app),
   });
   const threadId = "order:42";
   await client["relkit.agent.run"]({
@@ -98,10 +109,10 @@ test("persists a graph wait and resumes a falsy typed reply on the same thread",
   const waiting = await waitForStatus(client, graph.id, threadId, "waiting");
   expect(waiting.waiting).toMatchObject({ response: { type: "boolean" } });
   expect(waiting.waiting.requests[0]).not.toHaveProperty("id");
-  const intruder = createClient<any>({
+  const intruder = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers: { "x-relkit-identity-scope": "intruder", "x-relkit-session-epoch": "session" },
-    fetch: (request, init) => app.fetch(new Request(request, init)),
+    fetch: appFetch(app),
   });
   await expect(
     intruder["relkit.agent.run"]({
@@ -180,7 +191,7 @@ async function waitForStatus(client: any, agentId: string, threadId: string, sta
     } catch {
       // The local fixture atomically replaces its state file while the worker journals.
     }
-    await Bun.sleep(10);
+    await sleep(10);
   }
   throw new Error(`Agent did not reach ${status}.`);
 }
@@ -208,7 +219,12 @@ function graphPlan(workflow: unknown): RegistrationPlan {
         instructions: "",
         toolIds: [],
         limits: {},
-        generatedFunction: { functionId: "relkit.agent.orders.review.invoke" },
+        generatedFunction: {
+          functionId: "relkit.agent.orders.review.invoke",
+          generated: true,
+          generatedBy: "agent",
+          agentId: "orders.review",
+        },
         profile: "default",
         stateProfile: "default",
         client: "protected",

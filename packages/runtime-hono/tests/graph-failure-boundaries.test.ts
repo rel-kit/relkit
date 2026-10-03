@@ -1,4 +1,6 @@
-import { afterAll, expect, test } from "bun:test";
+import { createFixtureClient, appFetch } from "./fixture-client.js";
+import { setTimeout as sleep } from "node:timers/promises";
+import { afterAll, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -10,19 +12,21 @@ import {
   type AgentStateProvider,
   type ExecutionClaim,
 } from "@relkit/agents";
-import { createClient } from "@relkit/client";
+
 import type { RegistrationPlan } from "@relkit/graph";
 import { createLocalAgentStateProvider } from "@relkit/providers-local";
 import { createOperationId } from "@relkit/realtime";
 import { z } from "@relkit/schema";
-import { createApp, type RuntimeManifest } from "./src/index.ts";
-import { agentLimits, digest, encodedBytes } from "./src/agent-rpc-support.ts";
+import { createApp, type RuntimeManifest } from "../src/index.ts";
+import { agentLimits, digest, encodedBytes } from "../src/agent-rpc-support.ts";
 import { runtimeCohort } from "./test-cohort.ts";
+import { trackFixtureRun, trackFixtureProvider, joinFixtureRuns } from "./fixture-lifetime.js";
 
 const roots: string[] = [];
-afterAll(async () =>
-  Promise.all(roots.splice(0).map((root) => rm(root, { force: true, recursive: true }))),
-);
+afterAll(async () => {
+  await joinFixtureRuns();
+  await Promise.all(roots.splice(0).map((root) => rm(root, { force: true, recursive: true })));
+});
 
 test.each(["before", "after"] as const)(
   "checkpoint %s failure cannot publish a waiting contract",
@@ -129,7 +133,7 @@ test.each(["before", "after"] as const)(
     const restarted = runtimeClient(
       fixture.graph,
       graphPlan(fixture.graph.workflow),
-      createLocalAgentStateProvider(fixture.root, { pollingMs: 50 }),
+      trackFixtureProvider(createLocalAgentStateProvider(fixture.root, { pollingMs: 50 })),
       "generation-b",
       phase,
     );
@@ -155,7 +159,7 @@ test("retry after a committed continuation acknowledgement starts the accepted s
   await start(fixture.client, fixture.graph.id, threadId);
   const waiting = await waitForStatus(fixture.client, fixture.graph.id, threadId, "waiting");
   const restartedProvider = faultProvider(
-    createLocalAgentStateProvider(fixture.root, { pollingMs: 50 }),
+    trackFixtureProvider(createLocalAgentStateProvider(fixture.root, { pollingMs: 50 })),
     "admitContinuation",
     "after",
   );
@@ -204,7 +208,7 @@ async function createFixture(
 ) {
   const root = await mkdtemp(join(tmpdir(), "relkit-graph-boundary-"));
   roots.push(root);
-  const base = createLocalAgentStateProvider(root, { pollingMs: 50 });
+  const base = trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 }));
   let provider = options.providerFault
     ? faultProvider(base, options.providerFault[0], options.providerFault[1])
     : base;
@@ -294,7 +298,10 @@ function reviewGraph(checkpointer: MemorySaver, entries: { review: number; finis
     handler: () => {
       entries.review += 1;
       const approved = interrupt({ question: "Approve?" }) as boolean;
-      return new Command({ update: { approved }, goto: "finish" });
+      return new Command<unknown, { approved: boolean }, "finish">({
+        update: { approved },
+        goto: "finish",
+      });
     },
   });
   const finish = defineGraphNode({
@@ -332,6 +339,8 @@ function runtimeClient(
     manifest: {
       ...runtimeCohort(plan.graphHash),
       functions: {},
+      middleware: {},
+      requestTransforms: {},
       agents: { [graph.id]: graph },
     } as RuntimeManifest,
     engine: {
@@ -358,6 +367,7 @@ function runtimeClient(
       resolve: () => ({ identityScope: "viewer", sessionEpoch: "session" }),
     },
     agentRuntime: {
+      track: trackFixtureRun,
       applicationId: "fixture",
       environment: "test",
       generationId,
@@ -365,10 +375,10 @@ function runtimeClient(
       provider: () => provider,
     },
   });
-  return createClient<any>({
+  return createFixtureClient({
     baseUrl: "http://relkit.test",
     headers: { "x-relkit-identity-scope": "viewer", "x-relkit-session-epoch": "session" },
-    fetch: (request, init) => app.fetch(new Request(request, init)),
+    fetch: appFetch(app),
   });
 }
 
@@ -409,7 +419,7 @@ async function waitForStatus(client: any, agentId: string, threadId: string, sta
     } catch (cause) {
       lastError = cause;
     }
-    await Bun.sleep(10);
+    await sleep(10);
   }
   throw new Error(`Agent did not reach ${status}.`, { cause: lastError });
 }
@@ -433,6 +443,8 @@ function scope(snapshot: any, agentId: string) {
     providerEpoch: snapshot.providerEpoch,
     agentId,
     ownerScope: "viewer",
+    identityScope: "viewer",
+    sessionEpoch: "session",
     authorizationGrantId: digest({
       identity: { identityScope: "viewer", sessionEpoch: "session" },
       agentId,
@@ -479,7 +491,12 @@ function graphPlan(workflow: unknown): RegistrationPlan {
         instructions: "",
         toolIds: [],
         limits: {},
-        generatedFunction: { functionId: "relkit.agent.orders.boundary.invoke" },
+        generatedFunction: {
+          functionId: "relkit.agent.orders.boundary.invoke",
+          generated: true,
+          generatedBy: "agent",
+          agentId: "orders.boundary",
+        },
         profile: "default",
         stateProfile: "default",
         client: "protected",

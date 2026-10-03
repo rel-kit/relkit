@@ -1,4 +1,12 @@
-import { afterEach, expect, test } from "bun:test";
+import {
+  trackFixtureRun,
+  trackFixtureProvider,
+  joinFixtureRuns,
+  awaitFixtureCancellation,
+} from "./fixture-lifetime.js";
+import { createFixtureClient, createFixtureWebSocketClient, appFetch } from "./fixture-client.js";
+import { setTimeout as sleep } from "node:timers/promises";
+import { afterEach, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -6,24 +14,37 @@ import { defineAgent } from "@relkit/agents";
 import type { RegistrationPlan } from "@relkit/graph";
 import { createOperationId } from "@relkit/realtime";
 import { z } from "@relkit/schema";
-import { createClient, createWebSocketClient } from "@relkit/client";
+
 import { createLocalAgentStateProvider } from "@relkit/providers-local";
-import { createApp, type RuntimeManifest } from "./src/index.ts";
+import { createApp, type RuntimeManifest } from "../src/index.ts";
 import { runtimeCohort } from "./test-cohort.ts";
-import { upgradeWebSocket, websocket } from "hono/bun";
+import { startBunFixture, type BunFixture } from "./bun-fixture.ts";
 import { AGENT_CAPABILITY_HEADER } from "@relkit/contracts";
 
 const roots: string[] = [];
-const servers: Bun.Server<unknown>[] = [];
+const servers: BunFixture[] = [];
 afterEach(async () => {
-  servers.splice(0).forEach((server) => server.stop(true));
+  await joinFixtureRuns();
+  await Promise.all(servers.splice(0).map((server) => server.stop()));
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true })));
 });
+
+test.each(["before", "after"] as const)(
+  "a held fixture run settles when cancellation arrives %s invocation",
+  async (timing) => {
+    const controller = new AbortController();
+    const reason = new Error("The owning generation stopped this run.");
+    if (timing === "before") controller.abort(reason);
+    const held = awaitFixtureCancellation(controller.signal);
+    if (timing === "after") controller.abort(reason);
+    await expect(held).rejects.toBe(reason);
+  },
+);
 
 test("agent run acceptance is idempotent and restores its durable thread", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-agent-rpc-"));
   roots.push(root);
-  const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
+  const provider = trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 }));
   const authorizedOperations: string[] = [];
   const agent = defineAgent({
     id: "support.echo",
@@ -50,18 +71,14 @@ test("agent run acceptance is idempotent and restores its durable thread", async
     invoke: async (request: {
       readonly input: unknown;
       readonly signal?: AbortSignal;
-      readonly trigger?: { readonly messages?: unknown };
+      readonly trigger?: unknown;
     }) => {
       executions += 1;
-      histories.push(request.trigger?.messages);
+      histories.push((request.trigger as { readonly messages?: unknown } | undefined)?.messages);
       threadIds.push((request.trigger as { readonly threadId?: unknown } | undefined)?.threadId);
       const message = (request.input as { readonly message: string }).message;
       if (message === "hold") {
-        await new Promise((resolve, reject) => {
-          request.signal?.addEventListener("abort", () => reject(request.signal?.reason), {
-            once: true,
-          });
-        });
+        await awaitFixtureCancellation(request.signal);
       }
       await new Promise((resolve) => setTimeout(resolve, 25));
       return { answer: "hello" };
@@ -77,35 +94,31 @@ test("agent run acceptance is idempotent and restores its durable thread", async
       resolve: () => ({ identityScope: "viewer", sessionEpoch: "session" }),
     },
     agentRuntime: {
+      track: trackFixtureRun,
       applicationId: "fixture",
       environment: "test",
       generationId: "generation-a",
       publicFingerprint: "sha256:public",
       provider: () => provider,
     },
-    upgradeWebSocket,
   });
-  const client = createClient<any>({
+  const client = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers: { "x-relkit-identity-scope": "viewer", "x-relkit-session-epoch": "session" },
-    fetch: (request, init) => app.fetch(new Request(request, init)),
+    fetch: appFetch(app),
   });
-  const incompatibleClient = createClient<any>({
+  const incompatibleClient = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers: {
       "x-relkit-identity-scope": "viewer",
       "x-relkit-session-epoch": "session",
       [AGENT_CAPABILITY_HEADER]: "cursor-replay.v1",
     },
-    fetch: (request, init) => app.fetch(new Request(request, init)),
+    fetch: appFetch(app),
   });
-  const server = Bun.serve({
-    port: 0,
-    websocket,
-    fetch: (request, bunServer) => app.fetch(request, bunServer),
-  });
+  const server = await startBunFixture("agent-rpc", { root });
   servers.push(server);
-  const socketClient = createWebSocketClient<any>({
+  const socketClient = createFixtureWebSocketClient({
     baseUrl: `http://127.0.0.1:${server.port}`,
   });
   const appB = createApp({
@@ -118,6 +131,7 @@ test("agent run acceptance is idempotent and restores its durable thread", async
       resolve: () => ({ identityScope: "viewer", sessionEpoch: "session" }),
     },
     agentRuntime: {
+      track: trackFixtureRun,
       applicationId: "fixture",
       environment: "test",
       generationId: "generation-b",
@@ -125,10 +139,10 @@ test("agent run acceptance is idempotent and restores its durable thread", async
       provider: () => provider,
     },
   });
-  const clientB = createClient<any>({
+  const clientB = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers: { "x-relkit-identity-scope": "viewer", "x-relkit-session-epoch": "session" },
-    fetch: (request, init) => appB.fetch(new Request(request, init)),
+    fetch: appFetch(appB),
   });
   const operationId = createOperationId();
   const threadId = "conversation:echo";
@@ -168,6 +182,9 @@ test("agent run acceptance is idempotent and restores its durable thread", async
 
   const snapshot = await waitForIdle(client, agent.id, first.threadId);
   expect(executions).toBe(1);
+  expect(await (await fetch(`http://127.0.0.1:${server.port}/__fixture/state`)).json()).toEqual({
+    executions: 0,
+  });
   expect(snapshot.currentMessages.map((message: { role: string }) => message.role)).toEqual([
     "user",
     "assistant",
@@ -244,7 +261,22 @@ test("agent run acceptance is idempotent and restores its durable thread", async
 test("generation retirement interrupts its run and a newer generation cannot continue it", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-agent-generation-"));
   roots.push(root);
-  const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
+  const nativeProvider = createLocalAgentStateProvider(root, { pollingMs: 50 });
+  const controlStarted = Promise.withResolvers<void>();
+  const releaseControl = Promise.withResolvers<void>();
+  let controlSettled = false;
+  const provider = trackFixtureProvider({
+    ...nativeProvider,
+    readControls: async (request: Parameters<typeof nativeProvider.readControls>[0]) => {
+      controlStarted.resolve();
+      await releaseControl.promise;
+      try {
+        return await nativeProvider.readControls(request);
+      } finally {
+        controlSettled = true;
+      }
+    },
+  });
   const agent = defineAgent({
     id: "support.echo",
     input: z.string(),
@@ -258,17 +290,19 @@ test("generation retirement interrupts its run and a newer generation cannot con
   });
   const plan = agentPlan();
   const retired = new AbortController();
+  const acceptedRuns: Promise<void>[] = [];
   let executions = 0;
   const engine = {
     invoke: async ({ signal }: { readonly signal?: AbortSignal }) => {
       executions += 1;
-      if (signal?.aborted) throw signal.reason;
-      await new Promise((_, reject) =>
-        signal?.addEventListener("abort", () => reject(signal.reason), { once: true }),
-      );
+      await awaitFixtureCancellation(signal);
     },
   };
   const runtime = (generationId: string, signal?: AbortSignal) => ({
+    track: (task: Promise<void>) => {
+      acceptedRuns.push(task);
+      trackFixtureRun(task);
+    },
     applicationId: "fixture",
     environment: "test",
     generationId,
@@ -296,50 +330,68 @@ test("generation retirement interrupts its run and a newer generation cannot con
     clientIdentity: identity,
     agentRuntime: runtime("generation-b"),
   });
-  const clientA = createClient<any>({
+  const clientA = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers,
-    fetch: (request, init) => appA.fetch(new Request(request, init)),
+    fetch: appFetch(appA),
   });
-  const clientB = createClient<any>({
+  const clientB = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers,
-    fetch: (request, init) => appB.fetch(new Request(request, init)),
+    fetch: appFetch(appB),
   });
-  const accepted = await clientA["relkit.agent.run"]({
-    agentId: agent.id,
-    threadId: "generation:retirement",
-    operationId: createOperationId(),
-    kind: "run",
-    payload: "hold",
-  });
-  retired.abort();
-  const interrupted = await waitForThreadStatus(
-    clientB,
-    agent.id,
-    accepted.threadId,
-    "worker-interrupted",
-  );
-  expect(interrupted.currentRuns).toMatchObject([
-    { runId: accepted.runId, status: "worker-interrupted" },
-  ]);
-  expect(interrupted.activeRun?.owner.generationId).toBe("generation-a");
-  await expect(
-    clientB["relkit.agent.control"]({
+  try {
+    const accepted = await clientA["relkit.agent.run"]({
       agentId: agent.id,
-      threadId: accepted.threadId,
+      threadId: "generation:retirement",
       operationId: createOperationId(),
-      kind: "approve",
-      payload: { decisions: {} },
-    }),
-  ).rejects.toMatchObject({ code: "GENERATION_UNAVAILABLE" });
-  expect(executions).toBe(1);
+      kind: "run",
+      payload: "hold",
+    });
+    await controlStarted.promise;
+    retired.abort();
+    const interrupted = await waitForThreadStatus(
+      clientB,
+      agent.id,
+      accepted.threadId,
+      "worker-interrupted",
+    );
+    expect(interrupted.currentRuns).toMatchObject([
+      { runId: accepted.runId, status: "worker-interrupted" },
+    ]);
+    expect(interrupted.activeRun?.owner.generationId).toBe("generation-a");
+    await expect(
+      clientB["relkit.agent.control"]({
+        agentId: agent.id,
+        threadId: accepted.threadId,
+        operationId: createOperationId(),
+        kind: "approve",
+        payload: { decisions: {} },
+      }),
+    ).rejects.toMatchObject({ code: "GENERATION_UNAVAILABLE" });
+    expect(executions).toBe(1);
+    await Promise.allSettled(acceptedRuns);
+    let cleanupSettled = false;
+    const joined = joinFixtureRuns().then(() => {
+      cleanupSettled = true;
+    });
+    await Promise.resolve();
+    expect(controlSettled).toBe(false);
+    expect(cleanupSettled).toBe(false);
+    releaseControl.resolve();
+    await joined;
+    expect(controlSettled).toBe(true);
+  } finally {
+    retired.abort();
+    releaseControl.resolve();
+    await joinFixtureRuns();
+  }
 });
 
 test("a queued follow-up starts one new segment on the reusable thread", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-agent-follow-up-"));
   roots.push(root);
-  const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
+  const provider = trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 }));
   const agent = defineAgent({
     id: "support.echo",
     input: z.string(),
@@ -373,6 +425,7 @@ test("a queued follow-up starts one new segment on the reusable thread", async (
       resolve: () => ({ identityScope: "viewer", sessionEpoch: "session" }),
     },
     agentRuntime: {
+      track: trackFixtureRun,
       applicationId: "fixture",
       environment: "test",
       generationId: "generation-a",
@@ -380,10 +433,10 @@ test("a queued follow-up starts one new segment on the reusable thread", async (
       provider: () => provider,
     },
   });
-  const client = createClient<any>({
+  const client = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers: { "x-relkit-identity-scope": "viewer", "x-relkit-session-epoch": "session" },
-    fetch: (request, init) => app.fetch(new Request(request, init)),
+    fetch: appFetch(app),
   });
   const first = await client["relkit.agent.run"]({
     agentId: agent.id,
@@ -428,7 +481,7 @@ async function waitForThreadStatus(
   for (let attempt = 0; attempt < 100; attempt += 1) {
     const snapshot = await client["relkit.agent.load"]({ agentId, threadId });
     if (snapshot.thread.status === status) return snapshot;
-    await Bun.sleep(10);
+    await sleep(10);
   }
   throw new Error(`Agent did not reach ${status}.`);
 }
@@ -442,7 +495,7 @@ async function waitForRunCount(
   for (let attempt = 0; attempt < 100; attempt += 1) {
     const snapshot = await client["relkit.agent.load"]({ agentId, threadId });
     if (snapshot.thread.status === "idle" && snapshot.currentRuns.length === count) return snapshot;
-    await Bun.sleep(10);
+    await sleep(10);
   }
   throw new Error(`Agent did not settle ${count} runs.`);
 }
@@ -469,7 +522,12 @@ function agentPlan(): RegistrationPlan {
         instructions: "redacted",
         toolIds: [],
         limits: {},
-        generatedFunction: { functionId: "relkit.agent.support.echo.invoke" },
+        generatedFunction: {
+          functionId: "relkit.agent.support.echo.invoke",
+          generated: true,
+          generatedBy: "agent",
+          agentId: "support.echo",
+        },
         profile: "default",
         stateProfile: "default",
         client: "protected",
