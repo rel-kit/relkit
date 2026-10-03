@@ -19,6 +19,11 @@ const publicCodes = new Set([
   "NOT_FOUND",
 ]);
 
+/** Translate native call failures into the public agent RPC error contract.
+ * @typeParam Value - Value produced by the source or selected by the predicate.
+ * @param action - Native operation or lazy stream producer.
+ * @returns The action result; failures reject with a sanitized ORPCError.
+ */
 export async function agentRpcCall<Value>(action: () => Promise<Value>): Promise<Value> {
   try {
     return await action();
@@ -27,6 +32,11 @@ export async function agentRpcCall<Value>(action: () => Promise<Value>): Promise
   }
 }
 
+/** Translate failures raised while iterating an agent RPC source.
+ * @typeParam Value - Value produced by the source or selected by the predicate.
+ * @param action - Native operation or lazy stream producer.
+ * @returns The source values, preserving lazy iteration and public error mapping.
+ */
 export async function* agentRpcStream<Value>(
   action: () => AsyncIterable<Value>,
 ): AsyncIterable<Value> {
@@ -37,6 +47,10 @@ export async function* agentRpcStream<Value>(
   }
 }
 
+/** Retain known public errors and redact unsupported native failures.
+ * @param error - Native failure or public error identifier.
+ * @returns An ORPCError safe to expose at the agent RPC boundary.
+ */
 export function agentRpcError(error: unknown): ORPCError<string, unknown> {
   if (error instanceof ORPCError) return error;
   if (error instanceof TypeError) return new ORPCError("BAD_REQUEST", { message: error.message });
@@ -47,6 +61,10 @@ export function agentRpcError(error: unknown): ORPCError<string, unknown> {
   return new ORPCError("INTERNAL_SERVER_ERROR");
 }
 
+/** Read a string error code without requiring a native Error instance.
+ * @param error - Native failure or public error identifier.
+ * @returns The code when present, otherwise undefined.
+ */
 function errorCode(error: unknown): string | undefined {
   if (error === null || typeof error !== "object") return undefined;
   return typeof (error as { readonly code?: unknown }).code === "string"
@@ -54,6 +72,10 @@ function errorCode(error: unknown): string | undefined {
     : undefined;
 }
 
+/** Provide stable public wording for allowed agent error codes.
+ * @param code - Stable public error or mapping issue code.
+ * @returns A safe message derived from the allowlisted code.
+ */
 function publicMessage(code: string): string {
   if (code === "NOT_FOUND") return "Agent resource was not found.";
   if (code === "PROVIDER_STATE_LOST") return "Agent provider state changed.";

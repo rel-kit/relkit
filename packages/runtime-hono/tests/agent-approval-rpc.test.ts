@@ -1,4 +1,7 @@
-import { afterEach, expect, test } from "bun:test";
+import { trackFixtureRun, trackFixtureProvider, joinFixtureRuns } from "./fixture-lifetime.js";
+import { createFixtureClient, appFetch } from "./fixture-client.js";
+import { setTimeout as sleep } from "node:timers/promises";
+import { afterEach, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -6,19 +9,22 @@ import { defineAgent, type PendingApproval } from "@relkit/agents";
 import type { RegistrationPlan } from "@relkit/graph";
 import { createOperationId } from "@relkit/realtime";
 import { z } from "@relkit/schema";
-import { createClient } from "@relkit/client";
+
 import { createLocalAgentStateProvider } from "@relkit/providers-local";
-import { createApp, type RuntimeManifest } from "./src/index.ts";
-import { waitForAgentRun } from "./src/agent-run-tasks.ts";
+import { createApp, type RuntimeManifest } from "../src/index.ts";
+import { waitForAgentRun } from "../src/agent-run-tasks.ts";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const roots: string[] = [];
-afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true }))));
+afterEach(async () => {
+  await joinFixtureRuns();
+  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true })));
+});
 
 test("approval interruption admits one continuation without replaying agent execution", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-agent-approval-"));
   roots.push(root);
-  const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
+  const provider = trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 }));
   const agent = defineAgent({
     id: "support.approval",
     input: z.string(),
@@ -67,6 +73,7 @@ test("approval interruption admits one continuation without replaying agent exec
       resolve: () => ({ identityScope: "viewer", sessionEpoch: "session" }),
     },
     agentRuntime: {
+      track: trackFixtureRun,
       applicationId: "fixture",
       environment: "test",
       generationId: "generation-a",
@@ -74,10 +81,10 @@ test("approval interruption admits one continuation without replaying agent exec
       provider: () => provider,
     },
   });
-  const client = createClient<any>({
+  const client = createFixtureClient({
     baseUrl: "http://relkit.test",
     headers: { "x-relkit-identity-scope": "viewer", "x-relkit-session-epoch": "session" },
-    fetch: (request, init) => app.fetch(new Request(request, init)),
+    fetch: appFetch(app),
   });
   const accepted = await client["relkit.agent.run"]({
     agentId: agent.id,
@@ -146,7 +153,7 @@ async function waitForStatus(
   for (let attempt = 0; attempt < 100; attempt += 1) {
     const snapshot = await client["relkit.agent.load"]({ agentId, threadId });
     if (snapshot.thread.status === status) return snapshot;
-    await Bun.sleep(10);
+    await sleep(10);
   }
   throw new Error(`Agent did not reach ${status}.`);
 }
@@ -173,7 +180,12 @@ function approvalPlan(): RegistrationPlan {
         instructions: "redacted",
         toolIds: [],
         limits: {},
-        generatedFunction: { functionId: "relkit.agent.support.approval.invoke" },
+        generatedFunction: {
+          functionId: "relkit.agent.support.approval.invoke",
+          generated: true,
+          generatedBy: "agent",
+          agentId: "support.approval",
+        },
         profile: "default",
         stateProfile: "default",
         client: "protected",
