@@ -1,7 +1,7 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { Hono, type Context } from "hono";
 import type { RegistrationPlan } from "@relkit/graph";
-import { materializeRoutes, type RuntimeManifest } from "./src/materialize-routes";
+import { materializeRoutes, type RuntimeManifest } from "../src/materialize-routes";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "middleware.test.ts", line: 1, column: 1 } as const;
@@ -111,6 +111,7 @@ function plan(): RegistrationPlan {
     tools: [],
     agents: [],
     services: [],
+    channels: [],
     middlewares: middleware,
   };
 }

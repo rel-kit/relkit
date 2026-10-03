@@ -1,8 +1,8 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { invokeFunction, type InvocationTarget } from "@relkit/engine";
 import { z } from "@relkit/schema";
-import { createApp, type RuntimeManifest } from "./src/index.js";
-import type { HttpInvocationOptions } from "./src/materialize-routes.js";
+import { createApp, type RuntimeManifest } from "../src/index.js";
+import type { HttpInvocationOptions } from "../src/materialize-routes.js";
 import type { RegistrationPlan } from "@relkit/graph";
 import { runtimeCohort } from "./test-cohort.ts";
 
@@ -20,7 +20,9 @@ test("default middleware assigns IDs, forwards them to the engine, and records l
     middleware: {
       requestId: () => "request.fixed",
       traceId: () => traceId,
-      onLifecycleEvent: (event) => events.push(event.type),
+      onLifecycleEvent: (event) => {
+        events.push(event.type);
+      },
     },
     mapInput: () => ({}),
     engine: {
@@ -53,7 +55,9 @@ test("invalid incoming IDs are replaced and a body limit short-circuits the rout
     manifest: manifest(),
     middleware: {
       maxBodyBytes: 3,
-      onLifecycleEvent: (event) => events.push(event.type),
+      onLifecycleEvent: (event) => {
+        events.push(event.type);
+      },
     },
     mapInput: () => ({}),
     engine: { invoke: async () => ((calls += 1), { ok: true }) },
@@ -79,7 +83,9 @@ test("HTTP cancellation reaches the engine signal and emits one cancellation eve
     manifest: manifest(),
     middleware: {
       timeoutMs: 5,
-      onLifecycleEvent: (event) => events.push(event.type),
+      onLifecycleEvent: (event) => {
+        events.push(event.type);
+      },
     },
     mapInput: () => ({}),
     engine: {
@@ -97,7 +103,7 @@ test("HTTP cancellation reaches the engine signal and emits one cancellation eve
 
 test("the engine receives function input and the public context, never Hono context", async () => {
   let observedInput: unknown;
-  let observedContext: {
+  let observedContext!: {
     readonly invocation: { readonly correlationId?: string; readonly traceId: string };
   };
   const target: InvocationTarget = {
@@ -163,6 +169,7 @@ function plan(): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }

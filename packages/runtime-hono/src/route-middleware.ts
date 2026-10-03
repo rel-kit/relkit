@@ -1,11 +1,18 @@
-import type { Context, Hono, Next } from "hono";
+import { publicTrace } from "@relkit/invocation";
 import type { MiddlewareContext, MiddlewareDescriptor } from "@relkit/routes";
-import type { RouteMaterializationOptions } from "./materialize-routes.js";
+import { createPublicClockEffect } from "@relkit/runtime-effect";
+import type { Context, Hono, Next } from "hono";
+import { runHttp } from "./http-effect.js";
 import { getEntry, isRecord } from "./materialize-routes-utils.js";
+import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { getRequestState } from "./middleware.js";
 import { failureOutcome, recordDetail } from "./request-record-utils.js";
-import { publicTrace } from "@relkit/invocation";
 
+/** Registers declared middleware deterministically before materialized routes.
+ * @param app - Hono application receiving the configured endpoints or middleware.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Nothing; registers callable manifest middleware in stable declaration-ID order.
+ */
 export function registerRouteMiddleware(app: Hono, options: RouteMaterializationOptions): void {
   for (const middleware of [...options.plan.middlewares].sort((a, b) => a.id.localeCompare(b.id))) {
     const descriptor = getEntry(options.manifest.middleware, middleware.id);
@@ -14,6 +21,12 @@ export function registerRouteMiddleware(app: Hono, options: RouteMaterialization
   }
 }
 
+/** Executes declared middleware with trace attribution and request-record outcomes.
+ * @param middlewareId - Stable registered middleware identifier used for attribution.
+ * @param descriptor - Resolved runtime declaration and its application callbacks.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns A native handler preserving the declared middleware result and recording its outcome.
+ */
 function createMiddlewareHandler(
   middlewareId: string,
   descriptor: MiddlewareDescriptor,
@@ -50,6 +63,13 @@ function createMiddlewareHandler(
   };
 }
 
+/** Builds trusted middleware dependencies and an interruptible clock bridge.
+ * @param middlewareId - Stable registered middleware identifier used for attribution.
+ * @param request - Native request whose headers, body and cancellation signal define this operation.
+ * @param state - State owned by the current request or operation.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The configured middleware context, or defaults with public tracing and an interruptible clock.
+ */
 async function middlewareContext(
   middlewareId: string,
   request: Request,
@@ -67,6 +87,9 @@ async function middlewareContext(
       ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
     });
   }
+  /** Discard middleware log calls when no application context supplied a logger.
+   * @returns Nothing; the default context has no logging sink.
+   */
   const noop = (): void => undefined;
   return {
     signal,
@@ -76,14 +99,19 @@ async function middlewareContext(
       Object.freeze({ getSession: () => Promise.resolve(null) }),
     log: Object.freeze({ trace: noop, debug: noop, info: noop, warn: noop, error: noop }),
     trace: publicTrace,
-    time: Object.freeze({
-      now: () => new Date(),
-      sleep: (milliseconds: number) =>
-        new Promise<void>((resolve) => setTimeout(resolve, milliseconds)),
-    }),
+    time: await runHttp(
+      createPublicClockEffect(
+        { run: (effect, settings) => runHttp(effect, settings?.signal) },
+        signal,
+      ),
+    ),
   };
 }
 
+/** Recognizes a callable middleware descriptor before route registration.
+ * @param value - Value inspected, validated or projected by this operation.
+ * @returns Whether the inspected value satisfies the declared type guard.
+ */
 function isMiddleware(value: unknown): value is MiddlewareDescriptor {
   return isRecord(value) && typeof value.path === "string" && typeof value.handler === "function";
 }

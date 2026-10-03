@@ -1,3 +1,4 @@
+import { expect, test } from "vitest";
 import { Hono } from "hono";
 import type { MiddlewareHandler } from "hono";
 import {
@@ -6,7 +7,7 @@ import {
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
 } from "@relkit/contracts";
-import { createApp, materializeRoutes, type RuntimeManifest } from "./src/index.js";
+import { createApp, materializeRoutes, type RuntimeManifest } from "../src/index.js";
 import type { RegistrationPlan } from "@relkit/graph";
 
 const source = { file: "src/app.ts", line: 1, column: 1 };
@@ -39,6 +40,7 @@ function plan(withRefs = true): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }

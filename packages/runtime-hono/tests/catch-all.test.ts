@@ -1,6 +1,6 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
-import { createApp, type RuntimeManifest } from "./src/index.ts";
+import { createApp, type RuntimeManifest } from "../src/index.ts";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/routes/docs/[[...parts]]/route.ts", line: 1, column: 14 };
@@ -105,6 +105,7 @@ function plan(...triggers: readonly HttpTriggerRegistration[]): RegistrationPlan
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }
