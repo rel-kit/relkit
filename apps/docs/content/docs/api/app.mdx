@@ -1596,7 +1596,9 @@ The original validation error for invalid options.
 **Example**
 
 ```ts
-defineApp({ env: defineEnv({}), server: { port: 3000 } });
+import { defineApp } from "@relkit/app";
+import { defineEnv } from "@relkit/config";
+const app = defineApp({ env: defineEnv({}), server: { port: 3000 } });
 ```
 
 **Signature**
@@ -1613,7 +1615,7 @@ declare const defineApp: <
 ) => ApplicationDescriptor<Shape, Providers, Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L123)
 
 Since v0.2.0
 

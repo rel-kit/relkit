@@ -31,6 +31,14 @@ TypeError for malformed local input, or the original identity/ID error.
 **Example**
 
 ```ts
+import { defineFunction } from "@relkit/functions";
+import { z } from "@relkit/schema";
+import { defineService } from "@relkit/services";
+const lookup = defineFunction({
+  input: z.string(),
+  output: z.string(),
+  handler: (id) => id,
+});
 const orders = defineService({ id: "orders", functions: { lookup } });
 ```
 
@@ -40,7 +48,7 @@ const orders = defineService({ id: "orders", functions: { lookup } });
 declare const defineService: DefineService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L114)
 
 Since v0.1.0
 
