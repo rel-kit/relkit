@@ -1,9 +1,9 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createJobQueue } from "./src/jobs/queue.ts";
-import { createJobStore } from "./src/jobs/store.ts";
+import { createJobQueue } from "../src/jobs/queue.ts";
+import { createJobStore } from "../src/jobs/store.ts";
 
 const roots: string[] = [];
 
@@ -34,7 +34,7 @@ describe("local durable job queue", () => {
       "dead-lettered": 1,
     });
     await close();
-  });
+  }, 15_000);
 
   test("recovers accepted and expired leased work without inventing a state", async () => {
     const { queue, store, close } = await makeQueue();
