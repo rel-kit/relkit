@@ -30,7 +30,10 @@ test("worker message entrypoint opens, writes, queries, and closes a database", 
       handler.call(process, { id: current, command });
       return reply;
     };
-    expect((await call({ type: "open", root })).value).toEqual({ records: 0, malformed: 0 });
+    // Exercise the worker protocol independently of the fixed record's age.
+    expect(
+      (await call({ type: "open", root, retention: { maxAgeMs: Number.MAX_SAFE_INTEGER } })).value,
+    ).toEqual({ records: 0, malformed: 0 });
     const appended = await call({
       type: "append",
       records: [

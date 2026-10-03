@@ -64,6 +64,18 @@ export function makeDuckdbQueryEffect(
               : duckdbError("validate", cause),
         });
         const distinctTraces = kind === "traces" && query.traceId === undefined;
+        const listSelect =
+          kind === "requests"
+            ? `${select.replace(
+                "FROM records",
+                `FROM (
+              SELECT *, row_number() OVER (
+                PARTITION BY request_id
+                ORDER BY CASE json_extract_string(payload, '$.phase') WHEN 'completed' THEN 1 ELSE 0 END DESC, id DESC
+              ) AS request_rank FROM records WHERE signal = 'request'
+            )`,
+              )} WHERE request_rank = 1 AND`
+            : `${select} WHERE`;
         const clauses = [
           kind === "logs"
             ? "signal = 'log'"
@@ -131,7 +143,7 @@ export function makeDuckdbQueryEffect(
               ],
             )
           : yield* rows(
-              `${select} WHERE ${clauses.join(" AND ")} ORDER BY id ${descending ? "DESC" : "ASC"} LIMIT ?`,
+              `${listSelect} ${clauses.join(" AND ")} ORDER BY id ${descending ? "DESC" : "ASC"} LIMIT ?`,
               [...values, query.limit + 1],
             );
         const page = found.slice(0, query.limit);

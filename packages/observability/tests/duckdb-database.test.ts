@@ -3,10 +3,14 @@ import { appendFile, mkdir, mkdtemp, rename, rm, writeFile } from "node:fs/promi
 import { join } from "node:path";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { openDuckdbDatabase } from "../src/local/duckdb-database.js";
+
+// These fixtures exercise persistence and import, so retain their fixed historical records.
+const fixtureRetention = { maxAgeMs: Number.MAX_SAFE_INTEGER };
+
 test("direct DuckDB adapter appends, queries, and closes owned handles", async () => {
   const root = await mkdtemp(join("/tmp", "relkit-duckdb-direct-"));
   try {
-    const database = await openDuckdbDatabase(root);
+    const database = await openDuckdbDatabase(root, fixtureRetention);
     const stored = await database.append([
       {
         key: "direct:1",
@@ -30,7 +34,7 @@ test("direct DuckDB adapter appends, queries, and closes owned handles", async (
       _tag: "DuckdbError",
       operation: "closed",
     });
-    const reopened = await openDuckdbDatabase(root);
+    const reopened = await openDuckdbDatabase(root, fixtureRetention);
     expect((await reopened.list("logs")).items).toHaveLength(1);
     await reopened.close();
   } finally {
@@ -79,17 +83,17 @@ test("open imports legacy segments once as an active file grows", async () => {
   try {
     await mkdir(directory, { recursive: true });
     await writeFile(path, `${line("first")}\n`);
-    const first = await openDuckdbDatabase(root);
+    const first = await openDuckdbDatabase(root, fixtureRetention);
     expect(first.imported).toEqual({ records: 1, malformed: 0 });
     expect((await first.list("logs")).items).toHaveLength(1);
     await first.close();
     await appendFile(path, `${line("second")}\n`);
-    const second = await openDuckdbDatabase(root);
+    const second = await openDuckdbDatabase(root, fixtureRetention);
     expect(second.imported).toEqual({ records: 1, malformed: 0 });
     expect((await second.list("logs")).items).toHaveLength(2);
     await second.close();
     await rename(path, path.replace(".active.ndjson", ".ndjson"));
-    const unchanged = await openDuckdbDatabase(root);
+    const unchanged = await openDuckdbDatabase(root, fixtureRetention);
     expect(unchanged.imported).toEqual({ records: 0, malformed: 0 });
     expect((await unchanged.list("logs")).items).toHaveLength(2);
     await unchanged.close();
