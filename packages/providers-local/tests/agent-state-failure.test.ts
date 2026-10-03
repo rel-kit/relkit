@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, test } from "vitest";
 import { createHash } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -9,8 +9,8 @@ import { createOperationId } from "@relkit/realtime";
 import {
   createAgentStateProviderFromStore,
   createLocalAgentStateProvider,
-} from "./src/agent-state/provider.js";
-import { createAgentStateStore, type AgentStateStore } from "./src/agent-state/storage.js";
+} from "../src/agent-state/provider.js";
+import { createAgentStateStore, type AgentStateStore } from "../src/agent-state/storage.js";
 
 const roots: string[] = [];
 afterEach(async () =>

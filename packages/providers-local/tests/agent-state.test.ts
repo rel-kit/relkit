@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, test } from "vitest";
 import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
@@ -12,7 +12,7 @@ import type {
 } from "@relkit/agents";
 import { canonicalJson } from "@relkit/contracts";
 import { createOperationId } from "@relkit/realtime";
-import { createLocalAgentStateProvider } from "./src/agent-state/provider.js";
+import { createLocalAgentStateProvider } from "../src/agent-state/provider.js";
 
 const roots: string[] = [];
 afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true }))));
@@ -932,7 +932,7 @@ test("expired control recovery reconciles an admitted follow-up run", async () =
     receiptExpiresAt: future(30),
     limits,
   });
-  await Bun.sleep(110);
+  await new Promise((resolve) => setTimeout(resolve, 110));
   const snapshot = await provider.loadThread({
     ...scope,
     threadId: thread.threadId,
@@ -1093,11 +1093,7 @@ async function setup() {
   const root = await mkdtemp(join(tmpdir(), "relkit-agent-state-"));
   roots.push(root);
   const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
-  while (!(await Bun.file(join(root, "agent-state.json")).exists())) await Bun.sleep(1);
-  const state = JSON.parse(await readFile(join(root, "agent-state.json"), "utf8")) as {
-    providerEpoch: string;
-  };
-  return { provider, root, scope: baseScope(state.providerEpoch) };
+  return { provider, root, scope: baseScope(await provider.getEpoch()) };
 }
 
 function baseScope(providerEpoch: string): AgentRequestScope {
