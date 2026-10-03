@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { InvocationValidationError } from "@relkit/engine";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
 import {
@@ -9,12 +9,12 @@ import {
   unexpectedDefect,
 } from "@relkit/runtime-effect";
 import { z } from "@relkit/schema";
-import { createApp } from "./src/create-app.js";
+import { createApp } from "../src/create-app.js";
 import {
   mapFailureResponse,
   mapInputValidationResponse,
   mapSuccessResponse,
-} from "./src/response-mapping.js";
+} from "../src/response-mapping.js";
 import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/routes.ts", line: 1, column: 1 };
@@ -49,6 +49,7 @@ function plan(route: HttpTriggerRegistration): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   };
 }
