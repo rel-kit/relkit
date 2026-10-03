@@ -1,11 +1,11 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "vitest";
 import { applicationFailure, cancellationFailure, timeoutFailure } from "@relkit/runtime-effect";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createJobQueue } from "./src/jobs/queue.ts";
-import { applyRetry, calculateRetryDelay, planRetry } from "./src/jobs/retry.ts";
-import { createJobStore } from "./src/jobs/store.ts";
+import { createJobQueue } from "../src/jobs/queue.ts";
+import { applyRetry, calculateRetryDelay, planRetry } from "../src/jobs/retry.ts";
+import { createJobStore } from "../src/jobs/store.ts";
 
 const roots: string[] = [];
 

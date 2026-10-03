@@ -1,5 +1,9 @@
-import { describe, expect, test } from "bun:test";
-import { compileSchedule, createScheduler, ScheduleValidationError } from "./src/jobs/scheduler.ts";
+import { describe, expect, test } from "vitest";
+import {
+  compileSchedule,
+  createScheduler,
+  ScheduleValidationError,
+} from "../src/jobs/scheduler.ts";
 
 describe("local scheduler", () => {
   test("validates static schedules and calculates timezone-aware next fires", () => {

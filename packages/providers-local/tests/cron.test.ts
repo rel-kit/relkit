@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import { nextCronFire } from "./src/jobs/cron.ts";
+import { describe, expect, test } from "vitest";
+import { nextCronFire } from "../src/jobs/cron.ts";
 
 describe("internal cron adapter", () => {
   test("returns the next fire time without exposing parser values", () => {
