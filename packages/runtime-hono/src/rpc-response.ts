@@ -1,6 +1,9 @@
 import { ORPCError } from "@orpc/server";
 import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
 
+/** Creates the existing safe oRPC not-found response.
+ * @returns A JSON response with the public oRPC NOT_FOUND envelope and status 404.
+ */
 export function rpcNotFound(): Response {
   return Response.json(
     {
@@ -15,6 +18,11 @@ export function rpcNotFound(): Response {
   );
 }
 
+/** Converts a native invocation failure into the public oRPC error contract.
+ * @param cause - Native failure projected without exposing private exception details.
+ * @param signal - Cancellation signal inherited from the caller or owning scope.
+ * @returns The original oRPC error or a sanitized error matching the normalized invocation failure.
+ */
 export function rpcError(
   cause: unknown,
   signal: AbortSignal | undefined,
@@ -38,6 +46,10 @@ export function rpcError(
   return new ORPCError(code);
 }
 
+/** Reads the safe error metadata from a materialized HTTP failure response.
+ * @param response - Native response whose status, headers and body lifetime are preserved.
+ * @returns An oRPC error selected from the response status, with its parseable JSON body as data.
+ */
 export async function responseError(response: Response): Promise<ORPCError<string, unknown>> {
   const code =
     response.status === 401

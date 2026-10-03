@@ -1,16 +1,15 @@
 import { ORPCError } from "@orpc/server";
-import type { Context } from "hono";
 import { expectedClientIdentity, resolveClientIdentity } from "./client-identity.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
+import type { RpcIdentityContext } from "./rpc-identity.types.js";
 import { assertStateChangingRequest, TransportSecurityError } from "./transport-security.js";
+export type { RpcIdentityContext } from "./rpc-identity.types.js";
 
-export interface RpcIdentityContext {
-  readonly hono: Context;
-  readonly auth:
-    ReturnType<NonNullable<RouteMaterializationOptions["auth"]>["contextFor"]> | undefined;
-  readonly rpcHeaders?: Readonly<Record<string, string | string[] | undefined>>;
-}
-
+/** Maps transport-security failures to the existing safe oRPC forbidden error.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns A Promise resolving after security validation, or rejecting with a safe FORBIDDEN error.
+ */
 export async function assertRpcSecurity(
   context: RpcIdentityContext,
   options: NonNullable<RouteMaterializationOptions["transportSecurity"]>,
@@ -25,6 +24,12 @@ export async function assertRpcSecurity(
   }
 }
 
+/** Checks that the client's expected identity still matches its current session.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @param runtime - Configured runtime and provider dependencies.
+ * @param supplied - Expected client identity explicitly supplied by the protocol request.
+ * @returns A Promise resolving when identity scope and session epoch match, otherwise rejecting with IDENTITY_PRECONDITION_FAILED.
+ */
 export async function assertExpectedIdentity(
   context: RpcIdentityContext,
   runtime: NonNullable<RouteMaterializationOptions["clientIdentity"]>,
