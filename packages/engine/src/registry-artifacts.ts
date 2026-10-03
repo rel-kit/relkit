@@ -5,6 +5,10 @@ import {
 } from "@relkit/contracts";
 import type { RegistryIssue, RuntimeManifestInput } from "./registry.js";
 
+/** Collect safe mismatches among generated graph, manifest and integration artifacts.
+ * @returns Safe diagnostics describing generated-artifact mismatches.
+ * @param manifest - Generated executable manifest paired with the graph.
+ */
 export function artifactIssues(manifest: RuntimeManifestInput): RegistryIssue[] {
   const issues: RegistryIssue[] = [];
   const reference = manifest.runtimeIntegrationsPlan;
@@ -35,6 +39,10 @@ export function artifactIssues(manifest: RuntimeManifestInput): RegistryIssue[] 
   return issues;
 }
 
+/** Recognize non-null object records before reading native fields.
+ * @returns Whether the native value satisfies this guard.
+ * @param value - Native value being validated or projected.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
