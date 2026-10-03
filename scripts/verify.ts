@@ -148,6 +148,7 @@ async function main(): Promise<void> {
   await run("build", bun, ["run", "build"]);
   assertNoGitStateChange("generated-file no-diff", buildState, await gitState());
   await run("typecheck", bun, ["run", "typecheck"]);
+  await run("execution package test types", bun, ["run", "test:execution:types"]);
   await run("type fixtures", bun, ["run", "test:types"]);
   await run("package tests", bun, ["run", "test:packages"]);
   await run("unit and schema tests", bun, ["run", "test:unit"]);
