@@ -1,0 +1,39 @@
+{
+  "key": "packages/runtime-hono/src/http-response.ts",
+  "matches": {
+    "bf-d0e2081766cb3a42da7fe7d9": {
+      "id": "bf-d0e2081766cb3a42da7fe7d9",
+      "status": "verified",
+      "what": "Six validation failures in the locally scaffolded full-service demo have been corrected.",
+      "root_cause": "Compiler evaluator selection rejected callable error descriptors. Generated server omitted event/resource runtime inspection. Local event provider hid its administration query. DuckDB listed request lifecycle records without coalescing them. HTTP response completion inferred defect from 500 and overwrote declared outco",
+      "fixed_by": "Recognize safe error constructors; expose read-only local event queries and connect generated event/resource runtime sources; rank completed requests before filtering/paging; preserve classified outcomes at response EOF; add explicit resourceProviders: fake setup to starter tests. Live Redis/MinIO/event replay, fresh C",
+      "files": [
+        "packages/compiler/src/discovery/evaluator-child-utils.ts",
+        "packages/cli/src/commands/build-server.ts",
+        "packages/cli/src/commands/build-server-http-inspector.ts",
+        "packages/cli/src/commands/build-server-runtime-support.ts",
+        "packages/providers-local/src/events/provider.ts",
+        "packages/providers-local/src/events/provider.types.ts",
+        "packages/observability/src/local/duckdb-query-effect.ts",
+        "packages/runtime-hono/src/http-response.ts",
+        "packages/testing/src/application.ts",
+        "packages/testing/src/provider-replacements.ts",
+        "packages/testing/provider-replacements.test.ts",
+        "templates/default/v1/api/tests/integration/hello.route.test.ts",
+        "templates/default/v1/api/tests/integration/echo.route.test.ts",
+        "templates/default/v1/api/tests/integration/orders.route.test.ts",
+        "templates/default/v1/minimal/tests/integration/hello.route.test.ts",
+        "templates/default/v1/agent/tests/integration/hello.route.test.ts",
+        "templates/default/v1/fullstack/tests/integration/hello.route.test.ts",
+        "tests/compiler/evaluator-error-export.test.ts",
+        "tests/inspector/generated-runtime-wiring.test.ts",
+        "packages/observability/tests/duckdb-request-pages.test.ts",
+        "packages/runtime-hono/tests/http-declared-outcome.test.ts",
+        "tests/generator/add-acceptance.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-02T22:10:23+00:00",
+      "report": "bug-fix-reports/issues/bf-d0e2081766cb3a42da7fe7d9/report.md"
+    }
+  }
+}
