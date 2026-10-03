@@ -1,40 +1,51 @@
-import { Effect } from "effect";
-import type { MaybePromise } from "@relkit/contracts";
 import { normalizeFailure, type InvocationRunner } from "@relkit/invocation";
 import {
-  createPublicClockEffect,
-  createInvocationBridge,
   captureInvocationTrace,
+  createInvocationBridge,
+  createPublicClockEffect,
   type CapturedInvocationTrace,
 } from "@relkit/runtime-effect";
-import type {
-  DirectFunctionInvoker,
-  DirectFunctionRequest,
-  DirectTaskInvoker,
-} from "./dependencies.js";
+import { Effect } from "effect";
 import { createContext } from "./context.js";
-import { callHook, makeContext } from "./invoke-utils.js";
+import type { DirectFunctionInvoker, DirectTaskInvoker } from "./dependencies.js";
 import { createDependencyBridge } from "./dependency-bridge.js";
-import { createInvocationSpanOptions } from "./invoke-tracing.js";
-import { runTracedInvocation } from "./invoke-runtime-tracing.js";
 import { runConfiguredLifecycle } from "./invoke-lifecycle.js";
-import {
-  emitObservabilityEvent,
-  OBSERVABILITY_HOOK_PROTOCOL,
-  OBSERVABILITY_HOOK_VERSION,
-} from "./observability.js";
+import { runTracedInvocation } from "./invoke-runtime-tracing.js";
+import type { DirectChildInvoker } from "./invoke-runtime.types.js";
+import { createInvocationSpanOptions } from "./invoke-tracing.js";
 import type {
   InvocationContext,
   InvocationIdSource,
   InvocationRecord,
   InvocationTarget,
-  InvocationParent,
   InvokeOptions,
 } from "./invoke-types.js";
-type DirectChildInvoker = (
-  request: DirectFunctionRequest,
-  parent: InvocationParent,
-) => MaybePromise<unknown>;
+import { callHook, makeContext } from "./invoke-utils.js";
+import {
+  emitObservabilityEvent,
+  OBSERVABILITY_HOOK_PROTOCOL,
+  OBSERVABILITY_HOOK_VERSION,
+} from "./observability.js";
+
+/** Build guarded context and execute the shared lifecycle under invocation tracing.
+ * @typeParam Input - Validated handler input type.
+ * @typeParam Output - Validated handler output type.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns A Promise of lifecycle output before the outer invocation owns final completion.
+ * @param target - Declared target whose schema and metadata govern execution.
+ * @param input - Untrusted input validated before handler execution.
+ * @param record - Immutable invocation identity and start metadata.
+ * @param options - Explicit configuration and dependencies for this operation.
+ * @param controller - Invocation-owned abort controller.
+ * @param deadlineMs - Optional absolute deadline in milliseconds.
+ * @param traceId - Current shared trace identity.
+ * @param idSource - Shared trace, span and invocation identity allocator.
+ * @param runner - Configured Effect runtime at the native execution boundary.
+ * @param childInvoker - Direct child callback supplied by shared invocation dispatch.
+ * @param taskInvoker - Native durable task submission callback.
+ * @param progress - Optional validated progress emitter.
+ * @param onTrace - Callback retaining the shared trace context for child calls.
+ */
 export async function runHandler<
   Input,
   Output,
