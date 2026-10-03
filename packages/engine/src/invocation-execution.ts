@@ -1,11 +1,11 @@
-import { Context, Exit, Option, Tracer } from "effect";
+import { isSpanId, isTraceId, type ProtocolId } from "@relkit/contracts";
 import {
   currentExecutionContext,
   runInExecutionContext,
   SpanRuntime,
   type InvocationFailure,
 } from "@relkit/invocation";
-import { isSpanId, isTraceId, type ProtocolId } from "@relkit/contracts";
+import { Context, Exit, Option, Tracer } from "effect";
 import { createInvocationSpanOptions } from "./invoke-tracing.js";
 import type {
   InvocationIdSource,
@@ -15,6 +15,17 @@ import type {
   InvokeOptions,
 } from "./invoke-types.js";
 
+/** Create shared span ownership for a complete invocation or deferred stream.
+ * @typeParam Input - Validated handler input type.
+ * @typeParam Output - Validated handler output type.
+ * @typeParam Ctx - Handler context carrying cancellation authority.
+ * @returns The shared span and completion/capture methods for this invocation.
+ * @param target - Declared target whose schema and metadata govern execution.
+ * @param record - Immutable invocation identity and start metadata.
+ * @param options - Explicit configuration and dependencies for this operation.
+ * @param controller - Invocation-owned abort controller.
+ * @param ids - Generation identifier source used for new invocation spans.
+ */
 export function createInvocationExecution<
   Input,
   Output,
@@ -61,6 +72,8 @@ export function createInvocationExecution<
       }),
       attributes: {},
     }));
+  // Shared span timestamps are epoch nanoseconds for trace compatibility. Engine
+  // operation durations use the configured monotonic Effect Clock separately.
   const common = {
     name: spanOptions.name,
     parent: parent ? Option.some(parent) : Option.none(),
