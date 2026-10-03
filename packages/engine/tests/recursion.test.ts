@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import { createInvocationCallStack, RecursionPolicyError } from "./src/recursion.ts";
+import { describe, expect, test } from "vitest";
+import { createInvocationCallStack, RecursionPolicyError } from "../src/recursion.js";
 
 describe("invocation recursion policy", () => {
   test("denies direct recursion with a safe policy failure", () => {

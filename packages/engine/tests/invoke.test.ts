@@ -1,14 +1,15 @@
-import { describe, expect, test } from "bun:test";
-import type { ProtocolId } from "@relkit/contracts";
-import { Effect } from "effect";
 import { defineError, defineFunction, fail } from "@relkit/app";
+import type { ProtocolId } from "@relkit/contracts";
 import { z } from "@relkit/schema";
+import { Effect } from "effect";
+import { describe, expect, test } from "vitest";
 import {
   InvocationValidationError,
   invoke,
   invokeFunction,
   type InvocationTarget,
-} from "./src/invoke.ts";
+} from "../src/invoke.js";
+import { invocationTarget } from "./fixtures.js";
 
 const ids = () => {
   let next = 0;
@@ -112,10 +113,12 @@ describe("function invocation pipeline", () => {
   test("passes only validated input and execution context to handlers", async () => {
     let seen: unknown;
     await invokeFunction(
-      target((_input, context) => {
-        seen = context;
-        return { value: 1 };
-      }),
+      invocationTarget(
+        target((_input, context) => {
+          seen = context;
+          return { value: 1 };
+        }),
+      ),
       { value: 1 },
     );
 
@@ -127,25 +130,35 @@ describe("function invocation pipeline", () => {
     const events: string[] = [];
     const now = Date.now();
     const result = await invokeFunction(
-      target((input, context) => {
-        expect(context.invocation.source).toBe("direct");
-        expect(context.signal.aborted).toBe(false);
-        return { value: (input as { value: number }).value + 1 };
-      }),
+      invocationTarget(
+        target((input, context) => {
+          expect(context.invocation.source).toBe("direct");
+          expect(context.signal.aborted).toBe(false);
+          return { value: (input as { value: number }).value + 1 };
+        }),
+      ),
       { value: 2 },
       {
         idSource: ids(),
         now: () => now,
         timeoutMs: 500,
         hooks: {
-          onInvocationStart: () => events.push("start"),
-          onSpanStart: () => events.push("span-start"),
-          onSpanComplete: () => events.push("span-complete"),
+          onInvocationStart: () => {
+            events.push("start");
+          },
+          onSpanStart: (span) => {
+            if (span.name === "relkit.invoke.orders.get") events.push("span-start");
+          },
+          onSpanComplete: (span) => {
+            if (span.name === "relkit.invoke.orders.get") events.push("span-complete");
+          },
           onCompletion: (event) => {
             events.push(`complete:${event.outcome}`);
             expect(event.record.deadline).toBe(new Date(now + 500).toISOString());
           },
-          onRelease: (event) => events.push(`release:${event.admitted}`),
+          onRelease: (event) => {
+            events.push(`release:${event.admitted}`);
+          },
         },
       },
     );
@@ -180,7 +193,9 @@ describe("function invocation pipeline", () => {
       },
     });
 
-    await expect(invokeFunction(transformed, { value: 1 })).resolves.toEqual({ value: 4 });
+    await expect(invokeFunction(invocationTarget(transformed), { value: 1 })).resolves.toEqual({
+      value: 4,
+    });
     expect(events).toEqual(["before:direct", "handler:2", "after:3"]);
 
     let after = false;
@@ -196,7 +211,9 @@ describe("function invocation pipeline", () => {
         return output;
       },
     });
-    await expect(invokeFunction(failed, { value: 1 })).rejects.toMatchObject({ kind: "defect" });
+    await expect(invokeFunction(invocationTarget(failed), { value: 1 })).rejects.toMatchObject({
+      kind: "defect",
+    });
     expect(after).toBe(false);
 
     let invalidHandler = false;
@@ -210,7 +227,7 @@ describe("function invocation pipeline", () => {
         return input;
       },
     });
-    await expect(invokeFunction(invalid, { value: 1 })).rejects.toMatchObject({
+    await expect(invokeFunction(invocationTarget(invalid), { value: 1 })).rejects.toMatchObject({
       kind: "defect",
     });
     expect(invalidHandler).toBe(false);
@@ -221,10 +238,12 @@ describe("function invocation pipeline", () => {
     const events: string[] = [];
     await expect(
       invokeFunction(
-        target(() => {
-          called = true;
-          return { value: 1 };
-        }),
+        invocationTarget(
+          target(() => {
+            called = true;
+            return { value: 1 };
+          }),
+        ),
         { value: "wrong" },
         {
           idSource: ids(),
@@ -232,8 +251,12 @@ describe("function invocation pipeline", () => {
             throw new Error("must not admit");
           },
           hooks: {
-            onCompletion: (event) => events.push(`complete:${event.outcome}`),
-            onRelease: (event) => events.push(`release:${event.admitted}`),
+            onCompletion: (event) => {
+              events.push(`complete:${event.outcome}`);
+            },
+            onRelease: (event) => {
+              events.push(`release:${event.admitted}`);
+            },
           },
         },
       ),
@@ -247,11 +270,15 @@ describe("function invocation pipeline", () => {
     let failure: unknown;
     try {
       await invokeFunction(
-        target(() => ({ value: "wrong" })),
+        invocationTarget(target(() => ({ value: "wrong" }))),
         { value: 1 },
         {
           idSource: ids(),
-          admit: () => ({ release: () => (released = true) }),
+          admit: () => ({
+            release: () => {
+              released = true;
+            },
+          }),
         },
       );
     } catch (cause) {
@@ -273,11 +300,13 @@ describe("function invocation pipeline", () => {
       return error;
     };
     const failure = await invokeFunction(
-      target(
-        () => {
-          throw declared();
-        },
-        { errors: [{ id: "orders.unavailable", data }] },
+      invocationTarget(
+        target(
+          () => {
+            throw declared();
+          },
+          { errors: [{ id: "orders.unavailable", data }] },
+        ),
       ),
       { value: 1 },
       { idSource: ids() },
@@ -321,7 +350,7 @@ describe("function invocation pipeline", () => {
     });
 
     for (const target of [plain, direct, effect]) {
-      await expect(invokeFunction(target, {})).rejects.toMatchObject({
+      await expect(invokeFunction(invocationTarget(target), {})).rejects.toMatchObject({
         kind: "application",
         id: "orders.returned-unavailable",
         data: { reason: "sold out" },

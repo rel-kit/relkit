@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { defineFunction } from "@relkit/app";
 import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
@@ -7,16 +7,17 @@ import {
   RUNTIME_INTEGRATION_PLAN_VERSION,
   type ProtocolId,
 } from "@relkit/contracts";
-import { dispatchInvocation } from "@relkit/invocation";
-import { defineFunction } from "@relkit/app";
 import { hashGraph, type ApplicationGraph } from "@relkit/graph";
+import { dispatchInvocation } from "@relkit/invocation";
 import { z } from "@relkit/schema";
-import { createFunctionRegistry } from "./src/registry.ts";
+import { expect, test } from "vitest";
 import {
   createInspectableObservabilityHooks,
   invokeFunction,
   type InvocationTarget,
-} from "./src/index.ts";
+} from "../src/index.js";
+import { createFunctionRegistry } from "../src/registry.js";
+import { invocationTarget, runtimeHandler } from "./fixtures.js";
 
 const source = { file: "src/functions.ts", line: 1, column: 1 } as const;
 const input = z.number();
@@ -64,8 +65,8 @@ test("engine dispatch uses the verified generation registry in its shared scope"
     graphHash,
     ...runtimeCohort(graphHash),
     functions: {
-      [parent.id]: parent.handler,
-      [child.id]: (value: number) => value + 1,
+      [parent.id]: runtimeHandler(parent.handler),
+      [child.id]: runtimeHandler((value: number) => value + 1),
     },
   });
   const records: Array<{ id: string; functionId: string; parentId?: string; traceId: string }> = [];
@@ -76,14 +77,18 @@ test("engine dispatch uses the verified generation registry in its shared scope"
   };
 
   await expect(
-    invokeFunction(parent, 1, {
+    invokeFunction(invocationTarget(parent), 1, {
       idSource,
       registry,
       admit: () => {
         admissionCount += 1;
         return { release: () => undefined };
       },
-      hooks: { onInvocationStart: (record) => records.push(record) },
+      hooks: {
+        onInvocationStart: (record) => {
+          records.push(record);
+        },
+      },
     }),
   ).resolves.toBe(2);
 
@@ -148,14 +153,14 @@ test("function invoke uses standalone and active generation dispatch", async () 
     graphHash,
     ...runtimeCohort(graphHash),
     functions: {
-      [parent.id]: parent.handler,
-      [child.id]: (value: number) => value + 1,
+      [parent.id]: runtimeHandler(parent.handler),
+      [child.id]: runtimeHandler((value: number) => value + 1),
     },
   });
   const hooks = createInspectableObservabilityHooks();
 
   await expect(
-    invokeFunction(parent, 1, { registry, hooks: { observability: hooks } }),
+    invokeFunction(invocationTarget(parent), 1, { registry, hooks: { observability: hooks } }),
   ).resolves.toBe(2);
 
   const starts = hooks.read().filter((event) => event.type === "invocation.started");
@@ -228,7 +233,7 @@ test("keeps concurrent generation runtimes isolated", async () => {
       graphHash,
       ...runtimeCohort(graphHash),
       functions: {
-        [parent.id]: parent.handler,
+        [parent.id]: runtimeHandler(parent.handler),
         [child.id]: () => value,
       },
     });
@@ -240,8 +245,11 @@ test("keeps concurrent generation runtimes isolated", async () => {
     };
   };
 
-  const first = invokeFunction(parent, 1, { registry: registry(11), idSource: idSource("first") });
-  const second = invokeFunction(parent, 1, {
+  const first = invokeFunction(invocationTarget(parent), 1, {
+    registry: registry(11),
+    idSource: idSource("first"),
+  });
+  const second = invokeFunction(invocationTarget(parent), 1, {
     registry: registry(22),
     idSource: idSource("second"),
   });

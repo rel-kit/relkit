@@ -1,18 +1,28 @@
+import { spanSnapshot } from "@relkit/invocation";
 import type { InvocationTraceOptions } from "@relkit/runtime-effect";
-import {
-  emitObservabilityEvent,
-  OBSERVABILITY_HOOK_PROTOCOL,
-  OBSERVABILITY_HOOK_VERSION,
-} from "./observability.js";
-import { callHook } from "./invoke-utils.js";
 import type {
   InvocationRecord,
   InvocationTarget,
   InvokeOptions,
   SpanRecord,
 } from "./invoke-types.js";
-import { spanSnapshot } from "@relkit/invocation";
+import { callHook } from "./invoke-utils.js";
+import {
+  emitObservabilityEvent,
+  OBSERVABILITY_HOOK_PROTOCOL,
+  OBSERVABILITY_HOOK_VERSION,
+} from "./observability.js";
 
+/** Project invocation metadata and advisory observers to shared tracing options.
+ * @typeParam Input - Validated handler input type.
+ * @typeParam Output - Validated handler output type.
+ * @typeParam Context - Handler context carrying cancellation authority.
+ * @returns Shared tracing configuration and advisory observation callbacks.
+ * @param target - Declared target whose schema and metadata govern execution.
+ * @param record - Immutable invocation identity and start metadata.
+ * @param options - Explicit configuration and dependencies for this operation.
+ * @param controller - Invocation-owned abort controller.
+ */
 export function createInvocationSpanOptions<
   Input,
   Output,
