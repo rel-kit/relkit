@@ -1,0 +1,25 @@
+[WebServer] $ bun --cwd ../commerce check && next dev --hostname 127.0.0.1
+[WebServer] $ bun ../../packages/cli/dist/index.js check
+[WebServer] Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer]       at warnOnDeactivatedColors (internal:tty:33:24)
+[WebServer]       at getColorDepth (internal:tty:42:39)
+[WebServer]       at shouldColorize (internal:util/colors:14:109)
+[WebServer]       at refresh (internal:util/colors:18:31)
+[WebServer]       at internal:util/colors (internal:util/colors:24:16)
+[WebServer]       at internal:assert/assertion_error (internal:assert/assertion_error:2:187)
+[WebServer]       at loadAssertionError (node:assert:28:96)
+[WebServer]
+[WebServer] (node:97288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97291) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:97304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/e2e-commerce/commerce-example.spec.ts:3:1 › announcements synchronize connected tabs and restore a late tab (2.1s)
+  ✓  2 tests/e2e-commerce/commerce-example.spec.ts:35:1 › commerce support agent negotiates capabilities and settles its streamed run (8.3s)
+  ✓  3 tests/e2e-commerce/generated-ai-regressions.spec.ts:4:1 › generated dev host admits its browser origin and classifies malformed AI input (2.7s)
+
+  3 passed (25.3s)
