@@ -1,5 +1,8 @@
 import { parseTraceParent, toRequestId } from "@relkit/contracts";
 import type { MiddlewareHandler } from "hono";
+import { isRelkitControlPlanePath } from "./control-plane.js";
+import { createHttpSpanRuntime, httpSpanMiddleware, outerHttpState } from "./http-span.js";
+import { limitsMiddleware } from "./middleware-limits.js";
 import {
   createFallbackState,
   emitLifecycle,
@@ -8,26 +11,21 @@ import {
   lifecycleEvent,
   readId,
   REQUEST_ID_HEADER,
-  setResponseHeader,
   setRequestState,
-  TRACE_ID_HEADER,
+  setResponseHeader,
   type HttpMiddlewareOptions,
   type HttpRequestState,
-  type RequestLifecycleEvent,
-  type RequestLifecycleHooks,
-  type RequestLifecycleType,
 } from "./middleware-utils.js";
+import type { FrameworkMiddleware } from "./middleware.types.js";
 import { ensureRequestRecord } from "./request-record-middleware.js";
-import { limitsMiddleware } from "./middleware-limits.js";
 import { failureOutcome } from "./request-record-utils.js";
-import { createHttpSpanRuntime, httpSpanMiddleware, outerHttpState } from "./http-span.js";
-import { isRelkitControlPlanePath } from "./control-plane.js";
+export type { FrameworkMiddleware, FrameworkMiddlewareName } from "./middleware.types.js";
 
 export {
+  getRequestState,
   REQUEST_CONTEXT_KEY,
   REQUEST_ID_HEADER,
   TRACE_ID_HEADER,
-  getRequestState,
   type HttpMiddlewareOptions,
   type HttpRequestState,
   type RequestLifecycleEvent,
@@ -41,14 +39,11 @@ export const FRAMEWORK_MIDDLEWARE_ORDER = Object.freeze([
   "limits",
   "request-record",
 ] as const);
-export type FrameworkMiddlewareName = (typeof FRAMEWORK_MIDDLEWARE_ORDER)[number];
 
-export interface FrameworkMiddleware {
-  readonly name: FrameworkMiddlewareName;
-  readonly handler: MiddlewareHandler;
-}
-
-/** Installs the four framework-owned HTTP middleware layers in v3 order. */
+/** Installs the four framework-owned HTTP middleware layers in v3 order.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The ordered immutable request-ID, trace, limits and request-record middleware list.
+ */
 export function createFrameworkMiddleware(
   options: HttpMiddlewareOptions = {},
 ): readonly FrameworkMiddleware[] {
@@ -65,6 +60,10 @@ export const createHttpMiddleware = createFrameworkMiddleware;
 
 export { limitsMiddleware } from "./middleware-limits.js";
 
+/** Establishes one request identity for downstream middleware and response headers.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns A handler retaining the request identity through downstream execution and response headers.
+ */
 export function requestIdMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
   return async (context, next) => {
     const outer = outerHttpState(context.req.raw);
@@ -101,10 +100,18 @@ export function requestIdMiddleware(options: HttpMiddlewareOptions = {}): Middle
   };
 }
 
+/** Resolves incoming trace context for the request and downstream invocation.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The HTTP span middleware configured for incoming trace propagation.
+ */
 export function traceMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
   return httpSpanMiddleware(options);
 }
 
+/** Emits request lifecycle events while preserving the downstream result and failure.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns A handler emitting lifecycle observations while preserving downstream failures.
+ */
 export function requestLifecycleMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
   return async (context, next) => {
     const state = ensureRequestRecord(
@@ -117,6 +124,9 @@ export function requestLifecycleMiddleware(options: HttpMiddlewareOptions = {}):
       await emitLifecycle(options, started, "onStart");
     }
     const signal = state.runtimeSignal?.current ?? state.signal;
+    /** Publish the request's terminal cancellation event without delaying signal dispatch.
+     * @returns Nothing; advisory lifecycle delivery runs through the terminal-event guard.
+     */
     const cancelled = (): void => {
       void emitTerminalLifecycle(
         options,
@@ -144,6 +154,10 @@ export function requestLifecycleMiddleware(options: HttpMiddlewareOptions = {}):
   };
 }
 
+/** Skips application middleware on reserved control-plane endpoints.
+ * @param handler - Native handler executed within the configured boundary.
+ * @returns A handler bypassing the supplied middleware for reserved control-plane paths.
+ */
 function applicationOnly(handler: MiddlewareHandler): MiddlewareHandler {
   return async (context, next) => {
     if (isRelkitControlPlanePath(context.req.path)) return next();

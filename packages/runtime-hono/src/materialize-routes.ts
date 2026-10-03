@@ -1,123 +1,43 @@
+import type { HttpTriggerRegistration } from "@relkit/graph";
 import type { Hono } from "hono";
-import type { UpgradeWebSocket } from "hono/ws";
-import { GENERATOR_VERSION, MANIFEST_VERSION, type MaybePromise } from "@relkit/contracts";
-import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
-import type { RequestRecordSink } from "@relkit/observability";
-import type { MiddlewareContext } from "@relkit/routes";
-import type { MappingValue, RequestMappingOptions } from "./request-mapping.js";
+import { registerAuthMiddleware } from "./auth.js";
+import { installHttpLogging } from "./http-logging.js";
 import { createRouteHandler, getEntry, isRecord } from "./materialize-routes-utils.js";
-import { registerRouteMiddleware } from "./route-middleware.js";
+import { assertHttpManifest } from "./materialize-routes-validation.js";
+import type { RouteMaterializationOptions } from "./materialize-routes.types.js";
+import { installMcp } from "./mcp.js";
 import {
   FRAMEWORK_MIDDLEWARE_ORDER,
   type FrameworkMiddleware,
   type FrameworkMiddlewareName,
 } from "./middleware.js";
-import { withRateLimit, type RateLimitRuntimeOptions } from "./rate-limit.js";
-import { registerAuthMiddleware, type HttpAuthInvocation, type HttpAuthRuntime } from "./auth.js";
-import { installRpc } from "./rpc.js";
+import { withRateLimit } from "./rate-limit.js";
+import { registerRouteMiddleware } from "./route-middleware.js";
 import { installRpcWebSocket } from "./rpc-websocket.js";
-import { installMcp, type McpOptions } from "./mcp.js";
-import { installStaticFiles, type StaticFilesOptions } from "./static-files.js";
-import { RuntimeHonoManifestError } from "./manifest-validation.js";
-import type { ClientIdentityRuntime } from "./client-identity.js";
-import type { TransportSecurityOptions } from "./transport-security.js";
-import type { RealtimeRuntime } from "./realtime-runtime.js";
-import type { AgentRuntime } from "./agent-runtime.js";
-import type { JobsRpcRuntime } from "./jobs/types.js";
-import { assertHttpManifest } from "./materialize-routes-validation.js";
-export { assertHttpManifest } from "./materialize-routes-validation.js";
+import { installRpc } from "./rpc.js";
+import { installStaticFiles } from "./static-files.js";
 export { RuntimeHonoManifestError } from "./manifest-validation.js";
 export type { RuntimeHonoManifestErrorCode } from "./manifest-validation.js";
-export type ManifestEntries<T> = Readonly<Record<string, T>> | ReadonlyMap<string, T>;
-export interface RuntimeManifest {
-  readonly contractVersion: typeof MANIFEST_VERSION;
-  readonly generatorVersion: typeof GENERATOR_VERSION;
-  readonly graphHash: string;
-  readonly activationFingerprint: import("@relkit/contracts").RuntimeActivationFingerprint;
-  readonly runtimeIntegrationsPlan: import("@relkit/contracts").RuntimeIntegrationPlanReference;
-  readonly functions: ManifestEntries<unknown>;
-  readonly targets?: ManifestEntries<unknown>;
-  readonly agents?: ManifestEntries<unknown>;
-  readonly channels?: ManifestEntries<unknown>;
-  readonly routes?: ManifestEntries<unknown>;
-  readonly tools?: ManifestEntries<unknown>;
-  readonly services?: ManifestEntries<unknown>;
-  readonly tasks?: ManifestEntries<unknown>;
-  readonly jobs?: ManifestEntries<unknown>;
-  readonly hooks?: ManifestEntries<unknown>;
-  readonly application?: {
-    readonly env: unknown;
-  };
-  readonly middleware: ManifestEntries<unknown>;
-  readonly requestTransforms: ManifestEntries<unknown>;
-  readonly responseSchemas?: ManifestEntries<unknown>;
-}
-export interface HttpInvocationOptions {
-  readonly functionId: string;
-  readonly input: unknown;
-  readonly source: "http" | "tool";
-  readonly signal?: AbortSignal;
-  readonly requestId?: string;
-  readonly traceId?: string;
-  readonly correlationId?: string;
-  readonly timeoutMs?: number;
-  readonly auth?: HttpAuthInvocation;
-  readonly trigger?: unknown;
-  readonly progressSink?: import("@relkit/invocation").ProgressSink;
-  readonly toolHooks?: {
-    readonly onBefore?: (value: unknown, context: unknown) => unknown;
-    readonly onAfter?: (value: unknown, context: unknown) => unknown;
-  };
-}
-export interface HttpEngine {
-  readonly invoke: (options: HttpInvocationOptions) => Promise<unknown>;
-}
-export interface HttpRouteRequest {
-  readonly request: Request;
-  readonly pathPattern?: string;
-  readonly params: Readonly<Record<string, MappingValue>>;
-  readonly query: Readonly<Record<string, MappingValue>>;
-  readonly headers: Readonly<Record<string, MappingValue>>;
-  readonly validated?: Readonly<Record<string, unknown>>;
-}
-export type HttpInputMapper = (
-  request: HttpRouteRequest,
-  trigger: HttpTriggerRegistration,
-  targetFunctionId: string,
-  mapping?: unknown,
-) => unknown | Promise<unknown>;
-export interface RouteMaterializationOptions {
-  readonly plan: RegistrationPlan;
-  readonly manifest: RuntimeManifest;
-  readonly engine: HttpEngine;
-  readonly mapInput?: HttpInputMapper;
-  readonly requestMapping?: RequestMappingOptions;
-  readonly responseMapping?: import("./response-mapping.js").ResponseMappingOptions;
-  readonly generationId?: string;
-  readonly observability?: RequestRecordSink;
-  readonly rateLimitRuntime?: RateLimitRuntimeOptions;
-  readonly auth?: HttpAuthRuntime;
-  readonly clientIdentity?: ClientIdentityRuntime;
-  readonly transportSecurity?: TransportSecurityOptions;
-  readonly realtime?: RealtimeRuntime;
-  readonly agentRuntime?: AgentRuntime;
-  readonly jobs?: JobsRpcRuntime;
-  /** Compatibility alias for callers that name the service explicitly. */
-  readonly jobsRuntime?: JobsRpcRuntime;
-  readonly mcp?: McpOptions;
-  readonly staticFiles?: StaticFilesOptions;
-  readonly upgradeWebSocket?: UpgradeWebSocket;
-  readonly middlewareContext?: (options: {
-    readonly middlewareId: string;
-    readonly signal: AbortSignal;
-    readonly request: Request;
-    readonly auth?: HttpAuthInvocation;
-    readonly requestId?: string;
-    readonly traceId?: string;
-  }) => MaybePromise<MiddlewareContext>;
-}
+export { assertHttpManifest } from "./materialize-routes-validation.js";
+export type {
+  HttpEngine,
+  HttpInputMapper,
+  HttpInvocationOptions,
+  HttpRouteRequest,
+  ManifestEntries,
+  RouteMaterializationOptions,
+  RuntimeManifest,
+} from "./materialize-routes.types.js";
+export { FRAMEWORK_MIDDLEWARE_ORDER };
+export type { FrameworkMiddleware, FrameworkMiddlewareName };
+/** Validates and registers declared routes with deterministic middleware ordering.
+ * @param app - Hono application receiving the configured endpoints or middleware.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Nothing; registers validated HTTP, RPC, optional WebSocket, MCP and static routes.
+ */
 export function materializeRoutes(app: Hono, options: RouteMaterializationOptions): void {
   assertHttpManifest(options);
+  installHttpLogging(app, options);
   registerAuthMiddleware(app, options.auth);
   registerRouteMiddleware(app, options);
   const triggers = [...options.plan.httpTriggers].sort(
@@ -146,6 +66,12 @@ export function materializeRoutes(app: Hono, options: RouteMaterializationOption
   installMcp(app, options);
   installStaticFiles(app, options.staticFiles);
 }
+/** Registers one raw route using the configured method and path.
+ * @param app - Hono application receiving the configured endpoints or middleware.
+ * @param trigger - Registered route declaration with its target and transport contract.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Nothing; registers callable raw handlers for every compiled runtime path.
+ */
 function registerRawRoute(
   app: Hono,
   trigger: HttpTriggerRegistration,
@@ -155,11 +81,13 @@ function registerRawRoute(
   if (!isRecord(route) || typeof route.handler !== "function") return;
   const handler = route.handler as (request: Request) => Response | Promise<Response>;
   for (const path of trigger.config.runtimePaths ?? [trigger.config.path]) {
+    /** Forward the raw Fetch request without invoking declarative input mapping.
+     * @param context - Hono context supplying the original native request.
+     * @returns A Promise for the raw route handler's response.
+     */
     const run = (context: { readonly req: { readonly raw: Request } }) =>
       Promise.resolve(handler(context.req.raw));
     if (trigger.config.method === "ALL") app.all(path, run);
     else app.on(trigger.config.method, path, run);
   }
 }
-export { FRAMEWORK_MIDDLEWARE_ORDER };
-export type { FrameworkMiddleware, FrameworkMiddlewareName };

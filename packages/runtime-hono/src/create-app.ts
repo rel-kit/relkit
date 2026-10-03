@@ -1,50 +1,26 @@
-import { Hono } from "hono";
 import type { MiddlewareHandler } from "hono";
-import {
-  assertHttpManifest,
-  materializeRoutes,
-  type RouteMaterializationOptions,
-} from "./materialize-routes.js";
-import {
-  createFrameworkMiddleware,
-  FRAMEWORK_MIDDLEWARE_ORDER,
-  type FrameworkMiddleware,
-  type HttpMiddlewareOptions,
-} from "./middleware.js";
-import {
-  graphSnapshot,
-  installInternalEndpoints,
-  type InternalEndpointOptions,
-} from "./internal-endpoints.js";
-import { installApiDocs, type ApiDocsOptions } from "./api-docs.js";
-import {
-  installClientContractEndpoint,
-  type ClientContractEndpointOptions,
-} from "./client-contract.js";
-import type { McpOptions } from "./mcp.js";
-import { installClientIdentityEndpoint, type ClientIdentityRuntime } from "./client-identity.js";
-import { installTransportSecurity } from "./transport-security.js";
-import { installAgentProtocolEndpoints } from "./agent-protocol.js";
+import { Hono } from "hono";
 import { installAgentInspectorEndpoints } from "./agent-inspector.js";
+import { installAgentProtocolEndpoints } from "./agent-protocol.js";
+import { installApiDocs, type ApiDocsOptions } from "./api-docs.js";
+import { installClientContractEndpoint } from "./client-contract.js";
+import { installClientIdentityEndpoint } from "./client-identity.js";
+import type { CreateAppOptions, FrameworkMiddlewareInput } from "./create-app.types.js";
+import { installHttpLogging } from "./http-logging.js";
+import { graphSnapshot, installInternalEndpoints } from "./internal-endpoints.js";
+import { assertHttpManifest, materializeRoutes } from "./materialize-routes.js";
+import { createFrameworkMiddleware, FRAMEWORK_MIDDLEWARE_ORDER } from "./middleware.js";
+import { installTransportSecurity } from "./transport-security.js";
+export type { CreateAppOptions, FrameworkMiddlewareInput } from "./create-app.types.js";
 
-export type FrameworkMiddlewareInput =
-  | Partial<Record<(typeof FRAMEWORK_MIDDLEWARE_ORDER)[number], MiddlewareHandler>>
-  | readonly FrameworkMiddleware[];
-
-export interface CreateAppOptions extends RouteMaterializationOptions {
-  readonly frameworkMiddleware?: FrameworkMiddlewareInput;
-  readonly middleware?: HttpMiddlewareOptions;
-  readonly internalEndpoints?: InternalEndpointOptions;
-  readonly apiDocs?: ApiDocsOptions;
-  readonly clientContract?: ClientContractEndpointOptions;
-  readonly clientIdentity?: ClientIdentityRuntime;
-  readonly mcp?: McpOptions;
-}
-
-/** Creates the HTTP application from the already verified registration plan. */
+/** Creates the HTTP application from the already verified registration plan.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns The synchronously constructed Hono application; request work remains lazy.
+ */
 export function createApp(options: CreateAppOptions): Hono {
   assertHttpManifest(options);
   const app = new Hono();
+  installHttpLogging(app, options);
   const middlewareOptions = {
     ...(options.middleware ?? {}),
     graphHash: options.plan.graphHash,
@@ -78,6 +54,10 @@ export function createApp(options: CreateAppOptions): Hono {
   return app;
 }
 
+/** Resolves API-document options from the application configuration.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns API-doc settings with explicit options overriding internal-endpoint defaults.
+ */
 function apiDocsOptions(options: CreateAppOptions): ApiDocsOptions {
   const docs = options.apiDocs ?? {};
   const internal = options.internalEndpoints ?? {};
@@ -97,7 +77,11 @@ function apiDocsOptions(options: CreateAppOptions): ApiDocsOptions {
   };
 }
 
-/** Installs supplied framework middleware in the fixed v3 order. */
+/** Installs supplied framework middleware in the fixed v3 order.
+ * @param app - Hono application receiving the configured endpoints or middleware.
+ * @param input - Submitted operation input; validation and authorization occur before effects are admitted.
+ * @returns Nothing; the requested update is applied to the owned state.
+ */
 export function installFrameworkMiddleware(
   app: Hono,
   input: FrameworkMiddlewareInput | undefined,
@@ -110,6 +94,10 @@ export function installFrameworkMiddleware(
   }
 }
 
+/** Normalizes optional middleware configuration into an ordered list.
+ * @param input - Submitted operation input; validation and authorization occur before effects are admitted.
+ * @returns A map of unique, recognized framework middleware names to their handlers.
+ */
 function normalizeFrameworkMiddleware(
   input: FrameworkMiddlewareInput,
 ): ReadonlyMap<(typeof FRAMEWORK_MIDDLEWARE_ORDER)[number], MiddlewareHandler> {

@@ -1,8 +1,11 @@
-import type { HttpTriggerRegistration } from "@relkit/graph";
-import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import { assertManifestCohort, RuntimeHonoManifestError } from "./manifest-validation.js";
+import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 
+/** Verify route plan identity and all referenced middleware and transforms.
+ * @param options - Runtime configuration and dependencies for this operation.
+ * @returns Nothing when the manifest contains every required HTTP binding.
+ */
 export function assertHttpManifest(options: RouteMaterializationOptions): void {
   const { manifest, plan } = options;
   assertManifestCohort(manifest);
