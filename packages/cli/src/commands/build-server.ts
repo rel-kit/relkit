@@ -46,7 +46,7 @@ import { resolveEnv } from "@relkit/config";
 ${specializedImports}
 import { assertRuntimeIntegrationModules, createFunctionRegistry, createProviderRegistry, createTaskExecutor, invoke, materializeEvents, materializeJobs, parseInfrastructureBindingValues } from "@relkit/engine";
 import { createRegistrationPlan } from "@relkit/graph";
-import { installInspectorEndpoints } from "@relkit/inspector-api";
+import { installInspectorEndpoints, InspectorQueryError } from "@relkit/inspector-api";
 import { currentExecutionContext, publicTrace } from "@relkit/invocation";
 import { createObservabilityRuntime, createTelemetryExporterFanout } from "@relkit/observability";
 import { consoleHumanSink, formatHumanLog, stdoutJsonSink, redactFailureDetail } from "@relkit/runtime-effect";

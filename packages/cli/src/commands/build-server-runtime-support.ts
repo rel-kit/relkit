@@ -4,6 +4,49 @@ export const SERVER_RUNTIME_SUPPORT_SOURCE = `
 function provider(providerRegistry, capability, profile) {
   return providerRegistry.resolve(capability, profile).value;
 }
+async function resourceRuntimeMetadata(capability, nodes) {
+  const providerRegistry = await providerStartup;
+  if (providerRegistry === undefined) return [];
+  return nodes.map((node) => {
+    const handle = providerRegistry.resolve(capability, node.profile);
+    const features = handle.binding.adapter.features ?? [];
+    const capabilities = Object.fromEntries(features.map((feature) => [feature, true]));
+    for (const name of ["signedReadUrl", "signedWriteUrl", "increment"]) {
+      const supported = handle.value?.capabilities?.[name];
+      if (typeof supported === "boolean") capabilities[name] = supported;
+    }
+    return { id: node.id, profile: node.profile, capabilities };
+  });
+}
+async function queryEventRuntime(query) {
+  const providerRegistry = await providerStartup;
+  const result = { events: [], triggers: [], capabilities: [], publications: [], deliveries: [] };
+  if (providerRegistry === undefined) return result;
+  const profiles = [...new Set((plan.events ?? []).map((node) => node.profile))].sort();
+  let start = 0, cursor;
+  if (query.cursor !== undefined) {
+    const separator = query.cursor.indexOf("|");
+    const index = query.cursor.slice(0, separator);
+    if (separator < 1 || !/^\\d+$/.test(index) || Number(index) >= profiles.length)
+      throw new InspectorQueryError("Event cursor is invalid");
+    start = Number(index);
+    cursor = query.cursor.slice(separator + 1) || undefined;
+  }
+  const limit = query.limit ?? 50;
+  for (let index = start; index < profiles.length; index++) {
+    const value = provider(providerRegistry, "event", profiles[index]);
+    if (typeof value?.query !== "function") continue;
+    const page = await value.query({ ...query, cursor: index === start ? cursor : undefined,
+      limit: limit - result.deliveries.length });
+    for (const field of Object.keys(result)) result[field].push(...(page[field] ?? []));
+    if (page.nextCursor !== undefined || result.deliveries.length >= limit) {
+      const next = page.nextCursor !== undefined ? index : index + 1;
+      if (next < profiles.length) result.nextCursor = String(next) + "|" + (page.nextCursor ?? "");
+      break;
+    }
+  }
+  return result;
+}
 async function supportsInspector(capability, nodes, id, ...operations) {
   try {
     const inspector = await resourceInspector(capability, nodes, id);
