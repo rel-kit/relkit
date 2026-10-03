@@ -1,82 +1,28 @@
-import { PROTOCOL_VERSION, type MaybePromise } from "@relkit/contracts";
-import {
-  createObservabilityCollector,
-  type ObservabilityCollector,
-  type ObservabilityRecord,
-} from "@relkit/observability";
-import type { GraphEdge, ObservedEdge } from "@relkit/graph";
+import { PROTOCOL_VERSION } from "@relkit/contracts";
+import { createObservabilityCollector, type ObservabilityCollector } from "@relkit/observability";
 import type {
-  InvocationCompletion,
-  InvocationRecord,
-  InvocationRelease,
-  SpanRecord,
-} from "./invoke-types.js";
+  InspectableObservabilityHooks,
+  InvocationObservabilityHooks,
+  ObservabilityHookEvent,
+} from "./observability.types.js";
+export type {
+  InspectableObservabilityHooks,
+  InvocationObservabilityHooks,
+  ObservabilityHookEvent,
+  ObservabilityHooks,
+} from "./observability.types.js";
 
+/** Protocol identifier for compatibility invocation observation events. */
 export const OBSERVABILITY_HOOK_PROTOCOL = "relkit.observability.hooks" as const;
+/** Version of compatibility invocation observation events. */
 export const OBSERVABILITY_HOOK_VERSION = PROTOCOL_VERSION;
-
-export type ObservabilityHookEvent =
-  | {
-      readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
-      readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-      readonly type: "invocation.started";
-      readonly record: InvocationRecord;
-    }
-  | {
-      readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
-      readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-      readonly type: "span.started";
-      readonly record: SpanRecord;
-    }
-  | {
-      readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
-      readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-      readonly type: "span.completed";
-      readonly record: SpanRecord;
-    }
-  | {
-      readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
-      readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-      readonly type: "span.updated";
-      readonly record: SpanRecord;
-    }
-  | {
-      readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
-      readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-      readonly type: "edge.declared";
-      readonly edge: GraphEdge;
-    }
-  | {
-      readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
-      readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-      readonly type: "edge.observed";
-      readonly edge: ObservedEdge;
-    }
-  | {
-      readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
-      readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-      readonly type: "invocation.completed";
-      readonly completion: InvocationCompletion;
-    }
-  | {
-      readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
-      readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-      readonly type: "invocation.released";
-      readonly release: InvocationRelease;
-    };
-
-export interface InvocationObservabilityHooks {
-  readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
-  readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-  readonly emit: (event: ObservabilityHookEvent) => MaybePromise<void>;
-  readonly capture?: import("@relkit/observability").RequestRecordSink["capture"];
-}
-
-export type ObservabilityHooks = InvocationObservabilityHooks;
 
 /**
  * Sends a hook event without allowing telemetry failures to affect execution.
  * The event sink is intentionally not a storage or query API; Phase 11 owns that boundary.
+ * @returns A Promise settling after delivery or suppression of an advisory sink failure.
+ * @param hooks - Optional invocation sink; absence makes delivery a no-op.
+ * @param event - Versioned event frozen before delivery to the sink.
  */
 export async function emitObservabilityEvent(
   hooks: InvocationObservabilityHooks | undefined,
@@ -89,14 +35,9 @@ export async function emitObservabilityEvent(
   }
 }
 
-/** Hook inspection remains a compatibility view; admitted records use the bounded collector. */
-export interface InspectableObservabilityHooks extends InvocationObservabilityHooks {
-  readonly collect: (record: ObservabilityRecord) => ObservabilityRecord | undefined;
-  readonly read: () => readonly ObservabilityHookEvent[];
-  readonly readRecords: () => readonly ObservabilityRecord[];
-  readonly clear: () => void;
-}
-
+/** Create a bounded in-memory observation sink for inspection and tests.
+ * @returns A bounded versioned sink with read/clear inspection methods.
+ */
 export function createInspectableObservabilityHooks(): InspectableObservabilityHooks {
   const events: ObservabilityHookEvent[] = [];
   const collector: ObservabilityCollector = createObservabilityCollector();

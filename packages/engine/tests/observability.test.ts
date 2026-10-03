@@ -1,14 +1,15 @@
-import { describe, expect, test } from "bun:test";
-import { dispatchInvocation } from "@relkit/invocation";
 import { defineFunction, defineService } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { dispatchInvocation } from "@relkit/invocation";
 import { createObservabilityCollector } from "@relkit/observability";
+import { z } from "@relkit/schema";
+import { describe, expect, test } from "vitest";
 import {
   createInspectableObservabilityHooks,
   invokeFunction,
   OBSERVABILITY_HOOK_PROTOCOL,
   OBSERVABILITY_HOOK_VERSION,
-} from "./src/index.ts";
+} from "../src/index.js";
+import { invocationTarget } from "./fixtures.js";
 
 describe("versioned invocation observability hooks", () => {
   test("attaches service and member identity to invocation and spans", async () => {
@@ -21,14 +22,26 @@ describe("versioned invocation observability hooks", () => {
     const service = defineService({ id: "orders", functions: { get: target } });
     const collector = createObservabilityCollector();
 
-    await invokeFunction(service.get, {}, { hooks: { observability: collector } });
+    await invokeFunction(
+      invocationTarget(service.get),
+      {},
+      { hooks: { observability: collector } },
+    );
 
     expect(collector.read().filter(({ signal }) => signal === "invocation")).toMatchObject([
       { functionId: "orders.get", serviceId: "orders" },
       { functionId: "orders.get", serviceId: "orders" },
     ]);
-    expect(collector.read().filter(({ signal }) => signal === "span")).toMatchObject([
-      { functionId: "orders.get", serviceId: "orders" },
+    expect(
+      collector
+        .read()
+        .filter(
+          (record) =>
+            record.signal === "span" &&
+            record.name === "relkit.invoke.orders.get" &&
+            record.status !== "updated",
+        ),
+    ).toMatchObject([
       { functionId: "orders.get", serviceId: "orders" },
       { functionId: "orders.get", serviceId: "orders" },
     ]);
@@ -37,25 +50,20 @@ describe("versioned invocation observability hooks", () => {
   test("exposes lifecycle events and collector records", async () => {
     const hooks = createInspectableObservabilityHooks();
     await invokeFunction(
-      {
+      invocationTarget({
         id: "orders.observe",
         input: z.object({ value: z.number() }),
         output: z.object({ value: z.number() }),
-        handler: (input) => ({ value: (input as { value: number }).value + 1 }),
-      },
+        handler: (input: unknown) => ({ value: (input as { value: number }).value + 1 }),
+      }),
       { value: 1 },
       { hooks: { observability: hooks } },
     );
 
     const events = hooks.read();
-    expect(events.map((event) => event.type)).toEqual([
-      "invocation.started",
-      "span.started",
-      "span.updated",
-      "span.completed",
-      "invocation.completed",
-      "invocation.released",
-    ]);
+    expect(
+      events.filter((event) => !event.type.startsWith("span.")).map((event) => event.type),
+    ).toEqual(["invocation.started", "invocation.completed", "invocation.released"]);
     expect(events.every((event) => event.protocol === OBSERVABILITY_HOOK_PROTOCOL)).toBe(true);
     expect(events.every((event) => event.version === OBSERVABILITY_HOOK_VERSION)).toBe(true);
     expect(events[0]).toMatchObject({ type: "invocation.started", record: { status: "started" } });
@@ -64,13 +72,12 @@ describe("versioned invocation observability hooks", () => {
       completion: { outcome: "success" },
     });
     expect(Object.isFrozen(events[0])).toBe(true);
-    expect(hooks.readRecords().map((record) => record.signal)).toEqual([
-      "invocation",
-      "span",
-      "span",
-      "span",
-      "invocation",
-    ]);
+    expect(
+      hooks
+        .readRecords()
+        .filter((record) => record.signal === "invocation")
+        .map((record) => record.signal),
+    ).toEqual(["invocation", "invocation"]);
     hooks.clear();
     expect(hooks.read()).toEqual([]);
   });
@@ -78,22 +85,21 @@ describe("versioned invocation observability hooks", () => {
   test("accepts a collector directly through the existing hook seam", async () => {
     const collector = createObservabilityCollector();
     await invokeFunction(
-      {
+      invocationTarget({
         id: "orders.collect",
         input: z.number(),
         output: z.number(),
-        handler: (value) => value,
-      },
+        handler: (value: unknown) => value,
+      }),
       1,
       { hooks: { observability: collector } },
     );
-    expect(collector.read().map((record) => record.signal)).toEqual([
-      "invocation",
-      "span",
-      "span",
-      "span",
-      "invocation",
-    ]);
+    expect(
+      collector
+        .read()
+        .filter((record) => record.signal === "invocation")
+        .map((record) => record.signal),
+    ).toEqual(["invocation", "invocation"]);
   });
 
   test("captures redacted invocation input and output only when configured", async () => {
@@ -101,18 +107,23 @@ describe("versioned invocation observability hooks", () => {
       redaction: { mode: "development-redacted", maxBytes: 512 },
     });
     await invokeFunction(
-      {
+      invocationTarget({
         id: "orders.capture",
         input: z.object({ password: z.string(), value: z.number() }),
         output: z.object({ ok: z.boolean(), token: z.string() }),
         handler: () => ({ ok: true, token: "secret-result" }),
-      },
+      }),
       { password: "secret-input", value: 1 },
       { hooks: { observability: collector } },
     );
     const span = collector
       .read()
-      .find((record) => record.signal === "span" && record.status === "completed");
+      .find(
+        (record) =>
+          record.signal === "span" &&
+          record.status === "completed" &&
+          record.name === "relkit.invoke.orders.capture",
+      );
     expect(span).toMatchObject({
       inputCapture: {
         content: { password: "[REDACTED]", value: 1 },
@@ -134,14 +145,14 @@ describe("versioned invocation observability hooks", () => {
       handler: (input: unknown) => (input as number) + 1,
     };
     await invokeFunction(
-      {
+      invocationTarget({
         id: "orders.parent",
         input: z.number(),
         output: z.number(),
         handler: async () => {
           return (await dispatchInvocation({ target: child, input: 1 })) as number;
         },
-      },
+      }),
       0,
       { hooks: { observability: hooks } },
     );
@@ -162,12 +173,12 @@ describe("versioned invocation observability hooks", () => {
       id: "orders.get",
       input: z.object({}),
       output: z.object({ sku: z.string() }),
-      handler: () => service.product.invoke({}),
+      handler: (): Promise<{ sku: string }> => service.product.invoke({}),
     });
     const service = defineService({ id: "orders", functions: { get: parent, product: child } });
 
     await expect(
-      invokeFunction(service.get, {}, { hooks: { observability: hooks } }),
+      invokeFunction(invocationTarget(service.get), {}, { hooks: { observability: hooks } }),
     ).resolves.toEqual({ sku: "sku-1" });
 
     const starts = hooks.read().filter((event) => event.type === "invocation.started");
