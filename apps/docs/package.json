@@ -54,7 +54,7 @@
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.5",
     "create-relkit": "workspace:*",
-    "drizzle-kit": "1.0.0-rc.5-ab785fc",
+    "drizzle-kit": "1.0.0-rc.5-5935859",
     "drizzle-orm": "1.0.0-rc.5-169397b",
     "prettier": "3.9.6",
     "tailwindcss": "4.3.3",
