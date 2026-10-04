@@ -1,9 +1,28 @@
-import { expect, test } from "bun:test";
-import { createSupervisorWatcher } from "./src/watcher.js";
+import { afterEach, expect, test } from "bun:test";
+import { createSupervisorWatcher } from "../../src/watcher.js";
+import type { SupervisorWatcher, SupervisorWatcherOptions } from "../../src/watcher.js";
+import type { RecordedWatcherBatch } from "../fixtures/watcher.types.js";
+
+const owners: SupervisorWatcher[] = [];
+const pendingFixtures: (() => void)[] = [];
+
+afterEach(async () => {
+  const closing = owners.splice(0).map((owner) => owner.close());
+  pendingFixtures.splice(0).forEach((settle) => settle());
+  await Promise.all(closing);
+});
+
+/** Registers a native watcher fixture for cleanup even after a failed assertion.
+ * @param options - Compiler and debounce fixture. @returns The owned watcher. */
+function ownWatcher(options: SupervisorWatcherOptions): SupervisorWatcher {
+  const watcher = createSupervisorWatcher(options);
+  owners.push(watcher);
+  return watcher;
+}
 
 test("debounces source changes and compiles the newest coalesced batch", async () => {
-  const requests: Array<{ version: number; changedFiles: readonly string[] }> = [];
-  const watcher = createSupervisorWatcher({
+  const requests: RecordedWatcherBatch[] = [];
+  const watcher = ownWatcher({
     debounceMs: 100,
     compile: ({ version, changedFiles }) => {
       requests.push({ version, changedFiles });
@@ -21,7 +40,8 @@ test("debounces source changes and compiles the newest coalesced batch", async (
 test("aborts and obsoletes a compile when a newer source version arrives", async () => {
   const resolvers = new Map<number, () => void>();
   const signals = new Map<number, AbortSignal>();
-  const watcher = createSupervisorWatcher({
+  pendingFixtures.push(() => resolvers.forEach((resolve) => resolve()));
+  const watcher = ownWatcher({
     compile: ({ version, signal }) =>
       new Promise<void>((resolve) => {
         resolvers.set(version, resolve);
@@ -49,7 +69,7 @@ test("aborts and obsoletes a compile when a newer source version arrives", async
 
 test("ignores an out-of-order source version", async () => {
   let compiled = 0;
-  const watcher = createSupervisorWatcher({
+  const watcher = ownWatcher({
     compile: () => {
       compiled += 1;
     },
@@ -65,7 +85,8 @@ test("ignores an out-of-order source version", async () => {
 
 test("runs a queued change after its debounce expires during compilation", async () => {
   const resolvers = new Map<number, () => void>();
-  const watcher = createSupervisorWatcher({
+  pendingFixtures.push(() => resolvers.forEach((resolve) => resolve()));
+  const watcher = ownWatcher({
     compile: ({ version }) =>
       new Promise<void>((resolve) => {
         resolvers.set(version, resolve);
@@ -85,6 +106,8 @@ test("runs a queued change after its debounce expires during compilation", async
   watcher.dispose();
 });
 
+/** Waits for a native watcher fixture transition. @param check - Fixture predicate.
+ * @returns Once observed, or rejects at the retained 500 ms native deadline. */
 async function waitFor(check: () => boolean): Promise<void> {
   const deadline = Date.now() + 500;
   while (!check()) {

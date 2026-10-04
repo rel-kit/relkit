@@ -1,181 +1,134 @@
+import { Cause, Effect, Exit, Layer, ManagedRuntime, Metric } from "effect";
+import { runExecutionSync } from "@relkit/contracts/operation";
+import { observeExecution } from "@relkit/contracts/operation";
+import { createLoggerLayer } from "@relkit/runtime-effect/logger";
 import { createSupervisorStateMachine } from "./state-machine.js";
-import type { SupervisorCandidateToken } from "./state-machine-types.js";
 import type { SupervisorStateMachine } from "./state-machine.js";
+import { createWatcherLayer, SupervisorSourceWatcher } from "./watcher-service.js";
+import type {
+  SupervisorSourceChange,
+  SupervisorWatcherOptions,
+  WatcherService,
+} from "./watcher.types.js";
+export type {
+  SupervisorSourceChange,
+  SupervisorCompileRequest,
+  SupervisorCompile,
+  SupervisorWatcherOptions,
+} from "./watcher.types.js";
 
-export interface SupervisorSourceChange {
-  readonly version: number;
-  readonly changedFiles?: readonly string[];
-}
-
-export interface SupervisorCompileRequest {
-  readonly token: SupervisorCandidateToken;
-  readonly version: number;
-  readonly changedFiles: readonly string[];
-  readonly signal: AbortSignal;
-  readonly isCurrent: () => boolean;
-}
-
-export type SupervisorCompile = (request: SupervisorCompileRequest) => void | PromiseLike<void>;
-
-export interface SupervisorWatcherOptions {
-  readonly compile: SupervisorCompile;
-  readonly debounceMs?: number;
-  readonly stateMachine?: SupervisorStateMachine;
-}
-
-interface PendingChange {
-  readonly token: SupervisorCandidateToken;
-  readonly version: number;
-  readonly changedFiles: readonly string[];
-}
-
-interface ActiveCompile {
-  readonly token: SupervisorCandidateToken;
-  readonly controller: AbortController;
-}
-
-/** Coalesces source changes and protects the state machine from stale compiles. */
+/** Synchronous source admission over one reusable, scoped scheduling service. */
 export class SupervisorWatcher {
   readonly stateMachine: SupervisorStateMachine;
-  private readonly compile: SupervisorCompile;
-  private readonly debounceMs: number;
-  private latestVersion: number | undefined;
-  private pending: PendingChange | undefined;
-  private active: ActiveCompile | undefined;
-  private activeRun: Promise<void> | undefined;
-  private timer: ReturnType<typeof setTimeout> | undefined;
-  private disposed = false;
+  private readonly owner;
+  private readonly service: WatcherService;
+  private readonly context;
+  private closing: Promise<void> | undefined;
+  private finalVersion: number | undefined;
 
+  /** Acquires state once without starting compilation. @param options - Dependencies and timing. */
   constructor(options: SupervisorWatcherOptions) {
-    if (!Number.isFinite(options.debounceMs ?? 0) || (options.debounceMs ?? 0) < 0) {
-      throw new RangeError("Supervisor watcher debounce must be a non-negative number.");
-    }
-    this.stateMachine = options.stateMachine ?? createSupervisorStateMachine();
-    this.compile = options.compile;
-    this.debounceMs = options.debounceMs ?? 0;
+    this.stateMachine =
+      options.stateMachine ??
+      createSupervisorStateMachine(options.logger === undefined ? {} : { logger: options.logger });
+    this.owner = ManagedRuntime.make(
+      Layer.mergeAll(
+        createWatcherLayer(options, this.stateMachine),
+        createLoggerLayer({ component: "supervisor", ...options.logger }),
+        Layer.succeed(Metric.MetricRegistry, new Map()),
+      ),
+    );
+    this.service = runExecutionSync(this.owner, SupervisorSourceWatcher);
+    this.context = runExecutionSync(this.owner, Effect.context<never>());
   }
 
+  /** Latest admitted revision, retained after disposal. */
   get version(): number | undefined {
-    return this.latestVersion;
+    return this.closing === undefined
+      ? runExecutionSync(this.owner, this.service.version)
+      : this.finalVersion;
   }
 
-  /** Accepts a source version and schedules only the newest accepted batch. */
-  notify(change: SupervisorSourceChange): SupervisorCandidateToken | undefined {
-    this.assertOpen();
-    validateVersion(change.version);
-    if (this.latestVersion !== undefined && change.version < this.latestVersion) return undefined;
-
-    const token = this.stateMachine.requestSourceChange();
-    this.latestVersion = change.version;
-    this.pending = {
-      token,
-      version: change.version,
-      changedFiles: mergeFiles(this.pending?.changedFiles, change.changedFiles),
-    };
-    this.active?.controller.abort(new Error("Source changed before compilation completed."));
-    this.schedule();
-    return token;
+  /** Accepts a source batch synchronously. @param change - Revision and coalesced paths.
+   * @returns Its generation token, or undefined for an older revision.
+   */
+  notify(change: SupervisorSourceChange) {
+    if (this.closing !== undefined) throw new Error("Supervisor watcher is disposed.");
+    return runExecutionSync(this.owner, this.service.notify(change));
   }
 
-  sourceChanged(change: SupervisorSourceChange): SupervisorCandidateToken | undefined {
+  /** Alias for admission. @param change - Source batch. @returns Its admitted token. */
+  sourceChanged(change: SupervisorSourceChange) {
     return this.notify(change);
   }
 
-  /** Starts pending work immediately and waits for superseded work to settle. */
-  async flush(): Promise<void> {
-    this.clearTimer();
-    while (!this.disposed && (this.pending !== undefined || this.activeRun !== undefined)) {
-      if (this.activeRun !== undefined) await this.activeRun;
-      if (this.activeRun === undefined && this.pending !== undefined) await this.startPending();
-    }
+  /** Starts pending work immediately and joins it. @returns Completion of accepted work. */
+  flush(): Promise<void> {
+    if (this.closing !== undefined) return Promise.resolve();
+    return this.owner.runPromiseExit(this.service.flush).then((exit) => {
+      if (Exit.isSuccess(exit)) return exit.value;
+      if (this.closing !== undefined && Cause.hasInterruptsOnly(exit.cause)) return;
+      throw Cause.squash(exit.cause);
+    });
   }
 
-  /** Aborts current compilation and makes its token unable to complete successfully. */
+  /** Stops admission and aborts native compilation synchronously; close joins cleanup. */
   dispose(): void {
-    if (this.disposed) return;
-    this.disposed = true;
-    this.clearTimer();
-    const token = this.pending?.token ?? this.active?.token;
-    if (token !== undefined) this.stateMachine.compileFailed(token, "Supervisor watcher disposed.");
-    this.pending = undefined;
-    this.active?.controller.abort(new Error("Supervisor watcher disposed."));
-  }
-
-  private schedule(): void {
-    this.clearTimer();
-    this.timer = setTimeout(() => {
-      this.timer = undefined;
-      void this.startPending();
-    }, this.debounceMs);
-  }
-
-  private async startPending(): Promise<void> {
-    if (this.disposed || this.active !== undefined || this.pending === undefined) return;
-    const pending = this.pending;
-    this.pending = undefined;
-    const controller = new AbortController();
-    const active: ActiveCompile = { token: pending.token, controller };
-    this.active = active;
-    const run = this.runCompile(pending, controller);
-    this.activeRun = run;
-    await run;
-  }
-
-  private async runCompile(pending: PendingChange, controller: AbortController): Promise<void> {
+    if (this.closing !== undefined) return;
+    this.finalVersion = this.version;
+    /** Resolves the published cleanup promise. @returns After native completion publication. */
+    let complete: () => void = () => undefined;
+    /** Rejects the published cleanup promise. @param error - Original cleanup failure. @returns After native failure publication. */
+    let fail: (error: unknown) => void = () => undefined;
+    // Publish the native Promise before abort callbacks can reenter close.
+    this.closing = new Promise<void>((resolve, reject) => {
+      complete = resolve;
+      fail = reject;
+    });
+    void this.closing.catch(() => undefined);
+    let admissionFailure: unknown;
+    let failed = false;
     try {
-      await this.compile({
-        token: pending.token,
-        version: pending.version,
-        changedFiles: pending.changedFiles,
-        signal: controller.signal,
-        isCurrent: () => this.isCurrent(pending),
-      });
-      this.stateMachine.compileSucceeded(pending.token);
+      runExecutionSync(this.owner, this.service.dispose);
     } catch (error) {
-      this.stateMachine.compileFailed(pending.token, error);
-    } finally {
-      if (this.active?.token === pending.token) {
-        this.active = undefined;
-        this.activeRun = undefined;
-        if (!this.disposed && this.pending !== undefined) this.schedule();
-      }
+      failed = true;
+      admissionFailure = error;
     }
+    // Disposal runs outside the scope it closes, retaining the configured sink context.
+    void Effect.runPromiseExitWith(this.context)(
+      observeExecution("supervisor", "watcher.close", this.owner.disposeEffect, () => ({
+        generations: 1,
+      })),
+    ).then((exit) => {
+      if (failed) fail(admissionFailure);
+      else if (Exit.isFailure(exit)) fail(Cause.squash(exit.cause));
+      else complete();
+    }, fail);
+    if (failed) throw admissionFailure;
   }
 
-  private isCurrent(pending: PendingChange): boolean {
-    const candidate = this.stateMachine.snapshot().candidate;
-    return (
-      !this.disposed &&
-      this.latestVersion === pending.version &&
-      candidate?.sourceToken === pending.token.sourceToken &&
-      candidate.generationToken === pending.token.generationToken
-    );
-  }
-
-  private clearTimer(): void {
-    if (this.timer === undefined) return;
-    clearTimeout(this.timer);
-    this.timer = undefined;
-  }
-
-  private assertOpen(): void {
-    if (this.disposed) throw new Error("Supervisor watcher is disposed.");
+  /** Awaits exactly-once debounce and worker cleanup. @returns Closed owner scope. */
+  close(): Promise<void> {
+    this.dispose();
+    return this.closing!;
   }
 }
 
+/**
+ * Creates a synchronously ready watcher owner.
+ * @param options - Native compiler and explicit debounce policy.
+ * @returns A watcher; dispose stops admission and close awaits cleanup.
+ * @example
+ * ```ts
+ * import { createSupervisorWatcher } from "@relkit/supervisor";
+ * export async function watchSources(): Promise<void> {
+ * const watcher = createSupervisorWatcher({ compile: () => undefined,
+ *   logger: { human: false, json: false } });
+ * try { watcher.notify({ version: 1 }); await watcher.flush(); }
+ * finally { await watcher.close(); }
+ * }
+ * ```
+ */
 export function createSupervisorWatcher(options: SupervisorWatcherOptions): SupervisorWatcher {
   return new SupervisorWatcher(options);
-}
-
-function validateVersion(version: number): void {
-  if (!Number.isSafeInteger(version) || version < 0) {
-    throw new TypeError("Supervisor source versions must be non-negative safe integers.");
-  }
-}
-
-function mergeFiles(
-  previous: readonly string[] | undefined,
-  current: readonly string[] | undefined,
-): readonly string[] {
-  return Object.freeze([...new Set([...(previous ?? []), ...(current ?? [])])]);
 }
