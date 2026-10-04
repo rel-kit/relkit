@@ -2,7 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, rmSync } from "node:fs";
 import { defineEnv, env } from "@relkit/config";
 import { z } from "@relkit/schema";
-import { createTestRuntime, invokeFunction } from "./src/index.ts";
+import { invokeFunction } from "../../src/index.ts";
+import { createTestRuntime } from "../fixtures/owned-compatibility.ts";
 
 let observedContext:
   | {
@@ -40,7 +41,7 @@ describe("testing runtime foundation", () => {
       { value: 2 },
       {
         env: { offset: 3 },
-        hooks: { onInvocationStart: (record) => (observedRecord = record) },
+        hooks: { onInvocationStart: (record) => void (observedRecord = record) },
       },
     );
     expect(result).toEqual({ value: 5, now: expect.any(Number) });
@@ -127,7 +128,7 @@ describe("testing runtime foundation", () => {
       target,
       { value: 1 },
       {
-        hooks: { onInvocationStart: (record) => ids.push(record.id) },
+        hooks: { onInvocationStart: (record) => void ids.push(record.id) },
       },
     );
     await runtime.clock.advance(0);
