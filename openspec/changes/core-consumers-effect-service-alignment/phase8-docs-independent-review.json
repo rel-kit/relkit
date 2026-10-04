@@ -1,0 +1,9 @@
+{
+  "author": "root",
+  "reviewer": "testing_baseline",
+  "file": "apps/docs/scripts/feature-catalog.ts",
+  "sha256": "9b9ec2ffab598a547c07fc3174bb23b9fedeb2005d5018eb28afe08eb60ca8a4",
+  "result": "accepted",
+  "coverage": "Complete EOF catalog, transport.ts/index.ts; exact source path follows moved declaration while public reexport retained.",
+  "validation": "Assembled build rerun pending; earlier docs validation source-path failure resolved."
+}

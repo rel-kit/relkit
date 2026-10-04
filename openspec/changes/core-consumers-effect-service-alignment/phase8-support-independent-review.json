@@ -1,0 +1,10 @@
+{
+  "reviewer": "root",
+  "author": "testing_baseline",
+  "file": "scripts/check-observability-sinks.ts",
+  "sha256": "ef55f6e7bd4c8b07696c0a3cd32a95fe3c227e473987d566116db7518c4fb5a1",
+  "result": "accepted",
+  "coverage": "Complete EOF read plus extracted observability-stream.ts exporter EOF review; exact old adapter path replaced; no wildcard exceptions.",
+  "validation": "rtk bun run scripts/check-observability-sinks.ts: exit0, 0.409s",
+  "effect": "Pure static source audit; no Effect workflow introduced."
+}

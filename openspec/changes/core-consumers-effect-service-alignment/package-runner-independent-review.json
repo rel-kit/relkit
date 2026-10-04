@@ -1,0 +1,27 @@
+{
+  "reviewer": "/root/testing_baseline",
+  "reviewedAtUtc": "2026-10-03T18:12:33.898745+00:00",
+  "path": "scripts/test-packages.ts",
+  "sha256": "2dc2891164c8baa8fa9cee0e3f3557b16ac76858a33bda0f5e14ba365b7029cd",
+  "currentAndOriginalReadToEOF": true,
+  "discoveryImplementationByteIdentical": true,
+  "nativeExitAndTopLevelFailureImplementationByteIdentical": true,
+  "suites": {
+    "total": 703,
+    "unique": 703,
+    "vitest": 587,
+    "bun": 116,
+    "cli": 36,
+    "listSha256": "4ba00ba6b7eedea0613cf668dc001f79aa43af08279a4dc272dfa904dd63eafc"
+  },
+  "changes": "Vitest maxWorkers1 plus disableConsoleIntercept; serial CLI/other Bun groups unchanged. Assertions/deadlines/offline flags remain unchanged; all703 exact suites retained. Each started native child is joined and nonzero exit rejects/top-level exitCode1 remains.",
+  "accepted": true,
+  "previousAcceptedSha256": "40dfcadf5f7eb6e6e3712a8263a95fec262ab190dfba3a2121206409dcba58d9",
+  "installedFlagEvidence": {
+    "version": "5.0.1",
+    "implementation": "base.Cc3oda2V.js setupGlobalEnv (entire file EOF): flag only skips replacing global console with createCustomConsole; normal console retained; listenForErrors still installed independently.",
+    "console": "console.B09ye7y0.js (entire file EOF): intercepted logger schedules task-labelled log buffers then onUserConsoleLog RPC; disabled flag avoids this transport, does not suppress native output.",
+    "types": "plugin.d.CN87HSxv.d.ts disableConsoleIntercept documents normal synchronous terminal logging; cac.fSuRXrAx.js declares supported boolean flag and maxWorkers limit.",
+    "excludedFlags": "No dangerouslyIgnoreUnhandledErrors or deadline override."
+  }
+}
