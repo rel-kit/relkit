@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.5.6
+
+### Changes
+
+- Refactor core consumer workflows into scoped Effect services
+
 ## 0.5.5
 
 ### Changes

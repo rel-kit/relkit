@@ -1,6 +1,6 @@
 {
   "name": "@relkit/local-service",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Unsupported internal RELKIT local-service protocol; use @relkit/cli.",
   "license": "MIT",
   "repository": {
