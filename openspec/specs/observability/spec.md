@@ -276,3 +276,79 @@ Compiler instrumentation SHALL preserve the evaluator's output protocol and cand
 
 - **WHEN** the caller provisions a logger, tracer, or metric registry for compiler execution
 - **THEN** compiler operation signals use that context without installing a competing sink or placing telemetry metadata in generated artifact bytes
+
+### Requirement: Execution domain operation telemetry is standalone and bounded
+
+Every independently callable execution domain operation SHALL emit its execution count, terminal outcome, monotonic duration, applicable workload counts, and meaningful structured logs through supplied telemetry context. Outcomes SHALL distinguish success, expected failure, defect and interruption. Metric dimensions SHALL use bounded domain/operation/outcome labels; payloads, secrets and dynamic identities SHALL NOT become automatic metric labels or log content. Compatibility adapters SHALL NOT duplicate owning-operation counts.
+
+#### Scenario: Domain operation is called directly
+
+- **WHEN** a caller executes a provider, engine, runtime or transport domain operation without an enclosing stage
+- **THEN** the operation emits its own bounded telemetry through the caller's context
+
+#### Scenario: Operation is constructed but not executed
+
+- **WHEN** an instrumented operation is only constructed
+- **THEN** workload getters, logs and metrics are not evaluated
+
+#### Scenario: Observer fails
+
+- **WHEN** telemetry observation fails
+- **THEN** the original operation result, typed failure, defect or interruption is preserved
+
+### Requirement: Child logging configuration is isolated
+
+Owned child work SHALL inherit structured annotations and logger configuration. An operation-local minimum-level override SHALL affect that child workflow without changing its parent or siblings. Actual configured sinks SHALL receive redacted lifecycle, recovery and failure events at their enabled levels.
+
+#### Scenario: Child changes its minimum level
+
+- **WHEN** one child workflow overrides its minimum log level before forking
+- **THEN** the child's output reflects that level while parent and sibling configuration remain unchanged
+
+### Requirement: Core consumer and development support operations are independently observable
+
+Independently callable domain operations in the client, Inspector API, development supervisor, and testing support SHALL emit execution counts, terminal outcomes, monotonic durations, applicable workload measurements, and meaningful structured logs through their owning runtime's telemetry context. Outcomes SHALL distinguish success, expected failure, unexpected defect, and interruption. Labels SHALL use bounded domain, operation, outcome, and workload sets. Compatibility adapters SHALL NOT duplicate the owning operation's measurements. Constructing an unexecuted operation SHALL NOT emit execution telemetry.
+
+#### Scenario: Standalone operation uses supplied telemetry
+
+- **WHEN** a consumer invokes a domain operation outside a larger framework workflow with a supplied logger, tracer, and metric registry
+- **THEN** the operation emits its own correlated execution telemetry through those supplied facilities
+
+#### Scenario: A compatibility adapter invokes an operation
+
+- **WHEN** an existing Promise, iterator, HTTP, React, or synchronous adapter executes an owning domain operation
+- **THEN** the operation is counted once and nested distinct operations retain their own bounded attribution
+
+#### Scenario: Observation ends before its source work
+
+- **WHEN** a stream consumer closes an iterator or a subscription is interrupted
+- **THEN** observation telemetry completes once with the appropriate outcome after its owned cleanup, without reporting the independently owned underlying job or agent run as cancelled
+
+#### Scenario: Execution fails or telemetry delivery fails
+
+- **WHEN** a domain operation fails, defects, or is interrupted, including while a telemetry sink fails
+- **THEN** telemetry preserves the original operation result or cause and does not turn an exhausted failure into success or replace it with a telemetry error
+
+### Requirement: Core operation logs respect runtime configuration and privacy
+
+Core consumer and development support operations SHALL emit important lifecycle and outcome events at enabled operational levels, recovery events at warning level, and unrecovered failures at the owning error boundary. Noisy details SHALL respect debug filtering. Runtime-owned sinks and minimum-level configuration SHALL remain authoritative. Child work SHALL inherit correlation and logging context; child-specific level overrides SHALL leave parent and sibling levels unchanged. Payloads, credentials, cookies, raw URLs, persisted client keys, and dynamic identities SHALL NOT become automatic metric dimensions or unredacted log content. Telemetry reads SHALL NOT recursively amplify their own live event stream or leak server-only dependencies into browser consumers.
+
+#### Scenario: Runtime uses its normal log threshold
+
+- **WHEN** a standalone operation completes or recovers under the application's configured non-debug logging threshold
+- **THEN** relevant enabled lifecycle, outcome, and recovery records reach the actual configured sink with safe operation context
+
+#### Scenario: Child workflow changes its threshold
+
+- **WHEN** a child workflow overrides its logging threshold while a parent and sibling continue
+- **THEN** only the child's filtering changes and inherited annotations remain available to all three workflows
+
+#### Scenario: Inspector observes its own telemetry
+
+- **WHEN** an Inspector telemetry query or live subscription emits operation diagnostics
+- **THEN** the query and stream remain bounded without repeated self-generated updates causing recursive diagnostic traffic
+
+#### Scenario: Sensitive input reaches a browser client operation
+
+- **WHEN** a browser client operation uses authorization, tenant, session, or request input
+- **THEN** its configured telemetry exposes only safe bounded metadata, preserves browser-compatible execution, and does not install a server logger or transport
