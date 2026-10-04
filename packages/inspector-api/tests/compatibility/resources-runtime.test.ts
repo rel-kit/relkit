@@ -1,7 +1,9 @@
+import type { CollectionResponse } from "../fixtures/json.types.ts";
+import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
-import { installInspectorEndpoints } from "./src/index.ts";
+import { installInspectorEndpoints } from "../../src/index.ts";
 
 describe("inspector managed-resource runtime boundary", () => {
   test("projects capability/profile/counter metadata without provider storage", async () => {
@@ -65,8 +67,8 @@ describe("inspector managed-resource runtime boundary", () => {
 
     const buckets = await app.request(`${API_BASE_PATH}/runtime/buckets`);
     const cache = await app.request(`${API_BASE_PATH}/runtime/cache`);
-    const bucketBody = await buckets.json();
-    const cacheBody = await cache.json();
+    const bucketBody = await responseJson<CollectionResponse>(buckets);
+    const cacheBody = await responseJson<CollectionResponse>(cache);
 
     expect(buckets.status).toBe(200);
     expect(cache.status).toBe(200);

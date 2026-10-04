@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
-import { installInspectorEndpoints } from "./src/index.ts";
+import { installInspectorEndpoints } from "../../src/index.ts";
 
 const identity = { generationId: "generation-one", graphHash: "sha256:one" };
 
@@ -57,6 +57,7 @@ describe("inspector resource explorers", () => {
   });
 });
 
+/** @returns The original native bucket/cache router with bounded preview authorities. */
 function application(): Hono {
   const app = new Hono();
   installInspectorEndpoints(app, {

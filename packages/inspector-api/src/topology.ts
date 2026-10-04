@@ -1,6 +1,11 @@
 import type { JsonValue } from "@relkit/contracts";
 import { isRecord, safeJson, safeSource, stringValue } from "./shared.js";
 
+/**
+ * Selects public provider topology fields while excluding native files and credentials.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns A redacted provider declaration.
+ */
 export function projectProviderNode(value: Record<string, unknown>): JsonValue {
   const adapter = isRecord(value.adapter) ? value.adapter : {};
   const result: Record<string, unknown> = {
@@ -25,6 +30,11 @@ export function projectProviderNode(value: Record<string, unknown>): JsonValue {
   return safeJson(result);
 }
 
+/**
+ * Selects public application topology and declared deployment evidence.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns A redacted application declaration.
+ */
 export function projectAppNode(value: Record<string, unknown>): JsonValue {
   const result: Record<string, unknown> = { kind: "app", id: value.id };
   for (const key of ["environment", "defaults"])
@@ -37,6 +47,11 @@ export function projectAppNode(value: Record<string, unknown>): JsonValue {
   return safeJson(result);
 }
 
+/**
+ * Projects declared integration provenance without loading private provider implementations.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Public provenance records in source order.
+ */
 export function projectIntegrationProvenance(value: unknown): JsonValue[] {
   const entries = Array.isArray(value)
     ? value
@@ -66,6 +81,11 @@ export function projectIntegrationProvenance(value: unknown): JsonValue[] {
     .sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)));
 }
 
+/**
+ * Selects declared telemetry topology and bounded exporter identities.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Public telemetry topology evidence.
+ */
 function telemetryTopology(value: unknown): Record<string, unknown> | undefined {
   if (!isRecord(value)) return undefined;
   const exporters = isRecord(value.exporters)
@@ -89,6 +109,11 @@ function telemetryTopology(value: unknown): Record<string, unknown> | undefined 
   };
 }
 
+/**
+ * Selects a safe public provider declaration location.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns A safe source location or undefined.
+ */
 function providerSource(value: unknown): Record<string, unknown> {
   if (
     !isRecord(value) ||
@@ -103,6 +128,11 @@ function providerSource(value: unknown): Record<string, unknown> {
   };
 }
 
+/**
+ * Projects declared named topology collections in stable order.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Named public metadata records.
+ */
 function namedValues(value: unknown): Record<string, unknown>[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((entry) => {
@@ -118,6 +148,11 @@ function namedValues(value: unknown): Record<string, unknown>[] {
   });
 }
 
+/**
+ * Selects declared local-service recipe metadata without executable provisioning configuration.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns A public local recipe.
+ */
 function localRecipe(value: unknown): Record<string, unknown> | undefined {
   if (!isRecord(value)) return undefined;
   const integrationId = stringValue(value.integrationId);
@@ -128,6 +163,11 @@ function localRecipe(value: unknown): Record<string, unknown> | undefined {
     : { integrationId, recipeId, recipeVersion };
 }
 
+/**
+ * Selects public deployment role identities from declaration metadata.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Public deployment role records.
+ */
 function deploymentRoles(value: unknown): Record<string, unknown>[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((entry) => {
@@ -141,12 +181,22 @@ function deploymentRoles(value: unknown): Record<string, unknown>[] {
   });
 }
 
+/**
+ * Accepts only stored string metadata from the selected collection.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns The accepted string values.
+ */
 function strings(value: unknown): string[] {
   return Array.isArray(value)
     ? [...new Set(value.filter((entry): entry is string => typeof entry === "string"))].sort()
     : [];
 }
 
+/**
+ * Accepts finite positive integer topology bounds.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns An accepted bound or undefined.
+ */
 function positiveInteger(value: unknown): number | undefined {
   return Number.isSafeInteger(value) && Number(value) > 0 ? Number(value) : undefined;
 }

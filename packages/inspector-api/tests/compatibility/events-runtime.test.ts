@@ -1,7 +1,9 @@
+import type { EventsResponse } from "../fixtures/json.types.ts";
+import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
-import { installInspectorEndpoints } from "./src/index.ts";
+import { installInspectorEndpoints } from "../../src/index.ts";
 
 describe("inspector event runtime protocol", () => {
   test("projects versioned contracts, trigger bindings, publications, and safe deliveries", async () => {
@@ -37,7 +39,6 @@ describe("inspector event runtime protocol", () => {
                 triggers: [
                   {
                     protocol: "relkit.events.admin",
-                    version: 1,
                     id: "orders.email",
                     targetFunctionId: "orders.send-email",
                     eventId: "orders.created",
@@ -49,7 +50,6 @@ describe("inspector event runtime protocol", () => {
                 capabilities: [
                   {
                     protocol: "relkit.events.admin",
-                    version: 1,
                     triggerId: "orders.email",
                     delivery: "durable",
                     restartRecovery: true,
@@ -70,7 +70,6 @@ describe("inspector event runtime protocol", () => {
                 deliveries: [
                   {
                     protocol: "relkit.events.admin",
-                    version: 1,
                     deliveryId: "delivery-1",
                     eventInstanceId: "event-1",
                     eventId: "orders.created",
@@ -92,7 +91,7 @@ describe("inspector event runtime protocol", () => {
     const response = await app.request(
       `${API_BASE_PATH}/runtime/events?eventId=orders.created&eventVersion=2&limit=10`,
     );
-    const body = await response.json();
+    const body = await responseJson<EventsResponse>(response);
     expect(response.status).toBe(200);
     expect(body).toMatchObject({
       protocol: "relkit.inspector",
