@@ -3,7 +3,7 @@ import { realpathSync } from "node:fs";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { withRelkit } from "./src/build/next.ts";
+import { withRelkit } from "../../src/build/next.ts";
 
 const roots: string[] = [];
 
@@ -11,6 +11,10 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
 
+/**
+ * Creates an isolated temporary project for build-adapter assertions.
+ * @returns The temporary project directory owned by the calling test.
+ */
 async function project() {
   const parent = await mkdtemp(join(tmpdir(), "relkit-next-config-"));
   roots.push(parent);

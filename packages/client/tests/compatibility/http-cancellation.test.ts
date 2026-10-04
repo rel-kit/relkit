@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { oc } from "@orpc/contract";
-import { createClient, createAutoClient } from "./src/index.ts";
+import { createClient, createAutoClient } from "../../src/index.ts";
 
 const schema = {
   "~standard": { version: 1 as const, vendor: "test", validate: (value: unknown) => ({ value }) },
@@ -14,7 +14,6 @@ test.each([createClient, createAutoClient])(
     const caller = new AbortController();
     const client = create<typeof contract>({
       baseUrl: "http://relkit.test",
-      websocket: undefined,
       establishmentTimeoutMs: 1,
       fetch: Object.assign(
         async (_url: string | URL | Request, init?: RequestInit) => {
