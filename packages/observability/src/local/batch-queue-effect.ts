@@ -53,6 +53,7 @@ export const makeLocalBatchQueueEffect = Effect.fn("ObservabilityLocalBatch.crea
       };
       const schedule = (): void => {
         timer ??= setTimeout(() => {
+          timer = undefined;
           startDrain();
         }, 100);
       };
