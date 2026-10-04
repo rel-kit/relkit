@@ -1,5 +1,7 @@
 "use client";
 
+import type { QueryInput } from "./finite-hooks.types.js";
+
 import {
   useInfiniteQuery,
   useMutation,
@@ -15,28 +17,31 @@ import {
   type UseSuspenseQueryOptions,
   type UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { ORPCError } from "../index.js";
+import { runExecutionPromise } from "@relkit/contracts/operation";
+import { mutationOperations, mutationRuntime } from "./mutation-runtime.js";
 import { useRelkitClient } from "./context.js";
 import { relkitJobKey, relkitKey } from "./keys.js";
 import { procedureUtils } from "./procedure.js";
-import type { ErrorFor, InputFor, MutationSelector, OutputFor, QuerySelector } from "./registry.js";
-import {
-  forgetPending,
-  jobUnknownOutcome,
-  pendingScopeKey,
-  rememberJobPending,
-  rememberPending,
-  updatePending,
-} from "./pending.js";
+import type {
+  ErrorFor,
+  InputFor,
+  MutationSelector,
+  OutputFor,
+  QuerySelector,
+} from "./registry.types.js";
+import { pendingScopeKey } from "./pending.js";
 import { generatedJobTriggerName, prepareJobRequest } from "./job-hooks-support.js";
-export { RelkitWriteError } from "./write-error.js";
 import { RelkitWriteError } from "./write-error.js";
+export { RelkitWriteError } from "./write-error.js";
 
-type QueryInput<Name extends QuerySelector, Selected> = Omit<
-  UseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>,
-  "queryKey" | "queryFn"
-> & { readonly input: InputFor<Name> };
-
+/**
+ * Adapts a declared finite route into a scope-bound TanStack query.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @typeParam Selected - Caller-selected query result.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns The typed finite query result.
+ */
 export function useRoute<Name extends QuerySelector, Selected = OutputFor<Name>>(
   name: Name,
   options: QueryInput<Name, Selected>,
@@ -55,6 +60,14 @@ export function useRoute<Name extends QuerySelector, Selected = OutputFor<Name>>
   } as UseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>);
 }
 
+/**
+ * Adapts a ready declared route into a scope-bound suspense query.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @typeParam Selected - Caller-selected query result.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns The typed ready suspense query result.
+ */
 export function useSuspenseRoute<Name extends QuerySelector, Selected = OutputFor<Name>>(
   name: Name,
   options: Omit<
@@ -74,6 +87,14 @@ export function useSuspenseRoute<Name extends QuerySelector, Selected = OutputFo
   } as UseSuspenseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>);
 }
 
+/**
+ * Adapts a declared accepted-work operation into TanStack mutation state.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @typeParam Context - TanStack mutation context.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns The typed accepted-work mutation result.
+ */
 export function useRouteMutation<Name extends MutationSelector, Context = unknown>(
   name: Name,
   options: Omit<
@@ -115,34 +136,26 @@ export function useRouteMutation<Name extends MutationSelector, Context = unknow
           ? undefined
           : prepareJobRequest(input, runtime.identity, mutationContext);
       const effectiveInput = (prepared?.value ?? input) as InputFor<Name>;
-      const pending =
-        prepared === undefined
-          ? await rememberPending(scopeKey, "mutation", name, effectiveInput)
-          : await rememberJobPending(scopeKey, name, effectiveInput, {
-              operationId: prepared.operationId,
-              ...(prepared.idempotencyKey === undefined
-                ? {}
-                : { idempotencyKey: prepared.idempotencyKey }),
-            });
-      try {
-        const value = await original(effectiveInput, mutationContext);
-        forgetPending(scopeKey, pending.operationId);
-        return value;
-      } catch (error) {
-        const unknown = jobUnknownOutcome(error);
-        if (unknown) {
-          updatePending(scopeKey, {
-            ...pending,
-            state: "unknown",
-            ...(unknown.idempotencyKey === undefined
-              ? {}
-              : { idempotencyKey: unknown.idempotencyKey }),
-            recovery: unknown.recovery,
-          });
-        } else if (error instanceof ORPCError) forgetPending(scopeKey, pending.operationId);
-        else updatePending(scopeKey, { ...pending, state: "unknown" });
-        throw error;
-      }
+      return (await runExecutionPromise(
+        mutationRuntime,
+        mutationOperations.submit(
+          scopeKey,
+          prepared === undefined ? "mutation" : "job-trigger",
+          name,
+          effectiveInput,
+          {},
+          prepared === undefined
+            ? {}
+            : {
+                operationId: prepared.operationId,
+                retainRequest: true,
+                ...(prepared.idempotencyKey === undefined
+                  ? {}
+                  : { idempotencyKey: prepared.idempotencyKey }),
+              },
+          () => original(effectiveInput, mutationContext),
+        ),
+      )) as OutputFor<Name>;
     },
     mutationKey: runtime.scope
       ? generatedJobTriggerName(name) === undefined
@@ -152,6 +165,15 @@ export function useRouteMutation<Name extends MutationSelector, Context = unknow
   } as UseMutationOptions<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context>);
 }
 
+/**
+ * Adapts a declared paginated route while retaining page and scope inference.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @typeParam PageParam - Declared pagination cursor.
+ * @typeParam Selected - Caller-selected query result.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns The typed paginated query result.
+ */
 export function useInfiniteRoute<
   Name extends QuerySelector,
   PageParam,
@@ -188,6 +210,12 @@ export function useInfiniteRoute<
     PageParam
   >);
 }
+/**
+ * Returns the existing generated query/mutation utilities for a declared selector.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @param name - Declared resource or selector identity.
+ * @returns The declared generated query and mutation utilities.
+ */
 export function useRouteUtils<Name extends QuerySelector | MutationSelector>(name: Name) {
   const runtime = useRelkitClient();
   return procedureUtils(runtime.utils, name);
