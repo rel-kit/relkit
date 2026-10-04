@@ -1,0 +1,74 @@
+{
+  "protocol": "relkit.performance.core-consumers",
+  "version": 1,
+  "environment": {
+    "command": "rtk bun scripts/performance-core-consumers.ts",
+    "timestamp": "2026-10-03T17:40:28.924Z",
+    "bun": "1.3.10",
+    "node": "v24.3.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpuModel": "Apple M1 Pro",
+    "cpuCount": 10,
+    "totalMemoryBytes": 17179869184
+  },
+  "deadlineMs": 60000,
+  "elapsedMs": 2202.793,
+  "measurements": {
+    "sharedWatch": {
+      "latency": {
+        "iterations": 25,
+        "warmups": 10,
+        "totalMs": 808.938,
+        "averageMs": 32.358,
+        "p50Ms": 31.983,
+        "p95Ms": 38.867,
+        "opsPerSecond": 30.905
+      },
+      "resources": {
+        "opened": 3500,
+        "returned": 3500,
+        "active": 0,
+        "peakActive": 100,
+        "connectedLeases": 35000,
+        "disposedLeases": 35000
+      },
+      "feedsPerBatch": 100,
+      "leasesPerBatch": 1000
+    },
+    "inspectorQuery": {
+      "iterations": 100,
+      "warmups": 10,
+      "totalMs": 32.156,
+      "averageMs": 0.322,
+      "p50Ms": 0.291,
+      "p95Ms": 0.428,
+      "opsPerSecond": 3109.835
+    },
+    "supervisorProxy": {
+      "iterations": 100,
+      "warmups": 10,
+      "totalMs": 81.682,
+      "averageMs": 0.817,
+      "p50Ms": 0.718,
+      "p95Ms": 1.581,
+      "opsPerSecond": 1224.267
+    },
+    "candidateActivation": {
+      "iterations": 1000,
+      "warmups": 10,
+      "totalMs": 856.289,
+      "averageMs": 0.856,
+      "p50Ms": 0.761,
+      "p95Ms": 1.235,
+      "opsPerSecond": 1167.83
+    },
+    "inspectorReads": 110,
+    "proxyRequests": 110
+  },
+  "thresholds": {
+    "p50ReviewPercent": 5,
+    "p95ReviewPercent": 10
+  }
+}

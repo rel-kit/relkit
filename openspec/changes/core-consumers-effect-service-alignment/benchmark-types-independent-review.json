@@ -1,0 +1,17 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "author": "/root/client_baseline",
+  "outcome": "accepted",
+  "files": [
+    {
+      "path": "scripts/performance-core-consumers.types.ts",
+      "sha256": "74f0a4e010633967b92bfec2b4fe3a135d712804a255a1f74b6892d73ee59177",
+      "lines": 31,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "result": "accepted"
+    }
+  ],
+  "scope": "Phase1 script-owned measurement companion, previously independently reviewed and reread during final assembly coverage reconciliation.",
+  "assessment": "Native repository measure return type remains authority; resource counters and request/query latency distribution fields preserved. No domain logic or widened failure boundary introduced."
+}
