@@ -1,6 +1,6 @@
 {
   "name": "@relkit/integrations",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Optional catalog of standalone RELKIT integrations.",
   "license": "MIT",
   "repository": {
