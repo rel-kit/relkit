@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { resolveProcedure } from "./src/react/procedure.ts";
+import { resolveProcedure } from "../../src/react/procedure.ts";
 
 test("keeps exact dotted route keys while resolving nested job paths", () => {
   const route = { marker: "route" };

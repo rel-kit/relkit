@@ -1,14 +1,12 @@
-import type { QueryKey } from "@tanstack/react-query";
+import type { ProcedureUtilsLike } from "./procedure.types.js";
+export type { ProcedureUtilsLike } from "./procedure.types.js";
 
-export interface ProcedureUtilsLike {
-  queryOptions(options: object): object;
-  infiniteOptions(options: object): object;
-  mutationOptions(options?: object): object;
-  queryKey(options?: object): QueryKey;
-  infiniteKey(options?: object): QueryKey;
-  mutationKey(options?: object): QueryKey;
-}
-
+/**
+ * Resolves generated TanStack utilities using exact selector semantics.
+ * @param root - Existing root used for lookup or configuration.
+ * @param selector - Exact dotted selector or explicit path components.
+ * @returns The declared generated TanStack utility object.
+ */
 export function procedureUtils(
   root: unknown,
   selector: string | readonly string[],
@@ -18,6 +16,12 @@ export function procedureUtils(
   return value as unknown as ProcedureUtilsLike;
 }
 
+/**
+ * Resolves a callable generated procedure using exact selector semantics.
+ * @param root - Existing root used for lookup or configuration.
+ * @param selector - Exact dotted selector or explicit path components.
+ * @returns The declared procedure callable.
+ */
 export function procedureCall(
   root: unknown,
   selector: string | readonly string[],
@@ -28,7 +32,11 @@ export function procedureCall(
   return value as (...args: unknown[]) => unknown;
 }
 
-/** Resolves generated paths without changing exact dotted route-key semantics. */
+/** Resolves generated paths without changing exact dotted route-key semantics.
+ * @param root - Existing root used for lookup or configuration.
+ * @param selector - Exact dotted selector or explicit path components.
+ * @returns The selected exact or nested procedure value.
+ */
 export function resolveProcedure(root: unknown, selector: string | readonly string[]): unknown {
   if (typeof selector !== "string") return descend(root, selector);
   if (isRecord(root)) {
@@ -38,6 +46,12 @@ export function resolveProcedure(root: unknown, selector: string | readonly stri
   return descend(root, selector.split("."));
 }
 
+/**
+ * Resolves each explicit path component without rewriting dotted property semantics.
+ * @param root - Existing root used for lookup or configuration.
+ * @param path - Explicit lookup path components.
+ * @returns The explicit nested value, or undefined when traversal is unavailable.
+ */
 function descend(root: unknown, path: readonly string[]): unknown {
   let value = root;
   for (const key of path) {
@@ -48,6 +62,11 @@ function descend(root: unknown, path: readonly string[]): unknown {
   return value;
 }
 
+/**
+ * Checks whether the existing property-access boundary accepts a supplied value.
+ * @param value - Original input or payload; its identity is retained where required.
+ * @returns Whether property access is valid for this boundary.
+ */
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return value !== null && (typeof value === "object" || typeof value === "function");
 }

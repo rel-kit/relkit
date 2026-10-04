@@ -1,22 +1,21 @@
 "use client";
 
+import type { StreamState, UseStreamResult } from "./stream-hook.types.js";
+export type { StreamState, UseStreamResult } from "./stream-hook.types.js";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRelkitClient } from "./context.js";
-import { procedureCall } from "./procedure.js";
-import type { ErrorFor, InputFor, ItemFor, StreamSelector } from "./registry.js";
+import { runExecutionPromise } from "@relkit/contracts/operation";
+import { clientStreams, streamRuntime } from "./stream-runtime.js";
+import type { ErrorFor, InputFor, ItemFor, StreamSelector } from "./registry.types.js";
 
-export interface StreamState<Item, Error> {
-  readonly status: "idle" | "starting" | "streaming" | "completed" | "cancelled" | "error";
-  readonly items: readonly Item[];
-  readonly error?: Error;
-}
-
-export interface UseStreamResult<Input, Item, Error> extends StreamState<Item, Error> {
-  readonly start: (input: Input) => Promise<void>;
-  readonly cancel: () => void;
-  readonly reset: () => void;
-}
-
+/**
+ * Adapts a declared scoped stream into React state and explicit cancellation controls.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns Current stream state and stable start/abort controls.
+ */
 export function useStream<Name extends StreamSelector>(
   name: Name,
   options: { readonly autoStart?: boolean; readonly input?: InputFor<Name> } = {},
@@ -44,17 +43,24 @@ export function useStream<Name extends StreamSelector>(
       controller.current = next;
       setState({ status: "starting", items: [] });
       try {
-        const call = procedureCall(runtime.streamClient, name);
-        const stream = (await call(input, { signal: next.signal })) as AsyncIterable<ItemFor<Name>>;
-        setState({ status: "streaming", items: [] });
-        for await (const item of stream) {
-          if (next.signal.aborted) break;
-          setState((current) => ({
-            ...current,
-            status: "streaming",
-            items: [...current.items, item],
-          }));
-        }
+        await runExecutionPromise(
+          streamRuntime,
+          clientStreams.consume(
+            runtime.streamClient,
+            name,
+            input,
+            next.signal,
+            () => setState({ status: "streaming", items: [] }),
+            (item) => {
+              setState((current) => ({
+                ...current,
+                status: "streaming",
+                items: [...current.items, item as ItemFor<Name>],
+              }));
+            },
+          ),
+          { signal: next.signal },
+        );
         if (!next.signal.aborted) setState((current) => ({ ...current, status: "completed" }));
       } catch (error) {
         if (!next.signal.aborted)
