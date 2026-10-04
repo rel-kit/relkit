@@ -1,3 +1,4 @@
+import type { NormalizedTrigger } from "./events.types.js";
 import { normalizeId, type JsonValue } from "@relkit/contracts";
 import { materializeEvents } from "@relkit/engine";
 import type { InvocationRunner } from "@relkit/runtime-effect";
@@ -5,16 +6,15 @@ import { createDeterministicClock } from "./runtime-clock.js";
 import { createTestStateRoot } from "./state-root.js";
 import { createFailures, createIdSource, createRandom } from "./jobs-utils.js";
 import { createTestEventRuntime } from "./events-runtime.js";
-import type { TestEventFake, TestEventOptions, TestEventTriggerOptions } from "./events-types.js";
+import type { TestEventFake, TestEventOptions } from "./events-types.js";
 
-type NormalizedTrigger<Output> = TestEventTriggerOptions<Output> & {
-  readonly delivery: "ephemeral" | "durable";
-  readonly profile: string;
-  readonly eventId: string;
-  readonly eventVersion: number;
-};
-
-/** Creates a deterministic event publication and delivery harness. */
+/**
+ * Creates a deterministic event publication and delivery harness.
+ * @typeParam Payload - Event payload accepted by the native publication schema.
+ * @typeParam Output - Output validated by the target's native schema.
+ * @param options - Explicit configuration and native dependencies for this test owner.
+ * @returns The ready event harness, releasing partial acquisition on failure.
+ */
 export async function createTestEvent<Payload = unknown, Output = unknown>(
   options: TestEventOptions<Payload, Output>,
 ): Promise<TestEventFake<Payload, Output>> {
@@ -24,30 +24,46 @@ export async function createTestEvent<Payload = unknown, Output = unknown>(
     throw new TypeError("Test event version must be a positive integer");
   const profile = normalizeId(options.profile ?? "default");
   const triggers = normalizeTriggers(eventId, version, profile, options);
-  const owner = createTestStateRoot(options.stateRoot);
   const deterministic = createDeterministicClock(options.startTimeMs ?? 0);
+  const random = createRandom(options.random, options.randomValues);
   const failures = options.failures ?? createFailures();
   const runner: InvocationRunner = {
     run: (effect, runOptions) => deterministic.run(effect, runOptions),
   };
-  return createTestEventRuntime({
-    eventId,
-    version,
-    profile,
-    triggers,
-    plan: createPlan(eventId, version, triggers),
-    owner,
-    deterministic,
-    failures,
-    random: createRandom(options.random, options.randomValues),
-    runner,
-    idSource: createIdSource(),
-    options,
-  });
+  const owner = createTestStateRoot(options.stateRoot);
+  try {
+    return await createTestEventRuntime({
+      eventId,
+      version,
+      profile,
+      triggers,
+      plan: createPlan(eventId, version, triggers),
+      owner,
+      deterministic,
+      failures,
+      random,
+      runner,
+      idSource: createIdSource(),
+      options,
+    });
+  } catch (error) {
+    owner.cleanup(true);
+    throw error;
+  }
 }
 
+/** @inheritDoc createTestEvent */
 export const createTestEventFake = createTestEvent;
 
+/**
+ * Validates and binds event trigger identities and delivery policy.
+ * @typeParam Output - Output validated by the target's native schema.
+ * @param eventId - Declared event identity.
+ * @param version - Declared positive event version.
+ * @param profile - Native provider profile identity.
+ * @param options - Explicit configuration and native dependencies for this test owner.
+ * @returns Immutable triggers preserving native concurrency, retry and profile contracts.
+ */
 function normalizeTriggers<Output>(
   eventId: string,
   version: number,
@@ -95,6 +111,14 @@ function normalizeTriggers<Output>(
   );
 }
 
+/**
+ * Builds the minimal registration plan consumed by native materialization.
+ * @typeParam Output - Output validated by the target's native schema.
+ * @param eventId - Declared event identity.
+ * @param version - Declared positive event version.
+ * @param triggers - Normalized native event trigger policies.
+ * @returns A registration plan preserving retry, concurrency and identity policies.
+ */
 function createPlan<Output>(
   eventId: string,
   version: number,

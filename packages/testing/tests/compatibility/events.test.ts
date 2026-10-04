@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "@relkit/schema";
 import { defineEventFunction } from "@relkit/events";
-import { createTestEvent } from "./src/index.ts";
+import { createTestEvent } from "../../src/index.ts";
 
 const target = defineEventFunction({
   id: "orders.receipt",
@@ -72,19 +72,19 @@ describe("testing event fake", () => {
       retry,
     });
     try {
-      event.failures.once("event.after-persist-before-fanout");
+      event.failures.once!("event.after-persist-before-fanout");
       await expect(event.publish({ orderId: "persist" })).rejects.toThrow(
         "event.after-persist-before-fanout",
       );
       expect(event.envelopes).toHaveLength(1);
       await expect(event.runNext()).resolves.toMatchObject({ state: "completed" });
 
-      event.failures.once("event.after-fan-out");
+      event.failures.once!("event.after-fan-out");
       await expect(event.publish({ orderId: "fanout" })).rejects.toThrow("event.after-fan-out");
       expect(event.pending()).toBe(1);
       await expect(event.runNext()).resolves.toMatchObject({ state: "completed" });
 
-      event.failures.once("event.after-handler-success-before-ack");
+      event.failures.once!("event.after-handler-success-before-ack");
       await event.publish({ orderId: "ack-gap" });
       await expect(event.runNext()).rejects.toThrow("event.after-handler-success-before-ack");
       await event.clock.advance(10);
@@ -95,7 +95,7 @@ describe("testing event fake", () => {
         attempt: 2,
       });
 
-      event.failures.once("event.after-ack");
+      event.failures.once!("event.after-ack");
       await event.publish({ orderId: "after-ack" });
       await expect(event.runNext()).rejects.toThrow("event.after-ack");
       expect(event.completed()).toBe(4);
