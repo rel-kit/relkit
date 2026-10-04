@@ -1,11 +1,14 @@
-import type { AgentBase, AgentStopOptions, AgentThreadOptions } from "./agent-hook-types.js";
+import type { Invoke } from "./agent-methods.types.js";
+import type { AgentBase, AgentStopOptions, AgentThreadOptions } from "./agent-hook-types.types.js";
 
-type Invoke = (
-  kind: string,
-  payload: unknown,
-  options: AgentThreadOptions & { readonly resume?: boolean },
-) => Promise<void>;
-
+/**
+ * Projects declared agent methods over the view's borrowed invocation and observation adapters.
+ * @typeParam Output - Declared successful output payload.
+ * @param state - Current owned state.
+ * @param invoke - Borrowed accepted-work invocation adapter.
+ * @param observe - Borrowed thread observation adapter.
+ * @returns Declared agent invocation and observation methods.
+ */
 export function agentMethods<Output>(
   state: AgentBase<Output>,
   invoke: Invoke,

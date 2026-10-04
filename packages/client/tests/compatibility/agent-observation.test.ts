@@ -6,9 +6,9 @@ import type {
   JournalCheckpoint,
   ThreadSnapshot,
 } from "@relkit/contracts";
-import { agentContentFromMessages, applyAgentEvent } from "./src/react/agent-observation.ts";
-import type { AgentBase } from "./src/react/agent-hook-types.ts";
-import { applyAgentSnapshot } from "./src/react/agent-snapshot-observation.ts";
+import { agentContentFromMessages, applyAgentEvent } from "../../src/react/agent-observation.ts";
+import type { AgentBase } from "../../src/react/agent-hook-types.types.js";
+import { applyAgentSnapshot } from "../../src/react/agent-snapshot-observation.ts";
 
 const checkpoint: JournalCheckpoint = {
   applicationId: "fixture",
@@ -165,6 +165,12 @@ test("restores canonical output and values with terminal status", () => {
   });
 });
 
+/**
+ * Builds a canonical tool observation with the retained assertion payload.
+ * @param kind - Canonical event or frame discriminator.
+ * @param output - Declared successful output exposed by the observation.
+ * @returns The original tool event envelope.
+ */
 function toolEvent(kind: "tool-succeeded", output: unknown): AgentClientEvent {
   return {
     eventId: "event-1",
@@ -181,6 +187,14 @@ function toolEvent(kind: "tool-succeeded", output: unknown): AgentClientEvent {
   };
 }
 
+/**
+ * Builds a canonical nested execution observation.
+ * @param eventId - Stable canonical event identity used by duplicate filtering.
+ * @param nativeSequence - Canonical execution journal sequence.
+ * @param scope - Declared nested execution scope coordinates.
+ * @param value - Original assertion-bearing native payload.
+ * @returns The original journal event with its native sequence and scope.
+ */
 function executionEvent(
   eventId: string,
   nativeSequence: number,
@@ -190,6 +204,15 @@ function executionEvent(
   return nativeEvent(eventId, nativeSequence, "values", scope, value);
 }
 
+/**
+ * Builds the retained canonical execution event payload.
+ * @param eventId - Stable canonical event identity used by duplicate filtering.
+ * @param nativeSequence - Canonical execution journal sequence.
+ * @param kind - Canonical event or frame discriminator.
+ * @param scope - Declared nested execution scope coordinates.
+ * @param value - Original assertion-bearing native payload.
+ * @returns The exact assertion-bearing native event envelope.
+ */
 function nativeEvent(
   eventId: string,
   nativeSequence: number,
@@ -214,6 +237,12 @@ function nativeEvent(
   };
 }
 
+/**
+ * Builds an authoritative successful terminal observation.
+ * @param eventId - Stable canonical event identity used by duplicate filtering.
+ * @param output - Declared successful output exposed by the observation.
+ * @returns The original terminal event carrying declared output.
+ */
 function terminalEvent(eventId: string, output: unknown): AgentClientEvent {
   return {
     eventId,
@@ -226,6 +255,11 @@ function terminalEvent(eventId: string, output: unknown): AgentClientEvent {
   };
 }
 
+/**
+ * Builds an authoritative failed terminal observation.
+ * @param eventId - Stable canonical event identity used by duplicate filtering.
+ * @returns The retained failed-run event envelope.
+ */
 function failedTerminalEvent(eventId: string): AgentClientEvent {
   return {
     eventId,
