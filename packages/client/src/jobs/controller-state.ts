@@ -2,6 +2,14 @@ import type { RunWatchFrame } from "@relkit/contracts/jobs";
 import { isTerminalRun, type JobWatchOptions, type JobWatchState } from "./types.js";
 import type { FeedEvent } from "./watch-feed.js";
 
+/**
+ * Projects observation status or frames into the existing external-store state.
+ * @typeParam Run - Application-specific observed run payload.
+ * @param current - Current external-store state.
+ * @param event - Canonical observation event.
+ * @param source - Existing observation source.
+ * @returns The projected external-store snapshot.
+ */
 export function stateFromFeedEvent<Run>(
   current: JobWatchState<Run>,
   event: FeedEvent<Run>,
