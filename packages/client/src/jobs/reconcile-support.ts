@@ -1,5 +1,10 @@
 const closedIterators = new WeakSet<object>();
 
+/**
+ * Bounds a native iterator's return without changing an existing public failure.
+ * @param iterator - Owned native iterator.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 export async function closeIterator(iterator: AsyncIterator<unknown>): Promise<void> {
   if (typeof iterator.return !== "function") return;
   if (typeof iterator === "object" && iterator !== null) {
@@ -20,6 +25,10 @@ export async function closeIterator(iterator: AsyncIterator<unknown>): Promise<v
   }
 }
 
+/**
+ * Creates the existing local epoch used for synthesized authoritative snapshots.
+ * @returns A fresh local authoritative-snapshot epoch.
+ */
 export function newEpoch(): string {
   return typeof crypto.randomUUID === "function"
     ? crypto.randomUUID()
