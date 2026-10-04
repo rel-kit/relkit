@@ -1,25 +1,29 @@
 "use client";
 
+import type { ObservationRequest, InvocationOptions } from "./agent-hook.types.js";
+
 import { useCallback, useEffect, useState } from "react";
-import { ORPCError } from "../index.js";
+import { runExecutionPromise } from "@relkit/contracts/operation";
+import { agentOperations, agentRuntime } from "./agent-runtime.js";
+import { isAcceptedAgentRun } from "./agent-operations.service.js";
 import { emptyAgentContent } from "./agent-observation.js";
-import { prepareAgentContinuation, requiredThreadId } from "./agent-continuation.js";
+import { requiredThreadId } from "./agent-continuation.js";
 import { agentMethods } from "./agent-methods.js";
 import { restoreAndObserve } from "./agent-observer.js";
 import { reconcileAgentRun } from "./agent-reconcile.js";
 import { useRelkitClient } from "./context.js";
-import { forgetPending, pendingScopeKey, rememberPending, updatePending } from "./pending.js";
-import { procedureCall } from "./procedure.js";
-import type { AgentSelector } from "./registry.js";
-import type {
-  AgentBase,
-  AgentOutput,
-  AgentThreadOptions,
-  UseAgentResult,
-} from "./agent-hook-types.js";
+import { pendingScopeKey } from "./pending.js";
+import type { AgentSelector } from "./registry.types.js";
+import type { AgentOutput } from "./agent-hook-types.js";
+import type { AgentBase, AgentThreadOptions, UseAgentResult } from "./agent-hook-types.types.js";
 export type * from "./agent-hook-types.js";
-type ObservationRequest = { readonly threadId: string; readonly revision: number };
-type InvocationOptions = AgentThreadOptions & { readonly resume?: boolean };
+
+/**
+ * Adapts the agent service into React state while keeping accepted work independent of view cleanup.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @param name - Declared resource or selector identity.
+ * @returns The projected agent state and declared invocation methods.
+ */
 export function useAgent<Name extends AgentSelector>(name: Name): UseAgentResult<Name> {
   const runtime = useRelkitClient();
   const [observation, setObservation] = useState<ObservationRequest>();
@@ -80,69 +84,26 @@ export function useAgent<Name extends AgentSelector>(name: Name): UseAgentResult
         throw new Error(`Relkit client is not ready (${runtime.status})`);
       const threadId = requiredThreadId(options);
       const scope = pendingScopeKey(runtime.scope);
-      const continuation =
-        options.resume === true
-          ? await prepareAgentContinuation(runtime.client, name, threadId, payload, state.snapshot)
-          : undefined;
-      const pending = await rememberPending(
-        scope,
-        continuation === undefined
-          ? kind === "run"
-            ? "agent-run"
-            : "agent-control"
-          : "continuation",
-        name,
-        continuation?.digestValue ?? payload,
-        {
-          threadId,
-          ...(state.threadId === threadId && activeRunId !== undefined
-            ? { runId: activeRunId }
-            : {}),
-        },
-      );
-      try {
-        const call = procedureCall(
-          runtime.client,
-          kind === "run" ? "relkit.agent.run" : "relkit.agent.control",
-        );
-        const receipt = await call({
+      const receipt = await runExecutionPromise(
+        agentRuntime,
+        agentOperations.submit({
+          client: runtime.client,
+          scopeKey: scope,
           agentId: name,
-          expectedIdentity: runtime.identity,
           threadId,
+          identity: runtime.identity,
           kind,
           payload,
-          ...(options.resume === true ? { resume: true } : {}),
-          ...(continuation === undefined ? {} : { waitingRevision: continuation.waitingRevision }),
-          operationId: pending.operationId,
-          requestDigest: pending.requestDigest,
-        });
-        updatePending(scope, { ...pending, state: "accepted" });
-        if (kind === "run" && isAcceptedRun(receipt) && receipt.threadId !== threadId) {
-          throw new Error("Relkit returned a different thread ID than the caller supplied.");
-        }
-        if (receipt !== undefined) {
-          forgetPending(scope, pending.operationId);
-          if (kind === "run" && isAcceptedRun(receipt)) {
-            setObservation((current) => ({
-              threadId,
-              revision: (current?.revision ?? 0) + 1,
-            }));
-          }
-        }
-      } catch (error) {
-        if (error instanceof ORPCError) forgetPending(scope, pending.operationId);
-        else updatePending(scope, { ...pending, state: "unknown" });
-        throw error;
+          ...(options.resume === undefined ? {} : { resume: options.resume }),
+          ...(state.snapshot === undefined ? {} : { snapshot: state.snapshot }),
+          ...(state.threadId === threadId && activeRunId !== undefined ? { activeRunId } : {}),
+        }),
+      );
+      if (kind === "run" && isAcceptedAgentRun(receipt)) {
+        setObservation((current) => ({ threadId, revision: (current?.revision ?? 0) + 1 }));
       }
     },
     [activeRunId, name, runtime, state.snapshot, state.threadId],
   );
   return agentMethods(state, invoke, observe) as unknown as UseAgentResult<Name>;
-}
-function isAcceptedRun(value: unknown): value is { readonly threadId: string } {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    typeof (value as { threadId?: unknown }).threadId === "string"
-  );
 }
