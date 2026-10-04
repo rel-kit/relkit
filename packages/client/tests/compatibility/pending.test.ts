@@ -8,7 +8,7 @@ import {
   pendingRequest,
   rememberJobPending,
   updatePending,
-} from "./src/react/pending.ts";
+} from "../../src/react/pending.ts";
 
 test("job pending metadata matches the transmitted request and retains input only in memory", async () => {
   const scope = `pending-test-${crypto.randomUUID()}`;
@@ -21,7 +21,7 @@ test("job pending metadata matches the transmitted request and retains input onl
     idempotencyKey: "key-1",
   });
 
-  expect(metadata.operationId).toBe("operation-1");
+  expect(String(metadata.operationId)).toBe("operation-1");
   expect(metadata.idempotencyKey).toBe("key-1");
   expect(metadata.requestDigest).toBe(await digestPendingRequest(request));
   expect(pendingRequest(scope, "operation-1")).toBe(request);
