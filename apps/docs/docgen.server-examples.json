@@ -1,0 +1,6 @@
+{
+  "extends": "./docgen.examples.json",
+  "compilerOptions": {
+    "lib": ["ES2022"]
+  }
+}

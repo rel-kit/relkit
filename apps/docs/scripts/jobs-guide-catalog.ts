@@ -125,7 +125,10 @@ export const jobsGuideRelations = [
   {
     path: "jobs/testing",
     api: ["jobs", "testing", "client"],
-    examples: ["packages/jobs/tests/task-wire.test.ts", "packages/client/jobs-watch.test.ts"],
+    examples: [
+      "packages/jobs/tests/task-wire.test.ts",
+      "packages/client/tests/compatibility/jobs-watch.test.ts",
+    ],
   },
   {
     path: "jobs/migration",
