@@ -1,13 +1,13 @@
 import type { ClientIdentityDocument } from "@relkit/contracts";
-import {
-  createAutoClient,
-  createClient,
-  createWebSocketClient,
-  type ClientHeaders,
-} from "../index.js";
+import { createAutoClient, createClient, createWebSocketClient } from "../transport.js";
+import type { ClientHeaders } from "../index.types.js";
 import type { RelkitKeyScope } from "./keys.js";
 import { createAgentSseClient } from "./agent-sse-client.js";
 
+/**
+ * Reads the current browser backend origin or the existing local fallback.
+ * @returns The browser origin or local development fallback.
+ */
 export function browserOrigin(): string {
   return (
     (globalThis as { location?: { readonly origin: string } }).location?.origin ??
@@ -15,10 +15,19 @@ export function browserOrigin(): string {
   );
 }
 
+/**
+ * Selects query entries owned by RELKIT's existing key prefix.
+ * @param query - Existing query descriptor.
+ * @returns Whether the query key belongs to RELKIT.
+ */
 export function isRelkitQuery(query: { readonly queryKey: readonly unknown[] }): boolean {
   return query.queryKey[0] === "relkit";
 }
 
+/**
+ * Reads the existing browser or Next public fingerprint binding.
+ * @returns The configured fingerprint, or undefined when no binding exists.
+ */
 export function compiledFingerprint(): string | undefined {
   return (
     (globalThis as { __RELKIT_PUBLIC_FINGERPRINT__?: string }).__RELKIT_PUBLIC_FINGERPRINT__ ??
@@ -26,6 +35,13 @@ export function compiledFingerprint(): string | undefined {
   );
 }
 
+/**
+ * Reads the existing backend identity document with caller-owned cancellation.
+ * @param baseUrl - Configured backend root URL.
+ * @param credentials - Existing native credential policy.
+ * @param signal - Borrowed caller cancellation signal.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 export async function loadIdentity(
   baseUrl: string,
   credentials: NonNullable<RequestInit["credentials"]>,
@@ -40,6 +56,12 @@ export async function loadIdentity(
   return response.json() as Promise<ClientIdentityDocument>;
 }
 
+/**
+ * Attaches existing identity, jobs protocol and CSRF authority to current headers.
+ * @param value - Original input or payload; its identity is retained where required.
+ * @param identity - Existing application identity authority.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 export async function identityHeaders(
   value: ClientHeaders | undefined,
   identity: ClientIdentityDocument | undefined,
@@ -61,6 +83,11 @@ export async function identityHeaders(
   return headers;
 }
 
+/**
+ * Reads and decodes one existing browser cookie without retaining document state.
+ * @param name - Declared resource or selector identity.
+ * @returns The decoded cookie value, or undefined when absent.
+ */
 function browserCookie(name: string): string | undefined {
   const cookie = (globalThis as { document?: { readonly cookie: string } }).document?.cookie;
   const value = cookie
@@ -70,6 +97,11 @@ function browserCookie(name: string): string | undefined {
   return value === undefined ? undefined : decodeURIComponent(value.slice(name.length + 1));
 }
 
+/**
+ * Creates the finite native fetch edge with combined caller and deadline signals.
+ * @param timeoutMs - Existing read or establishment deadline in milliseconds.
+ * @returns A fetch adapter whose deadline also cancels its owned request.
+ */
 export function finiteFetcher(timeoutMs: number): typeof fetch {
   return ((input, init) => {
     const timeout = AbortSignal.timeout(timeoutMs);
@@ -78,6 +110,11 @@ export function finiteFetcher(timeoutMs: number): typeof fetch {
   }) as typeof fetch;
 }
 
+/**
+ * Bounds native stream establishment without timing out the subsequent live stream.
+ * @param timeoutMs - Existing read or establishment deadline in milliseconds.
+ * @returns A fetch adapter whose deadline ends after stream establishment.
+ */
 export function streamFetcher(timeoutMs: number): typeof fetch {
   return (async (input, init) => {
     const controller = new AbortController();
@@ -96,6 +133,11 @@ export function streamFetcher(timeoutMs: number): typeof fetch {
   }) as typeof fetch;
 }
 
+/**
+ * Selects the existing HTTP, WebSocket, auto or SSE procedure adapter.
+ * @param options - Existing public configuration and authority.
+ * @returns The configured stream procedure client.
+ */
 export function streamClientFor(options: {
   readonly baseUrl: string;
   readonly credentials: NonNullable<RequestInit["credentials"]>;
@@ -125,6 +167,14 @@ export function streamClientFor(options: {
     : createAutoClient({ ...shared, establishmentTimeoutMs: options.timeoutMs });
 }
 
+/**
+ * Constructs the complete existing backend and identity hydration/query scope.
+ * @param backend - Configured backend identity.
+ * @param identity - Existing application identity authority.
+ * @param identityKey - Caller identity key used for isolation.
+ * @param environment - Explicit environment boundary.
+ * @returns The complete backend, fingerprint, identity and session key scope.
+ */
 export function scopeFor(
   backend: string,
   identity: ClientIdentityDocument,
@@ -143,6 +193,12 @@ export function scopeFor(
   };
 }
 
+/**
+ * Compares every existing query and hydration isolation boundary.
+ * @param left - Existing left-hand value.
+ * @param right - Existing right-hand value.
+ * @returns Whether every isolation field matches.
+ */
 export function sameScope(left: RelkitKeyScope, right: RelkitKeyScope): boolean {
   return (
     left.backend === right.backend &&
