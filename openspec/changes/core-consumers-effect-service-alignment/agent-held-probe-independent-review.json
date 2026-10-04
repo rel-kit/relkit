@@ -1,0 +1,110 @@
+{
+  "reviewer": "client_baseline",
+  "status": "accepted final source and independently inspected parent-run native evidence: 2/2 cases passed",
+  "scope": "Independent full EOF review of all seven paths, including both TypeScript native route/type boundaries. No hosts, browsers, test runners, paid calls or original source edits.",
+  "files": [
+    {
+      "path": "/tmp/relkit-core-consumers-agent-held-8b18daca/application.mjs",
+      "sha256": "d3bbe02f6b213274be8c4a2275d39a15025388b87e86ec95e6b1802c80f9452b",
+      "lines": 97,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-agent-held-8b18daca/bounds.mjs",
+      "sha256": "6560b56ce6d4bf66a1c1f31b882a1ce14231e489a902f35371c9d1d231b6755a",
+      "lines": 44,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-agent-held-8b18daca/probe.mjs",
+      "sha256": "01192fc50e6de0ded1b0b6f5a49622a48922ecda7824237a3ff0fce575d73201",
+      "lines": 197,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-agent-held-8b18daca/run.mjs",
+      "sha256": "984f5590ef4d39dd2ad9c806385803ba44b982d740f157297bbf21556759ea2b",
+      "lines": 25,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-agent-held-8b18daca/src/routes/[[...path]]/route.ts",
+      "sha256": "277ed0d79492e13a40f907284ce5dd35e63dcdd1ed035307121be9e53a46137d",
+      "lines": 25,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-agent-held-8b18daca/src/routes/[[...path]]/route.types.ts",
+      "sha256": "c08ff683a93e7914916aac8ccdc907bcffe5e626a26d514ffbcf535d649f037d",
+      "lines": 4,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-agent-held-8b18daca/PREPARATION.md",
+      "sha256": "6471fb3b0be12c8496d524a04ac443eb26a6f6e84ded9342de7aa5c99681c328",
+      "lines": 39,
+      "readEOF": true
+    }
+  ],
+  "resolvedFindings": [
+    {
+      "finding": "Explicit observer abort originally followed iterator.return before verifying actual HTTP signal retirement, allowing return cleanup to mask ignored caller cancellation.",
+      "resolution": "Final probe asserts signal active before caller abort, awaits the native signal's abort receipt and asserts signal aborted before iterator.return; return remains cleanup. Final full probe reread accepted."
+    }
+  ],
+  "apiEvidence": {
+    "candidatePublicImports": "Direct absolute candidate public dist entry barrels for testing, agents, providers-local, runtime-hono, schema, contracts, client, realtime; app/config uses existing public config leaf. Native model _generate is deliberately held before delegating unchanged scripted output generation.",
+    "readCurrentSource": [
+      "packages/testing/src/agents-model.ts",
+      "packages/testing/src/agents-model-native.ts",
+      "packages/testing/src/application.types.ts",
+      "packages/testing/src/http.ts",
+      "packages/testing/src/http-listener.types.ts",
+      "packages/testing/src/application-request.ts",
+      "packages/testing/src/application-http.ts",
+      "packages/agents/src/runtime.types.ts"
+    ],
+    "compatibility": "createTestModel exposes mutable native languageModel with optional ParsedCallOptions signal; facade close owns its acquired runtime. Testing listener supports ephemeral port and disconnect purpose. Raw ALL route forwards original native Request into Hono fetch without buffering; no manufactured native Response/transport. invokeAgent receives original accepted-worker input/signal and thread/messages/steering/content sink."
+  },
+  "assertions": {
+    "admission": "Original receipt accepted, unique operation/thread/run; actual held model entry awaited.",
+    "activeWindow": "Same run operation identity, unsettled accepted/running status, activeRun identity and running thread both before and after actual observer retirement while model not released and calls zero.",
+    "actualTransport": "Public createClient fetch records real observe request and AbortSignal, native frame delivered; return case verifies done and aborted request; abort case separately proves active signal -> caller abort -> native abort receipt before return.",
+    "completion": "Only after disconnect proof releases held barrier; same accepted run succeeds, same operation, idle thread, exact answer, exactly one model call and identical retained durable run/output on repeated load. No timing retries.",
+    "claims": "No durable approval, no standalone/composed telemetry proof and no original retained fixture modification claimed."
+  },
+  "ownership": {
+    "barrier": "Each case timer and finally release; waitForRelease removes native abort listener on settlement; generation abort attempts native work cancellation.",
+    "receipts": "Accepted generation tasks tracked and actual allSettled joined with10s deadline before application/model close; cleanup attempts all acquired owners, reports AggregateError. Deadline failure is reported, not treated as native completion.",
+    "iterator": "Native observer cancellation authority distinct from accepted worker; finally aborts/removes parent bridge, joins iterator return, then owner listener closes. Successful core close assertion is required; failed-run secondary iterator close errors are suppressed while original failure remains failed.",
+    "runner": "Credential-free previously reviewed childEnvironment; actual Bun child scoped cwd; forwards one stop and waits actual exited, removes signal handlers. Parent retains external hard watchdog/owned subprocess recovery authority.",
+    "provider": "LocalAgentStateProvider has no long-running provider acquisition/close; local state confined to unique additive root. Native generation owns task lifetime and is joined.",
+    "organization": "Both TypeScript files are small native compatibility edges with named interface in .types companion and meaningful callable docs; no imperative package domain migration introduced by this acceptance harness."
+  },
+  "checks": {
+    "authorReported": "Node --check for MJS modules passed; not independently replayed here under no-runner instruction.",
+    "reviewExecuted": "Read-only EOF, public source signature check and exact SHA inventory only."
+  },
+  "runtimeEvidence": {
+    "resultPath": "/tmp/relkit-core-consumers-agent-held-8b18daca/evidence/results.json",
+    "resultSha256": "58dec43c22e2d27f62c59361f1d43d2069225f544f7a3d019ae91c51f6e48a5b",
+    "logPath": "/tmp/relkit-core-consumers-agent-held-live.log",
+    "logSha256": "e3873f88db6e66d7fc576ea5da5aa10b463de3cb5f6d1d63f3234e34258350d2",
+    "sourceHashesStillMatch": true,
+    "passedCases": 2,
+    "failure": null,
+    "cleanupFailure": null,
+    "returnRunId": "b388a1e0-e086-4727-b74f-6728b7d4aa94",
+    "abortRunId": "3d3691f0-05b9-46ba-9fc2-1b24f7099821",
+    "verification": "Both actual request signals retired while same accepted run/operation remained running and unsettled before and after disconnect. Both actual model barriers remained held through that assertion under the accepted source. After release, same runs durably succeeded with exact answer and one native scripted model call each; accepted source also asserted repeated persisted run/output equality. Abort case records callerAbortProvedBeforeReturn=true.",
+    "successAfterNativeAbortMs": { "return": 75, "abort": 60 },
+    "processExit": "Log records passed=2 without failure or cleanupFailure; accepted source sets exitCode0 for this result. Actual native process exit receipt remains parent-owned.",
+    "originalInputs": "No original demo/fixture source path is written by this additive source; execution evidence claims originalFixtureModified=false. This review did not repeat the original full preservation snapshot.",
+    "reviewExecution": "Read-only results/log EOF and independent evidence assertions; no host or runner started by reviewer."
+  },
+  "qualifications": [
+    "Fresh runtime results were produced by parent and independently inspected; reviewer started no host or runner.",
+    "Parent must serialize actual execution and bound startup/overall child lifetime externally; run.mjs itself forwards and joins stop without a hard kill deadline.",
+    "In-process durable local provider readback proves persistence after observer disconnect, not host restart or durable approval."
+  ]
+}

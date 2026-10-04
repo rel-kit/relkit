@@ -1,0 +1,25 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "author": "/root/client_baseline",
+  "scope": "Only coordinator-authorized installed dependency resolver amendment to independently accepted native composed probe",
+  "path": "/tmp/relkit-core-consumers-composed-telemetry.mjs",
+  "sha256": "edfa75d4b17502d7d610b3e0b733a60bed032d62f9d60db82202a00f92e67580",
+  "lines": 233,
+  "priorSha256": "97522448cbfeb586eda42b80a4f6e1aa19a2a7f22efa81953001fc6263aafc98",
+  "readToEOF": true,
+  "exactPriorReconstruction": "Removing solely explanatorycomment and restoring createRequire rootpackage manifest produces exactly prioracceptedSHA97522448cbfeb586eda42b80a4f6e1aa19a2a7f22efa81953001fc6263aafc98, proving allprobe assertions/body/cleanup unchanged.",
+  "dependencyAuthority": {
+    "manifest": "packages/runtime-hono/package.json",
+    "readToEOF": true,
+    "effect": "4.0.0-rc.115",
+    "hono": "4.13.5",
+    "@orpc/server": "2.0.0-beta.31",
+    "subpath": "@orpc/server/fetch public export resolved through declaredparentdependency",
+    "assessment": "createRequire origin now points to owning runtime manifest declaring all requested installed roots, rather than rootmanifest lacking oRPC. No source/dependency/pin change or reliance on accidental package hoisting."
+  },
+  "claimsPreserved": "Native public topology, percallClient/Inspector metricdelta1, finalInspector list2/open1/subscribe1 andTestinglisten1/close1, exactSupervisor loggeroutcomes, childloggercontext/noRecursion/sourcepersisted1, and joinedallowner cleanup are unchanged. Supervisor private metricvisibility remains explicitlyunverified.",
+  "result": "accepted",
+  "findings": [],
+  "reviewerExecutedProbeOrHost": false,
+  "remainingAcceptance": "Coordinator freshbounded realprobe subprocess must exit0 and recorded cleanup/outcomes must be audited."
+}

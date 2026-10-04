@@ -1,0 +1,20 @@
+{
+  "reviewer": "/root/testing_baseline",
+  "author": "/root",
+  "status": "accepted",
+  "path": "/tmp/relkit-core-consumers-agent-held-8b18daca/run.mjs",
+  "linesReadThroughEOF": 25,
+  "sha256": "984f5590ef4d39dd2ad9c806385803ba44b982d740f157297bbf21556759ea2b",
+  "execution": "Not executed; no child or host opened by this review.",
+  "evidence": [
+    "The runner imports the previously independently read credential-free childEnvironment helper; import.meta.main prevents its finite command or setup entry points from running during import.",
+    "The only spawned child is the exact disposable owner probe under /tmp/relkit-core-consumers-agent-held-8b18daca, with exact cwd and explicit owner argument.",
+    "The inherited environment is the helper's basic OS allowlist. No caller-supplied environment additions or paid credentials are admitted.",
+    "stdout and stderr remain inherited; stdin is ignored. No failure output is suppressed.",
+    "SIGINT and SIGTERM handlers share a stopping guard, forward SIGINT at most once to the actual admitted child, and never signal unrelated processes.",
+    "The runner awaits the actual child.exited receipt and propagates its exit code, including native failure. Signal handlers are removed in finally.",
+    "Spawn, handler registration, and admission contain no asynchronous gap before the awaited child exit receipt. A synchronous spawn failure leaves no admitted child receipt to join."
+  ],
+  "scope": "Runner only; independent Client review separately covers probe application ownership and assertions.",
+  "findings": []
+}

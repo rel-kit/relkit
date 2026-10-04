@@ -1,0 +1,46 @@
+{
+  "reviewer": "client_baseline",
+  "status": "accepted final ownership, documentation and original assertion parity",
+  "scope": "Read-only EOF and normalized TypeScript AST/text comparison; no browser, host, tests, installs or credential operations.",
+  "files": [
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-nnq5hlav/demo/scripts/owned-inspector-regressions.mjs",
+      "sha256": "bca65ea92781fc739271e6d503eb5d5fe07501382b662d8e7282dcecfd0a8896",
+      "lines": 133,
+      "readEOF": true,
+      "parseDiagnostics": 0
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/demo/scripts/owned-inspector-regressions.mjs",
+      "sha256": "bca65ea92781fc739271e6d503eb5d5fe07501382b662d8e7282dcecfd0a8896",
+      "lines": 133,
+      "readEOF": true,
+      "parseDiagnostics": 0
+    }
+  ],
+  "original": {
+    "path": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/inspector-regressions.mjs",
+    "sha256": "04067a56bf98849fda3679183bbae0d9411c09f800f419c588cc28c1093218de",
+    "bothCopiedOriginalsByteIdentical": true,
+    "retainedOriginalScripts": 16
+  },
+  "parity": {
+    "normalization": "Extract top-level try-block; replace its initial session=registerSession() with original let session=UUID expression and the later session=registerSession() with original session=UUID expression. No other body normalization.",
+    "exactOriginalBodyText": true,
+    "exactOriginalBodyAST": true,
+    "originalAssertCalls": 8,
+    "embeddedEvalAssertionRetained": true,
+    "payloadsWaitsOrderUnchanged": true
+  },
+  "ownership": {
+    "rootAndFreshEvidenceGuards": true,
+    "sessionRegisteredBeforeNativeCommand": true,
+    "allExactOwnedSessionCloseAttemptsJoined": true,
+    "initialAssertionFailureIdentityPreserved": true,
+    "cleanupFailuresReportedSeparately": true,
+    "cleanupFailureFailsOtherwiseSuccessfulRun": true,
+    "originalScriptsUnmodified": true
+  },
+  "qualification": "No execution results claimed. Normal script failure runs finally. External hard process termination may bypass JavaScript finally, so parent watchdog cleanup must recover exact sessions from the pre-admission manifest and close only those IDs; existing unbounded native child/browser waits remain externally bounded by parent.",
+  "finalAmendment": "Both complete 133-line files reread EOF after adding realpathSync and canonicalizing allowed roots, current directory admission and evidence. This resolves macOS /tmp -> /private/tmp mismatch before browser admission and validates the canonical evidence path remains beneath the owned directory. Exact normalized original assertion body text still matches in both copies; original scripts remain byte-identical. Parent confirms exact-manifest watchdog recovery and actual CLI-close joining. No browser execution performed by reviewer."
+}

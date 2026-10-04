@@ -1,0 +1,504 @@
+{
+  "change": "core-consumers-effect-service-alignment",
+  "framework": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "sourceBaseline": "b0f77720764fd61e9872b0995e456014a611ba37",
+  "sourceDisposition": "Uncommitted managed implementation worktree; primary user-owned checkout preserved.",
+  "finalSourceFixes": [
+    {
+      "path": "packages/observability/src/local/batch-queue-effect.ts",
+      "reason": "Clear consumed native timer before drain; no stranded subsequent small tail.",
+      "sha256": "316611ac7bd89704b5f2e6faf1b0ca39dcd5266f226b18b91eaa4076ebd614f5"
+    },
+    {
+      "path": "packages/observability/tests/local-batch-queue-effect.test.ts",
+      "sha256": "0d1b765610cdec9e829426089d452556cb1f949a48f327165f6f9ea7949ecf8c"
+    },
+    {
+      "path": "packages/runtime-hono/src/jobs/projection-validation.ts",
+      "reason": "Only compound acceptance identity gets finite supported envelope12521 bytes; other scalar guards remain256.",
+      "sha256": "09d3ad93908e461f721e6df351c291358001eedcf785294a1fe545dfd0dfbf6e"
+    },
+    {
+      "path": "packages/runtime-hono/tests/jobs-native-projection.test.ts",
+      "sha256": "c5b65889f2515fd3beaed1bd3bfc843b8940e83cbb9374c50cacfadd1782bae2"
+    }
+  ],
+  "verification": {
+    "fullVerify": {
+      "exitCode": 0,
+      "finishedUtc": "2026-10-03T19:38:00Z",
+      "timePrecision": "Minute",
+      "scope": "Before the two final scoped native replay fixes; affected checks below supplement this source revision."
+    },
+    "finalBuild": {
+      "exitCode": 0,
+      "tasks": 58,
+      "cached": 0,
+      "duration": "2m19.473s",
+      "scope": "After both behavior fixes; a subsequent three-line comment-only precision amendment has an additional successful owning-package rebuild."
+    },
+    "observability": {
+      "files": 62,
+      "passed": 169,
+      "exitCode": 0,
+      "finalQueueReplay": {
+        "files": 2,
+        "passed": 7,
+        "exitCode": 0
+      }
+    },
+    "runtimeHono": {
+      "files": 43,
+      "passed": 137,
+      "skipped": 1,
+      "skipDisposition": "Existing explicitly gated test, not a pass",
+      "exitCode": 0
+    },
+    "strictTestTypes": true,
+    "rootTypecheck": true,
+    "lint": true,
+    "boundaries": true,
+    "scopedFormatting": true,
+    "observabilitySinkScan": true,
+    "konsistentSchema": true,
+    "gitDiffCheck": true,
+    "inspectorBrowser": true,
+    "inspectorPlaywright": {
+      "passed": 31
+    },
+    "quality": {
+      "coverageFiles": 69,
+      "tests": 242,
+      "branchCoverage": "91.2% (508/557)",
+      "threshold": "90%",
+      "mutants": 793,
+      "killed": 501,
+      "survived": 268,
+      "noCoverage": 17,
+      "timeout": 7,
+      "errors": 0,
+      "semanticCategoriesPassed": 6,
+      "scope": "Unchanged quality scope; full verify includes actual coverage and mutation replay."
+    }
+  },
+  "demo": {
+    "original": "/Users/mustafaelsayed/Workspace/relkit-regression-demo",
+    "originalHead": "1faed92bfd52a71771251f995a46c88daab8bf40",
+    "baselineOwner": "/tmp/relkit-core-consumers-demo-baseline-nnq5hlav",
+    "candidateOwner": "/tmp/relkit-core-consumers-demo-3d6cp84c",
+    "baseline": {
+      "copyCheckTypeTests": true,
+      "demoTests": 6,
+      "fixtureTests": 6,
+      "live": 11,
+      "diagnostics": 5,
+      "browser": true,
+      "generated": 9,
+      "realtimeDisconnect": true,
+      "origins": {
+        "trusted": true,
+        "foreignHttp": 403,
+        "foreignWebsocket": "opened; baseline failure on both hosts"
+      }
+    },
+    "candidate": {
+      "copyCheckTypeTests": true,
+      "demoTests": 6,
+      "fixtureTests": 6,
+      "live": 11,
+      "diagnosticsBeforeAndAfterBrowser": 5,
+      "browser": true,
+      "graph": {
+        "nodes": 34,
+        "edges": 36,
+        "orphans": 0
+      },
+      "apiExpectedStatuses": {
+        "http200": 6,
+        "unsupportedHttp404": 1
+      },
+      "generated": 9,
+      "originsBothHosts": {
+        "trustedHttp": 200,
+        "trustedWebsocket": "opened",
+        "foreignHttp": 403,
+        "foreignWebsocket": "rejected"
+      },
+      "realtimeDisconnect": {
+        "return": {
+          "before": 1,
+          "samples": [
+            {
+              "elapsedMs": 32,
+              "connections": 0
+            },
+            {
+              "elapsedMs": 1061,
+              "connections": 0
+            },
+            {
+              "elapsedMs": 5120,
+              "connections": 0
+            }
+          ]
+        },
+        "abort": {
+          "before": 1,
+          "samples": [
+            {
+              "elapsedMs": 49,
+              "connections": 0
+            },
+            {
+              "elapsedMs": 1101,
+              "connections": 0
+            },
+            {
+              "elapsedMs": 5159,
+              "connections": 0
+            }
+          ]
+        }
+      },
+      "commerce": {
+        "passed": 3,
+        "skipped": 0,
+        "exitCode": 0,
+        "durationSeconds": 14,
+        "generatedHost": "http://127.0.0.1:3330"
+      },
+      "fixturePostloadApi200": 5
+    }
+  },
+  "composed": {
+    "nativeAgent": {
+      "cases": 2,
+      "exitCode": 0,
+      "acceptedWorkSurvivesObserverDisconnect": true,
+      "persistedCompletion": true
+    },
+    "nativeJob": {
+      "cases": 2,
+      "exitCode": 0,
+      "runnerTimedOut": false,
+      "acceptedWorkSurvivesObserverDisconnect": true,
+      "actualExecutionsPerCase": 1,
+      "actualNativeCommitsPerCase": 1,
+      "persistedCompletionAfterOwnerReacquisition": true
+    },
+    "nativeTelemetry": {
+      "exitCode": 0,
+      "runnerTimedOut": false,
+      "clientInvocationMetricDeltaPerCall": 1,
+      "inspectorListMetricDeltaPerCall": 1,
+      "childContextIsolation": true,
+      "privateTokenAbsent": true,
+      "noRecursiveFeedTraffic": true,
+      "sourceRecords": 1,
+      "sourcePublications": 1,
+      "subscribersAfterEof": 0,
+      "ownersJoined": 5,
+      "supervisorConfiguredLogOutcomes": true,
+      "supervisorPublicMetricVisibility": "Unverified; private isolated registry has no public injection/read API. Isolated domain tests cover counter behavior."
+    }
+  },
+  "preservation": {
+    "originalSourceFiles": 63,
+    "originalHistoryFiles": 177,
+    "originalFixtureFiles": 30,
+    "originalScripts": 16,
+    "allOriginalHashesUnchanged": true,
+    "ownedLinks": 86,
+    "globalBunLinksUsed": false,
+    "primaryStatus": "Sole original untracked OpenSpec change"
+  },
+  "cleanup": {
+    "demoNativeExit": 130,
+    "fixtureNativeExit": 130,
+    "disposition": "Expected SIGINT shutdown; native children joined",
+    "portsReleased": [
+      3000,
+      3210,
+      3330,
+      3331,
+      3010,
+      4010
+    ],
+    "ownedProcessRows": [],
+    "ownedDockerContainers": [],
+    "ownedBrowserSessionsClosed": 5
+  },
+  "remainingRisks": {
+    "focusedLatency": "Watch/query/proxy/activation costs increased; full exact baseline/candidate distributions retained. Required instrumentation retained.",
+    "jobsBrowserBundle": {
+      "baselineBytes": 20473,
+      "candidateBytes": 216594,
+      "increaseBytes": 196121,
+      "ratio": 10.58
+    },
+    "vendor": "Sparse checkout lacks core implementation/tests; installed Effect4.0.0-rc.115 source and local regressions supply compatibility evidence."
+  },
+  "notRun": [
+    "Paid verify-demo-agent.mjs",
+    "Paid verify-demo-luna.mjs",
+    "Paid verify-luna-agent.mjs",
+    "Cloud deployment/real AWS acceptance",
+    "Explicitly gated external jobs provider suite"
+  ],
+  "retention": {
+    "logs": "Retained native logs at exact paths and SHA descriptors below; copied native JSON results also retained beside this ledger.",
+    "firstFailures": "Initial native job projection failure and initial composed dependency resolution failure retained honestly; later actual reruns passed."
+  },
+  "logs": [
+    {
+      "path": "/tmp/relkit-core-consumers-verify-quality-final.log",
+      "bytes": 1074249,
+      "sha256": "7bc6478c000a0aa5930330818aaf4656beb489c3d5acd458e843575550b9a6b5"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-observability-final-tests.log",
+      "bytes": 529,
+      "sha256": "f8af70bd40dde9037d4b5b0566da2cabbdd39fc7ffcc54875af6d6a95f6f93d1"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-batch-timer-regression-final.log",
+      "bytes": 228,
+      "sha256": "3fb641f273f739b36c009afd4463b8630cef25152a2b5a6fd212acc4e3a31324"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-batch-fix-typecheck.log",
+      "bytes": 210754,
+      "sha256": "7ae8324fc607998a66edab795bbce162ea61ea4133954388b1b096bca411ffa6"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-batch-fix-test-types-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-batch-fix-build.log",
+      "bytes": 31653,
+      "sha256": "f97da16e3b7dc40527f465d5919820fc0200dbced822b13d1d22edc5b5f0eca7"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-batch-fix-lint.log",
+      "bytes": 86,
+      "sha256": "d79082b82fa392617045b70461e836b6c5df8d272fe2fcb68a0fb1978ca6a2a0"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-batch-fix-boundaries.log",
+      "bytes": 95,
+      "sha256": "d3c76bff8045de475b3ec35221cfde3754eb067e1c2684fc1215547b0427a7a9"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-batch-fix-sinks.log",
+      "bytes": 39,
+      "sha256": "0188709168075e6b147e49926f3a18110e5e7f145849c5f473b870f573e64677"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-batch-fix-konsistent.log",
+      "bytes": 46,
+      "sha256": "faec7cfdb75c655a380a827c7344ad83f034111e9c66aca77656737ffef143bc"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-hono-projection-tests.log",
+      "bytes": 491,
+      "sha256": "9fafcc46364a867ba83d1f2b3958b40401089adb442cfa9b3e0f1741b4e1ac35"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-hono-projection-types-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-hono-projection-format-final.log",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-hono-final-build.log",
+      "bytes": 31654,
+      "sha256": "e864a1a132dacfda273a66cc24c3d7d758e74207445a309c211d74c00238e5cc"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-hono-comment-final-build.log",
+      "bytes": 9,
+      "sha256": "faeaa94bcf7012d86f91ca647580449f56a263fb7eaf572c54789764f60a9b8f"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-hono-comment-final-format.log",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-hono-final-boundaries.log",
+      "bytes": 95,
+      "sha256": "7778ce3442b9ae930c902bbc1eaae0a615aaf5ba2e2456ffba99d7c9262a81ec"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-final-typecheck.log",
+      "bytes": 210754,
+      "sha256": "7ae8324fc607998a66edab795bbce162ea61ea4133954388b1b096bca411ffa6"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-final-lint.log",
+      "bytes": 86,
+      "sha256": "d79082b82fa392617045b70461e836b6c5df8d272fe2fcb68a0fb1978ca6a2a0"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-inspector-browser-final.log",
+      "bytes": 127,
+      "sha256": "c1e6dd3f059cb38ecc8a63afa590470139e09449992514718c27e86498bc5fae"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-inspector-playwright-final.log",
+      "bytes": 6295,
+      "sha256": "1f410306376d0c7eece3066a863e8c13fbae8cd9e23cf67c45d71b26ed8c5148"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-checks.log",
+      "bytes": 2222,
+      "sha256": "1cdf27233579223234dcf014912e705c5378786ebd1b2c65da1d21b206d9bcea"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-candidate-checks.log",
+      "bytes": 2211,
+      "sha256": "6261e32e7321f2e5f0856a74592d8597e8c7d181ef96051b4cd83d9a7254517d"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-live.log",
+      "bytes": 734,
+      "sha256": "b79d579327202346b6e3a172f9a3b38eead5d5bc80543a84426ff1a943536271"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-diagnostics.log",
+      "bytes": 331,
+      "sha256": "9b0eeeba679a9ad490ccce31e4c95200d03118d095fa3b59f919824069b0da5d"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-browser.log",
+      "bytes": 276,
+      "sha256": "31e0fce2fe245e1accc2c3d92bc102303c6b6cd77bd829730ebd91e9c149ffc9"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-foreign-origin.log",
+      "bytes": 974,
+      "sha256": "aeee3ea57ce435144bde712ba31b5d60ce0af1c176222864abab302dd3b03c22"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-fixture-baseline-foreign-origin.log",
+      "bytes": 974,
+      "sha256": "61acdc212e10c3c3ea383661cff82ae676f8c6bd1b0613e032e42d557cfce428"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-generated-baseline.log",
+      "bytes": 3360,
+      "sha256": "7297bbd667f8c1bded1e4e9a37d21444e0d88a1dfd0a119fb56db3c4469bc990"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-disconnect-baseline.log",
+      "bytes": 556,
+      "sha256": "9ca0e04e7a5ffd3d4d5a8fdbaf217e75a6500e24e35c3d182fd4a8f7456fea96"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-batch-fixed-live.log",
+      "bytes": 734,
+      "sha256": "b79d579327202346b6e3a172f9a3b38eead5d5bc80543a84426ff1a943536271"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-batch-fixed-diagnostics.log",
+      "bytes": 331,
+      "sha256": "9b0eeeba679a9ad490ccce31e4c95200d03118d095fa3b59f919824069b0da5d"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-batch-fixed-browser.log",
+      "bytes": 276,
+      "sha256": "83e4cec990a1a13d9016b7117e01822309a3de440196a69650f595e38f8010ea"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-batch-fixed-postload-diagnostics.log",
+      "bytes": 331,
+      "sha256": "9b0eeeba679a9ad490ccce31e4c95200d03118d095fa3b59f919824069b0da5d"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-batch-fixed-postload-api.log",
+      "bytes": 594,
+      "sha256": "a6b8d12685974bec5d9aeb1201f4499cf57d942e80df4a499ca68bca49a64df1"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-batch-fixed-origins.log",
+      "bytes": 350,
+      "sha256": "c297797b3e495beb8cfd8c3f5b15d2ff9245b7445b4acd5bcf0bf9263883edc9"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-batch-fixed-foreign-origin.log",
+      "bytes": 188,
+      "sha256": "fd738526103d5eff87525ed0fd56a7f387c9443ea9c11622e238fa0e77a47ec4"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-generated-candidate.log",
+      "bytes": 5536,
+      "sha256": "e7a5da815c553ab2094a2a851eb01d1eaa963c8b34c7f77b61ea79d81e965ce4"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-disconnect-candidate.log",
+      "bytes": 865,
+      "sha256": "ad5b1808fa0ecc39db824d5111b0111c08826cc449ac4d2915a2eeba1c473c2b"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-fixture-candidate-origins.log",
+      "bytes": 350,
+      "sha256": "16e7a34327789fdfe6adb24dd6fba10392ff01916a3a1d82e9134ae7d9c58212"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-fixture-candidate-foreign-origin.log",
+      "bytes": 188,
+      "sha256": "5bb09737d24f432c19ec3f79075645ceedf408769f4b9da2e6b2e34255838e44"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-commerce-candidate.log",
+      "bytes": 678,
+      "sha256": "986441e43733ef7c869cbfe6fcd6df3eb36558b47eb9fb59f57a4c852ef91c28"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-fixture-candidate-postload-api.log",
+      "bytes": 239,
+      "sha256": "3a8cf5609445455f92c1842a5acca870c66e5f757c6c7aeaaff3929476bb36e5"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-agent-held-live.log",
+      "bytes": 2263,
+      "sha256": "e3873f88db6e66d7fc576ea5da5aa10b463de3cb5f6d1d63f3234e34258350d2"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-job-held-live.log",
+      "bytes": 1025,
+      "sha256": "07a02edd2bed951032778f470cf77cb5323209e473307505dadcb33ada3fa700"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-job-held-final-live.log",
+      "bytes": 1674,
+      "sha256": "6c7df6bc794c9a7779788c19caf0030cf700807891bac4ea8f09bab526ae571d"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-composed-telemetry-live.log",
+      "bytes": 200,
+      "sha256": "44eb0636380ef7b5d2b96bf8441a96c9cee33f13eb328b0f3c438eeaadc59b06"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-composed-telemetry-final-live.log",
+      "bytes": 2499,
+      "sha256": "a7283542027a4885a46c601bcfb10cd4f6fb62ffe5dd4ca59745ace358a45c09"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-final-port-cleanup.log",
+      "bytes": 180,
+      "sha256": "4879c4c8c44469430f295dbc76edd628f1b1302337442941a5a17daa9bbe3b7f"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-final-process-cleanup.log",
+      "bytes": 24,
+      "sha256": "ead45a9ec2a982489a9233e8930f54a5bb84592835ea2cca2d71f372803f8122"
+    }
+  ]
+}
