@@ -1,0 +1,62 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "author": "/root/client_baseline",
+  "outcome": "accepted",
+  "files": [
+    {
+      "path": "packages/client/src/react/realtime-hook.types.ts",
+      "sha256": "73825c94ed1d86944bf76b836f1b499e24b66db445aad92667dac2f56643b512",
+      "lines": 79,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "packages/client/src/react/realtime-manager.ts",
+      "sha256": "483c91b73544ceb4a81c1e0353fd7ab774c7a43fbb4687025ce8504c211c909c",
+      "lines": 95,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "packages/client/src/react/realtime-manager.types.ts",
+      "sha256": "be8f729261f1c5a974794f933d791963d935c78e1499df20c3f00930f6897c12",
+      "lines": 51,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "packages/client/src/react/realtime-session-key.ts",
+      "sha256": "43fa75b66877c77a6142159897c9852dde3baef742ebb9052279c6967b12205e",
+      "lines": 24,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "packages/client/src/react/realtime-session.service.ts",
+      "sha256": "1dbfb6b7075260c68a51b808fe698ea44730e43f95856b1c5cca048172c9d7e8",
+      "lines": 194,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "packages/client/src/react/registry.types.ts",
+      "sha256": "1aa5e880b08dcbb6cea5cad9701cbeb1869cb3cfa04d680b900039ff2654a673",
+      "lines": 216,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "packages/client/tests/realtime/session.test.ts",
+      "sha256": "ad845bddcd34837e6a26648d3f5dfa3846533ba16d32f7292de872f62c754c75",
+      "lines": 128,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    }
+  ],
+  "currentCount": 169,
+  "currentLines": 13210,
+  "assertionParity": "Session assertions retain the same manager-local map and ownership/checkpoint targets; public subscriptions getter, realtimeSubscriptionKey and subscribe method signatures preserved.",
+  "scope": "Only local/internal map terminology and documentation/test target rename; no guard allowlist/config/assertion weakening.",
+  "authorReportedChecks": "Source + strict tests tsc, seven-file Prettier pass; 3/3 session tests. Exact source-export guard replay awaits last Testing wording fix.",
+  "hashVerification": "All169 final author inventory hashes matched current disk."
+}

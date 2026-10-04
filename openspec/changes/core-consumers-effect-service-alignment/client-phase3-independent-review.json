@@ -1,0 +1,2252 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "author": "/root/client_baseline",
+  "baselineCommit": "b0f77720764fd61e9872b0995e456014a611ba37",
+  "authorFreezeUtc": "2026-10-03T17:03:10.736046+00:00",
+  "outcome": "Source/behavior/types/docs/ownership independent review accepted. Whole-change performance acceptance remains OPEN.",
+  "counts": {
+    "currentTs": 169,
+    "sourceTs": 135,
+    "testTs": 33,
+    "configTs": 1,
+    "lines": 13212,
+    "baselineTs": 75
+  },
+  "coverage": "All 169 final authored TypeScript files read through EOF, 75 baseline originals read through EOF, strict JSON read through EOF. 64 amended/new files reread after provisional freeze; controller class comment reread after final generic documentation fix. Hidden/ignored recursive inventory found no omitted authored TS; dependencies/generated/dist excluded.",
+  "files": [
+    {
+      "path": "packages/client/src/build/manifest.ts",
+      "sha256": "2f67292f29ce096c850312874f8a43eda4909c490cbb7076532b1c5b7464008c",
+      "lines": 16,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/build/next.ts",
+      "sha256": "6ed6a3e29b4c96a7612897d04b9573648a9a35e8d8399b5f2727df1da1acd796",
+      "lines": 59,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/build/next.types.ts",
+      "sha256": "88c433722858d3f8c84956ca1d86c2c63ac978e67babd98502babe02fecab441",
+      "lines": 5,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/build/vite.ts",
+      "sha256": "9dcd2cf3dc105c4a137079cc105a2a4b09ac3eeee082acb12400daecc55d2088",
+      "lines": 21,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/build/vite.types.ts",
+      "sha256": "da953da92cab749668a7f0d4bad1f074957c3d15e3360a1663b4fc83ba705322",
+      "lines": 7,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/client-owner.ts",
+      "sha256": "780f1c8881d047814b2742170a3881806d6ef724f4292cc9cd24264d8cbf670e",
+      "lines": 50,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/client-owner.types.ts",
+      "sha256": "4543d83dfcd38e0fa0df47b9024a24c96a0c49762d0fded76a5748746e25793e",
+      "lines": 19,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/client-runtime.ts",
+      "sha256": "ca30d026529aa0ca5699d5827b6544d44e54e0f074799b51b0dcf3549a9413e0",
+      "lines": 29,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/index.ts",
+      "sha256": "63127c878022bd0c03b77d4b96a13d2c9a354cbf79be1d125ff2246c6cf9dd64",
+      "lines": 20,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/index.types.ts",
+      "sha256": "963d59d794e852f66a7a01d40ac5f108640ca4f0c79ec9ed5635da86cd18b0a6",
+      "lines": 35,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/content.service.ts",
+      "sha256": "5bfad80e9a063fec755bf05327c19c6c610ba354090867bda64f18acb5b40cd7",
+      "lines": 173,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/content.types.ts",
+      "sha256": "94ee17b86ec03a56862f088c31b989ae2f5fa7bb18d6fc21c0c4421b7240d9c9",
+      "lines": 17,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/contracts.types.ts",
+      "sha256": "e9cb1e5a4e6e61c9fd312445cfc70316d31707132f4c57f6fed48d7fa56b130f",
+      "lines": 114,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/controller-state.ts",
+      "sha256": "189b1848b99c6a8988178bb0a86e8188fee9eeddf537551d575601bc9d496826",
+      "lines": 60,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/controller-support.ts",
+      "sha256": "ca2a0ecbf5da8dc7c15c280cecfe933144933d90b8d3dd1fc9d9d6985ae4d621",
+      "lines": 70,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/controller.service.ts",
+      "sha256": "986cc0b21a75d4ddae2b186edd2d0e6c0479c3b0e7a57c9e0f8c50da0c41044f",
+      "lines": 250,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/controller.service.types.ts",
+      "sha256": "f45bd94c1965a8da5ee0152934be466e352643849390fc763f1c835dce8ed32c",
+      "lines": 18,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/controller.ts",
+      "sha256": "63f4b51851d3c9d9080c2ccb466e4c3838fea26b2c1b792e40f401e938b6bf09",
+      "lines": 108,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/feed-registry.service.ts",
+      "sha256": "b2c73229345652f38e7d8ebd0e4e3ea80d863fe550c50ce73847ef6965eec398",
+      "lines": 136,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/feed-registry.types.ts",
+      "sha256": "38acca4bbecc4399263bd4aaade6f75e334a1fd97f2280f53b23be6c65202a34",
+      "lines": 31,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/index.ts",
+      "sha256": "dbb5b2f5b7f19b9af4bc25afeaf1c35f1cec4433af63a26525dfabdfad7b8db6",
+      "lines": 59,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/job-registry-derived.ts",
+      "sha256": "ed9e1bd381856458b74928a352bde08ce0d2819529f0b39139589703d37f773a",
+      "lines": 3,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/job-registry-derived.types.ts",
+      "sha256": "a6a370106ef2f66dfeb047ecbab13f7490b1e107bbcab2ed8751b9504d4c861c",
+      "lines": 167,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/job-registry-types.ts",
+      "sha256": "91c0c7efc501578cb80ddea66eaf8ab3b502b78c6470566c3ff273e2efe6a216",
+      "lines": 8,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/job-registry.types.ts",
+      "sha256": "072b6103c0622182bb3c3a4747a69903248637b1ead3a26bb12c37b6a0138378",
+      "lines": 222,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/observation.service.ts",
+      "sha256": "20339eaea0ff16689b780278689be13e6ddd4a80ce6051ec1a871dd15d4ef9b5",
+      "lines": 30,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/observation.types.ts",
+      "sha256": "0763e4487e7f6f5a5434c9c0ec8c5ae1394e56aa63c9cac17f4d0f95cea758bf",
+      "lines": 15,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/read-timeout.ts",
+      "sha256": "db5f41f19bf18828579cf2deb469fa18fd39e302c30bda210a616cd47b6d33aa",
+      "lines": 60,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/reconcile-boundary.ts",
+      "sha256": "72db3481357cad4eb1c0ec7084f3a23bb04e06f65aca7500bd73b66f7313e610",
+      "lines": 141,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/reconcile-support.ts",
+      "sha256": "97e145cc94681e9cdacb94940da33984a259cd45022224d70859d53bfed2f086",
+      "lines": 36,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/reconcile.ts",
+      "sha256": "9d381c4a5f1bb45a7415e439f448e82ec3b62b1047d38f232d2f3197dc0d2638",
+      "lines": 148,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/reconcile.types.ts",
+      "sha256": "dce89601c5aeed44a801810a580c99aaf2fece756905e8b0d8a0eb617daadf6a",
+      "lines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/stream-errors.ts",
+      "sha256": "fffba0f8c8b573495908765e63138c0b6dde5e8129321d5ed8c6502f84af48fc",
+      "lines": 31,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/stream-support.ts",
+      "sha256": "9b773a6524acd68ce6289b65aefd1ed5e29d54c9641a17329d4f0a40bd96f7aa",
+      "lines": 73,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/stream.ts",
+      "sha256": "e916827f601c1112db8fa16654afaa4da288deb2668bdba69b160a74743a8008",
+      "lines": 32,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/stream.types.ts",
+      "sha256": "f8e43c28131affd475d56595a5b9dd3c75263785d96d98b0acf8eae1c86c2258",
+      "lines": 13,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/types.ts",
+      "sha256": "3d19f443c694df496684c73012ec956eb1be202e1363ed8b8407e10e07d51c97",
+      "lines": 75,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-loop.ts",
+      "sha256": "68d888d48655eae05709c0b463bc8d0ab4dccef354acabd7376f963b4cc3eebe",
+      "lines": 116,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-loop.types.ts",
+      "sha256": "804bf015e4147afaef9938570b482c94f7a695c40109af3edf3cd182eef95f00",
+      "lines": 28,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-observers.ts",
+      "sha256": "a04a3549997811902e31c88133dca7bf3643f5c2a87b72096eeb1e8437f9a476",
+      "lines": 66,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-observers.types.ts",
+      "sha256": "25cf051df98039a02aaa4de5aa347229d2efdd86774ad0f0f69d4b5f348ee67c",
+      "lines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-polling.ts",
+      "sha256": "e25af43bef373ecdd0c935670e5d1f1ef97bccab3fd230a8841e666d37b9f4cc",
+      "lines": 84,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-recovery.ts",
+      "sha256": "c1d5859fc159a056c24d324f0662cad996c29a1478ac42acfc87a97ca96d65d3",
+      "lines": 36,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-refetch.ts",
+      "sha256": "449adb0d7304a5eb6015d8932e3421e1d7dc15fd43ffad87193a277de61178bb",
+      "lines": 34,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-state.ts",
+      "sha256": "9325dc56ecbded129786d5751186b04aaff0f09a9833acdb93ddbdc0e4f423eb",
+      "lines": 51,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-state.types.ts",
+      "sha256": "29cc1ba87fb65b1073975938a243348c995c84be06f97e06ae64ad94126b7da6",
+      "lines": 12,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-support.ts",
+      "sha256": "d294c00fcb500340eafe68015b026df4d0c3526ed196c924a5ab0d6820601e6e",
+      "lines": 148,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-support.types.ts",
+      "sha256": "1c6f777123f939e84b4a39af2356fcceb244f0fbcd07ded92ac33b35b77fbcb8",
+      "lines": 6,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-teardown.ts",
+      "sha256": "44f5baff2e5c1c45e3b3a59a2677b09e003a3cd12dd5148d8d82b10e77e12085",
+      "lines": 24,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-terminal.ts",
+      "sha256": "3ecbb164707601a0c480fb443b9720757796e10b19d75c8498e69fc8083358eb",
+      "lines": 36,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed-types.ts",
+      "sha256": "685f312c65eb2283a90ac110d92788b3138c2a43d55c4d812b6779dfa32ef506",
+      "lines": 2,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed.ts",
+      "sha256": "c2518ec0237ea122d0bc970d2903a63afc70b9f1619c9f3002ee875ae2017e07",
+      "lines": 243,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-feed.types.ts",
+      "sha256": "84fa3d4db0393dea0f9ef8a424af9e74a7228fbf823288af0c14b3c9f75099c2",
+      "lines": 19,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch-key.ts",
+      "sha256": "cd6cfc7bc4f65a222545b5198b1c29bb9faeaabd1cb9866cb02d65761b4d3f51",
+      "lines": 79,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch.ts",
+      "sha256": "975f32cf9f6f44a811205339a8c97b4841c453cd2bab82cd9d8b1de11e859260",
+      "lines": 14,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/jobs/watch.types.ts",
+      "sha256": "2a31815f57ffeffd26379b9ee7c5aaeac1063e4766df4951f0ecfe63e7563aef",
+      "lines": 66,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/native-stream.ts",
+      "sha256": "a42a78679222313f5a5d7e525208ebb6311bb967e8f9c1381ea586622357bd82",
+      "lines": 83,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-continuation.ts",
+      "sha256": "821e2456f4038ded9811f3e089e73ad8b9c4bafd4ad7f2dde9fc75f7bed50b04",
+      "lines": 39,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-contract-selection.ts",
+      "sha256": "68e5d8e90447884d20ee9e9f6e8a1c50352d7321473b489ec2008f42b8e76161",
+      "lines": 3,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-contract-selection.types.ts",
+      "sha256": "bddb4b901acb2d0ae00d0541f1f628995e95c98bd45b9c9cab683ff496363d46",
+      "lines": 78,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-execution-observation.ts",
+      "sha256": "222dda63384be4e9ab718399ffef2285f52328bf910471f78afd415b93a0bdda",
+      "lines": 223,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-execution-observation.types.ts",
+      "sha256": "7ad22aa45b4f5a5ff72ab5e06e049a8eea2e18cb10ff9aae6bfb51bc099169a5",
+      "lines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-hook-contract.ts",
+      "sha256": "fe9f88737f2fef6cb024270268224210e2cb03107681761c86f251532576e1dd",
+      "lines": 3,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-hook-contract.types.ts",
+      "sha256": "62497bb363d909c88517cc0d75c4e9506af1887ee15f29eacd1bd30e0702f25f",
+      "lines": 147,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-hook-types.ts",
+      "sha256": "38ebef28cb2c27171176fe09dbe86cc88aacebd990d28bf58658f002a0e32fa3",
+      "lines": 3,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-hook-types.types.ts",
+      "sha256": "82e239dfad7f4d71dc0e8113003c85963b43f18a53dcfe8a010fa47323b6ddb6",
+      "lines": 223,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-hook.ts",
+      "sha256": "0be7a92e31012fef621cb9f5a1d8ca57efc2a670ee2a6718a186435824d0cf4a",
+      "lines": 109,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-hook.types.ts",
+      "sha256": "f1e6e9937380737728e5ae5429ae2f85829d1b31ce09c41ca108666f13e21c34",
+      "lines": 7,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-methods.ts",
+      "sha256": "5eaf5a8366be8dbed32c503cc688eed8b819f17beb9475d0f9c2764c66aeb0c1",
+      "lines": 32,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-methods.types.ts",
+      "sha256": "ea7b19a7eebca9a1976d38fa4cf12221f88e8634797c1cd291b82c7b096c48cc",
+      "lines": 8,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-observation-effect.ts",
+      "sha256": "9b99c39c34abae5aa3f855cd7cebf55641b6ba06711ad075a5b90d412dfe429e",
+      "lines": 159,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-observation-index.ts",
+      "sha256": "7011b7304d6bf48649937806fc719ac76cbfd1862acdda3510e4d74fd65201d0",
+      "lines": 109,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-observation.ts",
+      "sha256": "5dd29de354faba30a5450f39b1e41c495d92f6e6b100fd637ea6688e85fcf112",
+      "lines": 242,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-observer.ts",
+      "sha256": "43ebe91683bb79ba19519cf6a3a6a9a6964239f1430fc31b1c9917de1944dd72",
+      "lines": 36,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-operations.service.ts",
+      "sha256": "487a9a4b8060697c0c87ecdb1176e635626e2c394eaac708cae6ce331b01533f",
+      "lines": 209,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-operations.types.ts",
+      "sha256": "17e7ab918ca70dc3c651f1a4b864e7b4d7e0d307d49b3cf8526042a5e473881c",
+      "lines": 95,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-reconcile.ts",
+      "sha256": "d3a1acc5cb421c7ddf43899b22f1980c64878ad8726e3f64073fe78f9d5d708b",
+      "lines": 23,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-runtime.ts",
+      "sha256": "2d073114ebe21e697ab8b0d73aaa8de161d764479c28952dd43629682dae5c82",
+      "lines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-snapshot-observation.ts",
+      "sha256": "c2016953cb58331774f5752029d669dbfff7e935f4f0b65145c268da7c0dc2da",
+      "lines": 50,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-sse-client.ts",
+      "sha256": "49b391cd38377509fc862a8e11c3b7f53ca0ea4ed607e4322101f0a2ba340741",
+      "lines": 119,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-sse-stream.ts",
+      "sha256": "e9b7adf12cbbbb6f5a39a24133576bb0b9f42fe30ff88664ebe2f802d0a1fd29",
+      "lines": 112,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/agent-sse.types.ts",
+      "sha256": "b20e2de04276f2c4e95c56bfb057644f71677b98e685d7737309305d760bb33e",
+      "lines": 17,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/context-support.ts",
+      "sha256": "3895900557de672d0fde10611223d1360f9f9203db6a7e3e651a490b8224955b",
+      "lines": 213,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/context-types.ts",
+      "sha256": "2863130c40a085381b6132a1047d0354d4c798115ff8bbf86d9a2c04e0fcdff9",
+      "lines": 2,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/context.tsx",
+      "sha256": "f49558a7c41e1c7b912f086dd8be2e62b3a641c4da1f0e91af935bf0e50cfed0",
+      "lines": 195,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/context.types.ts",
+      "sha256": "470ee5e07164e6c28e9e576464841733503ddac685893466a55a471fe078b589",
+      "lines": 50,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/finite-hooks.ts",
+      "sha256": "5ac8348eb71eec79268a8008383beb0e25785b1b433be7a5aa64bdaccf866b2c",
+      "lines": 222,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/finite-hooks.types.ts",
+      "sha256": "a0c5ceae22107acfe27034dd353bc5191fd53e51e120cfa0227d3a65d8b66ee2",
+      "lines": 12,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/index.ts",
+      "sha256": "50e83091e98a96de86842d1ed9063a3c8568fb2e7382474039cf4251b8c5d7a8",
+      "lines": 46,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/job-hooks-support.ts",
+      "sha256": "6ea78c42ed167bceeeaa04e070d83a00011b696d780229795b0a6bcb60487e0a",
+      "lines": 91,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/job-hooks-support.types.ts",
+      "sha256": "efcf3c95c0427169bc4999021851fe29eea7a8a744170dd7d806c3922bc4b641",
+      "lines": 6,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/job-hooks.ts",
+      "sha256": "b517472ba3fe02a614ab2ba96822a11c5eaff2b8105ee9a6e93cca07a508df86",
+      "lines": 156,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/job-hooks.types.ts",
+      "sha256": "5769803f7821933dd6905c29a33362ef6d8a1ca1f5b2e6ab0863ec4366ee1dd7",
+      "lines": 24,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/job-mutation-hooks.ts",
+      "sha256": "d3efcc6d7401a95b776f6ad0f38af3a3ad6ed69d0221eeb96bd4f18bb76da2a9",
+      "lines": 215,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/job-mutation-hooks.types.ts",
+      "sha256": "bc96e65b0b679bb20ecb943cda15547021f4caf6324d2d6855d33d46d7263229",
+      "lines": 13,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/job-mutation-support.ts",
+      "sha256": "f7cb8a3cee681035bdf526f01c81b501dd024547a8323ef030850296c246393e",
+      "lines": 53,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/keys.ts",
+      "sha256": "9508b27196747c14d62f630f83ffcd60352d5e076b959fcf9e7e4943b4b68974",
+      "lines": 81,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/keys.types.ts",
+      "sha256": "056a0dbad843731567e3f9abb1c747e43e7d64e7722c03811c54c054c4e1fa16",
+      "lines": 21,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/mutation-runtime.ts",
+      "sha256": "fa526c3a6b42794c3074809b3e801154d849397a74a5c52af84b8fdcccee98d0",
+      "lines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/mutation.service.ts",
+      "sha256": "3fa03388bb70ae4030a4e3894f9359f73059ca926bcf75562978424c6c8ea4ca",
+      "lines": 88,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/mutation.service.types.ts",
+      "sha256": "8be4827a9342d20d973556cd08ef1b58e7762f6f84e776b41b55a211784ee893",
+      "lines": 34,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/pending-errors.ts",
+      "sha256": "6b9c4cb4e1b053a112349051fb8895d9da351136d37650ea8d9d826e77218b8e",
+      "lines": 42,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/pending-outcome.ts",
+      "sha256": "b6666e4944517e9933e947d750916adec4675e8058d507549c704a694a1d6dfd",
+      "lines": 24,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/pending-store.ts",
+      "sha256": "8d9dd3f1536c2a9c99b6433ecfe5c32237906ac4e30f56e3a5c656aa0308079b",
+      "lines": 95,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/pending-support.ts",
+      "sha256": "5fccd4113ae89f19398f60c8534454b13d3ab94458b9d2cf82dc459b523a06d9",
+      "lines": 18,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/pending.schemas.ts",
+      "sha256": "f8012f5e9c045987dda3a9b11970828cbc13c3c2d9f0e53404d16db10e6ed284",
+      "lines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/pending.service.ts",
+      "sha256": "e3c89b6d815d97ecc2f1753984defa00cdf9ee7bcb4edc07800550231d8c9977",
+      "lines": 237,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/pending.ts",
+      "sha256": "9cfd48a9568057b7d2e9c6e66cbcb061d242b8f5d6fe4d24bd08d3c987e3b147",
+      "lines": 158,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/pending.types.ts",
+      "sha256": "15d67154f950977346f40554862161422c49b5b560842b7462db380bcd9a0c52",
+      "lines": 67,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/procedure.ts",
+      "sha256": "bc22c76d0e0222e025563c08a8521b942fe3b770ab3c803add70175399b794be",
+      "lines": 72,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/procedure.types.ts",
+      "sha256": "199bb605a7c06b208e855bcb7fe7b8e9378a3ca9786289c5767f0b0efbd193fa",
+      "lines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/realtime-hook.ts",
+      "sha256": "e477c8b6573d770d3688d485e9b2c4c8a7328800f753350c31e594b2c4fa982a",
+      "lines": 122,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/realtime-hook.types.ts",
+      "sha256": "73825c94ed1d86944bf76b836f1b499e24b66db445aad92667dac2f56643b512",
+      "lines": 79,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/realtime-manager.ts",
+      "sha256": "483c91b73544ceb4a81c1e0353fd7ab774c7a43fbb4687025ce8504c211c909c",
+      "lines": 95,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/realtime-manager.types.ts",
+      "sha256": "be8f729261f1c5a974794f933d791963d935c78e1499df20c3f00930f6897c12",
+      "lines": 51,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/realtime-session-key.ts",
+      "sha256": "43fa75b66877c77a6142159897c9852dde3baef742ebb9052279c6967b12205e",
+      "lines": 24,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/realtime-session.service.ts",
+      "sha256": "1dbfb6b7075260c68a51b808fe698ea44730e43f95856b1c5cca048172c9d7e8",
+      "lines": 194,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/registry.ts",
+      "sha256": "b9972834efda0476e52fec5b26a260e16731fc9ac6633eb3f4d7372ba2441348",
+      "lines": 18,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/registry.types.ts",
+      "sha256": "1aa5e880b08dcbb6cea5cad9701cbeb1869cb3cfa04d680b900039ff2654a673",
+      "lines": 216,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/stream-hook.ts",
+      "sha256": "083109b6a54311c7d25c18809a56a9c741448dc44115bed66bd9764b5fd233ce",
+      "lines": 77,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/stream-hook.types.ts",
+      "sha256": "78b2ba5bb24a230ecebd83cb82c8e74622acee5d90ac903d268fd61aa05ba660",
+      "lines": 22,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/stream-runtime.ts",
+      "sha256": "d3ad92fb888d2eb762a28e1bed997b2ff3975016c70f9fa6a972d516a99587b6",
+      "lines": 8,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/stream.service.ts",
+      "sha256": "e46f4b19cb1955533f5ab0167e09f59746701d4f8f990ea0fe626dd01f0ff1a9",
+      "lines": 51,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/stream.service.types.ts",
+      "sha256": "ffaa466c720d7006ae1ff70358c891ece22e9b94020fe7dcac33ec8d8513b71e",
+      "lines": 20,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/view-owner.ts",
+      "sha256": "e1d19705cbaf8b1d57f84dc0f51389a56dae24f2ac57e401a53ce672db3934b5",
+      "lines": 23,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/react/write-error.ts",
+      "sha256": "10d1e8cc9734e18cea86118330a069eeb7b7d434c6b3f3baddaf88815e0551b7",
+      "lines": 15,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/server-context.ts",
+      "sha256": "8a7923fb079f8e3e34cc05a2adcee6912a8e6166fe65c87562e1554f9c3db545",
+      "lines": 61,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/server-context.types.ts",
+      "sha256": "5593d68d46296998f4b1f9fe9c82cf1fca21b2a7686858c4cc4a60f623b76bdd",
+      "lines": 21,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/server.ts",
+      "sha256": "a90be67d7c1bd723c39bcb73c55f032f5b50e5753af2caab38fc6a1e7f3f2780",
+      "lines": 35,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/tanstack-query.ts",
+      "sha256": "0c084fcb8e25da3941cfe7222e319aa98e5e366d06212214b7caba484f497602",
+      "lines": 2,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/transport-native.ts",
+      "sha256": "1f2cc6565ee9bce68b5e9a88ab1029ed37de0a463126a94c28fa3297168830ce",
+      "lines": 131,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/transport-socket.ts",
+      "sha256": "c732ac9e9b27a3c1ce2e51c3c7a993b1cdffdba03d2bd5a0a2b4abc53cabdf48",
+      "lines": 63,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/transport.service.ts",
+      "sha256": "b5a8d5e0845b7299cc7ccf8d97ae7682f7b2b79580ba14ebf89d016260599786",
+      "lines": 109,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/transport.ts",
+      "sha256": "5905f7edf6243621b4cc5dc364df3e1e1030197066c01b21550c8f2381d02b8a",
+      "lines": 79,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/src/transport.types.ts",
+      "sha256": "ac594b5ae9e7433a4cdec19ff814dce54741144b9083c7eed522e6910a192005",
+      "lines": 22,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/agent/pending-service.test.ts",
+      "sha256": "7b43456724e2aaec86179aff2dae7958fbd0852c0de7496851e527bdb312cb89",
+      "lines": 116,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-continuation.test.ts",
+      "sha256": "10550a1f64f21380fb05d0238f2171afe214ffd0ba9962fd53a6f1e8e9468b1f",
+      "lines": 157,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-observation.test.ts",
+      "sha256": "c88cbe210236252701efb3adb1949cc18a5a932a104ff17c25fded6ab6d32131",
+      "lines": 273,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-observer.test.ts",
+      "sha256": "837ab3337327838b6c3d04b07328f5085fca959a8e2fd42dbfb92329d0b13142",
+      "lines": 219,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-sse-client.test.ts",
+      "sha256": "2601b7cada8f5c8907a6516e278a9242439a188fbb03a1753430e7ef59f515a7",
+      "lines": 108,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-thread-identity.test.ts",
+      "sha256": "5ca9c969e26d2c998501ab402561cceee14104bbff752146b20abcb423fbfe88",
+      "lines": 56,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/client.test.ts",
+      "sha256": "c26bff33a9751af266d9c91c51fb58e65948c8bf14172a1fe328ed5b6470ab7f",
+      "lines": 134,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/context-support.test.ts",
+      "sha256": "bb4a37b935b9d068de6d2abdbe18d7795e34d8ada28256d61ad914ca57b5a242",
+      "lines": 58,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/frontend-dependency-closure.test.ts",
+      "sha256": "aac2b72a1c4a8ee67aa7e3ec52ceebee53ab6ec09ee16dda7ac0a7445cfad25a",
+      "lines": 57,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/frontend-dependency-closure.types.ts",
+      "sha256": "0f41c37cc2be64ac93679dce2aa60991daf2935a7dd8048fa3bd07895b4e5829",
+      "lines": 5,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/http-cancellation.test.ts",
+      "sha256": "a0aefe25d4229e7f3157892a37e9bbb91d2cce3be62fa65440aa04c432d2f2dc",
+      "lines": 52,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/jobs-watch.test.ts",
+      "sha256": "86589330bbf870ea947cd8aac08d959f47bb08f2bb70948054b8994be474aab8",
+      "lines": 697,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/next-config.test.ts",
+      "sha256": "56c37d01c1553bb3d77f064f896b83f0a2385f269ae876a213a529c2906a212c",
+      "lines": 59,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/pending.test.ts",
+      "sha256": "31343d69fea5ae3b23705a54fb1a78c04fcc33fa6ce9a04dee71b38b41a77487",
+      "lines": 106,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/procedure.test.ts",
+      "sha256": "7f303661116c901167b96af6828ddfb2459166650fd9800c89795d572ae0adac",
+      "lines": 13,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/compatibility/realtime-manager.test.ts",
+      "sha256": "b6e9f6b0d9bc0ec821c3827706d7b22c35a412e95db394927206bea536796a51",
+      "lines": 23,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/fixtures/fetch.ts",
+      "sha256": "9fc01d5205456879e3305e3a03e50dee14fd32eeee7ec025e9c0a179221df064",
+      "lines": 13,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/jobs/content.test.ts",
+      "sha256": "5bd4eeaf05b03051891206231aca69578b8b55a1c4de90b62c16e9987a3d1358",
+      "lines": 100,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/jobs/quality-fixture.ts",
+      "sha256": "d48299b5cb64da23a25ea09a50637112f57182936aaa53b8edd15f5dc316ff66",
+      "lines": 159,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/jobs/quality-fixture.types.ts",
+      "sha256": "8e50ac4a92f47518a45ea8e70cf16014b622fffe4b8a5c2f593081d6dbeb3382",
+      "lines": 23,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/jobs/quality.test.ts",
+      "sha256": "2f28c46fea56bc26f3abf4a69a77251aaa3bc4b309b8af44fea385fbc38fcbbe",
+      "lines": 169,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/jobs/registry.test.ts",
+      "sha256": "a6867a54c0d2273bbf85ef62c4cabc4310ac3d7926dd8cddfb0e30ec497ef684",
+      "lines": 185,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/jobs/support.test.ts",
+      "sha256": "5afdf722c038fdc013e4757e8e6aafd07865648fee011df21ea04cdc577dad4d",
+      "lines": 134,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/native/iterator-fixture.ts",
+      "sha256": "3c696116af7783b1bdbf7f7f0d1804a844de518bcbb300a31c5c783c52624bea",
+      "lines": 158,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/react/view-owner.test.ts",
+      "sha256": "8bae62c1355ea2a40b7558a1b4da8cd97ad11757dd12c20fbe750e4bb06a157b",
+      "lines": 26,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/realtime/session-fixture.ts",
+      "sha256": "f9eba5cb98f0fde9cdacbcce3b10aa05dda4125e83bb7766d265fa625844ca64",
+      "lines": 23,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/realtime/session.test.ts",
+      "sha256": "ad845bddcd34837e6a26648d3f5dfa3846533ba16d32f7292de872f62c754c75",
+      "lines": 128,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/transport/examples.test.ts",
+      "sha256": "8c8fc3bee46186b5fc0c0b7218eda610d9c685b8b2ccb364ee02aad9851a747c",
+      "lines": 91,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/transport/native.test.ts",
+      "sha256": "a8018afaa3b729d4b93d20ec9ad6ac5851fcf31122308b8ab1e2b97cec61b505",
+      "lines": 23,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/transport/owner.test.ts",
+      "sha256": "b1fa93e3ec86a733c648cbe959a1c5f2817e7f3e6cdf1d15069b437ddd00ff66",
+      "lines": 62,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/transport/selection.test.ts",
+      "sha256": "b039b8fc61f145d829f934f530e351021b8a17420c3cbfbdd68d94bf3c5537bc",
+      "lines": 84,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/transport/service.test.ts",
+      "sha256": "e67a6ce34f3eeda13a3da7fbc3a78bfd9476625d09beb474d71d04c04db36ef8",
+      "lines": 219,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/tests/transport/socket-fixture.ts",
+      "sha256": "fb1fed1acb900e6bdc25916791578e92e6e80fca8f3991e687ae4df240ec9020",
+      "lines": 78,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    },
+    {
+      "path": "packages/client/vitest.config.ts",
+      "sha256": "eff332db570179b201d2c24372aa33558ebd1b9babae9a072efbca7d1cf03b6f",
+      "lines": 10,
+      "reviewer": "/root/inspector_baseline",
+      "result": "accepted after full EOF review"
+    }
+  ],
+  "strictConfig": {
+    "path": "packages/client/tsconfig.tests.json",
+    "sha256": "ad4f763f044418853fab1ea1f62dc4f6220210e9024dc3d30e541a6bd1c91a96",
+    "reviewer": "/root/inspector_baseline",
+    "result": "accepted after EOF review"
+  },
+  "originalMap": [
+    {
+      "original": "packages/client/agent-continuation.test.ts",
+      "originalSha256": "f358d1f7738c530bf076e1ec646f63f5bb1d60ad2c667e9559dd2af91e554e3e",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/agent-continuation.test.ts"
+      ],
+      "originalLines": 143,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/agent-observation.test.ts",
+      "originalSha256": "0911a4c4c5825681fec39050c7ffc9d3d7edb2a48eba2fc5debe18dbff480dcc",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/agent-observation.test.ts"
+      ],
+      "originalLines": 239,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/agent-observer.test.ts",
+      "originalSha256": "68eb9d5bdd0edc846f132cebf1a62f21c3bb2af54551fab1bf3934fc51afe2aa",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/agent-observer.test.ts"
+      ],
+      "originalLines": 190,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/agent-sse-client.test.ts",
+      "originalSha256": "681b48f2d285bf8cdd6fc045e33157c37ab36f793a410f6c91d9f2708dc56889",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/agent-sse-client.test.ts"
+      ],
+      "originalLines": 100,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/agent-thread-identity.test.ts",
+      "originalSha256": "fa8c8b38809c294db5dc44b0aa28be3338cf1ee9f211a2dcb3f07ec24ae7026c",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/agent-thread-identity.test.ts"
+      ],
+      "originalLines": 48,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/client.test.ts",
+      "originalSha256": "05597abc4e49d56471e72e0533d41260ba249b5ef50acf18614db54c83d2a506",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/client.test.ts"
+      ],
+      "originalLines": 133,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/context-support.test.ts",
+      "originalSha256": "e7a87a60b7eb3fbf3252c77547654c17a49976694e466d3717eb677ff89cac5a",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/context-support.test.ts"
+      ],
+      "originalLines": 55,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/frontend-dependency-closure.test.ts",
+      "originalSha256": "c653568529aa9bd3b850c613de2dbdd9848403a1751d68be9d545dff58d69902",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/frontend-dependency-closure.test.ts"
+      ],
+      "originalLines": 51,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/http-cancellation.test.ts",
+      "originalSha256": "f8533848401fccb202d0a5189b0ec3d1c535fd28b33b90b9088c33bc4130cf40",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/http-cancellation.test.ts"
+      ],
+      "originalLines": 53,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/jobs-watch-quality.test.ts",
+      "originalSha256": "0615132537c2f4feda86f342cab64be2d329f8d529ec613ef8eb5886e3bbc621",
+      "disposition": "retained assertions migrated to Effect domain tests",
+      "final": [
+        "packages/client/tests/jobs/quality.test.ts",
+        "packages/client/tests/jobs/support.test.ts",
+        "packages/client/tests/jobs/quality-fixture.ts",
+        "packages/client/tests/jobs/quality-fixture.types.ts"
+      ],
+      "originalLines": 387,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/jobs-watch.test.ts",
+      "originalSha256": "2f95619787ff4db4392a3150920d9e9ea7a947e0d00b5697fcf1776403920cdf",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/jobs-watch.test.ts"
+      ],
+      "originalLines": 654,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/next-config.test.ts",
+      "originalSha256": "864475d403c330be56343fc83b126dcf0c4f56025c6b496f41e48b8eb167eded",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/next-config.test.ts"
+      ],
+      "originalLines": 55,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/pending.test.ts",
+      "originalSha256": "5941afffe83819325669a5eb4693f148ec5054c8f90b4ecdaa108f6f69a7501f",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/pending.test.ts"
+      ],
+      "originalLines": 106,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/procedure.test.ts",
+      "originalSha256": "360bb1a9c18055fedecc2cfb44ca7b015c27e75edeb15015b8b467eb440866d1",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/procedure.test.ts"
+      ],
+      "originalLines": 13,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/realtime-manager.test.ts",
+      "originalSha256": "185185b5429bdc9d020ca7f9970a6beae429fded3eb5ad9527cd70d482ae40df",
+      "disposition": "compatibility suite moved, assertions retained",
+      "final": [
+        "packages/client/tests/compatibility/realtime-manager.test.ts"
+      ],
+      "originalLines": 23,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/build/manifest.ts",
+      "originalSha256": "2ddf562592bf7d5e1b2c0ae0f4016e76ac7c75cb60315b81960e144ade9d8d48",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/build/manifest.ts"
+      ],
+      "originalLines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/build/next.ts",
+      "originalSha256": "1abbd57c42fc2a9040e316854b5585b63037ab0286cac1d8f613d79767727d76",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/build/next.ts"
+      ],
+      "originalLines": 46,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/build/vite.ts",
+      "originalSha256": "b6ef240158aaf58d2084fde9b60d933120ca5c65d340c189ae24c3304b63c928",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/build/vite.ts"
+      ],
+      "originalLines": 21,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/index.ts",
+      "originalSha256": "29ea9efa96d5c55adb979b5fee9ef14120d9e0907a776a43fd6985f442b7b272",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/index.ts"
+      ],
+      "originalLines": 226,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/controller-state.ts",
+      "originalSha256": "ecb51d8e2fec3c7169b25200ed8333fa27b311a6acd5b7d2dcb0adc961dc1d7a",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/controller-state.ts"
+      ],
+      "originalLines": 52,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/controller-support.ts",
+      "originalSha256": "8489dc682e5d0bf320cd5ec0ab7828e5c1ef65d6af26f413d11fc77189cf3cd6",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/controller-support.ts"
+      ],
+      "originalLines": 36,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/controller.ts",
+      "originalSha256": "e3414423b040f3be5c796efb8ac8b7934454a8b49bb3581338afe8d3491d4cda",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/controller.ts"
+      ],
+      "originalLines": 192,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/index.ts",
+      "originalSha256": "eabf412b5728fdc1ae0cce85bd0d40e055caa8a59f695a47bcba3d639d38f77e",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/index.ts"
+      ],
+      "originalLines": 134,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/job-registry-derived.ts",
+      "originalSha256": "2cd3e2a9b0ffe2f0ee652e67e27ba4a4b52014449e956b75e69e37199e3bda1b",
+      "disposition": "Canonical companion extraction with compatibility type reexports; original augmentation module authority retained where declared",
+      "final": [
+        "packages/client/src/jobs/job-registry-derived.ts",
+        "packages/client/src/jobs/job-registry-derived.types.ts"
+      ],
+      "originalLines": 110,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/job-registry-types.ts",
+      "originalSha256": "9894186dc4a2233b291183e3bbcb6c7d0441e7564129f58b51d4948d95419649",
+      "disposition": "Canonical companion extraction with compatibility type reexports; original augmentation module authority retained where declared",
+      "final": [
+        "packages/client/src/jobs/job-registry-types.ts",
+        "packages/client/src/jobs/job-registry.types.ts"
+      ],
+      "originalLines": 151,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/read-timeout.ts",
+      "originalSha256": "2cbc68e68190da73994766847a734fb085273a94b5652e494f5eeeb23fd3b8d4",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/read-timeout.ts"
+      ],
+      "originalLines": 45,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/reconcile-support.ts",
+      "originalSha256": "efbad413f79f642627bd49c21772ce33e5e4282df223de8d8dbf82c6cd647c62",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/reconcile-support.ts"
+      ],
+      "originalLines": 27,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/reconcile.ts",
+      "originalSha256": "e6cfa01b2ca591fe00f5c924a127070bf4b48944b4538bd488d294efca586733",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/reconcile.ts"
+      ],
+      "originalLines": 178,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/stream.ts",
+      "originalSha256": "9c275c276bdd79bec113a845d26a9c6a15926b477338adf8f77c348ae8bfd86f",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/stream.ts"
+      ],
+      "originalLines": 167,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/types.ts",
+      "originalSha256": "4d1a4eae0315d9d20dbc15a8982f4e130183c308d07b388e92c1fb432bfd472d",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/types.ts"
+      ],
+      "originalLines": 95,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/watch-feed-loop.ts",
+      "originalSha256": "2cf0ce8651ea066d53b8fb65553ed27e5bdc9eaa0e7b6ab5e2b9f51983e8aacd",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/watch-feed-loop.ts"
+      ],
+      "originalLines": 136,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/watch-feed-observers.ts",
+      "originalSha256": "e88f970fce86ba80cfeee7172821e7e3be84931b48e7a99711cf74580de1c40e",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/watch-feed-observers.ts"
+      ],
+      "originalLines": 41,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/watch-feed-polling.ts",
+      "originalSha256": "02ddb46b2fe4bae88532b6f90e26073de0a73204240a0f24258a31e3e2c8f748",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/watch-feed-polling.ts"
+      ],
+      "originalLines": 88,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/watch-feed-refetch.ts",
+      "originalSha256": "70102b1a6500b68dbdcfaab7a1c2c2d1e503d4daea0ebf838a9e95155b60e318",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/watch-feed-refetch.ts"
+      ],
+      "originalLines": 24,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/watch-feed-state.ts",
+      "originalSha256": "d4190a27e2311605e17d196100eb55a6f5afc08b6afa5faba6fcc612bebd7ef9",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/watch-feed-state.ts"
+      ],
+      "originalLines": 44,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/watch-feed-support.ts",
+      "originalSha256": "c298479d9fad64c683ad17853bd09b2263a7ee64a004c879da2e926be6da135c",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/watch-feed-support.ts"
+      ],
+      "originalLines": 103,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/watch-feed-types.ts",
+      "originalSha256": "b4b11313777d2dc6235f6dacf0e3c3c36b561e4d27799188008b28d43bdfeda8",
+      "disposition": "Canonical companion extraction with compatibility type reexports; original augmentation module authority retained where declared",
+      "final": [
+        "packages/client/src/jobs/watch-feed-types.ts",
+        "packages/client/src/jobs/watch-feed.types.ts"
+      ],
+      "originalLines": 10,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/watch-feed.ts",
+      "originalSha256": "5f00d3ccb7cc8753065673e50553fea304f77b653343ad539398610f863a117f",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/watch-feed.ts"
+      ],
+      "originalLines": 196,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/jobs/watch.ts",
+      "originalSha256": "63c15783b3f286966cf419b8903983303a0b1cae431f9b7febef12289fe5bf32",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/jobs/watch.ts"
+      ],
+      "originalLines": 70,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-continuation.ts",
+      "originalSha256": "93ce3fce7a2ab40cb796a44b4e6f812f9d976648c8f6238f35d5e24732afc788",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-continuation.ts"
+      ],
+      "originalLines": 33,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-contract-selection.ts",
+      "originalSha256": "bbc2cae1dced20829c6f380e4f381d1310ff116b9c616456b0a7ba948b1bfa05",
+      "disposition": "Canonical companion extraction with compatibility type reexports; original augmentation module authority retained where declared",
+      "final": [
+        "packages/client/src/react/agent-contract-selection.ts",
+        "packages/client/src/react/agent-contract-selection.types.ts"
+      ],
+      "originalLines": 23,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-execution-observation.ts",
+      "originalSha256": "45a7082adc94959ac4ba2b415a7e62051ace8d327291110647d84b5d1790aa78",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-execution-observation.ts"
+      ],
+      "originalLines": 154,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-hook-contract.ts",
+      "originalSha256": "5d857a45348a315942c99b542338089cd6f95efbfaf70112175dd58825d6a1c6",
+      "disposition": "Canonical companion extraction with compatibility type reexports; original augmentation module authority retained where declared",
+      "final": [
+        "packages/client/src/react/agent-hook-contract.ts",
+        "packages/client/src/react/agent-hook-contract.types.ts"
+      ],
+      "originalLines": 90,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-hook-types.ts",
+      "originalSha256": "611398f23f13e60615a195026c19d6051f42afd98a22807d7b13ee6af23a1025",
+      "disposition": "Canonical companion extraction with compatibility type reexports; original augmentation module authority retained where declared",
+      "final": [
+        "packages/client/src/react/agent-hook-types.ts",
+        "packages/client/src/react/agent-hook-types.types.ts"
+      ],
+      "originalLines": 160,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-hook.ts",
+      "originalSha256": "84078af9bc9d360214229ffa3a1d08cfb756a3a4b6a46ec1eb88c627797c308a",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-hook.ts"
+      ],
+      "originalLines": 148,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-methods.ts",
+      "originalSha256": "074f31ba3ad18fc4bc7e053c4f3555a4fc5491ea430464aad6db05ce7ec10f06",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-methods.ts"
+      ],
+      "originalLines": 29,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-observation-index.ts",
+      "originalSha256": "921f8c3148d4dff6fa684caf609fea9082db5b5978d51872cca70a39fa8f9d64",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-observation-index.ts"
+      ],
+      "originalLines": 75,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-observation.ts",
+      "originalSha256": "37bf30153cd0a5edd55bf7429316bff3c5b5b368cda2049f820e780189ee52c3",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-observation.ts"
+      ],
+      "originalLines": 190,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-observer.ts",
+      "originalSha256": "a2c7fd131e89195a1522c0bf9ef34b1f448cc2895d21fb95d7b1cdb5b51121bb",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-observer.ts"
+      ],
+      "originalLines": 111,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-reconcile.ts",
+      "originalSha256": "1fc5b9fd253c484258c3a1894f839653e4448c92aa6893d0dc8ac8138f040e94",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-reconcile.ts"
+      ],
+      "originalLines": 42,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-snapshot-observation.ts",
+      "originalSha256": "bdf27f4d2870d741f331b737f006a604d891f3918d7081822e783aaded620424",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-snapshot-observation.ts"
+      ],
+      "originalLines": 38,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/agent-sse-client.ts",
+      "originalSha256": "b03ae45bbc90197178f25250235ed004984339255c3829cb192312f48d1bbb22",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/agent-sse-client.ts"
+      ],
+      "originalLines": 147,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/context-support.ts",
+      "originalSha256": "c4c340686d3d987c4568c59c3a3cb68c125e7a21768d0449dab01bf0c8832183",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/context-support.ts"
+      ],
+      "originalLines": 157,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/context-types.ts",
+      "originalSha256": "a9da21878e908885c794f90f87e0107aba66e8012f150773e8bd98e573d7e86f",
+      "disposition": "Canonical companion extraction with compatibility type reexports; original augmentation module authority retained where declared",
+      "final": [
+        "packages/client/src/react/context-types.ts",
+        "packages/client/src/react/context.types.ts"
+      ],
+      "originalLines": 40,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/context.tsx",
+      "originalSha256": "219858d4aeee1375a401cd78f8386522f5ad5b32aa96d0bf297f8a5237273a67",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/context.tsx"
+      ],
+      "originalLines": 181,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/finite-hooks.ts",
+      "originalSha256": "401a010e05d240de138e43ec2b0d3033e675c01bd8fbe1cf4ef5cc11f8326b93",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/finite-hooks.ts"
+      ],
+      "originalLines": 194,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/index.ts",
+      "originalSha256": "50e83091e98a96de86842d1ed9063a3c8568fb2e7382474039cf4251b8c5d7a8",
+      "disposition": "unchanged pure public boundary",
+      "final": [
+        "packages/client/src/react/index.ts"
+      ],
+      "originalLines": 46,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/job-hooks-support.ts",
+      "originalSha256": "415f7127d608b87296248910f537f26a6a613ba41707b5f3c9ecd33c659d3ea0",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/job-hooks-support.ts"
+      ],
+      "originalLines": 63,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/job-hooks.ts",
+      "originalSha256": "a03339ae188b2ae75468753b91254c82738d606e42b61ac8bec3878da33857fb",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/job-hooks.ts"
+      ],
+      "originalLines": 147,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/job-mutation-hooks.ts",
+      "originalSha256": "c982514750a21706e4dba8504afd0279c7f318ac7648a454074119c9599c9d22",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/job-mutation-hooks.ts"
+      ],
+      "originalLines": 184,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/job-mutation-support.ts",
+      "originalSha256": "a933270edf24aa20741fe878e179d4f8ce1bf0659248f61f260e7a7e9b4e92c2",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/job-mutation-support.ts"
+      ],
+      "originalLines": 44,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/keys.ts",
+      "originalSha256": "f6ba60ffbf9dd986457e8890e2b2da15496e97c996e7fcefd0c01c318c0571f9",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/keys.ts"
+      ],
+      "originalLines": 77,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/pending-errors.ts",
+      "originalSha256": "659dd414577b82fb4f6d85943190ee6d65c3723e3e12b8822f265a7112d53a70",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/pending-errors.ts"
+      ],
+      "originalLines": 30,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/pending-store.ts",
+      "originalSha256": "552c4385adb8ecb93092d56c1ec275e440228bb4df0c6983f9679c15e0b356cb",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/pending-store.ts"
+      ],
+      "originalLines": 63,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/pending-support.ts",
+      "originalSha256": "40d1ddfdbfc4948a4284f2cf755f3eab50442120628fb9e161b3dc718a043abc",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/pending-support.ts"
+      ],
+      "originalLines": 8,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/pending.ts",
+      "originalSha256": "ae3a5f8d0978f812e04829e2c4c5c05e49c3879429fbc23efa827f81276bc303",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/pending.ts"
+      ],
+      "originalLines": 195,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/procedure.ts",
+      "originalSha256": "a594158686a96eb9fe55ba7179c86b7d3093750bac2c04b45b5502c586b2a31a",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/procedure.ts"
+      ],
+      "originalLines": 53,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/realtime-hook.ts",
+      "originalSha256": "4f09dbee10c7d5a2fc7738c87765df7dfc5b829dec347f82999044971bc5b633",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/realtime-hook.ts"
+      ],
+      "originalLines": 132,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/realtime-manager.ts",
+      "originalSha256": "5f6ea5897847f4257b9b433ec7026762debca4de9979cbc40eb01e84e19bea9c",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/realtime-manager.ts"
+      ],
+      "originalLines": 144,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/registry.ts",
+      "originalSha256": "126a25b1a2358cac770e91547e83c63e92638823cc588aabca774a58a2262c39",
+      "disposition": "Canonical companion extraction with compatibility type reexports; original augmentation module authority retained where declared",
+      "final": [
+        "packages/client/src/react/registry.ts",
+        "packages/client/src/react/registry.types.ts"
+      ],
+      "originalLines": 135,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/stream-hook.ts",
+      "originalSha256": "c039862f31552dd51574ff050aca4ac9357eeefb40cd71e180cda320b69ff779",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/stream-hook.ts"
+      ],
+      "originalLines": 71,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/react/write-error.ts",
+      "originalSha256": "bbff27f555a5538dab9330a1ca2cc82cdb46c8de5d04d3833ec3e4b7011c0e6f",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/react/write-error.ts"
+      ],
+      "originalLines": 9,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/server-context.ts",
+      "originalSha256": "a4d53a50dd06b6d2e02f9bbf8308022faa0314f95f4e8ad3200fb175f72f3884",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/server-context.ts"
+      ],
+      "originalLines": 58,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/server.ts",
+      "originalSha256": "e938618327e7ce13f59470892d8fb00d98283ab836d75b8283894167c86a9c81",
+      "disposition": "implemented or documented within owning domain",
+      "final": [
+        "packages/client/src/server.ts"
+      ],
+      "originalLines": 29,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    },
+    {
+      "original": "packages/client/src/tanstack-query.ts",
+      "originalSha256": "0c084fcb8e25da3941cfe7222e319aa98e5e366d06212214b7caba484f497602",
+      "disposition": "unchanged pure public boundary",
+      "final": [
+        "packages/client/src/tanstack-query.ts"
+      ],
+      "originalLines": 2,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF"
+    }
+  ],
+  "assertionParity": {
+    "command": "rtk proxy bun /tmp/relkit-client-parity.mjs",
+    "originalSuites": 15,
+    "currentMappedPaths": 16,
+    "originalOuterExpectChains": 180,
+    "retained": 180,
+    "additive": 2,
+    "missing": 0,
+    "method": "Independent TypeScript transpile/AST outer expect-chain comparison, only existing String(metadata.operationId) fixture typing normalization; full original/helper/native callbacks read manually."
+  },
+  "applicableFamilies": [
+    {
+      "family": "Service",
+      "disposition": "Cohesive transport, JobControllers/JobFeedRegistry/JobObservation/JobContent, ClientStreams, RealtimeSessions, PendingOperations/MutationOperations/AgentOperations; live Service.of and same-contract substituted Layers."
+    },
+    {
+      "family": "Schema",
+      "disposition": "Pending public metadata envelope derives native schema; retention guard remains intentionally weak for baseline parity; no hand-fabricated wire schemas."
+    },
+    {
+      "family": "Tagged Errors",
+      "disposition": "Bounded pending/transport/job errors retain existing public error identity and classifier contracts."
+    },
+    {
+      "family": "Error Management",
+      "disposition": "Original native Promise failures preserved; defects/interruption distinct, auth stops retries, accepted writes never replay automatically."
+    },
+    {
+      "family": "Data",
+      "disposition": "Existing native discriminated wire unions remain authority; no incompatible Data wrappers manufactured."
+    },
+    {
+      "family": "Observability",
+      "disposition": "Shared observeExecution fixed labels, independent borrow/continuation/mutation.settle instrumented; compatibility edges do not double count."
+    },
+    {
+      "family": "Metrics",
+      "disposition": "Operation counts/durations/outcomes provided through shared instrumentation and tested service probes."
+    },
+    {
+      "family": "Tracing",
+      "disposition": "Named Effect.fn and shared operation spans, native oRPC traceAsyncIterator unchanged."
+    },
+    {
+      "family": "Logs",
+      "disposition": "Shared browser-compatible runtime instrumentation respects configured level/redaction and parent/sibling context; no request payload labels."
+    },
+    {
+      "family": "Fibers",
+      "disposition": "Owner-scoped lazy shared selector; physical feed/session workers own native cancellation and joins."
+    },
+    {
+      "family": "PubSub",
+      "disposition": "Not applicable to canonical synchronous external-store callbacks; changing delivery timing would break public behavior."
+    },
+    {
+      "family": "Queue",
+      "disposition": "No asynchronous admission queue required; ordered native pulls and canonical metadata authority retained."
+    },
+    {
+      "family": "Stream",
+      "disposition": "Native iterator establishment/pull/return scopes preserve lazy pulls, EOF/cursor/terminal/retry/content-frame semantics."
+    },
+    {
+      "family": "Clocks",
+      "disposition": "Effect sleep and deterministic TestClock where appropriate; native finite boundary timers retain required AbortSignal cleanup."
+    },
+    {
+      "family": "Concurrency",
+      "disposition": "Shared selection atomic handle commit; RcMap full keys, reentrant callback guards, post-digest pending capacity recheck; stateful traversal sequential."
+    },
+    {
+      "family": "Caching",
+      "disposition": "Only shared selection and physical complete-key feed authority; no TTL/capacity eviction of observation/replay authority."
+    },
+    {
+      "family": "Scheduling",
+      "disposition": "Existing bounded reconnect policy retained; no write retry, no new scheduling subsystem."
+    },
+    {
+      "family": "Scope",
+      "disposition": "Once-acquired public owners and physical feed/session lifetime; passive view factory avoids unnecessary per-view runtime."
+    },
+    {
+      "family": "RcMap",
+      "disposition": "Full transport/security/schema/protocol/resource key, zero TTL, explicit borrowed scopes; retired lookup loses authority before abort/final release."
+    },
+    {
+      "family": "AcquireRelease",
+      "disposition": "Native socket/iterator acquisition and eager content/refetch prefixes protect finalizer registration, use interruptible operations and exact once cleanup."
+    },
+    {
+      "family": "Testing",
+      "disposition": "32 Effect cases plus 46 Bun compatibility cases reported; own EOF original/helper review and 180-chain AST preservation; new/refactored domains @effect/vitest."
+    },
+    {
+      "family": "Traits",
+      "disposition": "No domain value requires new equality/hash traits beyond native canonical identity and complete sharing key."
+    },
+    {
+      "family": "Refs",
+      "disposition": "Shared feed view-count Ref and pure state/store snapshot authority; isolation retained without per-view fiber bookkeeping."
+    },
+    {
+      "family": "Configs",
+      "disposition": "Public configuration options remain caller authority; browser package does not introduce server environment configuration."
+    },
+    {
+      "family": "Platform Logger",
+      "disposition": "Browser compatibility forbids importing native platform logger; shared injectable runtime logger boundary retained."
+    }
+  ],
+  "resolvedFindings": [
+    "Shared first caller interruption no longer poisons owner selection; sibling/future and owner-close cases",
+    "Pending native socket acquisition explicitly interruptible; admitted/untransferred native socket finalization",
+    "Reentrant connecting disposal/disconnection cannot acquire after retirement",
+    "Temporary refetch acquisition prefix covered by acquireUseRelease",
+    "Eager named iterator transfer closes exactly once on interruption",
+    "Named content preserves exact pre-pull caller abort reason",
+    "Agent reconnect doubles legacy delay after normal EOF",
+    "Standalone continuation propagates owned signal",
+    "Standalone registry borrow and mutation settlement observation",
+    "Canonical .types companions and declaration merging authority preserved",
+    "Meaningful legacy helper, generic type/class, owner docs and checked usage fixtures",
+    "Native wait borrowed abort listener removed on settlement; baseline fixture inputs preserved"
+  ],
+  "authorReportedChecks": {
+    "effect": "32 tests in12 files,1.01s",
+    "compatibility": "46 tests in14 files,134 runtime expects,423ms",
+    "sourceBuild": "passed",
+    "strictTestTsc": "passed",
+    "legacyAssertions": "independent reviewer verified all180 authored outer expect chains retained,including51 original quality expectations"
+  },
+  "performance": {
+    "baseline": {
+      "p50": 6.941,
+      "p95": 10.029
+    },
+    "passiveOwnerCheckpoint": {
+      "p50": 27.174,
+      "p95": 31.456
+    },
+    "finalPublicBuilt": {
+      "p50": 27.555,
+      "p95": 31.206,
+      "samples": 25,
+      "warmups": 10,
+      "elapsedMs": 1026.732417,
+      "opened": 3500,
+      "returned": 3500,
+      "connectedLeases": 35000,
+      "disposedLeases": 35000,
+      "active": 0,
+      "peakActive": 100,
+      "operationCounts": {
+        "jobs.observe": 3500,
+        "jobs.watch.frames": 3500
+      }
+    },
+    "status": "material regression remains open,baseline parity not claimed"
+  },
+  "browserBundles": {
+    "baseline": {
+      "root": 145692,
+      "jobs": 20473,
+      "react": 422290,
+      "tanstack": 10477
+    },
+    "final": {
+      "root": 153819,
+      "jobs": 216594,
+      "react": 518066,
+      "tanstack": 10477
+    },
+    "provenance": "Bun1.3.10 minified targetbrowser; public-built workspace exports; React/Tanstack external; no node:/bun: imports or server/native agent packages",
+    "risk": "Jobs216594/20473=10.58x;required Effect Stream/RcMap/observation runtime closure remains material"
+  },
+  "limitations": [
+    "Public bare oRPC client has no mandatory disposal API; selected socket belongs to transport Layer until SDK transfer; persistent socket/reconnect belongs to unchanged oRPC SDK contract thereafter.",
+    "WebCrypto cancellation cannot stop already-running native digest; result authority is dropped before dispatch.",
+    "Native SDK pull cancellation requires provided AbortSignal; acquired prefix and pending return/throw cancellation are covered by real Bun fixtures.",
+    "Effect vendor checkout is sparse and lacks core implementations/tests; installed pinnedrc.115 implementation and embedded examples plus focused owner tests were verified."
+  ],
+  "independentVendorEvidence": {
+    "effect": "Installed 4.0.0-rc.115 implementations/embedded examples for selected Context/Layer/Scope/RcMap/Ref/Deferred/Fiber/Stream/tryPromise/acquireRelease/Mask/Metric/Logger/Schema patterns verified; local repos/effect sparse core test gap disclosed.",
+    "orpc": "Installed @orpc/client 2.0.0-beta.31 source fetch/websocket/native traceAsyncIterator examined through EOF; official oRPC Effect guide read; SDK transport behavior retained."
+  },
+  "architectureExceptions": [
+    "Passive external-store view handles retain synchronous snapshots/control contract, physical feed services own Effect native workflows.",
+    "Pure collection/projection/keys/imperative React/native boundary callbacks remain direct when no Effect lifecycle is added.",
+    "Legacy Bun compatibility suites retained; refactored quality suites migrated to @effect/vitest; new domain tests use @effect/vitest.",
+    "Type-only compatibility entry modules and augmentation declarations retain original identity intentionally."
+  ],
+  "openAcceptanceRisks": [
+    "Watch p50/p95 27.555/31.206ms vs 6.941/10.029 baseline, material regression; no parity claim.",
+    "Jobs public browser bundle 216594 bytes vs 20473 baseline (10.58x), material regression; no bundle parity claim.",
+    "Root owns remaining whole-change integration/demo/performance acceptance."
+  ],
+  "documentationTagAmendment": {
+    "reviewedUtc": "2026-10-03T18:40:55.162007+00:00",
+    "path": "packages/client/src/transport.ts",
+    "previousAcceptedSha256": "0ff9346496622cd0bc687589a9dd4339375ce897a5203feb3dc9501ab9f334e3",
+    "sha256": "5905f7edf6243621b4cc5dc364df3e1e1030197066c01b21550c8f2381d02b8a",
+    "read": "EOF",
+    "accepted": true,
+    "proof": "Removing only restored baseline createClient @category Client/@since0.1.0 tags exactly reconstructs previous accepted hash; no code/assertion changes. All169 current hashes match."
+  }
+}
