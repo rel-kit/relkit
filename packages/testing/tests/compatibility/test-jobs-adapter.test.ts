@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { stableIdentityTuple } from "@relkit/jobs";
 import type { NativeSubmission } from "@relkit/jobs/adapter";
-import { createDeterministicJobsAdapter } from "./src/test-jobs-adapter.ts";
+import { createDeterministicJobsAdapter } from "../fixtures/owned-compatibility.ts";
 
 const context = {
   signal: new AbortController().signal,
@@ -67,6 +67,12 @@ test("makes cancel race and unknown write outcomes explicit", async () => {
   });
 });
 
+/**
+ * Supplies one deterministic native submission and its original identity evidence.
+ * @param value - Input value used by the acceptance tuple and deduplication key.
+ * @param operationId - Caller-owned operation identity forwarded without replacement.
+ * @returns The native submission fixture; adapter assertions prove its expected behavior.
+ */
 function request(value: string, operationId: string): NativeSubmission {
   return {
     jobId: "jobs.test",
