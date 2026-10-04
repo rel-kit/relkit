@@ -1,0 +1,203 @@
+{
+  "root": "/tmp/relkit-core-consumers-job-held-39c7e6b8",
+  "candidate": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "cases": [
+    {
+      "mode": "return",
+      "status": "passed",
+      "nativeRequests": [
+        {
+          "path": "/rpc/jobs/heldJob/runs/watch",
+          "aborted": true,
+          "abortedAtMs": 1791060030895
+        }
+      ],
+      "receipt": {
+        "accepted": true,
+        "runId": "local-local-07248ef1-cc1e-4fff-8224-b9d700515f81",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.847Z"
+      },
+      "beforeDisconnect": {
+        "accepted": true,
+        "runId": "local-local-07248ef1-cc1e-4fff-8224-b9d700515f81",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.847Z",
+        "buildId": "1",
+        "service": "local",
+        "status": "running",
+        "observedAt": "2026-10-03T20:40:30.881Z",
+        "resultAvailability": "pending",
+        "attempt": 1,
+        "startedAt": "2026-10-03T20:40:30.851Z"
+      },
+      "firstFrameKind": "snapshot",
+      "afterDisconnect": {
+        "accepted": true,
+        "runId": "local-local-07248ef1-cc1e-4fff-8224-b9d700515f81",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.847Z",
+        "buildId": "1",
+        "service": "local",
+        "status": "running",
+        "observedAt": "2026-10-03T20:40:30.900Z",
+        "resultAvailability": "pending",
+        "attempt": 1,
+        "startedAt": "2026-10-03T20:40:30.851Z"
+      },
+      "final": {
+        "accepted": true,
+        "runId": "local-local-07248ef1-cc1e-4fff-8224-b9d700515f81",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.847Z",
+        "buildId": "1",
+        "service": "local",
+        "status": "completed",
+        "observedAt": "2026-10-03T20:40:30.915Z",
+        "resultAvailability": "available",
+        "output": {
+          "answer": "native worker completed after disconnect"
+        },
+        "attempt": 1,
+        "startedAt": "2026-10-03T20:40:30.851Z",
+        "completedAt": "2026-10-03T20:40:30.906Z"
+      },
+      "actualTaskExecutions": 1,
+      "actualNativeCommits": 1,
+      "freshlyReacquired": {
+        "accepted": true,
+        "runId": "local-local-07248ef1-cc1e-4fff-8224-b9d700515f81",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.847Z",
+        "buildId": "1",
+        "service": "local",
+        "inputHash": "sha256:66fef038e515412282cbea9aad6d93f6d3bf958e9fed05b1050302efa22831b3",
+        "acceptanceIdentity": "[{\"type\":\"string\",\"value\":\"held-jobs\"},{\"type\":\"string\",\"value\":\"test\"},{\"type\":\"string\",\"value\":\"public:held-jobs\"},{\"type\":\"string\",\"value\":\"acceptance.held-job\"},{\"type\":\"string\",\"value\":\"acceptance.held-task\"},{\"type\":\"string\",\"value\":\"1\"},{\"type\":\"string\",\"value\":\"1\"},{\"type\":\"string\",\"value\":\"3da1f7e5-ef01-4297-8b78-e6f901cbf8e0\"}]",
+        "scope": "public:held-jobs",
+        "status": "completed",
+        "observedAt": "2026-10-03T20:40:30.965Z",
+        "resultAvailability": "available",
+        "attempt": 1,
+        "startedAt": "2026-10-03T20:40:30.851Z",
+        "completedAt": "2026-10-03T20:40:30.906Z",
+        "output": {
+          "answer": "native worker completed after disconnect"
+        }
+      }
+    },
+    {
+      "mode": "abort",
+      "status": "passed",
+      "nativeRequests": [
+        {
+          "path": "/rpc/jobs/heldJob/runs/watch",
+          "aborted": true,
+          "abortedAtMs": 1791060030941
+        }
+      ],
+      "receipt": {
+        "accepted": true,
+        "runId": "local-local-6dbba12e-d043-45b3-b442-1ef1f7cdb3a9",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.920Z"
+      },
+      "beforeDisconnect": {
+        "accepted": true,
+        "runId": "local-local-6dbba12e-d043-45b3-b442-1ef1f7cdb3a9",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.920Z",
+        "buildId": "1",
+        "service": "local",
+        "status": "running",
+        "observedAt": "2026-10-03T20:40:30.937Z",
+        "resultAvailability": "pending",
+        "attempt": 1,
+        "startedAt": "2026-10-03T20:40:30.923Z"
+      },
+      "firstFrameKind": "snapshot",
+      "callerAbortProvedBeforeReturn": true,
+      "afterDisconnect": {
+        "accepted": true,
+        "runId": "local-local-6dbba12e-d043-45b3-b442-1ef1f7cdb3a9",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.920Z",
+        "buildId": "1",
+        "service": "local",
+        "status": "running",
+        "observedAt": "2026-10-03T20:40:30.944Z",
+        "resultAvailability": "pending",
+        "attempt": 1,
+        "startedAt": "2026-10-03T20:40:30.923Z"
+      },
+      "final": {
+        "accepted": true,
+        "runId": "local-local-6dbba12e-d043-45b3-b442-1ef1f7cdb3a9",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.920Z",
+        "buildId": "1",
+        "service": "local",
+        "status": "completed",
+        "observedAt": "2026-10-03T20:40:30.957Z",
+        "resultAvailability": "available",
+        "output": {
+          "answer": "native worker completed after disconnect"
+        },
+        "attempt": 1,
+        "startedAt": "2026-10-03T20:40:30.923Z",
+        "completedAt": "2026-10-03T20:40:30.948Z"
+      },
+      "actualTaskExecutions": 1,
+      "actualNativeCommits": 1,
+      "freshlyReacquired": {
+        "accepted": true,
+        "runId": "local-local-6dbba12e-d043-45b3-b442-1ef1f7cdb3a9",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:40:30.920Z",
+        "buildId": "1",
+        "service": "local",
+        "inputHash": "sha256:41c1d73e022de63838ef4a68dbcc1c6c4c37074047f3665dc5820d11c0bb02f8",
+        "acceptanceIdentity": "[{\"type\":\"string\",\"value\":\"held-jobs\"},{\"type\":\"string\",\"value\":\"test\"},{\"type\":\"string\",\"value\":\"public:held-jobs\"},{\"type\":\"string\",\"value\":\"acceptance.held-job\"},{\"type\":\"string\",\"value\":\"acceptance.held-task\"},{\"type\":\"string\",\"value\":\"1\"},{\"type\":\"string\",\"value\":\"1\"},{\"type\":\"string\",\"value\":\"c6111bcb-d334-4ec0-ad59-2db9c7130fb0\"}]",
+        "scope": "public:held-jobs",
+        "status": "completed",
+        "observedAt": "2026-10-03T20:40:30.967Z",
+        "resultAvailability": "available",
+        "attempt": 1,
+        "startedAt": "2026-10-03T20:40:30.923Z",
+        "completedAt": "2026-10-03T20:40:30.948Z",
+        "output": {
+          "answer": "native worker completed after disconnect"
+        }
+      }
+    }
+  ],
+  "claims": {
+    "realTestingApplication": true,
+    "realBunHttp": true,
+    "publicClientJobWatcher": true,
+    "actualEngineTaskExecutor": true,
+    "nativeDurableAdapter": true,
+    "manualFakeCompletion": false,
+    "durableStateReacquiredAfterOwnerClose": true,
+    "originalFixtureModified": false
+  }
+}

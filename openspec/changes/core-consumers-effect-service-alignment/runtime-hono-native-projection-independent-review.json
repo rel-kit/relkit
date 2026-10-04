@@ -1,0 +1,150 @@
+{
+  "reviewer": "client_baseline",
+  "author": "testing_baseline",
+  "status": "accepted final2-file correction; no outstanding findings",
+  "files": [
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/src/jobs/projection-validation.ts",
+      "sha256": "09d3ad93908e461f721e6df351c291358001eedcf785294a1fe545dfd0dfbf6e",
+      "lines": 210,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/tests/jobs-native-projection.test.ts",
+      "sha256": "c5b65889f2515fd3beaed1bd3bfc843b8940e83cbb9374c50cacfadd1782bae2",
+      "lines": 116,
+      "readEOF": true
+    }
+  ],
+  "eofAuthorities": [
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/submission-admission.ts",
+      "sha256": "ce3b25bd94ec4a1cd450d654a287477f6aa826d1766d2a44fe6ebcbd4fb4e5e9",
+      "lines": 161,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/identity.ts",
+      "sha256": "bad982327f24f765d2bddf2b19764321f88f68d2381781ba71f96b72dc3c8777",
+      "lines": 140,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/controls-write-operations.ts",
+      "sha256": "904387447476ce667d9b43b33249bf59f6ea60a68c559870e850f3b809b09c26",
+      "lines": 185,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/task-policy-basic.ts",
+      "sha256": "690e64d22d4e8506909c2efd8e1bb801f9557fdfe89a7f070bbd1c7b81b1059e",
+      "lines": 120,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/task-policy-value.ts",
+      "sha256": "10ab2940b8b7a4bc6f54706d287937a3afa45902c0c053ef313fe07f1bb04bad",
+      "lines": 129,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/trigger-validation.ts",
+      "sha256": "de01b4b60eef6b77f3e81eee39b8308948945903957e06182081fd05552cdf01",
+      "lines": 158,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/runtime.ts",
+      "sha256": "f1515762339a8fc7a4f65ad7d1d1ba5d68376a8a4e830f295a61578c4c2e9309",
+      "lines": 145,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/runtime-selection.ts",
+      "sha256": "9011047402282e85690fc4ce2875675aeebf8bfd5265e62b4411ddab844e47a4",
+      "lines": 50,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/src/jobs/handlers-validation.ts",
+      "sha256": "c33ed4d58086478566562f6375b09fe6b0eb2c04b1a3a7f98a6f7fcbadc2313d",
+      "lines": 166,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/src/jobs/projection.ts",
+      "sha256": "6333bfe176de08aa8a1722ef8ad1801ef191902e17f236cf530305c7d20dbac5",
+      "lines": 164,
+      "readEOF": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/providers-local/src/jobs/native-adapter-support.ts",
+      "sha256": "09115f0c1d515e0291c0410148ecf20c11a54eaedad6f32d3a472863a8dd1d9b",
+      "lines": 199,
+      "readEOF": true
+    }
+  ],
+  "scope": "Independent full current2-file EOF, original projection EOF/diff and actual admission/identity/retry/HTTP projection/native callers. No source edits or test/host runners by reviewer.",
+  "findings": [
+    {
+      "severity": "documentation",
+      "status": "resolved final comment precision; current source reread EOF",
+      "description": "Describe12521 as supported finite projection envelope for eight256-byte scalar components; admission/runtime constructors do not enforce every hidden namespace component globally. Bound and behavior accepted."
+    }
+  ],
+  "identityBound": {
+    "components": [
+      "application",
+      "environment",
+      "scope",
+      "jobId",
+      "taskId",
+      "taskVersion",
+      "buildId",
+      "idempotencyKey ?? operationId"
+    ],
+    "scalarAuthority": "TASK_KEY_MAX_BYTES256",
+    "fixedTupleSyntaxBytes": 233,
+    "worstEscapingFactor": 6,
+    "finiteAggregateBytes": 12521,
+    "arithmetic": "Independent JSON canonical typed-string tuple calculation verified233 bytes for eight empty-string wrappers and12521 for eight256-byte NUL strings. ASCII controls maximize escaped output perUTF8byte; UTF8 multibyte oversize test retained.",
+    "retry": "Public retryRunOperationEffect forwards retained acceptanceIdentity unchanged; neither projection nor retry hashes/strips/rewrites it. Arbitrary oversized runtime/custom native identities remain finite-guarded.",
+    "normative": "No new public constructor/signature/schema or normative field bound introduced; only this internal aggregate metadata field moves from scalar to finite composite envelope."
+  },
+  "parity": "Diff changes only TASK_KEY_MAX_BYTES import, documented aggregate constant, moving acceptanceIdentity from scalar loop into same boundedText with12521. All other scalar256 guards, cursor4096, statuses/output/availability/cancellation checks and original error translations remain unchanged. Original tests untouched.",
+  "newTests": "Real Local native provider/public submit/get/observe plus existing HTTP canonical validation/projectSnapshot/projectWatchFrame; actual native initial frame and queued identity. Escaped envelope maximum/ASCII+UTF8 oversize/nonstring+empty/corrupted status/output/scalar limits. No invented provider data, altered original descriptors or silent guard removal.",
+  "ownership": "Scope acquires temporary directory then provider before runtime construction; resource-free runtime close finalizer installed before submit. Iterator acquisition has native return finalizer; reverse order retires iterator/runtime/provider before directory. Already registered provider protects synchronous runtime construction failure. No accepted worker or detached pull started by this queued projection test.",
+  "organization": "Implementation210 and test116 lines, strict existing authority-derived RunSnapshot and public imports; no own barrel import/new named inline interface or changed public augmentation. Existing pure synchronous native validation boundary is retained.",
+  "applicableFamilies": {
+    "Service": "No new domain or constructor; pure retained boundary validation. Uses existing public domain APIs.",
+    "Schema": "Existing RunSnapshot authority and canonical z task schemas retained; no gratuitous stricter schema.",
+    "Tagged Errors": "Existing jobError codes unchanged.",
+    "Error Management": "Original failure translation/throw behavior unchanged; Effect.promise test rejects visibly.",
+    "Data": "Readonly native snapshots retained; canonical tuple verified.",
+    "Observability": "No independently callable domain workflow added to pure validator; original native domain telemetry stays.",
+    "Metrics": "No altered production observations or labels.",
+    "Tracing": "No altered spans/correlation.",
+    "Logs": "No altered sinks/error redaction.",
+    "Fibers": "No new worker/fiber; native queued provider fixture scoped.",
+    "PubSub": "Native observe unchanged.",
+    "Queue": "No new queue.",
+    "Stream": "Actual native AsyncIterator borrowed and returned; no new Stream workflow needed.",
+    "Clocks": "No sleeps/time policy introduced.",
+    "Concurrency": "Finite test operations sequential; no detached acquisition/work.",
+    "Caching": "No cache.",
+    "Scheduling": "No retry schedule change.",
+    "Scope": "Existing Effect.scoped owns all fixture resources.",
+    "RcMap": "No keyed sharing added.",
+    "AcquireRelease": "Temp/provider/iterator acquisitions have installed release finalizers; runtime resource-free wrapper has addFinalizer. Reviewed existing approved rc115 pattern reused.",
+    "Testing": "@effect/vitest it.effect plus synchronous pure assertions; real Bun native provider boundary, original suites retained.",
+    "Traits": "No custom equality/hash/fluent protocol.",
+    "Refs": "No mutable service state introduced.",
+    "Configs": "Finite compile-time aggregate bound from existing scalar authority; no credential/environment setting.",
+    "Platform Logger": "No new file/export sink."
+  },
+  "upstreamEvidence": "Reuses previously independently inspected Effect4.0.0-rc.115 acquireRelease/addFinalizer/scoped/gen/promise/sync and @effect/vitest patterns (vendor implementation/tests/examples plus installed pin checked during phase2/3/6). No new Effect capability or unsupported API introduced by this amendment.",
+  "validation": "Parent reports Hono43files137cases1gatedskip, strict/format and full58-package build passed. Actual held Job probe2/2 exit0 nativeExitCode0 runnerTimedOutfalse independently verified in referenced actualAcceptanceProof; both original authored IDs and original assertion workflows retained. Reviewer started no host/test runner.",
+  "secondaryReview": "/tmp/relkit-hono-projection-assembly-secondary-review.json",
+  "actualAcceptanceProof": "/tmp/relkit-job-held-probe-independent-review.json",
+  "commentAmendmentProof": "Replacing only final3-line precision comment with prior3 lines exactly reconstructs accepted source50ba58d3. Tests remain unchangedc5b65889; no behavior/test/build invalidation."
+}

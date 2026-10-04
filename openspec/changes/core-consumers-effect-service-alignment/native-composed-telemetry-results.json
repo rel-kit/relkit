@@ -1,0 +1,126 @@
+{
+  "root": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "ownedRoot": "/tmp/relkit-phase7-telemetry-B6eZLD",
+  "imports": "Candidate public built exports and installed public dependencies",
+  "status": "passed",
+  "standalone": {
+    "clientRpcMetricDelta": 1,
+    "inspectorListMetricDelta": 1,
+    "inspectorOutcomes": [
+      {
+        "domain": "inspector",
+        "operation": "observability.list",
+        "outcome": "success"
+      }
+    ],
+    "proxyOutcomes": [],
+    "items": 1
+  },
+  "composed": {
+    "clientRpcMetricDelta": 1,
+    "inspectorListMetricDelta": 1,
+    "inspectorOutcomes": [
+      {
+        "domain": "inspector",
+        "operation": "observability.list",
+        "outcome": "success"
+      }
+    ],
+    "proxyOutcomes": [
+      {
+        "domain": "supervisor",
+        "operation": "proxy.request",
+        "outcome": "success"
+      }
+    ],
+    "items": 1
+  },
+  "inspectorMetrics": {
+    "list": 2,
+    "open": 1,
+    "subscribe": 1,
+    "registry": "Public suppliedOwner injection"
+  },
+  "supervisorMetricVisibility": {
+    "verified": false,
+    "reason": "SupervisorProxy owns a private isolated MetricRegistry with no public injection or read API; exact configured logger outcomes are verified separately."
+  },
+  "noRecursion": {
+    "sourceRecords": 1,
+    "cursor": "1",
+    "published": 1,
+    "subscribersAfterEof": 0
+  },
+  "childContext": {
+    "nativeRpcCalls": 2,
+    "exactMessages": [
+      "child visible",
+      "parent visible",
+      "child visible",
+      "parent visible"
+    ],
+    "inheritedRequestId": true,
+    "privateTokenAbsent": true
+  },
+  "cleanup": [
+    {
+      "label": "reader",
+      "status": "joined"
+    },
+    {
+      "label": "proxy",
+      "status": "joined"
+    },
+    {
+      "label": "inspector",
+      "status": "joined"
+    },
+    {
+      "label": "testing",
+      "status": "joined"
+    },
+    {
+      "label": "observability",
+      "status": "joined"
+    }
+  ],
+  "testingOutcomes": [
+    {
+      "domain": "testing",
+      "operation": "http.listen",
+      "outcome": "success"
+    },
+    {
+      "domain": "testing",
+      "operation": "http.close",
+      "outcome": "success"
+    }
+  ],
+  "proxyOutcomes": [
+    {
+      "domain": "supervisor",
+      "operation": "proxy.switch",
+      "outcome": "success"
+    },
+    {
+      "domain": "supervisor",
+      "operation": "proxy.request",
+      "outcome": "success"
+    },
+    {
+      "domain": "supervisor",
+      "operation": "proxy.request",
+      "outcome": "success"
+    },
+    {
+      "domain": "supervisor",
+      "operation": "proxy.stop",
+      "outcome": "success"
+    }
+  ],
+  "testingMetrics": {
+    "listen": 1,
+    "close": 1,
+    "registry": "Fresh child default registry"
+  }
+}
