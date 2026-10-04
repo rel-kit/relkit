@@ -1,3 +1,9 @@
+import type {
+  NativeRetryFixtureResponse,
+  PageResponse,
+  RunIdentity,
+} from "../fixtures/json.types.ts";
+import { nativeFixture, responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
 import type { RunPage, RunSnapshot } from "@relkit/contracts/jobs";
@@ -6,7 +12,7 @@ import {
   installInspectorEndpoints,
   type InspectorJobsBinding,
   type InspectorJobsServices,
-} from "./src/index.ts";
+} from "../../src/index.ts";
 
 const graph = {
   appId: "jobs-test",
@@ -41,6 +47,14 @@ const graph = {
   edges: [],
 };
 
+/**
+ * Creates the original native run snapshot used to test stable aggregate ordering.
+ * @param runId - Existing native run identity.
+ * @param acceptedAt - Native acceptance timestamp controlling merge order.
+ * @param service - Owning native service identity.
+ * @param status - Existing lifecycle status and result availability selector.
+ * @returns The unchanged run fixture snapshot.
+ */
 function run(
   runId: string,
   acceptedAt: string,
@@ -62,6 +76,12 @@ function run(
   } as RunSnapshot;
 }
 
+/**
+ * Creates the original native page and exact count metadata.
+ * @param items - Ordered native run fixtures.
+ * @param nextCursor - Optional original native continuation cursor.
+ * @returns The unchanged page receipt.
+ */
 function page(items: readonly RunSnapshot[], nextCursor?: string): RunPage<RunSnapshot> {
   return {
     items,
@@ -72,6 +92,11 @@ function page(items: readonly RunSnapshot[], nextCursor?: string): RunPage<RunSn
   };
 }
 
+/**
+ * Installs a native jobs authority on the existing fixture generation.
+ * @param jobs - Native bindings and optional Inspector privilege authority.
+ * @returns The fixture router with the unchanged graph identity.
+ */
 function app(jobs: InspectorJobsServices): Hono {
   const value = new Hono();
   installInspectorEndpoints(value, {
@@ -80,6 +105,12 @@ function app(jobs: InspectorJobsServices): Hono {
   return value;
 }
 
+/**
+ * Creates the existing native binding around a replaceable list authority.
+ * @param service - Owning service identity.
+ * @param list - Assertion-specific native page function.
+ * @returns The unchanged binding, including intentionally minimal retry receipts.
+ */
 function binding(service: string, list: InspectorJobsBinding["list"]): InspectorJobsBinding {
   return {
     service,
@@ -88,10 +119,19 @@ function binding(service: string, list: InspectorJobsBinding["list"]): Inspector
     list,
     get: async (runId) => run(runId, "2026-09-17T00:00:00.000Z", service),
     cancel: async (runId, operationId) => ({ runId, operationId, outcome: "requested" }),
-    retry: async (runId) => run(`${runId}-retry`, "2026-09-17T00:00:00.000Z", service) as never,
+    retry: async (runId) =>
+      nativeFixture<NativeRetryFixtureResponse>(
+        run(`${runId}-retry`, "2026-09-17T00:00:00.000Z", service),
+      ),
   };
 }
 
+/**
+ * Adds the original native schedule capabilities to a jobs binding.
+ * @param service - Owning service identity.
+ * @param list - Assertion-specific native schedule page function.
+ * @returns The unchanged native schedule binding.
+ */
 function scheduleBinding(
   service: string,
   list: NonNullable<InspectorJobsBinding["schedules"]>["list"],
@@ -116,7 +156,7 @@ describe("Inspector jobs API", () => {
     } satisfies InspectorJobsServices;
     const response = await app(jobs).request(`${API_BASE_PATH}/jobs/definitions?limit=1`);
     expect(response.status).toBe(200);
-    expect((await response.json()).items[0]).toMatchObject({
+    expect((await responseJson<PageResponse>(response)).items[0]).toMatchObject({
       name: "orders",
       taskId: "task.orders",
       health: "unknown",
@@ -136,6 +176,11 @@ describe("Inspector jobs API", () => {
         run("b-2", "2026-09-17T00:00:00.000Z", "secondary"),
       ],
     };
+    /**
+     * Retains both original native pages for consumed-row continuation assertions.
+     * @param service - Fixture service whose stored runs are returned.
+     * @returns The original list function with unchanged cursor behavior.
+     */
     const makeList =
       (service: keyof typeof values): InspectorJobsBinding["list"] =>
       async (query) =>
@@ -148,12 +193,12 @@ describe("Inspector jobs API", () => {
     } satisfies InspectorJobsServices;
     const server = app(jobs);
     const first = await server.request(`${API_BASE_PATH}/jobs/runs?limit=1`);
-    const firstBody = await first.json();
-    expect(firstBody.items[0].runId).toBe("a-1");
+    const firstBody = await responseJson<PageResponse<RunIdentity>>(first);
+    expect(firstBody.items[0]!.runId).toBe("a-1");
     const second = await server.request(
       `${API_BASE_PATH}/jobs/runs?limit=1&cursor=${firstBody.nextCursor}`,
     );
-    expect((await second.json()).items[0].runId).toBe("b-1");
+    expect((await responseJson<PageResponse<RunIdentity>>(second)).items[0]!.runId).toBe("b-1");
     const changed = await server.request(
       `${API_BASE_PATH}/jobs/runs?limit=1&status=running&cursor=${firstBody.nextCursor}`,
     );
@@ -181,9 +226,10 @@ describe("Inspector jobs API", () => {
       },
     }).request(`${API_BASE_PATH}/jobs/runs`);
     expect(thrown.status).toBe(403);
-    const allowed = app({ ...jobs, authorize: undefined });
+    const { authorize: _authorize, ...unauthorizedJobs } = jobs;
+    const allowed = app(unauthorizedJobs);
     const response = await allowed.request(`${API_BASE_PATH}/jobs/runs?limit=1`);
-    const body = await response.json();
+    const body = await responseJson<PageResponse>(response);
     expect(response.status).toBe(200);
     expect(body.availability).toContainEqual({
       service: "down",
@@ -207,7 +253,7 @@ describe("Inspector jobs API", () => {
       ],
     } satisfies InspectorJobsServices;
     const response = await app(jobs).request(`${API_BASE_PATH}/jobs/runs`);
-    const body = await response.json();
+    const body = await responseJson<PageResponse>(response);
     expect(response.status).toBe(200);
     expect(body.partial).toBe(true);
     expect(body.count).toBeUndefined();
@@ -236,11 +282,11 @@ describe("Inspector jobs API", () => {
     } satisfies InspectorJobsServices;
     const server = app(jobs);
     const first = await server.request(`${API_BASE_PATH}/jobs/schedules?limit=1`);
-    const firstBody = await first.json();
+    const firstBody = await responseJson<PageResponse>(first);
     const second = await server.request(
       `${API_BASE_PATH}/jobs/schedules?limit=1&cursor=${firstBody.nextCursor}`,
     );
-    const secondBody = await second.json();
+    const secondBody = await responseJson<PageResponse>(second);
     expect(firstBody.hasMore).toBe(true);
     expect(secondBody.items).toEqual([{ schedule: { id: "secondary-2" }, service: "secondary" }]);
     expect(calls.primary).toEqual(["first"]);
