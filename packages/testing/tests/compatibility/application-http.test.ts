@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
 import { defineError, defineFunction } from "@relkit/functions";
 import { z } from "@relkit/schema";
-import { handleTestRequest } from "./src/application-http.ts";
-import { createTestRuntime, type TestRuntime } from "./src/runtime.ts";
-import type { TestRoute } from "./src/application-routes.ts";
+import { handleTestRequest } from "../../src/application-http.ts";
+import { createTestRuntime, type TestRuntime } from "../../src/runtime.ts";
+import type { TestRoute } from "../../src/application-routes.ts";
 test("maps inferred declared errors in the in-process HTTP harness", async () => {
   const unavailable = defineError({
     id: "orders.unavailable",
