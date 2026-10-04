@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { RealtimeManager, type RealtimeStatus } from "./src/react/realtime-manager.ts";
+import { RealtimeManager, type RealtimeStatus } from "../../src/react/realtime-manager.ts";
 
 test("reports connection failures to the channel status listener", async () => {
   const manager = new RealtimeManager({
