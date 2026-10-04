@@ -9,11 +9,17 @@ import {
   type ToolEngine,
   type ToolEngineInvocation,
 } from "@relkit/tools";
-import { createTestAgent } from "./src/index.ts";
-import type { TestAgentModelOptions, TestModelTurn } from "./src/index.ts";
+import { createTestAgent } from "../fixtures/owned-compatibility.ts";
+import type { TestAgentModelOptions, TestModelTurn } from "../../src/index.ts";
 
-export type TargetFailure = "declared" | "defect";
+import type { TargetFailure } from "./agent-matrix-helpers.types.ts";
+export type { TargetFailure } from "./agent-matrix-helpers.types.ts";
 
+/**
+ * Defines one tool-enabled agent and captures its unchanged native engine requests.
+ * @param options - Approval policy, execution limits, side effect, and native failure branch.
+ * @returns Agent/tool/function descriptors, declared error constructor, and captured invocations.
+ */
 export function makeFixture(
   options: {
     readonly approval?: "never" | "on-write" | "always";
@@ -74,6 +80,13 @@ export function makeFixture(
   return { agent, target, tool, unavailable, engine, invocations };
 }
 
+/**
+ * Supplies a deterministic tool call followed by the matrix's successful final answer.
+ * @param toolId - Declared tool identifier forwarded to the scripted model.
+ * @param input - Native JSON tool input retained without schema coercion.
+ * @param answer - Final answer expected by the compatibility assertions.
+ * @returns The ordered native model turns.
+ */
 export function scriptedToolCall(
   toolId: string,
   input: JsonValue = { id: "1" },
@@ -85,6 +98,13 @@ export function scriptedToolCall(
   ];
 }
 
+/**
+ * Acquires an agent owner tracked by the shared compatibility afterEach cleanup.
+ * @param fixture - Native descriptors and default engine supplied by makeFixture.
+ * @param script - Ordered native turns used for this isolated model owner.
+ * @param options - Explicit approval, engine, size limits, model policy, or tool overrides.
+ * @returns The native test agent facade registered for failure-safe cleanup.
+ */
 export function harness(
   fixture: ReturnType<typeof makeFixture>,
   script: readonly TestModelTurn[],
@@ -109,10 +129,20 @@ export function harness(
   });
 }
 
+/**
+ * Reads the retained tool response observed by the model's second request.
+ * @param agent - Native harness whose captured model calls remain assertion authority.
+ * @returns The final message of that request, or undefined before it is captured.
+ */
 export function toolMessage(agent: ReturnType<typeof harness>): unknown {
   return agent.model.calls[1]?.request.messages.at(-1);
 }
 
+/**
+ * Adapts the matrix's native function descriptor to the production invocation engine.
+ * @param target - Known fixture descriptor cast to the native invocation contract.
+ * @returns An engine forwarding source, signal, timeout, and parent without transformation.
+ */
 export function engineForTarget(target: unknown): ToolEngine {
   const invocationTarget = target as InvocationTarget;
   return {

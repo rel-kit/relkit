@@ -3,8 +3,13 @@ import { defineAgent } from "@relkit/agents";
 import { defineFunction } from "@relkit/functions";
 import { z } from "@relkit/schema";
 import { defineTool } from "@relkit/tools";
-import { createTestAgent } from "./src/index.ts";
+import { createTestAgent } from "../fixtures/owned-compatibility.ts";
 
+/**
+ * Acquires one tracked agent with a writable tool and deterministic model turns.
+ * @param approval - Initial decision policy; omitted values retain the native default.
+ * @returns The owned agent facade and ordered native engine invocation evidence.
+ */
 function setup(approval?: "approved" | "pending") {
   const target = defineFunction({
     id: "orders.lookup",
@@ -39,7 +44,7 @@ function setup(approval?: "approved" | "pending") {
           return { state: "ready" };
         },
       },
-      approval,
+      ...(approval === undefined ? {} : { approval }),
       script: [
         { type: "tool-call", callId: "call-1", toolId: tool.id, input: { id: "1" } },
         { type: "final", output: { answer: "ready" } },
@@ -72,7 +77,7 @@ describe("testing agent harness", () => {
     await expect(run).resolves.toEqual({ answer: "ready" });
 
     const failed = setup("approved");
-    failed.agent.failures.once("model.after-tool-call");
+    failed.agent.failures.once!("model.after-tool-call");
     await expect(failed.agent.invoke({ question: "change" })).resolves.toEqual({ answer: "ready" });
   });
 });
