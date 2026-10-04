@@ -3,6 +3,10 @@ import { workspacePackageDirectories } from "./workspace-packages.js";
 
 const root = resolve(import.meta.dir, "..");
 
+/** Discovers every authored package suite without duplicate paths or generated output.
+ * @param repositoryRoot - Workspace root containing publishable package directories.
+ * @returns Deterministically ordered test paths relative to that root.
+ */
 export function packageTestFiles(repositoryRoot: string): string[] {
   const files = new Set<string>();
   for (const directory of workspacePackageDirectories(repositoryRoot))
@@ -17,6 +21,10 @@ export function packageTestFiles(repositoryRoot: string): string[] {
   return [...files].sort();
 }
 
+/** Runs unchanged suites with one Vitest worker and serial Bun runner groups.
+ * @param environment - Parent configuration; opt-in AWS and Docker probes remain disabled here.
+ * @returns After all Vitest and Bun owners settle, rejecting any failed group.
+ */
 export async function runPackageTests(environment: NodeJS.ProcessEnv = process.env): Promise<void> {
   const files = packageTestFiles(root);
   if (files.length === 0) throw new Error("No package tests were discovered.");
@@ -39,16 +47,28 @@ export async function runPackageTests(environment: NodeJS.ProcessEnv = process.e
     RELKIT_TEST_DOCKER: "0",
   };
   if (vitestFiles.length > 0)
-    await runTests([process.execPath, "x", "vitest", "run", ...vitestFiles], testEnvironment);
-  const runs = [cliFiles, otherFiles]
-    .filter((group) => group.length > 0)
-    .map((group) =>
-      runTests([process.execPath, "test", "--reporter=dot", ...group], testEnvironment),
+    await runTests(
+      [
+        process.execPath,
+        "x",
+        "vitest",
+        "run",
+        "--maxWorkers=1",
+        "--disableConsoleIntercept",
+        ...vitestFiles,
+      ],
+      testEnvironment,
     );
-  const results = await Promise.allSettled(runs);
-  for (const result of results) if (result.status === "rejected") throw result.reason;
+  for (const group of [cliFiles, otherFiles])
+    if (group.length > 0)
+      await runTests([process.execPath, "test", "--reporter=dot", ...group], testEnvironment);
 }
 
+/** Joins a native runner and retains its existing nonzero-exit failure contract.
+ * @param command - Pinned executable and complete suite arguments.
+ * @param environment - Explicit offline runner environment.
+ * @returns After native process exit; no test assertion or deadline is changed.
+ */
 async function runTests(command: string[], environment: NodeJS.ProcessEnv): Promise<void> {
   const child = Bun.spawn(command, {
     cwd: root,
