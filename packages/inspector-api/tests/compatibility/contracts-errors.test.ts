@@ -1,8 +1,10 @@
+import type { ErrorResponse } from "../fixtures/json.types.ts";
+import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { createObservabilityStream } from "@relkit/observability";
 import { Hono } from "hono";
-import { installInspectorEndpoints } from "./src/index.ts";
+import { installInspectorEndpoints } from "../../src/index.ts";
 import {
   expectResponse,
   identity,
@@ -21,7 +23,9 @@ describe("inspector invalid and unavailable contracts", () => {
     ]) {
       const response = await app.request(API_BASE_PATH + "/graph", { headers });
       expectResponse(response, 400);
-      expect((await response.json()).error).toBe("RELKIT_INSPECTOR_API_VERSION_UNSUPPORTED");
+      expect((await responseJson<ErrorResponse>(response)).error).toBe(
+        "RELKIT_INSPECTOR_API_VERSION_UNSUPPORTED",
+      );
     }
     expectResponse(await app.request(API_BASE_PATH + "/graph?protocol=wrong"), 400);
     expectResponse(
@@ -46,7 +50,9 @@ describe("inspector invalid and unavailable contracts", () => {
       idempotencyKey: "malformed-id",
     });
     expectResponse(invalidAction, 400);
-    expect((await invalidAction.json()).error).toBe("RELKIT_INSPECTOR_ACTION_TARGET_INVALID");
+    expect((await responseJson<ErrorResponse>(invalidAction)).error).toBe(
+      "RELKIT_INSPECTOR_ACTION_TARGET_INVALID",
+    );
   });
 
   test("returns unavailable-generation contracts without invoking services", async () => {
@@ -71,6 +77,8 @@ describe("inspector invalid and unavailable contracts", () => {
       idempotencyKey: "unavailable-generation",
     });
     expectResponse(action, 503);
-    expect((await action.json()).error).toBe("RELKIT_INSPECTOR_ACTION_GENERATION_UNAVAILABLE");
+    expect((await responseJson<ErrorResponse>(action)).error).toBe(
+      "RELKIT_INSPECTOR_ACTION_GENERATION_UNAVAILABLE",
+    );
   });
 });

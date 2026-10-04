@@ -2,8 +2,19 @@ export const identity = { generationId: "generation-one", graphHash: "sha256:one
 export const secret = "raw-inspector-secret";
 let forbiddenReads = 0;
 
+/**
+ * Creates stored declaration source evidence for projection assertions.
+ * @param file - Existing relative fixture source path.
+ * @returns The unchanged first-line source location.
+ */
 const source = (file: string) => ({ file, line: 1, column: 1 });
 
+/**
+ * Adds private accessor traps without changing the stored public fixture fields.
+ * @typeParam T - Original record shape retained for fixture consumers.
+ * @param value - Fixture record whose forbidden properties must never be read.
+ * @returns The same record with getter traps that count forbidden reads.
+ */
 export function poison<T extends Record<string, unknown>>(value: T): T {
   for (const key of ["handler", "providerFile"]) {
     Object.defineProperty(value, key, {
@@ -126,6 +137,7 @@ export const graph = {
   ],
 };
 
+/** @returns The total private accessor reads detected by fixture traps. */
 export function getForbiddenReads(): number {
   return forbiddenReads;
 }
