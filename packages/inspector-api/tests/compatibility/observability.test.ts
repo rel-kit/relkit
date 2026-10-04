@@ -1,3 +1,5 @@
+import type { NativeQueryFixtureResponse, ObservabilityResponse } from "../fixtures/json.types.ts";
+import { nativeFixture, responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -15,7 +17,7 @@ import {
   installObservabilityEndpoints,
   installInspectorEndpoints,
   ObservabilityEndpointConfigurationError,
-} from "./src/index.ts";
+} from "../../src/index.ts";
 
 const queryProtocol = "relkit.observability.query" as const;
 const query: ObservabilityQuery = {
@@ -24,12 +26,22 @@ const query: ObservabilityQuery = {
   traces: async () => ({ protocol: queryProtocol, version: 1, items: [] }),
   request: async (requestId) =>
     requestId === "request-1"
-      ? ({ protocol: queryProtocol, version: 1, request: { requestId }, records: [] } as never)
+      ? nativeFixture<NativeQueryFixtureResponse<"request">>({
+          protocol: queryProtocol,
+          version: 1,
+          request: { requestId },
+          records: [],
+        })
       : undefined,
   log: async () => undefined,
   trace: async (traceId) =>
     traceId === "trace-1"
-      ? ({ protocol: queryProtocol, version: 1, spans: [], records: [] } as never)
+      ? nativeFixture<NativeQueryFixtureResponse<"trace">>({
+          protocol: queryProtocol,
+          version: 1,
+          spans: [],
+          records: [],
+        })
       : undefined,
 };
 
@@ -49,7 +61,11 @@ describe("inspector observability endpoints", () => {
       `${API_BASE_PATH}/requests?limit=1000&cursor=1&severity=error&routeId=orders.create&serviceId=orders`,
     );
     expect(page.status).toBe(200);
-    expect(await page.json()).toMatchObject({ protocol: queryProtocol, version: 1, items: [] });
+    expect(await responseJson<ObservabilityResponse>(page)).toMatchObject({
+      protocol: queryProtocol,
+      version: 1,
+      items: [],
+    });
     expect(seen[0]).toMatchObject({
       limit: 100,
       cursor: "1",
@@ -59,12 +75,14 @@ describe("inspector observability endpoints", () => {
 
     const detail = await service.request(`${API_BASE_PATH}/requests/request-1`);
     expect(detail.status).toBe(200);
-    expect(await detail.json()).toMatchObject({ request: { requestId: "request-1" } });
+    expect(await responseJson<ObservabilityResponse>(detail)).toMatchObject({
+      request: { requestId: "request-1" },
+    });
     expect((await service.request(`${API_BASE_PATH}/traces/unknown`)).status).toBe(404);
 
     const invalid = await service.request(`${API_BASE_PATH}/logs?cursor=not-a-cursor`);
     expect(invalid.status).toBe(400);
-    expect(await invalid.json()).toMatchObject({
+    expect(await responseJson<ObservabilityResponse>(invalid)).toMatchObject({
       error: "RELKIT_OBSERVABILITY_QUERY_INVALID",
     });
   });
@@ -255,13 +273,13 @@ describe("inspector observability endpoints", () => {
       });
       const [requests, traces, logs, metadata] = await Promise.all(
         ["requests", "traces", "logs", "runtime"].map(async (path) =>
-          (await app.request(`${API_BASE_PATH}/${path}`)).json(),
+          responseJson<ObservabilityResponse>(await app.request(`${API_BASE_PATH}/${path}`)),
         ),
       );
-      expect(requests.items).toHaveLength(1);
-      expect(traces.items).toHaveLength(1);
-      expect(logs.items).toHaveLength(1);
-      expect(metadata.telemetry).toMatchObject({
+      expect(requests!.items).toHaveLength(1);
+      expect(traces!.items).toHaveLength(1);
+      expect(logs!.items).toHaveLength(1);
+      expect(metadata!.telemetry).toMatchObject({
         counters: { persisted: 3, sampledOut: 3, exportSelected: 0 },
         exporters: [{ name: "broken", healthy: true, received: 3, failures: 0 }],
       });

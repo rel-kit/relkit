@@ -1,17 +1,19 @@
-import { canonicalJson } from "@relkit/contracts";
+import type { StreamRequest } from "./observability-utils.types.js";
 import {
   MAX_OBSERVABILITY_QUERY_LIMIT,
   ObservabilityQueryError,
   OBSERVABILITY_STREAM_EVENT_TYPES,
   ObservabilityStreamError,
   type ObservabilityQueryRequest,
-  type ObservabilityStream,
-  type ObservabilityStreamEvent,
   type ObservabilityStreamEventType,
   type ObservabilityStreamOverflow,
-  type ObservabilityStreamSubscriptionOptions,
 } from "@relkit/observability";
 
+/**
+ * Validates the supported bounded observation query parameters.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @returns A native query request preserving existing invalid-filter errors.
+ */
 export function readObservabilityQuery(request: Request): ObservabilityQueryRequest {
   const params = new URL(request.url).searchParams;
   const value: Record<string, string | number> = {};
@@ -49,13 +51,12 @@ export function readObservabilityQuery(request: Request): ObservabilityQueryRequ
   return value as unknown as ObservabilityQueryRequest;
 }
 
-type StreamRequest = Omit<ObservabilityStreamSubscriptionOptions, "overflow" | "backpressure"> & {
-  readonly overflow?: ObservabilityStreamOverflow;
-  readonly backpressure?: ObservabilityStreamOverflow;
-  readonly type?: ObservabilityStreamEventType;
-};
-
-function readStreamOptions(request: Request): StreamRequest {
+/**
+ * Validates stream replay and event-type selectors before subscribing.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @returns Native subscription options preserving existing cursor errors.
+ */
+export function readStreamOptions(request: Request): StreamRequest {
   const params = new URL(request.url).searchParams;
   const cursor = params.get("cursor");
   const afterCursor = params.get("afterCursor");
@@ -90,93 +91,25 @@ function readStreamOptions(request: Request): StreamRequest {
   return result;
 }
 
-export function streamResponse(
-  stream: ObservabilityStream,
-  request: Request,
-  apiVersion: number,
-  heartbeatIntervalMs = 5_000,
-): Response {
-  const input = readStreamOptions(request);
-  const type = input.type;
-  const subscriptionOptions: ObservabilityStreamSubscriptionOptions = {
-    ...(input.cursor === undefined ? {} : { cursor: input.cursor }),
-    ...(input.afterCursor === undefined ? {} : { afterCursor: input.afterCursor }),
-    ...(input.queueSize === undefined ? {} : { queueSize: input.queueSize }),
-    ...(input.overflow === undefined ? {} : { overflow: input.overflow }),
-    ...(input.backpressure === undefined ? {} : { backpressure: input.backpressure }),
-  };
-  const subscription = stream.subscribe(subscriptionOptions);
-  let closed = false;
-  let connected = false;
-  let heartbeat: ReturnType<typeof setInterval> | undefined;
-  const encoder = new TextEncoder();
-  const close = (): void => {
-    if (closed) return;
-    closed = true;
-    clearInterval(heartbeat);
-    subscription.close();
-    request.signal.removeEventListener("abort", close);
-  };
-  request.signal.addEventListener("abort", close, { once: true });
-  const body = new ReadableStream<Uint8Array>({
-    start(controller) {
-      if (request.signal.aborted) {
-        close();
-        controller.close();
-        return;
-      }
-      // SSE comments keep idle connections alive without changing replay cursors.
-      heartbeat = setInterval(() => {
-        if (!closed && (controller.desiredSize ?? 0) > 0)
-          controller.enqueue(encoder.encode(": heartbeat\n\n"));
-      }, heartbeatIntervalMs);
-    },
-    async pull(controller) {
-      try {
-        if (!connected) {
-          connected = true;
-          controller.enqueue(encoder.encode(": connected\n\n"));
-          return;
-        }
-        while (!closed) {
-          const result = await subscription.next();
-          if (closed) return;
-          if (result.done) {
-            close();
-            controller.close();
-            return;
-          }
-          if (type !== undefined && result.value.type !== type) continue;
-          controller.enqueue(encoder.encode(eventFrame(result.value)));
-          return;
-        }
-      } catch {
-        close();
-        controller.close();
-      }
-    },
-    cancel: close,
-  });
-  return new Response(body, {
-    headers: {
-      "cache-control": "no-cache, no-store",
-      connection: "keep-alive",
-      "content-type": "text/event-stream; charset=utf-8",
-      "x-relkit-api-version": String(apiVersion),
-    },
-  });
-}
+export { streamResponse } from "./observability-stream.js";
 
-function eventFrame(event: ObservabilityStreamEvent): string {
-  return `id: ${event.cursor}\nevent: ${event.type}\ndata: ${canonicalJson(event)}\n\n`;
-}
-
+/**
+ * Validates a numeric request field against its declared range and default.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @param name - Public field or route parameter name.
+ * @returns A finite accepted integer or the existing parameter error.
+ */
 function integer(value: string, name: string): number {
   if (!/^\d+$/.test(value) || !Number.isSafeInteger(Number(value)))
     throw queryError(`${name} is invalid`);
   return Number(value);
 }
 
+/**
+ * Creates the existing invalid observation-query failure.
+ * @param message - Public diagnostic message, preserving the compatibility constructor.
+ * @returns A public observation query error.
+ */
 function queryError(message: string): ObservabilityQueryError {
   return new ObservabilityQueryError(
     "RELKIT_OBSERVABILITY_QUERY_INVALID",
@@ -184,6 +117,11 @@ function queryError(message: string): ObservabilityQueryError {
   );
 }
 
+/**
+ * Creates the existing invalid stream replay failure.
+ * @param message - Public diagnostic message, preserving the compatibility constructor.
+ * @returns A public observation stream error.
+ */
 function streamError(message: string): ObservabilityStreamError {
   return new ObservabilityStreamError("RELKIT_OBSERVABILITY_STREAM_INVALID", message);
 }

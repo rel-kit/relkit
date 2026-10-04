@@ -1,24 +1,31 @@
-import {
-  API_BASE_PATH,
-  API_VERSION,
-  canonicalJson,
-  type JsonValue,
-  type MaybePromise,
-} from "@relkit/contracts";
-import {
-  ObservabilityQueryError,
-  ObservabilityStreamError,
-  type ObservabilityQuery,
-  type ObservabilityStream,
-} from "@relkit/observability";
+import type {
+  ObservabilityEndpointMode,
+  ObservabilityEndpointOptions,
+} from "./observability.types.js";
+export type {
+  ObservabilityEndpointMode,
+  ObservabilityEndpointOptions,
+} from "./observability.types.js";
+import { API_BASE_PATH, API_VERSION, canonicalJson, type JsonValue } from "@relkit/contracts";
+import { ObservabilityQueryError, ObservabilityStreamError } from "@relkit/observability";
 import { Hono, type Context } from "hono";
-import { readObservabilityQuery, streamResponse } from "./observability-utils.js";
+import { Effect, Layer, ManagedRuntime } from "effect";
+import {
+  runInspectorPromise as runExecutionPromise,
+  unwrapInspectorFailure,
+} from "./native-edge.js";
+import { InspectorObservability, inspectorObservabilityLayer } from "./observability.service.js";
+import { inspectorLoggerLayer, registerInspectorOwner } from "./execution.js";
+import { readObservabilityQuery } from "./observability-utils.js";
 import { InspectorEndpointError, negotiateHeaders } from "./router-utils.js";
+import { EndpointError, ObservabilityEndpointConfigurationError } from "./observability-errors.js";
+export { ObservabilityEndpointConfigurationError } from "./observability-errors.js";
 
 export { readObservabilityQuery } from "./observability-utils.js";
-
 export const INSPECTOR_API_PROTOCOL = "relkit.inspector" as const;
 export const INSPECTOR_API_VERSION = API_VERSION;
+
+/** Established observation query and SSE route paths. */
 export const OBSERVABILITY_ENDPOINT_PATHS = Object.freeze([
   `${API_BASE_PATH}/requests`,
   `${API_BASE_PATH}/requests/:requestId`,
@@ -29,40 +36,43 @@ export const OBSERVABILITY_ENDPOINT_PATHS = Object.freeze([
   `${API_BASE_PATH}/stream`,
 ] as const);
 
-export type ObservabilityEndpointMode = "development" | "test" | "production";
-
+/**
+ * Builds native observation ingress edges around one reused service owner.
+ * @param options - Configured native authorities and ownership policy.
+ * @returns A native request handler with existing protocol and authorization behavior.
+ */
 export function createObservabilityHandler(options: ObservabilityEndpointOptions) {
   const app = new Hono();
   installObservabilityEndpoints(app, options);
   return async (request: Request): Promise<Response> => app.fetch(request);
 }
 
-export interface ObservabilityEndpointOptions {
-  readonly query: ObservabilityQuery;
-  readonly stream: ObservabilityStream;
-  readonly mode?: ObservabilityEndpointMode;
-  readonly environment?: ObservabilityEndpointMode;
-  readonly enabled?: boolean;
-  readonly bearerToken?: string;
-  readonly authorize?: (request: Request) => MaybePromise<boolean>;
-}
-
-export class ObservabilityEndpointConfigurationError extends TypeError {
-  constructor(message: string) {
-    super(message);
-    this.name = "ObservabilityEndpointConfigurationError";
-  }
-}
-
-/** Installs the bounded, versioned observability query and SSE endpoints. */
+/**
+ * Installs bounded observation routes backed by one reused service owner.
+ * @param app - Hono router receiving synchronous query and stream registrations.
+ * @param options - Native observation authorities, protection and logging settings.
+ * @param suppliedOwner - Optional shared router runtime; otherwise this installation acquires its own owner.
+ * @returns No value; the router owner retires through disposeInspectorEndpoints.
+ * @remarks Each SSE response separately owns its live feed, pull and heartbeat scope.
+ */
 export function installObservabilityEndpoints(
   app: Hono,
   options: ObservabilityEndpointOptions,
+  suppliedOwner?: ManagedRuntime.ManagedRuntime<InspectorObservability, never>,
 ): void {
   const mode = options.environment ?? options.mode ?? "development";
   const enabled = options.enabled ?? mode !== "production";
   validateConfiguration(mode, enabled, options);
   if (!enabled) return;
+  const owner =
+    suppliedOwner ??
+    ManagedRuntime.make(
+      Layer.mergeAll(
+        inspectorObservabilityLayer(options.query, options.stream),
+        inspectorLoggerLayer(options.logging),
+      ),
+    );
+  registerInspectorOwner(app, owner);
 
   const guard =
     (handler: (context: Context) => Promise<Response>) =>
@@ -83,7 +93,14 @@ export function installObservabilityEndpoints(
     app.get(
       `${API_BASE_PATH}/${kind}`,
       guard(async (context) =>
-        jsonResponse(await options.query[kind](readObservabilityQuery(context.req.raw))),
+        jsonResponse(
+          await runExecutionPromise(
+            owner,
+            Effect.flatMap(InspectorObservability, (service) =>
+              service.list(kind, readObservabilityQuery(context.req.raw)),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -97,7 +114,10 @@ export function installObservabilityEndpoints(
       guard(async (context) => {
         const id = context.req.param(parameter);
         if (id === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
-        const detail = await options.query[method](id);
+        const detail = await runExecutionPromise(
+          owner,
+          Effect.flatMap(InspectorObservability, (service) => service.detail(method, id)),
+        );
         if (detail === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
         return jsonResponse(detail);
       }),
@@ -106,11 +126,23 @@ export function installObservabilityEndpoints(
   app.get(
     `${API_BASE_PATH}/stream`,
     guard(async (context) =>
-      streamResponse(options.stream, context.req.raw, INSPECTOR_API_VERSION),
+      runExecutionPromise(
+        owner,
+        Effect.flatMap(InspectorObservability, (service) =>
+          service.response(context.req.raw, INSPECTOR_API_VERSION),
+        ),
+      ),
     ),
   );
 }
 
+/**
+ * Rejects unsupported modes and invalid protection or paired-authority settings before installation.
+ * @param mode - Configured Inspector environment used for authorization and audit identity.
+ * @param enabled - Whether this installation exposes Inspector routes.
+ * @param options - Configured native authorities and ownership policy.
+ * @returns No value after validating the existing configuration contract.
+ */
 function validateConfiguration(
   mode: ObservabilityEndpointMode,
   enabled: boolean,
@@ -131,6 +163,12 @@ function validateConfiguration(
     throw new ObservabilityEndpointConfigurationError("bearerToken must not be empty");
 }
 
+/**
+ * Checks configured native authorization and existing bearer protection before data access.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @param options - Configured native authorities and ownership policy.
+ * @returns Whether the native request is authorized.
+ */
 async function authorized(
   request: Request,
   options: ObservabilityEndpointOptions,
@@ -148,6 +186,13 @@ async function authorized(
     : request.headers.get("authorization") === `Bearer ${options.bearerToken}`;
 }
 
+/**
+ * Serializes the existing versioned observation response with no-store headers.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @param status - Public HTTP status associated with the response.
+ * @param headers - Optional native response headers merged into the no-store JSON envelope.
+ * @returns A native JSON response.
+ */
 function jsonResponse(
   value: unknown,
   status = 200,
@@ -164,6 +209,13 @@ function jsonResponse(
   });
 }
 
+/**
+ * Projects failures into the existing bounded public HTTP error envelope.
+ * @param code - Existing public failure code.
+ * @param status - Public HTTP status associated with the response.
+ * @param headers - Optional native response headers merged into the public error envelope.
+ * @returns A native response retaining the existing public status contract.
+ */
 function errorResponse(
   code: string,
   status: number,
@@ -176,18 +228,16 @@ function errorResponse(
   );
 }
 
+/**
+ * Maps recognized native observation failures without exposing their private causes.
+ * @param error - Native or validation failure to preserve in the public compatibility envelope.
+ * @returns A bounded public error response.
+ */
 function safeErrorResponse(error: unknown): Response {
+  error = unwrapInspectorFailure(error);
   if (error instanceof EndpointError) return errorResponse(error.code, error.status);
   if (error instanceof InspectorEndpointError) return errorResponse(error.code, error.status);
   if (error instanceof ObservabilityQueryError) return errorResponse(error.code, 400);
   if (error instanceof ObservabilityStreamError) return errorResponse(error.code, 400);
   return errorResponse("RELKIT_OBSERVABILITY_INTERNAL", 500);
-}
-class EndpointError extends Error {
-  constructor(
-    readonly code: string,
-    readonly status: number,
-  ) {
-    super(code);
-  }
 }
