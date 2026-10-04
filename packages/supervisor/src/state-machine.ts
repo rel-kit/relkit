@@ -1,197 +1,174 @@
-export * from "./state-machine-types.js";
-import {
-  type SupervisorCandidateToken,
-  type SupervisorCandidatePhase,
-  type SupervisorOutcomeName,
-  type SupervisorPhase,
-  type SupervisorState,
-  type SupervisorStateMachineOptions,
-  type SupervisorStateSnapshot,
-  type SupervisorTelemetry,
-  type SupervisorTelemetryListener,
-} from "./state-machine-types.js";
-import { SUPERVISOR_CANDIDATE_STEPS } from "./state-machine-types.js";
-import { SupervisorTelemetryLog, validateSupervisorToken } from "./state-machine-telemetry.js";
+import { Effect, Layer, ManagedRuntime, Metric } from "effect";
+import { runExecutionSync } from "@relkit/contracts/operation";
+import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createActivationLayer, SupervisorActivation } from "./activation.js";
+import { ActivationTransitionError } from "./state-machine.schemas.js";
+import type { ActivationService } from "./activation.types.js";
+import type {
+  SupervisorCandidateToken,
+  SupervisorState,
+  SupervisorStateMachineOptions,
+  SupervisorStateSnapshot,
+  SupervisorTelemetry,
+  SupervisorTelemetryListener,
+} from "./state-machine.types.js";
 
-/** Pure lifecycle state and token coordination for candidate activation. */
+export type * from "./state-machine.types.js";
+export { SUPERVISOR_STATES } from "./state-machine.schemas.js";
+export { SUPERVISOR_CANDIDATE_STEPS } from "./state-machine-data.js";
+
+/** Synchronous compatibility edge for one activation service; owns no native handles. */
 export class SupervisorStateMachine {
-  private currentState: SupervisorState;
-  private sourceSequence = 0;
-  private generationSequence = 0;
-  private candidate: SupervisorCandidateToken | undefined;
-  private activeGeneration: SupervisorCandidateToken | undefined;
-  private previousGeneration: SupervisorCandidateToken | undefined;
-  private readonly telemetryLog: SupervisorTelemetryLog;
+  private readonly owner;
+  private readonly service: ActivationService;
 
+  /**
+   * Acquires atomic state and configured operation sinks synchronously once.
+   * @param options - Initial active identity and lifecycle/operation observers.
+   */
   constructor(options: SupervisorStateMachineOptions = {}) {
-    const active = options.activeGeneration;
-    if (active !== undefined) {
-      validateSupervisorToken(active);
-      this.activeGeneration = Object.freeze({ ...active });
-      this.sourceSequence = active.sourceToken;
-      this.generationSequence = active.generationToken;
-    }
-    this.currentState = this.activeGeneration === undefined ? "idle" : "active";
-    this.telemetryLog = new SupervisorTelemetryLog(options.onTelemetry);
-  }
-
-  get state(): SupervisorState {
-    return this.currentState;
-  }
-
-  get sourceToken(): number {
-    return this.sourceSequence;
-  }
-
-  get generationToken(): number {
-    return this.generationSequence;
-  }
-
-  get telemetry(): readonly SupervisorTelemetry[] {
-    return this.telemetryLog.records;
-  }
-
-  snapshot(): SupervisorStateSnapshot {
-    return Object.freeze({
-      state: this.currentState,
-      sourceToken: this.sourceSequence,
-      generationToken: this.generationSequence,
-      candidate: this.candidate,
-      activeGeneration: this.activeGeneration,
-      previousGeneration: this.previousGeneration,
-    });
-  }
-
-  subscribe(listener: SupervisorTelemetryListener): () => void {
-    return this.telemetryLog.subscribe(listener);
-  }
-
-  requestSourceChange(): SupervisorCandidateToken {
-    const token = Object.freeze({
-      sourceToken: ++this.sourceSequence,
-      generationToken: ++this.generationSequence,
-    });
-    this.candidate = token;
-    this.transition("compiling-candidate", token);
-    return token;
-  }
-
-  compileSucceeded(token: SupervisorCandidateToken): boolean {
-    return this.finishCandidate(token, "compile", true);
-  }
-
-  compileFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
-    return this.finishCandidate(token, "compile", false, reason);
-  }
-
-  startSucceeded(token: SupervisorCandidateToken): boolean {
-    return this.finishCandidate(token, "start", true);
-  }
-
-  startFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
-    return this.finishCandidate(token, "start", false, reason);
-  }
-
-  verificationSucceeded(token: SupervisorCandidateToken): boolean {
-    return this.finishCandidate(token, "verification", true);
-  }
-
-  verificationFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
-    return this.finishCandidate(token, "verification", false, reason);
-  }
-
-  switchSucceeded(token: SupervisorCandidateToken): boolean {
-    if (!this.check(token, "switching", "switch")) return false;
-    const previous = this.activeGeneration;
-    this.telemetryLog.outcome("switch", "switch-succeeded", token, undefined, undefined, previous);
-    this.activeGeneration = token;
-    this.candidate = undefined;
-    this.previousGeneration = previous;
-    this.transition(previous === undefined ? "active" : "draining-previous", token);
-    return true;
-  }
-
-  switchFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
-    return this.finishCandidate(token, "switch", false, reason);
-  }
-
-  drainSucceeded(token: SupervisorCandidateToken): boolean {
-    return this.finishDrain(token, "drain-succeeded");
-  }
-
-  drainFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
-    return this.finishDrain(token, "drain-failed", reason);
-  }
-
-  private finishCandidate(
-    token: SupervisorCandidateToken,
-    phase: SupervisorCandidatePhase | "switch",
-    success: boolean,
-    reason?: unknown,
-  ): boolean {
-    const step = phase === "switch" ? undefined : SUPERVISOR_CANDIDATE_STEPS[phase];
-    const expected = step?.expected ?? "switching";
-    if (!this.check(token, expected, phase)) return false;
-    const next = success
-      ? (step?.next ?? "active")
-      : this.activeGeneration === undefined
-        ? "idle"
-        : "active";
-    this.telemetryLog.outcome(
-      phase,
-      success ? (step?.success ?? "switch-succeeded") : (step?.failure ?? "switch-failed"),
-      token,
-      reason,
-      success ? undefined : next,
+    this.owner = ManagedRuntime.make(
+      Layer.mergeAll(
+        createActivationLayer(options),
+        createLoggerLayer({ component: "supervisor", ...options.logger }),
+        Layer.succeed(Metric.MetricRegistry, new Map()),
+      ),
     );
-    if (!success) this.candidate = undefined;
-    this.transition(next, token);
-    return true;
+    this.service = runExecutionSync(this.owner, SupervisorActivation);
   }
 
-  private finishDrain(
-    token: SupervisorCandidateToken,
-    outcome: SupervisorOutcomeName,
-    reason?: unknown,
-  ): boolean {
-    if (!this.check(token, "draining-previous", "drain", "active")) return false;
-    const previous = this.previousGeneration;
-    this.telemetryLog.outcome("drain", outcome, token, reason, undefined, previous);
-    this.previousGeneration = undefined;
-    this.transition("active", token);
-    return true;
+  /** Current lifecycle state; reading never schedules asynchronous work. */
+  get state(): SupervisorState {
+    return this.snapshot().state;
   }
 
-  private check(
-    token: SupervisorCandidateToken,
-    expected: SupervisorState,
-    phase: SupervisorPhase,
-    owner: "candidate" | "active" = "candidate",
-  ): boolean {
-    validateSupervisorToken(token);
-    const current = owner === "candidate" ? this.candidate : this.activeGeneration;
-    if (
-      current?.sourceToken !== token.sourceToken ||
-      current.generationToken !== token.generationToken
-    ) {
-      this.telemetryLog.outcome(phase, "candidate-stale", token);
-      return false;
-    }
-    if (this.currentState !== expected) {
-      throw new Error(
-        `Supervisor cannot transition from ${this.currentState}; expected ${expected}.`,
-      );
-    }
-    return true;
+  /** Latest accepted source sequence. */
+  get sourceToken(): number {
+    return this.snapshot().sourceToken;
   }
 
-  private transition(to: SupervisorState, token: SupervisorCandidateToken): void {
-    const from = this.currentState;
-    this.currentState = to;
-    this.telemetryLog.transition(from, to, token);
+  /** Latest candidate generation sequence. */
+  get generationToken(): number {
+    return this.snapshot().generationToken;
+  }
+
+  /** Copy of committed lifecycle evidence. */
+  get telemetry(): readonly SupervisorTelemetry[] {
+    return this.run(this.service.telemetry);
+  }
+
+  /** Reads atomic lifecycle state. @returns An immutable public snapshot. */
+  snapshot(): SupervisorStateSnapshot {
+    return this.run(this.service.snapshot);
+  }
+
+  /** Borrows lifecycle evidence. @param listener - Native evidence consumer.
+   * @returns An idempotent synchronous unsubscribe function.
+   */
+  subscribe(listener: SupervisorTelemetryListener): () => void {
+    this.run(this.service.subscribe(listener));
+    return () => this.run(this.service.unsubscribe(listener));
+  }
+
+  /** Accepts a new source change. @returns Its monotonic candidate identity. */
+  requestSourceChange(): SupervisorCandidateToken {
+    return this.run(this.service.sourceChanged());
+  }
+
+  /** Completes compile. @param token - Owning candidate. @returns False for stale identity. */
+  compileSucceeded(token: SupervisorCandidateToken): boolean {
+    return this.run(this.service.complete("compile", token, true));
+  }
+
+  /** Rejects compile. @param token - Owning candidate. @param reason - Existing failure detail.
+   * @returns False for stale identity; the active generation remains available.
+   */
+  compileFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
+    return this.run(this.service.complete("compile", token, false, reason));
+  }
+
+  /** Completes start. @param token - Owning candidate. @returns False for stale identity. */
+  startSucceeded(token: SupervisorCandidateToken): boolean {
+    return this.run(this.service.complete("start", token, true));
+  }
+
+  /** Rejects start. @param token - Owning candidate. @param reason - Existing failure detail.
+   * @returns False for stale identity; the active generation remains available.
+   */
+  startFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
+    return this.run(this.service.complete("start", token, false, reason));
+  }
+
+  /** Completes verification. @param token - Owning candidate. @returns False for stale identity. */
+  verificationSucceeded(token: SupervisorCandidateToken): boolean {
+    return this.run(this.service.complete("verification", token, true));
+  }
+
+  /** Rejects verification. @param token - Owning candidate. @param reason - Existing failure detail.
+   * @returns False for stale identity; the active generation remains available.
+   */
+  verificationFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
+    return this.run(this.service.complete("verification", token, false, reason));
+  }
+
+  /** Switches verified state atomically. @param token - Verified candidate.
+   * @returns False for a stale candidate; no yield can separate comparison and switch.
+   */
+  switchSucceeded(token: SupervisorCandidateToken): boolean {
+    return this.run(this.service.activate(token));
+  }
+
+  /** Rejects activation. @param token - Candidate identity. @param reason - Existing failure.
+   * @returns False for stale identity; active traffic remains on the previous generation.
+   */
+  switchFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
+    return this.run(this.service.complete("switch", token, false, reason));
+  }
+
+  /** Completes retirement. @param token - Active identity. @returns False for stale identity. */
+  drainSucceeded(token: SupervisorCandidateToken): boolean {
+    return this.run(this.service.drained(token, "drain-succeeded"));
+  }
+
+  /** Records retirement failure. @param token - Active identity. @param reason - Failure detail.
+   * @returns False for stale identity; the active generation remains available.
+   */
+  drainFailed(token: SupervisorCandidateToken, reason: unknown): boolean {
+    return this.run(this.service.drained(token, "drain-failed", reason));
+  }
+
+  /** Translates internal errors at the existing synchronous edge.
+   * @typeParam A - Original public result. @typeParam E - Internal failure.
+   * @param effect - Synchronously completable service operation. @returns Its original result.
+   * @throws Existing Error/TypeError shapes without Effect's FiberFailure wrapper.
+   */
+  private run<A, E>(effect: Effect.Effect<A, E>): A {
+    return runExecutionSync(
+      this.owner,
+      effect.pipe(
+        Effect.mapError((error) =>
+          error instanceof ActivationTransitionError ? new Error(error.message) : error,
+        ),
+      ),
+    );
   }
 }
 
+/** Constructs a synchronously ready activation facade.
+ * @param options - Initial active state and observers. @returns One reusable state owner.
+ * @example
+ * ```ts
+ * import { createSupervisorStateMachine } from "@relkit/supervisor";
+ * export function activateGeneration(): void {
+ * const machine = createSupervisorStateMachine({ logger: { human: false, json: false } });
+ * const token = machine.requestSourceChange();
+ * machine.compileSucceeded(token);
+ * machine.startSucceeded(token);
+ * machine.verificationSucceeded(token);
+ * machine.switchSucceeded(token);
+ * }
+ * ```
+ */
 export function createSupervisorStateMachine(
   options?: SupervisorStateMachineOptions,
 ): SupervisorStateMachine {

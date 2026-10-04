@@ -128,7 +128,7 @@
       "summary": "Call checked routes through the generated typed contract.",
       "guide": "http/generated-clients",
       "apiPackage": "client",
-      "entrypoints": [{ "source": "packages/client/src/index.ts", "name": "createClient" }],
+      "entrypoints": [{ "source": "packages/client/src/transport.ts", "name": "createClient" }],
       "examples": ["examples/commerce/src/platform/generated-client.ts"]
     },
     {
@@ -549,7 +549,10 @@
     {
       "path": "jobs/testing",
       "api": ["jobs", "testing", "client"],
-      "examples": ["packages/jobs/tests/task-wire.test.ts", "packages/client/jobs-watch.test.ts"]
+      "examples": [
+        "packages/jobs/tests/task-wire.test.ts",
+        "packages/client/tests/compatibility/jobs-watch.test.ts"
+      ]
     },
     {
       "path": "jobs/migration",

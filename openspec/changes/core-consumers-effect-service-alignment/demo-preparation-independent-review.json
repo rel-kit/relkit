@@ -1,0 +1,1592 @@
+{
+  "reviewer": "client_baseline",
+  "status": "preparation accepted; execution claims and cleanup qualifications remain pending root orchestration",
+  "reviewUtc": "2026-10-03T18:54:20.409107+00:00",
+  "scope": "Read-only copy/setup/preservation review; all 16 original scripts read EOF in candidate copy and verified byte-identical to baseline and original. Replay helpers, origin rejection probe and offline/paid fixture models read EOF. No hosts, test runners, paid calls, credential reads, installs or global links.",
+  "originalPreservation": {
+    "current": {
+      "source": {
+        "count": 63,
+        "aggregateSha256": "14557a82ee5b09924818e56026dc34b998ea649753e06476d1be460a1d3ec11c"
+      },
+      "history": {
+        "count": 177,
+        "aggregateSha256": "c455745d2b30161187181e6a897b1677fb44ae46f4db30776461fc3b42fa74e8"
+      },
+      "fixture": {
+        "count": 30,
+        "aggregateSha256": "fba916f6feb4f9aea92599bd9bdaf25c9895799ea606bafebe6b8e4d50e5fa3e"
+      },
+      "git": {
+        "head": "1faed92bfd52a71771251f995a46c88daab8bf40",
+        "status": ""
+      }
+    },
+    "matchInitial": true
+  },
+  "baselineFrameworkHead": "b0f77720764fd61e9872b0995e456014a611ba37",
+  "roots": [
+    {
+      "root": "/tmp/relkit-core-consumers-demo-baseline-nnq5hlav",
+      "links": 86,
+      "externalOpenai": 2,
+      "linksExcludingOpenai": 84,
+      "badLinks": [],
+      "linksDetailed": [
+        {
+          "copy": "demo",
+          "name": "@langchain/openai",
+          "target": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@langchain/openai",
+          "version": "1.6.2",
+          "manifestSha256": "ed3583c43049d9628dff395246294861d509cf57c0b5401adbdce767135b6ed1"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/app",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/app",
+          "version": "0.5.5",
+          "manifestSha256": "aa2df1bf1637da6842c3407c53aeef793face83251863ab64bfc12add443a1b3"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/docker",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/docker",
+          "version": "0.5.5",
+          "manifestSha256": "ca5edfd85e29be0730b8c13625cffb92657bf1df95e449b4699c329efc4e3834"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/local",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/local",
+          "version": "0.5.5",
+          "manifestSha256": "ab5d7df57f25622c77bd8440da1be7eceb5627b426f77aa13bd1b75434c53bf7"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/redis",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/redis",
+          "version": "0.5.5",
+          "manifestSha256": "0a3fc85f363916da3dfe4d60a5fa518f2e2c467aae1f259d7a7a058d81126e18"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/s3",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/s3",
+          "version": "0.5.5",
+          "manifestSha256": "ba77969735379ebc49d4cf3eccb10712b9754a9a757c078e6eacc78febb4e3ca"
+        },
+        {
+          "copy": "demo",
+          "name": "langchain",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+          "version": "1.5.10",
+          "manifestSha256": "854693b0f89432430f091b520b23d80b020375e19c839b0f7e361e9259d3bf16"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/agents",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/agents",
+          "version": "0.5.5",
+          "manifestSha256": "a3e9be17f6c85b48aba3f5374f49e6f6e7fda06ca767a79134149c6855786759"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/better-auth",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/better-auth",
+          "version": "0.5.5",
+          "manifestSha256": "1757289e8d3e7c0a096c1f566ac4e09e89b9a79b0ca48eaa95f65a02d52b88c5"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/buckets",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/buckets",
+          "version": "0.5.5",
+          "manifestSha256": "53e78691f72f7eb16b6e63c9a5be312ca09cf0eaf88332579571e2cf0b184b5e"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/cache",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/cache",
+          "version": "0.5.5",
+          "manifestSha256": "ab235d6cf29b9d2d6df2af1320710c53479db13853dc9df580b28bb8fd7439a4"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/cli",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/cli",
+          "version": "0.5.5",
+          "manifestSha256": "cedf178f409308df75646a4f81cced3638e565b54eb6eae106c6222368111576"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/client",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/client",
+          "version": "0.5.5",
+          "manifestSha256": "a86513750aec284f85fb307bac7714fcddf69dd7cee3025ce705fab4ea9320b9"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/client-generator",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/client-generator",
+          "version": "0.5.5",
+          "manifestSha256": "4c0b7ba1fe58fd4b3e3cd70960d147723d88914e333a8384246a1b45f5c8f2ce"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/compiler",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/compiler",
+          "version": "0.5.5",
+          "manifestSha256": "ec71d17551348b2b37af758ca273e3877e6b5eae90f7812d575945d1d1e82cea"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/config",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/config",
+          "version": "0.5.5",
+          "manifestSha256": "cb5773cf1ca9fed8a51888f61108ac1eb3c18843e9d374f7a9eab4b7e3114cd7"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/contracts",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/contracts",
+          "version": "0.5.5",
+          "manifestSha256": "5a513b769868f7d848c0a8549ad3787e38916518b5a28111d7c9165a900dd963"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/deploy",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy",
+          "version": "0.5.5",
+          "manifestSha256": "5c3953ba0fac0395994a59f86beae3dcc7ac99f67899a464b1186b6994469cf5"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/deploy-pulumi",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy-pulumi",
+          "version": "0.5.5",
+          "manifestSha256": "3f39d3ec93308dd0b7e759d31fdd8a248fd31f4c8eae3c9e8f624d188427a320"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/diagnostics",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/diagnostics",
+          "version": "0.5.5",
+          "manifestSha256": "98e7454bc84095657ff57bbcbdc0e8925cc7185d38b9d91a78442fc50854c386"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/drizzle",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/drizzle",
+          "version": "0.5.5",
+          "manifestSha256": "b07357de6c894945e89cd28e950c3a42ee7fef103d87bc9d593c9e16af8e8415"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/engine",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/engine",
+          "version": "0.5.5",
+          "manifestSha256": "186ba56aedc0835682a54e75bd470d7654152307d9b742a9d7cea368c11e31b2"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/events",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/events",
+          "version": "0.5.5",
+          "manifestSha256": "81d86220f1de7a001292ced0a264992349eefd48d6816d8c74dff6e4ca3f4aaf"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/functions",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/functions",
+          "version": "0.5.5",
+          "manifestSha256": "8be50d93df71d87beed92f95232eb952868a4008ed7caf889de01e0b16f34390"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/graph",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/graph",
+          "version": "0.5.5",
+          "manifestSha256": "187989ed8703e5e7f94974649c85041e5d1895991e8855e98b7e9202424afff9"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/inspector-api",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/inspector-api",
+          "version": "0.5.5",
+          "manifestSha256": "b5c740e3f1def9e7b2d962198b35c2b0fd5d71b0a1a84ae16e982f4de69d6da4"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/invocation",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/invocation",
+          "version": "0.5.5",
+          "manifestSha256": "680972cca0b16f6575299dec6bcf4ffc47b7c761e2913de51423c30f6ab80d82"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/jobs",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/jobs",
+          "version": "0.5.5",
+          "manifestSha256": "bba1c781e53a3fd69a409d61e929b8e1fea5fb85da31f3d50cbf5d1eb966126a"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/local-service",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/local-service",
+          "version": "0.5.5",
+          "manifestSha256": "1d70465715ecc1e908b8b2613344e18757eb4dfec782a9a2381ada4090706968"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/observability",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/observability",
+          "version": "0.5.5",
+          "manifestSha256": "b8a78acfc4d25b7e16b2d0636e8181c8fc11a6dcee58f53f6902a05e9edbca2d"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/openapi",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/openapi",
+          "version": "0.5.5",
+          "manifestSha256": "b5a1a0bb81aec02e6a1323da3ad1e74567b66b1c1300e65ca5ad63c55837a0b5"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/provider",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/provider",
+          "version": "0.5.5",
+          "manifestSha256": "9508ba563bdd07a0f9ba78ef6f61369dc5f8380052f971cf901b6ba36fc21b17"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/providers-local",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/providers-local",
+          "version": "0.5.5",
+          "manifestSha256": "3945c0220d897fd739a491de87e5f40a3d2898144fee2863d32be62f5db8dc13"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/realtime",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/realtime",
+          "version": "0.5.5",
+          "manifestSha256": "00570ab2e0a9ad54d8ff7f012d00aa3f489c309d47a132f72254dcf3046ed541"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/routes",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/routes",
+          "version": "0.5.5",
+          "manifestSha256": "58433d76db2e65a2693e120f5d2fc0418adb5d7ddff8cbee970e44c467f152f6"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/runtime-effect",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-effect",
+          "version": "0.5.5",
+          "manifestSha256": "bc1893702d3135eab404a4053ff13c5fc59406a981e93b72706881eaac142c43"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/runtime-hono",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-hono",
+          "version": "0.5.5",
+          "manifestSha256": "174f7173e4f13bbf75f0878d564e38ac516a0c9a411a8eb09abc2705557846b4"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/schema",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/schema",
+          "version": "0.5.5",
+          "manifestSha256": "6706aff4851d3b5d453a16473fb8d7ec9e283152393778683808c409a4fb4868"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/services",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/services",
+          "version": "0.5.5",
+          "manifestSha256": "58528adc61063988442957b06451d3c1dd1cbe4d4e8412cc31a79a09cac17b29"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/supervisor",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/supervisor",
+          "version": "0.5.5",
+          "manifestSha256": "bf6ce4e9550ee8dbfac2d16f7d264250ea9cc9f6f999da3d291a1c3a11b0bb87"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/testing",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/testing",
+          "version": "0.5.5",
+          "manifestSha256": "7965ff33553c7f41c61a1facfc905e82393386839f11cd0c9dbf7608746a01f9"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/tools",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/tools",
+          "version": "0.5.5",
+          "manifestSha256": "2d9af001b2c76fe9899a017865738089822ebaa825a9c5a4135a0e2ff9b98201"
+        },
+        {
+          "copy": "demo",
+          "name": "@types/bun",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@types+bun@1.3.10/node_modules/@types/bun",
+          "version": "1.3.10",
+          "manifestSha256": "06eb274cb1964673954a63df2c8ca0429d45b2ef56106d35be3cb28364908472"
+        },
+        {
+          "copy": "demo",
+          "name": "typescript",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/typescript@5.9.3/node_modules/typescript",
+          "version": "5.9.3",
+          "manifestSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6"
+        },
+        {
+          "copy": "fixture",
+          "name": "@langchain/langgraph",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@langchain+langgraph@1.4.14+9ed32dbb8973e5bd/node_modules/@langchain/langgraph",
+          "version": "1.4.14",
+          "manifestSha256": "e737d5ed8be6004c6c11e3a6f3948fa335d10d3950cd9ad9d162ee82238ba297"
+        },
+        {
+          "copy": "fixture",
+          "name": "@langchain/openai",
+          "target": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@langchain/openai",
+          "version": "1.6.2",
+          "manifestSha256": "ed3583c43049d9628dff395246294861d509cf57c0b5401adbdce767135b6ed1"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/app",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/app",
+          "version": "0.5.5",
+          "manifestSha256": "aa2df1bf1637da6842c3407c53aeef793face83251863ab64bfc12add443a1b3"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/local",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/local",
+          "version": "0.5.5",
+          "manifestSha256": "ab5d7df57f25622c77bd8440da1be7eceb5627b426f77aa13bd1b75434c53bf7"
+        },
+        {
+          "copy": "fixture",
+          "name": "langchain",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+          "version": "1.5.10",
+          "manifestSha256": "854693b0f89432430f091b520b23d80b020375e19c839b0f7e361e9259d3bf16"
+        },
+        {
+          "copy": "fixture",
+          "name": "@types/bun",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@types+bun@1.3.10/node_modules/@types/bun",
+          "version": "1.3.10",
+          "manifestSha256": "06eb274cb1964673954a63df2c8ca0429d45b2ef56106d35be3cb28364908472"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/cli",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/cli",
+          "version": "0.5.5",
+          "manifestSha256": "cedf178f409308df75646a4f81cced3638e565b54eb6eae106c6222368111576"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/testing",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/testing",
+          "version": "0.5.5",
+          "manifestSha256": "7965ff33553c7f41c61a1facfc905e82393386839f11cd0c9dbf7608746a01f9"
+        },
+        {
+          "copy": "fixture",
+          "name": "typescript",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/typescript@5.9.3/node_modules/typescript",
+          "version": "5.9.3",
+          "manifestSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/agents",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/agents",
+          "version": "0.5.5",
+          "manifestSha256": "a3e9be17f6c85b48aba3f5374f49e6f6e7fda06ca767a79134149c6855786759"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/better-auth",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/better-auth",
+          "version": "0.5.5",
+          "manifestSha256": "1757289e8d3e7c0a096c1f566ac4e09e89b9a79b0ca48eaa95f65a02d52b88c5"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/buckets",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/buckets",
+          "version": "0.5.5",
+          "manifestSha256": "53e78691f72f7eb16b6e63c9a5be312ca09cf0eaf88332579571e2cf0b184b5e"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/cache",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/cache",
+          "version": "0.5.5",
+          "manifestSha256": "ab235d6cf29b9d2d6df2af1320710c53479db13853dc9df580b28bb8fd7439a4"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/client",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/client",
+          "version": "0.5.5",
+          "manifestSha256": "a86513750aec284f85fb307bac7714fcddf69dd7cee3025ce705fab4ea9320b9"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/client-generator",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/client-generator",
+          "version": "0.5.5",
+          "manifestSha256": "4c0b7ba1fe58fd4b3e3cd70960d147723d88914e333a8384246a1b45f5c8f2ce"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/compiler",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/compiler",
+          "version": "0.5.5",
+          "manifestSha256": "ec71d17551348b2b37af758ca273e3877e6b5eae90f7812d575945d1d1e82cea"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/config",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/config",
+          "version": "0.5.5",
+          "manifestSha256": "cb5773cf1ca9fed8a51888f61108ac1eb3c18843e9d374f7a9eab4b7e3114cd7"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/contracts",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/contracts",
+          "version": "0.5.5",
+          "manifestSha256": "5a513b769868f7d848c0a8549ad3787e38916518b5a28111d7c9165a900dd963"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/deploy",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy",
+          "version": "0.5.5",
+          "manifestSha256": "5c3953ba0fac0395994a59f86beae3dcc7ac99f67899a464b1186b6994469cf5"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/deploy-pulumi",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy-pulumi",
+          "version": "0.5.5",
+          "manifestSha256": "3f39d3ec93308dd0b7e759d31fdd8a248fd31f4c8eae3c9e8f624d188427a320"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/diagnostics",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/diagnostics",
+          "version": "0.5.5",
+          "manifestSha256": "98e7454bc84095657ff57bbcbdc0e8925cc7185d38b9d91a78442fc50854c386"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/drizzle",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/drizzle",
+          "version": "0.5.5",
+          "manifestSha256": "b07357de6c894945e89cd28e950c3a42ee7fef103d87bc9d593c9e16af8e8415"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/engine",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/engine",
+          "version": "0.5.5",
+          "manifestSha256": "186ba56aedc0835682a54e75bd470d7654152307d9b742a9d7cea368c11e31b2"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/events",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/events",
+          "version": "0.5.5",
+          "manifestSha256": "81d86220f1de7a001292ced0a264992349eefd48d6816d8c74dff6e4ca3f4aaf"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/functions",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/functions",
+          "version": "0.5.5",
+          "manifestSha256": "8be50d93df71d87beed92f95232eb952868a4008ed7caf889de01e0b16f34390"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/graph",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/graph",
+          "version": "0.5.5",
+          "manifestSha256": "187989ed8703e5e7f94974649c85041e5d1895991e8855e98b7e9202424afff9"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/inspector-api",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/inspector-api",
+          "version": "0.5.5",
+          "manifestSha256": "b5c740e3f1def9e7b2d962198b35c2b0fd5d71b0a1a84ae16e982f4de69d6da4"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/invocation",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/invocation",
+          "version": "0.5.5",
+          "manifestSha256": "680972cca0b16f6575299dec6bcf4ffc47b7c761e2913de51423c30f6ab80d82"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/jobs",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/jobs",
+          "version": "0.5.5",
+          "manifestSha256": "bba1c781e53a3fd69a409d61e929b8e1fea5fb85da31f3d50cbf5d1eb966126a"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/local-service",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/local-service",
+          "version": "0.5.5",
+          "manifestSha256": "1d70465715ecc1e908b8b2613344e18757eb4dfec782a9a2381ada4090706968"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/observability",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/observability",
+          "version": "0.5.5",
+          "manifestSha256": "b8a78acfc4d25b7e16b2d0636e8181c8fc11a6dcee58f53f6902a05e9edbca2d"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/openapi",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/openapi",
+          "version": "0.5.5",
+          "manifestSha256": "b5a1a0bb81aec02e6a1323da3ad1e74567b66b1c1300e65ca5ad63c55837a0b5"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/provider",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/provider",
+          "version": "0.5.5",
+          "manifestSha256": "9508ba563bdd07a0f9ba78ef6f61369dc5f8380052f971cf901b6ba36fc21b17"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/providers-local",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/providers-local",
+          "version": "0.5.5",
+          "manifestSha256": "3945c0220d897fd739a491de87e5f40a3d2898144fee2863d32be62f5db8dc13"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/realtime",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/realtime",
+          "version": "0.5.5",
+          "manifestSha256": "00570ab2e0a9ad54d8ff7f012d00aa3f489c309d47a132f72254dcf3046ed541"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/routes",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/routes",
+          "version": "0.5.5",
+          "manifestSha256": "58433d76db2e65a2693e120f5d2fc0418adb5d7ddff8cbee970e44c467f152f6"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/runtime-effect",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-effect",
+          "version": "0.5.5",
+          "manifestSha256": "bc1893702d3135eab404a4053ff13c5fc59406a981e93b72706881eaac142c43"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/runtime-hono",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-hono",
+          "version": "0.5.5",
+          "manifestSha256": "174f7173e4f13bbf75f0878d564e38ac516a0c9a411a8eb09abc2705557846b4"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/schema",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/schema",
+          "version": "0.5.5",
+          "manifestSha256": "6706aff4851d3b5d453a16473fb8d7ec9e283152393778683808c409a4fb4868"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/services",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/services",
+          "version": "0.5.5",
+          "manifestSha256": "58528adc61063988442957b06451d3c1dd1cbe4d4e8412cc31a79a09cac17b29"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/supervisor",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/supervisor",
+          "version": "0.5.5",
+          "manifestSha256": "bf6ce4e9550ee8dbfac2d16f7d264250ea9cc9f6f999da3d291a1c3a11b0bb87"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/tools",
+          "target": "/Users/mustafaelsayed/Workspace/relkit/packages/tools",
+          "version": "0.5.5",
+          "manifestSha256": "2d9af001b2c76fe9899a017865738089822ebaa825a9c5a4135a0e2ff9b98201"
+        }
+      ],
+      "originalInputChanges": [
+        "demo/package.json",
+        "fixture/package.json"
+      ],
+      "scripts": [
+        {
+          "path": "scripts/graph-evidence.mjs",
+          "sha256": "ae29250b95941bd01c052fd1f42b7ef96b22b3fb7c2fa7b7fd2c38b4f5470f9c",
+          "originalSha256": "ae29250b95941bd01c052fd1f42b7ef96b22b3fb7c2fa7b7fd2c38b4f5470f9c",
+          "match": true
+        },
+        {
+          "path": "scripts/inspector-api-evidence.mjs",
+          "sha256": "36c4ea7dbc3238b2832218d3d39a6905d70962426149eb1fb70e822dee3c6eea",
+          "originalSha256": "36c4ea7dbc3238b2832218d3d39a6905d70962426149eb1fb70e822dee3c6eea",
+          "match": true
+        },
+        {
+          "path": "scripts/inspector-regressions.mjs",
+          "sha256": "04067a56bf98849fda3679183bbae0d9411c09f800f419c588cc28c1093218de",
+          "originalSha256": "04067a56bf98849fda3679183bbae0d9411c09f800f419c588cc28c1093218de",
+          "match": true
+        },
+        {
+          "path": "scripts/live-smoke.mjs",
+          "sha256": "28deb7dca032c7d8cf106857c3d5f2936213f43164b5fc7398e40be3291ee950",
+          "originalSha256": "28deb7dca032c7d8cf106857c3d5f2936213f43164b5fc7398e40be3291ee950",
+          "match": true
+        },
+        {
+          "path": "scripts/setup-local.mjs",
+          "sha256": "ea6db2530019901b4e74affe6affa41d2b70e472f722592551151ca9387c28ea",
+          "originalSha256": "ea6db2530019901b4e74affe6affa41d2b70e472f722592551151ca9387c28ea",
+          "match": true
+        },
+        {
+          "path": "scripts/validation-regressions.mjs",
+          "sha256": "2839cf7820b9d839953c99e8fb6141712c72a58ba9581d7ef4eb8c5850149154",
+          "originalSha256": "2839cf7820b9d839953c99e8fb6141712c72a58ba9581d7ef4eb8c5850149154",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-demo-agent.mjs",
+          "sha256": "85fcdbdfc3b0532dc7514b1427d734510f94026da950e4c99a33dbf87a42433c",
+          "originalSha256": "85fcdbdfc3b0532dc7514b1427d734510f94026da950e4c99a33dbf87a42433c",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-demo-luna.mjs",
+          "sha256": "c82b76d3eaf982c4b66b7e7a51d650a39319c9ebffa04980a4af37650d5befce",
+          "originalSha256": "c82b76d3eaf982c4b66b7e7a51d650a39319c9ebffa04980a4af37650d5befce",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-dev-origin.mjs",
+          "sha256": "c5551f7ebffe650374256b5f3d4d1b09c4001489f596a45896190346c6d206d6",
+          "originalSha256": "c5551f7ebffe650374256b5f3d4d1b09c4001489f596a45896190346c6d206d6",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-generated-ai.mjs",
+          "sha256": "d3ca5222389de5aef6cbbcdd1b9257dc5687894d60fd734221ab1da4aaae9052",
+          "originalSha256": "d3ca5222389de5aef6cbbcdd1b9257dc5687894d60fd734221ab1da4aaae9052",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-luna-agent.mjs",
+          "sha256": "ebe8edd8801e372d95c20bcadcc46357684a8b297cbb848592b1efa69bc1a29b",
+          "originalSha256": "ebe8edd8801e372d95c20bcadcc46357684a8b297cbb848592b1efa69bc1a29b",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-realtime-disconnect.mjs",
+          "sha256": "9ab4dbfb975b5d4ad5cfc28e2f07eb3509ee0ae4d27865b06d67b9a99425e5ad",
+          "originalSha256": "9ab4dbfb975b5d4ad5cfc28e2f07eb3509ee0ae4d27865b06d67b9a99425e5ad",
+          "match": true
+        },
+        {
+          "path": "scripts/ai-verification/agents.mjs",
+          "sha256": "3f5f9cb8f7811394df06a3f76865a051bbab60a4451b3f4da8e4f3a82f72e669",
+          "originalSha256": "3f5f9cb8f7811394df06a3f76865a051bbab60a4451b3f4da8e4f3a82f72e669",
+          "match": true
+        },
+        {
+          "path": "scripts/ai-verification/realtime.mjs",
+          "sha256": "5e58af51125cafd48a0681c3a73a0b42c8a70452120721463ed80160756884c0",
+          "originalSha256": "5e58af51125cafd48a0681c3a73a0b42c8a70452120721463ed80160756884c0",
+          "match": true
+        },
+        {
+          "path": "scripts/ai-verification/streams.mjs",
+          "sha256": "cd9fb5f5131244ed1a87d6e824911920d7dd99fdeae89189fb39280d58ede672",
+          "originalSha256": "cd9fb5f5131244ed1a87d6e824911920d7dd99fdeae89189fb39280d58ede672",
+          "match": true
+        },
+        {
+          "path": "scripts/ai-verification/support.mjs",
+          "sha256": "42370ccf0a460eb0b1cf1e4b898a97dafc13fc05bb5aeb00f3983918495f2e1b",
+          "originalSha256": "42370ccf0a460eb0b1cf1e4b898a97dafc13fc05bb5aeb00f3983918495f2e1b",
+          "match": true
+        }
+      ],
+      "manifestChangesOnly": true
+    },
+    {
+      "root": "/tmp/relkit-core-consumers-demo-3d6cp84c",
+      "links": 86,
+      "externalOpenai": 2,
+      "linksExcludingOpenai": 84,
+      "badLinks": [],
+      "linksDetailed": [
+        {
+          "copy": "demo",
+          "name": "@langchain/openai",
+          "target": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@langchain/openai",
+          "version": "1.6.2",
+          "manifestSha256": "ed3583c43049d9628dff395246294861d509cf57c0b5401adbdce767135b6ed1"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/app",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/app",
+          "version": "0.5.5",
+          "manifestSha256": "aa2df1bf1637da6842c3407c53aeef793face83251863ab64bfc12add443a1b3"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/docker",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/docker",
+          "version": "0.5.5",
+          "manifestSha256": "ca5edfd85e29be0730b8c13625cffb92657bf1df95e449b4699c329efc4e3834"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/local",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/local",
+          "version": "0.5.5",
+          "manifestSha256": "ab5d7df57f25622c77bd8440da1be7eceb5627b426f77aa13bd1b75434c53bf7"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/redis",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/redis",
+          "version": "0.5.5",
+          "manifestSha256": "0a3fc85f363916da3dfe4d60a5fa518f2e2c467aae1f259d7a7a058d81126e18"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/s3",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/s3",
+          "version": "0.5.5",
+          "manifestSha256": "ba77969735379ebc49d4cf3eccb10712b9754a9a757c078e6eacc78febb4e3ca"
+        },
+        {
+          "copy": "demo",
+          "name": "langchain",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+          "version": "1.5.10",
+          "manifestSha256": "854693b0f89432430f091b520b23d80b020375e19c839b0f7e361e9259d3bf16"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/agents",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/agents",
+          "version": "0.5.5",
+          "manifestSha256": "a3e9be17f6c85b48aba3f5374f49e6f6e7fda06ca767a79134149c6855786759"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/better-auth",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/better-auth",
+          "version": "0.5.5",
+          "manifestSha256": "1757289e8d3e7c0a096c1f566ac4e09e89b9a79b0ca48eaa95f65a02d52b88c5"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/buckets",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/buckets",
+          "version": "0.5.5",
+          "manifestSha256": "53e78691f72f7eb16b6e63c9a5be312ca09cf0eaf88332579571e2cf0b184b5e"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/cache",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cache",
+          "version": "0.5.5",
+          "manifestSha256": "ab235d6cf29b9d2d6df2af1320710c53479db13853dc9df580b28bb8fd7439a4"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/cli",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cli",
+          "version": "0.5.5",
+          "manifestSha256": "cedf178f409308df75646a4f81cced3638e565b54eb6eae106c6222368111576"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/client",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client",
+          "version": "0.5.5",
+          "manifestSha256": "9104e578496da9655cf25e4be210671eb06b70b564419eaae77075be2e6d97c2"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/client-generator",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client-generator",
+          "version": "0.5.5",
+          "manifestSha256": "4c0b7ba1fe58fd4b3e3cd70960d147723d88914e333a8384246a1b45f5c8f2ce"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/compiler",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/compiler",
+          "version": "0.5.5",
+          "manifestSha256": "ec71d17551348b2b37af758ca273e3877e6b5eae90f7812d575945d1d1e82cea"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/config",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/config",
+          "version": "0.5.5",
+          "manifestSha256": "cb5773cf1ca9fed8a51888f61108ac1eb3c18843e9d374f7a9eab4b7e3114cd7"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/contracts",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/contracts",
+          "version": "0.5.5",
+          "manifestSha256": "e7a33ef58a1f868a884c5db0a0c98c0ab9595da428163804f624b078d47e1ed6"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/deploy",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy",
+          "version": "0.5.5",
+          "manifestSha256": "5c3953ba0fac0395994a59f86beae3dcc7ac99f67899a464b1186b6994469cf5"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/deploy-pulumi",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy-pulumi",
+          "version": "0.5.5",
+          "manifestSha256": "3f39d3ec93308dd0b7e759d31fdd8a248fd31f4c8eae3c9e8f624d188427a320"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/diagnostics",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/diagnostics",
+          "version": "0.5.5",
+          "manifestSha256": "98e7454bc84095657ff57bbcbdc0e8925cc7185d38b9d91a78442fc50854c386"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/drizzle",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/drizzle",
+          "version": "0.5.5",
+          "manifestSha256": "b07357de6c894945e89cd28e950c3a42ee7fef103d87bc9d593c9e16af8e8415"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/engine",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/engine",
+          "version": "0.5.5",
+          "manifestSha256": "186ba56aedc0835682a54e75bd470d7654152307d9b742a9d7cea368c11e31b2"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/events",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/events",
+          "version": "0.5.5",
+          "manifestSha256": "81d86220f1de7a001292ced0a264992349eefd48d6816d8c74dff6e4ca3f4aaf"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/functions",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/functions",
+          "version": "0.5.5",
+          "manifestSha256": "8be50d93df71d87beed92f95232eb952868a4008ed7caf889de01e0b16f34390"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/graph",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/graph",
+          "version": "0.5.5",
+          "manifestSha256": "187989ed8703e5e7f94974649c85041e5d1895991e8855e98b7e9202424afff9"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/inspector-api",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/inspector-api",
+          "version": "0.5.5",
+          "manifestSha256": "731e2a8f0db0040994e0b9b77f9e5c2211ef655491037e1d77e1a7c0662cb0ee"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/invocation",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/invocation",
+          "version": "0.5.5",
+          "manifestSha256": "680972cca0b16f6575299dec6bcf4ffc47b7c761e2913de51423c30f6ab80d82"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/jobs",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs",
+          "version": "0.5.5",
+          "manifestSha256": "bba1c781e53a3fd69a409d61e929b8e1fea5fb85da31f3d50cbf5d1eb966126a"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/local-service",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/local-service",
+          "version": "0.5.5",
+          "manifestSha256": "1d70465715ecc1e908b8b2613344e18757eb4dfec782a9a2381ada4090706968"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/observability",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/observability",
+          "version": "0.5.5",
+          "manifestSha256": "b8a78acfc4d25b7e16b2d0636e8181c8fc11a6dcee58f53f6902a05e9edbca2d"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/openapi",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/openapi",
+          "version": "0.5.5",
+          "manifestSha256": "b5a1a0bb81aec02e6a1323da3ad1e74567b66b1c1300e65ca5ad63c55837a0b5"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/provider",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/provider",
+          "version": "0.5.5",
+          "manifestSha256": "9508ba563bdd07a0f9ba78ef6f61369dc5f8380052f971cf901b6ba36fc21b17"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/providers-local",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/providers-local",
+          "version": "0.5.5",
+          "manifestSha256": "3945c0220d897fd739a491de87e5f40a3d2898144fee2863d32be62f5db8dc13"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/realtime",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/realtime",
+          "version": "0.5.5",
+          "manifestSha256": "00570ab2e0a9ad54d8ff7f012d00aa3f489c309d47a132f72254dcf3046ed541"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/routes",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/routes",
+          "version": "0.5.5",
+          "manifestSha256": "58433d76db2e65a2693e120f5d2fc0418adb5d7ddff8cbee970e44c467f152f6"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/runtime-effect",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-effect",
+          "version": "0.5.5",
+          "manifestSha256": "6fe9e540a375d9e4b35c744cc3eff07227bdb8e7fbd4738896fcf148fa2854f8"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/runtime-hono",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono",
+          "version": "0.5.5",
+          "manifestSha256": "174f7173e4f13bbf75f0878d564e38ac516a0c9a411a8eb09abc2705557846b4"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/schema",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/schema",
+          "version": "0.5.5",
+          "manifestSha256": "6706aff4851d3b5d453a16473fb8d7ec9e283152393778683808c409a4fb4868"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/services",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/services",
+          "version": "0.5.5",
+          "manifestSha256": "58528adc61063988442957b06451d3c1dd1cbe4d4e8412cc31a79a09cac17b29"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/supervisor",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/supervisor",
+          "version": "0.5.5",
+          "manifestSha256": "f2e87520c0cd4b504677da4fbe9b5f14c289b44445f7c4042c4e3fa36688ee9d"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/testing",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/testing",
+          "version": "0.5.5",
+          "manifestSha256": "670165fcca581cbfaf51a0a423885eaefee406a6700433e5382c547cce74e593"
+        },
+        {
+          "copy": "demo",
+          "name": "@relkit/tools",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/tools",
+          "version": "0.5.5",
+          "manifestSha256": "2d9af001b2c76fe9899a017865738089822ebaa825a9c5a4135a0e2ff9b98201"
+        },
+        {
+          "copy": "demo",
+          "name": "@types/bun",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@types+bun@1.3.10/node_modules/@types/bun",
+          "version": "1.3.10",
+          "manifestSha256": "06eb274cb1964673954a63df2c8ca0429d45b2ef56106d35be3cb28364908472"
+        },
+        {
+          "copy": "demo",
+          "name": "typescript",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/typescript@5.9.3/node_modules/typescript",
+          "version": "5.9.3",
+          "manifestSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6"
+        },
+        {
+          "copy": "fixture",
+          "name": "@langchain/langgraph",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@langchain+langgraph@1.4.14+9ed32dbb8973e5bd/node_modules/@langchain/langgraph",
+          "version": "1.4.14",
+          "manifestSha256": "e737d5ed8be6004c6c11e3a6f3948fa335d10d3950cd9ad9d162ee82238ba297"
+        },
+        {
+          "copy": "fixture",
+          "name": "@langchain/openai",
+          "target": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@langchain/openai",
+          "version": "1.6.2",
+          "manifestSha256": "ed3583c43049d9628dff395246294861d509cf57c0b5401adbdce767135b6ed1"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/app",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/app",
+          "version": "0.5.5",
+          "manifestSha256": "aa2df1bf1637da6842c3407c53aeef793face83251863ab64bfc12add443a1b3"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/local",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/local",
+          "version": "0.5.5",
+          "manifestSha256": "ab5d7df57f25622c77bd8440da1be7eceb5627b426f77aa13bd1b75434c53bf7"
+        },
+        {
+          "copy": "fixture",
+          "name": "langchain",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+          "version": "1.5.10",
+          "manifestSha256": "854693b0f89432430f091b520b23d80b020375e19c839b0f7e361e9259d3bf16"
+        },
+        {
+          "copy": "fixture",
+          "name": "@types/bun",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@types+bun@1.3.10/node_modules/@types/bun",
+          "version": "1.3.10",
+          "manifestSha256": "06eb274cb1964673954a63df2c8ca0429d45b2ef56106d35be3cb28364908472"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/cli",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cli",
+          "version": "0.5.5",
+          "manifestSha256": "cedf178f409308df75646a4f81cced3638e565b54eb6eae106c6222368111576"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/testing",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/testing",
+          "version": "0.5.5",
+          "manifestSha256": "670165fcca581cbfaf51a0a423885eaefee406a6700433e5382c547cce74e593"
+        },
+        {
+          "copy": "fixture",
+          "name": "typescript",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/typescript@5.9.3/node_modules/typescript",
+          "version": "5.9.3",
+          "manifestSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/agents",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/agents",
+          "version": "0.5.5",
+          "manifestSha256": "a3e9be17f6c85b48aba3f5374f49e6f6e7fda06ca767a79134149c6855786759"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/better-auth",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/better-auth",
+          "version": "0.5.5",
+          "manifestSha256": "1757289e8d3e7c0a096c1f566ac4e09e89b9a79b0ca48eaa95f65a02d52b88c5"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/buckets",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/buckets",
+          "version": "0.5.5",
+          "manifestSha256": "53e78691f72f7eb16b6e63c9a5be312ca09cf0eaf88332579571e2cf0b184b5e"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/cache",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cache",
+          "version": "0.5.5",
+          "manifestSha256": "ab235d6cf29b9d2d6df2af1320710c53479db13853dc9df580b28bb8fd7439a4"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/client",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client",
+          "version": "0.5.5",
+          "manifestSha256": "9104e578496da9655cf25e4be210671eb06b70b564419eaae77075be2e6d97c2"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/client-generator",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client-generator",
+          "version": "0.5.5",
+          "manifestSha256": "4c0b7ba1fe58fd4b3e3cd70960d147723d88914e333a8384246a1b45f5c8f2ce"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/compiler",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/compiler",
+          "version": "0.5.5",
+          "manifestSha256": "ec71d17551348b2b37af758ca273e3877e6b5eae90f7812d575945d1d1e82cea"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/config",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/config",
+          "version": "0.5.5",
+          "manifestSha256": "cb5773cf1ca9fed8a51888f61108ac1eb3c18843e9d374f7a9eab4b7e3114cd7"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/contracts",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/contracts",
+          "version": "0.5.5",
+          "manifestSha256": "e7a33ef58a1f868a884c5db0a0c98c0ab9595da428163804f624b078d47e1ed6"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/deploy",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy",
+          "version": "0.5.5",
+          "manifestSha256": "5c3953ba0fac0395994a59f86beae3dcc7ac99f67899a464b1186b6994469cf5"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/deploy-pulumi",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy-pulumi",
+          "version": "0.5.5",
+          "manifestSha256": "3f39d3ec93308dd0b7e759d31fdd8a248fd31f4c8eae3c9e8f624d188427a320"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/diagnostics",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/diagnostics",
+          "version": "0.5.5",
+          "manifestSha256": "98e7454bc84095657ff57bbcbdc0e8925cc7185d38b9d91a78442fc50854c386"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/drizzle",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/drizzle",
+          "version": "0.5.5",
+          "manifestSha256": "b07357de6c894945e89cd28e950c3a42ee7fef103d87bc9d593c9e16af8e8415"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/engine",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/engine",
+          "version": "0.5.5",
+          "manifestSha256": "186ba56aedc0835682a54e75bd470d7654152307d9b742a9d7cea368c11e31b2"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/events",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/events",
+          "version": "0.5.5",
+          "manifestSha256": "81d86220f1de7a001292ced0a264992349eefd48d6816d8c74dff6e4ca3f4aaf"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/functions",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/functions",
+          "version": "0.5.5",
+          "manifestSha256": "8be50d93df71d87beed92f95232eb952868a4008ed7caf889de01e0b16f34390"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/graph",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/graph",
+          "version": "0.5.5",
+          "manifestSha256": "187989ed8703e5e7f94974649c85041e5d1895991e8855e98b7e9202424afff9"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/inspector-api",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/inspector-api",
+          "version": "0.5.5",
+          "manifestSha256": "731e2a8f0db0040994e0b9b77f9e5c2211ef655491037e1d77e1a7c0662cb0ee"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/invocation",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/invocation",
+          "version": "0.5.5",
+          "manifestSha256": "680972cca0b16f6575299dec6bcf4ffc47b7c761e2913de51423c30f6ab80d82"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/jobs",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs",
+          "version": "0.5.5",
+          "manifestSha256": "bba1c781e53a3fd69a409d61e929b8e1fea5fb85da31f3d50cbf5d1eb966126a"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/local-service",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/local-service",
+          "version": "0.5.5",
+          "manifestSha256": "1d70465715ecc1e908b8b2613344e18757eb4dfec782a9a2381ada4090706968"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/observability",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/observability",
+          "version": "0.5.5",
+          "manifestSha256": "b8a78acfc4d25b7e16b2d0636e8181c8fc11a6dcee58f53f6902a05e9edbca2d"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/openapi",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/openapi",
+          "version": "0.5.5",
+          "manifestSha256": "b5a1a0bb81aec02e6a1323da3ad1e74567b66b1c1300e65ca5ad63c55837a0b5"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/provider",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/provider",
+          "version": "0.5.5",
+          "manifestSha256": "9508ba563bdd07a0f9ba78ef6f61369dc5f8380052f971cf901b6ba36fc21b17"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/providers-local",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/providers-local",
+          "version": "0.5.5",
+          "manifestSha256": "3945c0220d897fd739a491de87e5f40a3d2898144fee2863d32be62f5db8dc13"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/realtime",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/realtime",
+          "version": "0.5.5",
+          "manifestSha256": "00570ab2e0a9ad54d8ff7f012d00aa3f489c309d47a132f72254dcf3046ed541"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/routes",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/routes",
+          "version": "0.5.5",
+          "manifestSha256": "58433d76db2e65a2693e120f5d2fc0418adb5d7ddff8cbee970e44c467f152f6"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/runtime-effect",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-effect",
+          "version": "0.5.5",
+          "manifestSha256": "6fe9e540a375d9e4b35c744cc3eff07227bdb8e7fbd4738896fcf148fa2854f8"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/runtime-hono",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono",
+          "version": "0.5.5",
+          "manifestSha256": "174f7173e4f13bbf75f0878d564e38ac516a0c9a411a8eb09abc2705557846b4"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/schema",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/schema",
+          "version": "0.5.5",
+          "manifestSha256": "6706aff4851d3b5d453a16473fb8d7ec9e283152393778683808c409a4fb4868"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/services",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/services",
+          "version": "0.5.5",
+          "manifestSha256": "58528adc61063988442957b06451d3c1dd1cbe4d4e8412cc31a79a09cac17b29"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/supervisor",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/supervisor",
+          "version": "0.5.5",
+          "manifestSha256": "f2e87520c0cd4b504677da4fbe9b5f14c289b44445f7c4042c4e3fa36688ee9d"
+        },
+        {
+          "copy": "fixture",
+          "name": "@relkit/tools",
+          "target": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/tools",
+          "version": "0.5.5",
+          "manifestSha256": "2d9af001b2c76fe9899a017865738089822ebaa825a9c5a4135a0e2ff9b98201"
+        }
+      ],
+      "originalInputChanges": [
+        "demo/package.json",
+        "fixture/package.json"
+      ],
+      "scripts": [
+        {
+          "path": "scripts/graph-evidence.mjs",
+          "sha256": "ae29250b95941bd01c052fd1f42b7ef96b22b3fb7c2fa7b7fd2c38b4f5470f9c",
+          "originalSha256": "ae29250b95941bd01c052fd1f42b7ef96b22b3fb7c2fa7b7fd2c38b4f5470f9c",
+          "match": true
+        },
+        {
+          "path": "scripts/inspector-api-evidence.mjs",
+          "sha256": "36c4ea7dbc3238b2832218d3d39a6905d70962426149eb1fb70e822dee3c6eea",
+          "originalSha256": "36c4ea7dbc3238b2832218d3d39a6905d70962426149eb1fb70e822dee3c6eea",
+          "match": true
+        },
+        {
+          "path": "scripts/inspector-regressions.mjs",
+          "sha256": "04067a56bf98849fda3679183bbae0d9411c09f800f419c588cc28c1093218de",
+          "originalSha256": "04067a56bf98849fda3679183bbae0d9411c09f800f419c588cc28c1093218de",
+          "match": true
+        },
+        {
+          "path": "scripts/live-smoke.mjs",
+          "sha256": "28deb7dca032c7d8cf106857c3d5f2936213f43164b5fc7398e40be3291ee950",
+          "originalSha256": "28deb7dca032c7d8cf106857c3d5f2936213f43164b5fc7398e40be3291ee950",
+          "match": true
+        },
+        {
+          "path": "scripts/setup-local.mjs",
+          "sha256": "ea6db2530019901b4e74affe6affa41d2b70e472f722592551151ca9387c28ea",
+          "originalSha256": "ea6db2530019901b4e74affe6affa41d2b70e472f722592551151ca9387c28ea",
+          "match": true
+        },
+        {
+          "path": "scripts/validation-regressions.mjs",
+          "sha256": "2839cf7820b9d839953c99e8fb6141712c72a58ba9581d7ef4eb8c5850149154",
+          "originalSha256": "2839cf7820b9d839953c99e8fb6141712c72a58ba9581d7ef4eb8c5850149154",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-demo-agent.mjs",
+          "sha256": "85fcdbdfc3b0532dc7514b1427d734510f94026da950e4c99a33dbf87a42433c",
+          "originalSha256": "85fcdbdfc3b0532dc7514b1427d734510f94026da950e4c99a33dbf87a42433c",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-demo-luna.mjs",
+          "sha256": "c82b76d3eaf982c4b66b7e7a51d650a39319c9ebffa04980a4af37650d5befce",
+          "originalSha256": "c82b76d3eaf982c4b66b7e7a51d650a39319c9ebffa04980a4af37650d5befce",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-dev-origin.mjs",
+          "sha256": "c5551f7ebffe650374256b5f3d4d1b09c4001489f596a45896190346c6d206d6",
+          "originalSha256": "c5551f7ebffe650374256b5f3d4d1b09c4001489f596a45896190346c6d206d6",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-generated-ai.mjs",
+          "sha256": "d3ca5222389de5aef6cbbcdd1b9257dc5687894d60fd734221ab1da4aaae9052",
+          "originalSha256": "d3ca5222389de5aef6cbbcdd1b9257dc5687894d60fd734221ab1da4aaae9052",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-luna-agent.mjs",
+          "sha256": "ebe8edd8801e372d95c20bcadcc46357684a8b297cbb848592b1efa69bc1a29b",
+          "originalSha256": "ebe8edd8801e372d95c20bcadcc46357684a8b297cbb848592b1efa69bc1a29b",
+          "match": true
+        },
+        {
+          "path": "scripts/verify-realtime-disconnect.mjs",
+          "sha256": "9ab4dbfb975b5d4ad5cfc28e2f07eb3509ee0ae4d27865b06d67b9a99425e5ad",
+          "originalSha256": "9ab4dbfb975b5d4ad5cfc28e2f07eb3509ee0ae4d27865b06d67b9a99425e5ad",
+          "match": true
+        },
+        {
+          "path": "scripts/ai-verification/agents.mjs",
+          "sha256": "3f5f9cb8f7811394df06a3f76865a051bbab60a4451b3f4da8e4f3a82f72e669",
+          "originalSha256": "3f5f9cb8f7811394df06a3f76865a051bbab60a4451b3f4da8e4f3a82f72e669",
+          "match": true
+        },
+        {
+          "path": "scripts/ai-verification/realtime.mjs",
+          "sha256": "5e58af51125cafd48a0681c3a73a0b42c8a70452120721463ed80160756884c0",
+          "originalSha256": "5e58af51125cafd48a0681c3a73a0b42c8a70452120721463ed80160756884c0",
+          "match": true
+        },
+        {
+          "path": "scripts/ai-verification/streams.mjs",
+          "sha256": "cd9fb5f5131244ed1a87d6e824911920d7dd99fdeae89189fb39280d58ede672",
+          "originalSha256": "cd9fb5f5131244ed1a87d6e824911920d7dd99fdeae89189fb39280d58ede672",
+          "match": true
+        },
+        {
+          "path": "scripts/ai-verification/support.mjs",
+          "sha256": "42370ccf0a460eb0b1cf1e4b898a97dafc13fc05bb5aeb00f3983918495f2e1b",
+          "originalSha256": "42370ccf0a460eb0b1cf1e4b898a97dafc13fc05bb5aeb00f3983918495f2e1b",
+          "match": true
+        }
+      ],
+      "manifestChangesOnly": true
+    }
+  ],
+  "dependencyProvenance": "Each root has 86 direct absolute package links:84 from its selected framework workspace/dependency tree plus2 @langchain/openai1.6.2 links to the original installed external SDK (demo and fixture). 88 setup records include2 copied manifest SHA records, not88dependency links. All targets/linkstrings/native versions matched current disk. Original lockfiles remain byte-identical; only copied demo/fixture package manifests changed.",
+  "credentialPolicy": "Private .env variants/.npmrc excluded from copies; childEnvironment inherits only basic OS names and admits explicit local RELKIT_/PORT/HOST/NODE_ENV/BUN_ names, rejects credential-named extras. Both paid model declarations are lazy factories and offline scripts select only FakeToolCallingModel/MemorySaver graphs. Parent must keep paid probes excluded.",
+  "classification": {
+    "paidNotExecuted": [
+      "scripts/verify-demo-agent.mjs",
+      "scripts/verify-demo-luna.mjs",
+      "scripts/verify-luna-agent.mjs"
+    ],
+    "installerNotExecuted": [
+      "scripts/setup-local.mjs"
+    ],
+    "localDirectReplay": [
+      "scripts/graph-evidence.mjs",
+      "scripts/inspector-api-evidence.mjs",
+      "scripts/inspector-regressions.mjs",
+      "scripts/live-smoke.mjs",
+      "scripts/validation-regressions.mjs",
+      "scripts/verify-dev-origin.mjs",
+      "scripts/verify-generated-ai.mjs",
+      "scripts/verify-realtime-disconnect.mjs"
+    ],
+    "offlineHelperModules": [
+      "scripts/ai-verification/agents.mjs",
+      "scripts/ai-verification/realtime.mjs",
+      "scripts/ai-verification/streams.mjs",
+      "scripts/ai-verification/support.mjs"
+    ],
+    "offlineFixtureModels": [
+      "hello.assistant FakeToolCallingModel",
+      "hello.consumer FakeToolCallingModel",
+      "hello.review MemorySaver interrupt/resume unit graph"
+    ],
+    "paidLazyDeclarations": [
+      "demo.example-agent ChatOpenAI gpt-6-luna",
+      "hello.luna ChatOpenAI gpt-6-luna"
+    ]
+  },
+  "assertionParity": "All16 fullscript hashes exactly equal original values in both copied roots; no assertion/deadline/payload edits. Live-smoke11cases, validation-regressions5cases, generatedAI9checks retained. Unit review approval is an in-process MemorySaver interrupt/resume test; generated AI agent helper coversconsumer/assistant/invalid input only.",
+  "executionQualifications": [
+    {
+      "kind": "claim accuracy",
+      "path": "/tmp/relkit-core-consumers-demo-replay-sequence.md",
+      "issue": "Resolved in replay-sequence wording: generated replay records the actual nine checks, while approval is explicitly limited to the existing in-process MemorySaver unit. No live durable approval outcome is claimed."
+    },
+    {
+      "kind": "native browser cleanup",
+      "path": "scripts/inspector-regressions.mjs",
+      "issue": "Resolved structurally by independently accepted additive owned-inspector-regressions.mjs in both copies, preserving the original assertion body. Parent must still recover exact pre-admission registry sessions if external hard timeout bypasses JavaScript finally; no browser result claimed."
+    },
+    {
+      "kind": "capture-only oracle",
+      "paths": [
+        "scripts/graph-evidence.mjs",
+        "scripts/inspector-api-evidence.mjs"
+      ],
+      "issue": "Capture success is not assertion success. Sequence correctly requires independent raw graph/status/provider/event invariants; enforce those checks in fresh replay and retain exactresponses."
+    },
+    {
+      "kind": "bounded native execution",
+      "issue": "Some preserved scripts contain unbounded fetches/waits and the support runner uses spawnSync. Parent needs externally bounded retained process sessions with join/cleanup on allfailures; this preparation does not prove execution completion."
+    }
+  ],
+  "originRejectionProbe": "New native Bun foreign-origin probe freshly read EOF: bounded HTTP with403/ORIGIN_DENIED assertions, native websocket refuses opened/timeout outcomes, finally attempts socket.close and clears timer; requires fresh owned evidence path. Not executed here.",
+  "localResourceOwnership": "Recorded distinct real copied project roots hash into separate localProjectId/resourcePrefix; parent must audit exactprojectlabels and preserve others, no sharedapplicationId cleanup.",
+  "artifacts": [
+    {
+      "path": "/tmp/relkit-core-consumers-demo-copy.py",
+      "sha256": "adb9695fd459ae22e860e80ea3ebf34d6ded1088fdf828bcdaf3d53b2e45b376",
+      "lines": 101
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-replay-sequence.md",
+      "sha256": "97e326973c0037ef4d9ed72410deb6347d2fbb8ab53d5ce35a90165a6d2d90ce",
+      "lines": 75
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-local-resource-identities.json",
+      "sha256": "8a30803846679fe09c138bd7484c056211971eee4a6d992d03dc3f30de855d82",
+      "lines": 34
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-origin-rejection.mjs",
+      "sha256": "fe513b2d5a7d22e21cf456e1dd5c38a48d3990e610c793a9b2a8313552b7a021",
+      "lines": 69
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-nnq5hlav/replay-support.mjs",
+      "sha256": "3527684438dd8d5fba68fe7c9787ad189845a35d19e575c596bbda5800fcc707",
+      "lines": 100
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-nnq5hlav/copy-provenance.json",
+      "sha256": "9d892a152f729b14b4e4c5a7d5c6248447b2472874a36994992e7109dfe34f1d",
+      "lines": 714
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-nnq5hlav/setup-provenance.json",
+      "sha256": "a333efdd9b758408777f4c9742b56c6504307cfa78c156dfc701741deb4ff6fc",
+      "lines": 535
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-baseline-nnq5hlav/preservation-final.json",
+      "sha256": "73d139371f59a673c79585c36dc3c9e778c3c35c47dd1d4567256aca56650e03",
+      "lines": 8
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/replay-support.mjs",
+      "sha256": "5c7d27190b2e292f96a8bd15b19943aaa33e7e754a4dab990ec292f9569aed6b",
+      "lines": 100
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/copy-provenance.json",
+      "sha256": "721d46f48c999aa3e76db8a4bafb039acd12bf4fabd079f344e5d308e86b556a",
+      "lines": 714
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/setup-provenance.json",
+      "sha256": "011527bb33fb8dd1543758a391d77464d63b3e3ee88fb492e11225e570a7bace",
+      "lines": 535
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/preservation-final.json",
+      "sha256": "73d139371f59a673c79585c36dc3c9e778c3c35c47dd1d4567256aca56650e03",
+      "lines": 8
+    }
+  ],
+  "browserCleanupRecommendation": "Final parent-authored new owner harness inside each copied demo accepted; all 16 originals remain byte-identical. Full EOF and normalized AST plus exact body text prove unchanged assertions, operation order, wait deadlines and payloads. Each exact relkit-validation-UUID session is registered before native browser admission; finally joins all explicit session close attempts, preserving original failure and independently reporting cleanup failures. Parent confirms exact-registry recovery after hard termination. Canonical realpathSync root/evidence guards resolve macOS /tmp -> /private/tmp admission mismatch. See /tmp/relkit-demo-browser-owner-independent-review.json for two exact final SHAbca65ea92781fc739271e6d503eb5d5fe07501382b662d8e7282dcecfd0a8896,133-line paths. No browser execution was performed by reviewer.",
+  "integrationAcceptanceAssessment": {
+    "designAuthority": "design section 8 and tasks 7.2/9.5 freshly read through their full acceptance requirements",
+    "durableApproval": "Live durable approval is not one of the required nine generated-host checks. Existing fixture approval is an in-process MemorySaver interrupt/resume unit; repository agent-approval-rpc test uses appFetch with a local provider and proves approval continuation/idempotence, not a generated-host live approval probe. No additive live approval probe is required unless such a result is claimed.",
+    "acceptedAgentDisconnect": "Task7.2 explicitly requires accepted job/agent survival on observer disconnect. Retained generated AI helper observes its consumer only after settlement; realtime-disconnect concerns channel presence. Existing agent-rpc source uses actual Bun WebSocket acceptance/idempotence but returns a gap observer after the first run is already idle, and tests explicit stop/generation retirement separately. Those cases do not demonstrate disconnect during accepted execution. Add a bounded offline actual-server accepted-agent observer return/abort followed by continued completion, unless another independent actual-server case already supplies this precise evidence.",
+    "scope": "Assessment is read-only and does not claim complete repository coverage beyond the listed relevant cases. Parent owns additive probes and remaining composed telemetry/job evidence."
+  },
+  "limitations": "Preparation acceptance validates inputs/parity/provenance only. No fresh live/browser/provider outcomes are claimed; parent owns all future hosts and Commerce/Inspector browser runners."
+}

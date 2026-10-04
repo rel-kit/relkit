@@ -1,18 +1,30 @@
-import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { basename, delimiter, join, resolve } from "node:path";
 import { apiPackageDefinitions } from "./documentation-catalog.js";
 
 const root = resolve(import.meta.dir, "../../..");
 const examplesTsconfig = resolve(root, "apps/docs/docgen.examples.json");
 
+/** Generates one package reference and checks every extracted example in its source context.
+ * @param definition - Existing package catalog entry.
+ * @param exampleConfiguration - Runtime-specific example compiler configuration.
+ * @returns Rendered reference after native checks.
+ * @remarks Temporary checker/example output is owned by this invocation and removed on every exit. */
 export async function renderApi(
   definition: (typeof apiPackageDefinitions)[number],
+  exampleConfiguration: string = examplesTsconfig,
 ): Promise<string> {
   const { directory, packageName, slug, title } = definition;
   await mkdir(resolve(root, ".relkit"), { recursive: true });
   const workingDirectory = await mkdtemp(resolve(root, ".relkit/docgen-cwd-"));
   const temporary = resolve(root, ".relkit", `docgen-output-${basename(workingDirectory)}`);
   try {
+    const checker = resolve(workingDirectory, "check-examples.ts");
+    await writeFile(
+      checker,
+      `#!/usr/bin/env bun\nimport { checkDocgenExamples } from ${JSON.stringify(resolve(root, "apps/docs/scripts/check-docgen-examples.ts"))};\nprocess.exitCode = await checkDocgenExamples(process.argv.slice(2), process.env.RELKIT_DOCGEN_SOURCE_ROOT!, process.env.RELKIT_DOCGEN_TSC!);\n`,
+    );
+    await chmod(checker, 0o755);
     const config = JSON.parse(await readFile(resolve(root, "docgen.json"), "utf8")) as Record<
       string,
       unknown
@@ -27,7 +39,7 @@ export async function renderApi(
         JSON.stringify({
           ...config,
           outDir: `../${basename(temporary)}`,
-          tscExecutable: resolve(root, "node_modules/.bin/tsc"),
+          tscExecutable: checker,
         }),
       ),
     ]);
@@ -42,7 +54,7 @@ export async function renderApi(
       "--no-enforce-version",
       "--run-examples",
       "--examples-tsconfig-file",
-      examplesTsconfig,
+      exampleConfiguration,
       "--parse-tsconfig-file",
       resolve(root, directory, "tsconfig.json"),
     ];
@@ -50,6 +62,8 @@ export async function renderApi(
       cwd: workingDirectory,
       env: {
         ...process.env,
+        RELKIT_DOCGEN_SOURCE_ROOT: resolve(root, directory, "src"),
+        RELKIT_DOCGEN_TSC: resolve(root, "node_modules/.bin/tsc"),
         PATH: `${resolve(root, "apps/docs/node_modules/.bin")}${delimiter}${process.env.PATH ?? ""}`,
       },
       stdout: "pipe",
@@ -74,6 +88,8 @@ export async function renderApi(
   }
 }
 
+/** Lists generated module Markdown deterministically. @param directory - Owned output root.
+ * @returns Sorted generated Markdown paths. */
 export async function markdownFiles(directory: string): Promise<string[]> {
   const files: string[] = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -84,6 +100,8 @@ export async function markdownFiles(directory: string): Promise<string[]> {
   return files.sort((left, right) => left.localeCompare(right));
 }
 
+/** Removes docgen page frontmatter before composing the package reference.
+ * @param markdown - Generated module page. @returns Package-embeddable Markdown. */
 function cleanDocgen(markdown: string): string {
   const withoutFrontmatter = markdown.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
   return withoutFrontmatter.replace(/^## (.+\.ts) overview/m, "## `$1`");

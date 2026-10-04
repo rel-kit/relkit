@@ -1,15 +1,19 @@
-import { GRAPH_VERSION, type JsonValue } from "@relkit/contracts";
+import type { GraphCollection } from "./graph.types.js";
+export type { GraphCollection } from "./graph.types.js";
+import { Effect, Schema } from "effect";
+import { observeExecution } from "@relkit/contracts/operation";
 import {
-  identity,
-  isRecord,
-  page,
-  pick,
-  safeJson,
-  type ResolvedActiveGeneration,
-} from "./shared.js";
-import { projectDescriptors, projectNode, projectObservedEdges } from "./graph-utils.js";
+  runInspectorPromise as runExecutionPromise,
+  runInspectorSync as runExecutionSync,
+} from "./native-edge.js";
+import { inspectorExecution } from "./execution.js";
+import { projectionAttempt } from "./native-edge.js";
+import { type JsonValue } from "@relkit/contracts";
+import { identity, isRecord, page, type ResolvedActiveGeneration } from "./shared.js";
+import { projectDescriptors, projectObservedEdges } from "./graph-utils.js";
 import { projectIntegrationProvenance } from "./topology.js";
 
+/** Declared public graph collection vocabulary; no arbitrary object paths are accepted. */
 export const GRAPH_COLLECTIONS = Object.freeze([
   "descriptors",
   "routes",
@@ -26,19 +30,31 @@ export const GRAPH_COLLECTIONS = Object.freeze([
   "services",
   "providers",
 ] as const);
-export type GraphCollection = (typeof GRAPH_COLLECTIONS)[number];
 
-export class InspectorGraphError extends Error {
+/** Selective graph availability/detail failure preserving the positional public constructor. */
+export class InspectorGraphError extends Schema.TaggedError<InspectorGraphError>()(
+  "InspectorGraphError",
+  {
+    code: Schema.Literals(["RELKIT_INSPECTOR_GRAPH_UNAVAILABLE", "RELKIT_INSPECTOR_NOT_FOUND"]),
+    status: Schema.Literals([404, 503]),
+    message: Schema.String,
+  },
+) {
   constructor(
-    readonly code: "RELKIT_INSPECTOR_GRAPH_UNAVAILABLE" | "RELKIT_INSPECTOR_NOT_FOUND",
-    readonly status: 404 | 503,
+    code: "RELKIT_INSPECTOR_GRAPH_UNAVAILABLE" | "RELKIT_INSPECTOR_NOT_FOUND",
+    status: 404 | 503,
   ) {
-    super(code);
+    super({ code, status, message: code });
     this.name = "InspectorGraphError";
   }
 }
 
-export async function graphSnapshot(generation: ResolvedActiveGeneration): Promise<JsonValue> {
+/**
+ * Projects the active graph with declared and observed topology evidence.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @returns Public graph JSON retaining existing identity and version fields.
+ */
+function graphSnapshotValue(generation: ResolvedActiveGeneration): JsonValue {
   const data = graphData(generation.graph);
   if (data === undefined) throw new InspectorGraphError("RELKIT_INSPECTOR_GRAPH_UNAVAILABLE", 503);
   const observedEdges = projectObservedEdges(generation.observedEdges);
@@ -56,11 +72,37 @@ export async function graphSnapshot(generation: ResolvedActiveGeneration): Promi
   } as JsonValue;
 }
 
-export async function graphList(
+/**
+ * Projects the active graph with declared and observed topology evidence.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @returns A lazy observed Effect containing public graph JSON retaining existing identity and version fields.
+ */
+export const graphSnapshotEffect = Effect.fn("Inspector.graphSnapshot")(
+  (generation: ResolvedActiveGeneration) => projectionAttempt(() => graphSnapshotValue(generation)),
+  (effect) => observeExecution("inspector", "graphSnapshot", effect),
+);
+
+/**
+ * Projects the active graph with declared and observed topology evidence.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @returns Public graph JSON retaining existing identity and version fields.
+ */
+export function graphSnapshot(generation: ResolvedActiveGeneration): Promise<JsonValue> {
+  return runExecutionPromise(inspectorExecution, graphSnapshotEffect(generation));
+}
+
+/**
+ * Projects and paginates one declared graph collection.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @returns A bounded public graph page preserving continuation behavior.
+ */
+function graphListValue(
   generation: ResolvedActiveGeneration,
   collection: GraphCollection,
   request: Request,
-): Promise<JsonValue> {
+): JsonValue {
   const items =
     collection === "descriptors" && generation.descriptors !== undefined
       ? projectDescriptors(generation.descriptors)
@@ -69,7 +111,42 @@ export async function graphList(
   return { ...identity(generation), ...page(items, request) } as JsonValue;
 }
 
-export function graphDetail(
+/**
+ * Projects and paginates one declared graph collection.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @returns A lazy observed Effect containing a bounded public graph page preserving continuation behavior.
+ */
+export const graphListEffect = Effect.fn("Inspector.graphList")(
+  (generation: ResolvedActiveGeneration, collection: GraphCollection, request: Request) =>
+    projectionAttempt(() => graphListValue(generation, collection, request)),
+  (effect) => observeExecution("inspector", "graphList", effect),
+);
+
+/**
+ * Projects and paginates one declared graph collection.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @returns A bounded public graph page preserving continuation behavior.
+ */
+export function graphList(
+  generation: ResolvedActiveGeneration,
+  collection: GraphCollection,
+  request: Request,
+): Promise<JsonValue> {
+  return runExecutionPromise(inspectorExecution, graphListEffect(generation, collection, request));
+}
+
+/**
+ * Projects a declaration and only edges touching its identifier.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param id - Declaration or native record identifier selected by the caller.
+ * @returns The existing public declaration detail envelope.
+ */
+function graphDetailValue(
   generation: ResolvedActiveGeneration,
   collection: GraphCollection,
   id: string,
@@ -94,7 +171,41 @@ export function graphDetail(
   } as JsonValue;
 }
 
-export function sourceDetail(generation: ResolvedActiveGeneration, id: string): JsonValue {
+/**
+ * Projects a declaration and only edges touching its identifier.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param id - Declaration or native record identifier selected by the caller.
+ * @returns A lazy observed Effect containing the existing public declaration detail envelope.
+ */
+export const graphDetailEffect = Effect.fn("Inspector.graphDetail")(
+  (generation: ResolvedActiveGeneration, collection: GraphCollection, id: string) =>
+    projectionAttempt(() => graphDetailValue(generation, collection, id)),
+  (effect) => observeExecution("inspector", "graphDetail", effect),
+);
+
+/**
+ * Projects a declaration and only edges touching its identifier.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param id - Declaration or native record identifier selected by the caller.
+ * @returns The existing public declaration detail envelope.
+ */
+export function graphDetail(
+  generation: ResolvedActiveGeneration,
+  collection: GraphCollection,
+  id: string,
+): JsonValue {
+  return runExecutionSync(inspectorExecution, graphDetailEffect(generation, collection, id));
+}
+
+/**
+ * Projects a safe declaration source location without exposing provider paths.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param id - Declaration or native record identifier selected by the caller.
+ * @returns The existing public source envelope, or its not-found failure.
+ */
+function sourceDetailValue(generation: ResolvedActiveGeneration, id: string): JsonValue {
   const node = graphItems(generation.graph, "descriptors")?.find(
     (value) => isRecord(value) && value.id === id,
   );
@@ -103,54 +214,26 @@ export function sourceDetail(generation: ResolvedActiveGeneration, id: string): 
   return { ...identity(generation), id, source: node.source } as JsonValue;
 }
 
-function graphData(
-  value: unknown,
-): { contractVersion: number; appId?: string; nodes: JsonValue[]; edges: JsonValue[] } | undefined {
-  if (!isRecord(value) || !Array.isArray(value.nodes) || !Array.isArray(value.edges))
-    return undefined;
-  const nodes = value.nodes.flatMap((node) => {
-    const projected = projectNode(node);
-    return projected === undefined ? [] : [projected];
-  });
-  const edges = value.edges.flatMap((edge) => {
-    if (
-      !isRecord(edge) ||
-      typeof edge.kind !== "string" ||
-      typeof edge.from !== "string" ||
-      typeof edge.to !== "string"
-    )
-      return [];
-    return [
-      safeJson(pick(edge, ["kind", "from", "to", "role", "member", "order", "match", "phase"])),
-    ];
-  });
-  return {
-    contractVersion:
-      typeof value.contractVersion === "number" && Number.isSafeInteger(value.contractVersion)
-        ? value.contractVersion
-        : GRAPH_VERSION,
-    ...(typeof value.appId === "string" ? { appId: value.appId } : {}),
-    nodes,
-    edges,
-  };
+/**
+ * Projects a safe declaration source location without exposing provider paths.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param id - Declaration or native record identifier selected by the caller.
+ * @returns A lazy observed Effect containing the existing public source envelope, or its not-found failure.
+ */
+export const sourceDetailEffect = Effect.fn("Inspector.sourceDetail")(
+  (generation: ResolvedActiveGeneration, id: string) =>
+    projectionAttempt(() => sourceDetailValue(generation, id)),
+  (effect) => observeExecution("inspector", "sourceDetail", effect),
+);
+
+/**
+ * Projects a safe declaration source location without exposing provider paths.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param id - Declaration or native record identifier selected by the caller.
+ * @returns The existing public source envelope, or its not-found failure.
+ */
+export function sourceDetail(generation: ResolvedActiveGeneration, id: string): JsonValue {
+  return runExecutionSync(inspectorExecution, sourceDetailEffect(generation, id));
 }
 
-function graphItems(value: unknown, collection: GraphCollection | "env"): JsonValue[] | undefined {
-  const data = graphData(value);
-  if (data === undefined) return undefined;
-  if (collection === "descriptors") return data.nodes;
-  return data.nodes.filter((node) => belongs(node, collection));
-}
-
-function belongs(node: JsonValue, collection: string): boolean {
-  if (!isRecord(node)) return false;
-  if (collection === "routes")
-    return node.kind === "trigger" && isRecord(node.config) && node.config.method !== undefined;
-  if (collection === "env") return node.kind === "env";
-  if (collection === "providers") return node.kind === "provider";
-  return node.kind === (collection === "cache" ? "cache" : collection.slice(0, -1));
-}
-
-function edgeTouches(edge: JsonValue, id: string): boolean {
-  return isRecord(edge) && (edge.from === id || edge.to === id);
-}
+import { graphData, graphItems, edgeTouches } from "./graph-projection.js";

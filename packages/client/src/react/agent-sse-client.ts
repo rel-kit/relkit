@@ -1,29 +1,22 @@
-import {
-  AGENT_CAPABILITY_HEADER,
-  AGENT_CAPABILITY_VALUE,
-  type AgentObservation,
-  type JournalCheckpoint,
-} from "@relkit/contracts";
-import { ORPCError, type ClientHeaders } from "../index.js";
+import { AGENT_CAPABILITY_HEADER, AGENT_CAPABILITY_VALUE } from "@relkit/contracts";
+import { ORPCError } from "@orpc/client";
+import type { ClientHeaders } from "../index.types.js";
+import { agentSseObservations } from "./agent-sse-stream.js";
+import type { AgentSseClientOptions, AgentSseObserveInput } from "./agent-sse.types.js";
 
-interface AgentSseClientOptions {
-  readonly baseUrl: string;
-  readonly credentials: NonNullable<RequestInit["credentials"]>;
-  readonly headers?: ClientHeaders;
-  readonly fetch: typeof globalThis.fetch;
-}
-
-interface ObserveInput {
-  readonly agentId: string;
-  readonly threadId: string;
-  readonly runId?: string;
-  readonly after: JournalCheckpoint;
-}
-
+/**
+ * Creates the native SSE edge used by the agent observation service.
+ * @param options - Borrowed browser HTTP configuration.
+ * @param fallback - Existing finite procedure proxy.
+ * @returns A proxy overriding only the canonical observation procedure.
+ */
 export function createAgentSseClient(options: AgentSseClientOptions, fallback?: object): unknown {
   const observe = async (input: unknown, call?: unknown) => {
     const request = requireObserveInput(input);
     const signal = isRecord(call) && call.signal instanceof AbortSignal ? call.signal : undefined;
+    const controller = new AbortController();
+    const requestSignal =
+      signal === undefined ? controller.signal : AbortSignal.any([signal, controller.signal]);
     const headers = await resolveHeaders(options.headers);
     headers.set("accept", "text/event-stream");
     headers.set("content-type", "application/json");
@@ -38,7 +31,7 @@ export function createAgentSseClient(options: AgentSseClientOptions, fallback?: 
         method: "POST",
         headers,
         credentials: options.credentials,
-        ...(signal === undefined ? {} : { signal }),
+        signal: requestSignal,
         body: JSON.stringify({
           threadId: request.threadId,
           ...(request.runId === undefined ? {} : { runId: request.runId }),
@@ -48,7 +41,7 @@ export function createAgentSseClient(options: AgentSseClientOptions, fallback?: 
     if (!response.ok || response.body === null) {
       throw await responseError(response);
     }
-    return observations(response.body, signal);
+    return agentSseObservations(response.body, controller, signal);
   };
   return new Proxy(fallback ?? {}, {
     get(target, property, receiver) {
@@ -59,6 +52,11 @@ export function createAgentSseClient(options: AgentSseClientOptions, fallback?: 
   });
 }
 
+/**
+ * Translates the existing SSE HTTP error envelope into its canonical oRPC error.
+ * @param response - Original native HTTP response.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 async function responseError(response: Response): Promise<ORPCError<string, unknown>> {
   const payload = await response.json().catch(() => undefined);
   const nested = isRecord(payload) && isRecord(payload.error) ? payload.error : undefined;
@@ -83,48 +81,12 @@ async function responseError(response: Response): Promise<ORPCError<string, unkn
   return new ORPCError(code, { message });
 }
 
-async function* observations(
-  body: ReadableStream<Uint8Array>,
-  signal?: AbortSignal,
-): AsyncIterable<AgentObservation> {
-  const reader = body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  try {
-    while (!signal?.aborted) {
-      const next = await reader.read();
-      buffer += decoder.decode(next.value, { stream: !next.done }).replace(/\r\n/g, "\n");
-      let boundary = buffer.indexOf("\n\n");
-      while (boundary >= 0) {
-        const block = buffer.slice(0, boundary);
-        buffer = buffer.slice(boundary + 2);
-        const observation = decodeObservation(block);
-        if (observation !== undefined) yield observation;
-        boundary = buffer.indexOf("\n\n");
-      }
-      if (next.done) return;
-    }
-  } finally {
-    await reader.cancel(signal?.reason).catch(() => undefined);
-    reader.releaseLock();
-  }
-}
-
-function decodeObservation(block: string): AgentObservation | undefined {
-  const data = block
-    .split("\n")
-    .filter((line) => line.startsWith("data:"))
-    .map((line) => line.slice(5).trimStart())
-    .join("\n");
-  if (data === "") return undefined;
-  const event = JSON.parse(data) as unknown;
-  if (!isRecord(event) || !isRecord(event.metadata) || !isRecord(event.metadata.relkit)) {
-    return undefined;
-  }
-  return event.metadata.relkit.observation as AgentObservation | undefined;
-}
-
-function requireObserveInput(value: unknown): ObserveInput {
+/**
+ * Checks the existing selective SSE request authority before native dispatch.
+ * @param value - Original input or payload; its identity is retained where required.
+ * @returns The selectively checked observation request.
+ */
+function requireObserveInput(value: unknown): AgentSseObserveInput {
   if (
     !isRecord(value) ||
     typeof value.agentId !== "string" ||
@@ -134,14 +96,24 @@ function requireObserveInput(value: unknown): ObserveInput {
   ) {
     throw new TypeError("Agent SSE observation input is invalid.");
   }
-  return value as unknown as ObserveInput;
+  return value as unknown as AgentSseObserveInput;
 }
 
+/**
+ * Resolves current header values without mutating caller-owned headers.
+ * @param value - Original input or payload; its identity is retained where required.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 async function resolveHeaders(value: ClientHeaders | undefined): Promise<Headers> {
   const resolved = typeof value === "function" ? await value() : value;
   return new Headers(resolved as ConstructorParameters<typeof Headers>[0]);
 }
 
+/**
+ * Checks whether the existing property-access boundary accepts a supplied value.
+ * @param value - Original input or payload; its identity is retained where required.
+ * @returns Whether property access is valid for this boundary.
+ */
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return value !== null && typeof value === "object";
 }

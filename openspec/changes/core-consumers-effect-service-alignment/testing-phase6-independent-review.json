@@ -1,0 +1,1025 @@
+{
+  "reviewer": "client_baseline",
+  "worktree": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "baseline": "b0f77720764fd61e9872b0995e456014a611ba37",
+  "freezeUtc": "2026-10-03T18:39:06.036590+00:00",
+  "status": "accepted",
+  "reviewScope": "All 137 final TypeScript paths read through EOF across initial 125-path review, 77-path reread, 34-path amendment reread, and final 12-path owner reread; all 53 baseline paths and 12 moved counterparts reviewed; strict tsconfig.tests.json reread.",
+  "counts": {
+    "typescript": 137,
+    "source": 102,
+    "tests": 34,
+    "config": 1,
+    "baseline": 53,
+    "moved": 12,
+    "legacyOuterAssertionChains": 138
+  },
+  "findings": [],
+  "resolvedFindings": [
+    "Once-transition shutdown observers now record only the first runtime/job/event/HTTP release, including explicit repeated close and Layer finalizers.",
+    "HTTP Effect workflows own startup adoption, receipts, joins, all releases, callback ordering, and original failure selection; native listen/close remain platform seams.",
+    "Native non-cancelable HTTP startup has a masked admitted owner receipt and is retained until actual completion; owner close joins it before worker Scope retirement.",
+    "Both blocked-startup tests release their admission gate in finally, preserving cleanup when assertions or waits fail.",
+    "Earlier acquisition-prefix, implicit runtime cleanup, actual job/event/agent workflows, approval Deferred, schema/type companions, helper documentation, example cleanup, and legacy assertion-parity findings are resolved."
+  ],
+  "hashVerification": "All 137 final SHA-256 values matched current disk at final review; zero mismatches.",
+  "compatibility": "All 53 baseline paths reconcile; all 12 original/moved mappings preserve 138 exact outer assertion chains. The earlier 282 figure counted nested call expressions and is superseded.",
+  "effectDisposition": "All 25 use-effect families assessed with relevant installed rc.115 implementation, inline examples and tests; sparse read-only vendor checkout gaps recorded. No gratuitous API use required.",
+  "nativeBoundary": "HTTP platform.listen has no native signal; admitted startup is truthfully retained and joined rather than equating interrupted wait with native completion. Runtime's established bounded legacy callback deadline remains an explicit compatibility limit. Actual Bun isolation/cancellation/close-observation fixtures retain native ownership evidence.",
+  "checks": {
+    "effect": "28/28 cases across10files,4.51s after all final owner fixes",
+    "bun": "32/32 across 11 files, 142 executed expects, 1.446s",
+    "contractsAndEventIntegration": "57/57 across 7 files, 302 executed expects, 1.73s",
+    "engineMaterialization": "8/8 across 2 files, 805ms",
+    "strictTests": "Final strict tests tsc exit0",
+    "sourceBuild": "Final tsc-b package build exit0",
+    "format": "Final all-testing Prettier check exit0",
+    "legacyParity": "12 original/moved paths, 138 outer assertion chains exactly equal after imports/casts normalization; earlier 282 counted nested call expressions",
+    "bunAndContractsFinal": "89/89 cases across18files,444 executedexpects,2.83s after all final owner fixes",
+    "sourceAndTestTypecheck": "bun run --cwd packages/testing typecheck exit 0 (source build + strict tests)",
+    "postReviewStorage": "6/6 cases, 2.01s; all four clear/once-only-close metric counters asserted",
+    "packageBuild": "tsc -b exit0",
+    "prettier": "Passed all testing paths",
+    "implementationSize": "Final repository scan []",
+    "postReviewOwners": "7/7 focused owner cases across3files,960ms; interrupted native startup + public owner release metrics"
+  },
+  "reviewerRuns": "Read-only EOF/hash review; no overlapping heavy runner.",
+  "files": [
+    {
+      "path": "packages/testing/src/agent-approvals.ts",
+      "lines": 93,
+      "sha256": "6eb51e293ce681e82ed4dc5fc6777b7636b4369f1c7319d7b76d3cdb16cd763d",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agent-approvals.types.ts",
+      "lines": 18,
+      "sha256": "11541726e38a29531dc303362eb5019db0ebfe2142b950d036454a6159dd64d6",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agent-harness.types.ts",
+      "lines": 25,
+      "sha256": "d3bc8ce4d942f18bf50c8aad1b1b49f2bead19988b72be4675452b5857e5e60c",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agent-state.ts",
+      "lines": 191,
+      "sha256": "8b7bba383afe132156d078e580826ad4e81ba19e288d0d92ffd9aee281af589a",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agents-model-native.ts",
+      "lines": 135,
+      "sha256": "e559dfc53cd48897ea68435d4a12088e7707ce7caa5895252b43c319995f9d94",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agents-model.ts",
+      "lines": 153,
+      "sha256": "8428b8ac13b993cbf2f4477e42a089042a0acc3ce11ab6d2b939fbf23caeb44a",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agents-model.types.ts",
+      "lines": 20,
+      "sha256": "af5ba40b3555ef9ade269ea17389e2fc11958b2eefcb2f10580447f25cd80f06",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agents-types.ts",
+      "lines": 2,
+      "sha256": "0e8419ed09d61b8333de8fc161278b14222884451403d6c9cc78991c035c7a12",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agents-utils.ts",
+      "lines": 114,
+      "sha256": "4b29104a1da98f0eede720947f4421dce7d39b82c12b94d70c6e9d6f63b10a41",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agents.ts",
+      "lines": 121,
+      "sha256": "d392ffc8b73ca1c52cd74db9016b84cf4b2ff7f75247ebf09db39914cf14667e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/agents.types.ts",
+      "lines": 134,
+      "sha256": "cb1176ff551a79ae6afc561f366dc276f3d91e3cdbd309c417b67498c6d4c3da",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application-http.ts",
+      "lines": 215,
+      "sha256": "15129d40ca55e7911d8b1c69fb64cc802e15aaeffbc14652a5b5dccace43ac16",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application-realtime.ts",
+      "lines": 37,
+      "sha256": "d3f8947ea8a765c077e35fb78004cce48b78a441c82119b8af932583354c0add",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application-registry.ts",
+      "lines": 75,
+      "sha256": "5bb5f59959f418364ae57456fecfed7a353e278594443548c5e42a10d8d1e5f8",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application-registry.types.ts",
+      "lines": 13,
+      "sha256": "10fec625402086137cafac845f9c6f00a41a3804b2514f93e5cd661f83c6ff7d",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application-request.ts",
+      "lines": 75,
+      "sha256": "8ff2ee74f23024ccd7758751bb83e50099700669484509ff787cb61b54aae572",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application-routes.ts",
+      "lines": 237,
+      "sha256": "118f45b111db780af32f3fd80a82d62573880787c717e88542603d339e1bfe94",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application-routes.types.ts",
+      "lines": 43,
+      "sha256": "fb75fd4fd11901c446fa9fccae160df9b566e9f7e26731ce8d50fc83aacb702d",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application-services.ts",
+      "lines": 216,
+      "sha256": "395e6d1d2c9897d6e40bdac789989dd793b7fced6a77cd658fc5d0b3b70cf3ed",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application-services.types.ts",
+      "lines": 18,
+      "sha256": "0e6c47550f4f3eae04a0413326f25204a2607a29ed7608271fb3d73f69faa466",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/application.ts",
+      "lines": 231,
+      "sha256": "9e5dd7a164703f268587b45fb00cc561d3772b85ce55c67691dde519ce1c9e5b",
+      "reread": true,
+      "review": "Final EOF accepted after restoring original public JSDoc category/since tags"
+    },
+    {
+      "path": "packages/testing/src/application.types.ts",
+      "lines": 39,
+      "sha256": "06aff2a71e74c66b1babb77a5dc906fe93d17a815a90574a16ab707eedd6e6b9",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/bucket-storage.schemas.ts",
+      "lines": 19,
+      "sha256": "40c7192c23d844fb0bae7e7c56b56ba957033e6710cc5e5da26bce8f8ed51ade",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/bucket-storage.ts",
+      "lines": 232,
+      "sha256": "3e6947bfabef5a9684f2ec69840ea8d77fadf835cf06b685fe714e2afd4e735d",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/bucket-storage.types.ts",
+      "lines": 35,
+      "sha256": "e4efc37402ee60f7065fd6e24f24a0e124ee1ede2c8054b8d2ad7b61cdf3eea8",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/bucket-validation.ts",
+      "lines": 63,
+      "sha256": "9340832633f94313a61af5483a388e8336e7a934cea13839f601bc00a3112a1b",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/buckets-types.ts",
+      "lines": 2,
+      "sha256": "24f7c7745e6ffa0ae96223f61ca77e8c6a7bd968895511a0758043d784aea91d",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/buckets.ts",
+      "lines": 77,
+      "sha256": "7f4f4a02553f23d17b747b2366cbe0b1b19de55d7e5a7b8ee3fd90bf84850897",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/buckets.types.ts",
+      "lines": 41,
+      "sha256": "9e316c60cff0b84964e550d205f26dfba3cf94c48462ef4afff07ce4d2195682",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/cache-storage-state.ts",
+      "lines": 112,
+      "sha256": "f778dca39200e5833ad228aef23e431d535d6c1a6554dff9e94cbf054204eb68",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/cache-storage.schemas.ts",
+      "lines": 21,
+      "sha256": "780d08025ed88bfc4f3c8f1ca8d6220e3b177f209e677601df1bc6ea96e0fd2b",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/cache-storage.ts",
+      "lines": 215,
+      "sha256": "f52cf7f8eda72e530e63769c53084241a57234dd2a5d25ab66ddce2ff4419652",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/cache-storage.types.ts",
+      "lines": 60,
+      "sha256": "939f12e1a6e65375ca2d99839407169e149590d1ae79fb87d97ba45e46bf9b77",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/cache-types.ts",
+      "lines": 2,
+      "sha256": "b530db87b27580681769a7d23e3f28ea63915c59b1c6733ff5ba01c5b8ccd27c",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/cache.ts",
+      "lines": 98,
+      "sha256": "299ee1a39829bd238a928b606a68c75fcfedc965c607d7a453fb589b170f159d",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/cache.types.ts",
+      "lines": 57,
+      "sha256": "351c51b454c558891fa1392ee43e48c0edf8ce61dd2b2aa0ccd8489a5ca14546",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/event-controls.types.ts",
+      "lines": 17,
+      "sha256": "9b84c788acf7835dc5adaf225093d45c5240ca602eecf4c531afbe20b7fe611b",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-inspection.ts",
+      "lines": 56,
+      "sha256": "a652fac92bcd5ce446b0c441ef1a4e94e0432523d0bd5e3506985553159236f6",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-lifecycle.ts",
+      "lines": 27,
+      "sha256": "f8f95499da17f4c3fe93e5a6716c9d4c7040350fead411b4a3db0611d51046b0",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-runtime-controls.ts",
+      "lines": 170,
+      "sha256": "7746cc64098f631698d2c0eb6b5e1c529e74cc13213e02230ec996c2eda36bd7",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-runtime-controls.types.ts",
+      "lines": 42,
+      "sha256": "bd4ca2e68993a2b66241473b1be69100c1663264186ad91b2d652d327b6a1e05",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-runtime-open.ts",
+      "lines": 105,
+      "sha256": "65d8604d2a280d46e43ffadf232e9050550669b2a0186783db424589d485e64e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-runtime-open.types.ts",
+      "lines": 23,
+      "sha256": "72b8a9c16f552118c14d470e233e295fb268e7f00547c05feaf92b5d7166bcef",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-runtime-utils.ts",
+      "lines": 166,
+      "sha256": "857747ac86b428089da981a504070eed69a636137f3381813b56c25e70d56e37",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-runtime.ts",
+      "lines": 228,
+      "sha256": "8fcf2259e4da2f32e7834293125bb1137b73ced43229fcfbb2e78de32b0f57a2",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-runtime.types.ts",
+      "lines": 61,
+      "sha256": "a94100dd08ef23628c225a0256ec0cc18bdf7b140d4313254810efe9a6b3ae8e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events-types.ts",
+      "lines": 2,
+      "sha256": "fbd22143309f89bba699177b070dc200ae9be7089e10d36ea35dad9bab2d0620",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events.ts",
+      "lines": 174,
+      "sha256": "ee7438a0b95fcab026a40a1bb21a2c928a95ec8f3afd374e9950b690d6ad011f",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/events.types.ts",
+      "lines": 124,
+      "sha256": "b08bc7e6c448bad796a96718fd946631620e2b3312c7de0e00dd791c7011f040",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/fake-utils.ts",
+      "lines": 108,
+      "sha256": "e5057c4f1117d8f693a73d0d321383dbbc04fa4bf3fe4f7fd69738dc7cf52542",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/fake-utils.types.ts",
+      "lines": 5,
+      "sha256": "8b77c19ef6a8c8f8f5ddc7fd432c2ef7d15cafc49fe9a18fb024711cc6d7e3b3",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/fakes.ts",
+      "lines": 237,
+      "sha256": "1089385e611bd6d36186456a457e543fd1924987deb2b57382bc289e5d6b1161",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/fakes.types.ts",
+      "lines": 40,
+      "sha256": "1711555977425d3828f555bc7711590b3cfc92bd6d847ec2f67e78c411cfb259",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/http-listener.ts",
+      "lines": 102,
+      "sha256": "61ac2946daf1d319fcf0a4596a1ee402aa80ed264dbf59f71fcdf76b4877387c",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/http-listener.types.ts",
+      "lines": 22,
+      "sha256": "77ea2879569867b24192e5d117d1764ce85bacb7d8f6481692843207bcaa16e4",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/http-owner.ts",
+      "lines": 148,
+      "sha256": "9a81bc8357f943ac5e22e96d91e7f72511a5f92f4777479b54de7d61341c098e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/http-owner.types.ts",
+      "lines": 26,
+      "sha256": "783723a21eda6a480dd7823ef022a0813e2ccb101799a46a62bf0122e5925148",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/http.ts",
+      "lines": 235,
+      "sha256": "b711f42b8d90e659f21f6ef34f1eb7ff96019a4a7c51ce0228f15c47345958ec",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/http.types.ts",
+      "lines": 48,
+      "sha256": "1bc9879b83c93fac9cebae6e0836d013169521cd7a5e87063184070d02d1b7c8",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/identity.ts",
+      "lines": 50,
+      "sha256": "fc7a8686d35087f8acaa86fdc27bca24c12dc7dca8aee1abadd8dea17813e99a",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/identity.types.ts",
+      "lines": 8,
+      "sha256": "a94674074f17d1c0bbab68247e9162ce692ee5069aac3af82d147c9e53ed1b7c",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/index.ts",
+      "lines": 84,
+      "sha256": "449d6a136b865d24c5dc606a8648ddbe8b1c4b27f0fd5f3a1488ec04fd43e212",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/invoke-function.ts",
+      "lines": 178,
+      "sha256": "5ae95e2fb59365ce8990869522e5046629ee61cd157750381baff042a8fda166",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/invoke-function.types.ts",
+      "lines": 65,
+      "sha256": "68f3c04e5a67781e5eeee028dbe449503bcf736a96c1e21f8d74b38e1c288ae6",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/job-harness.types.ts",
+      "lines": 13,
+      "sha256": "52dc786752a4f78d9ee506e98d71e4efe848d35c550af84f258ec0224106b298",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/job-runtime-controls.ts",
+      "lines": 100,
+      "sha256": "28f1558259513791a19c62031a96cc0e0b084414d1f7bb455349e64355b9badd",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/job-runtime.ts",
+      "lines": 245,
+      "sha256": "d005add87159fffba96cfe470f06390922f6c90a6575255e0d93216126961de9",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/job-runtime.types.ts",
+      "lines": 15,
+      "sha256": "4a34ebff1989cafbcf66db9086e2e6e3095f7996dba5db8970da0b2b996791ce",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/jobs-conformance.ts",
+      "lines": 160,
+      "sha256": "c51495203dd8b2e1f43404ad5e23408e32898d03e675cf5bd04a2b3858401fac",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/jobs-conformance.types.ts",
+      "lines": 18,
+      "sha256": "45c4943a1bca5668c3a2777057e5eec40c0d957f9a4e375f3d6da0143a23ac55",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/jobs-types.ts",
+      "lines": 2,
+      "sha256": "829d6a120153cf15551001658d9672b33d90b02f0094a17bfc4491455b465edb",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/jobs-utils.ts",
+      "lines": 198,
+      "sha256": "7f20a5f9c023db3cb1340f485a8e24489d1124766380d8d136cc39898a7f8300",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/jobs.ts",
+      "lines": 92,
+      "sha256": "80d8d81969b824faca430917409510b28c92f74e2a95da6607a760b50f9eb96a",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/jobs.types.ts",
+      "lines": 70,
+      "sha256": "82a7e75bf11e70d715f58dbef3066a609f5320592ba616ab472c86d4a614ef06",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/native-jobs-observe.ts",
+      "lines": 64,
+      "sha256": "ec60779825ca054018d00626a35549a6182946cb652b19afeaa23fdf57d8782b",
+      "reread": true,
+      "review": "EOF accepted after observer-cursor TSDoc terminology amendment; exact hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/native-jobs-service.ts",
+      "lines": 247,
+      "sha256": "d9c02e422d1e3044838ad64d81cc1311d501771f6ba798d120959759a7834d3e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/native-jobs-state.ts",
+      "lines": 13,
+      "sha256": "7676baa5fff8723174781ee84aaad7fb9e428c932ea628f73e2af633b8eb751b",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/native-jobs.types.ts",
+      "lines": 59,
+      "sha256": "3ebc780454fb31d98cd4714cc5f3daa59d9c905c91627cb4457cba34de2f135e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/provider-replacements.ts",
+      "lines": 214,
+      "sha256": "49693125087ea55b1aeff3fff73e0d62d572e41d66e7c8b0c10aecdbd8f28fb7",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/provider-replacements.types.ts",
+      "lines": 6,
+      "sha256": "cca2de63f659ac59297aef16ed3c577ad0a85d74e28ca22483df3645b1c0f655",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/runtime-clock.ts",
+      "lines": 149,
+      "sha256": "8c071993183385b6196dd496deae7f2bd5910a12c326de8fb7028063f593a1ce",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/runtime-clock.types.ts",
+      "lines": 23,
+      "sha256": "8609a16cfac8720a914453635ca8268671eebfa2cc2b0b3e9ee4225fbd224c7f",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/runtime-close.ts",
+      "lines": 43,
+      "sha256": "03f8fd27f6960fc5709d1772b2c477dd2de1c8b5bdce9d0dd6c37a22b01927b5",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/runtime-context.ts",
+      "lines": 31,
+      "sha256": "8d1c68702dc8b19f83670f0f4a2d893784e71e5edc38520d9b3ed6b18805f485",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/runtime-execution.ts",
+      "lines": 220,
+      "sha256": "73f17725ed06f1bd7c905f689f5e3431382ee3aadaea2a9fd92e2b8e1b45e289",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/runtime-execution.types.ts",
+      "lines": 20,
+      "sha256": "b0a7a5b7e0f8a0e89a270ef2edaf5facc0cf2b04861af826c04913a11d8a79d9",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/runtime-options.ts",
+      "lines": 67,
+      "sha256": "1922da2323033722ab9f7f549b1e783e273466942a263c18bdacb7cf3eb78b52",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/runtime.ts",
+      "lines": 66,
+      "sha256": "cb3bf331b93447915ecb51f9ba1de71367de79d230038e44c87c98bec4b9d93a",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/runtime.types.ts",
+      "lines": 57,
+      "sha256": "419f4eb79715135ec99a2fa85277ed3f56250250c078ae4b4732c0aa8543ee46",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/state-providers.ts",
+      "lines": 24,
+      "sha256": "be354ab1c04d59c4830ca87166d3a8a86d1cf8f281e1b814ec9da9a6db6cabcc",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/state-root.ts",
+      "lines": 44,
+      "sha256": "a2309531d4e945ede59eb145b330d13643e4c42b2cf0d4a6a8ac86fec3992675",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/state-root.types.ts",
+      "lines": 5,
+      "sha256": "9af6f2a766501c2a309b82e0b0cdc4f2417685382519f573f8fc3eb4d66ada88",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/storage-failure.ts",
+      "lines": 9,
+      "sha256": "c0167a4eee2202e44341a508312c6b5cebd041f01241d90d58ff4c8e766685f9",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/test-jobs-adapter-controls.ts",
+      "lines": 137,
+      "sha256": "49665baf6e5aa0f3d6612c57087c06822736afe4883e746e038f4f038533ac43",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/test-jobs-adapter-support.ts",
+      "lines": 125,
+      "sha256": "30d32cb7372262f0b0f8343bb0786e7353a912b5a81b3f36c64b76fc7db65802",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/test-jobs-adapter-support.types.ts",
+      "lines": 19,
+      "sha256": "d0b1256c4face13f7c326500baafa59964872806f42e3a0480a7777a6a42c42f",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/test-jobs-adapter-work.ts",
+      "lines": 205,
+      "sha256": "3d39647aca5ee4e364371aec8392585cf276dc61029a6d69d28d7aa94f373e58",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/test-jobs-adapter.ts",
+      "lines": 111,
+      "sha256": "a415e863795ca5d38f8f6f680cc2708422d9c67d0c9f925440ca9ce1bf499ed2",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/test-jobs-adapter.types.ts",
+      "lines": 19,
+      "sha256": "6492bea0d949362001e5c2c45b824d5858399b1a6eeb2954d133ce1b47ed824d",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/testing-owner.ts",
+      "lines": 43,
+      "sha256": "dce8956cd0b658ea66fa700b274b78921ab0946c1e230c878460ef789a46f85e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/work-ownership.ts",
+      "lines": 160,
+      "sha256": "18a6b8500de2de89d62a5f4374959f5c3f09c3727998b316a066636359af8c48",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/src/work-ownership.types.ts",
+      "lines": 12,
+      "sha256": "1aa1e89473016a204066413d88ee45bab07814ee618ccdb0a780589bf5bda9a9",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/agents/approvals.test.ts",
+      "lines": 41,
+      "sha256": "43a585c459ee367bced5494c77ae158aa1390205df1b2481ef0a4acf5e90ac6e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/agents/model.test.ts",
+      "lines": 75,
+      "sha256": "e11fc3d84089b46ecce8a231703a3252f666a64c2abea321a46ab39c4b550f64",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/application/acquisition.test.ts",
+      "lines": 86,
+      "sha256": "97d3e1265f5691f1b943b90242a3aeae1a9d2850ea808de009b163e967b6916c",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/application/native-isolation.test.ts",
+      "lines": 14,
+      "sha256": "8c01e3ecc6657d02949882655b7b3c81d9f75024b106b0ad6abfee42896670b8",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/agent-matrix-agent.test.ts",
+      "lines": 79,
+      "sha256": "7d2e8a17688d7c3eb05de65a1bb1c27a7431b47dfc47e3d6b5f048060c45e0c6",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/agent-matrix-helpers.ts",
+      "lines": 157,
+      "sha256": "5e035b8feca527dd4214787de9624f28cd2949872004fc7cf142009b4b276c2b",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/agent-matrix-helpers.types.ts",
+      "lines": 2,
+      "sha256": "88be7720249de8be3bfbc888d370e93ffc9883aec938c3dc73003b1669bca290",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/agent-matrix-tools.test.ts",
+      "lines": 135,
+      "sha256": "1d54366bcd8d0ff891069d8186caf7cca2a22f37138613275e50f3407845478c",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/agents.test.ts",
+      "lines": 83,
+      "sha256": "c017bbc5f29f525c588f30d7c6f76f6dbcb6b571a8d14f2ece307901d81d5e69",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/application-http.test.ts",
+      "lines": 119,
+      "sha256": "5dc782b22925c2c93ab481b1462b821de364db3a6168851945f6b8b9d8600463",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/buckets-cache.test.ts",
+      "lines": 33,
+      "sha256": "c2870c2d88f89e8283934f4b575277588967622d5207e75d2561e8ca8ef48831",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/canonical-admission.test.ts",
+      "lines": 90,
+      "sha256": "ba019526076f26392d75cb28b0b2a674631029dd4292bb589d71de0c8fa175e3",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/events.test.ts",
+      "lines": 106,
+      "sha256": "ada96f94a2cb4a4e4e0bb75b35db572854ebab8822e842012b324dff3fe3a794",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/jobs.test.ts",
+      "lines": 102,
+      "sha256": "d722521f72c6d1ed4111a04f81522b79f18507d7c19c8420057d3063c2cb0ae0",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/provider-replacements.test.ts",
+      "lines": 112,
+      "sha256": "0b6c95354082f85353ef1e937f7f96979236de07fa38f70380f1237021b71a1d",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/runtime.test.ts",
+      "lines": 163,
+      "sha256": "76c0f0fee36ea841b314a382bb5d2fe435c1a875e7129cb85e047761688416cc",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/test-jobs-adapter.test.ts",
+      "lines": 89,
+      "sha256": "5243e5382101727c019ae52937478e5dca464cd4e37f8d24e027e9c6608228a0",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/bun-process.ts",
+      "lines": 18,
+      "sha256": "9bba85e5c3544bba2209e472baec1b8151d7c1b461f6d0257df1799a8bf43670",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/checked-examples.ts",
+      "lines": 96,
+      "sha256": "d69729099d99d1ccabf6922a7d1c56925efb971f428e8a8e4beaca6e50c1817a",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/close-observation.ts",
+      "lines": 59,
+      "sha256": "5dd7863ae81ff95f70111d65eb556aefead3db7d60e80ced9784da5cf4abb279",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/execution-evidence.ts",
+      "lines": 14,
+      "sha256": "19b926360cc479aa9a7486567a744bc40a707d8f961cf332f90b3301cc1bfb8d",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/execution-evidence.types.ts",
+      "lines": 7,
+      "sha256": "408bfb7d0220af6e4cffc719fd119c6e82b4ec087ea82482bffba5be239ae2e1",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/owned-compatibility.ts",
+      "lines": 97,
+      "sha256": "4dfaee4585b403000abee584ed9fdb7fc361836e3cdbc2d5ac8b1628fbe519d4",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/owned-compatibility.types.ts",
+      "lines": 6,
+      "sha256": "31e44e3ea3bf626930455c87298de81eaf57fece6c24ead5aac9aac0316f84b9",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/service-isolation-resource.ts",
+      "lines": 29,
+      "sha256": "f4429b7c510390b976c2b719bf5302680c385acb18f2bebecfe840df50a38ffd",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/service-isolation.ts",
+      "lines": 56,
+      "sha256": "1d43d993a3ccb92e8db1f5c1e540abf7906d4cd50033788f619bd27b0b6fa57e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/work-cancellation.ts",
+      "lines": 77,
+      "sha256": "3062e66b103a0c9550bc36cb52d1ce0f61893f9d9afec7239aee83487d858fc0",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/http/ownership.test.ts",
+      "lines": 169,
+      "sha256": "f9da8b8a5a36d28bbf6928b57314260255be8b8d040ee9f1fb59ea190f4caa21",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/jobs/native-jobs.test.ts",
+      "lines": 72,
+      "sha256": "9c8a3c0a4eef9a5c9b515cb8676783e38d061d6c5918d3ae1183bd8ac89332b9",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/jobs/ownership.test.ts",
+      "lines": 12,
+      "sha256": "b7bfafd52166a69252f4c5b60c2ad53963f448c61fc98d5756f74846a19102ef",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/runtime/acquisition.test.ts",
+      "lines": 112,
+      "sha256": "d9cc686d852c992fbe14abaaddf36a30230a00b741f5de644934148efe198b3e",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/runtime/acquisition.types.ts",
+      "lines": 7,
+      "sha256": "cd3b8b2b7cc1679a2629c5dd2e8445c45be0f6a500bfe42df5d8d6662636d066",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/runtime/operation-layer.test.ts",
+      "lines": 48,
+      "sha256": "6f3026fbbf46ee913f15f8db29a9785ec6bc38a68e9f858accd408b5927b15dd",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/tests/storage/storage.test.ts",
+      "lines": 163,
+      "sha256": "9d33dac13950bd91fb924378e79b0de89f905586ac730aea612952d587204d93",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    },
+    {
+      "path": "packages/testing/vitest.config.ts",
+      "lines": 10,
+      "sha256": "eff332db570179b201d2c24372aa33558ebd1b9babae9a072efbca7d1cf03b6f",
+      "reread": true,
+      "review": "EOF accepted; exact final hash reconciled"
+    }
+  ],
+  "strictConfig": {
+    "path": "packages/testing/tsconfig.tests.json",
+    "review": "EOF accepted"
+  },
+  "terminologyAmendment": {
+    "path": "packages/testing/src/native-jobs-observe.ts",
+    "sha256": "ec60779825ca054018d00626a35549a6182946cb652b19afeaa23fdf57d8782b",
+    "review": "Full EOF accepted; one TSDoc word changed, runtime/signatures/assertions unchanged; all137 hashes matched"
+  },
+  "publicJSDocAmendment": {
+    "path": "packages/testing/src/application.ts",
+    "lines": 231,
+    "sha256": "9e5dd7a164703f268587b45fb00cc561d3772b85ce55c67691dde519ce1c9e5b",
+    "baseline": "application.ts original @category Testing/@since0.1.0",
+    "review": "Original/finalEOF accepted;comment-only signatures/runtime/assertions unchanged; all137 finalhashes match",
+    "check": "apps/docs check:jsdoc passed32publicAPIs"
+  }
+}

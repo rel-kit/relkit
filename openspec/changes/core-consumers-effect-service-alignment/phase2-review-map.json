@@ -1,0 +1,556 @@
+{
+  "phase": 2,
+  "status": "accepted",
+  "files": [
+    {
+      "path": "apps/docs/scripts/jobs-guide-catalog.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-continuation.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/agent-continuation.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-observation.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/agent-observation.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-observer.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/agent-observer.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-sse-client.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/agent-sse-client.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/agent-thread-identity.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/agent-thread-identity.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/client.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/client.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/context-support.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/context-support.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/frontend-dependency-closure.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/frontend-dependency-closure.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/http-cancellation.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/http-cancellation.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/jobs-watch-quality.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/jobs-watch-quality.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/jobs-watch.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/jobs-watch.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/next-config.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/next-config.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/pending.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/pending.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/procedure.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/procedure.test.ts"
+    },
+    {
+      "path": "packages/client/tests/compatibility/realtime-manager.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/client/realtime-manager.test.ts"
+    },
+    {
+      "path": "packages/client/tests/fixtures/fetch.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/client/vitest.config.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/contracts/src/operation-observer.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/contracts/src/operation-runtime.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/contracts/src/operation-stream.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/contracts/src/operation.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/contracts/src/operation.types.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/contracts/tests/operation-observer.test.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/contracts/tests/operation-runtime-fixture.types.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/contracts/tests/operation-runtime.test.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/actions-admin.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/actions-admin.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/actions-fixtures.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/actions-fixtures.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/actions.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/actions.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-actions.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/contracts-actions.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-data.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/contracts-data.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-errors.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/contracts-errors.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-fixtures.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/contracts-fixtures.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-readonly.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/contracts-readonly.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/env-diagnostics.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/env-diagnostics.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/events-runtime.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/events-runtime.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/inspector-api.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/inspector-api.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/jobs.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/jobs.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/observability.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/observability.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/production-protection.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/production-protection.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/resource-explorer.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/resource-explorer.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/resources-runtime.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/resources-runtime.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/stream-heartbeat.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/inspector-api/stream-heartbeat.test.ts"
+    },
+    {
+      "path": "packages/inspector-api/tests/fixtures/json.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/inspector-api/tests/fixtures/json.types.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/inspector-api/vitest.config.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/runtime-effect/src/operation-stream.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/runtime-effect/src/operation.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/runtime-effect/src/operation.types.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/candidate.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/supervisor/candidate.test.ts"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/drain.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/supervisor/drain.test.ts"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/observability.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/supervisor/observability.test.ts"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/proxy-origin.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/supervisor/proxy-origin.test.ts"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/proxy.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/supervisor/proxy.test.ts"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/state-machine.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/supervisor/state-machine.test.ts"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/verification.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/supervisor/verification.test.ts"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/watcher.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/supervisor/watcher.test.ts"
+    },
+    {
+      "path": "packages/supervisor/tests/fixtures/fetch.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/supervisor/vitest.config.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/testing/src/runtime.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/agent-matrix-agent.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/agent-matrix-agent.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/agent-matrix-helpers.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/agent-matrix-helpers.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/agent-matrix-tools.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/agent-matrix-tools.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/agents.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/agents.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/application-http.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/application-http.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/buckets-cache.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/buckets-cache.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/canonical-admission.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/canonical-admission.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/events.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/events.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/jobs.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/jobs.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/provider-replacements.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/provider-replacements.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/runtime.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/runtime.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/compatibility/test-jobs-adapter.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed",
+      "movedFrom": "packages/testing/test-jobs-adapter.test.ts"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/execution-evidence.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/testing/tests/fixtures/execution-evidence.types.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/testing/tests/runtime/operation-layer.test.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "packages/testing/vitest.config.ts",
+      "author": "testing_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "scripts/jobs-coverage/vitest.config.ts",
+      "author": "root",
+      "reviewer": "client_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "scripts/performance-core-consumers-fixture.ts",
+      "author": "client_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "scripts/performance-core-consumers-fixture.types.ts",
+      "author": "client_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "scripts/performance-core-consumers-generation.ts",
+      "author": "client_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "scripts/performance-core-consumers-routes.ts",
+      "author": "client_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "scripts/performance-core-consumers-watch.ts",
+      "author": "client_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    },
+    {
+      "path": "scripts/performance-core-consumers.ts",
+      "author": "client_baseline",
+      "reviewer": "inspector_baseline",
+      "result": "passed"
+    }
+  ]
+}

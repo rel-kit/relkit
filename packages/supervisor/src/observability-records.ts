@@ -5,17 +5,17 @@ import {
   type GenerationRecord,
 } from "@relkit/observability";
 import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { SupervisorTelemetryRecord } from "./observability-records.types.js";
+export type { SupervisorTelemetryRecord } from "./observability-records.types.js";
 import type {
   SupervisorCandidateToken,
   SupervisorOutcomeTelemetry,
   SupervisorTelemetry,
-} from "./state-machine-types.js";
+} from "./state-machine.types.js";
 
-export interface SupervisorTelemetryRecord {
-  readonly record: GenerationRecord | DiagnosticRecord;
-  readonly streamType: "generation.changed" | "diagnostic.changed";
-}
-
+/** Selectively projects lifecycle evidence into existing observable records. @param event - Native outcome.
+ * @param activationFingerprint - Exact selected-generation resolver. @param now - Injected native timestamp.
+ * @returns Frozen generation/diagnostic records in existing topic order. */
 export function recordsForTelemetry(
   event: SupervisorTelemetry,
   activationFingerprint: (token: SupervisorCandidateToken) => RuntimeActivationFingerprint,
@@ -75,14 +75,17 @@ export function recordsForTelemetry(
   return Object.freeze(result);
 }
 
+/** Formats existing generation identity. @param token - Generation witness. @returns Existing generation-N identifier. */
 export function generationIdFor(token: SupervisorCandidateToken): string {
   return `generation-${token.generationToken}`;
 }
 
+/** Copies the lifecycle witness. @param event - Committed outcome. @returns Candidate identity without unrelated fields. */
 function tokenFor(event: SupervisorOutcomeTelemetry): SupervisorCandidateToken {
   return { sourceToken: event.sourceToken, generationToken: event.generationToken };
 }
 
+/** Maps existing supervisor outcomes. @param event - Committed outcome. @returns Existing observability lifecycle label. */
 function lifecycleFor(event: SupervisorOutcomeTelemetry): GenerationEvent {
   if (event.phase === "compile")
     return event.outcome === "compile-succeeded" ? "created" : "failed";

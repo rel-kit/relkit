@@ -1,0 +1,124 @@
+{
+  "reviewer": "client_baseline",
+  "status": "accepted preparation and actual coordinator-owned native return/abort proof",
+  "files": [
+    {
+      "path": "/tmp/relkit-core-consumers-job-held-39c7e6b8/application.mjs",
+      "sha256": "3aad63c10d8af5431e841d50bda5b0266d489569a7e04aade530ec0f3573a72c",
+      "lines": 155,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-job-held-39c7e6b8/probe.mjs",
+      "sha256": "0b2191139bf3c398dc5c6cd768ed5d668dde41dcef592fbbee77c36457957cc1",
+      "lines": 186,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-job-held-39c7e6b8/PREPARATION.md",
+      "sha256": "83ba232b7ec3ce98f0fe4cca5b8f552848e4d6ad7d911c6ba06e27a2bfc4a3fa",
+      "lines": 50,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-job-held-39c7e6b8/src/routes/[[...path]]/route.ts",
+      "sha256": "a0763ba28bf25223eb4d1b44dfa63da8e58cbacad4ea1bfb6dc4880b389c6299",
+      "lines": 25,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-job-held-39c7e6b8/src/routes/[[...path]]/route.types.ts",
+      "sha256": "d226d6a31077dccf8ddcb36bf49af65575ffbac563fc6dc92cc91ce540e810b4",
+      "lines": 4,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-agent-held-8b18daca/bounds.mjs",
+      "sha256": "6560b56ce6d4bf66a1c1f31b882a1ce14231e489a902f35371c9d1d231b6755a",
+      "lines": 44,
+      "readEOF": true
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-job-held-39c7e6b8/run.mjs",
+      "sha256": "686c5e333bb6bcb9158c9ef973c18626acb01238a67c34fce9ed8fb15bf81a7f",
+      "lines": 38,
+      "readEOF": true
+    }
+  ],
+  "scope": "Independent full source EOF review plus actual outcome/log EOF review; reviewer started no host or runner.",
+  "apiEvidence": {
+    "publicBuiltImports": "Candidate public testing/jobs/providers-local/engine/runtime-hono/schema/contracts barrels and public app/config leaf; public Client root.",
+    "confirmed": "NativeLocator is string, so fresh.get(runId,operationContext) is valid; actual worker.next consumes generation operation signal and builds native TaskExecutionBinding. Engine executor validates actual persisted envelope and supplies its native binding signal to task handler. Native worker.complete only follows actual executor output; fail is the real native failure path.",
+    "sourceAuthorities": [
+      "packages/jobs/src/adapter.types.ts",
+      "packages/jobs/src/runtime.ts",
+      "packages/jobs/src/runtime.types.ts",
+      "packages/providers-local/src/jobs/native-adapter.ts",
+      "packages/providers-local/src/jobs/native-adapter-next.ts",
+      "packages/providers-local/src/jobs/native-adapter-work.ts",
+      "packages/engine/src/task-executor.ts",
+      "packages/engine/src/task-context.ts"
+    ],
+    "scopeDisposition": "Additive native acceptance worker dispatch adapter, not a production domain migration or fake/manual completion."
+  },
+  "assertions": {
+    "active": "Original public trigger accepted identity plus actual task barrier entry; public get and first native watch frame same run running; native handler signal active/barrier unreleased/no completion before and after observer disconnect.",
+    "abort": "Actual request initially active; caller AbortSignal alone resolves native abort receipt BEFORE iterator.return cleanup, then aborted timestamp verified. Return case independently aborts request via public iterator return.",
+    "complete": "Barrier release only after active window proof; actual worker receipts joined, no worker failures, same run completed exact output/once actual handler/once actual native commit.",
+    "persistence": "After awaited full owner.close, fresh provider reacquires same run identity/completed output from real durable state and closes in finally."
+  },
+  "ownership": {
+    "prefix": "Model-independent task/provider/runtime acquired before Testing app; setup failure releases runtime or native acquired prefix. Raw route preserves Request and native response streaming without buffering.",
+    "worker": "Dispatch admitted only for nonduplicate native receipt, owns actual next/execution/complete under generation signal independently of observer request. Tracks pending receipts and retains failures; generation stop retires admission, aborts native signal and joins owned work before attempting app/runtime release.",
+    "case": "Timers cleared, barrier always released, observer/parent abort links retired, iterator return joined. Parent signal releases gates and aborts probe waits; core failures remain failed even if secondary iterator cleanup rejects.",
+    "fresh": "Reacquisition bounded10s signal/receipt with finally new provider.close; no shared/original path mutation.",
+    "deadline": "Shared accepted joined helper reports deadline failure, does not claim actual completion. Entire startup/child release must use parent external bounded credential-free runner."
+  },
+  "findings": [],
+  "organization": "Both TypeScript paths are <=250-line native boundaries with named NativeApplication interface in owning .types companion and documented install/handler callables; no unrelated package/domain changes.",
+  "claims": "Actual public Client/Testing Bun/RuntimeHono/Engine/Local durable adapter proof for these two fresh runs. No approval, restart, cross-network context, unlimited identity-size or paid-provider claim.",
+  "runner": "Final38-line root runner independently read EOF: exact owned child/cwd/argv, credential-free reviewed childEnvironment, stop once,30s watchdog plus2s SIGKILL escalation only same child, actual exited joined and exact nativeExitCode printed, timeout forces nonzero even child exits0, finally clears both timers and parent signal listeners. No runtime execution by reviewer.",
+  "actualEvidence": {
+    "files": [
+      {
+        "path": "/tmp/relkit-core-consumers-job-held-39c7e6b8/evidence/results.json",
+        "sha256": "4393320cee4d47facc6ae209e049a170c819f23ed49e55851eb9da8ae0da8b08",
+        "lines": 203,
+        "readEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-job-held-final-live.log",
+        "sha256": "6c7df6bc794c9a7779788c19caf0030cf700807891bac4ea8f09bab526ae571d",
+        "lines": 62,
+        "readEOF": true
+      }
+    ],
+    "outcomes": [
+      {
+        "mode": "return",
+        "runId": "local-local-07248ef1-cc1e-4fff-8224-b9d700515f81",
+        "nativeAbortMs": 1791060030895,
+        "completionAfterAbortMs": 11,
+        "actualTaskExecutions": 1,
+        "actualNativeCommits": 1,
+        "freshProviderRetainedExactOutput": true
+      },
+      {
+        "mode": "abort",
+        "runId": "local-local-6dbba12e-d043-45b3-b442-1ef1f7cdb3a9",
+        "nativeAbortMs": 1791060030941,
+        "completionAfterAbortMs": 7,
+        "actualTaskExecutions": 1,
+        "actualNativeCommits": 1,
+        "freshProviderRetainedExactOutput": true
+      }
+    ],
+    "nativeExitCode": 0,
+    "runnerTimedOut": false,
+    "failure": null,
+    "cleanupFailure": null,
+    "sourceAssertions": "Passed unchanged source explicitly requires barrier unreleased, actual native handler signal active and zero commits before and after observer disconnect; only then releases work. Caller abort receipt is proved before iterator.return. Owner close is joined before fresh durable provider acquisition.",
+    "independentOutcomeChecks": "Python raw JSON verification checked all run identity fields, active/completed states, exact output, once counts, native abort timestamps preceding completion, caller-abort ordering marker and exact native exit receipt.",
+    "initialFailure": "Earlier parent attempt failed honestly on native acceptanceIdentity339-byte projection against scalar256 bound; histories retain old attempt. Final successful source assertions and original descriptor IDs are unchanged."
+  }
+}

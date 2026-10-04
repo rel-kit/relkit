@@ -1,42 +1,36 @@
-import { createSupervisorDrain, SupervisorDrainError } from "./drain.js";
-import { validateSupervisorToken } from "./state-machine-telemetry.js";
-import type { SupervisorCandidateToken } from "./state-machine-types.js";
-import type { DrainPreviousGenerationOptions, SupervisorDrainReport } from "./drain-types.js";
+import { Cause, Effect, Exit, Layer, ManagedRuntime, Metric } from "effect";
+import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createDrainLayer } from "./drain-service.js";
+import { validateDrainOptions } from "./drain-validation.js";
+import {
+  validatePreviousGeneration,
+  drainPreviousGenerationWorkflow,
+} from "./drain-state-service.js";
+import type { DrainPreviousGenerationOptions, SupervisorDrainReport } from "./drain.types.js";
 
-/** Drains the token recorded by the 13.2 state machine and completes its drain transition. */
+/**
+ * Drains the recorded retired generation and completes its existing state transition.
+ * @param options - Active/retired witnesses, native owners and shared deadline policy.
+ * @returns Immutable cleanup evidence; stale completion never replaces the active generation.
+ */
 export async function drainPreviousGeneration(
   options: DrainPreviousGenerationOptions,
 ): Promise<SupervisorDrainReport> {
-  validateSupervisorToken(options.activeToken);
-  const snapshot = options.stateMachine.snapshot();
-  if (
-    snapshot.state !== "draining-previous" ||
-    !sameToken(snapshot.previousGeneration, options.token) ||
-    !sameToken(snapshot.activeGeneration, options.activeToken)
-  ) {
-    throw new SupervisorDrainError(
-      snapshot.state === "draining-previous"
-        ? "RELKIT_DRAIN_TOKEN_MISMATCH"
-        : "RELKIT_DRAIN_STATE_INVALID",
-      "The state machine no longer owns the retired generation.",
-    );
-  }
-  const report = await createSupervisorDrain(options).drain();
-  const completed =
-    report.outcome === "drained"
-      ? options.stateMachine.drainSucceeded(options.activeToken)
-      : options.stateMachine.drainFailed(options.activeToken, report.outcome);
-  return Object.freeze({ ...report, stateTransition: completed ? "completed" : "stale" });
-}
-
-function sameToken(
-  left: SupervisorCandidateToken | undefined,
-  right: SupervisorCandidateToken | undefined,
-): boolean {
-  return (
-    left !== undefined &&
-    right !== undefined &&
-    left.sourceToken === right.sourceToken &&
-    left.generationToken === right.generationToken
+  const admitted = Effect.runSyncExit(validatePreviousGeneration(options));
+  if (Exit.isFailure(admitted)) throw Cause.squash(admitted.cause);
+  const deadline = validateDrainOptions(options, 60_000);
+  const owner = ManagedRuntime.make(
+    Layer.mergeAll(
+      createDrainLayer(options, deadline),
+      createLoggerLayer({ component: "supervisor", ...options.logger }),
+      Layer.succeed(Metric.MetricRegistry, new Map()),
+    ),
   );
+  try {
+    const exit = await owner.runPromiseExit(drainPreviousGenerationWorkflow(options));
+    if (Exit.isFailure(exit)) throw Cause.squash(exit.cause);
+    return exit.value;
+  } finally {
+    await owner.dispose();
+  }
 }

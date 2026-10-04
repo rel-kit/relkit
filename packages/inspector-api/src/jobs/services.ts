@@ -7,6 +7,11 @@ import {
 } from "./types.js";
 import { isRecord, type ResolvedActiveGeneration } from "../shared.js";
 
+/**
+ * Requires configured native jobs authorities for an Inspector operation.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @returns The existing jobs service set or unavailable failure.
+ */
 export function jobsServices(generation: ResolvedActiveGeneration): InspectorJobsServices {
   const value: unknown = generation.jobs;
   if (!isRecord(value) || !("bindings" in value)) {
@@ -15,6 +20,11 @@ export function jobsServices(generation: ResolvedActiveGeneration): InspectorJob
   return value as unknown as InspectorJobsServices;
 }
 
+/**
+ * Resolves configured native bindings without altering declaration order.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @returns The retained native binding sequence.
+ */
 export async function jobBindings(
   generation: ResolvedActiveGeneration,
 ): Promise<readonly InspectorJobsBinding[]> {
@@ -28,6 +38,14 @@ export async function jobBindings(
   }
 }
 
+/**
+ * Checks native Inspector privilege before reading or controlling jobs.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @param operation - Declared read, control or schedule privilege category.
+ * @param service - Optional service selector; ambiguous selections are rejected.
+ * @returns The authorized native jobs authority or existing forbidden failure.
+ */
 export async function authorizeJobs(
   generation: ResolvedActiveGeneration,
   request: Request,
@@ -51,6 +69,15 @@ export async function authorizeJobs(
   return jobs;
 }
 
+/**
+ * Constructs the existing native Inspector administration context and passes the HTTP signal.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param binding - Selected native job authority and its service identity.
+ * @param operation - Declared read, control or schedule privilege category.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @param operationId - Caller-supplied native administration identity, when required.
+ * @returns An identity-bearing native operation context.
+ */
 export function operationContext(
   generation: ResolvedActiveGeneration,
   binding: InspectorJobsBinding,
@@ -71,6 +98,11 @@ export function operationContext(
   };
 }
 
+/**
+ * Projects supported native features and bounded limits without inventing capabilities.
+ * @param binding - Selected native job authority and its service identity.
+ * @returns The existing public capability declaration.
+ */
 export function bindingCapabilities(binding: InspectorJobsBinding): Record<string, unknown> {
   return {
     service: binding.service,

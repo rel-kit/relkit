@@ -1,0 +1,33 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit/packages/client
+stdout | tests/transport/selection.test.ts > socket constructor exceptions retain their identity as typed failures
+[04:45:52.557] ERROR (#3): Error [SecurityError]: Socket blocked by browser policy.
+    at new DOMException (node:internal/per_context/domexception:76:18)
+    at /Users/mustafaelsayed/Workspace/relkit/packages/client/tests/transport/selection.test.ts:17:21
+    at ClientTransport.connect (/Users/mustafaelsayed/Workspace/relkit/packages/client/tests/transport/selection.test.ts:23:26)
+    at ClientTransport.connect (definition) (/Users/mustafaelsayed/Workspace/relkit/packages/client/src/transport-socket.ts:27:43) {
+  [cause]: undefined
+}
+ ❯ tests/transport/selection.test.ts (3 tests | 1 failed) 15ms
+   × socket constructor exceptions retain their identity as typed failures 7ms
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  04:45:52
+   Duration  351ms (import 53%, transform 40%, tests 6%, worker 1%)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/transport/selection.test.ts > socket constructor exceptions retain their identity as typed failures
+SecurityError: Socket blocked by browser policy.
+ ❯ tests/transport/selection.test.ts:17:21
+     15| it.effect("socket constructor exceptions retain their identity as type…
+     16|   Effect.gen(function* () {
+     17|     const failure = new DOMException("Socket blocked by browser policy…
+       |                     ^
+     18|     class BlockedSocket extends TestSocket {
+     19|       constructor() {
+ ❯ IteratorImpl.~effect/Effect/successCont ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:1428:28
+ ❯ IteratorImpl.~effect/Effect/evaluate ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:1440:25
+ ❯ FiberImpl.runLoop ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:685:39
+ ❯ FiberImpl.evaluate ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:628:23
+ ❯ ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:5612:9
+ ❯ ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:5690:19
+ ❯ Module.<anonymous> ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:5709:5
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

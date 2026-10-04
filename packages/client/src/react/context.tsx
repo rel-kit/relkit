@@ -18,9 +18,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { createClient } from "../index.js";
+import { createClient } from "../transport.js";
 import { clearPendingOperations, pendingScopeKey } from "./pending.js";
 import { RealtimeManager } from "./realtime-manager.js";
+import { borrowViewOwner } from "./view-owner.js";
 import {
   browserOrigin,
   compiledFingerprint,
@@ -32,14 +33,19 @@ import {
   scopeFor,
   streamClientFor,
 } from "./context-support.js";
-import type { RelkitClientProviderProps, RelkitClientRuntime } from "./context-types.js";
+import type { RelkitClientProviderProps, RelkitClientRuntime } from "./context.types.js";
 export type {
   RelkitClientProviderProps,
   RelkitClientRuntime,
   RelkitHydrationState,
-} from "./context-types.js";
+} from "./context.types.js";
 const Context = createContext<RelkitClientRuntime | undefined>(undefined);
 
+/**
+ * Provides configured clients, query hydration, identity isolation and realtime ownership.
+ * @param props - Existing public React provider properties.
+ * @returns Children rendered inside the configured client context.
+ */
 export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNode {
   const baseUrl = props.baseUrl ?? browserOrigin();
   const [queryClient] = useState(() => props.queryClient ?? new QueryClient());
@@ -47,6 +53,7 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
   const [failed, setFailed] = useState(false);
   const previous = useRef<string | undefined>(undefined);
   const previousPendingScope = useRef<string | undefined>(undefined);
+  const realtimeOwners = useRef(new WeakMap<object, object>());
   const fetcher = useMemo(
     () => finiteFetcher(props.requestTimeoutMs ?? 30_000),
     [props.requestTimeoutMs],
@@ -86,7 +93,10 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
     [streamClient, identity],
   );
 
-  useEffect(() => () => realtime.dispose(), [realtime]);
+  useEffect(
+    () => borrowViewOwner(realtime, () => realtime.dispose(), realtimeOwners.current),
+    [realtime],
+  );
   useEffect(() => {
     const controller = new AbortController();
     setFailed(false);
@@ -174,6 +184,10 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
   );
 }
 
+/**
+ * Reads the required existing React client provider context.
+ * @returns The required provider runtime.
+ */
 export function useRelkitClient(): RelkitClientRuntime {
   const value = useContext(Context);
   if (value === undefined) throw new Error("useRelkitClient requires RelkitClientProvider");

@@ -1,0 +1,1474 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "author": "/root",
+  "baselineCommit": "b0f77720764fd61e9872b0995e456014a611ba37",
+  "authorFreezeUtc": "2026-10-03T17:39:21.317Z",
+  "outcome": "Source accepted; integration and performance acceptance remain parent-owned.",
+  "counts": {
+    "typescript": 101,
+    "source": 78,
+    "tests": 22,
+    "configs": 1,
+    "originals": 33,
+    "lines": 8104,
+    "maxImplementationLines": 227
+  },
+  "coverage": "Every final authored TS path and strict JSON read through EOF; all 33 original counterparts read EOF; every changed freeze amendment reread EOF; no sampling or omitted tails; current hashes independently match author freeze.",
+  "files": [
+    {
+      "path": "packages/supervisor/src/state-machine-types.ts",
+      "sha256": "73db2f820c161e28e07116f4f5474a5f25b73f0c256d5f8900d5c4f93db0f468",
+      "lines": 3,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-data.ts",
+      "sha256": "cab734fcadf0eefce1a78e0d675eb39ca74dc014c334d0ee5c5a132724ea08b5",
+      "lines": 2,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-fingerprint.ts",
+      "sha256": "e95296002227e619d9d9d7a73cb1ed19fde3d1e97d7a4d6b44f0bd3108a69f4d",
+      "lines": 21,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/observability-service.ts",
+      "sha256": "5b692c661341398a7a60b5fcbc44354763313cd018831421cc7188da1f838f67",
+      "lines": 163,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate-service.ts",
+      "sha256": "d5c4623f0e5fdd8e28119ce5a12b17853d6807193a1a4d4cf72bb42c41cdd987",
+      "lines": 163,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-cleanup.ts",
+      "sha256": "bd6d6177ee397e888329f2f45342089ff1784c940e7ad9cb20fd1b03a14beb92",
+      "lines": 57,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-service.ts",
+      "sha256": "d2fa890abca6a484944ea60baa1e5ee35efd2f8bc085ac84f16edd3b6d6519c9",
+      "lines": 162,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate-validation.ts",
+      "sha256": "8a680d704f8893abc09d8c015fa1b3c4f5aeac2137aa3b1a860951e446ca267b",
+      "lines": 30,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-cleanup.types.ts",
+      "sha256": "28b5c14eb500bfcee7266ee6e47fd59b6ce26e44c73d06450e30531e26565fd4",
+      "lines": 7,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/observability.types.ts",
+      "sha256": "e49af3eade395f3f204ac0fa89b61b05aff49e92aa5e8b3b24afe752ac37a7ca",
+      "lines": 46,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate-service.types.ts",
+      "sha256": "a977a70999661ed6046adb3eeb39f51de25f33c5167bc38fc7cd6105bfc647b3",
+      "lines": 56,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/output-lines.ts",
+      "sha256": "fd75281195e5a6fde872c6121c6ac362f97d316ce8018a4aa9af2b4ef32edd9b",
+      "lines": 110,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-types.ts",
+      "sha256": "de0b9352ed811016c7bd94f7e1b5cca81ecf4cbcd00cd5d8e271d89874a917b0",
+      "lines": 4,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-websocket.types.ts",
+      "sha256": "c946988e2c27fed590b723aa7b187c7a06cbf64b79a81ffee2947438eb5b0624",
+      "lines": 15,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-types.ts",
+      "sha256": "c275598d5059cdacdcdd98284196fa8f34d8424d1c4166418a234974040c37d5",
+      "lines": 2,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/watcher-service.ts",
+      "sha256": "59cc6c9b5814e5d5619af65d22d459579a653db989c1b2849281d962d7cf587a",
+      "lines": 196,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain.ts",
+      "sha256": "9f904eec1f2b451788d5e79254882f19d2e6caa47d210deeed80123900cad1d2",
+      "lines": 97,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-request.ts",
+      "sha256": "b4c74b58e3c188daf4c27b7174c6c355fb6f8c53fda8a803204d64a77035a26c",
+      "lines": 97,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-metadata.ts",
+      "sha256": "1f00648dce2853df42e85008c9f9195abfad49eda13524fcff0b38242978ea35",
+      "lines": 151,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate.ts",
+      "sha256": "e54d5c4aaf238d4db0abf8abd98ea23fc00b6258060b6a9cebf724329a9713db",
+      "lines": 111,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate.types.ts",
+      "sha256": "7db84261d1d4f1aaf349860991f9eb55862eb9ce67ac42c858e5a51b8fb0f16c",
+      "lines": 92,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/watcher.ts",
+      "sha256": "752ff631064ad823844679e8f5956734778d59e2407cae5791c73f69335eff26",
+      "lines": 134,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain.schemas.ts",
+      "sha256": "dd14676ebf80f71ba8b10c623e245749760729ac4d4a13bbb0d4e1adf7d75b07",
+      "lines": 8,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-run.ts",
+      "sha256": "25267994ea7371faf4bed38acd818cf859b22d8989749bcb07d89bda7b5bafe6",
+      "lines": 92,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/activation-publish.ts",
+      "sha256": "fd401a4abad322c34c700eb5cd1090f889f7ede04151fad5cfc6b86ee0905977",
+      "lines": 60,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-service.types.ts",
+      "sha256": "4629612ebcfabb443b5b3a4f4add2cafd77867779879467bb54d76fe56d923d8",
+      "lines": 45,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-body.ts",
+      "sha256": "1636d8499b1ac29b180c039b094a7592ef0913c0544532850cb847d18d3e8d85",
+      "lines": 114,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-listener-native.ts",
+      "sha256": "f524322189a153f50b082904da019571fc7c96eb2932cac90b787357694ad069",
+      "lines": 38,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/state-machine-data.ts",
+      "sha256": "9350180139d8dfe5399010879c82e7f03f99cd73673d36f03e55295dbc921800",
+      "lines": 24,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/state-machine.types.ts",
+      "sha256": "35036eef480a423c650bb525f5d4fdcdbdccde7ab118cb6b3b1d26b3c7868baa",
+      "lines": 83,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/observability-records.ts",
+      "sha256": "52721258803094df854645ec82aa577d734a4c5f31353010f81dacb455be9b31",
+      "lines": 99,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification.schemas.ts",
+      "sha256": "2b23461ee426a39c62bfae8e8801bb354b7efcd6371386d607084dcda4199e20",
+      "lines": 22,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-http.ts",
+      "sha256": "48bbf4f8fb7a5300fc193d7e316be0745044b0892924ca3292bb9ab1e7a6883d",
+      "lines": 69,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-service.ts",
+      "sha256": "67616f279dce6da3a5dbf86bce92c2004e63836c53cf2df85eb921e7394100d0",
+      "lines": 101,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate-types.ts",
+      "sha256": "09395605181c675c300a390232ed004ababa87fcf760eb5203dedab8e32ba345",
+      "lines": 2,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/watcher.schemas.ts",
+      "sha256": "d8a183b666d644dfb065e1b4ebc71857d7f59844a86129b292f9f776bb4540c4",
+      "lines": 7,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-websocket.ts",
+      "sha256": "f47bf2d5813b71ce1a0a068f65b681dacc912536b8713ee9f5865c968826283d",
+      "lines": 174,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/activation.ts",
+      "sha256": "2adbbdded3660d94b1a66f4c4b7d04bcc3aa2ea30ea33a7d164ced5034c9d2a5",
+      "lines": 169,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate-start.ts",
+      "sha256": "2d00a49fe92bd1794b42cabac44e75fedc74c233836b633041bacabcd7010111",
+      "lines": 178,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/observability-types.ts",
+      "sha256": "14b559c4b66b979d032242993979e06ec9790daeffb80f51812f6495299632c4",
+      "lines": 2,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-error.ts",
+      "sha256": "ba50d8ac6d3157f33545aec80c97fdaa355e00d85e7201208873cda8cfeb46a8",
+      "lines": 12,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-service.types.ts",
+      "sha256": "9b5cb2dec750530197640c4771a32ede87d268a8413700822315f21c672a2a9d",
+      "lines": 13,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-service.ts",
+      "sha256": "ae06d98950ad4efa3afa433adcdc8252c7f8b256851f0b2f4e8dc3d3a8076b8c",
+      "lines": 97,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain.types.ts",
+      "sha256": "177ec86e3f191d49b0925f88f60318355c0e665057136bf1b5ced7bce727fccd",
+      "lines": 95,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification.types.ts",
+      "sha256": "7df4460e5ea6b592ba36e3b30fb5c6e69337a8c0e1c11b27ee8b7d2e63c6dc06",
+      "lines": 50,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-validation.ts",
+      "sha256": "20c7774d0084cc08a71d5c197455a56a1af077f2806a47d9d55d2cfd89c3dc6a",
+      "lines": 22,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate-platform.ts",
+      "sha256": "6f5f0a17deb0620301a7e0b0ba2c22b847202622728f305d94b53c11ae3e2ecf",
+      "lines": 40,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-body.types.ts",
+      "sha256": "d86d1b0a21b57a6b8af660c848e7f9bea3ffc10ae063d1d57f10669fac215c25",
+      "lines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/state-machine.ts",
+      "sha256": "70437bea4be7329f585e61a0ddf205eb045e5c1a43c2da44d8c1e65380a334bb",
+      "lines": 176,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/observability-service.types.ts",
+      "sha256": "674e7b0ca8a1d0fd69e47f44f102231fc6f8192cff3f0176ee0245f7a4267f7a",
+      "lines": 24,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/observability.ts",
+      "sha256": "3c0ed84bfa63dca4ffeaf067ac6741ce378850c01b2ac394146c148940bab76c",
+      "lines": 68,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/watcher-compile.ts",
+      "sha256": "dbb6816e077d7f3b9be2971ede221ee608a5b8c079fad492459f20fcdcbef769",
+      "lines": 93,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-report.ts",
+      "sha256": "efdf0abb5996293c78dfe27669a97f76d2ff6d2c937dee0add091775adf45d8e",
+      "lines": 56,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-state-service.ts",
+      "sha256": "902b131d35c73e27cf56c1b0c847f281a1785427e34043bdaa7e34617255765f",
+      "lines": 56,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/observability-records.types.ts",
+      "sha256": "4024a60e69dac9460d3c449aff551dee966d11522f1f48025f1b2742a04bae3d",
+      "lines": 14,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/watcher-notify.ts",
+      "sha256": "61a557f794f7ea5b3a2c3d1873b4b048490c81f3b090335d80d756790d318ba6",
+      "lines": 67,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-state.ts",
+      "sha256": "f0e0b7597bb4ea929c7a3773bbcfd5320bc8d8d19a2535b0403377baa52b955f",
+      "lines": 36,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate-output.ts",
+      "sha256": "1c6186110e5a6b22b047f6b8a5c88ae3b7734a761ee67f70f4a2f4a18cd28f2d",
+      "lines": 92,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/state-machine.schemas.ts",
+      "sha256": "6498cb6ab4ffa7f0eae10ef621e8503793bebd4223c60e007483c9773bedcf03",
+      "lines": 33,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/drain-errors.ts",
+      "sha256": "b3b3485cb9204f1c88e2a6b17de376e1c105e8f5b9de00a36519b58e4c70ea42",
+      "lines": 10,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy.ts",
+      "sha256": "3dfbd6eb06050f14632d107642143994bc5a99e8b23e8271db0022bf86fcb252",
+      "lines": 180,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate-process.ts",
+      "sha256": "cb761bacb62f1952bccbfb718d8495532ebf7562ed83e6317c7cd74da24dd57c",
+      "lines": 167,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-errors.ts",
+      "sha256": "5bd4d21ccb74dc9204170a0bb89655b533856211f8510f180ee8882c627fdc33",
+      "lines": 27,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/watcher.types.ts",
+      "sha256": "94ceec6f32403b631e9ea5a9fc9ea75b36f8e47f27dc5f09fd4b0e0cd1b9526c",
+      "lines": 76,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-metadata.types.ts",
+      "sha256": "5460df16923f64de86edfa6f79b7a9bc7f79f41527cf8b6d67d830b0b6a3d1ed",
+      "lines": 13,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-websocket-native.ts",
+      "sha256": "208e5b2d5ea976757ce5d891ba1e2dc747984cafa9b5d219bcd1d16da791d6a1",
+      "lines": 62,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-validation.ts",
+      "sha256": "8eac3ef8a5db36bae30b6dd20a483a002980fcaa8a271d572492e7aa45186235",
+      "lines": 46,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/index.ts",
+      "sha256": "0e42c7a3784e7f11159234f5c7055163545580b036053f1915ac6d4d8258d686",
+      "lines": 9,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/activation.types.ts",
+      "sha256": "8c009f134f03e728c423c8497b932cd786557de87433edb2e706226864636565",
+      "lines": 65,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification.ts",
+      "sha256": "e8189d85a721eb19ff6805d1b7ee341cb6dc15275e13b19b5a42af99de0d913f",
+      "lines": 55,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/state-machine-telemetry.ts",
+      "sha256": "3f14c992d4ec84d9ccb7761ff273210f5549b8f59e2444fc34468f066f95daf8",
+      "lines": 18,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/activation-publish.types.ts",
+      "sha256": "8ddf36e972d6580e51394b997024cdae9c030dbaac83e1e62c985e5a31003f33",
+      "lines": 13,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/activation-plan.ts",
+      "sha256": "08d41c3037e64c979139964ea827ed3f70daefeee92ad100b3f4df5785e15b16",
+      "lines": 227,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/output-lines.types.ts",
+      "sha256": "a2ba653a4c01b624f34215a4ddd4d6563eda772fcebaed6ae99698366be0f55c",
+      "lines": 7,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/candidate-output.types.ts",
+      "sha256": "e8595d5ce0c25513a1f0147891a58352393312f5273a4ea1e2788e77bd8c42ce",
+      "lines": 11,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/verification-probe.ts",
+      "sha256": "96c180a86d9cc1d5be4010d8524d6dc595f8a999135f6dfc41962aa3c5c73f78",
+      "lines": 86,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy.types.ts",
+      "sha256": "df6d2958cde95686d22f13677553d25d9c47b38ddc329d33ac10fa78b58dd079",
+      "lines": 64,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/src/proxy-forward.ts",
+      "sha256": "3afb71b2ca2b80fbfa0d49009fe6769e6a2c72eeb82c135061b19dde6d98bec6",
+      "lines": 65,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/observability.test.ts",
+      "sha256": "5a3989c0390b64f8d26c6822ada3b9bdadfca2625f5dd0e95cf3d4794145835f",
+      "lines": 154,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/verification.test.ts",
+      "sha256": "6ebaa9327e8946cfa8f06aaaf861b34b5554b115cd8ba1cf99d08d58a15ba7d6",
+      "lines": 266,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/drain.test.ts",
+      "sha256": "bc9a87fc1a72472cf8499dd2141805025bf5c7d8a4a3369d4b58a18cbd34ba02",
+      "lines": 82,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/candidate.test.ts",
+      "sha256": "4650a4cb739a6130a364ce5e1ca48aec24f9b65f272099d53a0daf51b9083412",
+      "lines": 125,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/watcher.test.ts",
+      "sha256": "f2d954b1e6ed69b9d572d00dbcdc0bc68c7e06902f585d4c11db3f42094c6c92",
+      "lines": 117,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/proxy-origin.test.ts",
+      "sha256": "6fd8e3627013a31de6a11f13d46addd684ce2c69988d60c872a131a8eb422c3f",
+      "lines": 75,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/compatibility/proxy.test.ts",
+      "sha256": "ce62823a3cbd00b48a87a1c6c7ed9b60ea9085dc80942bbe9180085f49bee276",
+      "lines": 295,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/candidate/service.test.ts",
+      "sha256": "85ade6626eaf0b0191a00adacf6278273a9915930ef463c790a0a6383669e1f9",
+      "lines": 275,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/proxy/service.test.ts",
+      "sha256": "2e447e852406a8f503f0131014bdf53327a33b987eae3755cc7dfad48593b409",
+      "lines": 339,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/watcher/service.test.ts",
+      "sha256": "0c9d92128b27f510afe203391cdee0a0efa0b9a24c861041c8845c56d9e08eda",
+      "lines": 239,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/activation/service.test.ts",
+      "sha256": "f74ab8cd91791e2dcbf07455e59305b59b66d4de05633d3a70a13417ba99447b",
+      "lines": 141,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/activation/state-machine.test.ts",
+      "sha256": "c529bc8535e8f87f30bf4a80a8e0902006e7f4db6289e1b75e3a6cca5e391f62",
+      "lines": 83,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/observability/service.test.ts",
+      "sha256": "8558cd2f3714a023e9b1abd6428b3b7255dd19da171ef84760d7782dc8b6618a",
+      "lines": 182,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/verification/service.test.ts",
+      "sha256": "debe5f6f51c41f753f01bba2fcb33c20e4a5f4befb751231463865b4b225bcdf",
+      "lines": 201,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/drain/service.test.ts",
+      "sha256": "86076c7d1746c42402e124927819a98658c9f212f22d5893675d2c2d09d8a404",
+      "lines": 113,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/fixtures/observability.types.ts",
+      "sha256": "014baed9a5a15f834a1370ee5e066cb1c0056aa14b22a6df9a722d3068119e4e",
+      "lines": 8,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/fixtures/usage-examples.ts",
+      "sha256": "378f7d0c062358a7a01e04c70f1d997f3bb1210bcd8e0cf4083bf7c58e72bf0a",
+      "lines": 77,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/fixtures/native-gate.ts",
+      "sha256": "20156798cf198a081d882dce659d10cbcd7362f9f7d664577dae6f75f3e3243f",
+      "lines": 15,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/fixtures/observability.ts",
+      "sha256": "c54f2e08109da202ef5149c1a7f4159f50dadbf1019912a08b1583602952e053",
+      "lines": 20,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/fixtures/native-gate.types.ts",
+      "sha256": "ca56563ad8f972ab089b0c610a3dbac0456421bce12e5f5f6a14b57383aad239",
+      "lines": 8,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/fixtures/watcher.types.ts",
+      "sha256": "51b9eedf2420f64c2f6d5900bef985828798d48d9f67a7df593477340fe121e7",
+      "lines": 4,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/tests/fixtures/fetch.ts",
+      "sha256": "9fc01d5205456879e3305e3a03e50dee14fd32eeee7ec025e9c0a179221df064",
+      "lines": 13,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    },
+    {
+      "path": "packages/supervisor/vitest.config.ts",
+      "sha256": "eff332db570179b201d2c24372aa33558ebd1b9babae9a072efbca7d1cf03b6f",
+      "lines": 10,
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "outcome": "accepted"
+    }
+  ],
+  "strictConfig": {
+    "path": "packages/supervisor/tsconfig.tests.json",
+    "sha256": "2c5058d532bcd1974df4426a2090bec68e4bd00f606f33e646df2e77de839738",
+    "lines": 12,
+    "reviewer": "/root/inspector_baseline",
+    "read": "EOF"
+  },
+  "originalMap": [
+    {
+      "original": "packages/supervisor/candidate.test.ts",
+      "originalSha256": "393810c8eff981d91f11d0dba3252ea72acf798d0925abafa6a9c157d1048d70",
+      "originalLines": 115,
+      "final": [
+        "packages/supervisor/tests/compatibility/candidate.test.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Original assertion chains retained in owner-root suite; state machine converted to Effect Vitest, native protocol fixtures remain Bun"
+    },
+    {
+      "original": "packages/supervisor/drain.test.ts",
+      "originalSha256": "a584e4991f669de62e236898adcf1188e56f75aa762791074734ba80455dbba3",
+      "originalLines": 82,
+      "final": [
+        "packages/supervisor/tests/compatibility/drain.test.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Original assertion chains retained in owner-root suite; state machine converted to Effect Vitest, native protocol fixtures remain Bun"
+    },
+    {
+      "original": "packages/supervisor/observability.test.ts",
+      "originalSha256": "2ad976c4ab91b504c66957c829a48bb77e93d277e30fb6bc03fa0a3edd5a548f",
+      "originalLines": 145,
+      "final": [
+        "packages/supervisor/tests/compatibility/observability.test.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Original assertion chains retained in owner-root suite; state machine converted to Effect Vitest, native protocol fixtures remain Bun"
+    },
+    {
+      "original": "packages/supervisor/proxy-origin.test.ts",
+      "originalSha256": "9153a2862c698b097229ae7187a3c2601b1f8bc06a2a9f8d8bd63298c8e355e8",
+      "originalLines": 51,
+      "final": [
+        "packages/supervisor/tests/compatibility/proxy-origin.test.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Original assertion chains retained in owner-root suite; state machine converted to Effect Vitest, native protocol fixtures remain Bun"
+    },
+    {
+      "original": "packages/supervisor/proxy.test.ts",
+      "originalSha256": "a5416f8382a2db0a858c8c32210ba6db8484c48cf92c79d5060290e02c0f71f7",
+      "originalLines": 184,
+      "final": [
+        "packages/supervisor/tests/compatibility/proxy.test.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Original assertion chains retained in owner-root suite; state machine converted to Effect Vitest, native protocol fixtures remain Bun"
+    },
+    {
+      "original": "packages/supervisor/src/candidate-output.ts",
+      "originalSha256": "e3127a8c148b07481e3e59bb14640f91d66041e334467361c8342fec7bfb0de7",
+      "originalLines": 77,
+      "final": [
+        "packages/supervisor/src/candidate-output.ts",
+        "packages/supervisor/src/candidate-output.types.ts",
+        "packages/supervisor/src/output-lines.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/candidate-process.ts",
+      "originalSha256": "3f109456bc595cdb4eefaed18d5ae6efae9be09ef81d3ecf72b2336839df1ff9",
+      "originalLines": 141,
+      "final": [
+        "packages/supervisor/src/candidate-process.ts",
+        "packages/supervisor/src/candidate-platform.ts",
+        "packages/supervisor/src/candidate-start.ts",
+        "packages/supervisor/src/candidate-validation.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/candidate-types.ts",
+      "originalSha256": "a8737e677e63abeaaf4c1a225163b756f5dcdb95cebcfc53335794eac05e97d5",
+      "originalLines": 76,
+      "final": [
+        "packages/supervisor/src/candidate-types.ts",
+        "packages/supervisor/src/candidate.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/candidate.ts",
+      "originalSha256": "0a73518cc4e99d8b98e1406369172463f4ef0baa7fb464a75234735fd1ff86e6",
+      "originalLines": 157,
+      "final": [
+        "packages/supervisor/src/candidate.ts",
+        "packages/supervisor/src/candidate-service.ts",
+        "packages/supervisor/src/candidate-service.types.ts",
+        "packages/supervisor/src/candidate-platform.ts",
+        "packages/supervisor/src/candidate-start.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/drain-cleanup.ts",
+      "originalSha256": "fd72baf7889f69678f6df7da45fbe41f68cf70b0fb6192784f276b79edb2b491",
+      "originalLines": 48,
+      "final": [
+        "packages/supervisor/src/drain-cleanup.ts",
+        "packages/supervisor/src/drain-cleanup.types.ts",
+        "packages/supervisor/src/drain-errors.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/drain-state.ts",
+      "originalSha256": "4ba5c2cb86bb95c6b73478be9bcb3d6562799734e447c67a7252b2e1eb39f4db",
+      "originalLines": 42,
+      "final": [
+        "packages/supervisor/src/drain-state.ts",
+        "packages/supervisor/src/drain-state-service.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/drain-types.ts",
+      "originalSha256": "111d3bd7bf4d05d99ce1ab9213f248a74d6a141106da514f84bc2407ea8081b9",
+      "originalLines": 72,
+      "final": [
+        "packages/supervisor/src/drain-types.ts",
+        "packages/supervisor/src/drain.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/drain.ts",
+      "originalSha256": "16f15774da8376a52ea5e4f7c92eedf82f1e9346ab4cd90fc750ef8768c84d89",
+      "originalLines": 200,
+      "final": [
+        "packages/supervisor/src/drain.ts",
+        "packages/supervisor/src/drain-service.ts",
+        "packages/supervisor/src/drain-service.types.ts",
+        "packages/supervisor/src/drain-run.ts",
+        "packages/supervisor/src/drain-report.ts",
+        "packages/supervisor/src/drain-validation.ts",
+        "packages/supervisor/src/drain.schemas.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/index.ts",
+      "originalSha256": "0e42c7a3784e7f11159234f5c7055163545580b036053f1915ac6d4d8258d686",
+      "originalLines": 9,
+      "final": [
+        "packages/supervisor/src/index.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Reviewed unchanged pure public/helper boundary"
+    },
+    {
+      "original": "packages/supervisor/src/observability-records.ts",
+      "originalSha256": "81fbd8c0b2d299fc2c3e16d17e6098bf4317365ec5b98b50aef6471476bd64a6",
+      "originalLines": 96,
+      "final": [
+        "packages/supervisor/src/observability-records.ts",
+        "packages/supervisor/src/observability-records.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/observability-types.ts",
+      "originalSha256": "d58827ec68de36889be80a5f2ec35a85860a822559f7e9aa350e24b8b8bd9f31",
+      "originalLines": 34,
+      "final": [
+        "packages/supervisor/src/observability-types.ts",
+        "packages/supervisor/src/observability.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/observability.ts",
+      "originalSha256": "3866f0844e5dfea45f6dc24aa1d57bc3957e78f00f7ad5069a9a6cd3aff1e2ff",
+      "originalLines": 75,
+      "final": [
+        "packages/supervisor/src/observability.ts",
+        "packages/supervisor/src/observability-service.ts",
+        "packages/supervisor/src/observability-service.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/output-lines.ts",
+      "originalSha256": "8d6d87e894a78101e4fc2a2ae2942c0f3baeb14df93d7ba247f0e9d12b6717a2",
+      "originalLines": 61,
+      "final": [
+        "packages/supervisor/src/output-lines.ts",
+        "packages/supervisor/src/output-lines.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/proxy-forward.ts",
+      "originalSha256": "4f8b9b23e364e4a42ffc868a9038d38082b27ac7ba6488345a06dfe6b7e2653e",
+      "originalLines": 53,
+      "final": [
+        "packages/supervisor/src/proxy-forward.ts",
+        "packages/supervisor/src/proxy-request.ts",
+        "packages/supervisor/src/proxy-body.ts",
+        "packages/supervisor/src/proxy-body.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/proxy-websocket.ts",
+      "originalSha256": "bf5445d435df59cc0fdb27570a9484a40e09084cf44dbcfb2ac7d575505fc7cb",
+      "originalLines": 100,
+      "final": [
+        "packages/supervisor/src/proxy-websocket.ts",
+        "packages/supervisor/src/proxy-websocket-native.ts",
+        "packages/supervisor/src/proxy-websocket.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/proxy.ts",
+      "originalSha256": "0e3b66a302d6ad320ee29afe7161921ea794dbe0be368b5c821bcbfdb305ca82",
+      "originalLines": 197,
+      "final": [
+        "packages/supervisor/src/proxy.ts",
+        "packages/supervisor/src/proxy-service.ts",
+        "packages/supervisor/src/proxy.types.ts",
+        "packages/supervisor/src/proxy-listener-native.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/state-machine-telemetry.ts",
+      "originalSha256": "b49fde6214378c5db014bc68c52f3d4b5daf3fa7a762aef6b63b32d536503a09",
+      "originalLines": 100,
+      "final": [
+        "packages/supervisor/src/state-machine-telemetry.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/state-machine-types.ts",
+      "originalSha256": "2c0780bf4eec4ceb8b79e84ca86e5ef1ee2876e7a198bd7b02beee71e317eda6",
+      "originalLines": 96,
+      "final": [
+        "packages/supervisor/src/state-machine-types.ts",
+        "packages/supervisor/src/state-machine.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/state-machine.ts",
+      "originalSha256": "f9d041ce278605cad04c34488bf7849861dafc33b9933462725a6f9314c9fb98",
+      "originalLines": 199,
+      "final": [
+        "packages/supervisor/src/state-machine.ts",
+        "packages/supervisor/src/activation.ts",
+        "packages/supervisor/src/activation.types.ts",
+        "packages/supervisor/src/activation-plan.ts",
+        "packages/supervisor/src/activation-publish.ts",
+        "packages/supervisor/src/activation-publish.types.ts",
+        "packages/supervisor/src/state-machine-data.ts",
+        "packages/supervisor/src/state-machine.schemas.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/verification-fingerprint.ts",
+      "originalSha256": "7d384d56c71dedd0954350ecedc463a9237b7efd5bb33b0ef1eeb561d432ca4e",
+      "originalLines": 19,
+      "final": [
+        "packages/supervisor/src/verification-fingerprint.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/verification-http.ts",
+      "originalSha256": "1777647aab855b26dab2dc887ea72104ff58d082e4058dcb8d0c99d485dbfc56",
+      "originalLines": 54,
+      "final": [
+        "packages/supervisor/src/verification-http.ts",
+        "packages/supervisor/src/verification-metadata.ts",
+        "packages/supervisor/src/verification-metadata.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/verification-probe.ts",
+      "originalSha256": "083bd41f84c9f513e4aab325f0561d9e5b67061d05fb32ad7d248be4a38d827a",
+      "originalLines": 196,
+      "final": [
+        "packages/supervisor/src/verification-probe.ts",
+        "packages/supervisor/src/verification-service.ts",
+        "packages/supervisor/src/verification-errors.ts",
+        "packages/supervisor/src/verification.schemas.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/verification-types.ts",
+      "originalSha256": "e7b4638e55986c93f3789a8daaea9e842c015dd5336b042bbf954bf2eea638d4",
+      "originalLines": 63,
+      "final": [
+        "packages/supervisor/src/verification-types.ts",
+        "packages/supervisor/src/verification.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/verification.ts",
+      "originalSha256": "b9ca1f1ec278aba1fb7bd0c829e2f8b26742b900595764da88679220f15d977d",
+      "originalLines": 82,
+      "final": [
+        "packages/supervisor/src/verification.ts",
+        "packages/supervisor/src/verification-service.ts",
+        "packages/supervisor/src/verification-service.types.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/src/watcher.ts",
+      "originalSha256": "1fbfa77c55a3d607a59073c8b7da80b8963f5ae84ea627ff445b94bb8e39f3b7",
+      "originalLines": 181,
+      "final": [
+        "packages/supervisor/src/watcher.ts",
+        "packages/supervisor/src/watcher-service.ts",
+        "packages/supervisor/src/watcher-compile.ts",
+        "packages/supervisor/src/watcher-notify.ts",
+        "packages/supervisor/src/watcher.types.ts",
+        "packages/supervisor/src/watcher.schemas.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Refactored/documented owning service/native helper and canonical companion; public type entry retained"
+    },
+    {
+      "original": "packages/supervisor/state-machine.test.ts",
+      "originalSha256": "230eefcb0251987c07cba271f1de0650ee2d4963801d4466484368cc547dc24c",
+      "originalLines": 76,
+      "final": [
+        "packages/supervisor/tests/activation/state-machine.test.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Original assertion chains retained in owner-root suite; state machine converted to Effect Vitest, native protocol fixtures remain Bun"
+    },
+    {
+      "original": "packages/supervisor/verification.test.ts",
+      "originalSha256": "5abc26a688bdafac4be05d7992669cd7d81eb12d25eabd03f843749c7e90c74d",
+      "originalLines": 259,
+      "final": [
+        "packages/supervisor/tests/compatibility/verification.test.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Original assertion chains retained in owner-root suite; state machine converted to Effect Vitest, native protocol fixtures remain Bun"
+    },
+    {
+      "original": "packages/supervisor/watcher.test.ts",
+      "originalSha256": "f84e7a3fdaee073e72c97873ae949d475bd965125dd035c8bbc43897b9e7e47f",
+      "originalLines": 94,
+      "final": [
+        "packages/supervisor/tests/compatibility/watcher.test.ts"
+      ],
+      "reviewer": "/root/inspector_baseline",
+      "originalRead": "EOF",
+      "disposition": "Original assertion chains retained in owner-root suite; state machine converted to Effect Vitest, native protocol fixtures remain Bun"
+    }
+  ],
+  "assertionParity": {
+    "method": "Independent type-erased AST comparison /tmp/relkit-supervisor-parity.mjs; normalize only formatting and identical mockFetch wrapper boundary.",
+    "originalChains": 121,
+    "retained": 121,
+    "added": 6,
+    "suites": 8,
+    "missing": 0,
+    "perFile": [
+      {
+        "oldPath": "packages/supervisor/candidate.test.ts",
+        "newPath": "packages/supervisor/tests/compatibility/candidate.test.ts",
+        "originalAssertions": 13,
+        "currentAssertions": 13,
+        "missing": [],
+        "addedAssertions": 0
+      },
+      {
+        "oldPath": "packages/supervisor/drain.test.ts",
+        "newPath": "packages/supervisor/tests/compatibility/drain.test.ts",
+        "originalAssertions": 14,
+        "currentAssertions": 14,
+        "missing": [],
+        "addedAssertions": 0
+      },
+      {
+        "oldPath": "packages/supervisor/observability.test.ts",
+        "newPath": "packages/supervisor/tests/compatibility/observability.test.ts",
+        "originalAssertions": 12,
+        "currentAssertions": 12,
+        "missing": [],
+        "addedAssertions": 0
+      },
+      {
+        "oldPath": "packages/supervisor/proxy-origin.test.ts",
+        "newPath": "packages/supervisor/tests/compatibility/proxy-origin.test.ts",
+        "originalAssertions": 4,
+        "currentAssertions": 5,
+        "missing": [],
+        "addedAssertions": 1
+      },
+      {
+        "oldPath": "packages/supervisor/proxy.test.ts",
+        "newPath": "packages/supervisor/tests/compatibility/proxy.test.ts",
+        "originalAssertions": 30,
+        "currentAssertions": 35,
+        "missing": [],
+        "addedAssertions": 5
+      },
+      {
+        "oldPath": "packages/supervisor/state-machine.test.ts",
+        "newPath": "packages/supervisor/tests/activation/state-machine.test.ts",
+        "originalAssertions": 22,
+        "currentAssertions": 22,
+        "missing": [],
+        "addedAssertions": 0
+      },
+      {
+        "oldPath": "packages/supervisor/verification.test.ts",
+        "newPath": "packages/supervisor/tests/compatibility/verification.test.ts",
+        "originalAssertions": 16,
+        "currentAssertions": 16,
+        "missing": [],
+        "addedAssertions": 0
+      },
+      {
+        "oldPath": "packages/supervisor/watcher.test.ts",
+        "newPath": "packages/supervisor/tests/compatibility/watcher.test.ts",
+        "originalAssertions": 10,
+        "currentAssertions": 10,
+        "missing": [],
+        "addedAssertions": 0
+      }
+    ]
+  },
+  "applicableFamilies": [
+    {
+      "family": "Service",
+      "disposition": "Activation, candidate startup, verification, drain, source watcher, proxy and observation ownership are cohesive Context.Service contracts with live/test Layers and Service.of."
+    },
+    {
+      "family": "Schema",
+      "disposition": "Existing public wire authority retained; typed lifecycle/candidate/verification failures and schema-derived service companions where appropriate."
+    },
+    {
+      "family": "Tagged Errors",
+      "disposition": "Internal discriminated errors translate to original native/public errors at compatibility edges."
+    },
+    {
+      "family": "Error Management",
+      "disposition": "Original native failures, sink defects and interruption remain distinct; failed candidate cleanup retains active generation."
+    },
+    {
+      "family": "Data",
+      "disposition": "Existing native identity and telemetry unions remain canonical; no incompatible wrapper values."
+    },
+    {
+      "family": "Observability",
+      "disposition": "Shared operation instrumentation covers CAS, watcher notify/flush/close, proxy request/intercept/stop and observation append/flush."
+    },
+    {
+      "family": "Metrics",
+      "disposition": "Fixed bounded component/operation/outcome labels and truthful native work counts; same-contract fixture registries assert outcomes."
+    },
+    {
+      "family": "Tracing",
+      "disposition": "Named Effect.fn operations and shared bounded spans; passive synchronous native callbacks remain thin."
+    },
+    {
+      "family": "Logs",
+      "disposition": "Configured runtime logger adapter redacts sensitive telemetry; log output remains separate from queried observations."
+    },
+    {
+      "family": "Fibers",
+      "disposition": "Owned compile, append, request and tunnel workers attach to parent scopes; close joins native settlement."
+    },
+    {
+      "family": "PubSub",
+      "disposition": "Not appropriate for canonical synchronous lifecycle callbacks or native WebSocket delivery."
+    },
+    {
+      "family": "Queue",
+      "disposition": "Unbounded lossless baseline persistence ordering retained; admitted whole batches committed before reentrant sink callbacks. Scope closure completes waiters."
+    },
+    {
+      "family": "Stream",
+      "disposition": "Native response bodies retain admitted leases until EOF/cancel; no prefetch wrapper, original native WebSocket/code/reason behavior."
+    },
+    {
+      "family": "Clocks",
+      "disposition": "Injected native deadlines and Effect debounce sleeps preserve timing; TestClock and Deferred gates where deterministic."
+    },
+    {
+      "family": "Concurrency",
+      "disposition": "Atomic Ref CAS and synchronous admission; protected acquisition prefixes then explicitly interruptible workers; all endpoints verify identity."
+    },
+    {
+      "family": "Caching",
+      "disposition": "Only scoped once-owned shared compile/start handles; no TTL/capacity eviction of generation authority."
+    },
+    {
+      "family": "Scheduling",
+      "disposition": "Debounce/coalescing policy retained; no new retries of writes or activation."
+    },
+    {
+      "family": "Scope",
+      "disposition": "Reusable facades own Layer context; candidate directory/process/output, request body and WebSocket tunnel cleanup have exact native ownership."
+    },
+    {
+      "family": "RcMap",
+      "disposition": "Not needed: activation generation retirement requires explicit canonical owner/lease tracking, not cache eviction."
+    },
+    {
+      "family": "AcquireRelease",
+      "disposition": "Native process/request/reader/socket prefixes install finalizers atomically; output sink failure releases reader and framing timer."
+    },
+    {
+      "family": "Testing",
+      "disposition": "New/refactored domain suites use @effect/vitest; retained Bun native protocols preserve all 121 original assertion chains; author 36 Effect and 25 Bun cases pass."
+    },
+    {
+      "family": "Traits",
+      "disposition": "No new equality/hash traits needed beyond immutable canonical candidate fingerprint/token and native CAS witness."
+    },
+    {
+      "family": "Refs",
+      "disposition": "Atomic lifecycle, drain lease counts, proxy admission, watcher coalescing and observation batch state."
+    },
+    {
+      "family": "Configs",
+      "disposition": "Existing explicit public options remain authority; pinned Bun-only workaround narrowly guarded."
+    },
+    {
+      "family": "Platform Logger",
+      "disposition": "Existing @relkit/runtime-effect/logger configured server adapter with isolated metric registry; public facades preserve synchronous API."
+    }
+  ],
+  "resolvedFindings": [
+    "All three verification endpoint identities checked, no short-circuit skipped fetch.",
+    "Output sink exceptions and framing-timer exceptions cancel/release native reader and timer.",
+    "Protected HTTP lease admission/reader and WebSocket acquisition prefixes; workers explicitly interruptible.",
+    "Upstream WebSocket exact native close code/reason preserved.",
+    "Candidate allocator native Promise joins then pending Effect interruption checked before spawn; independent probe reproduced 1 pre-fix spawn and 0 post-fix.",
+    "Candidate/Watcher compile interruption joins native Promise settlement before directory cleanup.",
+    "Observation full batch admitted before reentrant close; snapshot flush preserves ordering.",
+    "Standalone CAS, proxy interception, watcher flush/close and observation flush observation restored without duplicate forwarding counts.",
+    "Native candidate fixtures release acquired process on assertion failure.",
+    "Generic/parameter/return ownership documentation and 10 self-contained examples checked."
+  ],
+  "authorReportedChecks": {
+    "effect": "36/36, 8 files, 1.69 sec",
+    "bun": "25/25, 7 files, 105 expectations, 674 ms",
+    "strictTypecheck": "passed",
+    "sourceBuild": "passed",
+    "actualDocgen": "135923 chars, all 10 examples passed with explicit ES2022 Bun config"
+  },
+  "independentChecks": {
+    "hashes": "All 102 current entries match exact author freeze.",
+    "assertionParity": "All 121 retained.",
+    "allocatorProbe": "Zero native spawns after interrupted allocator settles.",
+    "nativeShutdown": "Actual same-authority exclusive rebind, probe shutdown and natural subprocess exit verified; native stale stop Promise remains unresolved."
+  },
+  "nativeEvidence": "/tmp/relkit-bun-native-listener-evidence.json",
+  "limitations": [
+    "Custom allocatePort(hostname):Promise<number> has no Signal/cleanup contract; join settlement and check owner interruption before spawn. Default allocator joins temporary native listener stop.",
+    "Bun1.3.10 server-initiated WebSocket close leaves stale pendingWebSockets/stop Promise. Narrow adapter requires close acknowledgements, owned work joins, zero pendingRequests and actual exclusive same-host/port acquire+stop proof before unref; never claims stale Promise settled.",
+    "Borrowed native intercept/cleanup capabilities retain their existing cancellation contracts; unsupported Signal guarantees are not fabricated.",
+    "Assembled focused timings materially regress; source signoff does not approve performance parity."
+  ],
+  "independentVendorEvidence": {
+    "effect": "Installed rc.115 selected Context/Layer/Scope/forkIn/masking/tryPromise native Signal/Deferred/Ref/Clock/race/Metric/logger/Schema/Queue implementations and inline examples read; read-only vendor core tests absent (Queue/Scope explicitly missing); available NodeWorkerRunner native Queue/Deferred scoped test read through EOF.",
+    "bun": "Pinned native subprocess proof plus primary Bun stop documentation and issue36223, linked in native evidence."
+  },
+  "architectureExceptions": [
+    "Synchronous public lifecycle/CAS/snapshot callbacks remain native/pure edges; no per-call runtime.",
+    "Compatibility pure type entry paths reexport canonical .types companions.",
+    "Legacy native Bun compatibility suites retained; state-machine domain baseline migrated to Effect Vitest.",
+    "No RcMap/PubSub introduced for canonical explicit retirement authority."
+  ],
+  "openAcceptanceRisks": [
+    "Parent assembled performance regressions and whole-demo disconnect acceptance remain open."
+  ]
+}

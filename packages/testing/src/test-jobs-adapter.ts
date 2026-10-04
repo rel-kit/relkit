@@ -1,55 +1,45 @@
-import type { RunSnapshot } from "@relkit/contracts/jobs";
-import type { TestClock } from "./runtime.js";
-import { createDeterministicClock } from "./runtime-clock.js";
+import type { TestJobsAdapterOptions, TestJobsAdapter } from "./test-jobs-adapter.types.js";
+export type { TestJobsAdapterOptions, TestJobsAdapter } from "./test-jobs-adapter.types.js";
+import { Effect, Layer, ManagedRuntime, Stream } from "effect";
+import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import { JOBS_ADAPTER_PROTOCOL_VERSION, type JobsAdapterRuntime } from "@relkit/jobs/adapter";
+
+import { TestNativeJobs, nativeJobsLayer } from "./native-jobs-service.js";
 import {
-  JOBS_ADAPTER_PROTOCOL_VERSION,
-  type JobsAdapterRuntime,
-  type NativeControlReceipt,
-  type NativeTaskWork,
-} from "@relkit/jobs/adapter";
-import { cancel, retry, unknown } from "./test-jobs-adapter-controls.js";
-import {
-  createRun,
-  complete,
-  fail,
-  handle,
-  list,
-  next,
-  observe,
-} from "./test-jobs-adapter-work.js";
-import { requestKey, snapshotOf, type TestNativeRun } from "./test-jobs-adapter-support.js";
+  disposeTestingOwner,
+  runRetainedTestingQuery,
+  testingLoggerLayer,
+} from "./testing-owner.js";
+import { detachedNativeSnapshot } from "./test-jobs-adapter-support.js";
+import { Ref } from "effect";
 
-export interface TestJobsAdapterOptions {
-  readonly clock?: TestClock;
-  readonly startTimeMs?: number;
-  readonly service?: string;
-  readonly unknown?: Partial<Record<"submit" | "cancel" | "retry", boolean>>;
-}
-
-export interface TestJobsAdapter extends JobsAdapterRuntime {
-  readonly clock: TestClock;
-  readonly runNext: () => Promise<NativeTaskWork | undefined>;
-  readonly snapshot: (runId: string) => RunSnapshot;
-}
-
+/**
+ * Creates a synchronous compatibility adapter over one deterministic jobs owner.
+ * @param options Clock and explicitly injected native write outcomes.
+ * @returns Native jobs Promise/iterator operations; close releases this owner once.
+ */
 export function createDeterministicJobsAdapter(
   options: TestJobsAdapterOptions = {},
 ): TestJobsAdapter {
-  const deterministic =
-    options.clock === undefined ? createDeterministicClock(options.startTimeMs ?? 0) : undefined;
-  const clock = options.clock ?? deterministic!.clock;
-  const service = options.service ?? "test-jobs";
-  const runs = new Map<string, TestNativeRun>();
-  const keys = new Map<string, string>();
-  const cancelReceipts = new Map<string, NativeControlReceipt>();
-  const retryReceipts = new Map<string, NativeControlReceipt>();
-  let sequence = 0;
-  let closed = false;
-  const adapter: TestJobsAdapter = {
+  const owner = ManagedRuntime.make(
+    nativeJobsLayer(options).pipe(Layer.provideMerge(testingLoggerLayer(options.logger))),
+  );
+  const service = runExecutionSync(owner, TestNativeJobs);
+  const context = runExecutionSync(owner, Effect.context<never>());
+  let closing: Promise<void> | undefined;
+  const workerContext = {
+    signal: new AbortController().signal,
+    application: "test",
+    environment: "test",
+    scope: "test",
+    service: options.service ?? "test-jobs",
+    serviceGeneration: "test",
+  };
+  return Object.freeze<TestJobsAdapter>({
     kind: "jobs-adapter-runtime",
     protocolVersion: JOBS_ADAPTER_PROTOCOL_VERSION,
     capabilities: {
-      service,
+      service: options.service ?? "test-jobs",
       provider: "test",
       adapterId: "test-jobs",
       protocolVersion: 1,
@@ -62,66 +52,60 @@ export function createDeterministicJobsAdapter(
         retry: true,
       },
     },
-    submit: async (request) => {
-      ensureOpen();
-      if (options.unknown?.submit === true)
-        return unknown(
-          "RELKIT_JOB_SUBMISSION_UNKNOWN",
-          request.operationId,
-          request.idempotencyKey,
-        );
-      const key = requestKey(request);
-      const existing = key === undefined ? undefined : keys.get(key);
-      if (existing !== undefined) return { ...handle(runs.get(existing)!), duplicate: true };
-      const run = createRun(request, `test-run-${++sequence}`, undefined, clock);
-      runs.set(run.runId, run);
-      if (key !== undefined) keys.set(key, run.runId);
-      return handle(run);
-    },
-    get: async (locator) => {
-      const run = runs.get(locator);
-      if (run === undefined) throw new Error("Test run was not found");
-      return snapshotOf(run, service);
-    },
-    list: async (query) => list(runs, query, service),
-    observe: (request, context) => observe(runs, request, context, service),
-    cancel: async (request) =>
-      cancel(runs, cancelReceipts, request, options.unknown?.cancel === true, service),
-    retry: async (request) =>
-      retry(runs, retryReceipts, request, options.unknown?.retry === true, service, clock),
+    submit: (...args: Parameters<JobsAdapterRuntime["submit"]>) =>
+      closing === undefined
+        ? runExecutionPromise(owner, service.submit(...args))
+        : Promise.reject(new Error("Test jobs adapter is closed")),
+    get: (...args: Parameters<JobsAdapterRuntime["get"]>) =>
+      closing === undefined
+        ? runExecutionPromise(owner, service.get(...args))
+        : runRetainedTestingQuery(context, service.get(...args)),
+    list: (...args: Parameters<JobsAdapterRuntime["list"]>) =>
+      closing === undefined
+        ? runExecutionPromise(owner, service.list(...args))
+        : runRetainedTestingQuery(context, service.list(...args)),
+    observe: (...args: Parameters<NonNullable<JobsAdapterRuntime["observe"]>>) =>
+      Stream.toAsyncIterableWith(service.observe(...args), context),
+    cancel: (...args: Parameters<JobsAdapterRuntime["cancel"]>) =>
+      closing === undefined
+        ? runExecutionPromise(owner, service.cancel(...args))
+        : Promise.reject(new Error("Test jobs adapter is closed")),
+    retry: (...args: Parameters<NonNullable<JobsAdapterRuntime["retry"]>>) =>
+      closing === undefined
+        ? runExecutionPromise(owner, service.retry(...args))
+        : Promise.reject(new Error("Test jobs adapter is closed")),
     worker: {
-      next: async (context) => next(runs, context, service),
-      complete: async (runId, output) => complete(runs.get(runId), output, clock),
-      fail: async (runId, error) => fail(runs.get(runId), error, clock),
+      next: (...args: Parameters<NonNullable<JobsAdapterRuntime["worker"]>["next"]>) =>
+        closing === undefined
+          ? runExecutionPromise(owner, service.worker.next(...args))
+          : Promise.resolve(undefined),
+      complete: (...args: Parameters<NonNullable<JobsAdapterRuntime["worker"]>["complete"]>) =>
+        closing === undefined
+          ? runExecutionPromise(owner, service.worker.complete(...args))
+          : Promise.resolve(),
+      fail: (...args: Parameters<NonNullable<JobsAdapterRuntime["worker"]>["fail"]>) =>
+        closing === undefined
+          ? runExecutionPromise(owner, service.worker.fail(...args))
+          : Promise.resolve(),
     },
-    close: async () => {
-      closed = true;
-    },
-    clock,
-    runNext: async () =>
-      next(
-        runs,
-        {
-          signal: new AbortController().signal,
-          application: "test",
-          environment: "test",
-          scope: "test",
-          service,
-          serviceGeneration: "test",
-        },
-        service,
+    clock: service.clock,
+    runNext: () =>
+      closing === undefined
+        ? runExecutionPromise(owner, service.worker.next(workerContext))
+        : Promise.resolve(undefined),
+    snapshot: (runId: string) =>
+      detachedNativeSnapshot(
+        Ref.getUnsafe(service.state),
+        runId,
+        options.service ?? "test-jobs",
+        service.clock,
       ),
-    snapshot: (runId) => {
-      const run = runs.get(runId);
-      if (run === undefined) throw new Error("Test run was not found");
-      return snapshotOf(run, service);
-    },
-  };
-  return Object.freeze(adapter);
-
-  function ensureOpen(): void {
-    if (closed) throw new Error("Test jobs adapter is closed");
-  }
+    close: () =>
+      (closing ??= runExecutionPromise(owner, service.close).finally(() =>
+        disposeTestingOwner(owner),
+      )),
+  });
 }
 
+/** @inheritDoc createDeterministicJobsAdapter */
 export const createTestJobsAdapter = createDeterministicJobsAdapter;

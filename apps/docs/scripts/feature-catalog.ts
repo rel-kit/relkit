@@ -102,7 +102,7 @@ export const features = [
     "Call checked routes through the generated typed contract.",
     "http/generated-clients",
     "client",
-    [["packages/client/src/index.ts", "createClient"]],
+    [["packages/client/src/transport.ts", "createClient"]],
     ["examples/commerce/src/platform/generated-client.ts"],
   ),
   realtimeFeature,

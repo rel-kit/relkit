@@ -1,0 +1,92 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "author": "/root",
+  "result": "accepted",
+  "findings": [],
+  "scope": "Latent native export-queue liveness blocker exposed by candidate demo telemetry volume; no public protocol, bounds, assertions, or diagnostic deadline changes",
+  "files": [
+    {
+      "path": "packages/observability/src/local/batch-queue-effect.ts",
+      "sha256": "316611ac7bd89704b5f2e6faf1b0ca39dcd5266f226b18b91eaa4076ebd614f5",
+      "lines": 191,
+      "originalSha256": "efacbc0c37cc5f21306ab0ebc27487d3f5bd61e84044ba9ad3d88fc97ebeb084",
+      "originalLines": 190,
+      "review": "Current and original EOF; exact source comparison is solely timer=undefined added before timer callback calls startDrain. All existing workflow/instrumentation/cleanup contracts preserved."
+    },
+    {
+      "path": "packages/observability/tests/local-batch-queue-effect.test.ts",
+      "sha256": "0d1b765610cdec9e829426089d452556cb1f949a48f327165f6f9ea7949ecf8c",
+      "lines": 198,
+      "originalSha256": "139106ac8c84460f14922226ebeb23496a312fe105cb3d4f46a5b7ad013a14ff",
+      "originalLines": 151,
+      "review": "Current and original EOF; final source/test reread after narrow strictfixture amendment. Original full151line prefix is byte-exact after normalizing added vi import and one required fields:{} LogRecord fixture member. All10original static expect calls preserved;3new assertions prove originalrace first/second write, nextsmalltail write, exactpersisted3/queued0. Timer regression remains unchanged from independentlyaccepted prior freeze."
+    }
+  ],
+  "nativeOwnership": {
+    "fix": "Timeout callback relinquishes its expired handle before the coalescing guard can skip an already-active drain. Later admissions can install a new100ms timer. Existing serialized writer, close/flush clearTimeout, limits and interruption requeue remain unchanged.",
+    "test": "Only native setTimeout/clearTimeout are faked; native microtasks/Date and Effect Clock are not replaced. First native writer is held by explicit Promise gate. Timer2 fires while drain1 is held, gate release then advance0 joins microtasks before newsmalltail. All assertions occur before explicitclose, preventing cleanupflush from disguising liveness failure.",
+    "failureCleanup": "finally releases heldwriter before awaiting queueclose; nestedfinally restores native timers evenwhenclosefails. No new host, detached work, or timer deadline-as-proof.",
+    "runnerDisposition": "Direct Vitest is appropriate for this native timeout adapter regression; EffectTestClock/it.effect would not control the owned native timer. Effectworkflow itself runs through installedEffect APIs. Existing package layout/runner retained."
+  },
+  "families": {
+    "Service": "Existing cohesive LocalBatchQueueService/liveLayer contract unchanged.",
+    "Schema": "Existing LocalRecord contract and tagged native writer error unchanged.",
+    "Tagged Errors": "LocalBatchWriteError remains typed writerfailure; no newfailure model needed.",
+    "Error Management": "Existing catch/report/onInterrupt requeue semantics unchanged; testalwaysreleases writer.",
+    "Data": "No newdomain variants/data structures needed for one native timerhandle.",
+    "observability": "Existing bounded queue operation observer retained, no doublecount wrapper.",
+    "metrics": "Existing counters/duration and captured registry retained.",
+    "tracing": "NamedEffect.fn boundaries retained; no newstage created.",
+    "logs": "Existing best-effort failure sink preserved; no repeated diagnosticlogs added.",
+    "fibers": "Existing background Effect.runPromise coalescing remains unchanged; patchdoesnotintroduce newfork/promise ownership.",
+    "PubSub": "Not applicable; ordered finite persistence queue has no fanout.",
+    "Queue": "Existing bounded native synchronousadmission compatibility design preserved; unnecessary newqueue abstraction would expand scope.",
+    "Stream": "Not applicable to finite batchwriter timerfix.",
+    "Clocks": "Native timeout ownership must use nativefake timers for regression; existingClock metricsemantics unchanged.",
+    "concurrency": "ExistingSemaphore1 and drainingguard preserve orderedwriter serialization; timer retirement fixes futureadmission liveness.",
+    "caching": "Not applicable; queue is acceptedwork storage, not cache.",
+    "scheduling": "100ms nativecallback now retires its handle before startDrain; fakeclock explicitly exercises overlap without wallclock sleeps.",
+    "Scope": "Existing liveLayer ownsqueueclose; compatibility owner close unchanged and testclosejoined.",
+    "RcMap": "Not applicable; no keyedsharedresource leases.",
+    "AcquireRelease": "ExistingLayer acquisition/release remains; no newresource requires another scope.",
+    "testing": "Deterministic heldwriter/nativefakeTimer regression proves beforefail/afterpass and restoresglobal timerstate.",
+    "traits": "No new capability abstraction required.",
+    "Refs": "Existing local synchronousclosure state preserved; oneatomic nativecallbackassignment needs noRef migration.",
+    "Configs": "No changedsettings or limits;100ms/256/1MiB/4MiB unchanged.",
+    "Platform Logger": "Existing configured queueobserver/logger boundaries unaffected."
+  },
+  "apiEvidence": {
+    "Effect": "Reuse previouslyverified pinned4.0.0-rc.115 Context.Service,Effect.fn/gen/onInterrupt/runPromise,Semaphore.withPermit,MetricRegistry/Metricupdate,Layer.effect/acquireRelease and installedimplementation/inlineexamples; no newEffectpattern introduced. Sparse read-onlyvendor lacks matchingcoretests; prior installedsource/testevidence retained.",
+    "Vitest": "Installed5.0.1 dist/chunks/index.m3L2HgmY.js inspected fakeTimers implementation lines6738-6840 andpublic vi methods7232-7285: explicittoFake honored, advanceTimersByTimeAsync awaitsclock.tickAsync, useRealTimers uninstalls nativeclock.",
+    "supportEOF": [
+      "packages/observability/src/local/batch-queue-metrics.ts",
+      "packages/observability/src/local/batch-queue.types.ts",
+      "packages/observability/src/local/batch-queue.ts",
+      "packages/observability/tests/local-batch-queue.test.ts"
+    ]
+  },
+  "authorEvidenceIndependentlyRead": [
+    {
+      "path": "/tmp/relkit-core-consumers-batch-timer-regression-before.log",
+      "sha256": "0baa485bcfddc5b1de92da26b29a5ef480e240a09d36a62e6c2a5960542fe43f",
+      "bytes": 1189,
+      "result": "4originaltests pass; newsmalltail regressionfails expectedthird butactual first+second"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-batch-timer-regression-after.log",
+      "sha256": "db1716a2fbe2a350a37e85cd52a484be59d26ead3fca1fd8443f697ca915a9f8",
+      "bytes": 250,
+      "result": "Bothqueue testfiles7/7pass"
+    }
+  ],
+  "finalFixtureAmendment": {
+    "scope": "Added fields:{} to existing LogRecord fixture to satisfy the existing nativecontract under strictisolated testtypecheck. No casts,fabricatedoutcomes,assertionchanges,timerchanges or newsourcebehavior.",
+    "sourceHashUnchanged": true,
+    "timerRegressionTextUnchanged": true,
+    "allOriginalAssertionsPreserved": true,
+    "authorReportedCheck": "Strict isolated queue test typecheck passed; previous before/after logs precede thisfixture-only addition and remain raceproof, not a new finalruntime replay claim.",
+    "accepted": true
+  },
+  "reviewerExecutedRunners": false,
+  "remainingAcceptance": "Coordinator affectedcheck/build and unchanged actualdemo diagnosticreplay required; previous fullverify was preamendment and not presented as validating thisfix."
+}

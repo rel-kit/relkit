@@ -1,5 +1,8 @@
 "use client";
 
+import type { JobMutationOptions } from "./job-mutation-hooks.types.js";
+export type { JobMutationOptions } from "./job-mutation-hooks.types.js";
+
 import {
   useMutation,
   type UseMutationOptions,
@@ -16,25 +19,25 @@ import type {
   JobTriggerInputFor,
   JobTriggerOutputFor,
   JobTriggerName,
-} from "../jobs/index.js";
-import { useRelkitClient, type RelkitClientRuntime } from "./context.js";
+} from "../jobs/job-registry-derived.types.js";
+import { useRelkitClient } from "./context.js";
 import { relkitJobKey } from "./keys.js";
-import { forgetPending, pendingScopeKey, rememberJobPending, rememberPending } from "./pending.js";
+import { runExecutionPromise } from "@relkit/contracts/operation";
+import { mutationOperations, mutationRuntime } from "./mutation-runtime.js";
+import { pendingScopeKey } from "./pending.js";
 import { procedureUtils } from "./procedure.js";
 import { RelkitWriteError } from "./write-error.js";
 import { prepareJobRequest, readOperationId } from "./job-hooks-support.js";
-import {
-  controlReferences,
-  offline,
-  settlePending,
-  writableScope,
-} from "./job-mutation-support.js";
+import { controlReferences, offline, writableScope } from "./job-mutation-support.js";
 
-export type JobMutationOptions<Output, Failure, Input, Context> = Omit<
-  UseMutationOptions<Output, Failure, Input, Context>,
-  "mutationKey" | "mutationFn"
-> & { readonly jobId?: string };
-
+/**
+ * Adapts a declared job trigger and its pending authority into TanStack mutation state.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @typeParam Context - TanStack mutation context.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns The typed trigger mutation and its pending receipt state.
+ */
 export function useJobTrigger<Name extends JobTriggerName, Context = unknown>(
   name: Name,
   options: JobMutationOptions<
@@ -70,20 +73,24 @@ export function useJobTrigger<Name extends JobTriggerName, Context = unknown>(
       if (offline()) throw new RelkitWriteError("not-sent", "The browser is offline.");
       const prepared = prepareJobRequest(input, runtime.identity!, mutationContext);
       const scopeKey = pendingScopeKey(scope);
-      const pending = await rememberJobPending(scopeKey, name, prepared.value, {
-        operationId: prepared.operationId,
-        ...(prepared.idempotencyKey === undefined
-          ? {}
-          : { idempotencyKey: prepared.idempotencyKey }),
-      });
-      try {
-        const value = await original(prepared.value, mutationContext);
-        forgetPending(scopeKey, pending.operationId);
-        return value;
-      } catch (error) {
-        settlePending(scopeKey, pending, error);
-        throw error;
-      }
+      return (await runExecutionPromise(
+        mutationRuntime,
+        mutationOperations.submit(
+          scopeKey,
+          "job-trigger",
+          name,
+          prepared.value,
+          {},
+          {
+            operationId: prepared.operationId,
+            retainRequest: true,
+            ...(prepared.idempotencyKey === undefined
+              ? {}
+              : { idempotencyKey: prepared.idempotencyKey }),
+          },
+          () => original(prepared.value, mutationContext),
+        ),
+      )) as JobTriggerOutputFor<Name>;
     },
     mutationKey: runtime.scope
       ? relkitJobKey(runtime.scope, "trigger", { jobId: jobId ?? name })
@@ -96,6 +103,14 @@ export function useJobTrigger<Name extends JobTriggerName, Context = unknown>(
   >);
 }
 
+/**
+ * Adapts an idempotent job cancellation request into TanStack mutation state.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @typeParam Context - TanStack mutation context.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns The typed cancellation mutation.
+ */
 export function useJobCancel<Name extends JobCancelName, Context = unknown>(
   name: Name,
   options: JobMutationOptions<
@@ -113,6 +128,14 @@ export function useJobCancel<Name extends JobCancelName, Context = unknown>(
   return useJobControl(name, "cancel", options);
 }
 
+/**
+ * Adapts an explicit job retry request into TanStack mutation state.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @typeParam Context - TanStack mutation context.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns The typed retry mutation.
+ */
 export function useJobRetry<Name extends JobRetryName, Context = unknown>(
   name: Name,
   options: JobMutationOptions<
@@ -130,6 +153,18 @@ export function useJobRetry<Name extends JobRetryName, Context = unknown>(
   return useJobControl(name, "retry", options);
 }
 
+/**
+ * Builds the shared cancellation/retry mutation adapter with complete scope keys.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @typeParam Operation - Declared Operation type retained by this operation.
+ * @typeParam Input - Declared transmitted input.
+ * @typeParam Output - Declared successful output payload.
+ * @typeParam Context - TanStack mutation context.
+ * @param name - Declared resource or selector identity.
+ * @param operation - One native boundary operation.
+ * @param options - Existing public configuration and authority.
+ * @returns The typed control mutation with canonical scope keys.
+ */
 function useJobControl<
   Name extends JobCancelName | JobRetryName,
   Operation extends "cancel" | "retry",
@@ -160,22 +195,18 @@ function useJobControl<
       if (offline()) throw new RelkitWriteError("not-sent", "The browser is offline.");
       const scopeKey = pendingScopeKey(scope);
       const operationId = readOperationId(input);
-      const pending = await rememberPending(
-        scopeKey,
-        "mutation",
-        `jobs.${name}.runs.${operation}`,
-        input,
-        controlReferences(input),
-        operationId === undefined ? {} : { operationId },
-      );
-      try {
-        const value = await original(input, mutationContext);
-        forgetPending(scopeKey, pending.operationId);
-        return value;
-      } catch (error) {
-        settlePending(scopeKey, pending, error);
-        throw error;
-      }
+      return (await runExecutionPromise(
+        mutationRuntime,
+        mutationOperations.submit(
+          scopeKey,
+          "mutation",
+          `jobs.${name}.runs.${operation}`,
+          input,
+          controlReferences(input),
+          operationId === undefined ? {} : { operationId },
+          () => original(input, mutationContext),
+        ),
+      )) as Output;
     },
     mutationKey: runtime.scope
       ? relkitJobKey(runtime.scope, operation, { jobId: jobId ?? name })

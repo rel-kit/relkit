@@ -1,3 +1,9 @@
+import { assertFailurePoint, assertName, lazyRecords } from "./fake-utils.js";
+import { Context, Effect, Layer, ManagedRuntime, Ref } from "effect";
+import { observeExecution, runExecutionSync } from "@relkit/contracts/operation";
+import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
+import type { TestFailureControls, TestFakesOptions, TestFakes } from "./fakes.types.js";
+export type { TestFailureControls, TestFakesOptions, TestFakes } from "./fakes.types.js";
 import type { DependencyCategory, DependencyClientSources } from "@relkit/engine";
 import {
   createTestBucketFake,
@@ -5,44 +11,15 @@ import {
   type TestBucketFakeOptions,
 } from "./buckets.js";
 import { createTestCacheFake, type TestCacheFake, type TestCacheFakeOptions } from "./cache.js";
-import {
-  copyTestProviderReplacements,
-  type TestProviderReplacements,
-} from "./provider-replacements.js";
+import { copyTestProviderReplacements } from "./provider-replacements.js";
 
-export interface TestFailureControls {
-  readonly failAt: (point: string, cause?: unknown) => void;
-  readonly once?: (point: string, cause?: unknown) => void;
-  readonly clear: (point?: string) => void;
-  readonly check: (point: string) => void;
-}
-
-export interface TestFakesOptions {
-  readonly clock?: () => number;
-  readonly providers?: TestProviderReplacements;
-}
-
-export interface TestFakes {
-  readonly stateRoot: string;
-  readonly clients: DependencyClientSources;
-  readonly buckets: Readonly<Record<string, TestBucketFake>>;
-  readonly cache: Readonly<Record<string, TestCacheFake<unknown, unknown>>>;
-  readonly providers: TestProviderReplacements;
-  readonly createBucket: (
-    id: string,
-    options?: Omit<TestBucketFakeOptions, "bucketId" | "stateRoot" | "failures" | "clock">,
-  ) => TestBucketFake;
-  readonly createCache: (
-    id: string,
-    options?: Omit<TestCacheFakeOptions, "cacheId" | "stateRoot" | "failures" | "clock">,
-  ) => TestCacheFake<unknown, unknown>;
-  readonly setClient: (category: DependencyCategory, name: string, client: unknown) => void;
-  readonly removeClient: (category: DependencyCategory, name: string) => void;
-  readonly failures: TestFailureControls;
-}
-
-/** Creates fresh dependency sources and failure controls for one test runtime. */
-export function createTestFakes(stateRoot: string, options: TestFakesOptions = {}): TestFakes {
+/**
+ * Creates fresh dependency sources and failure controls for one test runtime.
+ * @param stateRoot - Native stateRoot supplied to this owner.
+ * @param options - Explicit configuration and native dependencies for this test owner.
+ * @returns Fake native providers whose complete close releases all acquired storage.
+ */
+function createFakeState(stateRoot: string, options: TestFakesOptions = {}): TestFakes {
   if (stateRoot.length === 0) throw new TypeError("Test fake state root must not be empty");
   const providers = copyTestProviderReplacements(options.providers);
   const clients = Object.fromEntries(
@@ -51,20 +28,24 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
       Object.create(null) as Record<string, unknown>,
     ]),
   ) as Record<DependencyCategory, Record<string, unknown>>;
-  const configuredFailures = new Map<string, { readonly cause: unknown; readonly once: boolean }>();
-  let eventSequence = 0;
-  let jobSequence = 0;
+  const state = Ref.makeUnsafe({
+    closed: false,
+    configuredFailures: new Map<string, { readonly cause: unknown; readonly once: boolean }>(),
+    eventSequence: 0,
+    jobSequence: 0,
+  });
+  const configuredFailures = Ref.getUnsafe(state).configuredFailures;
 
   const failures: TestFailureControls = Object.freeze({
     failAt: (point: string, cause?: unknown) => {
-      assertPoint(point);
+      assertFailurePoint(point);
       configuredFailures.set(point, {
         cause: cause ?? new Error(`Injected test failure: ${point}`),
         once: false,
       });
     },
     once: (point: string, cause?: unknown) => {
-      assertPoint(point);
+      assertFailurePoint(point);
       configuredFailures.set(point, {
         cause: cause ?? new Error(`Injected test failure: ${point}`),
         once: true,
@@ -86,10 +67,17 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
 
   const bucketRecords = Object.create(null) as Record<string, TestBucketFake>;
   const cacheRecords = Object.create(null) as Record<string, TestCacheFake<unknown, unknown>>;
+  /**
+   * Acquires each named native bucket at most once within this fake owner.
+   * @param id Declared bucket dependency identity.
+   * @param fakeOptions Per-bucket native policy; owner clock and root are shared.
+   * @returns The retained bucket facade, rejecting acquisition after close.
+   */
   const createBucket = (
     id: string,
     fakeOptions: Omit<TestBucketFakeOptions, "bucketId" | "stateRoot" | "failures" | "clock"> = {},
   ) => {
+    if (Ref.getUnsafe(state).closed) throw new Error("Test fakes are closed");
     const existing = bucketRecords[id];
     if (existing !== undefined) return existing;
     const fake = createTestBucketFake({
@@ -97,15 +85,23 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
       bucketId: id,
       stateRoot,
       failures,
+      ...(options.logger === undefined ? {} : { logger: options.logger }),
       ...(options.clock === undefined ? {} : { clock: options.clock }),
     });
     bucketRecords[id] = fake;
     return fake;
   };
+  /**
+   * Acquires each named writable cache at most once within this fake owner.
+   * @param id Declared cache dependency identity.
+   * @param fakeOptions Per-cache schema/TTL policy; owner clock and root are shared.
+   * @returns The retained cache facade, rejecting acquisition after close.
+   */
   const createCache = (
     id: string,
     fakeOptions: Omit<TestCacheFakeOptions, "cacheId" | "stateRoot" | "failures" | "clock"> = {},
   ) => {
+    if (Ref.getUnsafe(state).closed) throw new Error("Test fakes are closed");
     const existing = cacheRecords[id];
     if (existing !== undefined) return existing;
     const fake = createTestCacheFake({
@@ -113,6 +109,7 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
       cacheId: id,
       stateRoot,
       failures,
+      ...(options.logger === undefined ? {} : { logger: options.logger }),
       ...(options.clock === undefined ? {} : { clock: options.clock }),
     });
     cacheRecords[id] = fake as TestCacheFake<unknown, unknown>;
@@ -131,18 +128,26 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
   clients.events = lazyRecords(clients.events!, (id) =>
     Object.freeze({
       publish: async (_payload: unknown, _options: unknown, context: { signal: AbortSignal }) => {
+        if (Ref.getUnsafe(state).closed) throw new Error("Test fakes are closed");
         if (context.signal.aborted) throw context.signal.reason ?? new Error("Event cancelled");
         failures.check("event.publish");
-        return { accepted: true, instanceId: `test-event-${id}-${++eventSequence}` };
+        return {
+          accepted: true,
+          instanceId: `test-event-${id}-${++Ref.getUnsafe(state).eventSequence}`,
+        };
       },
     }),
   );
   clients.jobs = lazyRecords(clients.jobs!, (id) =>
     Object.freeze({
       enqueue: async (_input: unknown, _options: unknown, context: { signal: AbortSignal }) => {
+        if (Ref.getUnsafe(state).closed) throw new Error("Test fakes are closed");
         if (context.signal.aborted) throw context.signal.reason ?? new Error("Job cancelled");
         failures.check("job.enqueue");
-        return { accepted: true, instanceId: `test-job-${id}-${++jobSequence}` };
+        return {
+          accepted: true,
+          instanceId: `test-job-${id}-${++Ref.getUnsafe(state).jobSequence}`,
+        };
       },
     }),
   );
@@ -164,24 +169,69 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
       delete clients[category]![name];
     },
     failures,
-  });
-}
-
-function lazyRecords<T>(records: Record<string, T>, create: (id: string) => T): Record<string, T> {
-  return new Proxy(records, {
-    get(target, property, receiver) {
-      if (typeof property !== "string") return Reflect.get(target, property, receiver);
-      if (target[property] !== undefined) return target[property];
-      const created = create(property);
-      return (target[property] ??= created);
+    close: async () => {
+      const current = Ref.getUnsafe(state);
+      if (current.closed) return;
+      current.closed = true;
+      const results = await Promise.allSettled(
+        [...Object.values(bucketRecords), ...Object.values(cacheRecords)].map((fake) =>
+          fake.close(),
+        ),
+      );
+      const failures = results.filter((result) => result.status === "rejected");
+      if (failures.length > 0)
+        throw new AggregateError(
+          failures.map((result) => result.reason),
+          "Test fake cleanup failed",
+        );
     },
   });
 }
 
-function assertPoint(point: string): void {
-  if (point.length === 0) throw new TypeError("Failure point must not be empty");
+/** Native dependency sources and their storage release share a single test owner. */
+export class TestFakeProviders extends Context.Service<TestFakeProviders, TestFakes>()(
+  "relkit/testing/FakeProviders",
+) {}
+
+/**
+ * Acquires synchronous fake dependencies and scopes all storage created lazily later.
+ * @param stateRoot Explicit runtime-owned persistence root.
+ * @param options Injected clock and explicit provider replacements.
+ * @returns A scoped, substitutable fake-provider Layer.
+ */
+export function fakeProvidersLayer(stateRoot: string, options: TestFakesOptions = {}) {
+  return Layer.effect(
+    TestFakeProviders,
+    Effect.acquireRelease(
+      observeExecution(
+        "testing",
+        "fakes.acquire",
+        Effect.sync(() => TestFakeProviders.of(createFakeState(stateRoot, options))),
+      ),
+      (value) => Effect.promise(() => value.close()),
+    ),
+  );
 }
 
-function assertName(name: string): void {
-  if (name.length === 0) throw new TypeError("Fake client name must not be empty");
+/**
+ * Creates fresh native dependency sources with an owned Effect lifetime.
+ * @param stateRoot Explicit persistence root owned by the parent runtime.
+ * @param options Injected clock and explicit native replacements.
+ * @returns Synchronously ready fake providers; close releases all child storage.
+ */
+export function createTestFakes(stateRoot: string, options: TestFakesOptions = {}): TestFakes {
+  const owner = ManagedRuntime.make(
+    fakeProvidersLayer(stateRoot, options).pipe(
+      Layer.provideMerge(testingLoggerLayer(options.logger)),
+    ),
+  );
+  let value;
+  try {
+    value = runExecutionSync(owner, TestFakeProviders);
+  } catch (error) {
+    void disposeTestingOwner(owner).catch(() => undefined);
+    throw error;
+  }
+  let closing: Promise<void> | undefined;
+  return Object.freeze({ ...value, close: () => (closing ??= disposeTestingOwner(owner)) });
 }

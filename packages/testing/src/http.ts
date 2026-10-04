@@ -1,4 +1,24 @@
-import type { MaybePromise } from "@relkit/contracts";
+import { Layer, ManagedRuntime } from "effect";
+import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import { TestHttpOwner, httpOwnerLayer, TestHttpPlatformLive } from "./http-owner.js";
+import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
+import type {
+  TestHttpInput,
+  TestHttpRequest,
+  TestHttpApplication,
+  TestHttpClientOptions,
+  TestHttpClient,
+  TestObservability,
+} from "./http.types.js";
+export type {
+  TestHttpInput,
+  TestHttpRequest,
+  TestHttpApplication,
+  TestHttpClientOptions,
+  TestHttpClient,
+  TestObservability,
+} from "./http.types.js";
+
 import {
   createInspectableObservabilityHooks,
   OBSERVABILITY_HOOK_PROTOCOL,
@@ -12,63 +32,41 @@ import {
   type TestHttpListenerOptions,
 } from "./http-listener.js";
 
-export type TestHttpInput = Request | string | URL;
-export type TestHttpRequest = (input: TestHttpInput, init?: RequestInit) => Promise<Response>;
-
-/** The app request/fetch methods satisfy this boundary without leaking framework types. */
-export interface TestHttpApplication {
-  readonly request?: (input: TestHttpInput, init?: RequestInit) => Response | Promise<Response>;
-  readonly fetch?: (request: Request) => Response | Promise<Response>;
-}
-export interface TestHttpClientOptions {
-  readonly baseUrl?: string | URL;
-  /** Registers client shutdown with the owning test runtime/application. */
-  readonly registerClose?: (close: () => Promise<void>) => void;
-  readonly onClose?: () => MaybePromise<void>;
-  readonly closeTimeoutMs?: number;
-}
-export interface TestHttpClient {
-  readonly request: TestHttpRequest;
-  readonly get: TestHttpRequest;
-  readonly post: TestHttpRequest;
-  readonly put: TestHttpRequest;
-  readonly patch: TestHttpRequest;
-  readonly delete: TestHttpRequest;
-  readonly listen: (options?: TestHttpListenerOptions) => Promise<TestHttpListener>;
-  readonly close: () => Promise<void>;
-}
-
-/** Sends ordinary route tests through the app's in-memory request entry point. */
+/**
+ * Sends ordinary route tests through the app's in-memory request entry point.
+ * @param app - Native in-memory application request/fetch boundary.
+ * @param options - Explicit configuration and native dependencies for this test owner.
+ * @returns A synchronous client facade whose close waits for pending listener startup.
+ */
 export function createTestHttpClient(
   app: TestHttpApplication,
   options: TestHttpClientOptions = {},
 ): TestHttpClient {
   const baseUrl = normalizeBaseUrl(options.baseUrl ?? "http://relkit.test");
-  const listeners = new Set<TestHttpListener>();
+  const owner = ManagedRuntime.make(
+    httpOwnerLayer(app, options).pipe(
+      Layer.provide(TestHttpPlatformLive),
+      Layer.provideMerge(testingLoggerLayer(options.logger)),
+    ),
+  );
+  let service;
+  try {
+    service = runExecutionSync(owner, TestHttpOwner);
+  } catch (error) {
+    void disposeTestingOwner(owner).catch(() => undefined);
+    throw error;
+  }
   let closing: Promise<void> | undefined;
   const request: TestHttpRequest = (input, init) =>
     dispatchInMemory(app, makeRequest(input, init, baseUrl));
-  const listen = async (listenerOptions: TestHttpListenerOptions = {}) => {
-    const listener = await createTestHttpListener(app, {
-      ...listenerOptions,
-      ...(listenerOptions.closeTimeoutMs === undefined && options.closeTimeoutMs !== undefined
-        ? { closeTimeoutMs: options.closeTimeoutMs }
-        : {}),
-    });
-    listeners.add(listener);
-    return listener;
-  };
-  const close = (): Promise<void> => {
-    if (closing !== undefined) return closing;
-    closing = (async () => {
-      const results = await Promise.allSettled([...listeners].map((listener) => listener.close()));
-      listeners.clear();
-      const failed = results.find((result) => result.status === "rejected");
-      if (failed?.status === "rejected") throw failed.reason;
-      await options.onClose?.();
-    })();
-    return closing;
-  };
+  const listen = (listenerOptions?: TestHttpListenerOptions) =>
+    closing === undefined
+      ? runExecutionPromise(owner, service.listen(listenerOptions))
+      : Promise.reject(new Error("Test HTTP client is closed"));
+  const close = (): Promise<void> =>
+    (closing ??= runExecutionPromise(owner, service.close).finally(() =>
+      disposeTestingOwner(owner),
+    ));
   const client = Object.freeze({
     request,
     get: method(request, "GET"),
@@ -79,10 +77,16 @@ export function createTestHttpClient(
     listen,
     close,
   });
-  options.registerClose?.(close);
+  try {
+    options.registerClose?.(close);
+  } catch (error) {
+    void close().catch(() => undefined);
+    throw error;
+  }
   return client;
 }
 
+/** @inheritDoc createTestHttpClient */
 export const createHttpTestClient = createTestHttpClient;
 export { createTestHttpListener } from "./http-listener.js";
 export { createBunHttpListener } from "./http-listener.js";
@@ -92,11 +96,25 @@ export type {
   TestHttpListenerOptions,
 } from "./http-listener.js";
 
+/**
+ * Asserts the existing native HTTP response status.
+ * @param response - Native HTTP response returned by the application.
+ * @param expected - Existing expected status or ordered captured values.
+ * @returns The same response when the assertion succeeds.
+ */
 export function assertResponseStatus(response: Response, expected: number): Response {
   if (response.status !== expected)
     throw new Error(`Expected HTTP ${String(expected)}, received ${String(response.status)}`);
   return response;
 }
+
+/**
+ * Reads JSON after the optional native status assertion.
+ * @typeParam T - Caller-asserted response or record value type; native assertions remain authoritative.
+ * @param response - Native HTTP response returned by the application.
+ * @param expectedStatus - Optional status assertion performed before consuming the body.
+ * @returns The native decoded body cast to the caller's asserted type; no schema fallback is added.
+ */
 export async function responseJson<T = unknown>(
   response: Response,
   expectedStatus?: number,
@@ -104,22 +122,22 @@ export async function responseJson<T = unknown>(
   if (expectedStatus !== undefined) assertResponseStatus(response, expectedStatus);
   return (await response.json()) as T;
 }
+
+/**
+ * Reads text after the optional native status assertion.
+ * @param response - Native HTTP response returned by the application.
+ * @param expectedStatus - Optional status assertion performed before consuming the body.
+ * @returns The native response text.
+ */
 export async function responseText(response: Response, expectedStatus?: number): Promise<string> {
   if (expectedStatus !== undefined) assertResponseStatus(response, expectedStatus);
   return response.text();
 }
 
-export interface TestObservability {
-  readonly hooks: InspectableObservabilityHooks;
-  readonly read: () => readonly ObservabilityHookEvent[];
-  readonly types: () => readonly ObservabilityHookEvent["type"][];
-  readonly assertTypes: (
-    expected: readonly ObservabilityHookEvent["type"][],
-  ) => readonly ObservabilityHookEvent[];
-  readonly clear: () => void;
-}
-
-/** Creates a protocol/version-checked capture for engine-backed HTTP tests. */
+/**
+ * Creates a protocol/version-checked capture for engine-backed HTTP tests.
+ * @returns The capture and unchanged native assertion helpers.
+ */
 export function createTestObservability(): TestObservability {
   const hooks = createInspectableObservabilityHooks();
   return Object.freeze({
@@ -131,8 +149,16 @@ export function createTestObservability(): TestObservability {
     clear: hooks.clear,
   });
 }
+
+/** @inheritDoc createTestObservability */
 export const createObservabilityAssertions = createTestObservability;
 
+/**
+ * Asserts event order and the existing observability protocol/version.
+ * @param hooks - Caller-native hooks forwarded without changing ordering.
+ * @param expected - Existing expected status or ordered captured values.
+ * @returns The original captured events when all assertions pass.
+ */
 export function assertObservabilityHookTypes(
   hooks: Pick<InspectableObservabilityHooks, "read">,
   expected: readonly ObservabilityHookEvent["type"][],
@@ -152,23 +178,57 @@ export function assertObservabilityHookTypes(
   return events;
 }
 
+/**
+ * Binds one HTTP verb to the in-memory request boundary.
+ * @param request - Native operation input carrying explicit identity and execution context.
+ * @param verb - HTTP method retained in RequestInit.
+ * @returns A request function retaining all other RequestInit fields.
+ */
 function method(request: TestHttpRequest, verb: string): TestHttpRequest {
   return (input, init) => request(input, { ...(init ?? {}), method: verb });
 }
+
+/**
+ * Normalizes a native request input against the configured base URL.
+ * @param input - Declared input passed through the owning schema authority.
+ * @param init - Caller-native request options.
+ * @param baseUrl - Explicit origin for relative test requests.
+ * @returns A Request retaining caller options and existing Request semantics.
+ */
 function makeRequest(input: TestHttpInput, init: RequestInit | undefined, baseUrl: URL): Request {
   if (input instanceof Request) return init === undefined ? input : new Request(input, init);
   const url = input instanceof URL ? new URL(input) : new URL(input, baseUrl);
   return new Request(url.toString(), init);
 }
+
+/**
+ * Normalizes the test origin to a trailing-slash URL.
+ * @param value - Candidate native value checked or detached by this helper.
+ * @returns An independent URL suitable for relative request resolution.
+ */
 function normalizeBaseUrl(value: string | URL): URL {
   const url = new URL(value.toString());
   if (!url.href.endsWith("/")) url.href += "/";
   return url;
 }
+
+/**
+ * Prefers the application's in-memory request entry point.
+ * @param app - Native in-memory application request/fetch boundary.
+ * @param request - Native operation input carrying explicit identity and execution context.
+ * @returns The native response without opening a listening socket.
+ */
 async function dispatchInMemory(app: TestHttpApplication, request: Request): Promise<Response> {
   if (app.request !== undefined) return app.request(request);
   return dispatchFetch(app, request);
 }
+
+/**
+ * Invokes the available native application request/fetch boundary.
+ * @param app - Native in-memory application request/fetch boundary.
+ * @param request - Native operation input carrying explicit identity and execution context.
+ * @returns The original native response or Promise.
+ */
 function dispatchFetch(app: TestHttpApplication, request: Request): Response | Promise<Response> {
   if (app.fetch !== undefined) return app.fetch(request);
   throw new TypeError("Test HTTP application must expose request() or fetch()");

@@ -1,0 +1,91 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "bun": "1.3.10",
+  "platform": "macOS",
+  "probe": "/tmp/relkit-bun-ws-close-probe.ts",
+  "method": "Read-only isolated native Bun subprocesses with external 2-second diagnostic watchdog; timed-out child killed and joined, subsequent process inventory found zero orphan probe children. No production test timeout used as cleanup proof.",
+  "observations": [
+    {
+      "mode": "client-close",
+      "nativeCloseCallbacks": 1,
+      "pendingWebSockets": 0,
+      "pendingRequests": 0,
+      "readyState": 3,
+      "reboundSameHostPort": true,
+      "probeStopSettled": true,
+      "nativeStopSettled": true,
+      "childExit": 0
+    },
+    {
+      "mode": "server-close",
+      "code": 4321,
+      "reason": "fixture close",
+      "nativeCloseCallbacks": 1,
+      "pendingWebSockets": 1,
+      "pendingRequests": 0,
+      "readyState": 3,
+      "reboundSameHostPort": true,
+      "probeStopSettled": true,
+      "nativeStopSettled": false,
+      "diagnosticChild": "killed and joined at watchdog"
+    },
+    {
+      "mode": "close-terminate",
+      "code": 4321,
+      "reason": "fixture close",
+      "nativeCloseCallbacks": 1,
+      "pendingWebSockets": 1,
+      "pendingRequests": 0,
+      "readyState": 3,
+      "reboundSameHostPort": true,
+      "probeStopSettled": true,
+      "nativeStopSettled": false,
+      "diagnosticChild": "killed and joined at watchdog"
+    },
+    {
+      "mode": "terminate",
+      "code": 1006,
+      "reason": "Connection ended",
+      "nativeCloseCallbacks": 1,
+      "pendingWebSockets": 1,
+      "pendingRequests": 0,
+      "readyState": 3,
+      "reboundSameHostPort": true,
+      "probeStopSettled": true,
+      "nativeStopSettled": false,
+      "diagnosticChild": "killed and joined at watchdog"
+    },
+    {
+      "mode": "server-close-unref",
+      "code": 4321,
+      "reason": "fixture close",
+      "nativeCloseCallbacks": 1,
+      "pendingWebSockets": 1,
+      "pendingRequests": 0,
+      "readyState": 3,
+      "reboundSameHostPort": true,
+      "probeStopSettled": true,
+      "nativeStopSettled": false,
+      "naturalChildExit": 0,
+      "processExitCalled": false
+    }
+  ],
+  "control": "Duplicate exclusive same-host/port bind while original listener live rejected; post-stop exact authority bind succeeded.",
+  "additionalCheck": "IPv6 server.url.hostname [::1] accepted by Bun native exclusive rebind after stop.",
+  "disposition": "Narrow pinned native adapter fallback may report physical listener release only after accepted close callbacks, joined owned requests/upstreams, pendingRequests=0, exact same-authority exclusive acquired probe and actual probe stop; only then server.unref. Does not claim stale Bun stop Promise or pendingWebSockets counter settles.",
+  "allocatorInterruptionProbe": {
+    "path": "/tmp/relkit-candidate-port-interrupt-probe.ts",
+    "method": "Substituted native platform with an externally settled allocation Promise, Deferred admission, interrupted starting Effect fiber and joined cancellation. No real process/filesystem/listener resources acquired.",
+    "result": {
+      "spawnsBeforeAllocationSettlement": 0,
+      "spawnsAfterInterruptedAllocationSettlement": 1
+    },
+    "finding": "Entire startup workflow masked pending Effect interruption through allocator settlement and native spawn; uncancellable allocator must join, then restore/check owned interruption before protected process acquisition.",
+    "status": "Author restored interruptible checkpoints before native process admission; independent identical probe rerun reported zero spawns after interrupted allocation settlement. Final frozen owner regression read EOF; author full 36/36 Effect replay and strict checks passed.",
+    "correctedResult": { "spawnsBeforeAllocationSettlement": 0, "spawnsAfterInterruptedAllocationSettlement": 0 }
+  },
+  "sources": [
+    "https://github.com/oven-sh/bun/issues/36223",
+    "https://bun.com/reference/bun/Server/stop"
+  ]
+}

@@ -1,42 +1,33 @@
 "use client";
 
-import type { ExpectedClientIdentity } from "@relkit/contracts";
+import type { UseJobRunOptions, UseJobRunResult } from "./job-hooks.types.js";
+export type { UseJobRunOptions, UseJobRunResult } from "./job-hooks.types.js";
+
 import type { RunSnapshot } from "@relkit/contracts/jobs";
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
-import type {
-  JobRunFor,
-  JobWatchName,
-  JobWatchController,
-  JobWatchOptions,
-  JobWatchState,
-} from "../jobs/index.js";
-import { JobWatchUnavailableError, watchJobRun } from "../jobs/index.js";
+import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import type { JobRunFor, JobWatchName } from "../jobs/job-registry-derived.types.js";
+import type { JobWatchController, JobWatchOptions, JobWatchState } from "../jobs/types.js";
+import { JobWatchUnavailableError } from "../jobs/types.js";
+import { watchJobRun } from "../jobs/controller.js";
 import { useRelkitClient, type RelkitClientRuntime } from "./context.js";
+import { borrowViewOwner } from "./view-owner.js";
 
 export type { JobMutationOptions } from "./job-mutation-hooks.js";
 export { useJobCancel, useJobRetry, useJobTrigger } from "./job-mutation-hooks.js";
 
-export interface UseJobRunOptions extends Omit<
-  JobWatchOptions,
-  "runId" | "expectedIdentity" | "identityKey" | "applicationId" | "protocolVersion"
-> {
-  readonly runId?: string;
-  readonly enabled?: boolean;
-  readonly autoConnect?: boolean;
-  readonly expectedIdentity?: ExpectedClientIdentity;
-}
-
-export interface UseJobRunResult<Run = RunSnapshot> extends JobWatchState<Run> {
-  readonly connect: () => Promise<void>;
-  readonly disconnect: () => Promise<void>;
-  readonly refetch: () => Promise<void>;
-}
-
+/**
+ * Borrows an idle scoped job controller and exposes its frozen external-store state.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns The frozen run snapshot and explicit controller controls.
+ */
 export function useJobRun<Name extends JobWatchName>(
   name: Name,
   options: UseJobRunOptions = {},
 ): UseJobRunResult<JobRunFor<Name>> {
   const runtime = useRelkitClient();
+  const owners = useRef(new WeakMap<object, object>());
   const watchOptions = useMemo(
     () => buildWatchOptions(runtime, options),
     [
@@ -79,8 +70,16 @@ export function useJobRun<Name extends JobWatchName>(
 
   useEffect(() => {
     if (controller === undefined) return;
+    const retire = borrowViewOwner(
+      controller,
+      () => {
+        void controller.dispose();
+      },
+      owners.current,
+    );
     return () => {
       void controller.disconnect();
+      retire();
     };
   }, [controller]);
   useEffect(() => {
@@ -98,6 +97,12 @@ export function useJobRun<Name extends JobWatchName>(
   return { ...state, connect, disconnect, refetch };
 }
 
+/**
+ * Combines current identity and explicit options into complete watch authority.
+ * @param runtime - Existing runtime supplied by the owning operation.
+ * @param options - Existing public configuration and authority.
+ * @returns Scope-complete watch options, or undefined until identity is ready.
+ */
 function buildWatchOptions(
   runtime: RelkitClientRuntime,
   options: UseJobRunOptions,
@@ -137,6 +142,10 @@ function buildWatchOptions(
   };
 }
 
+/**
+ * Rejects observation when no usable run identity is available.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 function unavailable(): Promise<never> {
   return Promise.reject(new JobWatchUnavailableError());
 }

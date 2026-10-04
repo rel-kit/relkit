@@ -1,32 +1,37 @@
-import { Clock as EffectClock, Duration, Effect } from "effect";
-import type { InvocationRunner } from "@relkit/runtime-effect";
-import type { TestClock } from "./runtime.js";
+import type {
+  CombinedSignals,
+  DeterministicClockService,
+  ClockWaiter,
+} from "./runtime-clock.types.js";
+import { Clock as EffectClock, Context, Duration, Effect, Layer, Ref } from "effect";
 
-export function createDeterministicClock(startTime: number): {
-  readonly service: EffectClock.Clock;
-  readonly clock: TestClock;
-  readonly run: InvocationRunner["run"];
-} {
+/**
+ * Creates a manually controlled native Effect clock without wall-time polling.
+ * @param startTime - Finite initial manual-clock timestamp.
+ * @returns The clock service, public manual-time facade and native invocation runner.
+ */
+export function createDeterministicClock(startTime: number): DeterministicClockService {
   if (!Number.isFinite(startTime)) throw new TypeError("startTimeMs must be finite");
-  let current = startTime;
-  let monotonic = startTime * 1_000_000;
-  const waiting: Array<{
-    readonly at: number;
-    readonly resume: (effect: Effect.Effect<void>) => void;
-    done: boolean;
-  }> = [];
+  const state = Ref.makeUnsafe({
+    current: startTime,
+    monotonic: startTime * 1_000_000,
+    waiting: [] as ClockWaiter[],
+  });
+  const waiting = Ref.getUnsafe(state).waiting;
   const service: EffectClock.Clock = {
-    currentTimeMillisUnsafe: () => current,
-    currentTimeMillis: Effect.sync(() => current),
-    currentTimeNanosUnsafe: () => BigInt(Math.trunc(current * 1_000_000)),
-    currentTimeNanos: Effect.sync(() => BigInt(Math.trunc(current * 1_000_000))),
-    monotonicTimeNanosUnsafe: () => BigInt(Math.trunc(monotonic)),
-    monotonicTimeNanos: Effect.sync(() => BigInt(Math.trunc(monotonic))),
+    currentTimeMillisUnsafe: () => Ref.getUnsafe(state).current,
+    currentTimeMillis: Effect.sync(() => Ref.getUnsafe(state).current),
+    currentTimeNanosUnsafe: () => BigInt(Math.trunc(Ref.getUnsafe(state).current * 1_000_000)),
+    currentTimeNanos: Effect.sync(() =>
+      BigInt(Math.trunc(Ref.getUnsafe(state).current * 1_000_000)),
+    ),
+    monotonicTimeNanosUnsafe: () => BigInt(Math.trunc(Ref.getUnsafe(state).monotonic)),
+    monotonicTimeNanos: Effect.sync(() => BigInt(Math.trunc(Ref.getUnsafe(state).monotonic))),
     sleep: (duration) => {
       const milliseconds = Duration.toMillis(duration);
       if (milliseconds <= 0) return Effect.void;
       return Effect.callback<void>((resume) => {
-        const entry = { at: current + milliseconds, resume, done: false };
+        const entry = { at: Ref.getUnsafe(state).current + milliseconds, resume, done: false };
         waiting.push(entry);
         waiting.sort((left, right) => left.at - right.at);
         return Effect.sync(() => {
@@ -37,35 +42,51 @@ export function createDeterministicClock(startTime: number): {
       });
     },
   };
+  /**
+   * Advances manual time after letting admitted fibers register their sleeps.
+   * @param milliseconds Finite non-negative domain duration.
+   * @returns Completion after due sleepers resume without a wall-time timer.
+   */
   const advance = async (milliseconds: number): Promise<void> => {
     validateAdvance(milliseconds);
-    await new Promise<void>((resolve) => setTimeout(resolve, 0));
-    current += milliseconds;
-    monotonic += milliseconds * 1_000_000;
-    releaseWaiting(current);
+    await Effect.runPromise(Effect.yieldNow);
+    Ref.getUnsafe(state).current += milliseconds;
+    Ref.getUnsafe(state).monotonic += milliseconds * 1_000_000;
+    releaseWaiting(Ref.getUnsafe(state).current);
     await Promise.resolve();
   };
+  /**
+   * Replaces wall time while retaining a monotonic scheduling clock.
+   * @param timestamp Finite requested domain timestamp.
+   * @returns Completion after due sleepers resume.
+   */
   const setTime = async (timestamp: number): Promise<void> => {
     if (!Number.isFinite(timestamp)) throw new TypeError("clock timestamp must be finite");
-    await new Promise<void>((resolve) => setTimeout(resolve, 0));
-    if (timestamp >= current) monotonic += (timestamp - current) * 1_000_000;
-    current = timestamp;
+    await Effect.runPromise(Effect.yieldNow);
+    if (timestamp >= Ref.getUnsafe(state).current)
+      Ref.getUnsafe(state).monotonic += (timestamp - Ref.getUnsafe(state).current) * 1_000_000;
+    Ref.getUnsafe(state).current = timestamp;
     releaseWaiting(timestamp);
     await Promise.resolve();
   };
   const clock = Object.freeze({
-    now: () => new Date(current),
-    currentTimeMs: () => current,
+    now: () => new Date(Ref.getUnsafe(state).current),
+    currentTimeMs: () => Ref.getUnsafe(state).current,
     advance,
     setTime,
   });
-  return {
+  return TestDeterministicClock.of({
     service,
     clock,
     run: (effect, options) =>
       Effect.runPromise(Effect.provideService(effect, EffectClock.Clock, service), options),
-  };
+  });
 
+  /**
+   * Resumes deterministic sleeps whose deadlines have become due.
+   * @param timestamp - Finite requested domain timestamp.
+   * @returns Nothing after removing and completing every due waiter.
+   */
   function releaseWaiting(timestamp: number): void {
     for (const entry of [...waiting]) {
       if (entry.done || entry.at > timestamp) continue;
@@ -77,16 +98,23 @@ export function createDeterministicClock(startTime: number): {
   }
 }
 
+/**
+ * Checks manual clock advancement before changing domain time.
+ * @param value - Candidate native value checked or detached by this helper.
+ * @returns Nothing for a finite non-negative duration.
+ */
 function validateAdvance(value: number): void {
   if (!Number.isFinite(value) || value < 0) {
     throw new TypeError("clock advance must be finite and non-negative");
   }
 }
 
-export function combineSignals(...signals: (AbortSignal | undefined)[]): {
-  readonly signal: AbortSignal;
-  readonly dispose: () => void;
-} {
+/**
+ * Combines cancellation sources without retaining their listeners after work.
+ * @param signals - Native cancellation sources whose listeners are explicitly disposed.
+ * @returns One signal and an explicit listener cleanup hook.
+ */
+export function combineSignals(...signals: (AbortSignal | undefined)[]): CombinedSignals {
   const controller = new AbortController();
   const listeners: Array<readonly [AbortSignal, () => void]> = [];
   for (const signal of signals) {
@@ -103,4 +131,19 @@ export function combineSignals(...signals: (AbortSignal | undefined)[]): {
     dispose: () =>
       listeners.forEach(([signal, abort]) => signal.removeEventListener("abort", abort)),
   };
+}
+
+/** Manual time and native clock scheduling belong to one deterministic owner. */
+export class TestDeterministicClock extends Context.Service<
+  TestDeterministicClock,
+  DeterministicClockService
+>()("relkit/testing/DeterministicClock") {}
+
+/**
+ * Provides a replaceable clock service from the native manual-time implementation.
+ * @param startTime Finite initial test timestamp in milliseconds.
+ * @returns A synchronous service Layer retaining native scheduling semantics.
+ */
+export function deterministicClockLayer(startTime: number = 0) {
+  return Layer.sync(TestDeterministicClock, () => createDeterministicClock(startTime));
 }

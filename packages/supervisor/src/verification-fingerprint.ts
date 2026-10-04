@@ -3,8 +3,10 @@ import {
   isRuntimeActivationFingerprint,
   type RuntimeActivationFingerprint,
 } from "@relkit/contracts";
-import { CandidateVerificationError } from "./verification-types.js";
+import { CandidateVerificationError } from "./verification-error.js";
 
+/** Checks the complete runtime activation cohort. @param payload - Selective internal metadata.
+ * @param expected - Compiled graph/manifest/integration hashes. @returns Native admitted fingerprint. */
 export function verifyActivationFingerprint(
   payload: Record<string, unknown>,
   expected: RuntimeActivationFingerprint,

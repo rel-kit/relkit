@@ -1,8 +1,15 @@
 import type { ThreadSnapshot } from "@relkit/contracts";
 import { snapshotProjection } from "./agent-execution-observation.js";
-import type { AgentBase } from "./agent-hook-types.js";
+import type { AgentBase } from "./agent-hook-types.types.js";
 import { agentContentFromMessages } from "./agent-observation.js";
 
+/**
+ * Replaces authoritative agent state and reconciles its browser projection.
+ * @typeParam Output - Declared successful output payload.
+ * @param current - Current external-store state.
+ * @param snapshot - Authoritative thread or execution snapshot.
+ * @returns Agent state reconciled to the authoritative snapshot.
+ */
 export function applyAgentSnapshot<Output>(
   current: AgentBase<Output>,
   snapshot: ThreadSnapshot,
@@ -28,6 +35,11 @@ export function applyAgentSnapshot<Output>(
   };
 }
 
+/**
+ * Projects the existing snapshot lifecycle into browser agent status.
+ * @param snapshot - Authoritative thread or execution snapshot.
+ * @returns The browser status corresponding to the snapshot lifecycle.
+ */
 function snapshotStatus(snapshot: ThreadSnapshot): AgentBase<unknown>["status"] {
   if (snapshot.activeRun !== undefined) return snapshot.thread.status;
   const latest = [...snapshot.currentRuns].sort((left, right) =>

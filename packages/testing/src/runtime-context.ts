@@ -1,8 +1,14 @@
 import type { InvocationContextOptions } from "@relkit/engine";
 
 const noop = (): void => undefined;
+
 const log = Object.freeze({ trace: noop, debug: noop, info: noop, warn: noop, error: noop });
 
+/**
+ * Creates the validated runtime context defaults with an explicit caller patch.
+ * @param patch - Explicit context fields overriding deterministic native defaults.
+ * @returns A context factory preserving invocation, signal, time and dependency seams.
+ */
 export function createTestContextFactory(patch: Readonly<Record<string, unknown>>) {
   return ({ invocation, signal, env, time }: InvocationContextOptions) =>
     Object.freeze({

@@ -1,96 +1,66 @@
-import { canonicalJson, type PendingOperationMetadata } from "@relkit/contracts";
+import type { PendingOperationMetadata } from "@relkit/contracts";
 import type { JobUnknownOutcome } from "@relkit/contracts/jobs";
-import { createOperationId } from "@relkit/realtime/operation-id";
+import { ManagedRuntime } from "effect";
+import { runExecutionSync, runExecutionPromise } from "@relkit/contracts/operation";
 import type { RelkitKeyScope } from "./keys.js";
-import {
-  PENDING_PREFIX,
-  clearPendingStorage,
-  pendingEntryKey,
-  pendingMemory,
-  readPendingStorage,
-  removePendingStorage,
-  writePendingStorage,
-} from "./pending-store.js";
-import {
-  MAX_JOB_INTENTS,
-  PendingCapacityError,
-  PendingRecoveryUnavailableError,
-  PendingRequestMismatchError,
-} from "./pending-errors.js";
-import { candidates, isRecord } from "./pending-support.js";
+import { PendingOperations, pendingOperationsLayer } from "./pending.service.js";
+import type { PendingRememberOptions, PendingReferences } from "./pending.types.js";
+import { jobUnknownOutcome } from "./pending-outcome.js";
+export { jobUnknownOutcome } from "./pending-outcome.js";
+export type { PendingRememberOptions } from "./pending.types.js";
 export {
   PendingCapacityError,
   PendingRecoveryUnavailableError,
   PendingRequestMismatchError,
 } from "./pending-errors.js";
 
-export interface PendingRememberOptions {
-  readonly operationId?: string;
-  readonly idempotencyKey?: string;
-  readonly recovery?: JobUnknownOutcome["recovery"];
-  readonly retainRequest?: boolean;
-}
+// This browser-wide owner holds only plain metadata and borrowed storage. It never
+// acquires a socket, listener, timer or worker; each async call owns its own fiber.
+const owner = ManagedRuntime.make(pendingOperationsLayer());
+const service = runExecutionSync(owner, PendingOperations);
 
+/**
+ * Preserves the complete existing scope serialization used by query and receipt keys.
+ * @param scope - Application/environment/identity scope.
+ * @returns Its exact existing JSON key.
+ */
 export function pendingScopeKey(scope: RelkitKeyScope): string {
   return JSON.stringify(scope);
 }
 
-export async function rememberPending(
+/**
+ * Records a submission before dispatch without persisting its sensitive request.
+ * @param scopeKey - Full identity scope key.
+ * @param kind - Existing operation kind.
+ * @param resourceId - Declared resource identity.
+ * @param value - Transmitted request used for the digest.
+ * @param references - Thread/run references.
+ * @param options - Explicit receipt/recovery and memory-retention options.
+ * @returns Existing public metadata or the original public failure.
+ */
+export function rememberPending(
   scopeKey: string,
   kind: PendingOperationMetadata["kind"],
   resourceId: string,
   value: unknown,
-  references: Pick<PendingOperationMetadata, "threadId" | "runId"> = {},
+  references: PendingReferences = {},
   options: PendingRememberOptions = {},
 ): Promise<PendingOperationMetadata> {
-  const operationId = (options.operationId ??
-    createOperationId()) as PendingOperationMetadata["operationId"];
-  const existingMetadata = pendingOperations(scopeKey).find(
-    (entry) => entry.operationId === operationId,
+  return runExecutionPromise(
+    owner,
+    service.remember(scopeKey, kind, resourceId, value, references, options),
   );
-  if (
-    kind === "job-trigger" &&
-    existingMetadata === undefined &&
-    jobIntentCount(scopeKey) >= MAX_JOB_INTENTS
-  ) {
-    throw new PendingCapacityError();
-  }
-  const requestDigest = await digestPendingRequest(value);
-  if (
-    kind === "job-trigger" &&
-    existingMetadata !== undefined &&
-    existingMetadata.requestDigest !== requestDigest
-  ) {
-    throw new PendingRequestMismatchError();
-  }
-  if (
-    kind === "job-trigger" &&
-    existingMetadata?.state === "unknown" &&
-    !sameKeyRecoveryActive(existingMetadata)
-  ) {
-    throw new PendingRecoveryUnavailableError();
-  }
-  const metadata: PendingOperationMetadata = {
-    operationId,
-    kind,
-    resourceId,
-    ...references,
-    requestDigest,
-    submittedAt: new Date().toISOString(),
-    state: "submitted",
-    ...(options.idempotencyKey === undefined ? {} : { idempotencyKey: options.idempotencyKey }),
-    ...(options.recovery === undefined ? {} : { recovery: options.recovery }),
-  };
-  const key = pendingEntryKey(scopeKey, metadata.operationId);
-  pendingMemory.set(key, {
-    metadata,
-    ...(options.retainRequest === true ? { request: value } : {}),
-  });
-  writePendingStorage(key, metadata);
-  return metadata;
 }
 
-export async function rememberJobPending(
+/**
+ * Remembers a job intent and retains its transmitted request only in memory.
+ * @param scopeKey - Full identity scope key.
+ * @param resourceId - Declared job.
+ * @param request - Exact transmitted input/options.
+ * @param options - Receipt and recovery authority.
+ * @returns The recorded public metadata.
+ */
+export function rememberJobPending(
   scopeKey: string,
   resourceId: string,
   request: unknown,
@@ -102,94 +72,87 @@ export async function rememberJobPending(
     resourceId,
     request,
     {},
-    {
-      ...options,
-      retainRequest: true,
-    },
+    { ...options, retainRequest: true },
   );
 }
 
+/**
+ * Updates metadata while preserving a previously retained in-memory request.
+ * @param scopeKey - Full identity scope.
+ * @param value - Authoritative updated receipt metadata.
+ * @returns Nothing, synchronously.
+ */
 export function updatePending(scopeKey: string, value: PendingOperationMetadata): void {
-  const key = pendingEntryKey(scopeKey, value.operationId);
-  const previous = pendingMemory.get(key);
-  pendingMemory.set(key, {
-    metadata: value,
-    ...(previous?.request === undefined ? {} : { request: previous.request }),
-  });
-  writePendingStorage(key, value);
+  runExecutionSync(owner, service.update(scopeKey, value));
 }
 
+/**
+ * Removes memory and best-effort persisted metadata after a known outcome.
+ * @param scopeKey - Full identity scope.
+ * @param operationId - Receipt identity.
+ * @returns Nothing, synchronously.
+ */
 export function forgetPending(scopeKey: string, operationId: string): void {
-  pendingMemory.delete(pendingEntryKey(scopeKey, operationId));
-  removePendingStorage(pendingEntryKey(scopeKey, operationId));
+  runExecutionSync(owner, service.forget(scopeKey, operationId));
 }
 
+/**
+ * Merges recovered metadata with newer in-memory values without discarding authority.
+ * @param scopeKey - Full identity scope.
+ * @returns Pending metadata in existing insertion order.
+ */
 export function pendingOperations(scopeKey: string): readonly PendingOperationMetadata[] {
-  const result = readPendingStorage(scopeKey);
-  for (const [key, value] of pendingMemory) {
-    if (key.startsWith(`${PENDING_PREFIX}${scopeKey}.`))
-      result.set(value.metadata.operationId, value.metadata);
-  }
-  return [...result.values()];
+  return runExecutionSync(owner, service.list(scopeKey));
 }
 
+/**
+ * Reads a transmitted request; restored session metadata never recreates input.
+ * @param scopeKey - Full identity scope.
+ * @param operationId - Receipt identity.
+ * @returns The original in-memory request or undefined.
+ */
 export function pendingRequest(scopeKey: string, operationId: string): unknown {
-  return pendingMemory.get(pendingEntryKey(scopeKey, operationId))?.request;
+  return runExecutionSync(owner, service.request(scopeKey, operationId));
 }
 
-export async function matchesPendingRequest(
+/**
+ * Compares a proposed retry against its recorded transmitted request digest.
+ * @param scopeKey - Full identity scope.
+ * @param operationId - Receipt identity.
+ * @param request - Proposed transmitted request.
+ * @returns Whether its digest matches existing authority.
+ */
+export function matchesPendingRequest(
   scopeKey: string,
   operationId: string,
   request: unknown,
 ): Promise<boolean> {
-  const metadata = pendingOperations(scopeKey).find((entry) => entry.operationId === operationId);
-  return metadata !== undefined && metadata.requestDigest === (await digestPendingRequest(request));
+  return runExecutionPromise(owner, service.matches(scopeKey, operationId, request));
 }
 
+/**
+ * Clears every receipt in an explicitly retired identity scope.
+ * @param scopeKey - Full identity scope.
+ * @returns Nothing, synchronously.
+ */
 export function clearPendingOperations(scopeKey: string): void {
-  for (const key of [...pendingMemory.keys()]) {
-    if (key.startsWith(`${PENDING_PREFIX}${scopeKey}.`)) pendingMemory.delete(key);
-  }
-  clearPendingStorage(scopeKey);
+  runExecutionSync(owner, service.clear(scopeKey));
 }
 
+/**
+ * Checks nested public error envelopes for an unknown job outcome.
+ * @param value - Original rejected transport value.
+ * @returns Whether it carries recognized job recovery authority.
+ */
 export function isJobUnknownOutcome(value: unknown): value is JobUnknownOutcome {
   return jobUnknownOutcome(value) !== undefined;
 }
 
-export function jobUnknownOutcome(value: unknown): JobUnknownOutcome | undefined {
-  for (const candidate of candidates(value)) {
-    if (
-      isRecord(candidate) &&
-      candidate.outcome === "unknown" &&
-      (candidate.code === "RELKIT_JOB_SUBMISSION_UNKNOWN" ||
-        candidate.code === "RELKIT_JOB_CONTROL_UNKNOWN") &&
-      typeof candidate.operationId === "string" &&
-      isRecord(candidate.recovery) &&
-      (candidate.recovery.action === "retry-with-same-key" ||
-        candidate.recovery.action === "inspect-native" ||
-        candidate.recovery.action === "unavailable")
-    ) {
-      return candidate as unknown as JobUnknownOutcome;
-    }
-  }
-  return undefined;
-}
-
-export async function digestPendingRequest(value: unknown): Promise<string> {
-  const bytes = new TextEncoder().encode(canonicalJson(value as never));
-  const hash = await crypto.subtle.digest("SHA-256", bytes);
-  return `sha256:${Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
-}
-
-function jobIntentCount(scopeKey: string): number {
-  return pendingOperations(scopeKey).filter((entry) => entry.kind === "job-trigger").length;
-}
-
-function sameKeyRecoveryActive(metadata: PendingOperationMetadata): boolean {
-  const recovery = metadata.recovery;
-  return (
-    recovery?.action === "retry-with-same-key" &&
-    (recovery.expiresAt === undefined || Date.parse(recovery.expiresAt) > Date.now())
-  );
+/**
+ * Hashes the existing canonical transmitted request representation.
+ * @param value - Transmitted request.
+ * @returns Its SHA-256 digest with the existing prefix.
+ */
+export function digestPendingRequest(value: unknown): Promise<string> {
+  return runExecutionPromise(owner, service.digest(value));
 }

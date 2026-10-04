@@ -15,6 +15,7 @@ description: Generated public TypeScript reference for @relkit/drizzle.
   - [activateDrizzleService](#activatedrizzleservice)
 - [utils](#utils)
   - [DrizzleActivation (interface)](#drizzleactivation-interface)
+  - [DrizzleActivationOptions](#drizzleactivationoptions)
 
 ---
 
@@ -24,6 +25,7 @@ description: Generated public TypeScript reference for @relkit/drizzle.
 
 Activates a service once per descriptor object and returns its client, context, and close hook.
 Repeated calls share the first activation; close does not evict the cached activation.
+Isolated acquisition bypasses that cache and transfers close ownership to the caller.
 
 **Example**
 
@@ -57,10 +59,11 @@ declare const activateDrizzleService: <
 >(
   service: Service,
   env: Readonly<Record<string, unknown>>,
+  options?: DrizzleActivationOptions,
 ) => Promise<DrizzleActivation<Service>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.ts#L49)
 
 Since v0.1.0
 
@@ -80,7 +83,47 @@ export interface DrizzleActivation<Service extends DrizzleServiceDescriptor<any,
 }
 ```
 
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.ts#L7)
+
+## DrizzleActivationOptions
+
+**Signature**
+
+```ts
+declare const DrizzleActivationOptions: DrizzleActivationOptions;
+```
+
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.ts#L5)
+
+## `activation.types.ts`
+
+Acquisition policy for an application that owns its database lifetime.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [DrizzleActivationOptions (interface)](#drizzleactivationoptions-interface)
+
+---
+
+# utils
+
+## DrizzleActivationOptions (interface)
+
+Acquisition policy for an application that owns its database lifetime.
+
+**Signature**
+
+```ts
+export interface DrizzleActivationOptions {
+  /** Bypasses descriptor sharing; the caller must close this activation. */
+  readonly isolated?: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.types.ts#L2)
 
 ## `context.ts`
 
@@ -121,6 +164,7 @@ declare const createDatabaseContext: <Service extends DrizzleServiceDescriptor<a
   - [DatabaseContext](#databasecontext)
   - [DeleteArgs](#deleteargs)
   - [DialectDatabase](#dialectdatabase)
+  - [DrizzleActivationOptions](#drizzleactivationoptions)
   - [DrizzleCapability](#drizzlecapability)
   - [DrizzleOverrides](#drizzleoverrides)
   - [DrizzleServiceDescriptor](#drizzleservicedescriptor)
@@ -152,7 +196,7 @@ declare const createDatabaseContext: <Service extends DrizzleServiceDescriptor<a
 declare const ApplicationEnv: Readonly<Record<string, string>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L6)
 
 ## BaseOperations
 
@@ -162,7 +206,7 @@ declare const ApplicationEnv: Readonly<Record<string, string>>;
 declare const BaseOperations: BaseOperations<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L7)
 
 ## DatabaseContext
 
@@ -172,7 +216,7 @@ declare const BaseOperations: BaseOperations<T>;
 declare const DatabaseContext: DatabaseContext<Service>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L8)
 
 ## DeleteArgs
 
@@ -182,7 +226,7 @@ declare const DatabaseContext: DatabaseContext<Service>;
 declare const DeleteArgs: DeleteArgs<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L9)
 
 ## DialectDatabase
 
@@ -192,7 +236,17 @@ declare const DeleteArgs: DeleteArgs<T>;
 declare const DialectDatabase: DialectDatabase<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L10)
+
+## DrizzleActivationOptions
+
+**Signature**
+
+```ts
+declare const DrizzleActivationOptions: DrizzleActivationOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L2)
 
 ## DrizzleCapability
 
@@ -202,7 +256,7 @@ declare const DialectDatabase: DialectDatabase<T>;
 declare const DrizzleCapability: DrizzleCapability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L11)
 
 ## DrizzleOverrides
 
@@ -212,7 +266,7 @@ declare const DrizzleCapability: DrizzleCapability;
 declare const DrizzleOverrides: DrizzleOverrides<Tables>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L12)
 
 ## DrizzleServiceDescriptor
 
@@ -222,7 +276,7 @@ declare const DrizzleOverrides: DrizzleOverrides<Tables>;
 declare const DrizzleServiceDescriptor: DrizzleServiceDescriptor<Id, Client, Schema, Models>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L13)
 
 ## FindManyArgs
 
@@ -232,7 +286,7 @@ declare const DrizzleServiceDescriptor: DrizzleServiceDescriptor<Id, Client, Sch
 declare const FindManyArgs: FindManyArgs<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L14)
 
 ## FindOneArgs
 
@@ -242,7 +296,7 @@ declare const FindManyArgs: FindManyArgs<T>;
 declare const FindOneArgs: FindOneArgs<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L15)
 
 ## InsertArgs
 
@@ -252,7 +306,7 @@ declare const FindOneArgs: FindOneArgs<T>;
 declare const InsertArgs: InsertArgs<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L16)
 
 ## ModelDescriptor
 
@@ -262,7 +316,7 @@ declare const InsertArgs: InsertArgs<T>;
 declare const ModelDescriptor: ModelDescriptor<T, Extensions>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L17)
 
 ## ModelExtensionContext
 
@@ -272,7 +326,7 @@ declare const ModelDescriptor: ModelDescriptor<T, Extensions>;
 declare const ModelExtensionContext: ModelExtensionContext<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L18)
 
 ## Row
 
@@ -294,7 +348,7 @@ declare const Row: {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L19)
 
 ## TableOverrides
 
@@ -304,7 +358,7 @@ declare const Row: {
 declare const TableOverrides: TableOverrides<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L20)
 
 ## TableZodSchemas
 
@@ -314,7 +368,7 @@ declare const TableOverrides: TableOverrides<T>;
 declare const TableZodSchemas: TableZodSchemas<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L21)
 
 ## Update
 
@@ -360,7 +414,7 @@ declare const Update: Partial<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L22)
 
 ## UpdateArgs
 
@@ -370,7 +424,7 @@ declare const Update: Partial<{
 declare const UpdateArgs: UpdateArgs<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L23)
 
 ## UpsertArgs
 
@@ -380,7 +434,7 @@ declare const UpdateArgs: UpdateArgs<T>;
 declare const UpsertArgs: UpsertArgs<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L24)
 
 ## Where
 
@@ -402,7 +456,7 @@ declare const Where: Partial<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L25)
 
 ## activateDrizzleService
 
@@ -414,6 +468,7 @@ declare const activateDrizzleService: <
 >(
   service: Service,
   env: Readonly<Record<string, unknown>>,
+  options?: DrizzleActivationOptions,
 ) => Promise<DrizzleActivation<Service>>;
 ```
 
@@ -433,7 +488,7 @@ declare const defineDrizzleService: <
 ) => DrizzleServiceDescriptor<string, Client, Schema, Models>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L4)
 
 ## defineModel
 
@@ -449,7 +504,7 @@ declare const defineModel: <
 }) => ModelDescriptor<T, Extensions>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L3)
 
 ## `internal.ts`
 
@@ -497,6 +552,7 @@ declare const activateDrizzleService: <
 >(
   service: Service,
   env: Readonly<Record<string, unknown>>,
+  options?: DrizzleActivationOptions,
 ) => Promise<DrizzleActivation<Service>>;
 ```
 

@@ -1,0 +1,73 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "capturedUtc": "2026-10-03T18:21:07.415763+00:00",
+  "files": [
+    {
+      "path": "scripts/performance-core-consumers.ts",
+      "sha256": "01f621629b13de25510af1d45f33b19cb18142daa84c2d882a7e2036cf98293c",
+      "lines": 34,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root/client_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/performance-core-consumers-watch.ts",
+      "sha256": "f9622f2f585c6607476f804a34a051b7c337fbf8a18469f10bc7be41333b6c6f",
+      "lines": 128,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root/client_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/performance-core-consumers-routes.ts",
+      "sha256": "79f91d778af75f727fc1671d92389c95ffd38cb34e202257482e1ec4ca5771a5",
+      "lines": 96,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root/client_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/performance-core-consumers-fixture.ts",
+      "sha256": "054472170a2f255b65ef62f89b57373292197a71f6011849dab4ef3e96d066d7",
+      "lines": 65,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root/client_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/performance-core-consumers-generation.ts",
+      "sha256": "a8523fdca9c9388b8649bb88b805c9900bdc9ac530689fe8e0878dcd194454ef",
+      "lines": 164,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root/client_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/performance-core-consumers-fixture.types.ts",
+      "sha256": "715de6a8a01cb6aa486a40ef4dfa171d3f3cb4f145283b4341092fd7dbb3b3fc",
+      "lines": 16,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root/client_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/performance-core-consumers.types.ts",
+      "sha256": "74f0a4e010633967b92bfec2b4fe3a135d712804a255a1f74b6892d73ee59177",
+      "lines": 31,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root/client_baseline",
+      "read": "EOF",
+      "accepted": true
+    }
+  ],
+  "accepted": true,
+  "findings": [],
+  "workload": "Original 100-feed/1000-view batches, one-item Inspector limit100/auth/getter/redaction assertions, loopback proxy origin and activation transitions preserved. Public contracts imports retained; native proxy/upstream cleanup nested-finally retained. Pure benchmark measurement/types boundary is intentional; no domain refactor required.",
+  "checks": "Read-only final EOF/hash supplement; no performance runner repeated."
+}

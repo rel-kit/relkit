@@ -1,12 +1,14 @@
+import type { NextConfig } from "./next.types.js";
 import { existsSync, realpathSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { readPublicFingerprint } from "./manifest.js";
 
-type NextConfig = Readonly<Record<string, unknown>> & {
-  readonly env?: Readonly<Record<string, string | undefined>>;
-  readonly turbopack?: Readonly<Record<string, unknown>> & { readonly root?: string };
-};
-
+/**
+ * Adds the generated public fingerprint and linked-workspace root to Next configuration.
+ * @param config - Existing framework configuration.
+ * @param options - Existing public configuration and authority.
+ * @returns Next configuration with the generated fingerprint and workspace root.
+ */
 export function withRelkit(
   config: NextConfig = {},
   options: { readonly root?: string } = {},
@@ -25,6 +27,11 @@ export function withRelkit(
   };
 }
 
+/**
+ * Finds a shared workspace root only when a linked client lies outside the application.
+ * @param root - Existing root used for lookup or configuration.
+ * @returns The shared linked workspace root, or undefined when unnecessary.
+ */
 function linkedClientRoot(root: string): string | undefined {
   const client = join(root, "node_modules/@relkit/client");
   if (!existsSync(client)) return undefined;
@@ -40,6 +47,12 @@ function linkedClientRoot(root: string): string | undefined {
   return shared;
 }
 
+/**
+ * Checks whether a resolved target lies outside the supplied root.
+ * @param root - Existing root used for lookup or configuration.
+ * @param target - Resolved target path.
+ * @returns Whether the target lies outside the root.
+ */
 function outside(root: string, target: string): boolean {
   const path = relative(root, target);
   return path === ".." || path.startsWith(`..${sep}`) || isAbsolute(path);

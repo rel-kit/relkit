@@ -1,0 +1,1268 @@
+{
+  "reviewer": "/root/testing_baseline",
+  "baseline": "b0f77720764fd61e9872b0995e456014a611ba37",
+  "reviewedAtUtc": "2026-10-03T18:03:33.694406+00:00",
+  "currentCount": 111,
+  "baselineCount": 58,
+  "files": [
+    {
+      "path": "packages/inspector-api/src/actions-dispatch.ts",
+      "sha256": "83f1fdf678baf1c4b4234a4b08ddc4e87a15df84a4448193c0219c7d356dacc7",
+      "lines": 174,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-errors.ts",
+      "sha256": "dee1aa4f1611fa0fd14adbbe13467ccbf167acfac43714662639d24b28faf62c",
+      "lines": 17,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-projection.ts",
+      "sha256": "03ddc259215bceaf0b5a023f3c0a13c0beb3742cc1a8ba8e01cbf67d19b24693",
+      "lines": 94,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-runtime.ts",
+      "sha256": "9af801173dbee363b7ebc6f32a740938b44124f5ce5153d05458d9ade2e6dc76",
+      "lines": 132,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-runtime.types.ts",
+      "sha256": "63b2a90782a4dfa85348c32ff107ed75a2093380a153b3ca88fcf69b3e2b309f",
+      "lines": 38,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-schema.types.ts",
+      "sha256": "2c3a0fd4473817b9b10fc3b931d5837a11ebed43be9d9fc502a3a161662ec3cb",
+      "lines": 5,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-utils.ts",
+      "sha256": "d49e2fcc534f9dc4fad5bbe1eda309ccc7a29783c3fe310c229ef40ff1131297",
+      "lines": 225,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions.schemas.ts",
+      "sha256": "fc312020d882a10ab48436bc63f012bc8e0db17ed4cd5d35a0cdc8afabb47850",
+      "lines": 17,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions.ts",
+      "sha256": "1d6bba7352c9e50678aed07ead4794d99f5badfba9827920276124a78745e9b0",
+      "lines": 136,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions.types.ts",
+      "sha256": "3cfb4022b76eccbd96e3706509e456b2f2df54ebd0c10fe171f5a558a589f2b7",
+      "lines": 142,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/controls.service.ts",
+      "sha256": "8de4d7f9e153c7eb4e1b54832a0a8ca84c851f9d2d2de46ff45c2565ad8e1289",
+      "lines": 206,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/diagnostics.ts",
+      "sha256": "1fc35dc6482477ba8b4d24418573b92a4b3c685b1e9840bc9c0d98a7d7a48f42",
+      "lines": 127,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/environment.ts",
+      "sha256": "7a984debddc26303cf6065e8f2208e3b66ba2500f435a03363f2a2919c43f025",
+      "lines": 128,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/events-projection.ts",
+      "sha256": "50b34b833a4a37574f4588a388bf13130ca8164463a67e9d9b356f2a68e21f64",
+      "lines": 152,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/events-query.ts",
+      "sha256": "e89ce32cfdef0167c1b29d16b804dcc48f14354814886581489aff9da85710f5",
+      "lines": 92,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/events-runtime.ts",
+      "sha256": "9b40b19d2496a7e2d6f3cb9691727b796c4587de3df37ca880adaf23853cf332",
+      "lines": 46,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/execution.ts",
+      "sha256": "5a89f2c35c20c7709208655daf3c3d2b4ef77af82ed833daf6d66db022c66a19",
+      "lines": 83,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/execution.types.ts",
+      "sha256": "41a6269fb71562a23026e14679e9a8ae40e48aa47b5d42b87e042c6c5a86b199",
+      "lines": 9,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/generation-types.ts",
+      "sha256": "54ef55b44779511fc45f8e35e67811ec0a4c21b178d8c978d57ccfcabba57aa8",
+      "lines": 2,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/generation.ts",
+      "sha256": "18c59f73704bd951e7995c71581fbea64d68ecf7ead8d9b076e6d7385d42ff77",
+      "lines": 227,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/generation.types.ts",
+      "sha256": "420acf7107cf38df3b1c5e148c81d3e83c2341ec826f34aef146527139e0dd29",
+      "lines": 30,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/graph-projection.ts",
+      "sha256": "7334d8365939fb466d5b8638ae39aaeecbba95c037412cc5a47e6ab6a0df5249",
+      "lines": 80,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/graph-utils.ts",
+      "sha256": "808f206cafe7a41e8683a83121f458e06d4acf49ef5d31102aecb819ad6e68e1",
+      "lines": 105,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/graph.ts",
+      "sha256": "bc436659e03941a04dcd39c39add644e129ee9e2987c59b8a8a7c8792afd4f5c",
+      "lines": 239,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/graph.types.ts",
+      "sha256": "a1ec6ece83b19e8cfbfb7c7a4396c7cc8bb54276f21c366a5305424a83b51e3b",
+      "lines": 13,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/index.ts",
+      "sha256": "0688a62c1ce4dc56e68dd33c2863b8a7a26440df717f8b53ea8e9e718f8e14ee",
+      "lines": 32,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/inspector-endpoint-paths.ts",
+      "sha256": "5aa1ae48a1bf956e038640213f00bf2a33ee83b47358ab4d76c55be139a72df2",
+      "lines": 41,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/controls.ts",
+      "sha256": "4df5f8e74e509f30c67ed941c90926e4ef7ff0503e075351a1b4a7173ca4d124",
+      "lines": 170,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/definitions-support.ts",
+      "sha256": "3e418fe950c6842eccb7daa000e3454d972e27cf2accf26e464689a1c915faf0",
+      "lines": 220,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/definitions.ts",
+      "sha256": "08550904d2520dee86ebde079f4af62fc79ccb64b3ac57c86dedba8292ac35e2",
+      "lines": 184,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/definitions.types.ts",
+      "sha256": "bd11983461f13dd8a2bc226b02580815daf39d004a87791b6f43ee25304ef100",
+      "lines": 35,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/filters-support.ts",
+      "sha256": "3cd5b9cfc1f20564f4c015baec027cc5744ed389d5bf67307a9bc4566cb5e0de",
+      "lines": 188,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/filters.ts",
+      "sha256": "5a9957e24406f12d6fe75802b133fec4ae66a99cc28cd7dc58ded70797be96e1",
+      "lines": 204,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/filters.types.ts",
+      "sha256": "225c22040fff3e3aab2a0c32ab88acec6fe2ed51b4ff3f202c3e7f020e10ca07",
+      "lines": 20,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/jobs.types.ts",
+      "sha256": "d4fecf2eb040d08dca451ece2992553367ebae2e7dc7404cf949cecc9258e219",
+      "lines": 97,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/native.service.ts",
+      "sha256": "6683d757af14e1dfa657d93ee1f1a7e4b0bf30a700e088616ede5fd0d192595b",
+      "lines": 239,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/native.types.ts",
+      "sha256": "48107f0d01c9a1b4542f20d8f43e5f47ef538510a385e9b31d100c7edb844767",
+      "lines": 52,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/routes.ts",
+      "sha256": "94c30b019a957f738939abc8a7eab8076c0b1c12d6f9903056e66725a5fb83c5",
+      "lines": 232,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/routes.types.ts",
+      "sha256": "09402b989282486cd67a671f0450649ad56dff737166ac4884cdec62f0535b81",
+      "lines": 7,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/run-aggregate-support.ts",
+      "sha256": "0d7bb54d2e56ec453e97b2554c71ffcffa0ea132d8e5b37c05ba0a104f342980",
+      "lines": 193,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/run-aggregate-support.types.ts",
+      "sha256": "c9f7446cd133addcfd4f0131e3876dee3b7c750b0651f8ac6e7fd05c643e3197",
+      "lines": 31,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/run-aggregate.ts",
+      "sha256": "7237745b6dd666b51b1fb33ecb386015e1ae6e9ff36edaa8caadcb92722486d1",
+      "lines": 116,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/runs.ts",
+      "sha256": "2ac3e67756ae858d2efd59d330f6e5d8068ba23b9b1e12f733b4372bb5bc1411",
+      "lines": 194,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/runtime-summary.ts",
+      "sha256": "a790d1ab50bbf3a8bbe91ac681337c18dc23d80c1a398f15ffabad3287f29efe",
+      "lines": 54,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/schedules-support.ts",
+      "sha256": "7abca7dc4655599bfe75ee3e1e2d2ec2d87937615f0d41df8b86d9c7288d2967",
+      "lines": 158,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/schedules.ts",
+      "sha256": "094cc42a9691c069e6a8032bc5c0a8cbe568dbaa84807830b957a341b4c58c73",
+      "lines": 237,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/schedules.types.ts",
+      "sha256": "be73775d1b9526cc388bc9b9c8db62908101b472e48ab1fff5f57bcf9584d36f",
+      "lines": 19,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/service-list.ts",
+      "sha256": "d4ce801004c5d0242fa09c46229b4393f65185f6c00a1375c3ae82c9a39cdc1d",
+      "lines": 114,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/services.ts",
+      "sha256": "57f0a6e06798add6eeb5f034ae9ecd08439818a01ccb6f18e62f585f63dedc9a",
+      "lines": 113,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/types.ts",
+      "sha256": "f865c5680d2debf6b18f467c042b5f7b7df12965881161baea60061f578f2790",
+      "lines": 54,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/native-edge.ts",
+      "sha256": "089efb67b71b44aa24705b41ed86a2ba04159a2abd1766d14c4fb5c19fa58ec1",
+      "lines": 85,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/native-edge.types.ts",
+      "sha256": "9d6ef5d827e65b2af9e9c84a507dded5d0437ce15967d6cae1110b650659d885",
+      "lines": 15,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability-errors.ts",
+      "sha256": "313d01cf9ccf6c8510431330fb8f0b3f32980db92b8ca84a465b07499661fd8f",
+      "lines": 17,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability-service.types.ts",
+      "sha256": "8b91d3060840f4c5209f5cceb448b0685d436569194aa65e174d77de80386ec3",
+      "lines": 25,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability-stream.ts",
+      "sha256": "1413d72597f54b49dc37a3a11e7fc3f806b48fcd66eaa366469dd8f0f32839b4",
+      "lines": 212,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability-utils.ts",
+      "sha256": "ff6ce4f4d153e42b3bbd8bebf3a0fbb6c12e0d8e94fba0646b189fe427ff0045",
+      "lines": 127,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability-utils.types.ts",
+      "sha256": "976730703b905152344eeef6a34769bef6709341ed7ba18c6a9319530e0887bb",
+      "lines": 15,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability.service.ts",
+      "sha256": "8102ebfab2b59b20584c96b00d104d0617370254615c93936c69a3168e305365",
+      "lines": 92,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability.ts",
+      "sha256": "eb26b4b34727f021293af4b13f41cc5a40447dbfcf4267c9479af9637616c836",
+      "lines": 243,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability.types.ts",
+      "sha256": "35c6f16ff0b5c5652fca2b176a6ffcacced6fa1986f7e7749c39552e49392647",
+      "lines": 18,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/query-routes.ts",
+      "sha256": "21362fe1d807a68d206cc21b8a2ffe7d005c3a92f998dd428a5f11eb32d071b5",
+      "lines": 84,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/query.service.ts",
+      "sha256": "535535651e287b529967282306f99af88b530781589014269c8c08fa39089de8",
+      "lines": 133,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/query.types.ts",
+      "sha256": "d2768a94491c56681b0962e20c286752f8816d3ee06a28cf5ddaf611a5f1074d",
+      "lines": 65,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/resource-explorer-support.ts",
+      "sha256": "d5a53ab5e35d8f6e1314d04053997080b2a61558f54a9c2a7c320ed6b82a262c",
+      "lines": 110,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/resource-explorer.ts",
+      "sha256": "5cf1789233ada6bc56488c267eaea71cbca1596370613f784bda1a2cef4e6247",
+      "lines": 231,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/resource-explorer.types.ts",
+      "sha256": "57b798ed84bd122c8c3f099761dc7d854c7ff29511934ae958456872e2a70bb2",
+      "lines": 47,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/resource-routes.ts",
+      "sha256": "be3fbf2f6d9cd09627dabb4d9f9ae323fd5a04e48834fec3cb017f5edf53c6a2",
+      "lines": 85,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/resource-routes.types.ts",
+      "sha256": "ed676408b588ece8313e55a8a35c13e430da98bd37d7c6bbac4cb62817b64807",
+      "lines": 16,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/router-utils.ts",
+      "sha256": "7c91ecc9281b9bd70a6161629d344f0ccbe5795f0ab0d628c73e044989ac8a5f",
+      "lines": 245,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/router.ts",
+      "sha256": "9c7be48dadaadd60dda367a70258a22819e03d4b7afc4d7ec4b76bc9bfb5f790",
+      "lines": 179,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/router.types.ts",
+      "sha256": "491e369cd39c234a7b86645d7f1d4fde894d5161cda1cb583943d345cab16412",
+      "lines": 21,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/runtime-item.ts",
+      "sha256": "66e7ac6ef7c7801392ceea61958700893985d26ba924c7f383ae1949f57a8ad9",
+      "lines": 25,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/runtime-metadata.ts",
+      "sha256": "98df43e6cf7593844c0734e684bece0d6e4bb08e8acada9cd8e09a6ba896a80f",
+      "lines": 225,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/runtime-projection.ts",
+      "sha256": "3491af876dfe97ffa26d79f759c23379f7e2d50a00522f53a0e8b927cd8210b3",
+      "lines": 92,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/runtime.ts",
+      "sha256": "dd7a591891e6ab7e97d29c335f33025abc486144c31a7376de73f6c548ef2757",
+      "lines": 210,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/runtime.types.ts",
+      "sha256": "114691851b00b2ffb75e8eaefb859a5f9fddcd2f463ecc7df9899fd0b790e640",
+      "lines": 4,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/shared.ts",
+      "sha256": "79b44e34d0a3aeb0408137cc1cc1ab8b3499907d4fbbb82be61dab92d070a8a4",
+      "lines": 247,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/shared.types.ts",
+      "sha256": "34735b45f26dab30083ca74cea07d31194a1136f589b60dff70031ca75282438",
+      "lines": 95,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/topology.ts",
+      "sha256": "422e7825cb92d2105fb62fdcb9787dccae779532c20e0f514732fdbda45c07b4",
+      "lines": 202,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/actions-admin.test.ts",
+      "sha256": "83efcc358603951d90fa08fc3ed7db74bd66c8d35c7df809820815e4001a6b77",
+      "lines": 115,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/actions-fixtures.ts",
+      "sha256": "c5ab70cf56ad9fbe3c4169202204982f421e3d0101ac12c64ed497252a84f355",
+      "lines": 157,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/actions-fixtures.types.ts",
+      "sha256": "03656f215111cdf4d622605364cf942b8769f7c9e2de8c7ad1fe7e2111a7529f",
+      "lines": 19,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/actions.test.ts",
+      "sha256": "9a72671ebe8985e0bc2f5a6045e875a77a087e3abeba2352c0c0849759bbb6f5",
+      "lines": 76,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-actions.test.ts",
+      "sha256": "4285e59cbc1002584a7afc8ca7776084b0932f43ec05f41375bc3be24dbf7b18",
+      "lines": 106,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-data.ts",
+      "sha256": "563161b8727eabcdd5ec0d8e5c87f88bf72aaa9e91cffca37b4168ba3f9d6f0a",
+      "lines": 143,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-errors.test.ts",
+      "sha256": "6dd2af8f5eb67c39ba2fe26bd1ea226a8c84f08db70b12a51c3183428ef3d588",
+      "lines": 84,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-fixtures.ts",
+      "sha256": "a024b732ef72c932affe6605c23fce52752b18818e97413070f62d37a1817e62",
+      "lines": 236,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-fixtures.types.ts",
+      "sha256": "ea3a06909b95d5aa4de8a680784ac7e4fde294b42f3c188e77670f82eefb477d",
+      "lines": 13,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/contracts-readonly.test.ts",
+      "sha256": "3f401faa7361ac7e8c0f6eba0297cd23fe1793c0186ac1342501c2846e937f3a",
+      "lines": 147,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/env-diagnostics.test.ts",
+      "sha256": "45b53d9bd05004aec4b8662484dbcbd3f5f2fbd412e28cf239266ac99d4982dc",
+      "lines": 139,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/events-runtime.test.ts",
+      "sha256": "4c245c9f26a6847eda7537101ae9c1d95fd12db73b914a977939899a3f7451c6",
+      "lines": 110,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/inspector-api.test.ts",
+      "sha256": "860004d2b4afbef5fbeaf3fef8ab676aad4bc1e7f34f5c3db39e8a5558f06abb",
+      "lines": 347,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/jobs.test.ts",
+      "sha256": "bb58ee50d500ee17780293cea20d04adf321ac8da8dc5632189846f02543f826",
+      "lines": 295,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/observability.test.ts",
+      "sha256": "68cf47b9f3d53faa4b739830cc5e3bbe7876eb96da2d547045cb51f522db67f0",
+      "lines": 309,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/production-protection.test.ts",
+      "sha256": "0304c986b4706d481f494d9f00885c89e9657fdb587e9ea4af8e976d29cb5c70",
+      "lines": 149,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/resource-explorer.test.ts",
+      "sha256": "0d86342b3e2dd8ef3f32da69558d8122a4a9955a099cf6deba565f7fac187a28",
+      "lines": 102,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/resources-runtime.test.ts",
+      "sha256": "66587528b19ab7daa16fc9cb29853951bcb85c38cafd8181a1f42a984a23fffc",
+      "lines": 97,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/compatibility/stream-heartbeat.test.ts",
+      "sha256": "3bdb740d1519d6e6821c2f053d0f9c9ea75b88aa5a8b6b332901a315f7b5aac1",
+      "lines": 82,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/controls/receipts.test.ts",
+      "sha256": "aa08083dab5f9bc525c1ef69a8e15b6654e58ab1889cb607dd65e55416996beb",
+      "lines": 242,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/fixtures/json.ts",
+      "sha256": "83b56ca1b80124c743b525c0e3dba1a47cfbde27b1f37fdf5be3e43b32bd5ac6",
+      "lines": 27,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/fixtures/json.types.ts",
+      "sha256": "c80acad84d9c1f06120a7747fbf2935b8a209c79d96cd3a9ece5dec09c68d5e9",
+      "lines": 77,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/fixtures/native-stream.ts",
+      "sha256": "fd2f11ba6386a5e5a88afc808f11b67ba0ec3fc891607d920fdec751122c265d",
+      "lines": 110,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/fixtures/native-stream.types.ts",
+      "sha256": "cf7729fdd25189c1a5ade9884b55f295c6a6cb6c321da319215baf8eba640c70",
+      "lines": 4,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/fixtures/services.ts",
+      "sha256": "be68779e9d94671e9280cfccde11f5112eaef9d56276717e545b4530e68398b9",
+      "lines": 79,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/fixtures/services.types.ts",
+      "sha256": "bd75f42bc7c4fc3abc8cdff5d93ff0ad44edb4941354f20144be969ee6cf4eef",
+      "lines": 9,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/jobs/native-traversal.test.ts",
+      "sha256": "1a33baf50310e825c348b48477575c408139c9ba96c0f56617a4252698487167",
+      "lines": 101,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/observability/native-stream.test.ts",
+      "sha256": "69c5cd199b9898d065a194a3a8a055b74aefe298d72040611ee9c1d4925d449c",
+      "lines": 25,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/query/access.test.ts",
+      "sha256": "21202082dfe18c84c3b33fb95ac7a1ddaf6b65898f0b5529c8b91a374b234b21",
+      "lines": 171,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/query/owner-observation.test.ts",
+      "sha256": "9f4d20eb1b8721db7c4940bee2b8fe1de54adb1178b1ab4a7a9fa10820388543",
+      "lines": 105,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/tests/types/examples.test.ts",
+      "sha256": "489d4be276c33fb99607edcc91dd789efedb254926675599c3611c82e156500e",
+      "lines": 110,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/vitest.config.ts",
+      "sha256": "eff332db570179b201d2c24372aa33558ebd1b9babae9a072efbca7d1cf03b6f",
+      "lines": 10,
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    }
+  ],
+  "originalCounterparts": [
+    {
+      "path": "packages/inspector-api/actions-admin.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/actions-admin.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/actions-fixtures.ts",
+      "current": "packages/inspector-api/tests/compatibility/actions-fixtures.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/actions.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/actions.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/contracts-actions.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/contracts-actions.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/contracts-data.ts",
+      "current": "packages/inspector-api/tests/compatibility/contracts-data.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/contracts-errors.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/contracts-errors.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/contracts-fixtures.ts",
+      "current": "packages/inspector-api/tests/compatibility/contracts-fixtures.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/contracts-readonly.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/contracts-readonly.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/env-diagnostics.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/env-diagnostics.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/events-runtime.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/events-runtime.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/inspector-api.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/inspector-api.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/jobs.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/jobs.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/observability.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/observability.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/production-protection.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/production-protection.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/resource-explorer.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/resource-explorer.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/resources-runtime.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/resources-runtime.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-dispatch.ts",
+      "current": "packages/inspector-api/src/actions-dispatch.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-errors.ts",
+      "current": "packages/inspector-api/src/actions-errors.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-projection.ts",
+      "current": "packages/inspector-api/src/actions-projection.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-runtime.ts",
+      "current": "packages/inspector-api/src/actions-runtime.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions-utils.ts",
+      "current": "packages/inspector-api/src/actions-utils.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/actions.ts",
+      "current": "packages/inspector-api/src/actions.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/diagnostics.ts",
+      "current": "packages/inspector-api/src/diagnostics.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/environment.ts",
+      "current": "packages/inspector-api/src/environment.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/events-runtime.ts",
+      "current": "packages/inspector-api/src/events-runtime.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/generation-types.ts",
+      "current": "packages/inspector-api/src/generation-types.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/generation.ts",
+      "current": "packages/inspector-api/src/generation.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/graph-utils.ts",
+      "current": "packages/inspector-api/src/graph-utils.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/graph.ts",
+      "current": "packages/inspector-api/src/graph.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/index.ts",
+      "current": "packages/inspector-api/src/index.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/inspector-endpoint-paths.ts",
+      "current": "packages/inspector-api/src/inspector-endpoint-paths.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/controls.ts",
+      "current": "packages/inspector-api/src/jobs/controls.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/definitions-support.ts",
+      "current": "packages/inspector-api/src/jobs/definitions-support.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/definitions.ts",
+      "current": "packages/inspector-api/src/jobs/definitions.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/filters-support.ts",
+      "current": "packages/inspector-api/src/jobs/filters-support.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/filters.ts",
+      "current": "packages/inspector-api/src/jobs/filters.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/routes.ts",
+      "current": "packages/inspector-api/src/jobs/routes.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/run-aggregate-support.ts",
+      "current": "packages/inspector-api/src/jobs/run-aggregate-support.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/run-aggregate.ts",
+      "current": "packages/inspector-api/src/jobs/run-aggregate.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/runs.ts",
+      "current": "packages/inspector-api/src/jobs/runs.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/runtime-summary.ts",
+      "current": "packages/inspector-api/src/jobs/runtime-summary.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/schedules-support.ts",
+      "current": "packages/inspector-api/src/jobs/schedules-support.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/schedules.ts",
+      "current": "packages/inspector-api/src/jobs/schedules.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/service-list.ts",
+      "current": "packages/inspector-api/src/jobs/service-list.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/services.ts",
+      "current": "packages/inspector-api/src/jobs/services.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/jobs/types.ts",
+      "current": "packages/inspector-api/src/jobs/types.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability-utils.ts",
+      "current": "packages/inspector-api/src/observability-utils.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/observability.ts",
+      "current": "packages/inspector-api/src/observability.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/resource-explorer.ts",
+      "current": "packages/inspector-api/src/resource-explorer.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/resource-routes.ts",
+      "current": "packages/inspector-api/src/resource-routes.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/router-utils.ts",
+      "current": "packages/inspector-api/src/router-utils.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/router.ts",
+      "current": "packages/inspector-api/src/router.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/runtime-item.ts",
+      "current": "packages/inspector-api/src/runtime-item.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/runtime-metadata.ts",
+      "current": "packages/inspector-api/src/runtime-metadata.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/runtime.ts",
+      "current": "packages/inspector-api/src/runtime.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/shared.ts",
+      "current": "packages/inspector-api/src/shared.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/src/topology.ts",
+      "current": "packages/inspector-api/src/topology.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    },
+    {
+      "path": "packages/inspector-api/stream-heartbeat.test.ts",
+      "current": "packages/inspector-api/tests/compatibility/stream-heartbeat.test.ts",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    }
+  ],
+  "configs": [
+    {
+      "path": "packages/inspector-api/tsconfig.tests.json",
+      "reviewedToEOF": true,
+      "reviewer": "/root/testing_baseline"
+    }
+  ],
+  "assertionParity": {
+    "movedPaths": 17,
+    "authoredExpectChains": 198,
+    "mismatches": 0,
+    "method": "TypeScript AST erases casts/non-null/generic arguments and normalizes responseJson to original .json; formatting normalization only. All helpers and actual native callbacks also reviewed through EOF."
+  },
+  "findings": {
+    "open": [],
+    "closed": [
+      "Installer ownership and helper/generic-role parameter/return documentation",
+      "Misleading return/header descriptions",
+      "Legacy as-never fixture contracts replaced with native-return-derived guarded object casts preserving exact fixture values",
+      "Pure graph/definition/count shapes extracted to companions",
+      "Removed mapLimit internal traversal helper has no public barrel export or authored consumers"
+    ]
+  },
+  "families": {
+    "Service": "Four cohesive Context.Service domains with Service.of and substitutable live/test Layers; shared installed-route owner.",
+    "Schema": "Schema-backed action boundary/typed tagged errors; projection-only pure metadata leaves retain established contracts.",
+    "Tagged Errors": "Existing constructors/names/prototypes/status and native identity preserved through edge unwrapping.",
+    "Error Management": "Typed failures versus defects/interruption; no broad native-error masking or unsafe control retries.",
+    "Data": "Schema/error discriminants and companion contracts; no unrelated custom Data protocol.",
+    "Observability": "Shared contracts operation boundary, standalone owner-local observations, no feeding Inspector query source.",
+    "Metrics": "Owner-local metric registry and bounded labels; independent owners verified.",
+    "Tracing": "Named Effect.fn and shared operation spans around workflows/native traversals.",
+    "Logs": "Configured runtime-effect logger redacts full records before native sink.",
+    "Fibers": "Scope-owned receipt fork, explicit interruptible fork option; no unowned per-call runtimes.",
+    "PubSub": "Existing native replay/fanout stream remains authoritative; no extra PubSub added.",
+    "Queue": "Existing bounded native subscription queue/backpressure contract retained.",
+    "Stream": "Scope-provided Stream.toPull observes ordered native async iterator; native close precedes abort/join.",
+    "Clocks": "Native SSE heartbeat uses explicit owned platform timer; real-Bun tests intentionally exercise elapsed wall time.",
+    "Concurrency": "Finite ordered native traversal default four; dependency-ordered early-match reads remain sequential.",
+    "Caching": "Persistent idempotency receipts and external Map authorities retain failures; no eviction/TTL or Effect Cache added.",
+    "Scheduling": "No automatic retry for controls; owned native heartbeat timer, existing external schedules queried truthfully.",
+    "Scope": "Installed route runtime disposal and per-response subscription/pull/timer scopes.",
+    "RcMap": "No reference-counted keyed resource lifetime in Inspector; not applicable.",
+    "AcquireRelease": "Native SSE subscriptions acquired/released by response scopes.",
+    "Testing": "26 Effect cases with substitutable test Layers and six checked domain suites;14 Bun compatibility suites preserve native assertions.",
+    "Traits": "No new user value identity/hash protocol required; not applicable.",
+    "Refs": "Ref-backed receipt ownership plus Deferred waiter completion; external native Map preserved.",
+    "Configs": "Existing installer options/pre-acquisition validation retained; no separate environment configuration API needed.",
+    "Platform Logger": "Configured existing runtime-effect/native logger boundary, no independent platform console logger or transport."
+  },
+  "nativeEvidence": {
+    "supported": [
+      "Actual Bun SSE idle-heartbeat survival through HTTP proxy",
+      "Direct response reader cancel, request abort, source close, pre-aborted and abort-before-pull cleanup",
+      "Receipt native operation starts once and retained failed result identity",
+      "Bounded ordered native jobs traversal and truthful unavailable/count metadata",
+      "Standalone configured/redacted observation and owner isolation"
+    ],
+    "limits": [
+      "Native Promise authority cancellation only when its public AbortSignal contract supports it.",
+      "Native proxy fixture forwards explicit owner abort; does not prove raw socket disconnect propagation. Production proxy acceptance belongs coordinator."
+    ]
+  },
+  "apiEvidence": {
+    "installed": "Effect 4.0.0-rc.115 source verified; Context/Layer/ManagedRuntime/Ref/Deferred/Schema/Stream and internal forkIn/uninterruptibleMask/scopeMakeUnsafe/Channel.toPull plus source inline examples reviewed.",
+    "vendor": "Read-only sparse repos/effect source/test/examples inspected. Relevant available Schema, Vitest, HttpRouter, SQL and SSE evidence reviewed; matching core runtime source/tests/examples missing, installed source/inline checked examples used for gaps.",
+    "drizzle": "Inspector does not activate Drizzle; existing native jobs/resource authorities retained."
+  },
+  "authorChecks": {
+    "effect": "26/26,6 files, final post-fix replay 1.80s; author report",
+    "compatibility": "40/40,14 files,288 expects, final post-fix replay 2.18s; author report",
+    "strictTests": "Author reports pass after fixes",
+    "format": "Author reports pass",
+    "implementationLines": "All source implementations <=250"
+  },
+  "terminologyAmendment": {
+    "accepted": true,
+    "reviewer": "/root/testing_baseline",
+    "files": [
+      {
+        "path": "packages/inspector-api/src/observability-service.types.ts",
+        "previousSha256": "0dddd54d1a1d4984fe260ea4882198522a73e0865a0ace886e63df19ff0942a6",
+        "sha256": "8b91d3060840f4c5209f5cceb448b0685d436569194aa65e174d77de80386ec3",
+        "readToEOF": true,
+        "previousContentReconstructedExactly": true
+      },
+      {
+        "path": "packages/inspector-api/src/observability-stream.ts",
+        "previousSha256": "60e4cac6775dfa68ecf143420e010997d6aeb5d7ec2be0a19d1ff0adea1379c8",
+        "sha256": "1413d72597f54b49dc37a3a11e7fc3f806b48fcd66eaa366469dd8f0f32839b4",
+        "readToEOF": true,
+        "previousContentReconstructedExactly": true
+      },
+      {
+        "path": "packages/inspector-api/src/observability-utils.types.ts",
+        "previousSha256": "d6f0fc6eda6d3dc0650328e344f8294364eaf3ce53f6f3b5d44819286c06a5f9",
+        "sha256": "976730703b905152344eeef6a34769bef6709341ed7ba18c6a9319530e0887bb",
+        "readToEOF": true,
+        "previousContentReconstructedExactly": true
+      },
+      {
+        "path": "packages/inspector-api/src/observability.ts",
+        "previousSha256": "bd1c9311a47b1115c302d429b291712fc0dec9a74ba016d6b5f1133fa107446f",
+        "sha256": "eb26b4b34727f021293af4b13f41cc5a40447dbfcf4267c9479af9637616c836",
+        "readToEOF": true,
+        "previousContentReconstructedExactly": true
+      },
+      {
+        "path": "packages/inspector-api/src/router.ts",
+        "previousSha256": "97fd65917e04901997ca5297a5986b432351e92381e1ca80abb8fc000339f86f",
+        "sha256": "9c7be48dadaadd60dda367a70258a22819e03d4b7afc4d7ec4b76bc9bfb5f790",
+        "readToEOF": true,
+        "previousContentReconstructedExactly": true
+      },
+      {
+        "path": "packages/inspector-api/tests/fixtures/native-stream.ts",
+        "previousSha256": "5541c7f4668f65c7ff5263f18286ca2a88e9290cb160ab87a3a8c1dcaf86f39f",
+        "sha256": "fd2f11ba6386a5e5a88afc808f11b67ba0ec3fc891607d920fdec751122c265d",
+        "readToEOF": true,
+        "previousContentReconstructedExactly": true
+      },
+      {
+        "path": "packages/inspector-api/tests/types/examples.test.ts",
+        "previousSha256": "d26f681f9d1aa0a852adea4d13388b52f6f26f678873a7181dc261d28324646d",
+        "sha256": "489d4be276c33fb99607edcc91dd789efedb254926675599c3611c82e156500e",
+        "readToEOF": true,
+        "previousContentReconstructedExactly": true
+      }
+    ],
+    "scope": "Exactly feed terminology, local variable and bounded workload key; reverse replacement reconstructs all seven previous accepted SHA256 values. Public native type/API and subscriber stats retained.",
+    "runtimeReplay": "No heavy run; coordinator package replay pending."
+  }
+}

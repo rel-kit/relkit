@@ -1,188 +1,104 @@
 import type { RunSnapshot } from "@relkit/contracts/jobs";
-import {
-  JobWatchAbortedError,
-  JobWatchDisposedError,
-  type JobWatchController,
-  type JobWatchListener,
-  type JobWatchOptions,
-  type JobWatchState,
+import { Layer, ManagedRuntime } from "effect";
+import { runExecutionSync } from "@relkit/contracts/operation";
+import { reconnectAfterTeardown } from "./controller-support.js";
+import { JobControllers, JobControllersLive } from "./controller.service.js";
+import { JobFeedRegistryDefault } from "./watch.js";
+import type { JobRunFor } from "./job-registry-derived.types.js";
+import type {
+  JobWatchController,
+  JobWatchListener,
+  JobWatchOptions,
+  JobWatchState,
 } from "./types.js";
-import {
-  releaseSharedWatchFeed,
-  sharedWatchFeed,
-  type FeedEvent,
-  type SharedWatchFeed,
-} from "./watch.js";
-import { freeze, notify, reconnectAfterTeardown, resumedOptions } from "./controller-support.js";
-import type { JobRunFor } from "./job-registry-derived.js";
-import { stateFromFeedEvent } from "./controller-state.js";
-let nextControllerId = 1;
+
+const factoryOwner = ManagedRuntime.make(
+  JobControllersLive.pipe(Layer.provide(JobFeedRegistryDefault)),
+);
+const factory = runExecutionSync(factoryOwner, JobControllers);
+
+/**
+ * Passive synchronous external-store facade over scoped physical feed services.
+ * @typeParam Run - Observed job run payload retained in external-store snapshots.
+ */
 export class JobRunWatchController<Run = RunSnapshot> implements JobWatchController<Run> {
-  private readonly id = `watch-${nextControllerId++}`;
-  private readonly listeners = new Set<JobWatchListener<Run>>();
-  private state: JobWatchState<Run> = freeze({ connection: "idle", isStale: false });
-  private feed: SharedWatchFeed<Run> | undefined;
-  private leaseId: string | undefined;
-  private connectPromise: Promise<void> | undefined;
-  private refetchAbort: AbortController | undefined;
-  private activeOptions: JobWatchOptions | undefined;
-  private epoch = 0;
-  private manuallyDisconnected = false;
-  private disposed = false;
-  private disconnectPending: Promise<void> | undefined;
-  constructor(
-    private readonly client: unknown,
-    private readonly name: string,
-    private readonly options: JobWatchOptions,
-  ) {}
+  private readonly service;
+  private connecting: Promise<void> | undefined;
+  private disconnecting: Promise<void> | undefined;
+  private closing: Promise<void> | undefined;
+
+  /**
+   * Acquires controller state once; native observation begins only at connect.
+   * @param client - Borrowed generated client.
+   * @param name - Declared job identity.
+   * @param options - Full identity scope and observation policy.
+   * @returns An idle passive external-store view with no native requests.
+   */
+  constructor(client: unknown, name: string, options: JobWatchOptions) {
+    this.service = factory.view(client, name, options);
+  }
+
+  /** @returns The existing frozen external-store snapshot synchronously. */
   getSnapshot(): JobWatchState<Run> {
-    return this.state;
+    return this.service.snapshot() as JobWatchState<Run>;
   }
+
+  /**
+   * Borrows controller state publication without acquiring native work.
+   * @param listener - Isolated external-store callback.
+   * @returns Idempotent synchronous unsubscribe.
+   */
   subscribe(listener: JobWatchListener<Run>): () => void {
-    this.listeners.add(listener);
-    notify(listener, this.state);
-    return () => this.listeners.delete(listener);
+    return this.service.subscribe(listener as JobWatchListener<unknown>);
   }
+
+  /** @returns The same first-snapshot Promise for concurrent connect calls. */
   connect(): Promise<void> {
-    this.assertLive();
-    if (this.connectPromise !== undefined && !this.manuallyDisconnected) return this.connectPromise;
-    const previous = this.connectPromise;
-    this.manuallyDisconnected = false;
-    const pending = reconnectAfterTeardown(previous, this.disconnectPending, () =>
-      this.connectInternal(),
-    );
-    const shared = pending.finally(() => {
-      if (this.connectPromise === shared) this.connectPromise = undefined;
+    this.service.assertLive();
+    if (this.connecting !== undefined && !this.service.isDisconnected()) return this.connecting;
+    const pending = reconnectAfterTeardown(this.connecting, this.disconnecting, async () => {
+      await this.service.connect();
     });
-    this.connectPromise = shared;
+    const shared = pending.finally(() => {
+      if (this.connecting === shared) this.connecting = undefined;
+    });
+    this.connecting = shared;
     return shared;
   }
-  async disconnect(): Promise<void> {
-    if (this.disposed) return;
-    if (this.disconnectPending !== undefined) return this.disconnectPending;
-    this.manuallyDisconnected = true;
-    this.epoch += 1;
-    this.refetchAbort?.abort();
-    this.setState({
-      ...this.state,
-      connection: "disconnected",
-      isStale: false,
-      connectionError: undefined,
+
+  /** @returns Joined lease cleanup without retiring the reusable controller. */
+  disconnect(): Promise<void> {
+    if (this.closing !== undefined) return Promise.resolve();
+    if (this.disconnecting !== undefined) return this.disconnecting;
+    const pending = this.service.disconnect();
+    const joined = pending.finally(() => {
+      if (this.disconnecting === joined) this.disconnecting = undefined;
     });
-    const pending = this.releaseLease(new JobWatchAbortedError());
-    this.disconnectPending = pending;
-    await pending.finally(() => {
-      if (this.disconnectPending === pending) this.disconnectPending = undefined;
-    });
+    this.disconnecting = joined;
+    return joined;
   }
-  async dispose(): Promise<void> {
-    if (this.disposed) return;
-    this.disposed = true;
-    this.epoch += 1;
-    this.refetchAbort?.abort();
-    await this.releaseLease(new JobWatchAbortedError());
-    this.setState({ connection: "disposed", isStale: false });
-    this.listeners.clear();
+
+  /** @returns Joined final owner cleanup, including pending native observation. */
+  dispose(): Promise<void> {
+    if (this.closing !== undefined) return this.closing;
+    return (this.closing = this.service.dispose());
   }
-  async refetch(): Promise<void> {
-    this.assertLive();
-    this.refetchAbort?.abort();
-    const controller = new AbortController();
-    this.refetchAbort = controller;
-    const previousConnection = this.state.connection;
-    const temporary = this.feed === undefined;
-    const feedOptions = this.activeOptions ?? resumedOptions(this.options, this.state);
-    const feed = this.feed ?? sharedWatchFeed<Run>(this.client, this.name, feedOptions);
-    try {
-      const frame = await feed.refetch(controller.signal);
-      if (frame === undefined || controller.signal.aborted || this.disposed) return;
-      this.receive({ kind: "frame", frame }, this.epoch);
-      if (this.manuallyDisconnected && previousConnection === "disconnected") {
-        this.setState({ ...this.state, connection: "disconnected" });
-      }
-    } finally {
-      if (temporary)
-        releaseSharedWatchFeed(
-          this.client,
-          this.name,
-          feedOptions,
-          feed as SharedWatchFeed<unknown>,
-        );
-      if (this.refetchAbort === controller) this.refetchAbort = undefined;
-    }
-  }
-  private async connectInternal(): Promise<void> {
-    const requestedEpoch = this.epoch;
-    if (
-      this.state.connection === "connected" ||
-      this.state.connection === "connecting" ||
-      this.state.connection === "reconnecting"
-    )
-      return;
-    if (this.state.connection === "completed") {
-      await this.refetch();
-      if (requestedEpoch !== this.epoch || this.disposed) return;
-    }
-    if (this.state.connection === "completed") return;
-    if (requestedEpoch !== this.epoch || this.disposed) return;
-    if (this.feed !== undefined) await this.releaseLease(new JobWatchAbortedError());
-    if (requestedEpoch !== this.epoch || this.disposed) return;
-    this.manuallyDisconnected = false;
-    await this.startConnection();
-  }
-  private async startConnection(): Promise<void> {
-    const epoch = ++this.epoch;
-    this.manuallyDisconnected = false;
-    this.setState({
-      ...this.state,
-      connection: "connecting",
-      isStale: false,
-      connectionError: undefined,
-    });
-    const options = resumedOptions(this.options, this.state);
-    const feed = sharedWatchFeed<Run>(this.client, this.name, options);
-    const leaseId = `${this.id}:${epoch}`;
-    this.feed = feed;
-    this.leaseId = leaseId;
-    this.activeOptions = options;
-    try {
-      await feed.addLease(leaseId, (event) => this.receive(event, epoch));
-    } catch (error) {
-      if (epoch !== this.epoch || this.disposed || this.manuallyDisconnected) throw error;
-      if (this.state.connection !== "unauthorized") {
-        this.setState({
-          ...this.state,
-          connection: "error",
-          isStale: false,
-          connectionError: error,
-        });
-      }
-      throw error;
-    }
-  }
-  private receive(event: FeedEvent<Run>, epoch: number): void {
-    if (epoch !== this.epoch || this.disposed) return;
-    this.setState(stateFromFeedEvent(this.state, event, this.options.source));
-  }
-  private async releaseLease(error: unknown): Promise<void> {
-    const feed = this.feed;
-    const leaseId = this.leaseId;
-    this.feed = undefined;
-    this.leaseId = undefined;
-    const options = this.activeOptions ?? this.options;
-    this.activeOptions = undefined;
-    if (feed === undefined || leaseId === undefined) return;
-    await feed.removeLease(leaseId, error);
-    releaseSharedWatchFeed(this.client, this.name, options, feed as SharedWatchFeed<unknown>);
-  }
-  private setState(value: JobWatchState<Run>): void {
-    this.state = freeze(value);
-    for (const listener of this.listeners) notify(listener, this.state);
-  }
-  private assertLive(): void {
-    if (this.disposed) throw new JobWatchDisposedError();
+
+  /** @returns One authoritative read without resuming a manually disconnected watch. */
+  refetch(): Promise<void> {
+    this.service.assertLive();
+    return this.service.refetch();
   }
 }
+
+/**
+ * Creates an idle, independently disposable external-store watch owner.
+ * @typeParam Name - Declared job name.
+ * @param client - Generated client.
+ * @param name - Declared job.
+ * @param options - Full request authority and observation policy.
+ * @returns A synchronous public controller with existing inferred run payload.
+ */
 export function watchJobRun<Name extends string>(
   client: unknown,
   name: Name,

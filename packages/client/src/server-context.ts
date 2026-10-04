@@ -1,24 +1,22 @@
+import type {
+  CreateRelkitServerContextOptions,
+  RelkitServerContext,
+} from "./server-context.types.js";
 import type { ClientIdentityDocument } from "@relkit/contracts";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-import { dehydrate, type QueryClient } from "@tanstack/query-core";
-import { createClient } from "./index.js";
-import type { RelkitHydrationState } from "./react/context.js";
+import { dehydrate } from "@tanstack/query-core";
+import { createClient } from "./transport.js";
 import { scopeFor } from "./react/context-support.js";
+export type {
+  CreateRelkitServerContextOptions,
+  RelkitServerContext,
+} from "./server-context.types.js";
 
-export interface CreateRelkitServerContextOptions {
-  readonly baseUrl: string;
-  readonly request: Request;
-  readonly queryClient: QueryClient;
-  readonly identityKey?: string | null;
-}
-
-export interface RelkitServerContext {
-  readonly client: ReturnType<typeof createClient>;
-  readonly utils: ReturnType<typeof createTanstackQueryUtils>;
-  readonly identity: ClientIdentityDocument;
-  readonly dehydrate: () => RelkitHydrationState;
-}
-
+/**
+ * Forwards request identity into a server client and scope-bound hydration state.
+ * @param options - Existing public configuration and authority.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 export async function createRelkitServerContext(
   options: CreateRelkitServerContextOptions,
 ): Promise<RelkitServerContext> {
@@ -48,6 +46,11 @@ export async function createRelkitServerContext(
   };
 }
 
+/**
+ * Copies only the existing request headers allowed at the server-client boundary.
+ * @param request - Existing request and authorization authority.
+ * @returns A fresh header collection containing only permitted request headers.
+ */
 function forwardedHeaders(request: Request): Headers {
   const result = new Headers();
   for (const name of ["cookie", "authorization", "origin", "user-agent"]) {

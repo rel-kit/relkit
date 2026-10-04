@@ -1,0 +1,225 @@
+{
+  "root": "/tmp/relkit-core-consumers-agent-held-8b18daca",
+  "candidate": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "cases": [
+    {
+      "mode": "return",
+      "status": "passed",
+      "nativeRequests": [
+        {
+          "path": "/rpc/relkit.agent.observe",
+          "aborted": true,
+          "abortedAtMs": 1791057286327
+        }
+      ],
+      "receipt": {
+        "operationId": "01a10355-543e-7e85-baba-8488ace6d7e6",
+        "threadId": "held-return-af1f319e-13bd-4a1f-ae7b-a556789c5683",
+        "runId": "b388a1e0-e086-4727-b74f-6728b7d4aa94",
+        "status": "accepted",
+        "duplicate": false
+      },
+      "beforeDisconnect": {
+        "run": {
+          "runId": "b388a1e0-e086-4727-b74f-6728b7d4aa94",
+          "threadId": "held-return-af1f319e-13bd-4a1f-ae7b-a556789c5683",
+          "owner": {
+            "generationId": "d2112945-2bbc-4314-901c-d35ceb09d8e6",
+            "publicFingerprint": "sha256:held-public",
+            "protocolVersion": 2,
+            "schemaVersion": 2,
+            "providerScope": "default"
+          },
+          "operationId": "01a10355-543e-7e85-baba-8488ace6d7e6",
+          "status": "running",
+          "inputDigest": "sha256:1fccf25bdf46ea8ebec05c34b2518d75a8908c13ae75e94a9356e148b9dfee5f",
+          "acceptedAt": "2026-10-03T19:54:46.244Z"
+        },
+        "threadStatus": "running",
+        "activeRunId": "b388a1e0-e086-4727-b74f-6728b7d4aa94",
+        "checkpoint": {
+          "applicationId": "held-acceptance",
+          "environment": "test",
+          "profile": "default",
+          "providerEpoch": "55173882-1747-4a9c-99f8-d92e88aa3916",
+          "threadId": "held-return-af1f319e-13bd-4a1f-ae7b-a556789c5683",
+          "sequence": "2"
+        }
+      },
+      "firstFrameKind": "event",
+      "afterDisconnect": {
+        "run": {
+          "runId": "b388a1e0-e086-4727-b74f-6728b7d4aa94",
+          "threadId": "held-return-af1f319e-13bd-4a1f-ae7b-a556789c5683",
+          "owner": {
+            "generationId": "d2112945-2bbc-4314-901c-d35ceb09d8e6",
+            "publicFingerprint": "sha256:held-public",
+            "protocolVersion": 2,
+            "schemaVersion": 2,
+            "providerScope": "default"
+          },
+          "operationId": "01a10355-543e-7e85-baba-8488ace6d7e6",
+          "status": "running",
+          "inputDigest": "sha256:1fccf25bdf46ea8ebec05c34b2518d75a8908c13ae75e94a9356e148b9dfee5f",
+          "acceptedAt": "2026-10-03T19:54:46.244Z"
+        },
+        "threadStatus": "running",
+        "activeRunId": "b388a1e0-e086-4727-b74f-6728b7d4aa94",
+        "checkpoint": {
+          "applicationId": "held-acceptance",
+          "environment": "test",
+          "profile": "default",
+          "providerEpoch": "55173882-1747-4a9c-99f8-d92e88aa3916",
+          "threadId": "held-return-af1f319e-13bd-4a1f-ae7b-a556789c5683",
+          "sequence": "5"
+        }
+      },
+      "final": {
+        "run": {
+          "runId": "b388a1e0-e086-4727-b74f-6728b7d4aa94",
+          "threadId": "held-return-af1f319e-13bd-4a1f-ae7b-a556789c5683",
+          "owner": {
+            "generationId": "d2112945-2bbc-4314-901c-d35ceb09d8e6",
+            "publicFingerprint": "sha256:held-public",
+            "protocolVersion": 2,
+            "schemaVersion": 2,
+            "providerScope": "default"
+          },
+          "operationId": "01a10355-543e-7e85-baba-8488ace6d7e6",
+          "status": "succeeded",
+          "inputDigest": "sha256:1fccf25bdf46ea8ebec05c34b2518d75a8908c13ae75e94a9356e148b9dfee5f",
+          "acceptedAt": "2026-10-03T19:54:46.244Z",
+          "settledAt": "2026-10-03T19:54:46.402Z",
+          "outcome": "succeeded"
+        },
+        "threadStatus": "idle",
+        "checkpoint": {
+          "applicationId": "held-acceptance",
+          "environment": "test",
+          "profile": "default",
+          "providerEpoch": "55173882-1747-4a9c-99f8-d92e88aa3916",
+          "threadId": "held-return-af1f319e-13bd-4a1f-ae7b-a556789c5683",
+          "sequence": "25"
+        },
+        "output": {
+          "answer": "completed after disconnect"
+        }
+      },
+      "modelTurns": 1
+    },
+    {
+      "mode": "abort",
+      "status": "passed",
+      "nativeRequests": [
+        {
+          "path": "/rpc/relkit.agent.observe",
+          "aborted": true,
+          "abortedAtMs": 1791057286461
+        }
+      ],
+      "receipt": {
+        "operationId": "01a10355-551c-7fc9-a94f-f2789c6a1271",
+        "threadId": "held-abort-3c18296c-773f-47b3-83ed-676d258eb0b8",
+        "runId": "3d3691f0-05b9-46ba-9fc2-1b24f7099821",
+        "status": "accepted",
+        "duplicate": false
+      },
+      "beforeDisconnect": {
+        "run": {
+          "runId": "3d3691f0-05b9-46ba-9fc2-1b24f7099821",
+          "threadId": "held-abort-3c18296c-773f-47b3-83ed-676d258eb0b8",
+          "owner": {
+            "generationId": "d2112945-2bbc-4314-901c-d35ceb09d8e6",
+            "publicFingerprint": "sha256:held-public",
+            "protocolVersion": 2,
+            "schemaVersion": 2,
+            "providerScope": "default"
+          },
+          "operationId": "01a10355-551c-7fc9-a94f-f2789c6a1271",
+          "status": "running",
+          "inputDigest": "sha256:1fccf25bdf46ea8ebec05c34b2518d75a8908c13ae75e94a9356e148b9dfee5f",
+          "acceptedAt": "2026-10-03T19:54:46.433Z"
+        },
+        "threadStatus": "running",
+        "activeRunId": "3d3691f0-05b9-46ba-9fc2-1b24f7099821",
+        "checkpoint": {
+          "applicationId": "held-acceptance",
+          "environment": "test",
+          "profile": "default",
+          "providerEpoch": "55173882-1747-4a9c-99f8-d92e88aa3916",
+          "threadId": "held-abort-3c18296c-773f-47b3-83ed-676d258eb0b8",
+          "sequence": "2"
+        }
+      },
+      "firstFrameKind": "event",
+      "callerAbortProvedBeforeReturn": true,
+      "afterDisconnect": {
+        "run": {
+          "runId": "3d3691f0-05b9-46ba-9fc2-1b24f7099821",
+          "threadId": "held-abort-3c18296c-773f-47b3-83ed-676d258eb0b8",
+          "owner": {
+            "generationId": "d2112945-2bbc-4314-901c-d35ceb09d8e6",
+            "publicFingerprint": "sha256:held-public",
+            "protocolVersion": 2,
+            "schemaVersion": 2,
+            "providerScope": "default"
+          },
+          "operationId": "01a10355-551c-7fc9-a94f-f2789c6a1271",
+          "status": "running",
+          "inputDigest": "sha256:1fccf25bdf46ea8ebec05c34b2518d75a8908c13ae75e94a9356e148b9dfee5f",
+          "acceptedAt": "2026-10-03T19:54:46.433Z"
+        },
+        "threadStatus": "running",
+        "activeRunId": "3d3691f0-05b9-46ba-9fc2-1b24f7099821",
+        "checkpoint": {
+          "applicationId": "held-acceptance",
+          "environment": "test",
+          "profile": "default",
+          "providerEpoch": "55173882-1747-4a9c-99f8-d92e88aa3916",
+          "threadId": "held-abort-3c18296c-773f-47b3-83ed-676d258eb0b8",
+          "sequence": "5"
+        }
+      },
+      "final": {
+        "run": {
+          "runId": "3d3691f0-05b9-46ba-9fc2-1b24f7099821",
+          "threadId": "held-abort-3c18296c-773f-47b3-83ed-676d258eb0b8",
+          "owner": {
+            "generationId": "d2112945-2bbc-4314-901c-d35ceb09d8e6",
+            "publicFingerprint": "sha256:held-public",
+            "protocolVersion": 2,
+            "schemaVersion": 2,
+            "providerScope": "default"
+          },
+          "operationId": "01a10355-551c-7fc9-a94f-f2789c6a1271",
+          "status": "succeeded",
+          "inputDigest": "sha256:1fccf25bdf46ea8ebec05c34b2518d75a8908c13ae75e94a9356e148b9dfee5f",
+          "acceptedAt": "2026-10-03T19:54:46.433Z",
+          "settledAt": "2026-10-03T19:54:46.521Z",
+          "outcome": "succeeded"
+        },
+        "threadStatus": "idle",
+        "checkpoint": {
+          "applicationId": "held-acceptance",
+          "environment": "test",
+          "profile": "default",
+          "providerEpoch": "55173882-1747-4a9c-99f8-d92e88aa3916",
+          "threadId": "held-abort-3c18296c-773f-47b3-83ed-676d258eb0b8",
+          "sequence": "25"
+        },
+        "output": {
+          "answer": "completed after disconnect"
+        }
+      },
+      "modelTurns": 1
+    }
+  ],
+  "claims": {
+    "realTestingApplication": true,
+    "realBunHttp": true,
+    "publicClientObserver": true,
+    "heldOfflineModel": true,
+    "durableApproval": false,
+    "originalFixtureModified": false
+  }
+}

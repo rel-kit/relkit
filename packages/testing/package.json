@@ -55,6 +55,12 @@
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false"
+  },
+  "devDependencies": {
+    "@effect/vitest": "4.0.0-rc.115",
+    "@relkit/routes": "workspace:*",
+    "drizzle-orm": "1.0.0-rc.5-169397b",
+    "vitest": "5.0.1"
   }
 }

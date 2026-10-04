@@ -1,0 +1,51 @@
+{
+  "reviewer": "/root/testing_baseline",
+  "reviewedAtUtc": "2026-10-03T19:55:45.912Z",
+  "path": "/tmp/relkit-core-consumers-owned-host.mjs",
+  "sha256": "7dda33e73d1f44f8b6aa0bd9642fd2a35328c5551d38a875856e733c17b703c1",
+  "readToEOF": true,
+  "accepted": true,
+  "lifetime": "Native child receipt, immediate signal hooks, once shutdown, actual exit join, prefix write failure stop/join, hooks removed in finally accepted.",
+  "provenance": {
+    "bothOwnerRoots": true,
+    "privateEnvExcluded": true,
+    "absoluteOwnedLinks": true,
+    "originalSource63History177Fixture30HashesMatch": true
+  },
+  "execution": "Read-only; no hosts started.",
+  "previousSha256": "90e1a887a3db3dba5b31a32d2992827027702522fd7a13be07546d95809a29b8",
+  "resolvedFindings": [
+    {
+      "priority": "scope",
+      "detail": "Restrict root to exact two disposable owners and require copy-provenance.destination match before import/spawn."
+    }
+  ],
+  "findings": [],
+  "scopeGuard": "Exact two disposable roots, demo/fixture only, parsed provenance.destination equals root before module import or process spawn.",
+  "linesReadThroughEOF": 58,
+  "entrypoint": {
+    "frameworkMap": {
+      "candidate": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+      "baseline": "/Users/mustafaelsayed/Workspace/relkit"
+    },
+    "selected": "packages/cli/src/local.ts",
+    "readThroughEOF": [
+      "Both frameworks packages/cli/dist/index.js",
+      "Both frameworks packages/cli/src/local.ts",
+      "Both frameworks scripts/relkit-local.ts",
+      "Candidate packages/cli/src/main.ts",
+      "Candidate packages/cli/src/main-support.ts"
+    ],
+    "equalBaselineCandidateHashes": {
+      "packages/cli/dist/index.js": "0c84b050757f85587e768ab0c34081c3cbee5cb75d2e713ae60a16c26a3b5062",
+      "packages/cli/src/local.ts": "c1a340c38da5fc304133315e902e7d57a2d0004b57a9200402f1bbd4882ad449",
+      "scripts/relkit-local.ts": "ec6f470e2dee3bd20f168217912a99693a26c55ef265f150ac8e674c3567e54e"
+    },
+    "evidence": [
+      "Both dist wrappers select scripts/relkit-local.ts for the disposable external cwd; that launcher ultimately spawns this exact native local.ts dev entry.",
+      "Direct native entry preserves command dev and explicit ports but bypasses wrapper/watcher intermediaries, so cliPid is the server authority's actual native CLI receipt.",
+      "local.ts invokes runCli directly. Workspace link preparation and installer commandRunner are reachable only through create/scaffold callbacks; this dev command invokes neither.",
+      "Native executeInvocation installs SIGINT/SIGTERM handlers on its CLI controller, awaits command completion and removes handlers afterward."
+    ]
+  }
+}

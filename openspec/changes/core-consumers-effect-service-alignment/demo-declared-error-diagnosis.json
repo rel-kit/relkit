@@ -1,0 +1,47 @@
+{
+  "reviewer": "inspector_baseline",
+  "mode": "Read-only candidate source and real native GET queries; no source edits, hosts, or runners",
+  "requestId": "request-3fa13604-1c93-4699-b95e-51c8896959ba",
+  "initialFailure": {
+    "diagnostic": "declared-error HTTP outcome survives response completion",
+    "unchangedGate": "50 polls at 100ms; latest matching errorId request started after native POST initiation",
+    "httpCompletedAt": "2026-10-03T20:00:12.601Z",
+    "nativeStatus": 500,
+    "requestsListCount": 13,
+    "latestRequestCursor": "1002",
+    "storagePersisted": 1105,
+    "storageFailed": 0,
+    "storageDropped": 0
+  },
+  "laterReadOnlyEvidence": {
+    "path": "/_relkit/v1/requests/request-3fa13604-1c93-4699-b95e-51c8896959ba",
+    "capturedAt": "2026-10-03T20:12:04.633588+00:00",
+    "responseBytes": 49792,
+    "responseSha256": "df9959d7f87a0a1b3fef12e3782e79fb0fb82abab5e2458ee32b7d5e1120d228",
+    "startedCursor": "1107",
+    "completedCursor": "1146",
+    "startedAt": "2026-10-03T20:00:12.572Z",
+    "completedAt": "2026-10-03T20:00:12.600Z",
+    "outcome": "declared-error",
+    "errorId": "demo.example-error",
+    "laterListIncludesRequest": true,
+    "laterStoragePersisted": 2145
+  },
+  "causeAssessment": {
+    "file": "packages/observability/src/local/batch-queue-effect.ts",
+    "unchangedVersusBaseline": true,
+    "problem": "schedule stores a timeout handle. Its callback invokes startDrain without retiring that handle. If the timer fires during an existing drain, startDrain returns because draining is true. The expired handle remains non-undefined. If the current drain ends with no queued records, finally does not call schedule. A subsequent tail under256 calls schedule, but timer??= retains the expired handle and never installs a future timeout. Only explicit flush or reaching256 starts another drain.",
+    "relationshipToNativeFailure": "The entire last request starts atcursor1107 above previouslypersisted1105; started/completed/span/log records later became visible with additional browser traffic. This is consistent with stranded application export queue tail, not failed projection, saturation, incorrect declared-error outcome, or failed storage admission.",
+    "qualification": "Exact timer interleaving inferred from implementation and native visibility evidence; deterministic writer/timer regression and unchanged native diagnostic replay still required.",
+    "minimalFix": "Set timer=undefined at the beginning of the timeout callback before startDrain.",
+    "scope": "Latent baseline correctness blocker exposed by materially greater telemetry volume; parent owns shared Observability source fix. Preserve original diagnostic polling/assertions."
+  },
+  "proposedRegression": [
+    "Use fake native timers and hold first native writer behind an explicit barrier.",
+    "Enqueue first and fire timeout to start the held writer.",
+    "Enqueue second during drain and fire its timeout while draining=true.",
+    "Release first writer and join both first/second writes until drain ends.",
+    "Enqueue third below256; advance100ms and assert persistence without explicit flush or close.",
+    "Finally release writer and close queue; no leaked timers or worker promise."
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "author": "/root",
+  "outcome": "accepted",
+  "files": [
+    {
+      "path": "apps/docs/scripts/generate-api.ts",
+      "sha256": "b52228929c6cc00b554b058678b2a7a925f508acbc49780eb596d0dbbba1e594",
+      "lines": 108,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "apps/docs/scripts/check-docgen-examples.ts",
+      "sha256": "0b364be5587c4388d5db20478a105a75e493ea5cbca467f45187e09f8fc8ca4e",
+      "lines": 76,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "apps/docs/scripts/check-docgen-examples.types.ts",
+      "sha256": "507ecbd5206dbae40b6b0b72f0ef62c3698900953c8d7807812bba1f26cc5a9b",
+      "lines": 9,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "apps/docs/tests/docgen-examples.test.ts",
+      "sha256": "c01f190043978c511ec1196d693fe2aea1faaa5343e4f48a56ae273d03ebfc11",
+      "lines": 61,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    },
+    {
+      "path": "apps/docs/docgen.server-examples.json",
+      "sha256": "7cf98e2328638502a5a7cc9929a189ba3eece0ac1591c03c2447b11dafd9170f",
+      "lines": 6,
+      "read": "EOF",
+      "reviewer": "/root/inspector_baseline"
+    }
+  ],
+  "originalCounterpart": "b0f77720764fd61e9872b0995e456014a611ba37:apps/docs/scripts/generate-api.ts read EOF; original pinned tsc/runExamples/native child exit policy retained.",
+  "callersRead": [
+    "apps/docs/scripts/generate.ts",
+    "apps/docs/scripts/documentation-catalog.ts",
+    "apps/docs/docgen.examples.json",
+    "docgen.json",
+    "apps/docs/package.json"
+  ],
+  "findings": [],
+  "assessment": [
+    "Only generated temporary examples modified; original authored source remains unchanged.",
+    "AST transforms ordinary import/export/dynamic-import/require relative literal specifiers only, preserving code and missing bindings; each extracted snippet isolated with export {}.",
+    "Native pinned TypeScript compiler exit propagated unchanged; actual docgen runtime example execution retained after successful compiler check.",
+    "Pinned docgen Core.ts extraction filename, numeric uniqueness prefix, owner path flattening, compiler --project invocation and tsx runtime behavior verified against installed implementation.",
+    "Explicit server-only ES2022 extension preserves default DOM browser config and matches actual Bun native source; caller opts in.",
+    "New tests check restored import syntax and actual pinned compiler success/failure, own temporary directories in finally.",
+    "Pure AST/compiler CLI boundary appropriately remains native tooling; no domain-service refactor or Effect infrastructure added."
+  ],
+  "authorReportedChecks": {
+    "docsStrict": "passed",
+    "checker": "2 regressions, 8 expects, 654 ms",
+    "actualDocgen": "Client and Testing pass; Supervisor 10 examples pass"
+  },
+  "vendorGap": "repos/effect/packages/docgen and installed @effect/docgen test/examples directories absent; installed rc.115 Core.ts implementation, inline documentation and actual execution evidence used.",
+  "scope": "Current pinned emitted snippet forms; does not promise new support for all TypeScript import-type/import-equals constructs or external platform executable formats."
+}

@@ -1,5 +1,11 @@
 import type { RunAvailability, RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import { TASK_KEY_MAX_BYTES } from "@relkit/jobs";
 import { jobError } from "./support.js";
+
+// The supported projection envelope has eight 256-byte scalar components,
+// at most sixfold JSON escaping, and 233 bytes of typed tuple syntax. Public
+// retries retain this identity unchanged; other metadata keeps its scalar limit.
+const ACCEPTANCE_IDENTITY_MAX_BYTES = 8 * TASK_KEY_MAX_BYTES * 6 + 233;
 
 const RUN_STATUSES = new Set([
   "queued",
@@ -53,7 +59,6 @@ export function assertSafeRun(value: unknown): asserts value is RunSnapshot {
   for (const key of [
     "inputHash",
     "inputSchemaHash",
-    "acceptanceIdentity",
     "parentRunId",
     "retryOfRunId",
     "scheduledFor",
@@ -63,6 +68,8 @@ export function assertSafeRun(value: unknown): asserts value is RunSnapshot {
   ]) {
     if (value[key] !== undefined) boundedText(value[key], key);
   }
+  if (value.acceptanceIdentity !== undefined)
+    boundedText(value.acceptanceIdentity, "acceptanceIdentity", ACCEPTANCE_IDENTITY_MAX_BYTES);
   if (
     value.attempt !== undefined &&
     (typeof value.attempt !== "number" || !Number.isSafeInteger(value.attempt) || value.attempt < 0)

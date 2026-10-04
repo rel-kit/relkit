@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { Effect, Fiber, Metric } from "effect";
 import {
   LocalBatchQueueService,
@@ -16,6 +16,7 @@ const record: LocalRecord = {
     level: "info",
     component: "test",
     message: "effect queue",
+    fields: {},
   },
 };
 test("the queue Layer substitutes a writer and records operation metrics", async () => {
@@ -148,4 +149,50 @@ test("a full queue coalesces background drains and retains its metric registry",
   );
   expect(Effect.runSync(queue.stats()).persisted).toBe(512);
   expect(count.count).toBeLessThanOrEqual(3);
+});
+
+test("an expired timer during a drain cannot strand the next small batch", async () => {
+  vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+  let entered!: () => void;
+  let release!: () => void;
+  const writing = new Promise<void>((resolve) => {
+    entered = resolve;
+  });
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const written: string[] = [];
+  const queue = Effect.runSync(
+    makeLocalBatchQueueEffect(
+      async (batch) => {
+        if (written.length === 0) {
+          entered();
+          await gate;
+        }
+        written.push(...batch.map((entry) => entry.key));
+      },
+      () => undefined,
+    ),
+  );
+  try {
+    Effect.runSync(queue.enqueue({ ...record, key: "first" }));
+    await vi.advanceTimersByTimeAsync(100);
+    await writing;
+    Effect.runSync(queue.enqueue({ ...record, key: "second" }));
+    await vi.advanceTimersByTimeAsync(100);
+    release();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(written).toEqual(["first", "second"]);
+    Effect.runSync(queue.enqueue({ ...record, key: "third" }));
+    await vi.advanceTimersByTimeAsync(100);
+    expect(written).toEqual(["first", "second", "third"]);
+    expect(Effect.runSync(queue.stats())).toMatchObject({ persisted: 3, queued: 0 });
+  } finally {
+    release();
+    try {
+      await Effect.runPromise(queue.close());
+    } finally {
+      vi.useRealTimers();
+    }
+  }
 });

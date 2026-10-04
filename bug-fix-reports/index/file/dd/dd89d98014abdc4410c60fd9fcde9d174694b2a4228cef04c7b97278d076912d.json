@@ -1,0 +1,21 @@
+{
+  "key": "packages/client/src/transport-socket.ts",
+  "matches": {
+    "bf-031aa0d1c73949676bc9eaa3": {
+      "id": "bf-031aa0d1c73949676bc9eaa3",
+      "status": "verified",
+      "what": "Automatic RPC clients rejected synchronous WebSocket constructor failures instead of selecting HTTP.",
+      "root_cause": "packages/client/src/transport-socket.ts:33 constructed WebSocket inside Effect.callback without translating synchronous exceptions into its typed error channel; selectAutoTransport catches typed failures only.",
+      "fixed_by": "Catch only constructor exceptions and resume with Effect.fail(cause). Public client replay reaches a real loopback HTTP server twice, reuses selection, and retains direct constructor-error identity; 34 Effect tests and 46 compatibility tests pass.",
+      "files": [
+        "packages/client/src/transport-socket.ts",
+        "packages/client/tests/transport/selection.test.ts",
+        "packages/client/tests/transport/native.test.ts",
+        "packages/client/tests/native/auto-fallback-fixture.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-04T01:49:41+00:00",
+      "report": "bug-fix-reports/issues/bf-031aa0d1c73949676bc9eaa3/report.md"
+    }
+  }
+}

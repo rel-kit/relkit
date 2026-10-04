@@ -1,0 +1,335 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "author": "/root",
+  "capturedUtc": "2026-10-03T18:51:37.678734+00:00",
+  "accepted": true,
+  "findings": [],
+  "files": [
+    {
+      "path": "scripts/jobs-coverage/vitest.config.ts",
+      "sha256": "4e6c8cb9a3b3bb017240ffcb6bb456ecdcbb9db5db6449fdf6c902b1ae90da22",
+      "lines": 52,
+      "author": "/root",
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/jobs-coverage/stryker.config.mjs",
+      "sha256": "a5a5c5c9fb5160728a2fd2d5e7d5b4e90b1648fe3ee1228a0c735f2b0f66b727",
+      "lines": 34,
+      "author": "/root",
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/jobs-coverage/verify-mutation.ts",
+      "sha256": "d3e62d2507c7bd171bf8c6cab9326b5a134728e4fc1b21570aa91b8a0b072e6c",
+      "lines": 77,
+      "author": "/root",
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/jobs-coverage/verify-mutation.types.ts",
+      "sha256": "355b602e0677990ef91a5bc968795651e4663744d609f0a6cdb38b4571c55dea",
+      "lines": 17,
+      "author": "/root",
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "tests/unit/jobs-mutation-gate.test.ts",
+      "sha256": "75a371c151d9e54519a9ec8f5046596037125660a064d08a5ff7d212f84c32e4",
+      "lines": 64,
+      "author": "/root",
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "56e78664a83967cdcc25b5fbcbf8fe7b56395aefa4ce0a370e196e4b9fc16d51",
+      "lines": 106,
+      "author": "/root",
+      "reviewer": "/root/inspector_baseline",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "bun.lock",
+      "sha256": "392e26de57d0ff5d27f5423854e8720953cc2055344890fd2bf1fc9f78ac7622",
+      "lines": 5020,
+      "author": "/root",
+      "reviewer": "/root/inspector_baseline",
+      "read": "Relevant dependency records/current-original delta and native integrity metadata",
+      "accepted": true
+    }
+  ],
+  "originalCounterparts": [
+    {
+      "path": "scripts/jobs-coverage/vitest.config.ts",
+      "sha256": "16a0c2d2248fb4983208d3e4345bdc4474a85c13f67c72d205cfa91c8fb43d49",
+      "read": "EOF"
+    },
+    {
+      "path": "scripts/jobs-coverage/stryker.config.mjs",
+      "sha256": "4fa30db33cb72ce02d19dcd37dbed3106583e167d354449f9f3438967b212e3f",
+      "read": "EOF"
+    },
+    {
+      "path": "scripts/jobs-coverage/verify-mutation.ts",
+      "sha256": "93f8faf2095964b51ce25f5c499408a10881417a1ea1d00a1985c782b29524e2",
+      "read": "EOF"
+    },
+    {
+      "path": "package.json",
+      "sha256": "d3995b1228511da290e8f7b792431d575f6939e4da6fda1fe7a23906489d5e10",
+      "read": "EOF"
+    }
+  ],
+  "resolvedFindings": [
+    "Coverage denominator remaps four moved leaves without lowering90% gate.",
+    "Mutation ranges remap original controller/sharing/polling recovery responsibilities; seven original Jobs targets identical.",
+    "Stale epochs/abort cleanup verifier remaps actual service authority and keeps all six killed-mutant plus Error requirements.",
+    "Missing quality suite path resolves to reviewed Effect quality domain retaining baseline assertion parity.",
+    "New successfulReport named helper meaningful @returns added and final64lines rereadEOF."
+  ],
+  "suiteMap": [
+    {
+      "original": "packages/jobs/tests/task-progress.test.ts",
+      "current": "packages/jobs/tests/task-progress.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/authorization-cursor.test.ts",
+      "current": "packages/jobs/tests/authorization-cursor.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/client.test.ts",
+      "current": "packages/jobs/tests/client.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/trigger-schedule.test.ts",
+      "current": "packages/jobs/tests/trigger-schedule.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/authorization.test.ts",
+      "current": "packages/jobs/tests/authorization.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/authorization-effect.test.ts",
+      "current": "packages/jobs/tests/authorization-effect.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/migration.test.ts",
+      "current": "packages/jobs/tests/migration.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/schedule-reconciliation.test.ts",
+      "current": "packages/jobs/tests/schedule-reconciliation.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/task-policy.test.ts",
+      "current": "packages/jobs/tests/task-policy.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/identity.test.ts",
+      "current": "packages/jobs/tests/identity.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/authoring-boundaries.test.ts",
+      "current": "packages/jobs/tests/authoring-boundaries.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/task-wire.test.ts",
+      "current": "packages/jobs/tests/task-wire.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/resolve-binding.test.ts",
+      "current": "packages/jobs/tests/resolve-binding.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/boundary-policy.test.ts",
+      "current": "packages/jobs/tests/boundary-policy.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/jobs-quality.test.ts",
+      "current": "packages/jobs/tests/jobs-quality.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/trigger-boundaries.test.ts",
+      "current": "packages/jobs/tests/trigger-boundaries.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/jobs/tests/duration-effect.test.ts",
+      "current": "packages/jobs/tests/duration-effect.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/client/jobs-watch.test.ts",
+      "current": "packages/client/tests/compatibility/jobs-watch.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/client/jobs-watch-quality.test.ts",
+      "current": "packages/client/tests/jobs/quality.test.ts",
+      "presentInRealReport": true
+    },
+    {
+      "original": "packages/client/pending.test.ts",
+      "current": "packages/client/tests/compatibility/pending.test.ts",
+      "presentInRealReport": true
+    }
+  ],
+  "checks": {
+    "reviewer": "No runners; full current/original EOF, actual report parse and counts, installed implementation read only.",
+    "authorCoverage": {
+      "files": 69,
+      "tests": 242,
+      "branchesPercent": 91.2,
+      "branchesCovered": 508,
+      "branchesTotal": 557,
+      "threshold": 90,
+      "sourcePaths": 17
+    },
+    "authorMutation": {
+      "mutants": 793,
+      "elapsed": "3m5s",
+      "statuses": {
+        "NoCoverage": 17,
+        "Killed": 501,
+        "Survived": 268,
+        "Timeout": 7
+      },
+      "semanticCategories": [
+        {
+          "name": "tenant checks",
+          "killed": 18,
+          "targeted": 21,
+          "targets": [
+            {
+              "file": "packages/jobs/src/authorization-grant.ts",
+              "start": 26,
+              "end": 37
+            }
+          ]
+        },
+        {
+          "name": "abort cleanup",
+          "killed": 18,
+          "targeted": 30,
+          "targets": [
+            {
+              "file": "packages/client/src/jobs/controller.service.ts",
+              "start": 97,
+              "end": 108
+            },
+            {
+              "file": "packages/client/src/jobs/controller.service.ts",
+              "start": 222,
+              "end": 246
+            }
+          ]
+        },
+        {
+          "name": "stale epochs",
+          "killed": 36,
+          "targeted": 91,
+          "targets": [
+            {
+              "file": "packages/client/src/jobs/controller.service.ts",
+              "start": 90,
+              "end": 93
+            },
+            {
+              "file": "packages/client/src/jobs/controller.service.ts",
+              "start": 111,
+              "end": 142
+            },
+            {
+              "file": "packages/client/src/jobs/controller.service.ts",
+              "start": 201,
+              "end": 220
+            }
+          ]
+        },
+        {
+          "name": "memory conversion",
+          "killed": 29,
+          "targeted": 34,
+          "targets": [
+            {
+              "file": "packages/jobs/src/task-policy-value.ts",
+              "start": 74,
+              "end": 88
+            }
+          ]
+        },
+        {
+          "name": "retry-budget multiplication",
+          "killed": 12,
+          "targeted": 17,
+          "targets": [
+            {
+              "file": "packages/jobs/src/task-policy-value.ts",
+              "start": 113,
+              "end": 116
+            }
+          ]
+        },
+        {
+          "name": "duration conversion",
+          "killed": 22,
+          "targeted": 35,
+          "targets": [
+            {
+              "file": "packages/jobs/src/duration.ts",
+              "start": 60,
+              "end": 88
+            }
+          ]
+        }
+      ],
+      "reportSha256": "cc988d0a82bf9887b8b7e55a1b16408d060e1350bf79d1ab7a374be6f4c15785"
+    },
+    "authorUnit": "3 tests/9 expects pass; code retains individual NoCoverage/category absence, old facade position and Error rejection regressions."
+  },
+  "nativeRunner": {
+    "former": "Installed Bun plugin1.4.0 always spawns bun test with no plugin Vitest alias; native probe shows Bun basic Vitest support but Effect Vitest TestRunner API unavailable.",
+    "current": "Installed official Vitest runner10 source7 files readEOF; project-local createVitest fromvitest/node, real beforeEach task/afterAll suite.meta hooks; relatedfalse retains whole config dry-run; coveringtest filtering, state.errorsSet error propagation and ctx.close join retained.",
+    "pins": "Core10.0.0, officialVitest runner10.0.0, Vitest5.0.1, EffectVitest rc.115. Manifest/lock leaf and publisher sha512 exact.",
+    "deadlineDisposition": "Former bun.timeout30_000 bounded entire native child via setTimeout(beginTermination), never forwarded --timeout. Do not transfer it to a30k per-test limit. Existing Stryker core options.timeout formula/TimeoutDecorator recovery preserved; worker disposal waits2s then native kill, actual Vitest test deadlines not relaxed. Bun-only inspector/smol/RSS/childcap controls have no exact official plugin equivalent; lifecycle byte parity not claimed.",
+    "vendorGaps": "Official published package excludes plugin unit/integration tests; source and implementation comments/examples read, actual pinned native69file242test793mutant run supplies execution evidence; EffectVitest installed runTest ctx.signal/finalizer/TestClock code and prior localEffect reference review retained."
+  },
+  "families": {
+    "domainServicesLayers": "Pure local CLI report/target metadata transforms retain standard collections; no resource-owning domain introduced. Existing Client services are assessed in169-file review.",
+    "nativeBoundaries": "Actual supported Vitest runner lifecycle inspected; compatibility bun:test import alias only, no EffectVitest shim. Core bounded native disposal identified; no hypothetical cleanup assertion.",
+    "types": "Original minimal report fixture contract extracted to owning.types companion; no fabricated schema fields/assertion weakening. Locally scoped categories satisfies shape intentionally pure.",
+    "docs": "Meaningful verifier params/returns/self-containedexample and successfulReport returns present.",
+    "remaining25FamilyDisposition": "All25use-effect families considered through design\u00a76: typed failures/schema/time/refcount/cancellation/ref state/collection traversal/logger/tracer/metrics/native queue/cache/config/stream/fiber/scope/Layer/service/test/provision/runtime/docs/layout. These scripts own pure report metadata and upstream runner configuration; production lifetime families stay in independently reviewed Client ownership services. No new custom Effect manager/test runtime, fallback value or unbounded mutable request cache justified."
+  },
+  "limitations": [
+    "Review accepts source/evidence for local quality repair; material performance risks remain explicit in assembly.",
+    "No cloud or independent heavy runner.",
+    "Bun lock review scopes exact plugin dependency delta, not unrelated previously accepted workspace version/dependency changes."
+  ]
+}

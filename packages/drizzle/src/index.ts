@@ -1,4 +1,5 @@
 export { activateDrizzleService } from "./activation.js";
+export type { DrizzleActivationOptions } from "./activation.types.js";
 export { defineModel } from "./model.js";
 export { defineDrizzleService } from "./service.js";
 export type {

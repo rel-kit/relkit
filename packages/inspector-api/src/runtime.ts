@@ -1,21 +1,26 @@
+import type { RuntimeCollection } from "./runtime.types.js";
+export type { RuntimeCollection } from "./runtime.types.js";
+import { Effect, Schema } from "effect";
+import { observeExecution } from "@relkit/contracts/operation";
+import { runInspectorPromise as runExecutionPromise } from "./native-edge.js";
+import { inspectorNativeJobsExecution as inspectorExecution } from "./jobs/native.service.js";
+import { nativeAttempt, projectionAttempt } from "./native-edge.js";
 import type { JsonValue } from "@relkit/contracts";
-import { eventRuntimeList } from "./events-runtime.js";
-import { getJobRun, listJobRuns } from "./jobs/runs.js";
-import { runtimeJobSummary } from "./jobs/runtime-summary.js";
+import { eventRuntimeListEffect } from "./events-runtime.js";
+import { getJobRunEffect, listJobRunsEffect } from "./jobs/runs.js";
+import { runtimeJobSummaryEffect } from "./jobs/runtime-summary.js";
 import { projectRuntimeMetadata } from "./runtime-metadata.js";
 import { runtimeItemId } from "./runtime-item.js";
 import {
   identity,
   isRecord,
   page,
-  pick,
   resolveCollection,
   resolveItem,
-  safeJson,
-  safeSource,
   type ResolvedActiveGeneration,
 } from "./shared.js";
 
+/** Declared native runtime collection vocabulary, traversed with finite concurrency. */
 export const RUNTIME_COLLECTIONS = Object.freeze([
   "functions",
   "jobs",
@@ -25,161 +30,181 @@ export const RUNTIME_COLLECTIONS = Object.freeze([
   "tools",
   "agents",
 ] as const);
-export type RuntimeCollection = (typeof RUNTIME_COLLECTIONS)[number];
 
-const RUNTIME_FIELDS = [
-  "id",
-  "functionId",
-  "jobId",
-  "instanceId",
-  "eventId",
-  "eventVersion",
-  "deliveryId",
-  "bucketId",
-  "cacheId",
-  "toolId",
-  "agentId",
-  "turnId",
-  "profile",
-  "status",
-  "state",
-  "outcome",
-  "approval",
-  "sideEffect",
-  "invocationId",
-  "requestId",
-  "traceId",
-  "triggerId",
-  "toolCallId",
-  "parentSpanId",
-  "step",
-  "attempt",
-  "acceptedAt",
-  "availableAt",
-  "leaseExpiresAt",
-  "idempotencyExpiresAt",
-  "nextRun",
-  "nextRunAt",
-  "nextFireAt",
-  "schedules",
-  "startedAt",
-  "completedAt",
-  "durationMs",
-  "timeoutMs",
-  "concurrency",
-  "declaredEdges",
-  "observedEdges",
-  "failure",
-  "errorId",
-  "occurredAt",
-  "capabilities",
-  "policy",
-  "schemaVersion",
-  "bytes",
-  "objects",
-  "entries",
-  "hits",
-  "misses",
-  "evictions",
-  "inFlight",
-  "inputBytes",
-  "outputBytes",
-];
-
-export class InspectorRuntimeError extends Error {
+/** Native runtime availability/detail failure with the existing public status envelope. */
+export class InspectorRuntimeError extends Schema.TaggedError<InspectorRuntimeError>()(
+  "InspectorRuntimeError",
+  {
+    code: Schema.Literals(["RELKIT_INSPECTOR_RUNTIME_UNAVAILABLE", "RELKIT_INSPECTOR_NOT_FOUND"]),
+    status: Schema.Literals([404, 503]),
+    message: Schema.String,
+  },
+) {
   constructor(
-    readonly code: "RELKIT_INSPECTOR_RUNTIME_UNAVAILABLE" | "RELKIT_INSPECTOR_NOT_FOUND",
-    readonly status: 404 | 503,
+    code: "RELKIT_INSPECTOR_RUNTIME_UNAVAILABLE" | "RELKIT_INSPECTOR_NOT_FOUND",
+    status: 404 | 503,
   ) {
-    super(code);
+    super({ code, status, message: code });
     this.name = "InspectorRuntimeError";
   }
 }
 
-export async function runtimeSnapshot(generation: ResolvedActiveGeneration): Promise<JsonValue> {
-  const entries = await Promise.all(
-    RUNTIME_COLLECTIONS.map(async (collection) => {
-      if (collection === "jobs" && generation.jobs !== undefined)
-        return [collection, await runtimeJobSummary(generation)] as const;
-      const items = await runtimeItems(generation, collection);
-      return [collection, { count: items.length, items }] as const;
-    }),
-  );
-  return {
-    ...identity(generation),
-    state: Object.fromEntries(entries),
-    ...projectRuntimeMetadata(generation),
-  } as JsonValue;
+/**
+ * Reads declared runtime collections with finite ordered concurrency.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @returns A lazy observed Effect containing the existing runtime snapshot and public metadata.
+ */
+export const runtimeSnapshotEffect = Effect.fn("Inspector.runtimeSnapshot")(
+  function* (generation: ResolvedActiveGeneration) {
+    const entries = yield* Effect.forEach(
+      RUNTIME_COLLECTIONS,
+      (collection) =>
+        Effect.gen(function* () {
+          if (collection === "jobs" && generation.jobs !== undefined)
+            return [collection, yield* runtimeJobSummaryEffect(generation)] as const;
+          const items = yield* runtimeItemsEffect(generation, collection);
+          return [collection, { count: items.length, items }] as const;
+        }),
+      { concurrency: 4 },
+    );
+    return {
+      ...identity(generation),
+      state: Object.fromEntries(entries),
+      ...projectRuntimeMetadata(generation),
+    } as JsonValue;
+  },
+  (effect) => observeExecution("inspector", "runtimeSnapshot", effect),
+);
+
+/**
+ * Reads declared runtime collections with finite ordered concurrency.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @returns The existing runtime snapshot and public metadata.
+ */
+export function runtimeSnapshot(generation: ResolvedActiveGeneration): Promise<JsonValue> {
+  return runExecutionPromise(inspectorExecution, runtimeSnapshotEffect(generation));
 }
 
-export async function runtimeList(
+/**
+ * Lists and paginates the selected native runtime collection.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @returns A lazy observed Effect containing a bounded public runtime page.
+ */
+export const runtimeListEffect = Effect.fn("Inspector.runtimeList")(
+  function* (
+    generation: ResolvedActiveGeneration,
+    collection: RuntimeCollection,
+    request: Request,
+  ) {
+    if (collection === "events") return yield* eventRuntimeListEffect(generation, request);
+    if (collection === "jobs" && generation.jobs !== undefined)
+      return yield* listJobRunsEffect(generation, request);
+    const items = yield* runtimeItemsEffect(generation, collection);
+    return yield* projectionAttempt(
+      () => ({ ...identity(generation), ...page(items, request) }) as JsonValue,
+    );
+  },
+  (effect) => observeExecution("inspector", "runtimeList", effect),
+);
+
+/**
+ * Lists and paginates the selected native runtime collection.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @returns A bounded public runtime page.
+ */
+export function runtimeList(
   generation: ResolvedActiveGeneration,
   collection: RuntimeCollection,
   request: Request,
 ): Promise<JsonValue> {
-  if (collection === "events") return eventRuntimeList(generation, request);
-  if (collection === "jobs" && generation.jobs !== undefined)
-    return listJobRuns(generation, request);
-  const items = await runtimeItems(generation, collection);
-  return { ...identity(generation), ...page(items, request) } as JsonValue;
+  return runExecutionPromise(
+    inspectorExecution,
+    runtimeListEffect(generation, collection, request),
+  );
 }
 
-export async function runtimeDetail(
+/**
+ * Resolves one native runtime record and projects only public evidence.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param id - Declaration or native record identifier selected by the caller.
+ * @returns A lazy observed Effect containing the existing public runtime-detail envelope or not-found failure.
+ */
+export const runtimeDetailEffect = Effect.fn("Inspector.runtimeDetail")(
+  function* (generation: ResolvedActiveGeneration, collection: RuntimeCollection, id: string) {
+    if (collection === "jobs" && generation.jobs !== undefined)
+      return yield* getJobRunEffect(
+        generation,
+        new Request(`http://inspector${requestPath(generation, id)}`),
+        id,
+      );
+    const source = runtimeSource(generation, collection);
+    let item = yield* nativeAttempt(() => resolveItem(source, id));
+    if (item === undefined)
+      item = (yield* runtimeItemsEffect(generation, collection)).find(
+        (value) => runtimeItemId(value) === id,
+      );
+    if (item === undefined)
+      return yield* Effect.fail(new InspectorRuntimeError("RELKIT_INSPECTOR_NOT_FOUND", 404));
+    return { ...identity(generation), state: projectItem(item) } as JsonValue;
+  },
+  (effect) => observeExecution("inspector", "runtimeDetail", effect),
+);
+
+/**
+ * Resolves one native runtime record and projects only public evidence.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @param id - Declaration or native record identifier selected by the caller.
+ * @returns The existing public runtime-detail envelope or not-found failure.
+ */
+export function runtimeDetail(
   generation: ResolvedActiveGeneration,
   collection: RuntimeCollection,
   id: string,
 ): Promise<JsonValue> {
-  if (collection === "jobs" && generation.jobs !== undefined)
-    return getJobRun(generation, new Request(`http://inspector${requestPath(generation, id)}`), id);
-  const source = runtimeSource(generation, collection);
-  let item = await resolveItem(source, id);
-  if (item === undefined)
-    item = (await runtimeItems(generation, collection)).find(
-      (value) => runtimeItemId(value) === id,
-    );
-  if (item === undefined) throw new InspectorRuntimeError("RELKIT_INSPECTOR_NOT_FOUND", 404);
-  return { ...identity(generation), state: projectItem(item) } as JsonValue;
+  return runExecutionPromise(inspectorExecution, runtimeDetailEffect(generation, collection, id));
 }
 
+/**
+ * Constructs the existing native jobs detail path for a run identifier.
+ * @param _generation - Existing compatibility generation parameter; path identity comes from the encoded run ID.
+ * @param id - Declaration or native record identifier selected by the caller.
+ * @returns An encoded jobs detail path.
+ */
 function requestPath(_generation: ResolvedActiveGeneration, id: string): string {
   return `/_relkit/v1/jobs/runs/${encodeURIComponent(id)}`;
 }
 
-async function runtimeItems(
-  generation: ResolvedActiveGeneration,
-  collection: RuntimeCollection,
-): Promise<JsonValue[]> {
-  const source = runtimeSource(generation, collection);
-  if (source === undefined) return [];
-  const value = await resolveCollection(source);
-  if (value === undefined || value === null) return [];
-  const raw = Array.isArray(value)
-    ? value
-    : isRecord(value) && Array.isArray(value.items)
-      ? value.items
-      : isRecord(value)
-        ? [value]
-        : [];
-  return raw.flatMap((item) => {
-    const projected = projectItem(item);
-    return projected === undefined ? [] : [projected];
-  });
-}
+/**
+ * Resolves one native runtime collection and projects records individually.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param collection - Declared graph or runtime collection; arbitrary object paths are not accepted.
+ * @returns A lazy observed Effect containing public records in native source order.
+ */
+const runtimeItemsEffect = Effect.fn("Inspector.runtimeItems")(
+  function* (generation: ResolvedActiveGeneration, collection: RuntimeCollection) {
+    const source = runtimeSource(generation, collection);
+    if (source === undefined) return [];
+    const value = yield* nativeAttempt(() => resolveCollection(source));
+    if (value === undefined || value === null) return [];
+    const raw = Array.isArray(value)
+      ? value
+      : isRecord(value) && Array.isArray(value.items)
+        ? value.items
+        : isRecord(value)
+          ? [value]
+          : [];
+    return raw.flatMap((item) => {
+      const projected = projectItem(item);
+      return projected === undefined ? [] : [projected];
+    });
+  },
+  (effect) => observeExecution("inspector", "runtimeItems", effect),
+);
 
-function runtimeSource(
-  generation: ResolvedActiveGeneration,
-  collection: RuntimeCollection,
-): unknown {
-  if (collection === "cache") return generation.runtime?.cache ?? generation.runtime?.caches;
-  return generation.runtime?.[collection];
-}
-
-function projectItem(value: unknown): JsonValue | undefined {
-  if (!isRecord(value)) return undefined;
-  const result = pick(value, RUNTIME_FIELDS);
-  const source = safeSource(value.source);
-  if (source !== undefined) result.source = source;
-  const id = runtimeItemId(value);
-  if (id !== undefined) result.id = id;
-  return safeJson(result);
-}
+import { runtimeSource, projectItem } from "./runtime-projection.js";

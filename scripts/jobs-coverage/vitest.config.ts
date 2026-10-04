@@ -10,8 +10,12 @@ const jobSources = [
   "packages/client/src/jobs/controller-state.ts",
   "packages/client/src/jobs/controller-support.ts",
   "packages/client/src/jobs/controller.ts",
+  "packages/client/src/jobs/controller.service.ts",
+  "packages/client/src/jobs/feed-registry.service.ts",
+  "packages/client/src/jobs/watch-key.ts",
   "packages/client/src/jobs/watch-feed-loop.ts",
   "packages/client/src/jobs/watch-feed-polling.ts",
+  "packages/client/src/jobs/watch-feed-recovery.ts",
   "packages/client/src/jobs/watch-feed-support.ts",
   "packages/client/src/jobs/watch.ts",
 ];
@@ -22,11 +26,16 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    maxWorkers: 1,
+    disableConsoleIntercept: true,
     include: [
       "packages/jobs/**/*.test.ts",
-      "packages/client/jobs-watch.test.ts",
-      "packages/client/jobs-watch-quality.test.ts",
-      "packages/client/pending.test.ts",
+      "packages/client/tests/compatibility/jobs-watch.test.ts",
+      "packages/client/tests/jobs/quality.test.ts",
+      "packages/client/tests/jobs/support.test.ts",
+      "packages/client/tests/jobs/registry.test.ts",
+      "packages/client/tests/jobs/content.test.ts",
+      "packages/client/tests/compatibility/pending.test.ts",
     ],
     coverage: {
       provider: "v8",

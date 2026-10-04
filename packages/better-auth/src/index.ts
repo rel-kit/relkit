@@ -8,6 +8,8 @@ import { createUnboundIdentity } from "@relkit/invocation";
 import type { RawHttpHandler } from "@relkit/routes";
 import { betterAuth, type Auth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter, type DrizzleAdapterConfig } from "better-auth/adapters/drizzle";
+import type { BetterAuthActivationOptions } from "./activation.types.js";
+export type { BetterAuthActivationOptions } from "./activation.types.js";
 
 export const BETTER_AUTH_HANDLER = Symbol.for("relkit.better-auth.handler");
 const BETTER_AUTH_RUNTIME = Symbol.for("relkit.better-auth.runtime");
@@ -94,6 +96,16 @@ export function defineBetterAuthService<const Options extends BetterAuthServiceO
   return Object.freeze(descriptor) as BetterAuthServiceDescriptor<Options>;
 }
 
+/**
+ * Binds native authentication to a database and its declared ALL route.
+ * @typeParam Options - Configuration retained by the descriptor.
+ * @typeParam Database - Declaration supplying its native client and schema.
+ * @param service - Lazy auth declaration.
+ * @param database - Acquired database whose owner controls disposal.
+ * @param basePath - Derived ALL route prefix.
+ * @param options - Isolation leaves the descriptor's shared handler untouched.
+ * @returns Native auth; isolated owners must mount its handler within their application.
+ */
 export async function activateBetterAuthService<
   Options extends BetterAuthServiceOptions,
   Database extends DrizzleServiceDescriptor<any, any, any, any>,
@@ -101,11 +113,12 @@ export async function activateBetterAuthService<
   service: BetterAuthServiceDescriptor<Options>,
   database: DrizzleActivation<Database>,
   basePath: string,
+  options: BetterAuthActivationOptions = {},
 ): Promise<Auth<any>> {
   const runtime = runtimeOf(service);
-  if (runtime.activation !== undefined) return runtime.activation;
+  if (options.isolated !== true && runtime.activation !== undefined) return runtime.activation;
   validateBasePath(basePath);
-  runtime.activation = Promise.resolve().then(() => {
+  const activation = Promise.resolve().then(() => {
     const drizzle = drizzleRuntimeOf(databaseServiceOf(database));
     const { drizzle: adapterOptions, ...options } = runtime.options;
     return betterAuth({
@@ -118,10 +131,12 @@ export async function activateBetterAuthService<
       }),
     });
   });
-  runtime.activation.catch(() => {
-    runtime.activation = undefined;
+  if (options.isolated === true) return activation;
+  runtime.activation = activation;
+  activation.catch(() => {
+    if (runtime.activation === activation) runtime.activation = undefined;
   });
-  return runtime.activation;
+  return activation;
 }
 
 function runtimeOf<Options extends BetterAuthServiceOptions>(

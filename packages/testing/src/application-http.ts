@@ -2,6 +2,13 @@ import type { TestRoute } from "./application-routes.js";
 import { InvocationValidationError } from "@relkit/engine";
 import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
 import type { TestRuntime } from "./runtime.js";
+/**
+ * Dispatches a matched route through existing engine validation and error mapping.
+ * @param routes - Loaded native filesystem routes.
+ * @param runtime - Acquired deterministic invocation runtime.
+ * @param request - Native operation input carrying explicit identity and execution context.
+ * @returns The native HTTP response with the established status and error envelope.
+ */
 export async function handleTestRequest(
   routes: readonly TestRoute[],
   runtime: TestRuntime,
@@ -71,6 +78,16 @@ export async function handleTestRequest(
     );
   }
 }
+
+/**
+ * Projects declared HTTP fields into the function input without exposing Request.
+ * @param mapping - Declared HTTP field projection policy.
+ * @param url - Native request URL or URL pathname.
+ * @param params - Matched route parameter values.
+ * @param request - Native operation input carrying explicit identity and execution context.
+ * @param body - Previously decoded native request body.
+ * @returns The input object consumed by the descriptor validator.
+ */
 function mapInput(
   mapping: unknown,
   url: URL,
@@ -113,6 +130,12 @@ function mapInput(
   if (mapping.kind === "transform") return mapInput(mapping.value, url, params, request, body);
   throw new TypeError(`Unsupported test HTTP mapping: ${String(mapping.kind)}`);
 }
+
+/**
+ * Reads request content according to its native content type.
+ * @param request - Native operation input carrying explicit identity and execution context.
+ * @returns Parsed JSON or text; absent or invalid content follows the existing route contract.
+ */
 async function readBody(request: Request): Promise<unknown> {
   if (request.headers.get("content-type")?.startsWith("multipart/form-data")) {
     return request.formData();
@@ -125,6 +148,13 @@ async function readBody(request: Request): Promise<unknown> {
     return text;
   }
 }
+
+/**
+ * Selects and decodes one named request cookie.
+ * @param header - Native Cookie header value.
+ * @param name - Declared field or policy name used by existing validation errors.
+ * @returns The decoded value or undefined when absent.
+ */
 function cookie(header: string | null, name: string): string | undefined {
   const encoded = header
     ?.split(";")
@@ -138,6 +168,13 @@ function cookie(header: string | null, name: string): string | undefined {
     return encoded;
   }
 }
+
+/**
+ * Matches a filesystem route pattern against a URL pathname.
+ * @param path - Native module path or route path being resolved.
+ * @param url - Native request URL or URL pathname.
+ * @returns Captured path fields or undefined when the route does not match.
+ */
 function match(path: string, url: URL): Record<string, string | readonly string[]> | undefined {
   const expected = path.split("/").filter(Boolean);
   const actual = url.pathname.split("/").filter(Boolean);
@@ -157,9 +194,22 @@ function match(path: string, url: URL): Record<string, string | readonly string[
   }
   return actual.length === expected.length ? params : undefined;
 }
+
+/**
+ * Selectively reads one field after checking its containing record.
+ * @param value - Candidate native value checked or detached by this helper.
+ * @param name - Declared field or policy name used by existing validation errors.
+ * @returns The requested field value or undefined.
+ */
 function valueAt(value: unknown, name: string): unknown {
   return isRecord(value) ? value[name] : undefined;
 }
-function isRecord(value: unknown): value is Record<string, any> {
+
+/**
+ * Checks the shallow non-array object shape before selective property access.
+ * @param value - Candidate native value checked or detached by this helper.
+ * @returns True for a non-null non-array object.
+ */
+function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

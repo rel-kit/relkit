@@ -1,14 +1,14 @@
-export interface RelkitKeyScope {
-  readonly backend: string;
-  readonly applicationId: string;
-  readonly identityScope: string;
-  readonly sessionEpoch: string;
-  readonly identityKey: string | null | undefined;
-  readonly publicFingerprint: string;
-  readonly environment?: string;
-  readonly jobsProtocolVersion?: number;
-}
+import type { RelkitKeyScope, RelkitJobKeyOptions } from "./keys.types.js";
+export type { RelkitKeyScope, RelkitJobKeyOptions } from "./keys.types.js";
 
+/**
+ * Constructs the canonical scope-complete finite query or mutation key.
+ * @param scope - Complete identity scope.
+ * @param kind - Existing operation or event kind.
+ * @param procedureId - Existing procedure id supplied by the owning operation.
+ * @param input - Exact transmitted request input.
+ * @returns The canonical scope-complete finite operation key.
+ */
 export function relkitKey(
   scope: RelkitKeyScope,
   kind: "query" | "mutation" | "stream" | "agent" | "channel",
@@ -31,15 +31,14 @@ export function relkitKey(
   ] as const;
 }
 
-export interface RelkitJobKeyOptions {
-  readonly jobId: string;
-  readonly runId?: string;
-  readonly projection?: string;
-  readonly schemaVersion?: string;
-  readonly environment?: string;
-  readonly jobsProtocolVersion?: number;
-}
-
+/**
+ * Constructs the canonical scope-complete job observation or mutation key.
+ * @param scope - Complete identity scope.
+ * @param operation - One native boundary operation.
+ * @param options - Existing public configuration and authority.
+ * @param input - Exact transmitted request input.
+ * @returns The canonical scope-complete job operation key.
+ */
 export function relkitJobKey(
   scope: RelkitKeyScope,
   operation: "trigger" | "run" | "cancel" | "retry",
@@ -66,6 +65,11 @@ export function relkitJobKey(
   ] as const;
 }
 
+/**
+ * Normalizes nested object key order while retaining array order and scalar values.
+ * @param value - Original input or payload; its identity is retained where required.
+ * @returns The value with object keys sorted and array order preserved.
+ */
 function canonical(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonical);
   if (value === null || typeof value !== "object") return value;

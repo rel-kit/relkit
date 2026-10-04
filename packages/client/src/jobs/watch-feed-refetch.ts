@@ -3,6 +3,16 @@ import { authoritativeFrame } from "./reconcile.js";
 import type { JobWatchOptions } from "./types.js";
 import { withAfter } from "./watch-feed-support.js";
 
+/**
+ * Owns a temporary authoritative read while respecting borrowed cancellation.
+ * @typeParam Run - Application-specific observed run payload.
+ * @param client - Borrowed generated procedure client.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @param lastCursor - Existing last cursor supplied by the owning operation.
+ * @param signal - Borrowed caller cancellation signal.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 export async function refetchSharedWatchFeed<Run>(
   client: unknown,
   name: string,

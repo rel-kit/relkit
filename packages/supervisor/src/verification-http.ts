@@ -1,54 +1,69 @@
 import { API_BASE_PATH } from "@relkit/contracts";
-import type { CandidateProbeResponse, CandidateVerificationOptions } from "./verification-types.js";
-import { CandidateVerificationError } from "./verification-types.js";
+import { Clock, Effect } from "effect";
+import type { CandidateProbeResponse, CandidateVerificationOptions } from "./verification.types.js";
+import { CandidateVerificationError } from "./verification-error.js";
+import { rejectVerification } from "./verification-errors.js";
 
-/** Performs one bounded v1 probe without allowing a stalled backend to block activation. */
-export async function requestProbe(
+/**
+ * Performs one bounded probe with a real native signal for both fetch and body consumption.
+ * @param options - Candidate identity and explicit request cancellation.
+ * @param path - Declaration-owned internal endpoint.
+ * @param deadline - Shared absolute deadline from the injected Clock.
+ * @param fetcher - Acquired native platform boundary.
+ * @returns A valid object response, or undefined for unavailable/expired probes.
+ */
+export function requestProbe(
   options: CandidateVerificationOptions,
   path: string,
   deadline: number,
-): Promise<CandidateProbeResponse | undefined> {
-  if (options.signal?.aborted)
-    throw options.signal.reason ?? new Error("Verification was aborted.");
-  const remaining = deadline - Date.now();
-  if (remaining <= 0) return undefined;
-  const controller = new AbortController();
-  const forwardAbort = () => controller.abort(options.signal?.reason);
-  options.signal?.addEventListener("abort", forwardAbort, { once: true });
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const fetcher = options.fetch ?? fetch;
-  const url = `http://${options.hostname ?? "127.0.0.1"}:${options.candidate.port}${API_BASE_PATH}${path}`;
-  const responsePromise: Promise<CandidateProbeResponse | undefined> = fetcher(url, {
-    signal: controller.signal,
-  })
-    .then(async (response): Promise<CandidateProbeResponse | undefined> => {
-      const payload: unknown = await response.json();
-      if (!isRecord(payload))
-        throw new CandidateVerificationError(
-          "RELKIT_CANDIDATE_RESPONSE_INVALID",
-          "Candidate health response must be a JSON object.",
+  fetcher: typeof fetch,
+): Effect.Effect<CandidateProbeResponse | undefined, unknown> {
+  return Effect.gen(function* () {
+    if (options.signal?.aborted)
+      return yield* Effect.fail(options.signal.reason ?? new Error("Verification was aborted."));
+    const remaining = deadline - (yield* Clock.currentTimeMillis);
+    if (remaining <= 0) return undefined;
+    return yield* Effect.scoped(
+      Effect.gen(function* () {
+        const controller = yield* Effect.acquireRelease(
+          Effect.sync(() => new AbortController()),
+          (value) => Effect.sync(() => value.abort()),
         );
-      return { response, payload };
-    })
-    .catch((error) => {
-      if (error instanceof CandidateVerificationError) throw error;
-      return undefined;
-    });
-  const timeoutPromise = new Promise<undefined>((resolve) => {
-    timer = setTimeout(() => {
-      controller.abort();
-      resolve(undefined);
-    }, remaining);
+        const url = `http://${options.hostname ?? "127.0.0.1"}:${options.candidate.port}${API_BASE_PATH}${path}`;
+        const response = Effect.tryPromise({
+          try: async (signal) => {
+            const response = await fetcher(url, {
+              signal: AbortSignal.any([
+                signal,
+                controller.signal,
+                ...(options.signal === undefined ? [] : [options.signal]),
+              ]),
+            });
+            const payload: unknown = await response.json();
+            if (!isRecord(payload))
+              throw new CandidateVerificationError(
+                "RELKIT_CANDIDATE_RESPONSE_INVALID",
+                "Candidate health response must be a JSON object.",
+              );
+            return { response, payload };
+          },
+          catch: (error) => error,
+        }).pipe(
+          Effect.catch((error) =>
+            error instanceof CandidateVerificationError
+              ? rejectVerification(error)
+              : Effect.succeed(undefined),
+          ),
+        );
+        return yield* Effect.raceFirst(response, Effect.as(Effect.sleep(remaining), undefined));
+      }),
+    );
   });
-  try {
-    return await Promise.race([responsePromise, timeoutPromise]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-    options.signal?.removeEventListener("abort", forwardAbort);
-    controller.abort();
-  }
 }
 
+/** Checks only the decoded envelope shape.
+ * @param value - Native JSON result. @returns Whether it is an object record.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

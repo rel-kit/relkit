@@ -11,8 +11,7 @@ import type {
   AgentContent,
   AgentMessage,
   AgentProgress,
-  AgentToolCall,
-} from "./agent-hook-types.js";
+} from "./agent-hook-types.types.js";
 import { upsertMessage, upsertProgress, upsertTool } from "./agent-observation-index.js";
 import {
   clientEventProjection,
@@ -21,6 +20,10 @@ import {
   updateSnapshotProjection,
 } from "./agent-execution-observation.js";
 
+/**
+ * Creates empty indexed browser agent content without native resources.
+ * @returns Empty browser content with independent identity indexes.
+ */
 export function emptyAgentContent(): AgentContent {
   return {
     timeline: [],
@@ -34,10 +37,22 @@ export function emptyAgentContent(): AgentContent {
   };
 }
 
+/**
+ * Projects authoritative messages into indexed browser content.
+ * @param messages - Authoritative canonical messages.
+ * @returns Indexed content projected from the authoritative messages.
+ */
 export function agentContentFromMessages(messages: readonly BrowserMessage[]): AgentContent {
   return messages.reduce(upsertBrowserMessage, emptyAgentContent());
 }
 
+/**
+ * Applies one canonical agent observation while preserving lifecycle and journal authority.
+ * @typeParam Output - Declared successful output payload.
+ * @param current - Current external-store state.
+ * @param event - Canonical observation event.
+ * @returns Agent state updated from one canonical observation.
+ */
 export function applyAgentEvent<Output>(
   current: AgentBase<Output>,
   event: AgentClientEvent,
@@ -81,11 +96,24 @@ export function applyAgentEvent<Output>(
   };
 }
 
+/**
+ * Projects an authoritative terminal outcome into the existing browser state.
+ * @typeParam Output - Declared successful output payload.
+ * @param current - Current external-store state.
+ * @param value - Original input or payload; its identity is retained where required.
+ * @returns Agent state with the authoritative terminal outcome.
+ */
 function applyTerminal<Output>(current: AgentBase<Output>, value: unknown): AgentBase<Output> {
   const { output: _output, waiting: _waiting, ...rest } = current;
   return { ...rest, ...terminalProjection<Output>(value) };
 }
 
+/**
+ * Projects canonical message parts into stable browser message identity.
+ * @param content - Current indexed browser content.
+ * @param message - Authoritative canonical browser message and its projected parts.
+ * @returns Content with canonical message parts projected into stable identity.
+ */
 function upsertBrowserMessage(content: AgentContent, message: BrowserMessage): AgentContent {
   let next = content;
   if (message.role !== "tool") {
@@ -120,6 +148,12 @@ function upsertBrowserMessage(content: AgentContent, message: BrowserMessage): A
   return next;
 }
 
+/**
+ * Projects an execution event into the existing indexed tool state.
+ * @param content - Current indexed browser content.
+ * @param event - Canonical observation event.
+ * @returns Content with the execution event projected into tool state.
+ */
 function upsertToolEvent(content: AgentContent, event: AgentToolEvent): AgentContent {
   const prior = content.toolCallsById.get(event.toolCallId);
   return upsertTool(content, {
@@ -151,6 +185,13 @@ const toolEventStates = {
   "tool-denied": "denied",
 } satisfies Record<AgentToolEvent["kind"], ToolPartState>;
 
+/**
+ * Adds or replaces a tool part without changing unrelated browser message state.
+ * @param content - Current indexed browser content.
+ * @param message - Authoritative canonical browser message owning the tool part.
+ * @param part - Canonical message part.
+ * @returns Content with the corresponding tool part updated.
+ */
 function upsertToolPart(
   content: AgentContent,
   message: BrowserMessage,
@@ -176,6 +217,12 @@ function upsertToolPart(
   });
 }
 
+/**
+ * Projects existing progress scope into a stable browser progress identity.
+ * @param value - Original input or payload; its identity is retained where required.
+ * @param scope - Complete identity scope.
+ * @returns Progress with stable scope and browser identity.
+ */
 function scopedProgress(
   value: Omit<AgentProgress, "scope" | "toolCallId" | "toolId">,
   scope: AgentProgressScope,
@@ -183,6 +230,11 @@ function scopedProgress(
   return scope.scope === "tool" ? { ...value, ...scope } : { ...value, scope: "run" };
 }
 
+/**
+ * Checks whether a canonical message part carries text.
+ * @param part - Canonical message part.
+ * @returns Whether the canonical part contains text.
+ */
 function isTextPart(
   part: BrowserMessagePart,
 ): part is Extract<BrowserMessagePart, { readonly kind: "text" }> {

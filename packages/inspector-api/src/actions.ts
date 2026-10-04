@@ -1,133 +1,33 @@
-import { API_BASE_PATH, API_VERSION, PROTOCOL_VERSION, type MaybePromise } from "@relkit/contracts";
+import type { InspectorActionName, InspectorActionEndpointOptions } from "./actions.types.js";
+export type {
+  InspectorActionName,
+  InspectorFunctionActionRequest,
+  InspectorFunctionActionService,
+  InspectorJobActionRequest,
+  InspectorJobActionService,
+  InspectorEventActionRequest,
+  InspectorEventActionService,
+  InspectorToolApprovalState,
+  InspectorToolApprovalRecord,
+  InspectorToolApprovalRequest,
+  InspectorToolApprovalService,
+  InspectorAuditRecord,
+  InspectorActionServices,
+  InspectorActionEndpointOptions,
+  InspectorActionRequest,
+} from "./actions.types.js";
+import { API_BASE_PATH } from "@relkit/contracts";
 import { errorResponse, json, negotiate } from "./router-utils.js";
-import { executeInspectorAction, parseInspectorAction } from "./actions-runtime.js";
+import { parseInspectorActionEffect } from "./actions-runtime.js";
 import type { InspectorActionResult } from "./actions-runtime.js";
 import { InspectorActionError } from "./actions-errors.js";
-import type { InspectorMode, ResolvedActiveGeneration } from "./shared.js";
 import type { Context, Hono } from "hono";
-export type InspectorActionName =
-  | "function.invoke"
-  | "job.retry"
-  | "job.cancel"
-  | "event.retry"
-  | "event.cancel"
-  | "tool.approve"
-  | "tool.deny";
+import { Effect, Layer, ManagedRuntime } from "effect";
+import { runInspectorPromise as runExecutionPromise } from "./native-edge.js";
+import { InspectorControls, inspectorControlsLayer } from "./controls.service.js";
+import { inspectorLoggerLayer, registerInspectorOwner } from "./execution.js";
 
-export interface InspectorFunctionActionRequest {
-  readonly generationId: string;
-  readonly graphHash: string;
-  readonly functionId: string;
-  readonly input: unknown;
-  readonly idempotencyKey: string;
-  readonly signal?: AbortSignal;
-}
-
-export interface InspectorFunctionActionService {
-  readonly invoke: (request: InspectorFunctionActionRequest) => MaybePromise<unknown>;
-  readonly exists?: (functionId: string) => MaybePromise<boolean>;
-}
-
-export interface InspectorJobActionRequest {
-  readonly protocol: "relkit.jobs.admin";
-  readonly version: typeof PROTOCOL_VERSION;
-  readonly instanceId: string;
-  readonly reason?: string;
-}
-
-export interface InspectorJobActionService {
-  readonly protocol?: string;
-  readonly version?: number;
-  readonly status?: (instanceId: string) => MaybePromise<unknown>;
-  readonly retry?: (request: InspectorJobActionRequest) => MaybePromise<unknown>;
-  readonly cancel?: (request: InspectorJobActionRequest) => MaybePromise<unknown>;
-}
-
-export interface InspectorEventActionRequest {
-  readonly protocol: "relkit.events.admin";
-  readonly version: typeof PROTOCOL_VERSION;
-  readonly deliveryId: string;
-  readonly reason?: string;
-}
-
-export interface InspectorEventActionService {
-  readonly protocol?: string;
-  readonly version?: number;
-  readonly status?: (deliveryId: string) => MaybePromise<unknown>;
-  readonly retry?: (request: InspectorEventActionRequest) => MaybePromise<unknown>;
-  readonly cancel?: (request: InspectorEventActionRequest) => MaybePromise<unknown>;
-}
-
-export type InspectorToolApprovalState = "pending" | "approved" | "denied";
-
-export interface InspectorToolApprovalRecord {
-  readonly invocationId: string;
-  readonly toolCallId: string;
-  readonly toolId: string;
-  readonly state: InspectorToolApprovalState;
-  readonly sideEffect?: string;
-  readonly policy?: string;
-  readonly required?: boolean;
-}
-
-export interface InspectorToolApprovalRequest {
-  readonly invocationId: string;
-  readonly toolCallId: string;
-  readonly toolId: string;
-  readonly idempotencyKey: string;
-}
-
-export interface InspectorToolApprovalService {
-  readonly get: (
-    request: Omit<InspectorToolApprovalRequest, "idempotencyKey">,
-  ) => MaybePromise<InspectorToolApprovalRecord | undefined>;
-  readonly approve?: (request: InspectorToolApprovalRequest) => MaybePromise<unknown>;
-  readonly deny?: (request: InspectorToolApprovalRequest) => MaybePromise<unknown>;
-}
-
-export interface InspectorAuditRecord {
-  readonly protocol: "relkit.inspector.actions";
-  readonly version: typeof API_VERSION;
-  readonly actionId: string;
-  readonly action: InspectorActionName;
-  readonly targetId: string;
-  readonly generationId: string;
-  readonly graphHash: string;
-  readonly environment: InspectorMode;
-  readonly idempotencyKey: string;
-  readonly outcome: "applied" | "rejected";
-  readonly requestedAt: string;
-  readonly errorCode?: string;
-  readonly reason?: string;
-}
-
-export interface InspectorActionServices {
-  readonly functions?: InspectorFunctionActionService;
-  readonly invokeFunction?: InspectorFunctionActionService["invoke"];
-  readonly jobs?: InspectorJobActionService;
-  readonly events?: InspectorEventActionService;
-  readonly approvals?: InspectorToolApprovalService;
-  readonly tools?: { readonly approvals?: InspectorToolApprovalService };
-  readonly audit?: (record: InspectorAuditRecord) => MaybePromise<void>;
-}
-
-export interface InspectorActionEndpointOptions {
-  readonly mode: InspectorMode;
-  readonly enabled: boolean;
-  readonly authorize: (request: Request) => MaybePromise<boolean>;
-  readonly getGeneration: () => Promise<ResolvedActiveGeneration | undefined>;
-}
-
-export interface InspectorActionRequest {
-  readonly action: InspectorActionName;
-  readonly targetId: string;
-  readonly generationId: string;
-  readonly graphHash: string;
-  readonly idempotencyKey: string;
-  readonly body: Record<string, unknown>;
-  readonly signal?: AbortSignal;
-}
-
+/** Established native action route paths used by the synchronous Hono installer. */
 export const INSPECTOR_ACTION_PATHS = Object.freeze([
   `${API_BASE_PATH}/actions/functions/:id/invoke`,
   `${API_BASE_PATH}/actions/jobs/:id/retry`,
@@ -139,15 +39,27 @@ export const INSPECTOR_ACTION_PATHS = Object.freeze([
   `${API_BASE_PATH}/actions/tools/:id/deny`,
 ] as const);
 
+/**
+ * Installs native Hono action edges backed by one scoped control owner.
+ * @param app - Hono router receiving the synchronous route registrations.
+ * @param options - Configured native authorities and ownership policy.
+ * @param suppliedOwner - Optional reused router owner; absent owners are acquired once during installation.
+ * @returns No value; the supplied or acquired owner is reused across requests.
+ */
 export function installInspectorActionEndpoints(
   app: Hono,
   options: InspectorActionEndpointOptions,
+  suppliedOwner?: ManagedRuntime.ManagedRuntime<InspectorControls, never>,
 ): void {
   if (!options.enabled) return;
+  const owner =
+    suppliedOwner ??
+    ManagedRuntime.make(Layer.mergeAll(inspectorControlsLayer, inspectorLoggerLayer()));
+  registerInspectorOwner(app, owner);
   const idempotency = new Map<string, Promise<InspectorActionResult>>();
   const bind = (path: string, action: InspectorActionName, decision?: "approve" | "deny") =>
     app.post(path, async (context: Context) =>
-      handle(context, action, decision, options, idempotency),
+      handle(context, action, decision, options, idempotency, owner),
     );
   bind(INSPECTOR_ACTION_PATHS[0], "function.invoke");
   bind(INSPECTOR_ACTION_PATHS[1], "job.retry");
@@ -159,27 +71,46 @@ export function installInspectorActionEndpoints(
   bind(INSPECTOR_ACTION_PATHS[7], "tool.deny", "deny");
 }
 
+/**
+ * Authorizes a native action request before parsing or reading its active generation.
+ * @param context - Native request context retained only for this ingress operation.
+ * @param action - Declared operation selected by the route.
+ * @param decision - Explicit approval decision from the declared route, when available.
+ * @param options - Configured native authorities and ownership policy.
+ * @param idempotency - Authoritative receipt map retained without expiration or capacity eviction.
+ * @param owner - Reused service runtime supplied by the installing router.
+ * @returns The existing JSON action envelope and HTTP status.
+ */
 async function handle(
   context: Context,
   action: InspectorActionName,
   decision: "approve" | "deny" | undefined,
   options: InspectorActionEndpointOptions,
   idempotency: Map<string, Promise<InspectorActionResult>>,
+  owner: ManagedRuntime.ManagedRuntime<InspectorControls, never>,
 ): Promise<Response> {
   if (!(await options.authorize(context.req.raw)))
     return json({ error: "RELKIT_INSPECTOR_UNAUTHORIZED" }, 401, { "www-authenticate": "Bearer" });
   try {
     negotiate(context.req.raw);
     const body = await readBody(context.req.raw);
-    const request = parseInspectorAction(
-      action,
-      context.req.param("id"),
-      body,
-      context.req.raw.headers,
-      context.req.raw.signal,
-      decision,
+    const request = await runExecutionPromise(
+      owner,
+      parseInspectorActionEffect(
+        action,
+        context.req.param("id"),
+        body,
+        context.req.raw.headers,
+        context.req.raw.signal,
+        decision,
+      ),
     );
-    const result = await executeInspectorAction(request, { ...options, idempotency });
+    const result = await runExecutionPromise(
+      owner,
+      Effect.flatMap(InspectorControls, (service) =>
+        service.execute(request, { ...options, idempotency }),
+      ),
+    );
     return json(result.body, result.status);
   } catch (error) {
     if (error instanceof InspectorActionError)
@@ -188,6 +119,11 @@ async function handle(
   }
 }
 
+/**
+ * Reads the native request body once and validates the existing object-body contract.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @returns Parsed object fields or the existing invalid-body failure.
+ */
 async function readBody(request: Request): Promise<Record<string, unknown>> {
   try {
     const value: unknown = await request.json();

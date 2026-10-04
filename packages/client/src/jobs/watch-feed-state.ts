@@ -1,17 +1,24 @@
+import type { WatchFeedState } from "./watch-feed-state.types.js";
 import type { RunWatchFrame } from "@relkit/contracts/jobs";
 import { isFrame } from "./watch-feed-support.js";
+export type { WatchFeedState } from "./watch-feed-state.types.js";
 
-export interface WatchFeedState<Run> {
-  readonly lastFrame: RunWatchFrame<Run> | undefined;
-  readonly lastCursor: string | undefined;
-  readonly lastSequence: number;
-  readonly nativeEpoch: string | undefined;
-}
-
+/**
+ * Creates the initial empty observation cache with no native resources.
+ * @typeParam Run - Application-specific observed run payload.
+ * @returns An empty frame cache with no retained cursor.
+ */
 export function emptyWatchFeedState<Run>(): WatchFeedState<Run> {
   return { lastFrame: undefined, lastCursor: undefined, lastSequence: -1, nativeEpoch: undefined };
 }
 
+/**
+ * Applies epoch changes and duplicate suppression without losing retained cursor authority.
+ * @typeParam Run - Application-specific observed run payload.
+ * @param state - Current owned state.
+ * @param value - Original input or payload; its identity is retained where required.
+ * @returns The updated cache and accepted frame, if any.
+ */
 export function acceptWatchFrame<Run>(
   state: WatchFeedState<Run>,
   value: unknown,

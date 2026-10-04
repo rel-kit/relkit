@@ -1,0 +1,389 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "capturedUtc": "2026-10-03T20:54:24.120803+00:00",
+  "result": "accepted assembled source coverage and final native evidence; no actionable finding",
+  "reviewerExecutedRunners": false,
+  "repositoryEdits": false,
+  "scope": "Final phase8/9/10 read-only assembled cross-package and evidence audit. Root retains strict OpenSpec validation/task finalization authority.",
+  "counts": {
+    "laneTs": 518,
+    "changedCurrentTsTsx": 556,
+    "deletedOriginalTs": 52,
+    "reviewMapCurrent": 564,
+    "laneOriginalCounterparts": 219,
+    "qualityTs": 4,
+    "qualityMjs": 1,
+    "lateScopedOriginalCounterparts": 3,
+    "totalOriginalCounterparts": 222
+  },
+  "sourceHashes": {
+    "mappedCurrent": 564,
+    "allExact": true,
+    "changedTsTsx": 556,
+    "deletedOriginals": 52,
+    "missing": [],
+    "selfReview": [],
+    "originals": {
+      "lane": 219,
+      "lateScoped": 3,
+      "total": 222
+    },
+    "finalPhase10TsChanges": 0
+  },
+  "guidance": "All25 use-effect families assessed in independent lane/support ledgers and late queue/Hono dispositions; authored source and original counterparts EOF, selective native contracts/pure boundaries justified. No guidance/config/assertion weakened. Sparse upstream core implementation/tests gap retained with installed rc.115 evidence and targeted regressions.",
+  "reviewReferences": [
+    {
+      "path": "/tmp/relkit-assembly-independent-review.json",
+      "sha256": "b2c884d8c78b999a513d1da68e2737f376a276f8a28fe642345647f0c98b51c0",
+      "bytes": 319620
+    },
+    {
+      "path": "/tmp/relkit-demo-final-preservation-audit.json",
+      "sha256": "4d22f80993b0206bc59437fb1efbb003184148d6864d59ac8c91561275c72a3e",
+      "bytes": 53961
+    },
+    {
+      "path": "/tmp/relkit-batch-timer-independent-review.json",
+      "sha256": "b57f7cd833329b5249f30e3598adc0cc2247249bdb8cac9770ba2c4355b8e5df",
+      "bytes": 7562
+    },
+    {
+      "path": "/tmp/relkit-runtime-hono-native-projection-independent-review.json",
+      "sha256": "a849aa52eee42c234a788439d0e6c2683565882942005a6d2fb11e9aed0a9404",
+      "bytes": 9736
+    },
+    {
+      "path": "/tmp/relkit-hono-projection-assembly-secondary-review.json",
+      "sha256": "3eba7f18bdf267f6ddeef700b848aafe0c6819cdd6526311ef1e399d76841e57",
+      "bytes": 6295
+    },
+    {
+      "path": "/tmp/relkit-composed-telemetry-independent-review.json",
+      "sha256": "cc466880db9a9f8b9aa667fddb83b46082b48a069a5650a79a2c1fb843fff784",
+      "bytes": 6868
+    },
+    {
+      "path": "/tmp/relkit-composed-resolver-independent-review.json",
+      "sha256": "c5b3d04caa8c1491b62ddecf9a746236eaa160f84e2390a9d147a3653e4ce4dc",
+      "bytes": 1824
+    },
+    {
+      "path": "/tmp/relkit-job-held-probe-independent-review.json",
+      "sha256": "96e081f56ed4254a44b5fc71305c168f7799bd64693f9a989974c0c085958ae2",
+      "bytes": 7875
+    },
+    {
+      "path": "/tmp/relkit-agent-held-probe-independent-review.json",
+      "sha256": "e8213f227a00334351982a15a02ed1062df538f52177d6a4f54f670c5b6ac686",
+      "bytes": 8320
+    }
+  ],
+  "finalNativeCoordinatorEvidence": {
+    "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/final-native-replay-evidence.json",
+    "sha256": "3dcf4c6bbc15008bdd8392cf9d746bf58070b36dd33fdf522a55eca19d719411",
+    "bytes": 17217
+  },
+  "nativeLogDescriptors": {
+    "count": 50,
+    "allBytesAndHashesExact": true,
+    "qualification": "50 log descriptors reconciled; native replay receipt bodies read EOF; long fullverify/build/typecheck logs reviewed for gate summaries and earlier phase ledgers, not claimed new full-source verify."
+  },
+  "copiedNativeResults": [
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-composed-telemetry-results.json",
+      "sha256": "40cb344d73d0118bf582b5ce2b6d01872e78b9432da16fe7e55abad3f72c5f29",
+      "bytes": 2756,
+      "originalPath": "/tmp/relkit-phase7-telemetry-B6eZLD/composed-telemetry-results.json",
+      "semanticEquality": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-held-agent-results.json",
+      "sha256": "7960bebb9e7cfa3d816f92d7f08f9427010998f2206be0dc22c7f0e1dd111b98",
+      "bytes": 8422,
+      "originalPath": "/tmp/relkit-core-consumers-agent-held-8b18daca/evidence/results.json",
+      "semanticEquality": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-held-job-results.json",
+      "sha256": "afd0b16d8cc036def814d26fd7c4163445a61e9e7fd09ec7b86b8d9b9f5fcb13",
+      "bytes": 7737,
+      "originalPath": "/tmp/relkit-core-consumers-job-held-39c7e6b8/evidence/results.json",
+      "semanticEquality": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-generated-host-results.json",
+      "sha256": "8b51cda42203d6ccb1eeed79b49671596e52b599466a3f560126b5c69864a748",
+      "bytes": 6775,
+      "originalPath": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate/generated-results.json",
+      "semanticEquality": true
+    },
+    {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-realtime-disconnect-results.json",
+      "sha256": "c79fbcab0c6ab6f3bb00bfcfb2a79e14cb784709dacf9c822c503da7c8a0b532",
+      "bytes": 556,
+      "originalPath": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate-disconnect/realtime-disconnect-results.json",
+      "semanticEquality": true
+    }
+  ],
+  "verifiedOutcomes": {
+    "demo": {
+      "copyCheckTypeTests": true,
+      "demoTests": 6,
+      "fixtureTests": 6,
+      "live": 11,
+      "diagnosticsBeforeAndAfterBrowser": 5,
+      "browser": true,
+      "graph": {
+        "nodes": 34,
+        "edges": 36,
+        "orphans": 0
+      },
+      "apiExpectedStatuses": {
+        "http200": 6,
+        "unsupportedHttp404": 1
+      },
+      "generated": 9,
+      "originsBothHosts": {
+        "trustedHttp": 200,
+        "trustedWebsocket": "opened",
+        "foreignHttp": 403,
+        "foreignWebsocket": "rejected"
+      },
+      "realtimeDisconnect": {
+        "return": {
+          "before": 1,
+          "samples": [
+            {
+              "elapsedMs": 32,
+              "connections": 0
+            },
+            {
+              "elapsedMs": 1061,
+              "connections": 0
+            },
+            {
+              "elapsedMs": 5120,
+              "connections": 0
+            }
+          ]
+        },
+        "abort": {
+          "before": 1,
+          "samples": [
+            {
+              "elapsedMs": 49,
+              "connections": 0
+            },
+            {
+              "elapsedMs": 1101,
+              "connections": 0
+            },
+            {
+              "elapsedMs": 5159,
+              "connections": 0
+            }
+          ]
+        }
+      },
+      "commerce": {
+        "passed": 3,
+        "skipped": 0,
+        "exitCode": 0,
+        "durationSeconds": 14,
+        "generatedHost": "http://127.0.0.1:3330"
+      },
+      "fixturePostloadApi200": 5
+    },
+    "actualHeldJob": {
+      "passed": 2,
+      "sameRunRunningBeforeAfterNativeObserverAbort": true,
+      "workerBarrierHeld": "Accepted unchanged source asserts held handler/active signal/zero commits before and after native observerabort; successful native receipts corroborate.",
+      "executionsAndDurableCommitsPerCase": 1,
+      "freshProviderExactCompletedOutput": true,
+      "nativeExitCode": 0,
+      "runnerTimedOut": false
+    },
+    "actualHeldAgent": {
+      "passed": 2,
+      "sameRunRunningBeforeAfterNativeObserverAbort": true,
+      "modelBarrierHeld": "Accepted source asserts gate held through active window; modelTurns1 follows release.",
+      "onceModelTurns": 1,
+      "durableRetainedOutput": true,
+      "nativeExitCode": "Coordinator-owned actual exit0; rawlog records2passed without failure, no separate childexit JSON."
+    },
+    "composed": {
+      "passed": true,
+      "clientRpcMetricDeltaEach": 1,
+      "inspectorListMetricDeltaEach": 1,
+      "inspectorListOpenSubscribe": [
+        2,
+        1,
+        1
+      ],
+      "testingListenClose": [
+        1,
+        1
+      ],
+      "supervisorLogSwitchRequestStop": [
+        1,
+        2,
+        1
+      ],
+      "supervisorMetricsPubliclyVerified": false,
+      "noRecursiveSource": {
+        "sourceRecords": 1,
+        "cursor": "1",
+        "published": 1,
+        "subscribersAfterEof": 0
+      },
+      "safeServerLocalChildContext": true,
+      "ownersJoined": 5,
+      "nativeExitCode": 0,
+      "runnerTimedOut": false
+    }
+  },
+  "verificationQualification": {
+    "fullVerify": {
+      "exitCode": 0,
+      "finishedUtc": "2026-10-03T19:38:00Z",
+      "timePrecision": "Minute",
+      "scope": "Before the two final scoped native replay fixes; affected checks below supplement this source revision."
+    },
+    "finalBuild": {
+      "exitCode": 0,
+      "tasks": 58,
+      "cached": 0,
+      "duration": "2m19.473s",
+      "scope": "After both behavior fixes; a subsequent three-line comment-only precision amendment has an additional successful owning-package rebuild."
+    },
+    "observability": {
+      "files": 62,
+      "passed": 169,
+      "exitCode": 0,
+      "finalQueueReplay": {
+        "files": 2,
+        "passed": 7,
+        "exitCode": 0
+      }
+    },
+    "runtimeHono": {
+      "files": 43,
+      "passed": 137,
+      "skipped": 1,
+      "skipDisposition": "Existing explicitly gated test, not a pass",
+      "exitCode": 0
+    },
+    "strictTestTypes": true,
+    "rootTypecheck": true,
+    "lint": true,
+    "boundaries": true,
+    "scopedFormatting": true,
+    "observabilitySinkScan": true,
+    "konsistentSchema": true,
+    "gitDiffCheck": true,
+    "inspectorBrowser": true,
+    "inspectorPlaywright": {
+      "passed": 31
+    },
+    "quality": {
+      "coverageFiles": 69,
+      "tests": 242,
+      "branchCoverage": "91.2% (508/557)",
+      "threshold": "90%",
+      "mutants": 793,
+      "killed": 501,
+      "survived": 268,
+      "noCoverage": 17,
+      "timeout": 7,
+      "errors": 0,
+      "semanticCategoriesPassed": 6,
+      "scope": "Unchanged quality scope; full verify includes actual coverage and mutation replay."
+    }
+  },
+  "preservation": "Original63source/177history/30fixture and16scripts exactinitialhashes reverified;86setup links unchanged; originaldemo clean and primarysoleoriginaluntrackedOpenSpec. Onlyownedcopiedmanifests repointed; globalregistry unused.",
+  "cleanup": {
+    "demoNativeExit": 130,
+    "fixtureNativeExit": 130,
+    "disposition": "Expected SIGINT shutdown; native children joined",
+    "portsReleased": [
+      3000,
+      3210,
+      3330,
+      3331,
+      3010,
+      4010
+    ],
+    "ownedProcessRows": [],
+    "ownedDockerContainers": [],
+    "ownedBrowserSessionsClosed": 5
+  },
+  "performance": {
+    "status": "Material unresolved focused latency and jobsbrowserbundle regressions explicitly reported; source acceptance is not performance parity.",
+    "baselineP50P95Ms": {
+      "watch": [
+        6.941,
+        10.029
+      ],
+      "inspector": [
+        0.05,
+        0.154
+      ],
+      "proxy": [
+        0.277,
+        0.476
+      ],
+      "activation": [
+        0.002,
+        0.005
+      ]
+    },
+    "candidateP50P95Ms": {
+      "watch": [
+        31.983,
+        38.867
+      ],
+      "inspector": [
+        0.291,
+        0.428
+      ],
+      "proxy": [
+        0.718,
+        1.581
+      ],
+      "activation": [
+        0.761,
+        1.235
+      ]
+    },
+    "jobsBrowserBundle": {
+      "baselineBytes": 20473,
+      "candidateBytes": 216594,
+      "increaseBytes": 196121,
+      "ratio": 10.58
+    },
+    "resourceCountsPreserved": "3500feedopen/return,35000leaseconnect/dispose,zeroactive,110query/proxy; default requiredinstrumentation retained.",
+    "qualification": "Causeassessment identifies addedboundary/span/counter/logger/acquisitionwork; no exactprofilertiming attribution or resolvedcostclaim."
+  },
+  "limitations": [
+    "Fullverify19:38UTC predates finalqueue/Honocorrections; completeaffected169Observability/137Hono+existinggatedskip, strict/build/native/browserchecks supplement it; no full-final-source verify claim.",
+    "Supported12521-byte compoundprojectionenvelope doesnot globallyenforce directauthoringnamespace components.",
+    "Supervisor privateMetricRegistry lacks publicvisibility; exactconfiguredlogger outcomes verified, isolateddomainmetrics supplemental.",
+    "NativeBun1.3.10 staleWebSocketpending/stopPromise unavailable; narrowadapter establishes actual socketack/scopejoin/portrelease ratherthan claiming bookkeepingpromise settled.",
+    "Promise-onlyportallocation joined before interrupted startup admission; no unsupported nativeAbortSignalclaim.",
+    "Composedcontext proof server-local; no automaticcrossnetwork context claim.",
+    "Native EOFtelemetry proof separatefromfixtureactualreturn/abortdisconnect.",
+    "No restart/durableapproval claim for heldAgent; Jobfreshproviderreadback verifies ownedstate reacquisition.",
+    "Paid/cloud/explicitgatedprovider suites notrun; accountfreeDockerrelease variants actuallyrun."
+  ],
+  "taskEvidence": {
+    "atAuditDone": 57,
+    "pending": [
+      "- [ ] 10.1 Reconcile all scoped authored files with implemented or reviewed-unchanged status and every changed TypeScript path with a non-author reviewer/result; verify every applicable use-effect family is addressed, justified exclusions are narrow, and final additions/moves are included.",
+      "- [ ] 10.2 Validate the complete change with `rtk openspec validate core-consumers-effect-service-alignment --strict`, inspect the final diff, and record package coverage, checks, vendor gaps, demo outcomes, performance findings, worktree path and actual elapsed time; verify task completion reflects evidence and leave changes uncommitted.",
+      "- [ ] 10.3 Perform the final independent review of every TypeScript file changed in this phase plus the assembled cross-package diff and evidence; apply use-effect per design \u00a76, fix/re-review findings and rerun invalidated checks before marking implementation complete."
+    ],
+    "disposition": "All57 completed tasks supported; final10.1/10.3 can reference this non-author audit;10.2 strictvalidation and finaltaskwrites remain coordinator-owned."
+  },
+  "elapsed": "Managedworktree start12:09:34UTC; root20:51UTC update indicates approximately8h42m elapsed. Coordinator should measure actual final time.",
+  "findings": []
+}

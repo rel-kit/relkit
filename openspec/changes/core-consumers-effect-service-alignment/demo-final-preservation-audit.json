@@ -1,0 +1,1233 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "capturedUtc": "2026-10-03T20:52:45.492204+00:00",
+  "mode": "Read-only source/history/fixture/link/provenance preservation audit; only this /tmp result written. No hosts, runners, private environment reads, shared links or global registry edits.",
+  "copyRoot": "/tmp/relkit-core-consumers-demo-3d6cp84c",
+  "completeOriginalInventoryReconciliation": {
+    "source": {
+      "initial": 63,
+      "current": 63,
+      "added": [],
+      "removed": []
+    },
+    "history": {
+      "initial": 177,
+      "current": 177,
+      "added": [],
+      "removed": []
+    },
+    "fixture": {
+      "initial": 30,
+      "current": 30,
+      "added": [],
+      "removed": []
+    },
+    "exclusions": "Original copy rules for source/fixture; history retains originalgenerated/state evidence while excluding dependency/cache directories and privateenvironment files."
+  },
+  "nativeReplayReview": {
+    "reviewerExecutedRunners": false,
+    "logs": [
+      {
+        "stage": "live",
+        "path": "/tmp/relkit-core-consumers-demo-batch-fixed-live.log",
+        "bytes": 734,
+        "sha256": "b79d579327202346b6e3a172f9a3b38eead5d5bc80543a84426ff1a943536271",
+        "readToEOF": true,
+        "coordinatorReportedExitCode": 0
+      },
+      {
+        "stage": "diagnostics",
+        "path": "/tmp/relkit-core-consumers-demo-batch-fixed-diagnostics.log",
+        "bytes": 331,
+        "sha256": "9b0eeeba679a9ad490ccce31e4c95200d03118d095fa3b59f919824069b0da5d",
+        "readToEOF": true,
+        "coordinatorReportedExitCode": 0
+      },
+      {
+        "stage": "graph",
+        "path": "/tmp/relkit-core-consumers-demo-batch-fixed-graph.log",
+        "bytes": 1226,
+        "sha256": "9a8bbe4187e06977cc1d615ba04abdb56c9a2b6033865ce86e4268e32f2e7206",
+        "readToEOF": true,
+        "coordinatorReportedExitCode": 0
+      },
+      {
+        "stage": "api",
+        "path": "/tmp/relkit-core-consumers-demo-batch-fixed-api.log",
+        "bytes": 594,
+        "sha256": "a6b8d12685974bec5d9aeb1201f4499cf57d942e80df4a499ca68bca49a64df1",
+        "readToEOF": true,
+        "coordinatorReportedExitCode": 0
+      },
+      {
+        "stage": "origins",
+        "path": "/tmp/relkit-core-consumers-demo-batch-fixed-origins.log",
+        "bytes": 350,
+        "sha256": "c297797b3e495beb8cfd8c3f5b15d2ff9245b7445b4acd5bcf0bf9263883edc9",
+        "readToEOF": true,
+        "coordinatorReportedExitCode": 0
+      },
+      {
+        "stage": "foreign-origin",
+        "path": "/tmp/relkit-core-consumers-demo-batch-fixed-foreign-origin.log",
+        "bytes": 188,
+        "sha256": "fd738526103d5eff87525ed0fd56a7f387c9443ea9c11622e238fa0e77a47ec4",
+        "readToEOF": true,
+        "coordinatorReportedExitCode": 0
+      },
+      {
+        "stage": "browser",
+        "path": "/tmp/relkit-core-consumers-demo-batch-fixed-browser.log",
+        "bytes": 276,
+        "sha256": "83e4cec990a1a13d9016b7117e01822309a3de440196a69650f595e38f8010ea",
+        "readToEOF": true,
+        "coordinatorReportedExitCode": 0
+      },
+      {
+        "stage": "postload-diagnostics",
+        "path": "/tmp/relkit-core-consumers-demo-batch-fixed-postload-diagnostics.log",
+        "bytes": 331,
+        "sha256": "9b0eeeba679a9ad490ccce31e4c95200d03118d095fa3b59f919824069b0da5d",
+        "readToEOF": true,
+        "coordinatorReportedExitCode": 0
+      },
+      {
+        "stage": "postload-api",
+        "path": "/tmp/relkit-core-consumers-demo-batch-fixed-postload-api.log",
+        "bytes": 594,
+        "sha256": "a6b8d12685974bec5d9aeb1201f4499cf57d942e80df4a499ca68bca49a64df1",
+        "readToEOF": true,
+        "coordinatorReportedExitCode": 0
+      }
+    ],
+    "artifactHashes": [
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/demo/evidence/graph-evidence.json",
+        "bytes": 1225,
+        "sha256": "fbbe17bebfb786eda3680b61e597cacbd7a52d8676b184a08d9cc375fa12681f",
+        "decodedToEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/demo/evidence/independent-2026-10-03/inspector-api.json",
+        "bytes": 69923,
+        "sha256": "9a253502c3ebdc0f0072f4f0808e6f6434b074d6d742862bbf9f0009088fd679",
+        "decodedToEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/demo/evidence/replay-candidate-fixed/capture-assertions.json",
+        "bytes": 700,
+        "sha256": "912ac56fc8da571d9f0f7f2c3ad4e976d2f33aa4cc6cec48228eee5d74fdd683",
+        "decodedToEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/demo/evidence/replay-candidate-fixed/inspector-owned-sessions.json",
+        "bytes": 403,
+        "sha256": "c45242ba428905d69d3df69bf23c0b5a86c9d4e69c905ee8d5f3594e5d941b28",
+        "decodedToEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/demo/evidence/replay-candidate-fixed/dev-origin-results.json",
+        "bytes": 558,
+        "sha256": "2e1f2c8ba49d290c89a2581539f840b7a2d3531cf5033e08c6e0ccec6370a992",
+        "decodedToEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/demo/evidence/replay-candidate-fixed/foreign-origin-results.json",
+        "bytes": 249,
+        "sha256": "93a0fddd79dcc0b0bee4ec6ff22a7c433740e6bc67c9f7856a19279e238d5111",
+        "decodedToEOF": true
+      }
+    ],
+    "assertions": {
+      "liveSmoke": "All11parallel originalnamed live outcomes passed",
+      "diagnostics": "Original5/5 passed beforebrowser and again afterbrowserload; declared-error responsecompletion assertion preserved",
+      "graph": {
+        "nodes": 34,
+        "edges": 36,
+        "orphanEdges": 0,
+        "events": {
+          "publications": 8,
+          "deliveryTransitions": 32,
+          "completedDeliveries": 8
+        }
+      },
+      "api": {
+        "capturedAt": "2026-10-03T20:32:14.513Z",
+        "statuses": [
+          {
+            "path": "health/ready",
+            "status": 200,
+            "networkError": null
+          },
+          {
+            "path": "runtime",
+            "status": 200,
+            "networkError": null
+          },
+          {
+            "path": "runtime/events?eventId=demo.example-event&limit=100",
+            "status": 200,
+            "networkError": null
+          },
+          {
+            "path": "runtime/events/demo.example-event",
+            "status": 404,
+            "networkError": null
+          },
+          {
+            "path": "requests?limit=100&order=desc",
+            "status": 200,
+            "networkError": null
+          },
+          {
+            "path": "logs?limit=1",
+            "status": 200,
+            "networkError": null
+          },
+          {
+            "path": "traces?limit=1&order=desc",
+            "status": 200,
+            "networkError": null
+          }
+        ],
+        "knownUnsupportedPath": "runtime/events/demo.example-event remains404, explicitlyretained instead of claimingall7status200",
+        "requests": 40,
+        "uniqueRequestIds": 40,
+        "declaredErrorCompletedRows": 6,
+        "latestDeclaredErrorStartedAt": "2026-10-03T20:31:37.838Z",
+        "allDeclaredErrorRowsStatus500OutcomeDeclaredError": true
+      },
+      "origins": "Actual generatedHTTP absent/sameorigin200; actual sameoriginWebSocketopen; foreignHTTP403ORIGIN_DENIED andWebSocketrejected",
+      "browser": "Originalassertions5pages/37uniquerows/declared-error HTTP500filter pass;5owned sessions registryclosed true, assertionFailure null, cleanupFailures[]"
+    },
+    "coordinatorNativeCleanup": {
+      "hostSession": 52653,
+      "joinedExitCode": 130,
+      "exclusiveBindVerifiedPorts": [
+        3000,
+        3210,
+        3330,
+        3331
+      ],
+      "qualification": "Coordinator native cleanup proof reported; reviewer did not openhosts/ports or rerunprobe."
+    },
+    "scope": "Onlyownedcopy generated/state/evidence outputs overwritten by unchangedoriginal capture scripts. Original demo/source/history/fixture preservation separatelychecked and unchanged. Composed/heldjob/heldagent andfixtureCommerce finalacceptance remain separate."
+  },
+  "originalRoot": "/Users/mustafaelsayed/Workspace/relkit-regression-demo",
+  "originalGit": {
+    "initial": {
+      "head": "1faed92bfd52a71771251f995a46c88daab8bf40",
+      "status": ""
+    },
+    "head": "1faed92bfd52a71771251f995a46c88daab8bf40",
+    "status": ""
+  },
+  "primaryFrameworkGit": {
+    "root": "/Users/mustafaelsayed/Workspace/relkit",
+    "status": "?? openspec/changes/core-consumers-effect-service-alignment/",
+    "expected": "Only untracked openspec/changes/core-consumers-effect-service-alignment/; no tracked source changes"
+  },
+  "hashChecks": [
+    {
+      "group": "source",
+      "root": "/Users/mustafaelsayed/Workspace/relkit-regression-demo",
+      "count": 63,
+      "initialAggregateSha256": "14557a82ee5b09924818e56026dc34b998ea649753e06476d1be460a1d3ec11c",
+      "mismatches": []
+    },
+    {
+      "group": "history",
+      "root": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence",
+      "count": 177,
+      "initialAggregateSha256": "c455745d2b30161187181e6a897b1677fb44ae46f4db30776461fc3b42fa74e8",
+      "mismatches": []
+    },
+    {
+      "group": "fixture",
+      "root": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter",
+      "count": 30,
+      "initialAggregateSha256": "fba916f6feb4f9aea92599bd9bdaf25c9895799ea606bafebe6b8e4d50e5fa3e",
+      "mismatches": []
+    },
+    {
+      "group": "copySource",
+      "root": "/tmp/relkit-core-consumers-demo-3d6cp84c/demo",
+      "count": 63,
+      "initialAggregateSha256": "14557a82ee5b09924818e56026dc34b998ea649753e06476d1be460a1d3ec11c",
+      "mismatches": [
+        {
+          "path": "package.json",
+          "expected": "ace3722e4162fbfd839fb7e2af5a69b217cf129edc13d49ef941ae75534cf957",
+          "actual": "2472c6e052890176f4e7eabff38389a03917f6fbbae75f8e92155c8a999ad311"
+        }
+      ]
+    },
+    {
+      "group": "copyFixture",
+      "root": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture",
+      "count": 30,
+      "initialAggregateSha256": "fba916f6feb4f9aea92599bd9bdaf25c9895799ea606bafebe6b8e4d50e5fa3e",
+      "mismatches": [
+        {
+          "path": "package.json",
+          "expected": "9960f2f20b7267fef0c70826b162996ffa2ccf6a5c3a7ce19cb4fc7d097f0bc1",
+          "actual": "22e94fb17d1cdcc0d9ba696616c45b484db6c01b642033fcbb6330ec078ae8ea"
+        }
+      ]
+    }
+  ],
+  "originalScripts": [
+    {
+      "path": "scripts/graph-evidence.mjs",
+      "initialSha256": "ae29250b95941bd01c052fd1f42b7ef96b22b3fb7c2fa7b7fd2c38b4f5470f9c",
+      "currentSha256": "ae29250b95941bd01c052fd1f42b7ef96b22b3fb7c2fa7b7fd2c38b4f5470f9c",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/inspector-api-evidence.mjs",
+      "initialSha256": "36c4ea7dbc3238b2832218d3d39a6905d70962426149eb1fb70e822dee3c6eea",
+      "currentSha256": "36c4ea7dbc3238b2832218d3d39a6905d70962426149eb1fb70e822dee3c6eea",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/inspector-regressions.mjs",
+      "initialSha256": "04067a56bf98849fda3679183bbae0d9411c09f800f419c588cc28c1093218de",
+      "currentSha256": "04067a56bf98849fda3679183bbae0d9411c09f800f419c588cc28c1093218de",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/live-smoke.mjs",
+      "initialSha256": "28deb7dca032c7d8cf106857c3d5f2936213f43164b5fc7398e40be3291ee950",
+      "currentSha256": "28deb7dca032c7d8cf106857c3d5f2936213f43164b5fc7398e40be3291ee950",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/setup-local.mjs",
+      "initialSha256": "ea6db2530019901b4e74affe6affa41d2b70e472f722592551151ca9387c28ea",
+      "currentSha256": "ea6db2530019901b4e74affe6affa41d2b70e472f722592551151ca9387c28ea",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/validation-regressions.mjs",
+      "initialSha256": "2839cf7820b9d839953c99e8fb6141712c72a58ba9581d7ef4eb8c5850149154",
+      "currentSha256": "2839cf7820b9d839953c99e8fb6141712c72a58ba9581d7ef4eb8c5850149154",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/verify-demo-agent.mjs",
+      "initialSha256": "85fcdbdfc3b0532dc7514b1427d734510f94026da950e4c99a33dbf87a42433c",
+      "currentSha256": "85fcdbdfc3b0532dc7514b1427d734510f94026da950e4c99a33dbf87a42433c",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/verify-demo-luna.mjs",
+      "initialSha256": "c82b76d3eaf982c4b66b7e7a51d650a39319c9ebffa04980a4af37650d5befce",
+      "currentSha256": "c82b76d3eaf982c4b66b7e7a51d650a39319c9ebffa04980a4af37650d5befce",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/verify-dev-origin.mjs",
+      "initialSha256": "c5551f7ebffe650374256b5f3d4d1b09c4001489f596a45896190346c6d206d6",
+      "currentSha256": "c5551f7ebffe650374256b5f3d4d1b09c4001489f596a45896190346c6d206d6",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/verify-generated-ai.mjs",
+      "initialSha256": "d3ca5222389de5aef6cbbcdd1b9257dc5687894d60fd734221ab1da4aaae9052",
+      "currentSha256": "d3ca5222389de5aef6cbbcdd1b9257dc5687894d60fd734221ab1da4aaae9052",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/verify-luna-agent.mjs",
+      "initialSha256": "ebe8edd8801e372d95c20bcadcc46357684a8b297cbb848592b1efa69bc1a29b",
+      "currentSha256": "ebe8edd8801e372d95c20bcadcc46357684a8b297cbb848592b1efa69bc1a29b",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/verify-realtime-disconnect.mjs",
+      "initialSha256": "9ab4dbfb975b5d4ad5cfc28e2f07eb3509ee0ae4d27865b06d67b9a99425e5ad",
+      "currentSha256": "9ab4dbfb975b5d4ad5cfc28e2f07eb3509ee0ae4d27865b06d67b9a99425e5ad",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/ai-verification/agents.mjs",
+      "initialSha256": "3f5f9cb8f7811394df06a3f76865a051bbab60a4451b3f4da8e4f3a82f72e669",
+      "currentSha256": "3f5f9cb8f7811394df06a3f76865a051bbab60a4451b3f4da8e4f3a82f72e669",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/ai-verification/realtime.mjs",
+      "initialSha256": "5e58af51125cafd48a0681c3a73a0b42c8a70452120721463ed80160756884c0",
+      "currentSha256": "5e58af51125cafd48a0681c3a73a0b42c8a70452120721463ed80160756884c0",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/ai-verification/streams.mjs",
+      "initialSha256": "cd9fb5f5131244ed1a87d6e824911920d7dd99fdeae89189fb39280d58ede672",
+      "currentSha256": "cd9fb5f5131244ed1a87d6e824911920d7dd99fdeae89189fb39280d58ede672",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/ai-verification/support.mjs",
+      "initialSha256": "42370ccf0a460eb0b1cf1e4b898a97dafc13fc05bb5aeb00f3983918495f2e1b",
+      "currentSha256": "42370ccf0a460eb0b1cf1e4b898a97dafc13fc05bb5aeb00f3983918495f2e1b",
+      "unchanged": true
+    }
+  ],
+  "ownedLinks": {
+    "count": 86,
+    "records": [
+      {
+        "copy": "demo",
+        "name": "@langchain/openai",
+        "expectedTarget": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@langchain/openai",
+        "actualTarget": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@langchain/openai",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/app",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/app",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/app",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/docker",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/docker",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/docker",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/local",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/local",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/local",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/redis",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/redis",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/redis",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/s3",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/s3",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/s3",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "langchain",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/agents",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/agents",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/agents",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/better-auth",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/better-auth",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/better-auth",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/buckets",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/buckets",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/buckets",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/cache",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cache",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cache",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/cli",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cli",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cli",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/client",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/client-generator",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client-generator",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client-generator",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/compiler",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/compiler",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/compiler",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/config",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/config",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/config",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/contracts",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/contracts",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/contracts",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/deploy",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/deploy-pulumi",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy-pulumi",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy-pulumi",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/diagnostics",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/diagnostics",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/diagnostics",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/drizzle",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/drizzle",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/drizzle",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/engine",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/engine",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/engine",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/events",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/events",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/events",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/functions",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/functions",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/functions",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/graph",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/graph",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/graph",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/inspector-api",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/inspector-api",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/inspector-api",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/invocation",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/invocation",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/invocation",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/jobs",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/local-service",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/local-service",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/local-service",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/observability",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/observability",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/observability",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/openapi",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/openapi",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/openapi",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/provider",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/provider",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/provider",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/providers-local",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/providers-local",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/providers-local",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/realtime",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/realtime",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/realtime",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/routes",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/routes",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/routes",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/runtime-effect",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-effect",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-effect",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/runtime-hono",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/schema",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/schema",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/schema",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/services",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/services",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/services",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/supervisor",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/supervisor",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/supervisor",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/testing",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/testing",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/testing",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@relkit/tools",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/tools",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/tools",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "@types/bun",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@types+bun@1.3.10/node_modules/@types/bun",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@types+bun@1.3.10/node_modules/@types/bun",
+        "unchanged": true
+      },
+      {
+        "copy": "demo",
+        "name": "typescript",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/typescript@5.9.3/node_modules/typescript",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/typescript@5.9.3/node_modules/typescript",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@langchain/langgraph",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@langchain+langgraph@1.4.14+9ed32dbb8973e5bd/node_modules/@langchain/langgraph",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@langchain+langgraph@1.4.14+9ed32dbb8973e5bd/node_modules/@langchain/langgraph",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@langchain/openai",
+        "expectedTarget": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@langchain/openai",
+        "actualTarget": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@langchain/openai",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/app",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/app",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/app",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/local",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/local",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/integrations/packages/local",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "langchain",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@types/bun",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@types+bun@1.3.10/node_modules/@types/bun",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@types+bun@1.3.10/node_modules/@types/bun",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/cli",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cli",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cli",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/testing",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/testing",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/testing",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "typescript",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/typescript@5.9.3/node_modules/typescript",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/typescript@5.9.3/node_modules/typescript",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/agents",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/agents",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/agents",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/better-auth",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/better-auth",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/better-auth",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/buckets",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/buckets",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/buckets",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/cache",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cache",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/cache",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/client",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/client-generator",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client-generator",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/client-generator",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/compiler",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/compiler",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/compiler",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/config",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/config",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/config",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/contracts",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/contracts",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/contracts",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/deploy",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/deploy-pulumi",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy-pulumi",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/deploy-pulumi",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/diagnostics",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/diagnostics",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/diagnostics",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/drizzle",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/drizzle",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/drizzle",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/engine",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/engine",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/engine",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/events",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/events",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/events",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/functions",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/functions",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/functions",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/graph",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/graph",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/graph",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/inspector-api",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/inspector-api",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/inspector-api",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/invocation",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/invocation",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/invocation",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/jobs",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/local-service",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/local-service",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/local-service",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/observability",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/observability",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/observability",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/openapi",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/openapi",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/openapi",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/provider",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/provider",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/provider",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/providers-local",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/providers-local",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/providers-local",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/realtime",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/realtime",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/realtime",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/routes",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/routes",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/routes",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/runtime-effect",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-effect",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-effect",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/runtime-hono",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/schema",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/schema",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/schema",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/services",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/services",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/services",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/supervisor",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/supervisor",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/supervisor",
+        "unchanged": true
+      },
+      {
+        "copy": "fixture",
+        "name": "@relkit/tools",
+        "expectedTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/tools",
+        "actualTarget": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/tools",
+        "unchanged": true
+      }
+    ],
+    "mismatches": []
+  },
+  "manifestChanges": [
+    {
+      "copy": "demo",
+      "changedKeys": [
+        "dependencies",
+        "devDependencies"
+      ],
+      "dependencyNamesPreserved": true,
+      "devDependencyNamesPreserved": true,
+      "scriptsIdentical": true,
+      "sha256": "2472c6e052890176f4e7eabff38389a03917f6fbbae75f8e92155c8a999ad311"
+    },
+    {
+      "copy": "fixture",
+      "changedKeys": [
+        "dependencies",
+        "devDependencies"
+      ],
+      "dependencyNamesPreserved": true,
+      "devDependencyNamesPreserved": true,
+      "scriptsIdentical": true,
+      "sha256": "22e94fb17d1cdcc0d9ba696616c45b484db6c01b642033fcbb6330ec078ae8ea"
+    }
+  ],
+  "provenanceArtifacts": [
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/copy-provenance.json",
+      "bytes": 85859,
+      "sha256": "721d46f48c999aa3e76db8a4bafb039acd12bf4fabd079f344e5d308e86b556a"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/setup-provenance.json",
+      "bytes": 18542,
+      "sha256": "011527bb33fb8dd1543758a391d77464d63b3e3ee88fb492e11225e570a7bace"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/preservation-final.json",
+      "bytes": 388,
+      "sha256": "73d139371f59a673c79585c36dc3c9e778c3c35c47dd1d4567256aca56650e03"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/replay-support.mjs",
+      "bytes": 4578,
+      "sha256": "5c7d27190b2e292f96a8bd15b19943aaa33e7e754a4dab990ec292f9569aed6b"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/demo/scripts/owned-inspector-regressions.mjs",
+      "bytes": 5001,
+      "sha256": "bca65ea92781fc739271e6d503eb5d5fe07501382b662d8e7282dcecfd0a8896"
+    }
+  ],
+  "addonAssessment": {
+    "replaySupport": "100line helper read EOF: creates only owned absolute symlinks refusing conflicting destinations; source targets read-only; no Bun link/install/globalregistry calls. Explicit basicOS environment allowlist rejects credential names and admits explicit localRELKIT/PORT/HOST/NODE_ENV/BUN settings. @langchain/openai1.6.2 uses original installed externalSDK read-only. Copied lockfiles unchanged.",
+    "browserWrapper": {
+      "path": "demo/scripts/owned-inspector-regressions.mjs",
+      "lines": 133,
+      "readToEOF": true,
+      "originalAssertionBodyExactExceptSessionRegistration": true,
+      "ownership": "Exact newlyregistered owned browser sessions persisted before acquisition; finally closes each exactsession, joins childexit/output and recordscleanup failures. Existingassertions remain identical; no baseline diagnostic masking."
+    }
+  },
+  "resolverAmendment": {
+    "ledger": "/tmp/relkit-composed-resolver-independent-review.json",
+    "author": "/root/client_baseline",
+    "reviewer": "/root/inspector_baseline",
+    "result": "accepted",
+    "sha256": "edfa75d4b17502d7d610b3e0b733a60bed032d62f9d60db82202a00f92e67580",
+    "lines": 233,
+    "assertionsAndCleanupUnchanged": true
+  },
+  "result": "Original63source/177history/30fixture and all16originalscripts remain exact initialhashes;86owned links retain setup targets; originaldemo clean/primarysoleoriginaluntrackedOpenSpec. Actual final candidate demo and retainedfixture replay receipts accepted independently, including9generated/2disconnect/3Commerce withoutskip/fivepostload200. Nativeownersjoined/portsreleased per retained coordinator receipts. No paid/cloud approval or performanceparity claimed.",
+  "findings": [],
+  "finalNativeFixtureReview": {
+    "logs": [
+      {
+        "path": "/tmp/relkit-core-consumers-generated-candidate.log",
+        "bytes": 5536,
+        "sha256": "e7a5da815c553ab2094a2a851eb01d1eaa963c8b34c7f77b61ea79d81e965ce4",
+        "readEOF": true,
+        "coordinatorExecuted": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-disconnect-candidate.log",
+        "bytes": 865,
+        "sha256": "ad5b1808fa0ecc39db824d5111b0111c08826cc449ac4d2915a2eeba1c473c2b",
+        "readEOF": true,
+        "coordinatorExecuted": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-fixture-candidate-origins.log",
+        "bytes": 350,
+        "sha256": "16e7a34327789fdfe6adb24dd6fba10392ff01916a3a1d82e9134ae7d9c58212",
+        "readEOF": true,
+        "coordinatorExecuted": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-fixture-candidate-foreign-origin.log",
+        "bytes": 188,
+        "sha256": "5bb09737d24f432c19ec3f79075645ceedf408769f4b9da2e6b2e34255838e44",
+        "readEOF": true,
+        "coordinatorExecuted": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-commerce-candidate.log",
+        "bytes": 678,
+        "sha256": "986441e43733ef7c869cbfe6fcd6df3eb36558b47eb9fb59f57a4c852ef91c28",
+        "readEOF": true,
+        "coordinatorExecuted": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-fixture-candidate-postload-api.log",
+        "bytes": 239,
+        "sha256": "3a8cf5609445455f92c1842a5acca870c66e5f757c6c7aeaaff3929476bb36e5",
+        "readEOF": true,
+        "coordinatorExecuted": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-final-port-cleanup.log",
+        "bytes": 180,
+        "sha256": "4879c4c8c44469430f295dbc76edd628f1b1302337442941a5a17daa9bbe3b7f",
+        "readEOF": true,
+        "coordinatorExecuted": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-final-process-cleanup.log",
+        "bytes": 24,
+        "sha256": "ead45a9ec2a982489a9233e8930f54a5bb84592835ea2cca2d71f372803f8122",
+        "readEOF": true,
+        "coordinatorExecuted": true
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate/generated-results.json",
+        "bytes": 6774,
+        "sha256": "a0a932c631eea4dc0a629f2bcdc89d3c430de9a8bad6b16b0abcb1598adc99af",
+        "decodedEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate-disconnect/realtime-disconnect-results.json",
+        "bytes": 555,
+        "sha256": "dca266b6f658253afb298717e6ac84b0dc9ec83a4c51b9ca9ac132e90b482c3e",
+        "decodedEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate-origins/foreign-origin-results.json",
+        "bytes": 249,
+        "sha256": "7cd4c821f2fd4e5514951a163c2dfceec15abe85207b2911ed6ee709faafcd90",
+        "decodedEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate-origins/dev-origin-results.json",
+        "bytes": 558,
+        "sha256": "824e3a9c313f93d2a0892cd374ffe2e07b72dee25dd7d31c31912e0363c76f3c",
+        "decodedEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate-commerce/postload-api.json",
+        "bytes": 29484,
+        "sha256": "0918896b4ed97ea958cf6144cb312d89b315a851a515c2c6057cb41c0fec7abc",
+        "decodedEOF": true
+      },
+      {
+        "path": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate-commerce/playwright/.last-run.json",
+        "bytes": 45,
+        "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+        "decodedEOF": true
+      }
+    ],
+    "generated": {
+      "passed": 9,
+      "failed": 0,
+      "qualification": "Expected BAD_REQUEST400 is a passed rejection assertion; no paid model."
+    },
+    "disconnect": [
+      {
+        "method": "return",
+        "before": 1,
+        "samples": [
+          {
+            "elapsedMs": 32,
+            "connections": 0
+          },
+          {
+            "elapsedMs": 1061,
+            "connections": 0
+          },
+          {
+            "elapsedMs": 5120,
+            "connections": 0
+          }
+        ]
+      },
+      {
+        "method": "abort",
+        "before": 1,
+        "samples": [
+          {
+            "elapsedMs": 49,
+            "connections": 0
+          },
+          {
+            "elapsedMs": 1101,
+            "connections": 0
+          },
+          {
+            "elapsedMs": 5159,
+            "connections": 0
+          }
+        ]
+      }
+    ],
+    "disconnectAssessment": "Presence zero at first32/49ms sample and remainszero. Final5120/5159ms samples are scheduling observations, not a strict5000ms sample-punctuality claim.",
+    "commerce": {
+      "passed": 3,
+      "skipped": 0,
+      "durationSeconds": 14.0,
+      "nativeExitCode": 0,
+      "generatedHost": "http://127.0.0.1:3330",
+      "testNames": [
+        "announcements synchronize connected tabs and restore a late tab",
+        "commerce support agent negotiates capabilities and settles its streamed run",
+        "generated dev host admits its browser origin and classifies malformed AI input"
+      ]
+    },
+    "postloadApi": {
+      "passed": true,
+      "http200": 5,
+      "capturedAt": "2026-10-03T20:43:58.859Z",
+      "qualification": "Readiness/query transport proof; individual persisted400/500 rows remain valid actual request evidence, no all-requests-success claim."
+    },
+    "origins": "Both candidatehosts trustedHTTP200/WSopen; foreignHTTP403/WSrejected. OriginalbaselineforeignWSgap retained.",
+    "cleanup": {
+      "fixtureHostSession": 14820,
+      "coordinatorJoinedExit": 130,
+      "actualExclusiveReleasedPorts": [
+        3000,
+        3210,
+        3330,
+        3331,
+        3010,
+        4010
+      ],
+      "fourOwnedDockerPrefixesEmpty": "Coordinator native Docker receipt; reviewer started no runner",
+      "nativeProcessLog": "{\"ownedProcessRows\":[]}"
+    },
+    "reviewerExecutedRunners": false
+  }
+}

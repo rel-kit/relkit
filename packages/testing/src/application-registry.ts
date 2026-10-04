@@ -1,20 +1,18 @@
+import type { TestApplicationArtifacts } from "./application-registry.types.js";
+export type { TestApplicationArtifacts } from "./application-registry.types.js";
 import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   createFunctionRegistry,
-  type FunctionRegistry,
   type FunctionRegistryOptions,
   type LoadedRuntimeIntegrationModule,
 } from "@relkit/engine";
 
-export interface TestApplicationArtifacts {
-  readonly graph: FunctionRegistryOptions["graph"];
-  readonly publicFingerprint: string;
-  readonly registry: FunctionRegistry;
-  readonly runtimeIntegrationModules: readonly LoadedRuntimeIntegrationModule[];
-}
-
-/** Loads the generated graph, handlers, and selected integration modules for one test generation. */
+/**
+ * Loads the generated graph, handlers, and selected integration modules for one test generation.
+ * @param root - Explicit source project or persistence root.
+ * @returns Native artifacts, or undefined when generated output is absent.
+ */
 export async function loadTestApplicationArtifacts(
   root: string,
 ): Promise<TestApplicationArtifacts | undefined> {
@@ -51,6 +49,11 @@ export async function loadTestApplicationArtifacts(
   };
 }
 
+/**
+ * Imports a generated local module while treating missing output as unavailable.
+ * @param path - Native module path or route path being resolved.
+ * @returns The module exports, or undefined for missing generated output.
+ */
 async function importGenerated(path: string): Promise<Record<string, unknown>> {
   const source = (await Bun.file(path).text()).replace(
     /from ("(?:[^"\\]|\\.)*")/g,

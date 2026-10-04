@@ -1,0 +1,39 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "author": "/root",
+  "outcome": "accepted",
+  "phase": 8,
+  "files": [
+    {
+      "path": "scripts/release-package-contract.ts",
+      "sha256": "0c6cd18ea0ff13189426ffdc3cf2a6b112711af97809a5db912b7e7fee227f83",
+      "lines": 203,
+      "originalSha256": "c0b03405c6c814f9fb91c87997a43bdbdacd3bd643e32d97a391fce09639db12",
+      "originalLines": 186,
+      "reviewer": "/root/inspector_baseline",
+      "currentRead": "EOF",
+      "originalRead": "EOF",
+      "outcome": "accepted"
+    }
+  ],
+  "linkedSupportReview": "/tmp/relkit-docgen-independent-review.json",
+  "findings": [],
+  "scope": "Only additive exact export leaves and function TSDoc; existing root/jobs export leaves, all unrelated conditional tables and validators preserved.",
+  "assessment": [
+    "Contracts map adds ./operation with exact built operation.js/operation.d.ts leaves between root and jobs as manifest order.",
+    "Runtime-effect map adds ./logger with exact built logger.js/logger.d.ts leaves before existing root as manifest order.",
+    "Packing validator uses order-sensitive JSON comparison; release checker sorts keys. Both remain strict; no assertions or configuration weakened.",
+    "Meaningful helper params/returns describe pure native release tooling; no Effect service architecture appropriate for this fixed table."
+  ],
+  "callersRead": [
+    "scripts/pack-and-smoke-exports.ts",
+    "scripts/release-check-support.ts",
+    "scripts/release-package-contract-tables.ts"
+  ],
+  "manifestsRead": [
+    "packages/contracts/package.json",
+    "packages/runtime-effect/package.json"
+  ],
+  "independentCheck": "Short Bun read-only probe asserted exact JSON.stringify ordered equality for both packages and existence/nonempty size of every declared built type/runtime target. Exit0.",
+  "authorReportedChecks": "Prettier passes; packed/phase0 replay queued by parent; no duplicate heavy runner."
+}

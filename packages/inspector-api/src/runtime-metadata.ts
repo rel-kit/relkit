@@ -1,6 +1,11 @@
 import type { JsonValue } from "@relkit/contracts";
 import { isRecord, safeJson, stringValue, type ResolvedActiveGeneration } from "./shared.js";
 
+/**
+ * Projects public local-service and telemetry runtime evidence without private provider internals.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @returns Redacted runtime metadata.
+ */
 export function projectRuntimeMetadata(
   generation: ResolvedActiveGeneration,
 ): Record<string, JsonValue> {
@@ -12,6 +17,11 @@ export function projectRuntimeMetadata(
   };
 }
 
+/**
+ * Selects local-service health, phase, lease and recipe evidence.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Public local-service records in stable order.
+ */
 function projectLocalServices(value: unknown): JsonValue | undefined {
   if (!isRecord(value)) return undefined;
   const plan = isRecord(value.plan) ? value.plan : undefined;
@@ -51,6 +61,11 @@ function projectLocalServices(value: unknown): JsonValue | undefined {
   });
 }
 
+/**
+ * Selects telemetry state, bounded counters and declared exporter metadata.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Public telemetry evidence without credentials or endpoints.
+ */
 function projectTelemetry(value: unknown): JsonValue | undefined {
   if (!isRecord(value)) return undefined;
   const sampling = isRecord(value.sampling) ? value.sampling : {};
@@ -68,6 +83,11 @@ function projectTelemetry(value: unknown): JsonValue | undefined {
   });
 }
 
+/**
+ * Selects safe exporter identity and admission metadata.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Redacted public exporter evidence.
+ */
 function safeExporter(value: unknown): Record<string, unknown>[] {
   if (!isRecord(value) || stringValue(value.name) === undefined) return [];
   return [
@@ -81,6 +101,11 @@ function safeExporter(value: unknown): Record<string, unknown>[] {
   ];
 }
 
+/**
+ * Selects finite nonnegative counters from the declared field set.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Only accepted public numeric counters.
+ */
 function numericFields(value: Record<string, unknown>): Record<string, number> {
   return Object.fromEntries(
     [
@@ -104,6 +129,11 @@ function numericFields(value: Record<string, unknown>): Record<string, number> {
   );
 }
 
+/**
+ * Selects public lease ownership and expiration metadata.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Redacted lease evidence.
+ */
 function safeLease(value: Record<string, unknown>): Record<string, unknown> | undefined {
   const mode = value.mode === "attached" || value.mode === "detached" ? value.mode : undefined;
   const status = ["acquired", "adopted", "recovered", "blocked"].includes(String(value.status))
@@ -114,6 +144,11 @@ function safeLease(value: Record<string, unknown>): Record<string, unknown> | un
     : { ...(mode ? { mode } : {}), ...(status ? { status } : {}) };
 }
 
+/**
+ * Selects public local-service recipe metadata without native configuration values.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns A public recipe declaration.
+ */
 function safeRecipe(value: unknown): Record<string, unknown> | undefined {
   if (!isRecord(value)) return undefined;
   const integrationId = stringValue(value.integrationId);
@@ -124,6 +159,11 @@ function safeRecipe(value: unknown): Record<string, unknown> | undefined {
     : undefined;
 }
 
+/**
+ * Selects local-service phase and bounded failure metadata.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Public phase evidence.
+ */
 function safePhase(value: unknown): string | undefined {
   return ["pending", "starting", "healthy", "unhealthy", "stopped", "planned"].includes(
     String(value),
@@ -132,28 +172,54 @@ function safePhase(value: unknown): string | undefined {
     : undefined;
 }
 
+/**
+ * Accepts only stored string metadata from the selected collection.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns The accepted string values.
+ */
 function strings(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((entry): entry is string => typeof entry === "string").sort()
     : [];
 }
 
+/**
+ * Validates public telemetry sampling rates within the unit interval.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns An accepted sampling rate or undefined.
+ */
 function rate(value: unknown): number | undefined {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1
     ? value
     : undefined;
 }
 
+/**
+ * Accepts only the established public severity vocabulary.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns A public log severity or undefined.
+ */
 function logLevel(value: unknown): string | undefined {
   return ["trace", "debug", "info", "warn", "error", "fatal"].includes(String(value))
     ? String(value)
     : undefined;
 }
 
+/**
+ * Accepts only finite nonnegative numeric evidence.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns An accepted numeric value or undefined.
+ */
 function nonnegative(value: unknown): number | undefined {
   return Number.isSafeInteger(value) && Number(value) >= 0 ? Number(value) : undefined;
 }
 
+/**
+ * Orders projected metadata using its declared public name.
+ * @param left - First projected value in the stable ordering.
+ * @param right - Second projected value in the stable ordering.
+ * @returns The stable public-name comparison result.
+ */
 function byName(left: Record<string, unknown>, right: Record<string, unknown>): number {
   return String(left.name).localeCompare(String(right.name));
 }

@@ -1,0 +1,125 @@
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { expect, test } from "bun:test";
+import { startCandidate } from "../../src/candidate.js";
+
+test("completed candidate shutdown releases its long kill timer", async () => {
+  const child = Bun.spawn(
+    [
+      process.execPath,
+      "-e",
+      `import { terminate } from ${JSON.stringify(join(import.meta.dir, "../../src/candidate-process.ts"))};
+     const backend = Bun.spawn([process.execPath, "-e", "setInterval(() => {}, 1000)"], { stdout: "ignore", stderr: "ignore" });
+     await terminate(backend, 30_000);`,
+    ],
+    { stdout: "ignore", stderr: "pipe" },
+  );
+  const timer = setTimeout(() => child.kill("SIGKILL"), 2_000);
+  try {
+    expect(await child.exited).toBe(0);
+    expect(await new Response(child.stderr).text()).toBe("");
+  } finally {
+    clearTimeout(timer);
+    if (child.exitCode === null) child.kill("SIGKILL");
+  }
+});
+
+test("starts a token-scoped Bun backend on a dynamic port and disposes only itself", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-candidate-"));
+  const active = join(root, ".relkit", "generated", "generation-7");
+  await mkdir(join(root, ".relkit", "generated"), { recursive: true });
+  await writeFile(active, "active", { encoding: "utf8" });
+  const logs: string[] = [];
+  const candidate = await startCandidate({
+    projectRoot: root,
+    token: { sourceToken: 1, generationToken: 8 },
+    logger: (event) => logs.push(event.event),
+    compile: async ({ outputDirectory }) => {
+      const entrypoint = join(outputDirectory, "server.ts");
+      await writeFile(
+        entrypoint,
+        "Bun.serve({ port: Number(process.env.PORT), fetch: () => new Response(process.env.CANDIDATE_VALUE) });",
+      );
+      return { entrypoint, environment: { CANDIDATE_VALUE: "candidate" } };
+    },
+  });
+
+  try {
+    expect(candidate.port).toBeGreaterThan(0);
+    const response = await waitForResponse(`http://127.0.0.1:${candidate.port}`);
+    expect(await response.text()).toBe("candidate");
+    await candidate.dispose();
+    await expect(readFile(active, "utf8")).resolves.toBe("active");
+    await expect(readFile(candidate.directory, "utf8")).rejects.toMatchObject({ code: "ENOENT" });
+    expect(logs).toContain("candidate.compile.succeeded");
+    expect(logs).toContain("candidate.start.succeeded");
+  } finally {
+    await candidate.dispose();
+  }
+});
+
+test("cleans a failed compile without touching the active generation", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-candidate-"));
+  const active = join(root, ".relkit", "generated", "generation-9");
+  await mkdir(join(root, ".relkit", "generated"), { recursive: true });
+  await writeFile(active, "active", { encoding: "utf8", flag: "w" });
+
+  await expect(
+    startCandidate({
+      projectRoot: root,
+      token: { sourceToken: 2, generationToken: 10 },
+      compile: async () => {
+        throw new Error("compile failed");
+      },
+    }),
+  ).rejects.toThrow("compile failed");
+
+  await expect(readFile(active, "utf8")).resolves.toBe("active");
+  await expect(readFile(join(root, ".relkit", "generated", "generation-10"))).rejects.toMatchObject(
+    {
+      code: "ENOENT",
+    },
+  );
+});
+
+test("bounds startup output before logging and retaining it", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-candidate-"));
+  const candidate = await startCandidate({
+    projectRoot: root,
+    token: { sourceToken: 3, generationToken: 11 },
+    maxStartupOutputBytes: 16,
+    compile: async ({ outputDirectory }) => {
+      const entrypoint = join(outputDirectory, "server.ts");
+      await writeFile(
+        entrypoint,
+        'process.stdout.write("x".repeat(100)); setTimeout(() => {}, 1000);',
+      );
+      return { entrypoint };
+    },
+  });
+
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await candidate.stop();
+    const output = await candidate.output;
+    expect(new TextEncoder().encode(output.stdout).byteLength).toBeLessThanOrEqual(16);
+    expect(output.truncated).toBe(true);
+    await candidate.cleanup();
+  } finally {
+    await candidate.dispose();
+  }
+});
+
+/** Waits for the real candidate listener. @param url - Native health URL.
+ * @returns Its first successful response within the retained deadline. */
+async function waitForResponse(url: string): Promise<Response> {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      return await fetch(url);
+    } catch {
+      await Bun.sleep(10);
+    }
+  }
+  throw new Error(`Candidate did not start at ${url}`);
+}

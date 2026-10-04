@@ -1,0 +1,37 @@
+{
+  "root": "/tmp/relkit-core-consumers-job-held-39c7e6b8",
+  "candidate": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "cases": [
+    {
+      "mode": "return",
+      "status": "failed",
+      "nativeRequests": [],
+      "receipt": {
+        "accepted": true,
+        "runId": "local-local-6b875693-63df-4c06-b891-3b4fa1a111f9",
+        "jobId": "acceptance.held-job",
+        "taskId": "acceptance.held-task",
+        "taskVersion": "1",
+        "acceptedAt": "2026-10-03T20:28:42.739Z"
+      },
+      "error": {
+        "message": "Job run data is not available.",
+        "stack": "ORPCError: Job run data is not available.\n    at createORPCErrorFromJson (/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.BnATe4Ob.mjs:22:21)\n    at decodeResponse (/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.vEM0O_Eg.mjs:156:40)\n    at processTicksAndRejections (native:7:39)"
+      }
+    }
+  ],
+  "failure": {
+    "message": "Job run data is not available.",
+    "stack": "ORPCError: Job run data is not available.\n    at createORPCErrorFromJson (/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.BnATe4Ob.mjs:22:21)\n    at decodeResponse (/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.vEM0O_Eg.mjs:156:40)\n    at processTicksAndRejections (native:7:39)"
+  },
+  "claims": {
+    "realTestingApplication": true,
+    "realBunHttp": true,
+    "publicClientJobWatcher": true,
+    "actualEngineTaskExecutor": true,
+    "nativeDurableAdapter": true,
+    "manualFakeCompletion": false,
+    "durableStateReacquiredAfterOwnerClose": false,
+    "originalFixtureModified": false
+  }
+}

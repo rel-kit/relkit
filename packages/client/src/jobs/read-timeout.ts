@@ -1,5 +1,12 @@
 import { JobWatchAbortedError, JobWatchReadTimeoutError } from "./types.js";
 
+/**
+ * Bounds one native iterator pull using the caller's cancellation authority.
+ * @param iterator - Owned native iterator.
+ * @param signal - Borrowed caller cancellation signal.
+ * @param timeoutMs - Existing read or establishment deadline in milliseconds.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 export async function readWatchNext(
   iterator: AsyncIterator<unknown>,
   signal: AbortSignal,
@@ -8,6 +15,14 @@ export async function readWatchNext(
   return timedCall(signal, timeoutMs, () => iterator.next());
 }
 
+/**
+ * Races one native boundary call against cancellation and the existing bounded read deadline.
+ * @typeParam T - Input and successful result type.
+ * @param signal - Borrowed caller cancellation signal.
+ * @param timeoutMs - Existing read or establishment deadline in milliseconds.
+ * @param operation - One native boundary operation.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 export async function timedCall<T>(
   signal: AbortSignal,
   timeoutMs: number,

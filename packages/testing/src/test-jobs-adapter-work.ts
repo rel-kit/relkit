@@ -1,20 +1,14 @@
-import type {
-  RunHandle,
-  RunListQuery,
-  RunPage,
-  RunSnapshot,
-  RunWatchFrame,
-} from "@relkit/contracts/jobs";
+import type { RunHandle, RunListQuery, RunPage, RunSnapshot } from "@relkit/contracts/jobs";
 import type {
   NativeRunQuery,
   NativeTaskWork,
-  NativeWatchRequest,
   OperationContext,
   NativeSubmission,
   TaskExecutionBinding,
   TaskExecutionEnvelope,
 } from "@relkit/jobs/adapter";
 import type { TestClock } from "./runtime.js";
+import { combineSignals } from "./runtime-clock.js";
 import {
   failureOf,
   isTerminal,
@@ -22,6 +16,14 @@ import {
   type TestNativeRun,
 } from "./test-jobs-adapter-support.js";
 
+/**
+ * Creates one queued native run using an injected acceptance clock.
+ * @param request - Native operation input carrying explicit identity and execution context.
+ * @param runId - Accepted native run identity.
+ * @param retryOfRunId - Optional retry ancestry identity.
+ * @param clock - Injected deterministic domain clock.
+ * @returns Authoritative run state with canonical input and explicit retry ancestry.
+ */
 export function createRun(
   request: NativeSubmission,
   runId: string,
@@ -39,6 +41,11 @@ export function createRun(
   };
 }
 
+/**
+ * Projects the accepted native run identity.
+ * @param run - Authoritative native run state.
+ * @returns The existing accepted native handle.
+ */
 export function handle(run: TestNativeRun): RunHandle {
   return {
     accepted: true,
@@ -50,15 +57,24 @@ export function handle(run: TestNativeRun): RunHandle {
   };
 }
 
+/**
+ * Filters native runs and returns detached deterministic snapshots.
+ * @param runs - Authoritative native runs indexed by accepted identity.
+ * @param query - Existing native run list filters.
+ * @param service - Native service identity included in public run snapshots.
+ * @param clock - Injected deterministic domain clock.
+ * @returns The native page with explicit availability and count fields.
+ */
 export function list(
   runs: Map<string, TestNativeRun>,
   query: NativeRunQuery,
   service: string,
+  clock: TestClock,
 ): RunPage<RunSnapshot> {
   const items = [...runs.values()]
     .filter((run) => matches(run, query))
     .slice(0, query.limit ?? 25)
-    .map((run) => snapshotOf(run, service));
+    .map((run) => structuredClone(snapshotOf(run, service, clock)));
   return {
     items,
     hasMore: false,
@@ -67,47 +83,28 @@ export function list(
   };
 }
 
-export async function* observe(
-  runs: Map<string, TestNativeRun>,
-  request: NativeWatchRequest,
-  context: OperationContext,
-  service: string,
-): AsyncIterable<RunWatchFrame<RunSnapshot>> {
-  const run = runs.get(request.runId);
-  if (run === undefined) throw new Error("Test run was not found");
-  let sequence = 0;
-  yield {
-    kind: "snapshot",
-    run: snapshotOf(run, service),
-    observedAt: new Date().toISOString(),
-    epoch: "test",
-    sequence: ++sequence,
-    continuity: "state",
-  };
-  while (!isTerminal(run.status)) {
-    if (context.signal.aborted) return;
-    await new Promise<void>((resolve) => setTimeout(resolve, 0));
-    yield {
-      kind: "update",
-      run: snapshotOf(run, service),
-      observedAt: new Date().toISOString(),
-      epoch: "test",
-      sequence: ++sequence,
-    };
-  }
-}
-
+/**
+ * Admits one queued native task and binds native cancellation.
+ * @param runs - Authoritative native runs indexed by accepted identity.
+ * @param context - Native invocation context including cancellation and deadline.
+ * @param service - Native service identity included in public run snapshots.
+ * @param clock - Injected deterministic domain clock.
+ * @returns Work and execution binding, or undefined when admission finds no eligible task.
+ */
 export async function next(
   runs: Map<string, TestNativeRun>,
   context: OperationContext,
   service: string,
+  clock: TestClock,
 ): Promise<NativeTaskWork | undefined> {
   const run = [...runs.values()].find((candidate) => candidate.status === "queued");
   if (run === undefined || context.signal.aborted) return undefined;
   const controller = new AbortController();
   run.status = "running";
-  run.startedAt = new Date().toISOString();
+  run.startedAt = clock.now().toISOString();
   run.controller = controller;
+  const signal = combineSignals(controller.signal, context.signal);
+  run.disposeSignal = signal.dispose;
   const envelope: TaskExecutionEnvelope = {
     runId: run.runId,
     jobId: run.request.jobId,
@@ -151,11 +148,18 @@ export async function next(
         ? {}
         : { occurrenceIdentity: run.request.occurrenceIdentity }),
     },
-    signal: controller.signal,
+    signal: signal.signal,
   };
   return { envelope, binding };
 }
 
+/**
+ * Commits a nonterminal worker's successful native outcome.
+ * @param run - Authoritative native run state.
+ * @param output - Validated native worker result.
+ * @param clock - Injected deterministic domain clock.
+ * @returns Completion; terminal or absent runs remain unchanged.
+ */
 export async function complete(
   run: TestNativeRun | undefined,
   output: unknown,
@@ -167,6 +171,13 @@ export async function complete(
   run.completedAt = clock.now().toISOString();
 }
 
+/**
+ * Commits a nonterminal worker's bounded native failure envelope.
+ * @param run - Authoritative native run state.
+ * @param error - Original native worker failure.
+ * @param clock - Injected deterministic domain clock.
+ * @returns Completion; terminal or absent runs remain unchanged.
+ */
 export async function fail(
   run: TestNativeRun | undefined,
   error: unknown,
@@ -178,6 +189,12 @@ export async function fail(
   run.completedAt = clock.now().toISOString();
 }
 
+/**
+ * Tests native job list filters without changing authoritative state.
+ * @param run - Authoritative native run state.
+ * @param query - Existing native run list filters.
+ * @returns True when every supplied identity/status filter matches.
+ */
 function matches(run: TestNativeRun, query: RunListQuery): boolean {
   return (
     (query.runId === undefined || query.runId === run.runId) &&

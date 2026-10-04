@@ -1,6 +1,19 @@
 "use client";
 
-import type { ChannelCheckpoint } from "@relkit/realtime";
+import type {
+  EventsFor,
+  UseRealtimeResult,
+  UseChannelOptions,
+  ChannelState,
+  UseChannelResult,
+} from "./realtime-hook.types.js";
+export type {
+  UseRealtimeResult,
+  ChannelHandlers,
+  UseChannelOptions,
+  UseChannelResult,
+} from "./realtime-hook.types.js";
+
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRelkitClient } from "./context.js";
 import {
@@ -8,28 +21,12 @@ import {
   type RealtimeFrame,
   type RealtimeStatus,
 } from "./realtime-manager.js";
-import type { ChannelRegistry, ChannelSelector } from "./registry.js";
+import type { ChannelSelector } from "./registry.types.js";
 
-type ChannelFor<Name extends ChannelSelector> = ChannelRegistry[Name];
-type ParamsFor<Name extends ChannelSelector> =
-  ChannelFor<Name> extends { readonly params: infer Params } ? Params : never;
-type EventsFor<Name extends ChannelSelector> =
-  ChannelFor<Name> extends { readonly events: infer Events } ? Events : never;
-type PresenceFor<Name extends ChannelSelector> =
-  ChannelFor<Name> extends { readonly presence: infer Presence } ? Presence : never;
-
-export interface UseRealtimeResult {
-  readonly status: RealtimeStatus;
-  readonly subscribe: <Name extends ChannelSelector>(
-    name: Name,
-    params: ParamsFor<Name>,
-    listener: (frame: RealtimeFrame) => void,
-  ) => () => void;
-  readonly bind: UseRealtimeResult["subscribe"];
-  readonly unbind: (unsubscribe: () => void) => void;
-  readonly unsubscribe: (unsubscribe: () => void) => void;
-}
-
+/**
+ * Adapts manager status and explicit subscription leases into React's external store.
+ * @returns Manager status and explicit subscription controls.
+ */
 export function useRealtime(): UseRealtimeResult {
   const { realtime } = useRelkitClient();
   const status = useSyncExternalStore(
@@ -48,28 +45,13 @@ export function useRealtime(): UseRealtimeResult {
   };
 }
 
-export type ChannelHandlers<Name extends ChannelSelector> = Partial<{
-  readonly [Event in keyof EventsFor<Name>]: (payload: EventsFor<Name>[Event]) => void;
-}>;
-
-export interface UseChannelOptions<Name extends ChannelSelector> {
-  readonly params: ParamsFor<Name>;
-  readonly on?: ChannelHandlers<Name>;
-  readonly onCaughtUp?: () => void | Promise<void>;
-  readonly onGap?: (reason: string) => void | Promise<void>;
-}
-
-interface ChannelState {
-  readonly status: RealtimeStatus;
-  readonly checkpoint?: ChannelCheckpoint;
-  readonly caughtUp: boolean;
-  readonly gap?: string;
-  readonly presence?: unknown;
-}
-
-export type UseChannelResult<Name extends ChannelSelector> = Omit<ChannelState, "presence"> &
-  ([PresenceFor<Name>] extends [never] ? {} : { readonly presence: PresenceFor<Name> });
-
+/**
+ * Borrows one shared channel session and projects ordered frames into React state.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @param name - Declared resource or selector identity.
+ * @param options - Existing public configuration and authority.
+ * @returns The projected channel state and declared event controls.
+ */
 export function useChannel<Name extends ChannelSelector>(
   name: Name,
   options: UseChannelOptions<Name>,
@@ -96,6 +78,14 @@ export function useChannel<Name extends ChannelSelector>(
   return state as UseChannelResult<Name>;
 }
 
+/**
+ * Publishes existing channel events, presence and recovery callbacks.
+ * @typeParam Name - Declared resource or procedure selector.
+ * @param frame - Original observation frame.
+ * @param options - Existing public configuration and authority.
+ * @param update - Borrowed state publication callback.
+ * @returns A Promise for the existing result, preserving original rejected values.
+ */
 async function applyFrame<Name extends ChannelSelector>(
   frame: RealtimeFrame,
   options: UseChannelOptions<Name>,

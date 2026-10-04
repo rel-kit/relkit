@@ -32,7 +32,8 @@ export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
   "packages/observability/src/storage/index-files.ts",
   "packages/observability/src/storage/segment-files.ts",
   "packages/runtime-effect/src/logger.ts",
-  "packages/inspector-api/src/observability.ts",
+  // The response-owned SSE exporter serializes admitted native stream events.
+  "packages/inspector-api/src/observability-stream.ts",
   "packages/inspector-api/src/observability-utils.ts",
 ] as const);
 

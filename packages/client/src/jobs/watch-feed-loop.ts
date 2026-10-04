@@ -1,136 +1,116 @@
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
-import { closeIterator, openWatchIterator, authoritativeFrame, watchRequest } from "./reconcile.js";
+import { Effect, Stream } from "effect";
+import { nativeCall, nativeStream } from "../native-stream.js";
+import { openWatchIterator, authoritativeFrame, watchRequest } from "./reconcile.js";
+import { isTerminalRun } from "./types.js";
 import { readWatchNext } from "./read-timeout.js";
-import { isTerminalRun, type JobWatchOptions } from "./types.js";
-import {
-  backoff,
-  closeEmptyIterator,
-  isUnauthorized,
-  offline,
-  resetFrame,
-  wait,
-  withAfter,
-} from "./watch-feed-support.js";
-import type { FeedEvent } from "./watch-feed.js";
+import { offline, resetFrame, withAfter } from "./watch-feed-support.js";
+import { recoverWatchFeed } from "./watch-feed-recovery.js";
+import type { WatchFeedLoop } from "./watch-feed-loop.types.js";
 import { runPollingFeed } from "./watch-feed-polling.js";
+export type { WatchFeedLoop } from "./watch-feed-loop.types.js";
 
-export interface WatchFeedLoop<Run> {
-  readonly client: unknown;
-  readonly name: string;
-  readonly options: JobWatchOptions;
-  readonly isActive: (generation: number) => boolean;
-  readonly lastCursor: () => string | undefined;
-  readonly setAbort: (controller: AbortController | undefined) => void;
-  readonly setIterator: (iterator: AsyncIterator<unknown> | undefined) => void;
-  readonly acceptFrame: (value: unknown) => RunWatchFrame<Run> | undefined;
-  readonly emit: (event: FeedEvent<Run>) => void;
-  readonly verifyTerminal: (
-    frame: RunWatchFrame<Run>,
-    signal: AbortSignal,
-  ) => Promise<boolean | undefined>;
-  readonly releaseTerminal: () => void;
-  readonly resolveFirsts: () => void;
-  readonly rejectFirsts: (error: unknown) => void;
-  readonly failureCount: () => number;
-  readonly setFailureCount: (value: number) => void;
-}
-
-export async function runWatchFeed<Run>(
-  feed: WatchFeedLoop<Run>,
-  generation: number,
-): Promise<void> {
-  if (feed.options.source === "polling") {
-    await runPollingFeed(feed, generation);
-    return;
-  }
-  while (feed.isActive(generation)) {
-    let needsReset = feed.failureCount() > 0;
-    const controller = new AbortController();
-    feed.setAbort(controller);
-    if (await offline(controller.signal)) {
-      feed.setAbort(undefined);
-      continue;
-    }
-    feed.emit({
-      kind: "status",
-      status: feed.failureCount() === 0 ? "connecting" : "reconnecting",
-    });
-    let activeIterator: AsyncIterator<unknown> | undefined;
-    try {
-      const iterator = await openWatchIterator(
-        feed.client,
-        feed.name,
-        watchRequest(feed.options, feed.lastCursor()),
-        controller.signal,
-        feed.options.readTimeoutMs,
-      );
-      activeIterator = iterator;
-      feed.setIterator(iterator);
-      if (!feed.isActive(generation)) return;
-      feed.emit({ kind: "status", status: "connected" });
-      while (!controller.signal.aborted && feed.isActive(generation)) {
-        const next = await readWatchNext(iterator, controller.signal, feed.options.readTimeoutMs);
-        if (next.done === true) break;
-        const frame = feed.acceptFrame(needsReset ? resetFrame(next.value) : next.value);
-        if (frame === undefined) continue;
-        needsReset = false;
-        feed.setFailureCount(0);
-        if (isTerminalRun(frame.run)) {
-          const confirmed = await feed.verifyTerminal(frame, controller.signal);
-          if (confirmed === true) {
-            feed.emit({ kind: "status", status: "completed" });
-            feed.resolveFirsts();
-            feed.releaseTerminal();
-            return;
+/**
+ * Runs the native observation/reconciliation/retry state machine in its owner fiber.
+ * @typeParam Run - Application-specific snapshot payload.
+ * @param feed - Shared state and observer authority acquired once for this feed.
+ * @param generation - Epoch guard preventing retired workers from publishing.
+ * @returns Lazy work ending on confirmed terminal evidence, exhaustion or interruption.
+ */
+export const runWatchFeed = Effect.fn("JobObservation.consume")(
+  <Run>(feed: WatchFeedLoop<Run>, generation: number): Effect.Effect<void, unknown> =>
+    Effect.gen(function* () {
+      if (feed.options.source === "polling") return yield* runPollingFeed(feed, generation);
+      while (feed.isActive(generation)) {
+        const controller = new AbortController();
+        feed.setAbort(controller);
+        yield* Effect.gen(function* () {
+          if (yield* nativeCall(() => offline(controller.signal))) return;
+          let needsReset = feed.failureCount() > 0;
+          let terminal = false;
+          feed.emit({
+            kind: "status",
+            status: feed.failureCount() === 0 ? "connecting" : "reconnecting",
+          });
+          const source = nativeStream(
+            "jobs.watch.frames",
+            async (signal) => {
+              const iterator = await openWatchIterator(
+                feed.client,
+                feed.name,
+                watchRequest(feed.options, feed.lastCursor()),
+                signal,
+                feed.options.readTimeoutMs,
+              );
+              feed.setIterator(iterator);
+              return iterator;
+            },
+            controller.signal,
+            Effect.sync(() => feed.emit({ kind: "status", status: "connected" })),
+            (iterator, signal) => readWatchNext(iterator, signal, feed.options.readTimeoutMs),
+          );
+          yield* source.pipe(
+            Stream.mapEffect((value) =>
+              Effect.gen(function* () {
+                if (!feed.isActive(generation)) return false;
+                const frame = feed.acceptFrame(needsReset ? resetFrame(value) : value);
+                if (frame === undefined) return true;
+                needsReset = false;
+                feed.setFailureCount(0);
+                if (isTerminalRun(frame.run)) {
+                  const confirmed = yield* nativeCall(() =>
+                    feed.verifyTerminal(frame, controller.signal),
+                  );
+                  if (confirmed === true) {
+                    terminal = true;
+                    feed.emit({ kind: "status", status: "completed" });
+                    feed.resolveFirsts();
+                    feed.releaseTerminal();
+                    return false;
+                  }
+                  if (confirmed === false) feed.resolveFirsts();
+                } else {
+                  feed.emit({ kind: "frame", frame });
+                  feed.resolveFirsts();
+                }
+                return true;
+              }),
+            ),
+            Stream.takeWhile((continuing) => continuing),
+            Stream.runDrain,
+          );
+          if (terminal || controller.signal.aborted || !feed.isActive(generation)) return;
+          const reconciled = yield* nativeCall(() =>
+            authoritativeFrame(
+              feed.client,
+              feed.name,
+              withAfter(feed.options, feed.lastCursor()),
+              controller.signal,
+            ),
+          );
+          if (reconciled !== undefined) {
+            const frame = feed.acceptFrame(needsReset ? resetFrame(reconciled) : reconciled);
+            if (frame !== undefined) {
+              feed.setFailureCount(0);
+              feed.emit({ kind: "frame", frame });
+              if (isTerminalRun(frame.run)) {
+                feed.emit({ kind: "status", status: "completed" });
+                feed.resolveFirsts();
+                feed.releaseTerminal();
+                return;
+              }
+            }
           }
-          if (confirmed === false) feed.resolveFirsts();
-          continue;
-        }
-        feed.emit({ kind: "frame", frame });
-        feed.resolveFirsts();
+          yield* Effect.fail(new Error("Job watch ended before terminal evidence was available."));
+        }).pipe(
+          Effect.catch((error) => recoverWatchFeed(feed, generation, error, controller)),
+          Effect.ensuring(
+            Effect.sync(() => {
+              controller.abort();
+              feed.setIterator(undefined);
+              feed.setAbort(undefined);
+            }),
+          ),
+        );
       }
-      if (controller.signal.aborted || !feed.isActive(generation)) return;
-      const reconciled = await authoritativeFrame(
-        feed.client,
-        feed.name,
-        withAfter(feed.options, feed.lastCursor()),
-        controller.signal,
-      );
-      if (reconciled !== undefined) {
-        const frame = feed.acceptFrame(needsReset ? resetFrame(reconciled) : reconciled);
-        if (frame !== undefined) {
-          needsReset = false;
-          feed.setFailureCount(0);
-          feed.emit({ kind: "frame", frame });
-          if (isTerminalRun(frame.run)) {
-            feed.emit({ kind: "status", status: "completed" });
-            feed.resolveFirsts();
-            feed.releaseTerminal();
-            return;
-          }
-        }
-      }
-      throw new Error("Job watch ended before terminal evidence was available.");
-    } catch (error) {
-      if (controller.signal.aborted || !feed.isActive(generation)) return;
-      if (isUnauthorized(error)) {
-        feed.emit({ kind: "status", status: "unauthorized", error });
-        feed.rejectFirsts(error);
-        return;
-      }
-      const failures = feed.failureCount() + 1;
-      feed.setFailureCount(failures);
-      if (failures >= (feed.options.maxReconnectAttempts ?? 10)) {
-        feed.emit({ kind: "status", status: "error", error });
-        feed.rejectFirsts(error);
-        return;
-      }
-      feed.emit({ kind: "status", status: "reconnecting", error });
-      await wait(backoff(failures, feed.options), controller.signal);
-    } finally {
-      await closeIterator(activeIterator ?? closeEmptyIterator()).catch(() => undefined);
-      feed.setIterator(undefined);
-      feed.setAbort(undefined);
-    }
-  }
-}
+    }),
+);

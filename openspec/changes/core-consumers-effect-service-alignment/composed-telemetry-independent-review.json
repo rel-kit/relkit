@@ -1,0 +1,78 @@
+{
+  "reviewer": "client_baseline",
+  "status": "accepted split-author source review and independently inspected native execution: passed, exit0, no timeout",
+  "scope": "Independent EOF review; no hosts, browsers or native probe execution.",
+  "files": [
+    {
+      "path": "/tmp/relkit-core-consumers-composed-telemetry.mjs",
+      "sha256": "edfa75d4b17502d7d610b3e0b733a60bed032d62f9d60db82202a00f92e67580",
+      "lines": 233,
+      "readEOF": true,
+      "status": "Prior232line body independently accepted by client_baseline; two-line resolver delta authored by client_baseline and accepted by Inspector peer final EOF/hash"
+    },
+    {
+      "path": "/tmp/relkit-phase7-composed-evidence-assessment.json",
+      "sha256": "2f4454cd8ebb330925cbe557cd24c6649d00231a44b5ef2495e22736d1c52021",
+      "lines": 165,
+      "readEOF": true,
+      "status": "accepted preparation assessment; referenced17 hashes match"
+    },
+    {
+      "path": "/tmp/relkit-core-consumers-composed-runner.mjs",
+      "sha256": "fcf93bbd2ee056ca91dc09294b246be932a09b057fdf642deb96a21530623787",
+      "lines": 38,
+      "readEOF": true,
+      "status": "accepted"
+    }
+  ],
+  "findings": [
+    {
+      "owner": "inspector_baseline",
+      "status": "resolved with public ownership capability qualification",
+      "finding": "Probe checks Client actual metric delta but server owner exact outcomes currently use logger rows alone.",
+      "resolution": "Final probe supplies a public Inspector owner with an explicit isolated registry and asserts list delta1 per call/list2 total/open1/subscribe1, alongside fresh global Testing listen1/close1 and existing Client delta1. SupervisorProxy owns a private MetricRegistry and exposes neither injection nor read API; preserve exact configured logger switch1/request2/stop1 assertions and explicitly mark private metric visibility unverified rather than assert against the wrong global registry. Current public proxy source/options/index and Inspector suppliedOwner source read confirm this capability boundary."
+    },
+    {
+      "owner": "root",
+      "status": "resolved",
+      "finding": "External watchdog termination could theoretically preserve childexit0 and appear successful.",
+      "resolution": "Final runner records nativeExitCode/timedOut and forces nonzero when30s watchdog fires, joins actual exited and clears handlers/timers."
+    }
+  ],
+  "topology": "Actual public Testing Bun listener hosts Hono/oRPC and public Inspector endpoints over persisted public Observability source. Public Client calls direct and through actual public Supervisor proxy. RPC server program queries Inspector through actual native HTTP; SSE traverses proxy and source natural EOF.",
+  "acceptedAssertions": [
+    "Exact query payload equal direct/proxy, one authoritative seed",
+    "Client metric delta1 per public RPC; Inspector public suppliedOwner metric list delta1 per call/list2/open1/subscribe1; Testing fresh global listen1/close1",
+    "Configured Effect child Debug visibility and inherited explicit requestId while parent/sibling Debug hidden and token redacted",
+    "No query diagnostic feedback into source records/cursor/published",
+    "Actual proxied seed SSE frame, natural source EOF, subscriber0; exact observed lifetime logs",
+    "All acquired native cleanup attempted with failure evidence and nonzero exit"
+  ],
+  "ownership": "Request timer abort20s, read deadline propagates to fetch stream, finally abort/cancel reader and attempts proxy/Inspector/Testing/Observability cleanup. Runner credential-free environment, exact child cwd/importroot,30s watchdog plus2s SIGKILL escalation only same child, actual exited join/finally handlers/timers. A timeout is explicit failure; source startup/cleanup lacks intrinsic full deadline and relies on accepted runner.",
+  "scopeLimits": [
+    "Supervisor native owner metrics are private/unavailable through public API; exact configured operation log outcome counts are verified instead and evidence labels that visibility limit",
+    "Server-local configured logging context exercised through RPC, no automatic cross-network annotation/log-level propagation claim",
+    "Synthetic public RPC observation procedure, not a generated production app engine",
+    "Natural SSE EOF proves lifetime/noRecursion; not bare socket-abort propagation",
+    "Accepted work lifetime is independent held-job/agent proof, not this telemetry probe"
+  ],
+  "referencedAssessmentHashes": {
+    "count": 17,
+    "allCurrent": true
+  },
+  "resolutionAmendment": "After parent actual runner failed before acquisition, root-authorized client_baseline changed only createRequire owner context to runtime-hono/package.json plus one comment. Static resolution succeeds for its declared Effect/Hono/oRPC dependencies; reversing exact two-line delta reconstructs prior232-line accepted SHA97522448cbfeb586eda42b80a4f6e1aa19a2a7f22efa81953001fc6263aafc98. Inspector non-author amendment peer accepted /tmp/relkit-composed-resolver-independent-review.json SHAc5b3d04caa8c1491b62ddecf9a746236eaa160f84e2390a9d147a3653e4ce4dc; original assertion body and root runner independently accepted here.",
+  "runtimeEvidence": {
+    "resultPath": "/tmp/relkit-phase7-telemetry-B6eZLD/composed-telemetry-results.json",
+    "resultSha256": "a534817478157f85f2fa6ca682c2c3ea404fa4f238624b4fca283e41d594f7f1",
+    "logPath": "/tmp/relkit-core-consumers-composed-telemetry-final-live.log",
+    "logSha256": "a7283542027a4885a46c601bcfb10cd4f6fb62ffe5dd4ca59745ace358a45c09",
+    "status": "passed",
+    "nativeExitCode": 0,
+    "runnerTimedOut": false,
+    "verification": "Results/log read EOF and independently asserted against accepted source: both direct and proxy calls Client delta1/Inspector delta1/oneitem, Inspector list2/open1/subscribe1, Testing listen1/close1, exact proxy logger switch1/request2/stop1 allsuccess, source1/cursor1/published1/subscriber0 after naturalEOF, exact child/parent messages/requestId/privateTokenAbsence, all five reader/proxy/Inspector/Testing/Observability cleanup receipts joined. No failure fields present.",
+    "privateSupervisorMetricVisibility": "Unverified through public handle as explicitly recorded in result; exact configured operation logger outcomes verified.",
+    "scope": "Server-local configured child context; no automatic cross-network context, accepted work survival or bare native socket disconnect claim. Independent held worker probes supply those separate obligations.",
+    "sourceCurrent": "Current233-line resolver/source SHA matches peer accepted file,38-line runner unchanged; assessment remains a historical preparation-only inventory with unchanged referenced assertions."
+  },
+  "execution": "Parent actual bounded fresh subprocess produced these receipts; reviewer only read/validated evidence and started no host, browser or probe runner."
+}

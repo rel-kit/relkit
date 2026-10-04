@@ -1,0 +1,192 @@
+{
+  "protocol": "relkit.performance",
+  "version": 1,
+  "environment": {
+    "command": "bun run scripts/performance.ts",
+    "timestamp": "2026-10-03T12:16:26.707Z",
+    "bun": "1.3.10",
+    "node": "v24.3.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpuModel": "Apple M1 Pro",
+    "cpuCount": 10,
+    "totalMemoryBytes": 17179869184
+  },
+  "fixtures": {
+    "descriptorScales": [100, 1000, 10000],
+    "inspectorNodes": 1000,
+    "eventFanOut": 8
+  },
+  "measurements": {
+    "compilation": [
+      {
+        "descriptors": 100,
+        "totalMs": 113.952,
+        "graphNodes": 100,
+        "graphBytes": 40934,
+        "heapDeltaBytes": 0,
+        "graphHash": "sha256:bf272bb43cfaa1236018295a38ebca73449df84e9f9686cd6f77a97443bb899e"
+      },
+      {
+        "descriptors": 1000,
+        "totalMs": 643.803,
+        "graphNodes": 1000,
+        "graphBytes": 409934,
+        "heapDeltaBytes": 8187651,
+        "graphHash": "sha256:e21bf39578027f3a804736daa56ab2831e99f1f716bb1917673e549b8c112277"
+      },
+      {
+        "descriptors": 10000,
+        "totalMs": 7619.752,
+        "graphNodes": 10000,
+        "graphBytes": 4108934,
+        "heapDeltaBytes": 102710257,
+        "graphHash": "sha256:9189bf2e25878de5f9867443ce7ed63fc5b2fad3fa111f039ec8a30d3326ecf7"
+      }
+    ],
+    "warmDirectInvocation": {
+      "iterations": 100,
+      "warmups": 10,
+      "totalMs": 1213.014,
+      "averageMs": 12.13,
+      "p50Ms": 10.629,
+      "p95Ms": 19.355,
+      "opsPerSecond": 82.439
+    },
+    "warmRoute": {
+      "iterations": 100,
+      "warmups": 10,
+      "totalMs": 1833.72,
+      "averageMs": 18.337,
+      "p50Ms": 15.757,
+      "p95Ms": 35.086,
+      "opsPerSecond": 54.534
+    },
+    "requestStream": {
+      "iterations": 100,
+      "warmups": 10,
+      "totalMs": 45.104,
+      "averageMs": 0.451,
+      "p50Ms": 0.253,
+      "p95Ms": 0.859,
+      "opsPerSecond": 2217.119
+    },
+    "localJob": {
+      "iterations": 100,
+      "completed": 100,
+      "totalMs": 4050.197,
+      "opsPerSecond": 24.69
+    },
+    "eventFanOut": {
+      "iterations": 100,
+      "fanOut": 8,
+      "completed": 800,
+      "totalMs": 40325.939,
+      "eventsPerSecond": 2.48
+    },
+    "inspectorGraph": {
+      "nodes": 1000,
+      "edges": 999,
+      "totalMs": 413.54,
+      "width": 255976,
+      "height": 180
+    },
+    "candidateActivation": {
+      "iterations": 100,
+      "warmups": 10,
+      "totalMs": 0.791,
+      "averageMs": 0.008,
+      "p50Ms": 0.004,
+      "p95Ms": 0.013,
+      "opsPerSecond": 126455.503
+    },
+    "instrumentationOverhead": {
+      "directInvocation": {
+        "baseline": {
+          "iterations": 1000,
+          "warmups": 10,
+          "totalMs": 9131.75,
+          "averageMs": 9.132,
+          "p50Ms": 8.669,
+          "p95Ms": 13.001,
+          "opsPerSecond": 109.508
+        },
+        "recorded": {
+          "iterations": 1000,
+          "warmups": 10,
+          "totalMs": 10032.716,
+          "averageMs": 10.033,
+          "p50Ms": 9.307,
+          "p95Ms": 15.017,
+          "opsPerSecond": 99.674
+        },
+        "p50Percent": 7.36,
+        "p95Percent": 15.506
+      },
+      "operationHeavyInvocation": {
+        "baseline": {
+          "iterations": 1000,
+          "warmups": 10,
+          "totalMs": 10630.56,
+          "averageMs": 10.631,
+          "p50Ms": 9.894,
+          "p95Ms": 16.352,
+          "opsPerSecond": 94.068
+        },
+        "recorded": {
+          "iterations": 1000,
+          "warmups": 10,
+          "totalMs": 12156.231,
+          "averageMs": 12.156,
+          "p50Ms": 11.172,
+          "p95Ms": 18.603,
+          "opsPerSecond": 82.262
+        },
+        "p50Percent": 12.917,
+        "p95Percent": 13.766
+      },
+      "httpRoute": {
+        "baseline": {
+          "iterations": 1000,
+          "warmups": 10,
+          "totalMs": 13391.255,
+          "averageMs": 13.391,
+          "p50Ms": 11.003,
+          "p95Ms": 22.841,
+          "opsPerSecond": 74.676
+        },
+        "recorded": {
+          "iterations": 1000,
+          "warmups": 10,
+          "totalMs": 14374.457,
+          "averageMs": 14.374,
+          "p50Ms": 13.263,
+          "p95Ms": 22.115,
+          "opsPerSecond": 69.568
+        },
+        "p50Percent": 20.54,
+        "p95Percent": -3.178
+      }
+    },
+    "executionQuery": {
+      "iterations": 100,
+      "warmups": 10,
+      "totalMs": 82.853,
+      "averageMs": 0.829,
+      "p50Ms": 0.642,
+      "p95Ms": 1.456,
+      "opsPerSecond": 1206.961
+    },
+    "heapStabilization": {
+      "iterations": 2000,
+      "beforeBytes": 167014001,
+      "afterBytes": 72863633,
+      "deltaBytes": -94150368
+    }
+  },
+  "thresholds": {
+    "p50ReviewPercent": 5,
+    "p95ReviewPercent": 10
+  }
+}
