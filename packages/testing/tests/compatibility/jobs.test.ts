@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "@relkit/schema";
-import { createTestJob } from "./src/index.ts";
+import { createTestJob } from "../../src/index.ts";
 
 const target = {
   id: "orders.send",
@@ -50,7 +50,7 @@ describe("testing job fake", () => {
     });
     try {
       await job.enqueue({ orderId: "lease" });
-      job.failures.once("job.after-lease");
+      job.failures.once!("job.after-lease");
       await expect(job.runNext()).rejects.toThrow("job.after-lease");
       await job.clock.advance(10);
       await job.restart();
@@ -58,7 +58,7 @@ describe("testing job fake", () => {
       expect(calls).toBe(1);
 
       await job.enqueue({ orderId: "ack" });
-      job.failures.once("job.after-handler-success-before-ack");
+      job.failures.once!("job.after-handler-success-before-ack");
       await expect(job.runNext()).rejects.toThrow("job.after-handler-success-before-ack");
       await job.clock.advance(10);
       await job.restart();

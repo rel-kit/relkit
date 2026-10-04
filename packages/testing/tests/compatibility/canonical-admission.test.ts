@@ -1,13 +1,10 @@
 import { expect, test } from "bun:test";
-import {
-  defineJob,
-  defineTask,
-  createJobsRuntime,
-  submitCanonicalTask,
-  submitTask,
-} from "@relkit/jobs";
+import { defineJob, defineTask, submitCanonicalTask, submitTask } from "@relkit/jobs";
 import { z } from "@relkit/schema";
-import { createDeterministicJobsAdapter } from "./src/test-jobs-adapter.ts";
+import {
+  createDeterministicJobsAdapter,
+  createJobsRuntime,
+} from "../fixtures/owned-compatibility.ts";
 
 test("replays canonical task input without applying the public transform twice", async () => {
   let transforms = 0;
