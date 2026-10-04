@@ -1,15 +1,16 @@
 import { expect, test } from "bun:test";
-import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { GRAPH_VERSION } from "@relkit/contracts";
 import type { ApplicationGraph, ProviderBindingNode } from "@relkit/graph";
-import { createTestCacheFake } from "./src/cache.ts";
-import { createTestFakes } from "./src/fakes.ts";
 import {
+  createTestCacheFake,
+  createTestFakes,
   activateTestProviders,
-  copyTestProviderReplacements,
-} from "./src/provider-replacements.ts";
+  mkdtempSync,
+  closeCompatibilityOwners,
+} from "../fixtures/owned-compatibility.ts";
+import { copyTestProviderReplacements } from "../../src/provider-replacements.ts";
 
 const source = { file: "src/app.ts", line: 1, column: 1 } as const;
 
@@ -27,8 +28,7 @@ test("applies a cache profile replacement through the production registry", asyn
     expect(fakes.clients.cache?.prices).toBe(replacement.provider);
     expect(registry?.resolve("cache", "requests").value).toBe(replacement.provider);
   } finally {
-    await registry?.release();
-    rmSync(root, { recursive: true, force: true });
+    await closeCompatibilityOwners();
   }
 });
 
@@ -39,7 +39,7 @@ test("does not invent a fake for an unreplaced required profile", async () => {
       activateTestProviders(artifacts(), {}, undefined, createTestFakes(root)),
     ).rejects.toMatchObject({ code: "RELKIT_PROVIDER_INTEGRATION_MISSING" });
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    await closeCompatibilityOwners();
   }
 });
 
@@ -52,19 +52,27 @@ test("explicit resource fake mode replaces required profiles without integration
       fakes.createCache("provider.cache.requests").provider,
     );
   } finally {
-    await registry?.release();
-    rmSync(root, { recursive: true, force: true });
+    await closeCompatibilityOwners();
   }
 });
 
+/**
+ * Supplies the minimal native build artifacts exercised by provider activation.
+ * @returns The graph, stable fingerprint, unused registry cast, and empty module list.
+ */
 function artifacts() {
   return {
     graph: graph(),
+    publicFingerprint: "sha256:testing-replacements",
     registry: {} as never,
     runtimeIntegrationModules: [],
   };
 }
 
+/**
+ * Defines one connected cache profile and its required cache resource edge.
+ * @returns The unchanged native graph used to prove replacement admission.
+ */
 function graph(): ApplicationGraph {
   const binding: ProviderBindingNode = {
     kind: "provider",
