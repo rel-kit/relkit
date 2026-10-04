@@ -1,33 +1,25 @@
+import type {
+  Checkpoint,
+  AggregatePosition,
+  AggregateCount,
+  AggregateCountPage,
+  Candidate,
+} from "./run-aggregate-support.types.js";
+export type { Checkpoint, AggregatePosition, Candidate } from "./run-aggregate-support.types.js";
 import type { JsonValue } from "@relkit/contracts";
-import type { RunPage, RunSnapshot } from "@relkit/contracts/jobs";
+import type { RunSnapshot } from "@relkit/contracts/jobs";
+import type { NativeRunPage } from "./native.types.js";
 import { queryFilters, type InspectorCursor, type InspectorRunFilters } from "./filters.js";
 import { InspectorJobsError, type InspectorJobsBinding } from "./types.js";
 
-export interface Checkpoint {
-  readonly service: string;
-  readonly generation: string;
-  readonly cursor?: string;
-  readonly consumed: readonly string[];
-  readonly blocked?: boolean;
-  readonly exhausted?: boolean;
-}
-
-export interface AggregatePosition {
-  readonly services: readonly Checkpoint[];
-}
-
-export interface Candidate {
-  readonly binding: InspectorJobsBinding;
-  readonly run: RunSnapshot;
-  readonly key: string;
-}
-
+/**
+ * Advances aggregate checkpoints only for rows consumed by the public page.
+ * @param states - Ordered native page results and retained checkpoints.
+ * @param items - Ordered public records to filter and paginate.
+ * @returns Retained per-service cursor, consumed-row and availability evidence.
+ */
 export function advancePosition(
-  states: readonly {
-    binding: InspectorJobsBinding;
-    page?: RunPage<RunSnapshot>;
-    state: Checkpoint;
-  }[],
+  states: readonly NativeRunPage[],
   items: readonly Candidate[],
 ): AggregatePosition {
   const emitted = new Map<string, string[]>();
@@ -52,6 +44,12 @@ export function advancePosition(
   };
 }
 
+/**
+ * Selects declared native services and rejects an unavailable explicit selector.
+ * @param bindings - Native job authorities in declaration order.
+ * @param service - Optional service selector; ambiguous selections are rejected.
+ * @returns Native authorities in declaration order.
+ */
 export function selectBindings(
   bindings: readonly InspectorJobsBinding[],
   service: string | undefined,
@@ -67,14 +65,30 @@ export function selectBindings(
   return selected;
 }
 
+/**
+ * Creates the initial aggregate checkpoint for one native service generation.
+ * @param binding - Selected native job authority and its service identity.
+ * @returns An unconsumed service checkpoint.
+ */
 export function checkpoint(binding: InspectorJobsBinding): Checkpoint {
   return { service: binding.service, generation: binding.serviceGeneration, consumed: [] };
 }
 
+/**
+ * Creates aggregate checkpoints in native service declaration order.
+ * @param bindings - Native job authorities in declaration order.
+ * @returns The initial authoritative aggregate position.
+ */
 export function initialPosition(bindings: readonly InspectorJobsBinding[]): AggregatePosition {
   return { services: bindings.map(checkpoint) };
 }
 
+/**
+ * Validates the decoded continuation position before using it.
+ * @param cursor - Signed continuation cursor, or null for the initial page.
+ * @param bindings - Native job authorities in declaration order.
+ * @returns An accepted continuation position or the existing cursor failure.
+ */
 export function readPosition(
   cursor: InspectorCursor,
   bindings: readonly InspectorJobsBinding[],
@@ -112,9 +126,12 @@ export function readPosition(
   return { services };
 }
 
-export function countPages(
-  states: readonly { page?: RunPage<RunSnapshot>; state: Checkpoint }[],
-): { value: number; accuracy: "exact" | "approximate" } | undefined {
+/**
+ * Combines count evidence only when every native page is available and provides a count.
+ * @param states - Ordered native page results and retained checkpoints.
+ * @returns Combined count and its weakest accuracy, or undefined when incomplete.
+ */
+export function countPages(states: readonly AggregateCountPage[]): AggregateCount | undefined {
   if (
     states.some(
       ({ page, state }) => page === undefined || state.blocked || page.count === undefined,
@@ -130,6 +147,12 @@ export function countPages(
   };
 }
 
+/**
+ * Orders native runs using accepted timestamps and stable public service/run identities.
+ * @param left - First projected value in the stable ordering.
+ * @param right - Second projected value in the stable ordering.
+ * @returns The deterministic merge comparison result.
+ */
 export function compareCandidates(left: Candidate, right: Candidate): number {
   const accepted = right.run.acceptedAt.localeCompare(left.run.acceptedAt);
   if (accepted !== 0) return accepted;
@@ -141,31 +164,30 @@ export function compareCandidates(left: Candidate, right: Candidate): number {
   );
 }
 
+/**
+ * Combines service-generation and native run identity for consumed-row tracking.
+ * @param run - Native run identity used for stable aggregate ordering.
+ * @param binding - Selected native job authority and its service identity.
+ * @returns A stable private aggregate row key.
+ */
 export function runKey(run: RunSnapshot, binding: InspectorJobsBinding): string {
   return `${run.acceptedAt}\0${binding.serviceGeneration}\0${run.runId}`;
 }
 
+/**
+ * Projects present filter fields into the signed cursor identity.
+ * @param filters - Validated filters bound into the continuation cursor.
+ * @returns Canonical JSON-compatible filter fields.
+ */
 export function filtersJson(filters: InspectorRunFilters): JsonValue {
   return queryFilters(filters);
 }
 
+/**
+ * Checks the existing non-null non-array record boundary.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Whether the value can be selectively projected as a record.
+ */
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-export async function mapLimit<T, R>(
-  values: readonly T[],
-  limit: number,
-  callback: (value: T) => Promise<R>,
-): Promise<R[]> {
-  const result: R[] = [];
-  let next = 0;
-  async function worker(): Promise<void> {
-    const index = next++;
-    if (index >= values.length) return;
-    result[index] = await callback(values[index]!);
-    await worker();
-  }
-  await Promise.all(Array.from({ length: Math.min(limit, values.length) }, worker));
-  return result;
 }
