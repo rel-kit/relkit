@@ -1,3 +1,5 @@
+import type { ErrorResponse } from "../fixtures/json.types.ts";
+import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { createObservabilityStream, type ObservabilityQuery } from "@relkit/observability";
@@ -6,7 +8,7 @@ import {
   installInspectorEndpoints,
   installObservabilityEndpoints,
   type InspectorActionServices,
-} from "./src/index.ts";
+} from "../../src/index.ts";
 
 const identity = { generationId: "generation-one", graphHash: "sha256:one" };
 const generation = {
@@ -139,7 +141,9 @@ describe("production protection runtime enforcement", () => {
       }),
     });
     expect(response.status).toBe(403);
-    expect((await response.json()).error).toBe("RELKIT_INSPECTOR_ACTIONS_DISABLED");
+    expect((await responseJson<ErrorResponse>(response)).error).toBe(
+      "RELKIT_INSPECTOR_ACTIONS_DISABLED",
+    );
     expect(invoked).toBe(false);
   });
 });

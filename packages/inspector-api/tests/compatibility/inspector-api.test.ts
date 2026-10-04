@@ -1,7 +1,9 @@
+import type { CollectionResponse } from "../fixtures/json.types.ts";
+import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
-import { installInspectorEndpoints } from "./src/index.ts";
+import { installInspectorEndpoints } from "../../src/index.ts";
 
 const graph = {
   contractVersion: 3,
@@ -86,6 +88,12 @@ const graph = {
   ],
 };
 
+/**
+ * Creates the stored graph, runtime and provider evidence used by router assertions.
+ * @param id - Existing authoritative active generation identity.
+ * @param hash - Existing graph hash bound into the activation fingerprint.
+ * @returns The unchanged declaration fixture, including its sensitive values.
+ */
 function generation(id: string, hash: string) {
   return {
     generationId: id,
@@ -187,7 +195,7 @@ describe("versioned inspector router", () => {
     });
 
     const graphResponse = await app.request(`${API_BASE_PATH}/graph`);
-    const graphBody = await graphResponse.json();
+    const graphBody = await responseJson<CollectionResponse>(graphResponse);
     expect(graphResponse.status).toBe(200);
     expect(graphBody).toMatchObject({
       graphHash: "sha256:one",
@@ -209,7 +217,9 @@ describe("versioned inspector router", () => {
     expect(JSON.stringify(graphBody)).not.toContain("must-not-cross");
     expect(JSON.stringify(graphBody)).not.toContain("./runtime");
 
-    const providers = await (await app.request(`${API_BASE_PATH}/providers`)).json();
+    const providers = await responseJson<CollectionResponse>(
+      await app.request(`${API_BASE_PATH}/providers`),
+    );
     expect(providers.items).toMatchObject([
       {
         id: "provider.cache.default",
@@ -222,7 +232,9 @@ describe("versioned inspector router", () => {
       },
     ]);
 
-    const runtimeMetadata = await (await app.request(`${API_BASE_PATH}/runtime`)).json();
+    const runtimeMetadata = await responseJson<CollectionResponse>(
+      await app.request(`${API_BASE_PATH}/runtime`),
+    );
     expect(runtimeMetadata).toMatchObject({
       localServices: {
         planHash: "sha256:one:local-services",
@@ -243,43 +255,55 @@ describe("versioned inspector router", () => {
     expect(JSON.stringify(runtimeMetadata)).not.toContain("must-not-cross");
 
     const functions = await app.request(`${API_BASE_PATH}/functions?limit=1`);
-    expect((await functions.json()).items).toHaveLength(1);
+    expect((await responseJson<CollectionResponse>(functions)).items).toHaveLength(1);
     const searched = await app.request(`${API_BASE_PATH}/functions?search=orders&kind=function`);
-    expect((await searched.json()).items).toMatchObject([{ id: "orders.create" }]);
+    expect((await responseJson<CollectionResponse>(searched)).items).toMatchObject([
+      { id: "orders.create" },
+    ]);
     const routes = await app.request(`${API_BASE_PATH}/routes?kind=POST&search=orders`);
-    expect((await routes.json()).items).toMatchObject([{ id: "orders.create.http" }]);
+    expect((await responseJson<CollectionResponse>(routes)).items).toMatchObject([
+      { id: "orders.create.http" },
+    ]);
     const filteredRuntime = await app.request(
       `${API_BASE_PATH}/runtime/functions?status=completed&search=orders`,
     );
-    expect((await filteredRuntime.json()).items).toMatchObject([{ id: "orders.create" }]);
+    expect((await responseJson<CollectionResponse>(filteredRuntime)).items).toMatchObject([
+      { id: "orders.create" },
+    ]);
     const runtime = await app.request(`${API_BASE_PATH}/runtime/functions`);
-    expect((await runtime.json()).items).toMatchObject([
+    expect((await responseJson<CollectionResponse>(runtime)).items).toMatchObject([
       { id: "orders.create", status: "completed" },
     ]);
-    expect((await (await app.request(`${API_BASE_PATH}/runtime/jobs`)).json()).items).toMatchObject(
-      [
-        {
-          instanceId: "job-1",
-          nextRunAt: 1_700_000_000_000,
-          schedules: [{ id: "hourly", nextFireAt: 1_700_000_000_000 }],
-        },
-      ],
-    );
-    expect(await (await app.request(`${API_BASE_PATH}/env`)).json()).toMatchObject({
+    expect(
+      (await responseJson<CollectionResponse>(await app.request(`${API_BASE_PATH}/runtime/jobs`)))
+        .items,
+    ).toMatchObject([
+      {
+        instanceId: "job-1",
+        nextRunAt: 1_700_000_000_000,
+        schedules: [{ id: "hourly", nextFireAt: 1_700_000_000_000 }],
+      },
+    ]);
+    expect(
+      await responseJson<CollectionResponse>(await app.request(`${API_BASE_PATH}/env`)),
+    ).toMatchObject({
       items: [{ name: "DATABASE_URL", sensitive: true }],
     });
-    expect(await (await app.request(`${API_BASE_PATH}/source/orders.create`)).json()).toMatchObject(
-      {
-        source: { file: "src/orders.ts", line: 4 },
-      },
-    );
+    expect(
+      await responseJson<CollectionResponse>(
+        await app.request(`${API_BASE_PATH}/source/orders.create`),
+      ),
+    ).toMatchObject({
+      source: { file: "src/orders.ts", line: 4 },
+    });
     expect((await app.request(`${API_BASE_PATH}/diagnostics`)).status).toBe(200);
     expect(environmentReads).toBe(0);
 
     active = generation("generation-two", "sha256:two");
-    expect((await (await app.request(`${API_BASE_PATH}/graph`)).json()).graphHash).toBe(
-      "sha256:two",
-    );
+    expect(
+      (await responseJson<CollectionResponse>(await app.request(`${API_BASE_PATH}/graph`)))
+        .graphHash,
+    ).toBe("sha256:two");
   });
 
   test("negotiates versions, bounds cursors, and protects production", async () => {

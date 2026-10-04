@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
+import type { CollectionResponse } from "../fixtures/json.types.js";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { createObservabilityStream } from "@relkit/observability";
-import { GRAPH_COLLECTIONS, RUNTIME_COLLECTIONS } from "./src/index.ts";
+import { GRAPH_COLLECTIONS, RUNTIME_COLLECTIONS } from "../../src/index.ts";
 import {
   expectResponse,
   getForbiddenReads,
@@ -72,7 +73,7 @@ describe("inspector read-only contract matrix", () => {
     expect(page.items).toHaveLength(2);
     expect(page.nextCursor).toBe("3");
     expect(
-      (await json(app, API_BASE_PATH + "/functions?limit=1000")).items.length,
+      (await json<CollectionResponse>(app, API_BASE_PATH + "/functions?limit=1000")).items.length,
     ).toBeLessThanOrEqual(100);
   });
 
