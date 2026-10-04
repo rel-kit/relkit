@@ -1,15 +1,11 @@
+import type { JobsConformanceFixture, JobsConformanceHarness } from "./jobs-conformance.types.js";
+export type { JobsConformanceFixture, JobsConformanceHarness } from "./jobs-conformance.types.js";
 import type { RunHandle } from "@relkit/contracts/jobs";
 import type { JobsAdapterRuntime, NativeSubmission, OperationContext } from "@relkit/jobs/adapter";
 import {
   createDeterministicJobsAdapter,
-  type TestJobsAdapter,
   type TestJobsAdapterOptions,
 } from "./test-jobs-adapter.js";
-
-export interface JobsConformanceFixture {
-  readonly id: string;
-  readonly description: string;
-}
 
 export const JOBS_CONFORMANCE_FIXTURES: readonly JobsConformanceFixture[] = Object.freeze([
   {
@@ -29,13 +25,11 @@ export const JOBS_CONFORMANCE_FIXTURES: readonly JobsConformanceFixture[] = Obje
   },
 ]);
 
-export interface JobsConformanceHarness {
-  readonly adapter: TestJobsAdapter;
-  readonly context: OperationContext;
-  readonly fixtures: typeof JOBS_CONFORMANCE_FIXTURES;
-  readonly run: (fixtureId: string) => Promise<RunHandle | undefined>;
-}
-
+/**
+ * Creates the deterministic adapter used by native contract fixtures.
+ * @param options - Explicit configuration and native dependencies for this test owner.
+ * @returns An isolated adapter and the explicit fixture execution context.
+ */
 export function createJobsConformanceHarness(
   options: TestJobsAdapterOptions = {},
 ): JobsConformanceHarness {
@@ -56,6 +50,12 @@ export function createJobsConformanceHarness(
   });
 }
 
+/**
+ * Executes selected existing native adapter contract fixtures sequentially.
+ * @param adapter - Native jobs adapter under conformance evaluation.
+ * @param fixtureIds - Selected existing conformance fixture identities in execution order.
+ * @returns An immutable list of fixture identities that completed successfully.
+ */
 export async function runJobsConformance(
   adapter: JobsAdapterRuntime,
   fixtureIds: readonly string[] = JOBS_CONFORMANCE_FIXTURES.map((fixture) => fixture.id),
@@ -76,6 +76,13 @@ export async function runJobsConformance(
   return Object.freeze(passed);
 }
 
+/**
+ * Checks one native adapter compatibility scenario.
+ * @param adapter - Native jobs adapter under conformance evaluation.
+ * @param context - Native invocation context including cancellation and deadline.
+ * @param fixtureId - Existing native contract fixture identity.
+ * @returns The accepted run when the fixture returns a handle, otherwise undefined.
+ */
 async function runFixture(
   adapter: JobsAdapterRuntime,
   context: OperationContext,
@@ -118,6 +125,12 @@ async function runFixture(
   throw new Error(`Unknown conformance fixture ${fixtureId}`);
 }
 
+/**
+ * Creates a canonical native submission for one compatibility fixture.
+ * @param fixtureId - Existing native contract fixture identity.
+ * @param operationId - Explicit native write operation identity.
+ * @returns A submission carrying explicit operation and acceptance identities.
+ */
 function request(fixtureId: string, operationId: string): NativeSubmission {
   return {
     jobId: `job.${fixtureId}`,
@@ -132,6 +145,11 @@ function request(fixtureId: string, operationId: string): NativeSubmission {
   };
 }
 
+/**
+ * Checks the accepted native run result at the unknown adapter boundary.
+ * @param value - Candidate native value checked or detached by this helper.
+ * @returns True when acceptance and run identity are present.
+ */
 function isHandle(value: unknown): value is RunHandle {
   return (
     value !== null &&
