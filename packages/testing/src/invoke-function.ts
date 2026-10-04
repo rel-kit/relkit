@@ -1,72 +1,53 @@
-import type { MaybePromise } from "@relkit/contracts";
+import type {
+  StandaloneFunctionTarget,
+  FunctionInput,
+  FunctionOutput,
+  FunctionContextOf,
+  InvokeFunctionOptions,
+} from "./invoke-function.types.js";
+export type {
+  StandaloneFunctionTarget,
+  FunctionInput,
+  FunctionOutput,
+  FunctionContextOf,
+  InvokeFunctionOptions,
+} from "./invoke-function.types.js";
+
 import {
   invokeFunction as invokeEngineFunction,
-  type DependencyClientSources,
-  type FunctionRegistry,
-  type InvocationContext,
   type InvocationHooks,
-  type InvocationIdSource,
   type InvocationTarget,
 } from "@relkit/engine";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
+
 import type { InvocationRunner } from "@relkit/runtime-effect";
-import { createTestFakes } from "./fakes.js";
+import { createTestFakes, type TestFakes } from "./fakes.js";
 import { createTestStateRoot } from "./state-root.js";
-
-export interface StandaloneFunctionTarget {
-  readonly id: string;
-  readonly input: StandardSchemaV1;
-  readonly output: StandardSchemaV1;
-  readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
-  readonly dependencies?: import("@relkit/engine").DependencyDeclarations;
-  readonly publishes?: readonly string[];
-  readonly publications?: Readonly<Record<string, import("@relkit/engine").DependencyRefLike>>;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;
-}
-
-export type FunctionInput<Target extends { readonly input: StandardSchemaV1 }> = InferInput<
-  Target["input"]
->;
-
-export type FunctionOutput<Target extends { readonly output: StandardSchemaV1 }> = InferOutput<
-  Target["output"]
->;
-
-export type FunctionContextOf<Target> =
-  Target extends Record<"handler", (input: infer _Input, context: infer Context) => unknown>
-    ? Context extends { readonly signal: AbortSignal }
-      ? Context
-      : InvocationContext
-    : InvocationContext;
-
-export interface InvokeFunctionOptions<Context extends { readonly signal: AbortSignal }> {
-  readonly registry?: FunctionRegistry;
-  readonly env?: Readonly<Record<string, unknown>>;
-  readonly clients?: DependencyClientSources;
-  readonly signal?: AbortSignal;
-  readonly now?: () => number;
-  readonly idSource?: InvocationIdSource;
-  readonly context?: InvocationHooks<Context>["context"];
-  readonly hooks?: InvocationHooks<Context>;
-}
 
 /**
  * Invokes a function descriptor through the engine's direct, transport-free path.
  *
  * @example
  * ```ts
- * import { defineFunction } from "@relkit/app/functions"
- * import { z } from "@relkit/app/schema"
- * import { invokeFunction } from "@relkit/testing"
+ * import { defineFunction } from "@relkit/app/functions";
+ * import { z } from "@relkit/app/schema";
+ * import { invokeFunction } from "@relkit/testing";
  *
- * const greet = defineFunction({ id: "greet", input: z.string(), output: z.string(), handler: async (name) => `Hello ${name}` })
- * const result = await invokeFunction(greet, "Ada")
- * console.log(result)
+ * export async function greetingExample(): Promise<string> {
+ *   const greet = defineFunction({
+ *     id: "greet", input: z.string(), output: z.string(),
+ *     handler: async (name) => `Hello ${name}`,
+ *   });
+ *   return invokeFunction(greet, "Ada");
+ * }
  * ```
  * @category Testing
  * @since 0.1.0
+ * @typeParam Target - Descriptor carrying native input/output/context inference.
+ * @typeParam Context - Caller context patch consumed by engine hooks.
+ * @param target - Native target descriptor retaining validation and dependency contracts.
+ * @param input - Declared input passed through the owning schema authority.
+ * @param options - Explicit configuration and native dependencies for this test owner.
+ * @returns The validated native result or original mapped invocation failure.
  */
 export function invokeFunction<
   const Target extends StandaloneFunctionTarget,
@@ -80,14 +61,49 @@ export function invokeFunction<
     return invokeFunctionWithRunner(target, input, options);
   }
   const state = createTestStateRoot();
-  const fakes = createTestFakes(state.path, {
-    ...(options?.now === undefined ? {} : { clock: options.now }),
-  });
-  return invokeFunctionWithRunner(target, input, { ...options, clients: fakes.clients }).finally(
-    () => state.cleanup(false),
-  );
+  let fakes: TestFakes | undefined;
+  /**
+   * Releases native child storage before removing its temporary parent root.
+   * @returns Completion after every acquired fake owner has closed and root cleanup runs.
+   */
+  const release = async (): Promise<void> => {
+    try {
+      await fakes?.close();
+    } finally {
+      state.cleanup(false);
+    }
+  };
+  try {
+    fakes = createTestFakes(state.path, {
+      ...(options?.now === undefined ? {} : { clock: options.now }),
+    });
+    return invokeFunctionWithRunner(target, input, { ...options, clients: fakes.clients }).then(
+      async (value) => {
+        await release();
+        return value;
+      },
+      async (error) => {
+        await release().catch(() => undefined);
+        throw error;
+      },
+    );
+  } catch (error) {
+    if (fakes === undefined) state.cleanup(false);
+    else void release().catch(() => undefined);
+    throw error;
+  }
 }
 
+/**
+ * Invokes the existing engine validation path with an explicit Effect runner.
+ * @typeParam Target - Descriptor carrying native input/output/context inference.
+ * @typeParam Context - Caller context patch consumed by engine hooks.
+ * @param target - Native target descriptor retaining validation and dependency contracts.
+ * @param input - Declared input passed through the owning schema authority.
+ * @param options - Explicit configuration and native dependencies for this test owner.
+ * @param runner - Injected Effect invocation runner.
+ * @returns The validated descriptor result, preserving native rejection identity.
+ */
 export function invokeFunctionWithRunner<
   const Target extends StandaloneFunctionTarget,
   Context extends { readonly signal: AbortSignal } = FunctionContextOf<Target>,
@@ -117,6 +133,13 @@ export function invokeFunctionWithRunner<
   });
 }
 
+/**
+ * Adds the validated context factory without discarding existing engine hooks.
+ * @typeParam Context - Caller context patch consumed by engine hooks.
+ * @param hooks - Caller-native hooks forwarded without changing ordering.
+ * @param context - Native invocation context including cancellation and deadline.
+ * @returns Hooks that bind the test context at invocation admission.
+ */
 function withContextHook<Context extends { readonly signal: AbortSignal }>(
   hooks: InvocationHooks<Context> | undefined,
   context: InvocationHooks<Context>["context"] | undefined,
@@ -125,6 +148,11 @@ function withContextHook<Context extends { readonly signal: AbortSignal }>(
   return { ...(hooks ?? {}), context };
 }
 
+/**
+ * Copies explicit environment values without consulting process environment.
+ * @param env - Explicit environment values for the native invocation.
+ * @returns An immutable environment record for this invocation.
+ */
 function freezeEnv(
   env: Readonly<Record<string, unknown>> | undefined,
 ): Readonly<Record<string, unknown>> {
@@ -135,6 +163,11 @@ function freezeEnv(
   return Object.freeze({ ...env });
 }
 
+/**
+ * Checks whether the descriptor requires runtime dependency resolution.
+ * @param target - Native target descriptor retaining validation and dependency contracts.
+ * @returns True when a declared dependency needs an engine client.
+ */
 function hasDependencies(target: StandaloneFunctionTarget): boolean {
   return (
     (target.publishes?.length ?? 0) > 0 ||
