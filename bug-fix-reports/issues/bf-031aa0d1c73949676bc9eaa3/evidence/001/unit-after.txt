@@ -1,0 +1,5 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit/packages/client
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  04:46:35
+   Duration  384ms (import 54%, transform 41%, tests 4%, worker 1%)

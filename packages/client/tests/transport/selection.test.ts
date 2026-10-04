@@ -8,8 +8,30 @@ import {
 } from "../../src/transport.service.js";
 import type { TransportLink } from "../../src/transport.types.js";
 import { TestSocket } from "./socket-fixture.js";
+import { connectSocketEffect } from "../../src/transport-socket.js";
 
 class SelectedLink extends Context.Service<SelectedLink, TransportLink>()("TestSelectedLink") {}
+
+it.effect("socket constructor exceptions retain their identity as typed failures", () =>
+  Effect.gen(function* () {
+    const failure = new DOMException("Socket blocked by browser policy.", "SecurityError");
+    class BlockedSocket extends TestSocket {
+      constructor() {
+        super(
+          (() => {
+            throw failure;
+          })(),
+        );
+      }
+    }
+    const error = yield* connectSocketEffect(
+      BlockedSocket,
+      new URL("wss://localhost/rpc"),
+      1_000,
+    ).pipe(Effect.flip);
+    expect(error).toBe(failure);
+  }),
+);
 
 it.effect("auto owner closure interrupts pending actual socket callback acquisition", () =>
   Effect.promise(async () => {

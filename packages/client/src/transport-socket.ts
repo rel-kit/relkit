@@ -30,7 +30,13 @@ export const connectSocketEffect = Effect.fn("ClientTransport.connect")(
       "client",
       "rpc.connect",
       Effect.callback<WebSocket, unknown>((resume) => {
-        const socket = new Socket(endpoint);
+        let socket: WebSocket;
+        try {
+          socket = new Socket(endpoint);
+        } catch (cause) {
+          resume(Effect.fail(cause));
+          return;
+        }
         let opened = false;
         const cleanup = (): void => {
           socket.removeEventListener("open", open);

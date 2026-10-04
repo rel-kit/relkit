@@ -1,0 +1,25 @@
+[04:48:41.203] ERROR (#6): Execution operation failed {
+  domain: "client",
+  operation: "rpc.connect",
+  outcome: "failure",
+  duration_ms: 0.772375,
+}
+[04:48:41.215] INFO (#5): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 14.717541,
+}
+[04:48:41.216] INFO (#8): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 0.412875,
+}
+[04:48:41.216] ERROR (#9): Execution operation failed {
+  domain: "client",
+  operation: "rpc.connect",
+  outcome: "failure",
+  duration_ms: 0.088083,
+}
+native auto fallback: lazy selection, 2 HTTP results, original constructor error
