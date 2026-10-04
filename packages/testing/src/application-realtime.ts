@@ -4,6 +4,14 @@ import type { RealtimeProvider } from "@relkit/realtime";
 import type { TestApplicationArtifacts } from "./application-registry.js";
 import type { TestRuntime } from "./runtime.js";
 
+/**
+ * Binds registered realtime contracts to the acquired test provider generation.
+ * @param runtime - Acquired deterministic invocation runtime.
+ * @param artifacts - Generated graph and integration modules, when available.
+ * @param providers - Acquired native provider registry or explicit replacement declarations.
+ * @param environment - Explicit application environment identity.
+ * @returns The runtime facade carrying native realtime invocation hooks.
+ */
 export function bindTestRealtime(
   runtime: TestRuntime,
   artifacts: TestApplicationArtifacts | undefined,
