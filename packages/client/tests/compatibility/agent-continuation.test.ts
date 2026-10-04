@@ -1,8 +1,12 @@
 import { expect, test } from "bun:test";
 import type { ThreadSnapshot } from "@relkit/contracts";
-import { prepareAgentContinuation } from "./src/react/agent-continuation.ts";
-import { reconcileAgentRun } from "./src/react/agent-reconcile.ts";
-import { clearPendingOperations, pendingOperations, rememberPending } from "./src/react/pending.ts";
+import { prepareAgentContinuation } from "../../src/react/agent-continuation.ts";
+import { reconcileAgentRun } from "../../src/react/agent-reconcile.ts";
+import {
+  clearPendingOperations,
+  pendingOperations,
+  rememberPending,
+} from "../../src/react/pending.ts";
 
 test("binds continuation digest input to the observed waiting revision", async () => {
   let loads = 0;
@@ -114,6 +118,12 @@ test("restores a durable thread after an unknown run response", async () => {
   }
 });
 
+/**
+ * Builds the retained authoritative continuation waiting snapshot.
+ * @param threadId - Caller-owned durable thread identity.
+ * @param revision - Authoritative continuation waiting revision.
+ * @returns The original thread snapshot bound to the requested waiting revision.
+ */
 function waitingSnapshot(threadId: string, revision: string): ThreadSnapshot {
   return {
     thread: { threadId },
@@ -121,6 +131,10 @@ function waitingSnapshot(threadId: string, revision: string): ThreadSnapshot {
   } as unknown as ThreadSnapshot;
 }
 
+/**
+ * Provides isolated in-memory browser persistence for compatibility assertions.
+ * @returns A Storage-shaped fixture retaining the original metadata behavior.
+ */
 function memoryStorage(): Storage {
   const values = new Map<string, string>();
   const storage = {

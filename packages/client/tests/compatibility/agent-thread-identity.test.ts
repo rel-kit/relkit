@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
-import { clearPendingOperations, pendingOperations, rememberPending } from "./src/react/pending.ts";
+import {
+  clearPendingOperations,
+  pendingOperations,
+  rememberPending,
+} from "../../src/react/pending.ts";
 
 test("persists only the caller-supplied agent thread identity", async () => {
   const previous = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage");
@@ -26,6 +30,10 @@ test("persists only the caller-supplied agent thread identity", async () => {
   }
 });
 
+/**
+ * Provides isolated in-memory browser persistence for compatibility assertions.
+ * @returns A Storage-shaped fixture retaining the original metadata behavior.
+ */
 function memoryStorage(): Storage {
   const values = new Map<string, string>();
   const storage = {

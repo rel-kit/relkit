@@ -1,3 +1,4 @@
+import { mockFetch } from "../fixtures/fetch.ts";
 import { expect, test } from "bun:test";
 import {
   AGENT_CAPABILITY_HEADER,
@@ -5,8 +6,8 @@ import {
   type AgentObservation,
   type JournalCheckpoint,
 } from "@relkit/contracts";
-import { createAgentSseClient } from "./src/react/agent-sse-client.ts";
-import { ORPCError } from "./src/index.ts";
+import { createAgentSseClient } from "../../src/react/agent-sse-client.ts";
+import { ORPCError } from "../../src/index.ts";
 
 test("SSE adapter preserves identity, cursor, cancellation, and canonical observations", async () => {
   const checkpoint = point("4");
@@ -33,8 +34,9 @@ test("SSE adapter preserves identity, cursor, cancellation, and canonical observ
     baseUrl: "http://relkit.test",
     credentials: "include",
     headers: { authorization: "Bearer token", "x-relkit-identity-scope": "viewer" },
-    fetch: async (input, init) => {
-      request = new Request(input, init);
+    fetch: mockFetch(async (input, init) => {
+      request =
+        input instanceof Request ? new Request(input, init) : new Request(input.toString(), init);
       const payload = `data: ${JSON.stringify({ type: "CUSTOM", name: "relkit.execution", metadata: { relkit: { observation } } })}\r\n\r\n`;
       return new Response(
         new ReadableStream({
@@ -47,7 +49,7 @@ test("SSE adapter preserves identity, cursor, cancellation, and canonical observ
           },
         }),
       );
-    },
+    }),
   }) as Record<string, (input: unknown, call: unknown) => Promise<AsyncIterable<AgentObservation>>>;
   const controller = new AbortController();
   const stream = await client["relkit.agent.observe"]!(
@@ -72,11 +74,12 @@ test("SSE adapter exposes HTTP failures as permanent RPC errors", async () => {
   const client = createAgentSseClient({
     baseUrl: "http://relkit.test",
     credentials: "include",
-    fetch: async () =>
+    fetch: mockFetch(async () =>
       Response.json(
         { error: { id: "IDENTITY_PRECONDITION_FAILED", message: "Identity changed." } },
         { status: 409 },
       ),
+    ),
   }) as Record<string, (input: unknown) => Promise<unknown>>;
   const failure = client["relkit.agent.observe"]!({
     agentId: "support.echo",
@@ -88,6 +91,11 @@ test("SSE adapter exposes HTTP failures as permanent RPC errors", async () => {
   await expect(failure).rejects.toHaveProperty("code", "IDENTITY_PRECONDITION_FAILED");
 });
 
+/**
+ * Builds a canonical checkpoint for the SSE assertion journal.
+ * @param sequence - Native journal or frame position used by the assertion.
+ * @returns The retained typed checkpoint.
+ */
 function point(sequence: string): JournalCheckpoint {
   return {
     applicationId: "fixture",

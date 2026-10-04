@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import type { AgentBase } from "./src/react/agent-hook-types.ts";
-import { emptyAgentContent } from "./src/react/agent-observation.ts";
-import { restoreAndObserve } from "./src/react/agent-observer.ts";
+import type { AgentBase } from "../../src/react/agent-hook-types.types.js";
+import { emptyAgentContent } from "../../src/react/agent-observation.ts";
+import { restoreAndObserve } from "../../src/react/agent-observer.ts";
 import type { AgentObservation, JournalCheckpoint, ThreadSnapshot } from "@relkit/contracts";
 
 test("reconnects from the last cursor and replaces a declared gap with its snapshot", async () => {
@@ -29,7 +29,7 @@ test("reconnects from the last cursor and replaces a declared gap with its snaps
     },
   };
 
-  await restoreAndObserve(
+  await restoreAndObserve<unknown>(
     client,
     streamClient,
     "agent-1",
@@ -65,7 +65,7 @@ test("stops reconnecting after a terminal run-finished observation", async () =>
     },
   };
 
-  await restoreAndObserve(
+  await restoreAndObserve<{ answer: string }>(
     client,
     streamClient,
     "agent-1",
@@ -90,6 +90,10 @@ test("stops reconnecting after a terminal run-finished observation", async () =>
   });
 });
 
+/**
+ * Provides an admitted native observation followed by the original pull failure.
+ * @returns The retained async iterable that rejects after its initial event.
+ */
 async function* failedStream(): AsyncIterable<AgentObservation> {
   yield {
     kind: "event",
@@ -112,6 +116,10 @@ async function* failedStream(): AsyncIterable<AgentObservation> {
   throw new TypeError("connection lost");
 }
 
+/**
+ * Provides an authoritative terminal observation and native EOF.
+ * @returns The retained finite terminal observation iterable.
+ */
 async function* finishedStream(): AsyncIterable<AgentObservation> {
   yield {
     kind: "event",
@@ -127,6 +135,12 @@ async function* finishedStream(): AsyncIterable<AgentObservation> {
   };
 }
 
+/**
+ * Provides recovery observations and retires the fixture at the retained boundary.
+ * @param value - Original assertion-bearing native payload.
+ * @param controller - Borrowed cancellation authority used by the recovery fixture.
+ * @returns The original native recovery iterable.
+ */
 async function* recoveredStream(
   value: ThreadSnapshot,
   controller: AbortController,
@@ -135,6 +149,11 @@ async function* recoveredStream(
   controller.abort();
 }
 
+/**
+ * Builds the retained authoritative thread snapshot.
+ * @param sequence - Native journal or frame position used by the assertion.
+ * @returns The original canonical thread snapshot.
+ */
 function snapshot(sequence: string): ThreadSnapshot {
   return {
     snapshotId: `snapshot-${sequence}`,
@@ -159,6 +178,11 @@ function snapshot(sequence: string): ThreadSnapshot {
   };
 }
 
+/**
+ * Builds the retained active-run thread snapshot.
+ * @param sequence - Native journal or frame position used by the assertion.
+ * @returns The original canonical snapshot with its active run.
+ */
 function runningSnapshot(sequence: string): ThreadSnapshot {
   const run = {
     runId: "run-1",
@@ -178,6 +202,11 @@ function runningSnapshot(sequence: string): ThreadSnapshot {
   return { ...snapshot(sequence), activeRun: run, currentRuns: [run] };
 }
 
+/**
+ * Builds the retained journal checkpoint.
+ * @param sequence - Native journal or frame position used by the assertion.
+ * @returns The original checkpoint bound to the fixture journal and epoch.
+ */
 function checkpoint(sequence: string): JournalCheckpoint {
   return {
     applicationId: "fixture",
