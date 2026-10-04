@@ -5,6 +5,7 @@ import { OBSERVABILITY_ENDPOINT_PATHS } from "./observability.js";
 import { RUNTIME_COLLECTIONS } from "./runtime.js";
 import { JOBS_ENDPOINT_PATHS } from "./jobs/routes.js";
 
+/** Established public Inspector capability paths advertised by the root endpoint. */
 export const INSPECTOR_API_PATHS = Object.freeze([
   API_BASE_PATH,
   `${API_BASE_PATH}/health/live`,
