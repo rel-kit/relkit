@@ -2,14 +2,14 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { expect, test } from "bun:test";
-import { startCandidate } from "./src/candidate.js";
+import { startCandidate } from "../../src/candidate.js";
 
 test("completed candidate shutdown releases its long kill timer", async () => {
   const child = Bun.spawn(
     [
       process.execPath,
       "-e",
-      `import { terminate } from ${JSON.stringify(join(import.meta.dir, "src/candidate-process.ts"))};
+      `import { terminate } from ${JSON.stringify(join(import.meta.dir, "../../src/candidate-process.ts"))};
      const backend = Bun.spawn([process.execPath, "-e", "setInterval(() => {}, 1000)"], { stdout: "ignore", stderr: "ignore" });
      await terminate(backend, 30_000);`,
     ],
@@ -45,14 +45,18 @@ test("starts a token-scoped Bun backend on a dynamic port and disposes only itse
     },
   });
 
-  expect(candidate.port).toBeGreaterThan(0);
-  const response = await waitForResponse(`http://127.0.0.1:${candidate.port}`);
-  expect(await response.text()).toBe("candidate");
-  await candidate.dispose();
-  await expect(readFile(active, "utf8")).resolves.toBe("active");
-  await expect(readFile(candidate.directory, "utf8")).rejects.toMatchObject({ code: "ENOENT" });
-  expect(logs).toContain("candidate.compile.succeeded");
-  expect(logs).toContain("candidate.start.succeeded");
+  try {
+    expect(candidate.port).toBeGreaterThan(0);
+    const response = await waitForResponse(`http://127.0.0.1:${candidate.port}`);
+    expect(await response.text()).toBe("candidate");
+    await candidate.dispose();
+    await expect(readFile(active, "utf8")).resolves.toBe("active");
+    await expect(readFile(candidate.directory, "utf8")).rejects.toMatchObject({ code: "ENOENT" });
+    expect(logs).toContain("candidate.compile.succeeded");
+    expect(logs).toContain("candidate.start.succeeded");
+  } finally {
+    await candidate.dispose();
+  }
 });
 
 test("cleans a failed compile without touching the active generation", async () => {
@@ -95,14 +99,20 @@ test("bounds startup output before logging and retaining it", async () => {
     },
   });
 
-  await new Promise((resolve) => setTimeout(resolve, 50));
-  await candidate.stop();
-  const output = await candidate.output;
-  expect(new TextEncoder().encode(output.stdout).byteLength).toBeLessThanOrEqual(16);
-  expect(output.truncated).toBe(true);
-  await candidate.cleanup();
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await candidate.stop();
+    const output = await candidate.output;
+    expect(new TextEncoder().encode(output.stdout).byteLength).toBeLessThanOrEqual(16);
+    expect(output.truncated).toBe(true);
+    await candidate.cleanup();
+  } finally {
+    await candidate.dispose();
+  }
 });
 
+/** Waits for the real candidate listener. @param url - Native health URL.
+ * @returns Its first successful response within the retained deadline. */
 async function waitForResponse(url: string): Promise<Response> {
   for (let attempt = 0; attempt < 20; attempt += 1) {
     try {
