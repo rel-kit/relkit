@@ -1,13 +1,9 @@
 import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import type { PackageManifest } from "./frontend-dependency-closure.types.js";
 
-interface PackageManifest {
-  readonly name: string;
-  readonly dependencies?: Readonly<Record<string, string>>;
-}
-
-const repositoryRoot = resolve(import.meta.dir, "../..");
+const repositoryRoot = resolve(import.meta.dir, "../../../..");
 const nativeAgentPackage = /^(?:langchain|deepagents|@langchain\/)/;
 
 test("frontend client dependency closure excludes native agent runtimes", async () => {
@@ -18,6 +14,10 @@ test("frontend client dependency closure excludes native agent runtimes", async 
   expect([...closure].filter((name) => nativeAgentPackage.test(name))).toEqual([]);
 });
 
+/**
+ * Loads authored workspace manifests for dependency-boundary assertions.
+ * @returns Workspace package names mapped to their declared manifests.
+ */
 async function workspaceManifests(): Promise<ReadonlyMap<string, PackageManifest>> {
   const files = [
     ...new Bun.Glob("packages/*/package.json").scanSync(repositoryRoot),
@@ -35,6 +35,12 @@ async function workspaceManifests(): Promise<ReadonlyMap<string, PackageManifest
   return new Map(manifests);
 }
 
+/**
+ * Traverses workspace dependencies reachable from one browser entry package.
+ * @param root - Workspace package whose browser dependency closure is inspected.
+ * @param manifests - Authored workspace manifests indexed by package name.
+ * @returns The complete reachable workspace package set.
+ */
 function dependencyClosure(
   root: string,
   manifests: ReadonlyMap<string, PackageManifest>,

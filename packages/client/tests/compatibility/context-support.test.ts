@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { identityHeaders, streamFetcher } from "./src/react/context-support.ts";
+import { mockFetch } from "../fixtures/fetch.ts";
+import { identityHeaders, streamFetcher } from "../../src/react/context-support.ts";
 
 test("client headers include the Relkit CSRF cookie", async () => {
   const descriptor = Object.getOwnPropertyDescriptor(globalThis, "document");
@@ -18,7 +19,7 @@ test("client headers include the Relkit CSRF cookie", async () => {
 
 test("stream timeout applies only until response establishment", async () => {
   const original = globalThis.fetch;
-  globalThis.fetch = (async () => {
+  globalThis.fetch = mockFetch(async () => {
     await Bun.sleep(5);
     return new Response(
       new ReadableStream({
@@ -29,7 +30,7 @@ test("stream timeout applies only until response establishment", async () => {
         },
       }),
     );
-  }) as typeof fetch;
+  });
   try {
     const response = await streamFetcher(10)("http://relkit.test/rpc");
     expect(await response.text()).toBe("still-open");
@@ -40,10 +41,12 @@ test("stream timeout applies only until response establishment", async () => {
 
 test("stream establishment still has a bounded timeout", async () => {
   const original = globalThis.fetch;
-  globalThis.fetch = ((_: unknown, init?: RequestInit) =>
-    new Promise((_, reject) => {
-      init?.signal?.addEventListener("abort", () => reject(init.signal?.reason), { once: true });
-    })) as typeof fetch;
+  globalThis.fetch = mockFetch(
+    (_: unknown, init?: RequestInit) =>
+      new Promise((_, reject) => {
+        init?.signal?.addEventListener("abort", () => reject(init.signal?.reason), { once: true });
+      }),
+  );
   try {
     await expect(streamFetcher(5)("http://relkit.test/rpc")).rejects.toHaveProperty(
       "name",

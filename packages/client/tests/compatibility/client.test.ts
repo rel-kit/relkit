@@ -1,7 +1,8 @@
+import { mockFetch } from "../fixtures/fetch.ts";
 import { expect, test } from "bun:test";
 import { oc } from "@orpc/contract";
-import { createAutoClient, createClient } from "./src/index.ts";
-import { createServerClient } from "./src/server.ts";
+import { createAutoClient, createClient } from "../../src/index.ts";
+import { createServerClient } from "../../src/server.ts";
 import { SpanRuntime, runInExecutionContext, startRootSpan } from "@relkit/invocation";
 import {
   AGENT_CAPABILITY_HEADER,
@@ -24,19 +25,19 @@ test("reads mutable Headers for each future request and includes credentials", a
   const seen: {
     authorization: string | null;
     capabilities: string | null;
-    credentials: RequestCredentials | undefined;
+    credentials: RequestInit["credentials"];
   }[] = [];
   const client = createClient<typeof contract>({
     baseUrl: "https://api.example.test",
     headers,
-    fetch: async (_input, init) => {
+    fetch: mockFetch(async (_input, init) => {
       seen.push({
         authorization: new Headers(init?.headers).get("authorization"),
         capabilities: new Headers(init?.headers).get(AGENT_CAPABILITY_HEADER),
         credentials: init?.credentials,
       });
       return Response.json({}, { status: 500 });
-    },
+    }),
   });
 
   await client.ping({}).catch(() => undefined);
@@ -64,7 +65,7 @@ test("evaluates async headers for each request and honors credentials overrides"
     credentials: "same-origin",
     headers: async () =>
       new Headers(token === undefined ? {} : { authorization: `Bearer ${token}` }),
-    fetch: async (_input, init) => {
+    fetch: mockFetch(async (_input, init) => {
       expect(init?.credentials).toBe("same-origin");
       const headers = new Headers(init?.headers);
       seen.push({
@@ -72,7 +73,7 @@ test("evaluates async headers for each request and honors credentials overrides"
         capabilities: headers.get(AGENT_CAPABILITY_HEADER),
       });
       return Response.json({}, { status: 500 });
-    },
+    }),
   });
 
   token = "one";
@@ -96,12 +97,12 @@ test("server clients create client spans and inject their active W3C context", a
   let responseBody: ReadableStream<Uint8Array> | null = null;
   const client = createServerClient<typeof contract>({
     baseUrl: "https://api.example.test",
-    fetch: async (_input, init) => {
+    fetch: mockFetch(async (_input, init) => {
       traceparent = new Headers(init?.headers).get("traceparent");
       const response = Response.json({});
       responseBody = response.body;
       return response;
-    },
+    }),
   });
 
   await runInExecutionContext({ span: root, runtime }, () => client.ping({}));
@@ -123,10 +124,10 @@ test("auto transport falls back only when WebSocket establishment fails", async 
   const client = createAutoClient<typeof contract>({
     baseUrl: "https://api.example.test",
     websocket: FailedSocket as unknown as typeof WebSocket,
-    fetch: async () => {
+    fetch: mockFetch(async () => {
       fetches += 1;
       return Response.json({}, { status: 500 });
-    },
+    }),
   });
   await client.ping({}).catch(() => undefined);
   expect(fetches).toBe(1);
