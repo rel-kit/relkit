@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { createSupervisorStateMachine } from "./src/state-machine.js";
-import { createSupervisorDrain, drainPreviousGeneration } from "./src/drain.js";
+import { createSupervisorStateMachine } from "../../src/state-machine.js";
+import { createSupervisorDrain, drainPreviousGeneration } from "../../src/drain.js";
 
 const token = { sourceToken: 1, generationToken: 1 } as const;
 
@@ -9,8 +9,8 @@ test("waits for prior work, then closes the candidate and providers exactly once
   const drain = createSupervisorDrain({
     token,
     deadlineMs: 100,
-    candidate: { token, dispose: async () => closed.push("candidate") },
-    providers: [{ id: "provider-a", close: async () => closed.push("provider-a") }],
+    candidate: { token, dispose: async () => void closed.push("candidate") },
+    providers: [{ id: "provider-a", close: async () => void closed.push("provider-a") }],
   });
   const lease = drain.track(token);
   expect(lease).toBeDefined();
@@ -40,8 +40,8 @@ test("aborts remaining work at the deadline and still bounds cleanup", async () 
   const drain = createSupervisorDrain({
     token,
     deadlineMs: 5,
-    candidate: { token, dispose: () => void (disposed += 1) },
-    providers: [{ id: "provider-a", release: () => undefined }],
+    candidate: { token, dispose: async () => void (disposed += 1) },
+    providers: [{ id: "provider-a", release: async () => undefined }],
   });
   const lease = drain.track(token, { interrupt: () => void (interrupted += 1) });
   const draining = drain.drain();
