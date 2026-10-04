@@ -1,118 +1,170 @@
-import { normalizeId } from "@relkit/contracts";
-import type { UnknownEventEnvelope } from "@relkit/events";
-import type { EventDeliveryResult, EventRouter } from "@relkit/providers-local";
+import { admitOwnedWork } from "./work-ownership.js";
+import { pendingEventDeliveries, completedEventDeliveries } from "./events-inspection.js";
+import { eventLifecycle } from "./events-lifecycle.js";
+import type { TestEventControlState, TestEventControls } from "./events-runtime-controls.types.js";
+export type { TestEventControlState, TestEventControls } from "./events-runtime-controls.types.js";
+import { Context, Effect, Exit, Layer, ManagedRuntime, Scope } from "effect";
+import {
+  observeExecution,
+  runExecutionPromise,
+  runExecutionSync,
+} from "@relkit/contracts/operation";
+import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
+import type { EventControlsService } from "./event-controls.types.js";
+
+import type { EventDeliveryResult } from "@relkit/providers-local";
 import type { TestEventCloseOptions } from "./events-types.js";
-import type { TestStateRoot } from "./state-root.js";
-import type { TestFailureControls } from "./fakes.js";
 
-export interface TestEventControlState {
-  readonly router: () => EventRouter;
-  readonly log: () => { readonly close: () => Promise<void> };
-  readonly open: () => Promise<void>;
-  readonly openFanout: (envelope: UnknownEventEnvelope) => Promise<void>;
-  readonly owner: TestStateRoot;
-  readonly failures: TestFailureControls;
-  readonly triggers: readonly {
-    readonly id: string;
-    readonly eventId: string;
-    readonly eventVersion: number;
-  }[];
-  readonly envelopes: readonly UnknownEventEnvelope[];
-  readonly unfanned: Map<string, UnknownEventEnvelope>;
-  readonly remember: (result: EventDeliveryResult, envelope: UnknownEventEnvelope) => void;
-  readonly isClosed: () => boolean;
-  readonly markClosed: () => void;
-}
-
-export interface TestEventControls {
-  readonly pending: (triggerId?: string) => number;
-  readonly runNext: (triggerId?: string) => Promise<EventDeliveryResult | undefined>;
-  readonly drain: () => Promise<readonly EventDeliveryResult[]>;
-  readonly completed: (triggerId?: string) => number;
-  readonly restart: () => Promise<void>;
-  readonly close: (options?: TestEventCloseOptions) => Promise<void>;
-}
-
-export function createTestEventControls(state: TestEventControlState): TestEventControls {
-  const pending = (triggerId?: string): number => {
-    ensureOpen();
-    const id = triggerId === undefined ? undefined : normalizeId(triggerId);
-    const durable = state
-      .router()
-      .snapshot()
-      .deliveries.filter(
-        (delivery) =>
-          ["available", "leased", "delayed"].includes(delivery.state) &&
-          (id === undefined || delivery.triggerId === id),
-      ).length;
-    const unfanned = [...state.unfanned.values()].filter((envelope) =>
-      state.triggers.some(
-        (trigger) =>
-          (id === undefined || trigger.id === id) &&
-          trigger.eventId === envelope.eventId &&
-          trigger.eventVersion === envelope.version,
-      ),
-    ).length;
-    return durable + unfanned;
-  };
-  const runNext = async (triggerId?: string): Promise<EventDeliveryResult | undefined> => {
-    ensureOpen();
-    for (const envelope of state.unfanned.values()) {
-      await state.openFanout(envelope);
-    }
-    const result = await state.router().runNext(triggerId);
-    if (result === undefined) return undefined;
-    const envelope = state.envelopes.find((item) => item.instanceId === result.eventInstanceId);
-    if (envelope !== undefined) state.remember(result, envelope);
-    if (result.state === "completed") state.failures.check("event.after-ack");
-    return result;
-  };
-  const drain = async (): Promise<readonly EventDeliveryResult[]> => {
-    const results: EventDeliveryResult[] = [];
-    while (true) {
-      const result = await runNext();
-      if (result === undefined) {
-        await state.router().drain();
-        return Object.freeze(results);
-      }
-      results.push(result);
-    }
-  };
-  const completed = (triggerId?: string): number => {
-    ensureOpen();
-    const id = triggerId === undefined ? undefined : normalizeId(triggerId);
-    const durable = state
-      .router()
-      .snapshot()
-      .deliveries.filter(
-        (delivery) =>
-          delivery.state === "completed" && (id === undefined || delivery.triggerId === id),
-      ).length;
-    return (
-      durable +
-      state
-        .router()
-        .snapshot()
-        .triggers.filter((trigger) => id === undefined || trigger.id === id)
-        .reduce((sum, trigger) => sum + (trigger.ephemeral?.completed ?? 0), 0)
+/**
+ * Builds delivery decisions around the acquired native event resources.
+ * @param state - Owner-local native resources and admission state.
+ * @returns A service owning fanout, retry, restart and complete release.
+ */
+function makeEventControls(state: TestEventControlState) {
+  return Effect.gen(function* () {
+    // The final harness close is registered later and joins work before this scope retires.
+    const scope = yield* Effect.acquireRelease(Scope.make(), (scope) =>
+      Scope.close(scope, Exit.void),
     );
-  };
-  const restart = async (): Promise<void> => {
-    ensureOpen();
-    await state.router().close();
-    await state.log().close();
-    await state.open();
-  };
-  const close = async (options: TestEventCloseOptions = {}): Promise<void> => {
-    if (state.isClosed()) return;
-    state.markClosed();
-    await state.router().close();
-    await state.log().close();
-    state.owner.cleanup(options.failed === true);
-  };
-  return Object.freeze({ pending, runNext, drain, completed, restart, close });
+    const context = yield* Effect.context<never>();
+    const { restart, close } = eventLifecycle(state, scope, context);
+    /**
+     * Registers the full workflow before caller interruption can stop waiting.
+     * @typeParam A Domain workflow result.
+     * @param work Ordered event decisions and native operation seams.
+     * @returns The admitted Effect, joined by restart and close.
+     */
+    const admitted = <A>(work: Effect.Effect<A, unknown>) =>
+      admitOwnedWork(state.work, scope, context, work);
+    /**
+     * Recovers persisted fanout gaps before one authoritative delivery attempt.
+     * @param triggerId Optional declared trigger restricting native selection.
+     * @returns Native attempt outcome after ledger and post-ack failure checks.
+     */
+    const runNext = Effect.fn("Testing.event.runNext")(function* (triggerId?: string) {
+      yield* Effect.forEach([...state.unfanned.values()], state.openFanout, {
+        concurrency: 1,
+        discard: true,
+      });
+      const result = yield* Effect.tryPromise({
+        try: () => state.router().runNext(triggerId),
+        catch: (cause) => cause,
+      });
+      if (result === undefined) return undefined;
+      const envelope = state.envelopes.find((item) => item.instanceId === result.eventInstanceId);
+      if (envelope !== undefined) state.remember(result, envelope);
+      if (result.state === "completed")
+        yield* Effect.try({
+          try: () => state.failures.check("event.after-ack"),
+          catch: (cause) => cause,
+        });
+      return result;
+    });
+    /** Drains delivery attempts in native order while the owner accepts work. */
+    const drain = Effect.fn("Testing.event.drain")(function* () {
+      const results: EventDeliveryResult[] = [];
+      while (!state.work.closed) {
+        const result = yield* runNext();
+        if (result === undefined) {
+          yield* Effect.tryPromise({ try: () => state.router().drain(), catch: (cause) => cause });
+          return Object.freeze(results);
+        }
+        results.push(result);
+      }
+      return Object.freeze(results);
+    })();
+    return TestEventExecution.of({
+      publish: (...args) =>
+        observeExecution("testing", "event.publish", admitted(state.publish(...args))),
+      pending: (id) =>
+        Effect.try({ try: () => pendingEventDeliveries(state, id), catch: (cause) => cause }),
+      completed: (id) =>
+        Effect.try({ try: () => completedEventDeliveries(state, id), catch: (cause) => cause }),
+      runNext: (id) => observeExecution("testing", "event.runNext", admitted(runNext(id))),
+      drain: observeExecution("testing", "event.drain", admitted(drain)),
+      restart: observeExecution("testing", "event.restart", restart),
+      close: (options) => close(options?.failed === true),
+    });
+  });
+}
 
-  function ensureOpen(): void {
-    if (state.isClosed()) throw new Error("Test event is closed");
+/** Delivery admission, retry/fanout and release belong to one event owner. */
+export class TestEventExecution extends Context.Service<TestEventExecution, EventControlsService>()(
+  "relkit/testing/EventExecution",
+) {}
+
+/**
+ * Owns the native delivery lifecycle; alternate Layers retain this service contract.
+ * @param state Acquired native router/log and owner-local fanout ledger.
+ * @returns A scoped control Layer whose finalizer attempts every release.
+ */
+export function eventControlsLayer(state: TestEventControlState) {
+  return Layer.effect(
+    TestEventExecution,
+    Effect.acquireRelease(
+      Effect.gen(function* () {
+        yield* Effect.acquireRelease(Effect.succeed(state.owner), (owner) =>
+          Effect.sync(() => owner.cleanup(true)),
+        );
+        yield* Effect.acquireRelease(state.open, () => state.release.pipe(Effect.orDie));
+        return yield* makeEventControls(state);
+      }),
+      (service) => service.close().pipe(Effect.orDie),
+    ),
+  );
+}
+
+/**
+ * Exposes synchronous inspection and Promise work through one owned runtime.
+ * @param state Native resources acquired by the event harness.
+ * @returns Native-compatible controls with idempotent scoped shutdown.
+ */
+export async function createTestEventControls(
+  state: TestEventControlState,
+): Promise<TestEventControls> {
+  const owner = ManagedRuntime.make(
+    eventControlsLayer(state).pipe(Layer.provideMerge(testingLoggerLayer(state.logger))),
+  );
+  let service;
+  try {
+    service = await runExecutionPromise(owner, TestEventExecution);
+  } catch (error) {
+    await disposeTestingOwner(owner).catch(() => undefined);
+    throw error;
+  }
+  let closing: Promise<void> | undefined;
+  return Object.freeze({
+    publishNative: (...args: Parameters<TestEventControls["publishNative"]>) =>
+      run(service.publish(...args)),
+    pending: (id?: string) => query(service.pending(id)),
+    completed: (id?: string) => query(service.completed(id)),
+    runNext: (id?: string) => run(service.runNext(id)),
+    drain: () => run(service.drain),
+    restart: () => run(service.restart),
+    close: (options?: TestEventCloseOptions) =>
+      (closing ??= runExecutionPromise(owner, service.close(options)).finally(() =>
+        disposeTestingOwner(owner),
+      )),
+  });
+  /**
+   * Rejects new work once the public owner starts its release.
+   * @typeParam A Native workflow result.
+   * @param effect Admitted publication or delivery workflow.
+   * @returns Completion or the established closed-owner error.
+   */
+  function run<A>(effect: Effect.Effect<A, unknown>): Promise<A> {
+    return closing === undefined
+      ? runExecutionPromise(owner, effect)
+      : Promise.reject(new Error("Test event is closed"));
+  }
+  /**
+   * Preserves native closed-state errors for synchronous delivery inspection.
+   * @typeParam A Native count result.
+   * @param effect Query over the owner's retained native router state.
+   * @returns The existing count while admission remains open.
+   */
+  function query<A>(effect: Effect.Effect<A, unknown>): A {
+    if (closing !== undefined) throw new Error("Test event is closed");
+    return runExecutionSync(owner, effect);
   }
 }
