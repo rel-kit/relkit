@@ -180,6 +180,19 @@ async function main(): Promise<void> {
         )
           throw new Error(`${projectTemplate} generation was not byte-deterministic.`);
         console.log(`packed ${projectTemplate} smoke passed`);
+        await Promise.all(
+          ["tarball", "cli", "second"].map((variant) =>
+            rm(join(temporary, `${projectTemplate}-${variant}-project`), {
+              recursive: true,
+              force: true,
+            }),
+          ),
+        );
+        await Promise.all(
+          ["direct", "cli", "second"].map((variant) =>
+            rm(generationCache(variant), { recursive: true, force: true }),
+          ),
+        );
       }
     }
     console.log(`packed create smoke passed (${tarballs.size} packages)`);
