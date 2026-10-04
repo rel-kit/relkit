@@ -5,8 +5,8 @@ import {
   JobWatchReadTimeoutError,
   watchJobRun,
   watchJobStream,
-} from "./src/jobs/index.ts";
-import { JobStreamGapError, JobStreamOverflowError } from "./src/jobs/index.ts";
+} from "../../src/jobs/index.ts";
+import { JobStreamGapError, JobStreamOverflowError } from "../../src/jobs/index.ts";
 
 test("watch controllers stay idle until connect and share a first-snapshot promise", async () => {
   const stream = holdingIterator([frame("running", 1, "cursor-1")]);
@@ -165,7 +165,7 @@ test("a reconnect waits for interrupted teardown before reusing a shared feed", 
   let index = 0;
   const streams = [holdingIterator([]), finiteIterator([frame("completed", 1, "cursor-1")])];
   const controller = watchJobRun(
-    clientWith({ watch: async () => streams[index++], get: async () => run("completed") }),
+    clientWith({ watch: async () => streams[index++]!, get: async () => run("completed") }),
     "exports",
     { runId: "run-1" },
   );
@@ -547,6 +547,11 @@ test("shared watch envelope keeps 100 unique feeds and 1,000 leases bounded", as
   expect(performance.now() - started).toBeLessThan(5_000);
 });
 
+/**
+ * Supplies generated job procedures under their exact declared hierarchy.
+ * @param procedures - Exact native job procedure implementations.
+ * @returns A generated-procedure-shaped native client fixture.
+ */
 function clientWith(procedures: {
   readonly watch: (input: unknown, options: unknown) => Promise<AsyncIterator<unknown>>;
   readonly get?: (input: unknown, options: unknown) => Promise<RunSnapshot>;
@@ -556,6 +561,11 @@ function clientWith(procedures: {
   return { jobs: { exports: { runs } } };
 }
 
+/**
+ * Supplies dynamic procedure resolution through the legacy proxy boundary.
+ * @param value - Original assertion-bearing native payload.
+ * @returns A native proxy retaining exact procedure lookup behavior.
+ */
 function proxyClient(value: unknown): unknown {
   if (value === null || typeof value !== "object") return value;
   const record = value as Record<string, unknown>;
@@ -568,6 +578,11 @@ function proxyClient(value: unknown): unknown {
   );
 }
 
+/**
+ * Builds the retained authoritative job run fixture.
+ * @param status - Canonical run lifecycle exposed by the fixture.
+ * @returns The original assertion-bearing lifecycle snapshot.
+ */
 function run(status: RunSnapshot["status"]): RunSnapshot {
   return {
     accepted: true,
@@ -585,6 +600,14 @@ function run(status: RunSnapshot["status"]): RunSnapshot {
   } as RunSnapshot;
 }
 
+/**
+ * Builds the retained native job observation fixture.
+ * @param status - Canonical run lifecycle exposed by the fixture.
+ * @param sequence - Native journal or frame position used by the assertion.
+ * @param cursor - Retained native observation cursor.
+ * @param kind - Canonical event or frame discriminator.
+ * @returns The original frame identity, sequence, cursor and continuity.
+ */
 function frame(
   status: RunSnapshot["status"],
   sequence: number,
@@ -602,6 +625,11 @@ function frame(
   } as RunWatchFrame;
 }
 
+/**
+ * Builds a native frame for a distinct shared-watch resource key.
+ * @param runId - Distinct native run identity used by the sharing assertion.
+ * @returns The retained frame whose run identity matches the supplied resource.
+ */
 function frameFor(runId: string): RunWatchFrame {
   return {
     ...frame("running", 1, `cursor-${runId}`),
@@ -609,6 +637,11 @@ function frameFor(runId: string): RunWatchFrame {
   };
 }
 
+/**
+ * Provides ordered native values followed by EOF.
+ * @param values - Exact ordered native fixture values.
+ * @returns An independently indexed finite native iterator.
+ */
 function finiteIterator(
   values: readonly unknown[],
 ): AsyncIterator<unknown> & { returned?: boolean } {
@@ -623,6 +656,11 @@ function finiteIterator(
   };
 }
 
+/**
+ * Provides initial native values and blocks further pulls until return.
+ * @param values - Exact ordered native fixture values.
+ * @returns A controllable iterator with the original native return authority.
+ */
 function holdingIterator(
   values: readonly unknown[],
 ): AsyncIterator<unknown> & { returned: boolean } {
@@ -645,6 +683,11 @@ function holdingIterator(
   return iterator;
 }
 
+/**
+ * Waits within the existing bound for an asynchronous fixture condition.
+ * @param predicate - Asynchronous fixture condition checked within the existing deadline.
+ * @returns Completion once the condition holds, or the original deadline failure.
+ */
 async function waitFor(predicate: () => boolean): Promise<void> {
   for (let attempt = 0; attempt < 100; attempt += 1) {
     if (predicate()) return;
