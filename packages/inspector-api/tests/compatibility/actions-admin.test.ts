@@ -1,6 +1,8 @@
+import type { AdminResponse } from "../fixtures/json.types.ts";
+import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
-import { installInspectorEndpoints } from "./src/index.ts";
+import { installInspectorEndpoints } from "../../src/index.ts";
 import { identity, post, setup, activate } from "./actions-fixtures.ts";
 
 describe("inspector administrative actions", () => {
@@ -18,7 +20,7 @@ describe("inspector administrative actions", () => {
       idempotencyKey: "job-retry",
       reason: "operator requested retry",
     });
-    const jobBody = await job.json();
+    const jobBody = await responseJson<AdminResponse>(job);
     expect(job.status).toBe(200);
     expect(jobBody.record).toMatchObject({ action: "retry", instanceId: "job-1" });
     expect(JSON.stringify(jobBody)).not.toContain("must-not-cross");
@@ -68,7 +70,7 @@ describe("inspector administrative actions", () => {
       decision: "approve",
     });
     expect(approved.status).toBe(200);
-    expect((await approved.json()).approval).toMatchObject({
+    expect((await responseJson<AdminResponse>(approved)).approval).toMatchObject({
       toolCallId: "call-1",
       state: "approved",
     });
@@ -80,7 +82,10 @@ describe("inspector administrative actions", () => {
       toolCallId: "call-2",
     });
     expect(denied.status).toBe(200);
-    expect((await denied.json()).approval).toMatchObject({ toolCallId: "call-2", state: "denied" });
+    expect((await responseJson<AdminResponse>(denied)).approval).toMatchObject({
+      toolCallId: "call-2",
+      state: "denied",
+    });
     expect(state.audits).toHaveLength(2);
   });
 

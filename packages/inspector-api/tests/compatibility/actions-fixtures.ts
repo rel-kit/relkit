@@ -1,28 +1,17 @@
 import { API_BASE_PATH, PROTOCOL_VERSION } from "@relkit/contracts";
 import { Hono } from "hono";
-import { installInspectorEndpoints, type InspectorActionServices } from "./src/index.ts";
+import { installInspectorEndpoints, type InspectorActionServices } from "../../src/index.ts";
+import type { ActionTestState, ActionTestGeneration } from "./actions-fixtures.types.js";
+export type { ActionTestState, ActionTestGeneration } from "./actions-fixtures.types.js";
 
 export const identity = { generationId: "generation-one", graphHash: "sha256:one" };
 
-export interface ActionTestState {
-  readonly app: Hono;
-  readonly actions: InspectorActionServices;
-  readonly audits: readonly unknown[];
-  readonly approvals: Map<string, string>;
-  readonly calls: () => number;
-  readonly setActive: (generation: ActionTestGeneration) => void;
-}
-
-export interface ActionTestGeneration {
-  readonly generationId: string;
-  readonly graphHash: string;
-  readonly actions?: InspectorActionServices;
-}
-
+/** @returns A stored generation with the stable compatibility identity. */
 export function makeGeneration(): ActionTestGeneration {
   return { ...identity };
 }
 
+/** @returns Native action fixture authorities and their existing assertion counters. */
 export function setup(): ActionTestState {
   let active = makeGeneration();
   let functionCalls = 0;
@@ -136,10 +125,24 @@ export function setup(): ActionTestState {
   };
 }
 
+/**
+ * Installs the fixture action authorities on the selected active generation.
+ * @param state - Native fixture state observed by the unchanged compatibility assertions.
+ * @param generation - Stored generation identity to activate.
+ * @returns No value; the next native request reads this stored generation.
+ */
 export function activate(state: ActionTestState, generation = makeGeneration()): void {
   state.setActive({ ...generation, actions: state.actions });
 }
 
+/**
+ * Sends the existing native Hono action request used by the compatibility assertions.
+ * @param app - Installed native fixture router.
+ * @param path - Existing action route suffix.
+ * @param body - Stored JSON request fields.
+ * @param headers - Optional native identity or protection headers.
+ * @returns The unchanged native response.
+ */
 export async function post(
   app: Hono,
   path: string,

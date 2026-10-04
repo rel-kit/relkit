@@ -1,3 +1,5 @@
+import type { ContractResponse } from "../fixtures/json.types.ts";
+import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
@@ -6,7 +8,7 @@ import {
   INSPECTOR_API_PATHS,
   OBSERVABILITY_ENDPOINT_PATHS,
   installInspectorEndpoints,
-} from "./src/index.ts";
+} from "../../src/index.ts";
 import { identity, json, makeApp, post, secret } from "./contracts-fixtures.ts";
 
 describe("inspector action and authorization contracts", () => {
@@ -53,7 +55,7 @@ describe("inspector action and authorization contracts", () => {
     for (const [path, body] of cases) {
       const response = await post(app, path, body);
       expect(response.status, path).toBe(200);
-      const result = await response.json();
+      const result = await responseJson<ContractResponse>(response);
       expect(result.protocol).toBe("relkit.inspector");
       expect(result.action ?? result.record ?? result.approval).toBeDefined();
       expect(JSON.stringify(result)).not.toContain(secret);

@@ -1,6 +1,8 @@
+import type { ActionResponse } from "../fixtures/json.types.ts";
+import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
-import { installInspectorEndpoints } from "./src/index.ts";
+import { installInspectorEndpoints } from "../../src/index.ts";
 import { activate, identity, makeGeneration, post, setup } from "./actions-fixtures.ts";
 
 describe("inspector function actions", () => {
@@ -12,7 +14,7 @@ describe("inspector function actions", () => {
       idempotencyKey: "function-1",
       input: { orderId: "order-1" },
     });
-    const firstBody = await first.json();
+    const firstBody = await responseJson<ActionResponse>(first);
     expect(first.status).toBe(200);
     expect(firstBody.output).toEqual({ ok: true });
     expect(JSON.stringify(firstBody)).not.toContain("raw-secret");
@@ -25,7 +27,9 @@ describe("inspector function actions", () => {
       input: { orderId: "order-1" },
     });
     expect(replay.status).toBe(200);
-    expect((await replay.json()).action.actionId).toBe(firstBody.action.actionId);
+    expect((await responseJson<ActionResponse>(replay)).action.actionId).toBe(
+      firstBody.action.actionId,
+    );
     expect(state.calls()).toBe(1);
 
     const conflict = await post(state.app, "/actions/functions/orders.create/invoke", {
@@ -65,6 +69,8 @@ describe("inspector function actions", () => {
       { authorization: "Bearer test-token" },
     );
     expect(response.status).toBe(403);
-    expect((await response.json()).error).toBe("RELKIT_INSPECTOR_ACTIONS_DISABLED");
+    expect((await responseJson<ActionResponse>(response)).error).toBe(
+      "RELKIT_INSPECTOR_ACTIONS_DISABLED",
+    );
   });
 });
