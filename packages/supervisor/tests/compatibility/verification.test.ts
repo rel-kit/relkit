@@ -1,7 +1,8 @@
+import { mockFetch } from "../fixtures/fetch.ts";
 import { expect, test } from "bun:test";
 import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
-import { createSupervisorStateMachine } from "./src/state-machine.js";
-import { verifyCandidate, type CandidateVerificationCandidate } from "./src/verification.js";
+import { createSupervisorStateMachine } from "../../src/state-machine.js";
+import { verifyCandidate, type CandidateVerificationCandidate } from "../../src/verification.js";
 
 const token = { sourceToken: 2, generationToken: 3 } as const;
 const graphHash = "sha256:candidate";
@@ -75,7 +76,7 @@ test("waits for provider readiness before requesting the gated graph endpoint", 
   const result = await verifyCandidate({
     candidate: candidateFor(token),
     activationFingerprint,
-    fetch: async (input, init) => {
+    fetch: mockFetch(async (input, init) => {
       const path = new URL(input.toString()).pathname;
       if (path.endsWith("/health/ready") && ++readyProbes === 1) {
         return Response.json(
@@ -94,7 +95,7 @@ test("waits for provider readiness before requesting the gated graph endpoint", 
       if (path.endsWith("/graph") && readyProbes < 2)
         return Response.json({ error: "not-ready" }, { status: 503 });
       return respond(input, init);
-    },
+    }),
   });
   expect(result.providerReady).toBe(true);
   expect(readyProbes).toBe(2);
@@ -165,12 +166,14 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
       candidate: candidateFor(token),
       activationFingerprint,
       healthTimeoutMs: 10,
-      fetch: (_input, init) =>
-        new Promise<Response>((_, reject) =>
-          init?.signal?.addEventListener("abort", () => reject(new Error("aborted")), {
-            once: true,
-          }),
-        ),
+      fetch: mockFetch(
+        (_input, init) =>
+          new Promise<Response>((_, reject) =>
+            init?.signal?.addEventListener("abort", () => reject(new Error("aborted")), {
+              once: true,
+            }),
+          ),
+      ),
     }),
   ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_HEALTH_TIMEOUT" });
 
@@ -210,6 +213,8 @@ test("rejects a stale provider override generation before activation", async () 
   ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_ACTIVATION_MISMATCH" });
 });
 
+/** Creates the native candidate seam. @param currentToken - Expected generation. @param dispose - Optional cleanup counter.
+ * @returns The original candidate verification shape. */
 function candidateFor(
   currentToken: CandidateVerificationCandidate["token"],
   dispose?: () => Promise<void>,
@@ -217,12 +222,14 @@ function candidateFor(
   return { port: 30_001, token: currentToken, ...(dispose === undefined ? {} : { dispose }) };
 }
 
+/** Replaces actual probe fetches. @param graph - Selective fixture graph/readiness fields. @param version - API protocol.
+ * @param identity - Returned generation witness. @returns A native fetch-compatible fixture. */
 function responseFor(
   graph: Record<string, unknown>,
-  version = API_VERSION,
-  identity = token,
+  version: number = API_VERSION,
+  identity: CandidateVerificationCandidate["token"] = token,
 ): typeof fetch {
-  return async (input) => {
+  return mockFetch(async (input) => {
     const path = new URL(input.toString()).pathname;
     const body = path.endsWith("/health/live")
       ? { status: "ok", ...identity }
@@ -255,5 +262,5 @@ function responseFor(
         },
       },
     );
-  };
+  });
 }
