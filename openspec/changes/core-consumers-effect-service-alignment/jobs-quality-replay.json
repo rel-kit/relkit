@@ -1,0 +1,108 @@
+{
+  "capturedUtc": "2026-10-03T18:47:24Z",
+  "worktree": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "runner": {
+    "dependency": "@stryker-mutator/vitest-runner",
+    "version": "10.0.0",
+    "vitest": "5.0.1",
+    "effectVitest": "4.0.0-rc.115",
+    "core": "10.0.0",
+    "reference": "https://stryker-mutator.io/docs/stryker-js/vitest-runner/",
+    "reason": "Actual Bun1.3.10 probe passes basic Vitest jobs assertions but rejects @effect/vitest because TestRunner.getCurrentSuite is unavailable.",
+    "probeLog": "/tmp/relkit-jobs-quality-native-runner-probe.log",
+    "capabilityDisposition": "Former Bun plugin whole-child30s, Inspector10s,smol andRSS limits have no exact official-Vitest equivalents. Core timeout calculation, bounded worker recovery/disposal and actual suite test deadlines remain; no test deadline was relaxed."
+  },
+  "coverage": {
+    "command": "rtk proxy bun run test:jobs:coverage",
+    "exitCode": 0,
+    "tests": 242,
+    "files": 69,
+    "branches": {
+      "covered": 508,
+      "total": 557,
+      "percent": 91.2,
+      "threshold": 90
+    },
+    "sourceScope": "All13original targets retained plus4migrated responsibility leaves; original existing suites retained plus4owningEffect suites.",
+    "log": "/tmp/relkit-jobs-quality-migrated-coverage.log"
+  },
+  "mutation": {
+    "command": "rtk proxy bun run test:jobs:mutation",
+    "exitCode": 0,
+    "initialTests": 242,
+    "mutants": 793,
+    "sourceFiles": 11,
+    "duration": "3m5s",
+    "counts": {
+      "Killed": 501,
+      "Survived": 268,
+      "NoCoverage": 17,
+      "Timeout": 7,
+      "Error": 0
+    },
+    "categories": [
+      {
+        "name": "tenant checks",
+        "killed": 18,
+        "targeted": 21
+      },
+      {
+        "name": "abort cleanup",
+        "killed": 18,
+        "targeted": 30
+      },
+      {
+        "name": "stale epochs",
+        "killed": 36,
+        "targeted": 91
+      },
+      {
+        "name": "memory conversion",
+        "killed": 29,
+        "targeted": 34
+      },
+      {
+        "name": "retry-budget multiplication",
+        "killed": 12,
+        "targeted": 17
+      },
+      {
+        "name": "duration conversion",
+        "killed": 22,
+        "targeted": 35
+      }
+    ],
+    "report": {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/reports/mutation/mutation.json",
+      "bytes": 598335,
+      "sha256": "cc988d0a82bf9887b8b7e55a1b16408d060e1350bf79d1ab7a374be6f4c15785",
+      "retention": "Initial observed report descriptor; the native full verification run subsequently replaced this generated path. The original run log remains retained."
+    },
+    "log": "/tmp/relkit-jobs-quality-migrated-mutation.log",
+    "gate": "Unchanged requirement: zeroError and at least one killed mutant for each of six semantic categories. No excluded static mutants.",
+    "finalVerificationReport": {
+      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/reports/mutation/mutation.json",
+      "bytes": 598472,
+      "sha256": "616a39a14847525f74a81fd3c5f470e7899a7648a39b35bfbe93a400314e6b72",
+      "counts": { "Killed": 501, "Survived": 268, "NoCoverage": 17, "Timeout": 7, "Error": 0 },
+      "log": "/tmp/relkit-core-consumers-verify-quality-final.log",
+      "fullVerificationExitCode": 0,
+      "retention": "Current complete native generated report, preserved without manual edits."
+    }
+  },
+  "regression": {
+    "command": "rtk proxy bun test tests/unit/jobs-mutation-gate.test.ts",
+    "tests": 3,
+    "expectations": 9,
+    "exitCode": 0,
+    "proofs": [
+      "Every retained semantic responsibility must have a kill.",
+      "An old controller-facade stale-epoch position cannot satisfy migrated ownership.",
+      "Execution errors fail even when all category requirements otherwise pass."
+    ]
+  },
+  "limitations": [
+    "Mutation semantic gate does not require every mutant to be killed; survivors/no-coverage/timeouts remain in the complete native report.",
+    "Coverage/mutation pass is a narrow quality gate, not full repository/demo sign-off."
+  ]
+}

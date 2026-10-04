@@ -1,0 +1,192 @@
+{
+  "reviewer": "/root/inspector_baseline",
+  "capturedUtc": "2026-10-03T18:23:26.057384+00:00",
+  "accepted": true,
+  "findings": [],
+  "files": [
+    {
+      "path": "packages/better-auth/service.test.ts",
+      "sha256": "040674d25cf5132245bcc5e9ca96f656a7110a1a9cc7ad0a2b4bf346c780f6b6",
+      "lines": 68,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/better-auth/src/activation.types.ts",
+      "sha256": "a92a967c97a879573ce20febd0312e815efbfde71fa210a6cb9feef594f732c7",
+      "lines": 5,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/better-auth/src/index.ts",
+      "sha256": "060969ea1843e6ba09bff02b57d6beac4afd7358999b4b42afc313e08b98c073",
+      "lines": 168,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/drizzle/src/activation.ts",
+      "sha256": "ff7208b3084bff8d8b821aac89e3f595c71ae278efd62220c6450cae8ea5e48e",
+      "lines": 100,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/drizzle/src/activation.types.ts",
+      "sha256": "c41adb42b2ceeea360f0be708621fd78a37778efad374865487a08092c3f6c9d",
+      "lines": 5,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/drizzle/src/index.ts",
+      "sha256": "ed9ad5a39b94084df823dfae5ab99752f10b16db1e54ce1318982de3a79b7cab",
+      "lines": 26,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/drizzle/tests/activation.test.ts",
+      "sha256": "1a409ec492297cab027068b52bae177fca88059e64ffecaf125f304a17b6e8e3",
+      "lines": 84,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/contracts/src/operation-observer.ts",
+      "sha256": "7095e5ab396ca5ca0f9eb262ad1f536102a1ca0167b36e32d8e3829bdf869a19",
+      "lines": 147,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/contracts/src/operation-runtime.ts",
+      "sha256": "24ee0afb1ff3563a1253d3e9ca0dc2a4b3d6be0cbc7e46f1eb16302fe65b426c",
+      "lines": 65,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/contracts/src/operation-stream.ts",
+      "sha256": "f8526b974362a425eb1a5dfbb03012aaecffadce9aa55fdb688be77614201142",
+      "lines": 69,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/contracts/src/operation.types.ts",
+      "sha256": "a165e810ed25626403ea7937c43ae0e1dd97685f7a05574cc0aad2464a372add",
+      "lines": 21,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/contracts/src/operation.ts",
+      "sha256": "5f2b80f31ce4b522ca5ceedab857b4979884225c1e1dd414883fe9c29f914503",
+      "lines": 9,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/runtime-effect/src/operation.ts",
+      "sha256": "5fdad15f992ea911fa1d50de934dd23c29759fd3448703f218d372801e7d7b01",
+      "lines": 7,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/runtime-effect/src/operation-stream.ts",
+      "sha256": "302f1275c7e42556277d3dc7abdf511fbb99c05179a1b5d8507e0b5274db21cc",
+      "lines": 6,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/runtime-effect/src/operation.types.ts",
+      "sha256": "1cdaf947c94b119c42b608e328e03d460c75a414a3423bd94eca9457f0b93d7d",
+      "lines": 6,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/contracts/tests/operation-observer.test.ts",
+      "sha256": "035e34f4848e687067e59677e531edc578228d2f858467f19cd1bf6be3877cf8",
+      "lines": 59,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/contracts/tests/operation-runtime-fixture.types.ts",
+      "sha256": "69b67babb9ba8a9eee80147ade7e2af89402f2c5e635f55664530a682b96bc53",
+      "lines": 10,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "packages/contracts/tests/operation-runtime.test.ts",
+      "sha256": "cf150565d6d1872f9858755693558718f74786a05c18e0db8c0459b930b130a0",
+      "lines": 144,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "scripts/jobs-coverage/vitest.config.ts",
+      "sha256": "30eff4f8ad115bddaaa6bf571de6b0863e905420fef87b2273a0a23ea0e20fc5",
+      "lines": 43,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    },
+    {
+      "path": "apps/docs/scripts/jobs-guide-catalog.ts",
+      "sha256": "9146a9606f7309d929c58b1bc60b37945348aac1a99a26429708e5d9349effbc",
+      "lines": 150,
+      "reviewer": "/root/inspector_baseline",
+      "author": "/root",
+      "read": "EOF",
+      "accepted": true
+    }
+  ],
+  "baselineEvidence": "All existing BetterAuth/Drizzle four baseline counterparts and runtime-effect operation3, jobs coverage/catalog2 read EOF; new contracts observer/stream moved from original runtime-effect equivalents and pure type widening retains original operation result/cause/consumer ownership. Original BetterAuth assertion targets retained, SQLite disposal now failure-safe. Prior phase2/support independent Client review retained as additional evidence.",
+  "dispositions": "Optional isolated acquisition preserves default descriptor caches and lazy handler target; context-construction failure releases acquired Drizzle prefix; concurrent close joins same Promise. Shared operation metrics updateUnsafe uses exact pinned update implementation/fiber.context, fixed attributes override caller input labels, observation failure remains isolated. Sync/Promise edges preserve Cause.squash identity; stream lifetime observer is scoped and joins finalization. Coverage branch90 unchanged; exact migrated suite/catalog paths only. Pure compatibility support does not require extra domain abstraction.",
+  "vendorEvidence": "Installed Effect rc.115 Metric.update/updateUnsafe/withAttributes implementation and inline examples; available PrometheusMetrics test EOF; sparse vendor coreMetric/Logger test gap recorded earlier. Effect Scope/ManagedRuntime/Stream/Deferred/forkScoped API evidence retained from independent phase reviews. No vendor edits.",
+  "checks": "Fresh read-only final EOF/hash supplement; no heavy test runner."
+}
