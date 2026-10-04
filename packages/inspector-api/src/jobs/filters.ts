@@ -1,3 +1,5 @@
+import type { InspectorRunFilters, InspectorCursor } from "./filters.types.js";
+export type { InspectorRunFilters, InspectorCursor } from "./filters.types.js";
 import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import type { RunListQuery } from "@relkit/contracts/jobs";
 import { InspectorJobsError, type InspectorJobsBinding } from "./types.js";
@@ -18,22 +20,11 @@ import {
   validStatus,
 } from "./filters-support.js";
 
-export interface InspectorRunFilters extends RunListQuery {
-  readonly jobName?: string;
-  readonly failure?: string;
-  readonly attempt?: number;
-  readonly timezone?: string;
-  readonly nativeQuery?: string;
-}
-
-export interface InspectorCursor {
-  readonly kind: "definitions" | "runs" | "schedules";
-  readonly generationId: string;
-  readonly graphHash: string;
-  readonly filters: JsonValue;
-  readonly position: JsonValue;
-}
-
+/**
+ * Parses bounded jobs query filters using the existing status and timestamp rules.
+ * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
+ * @returns Validated native run filters.
+ */
 export function parseRunFilters(request: Request): InspectorRunFilters {
   const params = new URL(request.url).searchParams;
   if (params.has("scope"))
@@ -88,14 +79,30 @@ export function parseRunFilters(request: Request): InspectorRunFilters {
   }) as InspectorRunFilters;
 }
 
+/**
+ * Projects filters for the public jobs query envelope.
+ * @param filters - Validated filters bound into the continuation cursor.
+ * @returns Present declared run filter fields.
+ */
 export function queryFilters(filters: InspectorRunFilters): JsonValue {
   return queryFiltersValue(filters);
 }
 
+/**
+ * Selects only filters supported by the native run-list contract.
+ * @param filters - Validated filters bound into the continuation cursor.
+ * @returns A bounded native run query.
+ */
 export function nativeRunFilters(filters: InspectorRunFilters): RunListQuery {
   return queryFilters(filters) as RunListQuery;
 }
 
+/**
+ * Rejects requested filters unsupported by a selected native provider.
+ * @param binding - Selected native job authority and its service identity.
+ * @param filters - Validated filters bound into the continuation cursor.
+ * @returns No value when every requested filter is supported.
+ */
 export function assertFilterSupport(
   binding: InspectorJobsBinding,
   filters: InspectorRunFilters,
@@ -128,6 +135,12 @@ export function assertFilterSupport(
       );
 }
 
+/**
+ * Signs generation, graph, filters and continuation metadata without exposing the signing secret.
+ * @param cursor - Signed continuation cursor, or null for the initial page.
+ * @param secret - Cursor signing authority; retained only at this boundary.
+ * @returns The existing opaque aggregate cursor.
+ */
 export function encodeCursor(cursor: InspectorCursor, secret: string | Uint8Array): string {
   const body = { ...cursor, mac: sign(cursor, secret) };
   const encoded = Buffer.from(canonicalJson(body), "utf8").toString("base64url");
@@ -140,6 +153,13 @@ export function encodeCursor(cursor: InspectorCursor, secret: string | Uint8Arra
   return encoded;
 }
 
+/**
+ * Verifies cursor structure, signature and expected authoritative identity.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @param expected - Expected generation, graph and filters bound into the cursor.
+ * @param secret - Cursor signing authority; retained only at this boundary.
+ * @returns Validated continuation metadata or the existing cursor error.
+ */
 export function decodeCursor(
   value: string,
   expected: Omit<InspectorCursor, "position">,
@@ -170,6 +190,12 @@ export function decodeCursor(
   return unsigned as unknown as InspectorCursor;
 }
 
+/**
+ * Selects the configured cursor secret or existing graph-hash fallback.
+ * @param secret - Cursor signing authority; retained only at this boundary.
+ * @param graphHash - Authoritative graph hash used only as the existing signing fallback.
+ * @returns The existing signing authority.
+ */
 export function cursorSecret(
   secret: string | Uint8Array | undefined,
   graphHash: string,

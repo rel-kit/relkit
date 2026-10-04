@@ -1,8 +1,20 @@
+import { Effect } from "effect";
+import { observeExecution } from "@relkit/contracts/operation";
+import { runInspectorPromise as runExecutionPromise } from "../native-edge.js";
+import { InspectorNativeJobs, inspectorNativeJobsExecution } from "./native.service.js";
+import { nativeAttempt } from "../native-edge.js";
 import type { JsonValue } from "@relkit/contracts";
 import { InspectorJobsError, type InspectorJobsServices } from "./types.js";
-import { isRecord, safeJson, type ResolvedActiveGeneration } from "../shared.js";
+import { isRecord, pick, safeJson, type ResolvedActiveGeneration } from "../shared.js";
 import type { JobDefinitionRecord } from "./definitions.js";
+import type { JobDefinitionFilters } from "./definitions.types.js";
 
+/**
+ * Joins task-backed job declarations with their public native health evidence.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @param health - Public native health evidence indexed by declared service identity.
+ * @returns Stable ordered job definitions without native runtime instances.
+ */
 export function definitions(
   generation: ResolvedActiveGeneration,
   health = new Map<string, string>(),
@@ -72,52 +84,67 @@ export function definitions(
     .sort((left, right) => left.name.localeCompare(right.name) || left.id.localeCompare(right.id));
 }
 
-export async function serviceHealth(
-  jobs: InspectorJobsServices | undefined,
-): Promise<Map<string, string>> {
-  const result = new Map<string, string>();
-  if (jobs === undefined) return result;
-  for (const binding of await bindings(jobs)) {
-    try {
-      const value = binding.health === undefined ? undefined : await binding.health();
+/**
+ * Lazily reads native definition-health evidence in stable declaration order.
+ * @param jobs - Optional native job authority and configured read concurrency.
+ * @returns Service health requiring InspectorNativeJobs; absent authorities give an empty map.
+ */
+export const serviceHealthEffect = Effect.fn("InspectorJobs.definitionHealth")(
+  function* (jobs: InspectorJobsServices | undefined) {
+    const result = new Map<string, string>();
+    if (jobs === undefined) return result;
+    const bindings = yield* nativeAttempt(() =>
+      typeof jobs.bindings === "function" ? jobs.bindings() : jobs.bindings,
+    );
+    const native = yield* InspectorNativeJobs;
+    const pages = yield* native.healthPages(bindings, jobs.maxReadConcurrency);
+    for (const { binding, health, available } of pages)
       result.set(
         binding.service,
-        isRecord(value) && typeof value.state === "string"
-          ? value.state
-          : typeof value === "string"
-            ? value
-            : binding.health === undefined
-              ? "unknown"
-              : "available",
+        !available
+          ? "unavailable"
+          : isRecord(health) && typeof health.state === "string"
+            ? health.state
+            : typeof health === "string"
+              ? health
+              : binding.health === undefined
+                ? "unknown"
+                : "available",
       );
-    } catch {
-      result.set(binding.service, "unavailable");
-    }
-  }
-  return result;
+    return result;
+  },
+  (effect) => observeExecution("inspector", "jobs.definition-health", effect),
+);
+
+/**
+ * Reads definition health through the reused compatibility owner.
+ * @param jobs - Optional native job authority.
+ * @returns Stable service-to-health evidence, retaining unavailable providers.
+ */
+export function serviceHealth(
+  jobs: InspectorJobsServices | undefined,
+): Promise<Map<string, string>> {
+  return runExecutionPromise(inspectorNativeJobsExecution, serviceHealthEffect(jobs));
 }
 
-async function bindings(
-  jobs: InspectorJobsServices,
-): Promise<readonly import("./types.js").InspectorJobsBinding[]> {
-  return typeof jobs.bindings === "function" ? await jobs.bindings() : jobs.bindings;
-}
-
+/**
+ * Selects stored object graph nodes for declaration-only queries.
+ * @param generation - Authorized active generation supplying declaration metadata and native authorities.
+ * @returns Declaration records or an empty collection when unavailable.
+ */
 export function graphNodes(generation: ResolvedActiveGeneration): Record<string, unknown>[] {
   return isRecord(generation.graph) && Array.isArray(generation.graph.nodes)
-    ? generation.graph.nodes.filter(isRecord)
+    ? generation.graph.nodes.filter(isRecord).map((node) => pick(node, Object.keys(node)))
     : [];
 }
 
-export function matches(
-  item: JobDefinitionRecord,
-  filters: {
-    search?: string | undefined;
-    job?: string | undefined;
-    task?: string | undefined;
-    service?: string | undefined;
-  },
-): boolean {
+/**
+ * Matches a projected job definition against the declared filters.
+ * @param item - Selected declaration or native record to project.
+ * @param filters - Validated filters bound into the continuation cursor.
+ * @returns Whether the public definition matches every supplied selector.
+ */
+export function matches(item: JobDefinitionRecord, filters: JobDefinitionFilters): boolean {
   if (filters.job !== undefined && item.jobId !== filters.job && item.name !== filters.job)
     return false;
   if (filters.task !== undefined && item.taskId !== filters.task) return false;
@@ -130,18 +157,33 @@ export function matches(
   );
 }
 
+/**
+ * Projects present filter fields into the signed cursor identity.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Canonical JSON-compatible filter fields.
+ */
 export function filtersJson(value: Record<string, unknown>): JsonValue {
   return Object.fromEntries(
     Object.entries(value).filter(([, entry]) => entry !== undefined),
   ) as JsonValue;
 }
 
+/**
+ * Validates the decoded continuation position before using it.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns An accepted continuation position or the existing cursor failure.
+ */
 export function readPosition(value: JsonValue): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0)
     throw new InspectorJobsError("RELKIT_INSPECTOR_JOBS_CURSOR_INVALID", 400);
   return value;
 }
 
+/**
+ * Validates the bounded job-definition page size.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns A page size between one and one hundred.
+ */
 export function definitionLimit(value: string | null): number {
   if (value === null || value === "") return 25;
   const result = Number(value);
@@ -150,6 +192,11 @@ export function definitionLimit(value: string | null): number {
   return result;
 }
 
+/**
+ * Redacts a job declaration while retaining its public service identity.
+ * @param item - Selected declaration or native record to project.
+ * @returns Public job-definition JSON.
+ */
 export function projectDefinition(item: JobDefinitionRecord): JsonValue {
   const value = safeJson(item);
   return isRecord(value)
@@ -163,6 +210,11 @@ export function projectDefinition(item: JobDefinitionRecord): JsonValue {
     : value;
 }
 
+/**
+ * Normalizes optional query text without creating a default selector.
+ * @param value - Candidate metadata value, checked before selecting public fields.
+ * @returns Trimmed nonempty text or undefined.
+ */
 export function text(value: string | null): string | undefined {
   return value === null || value.trim() === "" ? undefined : value.trim();
 }
