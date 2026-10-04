@@ -6,6 +6,11 @@ import {
 
 const rootExport = { types: "./dist/index.d.ts", import: "./dist/index.js" };
 
+/** Declares the exact packed entry points, including intentional leaf exports.
+ * @param directoryName - Workspace directory basename.
+ * @param packageName - Published name for integration-specific subpaths.
+ * @returns The ordered export map required by manifest and packed-resolution checks.
+ */
 export function expectedExports(
   directoryName: string,
   packageName?: string,
@@ -41,10 +46,22 @@ export function expectedExports(
   if (directoryName === "contracts")
     return {
       ".": rootExport,
+      "./operation": {
+        types: "./dist/operation.d.ts",
+        import: "./dist/operation.js",
+      },
       "./jobs": {
         types: "./dist/jobs.d.ts",
         import: "./dist/jobs.js",
       },
+    };
+  if (directoryName === "runtime-effect")
+    return {
+      "./logger": {
+        types: "./dist/logger.d.ts",
+        import: "./dist/logger.js",
+      },
+      ".": rootExport,
     };
   if (directoryName === "events")
     return {
