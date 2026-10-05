@@ -5,8 +5,9 @@ import {
 } from "@relkit/local-service";
 import { signedRequest } from "../runtime/signing.js";
 
+// Public mirror of RELEASE.2025-04-22T22-12-26Z, pinned to the original image digest.
 const MINIO_IMAGE =
-  "quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e";
+  "ghcr.io/teableio/minio@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e";
 const BUCKET = "relkit";
 const REGION = "us-east-1";
 
