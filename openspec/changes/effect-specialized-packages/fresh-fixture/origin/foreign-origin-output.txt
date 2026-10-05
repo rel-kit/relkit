@@ -1,0 +1,29 @@
+{
+  "base": "http://127.0.0.1:3330",
+  "generationId": "generation.runtime",
+  "graphHash": "sha256:2d2549172c1ac8ccbdb259af30906075786768123244b55762aebaba1580a47b",
+  "http": {
+    "operation": "foreign-origin HTTP",
+    "origin": "https://foreign.example",
+    "status": 403,
+    "body": {
+      "error": {
+        "id": "ORIGIN_DENIED",
+        "message": "Request rejected."
+      }
+    }
+  },
+  "websocket": {
+    "operation": "foreign-origin WebSocket",
+    "origin": "https://foreign.example",
+    "upgradeStatus": 502,
+    "upgradeBody": "WebSocket upgrade failed.",
+    "opened": false,
+    "error": true,
+    "close": {
+      "code": 1002,
+      "reason": "Expected 101 status code"
+    },
+    "readyState": 3
+  }
+}
