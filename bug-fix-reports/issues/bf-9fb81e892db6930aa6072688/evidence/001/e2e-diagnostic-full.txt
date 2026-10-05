@@ -1,0 +1,120 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/generated-host.test.ts:
+10:40:13 INFO  runtime.specialized Execution operation completed
+               generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=3.494542 operation=database.acquire outcome=success
+10:40:13 INFO  runtime.specialized Execution operation completed
+               generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=2.598708 operation=auth.factory outcome=success
+10:40:13 INFO  runtime.specialized Execution operation completed
+               generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=7.586625 operation=auth.acquire outcome=success
+10:40:13 INFO  runtime.specialized Execution operation completed
+               request=request-fde5ce52-80b2-400a-acc1-9b016208d273 invocation=invocation-0fa39948-8d60-4522-adfc-20e1cce3f3be trace=876793a5f708d01d354ef3618e1f4166 span=8b234ae8e63e79ad generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=4.2275 operation=auth.session outcome=success
+10:40:13 INFO  runtime.specialized Execution operation completed
+               request=request-8ed5bf4c-1a2d-4543-80f4-591de6b81ddc invocation=invocation-f6f9330b-e7f2-4652-9532-2eafdd629291 trace=2f4da54047d362e30f48f9f235b4f54e span=463cb7bf7fdd1ae8 generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=4.906125 operation=database.insert outcome=success
+10:40:13 INFO  runtime.specialized Execution operation completed
+               request=request-8ed5bf4c-1a2d-4543-80f4-591de6b81ddc invocation=invocation-f6f9330b-e7f2-4652-9532-2eafdd629291 trace=2f4da54047d362e30f48f9f235b4f54e span=7aa6e3dcab444d46 generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=1.322417 operation=database.findMany outcome=success
+10:40:14 INFO  runtime.specialized Execution operation completed
+               request=request-f32a4cfb-6358-479b-ae91-5fbfe4d8af63 invocation=invocation-5d6ef9ce-11eb-4baa-a81c-baf445e784f1 trace=2ca4c1f47e2f94bb54cc20727b00f835 span=a0379e570ae31901 generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=0.580709 operation=database.insert outcome=success
+10:40:14 ERROR runtime.specialized Execution operation failed
+               request=request-f32a4cfb-6358-479b-ae91-5fbfe4d8af63 invocation=invocation-5d6ef9ce-11eb-4baa-a81c-baf445e784f1 trace=2ca4c1f47e2f94bb54cc20727b00f835 span=bc984813b1cf45e1 generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=3.970042 operation=database.transaction outcome=failure
+10:40:14 INFO  runtime.specialized Execution operation completed
+               request=request-f32a4cfb-6358-479b-ae91-5fbfe4d8af63 invocation=invocation-5d6ef9ce-11eb-4baa-a81c-baf445e784f1 trace=2ca4c1f47e2f94bb54cc20727b00f835 span=df0debcb872ea892 generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=0.261959 operation=database.findMany outcome=success
+10:40:14 INFO  runtime.specialized Execution operation completed
+               request=request-876645b2-f4aa-45a7-bb5f-1ec6d7883a31 invocation=invocation-554acac8-7bfc-47ae-b6c5-6d4e3ba00de0 trace=e3f3df2bfdda2c58c61d9efbce088ed7 span=d154e69d5bb3b237 generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=0.304917 operation=database.findMany outcome=success
+[13:40:14.069] INFO (#8057): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.314667,
+}
+[13:40:14.071] INFO (#8108): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 0.374,
+}
+[13:40:14.072] INFO (#8108): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 0.762791,
+}
+[13:40:14.074] ERROR (#8126): Execution operation failed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "failure",
+  duration_ms: 0.169083,
+}
+[13:40:14.075] INFO (#8129): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.2035,
+}
+[13:40:14.076] INFO (#8134): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.4165,
+}
+[13:40:14.076] INFO (#8135): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.421375,
+}
+10:40:14 INFO  runtime.specialized Execution operation completed
+               request=request-bfeb4b67-d4b4-4a1c-ace1-ac8a50735705 invocation=invocation-2c34afb4-923c-4879-80d4-70a09af82438 trace=493f0d034862ae7afeb3e61083f8c72b span=bd1def967a10b025 generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=7.931041 operation=database.extension outcome=success
+10:40:14 INFO  runtime.specialized Execution operation completed
+               request=request-bfeb4b67-d4b4-4a1c-ace1-ac8a50735705 invocation=invocation-2c34afb4-923c-4879-80d4-70a09af82438 trace=493f0d034862ae7afeb3e61083f8c72b span=49a394f69af1f8ad generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=0.260625 operation=database.findMany outcome=success
+[13:40:14.110] INFO (#9758): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.272833,
+}
+[13:40:14.112] ERROR (#9794): Execution operation failed {
+  domain: "runtime",
+  operation: "database.extension",
+  outcome: "failure",
+  duration_ms: 0.5095,
+}
+[13:40:14.117] INFO (#9776): Execution operation completed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "success",
+  duration_ms: 5.84125,
+}
+[13:40:14.118] INFO (#9822): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.130792,
+}
+transaction descendant probe {"premature":false,"committed":true,"disposed":true,"outcomes":["fulfilled","rejected","fulfilled"]}
+10:40:14 ERROR runtime.specialized Execution operation failed
+               request=request-105cff84-72e2-44d5-824c-33f7914c275d invocation=invocation-97d519b3-e620-4c1f-922f-3975c1df93cf trace=ef549803c806cb1755e30ecac878deea span=b2a0c7a709afcd07 generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=9.1265 operation=database.extension outcome=failure
+10:40:14 INFO  runtime.specialized Execution operation completed
+               generation=generation.runtime graph=sha256:08b55a3b3e199ba5d934544e8fc8330c6cd5ad29236342074b42b384e4292ba5 source=direct domain=runtime duration_ms=0.211542 operation=database.close outcome=success
+
+
+75 |       if (response.status !== 200 && host?.exitCode === null) {
+76 |         host.kill("SIGTERM");
+77 |         await host.exited;
+78 |         console.log((await output)?.join("\n"));
+79 |       }
+80 |       expect(response.status, JSON.stringify(result)).toBe(200);
+                                                           ^
+error: {"error":"internal-error"}
+
+Expected: 200
+Received: 500
+
+      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/tests/integration/database/generated-host.test.ts:80:55)
+      at async <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/tests/integration/database/generated-host.test.ts:92:18)
+(fail) generated host preserves database/auth ownership, rollback, session admission and shutdown [4133.12ms]
+
+ 0 pass
+ 1 fail
+ 12 expect() calls
+Ran 1 test across 1 file. [4.42s]

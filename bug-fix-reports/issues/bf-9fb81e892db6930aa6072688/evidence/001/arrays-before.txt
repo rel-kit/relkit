@@ -1,0 +1,42 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/drizzle
+
+stdout | tests/effect/string-bigint-arrays.test.ts > string bigint arrays retain dimensions and nullable/default metadata
+[13:44:38.104] ERROR (#1): [Error [SchemaError]: Expected string
+  at ["ids"]] {
+  issue: Composite {
+    '~effect/SchemaIssue/Issue': '~effect/SchemaIssue/Issue',
+    _tag: 'Composite',
+    ast: Objects {
+      '~effect/Schema': '~effect/Schema',
+      annotations: undefined,
+      checks: undefined,
+      encoding: undefined,
+      context: undefined,
+      _tag: 'Objects',
+      propertySignatures: [Array],
+      indexSignatures: [],
+      encodingChecks: undefined
+    },
+    issues: [ [Pointer] ]
+  },
+  _tag: 'SchemaError',
+  '~effect/Schema/SchemaError': '~effect/Schema/SchemaError',
+  [cause]: undefined
+}
+
+ ❯ tests/effect/string-bigint-arrays.test.ts (1 test | 1 failed) 10ms
+   × string bigint arrays retain dimensions and nullable/default metadata 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/effect/string-bigint-arrays.test.ts > string bigint arrays retain dimensions and nullable/default metadata
+SchemaError: Expected string
+  at ["ids"]
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  13:44:37
+   Duration  456ms (import 82%, transform 14%, tests 3%, worker 1%)

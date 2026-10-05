@@ -1,0 +1,2 @@
+$ relkit check
+Checked /Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter

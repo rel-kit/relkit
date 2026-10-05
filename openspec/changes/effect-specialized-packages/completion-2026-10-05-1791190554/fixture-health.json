@@ -1,0 +1,38 @@
+{
+  "health/ready": {
+    "protocol": "relkit.inspector",
+    "version": 1,
+    "status": "ready",
+    "graphHash": "sha256:2d2549172c1ac8ccbdb259af30906075786768123244b55762aebaba1580a47b",
+    "activationFingerprint": {
+      "graphHash": "sha256:2d2549172c1ac8ccbdb259af30906075786768123244b55762aebaba1580a47b",
+      "manifestHash": "sha256:67cb4db6e22763b4e917f74a28d4b999fea0f6cd6e71a5d8d228730f46776194",
+      "runtimeIntegrationsPlanHash": "sha256:9722bd88c916baffbea018ac4608ea29bce0059c96c4b381e1a7a3f43ae57909"
+    },
+    "manifestGraphHash": "sha256:2d2549172c1ac8ccbdb259af30906075786768123244b55762aebaba1580a47b",
+    "graphContractVersion": 10,
+    "manifestContractVersion": 10,
+    "manifestGeneratorVersion": 7,
+    "environmentReady": true,
+    "providerReady": true,
+    "databaseReady": true,
+    "authReady": true,
+    "sourceToken": 1,
+    "generationToken": 1
+  },
+  "client/identity": {
+    "protocol": "relkit.client-identity",
+    "version": 1,
+    "applicationId": "ai-validation",
+    "identityScope": "sha256:629aea8b3d758b0668b630bb7e4ae1a0e1ee01697e3ef132ada097ce2c9eb31a",
+    "sessionEpoch": "sha256:d141482d084cfbaef9068ac69c8d55d9248fefa43d59f27a97659fbe86512955",
+    "publicFingerprint": "sha256:e78ffe0a7e96b700542d0b9b0c9df45a06f101c1c893978327be6349c50297fe",
+    "issuedAt": "2026-10-05T09:09:00.708Z"
+  },
+  "graph": {
+    "generationId": "generation.runtime",
+    "graphHash": "sha256:2d2549172c1ac8ccbdb259af30906075786768123244b55762aebaba1580a47b"
+  },
+  "sourceCopyStillIdentical": true,
+  "candidateLinksVerified": true
+}

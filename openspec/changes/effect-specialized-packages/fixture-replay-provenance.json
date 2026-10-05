@@ -1,0 +1,51 @@
+{
+  "source": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter",
+  "root": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-fixture-TIUX33",
+  "candidate": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit",
+  "sourceHash": "b8068df2ab7364d781ed6a55017fc4090fbb445fbfbac71a73e32c27705c7e62",
+  "copyHash": "b8068df2ab7364d781ed6a55017fc4090fbb445fbfbac71a73e32c27705c7e62",
+  "ports": [
+    3330,
+    3331
+  ],
+  "reason": "Byte-identical executable fixture sources/config/tests with isolated generated/runtime state",
+  "hashInputs": ["src/", "tests/", "package.json", "bun.lock", "relkit.config.ts", "tsconfig.json"],
+  "copyExclusions": ["README.md", ".gitignore", ".env.example", ".vscode/", ".env", ".relkit/", "node_modules/"],
+  "/_relkit/v1/health/ready": {
+    "status": "ready",
+    "protocol": "relkit.inspector",
+    "version": 1,
+    "graphHash": "sha256:2d2549172c1ac8ccbdb259af30906075786768123244b55762aebaba1580a47b",
+    "activationFingerprint": {
+      "graphHash": "sha256:2d2549172c1ac8ccbdb259af30906075786768123244b55762aebaba1580a47b",
+      "manifestHash": "sha256:67cb4db6e22763b4e917f74a28d4b999fea0f6cd6e71a5d8d228730f46776194",
+      "runtimeIntegrationsPlanHash": "sha256:9722bd88c916baffbea018ac4608ea29bce0059c96c4b381e1a7a3f43ae57909"
+    },
+    "manifestGraphHash": "sha256:2d2549172c1ac8ccbdb259af30906075786768123244b55762aebaba1580a47b",
+    "graphContractVersion": 10,
+    "manifestContractVersion": 10,
+    "manifestGeneratorVersion": 7,
+    "environmentReady": true,
+    "providerReady": true,
+    "databaseReady": true,
+    "authReady": true,
+    "sourceToken": 1,
+    "generationToken": 1
+  },
+  "/_relkit/v1/client/identity": {
+    "status": 200,
+    "protocol": "relkit.client-identity",
+    "version": 1,
+    "applicationId": "ai-validation",
+    "identityScope": "sha256:2fd0be3abab8cbacdfd49ff08e60a234d37bbfeb5c288b0db5cf0f75fe764eaa",
+    "sessionEpoch": "sha256:682c3e89f8b3421f8ee1debd7995c7011ddf5f0032be634cd0883b86965db2bd",
+    "publicFingerprint": "sha256:e78ffe0a7e96b700542d0b9b0c9df45a06f101c1c893978327be6349c50297fe",
+    "issuedAt": "2026-10-04T17:15:27.916Z"
+  },
+  "/_relkit/v1/graph": {
+    "status": 200,
+    "generationId": "generation.runtime",
+    "graphHash": "sha256:2d2549172c1ac8ccbdb259af30906075786768123244b55762aebaba1580a47b",
+    "nodes": 22
+  }
+}

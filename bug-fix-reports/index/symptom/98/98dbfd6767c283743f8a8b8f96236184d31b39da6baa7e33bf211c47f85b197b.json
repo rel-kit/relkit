@@ -1,0 +1,30 @@
+{
+  "key": "transaction child ownership, string bigint validation, standalone instrumentation",
+  "matches": {
+    "bf-9fb81e892db6930aa6072688": {
+      "id": "bf-9fb81e892db6930aa6072688",
+      "status": "verified",
+      "what": "Drizzle transaction descendants escape lifetime, string bigint schemas reject valid data, standalone CRUD lacks instrumentation",
+      "root_cause": "packages/drizzle/src/context.ts transaction bindings used a static admission bypass instead of retaining owner and transaction lifetime; operations.ts override bases could escape SQLite exclusion. The pinned Drizzle rc.5 Effect schema generator models string-mode bigint as BigInt. operations.ts placed observations excl",
+      "fixed_by": "Retain owner admission at every execution edge and an expiring transaction callback lease, draining descendants before native commit/rollback and reacquiring SQLite exclusion for override bases. Refine string bigint schemas within signed/unsigned bounds while preserving array dimensions and generator null/default rules",
+      "files": [
+        "packages/drizzle/src/activation.ts",
+        "packages/drizzle/src/context.ts",
+        "packages/drizzle/src/context.types.ts",
+        "packages/drizzle/src/runtime-types.ts",
+        "packages/drizzle/src/operations.ts",
+        "packages/drizzle/src/transaction.ts",
+        "packages/drizzle/src/table.schemas.ts",
+        "packages/drizzle/tests/effect/review-regressions.test.ts",
+        "packages/drizzle/tests/effect/string-bigint-arrays.test.ts",
+        "tests/integration/database/review-regressions.test.ts",
+        "tests/integration/database/generated-host-fixture.ts",
+        "tests/integration/database/generated-host.test.ts",
+        "apps/docs/content/docs/api/drizzle.mdx"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-05T10:54:22+00:00",
+      "report": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/report.md"
+    }
+  }
+}

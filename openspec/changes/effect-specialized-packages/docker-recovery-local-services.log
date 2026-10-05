@@ -1,0 +1,22 @@
+$ RELKIT_TEST_DOCKER=1 bun test ./tests/integration/local-docker-services.test.ts
+bun test v1.3.10 (30e609e0)
+
+tests/integration/local-docker-services.test.ts:
+48 |           "RELKIT_DOCKER_OUTPUT_LIMIT",
+49 |           "Docker command output exceeded its safe limit.",
+50 |         );
+51 |       }
+52 |       if (result.exitCode !== 0) {
+53 |         throw new DockerEngineError(
+                   ^
+DockerEngineError: Docker container creation failed with exit code 1.
+ code: "RELKIT_DOCKER_COMMAND_FAILED"
+
+      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/docker/src/runtime/docker-client.ts:53:15)
+      at async start (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/docker/src/runtime/docker-materializer.ts:152:23)
+(fail) runs isolated Redis and MinIO services through adoption, persistence, and cleanup [1813.20ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [2.18s]
+error: script "test:local-docker" exited with code 1

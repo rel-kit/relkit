@@ -1,197 +1,138 @@
-import { and, asc, desc, eq, isNull, type Column, type SQL } from "drizzle-orm";
+import { Effect } from "effect";
 import type { ModelBinding } from "./runtime-types.js";
-import { withOperationTracing } from "./operation-tracing.js";
-export const runOperation = withOperationTracing(runLogicalOperation);
-async function runLogicalOperation(
+import { nativeCall, type DrizzleFailure } from "./failure.js";
+import { observeSpecializedOperation } from "./operation-tracing.js";
+import { transactionEffect, withSqlitePermit, withTransactionWork } from "./transaction.js";
+import { redactSpecializedTrace } from "./trace-redaction.js";
+import { checked, findOne, findMany } from "./queries.js";
+import { insert, update, remove } from "./mutations.js";
+import { isRecord, requiredRow, selector } from "./operations.utils.js";
+
+/**
+ * Runs one lazy CRUD workflow at its compatibility edge.
+ * @param binding - Owned client/model/transaction binding.
+ * @param name - Reserved CRUD operation.
+ * @param args - Public arguments validated inside the workflow.
+ * @returns Native Promise result retaining expected native rejection identity.
+ */
+export function runOperation(binding: ModelBinding, name: string, args: unknown): Promise<unknown> {
+  return binding.run(operationEffect(binding, name, args), name);
+}
+
+/**
+ * Composes overrides and MySQL write/recovery transaction ownership.
+ * @param binding - Model binding.
+ * @param name - Reserved operation.
+ * @param args - Original override arguments.
+ * @returns Lazy CRUD work with typed failures and no automatic write retries.
+ * @example Compose a page with an existing owner and table binding
+ * ```ts
+ * import { Effect } from "effect";
+ * import type { ManagedRuntime } from "effect";
+ * import { DrizzleFailure, DrizzleOwner, operationEffect, runDrizzlePromise } from "@relkit/drizzle/internal";
+ * function page(owner: ManagedRuntime.ManagedRuntime<DrizzleOwner, DrizzleFailure>, binding: Parameters<typeof operationEffect>[0]) {
+ *   return runDrizzlePromise(owner, Effect.gen(function* () {
+ *     const service = yield* DrizzleOwner;
+ *     return yield* service.work(operationEffect(binding, "findMany", { limit: 10 }));
+ *   }));
+ * }
+ * ```
+ */
+export function operationEffect(
   binding: ModelBinding,
   name: string,
   args: unknown,
-): Promise<unknown> {
+): Effect.Effect<unknown, DrizzleFailure> {
+  return redactSpecializedTrace(
+    observeSpecializedOperation(`database.${name}`, operationWorkflow(binding, name, args)),
+  );
+}
+
+/**
+ * Composes the unobserved core for nested dialect recovery and override bases.
+ * @param binding - Transaction-aware native dependencies.
+ * @param name - Reserved CRUD operation.
+ * @param args - Original public arguments.
+ * @returns Lazy work counted by the independently callable outer operation.
+ */
+const operationWorkflow = Effect.fn("Drizzle.operation")((
+  binding: ModelBinding,
+  name: string,
+  args: unknown,
+): Effect.Effect<unknown, DrizzleFailure> => {
   if (
     binding.dialect === "mysql" &&
     !binding.inTransaction &&
     ["insert", "update", "upsert", "delete"].includes(name)
   ) {
-    return transaction(binding.drizzle, (drizzle) =>
-      runLogicalOperation({ ...binding, drizzle, inTransaction: true }, name, args),
-    );
+    return transactionEffect(binding.drizzle, "mysql", (drizzle, lease) => {
+      const transactionBinding: ModelBinding = {
+        ...binding,
+        drizzle,
+        inTransaction: true,
+        run: (effect, operation) => binding.run(withTransactionWork(lease, effect), operation),
+      };
+      return transactionBinding.run(operationWorkflow(transactionBinding, name, args), name);
+    });
   }
-  const base = (next: unknown): Promise<unknown> => baseOperation(binding, name, next);
   const override = binding.override[name];
-  return typeof override === "function" ? override({ args, base }) : base(args);
-}
-async function baseOperation(binding: ModelBinding, name: string, args: unknown): Promise<unknown> {
-  const value = isRecord(args) ? args : {};
-  switch (name) {
-    case "findOne":
-      return findOne(binding, selector(binding, value.where));
-    case "findMany":
-      return findMany(binding, value);
-    case "insert":
-      return insert(binding, value.data);
-    case "update":
-      return update(binding, selector(binding, value.where), value.data);
-    case "delete":
-      return remove(binding, selector(binding, value.where));
-    case "upsert":
-      return upsert(binding, selector(binding, value.where), value.create, value.update);
-    default:
-      throw new TypeError(`Unknown model operation "${name}"`);
-  }
-}
-async function findOne(binding: ModelBinding, where: Record<string, unknown>): Promise<unknown> {
-  let query = call(
-    call(call(binding.drizzle, "select"), "from", binding.table),
-    "where",
-    clause(binding, where),
-  );
-  query = call(query, "limit", 1);
-  return (await rows(query))[0] ?? null;
-}
-async function findMany(binding: ModelBinding, args: Record<string, unknown>): Promise<unknown[]> {
-  const limit = integer(args.limit, "limit", 100, 1_000);
-  const offset = integer(args.offset, "offset", 0);
-  let query = call(call(binding.drizzle, "select"), "from", binding.table);
-  if (args.where !== undefined) query = call(query, "where", clause(binding, record(args.where)));
-  if (args.orderBy !== undefined) {
-    const order = record(args.orderBy);
-    const field = text(order.field, "orderBy.field");
-    const column = columnFor(binding, field);
-    if (order.direction !== "asc" && order.direction !== "desc") {
-      throw new TypeError("orderBy.direction must be asc or desc");
-    }
-    query = call(query, "orderBy", order.direction === "asc" ? asc(column) : desc(column));
-  }
-  query = call(call(query, "limit", limit), "offset", offset);
-  return rows(query);
-}
-async function insert(binding: ModelBinding, data: unknown): Promise<unknown> {
-  const values = record(data);
-  const query = call(call(binding.drizzle, "insert", binding.table), "values", values);
-  if (hasMethod(query, "returning")) return requiredRow((await rows(call(query, "returning")))[0]);
-  const where = recoverable(binding, values);
-  if (where === undefined)
-    throw new TypeError("MySQL insert requires a recoverable unique key override");
-  await query;
-  return requiredRow(await findOne(binding, where));
-}
-async function update(
+  const base = (next: unknown) => {
+    const core = baseOperation(binding, name, next);
+    return binding.run(
+      binding.dialect === "sqlite" && !binding.inTransaction
+        ? withSqlitePermit(binding.drizzle, core)
+        : core,
+      name,
+    );
+  };
+  const effect =
+    typeof override === "function"
+      ? nativeCall(name, () => override({ args, base }))
+      : baseOperation(binding, name, args);
+  return binding.dialect === "sqlite" && !binding.inTransaction
+    ? withSqlitePermit(binding.drizzle, effect)
+    : effect;
+});
+
+/**
+ * Dispatches validated arguments to named domain workflows.
+ * @param binding - Table/client metadata.
+ * @param name - Reserved operation.
+ * @param args - Unknown public arguments.
+ * @returns Lazy operation result or typed validation failure.
+ */
+function baseOperation(
   binding: ModelBinding,
-  where: Record<string, unknown>,
-  data: unknown,
-): Promise<unknown> {
-  const before = binding.dialect === "mysql" ? await findOne(binding, where) : undefined;
-  if (binding.dialect === "mysql" && before === null) return null;
-  let query = call(call(binding.drizzle, "update", binding.table), "set", record(data));
-  query = call(query, "where", clause(binding, where));
-  if (hasMethod(query, "returning")) return (await rows(call(query, "returning")))[0] ?? null;
-  await query;
-  const recover = recoverable(binding, { ...record(before), ...record(data) });
-  if (recover === undefined)
-    throw new TypeError("MySQL update requires a recoverable unique key override");
-  return findOne(binding, recover);
-}
-async function remove(binding: ModelBinding, where: Record<string, unknown>): Promise<unknown> {
-  const before = await findOne(binding, where);
-  if (before === null) return null;
-  let query = call(binding.drizzle, "delete", binding.table);
-  query = call(query, "where", clause(binding, where));
-  if (hasMethod(query, "returning")) return (await rows(call(query, "returning")))[0] ?? null;
-  await query;
-  return before;
-}
-async function upsert(
-  binding: ModelBinding,
-  where: Record<string, unknown>,
-  create: unknown,
-  updateValue: unknown,
-): Promise<unknown> {
-  const existing = await findOne(binding, where);
-  return existing === null
-    ? insert(binding, create)
-    : requiredRow(await update(binding, where, updateValue));
-}
-function selector(binding: ModelBinding, value: unknown): Record<string, unknown> {
-  const where = record(value);
-  for (const [key, entry] of Object.entries(where)) {
-    columnFor(binding, key);
-    if (entry === null || entry === undefined)
-      throw new TypeError("Selector values cannot be null or undefined");
-  }
-  if (!binding.metadata.selectors.some((keys) => keys.every((key) => Object.hasOwn(where, key)))) {
-    throw new TypeError("Selector must contain a complete primary or unique constraint");
-  }
-  return where;
-}
-function recoverable(
-  binding: ModelBinding,
-  value: Record<string, unknown>,
-): Record<string, unknown> | undefined {
-  const keys = binding.metadata.selectors.find((candidate) =>
-    candidate.every((key) => value[key] !== null && value[key] !== undefined),
-  );
-  return keys === undefined ? undefined : Object.fromEntries(keys.map((key) => [key, value[key]]));
-}
-function clause(binding: ModelBinding, where: Record<string, unknown>): SQL | undefined {
-  const filters = Object.entries(where).map(([key, value]) => {
-    const column = columnFor(binding, key);
-    if (value === undefined) throw new TypeError("Filter values cannot be undefined");
-    return value === null ? isNull(column) : eq(column, value);
-  });
-  return filters.length === 0 ? undefined : and(...filters);
-}
-function columnFor(binding: ModelBinding, key: string): Column {
-  const column = binding.metadata.columns[key];
-  if (column === undefined) throw new TypeError(`Unknown table column "${key}"`);
-  return column as Column;
-}
-async function rows(query: unknown): Promise<unknown[]> {
-  const value = await (query as PromiseLike<unknown>);
-  if (!Array.isArray(value)) throw new TypeError("Drizzle query did not return rows");
-  return value;
-}
-function call(target: unknown, name: string, ...args: unknown[]): unknown {
-  if (!isRecord(target) && typeof target !== "function")
-    throw new TypeError(`Drizzle ${name} is unavailable`);
-  const method = (target as Record<string, unknown>)[name];
-  if (typeof method !== "function") throw new TypeError(`Drizzle ${name} is unavailable`);
-  return method.apply(target, args);
-}
-function hasMethod(target: unknown, name: string): boolean {
-  return (
-    (isRecord(target) || typeof target === "function") &&
-    typeof (target as Record<string, unknown>)[name] === "function"
-  );
-}
-function transaction(
-  drizzle: unknown,
-  run: (transaction: unknown) => Promise<unknown>,
-): Promise<unknown> {
-  return call(drizzle, "transaction", run) as Promise<unknown>;
-}
-function record(value: unknown): Record<string, unknown> {
-  if (!isRecord(value)) throw new TypeError("Data-model arguments must be objects");
-  return value;
-}
-function text(value: unknown, name: string): string {
-  if (typeof value !== "string" || value === "") throw new TypeError(`${name} is invalid`);
-  return value;
-}
-function integer(
-  value: unknown,
   name: string,
-  fallback: number,
-  maximum = Number.MAX_SAFE_INTEGER,
-): number {
-  if (value === undefined) return fallback;
-  if (!Number.isSafeInteger(value) || Number(value) < 0 || Number(value) > maximum)
-    throw new TypeError(`${name} is invalid`);
-  return Number(value);
-}
-function requiredRow(value: unknown): unknown {
-  if (value === null || value === undefined) throw new TypeError("Mutation did not return a row");
-  return value;
-}
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  args: unknown,
+): Effect.Effect<unknown, DrizzleFailure> {
+  return Effect.gen(function* () {
+    const value = isRecord(args) ? args : {};
+    const where = () => selector(binding, value.where);
+    switch (name) {
+      case "findOne":
+        return yield* findOne(binding, yield* checked(where));
+      case "findMany":
+        return yield* findMany(binding, value);
+      case "insert":
+        return yield* insert(binding, value.data);
+      case "update":
+        return yield* update(binding, yield* checked(where), value.data);
+      case "delete":
+        return yield* remove(binding, yield* checked(where));
+      case "upsert": {
+        const selected = yield* checked(where);
+        const existing = yield* findOne(binding, selected);
+        return existing === null
+          ? yield* insert(binding, value.create)
+          : yield* update(binding, selected, value.update).pipe(
+              Effect.flatMap((row) => checked(() => requiredRow(row))),
+            );
+      }
+      default:
+        return yield* checked(() => {
+          throw new TypeError(`Unknown model operation "${name}"`);
+        });
+    }
+  });
 }

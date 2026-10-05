@@ -1,0 +1,551 @@
+{
+  "note": "Generator acceptance already re-registered some global links; original-checkout equivalents are reconstructed from matching candidate paths. Installed demo links were captured before explicit setup.",
+  "globals": {
+    "@relkit/tools": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/tools",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/tools",
+      "derivedFromCandidate": true
+    },
+    "@relkit/schema": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/schema",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/schema",
+      "derivedFromCandidate": true
+    },
+    "@relkit/invocation": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/invocation",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/invocation",
+      "derivedFromCandidate": true
+    },
+    "@relkit/contracts": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/contracts",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/contracts",
+      "derivedFromCandidate": true
+    },
+    "@relkit/functions": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/functions",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/functions",
+      "derivedFromCandidate": true
+    },
+    "@relkit/cache": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cache",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/cache",
+      "derivedFromCandidate": true
+    },
+    "@relkit/buckets": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/buckets",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/buckets",
+      "derivedFromCandidate": true
+    },
+    "@relkit/testing": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/testing",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/testing",
+      "derivedFromCandidate": true
+    },
+    "@relkit/runtime-hono": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-hono",
+      "derivedFromCandidate": true
+    },
+    "@relkit/realtime": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/realtime",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/realtime",
+      "derivedFromCandidate": true
+    },
+    "@relkit/routes": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/routes",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/routes",
+      "derivedFromCandidate": true
+    },
+    "@relkit/services": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/services",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/services",
+      "derivedFromCandidate": true
+    },
+    "@relkit/jobs": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/jobs",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/jobs",
+      "derivedFromCandidate": true
+    },
+    "@relkit/events": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/events",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/events",
+      "derivedFromCandidate": true
+    },
+    "@relkit/runtime-effect": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-effect",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-effect",
+      "derivedFromCandidate": true
+    },
+    "@relkit/observability": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/observability",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/observability",
+      "derivedFromCandidate": true
+    },
+    "@relkit/graph": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/graph",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/graph",
+      "derivedFromCandidate": true
+    },
+    "@relkit/config": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/config",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/config",
+      "derivedFromCandidate": true
+    },
+    "@relkit/provider": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/provider",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/provider",
+      "derivedFromCandidate": true
+    },
+    "@relkit/openapi": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/openapi",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/openapi",
+      "derivedFromCandidate": true
+    },
+    "@relkit/engine": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/engine",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/engine",
+      "derivedFromCandidate": true
+    },
+    "@relkit/app": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/app",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/app",
+      "derivedFromCandidate": true
+    },
+    "@relkit/agents": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/agents",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/agents",
+      "derivedFromCandidate": true
+    },
+    "langchain": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+      "derivedFromCandidate": true
+    },
+    "@relkit/providers-local": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/providers-local",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/providers-local",
+      "derivedFromCandidate": true
+    },
+    "@relkit/drizzle": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/drizzle",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/drizzle",
+      "derivedFromCandidate": true
+    },
+    "@relkit/compiler": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/compiler",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/compiler",
+      "derivedFromCandidate": true
+    },
+    "@relkit/local-service": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/local-service",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/local-service",
+      "derivedFromCandidate": true
+    },
+    "@relkit/diagnostics": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/diagnostics",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/diagnostics",
+      "derivedFromCandidate": true
+    },
+    "@relkit/client-generator": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/client-generator",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/client-generator",
+      "derivedFromCandidate": true
+    },
+    "@relkit/better-auth": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/better-auth",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/better-auth",
+      "derivedFromCandidate": true
+    },
+    "@relkit/client": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/client",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/client",
+      "derivedFromCandidate": true
+    },
+    "@relkit/supervisor": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/supervisor",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/supervisor",
+      "derivedFromCandidate": true
+    },
+    "@relkit/inspector-api": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/inspector-api",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/inspector-api",
+      "derivedFromCandidate": true
+    },
+    "@relkit/deploy-pulumi": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/deploy-pulumi",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy-pulumi",
+      "derivedFromCandidate": true
+    },
+    "@relkit/deploy": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/deploy",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy",
+      "derivedFromCandidate": true
+    },
+    "@relkit/cli": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cli",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/packages/cli",
+      "derivedFromCandidate": true
+    },
+    "@relkit/s3": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/s3",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/s3",
+      "derivedFromCandidate": true
+    },
+    "@relkit/redis": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/redis",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/redis",
+      "derivedFromCandidate": true
+    },
+    "@relkit/local": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/local",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/local",
+      "derivedFromCandidate": true
+    },
+    "@relkit/docker": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/docker",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/docker",
+      "derivedFromCandidate": true
+    },
+    "@langchain/langgraph": {
+      "observed": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/@langchain+langgraph@1.4.14+9ed32dbb8973e5bd/node_modules/@langchain/langgraph",
+      "restoration": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@langchain+langgraph@1.4.14+9ed32dbb8973e5bd/node_modules/@langchain/langgraph",
+      "derivedFromCandidate": true
+    }
+  },
+  "projects": [
+    {
+      "root": "/Users/mustafaelsayed/Workspace/relkit-regression-demo",
+      "manifestBytes": "{\n  \"name\": \"regression-demo\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"packageManager\": \"bun@1.3.10\",\n  \"scripts\": {\n    \"build\": \"relkit build\",\n    \"check\": \"relkit check\",\n    \"dev\": \"relkit dev\",\n    \"graph\": \"relkit graph print\",\n    \"start\": \"relkit start\",\n    \"test\": \"bun test\",\n    \"test:live\": \"bun scripts/live-smoke.mjs\",\n    \"test:regressions\": \"bun scripts/validation-regressions.mjs\",\n    \"test:inspector:regressions\": \"bun scripts/inspector-regressions.mjs\",\n    \"evidence:graph\": \"bun scripts/graph-evidence.mjs\",\n    \"test:integration\": \"bun test tests/integration\",\n    \"test:unit\": \"bun test tests/unit\",\n    \"typecheck\": \"tsc --noEmit\"\n  },\n  \"dependencies\": {\n    \"@langchain/openai\": \"^1.6.2\",\n    \"@relkit/app\": \"link:@relkit/app\",\n    \"@relkit/docker\": \"link:@relkit/docker\",\n    \"@relkit/local\": \"link:@relkit/local\",\n    \"@relkit/redis\": \"link:@relkit/redis\",\n    \"@relkit/s3\": \"link:@relkit/s3\",\n    \"langchain\": \"link:langchain\"\n  },\n  \"devDependencies\": {\n    \"@relkit/agents\": \"link:@relkit/agents\",\n    \"@relkit/better-auth\": \"link:@relkit/better-auth\",\n    \"@relkit/buckets\": \"link:@relkit/buckets\",\n    \"@relkit/cache\": \"link:@relkit/cache\",\n    \"@relkit/cli\": \"link:@relkit/cli\",\n    \"@relkit/client\": \"link:@relkit/client\",\n    \"@relkit/client-generator\": \"link:@relkit/client-generator\",\n    \"@relkit/compiler\": \"link:@relkit/compiler\",\n    \"@relkit/config\": \"link:@relkit/config\",\n    \"@relkit/contracts\": \"link:@relkit/contracts\",\n    \"@relkit/deploy\": \"link:@relkit/deploy\",\n    \"@relkit/deploy-pulumi\": \"link:@relkit/deploy-pulumi\",\n    \"@relkit/diagnostics\": \"link:@relkit/diagnostics\",\n    \"@relkit/drizzle\": \"link:@relkit/drizzle\",\n    \"@relkit/engine\": \"link:@relkit/engine\",\n    \"@relkit/events\": \"link:@relkit/events\",\n    \"@relkit/functions\": \"link:@relkit/functions\",\n    \"@relkit/graph\": \"link:@relkit/graph\",\n    \"@relkit/inspector-api\": \"link:@relkit/inspector-api\",\n    \"@relkit/invocation\": \"link:@relkit/invocation\",\n    \"@relkit/jobs\": \"link:@relkit/jobs\",\n    \"@relkit/local-service\": \"link:@relkit/local-service\",\n    \"@relkit/observability\": \"link:@relkit/observability\",\n    \"@relkit/openapi\": \"link:@relkit/openapi\",\n    \"@relkit/provider\": \"link:@relkit/provider\",\n    \"@relkit/providers-local\": \"link:@relkit/providers-local\",\n    \"@relkit/realtime\": \"link:@relkit/realtime\",\n    \"@relkit/routes\": \"link:@relkit/routes\",\n    \"@relkit/runtime-effect\": \"link:@relkit/runtime-effect\",\n    \"@relkit/runtime-hono\": \"link:@relkit/runtime-hono\",\n    \"@relkit/schema\": \"link:@relkit/schema\",\n    \"@relkit/services\": \"link:@relkit/services\",\n    \"@relkit/supervisor\": \"link:@relkit/supervisor\",\n    \"@relkit/testing\": \"link:@relkit/testing\",\n    \"@relkit/tools\": \"link:@relkit/tools\",\n    \"@types/bun\": \"1.3.10\",\n    \"typescript\": \"5.9.3\"\n  }\n}\n",
+      "lockBytes": "{\n  \"lockfileVersion\": 1,\n  \"configVersion\": 1,\n  \"workspaces\": {\n    \"\": {\n      \"name\": \"regression-demo\",\n      \"dependencies\": {\n        \"@langchain/openai\": \"^1.6.2\",\n        \"@relkit/app\": \"link:@relkit/app\",\n        \"@relkit/docker\": \"link:@relkit/docker\",\n        \"@relkit/local\": \"link:@relkit/local\",\n        \"@relkit/redis\": \"link:@relkit/redis\",\n        \"@relkit/s3\": \"link:@relkit/s3\",\n        \"langchain\": \"link:langchain\",\n      },\n      \"devDependencies\": {\n        \"@relkit/agents\": \"link:@relkit/agents\",\n        \"@relkit/better-auth\": \"link:@relkit/better-auth\",\n        \"@relkit/buckets\": \"link:@relkit/buckets\",\n        \"@relkit/cache\": \"link:@relkit/cache\",\n        \"@relkit/cli\": \"link:@relkit/cli\",\n        \"@relkit/client\": \"link:@relkit/client\",\n        \"@relkit/client-generator\": \"link:@relkit/client-generator\",\n        \"@relkit/compiler\": \"link:@relkit/compiler\",\n        \"@relkit/config\": \"link:@relkit/config\",\n        \"@relkit/contracts\": \"link:@relkit/contracts\",\n        \"@relkit/deploy\": \"link:@relkit/deploy\",\n        \"@relkit/deploy-pulumi\": \"link:@relkit/deploy-pulumi\",\n        \"@relkit/diagnostics\": \"link:@relkit/diagnostics\",\n        \"@relkit/drizzle\": \"link:@relkit/drizzle\",\n        \"@relkit/engine\": \"link:@relkit/engine\",\n        \"@relkit/events\": \"link:@relkit/events\",\n        \"@relkit/functions\": \"link:@relkit/functions\",\n        \"@relkit/graph\": \"link:@relkit/graph\",\n        \"@relkit/inspector-api\": \"link:@relkit/inspector-api\",\n        \"@relkit/invocation\": \"link:@relkit/invocation\",\n        \"@relkit/jobs\": \"link:@relkit/jobs\",\n        \"@relkit/local-service\": \"link:@relkit/local-service\",\n        \"@relkit/observability\": \"link:@relkit/observability\",\n        \"@relkit/openapi\": \"link:@relkit/openapi\",\n        \"@relkit/provider\": \"link:@relkit/provider\",\n        \"@relkit/providers-local\": \"link:@relkit/providers-local\",\n        \"@relkit/realtime\": \"link:@relkit/realtime\",\n        \"@relkit/routes\": \"link:@relkit/routes\",\n        \"@relkit/runtime-effect\": \"link:@relkit/runtime-effect\",\n        \"@relkit/runtime-hono\": \"link:@relkit/runtime-hono\",\n        \"@relkit/schema\": \"link:@relkit/schema\",\n        \"@relkit/services\": \"link:@relkit/services\",\n        \"@relkit/supervisor\": \"link:@relkit/supervisor\",\n        \"@relkit/testing\": \"link:@relkit/testing\",\n        \"@relkit/tools\": \"link:@relkit/tools\",\n        \"@types/bun\": \"1.3.10\",\n        \"typescript\": \"5.9.3\",\n      },\n    },\n  },\n  \"packages\": {\n    \"@cfworker/json-schema\": [\"@cfworker/json-schema@4.1.1\", \"\", {}, \"sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==\"],\n\n    \"@langchain/core\": [\"@langchain/core@1.2.14\", \"\", { \"dependencies\": { \"@cfworker/json-schema\": \"^4.0.2\", \"@standard-schema/spec\": \"^1.1.0\", \"js-tiktoken\": \"^1.0.12\", \"langsmith\": \">=0.5.0 <1.0.0\", \"mustache\": \"^4.2.0\", \"p-queue\": \"^6.6.2\", \"zod\": \"^3.25.76 || ^4\" } }, \"sha512-NP+FZMDO8kzVf79kiVHByveErVbTc1kUm0OvJuASxy5dt2xo/m7mi4O0npskU71A9h0vke3YUDYEciiAsXdCoA==\"],\n\n    \"@langchain/openai\": [\"@langchain/openai@1.6.2\", \"\", { \"dependencies\": { \"js-tiktoken\": \"^1.0.12\", \"openai\": \"^7.10.0\", \"zod\": \"^3.25.76 || ^4\" }, \"peerDependencies\": { \"@langchain/core\": \"^1.2.14\" } }, \"sha512-KaXc3zjdM2/E24FdBlsk5NTT2Dyxh46vzCS2by78ehN6G5zdx+4OfVnPvyLl8r2tv2TqQCHpEhImVXgnAZaOvg==\"],\n\n    \"@relkit/agents\": [\"@relkit/agents@link:@relkit/agents\", {}],\n\n    \"@relkit/app\": [\"@relkit/app@link:@relkit/app\", {}],\n\n    \"@relkit/better-auth\": [\"@relkit/better-auth@link:@relkit/better-auth\", {}],\n\n    \"@relkit/buckets\": [\"@relkit/buckets@link:@relkit/buckets\", {}],\n\n    \"@relkit/cache\": [\"@relkit/cache@link:@relkit/cache\", {}],\n\n    \"@relkit/cli\": [\"@relkit/cli@link:@relkit/cli\", { \"bin\": { \"relkit\": \"./dist/index.js\" } }],\n\n    \"@relkit/client\": [\"@relkit/client@link:@relkit/client\", {}],\n\n    \"@relkit/client-generator\": [\"@relkit/client-generator@link:@relkit/client-generator\", {}],\n\n    \"@relkit/compiler\": [\"@relkit/compiler@link:@relkit/compiler\", {}],\n\n    \"@relkit/config\": [\"@relkit/config@link:@relkit/config\", {}],\n\n    \"@relkit/contracts\": [\"@relkit/contracts@link:@relkit/contracts\", {}],\n\n    \"@relkit/deploy\": [\"@relkit/deploy@link:@relkit/deploy\", {}],\n\n    \"@relkit/deploy-pulumi\": [\"@relkit/deploy-pulumi@link:@relkit/deploy-pulumi\", {}],\n\n    \"@relkit/diagnostics\": [\"@relkit/diagnostics@link:@relkit/diagnostics\", {}],\n\n    \"@relkit/docker\": [\"@relkit/docker@link:@relkit/docker\", {}],\n\n    \"@relkit/drizzle\": [\"@relkit/drizzle@link:@relkit/drizzle\", {}],\n\n    \"@relkit/engine\": [\"@relkit/engine@link:@relkit/engine\", {}],\n\n    \"@relkit/events\": [\"@relkit/events@link:@relkit/events\", {}],\n\n    \"@relkit/functions\": [\"@relkit/functions@link:@relkit/functions\", {}],\n\n    \"@relkit/graph\": [\"@relkit/graph@link:@relkit/graph\", {}],\n\n    \"@relkit/inspector-api\": [\"@relkit/inspector-api@link:@relkit/inspector-api\", {}],\n\n    \"@relkit/invocation\": [\"@relkit/invocation@link:@relkit/invocation\", {}],\n\n    \"@relkit/jobs\": [\"@relkit/jobs@link:@relkit/jobs\", {}],\n\n    \"@relkit/local\": [\"@relkit/local@link:@relkit/local\", {}],\n\n    \"@relkit/local-service\": [\"@relkit/local-service@link:@relkit/local-service\", {}],\n\n    \"@relkit/observability\": [\"@relkit/observability@link:@relkit/observability\", {}],\n\n    \"@relkit/openapi\": [\"@relkit/openapi@link:@relkit/openapi\", {}],\n\n    \"@relkit/provider\": [\"@relkit/provider@link:@relkit/provider\", {}],\n\n    \"@relkit/providers-local\": [\"@relkit/providers-local@link:@relkit/providers-local\", {}],\n\n    \"@relkit/realtime\": [\"@relkit/realtime@link:@relkit/realtime\", {}],\n\n    \"@relkit/redis\": [\"@relkit/redis@link:@relkit/redis\", {}],\n\n    \"@relkit/routes\": [\"@relkit/routes@link:@relkit/routes\", {}],\n\n    \"@relkit/runtime-effect\": [\"@relkit/runtime-effect@link:@relkit/runtime-effect\", {}],\n\n    \"@relkit/runtime-hono\": [\"@relkit/runtime-hono@link:@relkit/runtime-hono\", {}],\n\n    \"@relkit/s3\": [\"@relkit/s3@link:@relkit/s3\", {}],\n\n    \"@relkit/schema\": [\"@relkit/schema@link:@relkit/schema\", {}],\n\n    \"@relkit/services\": [\"@relkit/services@link:@relkit/services\", {}],\n\n    \"@relkit/supervisor\": [\"@relkit/supervisor@link:@relkit/supervisor\", {}],\n\n    \"@relkit/testing\": [\"@relkit/testing@link:@relkit/testing\", {}],\n\n    \"@relkit/tools\": [\"@relkit/tools@link:@relkit/tools\", {}],\n\n    \"@standard-schema/spec\": [\"@standard-schema/spec@1.1.0\", \"\", {}, \"sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==\"],\n\n    \"@types/bun\": [\"@types/bun@1.3.10\", \"\", { \"dependencies\": { \"bun-types\": \"1.3.10\" } }, \"sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ==\"],\n\n    \"@types/node\": [\"@types/node@26.6.4\", \"\", { \"dependencies\": { \"undici-types\": \"~8.9.0\" } }, \"sha512-ldVPDCzj7fsaGZrLB0NuHuTvJcsNasysBAqMolr/cgxrLd1xbqxIr3XJiPnHHJUCxj5sNF1vnRj9aWnrVh5Jcg==\"],\n\n    \"base64-js\": [\"base64-js@1.5.1\", \"\", {}, \"sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==\"],\n\n    \"bun-types\": [\"bun-types@1.3.10\", \"\", { \"dependencies\": { \"@types/node\": \"*\" } }, \"sha512-tcpfCCl6XWo6nCVnpcVrxQ+9AYN1iqMIzgrSKYMB/fjLtV2eyAVEg7AxQJuCq/26R6HpKWykQXuSOq/21RYcbg==\"],\n\n    \"eventemitter3\": [\"eventemitter3@4.0.7\", \"\", {}, \"sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==\"],\n\n    \"js-tiktoken\": [\"js-tiktoken@1.0.21\", \"\", { \"dependencies\": { \"base64-js\": \"^1.5.1\" } }, \"sha512-biOj/6M5qdgx5TKjDnFT1ymSpM5tbd3ylwDtrQvFQSu0Z7bBYko2dF+W/aUkXUPuk6IVpRxk/3Q2sHOzGlS36g==\"],\n\n    \"langchain\": [\"langchain@link:langchain\", {}],\n\n    \"langsmith\": [\"langsmith@0.10.8\", \"\", { \"dependencies\": { \"p-queue\": \"6.6.2\" }, \"peerDependencies\": { \"@opentelemetry/api\": \"*\", \"@opentelemetry/exporter-trace-otlp-proto\": \"*\", \"@opentelemetry/sdk-trace-base\": \"*\", \"openai\": \"*\", \"ws\": \">=7\" }, \"optionalPeers\": [\"@opentelemetry/api\", \"@opentelemetry/exporter-trace-otlp-proto\", \"@opentelemetry/sdk-trace-base\", \"openai\", \"ws\"] }, \"sha512-svLrSnytr4cwZvx5XAel93fXRB1/OmC/u7tfXhnmyMpxIazPLDKKaMQYxGIjCvCRGhprmp9P4RiKM8ecZU46Mg==\"],\n\n    \"mustache\": [\"mustache@4.2.0\", \"\", { \"bin\": { \"mustache\": \"bin/mustache\" } }, \"sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==\"],\n\n    \"openai\": [\"openai@7.27.0\", \"\", { \"peerDependencies\": { \"@aws-sdk/credential-provider-node\": \">=3.972.0 <4\", \"@smithy/hash-node\": \">=4.3.0 <5\", \"@smithy/signature-v4\": \">=5.4.0 <6\", \"undici\": \">=5 <9\", \"ws\": \"^8.21.0\", \"zod\": \"^3.25 || ^4.0\" }, \"optionalPeers\": [\"@aws-sdk/credential-provider-node\", \"@smithy/hash-node\", \"@smithy/signature-v4\", \"undici\", \"ws\", \"zod\"] }, \"sha512-QDo1FvnRDZn15YwGVOhT9vpyypDiLphkd/7a4mcURWf5upMoEetgA6o4DJeII+ZZkC6m6DvlilCwii3+ynDcTw==\"],\n\n    \"p-finally\": [\"p-finally@1.0.0\", \"\", {}, \"sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==\"],\n\n    \"p-queue\": [\"p-queue@6.6.2\", \"\", { \"dependencies\": { \"eventemitter3\": \"^4.0.4\", \"p-timeout\": \"^3.2.0\" } }, \"sha512-RwFpb72c/BhQLEXIZ5K2e+AhgNVmIejGlTgiB9MzZ0e93GRvqZ7uSi0dvRF7/XIXDeNkra2fNHBxTyPDGySpjQ==\"],\n\n    \"p-timeout\": [\"p-timeout@3.2.0\", \"\", { \"dependencies\": { \"p-finally\": \"^1.0.0\" } }, \"sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==\"],\n\n    \"typescript\": [\"typescript@5.9.3\", \"\", { \"bin\": { \"tsc\": \"bin/tsc\", \"tsserver\": \"bin/tsserver\" } }, \"sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==\"],\n\n    \"undici-types\": [\"undici-types@8.9.0\", \"\", {}, \"sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==\"],\n\n    \"zod\": [\"zod@4.6.5\", \"\", {}, \"sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==\"],\n  }\n}\n",
+      "installed": {
+        "@relkit/tools": {
+          "link": "../../../relkit/packages/tools",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/tools"
+        },
+        "@relkit/schema": {
+          "link": "../../../relkit/packages/schema",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/schema"
+        },
+        "@relkit/invocation": {
+          "link": "../../../relkit/packages/invocation",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/invocation"
+        },
+        "@relkit/contracts": {
+          "link": "../../../relkit/packages/contracts",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/contracts"
+        },
+        "@relkit/functions": {
+          "link": "../../../relkit/packages/functions",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/functions"
+        },
+        "@relkit/cache": {
+          "link": "../../../relkit/packages/cache",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/cache"
+        },
+        "@relkit/buckets": {
+          "link": "../../../relkit/packages/buckets",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/buckets"
+        },
+        "@relkit/testing": {
+          "link": "../../../relkit/packages/testing",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/testing"
+        },
+        "@relkit/runtime-hono": {
+          "link": "../../../relkit/packages/runtime-hono",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-hono"
+        },
+        "@relkit/realtime": {
+          "link": "../../../relkit/packages/realtime",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/realtime"
+        },
+        "@relkit/routes": {
+          "link": "../../../relkit/packages/routes",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/routes"
+        },
+        "@relkit/services": {
+          "link": "../../../relkit/packages/services",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/services"
+        },
+        "@relkit/jobs": {
+          "link": "../../../relkit/packages/jobs",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/jobs"
+        },
+        "@relkit/events": {
+          "link": "../../../relkit/packages/events",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/events"
+        },
+        "@relkit/runtime-effect": {
+          "link": "../../../relkit/packages/runtime-effect",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-effect"
+        },
+        "@relkit/observability": {
+          "link": "../../../relkit/packages/observability",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/observability"
+        },
+        "@relkit/graph": {
+          "link": "../../../relkit/packages/graph",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/graph"
+        },
+        "@relkit/config": {
+          "link": "../../../relkit/packages/config",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/config"
+        },
+        "@relkit/provider": {
+          "link": "../../../relkit/packages/provider",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/provider"
+        },
+        "@relkit/openapi": {
+          "link": "../../../relkit/packages/openapi",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/openapi"
+        },
+        "@relkit/engine": {
+          "link": "../../../relkit/packages/engine",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/engine"
+        },
+        "@relkit/app": {
+          "link": "../../../relkit/packages/app",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/app"
+        },
+        "@relkit/agents": {
+          "link": "../../../relkit/packages/agents",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/agents"
+        },
+        "langchain": {
+          "link": "../../relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain"
+        },
+        "@relkit/providers-local": {
+          "link": "../../../relkit/packages/providers-local",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/providers-local"
+        },
+        "@relkit/drizzle": {
+          "link": "../../../relkit/packages/drizzle",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/drizzle"
+        },
+        "@relkit/compiler": {
+          "link": "../../../relkit/packages/compiler",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/compiler"
+        },
+        "@relkit/local-service": {
+          "link": "../../../relkit/packages/local-service",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/local-service"
+        },
+        "@relkit/diagnostics": {
+          "link": "../../../relkit/packages/diagnostics",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/diagnostics"
+        },
+        "@relkit/client-generator": {
+          "link": "../../../relkit/packages/client-generator",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/client-generator"
+        },
+        "@relkit/better-auth": {
+          "link": "../../../relkit/packages/better-auth",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/better-auth"
+        },
+        "@relkit/client": {
+          "link": "../../../relkit/packages/client",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/client"
+        },
+        "@relkit/supervisor": {
+          "link": "../../../relkit/packages/supervisor",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/supervisor"
+        },
+        "@relkit/inspector-api": {
+          "link": "../../../relkit/packages/inspector-api",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/inspector-api"
+        },
+        "@relkit/deploy-pulumi": {
+          "link": "../../../relkit/packages/deploy-pulumi",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy-pulumi"
+        },
+        "@relkit/deploy": {
+          "link": "../../../relkit/packages/deploy",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy"
+        },
+        "@relkit/cli": {
+          "link": "../../../relkit/packages/cli",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/cli"
+        },
+        "@relkit/s3": {
+          "link": "../../../relkit/integrations/packages/s3",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/s3"
+        },
+        "@relkit/redis": {
+          "link": "../../../relkit/integrations/packages/redis",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/redis"
+        },
+        "@relkit/local": {
+          "link": "../../../relkit/integrations/packages/local",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/local"
+        },
+        "@relkit/docker": {
+          "link": "../../../relkit/integrations/packages/docker",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/docker"
+        }
+      }
+    },
+    {
+      "root": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter",
+      "manifestBytes": "{\n  \"name\": \"ai-validation\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"packageManager\": \"bun@1.3.10\",\n  \"scripts\": {\n    \"build\": \"relkit build\",\n    \"check\": \"relkit check\",\n    \"dev\": \"relkit dev\",\n    \"graph\": \"relkit graph print\",\n    \"start\": \"relkit start\",\n    \"test\": \"bun test\",\n    \"test:integration\": \"bun test tests/integration\",\n    \"test:unit\": \"bun test tests/unit\",\n    \"typecheck\": \"tsc --noEmit\"\n  },\n  \"dependencies\": {\n    \"@langchain/langgraph\": \"link:@langchain/langgraph\",\n    \"@langchain/openai\": \"1.6.2\",\n    \"@relkit/app\": \"link:@relkit/app\",\n    \"@relkit/local\": \"link:@relkit/local\",\n    \"langchain\": \"link:langchain\"\n  },\n  \"devDependencies\": {\n    \"@types/bun\": \"1.3.10\",\n    \"@relkit/cli\": \"link:@relkit/cli\",\n    \"@relkit/testing\": \"link:@relkit/testing\",\n    \"typescript\": \"5.9.3\",\n    \"@relkit/agents\": \"link:@relkit/agents\",\n    \"@relkit/better-auth\": \"link:@relkit/better-auth\",\n    \"@relkit/buckets\": \"link:@relkit/buckets\",\n    \"@relkit/cache\": \"link:@relkit/cache\",\n    \"@relkit/client\": \"link:@relkit/client\",\n    \"@relkit/client-generator\": \"link:@relkit/client-generator\",\n    \"@relkit/compiler\": \"link:@relkit/compiler\",\n    \"@relkit/config\": \"link:@relkit/config\",\n    \"@relkit/contracts\": \"link:@relkit/contracts\",\n    \"@relkit/deploy\": \"link:@relkit/deploy\",\n    \"@relkit/deploy-pulumi\": \"link:@relkit/deploy-pulumi\",\n    \"@relkit/diagnostics\": \"link:@relkit/diagnostics\",\n    \"@relkit/drizzle\": \"link:@relkit/drizzle\",\n    \"@relkit/engine\": \"link:@relkit/engine\",\n    \"@relkit/events\": \"link:@relkit/events\",\n    \"@relkit/functions\": \"link:@relkit/functions\",\n    \"@relkit/graph\": \"link:@relkit/graph\",\n    \"@relkit/inspector-api\": \"link:@relkit/inspector-api\",\n    \"@relkit/invocation\": \"link:@relkit/invocation\",\n    \"@relkit/jobs\": \"link:@relkit/jobs\",\n    \"@relkit/local-service\": \"link:@relkit/local-service\",\n    \"@relkit/observability\": \"link:@relkit/observability\",\n    \"@relkit/openapi\": \"link:@relkit/openapi\",\n    \"@relkit/provider\": \"link:@relkit/provider\",\n    \"@relkit/providers-local\": \"link:@relkit/providers-local\",\n    \"@relkit/realtime\": \"link:@relkit/realtime\",\n    \"@relkit/routes\": \"link:@relkit/routes\",\n    \"@relkit/runtime-effect\": \"link:@relkit/runtime-effect\",\n    \"@relkit/runtime-hono\": \"link:@relkit/runtime-hono\",\n    \"@relkit/schema\": \"link:@relkit/schema\",\n    \"@relkit/services\": \"link:@relkit/services\",\n    \"@relkit/supervisor\": \"link:@relkit/supervisor\",\n    \"@relkit/tools\": \"link:@relkit/tools\"\n  }\n}\n",
+      "lockBytes": "{\n  \"lockfileVersion\": 1,\n  \"configVersion\": 1,\n  \"workspaces\": {\n    \"\": {\n      \"name\": \"ai-validation\",\n      \"dependencies\": {\n        \"@langchain/langgraph\": \"link:@langchain/langgraph\",\n        \"@langchain/openai\": \"1.6.2\",\n        \"@relkit/app\": \"link:@relkit/app\",\n        \"@relkit/local\": \"link:@relkit/local\",\n        \"langchain\": \"link:langchain\",\n      },\n      \"devDependencies\": {\n        \"@relkit/agents\": \"link:@relkit/agents\",\n        \"@relkit/better-auth\": \"link:@relkit/better-auth\",\n        \"@relkit/buckets\": \"link:@relkit/buckets\",\n        \"@relkit/cache\": \"link:@relkit/cache\",\n        \"@relkit/cli\": \"link:@relkit/cli\",\n        \"@relkit/client\": \"link:@relkit/client\",\n        \"@relkit/client-generator\": \"link:@relkit/client-generator\",\n        \"@relkit/compiler\": \"link:@relkit/compiler\",\n        \"@relkit/config\": \"link:@relkit/config\",\n        \"@relkit/contracts\": \"link:@relkit/contracts\",\n        \"@relkit/deploy\": \"link:@relkit/deploy\",\n        \"@relkit/deploy-pulumi\": \"link:@relkit/deploy-pulumi\",\n        \"@relkit/diagnostics\": \"link:@relkit/diagnostics\",\n        \"@relkit/drizzle\": \"link:@relkit/drizzle\",\n        \"@relkit/engine\": \"link:@relkit/engine\",\n        \"@relkit/events\": \"link:@relkit/events\",\n        \"@relkit/functions\": \"link:@relkit/functions\",\n        \"@relkit/graph\": \"link:@relkit/graph\",\n        \"@relkit/inspector-api\": \"link:@relkit/inspector-api\",\n        \"@relkit/invocation\": \"link:@relkit/invocation\",\n        \"@relkit/jobs\": \"link:@relkit/jobs\",\n        \"@relkit/local-service\": \"link:@relkit/local-service\",\n        \"@relkit/observability\": \"link:@relkit/observability\",\n        \"@relkit/openapi\": \"link:@relkit/openapi\",\n        \"@relkit/provider\": \"link:@relkit/provider\",\n        \"@relkit/providers-local\": \"link:@relkit/providers-local\",\n        \"@relkit/realtime\": \"link:@relkit/realtime\",\n        \"@relkit/routes\": \"link:@relkit/routes\",\n        \"@relkit/runtime-effect\": \"link:@relkit/runtime-effect\",\n        \"@relkit/runtime-hono\": \"link:@relkit/runtime-hono\",\n        \"@relkit/schema\": \"link:@relkit/schema\",\n        \"@relkit/services\": \"link:@relkit/services\",\n        \"@relkit/supervisor\": \"link:@relkit/supervisor\",\n        \"@relkit/testing\": \"link:@relkit/testing\",\n        \"@relkit/tools\": \"link:@relkit/tools\",\n        \"@types/bun\": \"1.3.10\",\n        \"typescript\": \"5.9.3\",\n      },\n    },\n  },\n  \"packages\": {\n    \"@cfworker/json-schema\": [\"@cfworker/json-schema@4.1.1\", \"\", {}, \"sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==\"],\n\n    \"@langchain/core\": [\"@langchain/core@1.2.14\", \"\", { \"dependencies\": { \"@cfworker/json-schema\": \"^4.0.2\", \"@standard-schema/spec\": \"^1.1.0\", \"js-tiktoken\": \"^1.0.12\", \"langsmith\": \">=0.5.0 <1.0.0\", \"mustache\": \"^4.2.0\", \"p-queue\": \"^6.6.2\", \"zod\": \"^3.25.76 || ^4\" } }, \"sha512-NP+FZMDO8kzVf79kiVHByveErVbTc1kUm0OvJuASxy5dt2xo/m7mi4O0npskU71A9h0vke3YUDYEciiAsXdCoA==\"],\n\n    \"@langchain/langgraph\": [\"@langchain/langgraph@link:@langchain/langgraph\", {}],\n\n    \"@langchain/openai\": [\"@langchain/openai@1.6.2\", \"\", { \"dependencies\": { \"js-tiktoken\": \"^1.0.12\", \"openai\": \"^7.10.0\", \"zod\": \"^3.25.76 || ^4\" }, \"peerDependencies\": { \"@langchain/core\": \"^1.2.14\" } }, \"sha512-KaXc3zjdM2/E24FdBlsk5NTT2Dyxh46vzCS2by78ehN6G5zdx+4OfVnPvyLl8r2tv2TqQCHpEhImVXgnAZaOvg==\"],\n\n    \"@relkit/agents\": [\"@relkit/agents@link:@relkit/agents\", {}],\n\n    \"@relkit/app\": [\"@relkit/app@link:@relkit/app\", {}],\n\n    \"@relkit/better-auth\": [\"@relkit/better-auth@link:@relkit/better-auth\", {}],\n\n    \"@relkit/buckets\": [\"@relkit/buckets@link:@relkit/buckets\", {}],\n\n    \"@relkit/cache\": [\"@relkit/cache@link:@relkit/cache\", {}],\n\n    \"@relkit/cli\": [\"@relkit/cli@link:@relkit/cli\", { \"bin\": { \"relkit\": \"./dist/index.js\" } }],\n\n    \"@relkit/client\": [\"@relkit/client@link:@relkit/client\", {}],\n\n    \"@relkit/client-generator\": [\"@relkit/client-generator@link:@relkit/client-generator\", {}],\n\n    \"@relkit/compiler\": [\"@relkit/compiler@link:@relkit/compiler\", {}],\n\n    \"@relkit/config\": [\"@relkit/config@link:@relkit/config\", {}],\n\n    \"@relkit/contracts\": [\"@relkit/contracts@link:@relkit/contracts\", {}],\n\n    \"@relkit/deploy\": [\"@relkit/deploy@link:@relkit/deploy\", {}],\n\n    \"@relkit/deploy-pulumi\": [\"@relkit/deploy-pulumi@link:@relkit/deploy-pulumi\", {}],\n\n    \"@relkit/diagnostics\": [\"@relkit/diagnostics@link:@relkit/diagnostics\", {}],\n\n    \"@relkit/drizzle\": [\"@relkit/drizzle@link:@relkit/drizzle\", {}],\n\n    \"@relkit/engine\": [\"@relkit/engine@link:@relkit/engine\", {}],\n\n    \"@relkit/events\": [\"@relkit/events@link:@relkit/events\", {}],\n\n    \"@relkit/functions\": [\"@relkit/functions@link:@relkit/functions\", {}],\n\n    \"@relkit/graph\": [\"@relkit/graph@link:@relkit/graph\", {}],\n\n    \"@relkit/inspector-api\": [\"@relkit/inspector-api@link:@relkit/inspector-api\", {}],\n\n    \"@relkit/invocation\": [\"@relkit/invocation@link:@relkit/invocation\", {}],\n\n    \"@relkit/jobs\": [\"@relkit/jobs@link:@relkit/jobs\", {}],\n\n    \"@relkit/local\": [\"@relkit/local@link:@relkit/local\", {}],\n\n    \"@relkit/local-service\": [\"@relkit/local-service@link:@relkit/local-service\", {}],\n\n    \"@relkit/observability\": [\"@relkit/observability@link:@relkit/observability\", {}],\n\n    \"@relkit/openapi\": [\"@relkit/openapi@link:@relkit/openapi\", {}],\n\n    \"@relkit/provider\": [\"@relkit/provider@link:@relkit/provider\", {}],\n\n    \"@relkit/providers-local\": [\"@relkit/providers-local@link:@relkit/providers-local\", {}],\n\n    \"@relkit/realtime\": [\"@relkit/realtime@link:@relkit/realtime\", {}],\n\n    \"@relkit/routes\": [\"@relkit/routes@link:@relkit/routes\", {}],\n\n    \"@relkit/runtime-effect\": [\"@relkit/runtime-effect@link:@relkit/runtime-effect\", {}],\n\n    \"@relkit/runtime-hono\": [\"@relkit/runtime-hono@link:@relkit/runtime-hono\", {}],\n\n    \"@relkit/schema\": [\"@relkit/schema@link:@relkit/schema\", {}],\n\n    \"@relkit/services\": [\"@relkit/services@link:@relkit/services\", {}],\n\n    \"@relkit/supervisor\": [\"@relkit/supervisor@link:@relkit/supervisor\", {}],\n\n    \"@relkit/testing\": [\"@relkit/testing@link:@relkit/testing\", {}],\n\n    \"@relkit/tools\": [\"@relkit/tools@link:@relkit/tools\", {}],\n\n    \"@standard-schema/spec\": [\"@standard-schema/spec@1.1.0\", \"\", {}, \"sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==\"],\n\n    \"@types/bun\": [\"@types/bun@1.3.10\", \"\", { \"dependencies\": { \"bun-types\": \"1.3.10\" } }, \"sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ==\"],\n\n    \"@types/node\": [\"@types/node@26.6.4\", \"\", { \"dependencies\": { \"undici-types\": \"~8.9.0\" } }, \"sha512-ldVPDCzj7fsaGZrLB0NuHuTvJcsNasysBAqMolr/cgxrLd1xbqxIr3XJiPnHHJUCxj5sNF1vnRj9aWnrVh5Jcg==\"],\n\n    \"base64-js\": [\"base64-js@1.5.1\", \"\", {}, \"sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==\"],\n\n    \"bun-types\": [\"bun-types@1.3.10\", \"\", { \"dependencies\": { \"@types/node\": \"*\" } }, \"sha512-tcpfCCl6XWo6nCVnpcVrxQ+9AYN1iqMIzgrSKYMB/fjLtV2eyAVEg7AxQJuCq/26R6HpKWykQXuSOq/21RYcbg==\"],\n\n    \"eventemitter3\": [\"eventemitter3@4.0.7\", \"\", {}, \"sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==\"],\n\n    \"js-tiktoken\": [\"js-tiktoken@1.0.21\", \"\", { \"dependencies\": { \"base64-js\": \"^1.5.1\" } }, \"sha512-biOj/6M5qdgx5TKjDnFT1ymSpM5tbd3ylwDtrQvFQSu0Z7bBYko2dF+W/aUkXUPuk6IVpRxk/3Q2sHOzGlS36g==\"],\n\n    \"langchain\": [\"langchain@link:langchain\", {}],\n\n    \"langsmith\": [\"langsmith@0.10.8\", \"\", { \"dependencies\": { \"p-queue\": \"6.6.2\" }, \"peerDependencies\": { \"@opentelemetry/api\": \"*\", \"@opentelemetry/exporter-trace-otlp-proto\": \"*\", \"@opentelemetry/sdk-trace-base\": \"*\", \"openai\": \"*\", \"ws\": \">=7\" }, \"optionalPeers\": [\"@opentelemetry/api\", \"@opentelemetry/exporter-trace-otlp-proto\", \"@opentelemetry/sdk-trace-base\", \"openai\", \"ws\"] }, \"sha512-svLrSnytr4cwZvx5XAel93fXRB1/OmC/u7tfXhnmyMpxIazPLDKKaMQYxGIjCvCRGhprmp9P4RiKM8ecZU46Mg==\"],\n\n    \"mustache\": [\"mustache@4.2.0\", \"\", { \"bin\": { \"mustache\": \"bin/mustache\" } }, \"sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==\"],\n\n    \"openai\": [\"openai@7.27.0\", \"\", { \"peerDependencies\": { \"@aws-sdk/credential-provider-node\": \">=3.972.0 <4\", \"@smithy/hash-node\": \">=4.3.0 <5\", \"@smithy/signature-v4\": \">=5.4.0 <6\", \"undici\": \">=5 <9\", \"ws\": \"^8.21.0\", \"zod\": \"^3.25 || ^4.0\" }, \"optionalPeers\": [\"@aws-sdk/credential-provider-node\", \"@smithy/hash-node\", \"@smithy/signature-v4\", \"undici\", \"ws\", \"zod\"] }, \"sha512-QDo1FvnRDZn15YwGVOhT9vpyypDiLphkd/7a4mcURWf5upMoEetgA6o4DJeII+ZZkC6m6DvlilCwii3+ynDcTw==\"],\n\n    \"p-finally\": [\"p-finally@1.0.0\", \"\", {}, \"sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==\"],\n\n    \"p-queue\": [\"p-queue@6.6.2\", \"\", { \"dependencies\": { \"eventemitter3\": \"^4.0.4\", \"p-timeout\": \"^3.2.0\" } }, \"sha512-RwFpb72c/BhQLEXIZ5K2e+AhgNVmIejGlTgiB9MzZ0e93GRvqZ7uSi0dvRF7/XIXDeNkra2fNHBxTyPDGySpjQ==\"],\n\n    \"p-timeout\": [\"p-timeout@3.2.0\", \"\", { \"dependencies\": { \"p-finally\": \"^1.0.0\" } }, \"sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==\"],\n\n    \"typescript\": [\"typescript@5.9.3\", \"\", { \"bin\": { \"tsc\": \"bin/tsc\", \"tsserver\": \"bin/tsserver\" } }, \"sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==\"],\n\n    \"undici-types\": [\"undici-types@8.9.0\", \"\", {}, \"sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==\"],\n\n    \"zod\": [\"zod@4.6.5\", \"\", {}, \"sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==\"],\n  }\n}\n",
+      "installed": {
+        "@relkit/tools": {
+          "link": "../../../../../../relkit/packages/tools",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/tools"
+        },
+        "@relkit/schema": {
+          "link": "../../../../../../relkit/packages/schema",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/schema"
+        },
+        "@relkit/invocation": {
+          "link": "../../../../../../relkit/packages/invocation",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/invocation"
+        },
+        "@relkit/contracts": {
+          "link": "../../../../../../relkit/packages/contracts",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/contracts"
+        },
+        "@relkit/functions": {
+          "link": "../../../../../../relkit/packages/functions",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/functions"
+        },
+        "@relkit/cache": {
+          "link": "../../../../../../relkit/packages/cache",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/cache"
+        },
+        "@relkit/buckets": {
+          "link": "../../../../../../relkit/packages/buckets",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/buckets"
+        },
+        "@relkit/supervisor": {
+          "link": "../../../../../../relkit/packages/supervisor",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/supervisor"
+        },
+        "@relkit/runtime-effect": {
+          "link": "../../../../../../relkit/packages/runtime-effect",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-effect"
+        },
+        "@relkit/observability": {
+          "link": "../../../../../../relkit/packages/observability",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/observability"
+        },
+        "@relkit/graph": {
+          "link": "../../../../../../relkit/packages/graph",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/graph"
+        },
+        "@relkit/config": {
+          "link": "../../../../../../relkit/packages/config",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/config"
+        },
+        "@relkit/provider": {
+          "link": "../../../../../../relkit/packages/provider",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/provider"
+        },
+        "@relkit/services": {
+          "link": "../../../../../../relkit/packages/services",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/services"
+        },
+        "@relkit/jobs": {
+          "link": "../../../../../../relkit/packages/jobs",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/jobs"
+        },
+        "@relkit/events": {
+          "link": "../../../../../../relkit/packages/events",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/events"
+        },
+        "@relkit/runtime-hono": {
+          "link": "../../../../../../relkit/packages/runtime-hono",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-hono"
+        },
+        "@relkit/realtime": {
+          "link": "../../../../../../relkit/packages/realtime",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/realtime"
+        },
+        "@relkit/routes": {
+          "link": "../../../../../../relkit/packages/routes",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/routes"
+        },
+        "@relkit/openapi": {
+          "link": "../../../../../../relkit/packages/openapi",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/openapi"
+        },
+        "@relkit/engine": {
+          "link": "../../../../../../relkit/packages/engine",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/engine"
+        },
+        "@relkit/app": {
+          "link": "../../../../../../relkit/packages/app",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/app"
+        },
+        "@relkit/agents": {
+          "link": "../../../../../../relkit/packages/agents",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/agents"
+        },
+        "@langchain/langgraph": {
+          "link": "../../../../../../relkit/node_modules/.bun/@langchain+langgraph@1.4.14+9ed32dbb8973e5bd/node_modules/@langchain/langgraph",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@langchain+langgraph@1.4.14+9ed32dbb8973e5bd/node_modules/@langchain/langgraph"
+        },
+        "langchain": {
+          "link": "../../../../../relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain"
+        },
+        "@relkit/providers-local": {
+          "link": "../../../../../../relkit/packages/providers-local",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/providers-local"
+        },
+        "@relkit/local-service": {
+          "link": "../../../../../../relkit/packages/local-service",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/local-service"
+        },
+        "@relkit/inspector-api": {
+          "link": "../../../../../../relkit/packages/inspector-api",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/inspector-api"
+        },
+        "@relkit/drizzle": {
+          "link": "../../../../../../relkit/packages/drizzle",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/drizzle"
+        },
+        "@relkit/diagnostics": {
+          "link": "../../../../../../relkit/packages/diagnostics",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/diagnostics"
+        },
+        "@relkit/deploy-pulumi": {
+          "link": "../../../../../../relkit/packages/deploy-pulumi",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy-pulumi"
+        },
+        "@relkit/deploy": {
+          "link": "../../../../../../relkit/packages/deploy",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy"
+        },
+        "@relkit/compiler": {
+          "link": "../../../../../../relkit/packages/compiler",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/compiler"
+        },
+        "@relkit/client-generator": {
+          "link": "../../../../../../relkit/packages/client-generator",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/client-generator"
+        },
+        "@relkit/client": {
+          "link": "../../../../../../relkit/packages/client",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/client"
+        },
+        "@relkit/better-auth": {
+          "link": "../../../../../../relkit/packages/better-auth",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/better-auth"
+        },
+        "@relkit/testing": {
+          "link": "../../../../../../relkit/packages/testing",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/testing"
+        },
+        "@relkit/cli": {
+          "link": "../../../../../../relkit/packages/cli",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/packages/cli"
+        },
+        "@relkit/local": {
+          "link": "../../../../../../relkit/integrations/packages/local",
+          "realpath": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/local"
+        }
+      }
+    }
+  ]
+}

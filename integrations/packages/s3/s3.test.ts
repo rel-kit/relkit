@@ -60,7 +60,8 @@ test("owns a pinned MinIO recipe with generated credentials and path-style outpu
   expect(localRecipe).toMatchObject({
     integrationId: "s3",
     recipeId: "minio-docker",
-    image: expect.stringMatching(/^quay\.io\/minio\/minio:RELEASE\.[^@]+@sha256:[a-f0-9]{64}$/),
+    image:
+      "ghcr.io/teableio/minio@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e",
     command: ["server", "/data", "--console-address", ":9001"],
     ports: { api: 9000, console: 9001 },
     volume: { mountPath: "/data" },

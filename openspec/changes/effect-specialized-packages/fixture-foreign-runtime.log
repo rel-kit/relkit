@@ -1,0 +1,142 @@
+20:36:19.192 INFO  relkit            Starting development server
+17:36:19 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.649125 operation=observability.emit outcome=success
+17:36:19 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.352125 operation=activation.source-change outcome=success
+20:36:19.211 INFO  build             Compiling application
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3791.437417 operation=candidate.compile outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3808.070792 operation=candidate.start outcome=success
+17:36:23 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.320083 operation=observability.emit outcome=failure
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.032625 operation=observability.emit outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=23.609208 operation=activation.compile.succeeded outcome=success
+17:36:23 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.09425 operation=observability.emit outcome=failure
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.065792 operation=observability.emit outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=15.241542 operation=activation.start.succeeded outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=512.993625 operation=candidate.verify outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.646791 operation=observability.emit outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.03275 operation=observability.emit outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=16.594666 operation=activation.verification.succeeded outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.129041 operation=proxy.switch outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.44875 operation=observability.emit outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.046625 operation=observability.emit outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=16.829083 operation=activation.switch outcome=success
+20:36:23.656 INFO  build             Compiled in 4444ms
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=50.100333 operation=observability.append outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.233541 operation=observability.append outcome=success
+20:36:23.673 INFO  server            Ready
+                                     API        http://127.0.0.1:3330
+                                     Inspector  http://127.0.0.1:3331
+                                     Reference  http://127.0.0.1:3330/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:3330/_relkit/v1/openapi.json
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.959208 operation=observability.append outcome=success
+17:36:23 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.274917 operation=observability.append outcome=success
+17:36:55 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.538292 operation=proxy.request outcome=success
+17:36:55 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.852708 operation=proxy.request outcome=success
+17:36:55 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.724875 operation=proxy.request outcome=success
+20:36:55.483 WARN  app               91 | export function assertWebSocketOrigin(request, options) {
+20:36:55.484 WARN  app               92 | const origin = request.headers.get("origin");
+20:36:55.484 WARN  app               93 | if (origin === null ||
+20:36:55.485 WARN  app               94 | origin === "null" ||
+20:36:55.485 WARN  app               95 | (origin !== new URL(request.url).origin &&
+                                     !allowedOrigins(options.allowedOrigins).has(origin))) {
+20:36:55.486 WARN  app               96 | throw new TransportSecurityError("ORIGIN_DENIED",
+                                     "WebSocket origin is not allowed.");
+                                     ^
+17:36:55 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=89.810959 operation=proxy.websocket outcome=failure
+20:36:55.513 WARN  app               TransportSecurityError: WebSocket origin is not allowed.
+                                     code: "ORIGIN_DENIED"
+                                     at assertWebSocketOrigin
+                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:96:15)
+                                     at assertWebSocketRequest
+                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:107:5)
+20:36:55.489 ERROR http              GET /rpc → 500 in 85ms
+                                     request: request-630d0671-263a-4617-af3a-aa0b7752131e
+                                     trace: ca257b5e20c87aee356ff111bd00a8d6
+17:37:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.924375 operation=proxy.request outcome=success
+17:37:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.774209 operation=proxy.request outcome=success
+17:37:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.262125 operation=proxy.request outcome=success
+20:37:21.656 WARN  app               91 | export function assertWebSocketOrigin(request, options) {
+20:37:21.657 WARN  app               92 | const origin = request.headers.get("origin");
+20:37:21.657 WARN  app               93 | if (origin === null ||
+20:37:21.658 WARN  app               94 | origin === "null" ||
+20:37:21.658 WARN  app               95 | (origin !== new URL(request.url).origin &&
+                                     !allowedOrigins(options.allowedOrigins).has(origin))) {
+20:37:21.659 WARN  app               96 | throw new TransportSecurityError("ORIGIN_DENIED",
+                                     "WebSocket origin is not allowed.");
+                                     ^
+17:37:21 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=84.531125 operation=proxy.websocket outcome=failure
+20:37:21.689 WARN  app               TransportSecurityError: WebSocket origin is not allowed.
+                                     code: "ORIGIN_DENIED"
+                                     at assertWebSocketOrigin
+                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:96:15)
+                                     at assertWebSocketRequest
+                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:107:5)
+20:37:21.660 ERROR http              GET /rpc → 500 in 83ms
+                                     request: request-1817d004-d337-47e5-83da-ce19160ac9c8
+                                     trace: fd0c9b73f3fd6c1a0636c831160d37e6
+20:37:21.740 WARN  app               91 | export function assertWebSocketOrigin(request, options) {
+20:37:21.741 WARN  app               92 | const origin = request.headers.get("origin");
+20:37:21.741 WARN  app               93 | if (origin === null ||
+20:37:21.742 WARN  app               94 | origin === "null" ||
+20:37:21.742 WARN  app               95 | (origin !== new URL(request.url).origin &&
+                                     !allowedOrigins(options.allowedOrigins).has(origin))) {
+20:37:21.742 WARN  app               96 | throw new TransportSecurityError("ORIGIN_DENIED",
+                                     "WebSocket origin is not allowed.");
+                                     ^
+17:37:21 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=82.906625 operation=proxy.websocket outcome=failure
+20:37:21.770 WARN  app               TransportSecurityError: WebSocket origin is not allowed.
+                                     code: "ORIGIN_DENIED"
+                                     at assertWebSocketOrigin
+                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:96:15)
+                                     at assertWebSocketRequest
+                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:107:5)
+20:37:21.744 ERROR http              GET /rpc → 500 in 80ms
+                                     request: request-bcc8e7e3-9ab2-4b5a-b122-853156b86916
+                                     trace: 1a1d66ce0f14e166cab1c8b5aa15c863
+20:38:30.916 INFO  relkit            Stopping development server
+17:38:30 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.173 operation=proxy.stop outcome=success
+17:38:30 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=127911.906542 operation=candidate.output outcome=success
+17:38:30 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=127853.147041 operation=candidate.exit outcome=failure
+17:38:30 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=14.376458 operation=candidate.stop outcome=success
+17:38:30 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=24.906584 operation=generation.drain outcome=success
+17:38:30 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.073625 operation=observability.flush outcome=success
+20:38:30.957 INFO  relkit            Development server stopped
+17:38:30 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.275042 operation=watcher.stopAdmission outcome=success
+17:38:30 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.161833 operation=watcher.close outcome=success

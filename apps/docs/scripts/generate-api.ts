@@ -1,4 +1,4 @@
-import { chmod, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { basename, delimiter, join, resolve } from "node:path";
 import { apiPackageDefinitions } from "./documentation-catalog.js";
 
@@ -19,6 +19,8 @@ export async function renderApi(
   const workingDirectory = await mkdtemp(resolve(root, ".relkit/docgen-cwd-"));
   const temporary = resolve(root, ".relkit", `docgen-output-${basename(workingDirectory)}`);
   try {
+    await mkdir(temporary, { recursive: true });
+    await symlink(resolve(root, directory, "node_modules"), resolve(temporary, "node_modules"));
     const checker = resolve(workingDirectory, "check-examples.ts");
     await writeFile(
       checker,

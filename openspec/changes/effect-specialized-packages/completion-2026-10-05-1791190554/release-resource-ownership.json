@@ -1,0 +1,201 @@
+[
+  {
+    "at": "2026-10-05T09:25:31.817065+00:00",
+    "containers": [
+      {
+        "id": "9245a008711f517d32cc931b368e09e33332d46ef62baf88196ed44aae9ee978",
+        "name": "/relkit-1e6b5c822b93-57f7b7d1e056-service-worker",
+        "labels": {
+          "dev.relkit.application-id": "tasks-inngest-docker-app",
+          "dev.relkit.binding-id": "provider.job.default",
+          "dev.relkit.endpoint-hash": "sha256:a81768c74aa65253b8a6b2b18fcef4f702b81e102ae8ce670d355f524fdb4195",
+          "dev.relkit.environment": "development",
+          "dev.relkit.local-project-id": "sha256:1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
+          "dev.relkit.managed": "true",
+          "dev.relkit.plan-hash": "sha256:28448cc66303902e2309f32c346e5d705d758acd4ba7ba800f025538d52079d0",
+          "dev.relkit.recipe-id": "inngest:inngest-docker:2",
+          "dev.relkit.service-generation": "sha256:86586d14975bfffadec824e9bbee390e90f6e69f6c6c5bb917c89539ab138527",
+          "dev.relkit.unit-id": "worker",
+          "dev.relkit.unit-kind": "worker"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-smoke-sWEgzm/tasks-inngest-docker-tarball-project/node_modules",
+            "Destination": "/relkit-node-modules",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-smoke-sWEgzm/tasks-inngest-docker-tarball-project/.relkit/state/local/1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
+            "Destination": "/relkit-state",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-smoke-sWEgzm/tasks-inngest-docker-tarball-project/.relkit/generated/.dev-eBEIlH/generation-1",
+            "Destination": "/relkit-worker",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      {
+        "id": "7c1cb1232989f4394490b9a50eb8838d9322fa982cbfb3b35d9008a600feaed3",
+        "name": "/relkit-1e6b5c822b93-57f7b7d1e056-service-inngest",
+        "labels": {
+          "dev.relkit.application-id": "tasks-inngest-docker-app",
+          "dev.relkit.binding-id": "provider.job.default",
+          "dev.relkit.endpoint-hash": "sha256:a81768c74aa65253b8a6b2b18fcef4f702b81e102ae8ce670d355f524fdb4195",
+          "dev.relkit.environment": "development",
+          "dev.relkit.local-project-id": "sha256:1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
+          "dev.relkit.managed": "true",
+          "dev.relkit.plan-hash": "sha256:28448cc66303902e2309f32c346e5d705d758acd4ba7ba800f025538d52079d0",
+          "dev.relkit.recipe-id": "inngest:inngest-docker:2",
+          "dev.relkit.service-generation": "sha256:86586d14975bfffadec824e9bbee390e90f6e69f6c6c5bb917c89539ab138527",
+          "dev.relkit.unit-id": "inngest",
+          "dev.relkit.unit-kind": "container"
+        },
+        "mounts": []
+      },
+      {
+        "id": "4e43e4e0b1d74d3917147d13da60a76a4c080f62ba723ee59adbbe565c588497",
+        "name": "/relkit-1e6b5c822b93-57f7b7d1e056-service-redis",
+        "labels": {
+          "dev.relkit.application-id": "tasks-inngest-docker-app",
+          "dev.relkit.binding-id": "provider.job.default",
+          "dev.relkit.endpoint-hash": "sha256:a81768c74aa65253b8a6b2b18fcef4f702b81e102ae8ce670d355f524fdb4195",
+          "dev.relkit.environment": "development",
+          "dev.relkit.local-project-id": "sha256:1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
+          "dev.relkit.managed": "true",
+          "dev.relkit.plan-hash": "sha256:28448cc66303902e2309f32c346e5d705d758acd4ba7ba800f025538d52079d0",
+          "dev.relkit.recipe-id": "inngest:inngest-docker:2",
+          "dev.relkit.service-generation": "sha256:86586d14975bfffadec824e9bbee390e90f6e69f6c6c5bb917c89539ab138527",
+          "dev.relkit.unit-id": "redis",
+          "dev.relkit.unit-kind": "container"
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "relkit-1e6b5c822b93-57f7b7d1e056-redis",
+            "Source": "/var/lib/docker/volumes/relkit-1e6b5c822b93-57f7b7d1e056-redis/_data",
+            "Destination": "/data",
+            "Driver": "local",
+            "Mode": "z",
+            "RW": true,
+            "Propagation": ""
+          }
+        ]
+      },
+      {
+        "id": "781d62d6d05daf5759b80ac7998dec77bb193ec837f3cd242eead0925730085a",
+        "name": "/relkit-1e6b5c822b93-57f7b7d1e056-service-postgres",
+        "labels": {
+          "dev.relkit.application-id": "tasks-inngest-docker-app",
+          "dev.relkit.binding-id": "provider.job.default",
+          "dev.relkit.endpoint-hash": "sha256:a81768c74aa65253b8a6b2b18fcef4f702b81e102ae8ce670d355f524fdb4195",
+          "dev.relkit.environment": "development",
+          "dev.relkit.local-project-id": "sha256:1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
+          "dev.relkit.managed": "true",
+          "dev.relkit.plan-hash": "sha256:28448cc66303902e2309f32c346e5d705d758acd4ba7ba800f025538d52079d0",
+          "dev.relkit.recipe-id": "inngest:inngest-docker:2",
+          "dev.relkit.service-generation": "sha256:86586d14975bfffadec824e9bbee390e90f6e69f6c6c5bb917c89539ab138527",
+          "dev.relkit.unit-id": "postgres",
+          "dev.relkit.unit-kind": "container"
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "relkit-1e6b5c822b93-57f7b7d1e056-postgres",
+            "Source": "/var/lib/docker/volumes/relkit-1e6b5c822b93-57f7b7d1e056-postgres/_data",
+            "Destination": "/var/lib/postgresql/data",
+            "Driver": "local",
+            "Mode": "z",
+            "RW": true,
+            "Propagation": ""
+          }
+        ]
+      },
+      {
+        "id": "23d4b07652f4dd6bb53797aaa91a628d86450060276cc696dedd678f474859a4",
+        "name": "/relkit-1e6b5c822b93-1c9fcad5c582-service",
+        "labels": {
+          "dev.relkit.application-id": "tasks-inngest-docker-app",
+          "dev.relkit.binding-id": "provider.cache.local",
+          "dev.relkit.environment": "development",
+          "dev.relkit.local-project-id": "sha256:1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
+          "dev.relkit.managed": "true",
+          "dev.relkit.plan-hash": "sha256:28448cc66303902e2309f32c346e5d705d758acd4ba7ba800f025538d52079d0",
+          "dev.relkit.recipe-id": "redis:redis-docker:1"
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "relkit-1e6b5c822b93-1c9fcad5c582-data",
+            "Source": "/var/lib/docker/volumes/relkit-1e6b5c822b93-1c9fcad5c582-data/_data",
+            "Destination": "/data",
+            "Driver": "local",
+            "Mode": "z",
+            "RW": true,
+            "Propagation": ""
+          }
+        ]
+      },
+      {
+        "id": "27d5b9df46edacae6ad1937aa28db3daf7963d021c53b29d45946c44696d648d",
+        "name": "/relkit-1e6b5c822b93-12449678b472-service",
+        "labels": {
+          "dev.relkit.application-id": "tasks-inngest-docker-app",
+          "dev.relkit.binding-id": "provider.bucket.shipping-example",
+          "dev.relkit.environment": "development",
+          "dev.relkit.local-project-id": "sha256:1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
+          "dev.relkit.managed": "true",
+          "dev.relkit.plan-hash": "sha256:28448cc66303902e2309f32c346e5d705d758acd4ba7ba800f025538d52079d0",
+          "dev.relkit.recipe-id": "s3:minio-docker:1"
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "relkit-1e6b5c822b93-12449678b472-data",
+            "Source": "/var/lib/docker/volumes/relkit-1e6b5c822b93-12449678b472-data/_data",
+            "Destination": "/data",
+            "Driver": "local",
+            "Mode": "z",
+            "RW": true,
+            "Propagation": ""
+          }
+        ]
+      },
+      {
+        "id": "9341e07a775285d3046126079a4e3af24cbe425e5734ccc746470f118117e2b8",
+        "name": "/relkit-1e6b5c822b93-58cd0e35b2fc-service",
+        "labels": {
+          "dev.relkit.application-id": "tasks-inngest-docker-app",
+          "dev.relkit.binding-id": "provider.bucket.local",
+          "dev.relkit.environment": "development",
+          "dev.relkit.local-project-id": "sha256:1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
+          "dev.relkit.managed": "true",
+          "dev.relkit.plan-hash": "sha256:28448cc66303902e2309f32c346e5d705d758acd4ba7ba800f025538d52079d0",
+          "dev.relkit.recipe-id": "s3:minio-docker:1"
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "relkit-1e6b5c822b93-58cd0e35b2fc-data",
+            "Source": "/var/lib/docker/volumes/relkit-1e6b5c822b93-58cd0e35b2fc-data/_data",
+            "Destination": "/data",
+            "Driver": "local",
+            "Mode": "z",
+            "RW": true,
+            "Propagation": ""
+          }
+        ]
+      }
+    ]
+  }
+]

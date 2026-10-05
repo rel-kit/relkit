@@ -1,0 +1,291 @@
+# bf-9fb81e892db6930aa6072688: Drizzle transaction descendants escape lifetime, string bigint schemas reject valid data, standalone CRUD lacks instrumentation
+
+Status: **verified**
+Attempt: 1 · Updated: 2026-10-05T10:54:22+00:00
+
+## What
+
+Drizzle transaction descendants escape lifetime, string bigint schemas reject valid data, standalone CRUD lacks instrumentation
+
+## Expected
+
+Transaction work drains before commit/disposal; native string bigint values validate; standalone CRUD records one operation
+
+## Observed before
+
+New regression tests fail all three assertions
+
+## Root cause
+
+packages/drizzle/src/context.ts transaction bindings used a static admission bypass instead of retaining owner and transaction lifetime; operations.ts override bases could escape SQLite exclusion. The pinned Drizzle rc.5 Effect schema generator models string-mode bigint as BigInt. operations.ts placed observations exclusively in the Promise adapter, leaving exported operationEffect unobserved.
+
+## Fixed by
+
+Retain owner admission at every execution edge and an expiring transaction callback lease, draining descendants before native commit/rollback and reacquiring SQLite exclusion for override bases. Refine string bigint schemas within signed/unsigned bounds while preserving array dimensions and generator null/default rules. Observe and redact standalone operationEffect once, using an unobserved nested workflow to avoid double counting. Focused unit, real SQLite, generated HTTP host, adjacent auth/persistence, types, lint, boundaries and documentation checks pass.
+
+## Changed files
+
+- packages/drizzle/src/activation.ts
+- packages/drizzle/src/context.ts
+- packages/drizzle/src/context.types.ts
+- packages/drizzle/src/runtime-types.ts
+- packages/drizzle/src/operations.ts
+- packages/drizzle/src/transaction.ts
+- packages/drizzle/src/table.schemas.ts
+- packages/drizzle/tests/effect/review-regressions.test.ts
+- packages/drizzle/tests/effect/string-bigint-arrays.test.ts
+- tests/integration/database/review-regressions.test.ts
+- tests/integration/database/generated-host-fixture.ts
+- tests/integration/database/generated-host.test.ts
+- apps/docs/content/docs/api/drizzle.mdx
+
+## Reproduction
+
+- Run new focused Vitest regression tests
+- Run public activation/native SQLite integration regression tests
+
+## Evidence
+
+- before: [unit](evidence/001/unit-before.txt) — Four behavioral regressions fail
+- before: [integration](evidence/001/runtime-before.txt) — Three runtime contract assertions fail
+- before: [unit](evidence/001/arrays-before.txt) — String bigint array decoding rejected native arrays before dimensions fix
+- after: [unit](evidence/001/unit-after.txt) — All 50 Drizzle tests pass, including nine regression cases and array boundaries
+- after: [integration](evidence/001/runtime-after.txt) — All three real SQLite/schema/observation invariants pass
+- after: [e2e](evidence/001/e2e.txt) — Generated host, auth session, lifecycle, rollback, detached child, shutdown and persistence pass
+- after: [integration](evidence/001/consumers.txt) — Ten activation/auth/persistence consumer cases pass
+- after: [unit](evidence/001/auth.txt) — 21 auth lifecycle/coordination/instrumentation cases pass
+
+## Scope
+
+```json
+{
+  "modules": [
+    "Drizzle activation",
+    "Drizzle transaction",
+    "Drizzle CRUD schemas",
+    "Drizzle instrumentation"
+  ],
+  "entrypoints": [
+    "activateDrizzleService",
+    "DatabaseContext.transaction",
+    "operationEffect"
+  ],
+  "invariants": [
+    "Safe transaction and owner lifetimes",
+    "Public schema compatibility",
+    "Standalone operation diagnostics"
+  ]
+}
+```
+
+## Environment
+
+```json
+{
+  "package": "packages/drizzle",
+  "revision": "0dbc3c445664d53c79d54c3e3e69628f039e6842 plus specialized migration working tree",
+  "target": "local Bun SQLite/public Effect composition",
+  "api_exposed": false,
+  "e2e_available": true,
+  "monitoring": "Configured Effect logger and MetricRegistry; no remote monitoring required"
+}
+```
+
+## Verification
+
+```json
+{
+  "unit": {
+    "before": {
+      "status": "failed",
+      "command": "rtk bun x vitest run --config packages/drizzle/vitest.config.ts tests/effect/review-regressions.test.ts",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Drain children, accept string bigint, emit one standalone operation",
+      "output": "evidence/001/unit-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk proxy bunx vitest run --config packages/drizzle/vitest.config.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/unit-after.txt",
+      "assertion": "Transaction children drain, stale contexts/bases reject, native string bigint and arrays validate, standalone diagnostics count once; 50 passing tests"
+    }
+  },
+  "runtime": {
+    "kind": "integration",
+    "reason": "These are database owner and schema/Effect APIs, with no HTTP endpoint of their own",
+    "boundary": "Public activation/model APIs -> Effect ownership -> native Bun SQLite; installed schema generator and configured logger/metrics",
+    "dependencies": [
+      "Real Bun SQLite and Drizzle adapter",
+      "Pinned Drizzle Effect schema generator",
+      "Configured Effect logger and MetricRegistry"
+    ],
+    "steps": [
+      "Start detached native transaction child, close while pending, then release",
+      "Decode supported native string bigint values",
+      "Execute standalone CRUD against real SQLite and inspect diagnostics"
+    ],
+    "before": {
+      "status": "failed",
+      "command": "rtk bun test tests/integration/database/review-regressions.test.ts",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "All three public/runtime invariants hold",
+      "output": "evidence/001/runtime-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk proxy bun test tests/integration/database/review-regressions.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/runtime-after.txt",
+      "assertion": "Detached native SQLite write succeeds before commit/disposal, native string schemas decode, standalone real SQLite emits one log/counter; three passing tests"
+    }
+  },
+  "e2e": {
+    "status": "passed",
+    "command": "rtk proxy bun test tests/integration/database/generated-host.test.ts tests/integration/database/data-model.test.ts",
+    "cwd": ".",
+    "exit_code": 0,
+    "output": "evidence/001/e2e.txt",
+    "assertion": "Generated HTTP host persists data, rolls back failed callback, drains detached transaction child before close, authenticates sessions, disposes only its owned activation; three passing tests"
+  },
+  "regressions": [
+    {
+      "kind": "e2e",
+      "boundary": "Generated HTTP invocation -> Drizzle and auth -> native SQLite -> shutdown",
+      "status": "passed",
+      "command": "rtk proxy bun test tests/integration/database/generated-host.test.ts tests/integration/database/data-model.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/e2e.txt",
+      "assertion": "Generated HTTP host persists data, rolls back failed callback, drains detached transaction child before close, authenticates sessions, disposes only its owned activation; three passing tests"
+    },
+    {
+      "kind": "integration",
+      "boundary": "Public activation and auth/database ownership -> SQLite persistence/restart",
+      "status": "passed",
+      "command": "rtk proxy bun test packages/drizzle/tests/activation.test.ts packages/drizzle/tests/activation-contract.test.ts packages/better-auth/tests/service.test.ts tests/integration/database/agent-persistence-sqlite.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/consumers.txt",
+      "assertion": "Acquisition caching, close idempotency/error identity, auth handler isolation and agent persistence survive; ten passing cases"
+    },
+    {
+      "kind": "integration",
+      "boundary": "Public activation/model -> native SQLite and configured Effect diagnostics",
+      "status": "passed",
+      "command": "rtk proxy bun test tests/integration/database/review-regressions.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/runtime-after.txt",
+      "assertion": "Detached native SQLite write succeeds before commit/disposal, native string schemas decode, standalone real SQLite emits one log/counter; three passing tests"
+    }
+  ],
+  "checks": [
+    {
+      "name": "package typecheck/build",
+      "status": "passed",
+      "command": "rtk proxy bunx tsc -b packages/drizzle packages/better-auth --pretty false",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/types.txt"
+    },
+    {
+      "name": "public type fixtures",
+      "status": "passed",
+      "command": "rtk proxy bun run test:types",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/type-fixtures.txt"
+    },
+    {
+      "name": "regression test types",
+      "status": "passed",
+      "command": "rtk proxy bunx tsc --noEmit --strict --skipLibCheck --target ES2022 --module NodeNext --moduleResolution NodeNext --types bun packages/drizzle/tests/effect/review-regressions.test.ts packages/drizzle/tests/effect/string-bigint-arrays.test.ts tests/integration/database/review-regressions.test.ts tests/integration/database/generated-host-fixture.ts tests/integration/database/generated-host.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/test-types.txt"
+    },
+    {
+      "name": "auth regressions",
+      "status": "passed",
+      "command": "rtk proxy bunx vitest run packages/better-auth/tests/auth",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/auth.txt"
+    },
+    {
+      "name": "boundaries",
+      "status": "passed",
+      "command": "rtk proxy bun run check",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/boundaries.txt"
+    },
+    {
+      "name": "lint",
+      "status": "passed",
+      "command": "rtk proxy bun run lint",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/lint.txt"
+    },
+    {
+      "name": "rich JSDoc",
+      "status": "passed",
+      "command": "rtk proxy bun run check:jsdoc",
+      "cwd": "apps/docs",
+      "exit_code": 0,
+      "output": "evidence/001/jsdoc.txt"
+    },
+    {
+      "name": "scoped Drizzle API docgen and extracted examples",
+      "status": "passed",
+      "command": "rtk proxy bun --eval scoped renderApi(drizzle), format and compare existing reference",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/docgen-check.txt"
+    },
+    {
+      "name": "formatting",
+      "status": "passed",
+      "command": "rtk proxy bunx prettier --check changed Drizzle source, new regressions, generated-host fixture and generated Drizzle reference",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/format.txt"
+    },
+    {
+      "name": "whitespace diff",
+      "status": "passed",
+      "command": "rtk proxy git diff --check",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/diff-check.txt"
+    }
+  ],
+  "limitations": [
+    "PostgreSQL/MySQL callback lifetime tested with deterministic native driver callbacks and installed schema generators; no external PostgreSQL/MySQL server was used.",
+    "Full monorepo verify, Docker and cloud acceptance were not run for these scoped Drizzle fixes.",
+    "Local configured Effect logger/MetricRegistry inspected; no remote monitoring dashboard was queried."
+  ]
+}
+```
+
+## Related reports
+
+```json
+[]
+```
+
+## Notes
+
+```json
+[
+  "Independent scoped review is clean, including detached-child rollback error identity and string-bigint arrays. Original migration work and primary checkout were preserved; all source fixes are in the effect-specialized-recovery worktree.",
+  "Generated-host probe initially opened a fixture database without tables; corrected to the actual host DATABASE_PATH and reran successfully.",
+  "A transient external source reversion was detected by type/docgen checks; reapplied the reviewed context fix and reran invalidated unit, runtime, generated-host, consumer and type checks. Final source and built context both contain the transaction lease guard."
+]
+```

@@ -1,0 +1,12 @@
+{
+  "project": "demo",
+  "label": "demo-foreign-origin",
+  "command": [
+    "rtk",
+    "bun",
+    "/tmp/relkit-effect-specialized-foreign-origin.mjs"
+  ],
+  "exitCode": 1,
+  "seconds": 0.15,
+  "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-foreign-origin.log"
+}

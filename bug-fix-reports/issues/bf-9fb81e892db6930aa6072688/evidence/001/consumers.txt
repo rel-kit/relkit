@@ -1,0 +1,274 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/agent-persistence-sqlite.test.ts:
+(pass) isolates native SQLite checkpoints and preserves real driver ownership [1467.88ms]
+
+packages/better-auth/tests/service.test.ts:
+[10:52:48.928] INFO (#9): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.961959,
+}
+[10:52:48.934] INFO (#13): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 2.047,
+}
+2026-10-05T10:52:48.935Z WARN [Better Auth]: [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[10:52:48.937] INFO (#13): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 5.945583,
+}
+[10:52:48.938] INFO (#17): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.076375,
+}
+(pass) creates a stable lazy handler and derives route protection [24.39ms]
+(pass) forbids database and basePath options [0.12ms]
+[10:52:48.940] INFO (#23): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.105459,
+}
+[10:52:48.940] INFO (#26): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 0.316209,
+}
+2026-10-05T10:52:48.941Z WARN [Better Auth]: [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[10:52:48.941] INFO (#26): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 0.799083,
+}
+[10:52:48.941] INFO (#29): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 0.251958,
+}
+2026-10-05T10:52:48.942Z WARN [Better Auth]: [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[10:52:48.942] INFO (#29): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 0.67225,
+}
+[10:52:48.942] INFO (#32): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 0.256708,
+}
+2026-10-05T10:52:48.942Z WARN [Better Auth]: [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[10:52:48.943] INFO (#32): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 0.616167,
+}
+[10:52:48.943] INFO (#37): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.088959,
+}
+(pass) isolated native auth does not acquire or replace the descriptor handler [5.12ms]
+[10:52:48.944] INFO (#43): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.146666,
+}
+[10:52:48.945] INFO (#46): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 0.301041,
+}
+[10:52:48.946] INFO (#46): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 0.949542,
+}
+[10:52:48.946] INFO (#51): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.059667,
+}
+(pass) failed shared auth acquisition resets and borrows the database without disposal [2.92ms]
+
+packages/drizzle/tests/activation-contract.test.ts:
+[10:52:48.957] INFO (#55): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.124792,
+}
+[10:52:48.958] INFO (#58): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.054625,
+}
+(pass) declarations stay lazy and shared activation retains the first environment after close [8.21ms]
+[10:52:48.960] ERROR (#62): Execution operation failed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "failure",
+  duration_ms: 0.966417,
+}
+[10:52:48.960] INFO (#65): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.030958,
+}
+[10:52:48.961] INFO (#68): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.024709,
+}
+(pass) a shared rejected acquisition preserves its error and permits a fresh attempt [2.27ms]
+[10:52:48.962] INFO (#74): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.0555,
+}
+[10:52:48.962] INFO (#76): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.033041,
+}
+[10:52:48.964] ERROR (#81): Execution operation failed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "failure",
+  duration_ms: 0.19275,
+}
+[10:52:48.964] INFO (#78): Execution operation completed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "success",
+  duration_ms: 1.762458,
+}
+[10:52:48.965] INFO (#82): Execution operation completed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "success",
+  duration_ms: 0.990042,
+}
+[10:52:48.965] INFO (#87): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.084583,
+}
+[10:52:48.965] INFO (#88): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.075333,
+}
+(pass) shared descriptors returning one SQLite client serialize callbacks and reject nesting [4.51ms]
+
+packages/drizzle/tests/activation.test.ts:
+[10:52:48.970] INFO (#92): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.348166,
+}
+[10:52:48.970] INFO (#94): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.133542,
+}
+[10:52:48.970] INFO (#97): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.069875,
+}
+[10:52:48.973] INFO (#99): Execution operation completed {
+  domain: "runtime",
+  operation: "database.insert",
+  outcome: "success",
+  duration_ms: 2.025958,
+}
+[10:52:48.973] INFO (#101): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findMany",
+  outcome: "success",
+  duration_ms: 0.416333,
+}
+[10:52:48.974] INFO (#103): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.159208,
+}
+[10:52:48.974] INFO (#105): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findMany",
+  outcome: "success",
+  duration_ms: 0.163542,
+}
+[10:52:48.974] INFO (#108): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.038417,
+}
+[10:52:48.975] INFO (#111): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.028625,
+}
+(pass) isolated owners have fresh clients and closing one preserves another [6.62ms]
+[10:52:48.975] INFO (#115): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.029375,
+}
+[10:52:48.976] INFO (#118): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.042125,
+}
+[10:52:48.976] INFO (#120): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.020875,
+}
+[10:52:48.976] INFO (#121): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.016041,
+}
+(pass) concurrent close shares completion and context failure releases the acquired prefix [1.16ms]
+
+ 10 pass
+ 0 fail
+ 50 expect() calls
+Ran 10 tests across 4 files. [1.79s]

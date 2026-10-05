@@ -1,0 +1,49 @@
+{
+  "value": "regression-1791191000504",
+  "results": [
+    {
+      "name": "starter hello",
+      "passed": true
+    },
+    {
+      "name": "starter echo",
+      "passed": true
+    },
+    {
+      "name": "nested service invocation",
+      "passed": true
+    },
+    {
+      "name": "Redis + MinIO + event publish",
+      "passed": true
+    },
+    {
+      "name": "durable event listener + bucket metadata/list + signed read",
+      "passed": true
+    },
+    {
+      "name": "input validation",
+      "passed": true
+    },
+    {
+      "name": "declared domain failure",
+      "passed": true
+    },
+    {
+      "name": "missing route",
+      "passed": true
+    },
+    {
+      "name": "OpenAPI",
+      "passed": true
+    },
+    {
+      "name": "cache and bucket deletion",
+      "passed": true
+    },
+    {
+      "name": "retained inspector sample",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "method": "return",
+    "before": 1,
+    "samples": [
+      {
+        "elapsedMs": 55,
+        "connections": 0
+      },
+      {
+        "elapsedMs": 1091,
+        "connections": 0
+      },
+      {
+        "elapsedMs": 5122,
+        "connections": 0
+      }
+    ]
+  },
+  {
+    "method": "abort",
+    "before": 1,
+    "samples": [
+      {
+        "elapsedMs": 41,
+        "connections": 0
+      },
+      {
+        "elapsedMs": 1070,
+        "connections": 0
+      },
+      {
+        "elapsedMs": 5099,
+        "connections": 0
+      }
+    ]
+  }
+]

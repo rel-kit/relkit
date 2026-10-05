@@ -1,0 +1,2 @@
+Command: rtk proxy bunx tsc -b packages/drizzle packages/better-auth --pretty false
+Observed exit code: 0

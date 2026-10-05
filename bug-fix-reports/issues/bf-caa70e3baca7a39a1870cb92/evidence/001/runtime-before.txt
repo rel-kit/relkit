@@ -1,0 +1,23 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/auth-reentrancy.test.ts:
+[11:59:42.363] INFO (#4): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 1.116583,
+}
+36 |     }],
+37 |   });
+38 |   const auth = await Promise.race([
+39 |     database.context.transaction(() => activateBetterAuthService(primary, database, "/api/auth")),
+40 |     new Promise<never>((_resolve, reject) => {
+41 |       const timer = setTimeout(() => reject(new Error("Nested auth acquisition deadlocked")), 1000);
+                                                     ^
+error: Nested auth acquisition deadlocked
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/integration/database/auth-reentrancy.test.ts:41:49)
+(fail) native auth initialization can activate another descriptor inside a SQLite transaction [1019.14ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [1287.00ms]

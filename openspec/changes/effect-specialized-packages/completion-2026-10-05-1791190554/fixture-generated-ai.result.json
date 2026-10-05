@@ -1,0 +1,12 @@
+{
+  "project": "fixture",
+  "label": "fixture-generated-ai",
+  "command": [
+    "rtk",
+    "bun",
+    "../../../../scripts/verify-generated-ai.mjs"
+  ],
+  "exitCode": 1,
+  "seconds": 0.07,
+  "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-generated-ai.log"
+}

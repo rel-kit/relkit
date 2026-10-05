@@ -1,0 +1,22 @@
+{
+  "key": "activation",
+  "matches": {
+    "bf-caa70e3baca7a39a1870cb92": {
+      "id": "bf-caa70e3baca7a39a1870cb92",
+      "status": "verified",
+      "what": "Nested authentication activation deadlocks on the parent's SQLite permit",
+      "root_cause": "ManagedRuntime builds authLiveLayer in a new fiber. inheritNativeLeases previously wrapped only the post-acquisition operation, so acquisition waited on the SQLite permit retained by its awaiting parent",
+      "fixed_by": "Build the auth layer inside an acquisition-only inheritNativeLeases effect using Layer.effectContext and Layer.build; keep ephemeral leases out of the returned service context",
+      "files": [
+        "packages/better-auth/src/activation.ts",
+        "packages/better-auth/tests/auth/reentrant-acquisition.test.ts",
+        "tests/integration/database/auth-reentrancy.test.ts",
+        "tests/integration/database/generated-host-fixture.ts",
+        "tests/integration/database/generated-host.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-05T12:07:59+00:00",
+      "report": "bug-fix-reports/issues/bf-caa70e3baca7a39a1870cb92/report.md"
+    }
+  }
+}

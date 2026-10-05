@@ -1,0 +1,18 @@
+{
+  "package": "@relkit/s3",
+  "artifact": "/tmp/relkit-effect-specialized-final-release-1791190554/relkit-s3-0.5.6.tgz",
+  "sha256": "de9287b36ce5c78233916beea60739085b98aafb541e20f6e35470962d3fcaca",
+  "manifestHashMatches": true,
+  "minioReferences": [
+    {
+      "path": "package/dist/local-recipe/index.d.ts",
+      "publicMirror": true,
+      "oldQuay": false
+    },
+    {
+      "path": "package/dist/local-recipe/index.js",
+      "publicMirror": true,
+      "oldQuay": false
+    }
+  ]
+}

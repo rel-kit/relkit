@@ -1,0 +1,26 @@
+$ bun test ./tests/security
+bun test v1.3.10 (30e609e0)
+
+tests/security/secret-scan.test.ts:
+(pass) recursively scans values and release artifacts without exposing raw matches [7.11ms]
+
+tests/security/source-scan-paths.test.ts:
+(pass) source scans reject symlinks outside their owned roots [4.45ms]
+
+tests/security/redaction/redaction.test.ts:
+09:11:04 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=4.708292 operation=observability.list outcome=success
+09:11:04 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=45.878125 operation=observability.detail outcome=success
+09:11:04 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=3.180917 operation=observability.list outcome=success
+09:11:04 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=16.893333 operation=observability.detail outcome=success
+09:11:04 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=1.329708 operation=observability.open outcome=success
+(pass) recursively finds no synthetic secret in observable flows or sinks [412.87ms]
+
+ 3 pass
+ 0 fail
+ 19 expect() calls
+Ran 3 tests across 3 files. [1108.00ms]

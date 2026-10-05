@@ -1,0 +1,2 @@
+drizzle: regenerated, formatted and checked API examples
+better-auth: regenerated, formatted and checked API examples

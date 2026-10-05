@@ -8,8 +8,12 @@ import type {
   ModelExtensionMap,
   NonEmptyExtensions,
 } from "./types.js";
-import { frameworkTrace } from "@relkit/invocation";
+import { Effect } from "effect";
+import { nativeCall } from "./failure.js";
+import { observeSpecializedOperation } from "./operation-tracing.js";
+import { withSqlitePermit } from "./transaction.js";
 
+/** Reserved base operations; authored extensions may not shadow these names. */
 export const RESERVED_OPERATIONS = Object.freeze([
   "findOne",
   "findMany",
@@ -22,6 +26,11 @@ export const RESERVED_OPERATIONS = Object.freeze([
 /**
  * Adds named table methods with an injected table and transaction-aware Drizzle client.
  * Use service overrides, not extensions, to replace the six reserved CRUD operations.
+ * @typeParam T - Authored Drizzle table.
+ * @typeParam Extensions - Inferred custom operation arguments and results.
+ * @param options - Matching table and non-empty extension map.
+ * @returns Frozen descriptor; extension functions remain lazy until activation use.
+ * @throws TypeError for missing, non-callable or reserved extensions.
  *
  * @example
  * ```ts
@@ -65,6 +74,12 @@ export function defineModel<
   return Object.freeze(descriptor) as ModelDescriptor<T, Extensions>;
 }
 
+/**
+ * Resolves hidden pure extension metadata.
+ * @param value - Frozen model descriptor.
+ * @returns Matching table and custom method definitions.
+ * @throws TypeError for invalid descriptors.
+ */
 export function modelRuntimeOf(value: ModelDescriptorAny): ModelRuntime {
   const runtime = (value as unknown as Record<PropertyKey, unknown>)[MODEL_RUNTIME];
   if (!isRecord(runtime) || !isRecord(runtime.extend)) {
@@ -73,6 +88,12 @@ export function modelRuntimeOf(value: ModelDescriptorAny): ModelRuntime {
   return runtime as unknown as ModelRuntime;
 }
 
+/**
+ * Binds public Promise methods to the owning Effect workflows.
+ * @param binding - Client/schema/override metadata and execution edge.
+ * @param model - Optional authored extensions.
+ * @returns Frozen CRUD/custom methods preserving injected native dependencies.
+ */
 export function createBoundModel(binding: ModelBinding, model?: ModelDescriptorAny): object {
   const base: BaseOperations<Table> = {
     findOne: (args) => runOperation(binding, "findOne", args) as never,
@@ -87,22 +108,41 @@ export function createBoundModel(binding: ModelBinding, model?: ModelDescriptorA
     Object.entries(modelRuntimeOf(model).extend).map(([name, extension]) => [
       name,
       (...args: unknown[]) =>
-        frameworkTrace.span(
-          `relkit.database.${name}`,
-          {
-            input: args,
-            attributes: {
-              "db.system.name": binding.dialect,
-              "db.operation.name": name,
-            },
-          },
-          () => extension({ table: binding.table, database: binding.drizzle as any }, ...args),
+        binding.run(
+          observeSpecializedOperation(
+            "database.extension",
+            extensionEffect(binding, () =>
+              extension({ table: binding.table, database: binding.drizzle as never }, ...args),
+            ),
+          ),
+          "extension",
         ),
     ]),
   );
   return Object.freeze({ ...base, ...extensions });
 }
 
+/**
+ * Executes an opaque user extension until native Promise completion.
+ * @param binding - Table/client transaction coordination policy.
+ * @param run - Extension thunk with transaction-aware dependencies.
+ * @returns Lazy result or typed extension failure; inputs/results stay private.
+ */
+const extensionEffect = Effect.fn("Drizzle.extension")((
+  binding: ModelBinding,
+  run: () => unknown,
+) => {
+  const effect = nativeCall("extension", run);
+  return binding.dialect === "sqlite" && !binding.inTransaction
+    ? withSqlitePermit(binding.drizzle, effect)
+    : effect;
+});
+
+/**
+ * Checks opaque model declarations without invoking extensions.
+ * @param value - Unknown declaration.
+ * @returns Whether value is a non-array object.
+ */
 function isRecord(value: unknown): value is Record<PropertyKey, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

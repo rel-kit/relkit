@@ -1,0 +1,45 @@
+{
+  "health/ready": {
+    "protocol": "relkit.inspector",
+    "version": 1,
+    "status": "ready",
+    "graphHash": "sha256:cfb3029fd49dcafce68b0d9c6a4e8d5f20b91a0d4db5b635a6860b5dcfb2cc24",
+    "activationFingerprint": {
+      "graphHash": "sha256:cfb3029fd49dcafce68b0d9c6a4e8d5f20b91a0d4db5b635a6860b5dcfb2cc24",
+      "jobsManifestHash": "sha256:7d85a61c198a84154292e8e4d8befc2048f9ac8a0d839242e007bacb1159e494",
+      "localServicesPlanHash": "sha256:1d279be4d6a0c4b53e64f30142de8a6de11f76098f8ba5594aee9343d56949e0",
+      "manifestHash": "sha256:35ff44798fb2c9e11e16b006c409b52c85779d20ed09e222feefc4a76672aa0c",
+      "providerOverridesGeneration": "34a8afec-ccc1-4fb4-9909-639002d3dc8f",
+      "runtimeIntegrationsPlanHash": "sha256:ff0003846acef622315178bfeb3601a1b23afe6df1929c0ab4a95b0f88483963"
+    },
+    "manifestGraphHash": "sha256:cfb3029fd49dcafce68b0d9c6a4e8d5f20b91a0d4db5b635a6860b5dcfb2cc24",
+    "graphContractVersion": 10,
+    "manifestContractVersion": 10,
+    "manifestGeneratorVersion": 7,
+    "environmentReady": true,
+    "providerReady": true,
+    "databaseReady": true,
+    "authReady": true,
+    "sourceToken": 1,
+    "generationToken": 1
+  },
+  "client/identity": {
+    "protocol": "relkit.client-identity",
+    "version": 1,
+    "applicationId": "regression-demo",
+    "identityScope": "sha256:a9ad183b291907876e87ca07a53bf5d3750058ebff0ee9dd30916d63713f82c0",
+    "sessionEpoch": "sha256:74d5a1feff0e89ddf57f940177afff6ab9955a62c46c9b19387b597e1b00e328",
+    "publicFingerprint": "sha256:cf81e1c1e95bcc7e067f39de1c8da9e2603433d518d0c3a15e2e96239b2c107e",
+    "issuedAt": "2026-10-05T09:06:43.207Z",
+    "jobs": {
+      "protocol": "relkit.jobs",
+      "version": 1
+    }
+  },
+  "graph": {
+    "generationId": "generation.runtime",
+    "graphHash": "sha256:cfb3029fd49dcafce68b0d9c6a4e8d5f20b91a0d4db5b635a6860b5dcfb2cc24"
+  },
+  "sourceCopyStillIdentical": true,
+  "candidateLinksVerified": true
+}

@@ -1,0 +1,2 @@
+Command: rtk proxy bunx tsc --noEmit --strict --skipLibCheck --target ES2022 --module NodeNext --moduleResolution NodeNext --types bun packages/drizzle/tests/effect/floating-point.test.ts packages/better-auth/tests/auth/reentrant-acquisition.test.ts tests/integration/database/floating-point.test.ts tests/integration/database/auth-reentrancy.test.ts tests/integration/database/generated-host-fixture.ts tests/integration/database/generated-host.test.ts
+Observed exit code: 0

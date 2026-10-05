@@ -1,0 +1,67 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/generated-host.test.ts:
+(pass) generated host preserves database/auth ownership, rollback, session admission and shutdown [4860.75ms]
+
+tests/integration/database/data-model.test.ts:
+[10:52:08.877] INFO (#583): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 1.539792,
+}
+[10:52:08.884] INFO (#585): Execution operation completed {
+  domain: "runtime",
+  operation: "database.insert",
+  outcome: "success",
+  duration_ms: 4.159041,
+}
+[10:52:08.886] INFO (#587): Execution operation completed {
+  domain: "runtime",
+  operation: "database.extension",
+  outcome: "success",
+  duration_ms: 1.493791,
+}
+[10:52:08.889] INFO (#589): Execution operation completed {
+  domain: "runtime",
+  operation: "database.update",
+  outcome: "success",
+  duration_ms: 1.541875,
+}
+[10:52:08.890] INFO (#591): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findOne",
+  outcome: "success",
+  duration_ms: 0.980084,
+}
+[10:52:08.892] INFO (#597): Execution operation completed {
+  domain: "runtime",
+  operation: "database.insert",
+  outcome: "success",
+  duration_ms: 0.327792,
+}
+[10:52:08.893] ERROR (#595): Execution operation failed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "failure",
+  duration_ms: 2.057167,
+}
+[10:52:08.894] INFO (#599): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findMany",
+  outcome: "success",
+  duration_ms: 0.829459,
+}
+[10:52:08.895] INFO (#602): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.110542,
+}
+(pass) Drizzle service > activates once, binds models and transactions, and disposes once [26.34ms]
+(pass) Drizzle service > validates schema models and reserved extensions [0.23ms]
+
+ 3 pass
+ 0 fail
+ 33 expect() calls
+Ran 3 tests across 2 files. [5.21s]

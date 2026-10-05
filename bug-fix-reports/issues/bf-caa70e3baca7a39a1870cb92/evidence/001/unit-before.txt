@@ -1,0 +1,41 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+stdout | packages/better-auth/tests/auth/reentrant-acquisition.test.ts > auth acquisition inherits a transaction lease without retaining it for later calls
+[14:59:13.957] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.517541
+}
+
+stdout | packages/better-auth/tests/auth/reentrant-acquisition.test.ts > auth acquisition inherits a transaction lease without retaining it for later calls
+[14:59:14.965] ERROR (#1): Error: Auth acquisition deadlocked
+    at Timeout._onTimeout (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/reentrant-acquisition.test.ts:22:47)
+    at listOnTimeout (node:internal/timers:605:17)
+    at processTimers (node:internal/timers:541:7) {
+  [cause]: undefined
+}
+
+ ❯ packages/better-auth/tests/auth/reentrant-acquisition.test.ts (1 test | 1 failed) 1019ms
+   × auth acquisition inherits a transaction lease without retaining it for later calls 1018ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/better-auth/tests/auth/reentrant-acquisition.test.ts > auth acquisition inherits a transaction lease without retaining it for later calls
+Error: Auth acquisition deadlocked
+ ❯ Timeout._onTimeout packages/better-auth/tests/auth/reentrant-acquisition.test.ts:22:47
+     20|       database.context.transaction(() => activateBetterAuthService(des…
+     21|       new Promise<never>((_resolve, reject) => {
+     22|         const timer = setTimeout(() => reject(new Error("Auth acquisit…
+       |                                               ^
+     23|         timer.unref();
+     24|       }),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:59:12
+   Duration  2.17s (tests 49%, import 29%, transform 23%)

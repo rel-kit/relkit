@@ -1,0 +1,51 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/floating-point.test.ts:
+[12:01:07.863] INFO (#4): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 1.429291,
+}
+[12:01:07.878] INFO (#6): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findMany",
+  outcome: "success",
+  duration_ms: 4.639041,
+}
+[12:01:07.880] INFO (#8): Execution operation completed {
+  domain: "runtime",
+  operation: "database.insert",
+  outcome: "success",
+  duration_ms: 1.510416,
+}
+[12:01:07.883] INFO (#10): Execution operation completed {
+  domain: "runtime",
+  operation: "database.update",
+  outcome: "success",
+  duration_ms: 2.209958,
+}
+[12:01:07.888] ERROR (#12): Execution operation failed {
+  domain: "runtime",
+  operation: "database.insert",
+  outcome: "failure",
+  duration_ms: 2.835667,
+}
+[12:01:07.889] INFO (#14): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findOne",
+  outcome: "success",
+  duration_ms: 0.5425,
+}
+[12:01:07.891] INFO (#17): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.2165,
+}
+(pass) portable CRUD preserves large native SQLite REAL values [62.38ms]
+
+ 1 pass
+ 0 fail
+ 5 expect() calls
+Ran 1 test across 1 file. [396.00ms]

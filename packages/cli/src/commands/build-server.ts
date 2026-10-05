@@ -39,6 +39,7 @@ export function serverSource(
   } = serverSourceOptions(graph, activation);
   return `import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash } from "node:crypto";
+import { Effect } from "effect";
 ${providerOverridesImport}
 import { assertAgentRuntimeDependencies, createGeneratedAgentFunction, invokeAgent, releaseAgentPersistence } from "@relkit/agents";
 import { createApplicationContextResolver } from "@relkit/app";
@@ -49,7 +50,7 @@ import { createRegistrationPlan } from "@relkit/graph";
 import { installInspectorEndpoints, InspectorQueryError } from "@relkit/inspector-api";
 import { currentExecutionContext, publicTrace } from "@relkit/invocation";
 import { createObservabilityRuntime, createTelemetryExporterFanout } from "@relkit/observability";
-import { consoleHumanSink, formatHumanLog, stdoutJsonSink, redactFailureDetail } from "@relkit/runtime-effect";
+import { consoleHumanSink, createLoggerLayer, formatHumanLog, stdoutJsonSink, redactFailureDetail } from "@relkit/runtime-effect";
 import { createApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "@relkit/runtime-hono";
 import { honoWebSocket, upgradeWebSocket } from "@relkit/runtime-hono/bun";
 import { createProviderRealtimeDispatcher, setActiveRealtimeDispatcher } from "@relkit/realtime";
@@ -104,6 +105,18 @@ const application = runtimeManifest.application;
 if (application === undefined) throw new Error("Runtime application metadata is unavailable.");
 const environmentResolution = resolveRuntimeEnvironment(application.env, environment, sourceValues);
 const values = environmentResolution.values;
+const specializedInstrumentation = await Effect.runPromise(
+  Effect.context().pipe(
+    Effect.annotateLogs({ generationId, graphHash, source: "direct" }),
+    Effect.provide(createLoggerLayer({
+      component: "runtime.specialized",
+      minimumLevel: process.env.RELKIT_DEV_LOGS === "1" ? "all" : "info",
+      collector: telemetry,
+      human: { write: (_line, record) => writeRuntimeLog(record) },
+      json: false,
+    })),
+  ),
+);
 const databaseNode = plan.services?.find((service) => service.capability?.kind === "drizzle");
 const authNode = plan.services?.find((service) => service.capability?.kind === "better-auth");
 const databaseStartup = createDatabaseRegistration(databaseNode, runtimeManifest.services, values);

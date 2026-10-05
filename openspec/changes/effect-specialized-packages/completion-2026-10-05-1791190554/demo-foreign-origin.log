@@ -1,0 +1,22 @@
+12 |     idempotencyKey: crypto.randomUUID(), input: { name: "Foreign origin" } }),
+13 |   signal: AbortSignal.timeout(10000),
+14 | });
+15 | const body = await response.json();
+16 | assert.equal(response.status, 403);
+17 | assert.equal(body.error.code, "RELKIT_ORIGIN_DENIED");
+            ^
+AssertionError: Expected values to be strictly equal:
++ actual - expected
+
++ undefined
+- 'RELKIT_ORIGIN_DENIED'
+
+ generatedMessage: true,
+     actual: undefined,
+   expected: "RELKIT_ORIGIN_DENIED",
+   operator: "strictEqual",
+       code: "ERR_ASSERTION"
+
+      at /private/tmp/relkit-effect-specialized-foreign-origin.mjs:17:8
+
+Bun v1.3.10 (macOS arm64)

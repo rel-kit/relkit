@@ -1,0 +1,2 @@
+$ bun run scripts/check-boundaries.ts
+Boundary check passed (60 roots, 4136 TypeScript files).

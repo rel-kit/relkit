@@ -1,0 +1,104 @@
+[20:16:49.449] INFO (#8): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 50.696084,
+}
+[20:16:49.764] INFO (#10): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 314.1695,
+}
+[20:16:49.798] INFO (#11): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 33.147334,
+}
+[20:16:49.813] INFO (#12): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 14.28925,
+}
+PASS generated agent executes a RELKIT tool and persists its consumed response
+{"runStatus":"succeeded","duplicate":true,"observationKinds":["message-updated","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","message-updated","execution-event","message-updated","execution-event","message-updated","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","tool-started","tool-input-ready","tool-executing","tool-succeeded","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","message-updated","execution-event","message-updated","execution-event","message-updated","execution-event","execution-event","execution-event","message-updated","execution-event","message-updated","execution-event","message-updated","execution-event","execution-event","execution-event","execution-event","execution-event","execution-event","message-updated","message-updated","run-finished","snapshot"]}
+[20:16:50.470] INFO (#14): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 24.964417,
+}
+PASS generated AG-UI stream emits native state and a completed assistant response
+{"types":["RUN_STARTED","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","TEXT_MESSAGE_START","TEXT_MESSAGE_CONTENT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","TOOL_CALL_START","TOOL_CALL_ARGS","TOOL_CALL_END","CUSTOM","CUSTOM","TOOL_CALL_RESULT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","TEXT_MESSAGE_START","TEXT_MESSAGE_CONTENT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","TEXT_MESSAGE_START","TEXT_MESSAGE_CONTENT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","CUSTOM","CUSTOM","CUSTOM","STATE_SNAPSHOT","CUSTOM","TEXT_MESSAGE_START","TEXT_MESSAGE_CONTENT","TOOL_CALL_RESULT","TEXT_MESSAGE_END","TEXT_MESSAGE_END","TEXT_MESSAGE_END","TEXT_MESSAGE_END","RUN_FINISHED"],"runStatus":"succeeded","todos":[{"content":"Answer the greeting","status":"completed"}]}
+[20:16:50.489] ERROR (#16): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 18.43125,
+}
+PASS generated agent rejects invalid input before acceptance
+{"rejectedCode":"BAD_REQUEST","httpStatus":400}
+PASS generated SSE function emits ordered items and one completion
+{"items":[1,2,3],"completions":1}
+PASS generated SSE failure stays explicit and redacts private error details
+{"firstItem":true,"errorFrame":true,"privateDetailsRedacted":true}
+PASS generated stream delivers incrementally and records consumer cancellation
+{"firstItemMs":39,"outcome":"cancelled","requestId":"request-e4e89807-5db7-46ba-94c9-b5874ba14d40"}
+[20:16:51.800] INFO (#17): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 8.820458,
+}
+[20:16:51.828] INFO (#18): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 6.61925,
+}
+[20:16:52.360] INFO (#19): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 8.691209,
+}
+[20:16:52.406] INFO (#20): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 14.32775,
+}
+[20:16:52.451] INFO (#21): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 17.756333,
+}
+PASS generated realtime fans out, isolates topics, replays and releases presence on abort
+{"subscribers":2,"lateReplay":[1,2],"resumedReplay":[2],"finalConnections":0}
+[20:16:52.628] INFO (#24): Execution operation completed {
+  domain: "client",
+  operation: "rpc.connect",
+  outcome: "success",
+  duration_ms: 8.485292,
+}
+[20:16:52.635] INFO (#22): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 18.476958,
+}
+PASS generated realtime publishes and consumes the same event over WebSocket
+{"event":"changed","payload":{"value":7},"transport":"WebSocket"}
+[20:16:52.945] INFO (#27): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 38.422125,
+}
+Invalid realtime parameters received: {"code":"BAD_REQUEST","message":"Channel params validation failed."}
+PASS generated realtime rejects invalid channel parameters
+{"rejectedCode":"BAD_REQUEST"}
+9/9 generated-host checks passed
