@@ -1,0 +1,730 @@
+12:02:12.357 INFO  relkit            Starting development server
+09:02:13 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=41.182958 operation=observability.emit outcome=success
+09:02:13 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=188.298541 operation=activation.source-change outcome=success
+12:02:13.206 INFO  build             Compiling application
+12:02:21.777 WARN  inspector         ⚠ Slow filesystem detected. The benchmark took 930ms. If
+                                     /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/apps/inspector/.next/dev
+                                     is a network drive, consider moving it to a local folder.
+12:02:22.020 WARN  inspector         See more: https://nextjs.org/docs/app/guides/local-development
+09:02:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=25740.316125 operation=candidate.compile outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=25802.918417 operation=candidate.start outcome=success
+09:02:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=15.457 operation=observability.emit outcome=failure
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.055083 operation=observability.emit outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=23.202542 operation=activation.compile.succeeded outcome=success
+09:02:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.08975 operation=observability.emit outcome=failure
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.056 operation=observability.emit outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.663042 operation=activation.start.succeeded outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=643.247625 operation=candidate.verify outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.264125 operation=observability.emit outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.036125 operation=observability.emit outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.300042 operation=activation.verification.succeeded outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.182083 operation=proxy.switch outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.429917 operation=observability.emit outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.029834 operation=observability.emit outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.380916 operation=activation.switch outcome=success
+12:02:39.779 INFO  build             Compiled in 26573ms
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=28.233375 operation=observability.append outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.987166 operation=observability.append outcome=success
+12:02:39.803 INFO  server            Ready
+                                     API        http://127.0.0.1:3000
+                                     Inspector  http://127.0.0.1:3210
+                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=10.637417 operation=observability.append outcome=success
+09:02:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.854833 operation=observability.append outcome=success
+09:03:03 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=8.174 operation=proxy.request outcome=success
+12:03:20.582 INFO  hello.hello       hello invoked
+                                     {"name":"Regression"}
+09:03:20 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=103.561875 operation=proxy.request outcome=success
+12:03:20.602 INFO  http              GET /hello → 200 in 75ms
+09:03:20 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=59.344667 operation=proxy.request outcome=success
+12:03:20.658 INFO  http              POST /echo → 200 in 33ms
+09:03:20 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=61.073292 operation=proxy.request outcome=success
+12:03:20.747 INFO  http              POST /orders → 201 in 56ms
+12:03:20.781 INFO  demo.example      demo.write.started
+                                     {"value":"regression-1791191000504"}
+12:03:20.877 INFO  demo.example      demo.write.completed
+                                     {"value":"regression-1791191000504"}
+09:03:20 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=134.956625 operation=proxy.request outcome=success
+12:03:20.886 INFO  http              POST /demo → 201 in 130ms
+12:03:20.936 INFO  demo.on-example   on-example
+                                     {"value":"regression-1791191000504"}
+09:03:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=218.8065 operation=proxy.request outcome=success
+12:03:21.011 INFO  http              GET /demo → 200 in 120ms
+09:03:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.632583 operation=proxy.request outcome=success
+12:03:21.138 WARN  http              POST /demo → 422 in 24ms
+                                     request: request-96a7a684-60d2-4c55-8eb4-94ea65f118b3
+                                     trace: 37be81c124062789901f52e279c2297c
+09:03:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=59.997083 operation=proxy.request outcome=success
+12:03:21.183 ERROR http              POST /demo → 500 in 39ms
+                                     request: request-3935fb46-4ab7-4b4c-9e40-8b252569dea8
+                                     trace: 329201f235323efed822245850c85dda
+09:03:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=11.16 operation=proxy.request outcome=success
+09:03:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.470167 operation=proxy.request outcome=success
+12:03:21.216 WARN  http              GET /missing-regression-route → 404 in 8ms
+                                     request: request-618a8716-5ed1-40ea-a948-f29be268524b
+                                     trace: f245b33afa998036ffbb74d2d2fcc415
+12:03:21.264 INFO  demo.delete       demo.deleted
+                                     {"value":"regression-1791191000504"}
+09:03:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=52.907541 operation=proxy.request outcome=success
+12:03:21.273 INFO  http              DELETE /demo → 200 in 51ms
+09:03:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=78.415 operation=proxy.request outcome=success
+12:03:21.353 INFO  http              GET /demo → 200 in 75ms
+12:03:21.384 INFO  demo.example      demo.write.started
+                                     {"value":"inspector-sample"}
+12:03:21.473 INFO  demo.example      demo.write.completed
+                                     {"value":"inspector-sample"}
+09:03:21 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=132.518208 operation=proxy.request outcome=success
+12:03:21.487 INFO  http              POST /demo → 201 in 127ms
+12:03:21.514 INFO  demo.on-example   on-example
+                                     {"value":"inspector-sample"}
+09:03:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=8.068958 operation=proxy.request outcome=success
+09:03:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.403792 operation=proxy.request outcome=success
+12:03:51.599 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.836125 operation=control.parse
+                                     outcome=success
+12:03:51.601 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.228792
+                                     operation=resolveCandidate outcome=success
+12:03:51.620 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=2.305625
+                                     operation=resolveActiveGeneration outcome=success
+12:03:51.619 INFO  hello.hello       hello invoked
+                                     {"name":"Origin validation"}
+12:03:51.628 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=25.226083
+                                     operation=dispatchInspectorAction outcome=success
+12:03:51.628 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.081125 operation=control.audit
+                                     outcome=success
+12:03:51.629 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=26.572583
+                                     operation=control.dispatch outcome=success
+09:03:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=44.224459 operation=proxy.request outcome=success
+12:03:51.654 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=32.321958
+                                     operation=control.execute outcome=success
+12:03:51.653 INFO  demo.example      demo.write.started
+                                     {"value":"validation-64637d04-9b51-4428-b9ad-8a6a914cc48c"}
+12:03:51.669 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.084417 operation=control.parse
+                                     outcome=success
+12:03:51.670 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.012917
+                                     operation=resolveCandidate outcome=success
+12:03:51.680 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.482833
+                                     operation=resolveActiveGeneration outcome=success
+12:03:51.680 INFO  hello.hello       hello invoked
+                                     {"name":"Origin validation"}
+12:03:51.688 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=16.454625
+                                     operation=dispatchInspectorAction outcome=success
+12:03:51.688 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.022459 operation=control.audit
+                                     outcome=success
+12:03:51.689 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=17.230667
+                                     operation=control.dispatch outcome=success
+09:03:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=58.265458 operation=proxy.request outcome=success
+12:03:51.723 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=18.671167
+                                     operation=control.execute outcome=success
+12:03:51.706 INFO  http              GET /rpc → 200 in 7ms
+12:03:51.782 INFO  demo.example      demo.write.completed
+                                     {"value":"validation-64637d04-9b51-4428-b9ad-8a6a914cc48c"}
+09:03:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=203.573125 operation=proxy.request outcome=success
+12:03:51.792 INFO  http              POST /demo → 201 in 164ms
+12:03:51.856 INFO  demo.on-example   on-example
+                                     {"value":"validation-64637d04-9b51-4428-b9ad-8a6a914cc48c"}
+09:03:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=120.318208 operation=proxy.request outcome=success
+12:03:51.914 INFO  http              GET /demo → 200 in 116ms
+12:03:51.921 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.015125
+                                     operation=resolveCandidate outcome=success
+12:03:51.921 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.589333
+                                     operation=resolveActiveGeneration outcome=success
+12:03:51.939 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=1.039042 operation=query.access
+                                     outcome=success
+12:03:51.940 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=17.169875
+                                     operation=eventRuntimeList outcome=success
+12:03:51.940 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=17.725709 operation=runtimeList
+                                     outcome=success
+09:03:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=24.532917 operation=proxy.request outcome=success
+12:03:51.948 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=18.190042 operation=query.project
+                                     outcome=success
+12:03:51.949 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.011584
+                                     operation=resolveCandidate outcome=success
+12:03:51.949 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.52375
+                                     operation=resolveActiveGeneration outcome=success
+12:03:51.950 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.844584 operation=query.access
+                                     outcome=success
+12:03:51.951 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.691959 operation=runtimeItems
+                                     outcome=success
+09:03:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=9.215333 operation=proxy.request outcome=success
+12:03:51.953 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=1.937917 operation=runtimeDetail
+                                     outcome=success
+12:03:51.979 INFO  app               09:03:51 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=2.247 operation=query.project
+                                     outcome=success
+09:03:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1001.381541 operation=proxy.websocket outcome=success
+09:03:52 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=7.994833 operation=observability.list outcome=success
+09:03:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=741.105875 operation=proxy.intercept outcome=success
+09:03:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=43.326792 operation=proxy.request outcome=success
+09:03:52 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=13.190667 operation=observability.list outcome=success
+09:03:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=16.406375 operation=proxy.intercept outcome=success
+12:03:52.737 ERROR http              POST /demo → 500 in 32ms
+                                     request: request-279a7e59-2184-4cb0-9244-0c306b9b5995
+                                     trace: f2938812728d5dbc94ee8b22b40db068
+09:03:52 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=65.765417 operation=observability.list outcome=success
+09:03:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=66.760625 operation=proxy.intercept outcome=success
+12:04:52.115 INFO  demo.example      demo.write.started
+                                     {"value":"browser-validation-17783571-a2d2-4ab1-9f9f-5fffc4a3db84"}
+12:04:52.206 INFO  demo.example      demo.write.completed
+                                     {"value":"browser-validation-17783571-a2d2-4ab1-9f9f-5fffc4a3db84"}
+09:04:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=143.282 operation=proxy.request outcome=success
+12:04:52.216 INFO  http              POST /demo → 201 in 135ms
+12:04:52.235 INFO  demo.on-example   on-example
+                                     {"value":"browser-validation-17783571-a2d2-4ab1-9f9f-5fffc4a3db84"}
+09:04:53 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.426042 operation=proxy.request outcome=success
+09:04:53 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.791125 operation=proxy.request outcome=success
+12:04:57.374 INFO  inspector         ○ Compiling /graph ...
+09:05:00 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=12.315625 operation=observability.open outcome=success
+09:05:00 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=73.121666 operation=proxy.intercept outcome=success
+09:05:00 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=2.741958 operation=observability.open outcome=success
+09:05:00 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.862875 operation=proxy.intercept outcome=success
+09:05:00 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=39.757666 operation=proxy.request outcome=success
+09:05:00 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.058375 operation=proxy.request outcome=success
+09:05:00 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=15.45375 operation=proxy.request outcome=success
+09:05:00 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=16.697333 operation=proxy.request outcome=success
+09:05:00 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=15.103583 operation=proxy.request outcome=success
+09:05:00 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.76275 operation=proxy.request outcome=success
+09:05:03 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=2.064167 operation=observability.open outcome=success
+09:05:03 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.365292 operation=proxy.intercept outcome=success
+09:05:03 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.076834 operation=proxy.request outcome=success
+12:05:03.863 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.181166
+                                     operation=resolveCandidate outcome=success
+12:05:03.864 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=2.549459
+                                     operation=resolveActiveGeneration outcome=success
+09:05:03 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.916375 operation=observability.open outcome=success
+09:05:03 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=18.919166 operation=proxy.intercept outcome=success
+12:05:03.891 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=3.479 operation=query.access
+                                     outcome=success
+12:05:03.899 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=39.847833 operation=graphList
+                                     outcome=success
+09:05:03 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=59.469958 operation=proxy.request outcome=success
+09:05:03 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=29.353958 operation=proxy.request outcome=success
+12:05:03.916 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=40.428167 operation=query.project
+                                     outcome=success
+12:05:03.916 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.03275 operation=resolveCandidate
+                                     outcome=success
+12:05:03.917 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.721625
+                                     operation=resolveActiveGeneration outcome=success
+12:05:03.937 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=1.072542 operation=query.access
+                                     outcome=success
+09:05:03 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=27.767625 operation=proxy.request outcome=success
+12:05:03.938 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=19.901416 operation=graphList
+                                     outcome=success
+12:05:03.967 INFO  app               09:05:03 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=20.350209 operation=query.project
+                                     outcome=success
+12:05:04.006 INFO  app               09:05:04 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.01375 operation=resolveCandidate
+                                     outcome=success
+12:05:04.007 INFO  app               09:05:04 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.555416
+                                     operation=resolveActiveGeneration outcome=success
+12:05:04.028 INFO  app               09:05:04 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.883334 operation=query.access
+                                     outcome=success
+09:05:04 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=25.94925 operation=proxy.request outcome=success
+12:05:04.030 INFO  app               09:05:04 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=20.813667 operation=graphList
+                                     outcome=success
+12:05:04.058 INFO  app               09:05:04 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=21.208333 operation=query.project
+                                     outcome=success
+09:05:06 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.309333 operation=proxy.request outcome=success
+12:05:06.372 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.0135 operation=resolveCandidate
+                                     outcome=success
+12:05:06.374 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.612625
+                                     operation=resolveActiveGeneration outcome=success
+09:05:06 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.951459 operation=observability.open outcome=success
+09:05:06 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=20.841291 operation=proxy.intercept outcome=success
+12:05:06.399 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.981625 operation=query.access
+                                     outcome=success
+12:05:06.404 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=30.351625
+                                     operation=eventRuntimeList outcome=success
+12:05:06.405 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=30.906291 operation=runtimeList
+                                     outcome=success
+09:05:06 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=36.024958 operation=proxy.request outcome=success
+09:05:06 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=24.252292 operation=proxy.request outcome=success
+09:05:06 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=29.261083 operation=proxy.request outcome=success
+09:05:06 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=24.471459 operation=proxy.request outcome=success
+12:05:06.424 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=31.188334 operation=query.project
+                                     outcome=success
+12:05:06.425 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.033459
+                                     operation=resolveCandidate outcome=success
+12:05:06.425 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.485541
+                                     operation=resolveActiveGeneration outcome=success
+12:05:06.447 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.766833 operation=query.access
+                                     outcome=success
+12:05:06.448 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=21.454042
+                                     operation=eventRuntimeList outcome=success
+12:05:06.449 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=22.143417 operation=runtimeList
+                                     outcome=success
+09:05:06 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=29.729667 operation=proxy.request outcome=success
+09:05:06 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.888167 operation=observability.open outcome=success
+09:05:06 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=52.857833 operation=proxy.intercept outcome=success
+12:05:06.488 INFO  app               09:05:06 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=23.144417 operation=query.project
+                                     outcome=success
+09:05:08 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=3.725459 operation=observability.open outcome=success
+09:05:08 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.634583 operation=proxy.intercept outcome=success
+09:05:08 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=27.920375 operation=proxy.request outcome=success
+09:05:08 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=17.212375 operation=proxy.request outcome=success
+12:05:08.853 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.020583
+                                     operation=resolveCandidate outcome=success
+12:05:08.856 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.92525
+                                     operation=resolveActiveGeneration outcome=success
+12:05:08.856 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=1.405 operation=query.access
+                                     outcome=success
+12:05:08.857 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.866125 operation=runtimeItems
+                                     outcome=success
+12:05:08.858 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=3.083584 operation=runtimeList
+                                     outcome=success
+12:05:08.858 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=4.770875 operation=query.project
+                                     outcome=success
+12:05:08.859 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=2.898292
+                                     operation=resolveCandidate outcome=success
+12:05:08.859 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=8.753291
+                                     operation=resolveActiveGeneration outcome=success
+12:05:08.884 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=9.2335 operation=query.access
+                                     outcome=success
+12:05:08.916 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=65.851 operation=graphDetail
+                                     outcome=success
+09:05:08 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=103.820916 operation=proxy.request outcome=success
+09:05:08 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=27.758208 operation=proxy.request outcome=success
+12:05:08.933 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=67.544375 operation=query.project
+                                     outcome=success
+12:05:08.934 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.016584
+                                     operation=resolveCandidate outcome=success
+12:05:08.934 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.587875
+                                     operation=resolveActiveGeneration outcome=success
+12:05:08.935 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.93 operation=query.access
+                                     outcome=success
+12:05:08.935 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.559042 operation=runtimeItems
+                                     outcome=success
+12:05:08.935 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.944917 operation=runtimeList
+                                     outcome=success
+09:05:08 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=49.936167 operation=proxy.request outcome=success
+12:05:08.936 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=1.228917 operation=query.project
+                                     outcome=success
+12:05:08.937 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.012458
+                                     operation=resolveCandidate outcome=success
+12:05:08.937 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.785083
+                                     operation=resolveActiveGeneration outcome=success
+12:05:08.965 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=1.239208 operation=query.access
+                                     outcome=success
+12:05:08.974 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=39.935459 operation=graphDetail
+                                     outcome=success
+09:05:08 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=50.605375 operation=proxy.request outcome=success
+12:05:08.980 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=40.305125 operation=query.project
+                                     outcome=success
+12:05:08.980 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.012208
+                                     operation=resolveCandidate outcome=success
+12:05:08.981 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.478583
+                                     operation=resolveActiveGeneration outcome=success
+09:05:08 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=57.6005 operation=proxy.request outcome=success
+12:05:09.000 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.777084 operation=query.access
+                                     outcome=success
+12:05:09.001 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=17.227666 operation=bucketObjects
+                                     outcome=success
+12:05:09.029 INFO  app               09:05:08 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=17.699 operation=query.project
+                                     outcome=success
+09:05:09 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=1.054667 operation=observability.open outcome=success
+09:05:09 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=180.535708 operation=proxy.intercept outcome=success
+09:05:09 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.949 operation=proxy.request outcome=success
+09:05:11 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=7.372208 operation=observability.open outcome=success
+09:05:11 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=10.684375 operation=proxy.intercept outcome=success
+12:05:11.919 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.017833
+                                     operation=resolveCandidate outcome=success
+12:05:11.921 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=2.108041
+                                     operation=resolveActiveGeneration outcome=success
+12:05:11.922 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=2.893041 operation=query.access
+                                     outcome=success
+09:05:11 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=37.289708 operation=observability.list outcome=success
+09:05:11 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=39.665791 operation=proxy.intercept outcome=success
+12:05:11.948 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.094583 operation=runtimeItems
+                                     outcome=success
+12:05:11.951 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=35.651208 operation=runtimeItems
+                                     outcome=success
+12:05:11.952 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.024375 operation=runtimeItems
+                                     outcome=success
+12:05:11.953 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.01025 operation=runtimeItems
+                                     outcome=success
+12:05:11.953 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=37.130708 operation=runtimeItems
+                                     outcome=success
+12:05:11.955 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=38.013584 operation=runtimeItems
+                                     outcome=success
+12:05:11.955 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=6.878167 operation=jobs.run-pages
+                                     outcome=success
+12:05:11.957 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=36.761083 operation=jobs.aggregate
+                                     outcome=success
+12:05:11.957 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=40.608958 operation=jobs.list-runs
+                                     outcome=success
+12:05:11.960 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=41.070625 operation=jobs.summary
+                                     outcome=success
+12:05:11.960 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=48.369958
+                                     operation=runtimeSnapshot outcome=success
+09:05:11 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=70.515458 operation=proxy.request outcome=success
+09:05:11 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=43.315208 operation=proxy.request outcome=success
+09:05:11 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.283792 operation=proxy.request outcome=success
+12:05:11.981 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=49.075209 operation=query.project
+                                     outcome=success
+12:05:11.983 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.013584
+                                     operation=resolveCandidate outcome=success
+12:05:11.986 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.571917
+                                     operation=resolveActiveGeneration outcome=success
+12:05:11.987 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.878709 operation=query.access
+                                     outcome=success
+12:05:12.020 INFO  app               09:05:11 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.016 operation=runtimeItems
+                                     outcome=success
+12:05:12.060 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=76.752958 operation=runtimeItems
+                                     outcome=success
+12:05:12.061 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.011916 operation=runtimeItems
+                                     outcome=success
+12:05:12.062 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.007541 operation=runtimeItems
+                                     outcome=success
+12:05:12.062 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=77.606375 operation=runtimeItems
+                                     outcome=success
+12:05:12.063 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=77.974917 operation=runtimeItems
+                                     outcome=success
+12:05:12.063 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=1.9545 operation=jobs.run-pages
+                                     outcome=success
+12:05:12.063 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=73.447916 operation=jobs.aggregate
+                                     outcome=success
+12:05:12.064 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=78.80075 operation=jobs.list-runs
+                                     outcome=success
+09:05:12 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=87.466958 operation=proxy.request outcome=success
+12:05:12.066 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=79.05825 operation=jobs.summary
+                                     outcome=success
+12:05:12.067 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=80.224291
+                                     operation=runtimeSnapshot outcome=success
+12:05:12.091 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=80.859667 operation=query.project
+                                     outcome=success
+12:05:12.092 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.026459
+                                     operation=resolveCandidate outcome=success
+12:05:12.092 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.537958
+                                     operation=resolveActiveGeneration outcome=success
+12:05:12.092 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.929083 operation=query.access
+                                     outcome=success
+12:05:12.102 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.012333 operation=runtimeItems
+                                     outcome=success
+12:05:12.103 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=18.161083 operation=runtimeItems
+                                     outcome=success
+12:05:12.103 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.009042 operation=runtimeItems
+                                     outcome=success
+12:05:12.104 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=0.007167 operation=runtimeItems
+                                     outcome=success
+12:05:12.104 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=18.884917 operation=runtimeItems
+                                     outcome=success
+12:05:12.104 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=19.230125 operation=runtimeItems
+                                     outcome=success
+12:05:12.105 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=1.665958 operation=jobs.run-pages
+                                     outcome=success
+12:05:12.105 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=18.966416 operation=jobs.aggregate
+                                     outcome=success
+12:05:12.105 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=19.942042 operation=jobs.list-runs
+                                     outcome=success
+09:05:12 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=97.714625 operation=proxy.request outcome=success
+12:05:12.107 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=20.166458 operation=jobs.summary
+                                     outcome=success
+12:05:12.107 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=21.095416
+                                     operation=runtimeSnapshot outcome=success
+12:05:12.136 INFO  app               09:05:12 INFO inspector Execution operation completed
+                                     domain=inspector duration_ms=21.319875 operation=query.project
+                                     outcome=success
+09:05:12 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.919458 operation=observability.open outcome=success
+09:05:12 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=578.545583 operation=proxy.intercept outcome=success
+09:05:12 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.644042 operation=observability.open outcome=success
+09:05:12 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.485125 operation=observability.open outcome=success
+09:05:12 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=580.899167 operation=proxy.intercept outcome=success
+09:05:12 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=571.545625 operation=proxy.intercept outcome=success
+09:05:12 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=6.901834 operation=observability.list outcome=success
+09:05:12 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=555.352584 operation=proxy.intercept outcome=success
+09:05:12 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=11.649917 operation=observability.list outcome=success
+09:05:12 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=519.995375 operation=proxy.intercept outcome=success
+09:05:17 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=9.608541 operation=observability.open outcome=success
+09:05:17 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=17.401042 operation=proxy.intercept outcome=success
+09:05:17 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=27.312959 operation=observability.list outcome=success
+09:05:17 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=31.180791 operation=proxy.intercept outcome=success
+09:05:30 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.369167 operation=proxy.request outcome=success
+09:05:30 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.225875 operation=proxy.request outcome=success
+12:05:30.678 WARN  app               91 | export function assertWebSocketOrigin(request, options) {
+12:05:30.679 WARN  app               92 | const origin = request.headers.get("origin");
+12:05:30.679 WARN  app               93 | if (origin === null ||
+12:05:30.679 WARN  app               94 | origin === "null" ||
+12:05:30.680 WARN  app               95 | (origin !== new URL(request.url).origin &&
+                                     !allowedOrigins(options.allowedOrigins).has(origin))) {
+12:05:30.680 WARN  app               96 | throw new TransportSecurityError("ORIGIN_DENIED",
+                                     "WebSocket origin is not allowed.");
+                                     ^
+09:05:30 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=133.007833 operation=proxy.websocket outcome=failure
+12:05:30.708 WARN  app               TransportSecurityError: WebSocket origin is not allowed.
+                                     code: "ORIGIN_DENIED"
+                                     at assertWebSocketOrigin
+                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:96:15)
+                                     at assertWebSocketRequest
+                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:107:5)
+12:05:30.684 ERROR http              GET /rpc → 500 in 130ms
+                                     request: request-e5584aa7-fcdd-40a0-b15a-d08f968f4311
+                                     trace: c162a980d59322656b054cee34f9b324
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.065 operation=proxy.request outcome=success
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.7415 operation=proxy.request outcome=success
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.416916 operation=proxy.request outcome=success
+12:06:43.390 INFO  relkit            Stopping development server
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.509459 operation=proxy.stop outcome=success
+12:06:43.404 ERROR relkit            Telemetry storage unavailable; restart dev to recover
+                                     Telemetry worker exited (null):
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=244383.162583 operation=candidate.output outcome=success
+09:06:43 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=244316.680667 operation=candidate.exit outcome=failure
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.689417 operation=candidate.stop outcome=success
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=43.564375 operation=generation.drain outcome=success
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.095209 operation=observability.flush outcome=success
+12:06:43.745 INFO  relkit            Development server stopped
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.271542 operation=watcher.stopAdmission outcome=success
+09:06:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.170875 operation=watcher.close outcome=success

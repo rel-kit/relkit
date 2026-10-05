@@ -1,0 +1,13 @@
+{
+  "project": "demo",
+  "label": "demo-typecheck",
+  "command": [
+    "rtk",
+    "bun",
+    "run",
+    "typecheck"
+  ],
+  "exitCode": 0,
+  "seconds": 40.43,
+  "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-typecheck.log"
+}
