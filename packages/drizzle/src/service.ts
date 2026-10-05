@@ -4,31 +4,22 @@ import { createInsertSchema, createSelectSchema, createUpdateSchema } from "driz
 import { getTableName } from "drizzle-orm";
 import { extractTables, inspectTables } from "./metadata.js";
 import { modelRuntimeOf, RESERVED_OPERATIONS } from "./model.js";
+import { effectSchemasFor } from "./table.schemas.js";
 import { DRIZZLE_RUNTIME, type DrizzleServiceRuntime } from "./runtime-types.js";
-import type {
-  ApplicationEnv,
-  DrizzleModelMap,
-  DrizzleOverrides,
-  DrizzleServiceDescriptor,
-  TablesOf,
-} from "./types.js";
+import type { DrizzleModelMap, DrizzleServiceDescriptor, TablesOf } from "./types.js";
 
-export interface DefineDrizzleServiceOptions<
-  Client,
-  Schema extends Readonly<Record<string, unknown>>,
-  Models extends DrizzleModelMap<TablesOf<Schema>>,
-> {
-  readonly id?: string;
-  readonly schema: Schema;
-  readonly client: (context: { readonly env: ApplicationEnv }) => Client | Promise<Client>;
-  readonly models?: Models;
-  readonly overrides?: DrizzleOverrides<TablesOf<Schema>>;
-  readonly dispose?: (database: Client) => unknown | Promise<unknown>;
-}
+import type { DefineDrizzleServiceOptions } from "./service.types.js";
+export type { DefineDrizzleServiceOptions } from "./service.types.js";
 
 /**
  * Defines the application's Drizzle service, table operations, and model customizations.
  * The client factory runs at activation, not during descriptor discovery.
+ * @typeParam Client - Native driver client retained by activation.
+ * @typeParam Schema - Authored tables and relations.
+ * @typeParam Models - Table extensions preserving caller arguments/results.
+ * @param options - Lazy client factory, schema, model/override and disposal policy.
+ * @returns Frozen descriptor and pure capabilities; no SDK work is started.
+ * @throws TypeError for invalid declarations, dialects, models or overrides.
  *
  * @example
  * ```ts
@@ -82,6 +73,11 @@ export function defineDrizzleService<
     overrides,
     metadata: inspection.metadata,
     zodSchemas,
+    effectSchemas: Object.freeze(
+      Object.fromEntries(
+        Object.entries(tables).map(([name, table]) => [name, effectSchemasFor(table)]),
+      ),
+    ),
     dialect: inspection.dialect,
   };
   const capability = Object.freeze({
@@ -120,17 +116,36 @@ export function defineDrizzleService<
   return Object.freeze(descriptor) as DrizzleServiceDescriptor<string, Client, Schema, Models>;
 }
 
+/**
+ * Reads the declared extension names for capability discovery.
+ * @param models - Pure authored model map.
+ * @param name - Schema table key.
+ * @returns Frozen declared custom methods, or an empty list.
+ */
 function capabilityMethods(models: object, name: string): readonly string[] {
   const model = (models as Record<string, { readonly extensionNames?: readonly string[] }>)[name];
   return model?.extensionNames ?? Object.freeze([]);
 }
 
+/**
+ * Resolves hidden runtime metadata without acquiring a client.
+ * @param value - Frozen service declaration.
+ * @returns Pure client factory/table metadata.
+ * @throws TypeError for unbranded declarations.
+ */
 export function drizzleRuntimeOf(value: object): DrizzleServiceRuntime {
   const runtime = (value as Record<PropertyKey, unknown>)[DRIZZLE_RUNTIME];
   if (!isRecord(runtime)) throw new TypeError("Invalid Drizzle service descriptor");
   return runtime as unknown as DrizzleServiceRuntime;
 }
 
+/**
+ * Validates extension table identity.
+ * @param tables - Discovered tables.
+ * @param models - Authored extensions.
+ * @returns Void after validation.
+ * @throws TypeError for unknown or mismatched tables.
+ */
 function validateModels(
   tables: Readonly<Record<string, unknown>>,
   models: Readonly<Record<string, unknown>>,
@@ -144,6 +159,14 @@ function validateModels(
   }
 }
 
+/**
+ * Checks override names and required keyless-table operations.
+ * @param tables - Discovered tables.
+ * @param overrides - Authored operation substitutions.
+ * @param metadata - Discovered unique selectors.
+ * @returns Void after validation.
+ * @throws TypeError for invalid overrides or uncovered keyless operations.
+ */
 function validateOverrides(
   tables: Readonly<Record<string, unknown>>,
   overrides: Readonly<Record<string, any>>,
@@ -168,6 +191,11 @@ function validateOverrides(
   }
 }
 
+/**
+ * Narrows opaque declaration records without acquiring clients.
+ * @param value - Unknown declaration.
+ * @returns Whether value is a non-array object.
+ */
 function isRecord(value: unknown): value is Record<PropertyKey, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
