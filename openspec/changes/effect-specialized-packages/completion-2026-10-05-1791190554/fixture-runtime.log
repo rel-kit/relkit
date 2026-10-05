@@ -1,0 +1,27 @@
+12:02:16.850 INFO  relkit            Starting development server
+09:02:18 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=11.374875 operation=observability.emit outcome=success
+09:02:18 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=537.56025 operation=activation.source-change outcome=success
+12:02:19.022 INFO  build             Compiling application
+12:02:24.016 WARN  inspector         ⨯ Another next dev server is already running.
+12:02:24.074 WARN  inspector         - PID: 9254
+12:02:24.116 WARN  inspector         - Dir:
+                                     /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/apps/inspector
+12:02:24.167 WARN  inspector         - Log: .next/dev/logs/next-development.log
+12:02:24.223 WARN  inspector         You can access the existing server at http://127.0.0.1:3210,
+12:02:24.359 WARN  inspector         or run kill 9254 to stop it and start a new one.
+12:02:24.374 WARN  inspector         error: script "dev" exited with code 1
+12:02:24.407 INFO  relkit            Stopping development server
+09:02:24 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=31.896375 operation=proxy.stop outcome=success
+09:02:24 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=9.62275 operation=observability.emit outcome=failure
+09:02:24 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.086708 operation=observability.emit outcome=success
+09:02:24 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=19.962458 operation=activation.compile.failed outcome=failure
+09:02:24 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.600542 operation=observability.flush outcome=success
+12:02:24.658 INFO  relkit            Development server stopped
+RELKIT_INTERNAL_ERROR: Inspector exited with code 1.

@@ -1,0 +1,23 @@
+$ bun test
+bun test v1.3.10 (30e609e0)
+
+tests/unit/review.agent.test.ts:
+(pass) review graph interrupts and resumes on an explicit thread [226.85ms]
+
+tests/unit/assistant.agent.test.ts:
+(pass) assistant runs native tools and todo middleware without a paid provider [77.16ms]
+
+tests/unit/hello.function.test.ts:
+(pass) hello returns a greeting [72.28ms]
+
+tests/unit/lookup.tool.test.ts:
+(pass) defineTool reuses the greeting function [19.70ms]
+(pass) MCP visibility can be disabled without disabling ordinary tool invocation [6.95ms]
+
+tests/integration/hello.route.test.ts:
+(pass) GET /hello [45.23ms]
+
+ 6 pass
+ 0 fail
+ 16 expect() calls
+Ran 6 tests across 5 files. [4.62s]

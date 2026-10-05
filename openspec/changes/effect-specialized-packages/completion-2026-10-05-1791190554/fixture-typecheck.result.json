@@ -1,0 +1,13 @@
+{
+  "project": "fixture",
+  "label": "fixture-typecheck",
+  "command": [
+    "rtk",
+    "bun",
+    "run",
+    "typecheck"
+  ],
+  "exitCode": 0,
+  "seconds": 45.39,
+  "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-typecheck.log"
+}
