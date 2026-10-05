@@ -1,0 +1,14 @@
+[FAIL] FAILURES:
+  (fail) generated host preserves database/auth ownership, rollback, session admission and shutdown [4559.06ms]
+  error: {"error":"internal-error"}
+  Expected: 200
+  Received: 500
+  at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/tests/integration/database/generated-host.test.ts:80:55)
+  at async <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/tests/integration/database/generated-host.test.ts:92:18)
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [5.38s]
+
+[full output: rtk recall df4bad757970]

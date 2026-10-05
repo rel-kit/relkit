@@ -1,0 +1,38 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/review-regressions.test.ts:
+[10:51:31.591] INFO (#6): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 1.057291,
+}
+[10:51:31.600] INFO (#10): Execution operation completed {
+  domain: "runtime",
+  operation: "database.extension",
+  outcome: "success",
+  duration_ms: 2.368541,
+}
+[10:51:31.603] INFO (#8): Execution operation completed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "success",
+  duration_ms: 8.352625,
+}
+[10:51:31.604] INFO (#13): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.186042,
+}
+{"before":{"committed":false,"disposed":false},"child":"fulfilled","committed":true,"disposed":true}
+(pass) public transaction APIs drain a detached child before SQLite commit and close [23.95ms]
+{"outcomes":["Success","Success","Success"]}
+(pass) installed PostgreSQL string bigint contracts accept native strings [1.47ms]
+{"result":[{"id":1}],"logs":1,"counters":1}
+(pass) standalone CRUD uses actual SQLite and records one outcome [4.03ms]
+
+ 3 pass
+ 0 fail
+ 10 expect() calls
+Ran 3 tests across 1 file. [350.00ms]

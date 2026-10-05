@@ -1,0 +1,2 @@
+$ bun run scripts/check-jsdoc.ts
+Checked rich JSDoc for 32 public authoring APIs.
