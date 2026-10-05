@@ -1,0 +1,1 @@
+{"base":"http://127.0.0.1:3330","http":{"status":403,"id":"ORIGIN_DENIED"},"websocket":{"opened":false,"closed":{"code":1002,"reason":"Expected 101 status code"},"error":"WebSocket connection to 'ws://127.0.0.1:3330/rpc' failed: Expected 101 status code"}}

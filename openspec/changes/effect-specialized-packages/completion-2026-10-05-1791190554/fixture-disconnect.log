@@ -1,0 +1,50 @@
+[12:10:23.002] INFO (#7): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 22.491583,
+}
+[12:10:28.225] INFO (#9): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 10.890333,
+}
+[
+  {
+    "method": "return",
+    "before": 1,
+    "samples": [
+      {
+        "elapsedMs": 46,
+        "connections": 0
+      },
+      {
+        "elapsedMs": 1086,
+        "connections": 0
+      },
+      {
+        "elapsedMs": 5130,
+        "connections": 0
+      }
+    ]
+  },
+  {
+    "method": "abort",
+    "before": 1,
+    "samples": [
+      {
+        "elapsedMs": 60,
+        "connections": 0
+      },
+      {
+        "elapsedMs": 1113,
+        "connections": 0
+      },
+      {
+        "elapsedMs": 5178,
+        "connections": 0
+      }
+    ]
+  }
+]

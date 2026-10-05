@@ -1,0 +1,13 @@
+{
+  "project": "fixture",
+  "label": "fixture-check",
+  "command": [
+    "rtk",
+    "bun",
+    "run",
+    "check"
+  ],
+  "exitCode": 0,
+  "seconds": 107.66,
+  "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-check.log"
+}

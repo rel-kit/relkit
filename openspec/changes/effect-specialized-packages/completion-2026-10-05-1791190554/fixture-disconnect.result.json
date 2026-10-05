@@ -1,0 +1,12 @@
+{
+  "project": "fixture",
+  "label": "fixture-disconnect",
+  "command": [
+    "rtk",
+    "bun",
+    "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo/scripts/verify-realtime-disconnect.mjs"
+  ],
+  "exitCode": 0,
+  "seconds": 10.81,
+  "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-disconnect.log"
+}
