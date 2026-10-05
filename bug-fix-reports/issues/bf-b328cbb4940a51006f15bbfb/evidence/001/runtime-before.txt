@@ -1,0 +1,55 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/floating-point.test.ts:
+[11:59:12.622] INFO (#4): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 2.200541,
+}
+[11:59:12.638] ERROR (#6): Execution operation failed {
+  domain: "runtime",
+  operation: "database.findMany",
+  outcome: "failure",
+  duration_ms: 9.234042,
+}
+[11:59:12.640] INFO (#9): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.249083,
+}
+399 |     return fromIssueExit(self);
+400 |   }
+401 |   return Effect.catchCause(self, cause => Effect.failCauseSync(() => Cause_.map(cause, issue => new SchemaError(issue))));
+402 | }
+403 | function fromIssueExit(exit) {
+404 |   return Exit_.isSuccess(exit) ? exit : Exit_.failCause(Cause_.map(exit.cause, issue => new SchemaError(issue)));
+                                                                                              ^
+error: Expected a value less than or equal to 140737488355327
+  at ["value"]
+      issue: Composite {
+  "~effect/SchemaIssue/Issue": "~effect/SchemaIssue/Issue",
+  _tag: "Composite",
+  ast: [Object ...],
+  issues: [
+    [Object ...]
+  ],
+},
+       _tag: "SchemaError",
+ ~effect/Schema/SchemaError: "~effect/Schema/SchemaError",
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Schema.js:404:89)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:164:23)
+      at map (1:11)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:161:33)
+      at fromIssueExit (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Schema.js:404:64)
+      at decodeTableValue (/Users/mustafaelsayed/Workspace/relkit/packages/drizzle/src/table.schemas.ts:53:43)
+      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:487:86)
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:438:23)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:821:17)
+(fail) portable CRUD preserves large native SQLite REAL values [50.68ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [444.00ms]

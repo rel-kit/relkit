@@ -1,0 +1,42 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit/packages/drizzle
+
+stdout | tests/effect/floating-point.test.ts > floating-point schemas accept native ranges and preserve column metadata
+[14:59:13.063] ERROR (#1): [Error [SchemaError]: Expected a value less than or equal to 140737488355327
+  at ["value"]] {
+  issue: Composite {
+    '~effect/SchemaIssue/Issue': '~effect/SchemaIssue/Issue',
+    _tag: 'Composite',
+    ast: Objects {
+      '~effect/Schema': '~effect/Schema',
+      annotations: undefined,
+      checks: undefined,
+      encoding: undefined,
+      context: undefined,
+      _tag: 'Objects',
+      propertySignatures: [Array],
+      indexSignatures: [],
+      encodingChecks: undefined
+    },
+    issues: [ [Pointer] ]
+  },
+  _tag: 'SchemaError',
+  '~effect/Schema/SchemaError': '~effect/Schema/SchemaError',
+  [cause]: undefined
+}
+
+ ❯ tests/effect/floating-point.test.ts (1 test | 1 failed) 9ms
+   × floating-point schemas accept native ranges and preserve column metadata 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/effect/floating-point.test.ts > floating-point schemas accept native ranges and preserve column metadata
+SchemaError: Expected a value less than or equal to 140737488355327
+  at ["value"]
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:59:12
+   Duration  381ms (import 79%, transform 16%, tests 3%, worker 1%)
