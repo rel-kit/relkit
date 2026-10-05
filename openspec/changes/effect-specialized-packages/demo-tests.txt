@@ -1,0 +1,41 @@
+$ bun test
+bun test v1.3.10 (30e609e0)
+
+tests/unit/orders.function.test.ts:
+(pass) createOrder invokes pricing [85.81ms]
+
+tests/unit/echo.function.test.ts:
+(pass) echo returns its input [14.46ms]
+
+tests/unit/hello.function.test.ts:
+(pass) hello returns a greeting [13.75ms]
+
+tests/integration/orders.route.test.ts:
+(pass) POST /orders [24.03ms]
+
+tests/integration/hello.route.test.ts:
+(pass) GET /hello [11.53ms]
+
+tests/integration/echo.route.test.ts:
+(pass) POST /echo [10.54ms]
+
+evidence/ai-validation-2026-10-03/agent-starter/tests/unit/review.agent.test.ts:
+(pass) review graph interrupts and resumes on an explicit thread [44.20ms]
+
+evidence/ai-validation-2026-10-03/agent-starter/tests/unit/assistant.agent.test.ts:
+(pass) assistant runs native tools and todo middleware without a paid provider [38.45ms]
+
+evidence/ai-validation-2026-10-03/agent-starter/tests/unit/hello.function.test.ts:
+(pass) hello returns a greeting [11.99ms]
+
+evidence/ai-validation-2026-10-03/agent-starter/tests/unit/lookup.tool.test.ts:
+(pass) defineTool reuses the greeting function [7.16ms]
+(pass) MCP visibility can be disabled without disabling ordinary tool invocation [2.33ms]
+
+evidence/ai-validation-2026-10-03/agent-starter/tests/integration/hello.route.test.ts:
+(pass) GET /hello [12.88ms]
+
+ 12 pass
+ 0 fail
+ 25 expect() calls
+Ran 12 tests across 11 files. [1486.00ms]
