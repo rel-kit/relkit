@@ -1,0 +1,497 @@
+$ bun run scripts/build.ts
+• turbo 2.10.12
+
+   • Packages in scope: @relkit/agents, @relkit/app, @relkit/aws, @relkit/better-auth, @relkit/buckets, @relkit/cache, @relkit/cli, @relkit/client, @relkit/client-generator, @relkit/cloud-aws, @relkit/cloudflare, @relkit/compiler, @relkit/config, @relkit/contracts, @relkit/deploy, @relkit/deploy-pulumi, @relkit/diagnostics, @relkit/docker, @relkit/docs, @relkit/drizzle, @relkit/effect-mq, @relkit/engine, @relkit/events, @relkit/example-auth-drizzle, @relkit/example-commerce, @relkit/example-commerce-web, @relkit/example-data-model, @relkit/functions, @relkit/graph, @relkit/inngest, @relkit/inspector, @relkit/inspector-api, @relkit/integrations, @relkit/invocation, @relkit/jobs, @relkit/local, @relkit/local-service, @relkit/observability, @relkit/openapi, @relkit/otlp, @relkit/provider, @relkit/providers-local, @relkit/providers-standard, @relkit/pulumi, @relkit/realtime, @relkit/redis, @relkit/routes, @relkit/runtime-effect, @relkit/runtime-hono, @relkit/s3, @relkit/schema, @relkit/sentry, @relkit/services, @relkit/supervisor, @relkit/testing, @relkit/tools, @relkit/trigger, create-relkit
+   • Running build in 58 packages
+   • Remote caching disabled, using shared worktree cache
+
+@relkit/providers-standard:build: cache hit, replaying logs 14100c4b00e67a6c
+@relkit/providers-standard:build: $ tsc -b
+@relkit/schema:build: cache hit, replaying logs aa8d710bf3ac4199
+@relkit/schema:build: $ tsc -b
+@relkit/contracts:build: cache hit, replaying logs 01d2922b388bc3d5
+@relkit/contracts:build: $ tsc -b
+@relkit/diagnostics:build: cache hit, replaying logs 0c2891aff8d569bb
+@relkit/diagnostics:build: $ tsc -b
+@relkit/buckets:build: cache hit, replaying logs a6d49e0d30618c5b
+@relkit/buckets:build: $ tsc -b
+@relkit/cache:build: cache hit, replaying logs 7fc3394cfe94a948
+@relkit/cache:build: $ tsc -b
+@relkit/realtime:build: cache hit, replaying logs 916ba882b1492060
+@relkit/realtime:build: $ tsc -b
+@relkit/provider:build: cache hit, replaying logs da98194da3d94837
+@relkit/provider:build: $ tsc -b
+@relkit/cloudflare:build: cache hit, replaying logs 785e5690fea89f25
+@relkit/cloudflare:build: $ tsc -b
+@relkit/local-service:build: cache hit, replaying logs 4f3d0370b701568c
+@relkit/local-service:build: $ tsc -b
+@relkit/s3:build: cache miss, executing befc9bbbb4b8e34d
+@relkit/s3:build: $ tsc -b
+@relkit/graph:build: cache hit, replaying logs 73a537011d9c4ff1
+@relkit/graph:build: $ tsc -b
+@relkit/config:build: cache hit, replaying logs 353092ab237ee1aa
+@relkit/config:build: $ tsc -b
+@relkit/docker:build: cache hit, replaying logs e89a3a00b247589e
+@relkit/docker:build: $ tsc -b
+@relkit/openapi:build: cache hit, replaying logs c6d19abc045c47ef
+@relkit/openapi:build: $ tsc -b
+@relkit/deploy:build: cache hit, replaying logs acce3203d892b5ec
+@relkit/deploy:build: $ tsc -b
+@relkit/pulumi:build: cache hit, replaying logs 17dc0f03693396f1
+@relkit/pulumi:build: $ tsc -b
+@relkit/aws:build: cache hit, replaying logs ae788fb5f9bd4f03
+@relkit/aws:build: $ tsc -b
+@relkit/invocation:build: cache hit, replaying logs 271fbf8939186418
+@relkit/invocation:build: $ tsc -b
+@relkit/inspector:build: cache hit, replaying logs 180b6e8f8dcc66e5
+@relkit/inspector:build: $ next build
+@relkit/inspector:build: ▲ Next.js 16.3.3 (Turbopack)
+@relkit/inspector:build: ✓ Running next.config.ts took 65ms
+@relkit/inspector:build:
+@relkit/inspector:build:   Creating an optimized production build ...
+@relkit/inspector:build: ✓ Compiled successfully in 44s
+@relkit/inspector:build:   Running TypeScript ...
+@relkit/inspector:build:   Finished TypeScript in 204ms ...
+@relkit/inspector:build:   Collecting page data using 9 workers ...
+@relkit/inspector:build:   Generating static pages using 9 workers (0/27) ...
+@relkit/inspector:build:   Generating static pages using 9 workers (6/27)
+@relkit/inspector:build:   Generating static pages using 9 workers (13/27)
+@relkit/inspector:build:   Generating static pages using 9 workers (20/27)
+@relkit/inspector:build: ✓ Generating static pages using 9 workers (27/27) in 685ms
+@relkit/inspector:build:   Finalizing page optimization ...
+@relkit/inspector:build:
+@relkit/inspector:build: Route (app)
+@relkit/inspector:build: ┌ ○ /
+@relkit/inspector:build: ├ ○ /_not-found
+@relkit/inspector:build: ├ ƒ /_relkit/backend/[...path]
+@relkit/inspector:build: ├ ○ /agents
+@relkit/inspector:build: ├ ƒ /agents/[id]
+@relkit/inspector:build: ├ ƒ /agents/[id]/chat
+@relkit/inspector:build: ├ ○ /api-reference
+@relkit/inspector:build: ├ ○ /buckets
+@relkit/inspector:build: ├ ƒ /buckets/[id]
+@relkit/inspector:build: ├ ○ /cache
+@relkit/inspector:build: ├ ƒ /cache/[id]
+@relkit/inspector:build: ├ ○ /channels
+@relkit/inspector:build: ├ ƒ /channels/[id]
+@relkit/inspector:build: ├ ○ /diagnostics
+@relkit/inspector:build: ├ ○ /domains
+@relkit/inspector:build: ├ ƒ /domains/[id]
+@relkit/inspector:build: ├ ○ /env
+@relkit/inspector:build: ├ ○ /errors
+@relkit/inspector:build: ├ ƒ /errors/[id]
+@relkit/inspector:build: ├ ○ /events
+@relkit/inspector:build: ├ ƒ /events/[id]
+@relkit/inspector:build: ├ ○ /functions
+@relkit/inspector:build: ├ ƒ /functions/[id]
+@relkit/inspector:build: ├ ○ /graph
+@relkit/inspector:build: ├ ○ /graphs
+@relkit/inspector:build: ├ ƒ /graphs/[id]
+@relkit/inspector:build: ├ ○ /jobs
+@relkit/inspector:build: ├ ƒ /jobs/[id]
+@relkit/inspector:build: ├ ○ /jobs/runs
+@relkit/inspector:build: ├ ƒ /jobs/runs/[runId]
+@relkit/inspector:build: ├ ○ /jobs/schedules
+@relkit/inspector:build: ├ ○ /jobs/services
+@relkit/inspector:build: ├ ○ /logs
+@relkit/inspector:build: ├ ○ /middlewares
+@relkit/inspector:build: ├ ƒ /middlewares/[id]
+@relkit/inspector:build: ├ ○ /providers
+@relkit/inspector:build: ├ ƒ /providers/[id]
+@relkit/inspector:build: ├ ○ /requests
+@relkit/inspector:build: ├ ƒ /requests/[requestId]
+@relkit/inspector:build: ├ ○ /routes
+@relkit/inspector:build: ├ ƒ /routes/[id]
+@relkit/inspector:build: ├ ƒ /tasks/[id]
+@relkit/inspector:build: ├ ○ /tools
+@relkit/inspector:build: ├ ƒ /tools/[id]
+@relkit/inspector:build: ├ ○ /traces
+@relkit/inspector:build: └ ƒ /traces/[traceId]
+@relkit/inspector:build:
+@relkit/inspector:build:
+@relkit/inspector:build: ○  (Static)   prerendered as static content
+@relkit/inspector:build: ƒ  (Dynamic)  server-rendered on demand
+@relkit/inspector:build:
+@relkit/drizzle:build: cache hit, replaying logs 741f0260bd4a8bd6
+@relkit/drizzle:build: $ tsc -b
+@relkit/client-generator:build: cache hit, replaying logs 278cde18676f2e4c
+@relkit/client-generator:build: $ tsc -b
+@relkit/functions:build: cache hit, replaying logs afd860f0199bb57b
+@relkit/functions:build: $ tsc -b
+@relkit/tools:build: cache hit, replaying logs d3e18830a16c2924
+@relkit/tools:build: $ tsc -b
+@relkit/observability:build: cache hit, replaying logs e02104e1e1eca0be
+@relkit/observability:build: $ tsc -b
+@relkit/sentry:build: cache hit, replaying logs ece8fcdd771b5275
+@relkit/sentry:build: $ tsc -b
+@relkit/otlp:build: cache hit, replaying logs 900d9f40b68e91ef
+@relkit/otlp:build: $ tsc -b
+@relkit/runtime-effect:build: cache hit, replaying logs d194871189d3dfa4
+@relkit/runtime-effect:build: $ tsc -b
+@relkit/deploy-pulumi:build: cache hit, replaying logs 79fc25ee34a7ad07
+@relkit/deploy-pulumi:build: $ tsc -b
+@relkit/client:build: cache hit, replaying logs 63d1c81a928cf406
+@relkit/client:build: $ tsc -b
+@relkit/supervisor:build: cache hit, replaying logs 151bc2f5436910df
+@relkit/supervisor:build: $ tsc -b
+@relkit/inspector-api:build: cache hit, replaying logs 0506f01a8d543e5e
+@relkit/inspector-api:build: $ tsc -b
+@relkit/jobs:build: cache hit, replaying logs 11cd79dd550f33d1
+@relkit/jobs:build: $ tsc -b
+@relkit/trigger:build: cache hit, replaying logs 97c5c75884e797cb
+@relkit/effect-mq:build: cache hit, replaying logs 259bb18e6d004805
+@relkit/trigger:build: $ tsc -b
+@relkit/effect-mq:build: $ tsc -b
+@relkit/agents:build: cache hit, replaying logs 4a89eb25745f9928
+@relkit/agents:build: $ tsc -b
+@relkit/inngest:build: cache hit, replaying logs 6988cd111b253d80
+@relkit/inngest:build: $ tsc -b
+@relkit/events:build: cache hit, replaying logs d2ff74a01b861c80
+@relkit/events:build: $ tsc -b
+@relkit/services:build: cache hit, replaying logs 7e63362262bbf97a
+@relkit/services:build: $ tsc -b
+@relkit/compiler:build: cache hit, replaying logs 48a65cf369014fdc
+@relkit/compiler:build: $ tsc -b
+@relkit/routes:build: cache hit, replaying logs b8653be82ba0c248
+@relkit/routes:build: $ tsc -b
+@relkit/better-auth:build: cache hit, replaying logs 9f28525052ef8a4d
+@relkit/better-auth:build: $ tsc -b
+create-relkit:build: cache hit, replaying logs 1f7fb532de89c727
+create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templates.ts
+@relkit/app:build: cache hit, replaying logs 030480fef3f9279b
+@relkit/app:build: $ tsc -b
+@relkit/providers-local:build: cache hit, replaying logs 3d2c82319bb18bee
+@relkit/providers-local:build: $ tsc -b
+@relkit/engine:build: cache hit, replaying logs 5c39c4ecdc73cf1e
+@relkit/engine:build: $ tsc -b
+@relkit/redis:build: cache hit, replaying logs a26ee84ca3720d57
+@relkit/redis:build: $ tsc -b
+@relkit/local:build: cache hit, replaying logs 515716f872d75a12
+@relkit/local:build: $ tsc -b
+@relkit/cloud-aws:build: cache hit, replaying logs 4041298a14bcc44b
+@relkit/cloud-aws:build: $ tsc -b
+@relkit/runtime-hono:build: cache hit, replaying logs c948e3c2935de4bc
+@relkit/runtime-hono:build: $ tsc -b
+@relkit/testing:build: cache hit, replaying logs b9b6f9e4a8ad0d0f
+@relkit/testing:build: $ tsc -b
+@relkit/cli:build: cache hit, replaying logs dbdd1780a045c900
+@relkit/cli:build: $ tsc -b && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-inspector.ts
+@relkit/cli:build: $ next build
+@relkit/cli:build: ▲ Next.js 16.3.3 (Turbopack)
+@relkit/cli:build: ✓ Running next.config.ts took 1050ms
+@relkit/cli:build:
+@relkit/cli:build:   Creating an optimized production build ...
+@relkit/cli:build: ✓ Compiled successfully in 9.5s
+@relkit/cli:build:   Running TypeScript ...
+@relkit/cli:build:   Finished TypeScript in 245ms ...
+@relkit/cli:build:   Collecting page data using 9 workers ...
+@relkit/cli:build:   Generating static pages using 9 workers (0/27) ...
+@relkit/cli:build:   Generating static pages using 9 workers (6/27)
+@relkit/cli:build:   Generating static pages using 9 workers (13/27)
+@relkit/cli:build:   Generating static pages using 9 workers (20/27)
+@relkit/cli:build: ✓ Generating static pages using 9 workers (27/27) in 587ms
+@relkit/cli:build:   Finalizing page optimization ...
+@relkit/cli:build:
+@relkit/cli:build: Route (app)
+@relkit/cli:build: ┌ ○ /
+@relkit/cli:build: ├ ○ /_not-found
+@relkit/cli:build: ├ ƒ /_relkit/backend/[...path]
+@relkit/cli:build: ├ ○ /agents
+@relkit/cli:build: ├ ƒ /agents/[id]
+@relkit/cli:build: ├ ƒ /agents/[id]/chat
+@relkit/cli:build: ├ ○ /api-reference
+@relkit/cli:build: ├ ○ /buckets
+@relkit/cli:build: ├ ƒ /buckets/[id]
+@relkit/cli:build: ├ ○ /cache
+@relkit/cli:build: ├ ƒ /cache/[id]
+@relkit/cli:build: ├ ○ /channels
+@relkit/cli:build: ├ ƒ /channels/[id]
+@relkit/cli:build: ├ ○ /diagnostics
+@relkit/cli:build: ├ ○ /domains
+@relkit/cli:build: ├ ƒ /domains/[id]
+@relkit/cli:build: ├ ○ /env
+@relkit/cli:build: ├ ○ /errors
+@relkit/cli:build: ├ ƒ /errors/[id]
+@relkit/cli:build: ├ ○ /events
+@relkit/cli:build: ├ ƒ /events/[id]
+@relkit/cli:build: ├ ○ /functions
+@relkit/cli:build: ├ ƒ /functions/[id]
+@relkit/cli:build: ├ ○ /graph
+@relkit/cli:build: ├ ○ /graphs
+@relkit/cli:build: ├ ƒ /graphs/[id]
+@relkit/cli:build: ├ ○ /jobs
+@relkit/cli:build: ├ ƒ /jobs/[id]
+@relkit/cli:build: ├ ○ /jobs/runs
+@relkit/cli:build: ├ ƒ /jobs/runs/[runId]
+@relkit/cli:build: ├ ○ /jobs/schedules
+@relkit/cli:build: ├ ○ /jobs/services
+@relkit/cli:build: ├ ○ /logs
+@relkit/cli:build: ├ ○ /middlewares
+@relkit/cli:build: ├ ƒ /middlewares/[id]
+@relkit/cli:build: ├ ○ /providers
+@relkit/cli:build: ├ ƒ /providers/[id]
+@relkit/cli:build: ├ ○ /requests
+@relkit/cli:build: ├ ƒ /requests/[requestId]
+@relkit/cli:build: ├ ○ /routes
+@relkit/cli:build: ├ ƒ /routes/[id]
+@relkit/cli:build: ├ ƒ /tasks/[id]
+@relkit/cli:build: ├ ○ /tools
+@relkit/cli:build: ├ ƒ /tools/[id]
+@relkit/cli:build: ├ ○ /traces
+@relkit/cli:build: └ ƒ /traces/[traceId]
+@relkit/cli:build:
+@relkit/cli:build:
+@relkit/cli:build: ○  (Static)   prerendered as static content
+@relkit/cli:build: ƒ  (Dynamic)  server-rendered on demand
+@relkit/cli:build:
+@relkit/cli:build: Packaged inspector server in packages/cli/dist/inspector.
+@relkit/example-data-model:build: cache hit, replaying logs 98e7c363df77f247
+@relkit/example-auth-drizzle:build: cache hit, replaying logs 9fff26c4f5a667f4
+@relkit/example-data-model:build: $ bun ../../packages/cli/dist/index.js build
+@relkit/example-data-model:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model/.relkit/build
+@relkit/example-auth-drizzle:build: $ bun ../../packages/cli/dist/index.js build
+@relkit/example-auth-drizzle:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle/.relkit/build
+@relkit/example-commerce-web:build: cache hit, replaying logs cd01cbc12e54a9e7
+@relkit/example-commerce-web:build: $ bun --cwd ../commerce check && bun run scripts/build.ts
+@relkit/example-commerce-web:build: $ bun ../../packages/cli/dist/index.js check
+@relkit/example-commerce-web:build: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
+@relkit/example-commerce-web:build: ▲ Next.js 16.3.3 (Turbopack)
+@relkit/example-commerce-web:build: ✓ Running next.config.ts took 75ms
+@relkit/example-commerce-web:build:
+@relkit/example-commerce-web:build:   Creating an optimized production build ...
+@relkit/example-commerce-web:build: ✓ Compiled successfully in 3.6s
+@relkit/example-commerce-web:build:   Running TypeScript ...
+@relkit/example-commerce-web:build:   Finished TypeScript in 1376ms ...
+@relkit/example-commerce-web:build:   Collecting page data using 4 workers ...
+@relkit/example-commerce-web:build:   Generating static pages using 4 workers (0/3) ...
+@relkit/example-commerce-web:build: ✓ Generating static pages using 4 workers (3/3) in 326ms
+@relkit/example-commerce-web:build:   Finalizing page optimization ...
+@relkit/example-commerce-web:build:
+@relkit/example-commerce-web:build: Route (app)
+@relkit/example-commerce-web:build: ┌ ○ /
+@relkit/example-commerce-web:build: └ ○ /_not-found
+@relkit/example-commerce-web:build:
+@relkit/example-commerce-web:build:
+@relkit/example-commerce-web:build: ○  (Static)  prerendered as static content
+@relkit/example-commerce-web:build:
+@relkit/example-commerce:build: cache miss, executing b57fed5eaeafd0d8
+@relkit/integrations:build: cache miss, executing 098159fae046e06f
+@relkit/integrations:build: $ tsc -b
+@relkit/example-commerce:build: $ bun ../../packages/cli/dist/index.js build
+@relkit/docs:build: cache miss, executing 939fb765a52b22ec
+@relkit/docs:build: $ bun run generate && next build
+@relkit/docs:build: $ bun run scripts/generate.ts
+@relkit/docs:build: generated apps/docs/content/generated/capabilities.mdx
+@relkit/docs:build: generated apps/docs/content/generated/create-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-service-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-function-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-task-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-error-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-event-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-event-function-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-job-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-cache-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-bucket-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-tool-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-prompt-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-agent-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-constants-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-route-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-middleware-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-transform-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-database-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/add-auth-options.mdx
+@relkit/docs:build: generated apps/docs/content/generated/coverage.json
+@relkit/docs:build: generated apps/docs/content/generated/related/index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/start-create-an-app.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/start-first-route.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/start-save-orders.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/start-protect-orders.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/start-test-orders.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/start-local-development.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/start-build-and-run.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/start-add-artifacts.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/fundamentals-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/fundamentals-application.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/fundamentals-functions.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/fundamentals-schemas.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/fundamentals-errors.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/fundamentals-context.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/fundamentals-environment.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/service-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/service-domains.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/service-organization.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/service-define.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/service-routes.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/service-first-service.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-define.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-routes.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-requests.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-uploads.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-middleware.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-rate-limits.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-responses.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-streaming.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-raw-handlers.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-openapi.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-generated-clients.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/http-first-route.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/events-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/events-define.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/events-publish.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/events-consume.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/events-first-event.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-quickstart.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-tasks.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-bindings.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-durations-and-sleep.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-execution-policy.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-retries-and-idempotency.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-clients.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-progress-and-streams.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-security.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-schedules.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-inspector.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-docker.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-providers.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-deployment.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-testing.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-migration.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/jobs-troubleshooting.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-drizzle.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-define.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-schema.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-queries.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-generated-schemas.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-models.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-overrides.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-transactions.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-migrations.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-better-auth.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-testing.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/database-first-database.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/auth-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/auth-better-auth.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/auth-sessions.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/auth-protect-routes.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/auth-clients.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/auth-customization.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/auth-testing.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/auth-first-auth.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/storage-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/storage-define.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/storage-upload.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/storage-read-delete.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/storage-first-upload.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/caching-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/caching-define.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/caching-read-write.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/caching-expiration.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/caching-first-cache.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-agents.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-native-runtime.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-graphs-persistence.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-streaming.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-threads-recovery.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-approvals.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-tools.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-function-tools.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-mcp.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/ai-first-agent.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/client-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/client-routes.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/client-mutations.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/client-streams.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/client-ssr.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/client-authentication.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/client-offline.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/realtime-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/realtime-access.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/realtime-react.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/realtime-presence.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/realtime-recovery.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/realtime-providers.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/integrations-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/integrations-local-docker.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/operations-index.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/operations-observability.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/operations-inspector.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/operations-realtime-agents-streaming.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/operations-testing.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/operations-deployment.mdx
+@relkit/docs:build: generated apps/docs/content/generated/related/operations-troubleshooting.mdx
+@relkit/docs:build: generated apps/docs/content/docs/operations/cli-reference.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/config.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/schema.mdx
+@relkit/example-commerce:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce/.relkit/build
+@relkit/docs:build: generated apps/docs/content/docs/api/functions.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/drizzle.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/services.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/app.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/buckets.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/cache.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/events.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/routes.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/jobs.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/better-auth.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/aws.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/realtime.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/tools.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/client.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/agents.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/testing.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/pulumi.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/otlp.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/cloudflare.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/docker.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/local.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/redis.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/trigger.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/sentry.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/inngest.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/effect-mq.mdx
+@relkit/docs:build: generated apps/docs/content/docs/api/integrations/s3.mdx
+@relkit/docs:build: Generated documentation updated.
+@relkit/docs:build: ▲ Next.js 16.3.3 (Turbopack)
+@relkit/docs:build: [MDX] generated files in 1.8899590000000899ms
+@relkit/docs:build: ✓ Running next.config.mjs took 727ms
+@relkit/docs:build:
+@relkit/docs:build:   Creating an optimized production build ...
+@relkit/docs:build: ✓ Compiled successfully in 3.6min
+@relkit/docs:build:   Running TypeScript ...
+@relkit/docs:build:   Finished TypeScript in 71s ...
+@relkit/docs:build:   Collecting page data using 8 workers ...
+@relkit/docs:build:   Generating static pages using 8 workers (0/163) ...
+@relkit/docs:build:   Generating static pages using 8 workers (40/163)
+@relkit/docs:build:   Generating static pages using 8 workers (81/163)
+@relkit/docs:build:   Generating static pages using 8 workers (122/163)
+@relkit/docs:build: ✓ Generating static pages using 8 workers (163/163) in 27.8s
+@relkit/docs:build:   Finalizing page optimization ...
+@relkit/docs:build:
+@relkit/docs:build: Route (app)
+@relkit/docs:build: ┌ ○ /
+@relkit/docs:build: ├ ○ /_not-found
+@relkit/docs:build: ├ ƒ /api/search
+@relkit/docs:build: ├   /docs/[[...slug]]
+@relkit/docs:build: │ ├ ● /docs
+@relkit/docs:build: │ ├ ● /docs/ai/agents
+@relkit/docs:build: │ ├ ● /docs/ai/approvals
+@relkit/docs:build: │ └ ● [+154 more paths]
+@relkit/docs:build: ├ ○ /llms-full.txt
+@relkit/docs:build: └ ○ /llms.txt
+@relkit/docs:build:
+@relkit/docs:build:
+@relkit/docs:build: ○  (Static)   prerendered as static content
+@relkit/docs:build: ●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+@relkit/docs:build: ƒ  (Dynamic)  server-rendered on demand
+@relkit/docs:build:
+
+ Tasks:    58 successful, 58 total
+Cached:    54 cached, 58 total
+  Time:    10m2.02s
+
+Workspace build passed.

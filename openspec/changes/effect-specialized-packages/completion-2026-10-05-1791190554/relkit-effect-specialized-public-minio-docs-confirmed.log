@@ -1,0 +1,371 @@
+$ bunx turbo run check test --filter=@relkit/docs
+• turbo 2.10.12
+
+   • Packages in scope: @relkit/docs
+   • Running check, test in 1 packages
+   • Remote caching disabled, using shared worktree cache
+
+@relkit/schema:check: cache hit, replaying logs bf4e2f2ac1d6dabb
+@relkit/contracts:check: cache hit, replaying logs 183b488924965109
+@relkit/schema:check: $ tsc -b --pretty false
+@relkit/contracts:check: $ tsc -b --pretty false
+@relkit/schema:build: cache hit, replaying logs aa8d710bf3ac4199
+@relkit/contracts:build: cache hit, replaying logs 01d2922b388bc3d5
+@relkit/graph:check: cache hit, replaying logs aa118971943901de
+@relkit/invocation:check: cache hit, replaying logs 072eac9649fa6b72
+@relkit/schema:build: $ tsc -b
+@relkit/contracts:build: $ tsc -b
+@relkit/diagnostics:check: cache hit, replaying logs b2ff2f90b2d7057c
+@relkit/cache:check: cache hit, replaying logs 2690da0896f8ea04
+@relkit/graph:check: $ tsc -b --pretty false
+@relkit/invocation:check: $ tsc -b --pretty false
+@relkit/cache:check: $ tsc -b --pretty false
+@relkit/diagnostics:check: $ tsc -b --pretty false
+@relkit/provider:check: cache hit, replaying logs 46cab8205ec707c9
+@relkit/observability:check: cache hit, replaying logs 93b2403a1de4b3bf
+@relkit/provider:check: $ tsc -b --pretty false
+@relkit/realtime:check: cache hit, replaying logs 94c10a4499386eff
+@relkit/observability:check: $ tsc -b --pretty false
+@relkit/buckets:check: cache hit, replaying logs 456a6c60003df103
+@relkit/realtime:check: $ tsc -b --pretty false
+@relkit/buckets:check: $ tsc -b --pretty false
+@relkit/diagnostics:build: cache hit, replaying logs 0c2891aff8d569bb
+@relkit/diagnostics:build: $ tsc -b
+@relkit/openapi:check: cache hit, replaying logs 6a0946c8e5425103
+@relkit/realtime:build: cache hit, replaying logs 916ba882b1492060
+@relkit/provider:build: cache hit, replaying logs da98194da3d94837
+@relkit/cache:build: cache hit, replaying logs 7fc3394cfe94a948
+@relkit/realtime:build: $ tsc -b
+@relkit/buckets:build: cache hit, replaying logs a6d49e0d30618c5b
+@relkit/provider:build: $ tsc -b
+@relkit/buckets:build: $ tsc -b
+@relkit/cache:build: $ tsc -b
+@relkit/openapi:check: $ tsc -b --pretty false
+@relkit/deploy:check: cache hit, replaying logs 18b2faa7070a892b
+@relkit/graph:build: cache hit, replaying logs 73a537011d9c4ff1
+@relkit/client-generator:check: cache hit, replaying logs 96188e67c1f57a91
+@relkit/graph:build: $ tsc -b
+@relkit/deploy:check: $ tsc -b --pretty false
+@relkit/client-generator:check: $ tsc -b --pretty false
+@relkit/local-service:check: cache hit, replaying logs e2c3031d79cb6373
+@relkit/otlp:check: cache hit, replaying logs 2b0e9dbf45fdaac9
+@relkit/config:check: cache hit, replaying logs d13c241956be6e7d
+@relkit/sentry:check: cache hit, replaying logs e1265441af294f0a
+@relkit/config:check: $ tsc -b --pretty false
+@relkit/local-service:check: $ tsc -b --pretty false
+@relkit/otlp:check: $ tsc -b --pretty false
+@relkit/sentry:check: $ tsc -b --pretty false
+@relkit/client:check: cache hit, replaying logs 7acef851033b8ce0
+@relkit/drizzle:check: cache hit, replaying logs 7ab450ff5c364d12
+@relkit/functions:check: cache hit, replaying logs 2e62e0fbb6cd5ecd
+@relkit/client:check: $ tsc -b --pretty false
+@relkit/drizzle:check: $ tsc -b --pretty false
+@relkit/functions:check: $ tsc -b --pretty false
+@relkit/cloudflare:check: cache hit, replaying logs 6d0ea3cb0f65448e
+@relkit/cloudflare:check: $ tsc -b --pretty false
+@relkit/cloudflare:build: cache hit, replaying logs 785e5690fea89f25
+@relkit/cloudflare:build: $ tsc -b
+@relkit/aws:check: cache hit, replaying logs 974d2a9c028cebd6
+@relkit/local-service:build: cache hit, replaying logs 4f3d0370b701568c
+@relkit/config:build: cache hit, replaying logs 353092ab237ee1aa
+@relkit/openapi:build: cache hit, replaying logs c6d19abc045c47ef
+@relkit/aws:check: $ tsc -b --pretty false
+@relkit/local-service:build: $ tsc -b
+@relkit/deploy:build: cache hit, replaying logs acce3203d892b5ec
+@relkit/pulumi:check: cache hit, replaying logs 7446355f9c7661d7
+@relkit/config:build: $ tsc -b
+@relkit/openapi:build: $ tsc -b
+@relkit/deploy:build: $ tsc -b
+@relkit/invocation:build: cache hit, replaying logs 271fbf8939186418
+@relkit/pulumi:check: $ tsc -b --pretty false
+@relkit/runtime-effect:check: cache hit, replaying logs d0a46572138b596a
+@relkit/invocation:build: $ tsc -b
+@relkit/s3:check: cache hit, replaying logs a2924e3ae7022ad4
+@relkit/runtime-effect:check: $ tsc -b --pretty false
+@relkit/s3:check: $ tsc -b --pretty false
+@relkit/docker:check: cache hit, replaying logs 3c15dfb118fa9fbc
+@relkit/compiler:check: cache hit, replaying logs 9cfbf6a38fe74b5d
+@relkit/docker:check: $ tsc -b --pretty false
+@relkit/compiler:check: $ tsc -b --pretty false
+@relkit/jobs:check: cache hit, replaying logs 2e6df6d93dedc1ad
+@relkit/tools:check: cache hit, replaying logs 6f268a4816dbfbb9
+@relkit/jobs:check: $ tsc -b --pretty false
+@relkit/tools:check: $ tsc -b --pretty false
+@relkit/s3:build: cache hit, replaying logs befc9bbbb4b8e34d
+@relkit/pulumi:build: cache hit, replaying logs 17dc0f03693396f1
+@relkit/client-generator:build: cache hit, replaying logs 278cde18676f2e4c
+@relkit/observability:build: cache hit, replaying logs e02104e1e1eca0be
+@relkit/docker:build: cache hit, replaying logs e89a3a00b247589e
+@relkit/s3:build: $ tsc -b
+@relkit/client-generator:build: $ tsc -b
+@relkit/pulumi:build: $ tsc -b
+@relkit/observability:build: $ tsc -b
+@relkit/docker:build: $ tsc -b
+@relkit/aws:build: cache hit, replaying logs ae788fb5f9bd4f03
+@relkit/inspector-api:check: cache hit, replaying logs 19ae1e1843c0dee4
+@relkit/aws:build: $ tsc -b
+@relkit/deploy-pulumi:check: cache hit, replaying logs 595e057bd9cb29ff
+@relkit/inspector-api:check: $ tsc -b --pretty false
+@relkit/deploy-pulumi:check: $ tsc -b --pretty false
+@relkit/functions:build: cache hit, replaying logs afd860f0199bb57b
+@relkit/drizzle:build: cache hit, replaying logs 741f0260bd4a8bd6
+@relkit/trigger:check: cache hit, replaying logs 34ca6aae574e5590
+create-relkit:check: cache hit, replaying logs 71f89a3aaae684dd
+@relkit/inngest:check: cache hit, replaying logs 81fac9dc76333f26
+create-relkit:check: $ tsc -b --pretty false
+@relkit/inngest:check: $ tsc -b --pretty false
+@relkit/supervisor:check: cache hit, replaying logs 11251c6f2277a23a
+@relkit/functions:build: $ tsc -b
+@relkit/events:check: cache hit, replaying logs 5a7a1d25480c831d
+@relkit/drizzle:build: $ tsc -b
+@relkit/agents:check: cache hit, replaying logs 8953bc55e7c41386
+@relkit/trigger:check: $ tsc -b --pretty false
+@relkit/effect-mq:check: cache hit, replaying logs 9bb84791b5828ed5
+@relkit/events:check: $ tsc -b --pretty false
+@relkit/agents:check: $ tsc -b --pretty false
+@relkit/effect-mq:check: $ tsc -b --pretty false
+@relkit/supervisor:check: $ tsc -b --pretty false
+@relkit/services:check: cache hit, replaying logs 4ab981f4d1559168
+@relkit/services:check: $ tsc -b --pretty false
+@relkit/otlp:build: cache hit, replaying logs 900d9f40b68e91ef
+@relkit/otlp:build: $ tsc -b
+@relkit/sentry:build: cache hit, replaying logs ece8fcdd771b5275
+@relkit/client:build: cache hit, replaying logs 63d1c81a928cf406
+@relkit/tools:build: cache hit, replaying logs d3e18830a16c2924
+@relkit/providers-local:check: cache hit, replaying logs f29bfba0783af2e7
+@relkit/sentry:build: $ tsc -b
+@relkit/providers-local:check: $ tsc -b --pretty false
+@relkit/client:build: $ tsc -b
+@relkit/tools:build: $ tsc -b
+@relkit/runtime-effect:build: cache hit, replaying logs d194871189d3dfa4
+@relkit/runtime-effect:build: $ tsc -b
+@relkit/routes:check: cache hit, replaying logs 93adefc4be2d5767
+@relkit/local:check: cache hit, replaying logs 2e1b41a0fbf403a1
+@relkit/routes:check: $ tsc -b --pretty false
+@relkit/redis:check: cache hit, replaying logs b493d215d3fa1900
+@relkit/redis:check: $ tsc -b --pretty false
+@relkit/local:check: $ tsc -b --pretty false
+@relkit/better-auth:check: cache hit, replaying logs ad658c633378e326
+@relkit/app:check: cache hit, replaying logs 5b2e9a5c686b3a3b
+@relkit/app:check: $ tsc -b --pretty false
+@relkit/better-auth:check: $ tsc -b --pretty false
+@relkit/deploy-pulumi:build: cache hit, replaying logs 79fc25ee34a7ad07
+@relkit/integrations:check: cache hit, replaying logs 885d3508c61c000a
+@relkit/integrations:check: $ tsc -b --pretty false
+@relkit/deploy-pulumi:build: $ tsc -b
+@relkit/engine:check: cache hit, replaying logs 1cddec1cd08e5663
+@relkit/engine:check: $ tsc -b --pretty false
+@relkit/runtime-hono:check: cache hit, replaying logs a984a29701fdbda1
+@relkit/runtime-hono:check: $ tsc -b --pretty false
+@relkit/supervisor:build: cache hit, replaying logs 151bc2f5436910df
+@relkit/inspector-api:build: cache hit, replaying logs 0506f01a8d543e5e
+@relkit/testing:check: cache hit, replaying logs 404fa441a2583da3
+@relkit/cli:check: cache hit, replaying logs 40683107c79ccff1
+@relkit/supervisor:build: $ tsc -b
+@relkit/inspector-api:build: $ tsc -b
+@relkit/jobs:build: cache hit, replaying logs 11cd79dd550f33d1
+@relkit/cli:check: $ tsc -b --pretty false
+@relkit/testing:check: $ tsc -b --pretty false
+@relkit/jobs:build: $ tsc -b
+@relkit/docs:check: cache miss, executing 5eea512a031e339e
+@relkit/agents:build: cache hit, replaying logs 4a89eb25745f9928
+@relkit/compiler:build: cache hit, replaying logs 48a65cf369014fdc
+@relkit/agents:build: $ tsc -b
+@relkit/compiler:build: $ tsc -b
+@relkit/effect-mq:build: cache hit, replaying logs 259bb18e6d004805
+@relkit/inngest:build: cache hit, replaying logs 6988cd111b253d80
+@relkit/trigger:build: cache hit, replaying logs 97c5c75884e797cb
+@relkit/events:build: cache hit, replaying logs d2ff74a01b861c80
+@relkit/effect-mq:build: $ tsc -b
+@relkit/inngest:build: $ tsc -b
+@relkit/trigger:build: $ tsc -b
+@relkit/events:build: $ tsc -b
+@relkit/services:build: cache hit, replaying logs 7e63362262bbf97a
+@relkit/services:build: $ tsc -b
+create-relkit:build: cache hit, replaying logs 1f7fb532de89c727
+create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templates.ts
+@relkit/routes:build: cache hit, replaying logs b8653be82ba0c248
+@relkit/routes:build: $ tsc -b
+@relkit/better-auth:build: cache hit, replaying logs 9f28525052ef8a4d
+@relkit/better-auth:build: $ tsc -b
+@relkit/providers-local:build: cache hit, replaying logs 3d2c82319bb18bee
+@relkit/app:build: cache hit, replaying logs 030480fef3f9279b
+@relkit/providers-local:build: $ tsc -b
+@relkit/app:build: $ tsc -b
+@relkit/redis:build: cache hit, replaying logs a26ee84ca3720d57
+@relkit/redis:build: $ tsc -b
+@relkit/local:build: cache hit, replaying logs 515716f872d75a12
+@relkit/local:build: $ tsc -b
+@relkit/integrations:build: cache hit, replaying logs 098159fae046e06f
+@relkit/docs:check: $ bun run generate:check && tsc --noEmit && bun run check:jsdoc && bun run check:links && bun run check:search
+@relkit/integrations:build: $ tsc -b
+@relkit/engine:build: cache hit, replaying logs 5c39c4ecdc73cf1e
+@relkit/engine:build: $ tsc -b
+@relkit/runtime-hono:build: cache hit, replaying logs c948e3c2935de4bc
+@relkit/runtime-hono:build: $ tsc -b
+@relkit/testing:build: cache hit, replaying logs b9b6f9e4a8ad0d0f
+@relkit/testing:build: $ tsc -b
+@relkit/docs:check: $ bun run scripts/generate.ts --check
+@relkit/cli:build: cache hit, replaying logs dbdd1780a045c900
+@relkit/cli:build: $ tsc -b && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-inspector.ts
+@relkit/cli:build: $ next build
+@relkit/cli:build: ▲ Next.js 16.3.3 (Turbopack)
+@relkit/cli:build: ✓ Running next.config.ts took 1050ms
+@relkit/cli:build:
+@relkit/cli:build:   Creating an optimized production build ...
+@relkit/cli:build: ✓ Compiled successfully in 9.5s
+@relkit/cli:build:   Running TypeScript ...
+@relkit/cli:build:   Finished TypeScript in 245ms ...
+@relkit/cli:build:   Collecting page data using 9 workers ...
+@relkit/cli:build:   Generating static pages using 9 workers (0/27) ...
+@relkit/cli:build:   Generating static pages using 9 workers (6/27)
+@relkit/cli:build:   Generating static pages using 9 workers (13/27)
+@relkit/cli:build:   Generating static pages using 9 workers (20/27)
+@relkit/cli:build: ✓ Generating static pages using 9 workers (27/27) in 587ms
+@relkit/cli:build:   Finalizing page optimization ...
+@relkit/cli:build:
+@relkit/cli:build: Route (app)
+@relkit/cli:build: ┌ ○ /
+@relkit/cli:build: ├ ○ /_not-found
+@relkit/cli:build: ├ ƒ /_relkit/backend/[...path]
+@relkit/cli:build: ├ ○ /agents
+@relkit/cli:build: ├ ƒ /agents/[id]
+@relkit/cli:build: ├ ƒ /agents/[id]/chat
+@relkit/cli:build: ├ ○ /api-reference
+@relkit/cli:build: ├ ○ /buckets
+@relkit/cli:build: ├ ƒ /buckets/[id]
+@relkit/cli:build: ├ ○ /cache
+@relkit/cli:build: ├ ƒ /cache/[id]
+@relkit/cli:build: ├ ○ /channels
+@relkit/cli:build: ├ ƒ /channels/[id]
+@relkit/cli:build: ├ ○ /diagnostics
+@relkit/cli:build: ├ ○ /domains
+@relkit/cli:build: ├ ƒ /domains/[id]
+@relkit/cli:build: ├ ○ /env
+@relkit/cli:build: ├ ○ /errors
+@relkit/cli:build: ├ ƒ /errors/[id]
+@relkit/cli:build: ├ ○ /events
+@relkit/cli:build: ├ ƒ /events/[id]
+@relkit/cli:build: ├ ○ /functions
+@relkit/cli:build: ├ ƒ /functions/[id]
+@relkit/cli:build: ├ ○ /graph
+@relkit/cli:build: ├ ○ /graphs
+@relkit/cli:build: ├ ƒ /graphs/[id]
+@relkit/cli:build: ├ ○ /jobs
+@relkit/cli:build: ├ ƒ /jobs/[id]
+@relkit/cli:build: ├ ○ /jobs/runs
+@relkit/cli:build: ├ ƒ /jobs/runs/[runId]
+@relkit/cli:build: ├ ○ /jobs/schedules
+@relkit/cli:build: ├ ○ /jobs/services
+@relkit/cli:build: ├ ○ /logs
+@relkit/cli:build: ├ ○ /middlewares
+@relkit/cli:build: ├ ƒ /middlewares/[id]
+@relkit/cli:build: ├ ○ /providers
+@relkit/cli:build: ├ ƒ /providers/[id]
+@relkit/cli:build: ├ ○ /requests
+@relkit/cli:build: ├ ƒ /requests/[requestId]
+@relkit/cli:build: ├ ○ /routes
+@relkit/cli:build: ├ ƒ /routes/[id]
+@relkit/cli:build: ├ ƒ /tasks/[id]
+@relkit/cli:build: ├ ○ /tools
+@relkit/cli:build: ├ ƒ /tools/[id]
+@relkit/cli:build: ├ ○ /traces
+@relkit/cli:build: └ ƒ /traces/[traceId]
+@relkit/cli:build:
+@relkit/cli:build:
+@relkit/cli:build: ○  (Static)   prerendered as static content
+@relkit/cli:build: ƒ  (Dynamic)  server-rendered on demand
+@relkit/cli:build:
+@relkit/cli:build: Packaged inspector server in packages/cli/dist/inspector.
+@relkit/docs:test: cache miss, executing f8120c53dce154e1
+@relkit/docs:test: $ bun test tests/*.test.ts
+@relkit/docs:test: bun test v1.3.10 (30e609e0)
+@relkit/docs:test:
+@relkit/docs:test: tests/event-learning.test.ts:
+@relkit/docs:test: (pass) places Events after HTTP Routes and gives every section a supported icon [12.48ms]
+@relkit/docs:test: (pass) keeps section headings for the Events guides' right-side table of contents [0.66ms]
+@relkit/docs:test: (pass) introduces the Events API and shows subscribers before the existing-app tutorial [0.33ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/examples.test.ts:
+@relkit/docs:test: (pass) documentation examples are executable descriptors [0.19ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/service-learning.test.ts:
+@relkit/docs:test: (pass) introduces Service after Core concepts with source-backed, connected guides [0.41ms]
+@relkit/docs:test: (pass) routes code-placement questions into existing capability and HTTP guides [0.12ms]
+@relkit/docs:test: (pass) walks through the Orders service using the executable API starter [0.03ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/cli-scaffolding.test.ts:
+@relkit/docs:test: (pass) every add command has a guide and complete CLI reference without inline option tables [7.20ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/auth-learning.test.ts:
+@relkit/docs:test: (pass) connects Auth after Database with source-backed guides and API reference [0.94ms]
+@relkit/docs:test: (pass) separates identity, integration, transport protection, and business authorization [0.25ms]
+@relkit/docs:test: (pass) teaches a migrated existing-app flow without hard-coded server secrets [0.79ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/documentation.test.ts:
+@relkit/docs:test: (pass) publishes authored, CLI, and application-facing API documentation [4.36ms]
+@relkit/docs:test: (pass) leads with the five product concepts and separates guides from API reference [0.40ms]
+@relkit/docs:test: (pass) keeps Core concepts near Start and retires the duplicate Async section [0.27ms]
+@relkit/docs:test: (pass) documents current Docker-backed service versions from integration source [0.55ms]
+@relkit/docs:test: (pass) keeps guides backed by executable examples and self-hosted discovery [6.96ms]
+@relkit/docs:test: (pass) keeps current guidance on the domain-first application layout [8.35ms]
+@relkit/docs:test: (pass) builds and starts from the repository root on Railway [0.46ms]
+@relkit/docs:test: (pass) derives capability and related-guide content from the typed catalogs [5.67ms]
+@relkit/docs:test: (pass) keeps learning guides focused and actionable [5.63ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/database-learning.test.ts:
+@relkit/docs:test: (pass) connects Database guides and the generated Drizzle reference [0.72ms]
+@relkit/docs:test: (pass) uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets [0.75ms]
+@relkit/docs:test: (pass) states validation, override, transaction, and lifecycle boundaries [0.18ms]
+@relkit/docs:test: (pass) explains generated data shapes and Better Auth's native-client boundary [0.14ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/ai-learning.test.ts:
+@relkit/docs:test: (pass) places AI beside Caching and keeps practical table-of-contents headings [0.90ms]
+@relkit/docs:test: (pass) documents an existing-app tutorial and MCP's exposure and approval boundaries [0.23ms]
+@relkit/docs:test: (pass) explains native agent foundations, inherited schemas, callbacks, and streaming [0.41ms]
+@relkit/docs:test: (pass) documents native compatibility, typed state, graphs, persistence, and resume [0.21ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/start-learning.test.ts:
+@relkit/docs:test: (pass) keeps a single ordered Orders journey with optional scaffolding last [0.34ms]
+@relkit/docs:test: (pass) uses the same Orders app from creation through the production build [0.13ms]
+@relkit/docs:test: (pass) redirects retired Start URLs directly to current guidance [0.06ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/http-learning.test.ts:
+@relkit/docs:test: (pass) connects Service to HTTP Routes without changing existing HTTP guide URLs [0.73ms]
+@relkit/docs:test: (pass) teaches the Orders HTTP boundary with executable starter source and tests [0.06ms]
+@relkit/docs:test: (pass) documents raw and RPC boundaries without promising REST-only policies on RPC [0.12ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/docgen-examples.test.ts:
+@relkit/docs:test: (pass) restores source-relative imports while keeping example names and expressions intact [4.84ms]
+@relkit/docs:test: ../../../../../../../../tmp/relkit-docgen-context-gZcTVY/examples/0--tmp-relkit-docgen-context-gZcTVY-source-owner.ts-function-run-0.ts(2,7): error TS2322: Type 'number' is not assignable to type 'string'.
+@relkit/docs:test: (pass) the real compiler accepts restored imports and still rejects invalid examples [580.02ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/jobs-learning.test.ts:
+@relkit/docs:test: (pass) connects Jobs between Events and Database with source-backed guides [0.87ms]
+@relkit/docs:test: (pass) teaches task admission and completion using executable documentation sources [0.07ms]
+@relkit/docs:test: (pass) states current retry, overlap, and provider limits without exactly-once promises [0.06ms]
+@relkit/docs:test: (pass) provider guides show configuration, real input, registration, and native run evidence [0.33ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/storage-learning.test.ts:
+@relkit/docs:test: (pass) places Storage beside Auth with focused pages and right-side TOC headings [2.27ms]
+@relkit/docs:test: (pass) teaches an existing-app upload with source-backed examples and local verification [0.57ms]
+@relkit/docs:test:
+@relkit/docs:test: tests/caching-learning.test.ts:
+@relkit/docs:test: (pass) places Caching beside Storage and preserves useful TOC headings [0.72ms]
+@relkit/docs:test: (pass) teaches caching in an existing app with a tested lookup and local Inspector steps [0.12ms]
+@relkit/docs:test:
+@relkit/docs:test:  44 pass
+@relkit/docs:test:  0 fail
+@relkit/docs:test:  1950 expect() calls
+@relkit/docs:test: Ran 44 tests across 14 files. [974.00ms]
+@relkit/docs:check: Generated documentation is current.
+@relkit/docs:check: $ bun run scripts/check-jsdoc.ts
+@relkit/docs:check: Checked rich JSDoc for 32 public authoring APIs.
+@relkit/docs:check: $ bun run scripts/check-links.ts
+@relkit/docs:check: Checked 157 documentation pages for internal links.
+@relkit/docs:check: $ bun run scripts/check-search.ts
+@relkit/docs:check: Validated metadata and search corpus for 157 pages.
+
+ Tasks:    102 successful, 102 total
+Cached:    100 cached, 102 total
+  Time:    46.996s
