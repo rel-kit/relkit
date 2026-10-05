@@ -1,0 +1,12 @@
+{
+  "project": "demo",
+  "label": "demo-origin",
+  "command": [
+    "rtk",
+    "bun",
+    "scripts/verify-dev-origin.mjs"
+  ],
+  "exitCode": 0,
+  "seconds": 1.29,
+  "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-origin.log"
+}

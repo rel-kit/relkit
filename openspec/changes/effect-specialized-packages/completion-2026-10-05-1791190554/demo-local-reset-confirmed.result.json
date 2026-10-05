@@ -1,0 +1,17 @@
+{
+  "project": "demo",
+  "label": "demo-local-reset-confirmed",
+  "command": [
+    "rtk",
+    "bun",
+    "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cli/dist/index.js",
+    "local",
+    "reset",
+    "--project-root",
+    "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo",
+    "--yes"
+  ],
+  "exitCode": 0,
+  "seconds": 9.53,
+  "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-local-reset-confirmed.log"
+}
