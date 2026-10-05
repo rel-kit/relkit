@@ -8,7 +8,7 @@ import {
   activateBetterAuthService,
   BETTER_AUTH_HANDLER,
   defineBetterAuthService,
-} from "./src/index.ts";
+} from "../src/index.ts";
 
 const user = sqliteTable("user", { id: text().primaryKey(), email: text().notNull() });
 
@@ -65,4 +65,38 @@ test("isolated native auth does not acquire or replace the descriptor handler", 
   } finally {
     await database.close();
   }
+});
+
+test("failed shared auth acquisition resets and borrows the database without disposal", async () => {
+  let disposals = 0;
+  const declaration = defineDrizzleService({
+    schema: { user },
+    client: () => drizzle({ client: new Database(":memory:") }),
+    dispose: (client) => {
+      disposals++;
+      client.$client.close();
+    },
+  });
+  const auth = defineBetterAuthService({ baseURL: "http://localhost" });
+  const database = await activateDrizzleService(declaration, {}, { isolated: true });
+  try {
+    const invalid = { client: database.client, context: database.context, close: database.close };
+    const first = activateBetterAuthService(auth, invalid as never, "/api/auth");
+    const second = activateBetterAuthService(auth, invalid as never, "/api/auth");
+    const results = await Promise.allSettled([first, second]);
+    for (const result of results) {
+      expect(result.status).toBe("rejected");
+      if (result.status === "rejected") {
+        expect(result.reason).toBeInstanceOf(TypeError);
+        expect(result.reason.message).toBe("Drizzle activation is missing its service");
+      }
+    }
+    const recovered = await activateBetterAuthService(auth, database, "/api/auth");
+    expect(await activateBetterAuthService(auth, database, "/ignored")).toBe(recovered);
+    expect(disposals).toBe(0);
+    expect(auth.handler[BETTER_AUTH_HANDLER].service).toBe(auth);
+  } finally {
+    await database.close();
+  }
+  expect(disposals).toBe(1);
 });
