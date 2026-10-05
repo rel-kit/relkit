@@ -74,7 +74,7 @@ function createDatabaseRegistration(node, services, env) {
   if (node === undefined) return undefined;
   const service = services?.[node.id];
   if (service === undefined) return Promise.reject(new Error("Drizzle service is unavailable."));
-  return activateDrizzleService(service, env);
+  return activateDrizzleService(service, env, { instrumentation: specializedInstrumentation });
 }
 
 function createBetterAuthRegistration(node, services, database) {

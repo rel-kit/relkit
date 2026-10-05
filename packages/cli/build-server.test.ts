@@ -46,6 +46,10 @@ test("generated runtime carries and verifies its activation fingerprint", () => 
   expect(source).toContain('if (environment === "production") stdoutJsonSink.write(record);');
   expect(source.toLowerCase()).not.toContain("cloudwatch");
   expect(source.match(/writeRuntimeLog\(record\);/g)?.length).toBe(3);
+  expect(source).toContain('component: "runtime.specialized"');
+  expect(source).toContain('minimumLevel: process.env.RELKIT_DEV_LOGS === "1" ? "all" : "info"');
+  expect(source).toContain("human: { write: (_line, record) => writeRuntimeLog(record) }");
+  expect(source).toContain("instrumentation: specializedInstrumentation");
   expect(source.indexOf("assertRuntimeIntegrationModules(")).toBeLessThan(
     source.indexOf("createProviderRegistry("),
   );

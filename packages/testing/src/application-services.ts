@@ -32,7 +32,8 @@ export const TestServicesPlatformLive = Layer.succeed(
   TestServicesPlatform,
   TestServicesPlatform.of({
     load: loadServices,
-    database: (service, env) => activateDrizzleService(service, env, { isolated: true }),
+    database: (service, env, options) =>
+      activateDrizzleService(service, env, { ...options, isolated: true }),
     auth: (service, database, basePath) =>
       activateBetterAuthService(service, database, basePath, { isolated: true }),
   }),
@@ -85,6 +86,7 @@ export function testServicesLayer(
       "services.acquire",
       Effect.fn("Testing.services.acquire")(function* () {
         const platform = yield* TestServicesPlatform;
+        const instrumentation = yield* Effect.context<never>();
         const services = yield* Effect.tryPromise({
           try: () => platform.load(root),
           catch: (cause) => cause,
@@ -102,6 +104,7 @@ export function testServicesLayer(
                         ApplicationServicesPlatform["database"]
                       >[0],
                       env,
+                      { instrumentation },
                     ),
                   catch: (cause) => cause,
                 }),
