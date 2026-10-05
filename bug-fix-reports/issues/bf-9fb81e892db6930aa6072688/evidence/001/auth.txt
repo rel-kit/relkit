@@ -1,0 +1,12 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit
+
+
+ Test Files  8 passed (8)
+      Tests  21 passed (21)
+   Start at  13:48:46
+   Duration  1.49s (import 62%, transform 35%, tests 3%)
+
+  Transform  transforming modules took 3.55s · 35% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
