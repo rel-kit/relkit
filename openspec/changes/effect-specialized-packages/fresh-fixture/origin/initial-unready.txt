@@ -1,0 +1,10 @@
+1 | import assert from "node:assert/strict";
+2 |
+3 | const base = process.env.RELKIT_ORIGIN_PROBE_URL ?? "http://127.0.0.1:3000";
+4 | const graph = await (await fetch(`${base}/_relkit/v1/graph`)).json();
+5 | const functionId = graph.graph.nodes.some((node) => node.id === "hello.greet")
+                             ^
+TypeError: undefined is not an object (evaluating 'graph.graph.nodes')
+      at /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/verify-dev-origin.mjs:5:26
+
+Bun v1.3.10 (macOS arm64)

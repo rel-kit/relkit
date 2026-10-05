@@ -1,0 +1,3 @@
+{"operation":"generated function invocation","origin":"absent","status":200,"output":{"message":"Hello, Origin validation!"}}
+{"operation":"generated function invocation","origin":"http://127.0.0.1:3330","status":200,"output":{"message":"Hello, Origin validation!"}}
+{"operation":"same-origin WebSocket","origin":"http://127.0.0.1:3330","open":true}
