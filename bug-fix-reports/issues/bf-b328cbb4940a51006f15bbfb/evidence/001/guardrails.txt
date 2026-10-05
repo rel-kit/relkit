@@ -1,0 +1,36 @@
+bun test v1.3.10 (30e609e0)
+
+tests/phase0.test.ts:
+(pass) Phase 0 guardrails > allows a declared public-package dependency [176.87ms]
+(pass) Phase 0 guardrails > allows integration, catalog, and application dependency direction [166.70ms]
+(pass) Phase 0 guardrails > rejects undeclared dependencies [152.91ms]
+(pass) Phase 0 guardrails > rejects cross-package relative imports [156.18ms]
+(pass) Phase 0 guardrails > rejects descriptor runtime imports [149.88ms]
+(pass) Phase 0 guardrails > rejects core dependencies on standalone integrations [145.43ms]
+(pass) Phase 0 guardrails > rejects engine dependencies on local provider implementations [157.09ms]
+(pass) Phase 0 guardrails > rejects integration dependencies on non-protocol core packages [145.40ms]
+(pass) Phase 0 guardrails > rejects catalog dependencies on core protocols [155.47ms]
+(pass) Phase 0 guardrails > rejects graph imports hono [153.30ms]
+(pass) Phase 0 guardrails > rejects graph imports @pulumi/pulumi [157.01ms]
+(pass) Phase 0 guardrails > rejects inspector imports @relkit/app [220.68ms]
+(pass) Phase 0 guardrails > rejects inspector imports @relkit/engine [324.41ms]
+(pass) Phase 0 guardrails > rejects fixture imports effect [267.15ms]
+(pass) Phase 0 guardrails > rejects fixture imports hono [154.74ms]
+(pass) Phase 0 guardrails > rejects fixture imports next [153.86ms]
+(pass) Phase 0 guardrails > rejects fixture imports @pulumi/pulumi [173.50ms]
+(pass) Phase 0 guardrails > rejects fixture imports @aws-sdk/client-s3 [168.02ms]
+(pass) Phase 0 guardrails > rejects fixture imports @relkit/compiler [158.04ms]
+(pass) Phase 0 guardrails > rejects template imports an internal package [146.06ms]
+(pass) Phase 0 guardrails > package exports resolve only through the public entry [78733.10ms]
+(pass) Phase 0 guardrails > scope exclusions report each affected path and rule [8.75ms]
+(pass) Phase 0 guardrails > ignores workspace coverage reports but still checks authored coverage files [261.16ms]
+(pass) Phase 0 guardrails > reports implementation files over the 250-line limit [2.20ms]
+(pass) Phase 0 guardrails > repository guidance has current commands and topology [0.88ms]
+(pass) Phase 0 guardrails > ignores only RelKit generated and local runtime roots [103.18ms]
+(pass) Phase 0 guardrails > rejects lockfile drift in an isolated workspace [21.95ms]
+(pass) Phase 0 guardrails > frozen install and typecheck leave lockfile/generated state unchanged [5058.87ms]
+
+ 28 pass
+ 0 fail
+ 168 expect() calls
+Ran 28 tests across 1 file. [88.00s]

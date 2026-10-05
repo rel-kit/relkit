@@ -1,0 +1,9 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/generated-host.test.ts:
+(pass) generated host preserves database/auth ownership, rollback, session admission and shutdown [8299.44ms]
+
+ 1 pass
+ 0 fail
+ 28 expect() calls
+Ran 1 test across 1 file. [9.27s]
