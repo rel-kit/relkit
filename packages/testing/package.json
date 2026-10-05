@@ -29,7 +29,7 @@
     }
   },
   "dependencies": {
-    "@langchain/core": "1.2.9",
+    "@langchain/core": "1.2.14",
     "@relkit/agents": "workspace:*",
     "@relkit/buckets": "workspace:*",
     "@relkit/cache": "workspace:*",
@@ -61,6 +61,6 @@
     "@effect/vitest": "4.0.0-rc.115",
     "@relkit/routes": "workspace:*",
     "drizzle-orm": "1.0.0-rc.5-169397b",
-    "vitest": "5.0.1"
+    "vitest": "5.0.3"
   }
 }
