@@ -1,6 +1,6 @@
 {
   "name": "@relkit/config",
-  "version": "0.5.6",
+  "version": "0.6.0",
   "description": "RELKIT environment configuration API; prefer @relkit/app/config in applications.",
   "license": "MIT",
   "repository": {

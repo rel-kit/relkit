@@ -1,6 +1,6 @@
 {
   "name": "@relkit/events",
-  "version": "0.5.6",
+  "version": "0.6.0",
   "description": "RELKIT event authoring API; prefer @relkit/app/events in applications.",
   "license": "MIT",
   "repository": {
