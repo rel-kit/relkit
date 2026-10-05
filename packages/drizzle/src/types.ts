@@ -1,76 +1,74 @@
+import type { Row, Insert, Update, BaseOperations } from "./operations.types.js";
 import type { DescriptorBase, MaybePromise } from "@relkit/contracts";
-import type { MySqlAsyncDatabase } from "drizzle-orm/mysql-core";
-import type { PgAsyncDatabase } from "drizzle-orm/pg-core";
-import type { SQLiteAsyncDatabase } from "drizzle-orm/sqlite-core";
-import type { InferInsertModel, InferSelectModel, Table } from "drizzle-orm";
-import type { MySqlTable } from "drizzle-orm/mysql-core";
-import type { PgTable } from "drizzle-orm/pg-core";
-import type { SQLiteTable } from "drizzle-orm/sqlite-core";
+import type { MySqlAsyncDatabase, MySqlTable } from "drizzle-orm/mysql-core";
+import type { PgAsyncDatabase, PgTable } from "drizzle-orm/pg-core";
+import type { SQLiteAsyncDatabase, SQLiteTable } from "drizzle-orm/sqlite-core";
+import type { Table } from "drizzle-orm";
 import type { ZodType } from "zod";
 
+/** Supported tables keyed by authored schema names. */
 export type TableMap = Readonly<Record<string, Table>>;
+
+/**
+ * Table-only projection of an authored Drizzle schema.
+ * @typeParam Schema - Authored table/relation map.
+ */
 export type TablesOf<Schema> = {
   readonly [Name in keyof Schema as Schema[Name] extends Table ? Name : never]: Extract<
     Schema[Name],
     Table
   >;
 };
-export type Row<T extends Table> = InferSelectModel<T>;
-export type Insert<T extends Table> = InferInsertModel<T>;
-export type Update<T extends Table> = Partial<Insert<T>>;
-export type Where<T extends Table> = Partial<Row<T>>;
 
-export interface FindOneArgs<T extends Table> {
-  readonly where: Where<T>;
-}
-export interface FindManyArgs<T extends Table> {
-  readonly where?: Where<T>;
-  readonly orderBy?: {
-    readonly field: Extract<keyof Row<T>, string>;
-    readonly direction: "asc" | "desc";
-  };
-  readonly limit?: number;
-  readonly offset?: number;
-}
-export interface InsertArgs<T extends Table> {
-  readonly data: Insert<T>;
-}
-export interface UpdateArgs<T extends Table> {
-  readonly where: Where<T>;
-  readonly data: Update<T>;
-}
-export interface UpsertArgs<T extends Table> {
-  readonly where: Where<T>;
-  readonly create: Insert<T>;
-  readonly update: Update<T>;
-}
-export interface DeleteArgs<T extends Table> {
-  readonly where: Where<T>;
-}
+export type {
+  Row,
+  Insert,
+  Update,
+  Where,
+  FindOneArgs,
+  FindManyArgs,
+  InsertArgs,
+  UpdateArgs,
+  UpsertArgs,
+  DeleteArgs,
+  BaseOperations,
+} from "./operations.types.js";
 
-export interface BaseOperations<T extends Table> {
-  findOne(args: FindOneArgs<T>): Promise<Row<T> | null>;
-  findMany(args?: FindManyArgs<T>): Promise<Row<T>[]>;
-  insert(args: InsertArgs<T>): Promise<Row<T>>;
-  update(args: UpdateArgs<T>): Promise<Row<T> | null>;
-  upsert(args: UpsertArgs<T>): Promise<Row<T>>;
-  delete(args: DeleteArgs<T>): Promise<Row<T> | null>;
-}
-
+/**
+ * Native override receiving a Promise base operation.
+ * @typeParam Args - Original validated public operation arguments.
+ * @typeParam Result - Public operation result.
+ * @param options - Caller arguments and lazy base operation on the same client.
+ * @returns Authored synchronous or asynchronous replacement result.
+ */
 export type OperationOverride<Args, Result> = (options: {
   readonly args: Args;
   readonly base: (args: Args) => Promise<Result>;
 }) => MaybePromise<Result>;
+
+/**
+ * Optional replacements for the six reserved table operations.
+ * @typeParam T - Matching table.
+ */
 export type TableOverrides<T extends Table> = {
   readonly [Name in keyof BaseOperations<T>]?: OperationOverride<
     Parameters<BaseOperations<T>[Name]>[0],
     Awaited<ReturnType<BaseOperations<T>[Name]>>
   >;
 };
+
+/**
+ * Table-keyed override declarations.
+ * @typeParam Tables - Discovered table map.
+ */
 export type DrizzleOverrides<Tables extends TableMap> = {
   readonly [Name in keyof Tables]?: TableOverrides<Tables[Name]>;
 };
 
+/**
+ * Transaction-aware native database surface inferred by dialect.
+ * @typeParam T - Table declaring the native dialect.
+ */
 export type DialectDatabase<T extends Table> = T extends SQLiteTable
   ? Omit<SQLiteAsyncDatabase<any, any, any>, "query">
   : T extends PgTable
@@ -79,19 +77,47 @@ export type DialectDatabase<T extends Table> = T extends SQLiteTable
       ? Omit<MySqlAsyncDatabase<any, any>, "query">
       : never;
 
+/**
+ * Injected table and transaction-bound native database.
+ * @typeParam T - Matching table.
+ */
 export interface ModelExtensionContext<T extends Table> {
   readonly table: T;
   readonly database: DialectDatabase<T>;
 }
+
+/**
+ * Authored native extension with inferred caller arguments/results.
+ * @typeParam T - Matching authored table.
+ * @param context - Table and transaction-aware native database.
+ * @param args - Custom caller arguments preserved in the public context.
+ * @returns Authored result whose exact synchronous/asynchronous type is retained.
+ */
 export type ModelExtension<T extends Table> = (
   context: ModelExtensionContext<T>,
   ...args: any[]
 ) => unknown;
+
+/**
+ * Named authored extension functions.
+ * @typeParam T - Matching table.
+ */
 export type ModelExtensionMap<T extends Table> = Readonly<Record<string, ModelExtension<T>>>;
+
+/**
+ * Rejects declarations without any custom methods.
+ * @typeParam Extensions - Authored method map.
+ */
 export type NonEmptyExtensions<Extensions extends Readonly<Record<string, unknown>>> =
   keyof Extensions extends never ? never : Extensions;
 
 declare const MODEL_TYPES: unique symbol;
+
+/**
+ * Frozen lazy model descriptor retaining authored extension types.
+ * @typeParam T - Matching table.
+ * @typeParam Extensions - Inferred custom method signatures.
+ */
 export interface ModelDescriptor<
   T extends Table,
   Extensions extends ModelExtensionMap<T> = ModelExtensionMap<T>,
@@ -100,11 +126,22 @@ export interface ModelDescriptor<
   readonly extensionNames: readonly Extract<keyof Extensions, string>[];
   readonly [MODEL_TYPES]: Extensions;
 }
+
+/** Internal erased model descriptor used for pure discovery. */
 export type ModelDescriptorAny = ModelDescriptor<Table, ModelExtensionMap<Table>>;
+
+/**
+ * Optional table-keyed model declarations.
+ * @typeParam Tables - Discovered table map.
+ */
 export type DrizzleModelMap<Tables extends TableMap> = Partial<{
   readonly [Name in keyof Tables]: ModelDescriptor<Tables[Name], any>;
 }>;
 
+/**
+ * Projects authored methods without their injected context argument.
+ * @typeParam Model - Lazy model descriptor.
+ */
 type ConsumerExtensions<Model> =
   Model extends ModelDescriptor<any, infer Extensions>
     ? {
@@ -117,6 +154,10 @@ type ConsumerExtensions<Model> =
       }
     : {};
 
+/**
+ * Unchanged public select, insert and update Zod contracts.
+ * @typeParam T - Matching table.
+ */
 export interface TableZodSchemas<T extends Table> {
   readonly select: ZodType<Row<T>>;
   readonly insert: ZodType<Insert<T>>;
@@ -128,10 +169,13 @@ declare global {
     interface ApplicationEnv {}
   }
 }
+
+/** Application declaration augmentation, falling back to string environment values. */
 export type ApplicationEnv = keyof Relkit.ApplicationEnv extends never
   ? Readonly<Record<string, string>>
   : Readonly<Relkit.ApplicationEnv>;
 
+/** Pure compiler-visible dialect, tables, constraints and custom methods. */
 export interface DrizzleCapability {
   readonly kind: "drizzle";
   readonly dialect: "pg" | "mysql" | "sqlite";
@@ -153,6 +197,14 @@ export interface DrizzleCapability {
 }
 
 declare const SERVICE_TYPES: unique symbol;
+
+/**
+ * Frozen service descriptor retaining native client, schema and model inference.
+ * @typeParam Id - Service identity.
+ * @typeParam Client - Acquired native client.
+ * @typeParam Schema - Authored schema.
+ * @typeParam Models - Inferred table-specific models.
+ */
 export type DrizzleServiceDescriptor<
   Id extends string,
   Client,
@@ -167,6 +219,10 @@ export type DrizzleServiceDescriptor<
   };
 };
 
+/**
+ * Public transaction-aware table operations and unchanged Zod schemas.
+ * @typeParam Service - Authored service retaining table/model types.
+ */
 export type DatabaseContext<Service extends DrizzleServiceDescriptor<any, any, any, any>> = {
   readonly [Name in keyof TablesOf<Service[typeof SERVICE_TYPES]["schema"]>]: BaseOperations<
     TablesOf<Service[typeof SERVICE_TYPES]["schema"]>[Name]
@@ -175,6 +231,12 @@ export type DatabaseContext<Service extends DrizzleServiceDescriptor<any, any, a
       ? ConsumerExtensions<Service[typeof SERVICE_TYPES]["models"][Name]>
       : {});
 } & {
+  /**
+   * Runs a callback in a portable transaction without nested portable transactions.
+   * @typeParam Value - Callback result.
+   * @param run - Callback receiving transaction-bound table operations.
+   * @returns Callback result after native commit, or original failure after rollback.
+   */
   readonly transaction: <Value>(
     run: (context: DatabaseContext<Service>) => MaybePromise<Value>,
   ) => Promise<Value>;

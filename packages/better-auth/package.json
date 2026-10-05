@@ -38,15 +38,18 @@
     "@relkit/drizzle": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/routes": "workspace:*",
-    "better-auth": "1.7.1"
+    "better-auth": "1.7.1",
+    "effect": "4.0.0-rc.115"
   },
   "peerDependencies": {
     "react": ">=18.0.0"
   },
   "devDependencies": {
+    "@effect/vitest": "4.0.0-rc.115",
     "@types/react": "19.2.18",
     "drizzle-orm": "1.0.0-rc.5-169397b",
-    "react": "19.2.8"
+    "react": "19.2.8",
+    "vitest": "5.0.1"
   },
   "scripts": {
     "build": "tsc -b",

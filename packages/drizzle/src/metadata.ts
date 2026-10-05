@@ -5,6 +5,12 @@ import { getTableConfig as getSqliteTableConfig, SQLiteTable } from "drizzle-orm
 import type { TableMetadata } from "./runtime-types.js";
 import type { TableMap } from "./types.js";
 
+/**
+ * Discovers one consistent dialect and unique table selectors.
+ * @param tables - Authored table map.
+ * @returns Pure dialect and frozen per-table metadata.
+ * @throws TypeError for absent tables or mixed/unsupported dialects.
+ */
 export function inspectTables(tables: TableMap): {
   readonly dialect: "pg" | "mysql" | "sqlite";
   readonly metadata: Readonly<Record<string, TableMetadata>>;
@@ -21,6 +27,12 @@ export function inspectTables(tables: TableMap): {
   };
 }
 
+/**
+ * Filters relations and other schema values from supported tables.
+ * @param schema - Authored Drizzle schema.
+ * @returns Frozen table-only map; no native client is acquired.
+ * @throws TypeError when no supported table exists.
+ */
 export function extractTables(schema: Readonly<Record<string, unknown>>): TableMap {
   const tables = Object.fromEntries(
     Object.entries(schema).filter(([, value]) => isSupportedTable(value)),
@@ -29,6 +41,12 @@ export function extractTables(schema: Readonly<Record<string, unknown>>): TableM
   return Object.freeze(tables);
 }
 
+/**
+ * Resolves a supported table dialect using Drizzle's entity guards.
+ * @param table - Table to inspect.
+ * @returns PostgreSQL, MySQL or SQLite dialect.
+ * @throws TypeError for unsupported entities.
+ */
 export function dialectFor(table: Table): "pg" | "mysql" | "sqlite" {
   if (is(table, PgTable)) return "pg";
   if (is(table, MySqlTable)) return "mysql";
@@ -36,6 +54,11 @@ export function dialectFor(table: Table): "pg" | "mysql" | "sqlite" {
   throw new TypeError("Only PostgreSQL, MySQL, and SQLite Drizzle tables are supported");
 }
 
+/**
+ * Distinguishes supported tables from relation declarations.
+ * @param value - Unknown schema entry.
+ * @returns Whether this integration supports its dialect.
+ */
 function isSupportedTable(value: unknown): value is Table {
   try {
     dialectFor(value as Table);
@@ -45,6 +68,11 @@ function isSupportedTable(value: unknown): value is Table {
   }
 }
 
+/**
+ * Collects declared columns and complete primary/unique selectors.
+ * @param table - Supported table.
+ * @returns Metadata keyed by authored names, preserving composite constraints.
+ */
 function tableMetadata(table: Table): TableMetadata {
   const columns = getTableColumns(table) as unknown as Record<string, unknown>;
   const config = configFor(table);
@@ -85,6 +113,12 @@ function tableMetadata(table: Table): TableMetadata {
   };
 }
 
+/**
+ * Reads the driver's pure table configuration.
+ * @param table - Supported table.
+ * @returns Primary keys, unique constraints and indexes.
+ * @throws TypeError for unsupported entities.
+ */
 function configFor(table: Table): {
   readonly primaryKeys: readonly unknown[];
   readonly uniqueConstraints: readonly unknown[];
@@ -96,6 +130,11 @@ function configFor(table: Table): {
   throw new TypeError("Unsupported Drizzle table");
 }
 
+/**
+ * Deduplicates equivalent selector sets without changing authored key order.
+ * @param values - Discovered column-name combinations.
+ * @returns Frozen unique selector arrays.
+ */
 function uniqueSelectors(values: readonly string[][]): readonly (readonly string[])[] {
   return [
     ...new Map(
@@ -104,6 +143,11 @@ function uniqueSelectors(values: readonly string[][]): readonly (readonly string
   ];
 }
 
+/**
+ * Checks optional index metadata records.
+ * @param value - Unknown configuration value.
+ * @returns Whether it is a non-array object.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
