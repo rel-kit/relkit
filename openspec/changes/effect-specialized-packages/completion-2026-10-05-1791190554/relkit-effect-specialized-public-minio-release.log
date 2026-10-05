@@ -1,0 +1,63 @@
+$ bun run scripts/release-check.ts --readiness --allow-dirty --skip-build
+21 |     new Response(child.stdout).text(),
+22 |     new Response(child.stderr).text(),
+23 |     child.exited,
+24 |   ]);
+25 |   if (code !== 0)
+26 |     throw new Error(`${executable} ${args.join(" ")} failed (${code})\n${stdout}${stderr}`);
+                   ^
+error: /Users/mustafaelsayed/.bun/bin/bun run scripts/pack-and-smoke-create-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-artifacts-0ESVBT failed (1)
+packed minimal smoke passed
+61 |       [cli, "add", "cache", name, "--service", "billing", "--profile", "local"],
+62 |       root,
+63 |       [["Start local Docker services now?", "y\r"]],
+64 |       unavailable ? { DOCKER_HOST: `unix://${join(root, "missing-docker.sock")}` } : {},
+65 |     );
+66 |     assert.equal(result.code, unavailable ? 1 : 0, result.output);
+                ^
+AssertionError: [90m│[39m
+[32m◇[39m  [0mPlanned changes[0m [90m──────────────────────────────╮[39m
+[90m│[39m                                                [90m│[39m
+[90m│[39m  Cache scaffold                                [90m│[39m
+[90m│[39m  Create:                                       [90m│[39m
+[90m│[39m    src/billing/cache/docker-approved.cache.ts  [90m│[39m
+[90m│[39m                                                [90m│[39m
+[90m├────────────────────────────────────────────────╯[39m
+[?25l[90m│[39m
+[35m◒[39m  Checking project[1G[J[35m◐[39m  Checking project[1G[J[35m◓[39m  Checking project[1G[J[35m◑[39m  Checking project[1G[J[35m◒[39m  Checking project[1G[J[35m◐[39m  Checking project[1G[J[35m◓[39m  Checking project[1G[J[35m◑[39m  Checking project[1G[J[35m◒[39m  Checking project.[1G[J[35m◐[39m  Checking project.[1G[J[35m◓[39m  Checking project.[1G[J[35m◑[39m  Checking project.[1G[J[35m◒[39m  Checking project.[1G[J[35m◐[39m  Checking project.[1G[J[35m◓[39m  Checking project.[1G[J[35m◑[39m  Checking project.[1G[J[35m◒[39m  Checking project..[1G[J[35m◐[39m  Checking project..[1G[J[35m◓[39m  Checking project..[1G[J[35m◑[39m  Checking project..[1G[J[35m◒[39m  Checking project..[1G[J[35m◐[39m  Checking project..[1G[J[35m◓[39m  Checking project..[1G[J[35m◑[39m  Checking project..[1G[J[35m◒[39m  Checking project...[1G[J[35m◐[39m  Checking project...[1G[J[35m◓[39m  Checking project...[1G[J[35m◑[39m  Checking project...[1G[J[35m◒[39m  Checking project...[1G[J[35m◐[39m  Checking project...[1G[J[35m◓[39m  Checking project...[1G[J[32m◇[39m  Scaffold applied.
+[?25h[?25l[90m│[39m
+[36m◆[39m  Start local Docker services now? (relkit local up --detach)
+[36m│[39m  [32m●[39m Yes [2m/[22m [2m○[22m [2mNo[22m
+[36m└[39m
+[1A
+[?25h[999D[4A[1B[J[32m◇[39m  Start local Docker services now? (relkit local up --detach)
+[90m│[39m  [2mYes[22m
+RELKIT_DOCKER_COMMAND_TIMEOUT: Docker command timed out.
+Added cache.
+Created:
+  src/billing/cache/docker-approved.cache.ts
+Warnings:
+  Run `relkit local up` before using this local resource.
+  Scaffold saved, but local services could not start. Resolve the error and run `relkit local up --detach`.
+Verification: passed
+Next:
+  relkit local up
+
+
+1 !== 0
+
+ generatedMessage: false,
+     actual: 1,
+   expected: 0,
+   operator: "strictEqual",
+       code: "ERR_ASSERTION"
+
+      at verifyScaffoldTerminal (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/scripts/scaffold-smoke-terminal.ts:66:12)
+      at processTicksAndRejections (native:7:39)
+
+Bun v1.3.10 (macOS arm64)
+
+      at command (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/scripts/release-check-support.ts:26:15)
+
+Bun v1.3.10 (macOS arm64)
+error: script "release:check" exited with code 1
