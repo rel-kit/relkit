@@ -1,68 +1,52 @@
+/** Lazy authoring and Effect-native authentication borrowing the application's DB. @packageDocumentation */
 import { createDescriptorBase } from "@relkit/contracts";
-import {
-  drizzleRuntimeOf,
-  type DrizzleActivation,
-  type DrizzleServiceDescriptor,
-} from "@relkit/drizzle/internal";
 import { createUnboundIdentity } from "@relkit/invocation";
-import type { RawHttpHandler } from "@relkit/routes";
-import { betterAuth, type Auth, type BetterAuthOptions } from "better-auth";
-import { drizzleAdapter, type DrizzleAdapterConfig } from "better-auth/adapters/drizzle";
-import type { BetterAuthActivationOptions } from "./activation.types.js";
+import type { Auth } from "better-auth";
+import { Effect } from "effect";
+import { activateBetterAuthService, runAuthPromise } from "./activation.js";
+import { AuthService } from "./auth.service.js";
+import type {
+  BetterAuthHandler,
+  BetterAuthRuntime,
+  BetterAuthServiceDescriptor,
+  BetterAuthServiceOptions,
+} from "./auth.types.js";
+import { BETTER_AUTH_HANDLER, BETTER_AUTH_RUNTIME } from "./symbols.js";
+
+export { activateBetterAuthService };
+export { BETTER_AUTH_HANDLER };
+export { AuthFailure } from "./auth.errors.js";
+export { AuthFactory, authFactoryLiveLayer } from "./auth.factory.js";
+export { AuthService, authServiceLayer, authLiveLayer } from "./auth.service.js";
 export type { BetterAuthActivationOptions } from "./activation.types.js";
-
-export const BETTER_AUTH_HANDLER = Symbol.for("relkit.better-auth.handler");
-const BETTER_AUTH_RUNTIME = Symbol.for("relkit.better-auth.runtime");
-
-export type BetterAuthServiceOptions = Omit<BetterAuthOptions, "database" | "basePath"> & {
-  readonly database?: never;
-  readonly basePath?: never;
-  readonly drizzle?: Omit<DrizzleAdapterConfig, "provider">;
-};
-
-export interface BetterAuthRegistration {
-  readonly kind: "better-auth";
-  readonly service: BetterAuthServiceDescriptor<any>;
-}
-
-export type BetterAuthHandler<Session = unknown> = RawHttpHandler & {
-  readonly [BETTER_AUTH_HANDLER]: BetterAuthRegistration;
-  readonly __session?: Session;
-};
-
-export type InferBetterAuthSession<Handler> =
-  Handler extends BetterAuthHandler<infer Session> ? Session : never;
-
-export interface BetterAuthServiceDescriptor<
-  Options extends BetterAuthServiceOptions,
-> extends ReturnType<typeof createDescriptorBase<"service", string>> {
-  readonly capability: { readonly kind: "better-auth" };
-  readonly handler: BetterAuthHandler<Auth<Options>["$Infer"]["Session"]>;
-}
-
-interface BetterAuthRuntime<Options extends BetterAuthServiceOptions> {
-  readonly options: Options;
-  activation: Promise<Auth<any>> | undefined;
-}
+export type {
+  BetterAuthServiceOptions,
+  BetterAuthRegistration,
+  BetterAuthHandler,
+  InferBetterAuthSession,
+  BetterAuthServiceDescriptor,
+  AuthConfiguration,
+  AuthServiceInterface,
+  AuthFactoryInterface,
+} from "./auth.types.js";
 
 /**
- * Defines a lazy Better Auth domain service using the application's Drizzle database.
- *
- * Mount `handler` with a filesystem `ALL` catch-all route. RELKIT supplies `database`
- * and derives `basePath` from that route; neither option can be set here. Other
- * options follow Better Auth, with optional `drizzle` adapter settings. The
- * descriptor is not the native auth instance and does not expose `auth.api`.
- * Supply BETTER_AUTH_SECRET through the server process environment before startup.
- *
+ * Defines lazy authentication using the application's Drizzle database.
+ * @typeParam Options - Native options retaining session and plugin inference.
+ * @param options - Native SDK configuration plus optional Drizzle adapter settings.
+ * @returns A frozen declaration and stable handler; inactive handlers return 503.
+ * @remarks Mount handler in a filesystem ALL catch-all route. RELKIT supplies
+ * database and basePath. Declaration and compilation never construct native auth.
+ * Supply BETTER_AUTH_SECRET in the server environment before activation.
+ * @throws TypeError When options is not an object or specifies database/basePath.
  * @example
  * ```ts
- * import { defineBetterAuthService } from "@relkit/better-auth"
- *
+ * import { defineBetterAuthService } from "@relkit/better-auth";
  * const auth = defineBetterAuthService({
  *   baseURL: "http://127.0.0.1:3000",
  *   emailAndPassword: { enabled: true },
- * })
- * const handler = auth.handler
+ * });
+ * const handler = auth.handler;
  * ```
  * @category Services
  * @since 0.0.5
@@ -70,18 +54,22 @@ interface BetterAuthRuntime<Options extends BetterAuthServiceOptions> {
 export function defineBetterAuthService<const Options extends BetterAuthServiceOptions>(
   options: Options,
 ): BetterAuthServiceDescriptor<Options> {
-  if (!isRecord(options)) throw new TypeError("Better Auth service options must be an object");
-  if (Object.hasOwn(options, "database")) {
+  if (options === null || typeof options !== "object" || Array.isArray(options))
+    throw new TypeError("Better Auth service options must be an object");
+  if (Object.hasOwn(options, "database"))
     throw new TypeError("Better Auth service database is provided by the Drizzle service");
-  }
-  if (Object.hasOwn(options, "basePath")) {
+  if (Object.hasOwn(options, "basePath"))
     throw new TypeError("Better Auth basePath is derived from its ALL route");
-  }
   const runtime: BetterAuthRuntime<Options> = { options, activation: undefined };
   const handler = (async (request: Request) => {
-    const auth = await runtime.activation;
-    if (auth === undefined) return new Response("Service Unavailable", { status: 503 });
-    return auth.handler(request);
+    const owner = runtime.activation;
+    if (owner === undefined) return new Response("Service Unavailable", { status: 503 });
+    return runAuthPromise(
+      owner,
+      Effect.flatMap(AuthService, (auth) => auth.handler(request)),
+      { signal: request.signal },
+      "auth.handler",
+    );
   }) as BetterAuthHandler<Auth<Options>["$Infer"]["Session"]>;
   const descriptor = {
     ...createDescriptorBase("service", createUnboundIdentity()),
@@ -94,75 +82,4 @@ export function defineBetterAuthService<const Options extends BetterAuthServiceO
   Object.defineProperty(descriptor, BETTER_AUTH_RUNTIME, { value: runtime });
   Object.freeze(handler);
   return Object.freeze(descriptor) as BetterAuthServiceDescriptor<Options>;
-}
-
-/**
- * Binds native authentication to a database and its declared ALL route.
- * @typeParam Options - Configuration retained by the descriptor.
- * @typeParam Database - Declaration supplying its native client and schema.
- * @param service - Lazy auth declaration.
- * @param database - Acquired database whose owner controls disposal.
- * @param basePath - Derived ALL route prefix.
- * @param options - Isolation leaves the descriptor's shared handler untouched.
- * @returns Native auth; isolated owners must mount its handler within their application.
- */
-export async function activateBetterAuthService<
-  Options extends BetterAuthServiceOptions,
-  Database extends DrizzleServiceDescriptor<any, any, any, any>,
->(
-  service: BetterAuthServiceDescriptor<Options>,
-  database: DrizzleActivation<Database>,
-  basePath: string,
-  options: BetterAuthActivationOptions = {},
-): Promise<Auth<any>> {
-  const runtime = runtimeOf(service);
-  if (options.isolated !== true && runtime.activation !== undefined) return runtime.activation;
-  validateBasePath(basePath);
-  const activation = Promise.resolve().then(() => {
-    const drizzle = drizzleRuntimeOf(databaseServiceOf(database));
-    const { drizzle: adapterOptions, ...options } = runtime.options;
-    return betterAuth({
-      ...options,
-      basePath,
-      database: drizzleAdapter(database.client, {
-        ...(adapterOptions ?? {}),
-        schema: adapterOptions?.schema ?? drizzle.schema,
-        provider: drizzle.dialect,
-      }),
-    });
-  });
-  if (options.isolated === true) return activation;
-  runtime.activation = activation;
-  activation.catch(() => {
-    if (runtime.activation === activation) runtime.activation = undefined;
-  });
-  return activation;
-}
-
-function runtimeOf<Options extends BetterAuthServiceOptions>(
-  service: BetterAuthServiceDescriptor<Options>,
-): BetterAuthRuntime<Options> {
-  const runtime = (service as unknown as Record<PropertyKey, unknown>)[BETTER_AUTH_RUNTIME];
-  if (!isRecord(runtime)) throw new TypeError("Invalid Better Auth service descriptor");
-  return runtime as unknown as BetterAuthRuntime<Options>;
-}
-
-function databaseServiceOf(
-  activation: DrizzleActivation<DrizzleServiceDescriptor<any, any, any, any>>,
-): DrizzleServiceDescriptor<any, any, any, any> {
-  const service = (activation as unknown as Record<PropertyKey, unknown>)[
-    Symbol.for("relkit.drizzle.service")
-  ];
-  if (!isRecord(service)) throw new TypeError("Drizzle activation is missing its service");
-  return service as DrizzleServiceDescriptor<any, any, any, any>;
-}
-
-function validateBasePath(value: string): void {
-  if (!value.startsWith("/") || value.endsWith("/") || value.includes("*") || value.includes("[")) {
-    throw new TypeError(`Invalid Better Auth base path "${value}"`);
-  }
-}
-
-function isRecord(value: unknown): value is Record<PropertyKey, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
