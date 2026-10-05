@@ -1,0 +1,30 @@
+docker.io/oven/bun@sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e: Pulling from oven/bun
+ac9148dc57ca: Pulling fs layer
+4c2f73d039a5: Pulling fs layer
+557f3e7ffdc8: Pulling fs layer
+04320dec943a: Pulling fs layer
+1ba5c011290f: Pulling fs layer
+f69bb4450976: Pulling fs layer
+1ba5c011290f: Waiting
+04320dec943a: Waiting
+f69bb4450976: Waiting
+4c2f73d039a5: Download complete
+04320dec943a: Verifying Checksum
+04320dec943a: Download complete
+1ba5c011290f: Verifying Checksum
+1ba5c011290f: Download complete
+f69bb4450976: Verifying Checksum
+f69bb4450976: Download complete
+557f3e7ffdc8: Verifying Checksum
+557f3e7ffdc8: Download complete
+ac9148dc57ca: Verifying Checksum
+ac9148dc57ca: Download complete
+ac9148dc57ca: Pull complete
+4c2f73d039a5: Pull complete
+557f3e7ffdc8: Pull complete
+04320dec943a: Pull complete
+1ba5c011290f: Pull complete
+f69bb4450976: Pull complete
+Digest: sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e
+Status: Downloaded newer image for oven/bun@sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e
+docker.io/oven/bun:1.3.10@sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e

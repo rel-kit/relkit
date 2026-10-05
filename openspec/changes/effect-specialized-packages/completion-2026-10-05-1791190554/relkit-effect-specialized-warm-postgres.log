@@ -1,0 +1,54 @@
+docker.io/library/postgres@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685: Pulling from library/postgres
+5de55e5ef9c0: Pulling fs layer
+9441768a3c04: Pulling fs layer
+bf5ce8e8fb48: Pulling fs layer
+cfa20b885895: Pulling fs layer
+262f5476e213: Pulling fs layer
+83373364c1a1: Pulling fs layer
+e46a888c76da: Pulling fs layer
+baa69516db24: Pulling fs layer
+e365de836bbc: Pulling fs layer
+8bc4580efc9a: Pulling fs layer
+0931630a3433: Pulling fs layer
+baa69516db24: Waiting
+262f5476e213: Waiting
+e365de836bbc: Waiting
+83373364c1a1: Waiting
+8bc4580efc9a: Waiting
+e46a888c76da: Waiting
+0931630a3433: Waiting
+cfa20b885895: Waiting
+9441768a3c04: Verifying Checksum
+9441768a3c04: Download complete
+bf5ce8e8fb48: Verifying Checksum
+bf5ce8e8fb48: Download complete
+5de55e5ef9c0: Verifying Checksum
+cfa20b885895: Verifying Checksum
+5de55e5ef9c0: Download complete
+cfa20b885895: Download complete
+262f5476e213: Download complete
+5de55e5ef9c0: Pull complete
+9441768a3c04: Pull complete
+bf5ce8e8fb48: Pull complete
+cfa20b885895: Pull complete
+262f5476e213: Pull complete
+e46a888c76da: Verifying Checksum
+e46a888c76da: Download complete
+baa69516db24: Verifying Checksum
+baa69516db24: Download complete
+e365de836bbc: Download complete
+0931630a3433: Verifying Checksum
+0931630a3433: Download complete
+8bc4580efc9a: Verifying Checksum
+8bc4580efc9a: Download complete
+83373364c1a1: Verifying Checksum
+83373364c1a1: Download complete
+83373364c1a1: Pull complete
+e46a888c76da: Pull complete
+baa69516db24: Pull complete
+e365de836bbc: Pull complete
+8bc4580efc9a: Pull complete
+0931630a3433: Pull complete
+Digest: sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+Status: Downloaded newer image for postgres@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+docker.io/library/postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
