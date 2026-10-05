@@ -1,0 +1,69 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/auth-reentrancy.test.ts:
+[12:02:14.935] INFO (#4): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 1.47175,
+}
+[12:02:14.954] INFO (#13): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 4.12325,
+}
+[12:02:14.967] INFO (#16): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 1.431167,
+}
+[12:02:14.970] INFO (#16): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 7.33775,
+}
+[12:02:14.989] INFO (#18): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.session",
+  outcome: "success",
+  duration_ms: 14.33325,
+}
+[12:02:14.994] INFO (#13): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 47.51425,
+}
+[12:02:14.994] INFO (#10): Execution operation completed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "success",
+  duration_ms: 51.911959,
+}
+[12:02:14.995] INFO (#20): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.session",
+  outcome: "success",
+  duration_ms: 0.396875,
+}
+[12:02:14.997] INFO (#23): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.18075,
+}
+[12:02:14.998] ERROR (#25): Execution operation failed {
+  domain: "runtime",
+  operation: "auth.session",
+  outcome: "failure",
+  duration_ms: 1.0555,
+}
+(pass) native auth initialization can activate another descriptor inside a SQLite transaction [137.54ms]
+
+ 1 pass
+ 0 fail
+ 4 expect() calls
+Ran 1 test across 1 file. [812.00ms]
