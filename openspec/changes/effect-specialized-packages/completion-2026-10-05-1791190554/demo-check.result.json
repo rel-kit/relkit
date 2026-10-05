@@ -1,0 +1,13 @@
+{
+  "project": "demo",
+  "label": "demo-check",
+  "command": [
+    "rtk",
+    "bun",
+    "run",
+    "check"
+  ],
+  "exitCode": 0,
+  "seconds": 136.37,
+  "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-check.log"
+}
