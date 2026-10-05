@@ -1,0 +1,17 @@
+{
+  "transferredPaths": 143,
+  "byteIdentical": true,
+  "stagedChanges": false,
+  "baseUnchanged": true,
+  "verifiedAt": "2026-10-05T11:42:35.777897+00:00",
+  "checks": {
+    "DrizzleVitest": 50,
+    "AuthVitest": 21,
+    "NativeBun": 48,
+    "typesExitCode": 0,
+    "boundariesExitCode": 0,
+    "installFrozenExitCode": 0,
+    "strictOpenSpecExitCode": 0,
+    "whitespaceExitCode": 0
+  }
+}

@@ -1,0 +1,1010 @@
+{
+  "source": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit",
+  "target": "/Users/mustafaelsayed/Workspace/relkit",
+  "base": "0dbc3c445664d53c79d54c3e3e69628f039e6842",
+  "capturedAt": "2026-10-05T11:36:32.047358+00:00",
+  "entries": [
+    {
+      "path": "apps/docs/content/docs/api/better-auth.mdx",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "94af53efcc7b1baa6608f682bbc0594f5c4679943eec25828ec79f48cce38bd6",
+      "targetBeforeHash": "5f59e0b93c44a0a021ac1a2fe57e98335cb31f1b636a24eae827f65d0e9578b4"
+    },
+    {
+      "path": "apps/docs/content/docs/api/drizzle.mdx",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "8c4c30e1cca78fe90f96457cf46a5017a36d96a1a1a0c5473c8855fd47c1a0f8",
+      "targetBeforeHash": "06e0b492b3b685829c07e74c3921e9a8a5b87dae13e740b3d1847e959994d9d3"
+    },
+    {
+      "path": "apps/docs/content/docs/api/integrations/s3.mdx",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "0e96878c098430004fae7d33530874cfc9434e69edf3ee61c371d0889a7753fa",
+      "targetBeforeHash": "40c1ad3440f8e08277b7b1931b0ff69e66c48369659381d62d90b2bdc8698d2e"
+    },
+    {
+      "path": "apps/docs/content/docs/api/testing.mdx",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "88fff3bb4845d08ce0783298ecf5d2af3f97f8c732f731ab3fd8cf887b6d45a5",
+      "targetBeforeHash": "fa50cd7f84d957564ea0795e9086b7a232d0c45d56d4ab49164a13a96e29a750"
+    },
+    {
+      "path": "apps/docs/content/docs/integrations/local-docker.mdx",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "8b83385a0a1303ab91094a68c89f3952934dda92b3591f5fc62a7526adb42198",
+      "targetBeforeHash": "e5505357a4862f6db74e1f9db82d440e4702209212ec0f8e4845ebbae8671d5f"
+    },
+    {
+      "path": "apps/docs/content/docs/operations/cli-reference.mdx",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "28755d020d087ce019dafe09694c2a3364c3b8eac2e71da244cbf332a9eafec8",
+      "targetBeforeHash": "f5971dea149a40ff9f08a1922fa235f75b51f16bc39eb2b9675416ccd0288982"
+    },
+    {
+      "path": "apps/docs/docgen.examples.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "6dac75c7c6cdfc764f353fc99290fb49b0a8e12ff5e7f7e5176cb073ad1840bc",
+      "targetBeforeHash": "f149dca6491a2b5b511c3734a551f4534f815e71d8bb1304f1f5c61f16c5f207"
+    },
+    {
+      "path": "apps/docs/scripts/generate-api.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "7ab8f912a29c2fd7483795526fd7736a51f2ccd6cce545270de4ea2ca89d32dd",
+      "targetBeforeHash": "b52228929c6cc00b554b058678b2a7a925f508acbc49780eb596d0dbbba1e594"
+    },
+    {
+      "path": "bug-fix-reports/index/status/1c/1c34f88707b55e6104c4eb20e71ffa3d33e414b71ef689a15fad0640d0ac58cb.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "ce0e3a0d28c7bb89a0c51b00b1697b746c63b8e97839734f3f9a575e8446f36e",
+      "targetBeforeHash": "7846fb4e844114f7ef03ebf084a544704c31bda7aca18fb48c1184a58765b887"
+    },
+    {
+      "path": "bun.lock",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "071a439979ab3f1f1b16ab1b32f2e0b8321b74140af16c3e8bd0c502e143d7ef",
+      "targetBeforeHash": "392e26de57d0ff5d27f5423854e8720953cc2055344890fd2bf1fc9f78ac7622"
+    },
+    {
+      "path": "integrations/packages/s3/s3.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "9980884dd3de84dbc506a058e113198d8b7b6bbfd24a237498427c7645345536",
+      "targetBeforeHash": "bd1d2fe202d7deb76c48a61c4af8b61c14d791f91c4a77567db4f516a02b68ce"
+    },
+    {
+      "path": "integrations/packages/s3/src/local-recipe/index.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "06dffb24216cf367a133ea6f159b1b57b335244301f1d59487d25e3159acfe8c",
+      "targetBeforeHash": "23878f8698485e717069f8848887f87552ec33f1005da2bf860455241ac8a9a0"
+    },
+    {
+      "path": "packages/better-auth/package.json",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "3b1dc98f2d732f50be810b46017332d41279f174a0f3087194ed33fffdb8c7da",
+      "targetBeforeHash": "24b622a4c2536d5f62df3ebfd2b016129dc17b81edb483a38d32250cedd95e7b"
+    },
+    {
+      "path": "packages/better-auth/service.test.ts",
+      "deleted": true,
+      "generated": false,
+      "sourceHash": null,
+      "targetBeforeHash": "040674d25cf5132245bcc5e9ca96f656a7110a1a9cc7ad0a2b4bf346c780f6b6"
+    },
+    {
+      "path": "packages/better-auth/src/index.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "2973ae6737fa219ade6991a5ac0272ac64dbe92be7302c4a17349cce32eda26e",
+      "targetBeforeHash": "060969ea1843e6ba09bff02b57d6beac4afd7358999b4b42afc313e08b98c073"
+    },
+    {
+      "path": "packages/better-auth/src/react.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "7bb2626ba8a5b671ac63eb95843d0a6e035900f3ee41a1bd93524a290b02a864",
+      "targetBeforeHash": "047469af83119b4c4dc09f310b4ccbe10617beef831f1fef39052141b1f55be2"
+    },
+    {
+      "path": "packages/cli/build-server.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "70e49c7406a0de42bfc2c7c8cccd58c7172f3f2d6e3c8e95f617c401236f1b5f",
+      "targetBeforeHash": "9c035f4758e21f15cdd3839d192eb7deae536ab39d1f519c546a08c2138023ff"
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-invocation.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "10f159bd3c6d3aa91d5a47dfb7979d35e1ac2052a3f51eb61aba9e5814ad30dd",
+      "targetBeforeHash": "704f103f16762c191433f5b1909a011ad033c28fd83bee1a76f4003c462b0b93"
+    },
+    {
+      "path": "packages/cli/src/commands/build-server.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "0a47331f5dabe24e4cd8653f6cd94c39629968f41aa32cda840dc10bc69ba49e",
+      "targetBeforeHash": "6f2e4b13d55bfead1166865de31402ae7c8f11be331d14ab97dcca6cf90d565b"
+    },
+    {
+      "path": "packages/drizzle/package.json",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "5b053e649834ebd3df7d749f612157f78ca4acc734e047e8398011681fe34424",
+      "targetBeforeHash": "e3fc831256862014b7b68878183f1157f24efb91fc26d8763c9440a2ba5b9125"
+    },
+    {
+      "path": "packages/drizzle/src/activation.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "9a4db8e4021f564e9131db9ed00a1468b72b995704320c02ab9920291efdd20e",
+      "targetBeforeHash": "ff7208b3084bff8d8b821aac89e3f595c71ae278efd62220c6450cae8ea5e48e"
+    },
+    {
+      "path": "packages/drizzle/src/activation.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "4fd141f6a276f462cfa0b415a73b9a5cf63011f6d43488de3150bbaaea92921d",
+      "targetBeforeHash": "c41adb42b2ceeea360f0be708621fd78a37778efad374865487a08092c3f6c9d"
+    },
+    {
+      "path": "packages/drizzle/src/context.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "e5aff4855085edb79cb6a3dfb251ae324a5b32c2324cac1c5f1c3c22b0543be9",
+      "targetBeforeHash": "082ecbf9de8115076a52cb1511ac26d87144421e250189c719c4bbd317ff060e"
+    },
+    {
+      "path": "packages/drizzle/src/index.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "5a14ca12f51cd529335bb1980f0b90a90fc0ad2e382b0fb7e6b3d942d97e8738",
+      "targetBeforeHash": "ed9ad5a39b94084df823dfae5ab99752f10b16db1e54ce1318982de3a79b7cab"
+    },
+    {
+      "path": "packages/drizzle/src/internal.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "e146127339b47d2ce2e6816e897e01abdbcabb4b6924c3ac4630f1e9b3019ee2",
+      "targetBeforeHash": "7eeba1ee7869d7716ec4bf9c889f44b78e4158d988d463d974c624e61d3f3e06"
+    },
+    {
+      "path": "packages/drizzle/src/metadata.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "88391ae0b73d747412dd256b9a66ad0b70d8549306e586c1cfaabc0808f9fd4b",
+      "targetBeforeHash": "1890ab8f3995253d0b1950eed0cb8a2fa267d699a72c634e61ad993eb2f48d8b"
+    },
+    {
+      "path": "packages/drizzle/src/model.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "0140a40eda4d63ae2fbfabd62305856a70ec24a98669ac6217b14a1ea758533d",
+      "targetBeforeHash": "2a10b770fa1ed5bdd7146de18e491de52a2fa083626f4805debe21b45449ef62"
+    },
+    {
+      "path": "packages/drizzle/src/operation-tracing.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "13647a69dc27dbc25d132821ea4e4c74b3a1dabca66d4684471f8d7d95870528",
+      "targetBeforeHash": "7bf8249b88d6d4be52e7c972b39b2710c6cdfc1b0142fb38952a43d0145f93f2"
+    },
+    {
+      "path": "packages/drizzle/src/operations.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "57e72dce04f9273b00be62f55b70bb16dc9d7ecbfa7e06a9e5a8f17da844f6e3",
+      "targetBeforeHash": "07b58e1cf2f7aa8409d003f11dda87ac7c2084d4a793915370e30e13abba56c9"
+    },
+    {
+      "path": "packages/drizzle/src/runtime-types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "2fe78fb90271891f1ee8b9a30d3bc79f329777563d8103466cc20043e5403e96",
+      "targetBeforeHash": "6d81f9cd0c2a65f24615233ac62b194655504e9f567f0924ef88a8ef6c2a5e20"
+    },
+    {
+      "path": "packages/drizzle/src/service.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "1d484378016b71f1a4a0ca91be77c7468e26d3c7ad0e4f3370d8d4de8b2b61f8",
+      "targetBeforeHash": "551e6018f3f4dd2976f7607942de8f6f362d7e144a289bcc4d506c12452796ff"
+    },
+    {
+      "path": "packages/drizzle/src/types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "af14026e1777e8d59904095fd300f0d8e480d4d194f091dc37945581b8e93e49",
+      "targetBeforeHash": "5cd17f4410eabf39fe582a329b0d7893c0fa9546cac3711e82b00067fcee2933"
+    },
+    {
+      "path": "packages/providers-standard/package.json",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "6d6ee9ddd49b2a456232d3734cbdc57c8aac4e1f6a7eea71ecd9502503318bae",
+      "targetBeforeHash": "2451531db621861e5653794be92531040a41ea29bf8a12fca4ee1547a06db08f"
+    },
+    {
+      "path": "packages/providers-standard/src/index.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "9303357199fc98b6b6c27d5ed91ee87ba1d52141c6bf10a85fa9f1a968e4fab8",
+      "targetBeforeHash": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+    },
+    {
+      "path": "packages/testing/src/application-services.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "f548d9e54516a9bad7af69c5436a0f803a7a6cb38fdc55799a3c26ddaa1d11c7",
+      "targetBeforeHash": "395e6d1d2c9897d6e40bdac789989dd793b7fced6a77cd658fc5d0b3b70cf3ed"
+    },
+    {
+      "path": "scripts/sync-release.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "231b4af76aac9316c2a9141a10abb44601f5a9b4c0ff5fffb8acac6bc3b0cfdf",
+      "targetBeforeHash": "05ea22657ee5f398c7f1f57f286de7cde5d9523b3b1cfe43a2fdc728bb80849e"
+    },
+    {
+      "path": "bug-fix-reports/index/entrypoint/ac/acf7b7b74bf9002fb293524dbb8875be72b0db5f61b8c3a02242a747756814e3.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "ae4fa049ecd3bee7df56c28d253c0be483acb8ddbf4d7c1ec0431ca908755ed7",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/09/098bd5f536133c09bf6d659115773ceb2cd9a8096295c378255ba2ed754374a2.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "4d6a06b9eb7b659ca8b5cff8e0672760c99c0c6309b41541403387585545a9df",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/1f/1ffec48dbf84c1416ef64c8b19ae496f0752b1679e14e4bc4ae5243bb0906890.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "904623d8c2175de73ec7bb64464d67a8d17ff9c356815942c807b19dd0cea19b",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/53/53845e59b8ec52c2e59163ea66924126597b0303b3cc58a875c914db4713df80.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "0742f43a5819a9fdb9b6cb87db17b980017fbe4942a0dda9e5a207684eb95cb2",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/5c/5cb384b789c6fb28eea802360283b768cd84a7eb4eb03d4d2124a6ee07a69fec.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "c0de4d0f31b383abd8931b0fe49f15e13daab1a33172ae7bfde49b0b60eae335",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/7a/7a01bf5417b013e53c886ceb451baadc5c1a8faff3c9830563d90278a887a78d.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "a6ae2f27345fad8e6d4e3deccf6aa030e8411b3d2c06226f8959a07dbd7ce6dc",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/b2/b27809c77394be2f79210d16f3d9ca994943b089cca61b03cced7be05cebb042.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "6c4aa394b7e01a96aa84c508ad9ee1400ee0e5dc65368cb2ae42f380024fac6b",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/b8/b879be973cd3373e822a88737ac04f151ecbf733a1afb0c63c45a1b40ff7a74c.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "1df63ff7fb3390dfff4332b70d41f4a57665095fa424815fb36a1c47884aaf02",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/c8/c880e676c723be9e3dfa9831b28a0e4d8140e75c275a0ef30b6ce22d4666019d.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "caad9087189f1bfdb6276b079a3ba59deb8fe8604419f9f52fc37edc229b7ff0",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/d5/d5043c6b185e16f96632c6e13642bcc55085a5636d3206adbe07a7cbf76d2446.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "e6a423b2a9e2835056c54da9c999cd7793922db6f1cfe069296496ecf9aabca4",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/d5/d58a77b5267750d46ab75cbda3e1903e8be14e641b2c6c270c1d7e49cae22ec9.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "759d37978472d55f90903d8f5d87b02ad6bbf77295d9a777b2d39f037db44a20",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/e6/e60acc8b911b02859c015352bfa8ccf2bc43f0c59d6b8d3e0a4f15d7b2ed3988.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "6a35be9a27f0ef0fbb8675ed2672ec90df8a3ee7c6aca60bb96e4511e608e92b",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/ed/ed46efdcd62b3a5eb65ec023c42f8d604fd64cef0450151e400362b3111f41fe.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "eb4e25bfb1f9341c8fd441bcaa375ff268d151147c12883d72a9a309092c04b3",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/file/fb/fb5e333b4cf2b4159a23b694fcf2080782c349fbb48920a6340ab207472923e3.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "41edb354621dfa54c10fc7cd4fd1be80acf5fcbf3dabe0271d4a8beb6cdb7f89",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/fingerprint/bb/bb33ac6abe670ce6d9aef7bbe29847ad37015395041e4cee085acdd0acbc94cc.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "53579bdc645abb67c23b942be4d2da43c0e8d8852e4fa202cf53cf5d837a7703",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/module/bb/bb090d4cc6a01ecd80d943806719ce301ae1a90ca569a88735eb9c6e488cf828.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "81ef46590c6606e36a3c0a8db0bff98f87b45cdaa36d2d75dd1313b97c8de6a6",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/symptom/98/98dbfd6767c283743f8a8b8f96236184d31b39da6baa7e33bf211c47f85b197b.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "00063878ace3f95353d1b5cf96da7397ab6c575e57957658b31b4c0f01d1d1c1",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/tag/42/424f22be65be224660c3d8a09fcbd6a4e8ca14db6bd2163c81d32077377ee7f9.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "1b94786bfbc58479cc7791c1d9356d5fb7e7d5a1a0561bffcc5802571360fdb7",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/tag/62/62f83620a259e48e4ae05b1bb597a5b6e62e2a9a62033bf4144a4670d9aabca4.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "24b1c1caafaa8183c47023f8b4388b771018da3225719636ee0b5d6304cf165c",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/tag/81/81dc075c3d55230215300137991a25f90be4c243a55580fe2af7538774147bd6.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "36488da5a90eb9d2f23cf7db34a49df6cda2641877021cfd0e87742a59dcd19c",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/index/tag/df/df0ad6e43880f09c90ebf95f19110178aba6890df0010ebda7485029e2b543b4.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "ae3cbefcaa3b0760b045433e19a0e181e8ed5214554f6e1efbc82ac07b6599dd",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/attempts/001.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "e0df4cbed8e8043e76008b3dcd3f2031745e841f6c09b42b3169f0abaef63d00",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/arrays-before.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "6034696181ee62b6110579f914b149b18e8c2499636e747d4450263f7bdea385",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/auth.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "3e640e459d01f7b39a0032031b8b2cc23cca5f1dcf3db9c65739a981fdc76316",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/baseline.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "f6c7ab04f4f310be3b5eb82d1d07ae257b271fbed493737e29a4934c19e069eb",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/boundaries.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "096d5f2a1da65794874c867a18546e10a7b525c91028b4fe16b9a5a2ed8be842",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/consumers.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "f87af889aee6d744ae7c2463d9ca62931408dadc94c19c1c5dca62404a237f86",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/diff-check.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "bf4915939190cdac275e9a9bdcf0e83171c1ca16d00723885eaaae50c52b906d",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/docgen-check.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "4962e2838d5e41caac895aca549f6df3a462b7dfc07f08f36a176ba45710f3d9",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/docgen.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "1415bb5b53774438077d3424a9f777f7e5e47f07a1b83d5450866f4884b99e36",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/e2e-cause.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "ed60b1c7881d619a53a8f61d5378fc158e3c41126f31372930b6d9d7f7479776",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/e2e-diagnostic-full.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "c8d757db3c30cb023c4478b29ad13b9776fc4e69f12642d2451d7664940b3bc2",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/e2e-diagnostic.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "f1e3d1634dde148a2aef7cb112168bc5fcc5752198f9bc440872363df9ac5c81",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/e2e-reason.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "dbb3f1c0a714636aa380b772c0df9d2c6b3e417206f93553fa4442bd00ad3229",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/e2e.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "8ad3196c39f875351d9205e4659655af65b7e3d7369111bed036503edf255ba2",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/format.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/jsdoc.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "13ec368be7d2d4559146fd9342067fff0de6d098ebfee88c15602c668c9f8fd2",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/lint.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "d79082b82fa392617045b70461e836b6c5df8d272fe2fcb68a0fb1978ca6a2a0",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/runtime-after.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "64a4ebfb803cad47964baf32a5dfc75a218d40c564d676b8fb6443f3ffe8d55a",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/runtime-before.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "22a96dfd34294efe56f17cc2a41aa80098ab9d37ffae4a2eb0cb65528950ad87",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/test-types.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "bf4915939190cdac275e9a9bdcf0e83171c1ca16d00723885eaaae50c52b906d",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/type-fixtures.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "7864578d53540c6e1569bfc8a3b67def494d05b8ca9868890c5b53b2a23272eb",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/types.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "bf4915939190cdac275e9a9bdcf0e83171c1ca16d00723885eaaae50c52b906d",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/unit-after.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "eee680b96fed7cbd4e860d3b79deaf573ecb0ee5d0f76053789e8e0cb37f620e",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/unit-before.txt",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "a9942515f8ada1e6d734039cedd32d2d46bdb99132ef83ffa7a830ed2d0fcbf3",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/evidence/001/verified.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "d6f428f42ee46cf50bbac1cbc027c186e7812fe57a3605c39663c77ede6f14a2",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/report.json",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "e0df4cbed8e8043e76008b3dcd3f2031745e841f6c09b42b3169f0abaef63d00",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "bug-fix-reports/issues/bf-9fb81e892db6930aa6072688/report.md",
+      "deleted": false,
+      "generated": true,
+      "sourceHash": "335d3b7727d3d416f2e11148b73b77c27453280c847b931165a0308d7fb4661b",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/src/activation.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "a292a9977982a83f8522f7642689c6de9b4cb629701268b34da82ae7d61b9a4f",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/src/auth.errors.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "09d9fb915dbd9f26c8ed846959b523c654f88ca84c55849c501d16ebf6abe033",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/src/auth.factory.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "007a37d5e386047e20e1cac290fa661f8e6296c9dea480fe5fe0bd58a648463b",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/src/auth.schemas.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "4f4830ffe122c12a6a8d092041d85eea21891910a1ffccdbb444151ad51278f1",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/src/auth.service.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "e237c88e92544e8366a203e71d23e8f938a6c8e523d180bcdb6b7795b8cd1318",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/src/auth.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "2a79f481f73a44b71cae430cc7dfa0a1573c022cdf866cbff2f32b37b4a30d09",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/src/react.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "1771c11e6325d32202f19ca637d9396520d11ca348a51de499a2360e65a576e0",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/src/symbols.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "05bd32f05be8d2fa0127e95f475c5bb0ef9ac1063798a194d32746ed7c1df5a4",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/acquisition.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "2dee2cf9d1a6dd2d7e76dbde77e57cda5a6ee66b97d7dba3b6cdae4fd431e1a3",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/auth-test-layer.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "4fcf43be47d7c26b3eee50b396099f83f5256a934d23237d5becb48cbd8644c6",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/auth-test.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "9d5da0616c64c852ba082a49c75a53ee50345f1b15434b198c792c27412d3d92",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/compatibility.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "d1016daf6a810e315ebd74f8226f14fb6b19ee3d27d731e31960cd2dedea4726",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/coordination-fixture.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "38ed8c2f9e469ddd4882672bc55c865b169d7ffaab57278cf6e73f535a7dbba9",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/coordination.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "d2a34a0bb8647d262724aa0e01cbcf70903c4c6f66251379c6dc6d6a55e52c1f",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/examples.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "ee2d937de35479a4be196e48e728dff1d10af5caad923b1e8d2d21c210aac12a",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/failure.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "b191940344bf27ceec34ebc8bdd1f19ec92dee998e5cd0ec5ffb884440ef38ac",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/hooks.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "dcfc4c1b2deb4348c4b376323e0ecc9982f02196e133c14d142c26947cc5460f",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/instrumentation.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "903172d79020a5bf10325e67b003047d8a4609ece5a2352ae64f3a24cf08f07e",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/runtime.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "bf9eba4f06ae76f6213509b589d499167ba513f8eb380cdd942e7ee278728d7a",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/auth/tracer.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "28ab20a94b231db7c553b677e0385f18d341773fe02f85c9df8e3c638444f2a6",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/react.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "58ea50e93ffb3cec06ec0a30913a974e04a20fd6930b3c5aa88c4ccee28b8665",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/better-auth/tests/service.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "2439d335616e98421d85991fa7ac5d75c29ccb300a18c3f31d225ea1bc5df204",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/cli/specialized-logging.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "12690a6748c76f7de1931e9cdb9051e0048ac5ab445cba331117d0db70a0b670",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/context.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "f084b58072d55d520f81dc7cf30a77065b15fb48738cc7ba62854035f177f348",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/coordination.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "72a4a477ca78efad0734d3faf925ca7cf878970d88b6b7e8f8ea919574febeb9",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/failure.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "3533563dd857c22e54e7173ebb38dc2cb57904d3502c7ffa19dfa71c9896b5a3",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/mutations.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "d6d5342d8461014d0a880095dd1c9c88d4972fbc34e035ecb548914f52a16117",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/native-leases.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "2cf57d79350ce8114549fe0184855e39cf294463fcd58eed9ee54d189f3252cf",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/native-leases.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "ce3c376364f2c7e2d12d511e0e5919a8bbd03d3345a69ee2ecfda2fad7e70da0",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/operations.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "696c315775f79e4a1d602c95f3664d9f95653badb475939580a849c3060570c0",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/operations.utils.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "49461c6fa1b014e5c79836020b3d6bfd20609d9197ccbf84a1692ec43a44e0a7",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/owner.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "e56bee6237f324634298399796dd8a719f191f7b6e42d48902e6efe6e7ff030f",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/owner.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "fe5786bfe43946bfa0be9bcbea62e8ca7ff0f757d201f3af63ca83372e37995f",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/queries.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "66b0b519db43adae4d2f872cecd58d13077a0f7391c1f824f1cbf38b8499058b",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/service.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "e8826b99dd965aa878a37ea815b990fe02cb1bd38df1c7102bf42e5506d6c02c",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/table.schemas.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "fe2614743dc3417a9b6f2652a93c42697f22cdd271979d7ef504577cc940c93b",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/trace-redaction.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "1f1e537400dd51d161c8bdd1de1bb5073648f5db1de385234934e9c2d4a0c1fd",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/src/transaction.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "29dd3f292800379c7dfeaf1c22ee2e42b8142c17f4239e2ca8b0f27dc160708c",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/activation-contract.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "2f59cbcac0c6ccbb1d481b92707ca14a9cc59411ba77b6187281c233b7c85a41",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/crud-fixtures.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "056716dd403c38c873075fbc37be05a9ddf19933cde8b381986b25c13ac596d1",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/crud-fixtures.types.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "55ce3cb3d9330237bbb64afd13b47b12d479495afea6ef50af6ced2a4e218914",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/crud.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "f0d451059b3f504798679b5124f98d2c6ee0cecc770078724e762510d815e73e",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/drain-scheduler.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "74ece42ca5cd7158be07ed9ec63ef2f748cc67afc3c0e5e6a9c2465b7f4bea65",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/examples.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "5f1c0778ee4e5541a227fb0449951803fd42d113f2d10883318b2259b49e62a7",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/fixtures.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "5e0287ed567c20f720bd3b845bdcca13c6bb58b6667a06977e622d63c6e63cb6",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/lifecycle.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "6ef0bcf2b7d0b91a6455d28bfb09e4c668adc838884de7931578260067ee021e",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/native-coordination.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "455f1bde25efc9e07db4fa4244b6982ea4d578ad89da20bc354b8ccf7daaa154",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/observability.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "009d97ff32b50057a39779646ab27e1cc9c4401fd078e99e9b266414ef2d7517",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/review-regressions.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "d8790e11c3f4eed36691cfe3c594d01298d64b6e49c9436bfe4ed7bfb6fd6382",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/schemas.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "8ddcc35d266a15b5aca343005cb8a67f078a746ebea1214aa08e9fae509383da",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/string-bigint-arrays.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "84e5d18ee1a1a065223ea754fafa443774e6ac29f25032aee11b724710655ef8",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/trace-redaction.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "384f4abb446515440114eb203fb4dee6a88b6199319fc56354ed6209cd5d73c3",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/tracer-redaction.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "19b9a6546b9af0ca96abc02182e54a4a77138ac5618c8068843867e8c681f1f2",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/tests/effect/transactions.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "315c595a243d9f2ce25618161952211923d2daa0ea49c15a2205534ac5104eb5",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/drizzle/vitest.config.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "f48506b0cff0556c262aed732056a7c955708eb66fba4b2f571ac7b73816197e",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "packages/providers-standard/README.md",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "1493f09317f4088707cd10a9744a0639684c6fd929d016f88fc0c98c41744466",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "tests/integration/database/generated-host-fixture.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "bc00db08db31cfd469fc15e6e0be29c17718997c64dee35ceed089b7f2a5d72c",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "tests/integration/database/generated-host.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "03adb818bda40a03d969e182ef06fe69594d9e7a30491c0f3826f0b471996cc7",
+      "targetBeforeHash": null
+    },
+    {
+      "path": "tests/integration/database/review-regressions.test.ts",
+      "deleted": false,
+      "generated": false,
+      "sourceHash": "dcb1de80db470acca2bd89885e36caa71b6c7c42fe4f7b1ac18a1152b6d61c97",
+      "targetBeforeHash": null
+    }
+  ],
+  "patchBatches": 15
+}
