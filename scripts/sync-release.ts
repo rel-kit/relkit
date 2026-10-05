@@ -39,7 +39,7 @@ const descriptions: Record<string, string> = {
   "@relkit/openapi": "Unsupported internal OpenAPI generator for RELKIT; use @relkit/cli.",
   "@relkit/provider": "Portable provider authoring and binding protocol for RELKIT.",
   "@relkit/providers-local": "Local runtime providers for RELKIT development and testing.",
-  "@relkit/providers-standard": "Standard provider adapters for RELKIT applications.",
+  "@relkit/providers-standard": "Empty compatibility package retained for RELKIT tooling.",
   "@relkit/realtime": "Typed realtime channels and provider contracts for RELKIT.",
   "@relkit/routes": "RELKIT route authoring API; prefer @relkit/app/routes in applications.",
   "@relkit/runtime-effect": "Unsupported internal Effect runtime for RELKIT; use @relkit/app.",

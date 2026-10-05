@@ -1,7 +1,7 @@
 {
   "name": "@relkit/providers-standard",
   "version": "0.5.6",
-  "description": "Standard provider adapters for RELKIT applications.",
+  "description": "Empty compatibility package retained for RELKIT tooling.",
   "license": "MIT",
   "repository": {
     "type": "git",
