@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const script = new URL(
-  "../../openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/foreign-origin.mjs",
+  "../../openspec/changes/archive/2026-10-05-effect-specialized-packages/completion-2026-10-05-1791190554/foreign-origin.mjs",
   import.meta.url,
 ).pathname;
 
