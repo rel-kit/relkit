@@ -1,0 +1,551 @@
+{
+  "candidate": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit",
+  "ownedRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8",
+  "evidence": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554",
+  "originalLinks": {
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/buckets": "../../../relkit/packages/buckets",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/invocation": "../../../relkit/packages/invocation",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/client-generator": "../../../relkit/packages/client-generator",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/runtime-hono": "../../../relkit/packages/runtime-hono",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/s3": "../../../relkit/integrations/packages/s3",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/tools": "../../../relkit/packages/tools",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/docker": "../../../relkit/integrations/packages/docker",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/deploy-pulumi": "../../../relkit/packages/deploy-pulumi",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/app": "../../../relkit/packages/app",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/cache": "../../../relkit/packages/cache",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/config": "../../../relkit/packages/config",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/redis": "../../../relkit/integrations/packages/redis",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/deploy": "../../../relkit/packages/deploy",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/contracts": "../../../relkit/packages/contracts",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/inspector-api": "../../../relkit/packages/inspector-api",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/graph": "../../../relkit/packages/graph",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/provider": "../../../relkit/packages/provider",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/providers-local": "../../../relkit/packages/providers-local",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/agents": "../../../relkit/packages/agents",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/cli": "../../../relkit/packages/cli",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/observability": "../../../relkit/packages/observability",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/runtime-effect": "../../../relkit/packages/runtime-effect",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/openapi": "../../../relkit/packages/openapi",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/local": "../../../relkit/integrations/packages/local",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/realtime": "../../../relkit/packages/realtime",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/testing": "../../../relkit/packages/testing",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/schema": "../../../relkit/packages/schema",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/diagnostics": "../../../relkit/packages/diagnostics",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/functions": "../../../relkit/packages/functions",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/better-auth": "../../../relkit/packages/better-auth",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/jobs": "../../../relkit/packages/jobs",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/events": "../../../relkit/packages/events",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/local-service": "../../../relkit/packages/local-service",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/engine": "../../../relkit/packages/engine",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/client": "../../../relkit/packages/client",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/compiler": "../../../relkit/packages/compiler",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/routes": "../../../relkit/packages/routes",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/services": "../../../relkit/packages/services",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/supervisor": "../../../relkit/packages/supervisor",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/@relkit/drizzle": "../../../relkit/packages/drizzle",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/buckets": "../../../../../../relkit/packages/buckets",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/invocation": "../../../../../../relkit/packages/invocation",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/client-generator": "../../../../../../relkit/packages/client-generator",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/runtime-hono": "../../../../../../relkit/packages/runtime-hono",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/tools": "../../../../../../relkit/packages/tools",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/deploy-pulumi": "../../../../../../relkit/packages/deploy-pulumi",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/app": "../../../../../../relkit/packages/app",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/cache": "../../../../../../relkit/packages/cache",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/config": "../../../../../../relkit/packages/config",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/deploy": "../../../../../../relkit/packages/deploy",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/contracts": "../../../../../../relkit/packages/contracts",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/inspector-api": "../../../../../../relkit/packages/inspector-api",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/graph": "../../../../../../relkit/packages/graph",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/provider": "../../../../../../relkit/packages/provider",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/providers-local": "../../../../../../relkit/packages/providers-local",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/agents": "../../../../../../relkit/packages/agents",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/cli": "../../../../../../relkit/packages/cli",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/observability": "../../../../../../relkit/packages/observability",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/runtime-effect": "../../../../../../relkit/packages/runtime-effect",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/openapi": "../../../../../../relkit/packages/openapi",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/local": "../../../../../../relkit/integrations/packages/local",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/realtime": "../../../../../../relkit/packages/realtime",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/testing": "../../../../../../relkit/packages/testing",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/schema": "../../../../../../relkit/packages/schema",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/diagnostics": "../../../../../../relkit/packages/diagnostics",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/functions": "../../../../../../relkit/packages/functions",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/better-auth": "../../../../../../relkit/packages/better-auth",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/jobs": "../../../../../../relkit/packages/jobs",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/events": "../../../../../../relkit/packages/events",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/local-service": "../../../../../../relkit/packages/local-service",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/engine": "../../../../../../relkit/packages/engine",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/client": "../../../../../../relkit/packages/client",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/compiler": "../../../../../../relkit/packages/compiler",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/routes": "../../../../../../relkit/packages/routes",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/services": "../../../../../../relkit/packages/services",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/supervisor": "../../../../../../relkit/packages/supervisor",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/@relkit/drizzle": "../../../../../../relkit/packages/drizzle",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/tools": "/Users/mustafaelsayed/Workspace/relkit/packages/tools",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/schema": "/Users/mustafaelsayed/Workspace/relkit/packages/schema",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/invocation": "/Users/mustafaelsayed/Workspace/relkit/packages/invocation",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/contracts": "/Users/mustafaelsayed/Workspace/relkit/packages/contracts",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/functions": "/Users/mustafaelsayed/Workspace/relkit/packages/functions",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/cache": "/Users/mustafaelsayed/Workspace/relkit/packages/cache",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/buckets": "/Users/mustafaelsayed/Workspace/relkit/packages/buckets",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/testing": "/Users/mustafaelsayed/Workspace/relkit/packages/testing",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/runtime-hono": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-hono",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/realtime": "/Users/mustafaelsayed/Workspace/relkit/packages/realtime",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/routes": "/Users/mustafaelsayed/Workspace/relkit/packages/routes",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/services": "/Users/mustafaelsayed/Workspace/relkit/packages/services",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/jobs": "/Users/mustafaelsayed/Workspace/relkit/packages/jobs",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/events": "/Users/mustafaelsayed/Workspace/relkit/packages/events",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/runtime-effect": "/Users/mustafaelsayed/Workspace/relkit/packages/runtime-effect",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/observability": "/Users/mustafaelsayed/Workspace/relkit/packages/observability",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/graph": "/Users/mustafaelsayed/Workspace/relkit/packages/graph",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/config": "/Users/mustafaelsayed/Workspace/relkit/packages/config",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/provider": "/Users/mustafaelsayed/Workspace/relkit/packages/provider",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/openapi": "/Users/mustafaelsayed/Workspace/relkit/packages/openapi",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/engine": "/Users/mustafaelsayed/Workspace/relkit/packages/engine",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/app": "/Users/mustafaelsayed/Workspace/relkit/packages/app",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/agents": "/Users/mustafaelsayed/Workspace/relkit/packages/agents",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/langchain": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/providers-local": "/Users/mustafaelsayed/Workspace/relkit/packages/providers-local",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/drizzle": "/Users/mustafaelsayed/Workspace/relkit/packages/drizzle",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/compiler": "/Users/mustafaelsayed/Workspace/relkit/packages/compiler",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/local-service": "/Users/mustafaelsayed/Workspace/relkit/packages/local-service",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/diagnostics": "/Users/mustafaelsayed/Workspace/relkit/packages/diagnostics",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/client-generator": "/Users/mustafaelsayed/Workspace/relkit/packages/client-generator",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/better-auth": "/Users/mustafaelsayed/Workspace/relkit/packages/better-auth",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/client": "/Users/mustafaelsayed/Workspace/relkit/packages/client",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/supervisor": "/Users/mustafaelsayed/Workspace/relkit/packages/supervisor",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/inspector-api": "/Users/mustafaelsayed/Workspace/relkit/packages/inspector-api",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/deploy-pulumi": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy-pulumi",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/deploy": "/Users/mustafaelsayed/Workspace/relkit/packages/deploy",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/cli": "/Users/mustafaelsayed/Workspace/relkit/packages/cli",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/s3": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/s3",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/redis": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/redis",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/local": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/local",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@relkit/docker": "/Users/mustafaelsayed/Workspace/relkit/integrations/packages/docker",
+    "/Users/mustafaelsayed/.bun/install/global/node_modules/@langchain/langgraph": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@langchain+langgraph@1.4.14+9ed32dbb8973e5bd/node_modules/@langchain/langgraph",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/langchain": "../../relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/node_modules/.bin/relkit": "../@relkit/cli/dist/index.js",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/langchain": "../../../../../relkit/node_modules/.bun/langchain@1.5.10+5b521f8d5499dc9c/node_modules/langchain",
+    "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter/node_modules/.bin/relkit": "../@relkit/cli/dist/index.js"
+  },
+  "projects": {
+    "demo": {
+      "source": "/Users/mustafaelsayed/Workspace/relkit-regression-demo",
+      "root": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo",
+      "sourceHash": "dccb8bf85a424a8f5bc32cd1549286c9b061da3849578974fa2c68b71c304971",
+      "copyHash": "dccb8bf85a424a8f5bc32cd1549286c9b061da3849578974fa2c68b71c304971",
+      "ports": [
+        3000,
+        3210
+      ],
+      "links": {
+        "@relkit/buckets": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/buckets",
+        "@relkit/invocation": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/invocation",
+        "@relkit/client-generator": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/client-generator",
+        "@relkit/runtime-hono": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono",
+        "@relkit/s3": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/s3",
+        "@relkit/tools": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/tools",
+        "@relkit/docker": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/docker",
+        "@relkit/deploy-pulumi": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/deploy-pulumi",
+        "@relkit/app": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/app",
+        "@relkit/cache": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cache",
+        "@relkit/config": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/config",
+        "@relkit/redis": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/redis",
+        "@relkit/deploy": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/deploy",
+        "@relkit/contracts": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/contracts",
+        "@relkit/inspector-api": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/inspector-api",
+        "@relkit/graph": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/graph",
+        "@relkit/provider": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/provider",
+        "@relkit/providers-local": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/providers-local",
+        "@relkit/agents": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/agents",
+        "@relkit/cli": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cli",
+        "@relkit/observability": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/observability",
+        "@relkit/runtime-effect": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-effect",
+        "@relkit/openapi": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/openapi",
+        "@relkit/local": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/local",
+        "@relkit/realtime": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/realtime",
+        "@relkit/testing": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/testing",
+        "@relkit/schema": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/schema",
+        "@relkit/diagnostics": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/diagnostics",
+        "@relkit/functions": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/functions",
+        "@relkit/better-auth": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/better-auth",
+        "@relkit/jobs": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/jobs",
+        "@relkit/events": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/events",
+        "@relkit/local-service": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/local-service",
+        "@relkit/engine": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/engine",
+        "@relkit/client": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/client",
+        "@relkit/compiler": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/compiler",
+        "@relkit/routes": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/routes",
+        "@relkit/services": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/services",
+        "@relkit/supervisor": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/supervisor",
+        "@relkit/drizzle": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/drizzle"
+      }
+    },
+    "fixture": {
+      "source": "/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/ai-validation-2026-10-03/agent-starter",
+      "root": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo/evidence/ai-validation-2026-10-03/agent-starter",
+      "sourceHash": "3eef9465ee5410640d745112a881da130197cd8ec813039616039154ef683b52",
+      "copyHash": "3eef9465ee5410640d745112a881da130197cd8ec813039616039154ef683b52",
+      "ports": [
+        3330,
+        3331
+      ],
+      "links": {
+        "@relkit/buckets": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/buckets",
+        "@relkit/invocation": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/invocation",
+        "@relkit/client-generator": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/client-generator",
+        "@relkit/runtime-hono": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono",
+        "@relkit/tools": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/tools",
+        "@relkit/deploy-pulumi": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/deploy-pulumi",
+        "@relkit/app": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/app",
+        "@relkit/cache": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cache",
+        "@relkit/config": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/config",
+        "@relkit/deploy": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/deploy",
+        "@relkit/contracts": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/contracts",
+        "@relkit/inspector-api": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/inspector-api",
+        "@relkit/graph": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/graph",
+        "@relkit/provider": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/provider",
+        "@relkit/providers-local": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/providers-local",
+        "@relkit/agents": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/agents",
+        "@relkit/cli": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cli",
+        "@relkit/observability": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/observability",
+        "@relkit/runtime-effect": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-effect",
+        "@relkit/openapi": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/openapi",
+        "@relkit/local": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/local",
+        "@relkit/realtime": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/realtime",
+        "@relkit/testing": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/testing",
+        "@relkit/schema": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/schema",
+        "@relkit/diagnostics": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/diagnostics",
+        "@relkit/functions": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/functions",
+        "@relkit/better-auth": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/better-auth",
+        "@relkit/jobs": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/jobs",
+        "@relkit/events": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/events",
+        "@relkit/local-service": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/local-service",
+        "@relkit/engine": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/engine",
+        "@relkit/client": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/client",
+        "@relkit/compiler": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/compiler",
+        "@relkit/routes": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/routes",
+        "@relkit/services": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/services",
+        "@relkit/supervisor": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/supervisor",
+        "@relkit/drizzle": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/drizzle"
+      }
+    }
+  },
+  "processes": [
+    {
+      "name": "demo",
+      "pid": 3638,
+      "command": [
+        "rtk",
+        "bun",
+        "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cli/dist/index.js",
+        "dev",
+        "--project-root",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo",
+        "--port",
+        "3000",
+        "--inspector-port",
+        "3210",
+        "--no-color"
+      ],
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-runtime.log"
+    },
+    {
+      "name": "fixture",
+      "pid": 3640,
+      "command": [
+        "rtk",
+        "bun",
+        "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cli/dist/index.js",
+        "dev",
+        "--project-root",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo/evidence/ai-validation-2026-10-03/agent-starter",
+        "--port",
+        "3330",
+        "--inspector-port",
+        "3331",
+        "--no-color"
+      ],
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-runtime.log"
+    },
+    {
+      "name": "fixture",
+      "pid": 19943,
+      "command": [
+        "rtk",
+        "bun",
+        "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cli/dist/index.js",
+        "dev",
+        "--project-root",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo/evidence/ai-validation-2026-10-03/agent-starter",
+        "--port",
+        "3330",
+        "--inspector-port",
+        "3331",
+        "--no-color"
+      ],
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-runtime-2.log"
+    }
+  ],
+  "commands": [
+    {
+      "project": "demo",
+      "label": "demo-check",
+      "command": [
+        "rtk",
+        "bun",
+        "run",
+        "check"
+      ],
+      "exitCode": 0,
+      "seconds": 136.37,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-check.log"
+    },
+    {
+      "project": "fixture",
+      "label": "fixture-check",
+      "command": [
+        "rtk",
+        "bun",
+        "run",
+        "check"
+      ],
+      "exitCode": 0,
+      "seconds": 107.66,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-check.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-typecheck",
+      "command": [
+        "rtk",
+        "bun",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "seconds": 40.43,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-typecheck.log"
+    },
+    {
+      "project": "fixture",
+      "label": "fixture-typecheck",
+      "command": [
+        "rtk",
+        "bun",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "seconds": 45.39,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-typecheck.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-tests",
+      "command": [
+        "rtk",
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "seconds": 6.08,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-tests.log"
+    },
+    {
+      "project": "fixture",
+      "label": "fixture-tests",
+      "command": [
+        "rtk",
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "seconds": 5.04,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-tests.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-live-smoke",
+      "command": [
+        "rtk",
+        "bun",
+        "run",
+        "test:live"
+      ],
+      "exitCode": 0,
+      "seconds": 1.15,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-live-smoke.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-origin",
+      "command": [
+        "rtk",
+        "bun",
+        "scripts/verify-dev-origin.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 1.29,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-origin.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-validation-regressions",
+      "command": [
+        "rtk",
+        "bun",
+        "run",
+        "test:regressions"
+      ],
+      "exitCode": 0,
+      "seconds": 1.5,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-validation-regressions.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-foreign-origin",
+      "command": [
+        "rtk",
+        "bun",
+        "/tmp/relkit-effect-specialized-foreign-origin.mjs"
+      ],
+      "exitCode": 1,
+      "seconds": 0.15,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-foreign-origin.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-inspector-regressions",
+      "command": [
+        "rtk",
+        "bun",
+        "run",
+        "test:inspector:regressions"
+      ],
+      "exitCode": 0,
+      "seconds": 25.97,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-inspector-regressions.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-foreign-origin-confirmed",
+      "command": [
+        "rtk",
+        "bun",
+        "/tmp/relkit-effect-specialized-foreign-origin.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 1.61,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-foreign-origin-confirmed.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-local-reset",
+      "command": [
+        "rtk",
+        "bun",
+        "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cli/dist/index.js",
+        "local",
+        "reset",
+        "--project-root",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo"
+      ],
+      "exitCode": 2,
+      "seconds": 2.63,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-local-reset.log"
+    },
+    {
+      "project": "fixture",
+      "label": "fixture-origin",
+      "command": [
+        "rtk",
+        "bun",
+        "../../../../scripts/verify-dev-origin.mjs"
+      ],
+      "exitCode": 1,
+      "seconds": 0.07,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-origin.log"
+    },
+    {
+      "project": "fixture",
+      "label": "fixture-generated-ai",
+      "command": [
+        "rtk",
+        "bun",
+        "../../../../scripts/verify-generated-ai.mjs"
+      ],
+      "exitCode": 1,
+      "seconds": 0.07,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-generated-ai.log"
+    },
+    {
+      "project": "fixture",
+      "label": "fixture-origin-confirmed",
+      "command": [
+        "rtk",
+        "bun",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo/scripts/verify-dev-origin.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 1.38,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-origin-confirmed.log"
+    },
+    {
+      "project": "fixture",
+      "label": "fixture-generated-ai-confirmed",
+      "command": [
+        "rtk",
+        "bun",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo/scripts/verify-generated-ai.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 6.11,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-generated-ai-confirmed.log"
+    },
+    {
+      "project": "demo",
+      "label": "demo-local-reset-confirmed",
+      "command": [
+        "rtk",
+        "bun",
+        "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/cli/dist/index.js",
+        "local",
+        "reset",
+        "--project-root",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo",
+        "--yes"
+      ],
+      "exitCode": 0,
+      "seconds": 9.53,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/demo-local-reset-confirmed.log"
+    },
+    {
+      "project": "fixture",
+      "label": "fixture-foreign-origin",
+      "command": [
+        "rtk",
+        "bun",
+        "/tmp/relkit-effect-specialized-foreign-origin.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 1.69,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-foreign-origin.log"
+    },
+    {
+      "project": "fixture",
+      "label": "fixture-disconnect",
+      "command": [
+        "rtk",
+        "bun",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-specialized-completion-pnolnur8/demo/scripts/verify-realtime-disconnect.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 10.81,
+      "log": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages/completion-2026-10-05-1791190554/fixture-disconnect.log"
+    }
+  ],
+  "restoredLinks": [],
+  "linksVerified": true
+}
