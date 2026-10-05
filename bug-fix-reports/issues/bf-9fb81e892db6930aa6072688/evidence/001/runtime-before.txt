@@ -1,0 +1,32 @@
+[FAIL] FAILURES:
+  (fail) public transaction APIs drain a detached child before SQLite commit and close [24.68ms]
+  (fail) installed PostgreSQL string bigint contracts accept native strings [2.36ms]
+  (fail) standalone CRUD uses actual SQLite and records one outcome [5.02ms]
+  error: expect(received).toEqual(expected)
+  {
+  -   "committed": false,
+  +   "committed": true,
+  "disposed": false,
+  }
+  - Expected  - 1
+  + Received  + 1
+  at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/tests/integration/database/review-regressions.test.ts:45:18)
+  error: expect(received).toMatchObject(expected)
+  {
+  -   "_tag": "Success",
+  -   "value": {
+  -     "id": "9007199254740993",
+  +   "~effect/Effect/args": CauseImpl {
+  +     "reasons": [
+  +       Fail {
+  +         "_tag": "Fail",
+  +         "annotations": Map {},
+  +         "error": [SchemaError: Expected bigint
+  ... +14 more
+
+SUMMARY:
+   0 pass
+   3 fail
+  Ran 3 tests across 1 file. [343.00ms]
+
+[full output: rtk recall 5822f9d52a81]

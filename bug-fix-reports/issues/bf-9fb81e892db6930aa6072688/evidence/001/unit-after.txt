@@ -1,0 +1,12 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/drizzle
+
+
+ Test Files  12 passed (12)
+      Tests  50 passed (50)
+   Start at  13:51:31
+   Duration  1.80s (import 52%, transform 44%, tests 3%)
+
+  Transform  transforming modules took 4.97s · 44% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns

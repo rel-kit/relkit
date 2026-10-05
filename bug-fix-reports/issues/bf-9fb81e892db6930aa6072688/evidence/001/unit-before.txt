@@ -1,0 +1,149 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/drizzle
+stdout | tests/effect/review-regressions.test.ts > transaction children drain before commit and owner disposal
+[13:29:42.516] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.599666
+}
+stdout | tests/effect/review-regressions.test.ts > transaction children drain before commit and owner disposal
+[13:29:42.520] INFO (#11): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 1.082792
+}
+stdout | tests/effect/review-regressions.test.ts > transaction children drain before commit and owner disposal
+[13:29:42.521] INFO (#13): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'success',
+  duration_ms: 1.617541
+}
+stdout | tests/effect/review-regressions.test.ts > transaction children drain before commit and owner disposal
+[13:29:42.522] INFO (#16): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.058041
+}
+stdout | tests/effect/review-regressions.test.ts > transaction children drain before commit and owner disposal
+[13:29:42.524] ERROR (#3): Error [AssertionError]: expected true to be false // Object.is equality
+    at /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/drizzle/tests/effect/review-regressions.test.ts:38:25 {
+  actual: true,
+  expected: false,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+stdout | tests/effect/review-regressions.test.ts > pg string bigint schemas preserve native values and reject invalid integers
+[13:29:42.528] ERROR (#20): [Error [SchemaError]: Expected bigint
+  at ["id"]] {
+  issue: Composite {
+    '~effect/SchemaIssue/Issue': '~effect/SchemaIssue/Issue',
+    _tag: 'Composite',
+    ast: Objects {
+      '~effect/Schema': '~effect/Schema',
+      annotations: undefined,
+      checks: undefined,
+      encoding: undefined,
+      context: undefined,
+      _tag: 'Objects',
+      propertySignatures: [Array],
+      indexSignatures: [],
+      encodingChecks: undefined
+    },
+    issues: [ [Pointer] ]
+  },
+  _tag: 'SchemaError',
+  '~effect/Schema/SchemaError': '~effect/Schema/SchemaError',
+  [cause]: undefined
+}
+stdout | tests/effect/review-regressions.test.ts > mysql string bigint schemas preserve native values and reject invalid integers
+[13:29:42.529] ERROR (#26): [Error [SchemaError]: Expected bigint
+  at ["id"]] {
+  issue: Composite {
+    '~effect/SchemaIssue/Issue': '~effect/SchemaIssue/Issue',
+    _tag: 'Composite',
+    ast: Objects {
+      '~effect/Schema': '~effect/Schema',
+      annotations: undefined,
+      checks: undefined,
+      encoding: undefined,
+      context: undefined,
+      _tag: 'Objects',
+      propertySignatures: [Array],
+      indexSignatures: [],
+      encodingChecks: undefined
+    },
+    issues: [ [Pointer] ]
+  },
+  _tag: 'SchemaError',
+  '~effect/Schema/SchemaError': '~effect/Schema/SchemaError',
+  [cause]: undefined
+}
+stdout | tests/effect/review-regressions.test.ts > standalone CRUD Effects emit logs and count one operation
+[13:29:42.532] ERROR (#32): Error [AssertionError]: expected [] to have a length of 1 but got +0
+    at Proxy.<anonymous> (file:///Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/vitest@5.0.1+632d306ebd1e5cd5/node_modules/vitest/dist/chunks/index.m3L2HgmY.js:2137:20)
+    at Proxy.<anonymous> (file:///Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/vitest@5.0.1+632d306ebd1e5cd5/node_modules/vitest/dist/chunks/index.m3L2HgmY.js:1934:14)
+    at Proxy.methodWrapper (file:///Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/chai@6.2.2/node_modules/chai/index.js:1700:25)
+    at /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/drizzle/tests/effect/review-regressions.test.ts:88:18 {
+  actual: 0,
+  expected: 1,
+  showDiff: true,
+  [cause]: undefined
+}
+ ❯ tests/effect/review-regressions.test.ts (4 tests | 4 failed) 23ms
+   × transaction children drain before commit and owner disposal 16ms
+   × pg string bigint schemas preserve native values and reject invalid integers 2ms
+   × mysql string bigint schemas preserve native values and reject invalid integers 1ms
+   × standalone CRUD Effects emit logs and count one operation 3ms
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  13:29:41
+   Duration  1.11s (import 49%, transform 48%, tests 2%)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/effect/review-regressions.test.ts > transaction children drain before commit and owner disposal
+AssertionError: expected true to be false // Object.is equality
+- Expected
++ Received
+- false
++ true
+ ❯ tests/effect/review-regressions.test.ts:38:25
+     36|     try {
+     37|       yield* Effect.promise(() => new Promise<void>((resolve) => setIm…
+     38|       expect(committed).toBe(false);
+       |                         ^
+     39|       expect(client.statements).toEqual(["begin"]);
+     40|       expect(disposed).toBe(false);
+ ❯ IteratorImpl.~effect/Effect/successCont ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:1428:28
+ ❯ ExitPrimitive.~effect/Effect/evaluate ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/core.ts:523:30
+ ❯ FiberImpl.runLoop ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:685:39
+ ❯ FiberImpl.evaluate ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:628:23
+ ❯ ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:1167:17
+ ❯ ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:1102:14
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+ FAIL  tests/effect/review-regressions.test.ts > pg string bigint schemas preserve native values and reject invalid integers
+ FAIL  tests/effect/review-regressions.test.ts > mysql string bigint schemas preserve native values and reject invalid integers
+SchemaError: Expected bigint
+  at ["id"]
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+ FAIL  tests/effect/review-regressions.test.ts > standalone CRUD Effects emit logs and count one operation
+AssertionError: expected [] to have a length of 1 but got +0
+- Expected
++ Received
+- 1
++ 0
+ ❯ tests/effect/review-regressions.test.ts:88:18
+     86|       Effect.provideService(Metric.MetricRegistry, registry),
+     87|     );
+     88|     expect(logs).toHaveLength(1);
+       |                  ^
+     89|     const counters = [...registry.values()].filter((metric) => metric.…
+     90|     expect(counters).toHaveLength(1);
+ ❯ IteratorImpl.~effect/Effect/successCont ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:1428:28
+ ❯ ExitPrimitive.~effect/Effect/evaluate ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/core.ts:523:30
+ ❯ FiberImpl.runLoop ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:685:39
+ ❯ FiberImpl.evaluate ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:628:23
+ ❯ ../../node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/src/internal/effect.ts:1167:17
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
