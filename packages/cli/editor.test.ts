@@ -8,9 +8,7 @@ import ts from "typescript";
 const require = createRequire(import.meta.url);
 
 test("the packaged editor plugin reports unsaved route mistakes and offers a working code fix", () => {
-  const initialize = require("@relkit/cli/editor") as (modules: {
-    typescript: typeof ts;
-  }) => ts.server.PluginModule;
+  const initialize = require("@relkit/cli/editor") as typeof import("./src/editor.js").default;
   expect(typeof initialize).toBe("function");
   const root = resolve(import.meta.dir, "../../examples/commerce");
   const file = resolve(root, "src/routes/orders/route.ts");
@@ -35,6 +33,8 @@ test("the packaged editor plugin reports unsaved route mistakes and offers a wor
     readDirectory: ts.sys.readDirectory,
   };
   const service = ts.createLanguageService(host);
+  // These hooks consume only languageService; the fixture deliberately supplies
+  // an in-memory host so unsaved snapshots, rather than disk contents, drive findings.
   const plugin = initialize({ typescript: ts }).create({
     languageService: service,
   } as ts.server.PluginCreateInfo);
@@ -104,9 +104,7 @@ process.stdout.write(typeof result.module);`,
 });
 
 test("the packaged editor excludes test and fixture routes but diagnoses application routes", () => {
-  const initialize = require("@relkit/cli/editor") as (modules: {
-    typescript: typeof ts;
-  }) => ts.server.PluginModule;
+  const initialize = require("@relkit/cli/editor") as typeof import("./src/editor.js").default;
   const files = [
     "/app/src/routes/__fixtures__/route.ts",
     "/app/src/routes/users/__tests__/route.ts",
@@ -125,6 +123,7 @@ test("the packaged editor excludes test and fixture routes but diagnoses applica
     readFile: (file) => (files.includes(file) ? source : undefined),
   };
   const service = ts.createLanguageService(host);
+  // The pure plugin hooks read no PluginCreateInfo members beyond this service.
   const plugin = initialize({ typescript: ts }).create({
     languageService: service,
   } as ts.server.PluginCreateInfo);

@@ -61,8 +61,11 @@ export const { GET } = defineServiceRoutes(service, { GET: { member: "example" }
       readFile: ts.sys.readFile,
       readDirectory: ts.sys.readDirectory,
     });
-    const initialize = require("@relkit/cli/editor");
-    const plugin = initialize({ typescript: ts }).create({ languageService: service });
+    const initialize = require("@relkit/cli/editor") as typeof import("./src/editor.js").default;
+    // The plugin consumes only languageService, which owns these mutable snapshots.
+    const plugin = initialize({ typescript: ts }).create({
+      languageService: service,
+    } as ts.server.PluginCreateInfo);
     const findings = () =>
       plugin
         .getSemanticDiagnostics(routeFile)
