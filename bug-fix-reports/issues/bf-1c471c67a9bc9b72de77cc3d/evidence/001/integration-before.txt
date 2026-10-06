@@ -1,0 +1,18 @@
+[FAIL] FAILURES:
+  (fail) caller cancellation completes while the jobs backend withholds headers [524.66ms]
+  (fail) SIGINT exits the real jobs CLI before the backend sends headers [2264.48ms]
+  error: expect(received).toBe(expected)
+  Expected: true
+  Received: false
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/http-native.test.ts:34:36)
+  error: expect(received).toBe(expected)
+  Expected: 130
+  Received: null
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/http-native.test.ts:72:31)
+
+SUMMARY:
+   1 pass
+   2 fail
+  Ran 3 tests across 1 file. [2.96s]
+
+[full output: rtk recall 3f75b8eaed2e]

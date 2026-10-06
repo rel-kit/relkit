@@ -1,0 +1,38 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+stdout | packages/cli/tests/services/http.test.ts > interrupting header acquisition aborts the native fetch signal
+[22:59:30.330] ERROR (#1): Error [AssertionError]: expected false to be true // Object.is equality
+    at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/http.test.ts:29:34 {
+  actual: false,
+  expected: true,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+ ❯ packages/cli/tests/services/http.test.ts (4 tests | 1 failed) 18ms
+   × interrupting header acquisition aborts the native fetch signal 11ms
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  22:59:29
+   Duration  895ms (transform 72%, import 26%, tests 2%)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  packages/cli/tests/services/http.test.ts > interrupting header acquisition aborts the native fetch signal
+AssertionError: expected false to be true // Object.is equality
+- Expected
++ Received
+- true
++ false
+ ❯ packages/cli/tests/services/http.test.ts:29:34
+     27|     response.resolve(new Response(null));
+     28|     yield* Fiber.await(requesting);
+     29|     expect(abortedBeforeHeaders).toBe(true);
+       |                                  ^
+     30|   }).pipe(Effect.provide(httpLayer)),
+     31| );
+ ❯ IteratorImpl.~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1417:28
+ ❯ ExitPrimitive.~effect/Effect/evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/core.ts:565:30
+ ❯ FiberImpl.runLoop node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:650:39
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:592:23
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:586:27
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1154:17
+ ❯ Array.<anonymous> node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:799:44
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
