@@ -1,5 +1,10 @@
 import type { DatabaseDialect } from "./add-types.js";
 
+/**
+ * Renders database Service Source as source text without executing user modules.
+ * @param dialect - Supported database dialect.
+ * @returns TypeScript declaring the selected Drizzle database service and connection factory.
+ */
 export function databaseServiceSource(dialect: DatabaseDialect): string {
   const sqlite = dialect === "sqlite";
   const client = sqlite
@@ -19,6 +24,11 @@ export default defineDrizzleService({
 `;
 }
 
+/**
+ * Renders items Schema Source as source text without executing user modules.
+ * @param dialect - Supported database dialect.
+ * @returns Drizzle TypeScript schema source for the example items table.
+ */
 export function itemsSchemaSource(dialect: DatabaseDialect): string {
   if (dialect === "sqlite") {
     return `import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
@@ -47,6 +57,11 @@ export const items = mysqlTable("items", {
 `;
 }
 
+/**
+ * Renders drizzle Config Source as source text without executing user modules.
+ * @param dialect - Supported database dialect.
+ * @returns Drizzle Kit configuration source using the dialect's explicit environment connection.
+ */
 export function drizzleConfigSource(dialect: DatabaseDialect): string {
   const variable = dialect === "sqlite" ? "DATABASE_PATH" : "DATABASE_URL";
   const value = dialect === "sqlite" ? "path" : "url";
