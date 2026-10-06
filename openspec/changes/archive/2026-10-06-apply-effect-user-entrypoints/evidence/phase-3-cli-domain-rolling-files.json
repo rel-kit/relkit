@@ -1,0 +1,643 @@
+{
+  "reviewer": "/root/native_gate",
+  "status": "open; final freeze and regression gates pending",
+  "files": [
+    {
+      "path": "packages/cli/src/commands/client-check.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "dde066dc73d0853b483f31633e5f28a7de7e442f69f1bb182acd1849e04ebaed",
+      "lines": 59,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/client-document.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "56010fd3af71d7a0b5c22f164daee27b8e960e4063306f039a3ab3542ebf658d",
+      "lines": 62,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/client.schemas.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "08996ba4fb0fc279a83e3596a3997ef8aa37fefa9bfa565758e37a60104af589",
+      "lines": 20,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/client.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "a210ed652d4f2d4941f1bcc2c7a927011e5777d76331629b948997733c9a056f",
+      "lines": 40,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/client.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "06bbd31301f698f5ac07181bca02175ecdc3edb66777ca03d5e531a09834bf53",
+      "lines": 18,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-confirmation.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "4ac1c3b863e3d230b8e297110fe7a828789455175cc5a86d18c762181469d5a8",
+      "lines": 32,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-operations.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "d90de64d33d482f068dccdfcc08b49d851efa30d3490d6a76ba270f6c0d894c6",
+      "lines": 87,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-preparation.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "3e751642ea884d4db8f05e75bbcac739a716d898ef977395c38f651dfc0add2a",
+      "lines": 119,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-report.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "5eba7bd254cdbec9ef02a25f6481fbc9415c7f639e9d86503658f54b044b0452",
+      "lines": 149,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-support.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "f6355df1ebacfca2f2b1fee7b3a104733abe4467b06ccddd66e0f9507649d12d",
+      "lines": 115,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-support.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "3f657ec8c563ee715b8ca65c639f22798a46e65c1fbe230957afd5fe4ead32df",
+      "lines": 58,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy.schemas.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "275a35c23e3d1817ef90b047c6119c9da50c15566d84db9cb6b8b3ae0e915ed5",
+      "lines": 6,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "71315e7f3829e746ea7b747fd988bc444aa8847433cda1ba92e35567d07049d8",
+      "lines": 66,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deployment-integrations.schemas.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "ce991fd3555c22158035591e9154aa4ad334f40b4ba16f74546349d587afd104",
+      "lines": 10,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deployment-integrations.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "8258050ec70b70106cf2485855c469637d0b9edb29fe920888cafa3ed65e631e",
+      "lines": 107,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/deployment-integrations.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "0d1b40e19e7765123034f96776445893b567a2e49586cf153644452e8f990a8e",
+      "lines": 19,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-activation-fingerprint.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "9f9221fc9e62e9856b7c26d65c00d9faaeeeb202e4e575c254ed92f91c1af527",
+      "lines": 32,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-activation.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "4d4514aad17ac9b1c687670088917be884825bbe3f2e788872f0c48887b54d23",
+      "lines": 105,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-check-worker.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "f0d778224daa0b91b17aaf5a975eeaf82328794f10eb0e5578b81887cdd0a6ba",
+      "lines": 32,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-check.schemas.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "b719c694b2bfd29e9c4f580867d9a80041591cca963d9dfc9e5699ce0d70e62a",
+      "lines": 57,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-check.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "a6187000d71d8265e2d1d20f6e81c62d670c1131ed3e10466848202fa8a05626",
+      "lines": 80,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-check.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "0558868bde3d9e672e45ffcedd12eb543d1544a33759edeace6d7b6623ff3c37",
+      "lines": 10,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-command-operation.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "4cdae939b5671a04ff2913ff95cfece71d2b025d150ee5bb101e21c47d130f80",
+      "lines": 76,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-command.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "9cbb5be349ec1942702371ecb97a90217f152d4d8413d480e4d4b0c7fb8d0425",
+      "lines": 17,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-compiler-bridge.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "8b14850305ee721f004a89c18a9a5f0874a954c6d9ea2ae7f2af9f78171f9bb5",
+      "lines": 47,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-drain.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "ebcb6240f9af33613b9aa6d982f67ee551e5632a6dcb26de13b0386525032dc1",
+      "lines": 27,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-generation-key.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "92a1896f77c32a4d00a282218567411b81097d231b2b81ea61c6227d156664fc",
+      "lines": 5,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-inspector.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "8bcb3e7ad795127082d0e056eb8cdc0aeed61de1bf3b1cbc74576467d4d8e4da",
+      "lines": 67,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-inspector.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "85e9539b01ffa3820e12369f207e04d35749034218dcecba51ecfd33b3ced989",
+      "lines": 5,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-compiler.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "6f78b02221c18ebfa15c256c4046b80379cc671bea4420b8e8ca1fe0bd0d86d2",
+      "lines": 101,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-diagnostics.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "c95432e1b28c71f5be1176bddc1305338f001e3587363ebb12f1c69c49d2f153",
+      "lines": 18,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-runtime.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "5ba987b692e5b9e16057e3257deb9ccac6f3aea5383bc1834c7834e1d0286f59",
+      "lines": 70,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-runtime.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "1220d884400e3d7c47df804a9cbaf4ed7dc0efa2715a4f09c75e094cef15d433",
+      "lines": 20,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-services.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "d7df247994fd8e8dc50250b8a51e3eb314193ee5132cfaa3a0a32021530f5f4f",
+      "lines": 70,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-services.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "a4738ad555b3b1af5733db6ae4b693c3ad9352020ad47979c36bf1fcc4b93676",
+      "lines": 17,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "af1dff38ac1c3d2f4cd6f2a5edf8eaaed2b62c1be865eb0baf772e9509734c85",
+      "lines": 52,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "21aef70f030193fd5357ecdc5b807b18ecffb20521742618a58fa3f60a32e2d2",
+      "lines": 31,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-details.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "5ea11917eadb6c0aa6c632ccf64bb668ca2a316851f6e1c330b26361a3f2b6b4",
+      "lines": 56,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-format.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "f8e22be40a79a52707fe558ca2c44ebdc94c112f5819ee0b036e5cf6224f175b",
+      "lines": 161,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-format.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "6d643fbcc17f4d9782a4c7ca93fcb300b0399b70881d2fd84eb95571ec3eea22",
+      "lines": 6,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-record.schemas.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "69dcf4312e7ee5597da960eec041e71ec697c5c290fcc04634e1590cb38cea3e",
+      "lines": 18,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-record.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "dd9a9d31a568799c7936ef2fad8708dfe19254eac26b92dd36cca5111e0aaed6",
+      "lines": 93,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-logger.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "a56d05663942e90b268883a7ef5940d0d0b7873c210f8f474dff8a0441498d4a",
+      "lines": 87,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-process.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "a34b2eaa1876871a27ddf8743dd2a05e49dd52c309c4c2dad886b2b02b6ac13f",
+      "lines": 104,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-process.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "42e7f8e547fe3c902abe2f21d435120438729eecd65b5b467dca0d3cd47ccf51",
+      "lines": 27,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-ready.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "d2305855fcee1a94e99f4891cf3eada1cfa617fe0961ac0ad34777deb175ed1d",
+      "lines": 28,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-recipe-cache.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "792a8764957e643238ec1ea8304a6b2c197f7edf758ba821e562cff73787e09b",
+      "lines": 36,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-recipe-cache.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "eb7d2f7fa776b10eb6287b046dad90ed738538af4f103aeb9b4ebdc13b313d97",
+      "lines": 18,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-session-engine.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "f484463fff286456192a3657c6784f5b2fe18d7593b98c840a5a0fd1521a5e78",
+      "lines": 102,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-session.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "3638d4ee640238b06499f77c1ed16820a4b39b9ef255c3848c4ec92b089e6e9d",
+      "lines": 179,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-session.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "a232a04dffb21af4ecca301718d99ad86b406a8aea0bde0f2c2d7363935356cb",
+      "lines": 45,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-shutdown.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "582a279fe17bc4ba447c22f69f1308ae786169d1e21f17e00ebd537be9df1f86",
+      "lines": 64,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-signals.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "525da0de54fdff6e965640b729e0c90a61a6d574acc6e44b0f4c18eef41e356d",
+      "lines": 46,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-watch.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "1f9b5654e0449baf6f202845dfdb49e111b531bf72665254bdd8c406621529f3",
+      "lines": 95,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-watch.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "1d2f6af65d7e4910cdfa16728d5545d3abb18128ead7126d46a03d0c044465b3",
+      "lines": 17,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "c398eb67fb9679f189e08eab47af21b7634e9ffbbed3f084390c2e4f36b0076b",
+      "lines": 29,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/dev.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "ce96c3e5d79c114d81dc5acaad37f10c7429a0c45a9da556b37b125e865046dd",
+      "lines": 49,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-args.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "c742b7da8833b2b730875efc2d8549238b1b1903d9dd6d844c9e7c7150460583",
+      "lines": 54,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-command-operation.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "578e46b393f21fa5ccac2fa5034e59ee792e4f65722ac92c04a3060b2aa10620",
+      "lines": 38,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-confirmation.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "5e401205e3ab195fe94e0528788c5119cb1cffcfa151bce253f5d0f6481f0131",
+      "lines": 29,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-materializer.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "2c7da9769ba78af0f9b594ebaa80953d050585f83965c392ad0b4f88dca5ff90",
+      "lines": 12,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-operation-support.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "2706d68b17234d39b5908e3e3cf753db553cc08dd53dc9fede82c67ff8d310be",
+      "lines": 108,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-operations.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "3defaee05b764c38640cf78965cb48849f98abcf7e233b4f9324bc812db73df1",
+      "lines": 80,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-plan.ts",
+      "classification": "pure validated projection/parser/presentation leaf",
+      "sha256": "dc43f485234785a98f9caf5b87524315af6e74d2afb972d3b0944d7a7f892e23",
+      "lines": 30,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-recipe.schemas.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "d9ca12a8c3ce0cff33b7d1f4e8a5bc8ad295e36ad05dfdd700868a660e8c4666",
+      "lines": 44,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-runtime-modules.schemas.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "840aa87320b2220f202d6efd195c0b80c6e87193954f3ee2f15aee5a6d7e0a50",
+      "lines": 30,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-runtime-modules.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "2cd856855bf9ad22f6f75378482fb36a68bb1a76682858a89de796deed6f1412",
+      "lines": 80,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-runtime-modules.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "59e710b0209464771aba58fe960fd284b193571ad38d56eb57abc04d56f7f2c0",
+      "lines": 80,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-service-options.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "b1e0dc9f7e2c620a113c0bf1f30a4a3bebacfa6edefde0e0bcfe41d462fc8419",
+      "lines": 140,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-status-stop.ts",
+      "classification": "pure compatibility barrel",
+      "sha256": "5d53f2992bdde5c967bff66ab4f98e474b4d23c2e862f9e1558b41f06f0a2cda",
+      "lines": 3,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-status.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "30cf032028ad8498657bc368d1bed456007775df8ba874f8a6e7fb21e81bda9b",
+      "lines": 86,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-stop.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "99133e909d075381ef1de65b1df7cbaa21634113c5005597b84af05220d95d1a",
+      "lines": 88,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local-worker-overrides.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "d2194397beba98260fff48f0dd83d7f7bd5110128778112e455a021c070529bf",
+      "lines": 67,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "4e83772f1b11fde927624ea4d305fe08066e21ceb31f32add657d619686619ee",
+      "lines": 48,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/commands/local.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "946d10096e5acb347a0f502b5981a9b58d7c7a704eb5132ae27b68d52c856506",
+      "lines": 18,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/client.service.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "b547243742b41faeaa1615b64fbb75cc654b21857b9c4591cf77b758a556cf62",
+      "lines": 82,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/client.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "83411038568efd48e1c15671c6ce419907ab96104d39eda1425b1d1412c1f861",
+      "lines": 24,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/deploy-confirmation.service.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "e414900650acea8ec0d1e056eb94a04620ebc79576a47ddd50c7734573d9129b",
+      "lines": 27,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/deploy-confirmation.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "a1d398c86800ea74396381296ab2257e1ce5f87a311e7841f925ea71afa5959d",
+      "lines": 11,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/deployment.service.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "c2a4d31f7bd309d9cf624cd437ac4e2da67fcc4caf8783b28be417a481242337",
+      "lines": 64,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/deployment.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "4f7075985da6eea722befb0c77c6144b4e1ef3f369cf6db6dc4931446d1680cc",
+      "lines": 15,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/dev-supervisor.service.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "df8f14fd3637294e9965f48edbe45b3e3d7fb4ec3147ec3d5e9f218bcfc0caa6",
+      "lines": 45,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/dev-supervisor.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "d042e00cf987fde6c4975b70102b988a011334bfda88b71cb468a52aed5e065a",
+      "lines": 19,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/dev.service.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "79852ad2001b569b9f6cc4cc184cce2e8c68d0fdb4e5e03e4d7128fab971ac38",
+      "lines": 52,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/dev.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "a62b887133886fc88db3c3aae26dbd40bfee5e2338a46b9b298dffe867f49eff",
+      "lines": 9,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/local-capabilities.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "5e0d5d9755976f2d4dc149983be09426a326354adc66e42fe65c0f83d732d786",
+      "lines": 9,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/local.service.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "b5c27836b8212d16173634d53c5e2895d0bc68907c00437e939bb55b5b6a9382",
+      "lines": 56,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/local.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "3bb4dc3abb382453ee3e929b316152e76b60818b70fb39f33fc7794e608d3d19",
+      "lines": 14,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/owned-promise.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "94f827e9ad82bbecbfe46844ae9ab35cff1d443e6bccf6c579c3b69a6b201113",
+      "lines": 25,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/pulumi.service.ts",
+      "classification": "Effect domain/native owner or compatibility edge",
+      "sha256": "70c3a0fe878777434834a4c497c27a466087e6cda3b2dd9b420d2e79a6c10a55",
+      "lines": 46,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    },
+    {
+      "path": "packages/cli/src/services/pulumi.types.ts",
+      "classification": "pure Schema/type contract",
+      "sha256": "e30f18b272303ce1d7c448a74e4c3e99665bbabf228f0720d1a858da3c163bd6",
+      "lines": 64,
+      "status": "rolling EOF review; subsequent author deltas pending"
+    }
+  ]
+}
