@@ -1,46 +1,81 @@
 import { pathToFileURL } from "node:url";
-import { resolveIntegrationPackageRole } from "@relkit/compiler";
-import {
-  DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
-  type DeploymentIntegrationMetadata,
-  type DeploymentIntegrationPlan,
-  type DeploymentIntegrationRole,
-  type DeploymentPlan,
+import { Effect, Layer, Schema } from "effect";
+import type {
+  DeploymentIntegrationMetadata,
+  DeploymentIntegrationPlan,
+  DeploymentIntegrationRole,
+  DeploymentPlan,
 } from "@relkit/deploy";
+import { cliTry } from "../cli-errors.js";
+import { observeCli, runCliEffect } from "../cli-runtime.js";
+import { CliCompiler, compilerLayer } from "../services/compiler.service.js";
+import { CliModules, moduleLayer } from "../services/modules.service.js";
+import { deploymentIntegrationMetadataSchema } from "./deployment-integrations.schemas.js";
+import type {
+  LoadedDeploymentIntegration,
+  LoadedDeploymentIntegrations,
+} from "./deployment-integrations.types.js";
+export type {
+  LoadedDeploymentIntegration,
+  LoadedDeploymentIntegrations,
+} from "./deployment-integrations.types.js";
 
-export interface LoadedDeploymentIntegration {
-  readonly metadata: DeploymentIntegrationMetadata;
-  readonly packageName: string;
-  readonly packageVersion: string;
-  readonly exportName: string;
-  readonly resolvedPath: string;
-  readonly module: Readonly<Record<string, unknown>>;
-}
+/**
+ * Resolves only declared deployment roles, retaining module namespace identity.
+ * @param projectRoot - Package resolution root.
+ * @param plan - Validated provider-neutral deployment plan.
+ * @returns Complete role registrations, requiring explicit compiler and import authority.
+ */
+export const loadDeploymentIntegrationsEffect = Effect.fn("Deployment.loadIntegrations")(
+  function* (projectRoot: string, plan: DeploymentPlan) {
+    const selected = [
+      ...new Map(
+        references(plan).map((entry) => [integrationKey(entry.role, entry.integrationId), entry]),
+      ).values(),
+    ];
+    const entries = yield* Effect.forEach(selected, (reference) =>
+      loadIntegrationEffect(projectRoot, reference),
+    );
+    const loaded = new Map(
+      entries.map((entry) => [
+        integrationKey(entry.metadata.role, entry.metadata.integrationId),
+        entry,
+      ]),
+    );
+    return yield* cliTry("deployment.integrations", () =>
+      Object.freeze({
+        engine: required(loaded, plan.engine),
+        host: required(loaded, plan.host),
+        infrastructure: roleMap(loaded, "infrastructure"),
+        access: roleMap(loaded, "access"),
+      }),
+    );
+  },
+  (effect, _projectRoot: string, _plan: DeploymentPlan) =>
+    observeCli("deployment.loadIntegrations", effect),
+);
 
-export interface LoadedDeploymentIntegrations {
-  readonly engine: LoadedDeploymentIntegration;
-  readonly host: LoadedDeploymentIntegration;
-  readonly infrastructure: ReadonlyMap<string, LoadedDeploymentIntegration>;
-  readonly access: ReadonlyMap<string, LoadedDeploymentIntegration>;
-}
-
-export async function loadDeploymentIntegrations(
+/**
+ * Adapts standalone integration discovery to one shared runtime edge.
+ * @param projectRoot - Authored root used for package resolution.
+ * @param plan - Selected deployment cohort.
+ * @returns The accepted integrations, without a cross-invocation cache.
+ */
+export function loadDeploymentIntegrations(
   projectRoot: string,
   plan: DeploymentPlan,
 ): Promise<LoadedDeploymentIntegrations> {
-  const loaded = new Map<string, LoadedDeploymentIntegration>();
-  for (const reference of references(plan)) {
-    const key = integrationKey(reference.role, reference.integrationId);
-    if (!loaded.has(key)) loaded.set(key, await load(projectRoot, reference));
-  }
-  return Object.freeze({
-    engine: required(loaded, plan.engine),
-    host: required(loaded, plan.host),
-    infrastructure: roleMap(loaded, "infrastructure"),
-    access: roleMap(loaded, "access"),
-  });
+  return runCliEffect(
+    loadDeploymentIntegrationsEffect(projectRoot, plan),
+    Layer.merge(compilerLayer, moduleLayer),
+  );
 }
 
+/**
+ * Returns deterministically ordered role registrations for program rendering.
+ * @param integrations - Complete accepted role registrations.
+ * @returns The portable sorted role entries.
+ */
 export function deploymentIntegrationEntries(
   integrations: LoadedDeploymentIntegrations,
 ): readonly LoadedDeploymentIntegration[] {
@@ -56,6 +91,10 @@ export function deploymentIntegrationEntries(
   );
 }
 
+/** Collects the role references required by the accepted deployment graph.
+ * @param plan - Accepted deployment cohort.
+ * @returns Deterministically ordered required role references.
+ */
 function references(plan: DeploymentPlan): readonly DeploymentIntegrationPlan[] {
   return [
     plan.engine,
@@ -68,45 +107,58 @@ function references(plan: DeploymentPlan): readonly DeploymentIntegrationPlan[] 
     ),
   );
 }
+/**
+ * Loads one declared role through the pinned compiler's contained resolution API.
+ * @param projectRoot - Package resolution root.
+ * @param reference - Selected integration identity and role.
+ * @returns An accepted native namespace and its validated metadata.
+ */
+const loadIntegrationEffect = Effect.fn("Deployment.loadIntegration")(
+  function* (projectRoot: string, reference: DeploymentIntegrationPlan) {
+    const compiler = yield* CliCompiler;
+    const modules = yield* CliModules;
+    const selected = yield* compiler.integrationRole({
+      projectRoot,
+      packageName: `@relkit/${reference.integrationId}`,
+      integrationId: reference.integrationId,
+      role: reference.role,
+    });
+    const module = yield* modules.load(pathToFileURL(selected.resolvedPath).href);
+    const metadata = yield* cliTry("deployment.metadata", () => {
+      const metadata = module.deploymentIntegration;
+      if (!matches(metadata, reference))
+        throw new TypeError(
+          `Deployment integration ${reference.role} "${reference.integrationId}" reports incompatible metadata.`,
+        );
+      return metadata;
+    });
+    return Object.freeze({ ...selected, metadata, module });
+  },
+  (effect, _projectRoot: string, _reference: DeploymentIntegrationPlan) =>
+    observeCli("deployment.loadIntegration", effect),
+);
 
-async function load(
-  projectRoot: string,
-  reference: DeploymentIntegrationPlan,
-): Promise<LoadedDeploymentIntegration> {
-  const packageName = `@relkit/${reference.integrationId}`;
-  const selected = resolveIntegrationPackageRole({
-    projectRoot,
-    packageName,
-    integrationId: reference.integrationId,
-    role: reference.role,
-  });
-  const module = (await import(pathToFileURL(selected.resolvedPath).href)) as Record<
-    string,
-    unknown
-  >;
-  const metadata = module.deploymentIntegration;
-  if (!matches(metadata, reference)) {
-    throw new TypeError(
-      `Deployment integration ${reference.role} "${reference.integrationId}" reports incompatible metadata.`,
-    );
-  }
-  return Object.freeze({ ...selected, metadata, module });
-}
-
+/** Checks namespace role metadata against the declared identity and version.
+ * @param value - Untrusted namespace metadata.
+ * @param reference - Expected role identity/version.
+ * @returns Whether the complete metadata matches this declared role.
+ */
 function matches(
   value: unknown,
   reference: DeploymentIntegrationPlan,
 ): value is DeploymentIntegrationMetadata {
   return (
-    isRecord(value) &&
-    value.kind === "deployment-integration" &&
-    value.protocolVersion === DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION &&
+    Schema.is(deploymentIntegrationMetadataSchema)(value) &&
     value.protocolVersion === reference.protocolVersion &&
     value.integrationId === reference.integrationId &&
     value.role === reference.role
   );
 }
-
+/** Selects the unique registered integration for a required role.
+ * @param loaded - Accepted role registrations.
+ * @param reference - Required engine/host reference.
+ * @returns Its accepted namespace or the existing missing-role failure.
+ */
 function required(
   loaded: ReadonlyMap<string, LoadedDeploymentIntegration>,
   reference: DeploymentIntegrationPlan,
@@ -117,6 +169,11 @@ function required(
   return selected;
 }
 
+/** Projects optional integration registrations into a portable role map.
+ * @param loaded - Accepted role registrations.
+ * @param role - Optional role family.
+ * @returns Portable entries keyed by integration identity.
+ */
 function roleMap(
   loaded: ReadonlyMap<string, LoadedDeploymentIntegration>,
   role: "infrastructure" | "access",
@@ -128,10 +185,11 @@ function roleMap(
   );
 }
 
+/** Constructs an unambiguous session lookup key for an integration role.
+ * @param role - Declared role.
+ * @param integrationId - Declared integration owner.
+ * @returns A collision-free in-memory role/identity key.
+ */
 function integrationKey(role: DeploymentIntegrationRole, integrationId: string): string {
   return `${role}\0${integrationId}`;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
