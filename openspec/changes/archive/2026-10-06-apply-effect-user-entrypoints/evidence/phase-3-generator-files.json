@@ -1,0 +1,1125 @@
+{
+  "phase": 3,
+  "lane": "create-relkit",
+  "status": "author-frozen; independent phase-three review complete; supporting phase-four exports reviewed separately",
+  "documentationReview": {
+    "kind": "TypeScript AST actual-JSDoc-span reconstruction and exact full-file SHA-256 comparison",
+    "commentsReconstructed": 429,
+    "sourceFiles": 94,
+    "applicability": "The phase-three documentation freeze before the separately reviewed supporting catalog exports.",
+    "unexpectedImplementationDeltas": [],
+    "acceptedSemanticFiles": [
+      "packages/create-relkit/src/validate-paths.ts",
+      "packages/create-relkit/tests/planning.effect.test.ts"
+    ],
+    "acceptedSemanticChange": "Use basename for missing segments beneath filesystem root and cover it with an explicit GeneratorPaths test Layer."
+  },
+  "worktree": "/Users/mustafaelsayed/.codex/worktrees/effect-user-entrypoints/relkit",
+  "scope": "Every authored TypeScript file under packages/create-relkit, including package-root tests/config.",
+  "counts": {
+    "source": 122,
+    "testsAndFixtures": 12,
+    "testConfiguration": 1,
+    "total": 135,
+    "maximumSourceLines": 242,
+    "classifications": {
+      "pure-option-parsing": 5,
+      "pure-output-formatting": 2,
+      "cohesive-domain-service": 5,
+      "type-contract": 31,
+      "typed-resolution-workflow": 9,
+      "private-ref-state": 3,
+      "compatibility-edge": 4,
+      "scoped-transaction-workflow": 3,
+      "process-workflow": 2,
+      "runtime-edge": 3,
+      "typed-planning-workflow": 14,
+      "pure-catalog-manifest": 4,
+      "typed-io-workflow": 10,
+      "pure-source-rendering": 10,
+      "diagnostic-ownership": 2,
+      "schema-boundary": 2,
+      "native-io-service": 4,
+      "pure-barrel": 2,
+      "pure-ast-discovery": 6,
+      "public-error-contract": 1,
+      "foundation-regression-test": 3,
+      "test-fixture": 2,
+      "effect-regression-test": 6,
+      "compiler-probe": 1,
+      "test-configuration": 1
+    }
+  },
+  "excluded": [
+    "dist/** generated compiler/package output",
+    "node_modules/** installed dependencies",
+    "read-only repos/effect vendor outside package scope"
+  ],
+  "removedSource": ["packages/create-relkit/src/create-additions.ts"],
+  "removedSourceClassifications": [
+    {
+      "path": "packages/create-relkit/src/create-additions.ts",
+      "classification": "retired-interactive-workflow",
+      "reason": "The approved creation flow asks only a missing name and final confirmation. The staged artifact question loop is removed; artifact generation remains available through relkit add."
+    }
+  ],
+  "supportingIntegrationDeltas": [
+    {
+      "paths": [
+        "packages/create-relkit/src/index.ts",
+        "packages/create-relkit/src/catalog-resolution.ts"
+      ],
+      "kind": "pure public resolver and type exports",
+      "reason": "Expose the existing resolver through the public barrel and a packed source subpath so workspace tooling can bootstrap without generated dist. Resolver implementation is unchanged; these exports are not documentation-only changes.",
+      "evidence": "phase-4-catalog-bootstrap.md"
+    }
+  ],
+  "supportingRootTests": [
+    "tests/generator/add-resolver.test.ts",
+    "tests/generator/create-additions.test.ts",
+    "tests/generator/local-workspace.test.ts"
+  ],
+  "reviewEvidence": "phase-3-generator-review.md is owned by the independent reviewer and records the final review separately.",
+  "files": [
+    {
+      "path": "packages/create-relkit/src/add-name.ts",
+      "lines": 35,
+      "sha256": "2994138781671f7c9b3a59a9a124d8fb0899172c118cf8c40bf9552a6af0fa51",
+      "preDocumentationSha256": "66db35f06be7d044e12f47b1733be12c91488a65b8c89077a39f0c16581b9759",
+      "classification": "pure-option-parsing",
+      "reason": "Deterministic parsing, validation and flag projection remain synchronous; IO and prompts are delegated to typed owners."
+    },
+    {
+      "path": "packages/create-relkit/src/add-options-parser.ts",
+      "lines": 184,
+      "sha256": "3785e8a65f55540ac8b7610bbd94586480a28be38c2bfdc557a1c74042925613",
+      "preDocumentationSha256": "bb6ef94e4c03c14072d0fff340662e2a6b6882729374c6a6e62a46ccf408cc76",
+      "classification": "pure-option-parsing",
+      "reason": "Deterministic parsing, validation and flag projection remain synchronous; IO and prompts are delegated to typed owners."
+    },
+    {
+      "path": "packages/create-relkit/src/add-options-resource.ts",
+      "lines": 36,
+      "sha256": "8e989d5b020c3a4ab6300553c3e9a462f3a7c8405aab8a538a65d9104ea8880a",
+      "preDocumentationSha256": "d55ca39f45297c8461643ba62e379849884536a56bdd0a20f28300e1c7df7559",
+      "classification": "pure-option-parsing",
+      "reason": "Deterministic parsing, validation and flag projection remain synchronous; IO and prompts are delegated to typed owners."
+    },
+    {
+      "path": "packages/create-relkit/src/add-options.ts",
+      "lines": 239,
+      "sha256": "f27d26810df5f064a78e4b12e945350e534f7779843df961c764e33610f84ed1",
+      "preDocumentationSha256": "3266ce14321cd3a477eb14097f7773898a03709e6dd2be9a2a085ef47937e15c",
+      "classification": "pure-option-parsing",
+      "reason": "Deterministic parsing, validation and flag projection remain synchronous; IO and prompts are delegated to typed owners."
+    },
+    {
+      "path": "packages/create-relkit/src/add-output.ts",
+      "lines": 76,
+      "sha256": "0ca7db50447d26eb6cb5937d2272e2fd639f4729f06a39b29bb89e9ae747766f",
+      "preDocumentationSha256": "d0c3039dd0dce7848880864edbd26a22202f8b1e68b7bf3ed4e44fa5c40314e0",
+      "classification": "pure-output-formatting",
+      "reason": "Deterministic text/JSON formatting preserves public output shapes and requires no service lifetime."
+    },
+    {
+      "path": "packages/create-relkit/src/add-plan.ts",
+      "lines": 128,
+      "sha256": "b51dd76b646b57002ddcff7e15225b4b5cce35b25b8af680213d46590545dfe1",
+      "preDocumentationSha256": "5cf8befb917713aa57a5adb70b335d8fbd815f112fab78771502d2125b34ecdf",
+      "classification": "cohesive-domain-service",
+      "reason": "Context.Service owns discovery/planning/resolution/generation/transaction capabilities and exposes narrow typed Effect methods plus existing Promise edges."
+    },
+    {
+      "path": "packages/create-relkit/src/add-plan.types.ts",
+      "lines": 15,
+      "sha256": "e83a16ee0d2209adb96613efa2b7e5316a9b8961888cd7f9509a6d68e488235d",
+      "preDocumentationSha256": "d7ee37f9a655bed902954770c00d9d922f75e3a4f539d4cb2a0869447185d81e",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolution-discovery.ts",
+      "lines": 197,
+      "sha256": "de28c3091e0b3841aedecb159cca365291a5b44c50d96df46cff6b7b60164937",
+      "preDocumentationSha256": "eafe3e4faf430abeac094b49d5514adb598e695068c62b95ccf567c4533fa24e",
+      "classification": "typed-resolution-workflow",
+      "reason": "Typed prompt/discovery Effects normalize requests and retain existing add consent/flags; creation resolves only a missing name."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolution-prompt.ts",
+      "lines": 112,
+      "sha256": "4ffedbc3ac2410469543beaf915f248440b4cc943d67db667013cb8e19238828",
+      "preDocumentationSha256": "7b48bbcd1b12255c969a890a1154f5802c81d884d674474d538881ebe05c4ea8",
+      "classification": "typed-resolution-workflow",
+      "reason": "Typed prompt/discovery Effects normalize requests and retain existing add consent/flags; creation resolves only a missing name."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolution-state-base.ts",
+      "lines": 183,
+      "sha256": "2045df29f89eeb62e6ec32d0241bd7e99c9dd224f614e34a4ad79c3734b13201",
+      "preDocumentationSha256": "2e8d9663ba05aab68ef885521ecf121710f5cb603e95e7eb58143188db92e1e9",
+      "classification": "private-ref-state",
+      "reason": "Each request has authoritative private Ref state; mutation and duplicate reservation compose as typed observed Effects."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolution-state.ts",
+      "lines": 139,
+      "sha256": "1f7da481d2d793c94be68bcbeff1140631c384d0aa7ef34b0975900a19f262c9",
+      "preDocumentationSha256": "b796b4aa10923db87e8372b12b5ecc8813a154ee67fd3551953b51995cee7165",
+      "classification": "compatibility-edge",
+      "reason": "Existing synchronous/Promise methods adapt the authoritative typed Effect workflow; state is not recreated behind each method."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolution-state.types.ts",
+      "lines": 5,
+      "sha256": "636496d2b9031fa4a8e476c51fe2d5e89c3a7e405e7d5a1faf340624e08c74c6",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolver-domain-execution.ts",
+      "lines": 158,
+      "sha256": "7c5ce0c5088e86daad2181707c75dc42d3d0147f9d0679d579b0adce13e4c7af",
+      "preDocumentationSha256": "c3832f16898a0d9a25c8a778dee4e7fa1e77b4110c197cea5a534b0554b4d3a4",
+      "classification": "typed-resolution-workflow",
+      "reason": "Typed prompt/discovery Effects normalize requests and retain existing add consent/flags; creation resolves only a missing name."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolver-domain-input.ts",
+      "lines": 139,
+      "sha256": "91f2684396661f977b8a50fe3dec49524d169e1183213fd400d08d1aaf2c21f6",
+      "preDocumentationSha256": "6c6fb155b91bc6ecd484f75293c35e139375aa7efb8dedf7d1c8747e80e2753a",
+      "classification": "typed-resolution-workflow",
+      "reason": "Typed prompt/discovery Effects normalize requests and retain existing add consent/flags; creation resolves only a missing name."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolver-domain.ts",
+      "lines": 87,
+      "sha256": "d23a45a27e57e6ec4980e03a488e47c768fdf99ea34db8d314765850e773d87e",
+      "preDocumentationSha256": "9eeb4fd5431cb2fff00a168757cbe6feae69bcc5e445b58289159accfb95a0df",
+      "classification": "typed-resolution-workflow",
+      "reason": "Typed prompt/discovery Effects normalize requests and retain existing add consent/flags; creation resolves only a missing name."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolver-platform.ts",
+      "lines": 216,
+      "sha256": "f64fbedf0fd9ead1de61773fc1a2777bc6ccb5831bc225738d82d597a9ddaff5",
+      "preDocumentationSha256": "53733a0870f0a90ca803903ef26956bb2dbbb2f4f81e62339cb2c6862b2941eb",
+      "classification": "typed-resolution-workflow",
+      "reason": "Typed prompt/discovery Effects normalize requests and retain existing add consent/flags; creation resolves only a missing name."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolver-provider.ts",
+      "lines": 88,
+      "sha256": "93b600b494783d8163b705521a00547614628f823fe07afb50fcbec30cfd86bb",
+      "preDocumentationSha256": "fac45f9f5b3e46b81aeff2456ac584e728dc1c367136669c3d7dee3e4220e566",
+      "classification": "typed-resolution-workflow",
+      "reason": "Typed prompt/discovery Effects normalize requests and retain existing add consent/flags; creation resolves only a missing name."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolver-resources.ts",
+      "lines": 223,
+      "sha256": "e1b92ecb6f8be78d3b1f3687fa7a31a4b7595de309b6a156a05ea6ffba6347a6",
+      "preDocumentationSha256": "c58b33c4c9f7d433499933bc32ed86c22d2668de31f0fccf4250ef591923aa0c",
+      "classification": "typed-resolution-workflow",
+      "reason": "Typed prompt/discovery Effects normalize requests and retain existing add consent/flags; creation resolves only a missing name."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolver.ts",
+      "lines": 131,
+      "sha256": "1d98e3e7057e77ccf69addf36242e62d2097d89df6c270b65eb51f4d10984e57",
+      "preDocumentationSha256": "58176ea1adcf29db7ac7c92eafc01f34b006f0eaec26815a6e4f705222347845",
+      "classification": "cohesive-domain-service",
+      "reason": "Context.Service owns discovery/planning/resolution/generation/transaction capabilities and exposes narrow typed Effect methods plus existing Promise edges."
+    },
+    {
+      "path": "packages/create-relkit/src/add-resolver.types.ts",
+      "lines": 39,
+      "sha256": "70f54be818a6d4bf79b532d217551f6b7a9fe2012e39b8bd79223b62e5004635",
+      "preDocumentationSha256": "ca42020fe2b2c4257a4681e8d9cfb5e83a22baa40b7153966ad414e4b9663a0d",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/add-transaction-files-compat.ts",
+      "lines": 68,
+      "sha256": "356b21ab144783affb7545c1e932845d5f306e8944b3d6774ed1511a1c66bad0",
+      "preDocumentationSha256": "e4fa0a0c792c9dd9aaf64a80d53381b1129cfb95fba31c078beda0982d4b736c",
+      "classification": "compatibility-edge",
+      "reason": "Existing synchronous/Promise methods adapt the authoritative typed Effect workflow; state is not recreated behind each method."
+    },
+    {
+      "path": "packages/create-relkit/src/add-transaction-files.ts",
+      "lines": 233,
+      "sha256": "ad3dd697e261e5f86436f713d37713e2b204fc2fcb400d8aa08f848eba9bc61f",
+      "preDocumentationSha256": "203d64d28573ca9908838833664e1b13bd76ef245ee9fa235c1d8655a69a10dc",
+      "classification": "scoped-transaction-workflow",
+      "reason": "Scope owns snapshots, staging/atomic writes, rollback and finalizers; physical completion and bookkeeping settle before rollback."
+    },
+    {
+      "path": "packages/create-relkit/src/add-transaction-files.types.ts",
+      "lines": 6,
+      "sha256": "35d420706c11797e3c6b3051c9b9282b8068dd71cd76e46debe0d38b5d17a5c0",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/add-transaction-process.ts",
+      "lines": 94,
+      "sha256": "99f92e62da8df7a9e69a3dede8a5be8aa485f4800ad9b69013ac233c6f390f21",
+      "preDocumentationSha256": "5388a10fb5635425614ed555be67f4b970e5ae22c45164b544c8567823f03631",
+      "classification": "process-workflow",
+      "reason": "Typed process orchestration owns availability, command result checks, output and cancellation without hidden Promise domain control flow."
+    },
+    {
+      "path": "packages/create-relkit/src/add-transaction-workflow.ts",
+      "lines": 133,
+      "sha256": "70d11ebc9570a62accaadebde17ae1cfd574a6509abd17e1be1fcad1bf9bb3e9",
+      "preDocumentationSha256": "ead339ca3cbf9ed75c9a7b2b75617ccc313b2eb1d47554f78e495cf35decd060",
+      "classification": "scoped-transaction-workflow",
+      "reason": "Scope owns snapshots, staging/atomic writes, rollback and finalizers; physical completion and bookkeeping settle before rollback."
+    },
+    {
+      "path": "packages/create-relkit/src/add-transaction.ts",
+      "lines": 115,
+      "sha256": "3c108f382ab80f05034ad4cdef306f4256e17cf02e166415e512cd1c25c70633",
+      "preDocumentationSha256": "f4407253459eb6a45048183c0bb6b932110f0e2f2df44aeffb6a2cb46f9c02cb",
+      "classification": "cohesive-domain-service",
+      "reason": "Context.Service owns discovery/planning/resolution/generation/transaction capabilities and exposes narrow typed Effect methods plus existing Promise edges."
+    },
+    {
+      "path": "packages/create-relkit/src/add-transaction.types.ts",
+      "lines": 40,
+      "sha256": "990094ef68a0ba39ee2b27276711a17ecd1c6b6704ad00c05ef34f9b3b45dd3a",
+      "preDocumentationSha256": "6a2491773cd997227583f369401610a9edad03834fb421667c3e1fd1307f0806",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/add-types.ts",
+      "lines": 234,
+      "sha256": "671f801d50b7bb76039a63ccd5f6b1e3a229a5bde4d0926b625b099619b7e173",
+      "preDocumentationSha256": "a9e2bf46554d12d60ef418cb8edaf22f0ba68c82b485653d4940e5f031d29117",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/bin.ts",
+      "lines": 116,
+      "sha256": "9f100d942226b41875a94f8900a04749562d53874f8b0a82b5e54acfd5e4e765",
+      "classification": "runtime-edge",
+      "reason": "Explicit composition or native compatibility boundary runs typed domain effects, forwards cancellation and keeps library logging quiet."
+    },
+    {
+      "path": "packages/create-relkit/src/bucket-profiles.ts",
+      "lines": 67,
+      "sha256": "e9a30f1f52b75ef0bbd1b7aa78e90ca4bfaf3510c7cd8e56da2117cf2ffa1b57",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/bucket-profiles.types.ts",
+      "lines": 12,
+      "sha256": "61677842a4ec9b5653cc79618efad81763e0e2f065d20397a2cbaef4b9862c1a",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/build-catalog.ts",
+      "lines": 80,
+      "sha256": "11c1ccd75dbd71aee595797c00d3bf7e8d919d41fd145d1ecc64c7635c2b5526",
+      "preDocumentationSha256": "1139fc527d4f5ad85f58aee0104b0a76759f8f87479161eb368b4b37fb585747",
+      "classification": "pure-catalog-manifest",
+      "reason": "Synchronous portable metadata/schema computation uses materialized concrete versions; no duplicated root pins or filesystem discovery."
+    },
+    {
+      "path": "packages/create-relkit/src/catalog-resolution.ts",
+      "lines": 55,
+      "sha256": "367dd4283c06aebed217d7a75a2923b74e1acfdf5a5eb1d90f18d8000995be8b",
+      "classification": "pure-catalog-manifest",
+      "reason": "Synchronous portable metadata/schema computation uses materialized concrete versions; no duplicated root pins or filesystem discovery."
+    },
+    {
+      "path": "packages/create-relkit/src/catalog-resolution.types.ts",
+      "lines": 2,
+      "sha256": "c485146cc029126b3848502471a96358525b48392bfe993586644c0ab666b77e",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/create-preview.ts",
+      "lines": 106,
+      "sha256": "b7d04c834f84d5ad2b6ae7f6c137634bde4ab57c0532684ad52853ebc0aaf6ef",
+      "preDocumentationSha256": "5f62f7a2243d6fd2e7dad51cb78ffce86cfafe0927c4c13b4b8ff17619c3dabf",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/create-preview.types.ts",
+      "lines": 8,
+      "sha256": "9352d559cd78e28b7baab89acb643d9d461d68eeb2bf24be9e48fc59054a5cf2",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/create-resolver.ts",
+      "lines": 95,
+      "sha256": "627340442ac5ee6583a6c54992d0603f2d9de4f5deec3b7d29da56badbf9d0a4",
+      "preDocumentationSha256": "9bdb52af0097364fe5815327ac9147f650b05b31c9490ccb31c01a190524dbd3",
+      "classification": "typed-resolution-workflow",
+      "reason": "Typed prompt/discovery Effects normalize requests and retain existing add consent/flags; creation resolves only a missing name."
+    },
+    {
+      "path": "packages/create-relkit/src/create-resolver.types.ts",
+      "lines": 16,
+      "sha256": "974797363f4921f049da9677642bcb501e709cff20ef9166388706cfee8dbb5c",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/dependency-patch-installation.ts",
+      "lines": 74,
+      "sha256": "7f56f9e0cb05864a1df942b9627e9e7d2d2f39e8d074847690f4e5492e0b62f2",
+      "preDocumentationSha256": "2f9cfb2fd455d13492ec646c0bd53818e87405e12cb17953f41cd983328c0409",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/dependency-patches.ts",
+      "lines": 184,
+      "sha256": "1a8772d09d7f97b35d4b4d2a97653708ad5e3fd5b6c237874f2c20d575ea499c",
+      "preDocumentationSha256": "1639cfd57236f1e9789ff2a2bdd2294099cf2c6cc1c9a6b8d55b6e9f20719208",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/dependency-patches.types.ts",
+      "lines": 23,
+      "sha256": "8dda290a23b774dcac0dd51e79fe30166ee0235f1429de9c5485b9338215c44c",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/domain-artifact.ts",
+      "lines": 152,
+      "sha256": "2961513a5213d0722ddde048b2cd3f401f635f3f63324759cdb9286cf186c3ab",
+      "preDocumentationSha256": "677cd361be9f5362b78e913dad32ac3e2f3c5eea5e52743528c1b42c2261e651",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/domain-planning.ts",
+      "lines": 158,
+      "sha256": "0138791ef567dbedd165811813d339158fbe939a44ae926a09f2e60757a03b4c",
+      "preDocumentationSha256": "ae72c191562c13c68555f14b4fd30db7c8591b7ba46d6baaeb2bb38d8c873a4f",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/domain-planning.types.ts",
+      "lines": 23,
+      "sha256": "2c124b56a78804725f021163f9bde7aff1fcaf865dbab2dfe726a457ef46c51e",
+      "preDocumentationSha256": "5e6aaaef657f9d8f663074aab03f933d98983474f30ea4062efb9b85160c9d9b",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-deployment.ts",
+      "lines": 140,
+      "sha256": "2c2456323bfbccfbe957f3e438e2f978969ac9e4c1f81d32d60e71c08f4d608a",
+      "preDocumentationSha256": "2042986bdf4e4f6e18ab6a2c04f682ecd1cf27efb3829c3b58784f4bd7fbb682",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-files-compat.ts",
+      "lines": 73,
+      "sha256": "8272b3d814c073295dab2664a5109e1e283a7a459a3cdc425f38c90e815f2f3c",
+      "preDocumentationSha256": "5e1b8a938132573fcc4fd27624a3514a8675ae359a858bc227dc5da3f42ceee6",
+      "classification": "compatibility-edge",
+      "reason": "Existing synchronous/Promise methods adapt the authoritative typed Effect workflow; state is not recreated behind each method."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-files-utilities.ts",
+      "lines": 222,
+      "sha256": "bd50016bc3d6fa1a0b94ee7e427759fab6ea1ae8ea50f03eb174f0a94d958056",
+      "preDocumentationSha256": "3aa2e5474073f587ba8ccdc2886ef352eaa9d641bccee8acf80429c1a3e80922",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-files-utilities.types.ts",
+      "lines": 5,
+      "sha256": "09bf47671b4e8214d122517819f3e9aac48ee603385c48208d40fc85b6ec8a93",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-files.ts",
+      "lines": 113,
+      "sha256": "d85b3687f99df52cc0325fed237d426c6e4496117a485eda09c5cdb0fa19cb69",
+      "preDocumentationSha256": "559d59c5693679c357ec16a76d1d8e054a19a29cd7b1f098ba0d4421f6245631",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-output.ts",
+      "lines": 117,
+      "sha256": "f8e4554d53d9b30fb57e2d2b887408f7b3ae0f7da86b3f2e4e354e4bd7121005",
+      "preDocumentationSha256": "50528079aa5097955d218944eff67c0685bc4b2a9ed10c5a66e0eea1f9322f8c",
+      "classification": "pure-output-formatting",
+      "reason": "Deterministic text/JSON formatting preserves public output shapes and requires no service lifetime."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-output.types.ts",
+      "lines": 20,
+      "sha256": "0528f937891348f850bd4d542a2cbf4ecf63162b882fd533bf2924430b03df0e",
+      "preDocumentationSha256": "4c9502abb12b91e84e200cea6f37299f21e1f0c7ff086607cdfca87ddd926185",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-process.ts",
+      "lines": 222,
+      "sha256": "2ff70f0222a1a5e359faf370e6d832c52c1bcd6af7f1ceb81969856a94b9ff56",
+      "preDocumentationSha256": "ef5a8885700370bb00abbffb8ee282ce3eb0974b5f22c3e4678820dce1bcc9b7",
+      "classification": "process-workflow",
+      "reason": "Typed process orchestration owns availability, command result checks, output and cancellation without hidden Promise domain control flow."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-stage-cleanup.ts",
+      "lines": 38,
+      "sha256": "2a30fdc4a590f9bf7f1d9f1778cf9f2ee0732504e17e215bd96496fe81b56e98",
+      "preDocumentationSha256": "8d82195041811d98e6d19acd27e924f63ccc52207ad9a0f7432c3a8d5994ac4b",
+      "classification": "diagnostic-ownership",
+      "reason": "Bounded cleanup diagnostics and stage disposition preserve original public failures/results and scope ownership."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-types.ts",
+      "lines": 113,
+      "sha256": "7dd639fc33ac40408189d216e00183f65ab240d3a00e857cfd717f0b98d8bc7e",
+      "preDocumentationSha256": "6f3b8e4fb987741167cea2cb175823b972c8f2661b4bfaf55631b9852e6cb702",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generate-workflow.ts",
+      "lines": 193,
+      "sha256": "fe963b111efa41bb6e5cf7395adf6f438a8667976cfff99b9ade7c511359cd5e",
+      "preDocumentationSha256": "20d54321b4782eadee981764ff71439344417656efb6e93c97f7623b450173a7",
+      "classification": "scoped-transaction-workflow",
+      "reason": "Scope owns snapshots, staging/atomic writes, rollback and finalizers; physical completion and bookkeeping settle before rollback."
+    },
+    {
+      "path": "packages/create-relkit/src/generate.service.types.ts",
+      "lines": 26,
+      "sha256": "d6d7c1625c28417b5e948a15fdfb27615e54cb96ef1bc14f7f77816acb844a7f",
+      "preDocumentationSha256": "2213e43f501686a03c5a6a3cebcc52b18807d18222004297c51dabb89ae69ca2",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generate.ts",
+      "lines": 115,
+      "sha256": "4773c21359b367d60949175d2fc1ecb373555a70707ad5434f64828dbf4530c3",
+      "preDocumentationSha256": "7266725008a0b3c97a1c2d0b0bacff2c7154c11015d089269a9238f7cfb64f39",
+      "classification": "cohesive-domain-service",
+      "reason": "Context.Service owns discovery/planning/resolution/generation/transaction capabilities and exposes narrow typed Effect methods plus existing Promise edges."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-cleanup.ts",
+      "lines": 87,
+      "sha256": "990b9e777474c21289cdfe3a4c19d48fcb133fb0ef9c9302a48dcf44c61ff852",
+      "preDocumentationSha256": "b9ee3ad1b132942082562fd08627bef6c55ace8e12971487aa85675cafe5a3b2",
+      "classification": "diagnostic-ownership",
+      "reason": "Bounded cleanup diagnostics and stage disposition preserve original public failures/results and scope ownership."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-cleanup.types.ts",
+      "lines": 5,
+      "sha256": "180ea361983d4d36027d2846fb8091318014fcb4594004047ced79e31099e170",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-errors.ts",
+      "lines": 113,
+      "sha256": "c70d97a091a02286b974b40927b20a89067265964127dd36fb96787e1cea5207",
+      "classification": "schema-boundary",
+      "reason": "Schema validates owned JSON/answer fields and Schema.TaggedError models expected internal failures; unexpected defects remain defects."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-filesystem.ts",
+      "lines": 144,
+      "sha256": "dbaa6ade681e96206ae5862963282cac721e3108676be3a790d8365e4850e04b",
+      "preDocumentationSha256": "d95d437cc35e39550bf8d20500836f359bc5f33b518e1c5c050ead49cde3fbff",
+      "classification": "native-io-service",
+      "reason": "Context.Service with real/fake Layers owns filesystem, process, read-only paths or prompt authority; named methods have shared execution observation."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-filesystem.types.ts",
+      "lines": 123,
+      "sha256": "4ae998f26ed46d73f836224ed30631ffe68275c9d1f84bb504f66404762d5bda",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-paths.ts",
+      "lines": 78,
+      "sha256": "df45a25df1b4990781a4e1e8833a286bc32eaed82b6a91b7bfba682fcdf31667",
+      "preDocumentationSha256": "50ddc4f03749038913cf743eb398fdf3b93f82428c16306e75b5c884b065b1d2",
+      "classification": "native-io-service",
+      "reason": "Context.Service with real/fake Layers owns filesystem, process, read-only paths or prompt authority; named methods have shared execution observation."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-paths.types.ts",
+      "lines": 42,
+      "sha256": "ccc8b1400b51b0d076cf7253a32c98a99186888012b6c84725b15b5099658ef6",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-process.ts",
+      "lines": 163,
+      "sha256": "b2d8fd882fc024c5f071cfcd1968dbc33dfe77b2d240b45b18ae041dd35073a8",
+      "classification": "native-io-service",
+      "reason": "Context.Service with real/fake Layers owns filesystem, process, read-only paths or prompt authority; named methods have shared execution observation."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-process.types.ts",
+      "lines": 36,
+      "sha256": "1e1f254594e2400842a5215a627866169c0d5a95d3d1f1b52d56194e60e3b43f",
+      "preDocumentationSha256": "c3c1a620f62f9a4a9fc6facb613136ebdb39929f1c86708e900567d8c86274ca",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-prompt.ts",
+      "lines": 119,
+      "sha256": "7d033741fdf74047dae5139b4d985fe1ad02843f238389771950177dc75522f8",
+      "preDocumentationSha256": "1cbbd0dcee09c5b0a06112aba06e9d54171c9c867e30de1b256d03f07ee11514",
+      "classification": "native-io-service",
+      "reason": "Context.Service with real/fake Layers owns filesystem, process, read-only paths or prompt authority; named methods have shared execution observation."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-prompt.types.ts",
+      "lines": 40,
+      "sha256": "8a3ad6ba931d5a90e30ac35154eb2ef15d8edb7b4a8ce19ff83a27f2ddcedc86",
+      "preDocumentationSha256": "d06d8d326d487b780d8362e3805d2eee1fa2248ea4e34239b95547c05059a58f",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/generator-runtime.ts",
+      "lines": 43,
+      "sha256": "3a955fd7f1f714a33ca0d328cdd9cf27cb20ea44789522ba77d3c29223377867",
+      "classification": "runtime-edge",
+      "reason": "Explicit composition or native compatibility boundary runs typed domain effects, forwards cancellation and keeps library logging quiet."
+    },
+    {
+      "path": "packages/create-relkit/src/index.ts",
+      "lines": 36,
+      "sha256": "14b4af5c375f58fba29c1b66ed1cc9f721ea6b1780195883461d8945cac82b19",
+      "classification": "pure-barrel",
+      "reason": "Exports only; importing the public API cannot execute prompts or a command."
+    },
+    {
+      "path": "packages/create-relkit/src/options.ts",
+      "lines": 206,
+      "sha256": "b6033e5b4b4299f70a4f25bdc834b7d3e32b9cb2768e103abc6d429bf8eb7be4",
+      "preDocumentationSha256": "253d3d1cbdd5d8a29432cec5b5edfb406b32b594950fa4478a7fc7b80dd12c5d",
+      "classification": "pure-option-parsing",
+      "reason": "Deterministic parsing, validation and flag projection remain synchronous; IO and prompts are delegated to typed owners."
+    },
+    {
+      "path": "packages/create-relkit/src/plan-builder-effects.ts",
+      "lines": 230,
+      "sha256": "4edf8b001174c5cc66bac68f97508014008302e947274cf15daa046fa88228c8",
+      "preDocumentationSha256": "64a1a17c470a448152df28c84b0e5a3e3f2b4eccf585e5432d59ce97085fccd5",
+      "classification": "private-ref-state",
+      "reason": "Each request has authoritative private Ref state; mutation and duplicate reservation compose as typed observed Effects."
+    },
+    {
+      "path": "packages/create-relkit/src/plan-builder-files.ts",
+      "lines": 147,
+      "sha256": "7ca1f17d31c81bf11385be391a161b277ed327d50d76fe02710b89bf9801174a",
+      "preDocumentationSha256": "5d640df7b6d04028c6e85cfcab5df7a5e0ba673f87aaa153a8d451d8a8ae4545",
+      "classification": "private-ref-state",
+      "reason": "Each request has authoritative private Ref state; mutation and duplicate reservation compose as typed observed Effects."
+    },
+    {
+      "path": "packages/create-relkit/src/plan-builder-files.types.ts",
+      "lines": 67,
+      "sha256": "4204f28fae715c5aa7825744e63fa799dd71cd8165ffb97a1c50a42cd05027af",
+      "preDocumentationSha256": "e9f1fa1ca271472c1d1938e463ce44554fba8ff333a0208fd88a1e8e472dd0a4",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/plan-builder-manifest.ts",
+      "lines": 66,
+      "sha256": "162af91a8edba9a5a9766c01a5df238ba3b72beb866505759b5e0128314849b8",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/plan-builder.ts",
+      "lines": 136,
+      "sha256": "44048f10f2850ec9207ff11d7dbee913b86b99b6ef876beed96a87882802e6ce",
+      "preDocumentationSha256": "384aca0d3ccf7158e7a68d6ffacad2caea35ac9db4907ad8a42ee30a5cd208b3",
+      "classification": "compatibility-edge",
+      "reason": "Existing synchronous/Promise methods adapt the authoritative typed Effect workflow; state is not recreated behind each method."
+    },
+    {
+      "path": "packages/create-relkit/src/plan-builder.types.ts",
+      "lines": 23,
+      "sha256": "bbbfee63fa3bd2184c3a3996d363613d723fcd502a8f1eb0ef80b84999bf5224",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/plan-manifest.ts",
+      "lines": 111,
+      "sha256": "e6194638318efacd8394d3fa09b42fddc1b967b96cecbb83b2c03b7652b2e9b8",
+      "preDocumentationSha256": "373d02d4ab25fcfc23fad6c615447c3d5cd5a7c7229b75b6425f6afd3848c7a5",
+      "classification": "pure-catalog-manifest",
+      "reason": "Synchronous portable metadata/schema computation uses materialized concrete versions; no duplicated root pins or filesystem discovery."
+    },
+    {
+      "path": "packages/create-relkit/src/plan-manifest.types.ts",
+      "lines": 13,
+      "sha256": "9b4517c58a841b4e707f779a46d626af190c1b270b226d0a965a0c7566cdd4ec",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/project-catalog.ts",
+      "lines": 94,
+      "sha256": "c4e44aed6d29707c8f2d6da087fc450a435e38a924a6ddbed5885dc92e8f855d",
+      "preDocumentationSha256": "0cd3f7c538f840be8f8ddf61610aeb1191bf91fc242f3d1344eef2cdeb679cb7",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/project-discovery-app.ts",
+      "lines": 223,
+      "sha256": "677783725c672d76c3974158697883f390120225ae760763720aa13df6d49f91",
+      "preDocumentationSha256": "36f9bbc86562b1da162c9cc4cf3c11ba81889819777ce60925300b58c8ebff76",
+      "classification": "pure-ast-discovery",
+      "reason": "Static AST inspection and source transformations never import or execute the user's application."
+    },
+    {
+      "path": "packages/create-relkit/src/project-discovery-database.ts",
+      "lines": 80,
+      "sha256": "6796bec7919b220c3420859a12ba5f78c38690c7e435fb3d81c8aa1d2c2036b4",
+      "preDocumentationSha256": "df3930dfa28a399391464bf14102d6684ecd5ff3b8d61e2e0e569e3568e59691",
+      "classification": "pure-ast-discovery",
+      "reason": "Static AST inspection and source transformations never import or execute the user's application."
+    },
+    {
+      "path": "packages/create-relkit/src/project-discovery-facts.ts",
+      "lines": 211,
+      "sha256": "42cc40f370f1f7cd789abf347ca637f52015c205e38eee5e1697f5099fac72bb",
+      "preDocumentationSha256": "ce63d9207014ef8428ab7c043e8c3ee96d7b506303e55179187df77d2371d17e",
+      "classification": "pure-ast-discovery",
+      "reason": "Static AST inspection and source transformations never import or execute the user's application."
+    },
+    {
+      "path": "packages/create-relkit/src/project-discovery-types.ts",
+      "lines": 64,
+      "sha256": "b737af6ce1608ddd6faf0e9d2da2d1dc0af6d6725c2a08cced8e9789eab96a85",
+      "preDocumentationSha256": "68b171521d05337682f9e4b9c56a61b9500c76d24f15049a1324dbd53ff09e0b",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/project-discovery.service.types.ts",
+      "lines": 15,
+      "sha256": "7104f5c0f4de7e07a412e5c3de8643d55591cb5681778cef588fe72f45ea1666",
+      "preDocumentationSha256": "07ea5f2f8b35e97e0a7cda71ad2ca8bc8c1aedda8ea49d911917f2323bef5098",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/project-discovery.ts",
+      "lines": 91,
+      "sha256": "31da7d2551fb11020260f8153ddec7d45fb3f7fc8e0b42ed0cb6f50a119d3268",
+      "preDocumentationSha256": "da2fa2d05e9976dfe69f12d3eb170232f917e810a7f94f056a955b97a09fff99",
+      "classification": "cohesive-domain-service",
+      "reason": "Context.Service owns discovery/planning/resolution/generation/transaction capabilities and exposes narrow typed Effect methods plus existing Promise edges."
+    },
+    {
+      "path": "packages/create-relkit/src/project-manifest.schemas.ts",
+      "lines": 34,
+      "sha256": "ac3be00c133051eb85327097283d5f7c2f681918faa5798554b2bc85ec509a9b",
+      "classification": "schema-boundary",
+      "reason": "Schema validates owned JSON/answer fields and Schema.TaggedError models expected internal failures; unexpected defects remain defects."
+    },
+    {
+      "path": "packages/create-relkit/src/prompt-driver.ts",
+      "lines": 97,
+      "sha256": "5d05467064323fcb63c74ae2997e41792dae2b9209de2d06e3816d86b115f0af",
+      "preDocumentationSha256": "dc215726f49928f6f9c796aa4746d590df4a15e9065c5abcf6c8960a4f363cb8",
+      "classification": "runtime-edge",
+      "reason": "Explicit composition or native compatibility boundary runs typed domain effects, forwards cancellation and keeps library logging quiet."
+    },
+    {
+      "path": "packages/create-relkit/src/prompt-driver.types.ts",
+      "lines": 101,
+      "sha256": "17bc419f96449e53b484b660214e520a63028ff28b1fdbe7e9eccaeb7cc17d37",
+      "preDocumentationSha256": "641227121b67bcf494c94a00c2734506946cc5e45f0f8241f1258f98f99fd8cd",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/provider-planning-definitions.ts",
+      "lines": 177,
+      "sha256": "d920501e1bbdb1e35aec6c891f4c87c8aa45aeec804de281bef19923840aa0b6",
+      "preDocumentationSha256": "40bdb393416778608d67b48240ede6e3391efbd0d25bf53e26c784300d0305be",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/provider-planning.ts",
+      "lines": 198,
+      "sha256": "8284ba76dabf15399e11209b64a91c148fb7b4d0a22c056dc4d8abdb925e7297",
+      "preDocumentationSha256": "15358c94fcf318e82e24e8457ebf496e2793fb0dc770e003d8506654c6307d51",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/provider-planning.types.ts",
+      "lines": 14,
+      "sha256": "ea20ec05942d55695cea7122277bc033310bb9b96d27c6e1b84df2b2b425787c",
+      "preDocumentationSha256": "aea3400310356e512ee247464948ed8ca0097155f8c045b394bf950fb7b5987e",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/provider-profile-definition.ts",
+      "lines": 98,
+      "sha256": "ee01268597223fb42335384fdad00da3cb15b5fb8add21cca18b2505a5b66357",
+      "preDocumentationSha256": "d0bc69d8219d9ee567c0fb46c5f0eaf55c439edc36785c61de96c1ab346539dc",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/render-ai-sources.ts",
+      "lines": 100,
+      "sha256": "8e875685d802aea2f2c7569e06e7b0022ca5b87f883ae4751646f7fe03e55328",
+      "preDocumentationSha256": "6e349c1cf837b3a84939502aa126a0d5d928069e9c785f0ac85e0fe985189876",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/render-ai.ts",
+      "lines": 176,
+      "sha256": "c67b5098e3e0365b82b673327489db1803be5fc265f047e46c0c22ba99446244",
+      "preDocumentationSha256": "3899ec971efb9b706a87ce9cc6e3da5739b1b281ca4af36cc7b1783e155aa31b",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/render-auth-schema.ts",
+      "lines": 107,
+      "sha256": "6e0ac96be0bed2b2af40eb7d04532c84ec375d892d6ce3dc23c4504ec0cc2e6e",
+      "preDocumentationSha256": "089ffb730f00be2a267fce48afd3732969a9ae12027da9bf387e363f4db88a38",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/render-auth-sources.ts",
+      "lines": 25,
+      "sha256": "4baae1c84f4396ca4acdcd60fe57fd987553539a0789118367dc38ceb99c15c3",
+      "preDocumentationSha256": "b249491a3ef49f7ca82f26a53f5e2cece02e2cd1d7b92ff1a5645a7ec9a1fa3d",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/render-auth.ts",
+      "lines": 197,
+      "sha256": "39ede85d2ce3504d6dfbba43508894bfa473506c696db9e4da638f6bb663a19d",
+      "preDocumentationSha256": "11b04beadc38cff07e7f5bb17e0384e23c794a4ec6731ed7a11be109acb83da0",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/render-database-sources.ts",
+      "lines": 83,
+      "sha256": "3327d12abb0b4c8808f9a94c36f43e1e372a58932262fc0d0ef201d0d6f686c0",
+      "preDocumentationSha256": "557c158f87d7874e7fa064d3a1992999c7a507750f81fe79947b39af4dacec46",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/render-database.ts",
+      "lines": 101,
+      "sha256": "8c17ba1cafa9b1213b9eacb4f8baf06cdc212d4882ffb33692605eabc86df327",
+      "preDocumentationSha256": "dfb9e431b9ed2c23a408beda0f4d7c52c4c20bfa2f95066a833b5ecbda68e5dc",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/render-domain-callables.ts",
+      "lines": 176,
+      "sha256": "6cecc298f9dbce9b827f767d5cac827c993c1a06200e120436e8799b0c819aba",
+      "preDocumentationSha256": "274654446e32c63a723d15da7bdfa87c6afe13d2b73ad86c0bd70a0906aea8d7",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/render-domain-events.ts",
+      "lines": 157,
+      "sha256": "6fe5ee8b57c7a76efaa8d7f60d5137fb8757c1b787bca49af734a79ed960961f",
+      "preDocumentationSha256": "e36aa8a2eb21d03a4f43c73accb6632833815a886789be2ad11d88eba4cfceea",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/render-domain-jobs.ts",
+      "lines": 155,
+      "sha256": "b452a97b7ff3e7123167afb5df17edbfc7924e63135c7d575b1dc1b0e314f06d",
+      "preDocumentationSha256": "2c91d049bd1e91e613798d23736ccdf72d9be2f166652efbd5e0fcf95081cff7",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/render-domain-register.ts",
+      "lines": 47,
+      "sha256": "d6a51f302048dd5002ff29b342253d9dc0d136d995c2f2b504b0a80eee4a8ad8",
+      "preDocumentationSha256": "98f4c171bc9bff9f82bfe5f5833cae40aca3010f85d529f6c0b8bc636edb9f3d",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/render-domain-sources.ts",
+      "lines": 242,
+      "sha256": "8cdf085e9d27643ce9bfb3ae1a52a9e1f1cd0f8964898fdee56252a3c6745365",
+      "preDocumentationSha256": "009b6a38eb1771801279a21f4075aa7f8cc01364610df7667e6e433103f4c05c",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/render-domain.ts",
+      "lines": 4,
+      "sha256": "2e14e276b728fa1c460738049bbf1b42b5d9cc69322f19b7fd873dbeab2c1908",
+      "classification": "pure-barrel",
+      "reason": "Exports only; importing the public API cannot execute prompts or a command."
+    },
+    {
+      "path": "packages/create-relkit/src/render-domain.types.ts",
+      "lines": 17,
+      "sha256": "19f062dad1868fbccc61293cb2c37ae29655c476d852724f192688b6ed37dd7e",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/render-resource-sources.ts",
+      "lines": 45,
+      "sha256": "32c8ebfab17a1277159d7480049b7bf77c39697cca743685d72eafc30c1fbdcb",
+      "preDocumentationSha256": "3d6ed30bc9b8eda87b3c1589f5daf675356f14ff594325bab72e932ef404a347",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/render-resources.ts",
+      "lines": 157,
+      "sha256": "a58fda411bad13534c5623edf476af88517da6ae8c0380a7a636a24bcf508084",
+      "preDocumentationSha256": "eb415463ade457de42530b2d47f52c05180e72c6e1e803bb4f226de0c1ad0fbd",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/render-route-sources.ts",
+      "lines": 61,
+      "sha256": "ec572bbaa4d344242c02ab1839cbbf647c5b84c49d13c40e80293434946a1308",
+      "preDocumentationSha256": "9fc150c0f0e015a04bf0cbdda92d3ecfb4d65aae2bd0949d61f34d1b65ddb75a",
+      "classification": "pure-source-rendering",
+      "reason": "Deterministic emitted RELKIT source stays free of generator runtime services and Effect imports."
+    },
+    {
+      "path": "packages/create-relkit/src/render-routes.ts",
+      "lines": 157,
+      "sha256": "f85de71013ac0ea83f5481f4d62f7a2ef3ecb22a5ada5c8c832fe07c7086c6ba",
+      "preDocumentationSha256": "99cb7dccf0548704d89ea72d46f639469ecd1b70cebb51e91a66e2172228b3cd",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/render-service.ts",
+      "lines": 238,
+      "sha256": "2f8697fe3d8ab9b0452200e54a745021dfc4eccfec7c5dfd8a7a7b17321e0548",
+      "preDocumentationSha256": "16448d1c839d0df88b23ff7c5248f167ea07b2d467d011ace487b4aec70fe02c",
+      "classification": "typed-planning-workflow",
+      "reason": "Domain planning composes actual PlanBuilder Ref/file Effects; pure rendering remains separate."
+    },
+    {
+      "path": "packages/create-relkit/src/scaffold-catalog.ts",
+      "lines": 37,
+      "sha256": "564d7a94621439e73607793863464a3f5c8e3ae22af2f741536f8ca31623433a",
+      "classification": "pure-catalog-manifest",
+      "reason": "Synchronous portable metadata/schema computation uses materialized concrete versions; no duplicated root pins or filesystem discovery."
+    },
+    {
+      "path": "packages/create-relkit/src/scaffold-catalog.types.ts",
+      "lines": 13,
+      "sha256": "c811b6fa5c4e018560969d0edb7705691fa586e151b2d0954357e99d5e313dbd",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/src/source-edit.ts",
+      "lines": 109,
+      "sha256": "818db0e557a367fcfd1068bbe53dfe5787d1138272e8d34bdd1efc826f6740c1",
+      "preDocumentationSha256": "f862867e137f6f8cce74a6dc6de441fa94fed1fed229f715f0a3ab28a540e163",
+      "classification": "pure-ast-discovery",
+      "reason": "Static AST inspection and source transformations never import or execute the user's application."
+    },
+    {
+      "path": "packages/create-relkit/src/source-factory-edit.ts",
+      "lines": 197,
+      "sha256": "74a45374ac773d8ed0f3114fef6e54c79fa259e5c554755e8e8c0f3747c236e6",
+      "preDocumentationSha256": "2788b6ec4e27f749de552c019212f989686cf97f1e2228cc15ea016070374f91",
+      "classification": "pure-ast-discovery",
+      "reason": "Static AST inspection and source transformations never import or execute the user's application."
+    },
+    {
+      "path": "packages/create-relkit/src/source-import-edit.ts",
+      "lines": 87,
+      "sha256": "243c89abf0444e43416bf16ca0d96ab5a345344fa8fc3ba4a62e02dc6ed257ce",
+      "preDocumentationSha256": "cc30389e52566c6ca80f2112d66a429d0a4dba4d5c2e44883427247a3302160c",
+      "classification": "pure-ast-discovery",
+      "reason": "Static AST inspection and source transformations never import or execute the user's application."
+    },
+    {
+      "path": "packages/create-relkit/src/template-root.ts",
+      "lines": 36,
+      "sha256": "78e41a3a34c8a3eb07e9ee8c351ad6e8a2dcecf7854938f9dc99140687bbf39c",
+      "preDocumentationSha256": "754be70fc142a746617224416c31947913a15d7c5cb89a0c463c8e2ad385caa4",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/validate-errors.ts",
+      "lines": 16,
+      "sha256": "7774ef038b03e9d1ae6e6cc31aabc095f32838a35e70364fcf88474c29cab08e",
+      "classification": "public-error-contract",
+      "reason": "Canonical existing public constructor and diagnostic codes remain identical across sync and Promise edges."
+    },
+    {
+      "path": "packages/create-relkit/src/validate-paths.ts",
+      "lines": 142,
+      "sha256": "6363cb10051e48e060ddaf1a5f44111182c9fe918f1ba5e665207098b223af50",
+      "preDocumentationSha256": "e64a081563ff1628803cf921826c82bf504b73cc5bfb090234823b367565d311",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/validate.ts",
+      "lines": 181,
+      "sha256": "b1b917a26128d45db55eceac83728f20b329496beabcd100b8faf9636c141046",
+      "preDocumentationSha256": "0bc4b52cf2be37c153191a8735bbfed406c1478512972d6d5be9ad937c367045",
+      "classification": "typed-io-workflow",
+      "reason": "Typed filesystem/path Effects own discovery, preview, manifest and portable patch operations with bounded reads and ordered writes."
+    },
+    {
+      "path": "packages/create-relkit/src/validate.types.ts",
+      "lines": 21,
+      "sha256": "95329718b4107925dd7c043cde4c4097053a21dd0acacaf4edf6a330380990de",
+      "classification": "type-contract",
+      "reason": "Static public/internal contracts and named service environments; no runtime authority is acquired."
+    },
+    {
+      "path": "packages/create-relkit/tests/dependency-patch-generation.test.ts",
+      "lines": 65,
+      "sha256": "c0f85f938bb5bf7284e08e726046089ef20d383e301453008de9a746a2fe7a24",
+      "classification": "foundation-regression-test",
+      "reason": "Existing Bun generator coverage checks pure portable manifest/catalog/patch contracts."
+    },
+    {
+      "path": "packages/create-relkit/tests/dependency-patches.fixture.ts",
+      "lines": 53,
+      "sha256": "4c5bd3f6aab02aa20969cbc294816cc0fefc3fe81a10f46fa5cc792b38f42cd7",
+      "classification": "test-fixture",
+      "reason": "Deterministic fake Layer or portable patch fixture supports behavioral tests without acquiring production authority."
+    },
+    {
+      "path": "packages/create-relkit/tests/dependency-patches.test.ts",
+      "lines": 247,
+      "sha256": "f08f8764eb60c03405fe597ed8b9b684c4f114d4727fd111f616418186e189d9",
+      "classification": "foundation-regression-test",
+      "reason": "Existing Bun generator coverage checks pure portable manifest/catalog/patch contracts."
+    },
+    {
+      "path": "packages/create-relkit/tests/environment.effect.test.ts",
+      "lines": 43,
+      "sha256": "c1cd825b352bd47e3d5f8ef00ce12361ac4feef987753f558367dcc829e28a85",
+      "classification": "effect-regression-test",
+      "reason": "Effect/Vitest checks real or fake Layer authority, scope ownership, observation or executed compiler boundaries."
+    },
+    {
+      "path": "packages/create-relkit/tests/executable.effect.test.ts",
+      "lines": 57,
+      "sha256": "5603b16735e8fecb6e49aabcc12c91ab254956f6a62761beb0fff6ea15f6e26e",
+      "prePortabilitySha256": "e1071db8a589fd227021807eb47ff4c423dcb39a20ce86ecb9305f2a3c10a45c",
+      "classification": "effect-regression-test",
+      "reason": "Effect/Vitest checks passive public imports and singular executable JSON using explicit Bun children, drained pipes, physical close settlement and bounded SIGKILL timeout under either Node or Bun test hosts. Native_gate independently accepted the final source and portability gate."
+    },
+    {
+      "path": "packages/create-relkit/tests/generator-environment.probe.ts",
+      "lines": 67,
+      "sha256": "609c2b409369d4a71bdc19893745a6fd93aec48b9fc16cfd803d009c796e74db",
+      "classification": "compiler-probe",
+      "reason": "Strict positive and negative authority examples are actually compiled; mutation proves environment erasure breaks expected diagnostics."
+    },
+    {
+      "path": "packages/create-relkit/tests/generator-services.fixture.ts",
+      "lines": 121,
+      "sha256": "c96ab8e76a1fec6caa6ea412faba48f8a69ae84676eda5c9355f67f000b0c9b4",
+      "classification": "test-fixture",
+      "reason": "Deterministic fake Layer or portable patch fixture supports behavioral tests without acquiring production authority."
+    },
+    {
+      "path": "packages/create-relkit/tests/native-process.effect.test.ts",
+      "lines": 106,
+      "sha256": "266c6ca7dafa934c179e997b5b2c452c85df6db32c6ac797770d47a97df8da6a",
+      "classification": "effect-regression-test",
+      "reason": "Effect/Vitest checks real or fake Layer authority, scope ownership, observation or executed compiler boundaries."
+    },
+    {
+      "path": "packages/create-relkit/tests/observation.effect.test.ts",
+      "lines": 101,
+      "sha256": "b707c627a8ba47999470ab99186e8320b88328c8a7b4b8fa867dd76ecf906ccd",
+      "classification": "effect-regression-test",
+      "reason": "Effect/Vitest checks real or fake Layer authority, scope ownership, observation or executed compiler boundaries."
+    },
+    {
+      "path": "packages/create-relkit/tests/planning.effect.test.ts",
+      "lines": 128,
+      "sha256": "6c327a93a089a0e84bf10937acd42b9d7579c25e616f343a7f43d7552ab027b9",
+      "classification": "effect-regression-test",
+      "reason": "Effect/Vitest checks real or fake Layer authority, scope ownership, observation or executed compiler boundaries."
+    },
+    {
+      "path": "packages/create-relkit/tests/project-catalog.test.ts",
+      "lines": 118,
+      "sha256": "e8b904945d57b8183d74d09a0da08a632e50bb2b3bc4332aed43a89cbff5a931",
+      "classification": "foundation-regression-test",
+      "reason": "Existing Bun generator coverage checks pure portable manifest/catalog/patch contracts."
+    },
+    {
+      "path": "packages/create-relkit/tests/transaction-lifecycle.effect.test.ts",
+      "lines": 196,
+      "sha256": "6bb130d2677f3ba162513d22f5ffe1e06ba9804d433c77e2aa47b6dd74eb4b32",
+      "classification": "effect-regression-test",
+      "reason": "Effect/Vitest checks real or fake Layer authority, scope ownership, observation or executed compiler boundaries."
+    },
+    {
+      "path": "packages/create-relkit/vitest.config.ts",
+      "lines": 9,
+      "sha256": "50694896e8dd60f0b3c558b0a675f3b44f4b03c9f06f0b9fd1d0d183fd73e8ca",
+      "classification": "test-configuration",
+      "reason": "Pure Vitest runner configuration selects Effect service tests; no production runtime effects."
+    }
+  ]
+}
