@@ -45,10 +45,10 @@
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*",
-    "effect": "4.0.0-rc.115"
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "vitest": "5.0.1"
+    "vitest": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",
