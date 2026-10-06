@@ -2,7 +2,16 @@ import type { Exit } from "effect";
 
 /** Fixed owners of internal execution operations. */
 export type ExecutionDomain =
-  "runtime" | "local" | "engine" | "http" | "client" | "inspector" | "supervisor" | "testing";
+  | "runtime"
+  | "local"
+  | "engine"
+  | "http"
+  | "client"
+  | "inspector"
+  | "supervisor"
+  | "testing"
+  | "cli"
+  | "generator";
 
 /** Declaration-owned workload names and non-negative counts; never input identities. */
 export type ExecutionWorkload = Readonly<Record<string, number>>;

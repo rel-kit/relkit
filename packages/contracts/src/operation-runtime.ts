@@ -1,5 +1,5 @@
-import { Cause, Exit } from "effect";
-import type { Effect, ManagedRuntime } from "effect";
+import { Cause, Effect, Exit, type Context } from "effect";
+import type { ManagedRuntime } from "effect";
 
 /**
  * Runs a synchronous compatibility edge in its existing service owner.
@@ -60,6 +60,44 @@ export async function runExecutionPromise<A, E, R, ER>(
   options?: Effect.RunOptions,
 ): Promise<A> {
   const exit = await runtime.runPromiseExit(effect, options);
+  if (Exit.isSuccess(exit)) return exit.value;
+  throw Cause.squash(exit.cause);
+}
+
+/**
+ * Runs a native callback with services captured from its existing scope owner.
+ * @typeParam A - Public successful value.
+ * @typeParam E - Original domain failure.
+ * @typeParam R - Captured service authority.
+ * @param context - Existing owner's services; this runner acquires no resource graph.
+ * @param effect - Native callback operation, already owned by that lifetime.
+ * @param options - Optional caller cancellation.
+ * @returns Original result or rejection, preserving public failure identity.
+ */
+export async function runExecutionPromiseWith<A, E, R>(
+  context: Context.Context<R>,
+  effect: Effect.Effect<A, E, R>,
+  options?: Effect.RunOptions,
+): Promise<A> {
+  const exit = await Effect.runPromiseExitWith(context)(effect, options);
+  if (Exit.isSuccess(exit)) return exit.value;
+  throw Cause.squash(exit.cause);
+}
+
+/**
+ * Runs a synchronous native callback in its captured owner context.
+ * @typeParam A - Public successful value.
+ * @typeParam E - Original domain failure.
+ * @typeParam R - Captured service authority.
+ * @param context - Existing owner services; no new lifetime is acquired.
+ * @param effect - Synchronously completable operation.
+ * @returns Original result; suspension remains a programming error.
+ */
+export function runExecutionSyncWith<A, E, R>(
+  context: Context.Context<R>,
+  effect: Effect.Effect<A, E, R>,
+): A {
+  const exit = Effect.runSyncExitWith(context)(effect);
   if (Exit.isSuccess(exit)) return exit.value;
   throw Cause.squash(exit.cause);
 }
