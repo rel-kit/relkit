@@ -11,7 +11,7 @@ import { runScaffoldTerminal } from "../../scripts/scaffold-smoke-terminal.ts";
 
 const roots: string[] = [];
 
-test("local create preserves the staged interactive addition prompt", async () => {
+test("local create asks only final confirmation when the project name is explicit", async () => {
   const parent = await mkdtemp(join(tmpdir(), "relkit-local-create-terminal-"));
   roots.push(parent);
   const result = await runScaffoldTerminal(
@@ -32,13 +32,12 @@ test("local create preserves the staged interactive addition prompt", async () =
       "--examples",
     ],
     parent,
-    [
-      ["Jobs service", "\r"],
-      ["Create this project?", "\r"],
-      ["Add an artifact before finishing?", "n\r"],
-    ],
+    [["Create this project?", "\r"]],
   );
   expect(result.code, result.output).toBe(0);
+  expect(result.output).not.toContain("Add an artifact before finishing?");
+  expect(result.output).not.toContain("Project name");
+  expect(result.output).not.toContain("App format");
   expect(await Bun.file(join(parent, "app/package.json")).exists()).toBe(true);
 }, 600_000);
 
@@ -130,7 +129,7 @@ test("local links keep web dependencies local and repair previously linked inspe
     expect(names).not.toContain("react-dom");
     expect(manifest.dependencies).toMatchObject({
       langchain: "link:langchain",
-      next: linked ? cliManifest.dependencies.next : "16.3.3",
+      next: linked ? cliManifest.relkit.buildCatalog.dependencies.next : "16.3.3",
       react: "19.2.8",
       "react-dom": "19.2.8",
     });
@@ -221,7 +220,7 @@ test("local launcher and linked CLI hide workspace build output", async () => {
   roots.push(external);
   for (const [executable, cwd] of [
     [join(repository, "scripts/relkit-local.ts"), repository],
-    [join(repository, "packages/cli/dist/index.js"), external],
+    [join(repository, "packages/cli/dist/bin.js"), external],
   ]) {
     const child = Bun.spawn([process.execPath, executable, "--version"], {
       cwd,
