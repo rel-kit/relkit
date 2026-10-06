@@ -1,7 +1,28 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { runCommand, type Manifest } from "./pack-and-smoke-create-relkit-support.js";
 import { workspacePackageDirectories } from "./workspace-packages.js";
+import { assertPackedDependencies } from "./catalog-manifest.js";
+
+/**
+ * Reads package metadata from the artifact that consumers actually install.
+ * @param path - Package tarball path.
+ * @returns Its package manifest.
+ * @throws When extraction fails or the manifest is malformed JSON.
+ */
+export async function readPackedManifest(path: string): Promise<Manifest> {
+  const child = Bun.spawn(["tar", "-xOf", path, "package/package.json"], {
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const [stdout, stderr, code] = await Promise.all([
+    new Response(child.stdout).text(),
+    new Response(child.stderr).text(),
+    child.exited,
+  ]);
+  if (code !== 0) throw new Error(`Cannot read packed manifest ${path}\n${stderr}`);
+  return JSON.parse(stdout) as Manifest;
+}
 
 export async function readManifests(
   root: string,
@@ -70,7 +91,20 @@ export async function startRegistry(
   manifests: Map<string, { directory: string; manifest: Manifest }>,
 ): Promise<ReturnType<typeof Bun.serve>> {
   const bytes = new Map<string, Uint8Array>();
-  for (const [name, path] of tarballs) bytes.set(name, await readFile(path));
+  const packedManifests = new Map<string, Manifest>();
+  const rootManifest = JSON.parse(
+    await readFile(resolve(import.meta.dir, "../package.json"), "utf8"),
+  );
+  const workspaceNames = new Set(manifests.keys());
+  for (const [name, path] of tarballs) {
+    const packed = await readPackedManifest(path);
+    const source = manifests.get(name)?.manifest;
+    if (source === undefined || packed.name !== name || packed.version !== source.version)
+      throw new Error(`Packed registry identity mismatch: ${name}`);
+    assertPackedDependencies(source, packed, rootManifest, workspaceNames, packed.version);
+    packedManifests.set(name, packed);
+    bytes.set(name, await readFile(path));
+  }
   const upstreamResponses = new Map<
     string,
     Promise<{ body: Uint8Array; contentType: string; status: number }>
@@ -108,23 +142,16 @@ export async function startRegistry(
         return new Response(Buffer.from(bytes.get(name)!), {
           headers: { "content-type": "application/octet-stream" },
         });
-      const manifest = manifests.get(name)?.manifest;
-      if (manifest !== undefined && !bytes.has(name))
+      const manifest = packedManifests.get(name);
+      if (manifests.has(name) && manifest === undefined)
         return new Response(`Workspace package was not packed: ${name}`, { status: 404 });
       if (manifest === undefined) return proxyUpstream(url);
-      const dependencies = Object.fromEntries(
-        Object.entries(manifest.dependencies ?? {}).map(([key, value]) => [
-          key,
-          value.startsWith("workspace:") ? manifest.version : value,
-        ]),
-      );
       return Response.json({
         name,
         "dist-tags": { latest: manifest.version },
         versions: {
           [manifest.version]: {
             ...manifest,
-            dependencies,
             dist: { tarball: `http://127.0.0.1:${port}/_tar/${encodeURIComponent(name)}` },
           },
         },
