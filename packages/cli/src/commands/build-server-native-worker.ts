@@ -1,5 +1,6 @@
+/** Pure native SDK callbacks; the typed host owns worker handles and readiness retries. */
 export const SERVER_NATIVE_WORKER_SOURCE = `
-function registerNativeJobWorker(runtime, jobs, tasks, executor) {
+async function registerNativeJobWorker(runtime, jobs, tasks, executor) {
   const register = runtime.adapter.registerWorker;
   if (typeof register !== "function") return;
   const profiles = new Set((plan.jobs ?? []).map((candidate) => candidate.profile));
@@ -7,25 +8,26 @@ function registerNativeJobWorker(runtime, jobs, tasks, executor) {
   if (first === undefined) return;
   const definitions = jobs.map((job) => nativeTaskDefinition(job, tasks));
   const role = process.env.RELKIT_WORKER_ROLE ?? "worker";
-  const handle = register({
+  const handle = await runtimeOwner.resource("native-job-registration", async () => register({
     definitions,
     executor,
     startWorker: role !== "api",
     ...(profiles.size === 1 ? {} : { servePath: "/api/inngest/" + safeSegment(first.profile) }),
-  });
-  if (handle === null || typeof handle !== "object" || typeof handle.ready !== "function" || typeof handle.close !== "function") {
-    throw new Error("Native jobs adapter returned an invalid worker handle.");
-  }
+  }), (value) => value?.close?.(), (value) => {
+    if (value === null || typeof value !== "object" || typeof value.ready !== "function" || typeof value.close !== "function")
+      throw new Error("Native jobs adapter returned an invalid worker handle.");
+    if ((typeof value.path === "string" || typeof value.handler === "function") && (typeof value.path !== "string" || typeof value.handler !== "function"))
+      throw new Error("Native jobs adapter returned an incomplete worker endpoint.");
+  }, "worker");
   const registration = { handle, runtime, jobs, definitions, startWorker: role !== "api" };
   nativeJobWorkerRegistrations.add(registration);
-  nativeJobWorkerHandles.add(handle);
-  nativeJobWorkerReady = false;
+  runtimeOwner.setReady("nativeWorker", false);
   nativeJobWorkerReadyHandles.delete(handle);
   if (typeof handle.path === "string" || typeof handle.handler === "function") {
     if (typeof handle.path !== "string" || typeof handle.handler !== "function") throw new Error("Native jobs adapter returned an incomplete worker endpoint.");
     nativeJobWorkerEndpoints.set(handle.path, handle);
   }
-  if (nativeJobWorkerServerReady) void readyNativeJobWorker(registration);
+  void readyNativeJobWorker(registration).catch(() => {});
   return handle;
 }
 
@@ -69,10 +71,8 @@ function nativeJobHandler(request) {
 }
 
 async function readyNativeJobWorker(registration) {
-  let retryDelay = 250;
-  let lastError;
-  while (!stopping) {
-    try {
+  await runtimeOwner.awaitReady("server");
+  await runtimeOwner.retry("native-job-registration", async () => {
       await registration.handle.ready();
       if (registration.startWorker && registration.runtime.adapter.schedules !== undefined) {
         for (const definition of registration.definitions) {
@@ -89,23 +89,7 @@ async function readyNativeJobWorker(registration) {
         }
       }
       nativeJobWorkerReadyHandles.add(registration.handle);
-      nativeJobWorkerReady = nativeJobWorkerReadyHandles.size === nativeJobWorkerRegistrations.size;
-      return true;
-    } catch (error) {
-      lastError = error;
-      nativeJobWorkerReadyHandles.delete(registration.handle);
-      nativeJobWorkerReady = false;
-      await new Promise((resolve) => setTimeout(resolve, retryDelay));
-      retryDelay = Math.min(retryDelay * 2, 5_000);
-    }
-  }
-  if (lastError !== undefined)
-    recordRuntimeFailure("runtime.native-job-registration", "Native jobs worker registration failed", lastError, "job");
-  return false;
-}
-
-async function readyNativeJobWorkers() {
-  const results = await Promise.all([...nativeJobWorkerRegistrations].map((registration) => readyNativeJobWorker(registration)));
-  nativeJobWorkerReady = results.length === nativeJobWorkerRegistrations.size && results.every(Boolean);
+      runtimeOwner.setReady("nativeWorker", nativeJobWorkerReadyHandles.size === nativeJobWorkerRegistrations.size);
+  });
 }
 `;

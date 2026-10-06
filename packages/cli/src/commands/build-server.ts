@@ -12,7 +12,17 @@ import { SERVER_NATIVE_WORKER_SOURCE } from "./build-server-native-worker.js";
 import { SERVER_RUNTIME_SOURCE } from "./build-server-runtime.js";
 import { SERVER_REGISTRATION_SOURCE } from "./build-server-registration.js";
 import { SERVER_SHUTDOWN_SOURCE } from "./build-server-shutdown.js";
-/** Emits the one Bun entrypoint used by dev, start, and the production container. */
+import { SERVER_BOOTSTRAP_SOURCE } from "./build-server-bootstrap.js";
+/**
+ * Emits the Bun entrypoint shared by dev, start, and the production container.
+ * @param graph - Validated application graph.
+ * @param graphHash - Graph identity verified by the generated host.
+ * @param activation - Atomic artifact activation identity.
+ * @param openapi - Generated HTTP documentation.
+ * @param clientContract - Generated client protocol contract.
+ * @param configuration - Validated HTTP build configuration.
+ * @returns Pure source text; resource lifetimes are delegated to the typed runtime helper.
+ */
 export function serverSource(
   graph: ApplicationGraph,
   graphHash: string,
@@ -40,6 +50,7 @@ export function serverSource(
   return `import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash } from "node:crypto";
 import { Effect } from "effect";
+import { createServerRuntimeHost } from "@relkit/cli/internal/server-runtime";
 ${providerOverridesImport}
 import { assertAgentRuntimeDependencies, createGeneratedAgentFunction, invokeAgent, releaseAgentPersistence } from "@relkit/agents";
 import { createApplicationContextResolver } from "@relkit/app";
@@ -60,6 +71,7 @@ import { runtimeIntegrationModules } from "./runtime-integrations.ts";
 ${localServicesImport}
 ${jobsManifestImport}
 import { runtimeManifest } from "./runtime.manifest.ts";
+${SERVER_BOOTSTRAP_SOURCE}
 
 const graph = ${canonicalJson(graph)};
 const graphHash = ${JSON.stringify(graphHash)};
@@ -86,14 +98,30 @@ const sourceToken = tokenFrom(process.env.RELKIT_SOURCE_TOKEN);
 const generationToken = tokenFrom(process.env.RELKIT_GENERATION_TOKEN);
 const sourceValues = Object.fromEntries(Object.entries(process.env).filter((entry) => entry[1] !== undefined));
 const infrastructureBindingValues = parseInfrastructureBindingValues(process.env.RELKIT_INFRASTRUCTURE_BINDINGS);
-const shutdownController = new AbortController();
+const databaseNode = plan.services?.find((service) => service.capability?.kind === "drizzle");
+const authNode = plan.services?.find((service) => service.capability?.kind === "better-auth");
+let runtimeReport = () => {};
+let runtimeWrite = () => {};
+let telemetry;
+const runtimeOwner = await createServerRuntimeHost({ ready: { database: databaseNode === undefined, auth: authNode === undefined }, annotations: { generationId, graphHash, source: "direct" }, report: (failure, cleanup) => runtimeReport(failure, cleanup), logger: { component: "runtime.lifecycle", minimumLevel: process.env.RELKIT_DEV_LOGS === "1" ? "all" : "info", collector: { collect: (record) => telemetry?.collect(record) }, human: { write: (_line, record) => runtimeWrite(record) }, json: false } });
+const shutdownController = { signal: runtimeOwner.signal };
+const runtimeState = () => runtimeOwner.snapshot();
+try {
 const telemetryConfiguration = graph.nodes.find((node) => node.kind === "app")?.telemetry;
 assertRuntimeIntegrationModules(runtimeIntegrationsPlan, runtimeIntegrationModules);
-const telemetryExporters = await createTelemetryExporterFanout({ exporters: telemetryConfiguration?.exporters, modules: runtimeIntegrationModules, values: sourceValues, signal: shutdownController.signal });
-const telemetry = await createObservabilityRuntime({ root: process.env.RELKIT_OBSERVABILITY_ROOT ?? ".relkit/observability", configuration: telemetryConfiguration, exporter: telemetryExporters,
+const telemetryExporters = await runtimeOwner.resource("telemetry.exporters", (signal) => createTelemetryExporterFanout({ exporters: telemetryConfiguration?.exporters, modules: runtimeIntegrationModules, values: sourceValues, signal }), (value) => value.close(), undefined, "telemetry");
+telemetry = await runtimeOwner.resource("telemetry", () => createObservabilityRuntime({ root: process.env.RELKIT_OBSERVABILITY_ROOT ?? ".relkit/observability", configuration: telemetryConfiguration, exporter: telemetryExporters,
   ...(environment !== "production" && process.env.RELKIT_TELEMETRY_URL && process.env.RELKIT_TELEMETRY_TOKEN ? {
     remote: { url: process.env.RELKIT_TELEMETRY_URL, token: process.env.RELKIT_TELEMETRY_TOKEN }
-  } : {}) });
+  } : {}) }), (value) => value.close(), undefined, "telemetry");
+runtimeWrite = writeRuntimeLog;
+runtimeReport = (failure, cleanup) => {
+  const operation = failure.operation;
+  const component = operation.startsWith("telemetry") ? "telemetry" : operation.startsWith("database") ? "database" : operation.startsWith("auth") ? "auth" : operation === "native-job-worker" ? "native-job-worker" : operation.startsWith("native-job") ? "native-job-registration" : operation.startsWith("job-worker") ? "job-worker" : operation.startsWith("provider") ? "provider" : "lifecycle";
+  const labels = { provider: "Provider", database: "Database", auth: "Auth", telemetry: "Telemetry", "native-job-registration": "Native jobs worker registration", "native-job-worker": "Native jobs worker", "job-worker": "Job worker", lifecycle: "Runtime" };
+  const suffix = cleanup ? " cleanup failed" : component.endsWith("worker") || component === "native-job-registration" ? " failed" : " startup failed";
+  recordRuntimeFailure("runtime." + component, labels[component] + suffix, failure.cause, component === "auth" ? "http" : component.includes("job") ? "job" : "direct");
+};
 globalThis["__relkit_flush_telemetry"] = telemetry.flush;
 const spanRuntime = createHttpSpanRuntime({ generationId, graphHash, observability: telemetry });
 const executableManifest = {
@@ -117,10 +145,8 @@ const specializedInstrumentation = await Effect.runPromise(
     })),
   ),
 );
-const databaseNode = plan.services?.find((service) => service.capability?.kind === "drizzle");
-const authNode = plan.services?.find((service) => service.capability?.kind === "better-auth");
-const databaseStartup = createDatabaseRegistration(databaseNode, runtimeManifest.services, values);
-const authStartup = createBetterAuthRegistration(authNode, runtimeManifest.services, databaseStartup);
+const databaseStartup = databaseNode === undefined ? undefined : runtimeOwner.resource("database", () => createDatabaseRegistration(databaseNode, runtimeManifest.services, values), (value) => value.close(), () => runtimeOwner.setReady("database", true));
+const authStartup = authNode === undefined ? undefined : runtimeOwner.resource("auth", () => createBetterAuthRegistration(authNode, runtimeManifest.services, databaseStartup), () => {}, () => runtimeOwner.setReady("auth", true));
 const authRequestStorage = new AsyncLocalStorage();
 const authRuntime = createAuthRegistration(graph, runtimeManifest.routes, authStartup);
 const contextResolver = createApplicationContextResolver({
@@ -132,54 +158,35 @@ bindAgents();
 await assertAgentRuntimeDependencies(Object.values(runtimeManifest.agents ?? {}));
 const registry = createFunctionRegistry(graph, executableManifest);
 let materializedJobs;
-let jobWorker;
-let nativeJobWorker;
 let nativeJobsRuntimes = new Map();
-let nativeJobWorkerServerReady = false;
-let nativeJobWorkerReady = true;
 const nativeJobWorkerRegistrations = new Set();
-const nativeJobWorkerHandles = new Set();
 const nativeJobWorkerReadyHandles = new Set();
 const nativeJobWorkerEndpoints = new Map();
-const providerStartup = (environmentResolution.error === undefined
-  ? createProviderRegistry({ generationId, graph, runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues, infrastructureBindingValues, signal: shutdownController.signal })
-  : Promise.reject(environmentResolution.error)).then(async (value) => {
+const providerStartup = runtimeOwner.resource("provider", (signal) => environmentResolution.error === undefined
+  ? createProviderRegistry({ generationId, graph, runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues, infrastructureBindingValues, signal })
+  : Promise.reject(environmentResolution.error), (value) => value.dispose(), async (value) => {
   if ((plan.channels ?? []).length > 0) setActiveRealtimeDispatcher(createProviderRealtimeDispatcher({ applicationId: graph.appId, environment, generationId, publicFingerprint, provider: (profile) => provider(value, "realtime", profile) }));
   await materializeEvents({ plan, providerRegistry: value, engine: { invoke: invokeHttp } });
   materializedJobs = await materializeJobs({ plan, engine: { invoke: invokeHttp }, createQueue: (context) => queueProvider(value, context), spanRuntime });
-  jobWorker = plan.queues.length === 0 ? undefined : startJobWorker(materializedJobs);
-  nativeJobsRuntimes = createNativeJobsRuntimes(value);
-  nativeJobWorker = startNativeJobWorker(nativeJobsRuntimes);
-  await waitForProviderReady();
-  providerReady = true;
-  providers = value;
-  return value;
-}).catch((error) => {
-  recordRuntimeFailure("runtime.provider", "Provider startup failed", error, "direct");
-  providerFailed = true;
+  if (plan.queues.length > 0) await startJobWorker(materializedJobs);
+  nativeJobsRuntimes = await createNativeJobsRuntimes(value);
+  await startNativeJobWorker(nativeJobsRuntimes);
+  await runtimeOwner.providerDelay();
+  runtimeOwner.setReady("provider", true);
+}, "application", false).catch((error) => {
   return undefined;
 });
-let providers;
-let providerReady = false;
-let providerFailed = false;
-let databaseReady = databaseNode === undefined;
-let authReady = authNode === undefined;
-let specializedFailed = false;
-databaseStartup?.then(() => { databaseReady = true; }).catch((error) => {
-  specializedFailed = true;
-  recordRuntimeFailure("runtime.database", "Database startup failed", error, "direct");
-});
-authStartup?.then(() => { authReady = true; }).catch((error) => {
-  specializedFailed = true;
-  recordRuntimeFailure("runtime.auth", "Auth startup failed", error, "http");
-});
-const activeInvocations = new Set();
-let stopping = false;
+void databaseStartup?.catch(() => {});
+void authStartup?.catch(() => {});
 ${serverHttpSource(configuration)}
 ${SERVER_INVOCATION_SOURCE}
 ${SERVER_REGISTRATION_SOURCE}
 ${SERVER_NATIVE_WORKER_SOURCE}
 ${SERVER_RUNTIME_SOURCE}
 ${SERVER_SHUTDOWN_SOURCE}
+} catch (error) {
+  await runtimeOwner.shutdown(async () => {});
+  throw error;
+}
 `;
 }

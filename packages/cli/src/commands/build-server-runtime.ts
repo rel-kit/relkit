@@ -1,4 +1,5 @@
 import { SERVER_RUNTIME_SUPPORT_SOURCE } from "./build-server-runtime-support.js";
+/** Pure provider/task adapters; the typed host owns serial worker polling and draining. */
 export const SERVER_RUNTIME_SOURCE = `
 function targetFor(functionId) {
   const target = executableManifest.targets?.[functionId];
@@ -27,7 +28,7 @@ function taskDescriptors() {
   }));
 }
 
-function createNativeJobsRuntimes(providerRegistry) {
+async function createNativeJobsRuntimes(providerRegistry) {
   const tasks = taskDescriptors();
   const executor = createTaskExecutor({
     tasks,
@@ -51,7 +52,7 @@ function createNativeJobsRuntimes(providerRegistry) {
       tasks: Object.values(tasks),
       taskExecutor: executor,
     });
-    registerNativeJobWorker(runtime, (plan.jobs ?? []).filter((candidate) => candidate.profile === job.profile), tasks, executor);
+    await registerNativeJobWorker(runtime, (plan.jobs ?? []).filter((candidate) => candidate.profile === job.profile), tasks, executor);
     runtimes.set(job.profile, runtime);
   }
   return runtimes;
@@ -76,14 +77,9 @@ async function nativeJobControl(instanceId, action, reason) {
   throw new Error("Native job run was not found");
 }
 
-function startNativeJobWorker(runtimes) {
+async function startNativeJobWorker(runtimes) {
   if (runtimes.size === 0 || (process.env.RELKIT_WORKER_ROLE ?? "worker") === "api") return undefined;
-  let running = false;
-  const worker = setInterval(() => {
-    if (running || stopping) return;
-    running = true;
-    const task = (async () => {
-      try {
+  await runtimeOwner.worker("native-job-worker", async () => {
         for (const runtime of runtimes.values()) {
           const nativeWorker = runtime.adapter.worker;
           if (nativeWorker === undefined || runtime.taskExecutor === undefined) continue;
@@ -102,20 +98,7 @@ function startNativeJobWorker(runtimes) {
             }
           }
         }
-      } catch (error) {
-        recordRuntimeFailure("runtime.native-job-worker", "Native jobs worker failed", error, "job");
-      } finally {
-        running = false;
-      }
-    })();
-    activeInvocations.add(task);
-    void task.then(
-      () => activeInvocations.delete(task),
-      () => activeInvocations.delete(task),
-    );
-  }, environment === "production" ? 1_000 : 100);
-  worker.unref?.();
-  return worker;
+  });
 }
 ${SERVER_RUNTIME_SUPPORT_SOURCE}
 `;
