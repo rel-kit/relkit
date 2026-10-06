@@ -10,14 +10,37 @@ import {
 } from "./add-options-parser.js";
 import { resourceRequest } from "./add-options-resource.js";
 
+/**
+ * Supported event delivery guarantees.
+ */
 const DELIVERIES = ["transient", "durable"] as const;
+/**
+ * Supported task execution guarantees.
+ */
 const EXECUTIONS = ["durable", "retryable"] as const;
+/**
+ * Supported tool side-effect classifications.
+ */
 const SIDE_EFFECTS = ["none", "read", "write", "external"] as const;
+/**
+ * Supported tool approval policies.
+ */
 const APPROVALS = ["never", "on-write", "always"] as const;
+/**
+ * Supported database dialects.
+ */
 const DIALECTS = ["sqlite", "postgresql", "mysql"] as const;
+/**
+ * Supported route methods.
+ */
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] as const;
 
-/** Parses one complete non-interactive `relkit add` request. */
+/**
+ * Parses one complete non-interactive `relkit add` request.
+ * @param args - Literal flag and positional arguments.
+ * @param context - Optional working directory for resolving the project root.
+ * @returns The validated discriminated artifact request, preserving omitted optional fields.
+ */
 export function normalizeAddRequest(
   args: readonly string[],
   context: { readonly cwd?: string } = {},
@@ -138,6 +161,13 @@ export function normalizeAddRequest(
   }
 }
 
+/**
+ * Builds an agent request requiring exactly one prompt source.
+ * @param common - Shared project, service and installation fields.
+ * @param name - Agent artifact name.
+ * @param values - Parsed values grouped by flag name.
+ * @returns The agent request with ordered tools and either a prompt or inline instructions.
+ */
 function agentRequest(
   common: Omit<AddRequest, "kind">,
   name: string,
@@ -159,6 +189,13 @@ function agentRequest(
   } as AddRequest;
 }
 
+/**
+ * Validates route mode and method-to-member mappings.
+ * @param common - Shared project, service and installation fields.
+ * @param path - Requested route path.
+ * @param values - Parsed values grouped by flag name.
+ * @returns The route request with a required path and mode-appropriate mappings.
+ */
 function routeRequest(
   common: Omit<AddRequest, "kind">,
   path: string | undefined,
@@ -176,6 +213,11 @@ function routeRequest(
   return { ...common, kind: "route", path: required(path, "route requires a path."), mode, maps };
 }
 
+/**
+ * Parses a METHOD=member service route mapping.
+ * @param value - Raw METHOD=member mapping.
+ * @returns The uppercase supported method and nonempty member name.
+ */
 function routeMap(value: string): readonly [RouteMethod, string] {
   const separator = value.indexOf("=");
   const method = value.slice(0, separator).toUpperCase();
@@ -185,6 +227,11 @@ function routeMap(value: string): readonly [RouteMethod, string] {
   return [method as RouteMethod, member];
 }
 
+/**
+ * Rejects artifact kinds that cannot be included in a service scaffold.
+ * @param value - Requested artifact kind.
+ * @returns The supported service include; excluded kinds raise a usage error.
+ */
 function serviceInclude(value: string): ServiceInclude {
   const excluded = new Set(["service", "database", "auth", "middleware", "transform"]);
   if (excluded.has(value)) usage(`Unsupported service include: ${value}`);

@@ -1,5 +1,8 @@
 import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
 
+/**
+ * Normalized user label, file stem, binding identifier and descriptor ID segment.
+ */
 export interface NormalizedArtifactName {
   readonly input: string;
   readonly fileStem: string;
@@ -7,7 +10,11 @@ export interface NormalizedArtifactName {
   readonly idSegment: string;
 }
 
-/** Normalizes one friendly label for source files, bindings, and stable IDs. */
+/**
+ * Normalizes one friendly label for source files, bindings, and stable IDs.
+ * @param input - Friendly artifact label, normalized with Unicode NFKC.
+ * @returns A frozen normalized input, kebab-case file/ID segment and camel-case binding.
+ */
 export function normalizeArtifactName(input: string): NormalizedArtifactName {
   const value = input.normalize("NFKC").trim();
   const fileStem = value
