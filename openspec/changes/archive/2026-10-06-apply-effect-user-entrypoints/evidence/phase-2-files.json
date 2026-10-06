@@ -1,0 +1,336 @@
+{
+  "phase": 2,
+  "baselineHead": "e081bde6054c8395209cdec145d8217c5d9c0dfd",
+  "files": [
+    {
+      "path": "integrations/packages/effect-mq/src/build-catalog.ts",
+      "sha256": "420fa96d51ca2909ed9dd28428d7be01f9aac9d62b8321750945e4c7b45d4a6a",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "integrations/packages/effect-mq/src/deployment/index.ts",
+      "sha256": "a68866a42459ad261e28e6d67fe256213854e34f5826d933ff304ec4543103f0",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "integrations/packages/effect-mq/src/postgres-listen.ts",
+      "sha256": "74894319d9872b3e9d33096b1e6b207c5e499231657c62fab10589bd82c1d596",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "integrations/packages/effect-mq/tests/postgres-declarations.test.ts",
+      "sha256": "c007208c407dc44b9608c4c98f0bdc0e289aff8f2167770caf8d0547fc5da228",
+      "reviewer": "plan_cli"
+    },
+    {
+      "path": "integrations/packages/effect-mq/tests/postgres-declarations.ts",
+      "sha256": "04a5e5db592ece3fea8fab3f1ecadd3562323ffb9f6114facd55d0389252d6b8",
+      "reviewer": "plan_cli"
+    },
+    {
+      "path": "integrations/packages/effect-mq/tests/postgres-listen.test.ts",
+      "sha256": "71b09e4a5fa4ba4c2dcb0506b589d3c860fb87d682f09241bfee93d1fedc39c5",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command-add.ts",
+      "sha256": "5184e0af8f77b584c80b0b4e395028b931235f4b741d8ceadccbb57b132fe803",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command-basic.ts",
+      "sha256": "cef3f28ede8fae7dcf3e1c442ace39876fefed12a1676b2dbccd6d0fcae39877",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command-client.ts",
+      "sha256": "34718847b29de5e866ca1b1c45211a46f4631a089bf6f9deff87fb8209386a81",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command-deploy.ts",
+      "sha256": "ba1fd479287671a0673509dff7072581b3b93bebd49f4f9c2a0484f02572ea81",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command-groups.ts",
+      "sha256": "ab71f3903f35119998a9c4e4e5667aa89e83cdc2b6bc50d9a73e5ab920ac7695",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command-jobs-runs.ts",
+      "sha256": "6a2ab8181e7bbfc07f0a74b281e9e3e4688f9d359cfe18a4ef8788c2a8253b5e",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command-jobs.ts",
+      "sha256": "afad30b081ecea6122c767846364b7fa6ec2e41aba5b7115e52b586f9cc0f45d",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command-local.ts",
+      "sha256": "5ba67a6fe5c928165841ad2825a4ebaa14a38c0f4cba0913522a8977ef7ff9e8",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command-shared.ts",
+      "sha256": "90c273c57b3cdaa93948ec8fa5c9922cf855b82ca0aaf6682b69f4efdcebca51",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-command.ts",
+      "sha256": "3405036bb290dfa710ae450bcc004cdced45eb8f2aa2118184c740816bccbb5b",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/cli-effect-runtime.ts",
+      "sha256": "293406e2c17cbb40098e64eaffaaf5bfa4843a2ab58db869f45212444077af03",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-compat.ts",
+      "sha256": "87bbaeac9941a456672e8f756972bd41234e7b68287fcad7bbb9c259d0368e85",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/cli/src/local.ts",
+      "sha256": "0beb77b76034cbfa9f4e2e0f0ef7fbdc2e694f91231ad45800ac7a81344778ef",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/contracts/src/operation.types.ts",
+      "sha256": "e5766b2aa9707672c644dc6b5acf47f477dfb0cd3d12cd10b1a9bdf6f64f4c7b",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/contracts/tests/operation-observer.test.ts",
+      "sha256": "1f678bc2bd8ecadf3ed91a7f32a7b9f64263853b7dbb0c525e5db8dc810db065",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/create-relkit/src/add-transaction-files.ts",
+      "sha256": "188cb63e1fa48bec53921cda57f5f07ea6a8f9cc5925762728e38eb51a3d3b6e",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/add-transaction.ts",
+      "sha256": "acd3717d851f644ee0c74261d014e5d3560178916541b2bc1f18eca95c082ee1",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/build-catalog.ts",
+      "sha256": "cf6f6140d3b1d0df6cb228239f3ec0f5884f3cc7babad528df00193e25cb528f",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/catalog-resolution.ts",
+      "sha256": "f0cfdcd04f33b9a946095ec3a2d1126fff4ae703b99cd4638c8a92226be714a4",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/create-relkit/src/catalog-resolution.types.ts",
+      "sha256": "c485146cc029126b3848502471a96358525b48392bfe993586644c0ab666b77e",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/create-relkit/src/dependency-patch-installation.ts",
+      "sha256": "1393c4d1a387eaa531d2d7049afc207ef50ccbe14b9da55a9e783b69ef399109",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/dependency-patches.ts",
+      "sha256": "8b1300e576f12b94108afa7004324c13108b21ba0f911c13f76bceebbfc2ea25",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/dependency-patches.types.ts",
+      "sha256": "68f7ca9bfc7cfd13ee8b9c3c3357d6f1003bf50c613d99db6267e9bd107c6244",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/generate.ts",
+      "sha256": "04d29f9037db64b5fbbafa2fbc32e020e80b27dbab4c92ffc4cd87efab1cc72e",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/index.ts",
+      "sha256": "af7f985341d6cffbcc92c452367c63b07a1555103d0728570578af6b2606a9a2",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/plan-builder.ts",
+      "sha256": "c5fba093b921110c154e5a6487be140bd4765ae79574a5c8d369e2fbef375ac1",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/plan-manifest.ts",
+      "sha256": "08c4d652821e3df6b3ae8ff68016480687f93869ba102f54fba043dfee9d348f",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/plan-manifest.types.ts",
+      "sha256": "9b4517c58a841b4e707f779a46d626af190c1b270b226d0a965a0c7566cdd4ec",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/project-catalog.ts",
+      "sha256": "89010da2898641e6cbe1afb6d378a2a19defc7d7e765b70807221b90d82524ae",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/scaffold-catalog.ts",
+      "sha256": "b81464175855e56c1ed2c17b2cb16d9786450d5d7750e8f9f2c8e2448611d301",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/src/scaffold-catalog.types.ts",
+      "sha256": "c811b6fa5c4e018560969d0edb7705691fa586e151b2d0954357e99d5e313dbd",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/tests/dependency-patch-generation.test.ts",
+      "sha256": "c0f85f938bb5bf7284e08e726046089ef20d383e301453008de9a746a2fe7a24",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/tests/dependency-patches.fixture.ts",
+      "sha256": "4c5bd3f6aab02aa20969cbc294816cc0fefc3fe81a10f46fa5cc792b38f42cd7",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/tests/dependency-patches.test.ts",
+      "sha256": "f08f8764eb60c03405fe597ed8b9b684c4f114d4727fd111f616418186e189d9",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/create-relkit/tests/project-catalog.test.ts",
+      "sha256": "e8b904945d57b8183d74d09a0da08a632e50bb2b3bc4332aed43a89cbff5a931",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "packages/observability/src/local/duckdb-worker-process.ts",
+      "sha256": "c20e1dd75fa3ccc8a2cbc15bb4728def2c8219c75ae0b48957d4416f2549221f",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "packages/observability/src/local/duckdb-worker.ts",
+      "sha256": "35b72cf1fe4624d3da48c70b0a3c1fdb32f101793591315b03cb15cbbb6f065a",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/build-catalog.ts",
+      "sha256": "c65a5573fcd4356464e529dd896181673d2b8066bdfcecf68a01c73f59877d7a",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/build-catalog.types.ts",
+      "sha256": "1f484ef40f228a8977b385d0c5cca41f0c3c68de3aa5dd4d1dbbac02704b3bcb",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/build.ts",
+      "sha256": "33572bdccd1ba006af0a9706a1746df23b79ff272b0ea94d72a7613c2332741a",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/catalog-manifest.ts",
+      "sha256": "0b1f35b44c7d8931640a2664a4e7d530fedfd7f4488d060c55df23003b23a776",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/catalog-manifest.types.ts",
+      "sha256": "95a618bec3f48b3d57dea1f3d4dabaa8a76209dc4c61f366117e90d327f4f689",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/pack-and-smoke-create-relkit-pack.ts",
+      "sha256": "fa04c06198912984b913dfa55030b8d3a84bc73563a2d162e0a8e9878de036b0",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/pack-and-smoke-postgres.ts",
+      "sha256": "f6aa196271b5f05ebd6c545dc261fd78cd110ff38e8d84e18b2b9deeed47993a",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/package-create-relkit-templates.ts",
+      "sha256": "6b9ec2ef8cc9a03e815dc50f064782224bd0d5eba32980dfc1b575e406dc88d6",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/packed-postgres-consumer.ts",
+      "sha256": "e27178624475b163a682468bc98b8d2c351e3257c634797ca958a2a6cc9aee6e",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/release-check-artifacts.ts",
+      "sha256": "2e820ef86148dbfb66010ceeffc64417bcfa360447e345fed8bf5e9a6addf44e",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/release-check-listing.ts",
+      "sha256": "f87edd25cde65a0c4e103bdbf4074b26f0446c8c91350b664c3fc47362af15be",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/release-check-support.ts",
+      "sha256": "6bda390dc951435c31861d19ed3e8ec7424f28d8c6bab64dba4fbc8be0d37796",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/release-check-templates.ts",
+      "sha256": "59967e58eabf1a31b0cdbadc98e7838704131412ce8d76d4efc6246f3aeeb3bd",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/release-check.ts",
+      "sha256": "512e319b9a3bf02578ca0538f6f1f1b595eda79115e935a8c38917f24b6a5ba1",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/release-stage.ts",
+      "sha256": "0257304660f300dec0e7aaae91e435ec5ffc0fa237eb5e6c611e3f90e5734814",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "scripts/sync-release.ts",
+      "sha256": "4a5ca1a2a4a9c349a22a1b779b47e0a126c37542f3a7e1ddae753f281b4e1d35",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "tests/generator/add-acceptance.test.ts",
+      "sha256": "89f448b7c739867f9ae1767d6e27f36174dfeb925157b9a1749ba921a3f254dc",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "tests/generator/option-matrix.test.ts",
+      "sha256": "c665d56d24b4f55df8038c4e4cb1458b3337e9dc051583cbdbd867b717afb07c",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "tests/generator/scaffold-catalog.test.ts",
+      "sha256": "a5cfc849619673f9242d839d3cc6fd5e3505a30a055964c1f5e24ddf4afdb62e",
+      "reviewer": "coordinator"
+    },
+    {
+      "path": "tests/unit/build-catalog.test.ts",
+      "sha256": "c331b4463c8fef004a605b74f11d9db280c42865887d30aa2c61b54c3fa6019a",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "tests/unit/catalog-manifest.test.ts",
+      "sha256": "cb16b6c70d6a2872e31fa2cd3fcb4befbbd923b38acdcdd267f3474d3a9c77e6",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "tests/unit/packed-registry.test.ts",
+      "sha256": "37c9a0b7f4aaf0123b55b8c5c83eca3c84ff825369a0acb21d6297a8d9e50490",
+      "reviewer": "native_gate"
+    },
+    {
+      "path": "tests/unit/sync-release.test.ts",
+      "sha256": "697cfedc347bc393bfaf4328bcf12bfca0107774a5754008ba0398625815259a",
+      "reviewer": "native_gate"
+    }
+  ]
+}
