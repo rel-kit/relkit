@@ -1,33 +1,26 @@
-import { Effect } from "effect";
-import { canonicalJson } from "@relkit/contracts";
-import { createLoggerLayer, type LogRecord } from "@relkit/runtime-effect";
-import { executeCommand } from "./command-dispatch.js";
-import { resolveRootMenu } from "./root-menu.js";
-import { executeScaffoldCommand } from "./scaffold-command.js";
-import { createCliStatus } from "./cli-status.js";
+import { Layer } from "effect";
+import { runCliEffect } from "./cli-runtime.js";
+import { interactionLayer } from "./cli-interaction.service.js";
+import { fileSystemLayer } from "./services/filesystem.service.js";
+import { runCliProgram } from "./main-effect.js";
+import { isJsonMode } from "./cli-effect-runtime.js";
 import {
-  cliErrorMessage,
-  isJsonMode,
-  parseEffectCli,
-  unknownCommandMessage,
-  type CliInvocation,
-} from "./cli-effect-runtime.js";
-import {
-  CLI_EXIT_CODES,
-  CLI_VERSION,
   createReporter,
-  errorMessage,
-  helpPayload,
   installSignals,
   toFailure,
   type CliIo,
-  type CliLogger,
-  type CliReporter,
   type CliRuntime,
 } from "./main-support.js";
 
 export * from "./cli-help-model.js";
 export * from "./main-support.js";
+
+/**
+ * Executes one invocation with one service graph and scoped resources.
+ * @param argv - Existing command arguments, defaulting to the native process.
+ * @param runtime - Optional presentation, generator and cancellation injection.
+ * @returns The established CLI exit status after cleanup and log draining.
+ */
 export async function runCli(
   argv: readonly string[] = process.argv.slice(2),
   runtime: CliRuntime = {},
@@ -35,164 +28,37 @@ export async function runCli(
   const io = runtime.io ?? processIo;
   const json = isJsonMode(argv);
   const reporter = createReporter(json, io);
-  let input: readonly string[];
-  try {
-    input = await resolveRootMenu(argv, {
-      enabled:
-        !json &&
-        !(runtime.ci ?? Boolean(process.env.CI)) &&
-        (runtime.tty ?? process.stdin.isTTY) === true,
-      ...(runtime.cwd ? { cwd: runtime.cwd } : {}),
-      ...(runtime.promptDriver ? { promptDriver: runtime.promptDriver } : {}),
-    });
-  } catch (error) {
-    const failure = toFailure(error, new AbortController().signal);
-    reporter.error(failure.code, failure.message);
-    return failure.exitCode;
-  }
-  if (hasAction(input, "help", "h") && hasAction(input, "version", "v")) {
-    reporter.error("RELKIT_CLI_USAGE", "--help and --version are exclusive");
-    return CLI_EXIT_CODES.usage;
-  }
-  const version = runtime.version ?? CLI_VERSION;
-  let parsed: Awaited<ReturnType<typeof parseEffectCli>>;
-  try {
-    parsed = await parseEffectCli(input, version);
-  } catch (error) {
-    reporter.error("RELKIT_INTERNAL_ERROR", errorMessage(error));
-    return CLI_EXIT_CODES.failure;
-  }
-  if (parsed.error !== undefined) {
-    if (parsed.error._tag === "ShowHelp" && parsed.error.errors.length === 0) {
-      reporter.output(helpPayload(version, parsed.helpPath), parsed.stdout);
-      return CLI_EXIT_CODES.success;
-    }
-    const unknown = unknownCommandMessage(parsed.error);
-    reporter.error(
-      unknown === undefined ? "RELKIT_CLI_USAGE" : "RELKIT_COMMAND_UNAVAILABLE",
-      unknown ?? cliErrorMessage(parsed.error),
-    );
-    return unknown === undefined ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
-  }
-  if (hasAction(parsed.argv, "version", "v")) {
-    reporter.output({ name: "relkit", version }, `relkit ${version}`);
-    return CLI_EXIT_CODES.success;
-  }
-  const completionShell = actionValue(parsed.argv, "completions");
-  if (completionShell !== undefined) {
-    reporter.output(
-      {
-        name: "relkit",
-        shell: completionShell === "sh" ? "bash" : completionShell,
-        script: parsed.stdout,
-      },
-      parsed.stdout,
-    );
-    return CLI_EXIT_CODES.success;
-  }
-  if (hasAction(parsed.argv, "help", "h") || parsed.invocation === undefined) {
-    reporter.output(helpPayload(version, parsed.helpPath), parsed.stdout);
-    return CLI_EXIT_CODES.success;
-  }
-  return executeInvocation(parsed.invocation, json, runtime, reporter, io);
-}
-
-export async function main(argv: readonly string[] = process.argv.slice(2)): Promise<number> {
-  return runCli(argv);
-}
-
-async function executeInvocation(
-  invocation: CliInvocation,
-  json: boolean,
-  runtime: CliRuntime,
-  reporter: CliReporter,
-  io: CliIo,
-): Promise<number> {
   const controller = new AbortController();
   const signal = runtime.signal
     ? AbortSignal.any([runtime.signal, controller.signal])
     : controller.signal;
   const removeSignals =
     runtime.installSignalHandlers === false ? () => undefined : installSignals(controller);
-  const log = createCliLogger(json, io);
-  const status = createCliStatus(runtime, json, invocation.command);
   try {
-    status.start();
-    const result = await execute(invocation, runtime, signal, reporter, log, json, io, status);
-    if (signal.aborted) {
-      const failure = toFailure(signal.reason, signal);
-      reporter.error(failure.code, failure.message);
-      status.finish(false);
-      return failure.exitCode;
-    }
-    status.finish(result === CLI_EXIT_CODES.success);
-    return result;
+    return await runCliEffect(
+      runCliProgram(argv, runtime, reporter, io, json, signal),
+      Layer.merge(fileSystemLayer, interactionLayer),
+      signal,
+      { json, io },
+    );
   } catch (error) {
     const failure = toFailure(error, signal);
     reporter.error(failure.code, failure.message);
-    status.finish(false);
     return failure.exitCode;
   } finally {
     removeSignals();
   }
 }
 
-async function execute(
-  invocation: CliInvocation,
-  runtime: CliRuntime,
-  signal: AbortSignal,
-  reporter: CliReporter,
-  log: CliLogger,
-  json: boolean,
-  io: CliIo,
-  status: ReturnType<typeof createCliStatus>,
-): Promise<number> {
-  const context = {
-    command: invocation.command,
-    args: invocation.args,
-    json,
-    signal,
-    tty: runtime.tty ?? process.stdin.isTTY,
-    ci: runtime.ci ?? Boolean(process.env.CI),
-    ...(runtime.cwd ? { cwd: runtime.cwd } : {}),
-    ...(runtime.promptDriver ? { promptDriver: runtime.promptDriver } : {}),
-    reporter,
-    log,
-    io,
-    ...(json
-      ? {}
-      : {
-          onProgress: (message: string) =>
-            runtime.io ? io.stderr(message) : status.message(message),
-        }),
-  };
-  const scaffold = await executeScaffoldCommand(invocation, context, runtime);
-  return scaffold ?? executeCommand(invocation, context);
+/**
+ * Runs the native process entry point using the same invocation owner.
+ * @param argv - Optional original command arguments.
+ * @returns The established CLI exit status after cleanup.
+ */
+export function main(argv: readonly string[] = process.argv.slice(2)): Promise<number> {
+  return runCli(argv);
 }
 
-function createCliLogger(json: boolean, io: CliIo): CliLogger {
-  const layer = createLoggerLayer({
-    component: "cli",
-    human: json ? false : { write: (line: string) => io.stderr(line) },
-    json: json ? { write: (record: LogRecord) => io.stderr(canonicalJson(record)) } : false,
-  });
-  return (level, message, fields) => {
-    const effect =
-      level === "error" || level === "fatal" ? Effect.logError(message) : Effect.logInfo(message);
-    Effect.runSync(effect.pipe(Effect.annotateLogs(fields ?? {}), Effect.provide(layer)));
-  };
-}
-
-function hasAction(argv: readonly string[], name: string, alias?: string): boolean {
-  return argv.some(
-    (entry) => entry === `--${name}` || (alias === undefined ? false : entry === `-${alias}`),
-  );
-}
-function actionValue(argv: readonly string[], name: string): string | undefined {
-  const index = argv.findIndex((entry) => entry === `--${name}` || entry.startsWith(`--${name}=`));
-  if (index < 0) return undefined;
-  return argv[index]!.includes("=") ? argv[index]!.split("=", 2)[1] : argv[index + 1];
-}
 const processIo: CliIo = Object.freeze({
   stdout: (line: string) => process.stdout.write(`${line}\n`),
   stderr: (line: string) => process.stderr.write(`${line}\n`),
