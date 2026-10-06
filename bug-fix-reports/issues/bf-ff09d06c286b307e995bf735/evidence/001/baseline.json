@@ -1,0 +1,8 @@
+{
+  "revision": "e081bde6054c8395209cdec145d8217c5d9c0dfd",
+  "effect": "4.0.1",
+  "files": {
+    "packages/create-relkit/src/generator-process.ts": "b2d8fd882fc024c5f071cfcd1968dbc33dfe77b2d240b45b18ae041dd35073a8",
+    "packages/create-relkit/tests/native-process.effect.test.ts": "266c6ca7dafa934c179e997b5b2c452c85df6db32c6ac797770d47a97df8da6a"
+  }
+}

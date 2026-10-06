@@ -1,0 +1,163 @@
+import { Cause, Context, Effect, Exit, Layer } from "effect";
+import { observeExecution } from "@relkit/contracts/operation";
+import { GeneratorProcessError, errorMessage } from "./generator-errors.js";
+import type { GeneratorCommandRunner, GeneratorProcessService } from "./generator-process.types.js";
+import { recordCleanupFailure } from "./generator-cleanup.js";
+
+/**
+ * Child-process authority, replaceable at the same Layer boundary in tests.
+ * @example
+ * ```ts
+ * import { Effect } from "effect";
+ * import { GeneratorProcess, generatorProcessLive } from "create-relkit";
+ * const locate = GeneratorProcess.use((process) => process.which("bun"));
+ * const supplied = locate.pipe(Effect.provide(generatorProcessLive));
+ * ```
+ */
+export class GeneratorProcess extends Context.Service<GeneratorProcess, GeneratorProcessService>()(
+  "create-relkit/GeneratorProcess",
+) {}
+
+/** Live scoped Bun child-process implementation. */
+export const generatorProcessLive = generatorProcessLayer();
+
+/**
+ * Constructs a live process adapter or adapts an existing injected command runner.
+ * @param runner - Optional compatibility runner; it receives the fiber-owned signal.
+ * @returns A process Layer with identical result and cancellation contracts.
+ */
+export function generatorProcessLayer(
+  runner?: GeneratorCommandRunner,
+): Layer.Layer<GeneratorProcess> {
+  return Layer.effect(
+    GeneratorProcess,
+    Effect.gen(function* () {
+      return GeneratorProcess.of({
+        run: Effect.fn("GeneratorProcess.run")((command, cwd) =>
+          observeExecution(
+            "generator",
+            "process.run",
+            runner === undefined ? nativeRun(command, cwd) : injectedRun(runner, command, cwd),
+            () => ({ commands: 1 }),
+          ),
+        ),
+        which: Effect.fn("GeneratorProcess.which")((executable) =>
+          observeExecution(
+            "generator",
+            "process.which",
+            Effect.try({
+              try: () => Bun.which(executable),
+              catch: (cause) => processError("which", cause),
+            }),
+          ),
+        ),
+      });
+    }),
+  );
+}
+
+/**
+ * Owns an injected runner until its physical Promise settles, including after interruption.
+ * @param runner - Existing Promise runner, expected to honor cancellation and settle promptly.
+ * @param command - Literal executable and argument vector.
+ * @param cwd - Child working directory.
+ * @returns The runner result after its scope's settlement barrier.
+ * @remarks Interruption aborts the runner signal, then awaits its settlement before rollback.
+ */
+const injectedRun = Effect.fn("GeneratorProcess.injectedRun")(
+  (runner: GeneratorCommandRunner, command: readonly string[], cwd: string) =>
+    Effect.scoped(
+      Effect.gen(function* () {
+        const owned = yield* Effect.acquireRelease(
+          Effect.try({
+            try: () => {
+              const controller = new AbortController();
+              const result = runner(command, cwd, controller.signal);
+              return {
+                controller,
+                result,
+                settled: result.then(
+                  () => undefined,
+                  () => undefined,
+                ),
+              };
+            },
+            catch: (cause) => processError("run", cause),
+          }),
+          (owned, exit) =>
+            Effect.gen(function* () {
+              if (Exit.isFailure(exit)) owned.controller.abort(Cause.squash(exit.cause));
+              yield* Effect.promise(() => owned.settled);
+            }),
+        );
+        return yield* Effect.tryPromise({
+          try: () => owned.result,
+          catch: (cause) => processError("run", cause),
+        });
+      }),
+    ),
+);
+
+/**
+ * Spawns, drains, and awaits a child inside one resource scope.
+ * @param command - Executable and literal argument vector.
+ * @param cwd - Child working directory.
+ * @returns Captured output and exit status after the child has settled.
+ * @remarks Interrupting any drain interrupts siblings; scope release kills and awaits the child.
+ */
+const nativeRun = Effect.fn("GeneratorProcess.nativeRun")(
+  (command: readonly string[], cwd: string) =>
+    Effect.scoped(
+      Effect.gen(function* () {
+        const child = yield* Effect.acquireRelease(
+          Effect.try({
+            try: () => Bun.spawn([...command], { cwd, stdout: "pipe", stderr: "pipe" }),
+            catch: (cause) => processError("spawn", cause),
+          }),
+          (process, exit) =>
+            Effect.gen(function* () {
+              if (process.exitCode === null)
+                yield* Effect.try({
+                  try: () => process.kill("SIGKILL"),
+                  catch: (cause) => processError("kill", cause),
+                }).pipe(Effect.catch((cause) => recordCleanupFailure(exit, "process", cause)));
+              yield* Effect.tryPromise({
+                try: () => process.exited,
+                catch: (cause) => processError("release", cause),
+              }).pipe(
+                Effect.asVoid,
+                Effect.catch((cause) => recordCleanupFailure(exit, "process", cause)),
+              );
+            }),
+        );
+        const [exitCode, stdout, stderr] = yield* Effect.all(
+          [
+            Effect.tryPromise({
+              try: () => child.exited,
+              catch: (cause) => processError("wait", cause),
+            }),
+            Effect.tryPromise({
+              try: () => new Response(child.stdout).text(),
+              catch: (cause) => processError("stdout", cause),
+            }),
+            Effect.tryPromise({
+              try: () => new Response(child.stderr).text(),
+              catch: (cause) => processError("stderr", cause),
+            }),
+          ],
+          { concurrency: "unbounded" },
+        );
+        return { exitCode, stdout, stderr };
+      }),
+    ),
+);
+
+/**
+ * Carries a native process rejection through the typed adapter.
+ * @param operation - Fixed process operation label.
+ * @param cause - Original rejection.
+ * @returns An identity-preserving process diagnostic.
+ */
+function processError(operation: string, cause: unknown): GeneratorProcessError {
+  return new GeneratorProcessError({ operation, cause, message: errorMessage(cause) });
+}
