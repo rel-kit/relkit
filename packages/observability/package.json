@@ -39,11 +39,11 @@
   "dependencies": {
     "@duckdb/node-api": "1.5.5-r.4",
     "@relkit/contracts": "workspace:*",
-    "effect": "4.0.0-rc.115"
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "5.0.1",
-    "vitest": "5.0.1"
+    "@vitest/coverage-v8": "catalog:",
+    "vitest": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",

@@ -58,22 +58,22 @@
     "@relkit/contracts": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/realtime": "workspace:*",
-    "@orpc/client": "2.0.0-beta.31",
-    "@orpc/contract": "2.0.0-beta.31",
+    "@orpc/client": "catalog:",
+    "@orpc/contract": "catalog:",
     "@orpc/tanstack-query": "2.0.0-beta.31",
-    "effect": "4.0.0-rc.115"
+    "effect": "catalog:"
   },
   "peerDependencies": {
-    "@tanstack/query-core": ">=5.80.2",
-    "@tanstack/react-query": ">=5.80.2",
-    "react": ">=18.0.0"
+    "@tanstack/query-core": "catalog:peer",
+    "@tanstack/react-query": "catalog:peer",
+    "react": "catalog:peer"
   },
   "devDependencies": {
-    "@effect/vitest": "4.0.0-rc.115",
-    "vitest": "5.0.1",
-    "@types/react": "19.2.18",
-    "@tanstack/react-query": "5.102.3",
-    "react": "19.2.8"
+    "@effect/vitest": "catalog:",
+    "vitest": "catalog:",
+    "@types/react": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "react": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",

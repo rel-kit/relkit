@@ -35,13 +35,13 @@
   "dependencies": {
     "@relkit/contracts": "workspace:*",
     "@relkit/invocation": "workspace:*",
-    "drizzle-orm": "1.0.0-rc.5-169397b",
-    "effect": "4.0.0-rc.115",
+    "drizzle-orm": "catalog:",
+    "effect": "catalog:",
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@effect/vitest": "4.0.0-rc.115",
-    "vitest": "5.0.1"
+    "@effect/vitest": "catalog:",
+    "vitest": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",
