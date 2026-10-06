@@ -1,0 +1,15 @@
+{
+  "reviewer": "/root/compiler_fixture_reviewer",
+  "author": "/root/compiler_fixture_author",
+  "status": "independently accepted complete EOF and current hash for the changed TypeScript file",
+  "verification": "Author-run final focused Bun 1.3.10 test log inspected independently: four tests, sixteen assertions, zero failures in 5.75 seconds with the unchanged 15000 ms command limit. Strict compilation of the actual test body and final formatting check passed. Complete repository verification remains a separate gate.",
+  "files": [
+    {
+      "path": "tests/compiler/project-typecheck.test.ts",
+      "lines": 173,
+      "sha256": "5ac4d04943f0c01ea234dd74eae5cc3c64b6e9227fe9d090d786d5dfe2871a9e",
+      "classification": "native compiler fixture boundary with per-invocation Effect resource ownership, physical Promise settlement before cleanup, and deterministic interruption, independent fixture and primary failure regression",
+      "reviewStatus": "accepted full EOF"
+    }
+  ]
+}

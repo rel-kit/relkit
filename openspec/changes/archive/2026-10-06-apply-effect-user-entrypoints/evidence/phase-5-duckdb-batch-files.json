@@ -1,0 +1,50 @@
+{
+  "reviewer": "/root",
+  "author": "/root/native_gate",
+  "status": "independently accepted complete EOF and current hashes for all six TypeScript files",
+  "verification": "Independent root complete observability suite: 64 files / 181 tests passed, exit 0, 7.55 seconds; /tmp/relkit-effect-duckdb-root-tests.log. Author strict source and actual three test-body checks passed; focused native/controlled/concurrency 14 passed, exit 0. Fresh temporary packed two-session proof passed; immutable source-packed release is a separate pending gate.",
+  "files": [
+    {
+      "path": "packages/observability/src/local/duckdb-storage.ts",
+      "lines": 135,
+      "sha256": "3e23c73bc8993c543eeb2e39c9564a91a11eca841619045c94ee60fb4bb283c8",
+      "classification": "serialized transaction owner; native lifetime, retention, typed failures and rollback preserved",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/observability/src/local/duckdb-batch.ts",
+      "lines": 127,
+      "sha256": "1888d23996f39adaafaf29561beffa08c9d484debce468b88ab80108d6168bc9",
+      "classification": "bounded Effect batch admission and parameter-bound SQL; deterministic BigInt cursor assignment",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/observability/src/local/duckdb-batch.types.ts",
+      "lines": 9,
+      "sha256": "d4ffa1ce00ebea0fd0d422e461cb83beeb8e7455853112fb0edb87c61f1a2a48",
+      "classification": "pure readonly prepared-record contract",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/observability/tests/duckdb-batch.test.ts",
+      "lines": 188,
+      "sha256": "432e5080499537535210c700cfd7acf00d54e8099393adb8ef6f46624e5c2338",
+      "classification": "deterministic allocation, invalid duplicate, transaction failure and physical cancellation regressions",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/observability/tests/duckdb-batch-native.test.ts",
+      "lines": 178,
+      "sha256": "5d31c96adb8aa1672c911c5b496a2cb62936ec3adc53f5dccb8e4120396c1795",
+      "classification": "actual native DuckDB deduplication, bound, rollback, retry and cursor regressions with immediately owned fixtures",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/observability/tests/duckdb-concurrency.test.ts",
+      "lines": 148,
+      "sha256": "d001f218c68b6d57e8e35a5069491be1c1aa37550357f0ccbcf1b47de1ca9981",
+      "classification": "existing connection serialization and commit failure regressions; allocation fixture and strict record fields updated",
+      "reviewStatus": "accepted full EOF"
+    }
+  ]
+}

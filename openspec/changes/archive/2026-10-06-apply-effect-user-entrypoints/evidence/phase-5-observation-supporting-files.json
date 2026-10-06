@@ -1,0 +1,41 @@
+{
+  "reviewer": "/root/native_gate",
+  "author": "/root",
+  "status": "independently accepted complete EOF and current hashes for all three TypeScript files",
+  "verification": "rtk proxy bun x vitest run packages/contracts/tests/operation-log-policy.test.ts packages/cli/tests/server-runtime --maxWorkers=1: 30/30 passed, exit 0, 10.99 seconds; unchanged boundaries passed 60 roots/4461 TypeScript files; CLI no-emit zero diagnostics",
+  "files": [
+    {
+      "path": "packages/contracts/src/operation-observer.ts",
+      "lines": 165,
+      "sha256": "e687082ba1e064546e2214756cc8f166aa49ca7eafb90b61840f6883f318795f",
+      "classification": "shared Effect observation policy; metrics, spans and all failure paths retained",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/contracts/src/operation.ts",
+      "lines": 14,
+      "sha256": "409a2f467956229010729cb205e5121a3d22dfcf091326df5611af99bce7e13a",
+      "classification": "pure compatibility barrel",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/contracts/tests/operation-log-policy.test.ts",
+      "lines": 73,
+      "sha256": "76b14051bb618916acf393379772f607dd94c60c8234432f31bda00a28dc2ae8",
+      "classification": "deterministic Context inheritance, metrics, failure identity and application logging regression",
+      "reviewStatus": "accepted full EOF"
+    }
+  ],
+  "metadata": [
+    {
+      "path": "packages/cli/package.json",
+      "sha256": "9ae30ac721239a83f057bd3dba13a70f940af6e70803bd5b9f9c392fb30870da",
+      "reviewStatus": "complete manifest read; providers-local workspace devDependency supplies the actual SDK regression without changing production dependencies"
+    },
+    {
+      "path": "bun.lock",
+      "sha256": "ae1ecdc670cc347104f0e6d53be3a6356d4933fae53c4e6946c5bc749bf280a2",
+      "reviewStatus": "relevant CLI workspace entry matches the manifest; root reports frozen installation exit 0; historical catalog/patch graph evidence retained separately"
+    }
+  ]
+}

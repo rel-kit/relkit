@@ -1,0 +1,40 @@
+{
+  "scope": "packages/cli",
+  "phase": "phase-5-packed-shutdown",
+  "author": "plan_cli",
+  "reviewer": "native_gate",
+  "sourceFreeze": true,
+  "baseline": "phase-3-cli-domain-files.json",
+  "reviewStatus": "independently accepted complete EOF and current SHA-256 bytes for both files; packed replay remains a separate gate",
+  "independentVerification": {
+    "reviewer": "/root/native_gate",
+    "coverage": "2/2 files read through EOF; both SHA-256 anchors match current bytes; no actionable findings",
+    "native": "rtk proxy bun x --bun vitest run packages/cli/tests/services/dev-candidate-cancellation.test.ts packages/cli/tests/services/dev-supervisor.test.ts --maxWorkers=1: 6/6 passed, exit 0, no skips, 2.02 seconds",
+    "contracts": "Acquired native child survives session abort until explicit disposal; file-gated graceful release is physically joined with exit 0. Pending, already-aborted and Effect-interrupted acquisitions retain cancellation and settlement ownership."
+  },
+  "change": "Forward CLI candidate acquisition cancellation while startCandidate is unsettled, then remove all links before handing the acquired child to its scoped stop/dispose authority. Public supervisor cancellation behavior is unchanged.",
+  "authorVerification": {
+    "native": "bun x --bun vitest run packages/cli/tests/services/dev-candidate-cancellation.test.ts packages/cli/tests/services/dev-supervisor.test.ts: 6/6 passed, no skips",
+    "strict": "New actual native test body with strict, noUncheckedIndexedAccess, exactOptionalPropertyTypes and skipLibCheck:false: zero diagnostics",
+    "source": "CLI no-emit source compilation: zero diagnostics",
+    "actualPacked": "Original strict two-second full-Docker smoke reproduced before these changes. Rebuilt CLI entry with fresh collector history passed the unchanged devSmoke full Billing/Shipping, Redis/two-MinIO, hot-reload, SIGTERM and both-port-release gate in 21.241 seconds overall (/tmp/relkit-effect-full-collector-policy-fresh-probe.log). A reused 56 MB collector history exceeded the strict budget before the fresh-history replay. Immutable fresh-registry packed acceptance remains a separate coordinator gate."
+  },
+  "files": [
+    {
+      "path": "packages/cli/src/services/dev-supervisor.service.ts",
+      "lines": 115,
+      "sha256": "b43860fda2d06ebdbecf791cdd302cd3d6da8f8b9624e43af1a1371c67a16eb6",
+      "origin": "added",
+      "classification": "native",
+      "reviewGroup": "domain"
+    },
+    {
+      "path": "packages/cli/tests/services/dev-candidate-cancellation.test.ts",
+      "lines": 202,
+      "sha256": "9b4e7a8956e6f553e673dedc5372bf67a0c05f83b08116f579c06b7cc5235f4a",
+      "origin": "added",
+      "classification": "test",
+      "reviewGroup": "domain"
+    }
+  ]
+}
