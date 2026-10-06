@@ -1,8 +1,8 @@
 import { PgClient } from "@effect/sql-pg";
 import { Effect, Layer, Stream } from "effect";
-import type { SqlError } from "effect/unstable/sql/SqlError";
+import type { SqlError } from "effect/sql/SqlError";
 
-/** Adapt rc.115's scoped notification queue to EffectMQ 0.7's payload stream.
+/** Adapt stable v4's scoped notification queue to EffectMQ 0.7's payload stream.
  * @param client - Native PostgreSQL client owning LISTEN acquisition and release.
  * @param channel - EffectMQ's declared wake-up channel.
  * @returns A lazy payload stream retaining SQL failures and the native listener scope.

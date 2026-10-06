@@ -21,6 +21,19 @@ the task and job. Open `relkit.config.ts`; the generated binding should match th
 jobs without an explicit profile. In an existing app, install the three packages and extend
 its config with those two entries, retaining its own ID and server settings.
 
+The generator also installs an application-owned Drizzle declaration patch before running
+Bun. This repair updates Drizzle's SQL error imports for stable Effect 4 and makes its
+optional PostgreSQL configuration fields compatible with strict declarations. Keep the
+generated `patches/` asset and `package.json` `patchedDependencies` entry together.
+
+For a manual native installation, install `create-relkit` as a development dependency and
+copy its `dist/patches/drizzle-orm.patch` into the application's `patches/` directory. Register
+that relative asset in `package.json` under `patchedDependencies`, using the exact package key
+from the generator's `package.json` field `relkit.buildCatalog.patches["drizzle-orm"].key`,
+then run `bun install`. Preserve any other patch entries. Dependency packages cannot supply
+an application-level Bun patch registration, so installing `@relkit/effect-mq` alone does not
+apply this repair. Validate manual consumers with `skipLibCheck: false`.
+
 <include cwd lang="ts" meta='title="relkit.config.ts"'>
   ../../apps/docs/examples/jobs/providers/effect-mq-config.ts
 </include>
