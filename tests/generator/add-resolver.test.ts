@@ -99,18 +99,27 @@ test("creates a function for a new service and respects explicit creation headle
   });
 });
 
-test("asks only the missing creation name and defaults to minimal", async () => {
+test("asks for name, template, jobs and destination while keeping silent defaults", async () => {
   const questions: string[] = [];
   const unexpected = async (): Promise<never> => {
     throw new Error("Unexpected setup question.");
   };
   const prompt: PromptDriver = {
     ...driver({}),
-    select: unexpected,
+    select: async (options) => {
+      questions.push(options.message);
+      if (options.initialValue === undefined) throw new Error("Missing initial selection.");
+      return options.initialValue;
+    },
     multiselect: unexpected,
     confirm: unexpected,
     text: async (options) => {
       questions.push(options.message);
+      if (options.message === "Destination") {
+        expect(options.initialValue).toBe("sample-app");
+        expect(options.validate?.("")).toBe("A destination is required.");
+        expect(options.validate?.("sample-app")).toBeUndefined();
+      }
       return "sample-app";
     },
   };
@@ -118,7 +127,7 @@ test("asks only the missing creation name and defaults to minimal", async () => 
     interactive: true,
     promptDriver: prompt,
   });
-  expect(questions).toEqual(["Project name"]);
+  expect(questions).toEqual(["Project name", "Starter template", "Jobs service", "Destination"]);
   expect(resolved).toEqual({
     prompted: true,
     options: {
@@ -129,6 +138,7 @@ test("asks only the missing creation name and defaults to minimal", async () => 
       install: true,
       git: true,
       examples: true,
+      directory: "sample-app",
       forceEmptyDirectory: false,
       json: false,
     },
@@ -156,6 +166,8 @@ test("retains advanced explicit creation flags without any setup question", asyn
         "aws",
         "--deploy",
         "pulumi",
+        "--jobs",
+        "effect-mq-docker",
         "--directory",
         "apps/sample",
         "--no-install",
@@ -171,6 +183,7 @@ test("retains advanced explicit creation flags without any setup question", asyn
       template: "api",
       cloud: "aws",
       deploy: "pulumi",
+      jobs: "effect-mq-docker",
       install: false,
       git: false,
       examples: false,
@@ -179,6 +192,96 @@ test("retains advanced explicit creation flags without any setup question", asyn
       json: false,
     },
   });
+});
+
+test("honors the chosen starter template and custom destination", async () => {
+  const resolved = await resolveCreateOptionsDetails(["sample-app"], {
+    interactive: true,
+    promptDriver: driver({
+      select: { "Starter template": "api", "Jobs service": "none" },
+      text: { Destination: "apps/sample-api" },
+    }),
+  });
+  expect(resolved).toMatchObject({
+    prompted: true,
+    options: { name: "sample-app", template: "api", directory: "apps/sample-api", git: true },
+  });
+  expect(resolved.options.jobs).toBeUndefined();
+});
+
+test("skips inline template and destination flags while still offering jobs", async () => {
+  const questions: string[] = [];
+  const unexpected = async (): Promise<never> => {
+    throw new Error("Unexpected setup question.");
+  };
+  const resolved = await resolveCreateOptionsDetails(
+    ["sample-app", "--template=agent", "--directory=apps/sample", "--no-git"],
+    {
+      interactive: true,
+      promptDriver: {
+        ...driver({}),
+        text: unexpected,
+        confirm: unexpected,
+        select: async (options) => {
+          questions.push(options.message);
+          const selected = options.options.find((option) => option.value === "none");
+          if (!selected) throw new Error("Missing jobs default.");
+          return selected.value;
+        },
+      },
+    },
+  );
+  expect(questions).toEqual(["Jobs service"]);
+  expect(resolved).toMatchObject({
+    prompted: true,
+    options: { template: "agent", directory: "apps/sample", git: false },
+  });
+  expect(resolved.options.jobs).toBeUndefined();
+});
+
+test("resolves every jobs provider selected interactively", async () => {
+  for (const jobs of ["inngest-docker", "effect-mq-docker", "trigger-docker"]) {
+    const questions: string[] = [];
+    const resolved = await resolveCreateOptionsDetails(
+      ["sample-app", "--template=minimal", "--directory=sample-app"],
+      {
+        interactive: true,
+        promptDriver: {
+          ...driver({}),
+          select: async (options) => {
+            questions.push(options.message);
+            const selected = options.options.find((option) => option.value === jobs);
+            if (!selected) throw new Error("Missing jobs provider.");
+            return selected.value;
+          },
+        },
+      },
+    );
+    expect(questions).toEqual(["Jobs service"]);
+    expect(resolved.options).toMatchObject({ jobs, git: true });
+  }
+});
+
+test("retains headless defaults without requesting interactive choices", async () => {
+  const unexpected = async (): Promise<never> => {
+    throw new Error("Unexpected headless prompt.");
+  };
+  const resolved = await resolveCreateOptionsDetails(["sample-app"], {
+    json: true,
+    promptDriver: {
+      ...driver({}),
+      text: unexpected,
+      select: unexpected,
+      multiselect: unexpected,
+      confirm: unexpected,
+    },
+  });
+  expect(resolved).toMatchObject({
+    prompted: false,
+    options: { template: "minimal", cloud: "none", deploy: "none", git: true, json: true },
+  });
+  expect(resolved.options.jobs).toBeUndefined();
+  expect(resolved.options.directory).toBeUndefined();
 });
 
 function driver(answers: {

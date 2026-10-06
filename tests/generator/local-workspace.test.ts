@@ -11,7 +11,7 @@ import { runScaffoldTerminal } from "../../scripts/scaffold-smoke-terminal.ts";
 
 const roots: string[] = [];
 
-test("local create asks only final confirmation when the project name is explicit", async () => {
+test("local create asks for jobs and final confirmation when other choices are explicit", async () => {
   const parent = await mkdtemp(join(tmpdir(), "relkit-local-create-terminal-"));
   roots.push(parent);
   const result = await runScaffoldTerminal(
@@ -32,12 +32,19 @@ test("local create asks only final confirmation when the project name is explici
       "--examples",
     ],
     parent,
-    [["Create this project?", "\r"]],
+    [
+      ["Jobs service", "\r"],
+      ["Create this project?", "\r"],
+    ],
   );
   expect(result.code, result.output).toBe(0);
   expect(result.output).not.toContain("Add an artifact before finishing?");
   expect(result.output).not.toContain("Project name");
   expect(result.output).not.toContain("App format");
+  expect(result.output).not.toContain("Starter template");
+  expect(result.output).not.toContain("Destination");
+  expect(result.output).not.toContain("Initialize a Git repository?");
+  expect(result.output).not.toContain("Planned project");
   expect(await Bun.file(join(parent, "app/package.json")).exists()).toBe(true);
 }, 600_000);
 

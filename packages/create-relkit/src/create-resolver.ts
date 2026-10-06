@@ -1,6 +1,12 @@
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { normalizeCreateOptions, type CreateOptions } from "./options.js";
+import {
+  CREATE_JOBS,
+  CREATE_OPTION_DEFAULTS,
+  CREATE_TEMPLATES,
+  normalizeCreateOptions,
+  type CreateOptions,
+} from "./options.js";
 import { createClackPromptDriver } from "./prompt-driver.js";
 import { GeneratorPrompt, generatorPromptLayer } from "./generator-prompt.js";
 import { domainTry } from "./generator-errors.js";
@@ -15,24 +21,58 @@ export type { ResolveCreateContext, ResolvedCreateOptions } from "./create-resol
 const VALUE_OPTIONS = new Set(["template", "cloud", "deploy", "jobs", "directory"]);
 
 /**
- * Resolves explicit flags and the minimal starter default, asking only a missing project name.
+ * Resolves explicit flags and prompts for missing name, template, jobs and destination choices.
  * @param args - Existing create argument vector.
  * @param context - Existing JSON and interactivity settings.
- * @returns Options retaining undefined jobs/directory and whether name input was prompted.
- * @remarks Generation owns final consent; infrastructure and template choices use explicit flags.
+ * @returns Options retaining undefined jobs when disabled and whether any choice was prompted.
+ * @remarks Generation owns final consent; Git initialization defaults to enabled without a prompt.
  */
 export const resolveCreateOptionsDetailsEffect = Effect.fn("CreateResolution.resolve")(
   function* (args: readonly string[], context: ResolveCreateContext = {}) {
     const output = [...args];
     let prompted = false;
-    if (context.interactive === true && !positional(output)) {
-      const name = yield* (yield* GeneratorPrompt).text({
-        message: "Project name",
-        validate: (value) =>
-          isValidPackageName(value) ? undefined : "Use a valid npm package name.",
-      });
-      output.unshift(name);
-      prompted = true;
+    if (context.interactive === true) {
+      const prompt = yield* GeneratorPrompt;
+      let name = positional(output);
+      if (!name) {
+        name = yield* prompt.text({
+          message: "Project name",
+          validate: (value) =>
+            isValidPackageName(value) ? undefined : "Use a valid npm package name.",
+        });
+        output.unshift(name);
+        prompted = true;
+      }
+      if (!has(output, "template")) {
+        const template = yield* prompt.select({
+          message: "Starter template",
+          options: CREATE_TEMPLATES.map((value) => ({ value, label: title(value) })),
+          initialValue: CREATE_OPTION_DEFAULTS.template,
+        });
+        output.push("--template", template);
+        prompted = true;
+      }
+      if (!has(output, "jobs")) {
+        const jobs = yield* prompt.select({
+          message: "Jobs service",
+          options: [
+            { value: "none", label: "None" },
+            ...CREATE_JOBS.map((value) => ({ value, label: title(value) })),
+          ],
+          initialValue: "none",
+        });
+        if (jobs !== "none") output.push("--jobs", jobs);
+        prompted = true;
+      }
+      if (!has(output, "directory")) {
+        const directory = yield* prompt.text({
+          message: "Destination",
+          initialValue: name,
+          validate: (value) => (value?.trim() ? undefined : "A destination is required."),
+        });
+        output.push("--directory", directory);
+        prompted = true;
+      }
     }
     const options = yield* domainTry(() =>
       normalizeCreateOptions(output, context.json === undefined ? {} : { json: context.json }),
@@ -46,7 +86,7 @@ export const resolveCreateOptionsDetailsEffect = Effect.fn("CreateResolution.res
  * Preserves normalized creation's Promise compatibility API.
  * @param args - Existing flags.
  * @param context - Existing prompt settings.
- * @returns The minimal-default options or explicit advanced choices.
+ * @returns Explicit or prompted choices with the existing defaults for other settings.
  */
 export async function resolveCreateOptions(
   args: readonly string[],
@@ -56,10 +96,10 @@ export async function resolveCreateOptions(
 }
 
 /**
- * Preserves detailed creation resolution while reducing setup questions to missing name input.
+ * Preserves detailed creation resolution with the shared interactive choices.
  * @param args - Existing flags.
  * @param context - Existing prompt settings.
- * @returns Options and whether name input was requested.
+ * @returns Options and whether any creation choice was requested.
  */
 export function resolveCreateOptionsDetails(
   args: readonly string[],
@@ -92,4 +132,26 @@ function positional(args: readonly string[]): string | undefined {
     } else return value;
   }
   return undefined;
+}
+
+/**
+ * Checks both separate and inline spellings of an explicit creation option.
+ * @param args - Literal flag and positional arguments.
+ * @param name - Supported flag name without its leading dashes.
+ * @returns Whether the caller already supplied this choice.
+ */
+function has(args: readonly string[], name: string): boolean {
+  return args.some((value) => value === `--${name}` || value.startsWith(`--${name}=`));
+}
+
+/**
+ * Formats a declared template or jobs provider for its native selection label.
+ * @param value - Supported choice value.
+ * @returns A readable label retaining the Docker provider distinction.
+ */
+function title(value: string): string {
+  return value
+    .replace("effect-mq", "Effect MQ")
+    .replace(/-docker$/u, " (Docker)")
+    .replace(/^./u, (character) => character.toUpperCase());
 }

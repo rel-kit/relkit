@@ -2,6 +2,7 @@ import { strict as assert } from "node:assert";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+import type { PromptDriver } from "create-relkit";
 import type { ScaffoldTerminalResult } from "./scaffold-smoke-terminal.types.js";
 
 const SCAFFOLD_TERMINAL_TIMEOUT_MS = 600_000;
@@ -87,9 +88,9 @@ export async function verifyScaffoldTerminal(root: string, cli: string): Promise
   }
 }
 
-/** Verifies the packed public resolver's minimal defaults and explicit advanced flags.
+/** Verifies the packed public resolver's creation choices and explicit advanced flags.
  * @param root - Registry consumer containing the actual packed generator.
- * @returns After asserting only a missing name is requested before final generation confirmation.
+ * @returns After asserting omitted choices are prompted and explicit flags bypass their questions.
  */
 export async function verifyInteractiveResolver(root: string): Promise<void> {
   // Release staging verifies this package/version before installation; assert the
@@ -98,14 +99,21 @@ export async function verifyInteractiveResolver(root: string): Promise<void> {
     pathToFileURL(join(root, "node_modules/create-relkit/dist/index.js")).href
   )) as typeof import("create-relkit");
   const requested: string[] = [];
-  const answers = {
-    text: async ({ message }: { readonly message: string }) => {
+  const answers: PromptDriver = {
+    text: async ({ message }) => {
       requested.push(message);
-      assert.equal(message, "Project name");
-      return "interactive-app";
+      if (message === "Project name") return "interactive-app";
+      assert.equal(message, "Destination");
+      return "interactive-project";
     },
-    select: async () => {
-      throw new Error("Creation requested an unexpected selection.");
+    select: async ({ message, options }) => {
+      requested.push(message);
+      assert.ok(message === "Starter template" || message === "Jobs service");
+      const selected = options.find(
+        (option) => option.value === (message === "Starter template" ? "minimal" : "none"),
+      );
+      assert.ok(selected);
+      return selected.value;
     },
     multiselect: async () => {
       throw new Error("Creation requested an unexpected multiselect.");
@@ -123,21 +131,31 @@ export async function verifyInteractiveResolver(root: string): Promise<void> {
   });
   assert.equal(resolved.options.name, "interactive-app");
   assert.equal(resolved.options.template, "minimal");
-  assert.equal(resolved.options.directory, undefined);
+  assert.equal(resolved.options.directory, "interactive-project");
   assert.equal(resolved.options.cloud, "none");
   assert.equal(resolved.options.deploy, "none");
   assert.equal(resolved.options.jobs, undefined);
   assert.equal(resolved.options.install, true);
   assert.equal(resolved.options.git, true);
   assert.equal(resolved.options.examples, true);
-  assert.deepEqual(requested, ["Project name"]);
+  assert.deepEqual(requested, ["Project name", "Starter template", "Jobs service", "Destination"]);
   requested.length = 0;
   const explicit = await api.resolveCreateOptionsDetails(
-    ["named-app", "--template", "api", "--directory", "explicit-project", "--no-install"],
+    [
+      "named-app",
+      "--template",
+      "api",
+      "--jobs",
+      "effect-mq-docker",
+      "--directory",
+      "explicit-project",
+      "--no-install",
+    ],
     { interactive: true, promptDriver: answers },
   );
   assert.equal(explicit.options.name, "named-app");
   assert.equal(explicit.options.template, "api");
+  assert.equal(explicit.options.jobs, "effect-mq-docker");
   assert.equal(explicit.options.directory, "explicit-project");
   assert.equal(explicit.options.install, false);
   assert.deepEqual(requested, []);

@@ -9,7 +9,7 @@ export interface ResolveCreateContext {
   readonly signal?: AbortSignal;
 }
 
-/** Existing resolver result; prompted records whether a missing name was requested. */
+/** Existing resolver result; prompted records whether any creation choice was requested. */
 export interface ResolvedCreateOptions {
   readonly options: CreateOptions;
   readonly prompted: boolean;
