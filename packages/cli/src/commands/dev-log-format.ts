@@ -1,12 +1,14 @@
 import type { LogRecord } from "@relkit/runtime-effect";
 import { devLogDetails } from "./dev-log-details.js";
+import type { DevLogFormatOptions } from "./dev-log-format.types.js";
+export type { DevLogFormatOptions } from "./dev-log-format.types.js";
 
-export interface DevLogFormatOptions {
-  readonly verbose?: boolean;
-  readonly color?: boolean;
-  readonly columns?: number;
-}
-
+/**
+ * Renders one admitted log using the existing compact terminal vocabulary.
+ * @param record - Validated and redacted log envelope.
+ * @param options - Width, color and detail policy.
+ * @returns A formatted line, empty for intentionally hidden blank inspector output.
+ */
 export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {}): string {
   const f = record.fields;
   const event = record.message;
@@ -103,6 +105,11 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
   );
 }
 
+/** Wraps terminal diagnostics to the available width without discarding words.
+ * @param value - Terminal content.
+ * @param width - Available columns.
+ * @returns Wrapped words without truncating diagnostics.
+ */
 function wrap(value: string, width: number): string[] {
   const lines: string[] = [];
   let line = "";
@@ -116,6 +123,10 @@ function wrap(value: string, width: number): string[] {
   return [...lines, line];
 }
 
+/** Renders the nonempty correlation fields of a validated log envelope.
+ * @param record - Admitted envelope.
+ * @returns Existing nonempty correlation labels for verbose rendering.
+ */
 function correlations(record: LogRecord) {
   return Object.fromEntries(
     ["requestId", "traceId", "spanId", "functionId", "serviceId"].flatMap((key) => {
@@ -125,6 +136,10 @@ function correlations(record: LogRecord) {
   );
 }
 
+/** Formats a native record timestamp for the existing terminal presentation.
+ * @param value - Native record time.
+ * @returns Local millisecond clock display, retaining an invalid original value.
+ */
 function timestamp(value: string): string {
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return value;
@@ -135,12 +150,23 @@ function timestamp(value: string): string {
   );
 }
 
+/** Fits a scope label to its allotted width using middle ellipsis.
+ * @param value - Scope label.
+ * @param maximum - Available label width.
+ * @returns Middle-ellipsized presentation without changing record content.
+ */
 function middle(value: string, maximum: number): string {
   if (value.length <= maximum) return value;
   const side = Math.floor((maximum - 1) / 2);
   return `${value.slice(0, side)}…${value.slice(-(maximum - side - 1))}`;
 }
 
+/** Applies the configured terminal severity color to a label.
+ * @param value - Level label.
+ * @param level - Existing severity.
+ * @param enabled - Terminal color policy.
+ * @returns Optional ANSI presentation for that label.
+ */
 function color(value: string, level: string, enabled = false): string {
   const code =
     level === "error" || level === "fatal"

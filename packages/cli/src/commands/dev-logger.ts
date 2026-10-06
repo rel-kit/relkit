@@ -5,6 +5,12 @@ import type { DevLog, DevOptions } from "./dev.js";
 import { devLogRecord } from "./dev-log-record.js";
 import { formatDevLog } from "./dev-log-format.js";
 
+/**
+ * Preserves the selected terminal mode without adding ordinary CLI stdout output.
+ * @param json - Whether development logs use JSON envelopes.
+ * @param write - Borrowed diagnostic sink.
+ * @returns Mutually exclusive existing human/JSON logger sinks.
+ */
 export function devLogSinks(
   json: boolean,
   write: (line: string) => void = (line) => process.stderr.write(`${line}\n`),
@@ -15,6 +21,11 @@ export function devLogSinks(
   };
 }
 
+/**
+ * Constructs the synchronous SDK logging edge after validation and redaction.
+ * @param options - Existing sinks, threshold, callbacks and terminal policy.
+ * @returns A callback that isolates sink failures from the scoped session lifecycle.
+ */
 export function createDevLogger(options: DevOptions): DevLog {
   let startupFailed = false;
   return (event) => {
