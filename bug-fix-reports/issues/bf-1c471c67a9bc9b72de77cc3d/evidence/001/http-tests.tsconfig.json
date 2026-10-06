@@ -1,0 +1,17 @@
+{
+  "extends": "/Users/mustafaelsayed/Workspace/relkit/packages/cli/tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "rootDir": "/Users/mustafaelsayed/Workspace/relkit"
+  },
+  "references": [],
+  "include": [],
+  "exclude": [],
+  "files": [
+    "/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/http.test.ts",
+    "/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/http-native.test.ts"
+  ]
+}

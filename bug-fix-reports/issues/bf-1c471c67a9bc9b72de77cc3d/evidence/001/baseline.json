@@ -1,0 +1,8 @@
+{
+  "revision": "e081bde6054c8395209cdec145d8217c5d9c0dfd",
+  "effect": "4.0.1",
+  "files": {
+    "packages/cli/src/services/http.service.ts": "d6e9d7cd7d6100f8c42b6c1bac70f5405cbec2f446b9a792193c940ea94f6611",
+    "packages/cli/tests/services/http.test.ts": "dd28b23e0af0983f2e2c9ecdf8fb23e4ea1e456979c1cdb8d7fcad005e215239"
+  }
+}

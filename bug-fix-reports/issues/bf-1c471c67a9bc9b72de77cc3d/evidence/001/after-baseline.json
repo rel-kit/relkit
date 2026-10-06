@@ -1,0 +1,9 @@
+{
+  "head": "e081bde6054c8395209cdec145d8217c5d9c0dfd",
+  "effect_version": "4.0.1",
+  "files": {
+    "packages/cli/src/services/http.service.ts": "0a3af6f59e920b38e02d51b0727d2605c55765870f949b9a86b7530a9f95997b",
+    "packages/cli/tests/services/http.test.ts": "97a529ebac930089302bd39c66dbccaffec2dc7ecfd162062356f01fb1f51f2f",
+    "packages/cli/tests/services/http-native.test.ts": "82e5ea1e81b89dad2925df2da959d62a047ba96ad9c6988eaec1ecf468e95e1a"
+  }
+}
