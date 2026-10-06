@@ -1,11 +1,19 @@
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { loadConfig } from "@relkit/compiler";
-import type { DevInspectorOptions } from "./dev-process.js";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { Effect, Layer } from "effect";
+import { CliCompiler, compilerLayer } from "../services/compiler.service.js";
+import { CliModules, moduleLayer } from "../services/modules.service.js";
+import { cliTry } from "../cli-errors.js";
+import { observeCli, runCliEffect } from "../cli-runtime.js";
+import type { DevInspectorOptions } from "./dev-process.types.js";
+import type { DevelopmentPorts, InspectorInstallation } from "./dev-inspector.types.js";
 import { resolveApplicationPort, resolveInspectorPort } from "./ports.js";
 
-/** Returns the source inspector for a checkout, or the packaged inspector for installs. */
+/** Selects the source or packaged inspector's default launch configuration.
+ * @param inspectorPort - Optional accepted listener override.
+ * @returns Source or installed inspector launch policy.
+ */
 export function defaultInspectorOptions(inspectorPort?: number): DevInspectorOptions {
   const installation = resolveInspectorInstallation();
   return {
@@ -15,50 +23,98 @@ export function defaultInspectorOptions(inspectorPort?: number): DevInspectorOpt
   };
 }
 
+/**
+ * Reads authored configuration through explicit import/compiler authority.
+ * @param projectRoot - Authored project root.
+ * @param backendPort - Optional command override.
+ * @param inspectorPort - Optional command override.
+ * @param source - Captured invocation environment.
+ * @returns Validated ports and inspector launch policy.
+ */
+export const developmentPortsEffect = Effect.fn("Dev.ports")(
+  function* (
+    projectRoot: string,
+    backendPort?: number,
+    inspectorPort?: number,
+    source: Readonly<Record<string, string | undefined>> = process.env,
+  ) {
+    const compiler = yield* CliCompiler;
+    const modules = yield* CliModules;
+    const loaded = yield* modules.load(
+      `${pathToFileURL(join(projectRoot, "relkit.config.ts")).href}?relkit_dev=${crypto.randomUUID()}`,
+    );
+    const config = yield* compiler.loadConfig(loaded.default ?? loaded, projectRoot);
+    return yield* cliTry("dev.ports.resolve", (): DevelopmentPorts => ({
+      backend: resolveApplicationPort({
+        ...(backendPort === undefined ? {} : { flag: backendPort }),
+        source,
+        configured: config.server.port,
+      }),
+      inspector: defaultInspectorOptions(
+        resolveInspectorPort({
+          ...(inspectorPort === undefined ? {} : { flag: inspectorPort }),
+          source,
+          configured: config.inspector.port,
+        }),
+      ),
+    }));
+  },
+  (
+    effect,
+    _root: string,
+    _backend?: number,
+    _inspector?: number,
+    _source: Readonly<Record<string, string | undefined>> = process.env,
+  ) => observeCli("dev.ports", effect),
+);
+
+/** Restores the validated inspector configuration at the public Promise boundary.
+ * @param projectRoot - Authored root.
+ * @param inspectorPort - Optional override.
+ * @param source - Environment.
+ * @returns Public inspector policy.
+ */
 export async function configuredInspectorOptions(
   projectRoot: string,
   inspectorPort?: number,
   source: Readonly<Record<string, string | undefined>> = process.env,
 ): Promise<DevInspectorOptions> {
-  const configured = await developmentPorts(projectRoot, undefined, inspectorPort, source);
-  return configured.inspector;
+  return (await developmentPorts(projectRoot, undefined, inspectorPort, source)).inspector;
 }
-
-export async function developmentPorts(
+/** Restores validated backend and inspector ports at the public Promise boundary.
+ * @param projectRoot - Authored root.
+ * @param backendPort - Optional override.
+ * @param inspectorPort - Optional override.
+ * @param source - Environment.
+ * @returns Public validated listener policy.
+ */
+export function developmentPorts(
   projectRoot: string,
   backendPort?: number,
   inspectorPort?: number,
   source: Readonly<Record<string, string | undefined>> = process.env,
-): Promise<{ readonly backend: number; readonly inspector: DevInspectorOptions }> {
-  const configPath = join(projectRoot, "relkit.config.ts");
-  const loaded = (await import(`${pathToFileURL(configPath).href}?relkit_dev=${Date.now()}`)) as {
-    readonly default?: unknown;
-  };
-  const config = loadConfig(loaded.default ?? loaded, projectRoot);
-  return {
-    backend: resolveApplicationPort({
-      ...(backendPort === undefined ? {} : { flag: backendPort }),
-      source,
-      configured: config.server.port,
-    }),
-    inspector: defaultInspectorOptions(
-      resolveInspectorPort({
-        ...(inspectorPort === undefined ? {} : { flag: inspectorPort }),
-        source,
-        configured: config.inspector.port,
-      }),
-    ),
-  };
+): Promise<DevelopmentPorts> {
+  return runCliEffect(
+    developmentPortsEffect(projectRoot, backendPort, inspectorPort, source),
+    Layer.merge(compilerLayer, moduleLayer),
+  );
 }
-
+/** Locates the source or packaged inspector through the synchronous installation edge.
+ * @returns Selected inspector installation root using the synchronous native installation edge.
+ */
 export function inspectorRoot(): string {
   return resolveInspectorInstallation().root;
 }
-
+/**
+ * Locates the installation without importing or starting the inspector.
+ * @param baseDirectory - CLI module directory.
+ * @param source - Explicit native environment.
+ * @returns Source checkout or packed inspector process inputs.
+ */
 export function resolveInspectorInstallation(
-  baseDirectory: string = import.meta.dir,
+  baseDirectory: string = fileURLToPath(new URL(".", import.meta.url)),
   source: Readonly<Record<string, string | undefined>> = process.env,
-): { readonly root: string; readonly command: readonly string[] } {
+): InspectorInstallation {
   const configured = source.RELKIT_INSPECTOR_ROOT;
   if (configured !== undefined) return sourceInstallation(configured);
   const workspace = resolve(baseDirectory, "../../../../apps/inspector");
@@ -68,11 +124,11 @@ export function resolveInspectorInstallation(
     return { root: packaged, command: ["node", "server.js"] };
   throw new Error("The packaged RELKIT inspector is missing. Reinstall @relkit/cli.");
 }
-
-function sourceInstallation(root: string): {
-  readonly root: string;
-  readonly command: readonly string[];
-} {
+/** Validates an explicit source inspector installation and prepares its launch inputs.
+ * @param root - Explicit checkout.
+ * @returns Native development process inputs after installation validation.
+ */
+function sourceInstallation(root: string): InspectorInstallation {
   if (!existsSync(join(root, "package.json")))
     throw new Error(`RELKIT_INSPECTOR_ROOT does not contain an inspector app: ${root}`);
   return { root, command: [process.execPath, "run", "dev"] };
