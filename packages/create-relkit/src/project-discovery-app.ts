@@ -4,8 +4,18 @@ import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
 import type { DiscoveredProfile } from "./project-discovery-types.js";
 import { readFactoryObject, staticPropertyName } from "./source-edit.js";
 
+/**
+ * Provider capabilities recognized in static app configuration.
+ */
 const CAPABILITIES = ["bucket", "cache", "job", "event", "model"] as const;
 
+/**
+ * Reads the canonical app factory and its source-declared environment/providers.
+ * @param source - Authored source text inspected or transformed without execution.
+ * @param path - Path inside the current project or owned resource.
+ * @param root - Absolute project or owned resource root.
+ * @returns The recognized app factory, optional environment source path and provider profiles.
+ */
 export function readAppDiscovery(
   source: string,
   path: string,
@@ -33,6 +43,11 @@ export function readAppDiscovery(
   );
 }
 
+/**
+ * Reads provider profiles, aliases and default selections from app configuration.
+ * @param object - App factory's object-literal argument.
+ * @returns Source-discovered provider profile facts without importing the configuration.
+ */
 function readProfiles(object: ts.ObjectLiteralExpression): DiscoveredProfile[] {
   const defaults = objectPropertyObject(object, "defaults");
   return CAPABILITIES.flatMap((capability) => {
@@ -70,6 +85,14 @@ function readProfiles(object: ts.ObjectLiteralExpression): DiscoveredProfile[] {
   });
 }
 
+/**
+ * Resolves the statically imported environment source for a shorthand env property.
+ * @param source - Authored source text inspected or transformed without execution.
+ * @param object - Object-literal AST whose properties are inspected.
+ * @param appPath - App configuration source path used to resolve its imports.
+ * @param root - Absolute project or owned resource root.
+ * @returns The environment import's resolved TypeScript path, or undefined when not statically discoverable.
+ */
 function importedEnvPath(
   source: string,
   object: ts.ObjectLiteralExpression,
@@ -90,19 +113,43 @@ function importedEnvPath(
   return imported.replace(/\.js$/, ".ts");
 }
 
+/**
+ * Finds a statically named app configuration property.
+ * @param object - App configuration object-literal AST.
+ * @param name - Authored name or declaration key.
+ * @returns The matching property, or undefined when absent.
+ */
 function objectProperty(object: ts.ObjectLiteralExpression, name: string) {
   return object.properties.find((item) => staticPropertyName(item.name) === name);
 }
+/**
+ * Reads the capability property, including the jobs/job alias.
+ * @param object - App configuration object-literal AST.
+ * @param capability - Requested provider capability.
+ * @returns The matching capability declaration, or undefined when absent.
+ */
 function profileProperty(object: ts.ObjectLiteralExpression, capability: string) {
   return capability === "job"
     ? (objectProperty(object, "jobs") ?? objectProperty(object, "job"))
     : objectProperty(object, capability);
 }
+/**
+ * Reads a statically declared object-valued property.
+ * @param object - Owning object-literal AST.
+ * @param name - Authored name or declaration key.
+ * @returns The unwrapped object literal, or undefined for absent/nonliteral values.
+ */
 function objectPropertyObject(object: ts.ObjectLiteralExpression, name: string) {
   const item = objectProperty(object, name);
   const value = item && ts.isPropertyAssignment(item) ? unwrap(item.initializer) : undefined;
   return value && ts.isObjectLiteralExpression(value) ? value : undefined;
 }
+/**
+ * Reads one literal default selection from app configuration.
+ * @param object - Object-literal AST whose properties are inspected.
+ * @param name - Authored name or declaration key.
+ * @returns The declared string default, or undefined for absent/nonliteral properties.
+ */
 function defaultValue(
   object: ts.ObjectLiteralExpression | undefined,
   name: string,
@@ -112,6 +159,11 @@ function defaultValue(
     ? item.initializer.text
     : undefined;
 }
+/**
+ * Reads static constructor names, including nested adapter wrappers.
+ * @param call - Call-expression AST inspected without evaluation.
+ * @returns The static adapter name including nested constructor names, or undefined for dynamic calls.
+ */
 function callName(call: ts.CallExpression): string | undefined {
   const name = ts.isIdentifier(call.expression)
     ? call.expression.text
@@ -128,6 +180,12 @@ function callName(call: ts.CallExpression): string | undefined {
   const nestedName = nested === undefined ? undefined : callName(nested);
   return nestedName === undefined ? name : `${name}(${nestedName})`;
 }
+/**
+ * Reads one literal option from a constructor's first object argument.
+ * @param call - Call-expression AST inspected without evaluation.
+ * @param name - Authored name or declaration key.
+ * @returns The string option from the first object argument, or undefined when nonliteral or absent.
+ */
 function callStringOption(call: ts.CallExpression, name: string): string | undefined {
   const value = unwrap(call.arguments[0]);
   if (!value || !ts.isObjectLiteralExpression(value)) return undefined;
@@ -136,6 +194,11 @@ function callStringOption(call: ts.CallExpression, name: string): string | undef
     ? item.initializer.text
     : undefined;
 }
+/**
+ * Removes parentheses and TypeScript assertions from a source expression.
+ * @param value - AST expression whose static wrapper nodes are ignored.
+ * @returns The underlying expression, or undefined when no expression was supplied.
+ */
 function unwrap(value: ts.Expression | undefined): ts.Expression | undefined {
   return value &&
     (ts.isAsExpression(value) ||
@@ -144,6 +207,14 @@ function unwrap(value: ts.Expression | undefined): ts.Expression | undefined {
     ? unwrap(value.expression)
     : value;
 }
+/**
+ * Omits absent fields when constructing a public result.
+ * @typeParam Name - Literal property key retained in the mapped result.
+ * @typeParam Value - Value type retained for the optional property.
+ * @param name - Result property key.
+ * @param value - Defined property value or undefined to omit it.
+ * @returns An empty object for undefined, otherwise an object containing the named field.
+ */
 function optional<Name extends string, Value>(
   name: Name,
   value: Value | undefined,
