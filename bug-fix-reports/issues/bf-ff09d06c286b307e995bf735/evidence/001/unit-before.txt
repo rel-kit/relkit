@@ -1,0 +1,48 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+stdout | packages/create-relkit/tests/native-process.effect.test.ts > joins pending native stdout after the immediate child exits
+[22:59:45.392] ERROR (#1): Error [AssertionError]: expected true to be false // Object.is equality
+    at native
+    at /Users/mustafaelsayed/Workspace/relkit/packages/create-relkit/tests/native-process.effect.test.ts:59:37 {
+  actual: true,
+  expected: false,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+stdout | packages/create-relkit/tests/native-process.effect.test.ts > joins pending native stderr after the immediate child exits
+[22:59:45.412] ERROR (#7): Error [AssertionError]: expected true to be false // Object.is equality
+    at native
+    at /Users/mustafaelsayed/Workspace/relkit/packages/create-relkit/tests/native-process.effect.test.ts:59:37 {
+  actual: true,
+  expected: false,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+ ❯ packages/create-relkit/tests/native-process.effect.test.ts (5 tests | 2 failed) 137ms
+   × joins pending native stdout after the immediate child exits 28ms
+   × joins pending native stderr after the immediate child exits 14ms
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+   Start at  22:59:45
+   Duration  336ms (tests 50%, import 27%, transform 22%, worker 1%)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  packages/create-relkit/tests/native-process.effect.test.ts > joins pending native stdout after the immediate child exits
+ FAIL  packages/create-relkit/tests/native-process.effect.test.ts > joins pending native stderr after the immediate child exits
+AssertionError: expected true to be false // Object.is equality
+- Expected
++ Received
+- false
++ true
+ ❯ packages/create-relkit/tests/native-process.effect.test.ts:59:37
+     57|       const exit = yield* Fiber.await(running);
+     58|       expect(Exit.isFailure(exit)).toBe(true);
+     59|       expect(completedBeforeOutput).toBe(false);
+       |                                     ^
+     60|     }),
+     61|   );
+ ❯ ~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1417:27
+ ❯ runLoop node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:650:29
+ ❯ evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:592:22
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1154:16
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
