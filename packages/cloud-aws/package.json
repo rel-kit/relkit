@@ -41,9 +41,9 @@
     "@relkit/events": "workspace:*",
     "@relkit/graph": "workspace:*",
     "@relkit/jobs": "workspace:*",
-    "@pulumi/aws": "7.43.0",
+    "@pulumi/aws": "catalog:",
     "@pulumi/awsx": "3.8.0",
-    "@pulumi/pulumi": "3.259.0"
+    "@pulumi/pulumi": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",
