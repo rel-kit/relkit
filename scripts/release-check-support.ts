@@ -3,20 +3,30 @@ import { readFile } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
 import { expectedExports } from "./release-package-contract.js";
 import { workspacePackageDirectories } from "./workspace-packages.js";
+import {
+  dependencyFields,
+  exactVersion,
+  resolveDependencyFields,
+  type CatalogManifest,
+} from "./catalog-manifest.js";
+export { exactVersion } from "./catalog-manifest.js";
 
 export const root = resolve(import.meta.dir, "..");
 export const bun = process.execPath;
-export const packageFields = [
-  "dependencies",
-  "devDependencies",
-  "optionalDependencies",
-  "peerDependencies",
-] as const;
+export const packageFields = dependencyFields;
 export type RecordValue = Record<string, any>;
-export type PackageInfo = { directory: string; name: string; manifest: RecordValue };
+export type PackageInfo = {
+  directory: string;
+  name: string;
+  manifest: RecordValue;
+};
 
 export async function command(executable: string, args: string[], cwd = root): Promise<string> {
-  const child = Bun.spawn([executable, ...args], { cwd, stdout: "pipe", stderr: "pipe" });
+  const child = Bun.spawn([executable, ...args], {
+    cwd,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
   const [stdout, stderr, code] = await Promise.all([
     new Response(child.stdout).text(),
     new Response(child.stderr).text(),
@@ -69,22 +79,16 @@ export async function packages(): Promise<PackageInfo[]> {
   );
 }
 
-export function exactVersion(value: unknown): value is string {
-  return (
-    typeof value === "string" &&
-    /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(
-      value,
-    )
-  );
-}
-
 export function exportTargets(value: any): string[] {
   if (typeof value === "string") return [value];
   if (value === null || typeof value !== "object") return [];
   return Object.values(value).flatMap(exportTargets);
 }
 
-export function checkManifests(items: PackageInfo[]): {
+export function checkManifests(
+  items: PackageInfo[],
+  rootManifest: CatalogManifest,
+): {
   version: string;
   summary: RecordValue[];
 } {
@@ -111,9 +115,9 @@ export function checkManifests(items: PackageInfo[]): {
       throw new Error(`Export map mismatch: ${item.name}`);
     const expectedBin =
       directoryName === "cli"
-        ? { relkit: "./dist/index.js" }
+        ? { relkit: "./dist/bin.js" }
         : directoryName === "create-relkit"
-          ? { "create-relkit": "./dist/index.js" }
+          ? { "create-relkit": "./dist/bin.js" }
           : undefined;
     if (JSON.stringify(stable(item.manifest.bin)) !== JSON.stringify(stable(expectedBin)))
       throw new Error(`Binary map mismatch: ${item.name}`);
@@ -126,14 +130,21 @@ export function checkManifests(items: PackageInfo[]): {
       item.manifest.homepage !== "https://github.com/rel-kit/relkit#readme" ||
       item.manifest.bugs?.url !== "https://github.com/rel-kit/relkit/issues" ||
       JSON.stringify(item.manifest.files) !==
-        JSON.stringify(directoryName === "cli" ? ["dist", "editor"] : ["dist"]) ||
+        JSON.stringify(
+          directoryName === "cli"
+            ? ["dist", "editor"]
+            : directoryName === "create-relkit"
+              ? ["dist", "src/catalog-resolution.ts", "src/catalog-resolution.types.ts"]
+              : ["dist"],
+        ) ||
       item.manifest.publishConfig?.access !== "public" ||
       item.manifest.engines?.bun !== ">=1.3.10" ||
       item.manifest.private === true
     )
       throw new Error(`Release metadata mismatch: ${item.name}`);
+    const dependencies = resolveDependencyFields(item.manifest, rootManifest);
     for (const field of packageFields)
-      for (const [name, spec] of Object.entries(item.manifest[field] ?? {})) {
+      for (const [name, spec] of Object.entries(dependencies[field])) {
         const valid = workspaceNames.has(name)
           ? spec === "workspace:*"
           : field === "peerDependencies" || exactVersion(spec);
@@ -145,8 +156,11 @@ export function checkManifests(items: PackageInfo[]): {
       version,
       exports: stable(item.manifest.exports),
       dependencyFields: Object.fromEntries(
-        packageFields.map((field) => [field, stable(item.manifest[field] ?? {})]),
+        packageFields.map((field) => [field, stable(dependencies[field])]),
       ),
+      ...(item.manifest.relkit?.buildCatalog === undefined
+        ? {}
+        : { buildCatalog: stable(item.manifest.relkit.buildCatalog) }),
       workspaceDependencies: Object.keys(item.manifest.dependencies ?? {})
         .filter((name) => workspaceNames.has(name))
         .sort(),

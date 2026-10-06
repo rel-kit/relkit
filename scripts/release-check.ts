@@ -89,7 +89,7 @@ async function main(): Promise<void> {
   await command(bun, ["run", "scripts/sync-release.ts"]);
   const items = await packages();
   const rootManifest = await readJson(join(root, "package.json"));
-  const { version, summary } = checkManifests(items);
+  const { version, summary } = checkManifests(items, rootManifest);
   const templates = await templateInputs(version, rootManifest);
   const input = {
     version,
@@ -155,6 +155,7 @@ async function main(): Promise<void> {
     );
     await command(bun, ["run", "check"]);
     await command(bun, ["run", "scripts/check-public-declarations.ts"]);
+    await command(bun, ["run", "scripts/pack-and-smoke-postgres.ts", "--artifacts", artifactRoot]);
     if (!ciPack) {
       await command(bun, ["run", "scripts/pack-and-smoke-exports.ts", "--artifacts", artifactRoot]);
       await command(bun, [
