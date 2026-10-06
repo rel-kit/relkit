@@ -1,0 +1,404 @@
+{
+  "phase": 3,
+  "lane": "independent-invocation-and-jobs-review",
+  "reviewer": "/root/plan_create_relkit",
+  "status": "accepted at recorded hashes",
+  "counts": {
+    "total": 48,
+    "source": 39,
+    "tests": 9
+  },
+  "supportingReads": [
+    "packages/cli/src/cli-cleanup-evidence.ts",
+    "packages/cli/src/cli-errors.ts",
+    "packages/cli/src/services/cleanup.service.ts",
+    "packages/cli/src/services/http.service.ts",
+    "packages/client/src/transport.ts"
+  ],
+  "files": [
+    {
+      "path": "packages/cli/src/main.ts",
+      "lines": 66,
+      "sha256": "e03a6fa9f461b002fd57a149a7497f68f4a81b473738f6ec2808c47ff40bb53a",
+      "classification": "public-runtime-edge",
+      "reason": "One invocation runtime supplies native live Layers, cancellation and quiet library logging; terminal policy presents cleanup without changing public outcomes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/main-effect.ts",
+      "lines": 163,
+      "sha256": "808155d68138c6b94e27883207c8b6a57b6831fb90a3c7d7e0d7301207a24c94",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/main-support.ts",
+      "lines": 227,
+      "sha256": "4b48c2736736640e67f15a3e5e9f42de3e1d9d7373525da41de7463beaad6945",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/main-support-types.ts",
+      "lines": 134,
+      "sha256": "092bf8d2392a303899a1cc082552aa642934035c557488481d48303bb97f6c5e",
+      "classification": "type-contract",
+      "reason": "Pure public/service capability declarations retain concrete result, failure and environment shapes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/command-dispatch.ts",
+      "lines": 212,
+      "sha256": "8d35b6ce34fba437b7f49536da52b924e3bb15aac833919807f13c7cd97770ef",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/root-menu.ts",
+      "lines": 69,
+      "sha256": "757cdb5fe88bc8cf9e7423650a28c02829808714d8d1c1a3044e943ddc3a4f75",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/cli-status.ts",
+      "lines": 93,
+      "sha256": "4cc16187cd0d563d6e8a2b2049bb22c9ab4a858b0b16fdfab84da01a7e359b36",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/scaffold-command.ts",
+      "lines": 46,
+      "sha256": "d63372d8a3cbf632e93885e667907d0c463b2116b5ca1fc54497fe3c1e824863",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/scaffold-mutations.ts",
+      "lines": 135,
+      "sha256": "3dc97fc07556668ad3f114ea843027a6cf5ac3f73198878b97d91ecdb2e80ae9",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/scaffold-local.ts",
+      "lines": 121,
+      "sha256": "32a6f1e9719e5f78b0ac8400ddf691e1b62bb3cb015fd2c03811a0891017c136",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/scaffold-presentation.ts",
+      "lines": 40,
+      "sha256": "067bdca25ae41f44fc97c24d2d98f0b1a3e7e593b34f5ca4a520d48cf687247c",
+      "classification": "pure-domain-helper",
+      "reason": "Deterministic parsing, formatting or public-error translation requires no runtime service lifetime.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/cli-interaction.service.ts",
+      "lines": 66,
+      "sha256": "bc73e18bd47d3f2547b185c932c3eb871b4a1b62769cc6cf31fd39052b09f5bd",
+      "classification": "cohesive-domain-service",
+      "reason": "A concrete capability owner composes typed Effects over explicit live/test dependencies; native SDK/Promise calls remain at cancellation-aware edges.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/cli-interaction.types.ts",
+      "lines": 57,
+      "sha256": "105d4bca1342efb87eb4229f24ee11580f0d9911dff317859b81483d49e891ed",
+      "classification": "type-contract",
+      "reason": "Pure public/service capability declarations retain concrete result, failure and environment shapes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/cli-logger.ts",
+      "lines": 64,
+      "sha256": "15cc9489c1667235f265ac9b2b9ab7dc49f66501c84fb326d8f389e2dc5053bd",
+      "classification": "scoped-native-callback-owner",
+      "reason": "One scope owns the ordered log queue/fiber; callbacks do not launch Effects and scope release joins delivery.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/cli-logger.types.ts",
+      "lines": 11,
+      "sha256": "0c61bac3dc7ad0fe9ff355d1a668bb5d13b578f5038e73d645943e1c8e6e520c",
+      "classification": "type-contract",
+      "reason": "Pure public/service capability declarations retain concrete result, failure and environment shapes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/services/generator.service.ts",
+      "lines": 150,
+      "sha256": "7e15d477ddd4d5ecdeecda55f291282d74d0515ed152ef35b0681c9be28c6a32",
+      "classification": "cohesive-domain-service",
+      "reason": "A concrete capability owner composes typed Effects over explicit live/test dependencies; native SDK/Promise calls remain at cancellation-aware edges.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/services/generator.types.ts",
+      "lines": 85,
+      "sha256": "849f471e62d5ac713eb655cbd1667e14dc9cb1a8901f6feb5f180e0bcc5a1a3e",
+      "classification": "type-contract",
+      "reason": "Pure public/service capability declarations retain concrete result, failure and environment shapes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/tests/invocation/generator.test.ts",
+      "lines": 94,
+      "sha256": "3c5d4c9ccc503d4c65a1a36e845b0f09dab57abf19c4ae46ff4f01f0853dcfed",
+      "classification": "effect-regression-test",
+      "reason": "Uses @effect/vitest to exercise owned cancellation, settlement, observation, bounds or public boundary behavior.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/tests/invocation/interaction.test.ts",
+      "lines": 111,
+      "sha256": "6c174111febc024e4e6820f63557827fabbd9ebd0fef110cc840e12e82d2243d",
+      "classification": "effect-regression-test",
+      "reason": "Uses @effect/vitest to exercise owned cancellation, settlement, observation, bounds or public boundary behavior.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/tests/invocation/logging.test.ts",
+      "lines": 74,
+      "sha256": "bbe4fa748c6f6d5f5c732963a7711114f0e000a4d69c8fd24a12021271fa0faa",
+      "classification": "effect-regression-test",
+      "reason": "Uses @effect/vitest to exercise owned cancellation, settlement, observation, bounds or public boundary behavior.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/tests/invocation/type-probes.test.ts",
+      "lines": 78,
+      "sha256": "18dc2be6b9f16f15f975b674e66e2c92b4062a9d37f6ccda24e48172ee02adf3",
+      "classification": "executed-compiler-regression",
+      "reason": "Compiles real service consumers, negative authority cases and environment-erasure controls.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-base-url.ts",
+      "lines": 14,
+      "sha256": "b7bc52365e27f45a0179151df4a11cd0b640a9314099cb682b51840bef4515f1",
+      "classification": "pure-domain-helper",
+      "reason": "Deterministic parsing, formatting or public-error translation requires no runtime service lifetime.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-error.ts",
+      "lines": 16,
+      "sha256": "785e71ce4f58a929a47b1be9fc598dbd5bcce7a753177e5665eb8653adb3f3db",
+      "classification": "pure-domain-helper",
+      "reason": "Deterministic parsing, formatting or public-error translation requires no runtime service lifetime.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-http.ts",
+      "lines": 116,
+      "sha256": "59c4bbefed9c51685daa498523aec56b6a69daf58f87dd059deb1806003d74c8",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-json.ts",
+      "lines": 40,
+      "sha256": "100d24fac090238303504c27d2918214f66dc2d45e34dba5cf28d0b6dff7a830",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-manifest.ts",
+      "lines": 16,
+      "sha256": "00a6d73408b871a37b346aed074caca7668cb1a4f83851115e034abf20c2cba5",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-request.ts",
+      "lines": 53,
+      "sha256": "7ac155080f2a320ccb1b7224e4f09ee4ad597f66add24ee82928957e34895f01",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-rpc-core.ts",
+      "lines": 156,
+      "sha256": "1c3a9c69fcce242d1217eb375a2874bfd1325bb55810ba81ec2340784c12df7e",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-rpc-support.ts",
+      "lines": 99,
+      "sha256": "d7ee4e8946481cd99c789d6c8ca9d9b4d4049822175afef46fed31dd0fc43624",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-rpc.ts",
+      "lines": 31,
+      "sha256": "4b0465dd8642cd674c8aee5e03723a00af680ebf4b796b1c320a7c1d645a322a",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-signal.ts",
+      "lines": 27,
+      "sha256": "0585f7ba44edf383610994f9a3026bf9a6672e2b0ae820133f4ef06a71937351",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs-support.ts",
+      "lines": 68,
+      "sha256": "4e7e9f174d10952711151e62493f221a1bfeb77e2f58c8d373961f6c0369fbcd",
+      "classification": "pure-domain-helper",
+      "reason": "Deterministic parsing, formatting or public-error translation requires no runtime service lifetime.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs.schemas.ts",
+      "lines": 34,
+      "sha256": "3680376458794c54e321835476d85103cb1dd0535c8d77c687e4018cec132e31",
+      "classification": "schema-boundary",
+      "reason": "Owned unknown jobs payloads are checked with stable Effect Schema before domain use.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs.ts",
+      "lines": 175,
+      "sha256": "3af7aee4ebe9088f3de9517330871401b84bf6b13d50c1bc2d2362c27ecb9557",
+      "classification": "typed-domain-workflow",
+      "reason": "Composes the selected concrete capabilities with explicit failure channels, shared bounded operation observation and owned scope where resources are acquired.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/commands/jobs.types.ts",
+      "lines": 30,
+      "sha256": "1fe6306cb6b129352d06af2fbe6b3a8ba108f8691f78bed8e24e46cb23c9311b",
+      "classification": "type-contract",
+      "reason": "Pure public/service capability declarations retain concrete result, failure and environment shapes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/services/jobs-sdk-fetch.ts",
+      "lines": 108,
+      "sha256": "1c2bdb4df08588dc7406b1d0ae25295d2dae34c48969e308bcc67708fa496ba3",
+      "classification": "cohesive-domain-service",
+      "reason": "A concrete capability owner composes typed Effects over explicit live/test dependencies; native SDK/Promise calls remain at cancellation-aware edges.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/services/jobs-sdk.service.ts",
+      "lines": 172,
+      "sha256": "e0a806b3b291a02740b04c24df6bd8737f7c7a19857cf3ec90e588a138f284b6",
+      "classification": "cohesive-domain-service",
+      "reason": "A concrete capability owner composes typed Effects over explicit live/test dependencies; native SDK/Promise calls remain at cancellation-aware edges.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/services/jobs-sdk.types.ts",
+      "lines": 38,
+      "sha256": "baada21b304e5f43f756095ec4323de8595b36dde0a5597de85b5283db9eff33",
+      "classification": "type-contract",
+      "reason": "Pure public/service capability declarations retain concrete result, failure and environment shapes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/services/jobs.service.ts",
+      "lines": 107,
+      "sha256": "6a03ca99e58cece9dff891e5fabdc8d3f5e94c4990083b55d807f1645ae0c5cc",
+      "classification": "cohesive-domain-service",
+      "reason": "A concrete capability owner composes typed Effects over explicit live/test dependencies; native SDK/Promise calls remain at cancellation-aware edges.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/services/jobs.types.ts",
+      "lines": 64,
+      "sha256": "97e09109af8a727770b3a3a5ba985b1da76ab4aac4cfd2c086137b64e49e14cb",
+      "classification": "type-contract",
+      "reason": "Pure public/service capability declarations retain concrete result, failure and environment shapes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/tests/jobs/domain.test.ts",
+      "lines": 163,
+      "sha256": "90d25efcef1bb9bd8048b829231e8ed4574396ec75b76f2da0332176f8151ffd",
+      "classification": "effect-regression-test",
+      "reason": "Uses @effect/vitest to exercise owned cancellation, settlement, observation, bounds or public boundary behavior.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/tests/jobs/sdk-fetch.test.ts",
+      "lines": 159,
+      "sha256": "7933eb49dca7567ef894a5a97cb413ca9e569aa8d85b5d672dab784cb5eb1580",
+      "classification": "effect-regression-test",
+      "reason": "Uses @effect/vitest to exercise owned cancellation, settlement, observation, bounds or public boundary behavior.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/tests/jobs/sdk-lifecycle.test.ts",
+      "lines": 133,
+      "sha256": "cbe99bf7f68c058c156c21a88bbf02bf5015e17bec24501d1409496730f03ab6",
+      "classification": "effect-regression-test",
+      "reason": "Uses @effect/vitest to exercise owned cancellation, settlement, observation, bounds or public boundary behavior.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/tests/jobs/type-probes.test.ts",
+      "lines": 89,
+      "sha256": "175fc8ba63852bccc69f33cae49b7d808ae191d9e01ace726ea879a9f27ab43e",
+      "classification": "executed-compiler-regression",
+      "reason": "Compiles real service consumers, negative authority cases and environment-erasure controls.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/cli-runtime.ts",
+      "lines": 92,
+      "sha256": "cfa8ef1598e265f9aabfcd2397461eb4bf94e0f0b34186c3c9a6d15ba042faae",
+      "classification": "public-runtime-edge",
+      "reason": "One invocation runtime supplies native live Layers, cancellation and quiet library logging; terminal policy presents cleanup without changing public outcomes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/cli-runtime.types.ts",
+      "lines": 7,
+      "sha256": "afa728e668646c5c5ce100c5b4b6703e22328616798473c9922e92381d07a50b",
+      "classification": "type-contract",
+      "reason": "Pure public/service capability declarations retain concrete result, failure and environment shapes.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/src/cli-cleanup-presentation.ts",
+      "lines": 44,
+      "sha256": "1b8b5411cf893d8543b1eedf8612026116e407ec3eca846a31319e095ab0c7f8",
+      "classification": "pure-terminal-presentation",
+      "reason": "Renders bounded settled cause tags through explicitly provided sinks while retaining primary result and secret-safe v2 log format.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/tests/services/cleanup-receipts.test.ts",
+      "lines": 205,
+      "sha256": "5b08eee6e58e1005d4c00690a2122ccf2b0722d7e95b995eda2fcb579f0c0cd1",
+      "classification": "effect-regression-test",
+      "reason": "Uses @effect/vitest to exercise owned cancellation, settlement, observation, bounds or public boundary behavior.",
+      "readThroughEof": true
+    }
+  ]
+}
