@@ -22,6 +22,23 @@ const suites = [
   { name: "other generator", args: otherFiles },
 ] as const;
 
+await runServiceGate("generator strict services", [
+  "x",
+  "tsc",
+  "-p",
+  "packages/create-relkit/tsconfig.tests.json",
+  "--pretty",
+  "false",
+]);
+await runServiceGate("generator Effect services", [
+  "x",
+  "--bun",
+  "vitest",
+  "run",
+  "--config",
+  "packages/create-relkit/vitest.config.ts",
+]);
+
 const results = await Promise.all(
   suites.map(async ({ name, args }) => {
     const startedAt = performance.now();
@@ -37,3 +54,19 @@ const results = await Promise.all(
 );
 const failure = results.find(({ code }) => code !== 0);
 if (failure !== undefined) throw new Error(`${failure.name} failed.`);
+
+/**
+ * Joins a required generator service gate before the native fixture suites run.
+ * @param name - Fixed gate label.
+ * @param args - Complete arguments passed to the pinned Bun executable.
+ * @returns After physical runner exit, rejecting a failed compiler or service suite.
+ */
+async function runServiceGate(name: string, args: readonly string[]): Promise<void> {
+  const child = Bun.spawn([process.execPath, ...args], {
+    cwd: root,
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+  const code = await child.exited;
+  if (code !== 0) throw new Error(`${name} failed with exit ${code}.`);
+}
