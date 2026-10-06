@@ -26,4 +26,6 @@ export * from "./jobs/provider-requirements.js";
 export * from "./jobs/replay-diagnostics.js";
 export * from "./jobs/build-id.js";
 export * from "./jobs/manifest.js";
+export { JobsManifest as JobsManifestSchema } from "./jobs/manifest-schema.js";
+export { LoadedToolingConfigSchema } from "./config-loader-types.js";
 export * from "./jobs/worker-entries.js";
