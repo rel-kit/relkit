@@ -33,18 +33,18 @@
     }
   },
   "dependencies": {
-    "@effect/platform-bun": "4.0.0-rc.115",
-    "@effect/platform-node-shared": "4.0.0-rc.115",
+    "@effect/platform-bun": "catalog:",
+    "@effect/platform-node-shared": "catalog:",
     "@relkit/config": "workspace:*",
     "@relkit/contracts": "workspace:*",
     "@relkit/graph": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/observability": "workspace:*",
-    "effect": "4.0.0-rc.115"
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "@effect/vitest": "4.0.0-rc.115",
-    "vitest": "5.0.1"
+    "@effect/vitest": "catalog:",
+    "vitest": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",

@@ -41,11 +41,11 @@
     "@relkit/provider": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
     "@relkit/schema": "workspace:*",
-    "effect": "4.0.0-rc.115"
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "@effect/vitest": "4.0.0-rc.115",
-    "vitest": "5.0.1"
+    "@effect/vitest": "catalog:",
+    "vitest": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",
