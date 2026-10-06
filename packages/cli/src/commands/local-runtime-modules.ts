@@ -1,155 +1,159 @@
 import { pathToFileURL } from "node:url";
-import { resolveIntegrationPackageRole } from "@relkit/compiler";
+import { Effect, Layer, Schema } from "effect";
 import type { RuntimeIntegrationPlan } from "@relkit/contracts";
-import type {
-  LocalServiceMaterializerRuntime,
-  LocalServicePlan,
-  LocalServiceRecipeInput,
-  LocalServiceInstance,
-  LocalServiceState,
-  LocalServiceWorkerArtifact,
+import {
+  normalizeLocalServiceRecipeEffect,
+  type LocalServiceRecipeInput,
 } from "@relkit/local-service";
+import { cliAdapterError, cliTry } from "../cli-errors.js";
+import { observeCli, runCliEffect } from "../cli-runtime.js";
+import { CliCompiler, compilerLayer } from "../services/compiler.service.js";
+import { CliModules, moduleLayer } from "../services/modules.service.js";
+import { localRuntimeSchema, dockerRuntimeSchema } from "./local-runtime-modules.schemas.js";
+import { localRecipeSchema } from "./local-recipe.schemas.js";
+import type { LoadedLocalRuntimeModules } from "./local-runtime-modules.types.js";
+export type {
+  LoadedLocalIdentity,
+  LoadedLocalLease,
+  LoadedLocalReconciler,
+  LoadedLocalRuntime,
+  LoadedLocalRuntimeModules,
+} from "./local-runtime-modules.types.js";
 
-export interface LoadedLocalIdentity {
-  readonly applicationId: string;
-  readonly projectRoot: string;
-  readonly localProjectId: string;
-}
+/**
+ * Loads only the declared local orchestration and materializer SDK exports.
+ * @param projectRoot - Package resolution root.
+ * @param materializerId - Selected materializer; only Docker is currently supported.
+ * @returns Original native namespaces with validated callability, requiring compiler/import authority.
+ */
+export const loadLocalRuntimeModulesEffect = Effect.fn("Local.loadRuntimeModules")(
+  function* (projectRoot: string, materializerId: string) {
+    if (materializerId !== "docker")
+      return yield* cliTry("local.materializer", () => {
+        throw new Error(`Unsupported local materializer: ${materializerId}`);
+      });
+    const compiler = yield* CliCompiler;
+    const modules = yield* CliModules;
+    const [localRole, materializerRole] = yield* Effect.all(
+      [
+        compiler.integrationRole({
+          projectRoot,
+          packageName: "@relkit/local",
+          integrationId: "local",
+          role: "localService",
+        }),
+        compiler.integrationRole({
+          projectRoot,
+          packageName: "@relkit/docker",
+          integrationId: "docker",
+          role: "localMaterializer",
+        }),
+      ],
+      { concurrency: 2 },
+    );
+    const [localModule, materializerModule] = yield* Effect.all(
+      [
+        modules.load(pathToFileURL(localRole.resolvedPath).href),
+        modules.load(pathToFileURL(materializerRole.resolvedPath).href),
+      ],
+      { concurrency: 2 },
+    );
+    return yield* cliTry("local.runtimeExports", () => {
+      if (
+        !Schema.is(localRuntimeSchema)(localModule) ||
+        !Schema.is(dockerRuntimeSchema)(materializerModule)
+      )
+        throw new Error("Local integration runtime exports are invalid.");
+      return Object.freeze({
+        local: localModule,
+        materializer: materializerModule.createDockerMaterializer(),
+      }) satisfies LoadedLocalRuntimeModules;
+    });
+  },
+  (effect, _projectRoot: string, _materializerId: string) =>
+    observeCli("local.loadRuntimeModules", effect),
+);
 
-export interface LoadedLocalLease {
-  readonly mode: "attached" | "detached";
-  readonly sessionId: string;
-  readonly ownerPid?: number;
-}
+/**
+ * Resolves and validates one recipe under its accepted graph/import epoch.
+ * @param projectRoot - Package resolution root.
+ * @param runtimePlan - Compiler-owned integration cohort.
+ * @param integrationId - Selected recipe owner.
+ * @param epoch - Optional session import generation after source/configuration edits.
+ * @returns A native recipe after structural and owner semantic validation.
+ */
+export const loadLocalRecipeEffect = Effect.fn("Local.loadRecipe")(
+  function* (
+    projectRoot: string,
+    runtimePlan: RuntimeIntegrationPlan,
+    integrationId: string,
+    epoch?: string,
+  ) {
+    const compiler = yield* CliCompiler;
+    const modules = yield* CliModules;
+    const selected = runtimePlan.integrations.find(
+      (entry) => entry.integrationId === integrationId,
+    );
+    const selectedRole = yield* compiler.integrationRole({
+      projectRoot,
+      packageName: selected?.packageName ?? `@relkit/${integrationId}`,
+      integrationId,
+      role: "localRecipe",
+    });
+    const module = yield* modules.load(
+      `${pathToFileURL(selectedRole.resolvedPath).href}?relkit_recipe=${encodeURIComponent(runtimePlan.graphHash)}${epoch === undefined ? "" : `&relkit_epoch=${encodeURIComponent(epoch)}`}`,
+    );
+    const recipe = yield* cliTry("local.recipeExports", () => {
+      if (module.localRecipe === undefined)
+        throw new Error(`Local recipe export for "${integrationId}" is unavailable.`);
+      if (!Schema.is(localRecipeSchema)(module.localRecipe))
+        throw new TypeError("Local-service recipe is invalid.");
+      return module.localRecipe;
+    });
+    yield* normalizeLocalServiceRecipeEffect(recipe).pipe(
+      Effect.mapError((error) => cliAdapterError("local.recipeValidation", error.cause)),
+    );
+    return recipe satisfies LocalServiceRecipeInput;
+  },
+  (
+    effect,
+    _projectRoot: string,
+    _runtimePlan: RuntimeIntegrationPlan,
+    _integrationId: string,
+    _epoch?: string,
+  ) => observeCli("local.loadRecipe", effect),
+);
 
-export interface LoadedLocalReconciler {
-  readonly reconcile: (request: {
-    readonly plan: LocalServicePlan;
-    readonly planHash: string;
-    readonly recipes: Readonly<Record<string, LocalServiceRecipeInput>>;
-    readonly scope: "required" | "all";
-    readonly environment?: string;
-    readonly serviceGeneration?: string;
-    readonly serviceGenerations?: Readonly<Record<string, string>>;
-    readonly endpoints?: Readonly<Record<string, Readonly<Record<string, string>>>>;
-    readonly environmentOverrides?: Readonly<Record<string, Readonly<Record<string, string>>>>;
-    readonly environmentOverridesByUnit?: Readonly<
-      Record<string, Readonly<Record<string, Readonly<Record<string, string>>>>>
-    >;
-    readonly workerArtifacts?: Readonly<Record<string, LocalServiceWorkerArtifact>>;
-    readonly signal?: AbortSignal;
-  }) => Promise<{
-    readonly overrides: { readonly generationId: string };
-    readonly state: LocalServiceState;
-  }>;
-  readonly close: () => Promise<void>;
-}
-
-export interface LoadedLocalRuntime {
-  readonly createLocalProjectIdentity: (root: string, applicationId: string) => LoadedLocalIdentity;
-  readonly localProjectLabels: (identity: LoadedLocalIdentity) => Readonly<Record<string, string>>;
-  readonly acquireLocalProjectLease: (
-    identity: LoadedLocalIdentity,
-    options: {
-      readonly mode: "attached" | "detached";
-      readonly sessionId: string;
-    },
-  ) => {
-    readonly lease: LoadedLocalLease;
-    readonly status: "acquired" | "adopted" | "recovered";
-    readonly release: () => void;
-  };
-  readonly readLocalProjectLease: (identity: LoadedLocalIdentity) => LoadedLocalLease | undefined;
-  readonly createLocalServiceReconciler: (options: {
-    readonly identity: LoadedLocalIdentity;
-    readonly materializer: LocalServiceMaterializerRuntime;
-    readonly preserveOnClose: boolean;
-  }) => LoadedLocalReconciler;
-  readonly readLocalServiceState: (identity: LoadedLocalIdentity) => LocalServiceState | undefined;
-  readonly localStateDirectory: (identity: LoadedLocalIdentity) => string;
-  readonly removeLocalStateFile: (
-    identity: LoadedLocalIdentity,
-    name:
-      | "lease.json"
-      | "local-services.state.json"
-      | "provider-overrides.json"
-      | "worker-provider-overrides.json"
-      | "local-secrets.json",
-  ) => void;
-  readonly groupServiceInstances: (
-    instances: readonly LocalServiceInstance[],
-  ) => readonly LocalServiceInstance[];
-  readonly serviceInstanceIds: (instance: LocalServiceInstance) => readonly string[];
-}
-
-export async function loadLocalRuntimeModules(
+/**
+ * Retains standalone module loading at one public Promise edge.
+ * @param projectRoot - Package resolution root.
+ * @param materializerId - Selected Docker materializer.
+ * @returns Accepted native handles after the invocation lifetime.
+ */
+export function loadLocalRuntimeModules(
   projectRoot: string,
   materializerId: string,
-): Promise<{
-  readonly local: LoadedLocalRuntime;
-  readonly materializer: LocalServiceMaterializerRuntime;
-}> {
-  if (materializerId !== "docker")
-    throw new Error(`Unsupported local materializer: ${materializerId}`);
-  const [localRole, materializerRole] = await Promise.all([
-    resolveIntegrationPackageRole({
-      projectRoot,
-      packageName: "@relkit/local",
-      integrationId: "local",
-      role: "localService",
-    }),
-    resolveIntegrationPackageRole({
-      projectRoot,
-      packageName: "@relkit/docker",
-      integrationId: "docker",
-      role: "localMaterializer",
-    }),
-  ]);
-  const [localModule, materializerModule] = await Promise.all([
-    import(pathToFileURL(localRole.resolvedPath).href),
-    import(pathToFileURL(materializerRole.resolvedPath).href),
-  ]);
-  assertFunctions(localModule, [
-    "createLocalProjectIdentity",
-    "localProjectLabels",
-    "acquireLocalProjectLease",
-    "readLocalProjectLease",
-    "createLocalServiceReconciler",
-    "readLocalServiceState",
-    "localStateDirectory",
-    "removeLocalStateFile",
-    "groupServiceInstances",
-    "serviceInstanceIds",
-  ]);
-  assertFunctions(materializerModule, ["createDockerMaterializer"]);
-  return Object.freeze({
-    local: localModule as unknown as LoadedLocalRuntime,
-    materializer: (
-      materializerModule.createDockerMaterializer as () => LocalServiceMaterializerRuntime
-    )(),
-  });
+): Promise<LoadedLocalRuntimeModules> {
+  return runCliEffect(
+    loadLocalRuntimeModulesEffect(projectRoot, materializerId),
+    Layer.merge(compilerLayer, moduleLayer),
+  );
 }
 
-export async function loadLocalRecipe(
+/**
+ * Retains standalone recipe loading without a process-global cache.
+ * @param projectRoot - Package resolution root.
+ * @param runtimePlan - Accepted integration cohort.
+ * @param integrationId - Recipe owner.
+ * @returns The validated original recipe object.
+ */
+export function loadLocalRecipe(
   projectRoot: string,
   runtimePlan: RuntimeIntegrationPlan,
   integrationId: string,
 ): Promise<LocalServiceRecipeInput> {
-  const selected = runtimePlan.integrations.find((entry) => entry.integrationId === integrationId);
-  const packageName = selected?.packageName ?? `@relkit/${integrationId}`;
-  const selectedRole = resolveIntegrationPackageRole({
-    projectRoot,
-    packageName,
-    integrationId,
-    role: "localRecipe",
-  });
-  const module = await import(pathToFileURL(selectedRole.resolvedPath).href);
-  if (module.localRecipe === undefined)
-    throw new Error(`Local recipe export for "${integrationId}" is unavailable.`);
-  return module.localRecipe as LocalServiceRecipeInput;
-}
-
-function assertFunctions(module: Record<string, unknown>, names: readonly string[]): void {
-  if (names.some((name) => typeof module[name] !== "function"))
-    throw new Error("Local integration runtime exports are invalid.");
+  return runCliEffect(
+    loadLocalRecipeEffect(projectRoot, runtimePlan, integrationId),
+    Layer.merge(compilerLayer, moduleLayer),
+  );
 }
