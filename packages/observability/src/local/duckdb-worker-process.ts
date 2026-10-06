@@ -8,16 +8,16 @@ import type { DuckdbWorkerMessage } from "./duckdb-worker-process.types.js";
  * Registers IPC, signal, disconnect, and maintenance resources in one Scope.
  * The process entrypoint keeps that Scope alive until disconnect.
  *
+ * @param scope - Closeable scope owned by the process entrypoint.
  * @returns An Effect completing when listeners and timer are registered.
  * @example
- * yield* startDuckdbWorkerProcessEffect();
+ * yield* startDuckdbWorkerProcessEffect(scope);
  */
 export const startDuckdbWorkerProcessEffect = Effect.fn("ObservabilityDuckdb.worker.process")(
-  function* () {
+  function* (scope: Scope.Closeable) {
     return yield* observeDuckdb(
       "worker-process",
       Effect.gen(function* () {
-        const scope = yield* Scope.Scope;
         const worker = yield* Effect.acquireRelease(
           makeDuckdbWorkerEffect().pipe(Effect.provide(duckdbDriverLayer)),
           (owned) => Effect.ignore(owned.close()),

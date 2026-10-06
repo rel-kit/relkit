@@ -1,7 +1,7 @@
 import { Effect, Exit, Scope } from "effect";
 import { startDuckdbWorkerProcessEffect } from "./duckdb-worker-process.js";
 const scope = Effect.runSync(Scope.make());
-void Effect.runPromise(startDuckdbWorkerProcessEffect().pipe(Scope.provide(scope))).catch(
+void Effect.runPromise(startDuckdbWorkerProcessEffect(scope).pipe(Scope.provide(scope))).catch(
   (error: unknown) => {
     process.send?.({
       id: 0,
