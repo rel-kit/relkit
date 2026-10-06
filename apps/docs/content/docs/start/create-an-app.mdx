@@ -9,8 +9,8 @@ deployment tool is needed yet.
 
 ## Create the project
 
-Run the generator in the directory where you want the new project. Choose the `api` template, then
-skip the optional add-artifact wizard so your files match this guide:
+Run the generator in the directory where you want the new project. Select the `api` template with
+the flag below so your files match this guide, then confirm creation:
 
 ```sh title="Terminal — parent directory"
 bunx create-relkit@latest relkit-orders --template api
@@ -21,6 +21,10 @@ cp .env.example .env
 The generator installs dependencies and checks the initial app. The API template already contains
 Hello, Echo, and Orders; later chapters **extend those files** rather than create a second Orders domain.
 The commands from here onward run in `relkit-orders`.
+
+Without `--template`, creation uses `minimal`. It asks for a project name only when you omit one,
+then asks for final confirmation. Use explicit flags for other templates and advanced choices;
+add more artifacts afterward with [`relkit add`](/docs/start/add-artifacts).
 
 ## Run it and make a request
 
