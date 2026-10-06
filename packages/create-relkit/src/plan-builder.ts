@@ -1,195 +1,136 @@
-import { readFile } from "node:fs/promises";
-import { relative, resolve } from "node:path";
-import {
-  ADD_FAILURE_CODES,
-  AddScaffoldError,
-  type AddRequest,
-  type ScaffoldFileOperation,
-  type ScaffoldPlan,
-  type ScaffoldWarning,
-} from "./add-types.js";
-import type {
-  DiscoveredArtifact,
-  DiscoveredProfile,
-  ProjectDiscovery,
-} from "./project-discovery-types.js";
-import { mergeScaffoldManifest } from "./plan-manifest.js";
+import { relative } from "node:path";
+
+import { type ScaffoldPlan } from "./add-types.js";
+import type { DiscoveredArtifact, DiscoveredProfile } from "./project-discovery-types.js";
 import type { ScaffoldDependencyName } from "./scaffold-catalog.js";
+import type { PlannedArtifactInput } from "./plan-builder.types.js";
 
-export class PlanBuilder {
-  readonly #files = new Map<string, ScaffoldFileOperation>();
-  readonly #dependencies = new Set<ScaffoldDependencyName>();
-  readonly #scripts = new Map<string, string>();
-  readonly #warnings = new Map<string, ScaffoldWarning>();
-  readonly #nextSteps = new Set<string>();
-  readonly #plannedArtifacts: DiscoveredArtifact[] = [];
-  readonly #plannedProfiles: DiscoveredProfile[] = [];
+import { runGeneratorPromise, runGeneratorSync } from "./generator-runtime.js";
 
-  constructor(
-    readonly request: AddRequest,
-    readonly discovery: ProjectDiscovery,
-  ) {}
-  async read(path: string): Promise<string> {
-    const planned = this.#files.get(path);
-    return planned?.content ?? readFile(resolve(this.discovery.projectRoot, path), "utf8");
+import { PlanBuilderEffects } from "./plan-builder-effects.js";
+
+/** Per-request Effect owner with synchronous and Promise compatibility edges. */
+export class PlanBuilder extends PlanBuilderEffects {
+  /**
+   * Reads source through the Promise compatibility edge.
+   * @param path - Path inside the current project or owned resource.
+   * @returns Planned text when present, otherwise the current project file text.
+   */
+  read(path: string): Promise<string> {
+    return runGeneratorPromise(this.readEffect(path));
   }
 
-  async create(path: string, content: string, mode?: number): Promise<void> {
-    if (
-      this.#files.has(path) ||
-      (await Bun.file(resolve(this.discovery.projectRoot, path)).exists())
-    ) {
-      collision(`${path} already exists.`);
-    }
-    this.#files.set(path, {
-      path,
-      action: "create",
-      content,
-      ...(mode === undefined ? {} : { mode }),
-    });
+  /**
+   * Plans file creation through the Promise compatibility edge.
+   * @param path - Path inside the current project or owned resource.
+   * @param content - Complete bytes or text planned for the destination.
+   * @param mode - Optional restored or generated permission mode.
+   * @returns Completion after the existing contract has been applied.
+   */
+  create(path: string, content: string, mode?: number): Promise<void> {
+    return runGeneratorPromise(this.createEffect(path, content, mode));
   }
 
-  async update(path: string, transform: (source: string) => string): Promise<void> {
-    const existing = this.#files.get(path);
-    let source: string;
-    try {
-      source =
-        existing?.content ?? (await readFile(resolve(this.discovery.projectRoot, path), "utf8"));
-    } catch {
-      throw new AddScaffoldError(ADD_FAILURE_CODES.invalidProject, `${path} does not exist.`);
-    }
-    const content = transform(source);
-    if (content === source) return;
-    this.#files.set(path, {
-      path,
-      action: existing?.action ?? "update",
-      content,
-      ...(existing?.mode === undefined ? {} : { mode: existing.mode }),
-    });
+  /**
+   * Plans a source update through the Promise compatibility edge.
+   * @param path - Path inside the current project or owned resource.
+   * @param transform - Pure transformation applied atomically to the latest planned source.
+   * @returns Completion after the existing contract has been applied.
+   */
+  update(path: string, transform: (source: string) => string): Promise<void> {
+    return runGeneratorPromise(this.updateEffect(path, transform));
   }
 
+  /**
+   * Preserves the existing synchronous dependency API.
+   * @param name - Authored name or declaration key.
+   * @returns Completion after the existing contract has been applied.
+   */
   dependency(name: ScaffoldDependencyName): void {
-    this.#dependencies.add(name);
+    runGeneratorSync(this.dependencyEffect(name));
   }
 
-  get artifacts(): readonly DiscoveredArtifact[] {
-    return [...this.discovery.artifacts, ...this.#plannedArtifacts];
+  /**
+   * Preserves the existing synchronous artifact registration API.
+   * @param kind - Authoritative artifact kind.
+   * @param value - Artifact domain, source path, binding and optional identity/export form.
+   * @returns Completion after the artifact is registered in this request.
+   */
+  registerArtifact(kind: DiscoveredArtifact["kind"], value: PlannedArtifactInput): void {
+    runGeneratorSync(this.registerArtifactEffect(kind, value));
   }
 
-  registerArtifact(
-    kind: DiscoveredArtifact["kind"],
-    value: {
-      readonly domain: string;
-      readonly path: string;
-      readonly binding: string;
-      readonly id: string;
-      readonly exportKind?: "default" | "named";
-    },
-  ): void {
-    this.#plannedArtifacts.push({
-      kind,
-      path: value.path,
-      domain: value.domain,
-      binding: value.binding,
-      id: value.id,
-      factory: "scaffold",
-      exported: true,
-      exportKind: value.exportKind ?? "default",
-      options: [],
-    });
-  }
-
-  get profiles(): readonly DiscoveredProfile[] {
-    return [...this.discovery.profiles, ...this.#plannedProfiles];
-  }
-
+  /**
+   * Preserves the existing synchronous profile registration API.
+   * @param profile - Selected provider profile.
+   * @returns Completion after the existing contract has been applied.
+   */
   registerProfile(profile: DiscoveredProfile): void {
-    this.#plannedProfiles.push(profile);
+    runGeneratorSync(this.registerProfileEffect(profile));
   }
 
+  /**
+   * Preserves the existing synchronous script API.
+   * @param name - Authored name or declaration key.
+   * @param command - Shell command stored under the package script name.
+   * @returns Completion after the existing contract has been applied.
+   */
   script(name: string, command: string): void {
-    this.#scripts.set(name, command);
+    runGeneratorSync(this.scriptEffect(name, command));
   }
 
+  /**
+   * Preserves the existing synchronous warning API.
+   * @param code - Stable category code included in the resulting diagnostic.
+   * @param message - Existing user-facing diagnostic.
+   * @returns Completion after the existing contract has been applied.
+   */
   warning(code: string, message: string): void {
-    this.#warnings.set(code, Object.freeze({ code, message }));
+    runGeneratorSync(this.warningEffect(code, message));
   }
 
+  /**
+   * Preserves the existing synchronous next-step API.
+   * @param command - Shell command shown as a follow-up instruction.
+   * @returns Completion after the existing contract has been applied.
+   */
   nextStep(command: string): void {
-    this.#nextSteps.add(command);
+    runGeneratorSync(this.nextStepEffect(command));
   }
 
-  async envExample(name: string, value = ""): Promise<void> {
-    await this.appendLine(".env.example", `${name}=${value}`, (source) =>
-      new RegExp(`^${escape(name)}=`, "m").test(source),
-    );
+  /**
+   * Preserves the environment-example Promise API.
+   * @param name - Environment variable name.
+   * @param value - Example value used only for a new declaration.
+   * @returns Completion after the example declaration is planned.
+   */
+  envExample(name: string, value = ""): Promise<void> {
+    return runGeneratorPromise(this.envExampleEffect(name, value));
   }
 
-  async gitignore(pattern: string): Promise<void> {
-    await this.appendLine(".gitignore", pattern, (source) =>
-      source.split(/\r?\n/).includes(pattern),
-    );
+  /**
+   * Preserves the gitignore Promise API.
+   * @param pattern - Declaration-owned glob or ignore pattern.
+   * @returns Completion after the existing contract has been applied.
+   */
+  gitignore(pattern: string): Promise<void> {
+    return runGeneratorPromise(this.gitignoreEffect(pattern));
   }
 
-  async finish(): Promise<ScaffoldPlan> {
-    const dependencies = await this.updateManifest();
-    return Object.freeze({
-      request: this.request,
-      projectRoot: this.discovery.projectRoot,
-      operations: Object.freeze(
-        [...this.#files.values()].sort((a, b) => a.path.localeCompare(b.path)),
-      ),
-      dependencies: Object.freeze(dependencies),
-      artifacts: Object.freeze(
-        this.#plannedArtifacts.map(({ kind, path, id, binding }) => ({
-          kind,
-          path,
-          id: id!,
-          binding,
-        })),
-      ),
-      profiles: Object.freeze(
-        this.#plannedProfiles.map(({ capability, name }) => ({ capability, name })),
-      ),
-      warnings: Object.freeze([...this.#warnings.values()]),
-      nextSteps: Object.freeze([...this.#nextSteps]),
-    });
+  /**
+   * Preserves the immutable plan Promise API.
+   * @returns The frozen plan containing ordered operations, concrete dependencies and follow-up metadata.
+   */
+  finish(): Promise<ScaffoldPlan> {
+    return runGeneratorPromise(this.finishEffect());
   }
 
+  /**
+   * Converts a source path into its existing project-relative representation.
+   * @param absolutePath - Absolute path converted relative to the discovered project root.
+   * @returns The path relative to the discovered project root using forward slashes.
+   */
   relative(absolutePath: string): string {
     return relative(this.discovery.projectRoot, absolutePath).replaceAll("\\", "/");
   }
-
-  private async appendLine(
-    path: string,
-    line: string,
-    present: (source: string) => boolean,
-  ): Promise<void> {
-    if (
-      !(await Bun.file(resolve(this.discovery.projectRoot, path)).exists()) &&
-      !this.#files.has(path)
-    ) {
-      await this.create(path, `${line}\n`);
-      return;
-    }
-    await this.update(path, (source) =>
-      present(source) ? source : `${source.trimEnd()}\n${line}\n`,
-    );
-  }
-
-  private async updateManifest(): Promise<Record<string, string>> {
-    if (this.#dependencies.size === 0 && this.#scripts.size === 0) return {};
-    const path = "package.json";
-    const result = mergeScaffoldManifest(await this.read(path), this.#dependencies, this.#scripts);
-    await this.update(path, () => result.content);
-    return result.added;
-  }
-}
-
-function collision(message: string): never {
-  throw new AddScaffoldError(ADD_FAILURE_CODES.collision, message);
-}
-
-function escape(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
