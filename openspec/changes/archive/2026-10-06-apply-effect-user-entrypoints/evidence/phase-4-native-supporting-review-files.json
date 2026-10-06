@@ -1,0 +1,54 @@
+{
+  "reviewer": "native_gate",
+  "coverage": 5,
+  "review": "Previously independently reviewed; final current EOF reread accepted. Current byte anchors include binary guard, required generator strict/service gates, normalized tooling Schema, captured Context and ManagedRuntime runners, and their pure barrel.",
+  "findings": "No unresolved findings",
+  "verification": "Root reran positive and four negative missing-authority Context/ManagedRuntime compiler probes successfully; generator reviewer passed the complete generator gate.",
+  "files": [
+    {
+      "path": "scripts/pack-and-smoke-exports.ts",
+      "classification": "native verification orchestration",
+      "lines": 172,
+      "sha256": "037b1e42229241cdfe01123f033fc0d0c6bdc9a3de370ac168c963415f4381f7",
+      "author": "root",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "scripts/test-generator.ts",
+      "classification": "native verification orchestration",
+      "lines": 72,
+      "sha256": "ed850f84df49eac3536df825a8076aa51405f2e48938805eaec3a2af4d95eb88",
+      "author": "root",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/compiler/src/config-loader-types.ts",
+      "classification": "pure Schema and metadata",
+      "lines": 115,
+      "sha256": "f3368cb1bbcdb7bda790e296b5c5791c193cb59d6f78a1f31148a32af70b970b",
+      "author": "root",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/contracts/src/operation-runtime.ts",
+      "classification": "captured-owner public execution runners",
+      "lines": 103,
+      "sha256": "12d894cab2af8632f1d1caec922607a5a7aaa359b13d50f81cf97ca322514de6",
+      "author": "root",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/contracts/src/operation.ts",
+      "classification": "pure export barrel",
+      "lines": 14,
+      "sha256": "c066c8a39ad4550534d43040f28b8941eed3ec604a999e293f298208eace305e",
+      "author": "root",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    }
+  ]
+}

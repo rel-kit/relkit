@@ -1,0 +1,760 @@
+{
+  "status": "accepted at recorded current hashes; independent full EOF, controlled/native/strict and packed bootstrap verification passed",
+  "groupCounts": {
+    "cold catalog bootstrap": 8,
+    "doctor/start": 31,
+    "emitted runtime": 28,
+    "emitted runtime supporting tests": 4,
+    "parser": 11
+  },
+  "files": [
+    {
+      "path": "packages/cli/src/commands/doctor-checks.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "227e2ba509966693ee8ff854c23c0af803e58858e3455aab9d9d8f716e937c03",
+      "lines": 212
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-compat.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "3bf6303020a8de23041b1c23415a6d0171ace541a1924d7cffe7d88332ba5f75",
+      "lines": 202
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-config.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "56e3c7310ecaf318b1dde84acd50bd1efff3ac8bdf2894d44d0f4ba002301c09",
+      "lines": 85
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-error.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "572bd9ecca98d7eadd7a10030d41f29c06efa25fb8496fcbabbef874828b60ef",
+      "lines": 15
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-native.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "d0d91782b0b20a3514c87dac55af863599653d320700e4a8e9c444664fff0a0b",
+      "lines": 98
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-project.service.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "8030525f2e073d0026234de9aea6b93f2b9358f7e3a8971b45e53f0c7a51c90d",
+      "lines": 131
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-roots.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "692594c909ff2f709074c688a99744ef941e264369fe2ea4c2ed585cd702c7f1",
+      "lines": 53
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-support.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "0859152fa5974804a6e402a5916b9a01bac90f4dbad50cd6fd48a07bd256b7b8",
+      "lines": 90
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-toolchain.service.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "e026807b21b8ec2f2b6bb26601276fd10749d3018bd44ea12f1914416f3f2867",
+      "lines": 43
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-toolchain.types.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "71f34573b64fc00169093d317c98cc65126930acaab2e03e85ab9ca63a7ce1c5",
+      "lines": 29
+    },
+    {
+      "path": "packages/cli/src/commands/doctor.schemas.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "1705375f4041070def9e708bb99445839ef8cc0878c92f9d6918ec070e99a302",
+      "lines": 23
+    },
+    {
+      "path": "packages/cli/src/commands/doctor.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "542a85e94e577caabbba220b4f83f9c7d6caa15d3501555b15eb710810727cb1",
+      "lines": 82
+    },
+    {
+      "path": "packages/cli/src/commands/doctor.types.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "16a1c6d0423b4c0346b72311c8b95e73d7a03e2218c65305a3fc6277cb422411",
+      "lines": 49
+    },
+    {
+      "path": "packages/cli/src/commands/start-built-validation.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "e4468d0c60387da4e7ff088bc8418dd8c46c955eb97a2fd70ba3486bf1c1301a",
+      "lines": 69
+    },
+    {
+      "path": "packages/cli/src/commands/start-built-workflow.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "b5f5f65fd769edaac85d68dc467c712190b616cf651f21b3c3cf73afb8020eb1",
+      "lines": 220
+    },
+    {
+      "path": "packages/cli/src/commands/start-built.schemas.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "536fc2ff512d39acfa8c2f76144fc813c1fa616aaac71e527c5d9accf21ebef7",
+      "lines": 26
+    },
+    {
+      "path": "packages/cli/src/commands/start-built.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "742026c2be5fad95b2e453fcc46cbeb2fa021baef69a4481e759af021fceaab3",
+      "lines": 45
+    },
+    {
+      "path": "packages/cli/src/commands/start-built.types.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "f9ce3b262bada48f7888987f4e1e5ad21b100623e8cac647c498ff12aa88fbd5",
+      "lines": 22
+    },
+    {
+      "path": "packages/cli/src/commands/start-health.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "8acd8ba36a7ddd71e6460b7941c80872d331730e770ff24cbbdc0a97203097b9",
+      "lines": 61
+    },
+    {
+      "path": "packages/cli/src/commands/start-native.service.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "86b609cf399f32346ab29b757802c4c17c91f5e9f8ef76b502df8f3b81e4cbdd",
+      "lines": 74
+    },
+    {
+      "path": "packages/cli/src/commands/start-process.service.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "52cb6453156c3d23b80a9acc109da445b2ab5ce4e6f8b8c947bf6238c38e2629",
+      "lines": 129
+    },
+    {
+      "path": "packages/cli/src/commands/start-process.types.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "47e3b15f8ee7aa3ae192711c9e4ade4d9d19c4c4174bfe7e361b8bf388c45842",
+      "lines": 10
+    },
+    {
+      "path": "packages/cli/src/commands/start.service.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "a38c11315eb79e4e3cf4196115619e5b4f892e957c2de3b742f9fbf9e7a5c2fb",
+      "lines": 136
+    },
+    {
+      "path": "packages/cli/src/commands/start.ts",
+      "group": "doctor/start",
+      "classification": "Effect service/workflow/native or compatibility edge",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "f77f5093d82f76a99e0669999276c434a4524564529dbec4ded07e241fd93fe1",
+      "lines": 169
+    },
+    {
+      "path": "packages/cli/src/commands/start.types.ts",
+      "group": "doctor/start",
+      "classification": "pure contract or Schema",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "83d2ec4100b42af4f42a1fca1edc22afd0c61a280b20abbbb1f474e3509e83f0",
+      "lines": 90
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/domain.test.ts",
+      "group": "doctor/start",
+      "classification": "test/strict/native verification",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "2c8316ee6de73222ab6e24298bef024299c8f58f116ae672696cc641f97f8fd4",
+      "lines": 226
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/native-fixture.ts",
+      "group": "doctor/start",
+      "classification": "test/strict/native verification",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "a5df44fabb0d97b97630b1303e73e8e40dc49935561aa6e329b27a3f96c88ae6",
+      "lines": 70
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/native.acceptance.ts",
+      "group": "doctor/start",
+      "classification": "test/strict/native verification",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "3ba685a1cb147f9d1c063069514ae1dee524bcf5867ee5839fa805bf55898cd0",
+      "lines": 171
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/observation.test.ts",
+      "group": "doctor/start",
+      "classification": "test/strict/native verification",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "cf1d1765f6571662dca44abd2184c25313f617f57e7538743d0a70269e2ae37d",
+      "lines": 55
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/type-probes.test.ts",
+      "group": "doctor/start",
+      "classification": "test/strict/native verification",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "3622e19aa63b696fb375b6d3eadc503bfd99860d085ae80c06c474ebb8b2a9d8",
+      "lines": 107
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/compatibility.test.ts",
+      "group": "doctor/start",
+      "classification": "controlled startup compatibility regression",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "e42120c3ca2d2b31bb3be335a0add3f97e921bf5b0d0d8f258eb99328a4d61f9",
+      "lines": 38
+    },
+    {
+      "path": "packages/cli/src/cli-command-add.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "95daa940f91a08d526dd51d1675986881c2fc78d95eb64c6c0526846de3a0a59",
+      "lines": 103
+    },
+    {
+      "path": "packages/cli/src/cli-command-basic.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "cc0cf31c14551ca49c07b3c4820a376c94fe1dda9874fc9bc9085e3ecf58207f",
+      "lines": 157
+    },
+    {
+      "path": "packages/cli/src/cli-command-client.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "3b1e93c8f5ae3d6185d186218fa49393da6d84ec5e1abe136d6b03a0f547ff82",
+      "lines": 45
+    },
+    {
+      "path": "packages/cli/src/cli-command-deploy.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "cf63fe98ecf69e816fa0a779d43913399b271f494c6d6b33b2f7456082495309",
+      "lines": 52
+    },
+    {
+      "path": "packages/cli/src/cli-command-groups.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "0dcffc599e3e457a9d1676cc422e8d16ae0de29ab62a9852f9689dd9cec0df60",
+      "lines": 210
+    },
+    {
+      "path": "packages/cli/src/cli-command-jobs-runs.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "9d2dee499dd67c247e6ec1d7f3525f85cf3ab6e79b18619b5235291eec5c4b67",
+      "lines": 108
+    },
+    {
+      "path": "packages/cli/src/cli-command-jobs.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "64dc8f24811221b51afc81c66f7e24b35f595bc8af8decefb03802a87c14a373",
+      "lines": 186
+    },
+    {
+      "path": "packages/cli/src/cli-command-local.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "89de71674fe43555c54b423ece4f5eb37a4b26534aa3ef270207d2f2f3b6051a",
+      "lines": 50
+    },
+    {
+      "path": "packages/cli/src/cli-command-shared.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "cd2036e3eb22f69ca4ba9665b12d793f4be6003a983b1035d6a68955417cdb68",
+      "lines": 245
+    },
+    {
+      "path": "packages/cli/src/cli-command.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "ba6e8166bef48de6dafb126d5708dfa56b2f5d6dfd49cd3d2f46bb8c778f5de5",
+      "lines": 36
+    },
+    {
+      "path": "packages/cli/src/cli-command.types.ts",
+      "group": "parser",
+      "classification": "pure typed command construction or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "900ddea7e502ffec985abb2d1476b53fdbc7ff0425bdd8624adac8d91aa52da8",
+      "lines": 11
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-bootstrap.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "a50c82d4cde358870d58e741a632f72419c780c06e7ba0bdf925c754c80b49ce",
+      "lines": 19
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-http-inspector.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "0d06ae276d1188dc5e1fdc590d6659052dcbc452675aefb8b69f897aac725de8",
+      "lines": 120
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-http.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "e051a573c587bfc1a02918e8fdf380259b4782a4955a084e450722cc3e8b58b9",
+      "lines": 147
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-invocation.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "b300116f2ec10b7fe7f28564f63289e00891b0c33d572c294185acdd010643ce",
+      "lines": 104
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-native-worker.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "9ab6ef1c983bef53b8ff0215d6fd9a17f14518dd3c200659648963a8056e1557",
+      "lines": 95
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-options.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "95864e1e98e225d38bae28b679cbc96085a49f79e7a4b1f67a0fe6c33b01e729",
+      "lines": 77
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-registration.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "6073a77ecfd15cdd67e67c80617bc8d1281f224c9efda6564c323997a2a14918",
+      "lines": 117
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-runtime-support.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "264846c9d4ea57468c3bc494c6cb76f1a8a97a02a63587d1f850b0bcdb2c7683",
+      "lines": 136
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-runtime.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "d1575c51d56e4aaf034d4b5ce2ab68ae574fd6b4ffd10ee87feef65425d4311e",
+      "lines": 104
+    },
+    {
+      "path": "packages/cli/src/commands/build-server-shutdown.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "c93a86e98a8f375d4cb7f97fbec716d9023bd1d568698fa1aac4510df5afba25",
+      "lines": 21
+    },
+    {
+      "path": "packages/cli/src/commands/build-server.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "b3d042a739a508218b1b2a363623b55e875d31d5c6d3472e710f9f3ce247b436",
+      "lines": 192
+    },
+    {
+      "path": "packages/cli/src/commands/build-server.types.ts",
+      "group": "emitted runtime",
+      "classification": "pure source emitter or type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "bac086d76b59f6fa3af701c8413934fe176ad2c38256ffa986e9334fa0330712",
+      "lines": 23
+    },
+    {
+      "path": "packages/cli/src/server-runtime/runtime-cleanup.ts",
+      "group": "emitted runtime",
+      "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "6606fa02245548553b16742a08dc0309eef10b4e242c47f265882530fb717b03",
+      "lines": 83
+    },
+    {
+      "path": "packages/cli/src/server-runtime/runtime-environment.ts",
+      "group": "emitted runtime",
+      "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "c9965691ad5fe8d911cb9118ba372395c623d317063d341d48b845d5dfe1c71e",
+      "lines": 74
+    },
+    {
+      "path": "packages/cli/src/server-runtime/runtime-resources.ts",
+      "group": "emitted runtime",
+      "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "7a4026702d34683500078228326cd45b2bb269cf5e305f26e6e21765421a541a",
+      "lines": 67
+    },
+    {
+      "path": "packages/cli/src/server-runtime/runtime-shutdown.ts",
+      "group": "emitted runtime",
+      "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "1302df2fe08ebd5befe2876a25a4917e3c6ee275ce0041ce8285b87d6a9c37a5",
+      "lines": 104
+    },
+    {
+      "path": "packages/cli/src/server-runtime/runtime-workers.ts",
+      "group": "emitted runtime",
+      "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "6672b547fef5697b7581396c4987dafaecbf80bf9a5daf434089d60cf37d73f8",
+      "lines": 81
+    },
+    {
+      "path": "packages/cli/src/server-runtime/server-runtime-host.ts",
+      "group": "emitted runtime",
+      "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "43095e8c4845f57e178ba629008697461e64dc4280ab7e2d8cec29bbba0a820b",
+      "lines": 230
+    },
+    {
+      "path": "packages/cli/src/server-runtime/server-runtime.schemas.ts",
+      "group": "emitted runtime",
+      "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "282d0aeecf8103e4f769abff234c66e38cf43ea6243da25cb8112c01be5c7840",
+      "lines": 32
+    },
+    {
+      "path": "packages/cli/src/server-runtime/server-runtime.service.ts",
+      "group": "emitted runtime",
+      "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "588f5f58c81b9747bbe69af40ea332e1c396a28adecebbcf254b0cc542966880",
+      "lines": 234
+    },
+    {
+      "path": "packages/cli/src/server-runtime/server-runtime.types.ts",
+      "group": "emitted runtime",
+      "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "67f55a2f01d06b71f4c92c3f35e9312dc45d89698383d47e28f3a9df2cae7d10",
+      "lines": 227
+    },
+    {
+      "path": "packages/cli/src/internal/server-runtime.ts",
+      "group": "emitted runtime",
+      "classification": "pure intentional private export barrel",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "b8980face705ab3344035bea9b3b57f5ef95917a74b665acddc1fab26014c397",
+      "lines": 16
+    },
+    {
+      "path": "packages/cli/tests/server-runtime/concurrency.test.ts",
+      "group": "emitted runtime",
+      "classification": "controlled/strict/native acceptance",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "06ab3a91beca0454fa315f9409be76831e9b4c989c14975a1c11c80b7f434c24",
+      "lines": 171
+    },
+    {
+      "path": "packages/cli/tests/server-runtime/host.test.ts",
+      "group": "emitted runtime",
+      "classification": "controlled/strict/native acceptance",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "38a19c3b9eb3c49c8805c37d821b7a54da67b80bd2bc750cd667e194731f3c0c",
+      "lines": 212
+    },
+    {
+      "path": "packages/cli/tests/server-runtime/lifecycle.test.ts",
+      "group": "emitted runtime",
+      "classification": "controlled/strict/native acceptance",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "50efb41e41e72b538a3ed0a1a8c8a6255880188d5c4922d7cd15c872219df578",
+      "lines": 188
+    },
+    {
+      "path": "packages/cli/tests/server-runtime/runtime-test-layer.ts",
+      "group": "emitted runtime",
+      "classification": "controlled/strict/native acceptance",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "c2e45163d0ceb386b0a6ff64955ee174b098ecbdf14a73e6bc4d983f1290dcb3",
+      "lines": 45
+    },
+    {
+      "path": "packages/cli/tests/server-runtime/standalone.acceptance.ts",
+      "group": "emitted runtime",
+      "classification": "controlled/strict/native acceptance",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "02ae160a611c45d4ce81619814e1d65b98a42022d0382a420b06d6aaf06b5b86",
+      "lines": 105
+    },
+    {
+      "path": "packages/cli/tests/server-runtime/type-probes.test.ts",
+      "group": "emitted runtime",
+      "classification": "controlled/strict/native acceptance",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "ec0ca69ff90c9ee4e823edb4bc7db09f7e5e5d2fc70480b3abfaad391c1e4ac5",
+      "lines": 79
+    },
+    {
+      "path": "packages/cli/build-server.test.ts",
+      "group": "emitted runtime supporting tests",
+      "classification": "retained boundary acceptance with reviewed emitter assertions",
+      "author": "/root/plan_cli",
+      "independentReviewer": "/root and /root/plan_create_relkit",
+      "sha256": "f711a1e1ae48a7584055497b03079e497f2fd76aa1818e834a9cbf4e9ae29f87",
+      "lines": 94
+    },
+    {
+      "path": "packages/cli/specialized-logging.test.ts",
+      "group": "emitted runtime supporting tests",
+      "classification": "retained boundary acceptance with reviewed emitter assertions",
+      "author": "/root/plan_cli",
+      "independentReviewer": "/root and /root/plan_create_relkit",
+      "sha256": "dea7b6a58df43cba2bc0d565a4ac9514fe19438927e3cc37918872c21312ef2b",
+      "lines": 80
+    },
+    {
+      "path": "packages/create-relkit/src/catalog-resolution.ts",
+      "group": "cold catalog bootstrap",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "367dd4283c06aebed217d7a75a2923b74e1acfdf5a5eb1d90f18d8000995be8b",
+      "lines": 55
+    },
+    {
+      "path": "scripts/catalog-manifest.ts",
+      "group": "cold catalog bootstrap",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "4f0e1d4c5b870a5bfc226ecc8b054d3e678dfe85b5d214ccb40a1b55a75bf53a",
+      "lines": 102
+    },
+    {
+      "path": "scripts/catalog-manifest.types.ts",
+      "group": "cold catalog bootstrap",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "5e7480255d46a91e6203d168189d358cfd8d4ddfd726a175a00de63fb39ed3bc",
+      "lines": 6
+    },
+    {
+      "path": "scripts/sync-release.ts",
+      "group": "cold catalog bootstrap",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "ecdb4580597221bd8a2a66e4146bb084df4be6440e00a664c103fce5faa28c61",
+      "lines": 184
+    },
+    {
+      "path": "scripts/release-package-contract.ts",
+      "group": "cold catalog bootstrap",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "1de518e5b42ff5031dd725bf5599d5456c7a59e3d939193e741bf0be046e5b8c",
+      "lines": 215
+    },
+    {
+      "path": "scripts/release-check-support.ts",
+      "group": "cold catalog bootstrap",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "fb4874ac2340e24872dde924c0244172186fbd1a17b7cafdd153d1110d068275",
+      "lines": 170
+    },
+    {
+      "path": "tests/unit/catalog-bootstrap.test.ts",
+      "group": "cold catalog bootstrap",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "e09ec1db324dfdd583e5de64e33c12600fba7d670198cb09f72d64c8b9b76a80",
+      "lines": 93
+    },
+    {
+      "path": "tests/unit/sync-release.test.ts",
+      "group": "cold catalog bootstrap",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "15bde6b0cd4b4c5644e0057ed4e2e9d03b728bff21ada07525d1686a0c926b11",
+      "lines": 110
+    },
+    {
+      "path": "packages/cli/tests/server-runtime/telemetry-shutdown.test.ts",
+      "group": "emitted runtime supporting tests",
+      "classification": "deterministic lifecycle ordering and cleanup failure regression",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "a55e1e8ddb94bb4c1be21b0d8a0faf9358b85956afcf7bdc262803530d49c5f0",
+      "lines": 115
+    },
+    {
+      "path": "packages/cli/tests/server-runtime/background-observation.test.ts",
+      "group": "emitted runtime supporting tests",
+      "classification": "actual native SDK async context, metrics, errors and user log regression",
+      "author": "/root/native_gate",
+      "independentReviewer": "/root",
+      "sha256": "f77be40a692c3be36336b161af725a8cb03fe87f932f3fae42df03bda8e0bf61",
+      "lines": 103
+    }
+  ],
+  "reviewer": "/root",
+  "evidence": [
+    "phase-3-doctor-start-review.md",
+    "phase-3-parser-implementation.md",
+    "phase-4-runtime-review.md",
+    "phase-4-catalog-bootstrap.md",
+    "phase-3-contributor-review.md",
+    "phase-3-cli-baseline-review.md",
+    "phase-5-runtime-shutdown-review.md"
+  ]
+}
