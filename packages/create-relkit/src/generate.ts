@@ -1,152 +1,115 @@
-import { mkdir, mkdtemp, rename } from "node:fs/promises";
-import { basename, dirname, join } from "node:path";
+import { Context, Effect, Layer } from "effect";
+
+import { observeExecution } from "@relkit/contracts/operation";
+
 import type { CreateOptions } from "./options.js";
-import { validateCreateOptions } from "./validate.js";
-import {
-  injectGenerateFailure,
-  generationError,
-  resolveRelkitExecutable,
-  runProjectStep,
-  throwIfAborted,
-} from "./generate-process.js";
-import {
-  copyTemplate,
-  cleanupStagedProject,
-  customizeProject,
-  listProjectFiles,
-  requireFiles,
-  requireTemplate,
-} from "./generate-files.js";
-import { createGenerateNextSteps } from "./generate-output.js";
-import { addToStagedProject } from "./create-additions.js";
-import { resolveTemplateRoot } from "./template-root.js";
-import { type GenerateProjectContext, type GenerateProjectResult } from "./generate-types.js";
 
-const DIRECTORY_MODE = 0o755;
+import { generationError, throwIfAborted } from "./generate-process.js";
 
-/** Copies, validates, checks, and atomically publishes one generated project. */
+import {
+  GenerateProjectError,
+  type GenerateProjectContext,
+  type GenerateProjectResult,
+} from "./generate-types.js";
+
+import { GeneratorFileSystem } from "./generator-filesystem.js";
+
+import { GeneratorProcess, generatorProcessLayer } from "./generator-process.js";
+
+import { GeneratorPaths } from "./generator-paths.js";
+
+import { GeneratorPrompt, generatorPromptLayer } from "./generator-prompt.js";
+
+import { createClackPromptDriver } from "./prompt-driver.js";
+
+import { transferCleanupFailures } from "./generator-cleanup.js";
+
+import { stageCleanupFor } from "./generate-stage-cleanup.js";
+
+import { runGeneratorPromise } from "./generator-runtime.js";
+
+import type { ProjectGenerationService } from "./generate.service.types.js";
+
+/** Owns one complete creation workflow, including consent and atomic publication. */
+export class ProjectGeneration extends Context.Service<
+  ProjectGeneration,
+  ProjectGenerationService
+>()("create-relkit/ProjectGeneration") {}
+
+/**
+ * Generation captures explicit filesystem, path, process and prompt authority at acquisition.
+ * @returns A ProjectGeneration Layer requiring filesystem, paths, process and prompt services.
+ */
+export const projectGenerationLive = Layer.effect(
+  ProjectGeneration,
+  Effect.gen(function* () {
+    const fs = yield* GeneratorFileSystem;
+    const process = yield* GeneratorProcess;
+    const paths = yield* GeneratorPaths;
+    const prompt = yield* GeneratorPrompt;
+    return ProjectGeneration.of({
+      generate: Effect.fn("ProjectGeneration.generate")((options, context) =>
+        observeExecution(
+          "generator",
+          "generation.generate",
+          generateEffect(options, context).pipe(
+            Effect.provideService(GeneratorFileSystem, fs),
+            Effect.provideService(GeneratorProcess, process),
+            Effect.provideService(GeneratorPaths, paths),
+            Effect.provideService(GeneratorPrompt, prompt),
+          ),
+          () => ({ projects: 1 }),
+        ),
+      ),
+    });
+  }),
+);
+
+/**
+ * Generates a project through explicitly acquired creation authority.
+ * @param options - Normalized creation flags.
+ * @param context - Existing template, progress and executable settings.
+ * @returns A lazy scoped workflow that settles owned resources before its result.
+ */
+export const generateProjectEffect = Effect.fn("ProjectGeneration.create")(
+  function* (options: CreateOptions, context: GenerateProjectContext = {}) {
+    return yield* (yield* ProjectGeneration).generate(options, context);
+  },
+  (effect) => observeExecution("generator", "generation.create", effect),
+);
+
+/**
+ * Preserves the public Promise API, flags, errors and generated result shape.
+ * @param options - Normalized creation flags.
+ * @param context - Existing runner, prompt and cancellation settings.
+ * @returns The generated result after atomic publication and scoped cleanup.
+ */
 export async function generateProject(
   options: CreateOptions,
   context: GenerateProjectContext = {},
 ): Promise<GenerateProjectResult> {
-  let validated: ReturnType<typeof validateCreateOptions>;
-  try {
-    validated = validateCreateOptions(
-      options,
-      context.cwd === undefined ? {} : { cwd: context.cwd },
-    );
-  } catch (error) {
-    throw generationError(error, "RELKIT_CREATE_VALIDATION_FAILED");
-  }
   throwIfAborted(context.signal);
-  context.onProgress?.(`Creating a new RELKIT app in ${validated.destination}.`);
-
-  const templateRoot = resolveTemplateRoot(context);
-  const template = join(templateRoot, options.jobs === undefined ? options.template : "tasks");
-  let stage: string | undefined;
-  let published = false;
-
+  let program = generateProjectEffect(options, context).pipe(
+    Effect.provide(projectGenerationLive),
+    Effect.provide(
+      generatorPromptLayer(
+        context.promptDriver ?? createClackPromptDriver("RELKIT_CREATE_CANCELLED"),
+      ),
+    ),
+  );
+  if (context.commandRunner !== undefined)
+    program = program.pipe(Effect.provide(generatorProcessLayer(context.commandRunner)));
   try {
-    await requireTemplate(template);
-    await mkdir(dirname(validated.destination), { recursive: true, mode: DIRECTORY_MODE });
-    const staged = await mkdtemp(
-      join(dirname(validated.destination), `.${basename(validated.destination)}-relkit-`),
-    );
-    stage = staged;
-
-    injectGenerateFailure(context, "copy");
-    await copyTemplate(template, staged);
-    injectGenerateFailure(context, "substitute");
-    await customizeProject(staged, options);
-    await requireFiles(staged, [
-      "package.json",
-      "relkit.config.ts",
-      "src/platform/env.ts",
-      ".env.example",
-      ".gitignore",
-    ]);
-
-    const stagedAdditions = await addToStagedProject(staged, context);
-    const additions = stagedAdditions.results;
-
-    if (options.install) {
-      context.onProgress?.("Installing dependencies...");
-      await runProjectStep(
-        context,
-        [context.bunExecutable ?? process.execPath, "install"],
-        staged,
-        "install",
-        "install",
-      );
-    }
-
-    const git = context.gitExecutable ?? (context.commandRunner ? "git" : Bun.which("git"));
-    const gitInitialized = options.git && git !== null;
-    if (gitInitialized) {
-      context.onProgress?.("Initializing Git repository...");
-      await runProjectStep(context, [git, "init"], staged, "git", "git");
-    }
-
-    if (options.install) {
-      const relkit = await resolveRelkitExecutable(context, staged);
-      const deploymentCheck = options.cloud === "none" || options.deploy === "none";
-      context.onProgress?.("Checking generated project...");
-      await runProjectStep(
-        context,
-        [
-          relkit,
-          "doctor",
-          "--project-root",
-          staged,
-          "--no-ports",
-          ...(deploymentCheck ? ["--no-pulumi"] : []),
-        ],
-        staged,
-        "doctor",
-        "doctor",
-      );
-      await runProjectStep(
-        context,
-        [relkit, "check", "--project-root", staged],
-        staged,
-        "check",
-        "check",
-      );
-    }
-    throwIfAborted(context.signal);
-    injectGenerateFailure(context, "rename");
-    await rename(staged, validated.destination);
-    published = true;
-
-    return Object.freeze({
-      ok: true,
-      command: "create" as const,
-      name: options.name,
-      template: options.template,
-      cloud: options.cloud,
-      deploy: options.deploy,
-      destination: validated.destination,
-      files: Object.freeze(await listProjectFiles(validated.destination)),
-      installed: options.install,
-      gitInitialized,
-      additions,
-      warnings: Object.freeze([
-        ...additions.flatMap((addition) => addition.warnings),
-        ...(!options.install
-          ? [
-              {
-                code: "validation-skipped",
-                message: "Install dependencies, then run bun run check.",
-              },
-            ]
-          : []),
-      ]),
-      nextSteps: createGenerateNextSteps(options, validated.destination, context.cwd),
-    });
+    return await runGeneratorPromise(program, context.signal);
   } catch (error) {
-    const cleanup = published
-      ? undefined
-      : await cleanupStagedProject(stage, validated.destination);
-    throw generationError(error, "RELKIT_CREATE_FAILED", cleanup);
+    const cause = context.signal?.aborted
+      ? (context.signal.reason ??
+        new GenerateProjectError("RELKIT_INTERRUPTED", "Generation was interrupted."))
+      : error;
+    const cleanup = stageCleanupFor(context.signal?.aborted ? context.signal : error);
+    const failure = generationError(cause, "RELKIT_CREATE_FAILED", cleanup);
+    throw transferCleanupFailures(context.signal, transferCleanupFailures(error, failure));
   }
 }
+
+import { generateEffect } from "./generate-workflow.js";
