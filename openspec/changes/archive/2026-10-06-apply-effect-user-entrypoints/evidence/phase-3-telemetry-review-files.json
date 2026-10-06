@@ -1,0 +1,126 @@
+{
+  "reviewer": "/root/plan_create_relkit",
+  "author": "/root",
+  "source": 17,
+  "tests": 2,
+  "total": 19,
+  "readThroughEOF": 19,
+  "maximumSourceLines": 219,
+  "findings": [],
+  "files": [
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-config.schemas.ts",
+      "lines": 54,
+      "sha256": "504e42007e0d9b59c46bc34d61e5e453f33e2a3fa939c9da3a30700727fc5c20",
+      "classification": "schema-contract"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-config.ts",
+      "lines": 32,
+      "sha256": "cf2328354a661d60c015ee39a86e68f1d4a99cee75f44494c976e2fa292e2ec8",
+      "classification": "scoped-effect-workflow"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-error.ts",
+      "lines": 30,
+      "sha256": "f73e78a4f0dde3345736e8cf2b30fca54a56884df7a6afc4021bc13d2f783c8b",
+      "classification": "pure-projection"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-http.ts",
+      "lines": 94,
+      "sha256": "3074f39c5c62668b50ff5ce489d3ec9be29109a37a4023ec0013540705cb2e25",
+      "classification": "scoped-effect-workflow"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-lifetime.ts",
+      "lines": 44,
+      "sha256": "d9301b3628afdeff9e83c442cf6566356e4529b8067e4daad0854af08c619e91",
+      "classification": "scoped-effect-workflow"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-native.service.ts",
+      "lines": 130,
+      "sha256": "fbf393b6a51d7aae498140766781e6ee08aa6eb2115a7d2002608e6e23685208",
+      "classification": "native-effect-service"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-native.types.ts",
+      "lines": 39,
+      "sha256": "d09147ecc05a48443ba69aab3db0f76cb897f1c5e51374b2b4e164cbfacd4397",
+      "classification": "type-contract"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-operation.ts",
+      "lines": 219,
+      "sha256": "240e642bc55954051bb042216316a560acd9f57ea9c8ecdd191b8c8ca65c8733",
+      "classification": "scoped-effect-workflow"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-query.schemas.ts",
+      "lines": 76,
+      "sha256": "3f2cd01e2abc7090be48980497385125f9faad59e5d312005bc3aa2f6919f306",
+      "classification": "schema-contract"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-query.ts",
+      "lines": 55,
+      "sha256": "b35afde3c9b2ffb12f046aab43387a298e5432004624286c416908da283d9de6",
+      "classification": "owned-promise-edge"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-state.ts",
+      "lines": 39,
+      "sha256": "bd5d9ce92124dc596873fce82cdcb402409c6d0cf943f6bf302185dcb6c906ee",
+      "classification": "scoped-effect-workflow"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-status.ts",
+      "lines": 54,
+      "sha256": "e1960890331edd006c8be3d1c792e917f369d48e0f72aa7650412862706cf9df",
+      "classification": "scoped-effect-workflow"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-store.ts",
+      "lines": 116,
+      "sha256": "7a915df21aa99328165ee205af434c0509acb9b896c58c99440830f1e014a893",
+      "classification": "scoped-effect-workflow"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry-stream.ts",
+      "lines": 26,
+      "sha256": "3acbb0bff375e04b6072d52a257b9981c03e2c10f7fcf2abad120f6d48650704",
+      "classification": "pure-projection"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry.schemas.ts",
+      "lines": 80,
+      "sha256": "b992bfd97d9b44b239cd2b51b75de60bf603844b6445d43119578d403685dcbe",
+      "classification": "schema-contract"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry.ts",
+      "lines": 89,
+      "sha256": "1d67001818dd04399f2756128ae5bde6128b0d843e2df23e015feed71703cdb9",
+      "classification": "owned-promise-edge"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-telemetry.types.ts",
+      "lines": 57,
+      "sha256": "72c0735158540a60084e742cbadde7fc12fe92ef2b2b3be4fed011d948abc5fa",
+      "classification": "type-contract"
+    },
+    {
+      "path": "packages/cli/tests/telemetry/domain.test.ts",
+      "lines": 152,
+      "sha256": "8924c3ca578b7109ff54d81bd67ff1afa02bd1d6fde0887d8f88d7ba7cc9f73e",
+      "classification": "effect-test-and-strict-consumer-probe"
+    },
+    {
+      "path": "packages/cli/tests/telemetry/type-probes.test.ts",
+      "lines": 80,
+      "sha256": "ee9538b83127f1a3876b998da1e42af36aedc5148e34e0f11d5d74cc2a9a9ae9",
+      "classification": "effect-test-and-strict-consumer-probe"
+    }
+  ]
+}
