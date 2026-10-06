@@ -49,7 +49,7 @@ export const { GET } = defineServiceRoutes(service, { GET: "example" });`,
   const command = Bun.spawn(
     [
       process.execPath,
-      join(repository, "packages/cli/dist/index.js"),
+      join(repository, "packages/cli/dist/bin.js"),
       "check",
       "--project-root",
       root,
