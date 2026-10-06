@@ -1,184 +1,115 @@
-import { access, writeFile, rm } from "node:fs/promises";
-import { randomUUID } from "node:crypto";
-import { join } from "node:path";
-import { resolveRelkitExecutable } from "./generate-process.js";
+import { Context, Effect, Layer } from "effect";
+
+import { observeExecution } from "@relkit/contracts/operation";
+
 import {
   ADD_FAILURE_CODES,
   AddScaffoldError,
   type AddResult,
   type ScaffoldPlan,
-  type ScaffoldVerification,
 } from "./add-types.js";
-import {
-  applyFileOperations,
-  restoreFiles,
-  snapshotFiles,
-  validateOperationActions,
-} from "./add-transaction-files.js";
 
-export interface AddCommandResult {
-  readonly exitCode: number;
-  readonly stdout?: string;
-  readonly stderr?: string;
-}
+import { GeneratorFileSystem } from "./generator-filesystem.js";
 
-export interface ApplyScaffoldContext {
-  readonly commandRunner?: (
-    command: readonly string[],
-    cwd: string,
-    signal?: AbortSignal,
-  ) => Promise<AddCommandResult>;
-  readonly bunExecutable?: string;
-  readonly relkitExecutable?: string;
-  readonly signal?: AbortSignal;
-  readonly onProgress?: (message: string) => void;
-  readonly deferVerification?: boolean;
-}
+import { GeneratorProcess, generatorProcessLayer } from "./generator-process.js";
 
-/** Applies a complete plan and restores every touched project path on failure. */
+import { domainError, errorMessage, publicFailure, scaffoldErrors } from "./generator-errors.js";
+
+import { runGeneratorPromise } from "./generator-runtime.js";
+
+import type { ApplyScaffoldContext, ScaffoldTransactionService } from "./add-transaction.types.js";
+
+import { transferCleanupFailures } from "./generator-cleanup.js";
+
+export type { AddCommandResult, ApplyScaffoldContext } from "./add-transaction.types.js";
+
+/** Owns file mutation, install/check and rollback within one finite transaction scope. */
+export class ScaffoldTransaction extends Context.Service<
+  ScaffoldTransaction,
+  ScaffoldTransactionService
+>()("create-relkit/ScaffoldTransaction") {}
+
+/**
+ * Transaction Layer captures explicit filesystem and process authority once.
+ * @returns A ScaffoldTransaction Layer requiring filesystem and process services.
+ */
+export const scaffoldTransactionLive = Layer.effect(
+  ScaffoldTransaction,
+  Effect.gen(function* () {
+    const fs = yield* GeneratorFileSystem;
+    const process = yield* GeneratorProcess;
+    return ScaffoldTransaction.of({
+      apply: Effect.fn("ScaffoldTransaction.apply")((plan, context) =>
+        observeExecution(
+          "generator",
+          "transaction.apply",
+          transactionEffect(plan, context).pipe(
+            scaffoldErrors,
+            Effect.provideService(GeneratorFileSystem, fs),
+            Effect.provideService(GeneratorProcess, process),
+            Effect.mapError((error) => {
+              const original = publicFailure(error);
+              return original instanceof AddScaffoldError
+                ? domainError(original)
+                : domainError(
+                    transferCleanupFailures(
+                      original,
+                      new AddScaffoldError(ADD_FAILURE_CODES.validation, errorMessage(original)),
+                    ),
+                  );
+            }),
+          ),
+          () => ({
+            files: plan.operations.length,
+            dependencies: Object.keys(plan.dependencies).length,
+          }),
+        ),
+      ),
+    });
+  }),
+);
+
+/**
+ * Applies a plan with a caller-supplied transaction service.
+ * @param plan - Complete immutable plan.
+ * @param context - Existing runner and verification settings.
+ * @returns A lazy transaction that awaits rollback and marker cleanup before settling.
+ */
+export const applyScaffoldPlanEffect = Effect.fn("ScaffoldTransaction.commit")(
+  function* (plan: ScaffoldPlan, context: ApplyScaffoldContext = {}) {
+    return yield* (yield* ScaffoldTransaction).apply(plan, context);
+  },
+  (effect) => observeExecution("generator", "ScaffoldTransaction.commit", effect),
+);
+
+/**
+ * Preserves the Promise transaction API and canonical public error constructors.
+ * @param plan - Complete plan.
+ * @param context - Existing runner, progress and cancellation settings.
+ * @returns The unchanged public result after commit, or after completed rollback.
+ */
 export async function applyScaffoldPlan(
   plan: ScaffoldPlan,
   context: ApplyScaffoldContext = {},
 ): Promise<AddResult> {
-  throwIfAborted(context.signal);
-  await validateOperationActions(plan.projectRoot, plan.operations);
-  const packages = Object.keys(plan.dependencies).sort();
-  const snapshots = await snapshotFiles(plan.projectRoot, plan.operations, packages.length > 0);
-  const createdDirectories = new Set<string>();
-  // Dev watches this process-scoped marker until installation/checking or rollback finishes.
-  const marker = join(plan.projectRoot, `.relkit-scaffold-${process.pid}-${randomUUID()}.tmp`);
-  await writeFile(marker, "", { flag: "wx" });
-  try {
-    await applyFileOperations(plan.projectRoot, plan.operations, createdDirectories);
-    let verification: ScaffoldVerification;
-    if (context.deferVerification) {
-      verification = {
-        status: "skipped",
-        reason: "Validation is deferred until project creation finishes.",
-        command: "bun run check",
-      };
-    } else if (packages.length > 0 && plan.request.install) {
-      context.onProgress?.("Installing dependencies...");
-      await run(
-        context,
-        [context.bunExecutable ?? process.execPath, "install"],
-        ADD_FAILURE_CODES.installation,
-        plan.projectRoot,
-      );
-      verification = await check(plan, context);
-    } else if (packages.length > 0 && !(await packagesAvailable(plan.projectRoot, packages))) {
-      verification = {
-        status: "skipped",
-        reason: `New packages are not installed: ${packages.join(", ")}`,
-        command: "bun run check",
-      };
-    } else {
-      verification = await check(plan, context);
-    }
-    return Object.freeze({
-      ok: true,
-      command: "add",
-      kind: plan.request.kind,
-      projectRoot: plan.projectRoot,
-      createdFiles: Object.freeze(
-        plan.operations.filter((item) => item.action === "create").map((item) => item.path),
-      ),
-      updatedFiles: Object.freeze(
-        plan.operations.filter((item) => item.action === "update").map((item) => item.path),
-      ),
-      installedPackages: Object.freeze(plan.request.install ? packages : []),
-      warnings: plan.warnings,
-      verification,
-      nextSteps: Object.freeze([
-        ...plan.nextSteps,
-        ...(verification.status === "skipped" && !context.deferVerification
-          ? ["bun install", verification.command]
-          : []),
-      ]),
-    });
-  } catch (error) {
-    await restoreFiles(snapshots, createdDirectories);
-    if (context.signal?.aborted) {
-      throw new AddScaffoldError(ADD_FAILURE_CODES.cancellation, "Scaffolding was cancelled.");
-    }
-    if (error instanceof AddScaffoldError) throw error;
-    throw new AddScaffoldError(ADD_FAILURE_CODES.validation, message(error));
-  } finally {
-    await rm(marker, { force: true });
-  }
-}
-
-async function check(
-  plan: ScaffoldPlan,
-  context: ApplyScaffoldContext,
-): Promise<ScaffoldVerification> {
-  context.onProgress?.("Checking project...");
-  const executable = await resolveRelkitExecutable(context, plan.projectRoot);
-  await run(
-    context,
-    [executable, "check", "--project-root", plan.projectRoot],
-    ADD_FAILURE_CODES.validation,
-    plan.projectRoot,
+  if (context.signal?.aborted) throw cancelled();
+  let program = applyScaffoldPlanEffect(plan, context).pipe(
+    Effect.provide(scaffoldTransactionLive),
   );
-  return { status: "passed", command: "bun run check" };
-}
-
-async function run(
-  context: ApplyScaffoldContext,
-  command: readonly string[],
-  code: typeof ADD_FAILURE_CODES.installation | typeof ADD_FAILURE_CODES.validation,
-  cwd: string,
-): Promise<void> {
-  throwIfAborted(context.signal);
-  const result = context.commandRunner
-    ? await context.commandRunner(command, cwd, context.signal)
-    : await defaultRunner(command, cwd, context.signal);
-  if (result.exitCode !== 0) {
-    throw new AddScaffoldError(
-      code,
-      result.stderr?.trim() || result.stdout?.trim() || `${command[0]} failed.`,
+  if (context.commandRunner !== undefined)
+    program = program.pipe(Effect.provide(generatorProcessLayer(context.commandRunner)));
+  try {
+    return await runGeneratorPromise(program, context.signal);
+  } catch (error) {
+    if (context.signal?.aborted)
+      throw transferCleanupFailures(context.signal, transferCleanupFailures(error, cancelled()));
+    if (error instanceof AddScaffoldError) throw error;
+    throw transferCleanupFailures(
+      error,
+      new AddScaffoldError(ADD_FAILURE_CODES.validation, errorMessage(error)),
     );
   }
-  throwIfAborted(context.signal);
 }
 
-async function defaultRunner(
-  command: readonly string[],
-  cwd: string,
-  signal?: AbortSignal,
-): Promise<AddCommandResult> {
-  const process = Bun.spawn([...command], {
-    cwd,
-    stdout: "pipe",
-    stderr: "pipe",
-    ...(signal ? { signal } : {}),
-  });
-  const [exitCode, stdout, stderr] = await Promise.all([
-    process.exited,
-    new Response(process.stdout).text(),
-    new Response(process.stderr).text(),
-  ]);
-  return { exitCode, stdout, stderr };
-}
-
-async function packagesAvailable(root: string, packages: readonly string[]): Promise<boolean> {
-  const results = await Promise.all(
-    packages.map((name) =>
-      access(join(root, "node_modules", ...name.split("/"))).then(
-        () => true,
-        () => false,
-      ),
-    ),
-  );
-  return results.every(Boolean);
-}
-
-function throwIfAborted(signal: AbortSignal | undefined): void {
-  if (signal?.aborted) {
-    throw new AddScaffoldError(ADD_FAILURE_CODES.cancellation, "Scaffolding was cancelled.");
-  }
-}
-
-function message(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
+import { transactionEffect } from "./add-transaction-workflow.js";
+import { cancelled } from "./add-transaction-process.js";
