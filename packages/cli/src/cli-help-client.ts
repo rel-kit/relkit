@@ -1,5 +1,6 @@
 import { argument, command, option } from "./cli-help-builders.js";
 
+/** Static client command metadata; contract fetching is owned by the client service. */
 export const clientHelp = command(
   "client",
   "Generate a client from a running application",

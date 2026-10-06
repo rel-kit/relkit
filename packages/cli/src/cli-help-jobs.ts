@@ -1,6 +1,7 @@
 import { command, option, title } from "./cli-help-builders.js";
 import { environment, projectRoot } from "./cli-help-options.js";
 
+/** Static jobs command tree; provider acquisition and run streams occur during execution. */
 export const jobs = command(
   "jobs",
   "Inspect and operate task-backed jobs",
