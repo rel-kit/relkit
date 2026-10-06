@@ -1,39 +1,33 @@
 import { canonicalGraphJson } from "@relkit/graph";
+import { Effect } from "effect";
+import { cliTry } from "../cli-errors.js";
+import { observeCli, runCliEffect } from "../cli-runtime.js";
+import { graphFilesLayer } from "./graph-file.service.js";
+import type { ParsedGraphArgs } from "./graph.types.js";
 import { CLI_EXIT_CODES, type CliCommandContext } from "../main-support.js";
 import {
-  checkGraph,
-  diffGraphFiles,
+  checkGraphEffect,
+  diffGraphFilesEffect,
   GraphCommandError,
-  printGraph,
+  printGraphEffect,
   type GraphDiffResult,
   type GraphFileOptions,
 } from "./graph-support.js";
 
 export * from "./graph-support.js";
 
-/** Runs `relkit graph print|check|diff` through the shared CLI reporter. */
+/**
+ * Runs graph commands through the existing reporter and exit-code boundary.
+ * @param args - Graph subcommand and flags.
+ * @param context - Existing output presentation policy.
+ * @returns Established success, failure, or usage exit status.
+ */
 export async function runGraph(
   args: readonly string[],
   context: Pick<CliCommandContext, "json" | "reporter">,
 ): Promise<number> {
   try {
-    const parsed = parseArgs(args);
-    if (parsed.command === "print") {
-      const result = await printGraph(fileOptions(parsed));
-      context.reporter.output(result, canonicalGraphJson(result.graph));
-      return CLI_EXIT_CODES.success;
-    }
-    if (parsed.command === "check") {
-      const result = await checkGraph({
-        ...fileOptions(parsed),
-        ...(parsed.expectedHash === undefined ? {} : { expectedHash: parsed.expectedHash }),
-      });
-      context.reporter.output(result, `Graph is valid. Hash: ${result.graphHash}`);
-      return CLI_EXIT_CODES.success;
-    }
-    const result = await diffGraphFiles(parsed.paths[0]!, parsed.paths[1]!, fileOptions(parsed));
-    context.reporter.output(result, formatDiff(result));
-    return CLI_EXIT_CODES.success;
+    return await runCliEffect(runGraphEffect(args, context), graphFilesLayer);
   } catch (error) {
     const code =
       error instanceof Error && "code" in error ? String(error.code) : "RELKIT_GRAPH_FAILED";
@@ -42,14 +36,46 @@ export async function runGraph(
   }
 }
 
-type ParsedArgs = {
-  readonly command: "print" | "check" | "diff";
-  readonly paths: readonly string[];
-  readonly expectedHash?: string;
-  readonly projectRoot?: string;
-};
+/**
+ * Composes graph operations lazily without starting a nested runtime.
+ * @param args - Graph subcommand and flags.
+ * @param context - Existing reporter, receiving unchanged result shapes.
+ * @returns A lazy reported exit code requiring CliGraphFiles.
+ */
+export const runGraphEffect = Effect.fn("Graph.command")(
+  function* (args: readonly string[], context: Pick<CliCommandContext, "json" | "reporter">) {
+    const parsed = yield* cliTry("graph.args", () => parseArgs(args));
+    if (parsed.command === "print") {
+      const result = yield* printGraphEffect(fileOptions(parsed));
+      context.reporter.output(result, canonicalGraphJson(result.graph));
+      return CLI_EXIT_CODES.success;
+    }
+    if (parsed.command === "check") {
+      const result = yield* checkGraphEffect({
+        ...fileOptions(parsed),
+        ...(parsed.expectedHash === undefined ? {} : { expectedHash: parsed.expectedHash }),
+      });
+      context.reporter.output(result, `Graph is valid. Hash: ${result.graphHash}`);
+      return CLI_EXIT_CODES.success;
+    }
+    const result = yield* diffGraphFilesEffect(
+      parsed.paths[0]!,
+      parsed.paths[1]!,
+      fileOptions(parsed),
+    );
+    context.reporter.output(result, formatDiff(result));
+    return CLI_EXIT_CODES.success;
+  },
+  (effect) => observeCli("graph.command", effect),
+);
 
-function parseArgs(args: readonly string[]): ParsedArgs {
+/**
+ * Parses graph arguments without filesystem or module authority.
+ * @param args - Literal command arguments.
+ * @returns Validated graph argument selection.
+ * @throws GraphCommandError for usage errors.
+ */
+function parseArgs(args: readonly string[]): ParsedGraphArgs {
   const command = args[0];
   if (command !== "print" && command !== "check" && command !== "diff")
     throw new GraphCommandError(
@@ -87,13 +113,24 @@ function parseArgs(args: readonly string[]): ParsedArgs {
   };
 }
 
-function fileOptions(args: ParsedArgs, index = 0): GraphFileOptions {
+/**
+ * Selects one artifact from validated arguments.
+ * @param args - Parsed command arguments.
+ * @param index - Artifact position, defaulting to the first.
+ * @returns Optional root and path without default materialization.
+ */
+function fileOptions(args: ParsedGraphArgs, index = 0): GraphFileOptions {
   return {
     ...(args.projectRoot === undefined ? {} : { projectRoot: args.projectRoot }),
     ...(args.paths[index] === undefined ? {} : { graphPath: args.paths[index] }),
   };
 }
 
+/**
+ * Formats compatibility changes with the existing human output layout.
+ * @param result - Validated compatibility result.
+ * @returns Stable human-readable lines.
+ */
 function formatDiff(result: GraphDiffResult): string {
   const lines = [`Before: ${result.beforeHash}`, `After: ${result.afterHash}`];
   if (result.changes.length === 0) return [...lines, "No compatibility changes."].join("\n");
