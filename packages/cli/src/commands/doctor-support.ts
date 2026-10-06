@@ -1,82 +1,19 @@
-import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { ConfigValidationError, loadConfig, type LoadedToolingConfig } from "@relkit/compiler";
-import {
-  checkAws,
-  checkLockfile,
-  checkPorts,
-  checkPulumi,
-  checkRoots,
-  availablePort,
-} from "./doctor-checks.js";
-import { detectDeployment, isAppDescriptor, readJson, versionChecks } from "./doctor-compat.js";
+import type { DoctorResult, ParsedDoctorArgs } from "./doctor.types.js";
+import { DoctorCommandError } from "./doctor-error.js";
+export type {
+  DoctorCheck,
+  DoctorResult,
+  DoctorOptions,
+  DoctorCommandRunner,
+} from "./doctor.types.js";
+export { DoctorCommandError } from "./doctor-error.js";
+export { doctorProject } from "./doctor-project.service.js";
 
-export interface DoctorCheck {
-  readonly name: string;
-  readonly ok: boolean;
-  readonly message: string;
-  readonly details?: Readonly<Record<string, unknown>>;
-}
-export interface DoctorResult {
-  readonly ok: boolean;
-  readonly command: "doctor";
-  readonly projectRoot: string;
-  readonly checks: readonly DoctorCheck[];
-}
-export interface DoctorOptions {
-  readonly projectRoot?: string;
-  readonly source?: Readonly<Record<string, string | undefined>>;
-  readonly backendPort?: number;
-  readonly inspectorPort?: number;
-  readonly skipPorts?: boolean;
-  readonly deploymentEnabled?: boolean;
-  readonly commandRunner?: DoctorCommandRunner;
-  readonly portProbe?: (port: number) => Promise<boolean>;
-}
-export type DoctorCommandRunner = (
-  command: readonly string[],
-  cwd: string,
-) => Promise<{ readonly exitCode: number }>;
-
-export class DoctorCommandError extends Error {
-  readonly code: string;
-  constructor(code: string, message: string) {
-    super(message);
-    this.name = "DoctorCommandError";
-    this.code = code;
-  }
-}
-
-type ParsedDoctorArgs = Pick<DoctorOptions, "projectRoot" | "backendPort" | "inspectorPort"> & {
-  readonly skipPorts?: boolean;
-  readonly deploymentEnabled?: boolean;
-};
-
-export async function doctorProject(options: DoctorOptions = {}): Promise<DoctorResult> {
-  const root = resolve(options.projectRoot ?? process.cwd());
-  const checks: DoctorCheck[] = [];
-  const manifest = await readJson(join(root, "package.json"));
-  checks.push(...(await versionChecks(manifest, root)));
-  const config = await checkConfig(root, checks);
-  const app = await checkApp(root, config, checks);
-  const enabled = options.deploymentEnabled ?? detectDeployment(manifest, config);
-  checks.push(await checkPulumi(enabled, root, options.commandRunner));
-  checks.push(checkAws(enabled, options.source ?? process.env));
-  checks.push(await checkRoots(root));
-  checks.push(
-    options.skipPorts
-      ? { name: "ports", ok: true, message: "Port availability check skipped." }
-      : await checkPorts(config, options, options.portProbe ?? availablePort),
-  );
-  checks.push(await checkLockfile(root, options.commandRunner));
-  return Object.freeze({
-    ok: checks.every((check) => check.ok),
-    command: "doctor",
-    projectRoot: root,
-    checks: Object.freeze(checks.map((check) => Object.freeze(check))),
-  });
-}
-
+/** Parses doctor flags in order, retaining the last explicit prerequisite override.
+ * @param args - Literal command arguments.
+ * @returns Defined options without manufacturing absent defaults.
+ * @throws DoctorCommandError for unknown flags, missing values or invalid ports.
+ */
 export function parseDoctorArgs(args: readonly string[]): ParsedDoctorArgs {
   let projectRoot: string | undefined;
   let backendPort: number | undefined;
@@ -104,72 +41,47 @@ export function parseDoctorArgs(args: readonly string[]): ParsedDoctorArgs {
   };
 }
 
-async function checkConfig(
-  root: string,
-  checks: DoctorCheck[],
-): Promise<LoadedToolingConfig | undefined> {
-  try {
-    const loaded = await import(
-      `${pathToFileURL(join(root, "relkit.config.ts")).href}?relkit_doctor=1`
-    );
-    const config = loadConfig((loaded as { readonly default?: unknown }).default ?? loaded, root);
-    checks.push({ name: "config", ok: true, message: "relkit.config.ts is valid." });
-    return config;
-  } catch (error) {
-    const detail =
-      error instanceof ConfigValidationError
-        ? error.issues.map((issue) => `${issue.path}:${issue.code}`).join(", ")
-        : "file is missing or could not be loaded";
-    checks.push({ name: "config", ok: false, message: `Invalid relkit.config.ts (${detail}).` });
-    return undefined;
-  }
-}
-
-async function checkApp(
-  root: string,
-  config: LoadedToolingConfig | undefined,
-  checks: DoctorCheck[],
-): Promise<unknown> {
-  if (config === undefined) {
-    checks.push({
-      name: "app",
-      ok: false,
-      message: "App cannot be checked because config is invalid.",
-    });
-    return undefined;
-  }
-  try {
-    const file = "relkit.config.ts";
-    const loaded = await import(`${pathToFileURL(resolve(root, file)).href}?relkit_doctor_app=1`);
-    const app = (loaded as { readonly default?: unknown }).default;
-    const ok = isAppDescriptor(app);
-    checks.push({
-      name: "app",
-      ok,
-      message: ok ? `${file} defines the application.` : `${file} is not a valid app config.`,
-    });
-    return app;
-  } catch {
-    checks.push({ name: "app", ok: false, message: "relkit.config.ts could not be loaded." });
-    return undefined;
-  }
-}
-
+/** Checks the existing numeric port contract.
+ * @param value - Parsed numeric input.
+ * @param dynamic - Whether zero requests a dynamic backend listener.
+ * @returns Whether the input is in the admitted integer range.
+ */
 function validPort(value: number, dynamic: boolean): boolean {
   return Number.isInteger(value) && value >= (dynamic ? 0 : 1) && value <= 65535;
 }
+
+/** Validates one explicit port without acquiring a listener.
+ * @param value - Literal flag value.
+ * @param option - Existing diagnostic flag name.
+ * @param dynamic - Whether zero is admitted.
+ * @returns Valid port.
+ * @throws DoctorCommandError for invalid values.
+ */
 function parsePort(value: string, option: string, dynamic: boolean): number {
   const port = Number(value);
   if (!validPort(port, dynamic))
     throw new DoctorCommandError("RELKIT_DOCTOR_USAGE", `${option} must be a valid port.`);
   return port;
 }
+
+/** Requires a value before another flag can be interpreted as data.
+ * @param args - Literal arguments.
+ * @param index - Requested value position.
+ * @param option - Existing diagnostic flag name.
+ * @returns The selected value.
+ * @throws DoctorCommandError when absent or flag-like.
+ */
 function requiredValue(args: readonly string[], index: number, option: string): string {
   const value = args[index];
   if (value === undefined || value.startsWith("-"))
     throw new DoctorCommandError("RELKIT_DOCTOR_USAGE", `${option} requires a value.`);
   return value;
 }
+
+/** Formats prerequisite checks using the established terminal rows.
+ * @param result - Complete report.
+ * @returns Existing human output without environment values.
+ */
 export function formatDoctor(result: DoctorResult): string {
   return [
     ...result.checks.map((check) => `${check.ok ? "✓" : "✗"} ${check.name}: ${check.message}`),
