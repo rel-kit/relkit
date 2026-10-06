@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import {
   booleanArgs,
   booleanFlag,
@@ -9,6 +9,12 @@ import {
   type SelectInvocation,
 } from "./cli-command-shared.js";
 
+/** Builds local-service syntax without acquiring containers or leases.
+ *
+ * @param select - Invocation recorder; execution retains separate Docker consent.
+ *
+ * @returns The pure local up/status/stop/reset tree.
+ */
 export function localCommand(select: SelectInvocation) {
   const commands = (["up", "status", "stop", "reset"] as const).map((name) => {
     const path = ["local", name] as const;

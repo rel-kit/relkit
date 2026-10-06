@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import {
   booleanArgs,
   booleanFlag,
@@ -11,6 +11,12 @@ import {
   type SelectInvocation,
 } from "./cli-command-shared.js";
 
+/** Builds deployment syntax without acquiring a native workspace or invoking Pulumi.
+ *
+ * @param select - Invocation recorder; execution owns confirmation and secret handling.
+ *
+ * @returns The pure deployment parser tree.
+ */
 export function deployCommand(select: SelectInvocation) {
   const operations = ["init", "preview", "up", "refresh", "outputs", "destroy"] as const;
   const commands = operations.map((operation) => {

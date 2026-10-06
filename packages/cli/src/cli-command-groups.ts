@@ -1,5 +1,5 @@
 import { Effect, Option } from "effect";
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import {
   booleanArgs,
   booleanFlag,
@@ -14,6 +14,12 @@ import { localCommand } from "./cli-command-local.js";
 import { clientCommand } from "./cli-command-client.js";
 import { jobsCommand } from "./cli-command-jobs.js";
 
+/** Builds grouped command syntax without executing any domain operation.
+ *
+ * @param select - Invocation recorder.
+ *
+ * @returns Graph, env, deploy, client, local and jobs in root help order.
+ */
 export function groupCommands(select: SelectInvocation) {
   return [
     graphCommand(select),
@@ -25,6 +31,11 @@ export function groupCommands(select: SelectInvocation) {
   ] as const;
 }
 
+/**
+ * Builds graph inspection syntax from static help.
+ * @param select - Invocation recorder.
+ * @returns Pure graph inspection syntax.
+ */
 function graphCommand(select: SelectInvocation) {
   const print = graphFileCommand(select, "print");
   const checkPath = ["graph", "check"] as const;
@@ -74,6 +85,13 @@ function graphCommand(select: SelectInvocation) {
   ]);
 }
 
+/**
+ * Builds one optional graph-file positional parser.
+ * @param select - Invocation recorder.
+ * @param name - Graph operation.
+ *
+ * @returns A parser retaining an optional graph path.
+ */
 function graphFileCommand(select: SelectInvocation, name: "print") {
   const path = ["graph", name] as const;
   return document(
@@ -96,6 +114,11 @@ function graphFileCommand(select: SelectInvocation, name: "print") {
   );
 }
 
+/**
+ * Builds value-free environment inspection syntax.
+ * @param select - Invocation recorder.
+ * @returns Pure value-free environment syntax.
+ */
 function envCommand(select: SelectInvocation) {
   const commands = (["check", "list"] as const).map((name) => envStatusCommand(select, name));
   const explainPath = ["env", "explain"] as const;
@@ -148,6 +171,13 @@ function envCommand(select: SelectInvocation) {
   );
 }
 
+/**
+ * Builds an environment status parser.
+ * @param select - Invocation recorder.
+ * @param name - Status operation.
+ *
+ * @returns A parser with explicit project/environment selection.
+ */
 function envStatusCommand(select: SelectInvocation, name: "check" | "list") {
   const path = ["env", name] as const;
   return document(
@@ -170,6 +200,11 @@ function envStatusCommand(select: SelectInvocation, name: "check" | "list") {
   );
 }
 
+/**
+ * Serializes an optional positional value without evaluating it.
+ * @param value - Parsed optional positional value.
+ * @returns Zero or one literal argument.
+ */
 function optionalArgument(value: Option.Option<string>): readonly string[] {
   return Option.isSome(value) ? [value.value] : [];
 }

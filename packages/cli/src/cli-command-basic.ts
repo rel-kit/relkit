@@ -1,5 +1,5 @@
 import { Effect, Option } from "effect";
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import {
   booleanArgs,
   booleanFlag,
@@ -12,6 +12,12 @@ import {
   type SelectInvocation,
 } from "./cli-command-shared.js";
 
+/** Builds the six direct project command parsers without executing them.
+ *
+ * @param select - Records a parsed invocation.
+ *
+ * @returns Create, dev, check, build, start and doctor in root help order.
+ */
 export function basicCommands(select: SelectInvocation) {
   const createPath = ["create"] as const;
   const create = document(
@@ -63,6 +69,16 @@ export function basicCommands(select: SelectInvocation) {
   ] as const;
 }
 
+/** Builds one project parser with only its supported optional flags.
+ *
+ * @param select - Invocation recorder.
+ * @param name - Command name.
+ *
+ * @param port - Includes the application port.
+ * @param inspectorPort - Includes inspector flags.
+ *
+ * @returns A pure command retaining existing argument serialization.
+ */
 function projectCommand(
   select: SelectInvocation,
   name: "dev" | "check" | "build" | "start",
@@ -105,6 +121,12 @@ function projectCommand(
   );
 }
 
+/** Builds prerequisite-selection syntax without probing the host.
+ *
+ * @param select - Invocation recorder.
+ *
+ * @returns The pure doctor command.
+ */
 function doctorCommand(select: SelectInvocation) {
   const path = ["doctor"] as const;
   return document(
