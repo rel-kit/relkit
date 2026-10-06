@@ -1,178 +1,198 @@
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
+import { Effect } from "effect";
+
+import { observeExecution } from "@relkit/contracts/operation";
+
+import { GeneratorFileSystem } from "./generator-filesystem.js";
+
+import {
+  scaffoldErrors,
+  type GeneratorDomainError,
+  type GeneratorIoError,
+} from "./generator-errors.js";
+
+import { runGeneratorPromise } from "./generator-runtime.js";
+
 import { normalizeArtifactName } from "./add-name.js";
+
 import { PlanBuilder } from "./plan-builder.js";
+
 import type { DiscoveredProfile } from "./project-discovery-types.js";
+
 import {
   defaultProviderProfile,
   providerDefinitions,
   requireAwsDeployment,
-  type ProviderDefinition,
 } from "./provider-planning-definitions.js";
+
 import { addFactoryObjectMember, addSourceImport } from "./source-edit.js";
-const { awsDefinition, connectedCloudflare, connectedRedis, connectedS3, dockerDefinition } =
-  providerDefinitions;
 
-export type ProviderCapability = "cache" | "bucket" | "event" | "job";
+/**
+ * Plans ensure provider profile through the owning request and typed filesystem authority.
+ * @param builder - Per-request planning owner.
+ * @param capability - Requested provider capability.
+ * @param options - Explicit options retaining existing defaults.
+ * @returns The reused or newly planned provider profile name.
+ */
+export const ensureProviderProfileEffect = Effect.fn("Scaffold.ensureProviderProfile")(
+  function* (
+    builder: PlanBuilder,
+    capability: ProviderCapability,
+    options: EnsureProfileOptions = {},
+  ): Effect.fn.Return<string, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem> {
+    const configCapability = capability === "job" && options.legacy !== true ? "jobs" : capability;
+    const profiles = builder.profiles.filter((item) => item.capability === capability);
+    const explicitSource = options.provider !== undefined || options.source !== undefined;
+    if (options.requested) {
+      const existing = profiles.find((item) => item.name === options.requested);
+      if (existing && !explicitSource) return yield* reuseProfileEffect(builder, existing);
+    } else if (!explicitSource) {
+      const configured =
+        profiles.find((item) => item.isDefault) ??
+        (profiles.length === 1 ? profiles[0] : undefined);
+      if (configured) return yield* reuseProfileEffect(builder, configured);
+    }
+    const name = normalizeArtifactName(
+      options.requested ?? defaultProviderProfile(capability, options.provider, options.source),
+    ).fileStem;
+    const definition = definitionFor(capability, options);
+    const existing = profiles.find((item) => item.name === name);
+    if (existing) {
+      if (existing.adapter && !sameProviderAdapter(existing.adapter, definition.adapter)) {
+        usage(
+          `Provider profile ${name} already uses ${existing.adapter}, not ${definition.adapter}.`,
+        );
+      }
+      return yield* reuseProfileEffect(builder, existing);
+    }
+    if (options.source === "aws") requireAwsDeployment(builder.discovery.awsPulumiDeployment);
+    for (const dependency of definition.dependencies) yield* builder.dependencyEffect(dependency);
+    for (const declaration of definition.imports) {
+      yield* builder.updateEffect("relkit.config.ts", (source) =>
+        addSourceImport(source, "relkit.config.ts", declaration),
+      );
+    }
+    for (const environment of definition.environment) {
+      yield* ensureEnvironmentEffect(builder, environment.name, environment.definition);
+    }
+    yield* builder.updateEffect("relkit.config.ts", (source) => {
+      const path = profiles.length === 0 ? [] : [configCapability];
+      const member =
+        profiles.length === 0
+          ? `${configCapability}: { ${JSON.stringify(name)}: ${definition.expression} }`
+          : `${JSON.stringify(name)}: ${definition.expression}`;
+      return addFactoryObjectMember(
+        source,
+        "relkit.config.ts",
+        [builder.discovery.appFactory],
+        path,
+        profiles.length === 0 ? configCapability : name,
+        member,
+      );
+    });
+    if (!profiles.some((item) => item.isDefault)) {
+      yield* builder.updateEffect("relkit.config.ts", (source) =>
+        addFactoryObjectMember(
+          source,
+          "relkit.config.ts",
+          [builder.discovery.appFactory],
+          ["defaults"],
+          configCapability,
+          `${configCapability}: "${name}"`,
+        ),
+      );
+    }
+    if (definition.warning)
+      yield* builder.warningEffect(definition.warning.code, definition.warning.message);
+    if (definition.adapter === "docker") yield* builder.nextStepEffect("relkit local up");
+    yield* builder.registerProfileEffect({
+      capability,
+      name,
+      adapter: definition.adapter,
+      isDefault: !profiles.some((item) => item.isDefault),
+    });
+    return name;
+  },
+  (effect) =>
+    observeExecution("generator", "planning.ensureProviderProfile", scaffoldErrors(effect)),
+);
 
-export interface EnsureProfileOptions {
-  readonly requested?: string | undefined;
-  readonly provider?: string | undefined;
-  readonly source?: "docker" | "connected" | "aws" | undefined;
-  readonly legacy?: boolean | undefined;
-}
+/**
+ * Plans ensure environment through the owning request and typed filesystem authority.
+ * @param builder - Per-request planning owner.
+ * @param name - Authored name or declaration key.
+ * @param definition - Rendered environment schema expression.
+ * @param example - Example value included only when adding a declaration.
+ * @returns Completion after the environment schema and missing example value are planned.
+ */
+export const ensureEnvironmentEffect = Effect.fn("Scaffold.ensureEnvironment")(
+  function* (
+    builder: PlanBuilder,
+    name: string,
+    definition: string,
+    example = "",
+  ): Effect.fn.Return<void, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem> {
+    const path = builder.discovery.envPath
+      ? builder.relative(builder.discovery.envPath)
+      : "relkit.config.ts";
+    yield* builder.updateEffect(path, (source) =>
+      addFactoryObjectMember(source, path, ["defineEnv"], [], name, `${name}: ${definition}`),
+    );
+    yield* builder.envExampleEffect(name, example);
+  },
+  (effect) => observeExecution("generator", "planning.ensureEnvironment", scaffoldErrors(effect)),
+);
 
-export async function ensureProviderProfile(
+/**
+ * Composes reuse Profile with explicit services, typed failures and owned resource lifetime.
+ * @param builder - Per-request planning owner.
+ * @param profile - Selected provider profile.
+ * @returns The existing profile name after required Docker warnings/next steps are retained.
+ */
+const reuseProfileEffect = Effect.fn("Scaffold.reuseProfile")(
+  function* (builder: PlanBuilder, profile: DiscoveredProfile) {
+    if (profile.adapter?.startsWith("docker")) {
+      const warning = providerDefinitions.dockerWarning;
+      yield* builder.warningEffect(warning.code, warning.message);
+      yield* builder.nextStepEffect("relkit local up");
+    }
+    return profile.name;
+  },
+  (effect) => observeExecution("generator", "planning.reuseProfile", effect),
+);
+
+/**
+ * Preserves the ensureProviderProfile Promise compatibility API.
+ * @param builder - Per-request planning owner.
+ * @param capability - Requested provider capability.
+ * @param options - Explicit options retaining existing defaults.
+ * @returns The chosen existing or newly planned provider profile name.
+ */
+export function ensureProviderProfile(
   builder: PlanBuilder,
   capability: ProviderCapability,
   options: EnsureProfileOptions = {},
 ): Promise<string> {
-  const configCapability = capability === "job" && options.legacy !== true ? "jobs" : capability;
-  const profiles = builder.profiles.filter((item) => item.capability === capability);
-  const explicitSource = options.provider !== undefined || options.source !== undefined;
-  if (options.requested) {
-    const existing = profiles.find((item) => item.name === options.requested);
-    if (existing && !explicitSource) return reuseProfile(builder, existing);
-  } else if (!explicitSource) {
-    const configured =
-      profiles.find((item) => item.isDefault) ?? (profiles.length === 1 ? profiles[0] : undefined);
-    if (configured) return reuseProfile(builder, configured);
-  }
-  const name = normalizeArtifactName(
-    options.requested ?? defaultProviderProfile(capability, options.provider, options.source),
-  ).fileStem;
-  const definition = definitionFor(capability, options);
-  const existing = profiles.find((item) => item.name === name);
-  if (existing) {
-    if (existing.adapter && !sameProviderAdapter(existing.adapter, definition.adapter)) {
-      usage(
-        `Provider profile ${name} already uses ${existing.adapter}, not ${definition.adapter}.`,
-      );
-    }
-    return reuseProfile(builder, existing);
-  }
-  if (options.source === "aws") requireAwsDeployment(builder.discovery.awsPulumiDeployment);
-  for (const dependency of definition.dependencies) builder.dependency(dependency);
-  for (const declaration of definition.imports) {
-    await builder.update("relkit.config.ts", (source) =>
-      addSourceImport(source, "relkit.config.ts", declaration),
-    );
-  }
-  for (const environment of definition.environment) {
-    await ensureEnvironment(builder, environment.name, environment.definition);
-  }
-  await builder.update("relkit.config.ts", (source) => {
-    const path = profiles.length === 0 ? [] : [configCapability];
-    const member =
-      profiles.length === 0
-        ? `${configCapability}: { ${JSON.stringify(name)}: ${definition.expression} }`
-        : `${JSON.stringify(name)}: ${definition.expression}`;
-    return addFactoryObjectMember(
-      source,
-      "relkit.config.ts",
-      [builder.discovery.appFactory],
-      path,
-      profiles.length === 0 ? configCapability : name,
-      member,
-    );
-  });
-  if (!profiles.some((item) => item.isDefault)) {
-    await builder.update("relkit.config.ts", (source) =>
-      addFactoryObjectMember(
-        source,
-        "relkit.config.ts",
-        [builder.discovery.appFactory],
-        ["defaults"],
-        configCapability,
-        `${configCapability}: "${name}"`,
-      ),
-    );
-  }
-  if (definition.warning) builder.warning(definition.warning.code, definition.warning.message);
-  if (definition.adapter === "docker") builder.nextStep("relkit local up");
-  builder.registerProfile({
-    capability,
-    name,
-    adapter: definition.adapter,
-    isDefault: !profiles.some((item) => item.isDefault),
-  });
-  return name;
+  return runGeneratorPromise(ensureProviderProfileEffect(builder, capability, options));
 }
 
-export async function ensureEnvironment(
+/**
+ * Preserves the ensureEnvironment Promise compatibility API.
+ * @param builder - Per-request planning owner.
+ * @param name - Authored name or declaration key.
+ * @param definition - Rendered environment schema expression.
+ * @param example - Example value included only when adding a declaration.
+ * @returns Completion after the existing contract has been applied.
+ */
+export function ensureEnvironment(
   builder: PlanBuilder,
   name: string,
   definition: string,
   example = "",
 ): Promise<void> {
-  const path = builder.discovery.envPath
-    ? builder.relative(builder.discovery.envPath)
-    : "relkit.config.ts";
-  await builder.update(path, (source) =>
-    addFactoryObjectMember(source, path, ["defineEnv"], [], name, `${name}: ${definition}`),
-  );
-  await builder.envExample(name, example);
+  return runGeneratorPromise(ensureEnvironmentEffect(builder, name, definition, example));
 }
 
-function definitionFor(
-  capability: ProviderCapability,
-  options: EnsureProfileOptions,
-): ProviderDefinition {
-  if (capability === "event" || capability === "job") return localDefinition(capability);
-  if (capability === "cache") return cacheDefinition(options);
-  return bucketDefinition(options);
-}
+import { definitionFor, usage, sameProviderAdapter } from "./provider-profile-definition.js";
 
-function localDefinition(capability: "event" | "job"): ProviderDefinition {
-  return {
-    adapter: capability === "event" ? "localEvent" : "localJob",
-    expression: capability === "event" ? "localEvent()" : "localJob()",
-    imports: [
-      `import { ${capability === "event" ? "localEvent" : "localJob"} } from "@relkit/local";`,
-    ],
-    dependencies: ["@relkit/local"],
-    environment: [],
-  };
-}
-
-function cacheDefinition(options: EnsureProfileOptions): ProviderDefinition {
-  const provider = options.provider ?? "redis";
-  const source = options.source ?? "docker";
-  if (provider === "cloudflare-kv") {
-    if (source !== "connected") usage("Cloudflare KV supports only --source connected.");
-    return connectedCloudflare("kv");
-  }
-  if (source === "aws") return awsDefinition("redis", 'aws(redis(), { engine: "valkey" })');
-  if (source === "connected") return connectedRedis();
-  return dockerDefinition("redis", "docker(redis())");
-}
-
-function bucketDefinition(options: EnsureProfileOptions): ProviderDefinition {
-  const provider = options.provider ?? "s3";
-  const source = options.source ?? "docker";
-  if (provider === "cloudflare-r2") {
-    if (source !== "connected") usage("Cloudflare R2 supports only --source connected.");
-    return connectedCloudflare("r2");
-  }
-  if (source === "aws") return awsDefinition("s3", "aws(s3(), { versioning: true })");
-  if (source === "connected") return connectedS3();
-  return dockerDefinition("s3", "docker(s3())");
-}
-
-function usage(message: string): never {
-  throw new AddScaffoldError(ADD_FAILURE_CODES.usage, message);
-}
-
-function reuseProfile(builder: PlanBuilder, profile: DiscoveredProfile): string {
-  if (profile.adapter?.startsWith("docker")) {
-    const warning = providerDefinitions.dockerWarning;
-    builder.warning(warning.code, warning.message);
-    builder.nextStep("relkit local up");
-  }
-  return profile.name;
-}
-
-function sameProviderAdapter(existing: string, requested: string): boolean {
-  return requested === "docker"
-    ? existing === "docker" || existing.startsWith("docker(")
-    : existing === requested;
-}
+import type { ProviderCapability, EnsureProfileOptions } from "./provider-planning.types.js";
+export type { ProviderCapability, EnsureProfileOptions } from "./provider-planning.types.js";
