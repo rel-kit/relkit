@@ -1,9 +1,22 @@
 import { canonicalJson } from "@relkit/contracts";
-import type { EnvIssue, EnvMetadata, EnvProjection, EnvValueType } from "@relkit/config";
+import type { EnvMetadata, EnvProjection, EnvValueType } from "@relkit/config";
+import type {
+  EnvStatus,
+  ParsedEnvArgs,
+  EnvCheckPresentation,
+  EnvExplainPresentation,
+} from "./env.types.js";
+export type { EnvStatus, ParsedEnvArgs, EnvCommandOptions, SafeEnvIssue } from "./env.types.js";
 
+/** Established environment exception with unchanged public code and constructor. */
 export class EnvCommandError extends Error {
   readonly code: string;
 
+  /**
+   * Constructs the existing environment command failure.
+   * @param code - Public diagnostic code.
+   * @param message - Existing safe failure text.
+   */
   constructor(code: string, message: string) {
     super(message);
     this.name = "EnvCommandError";
@@ -11,27 +24,12 @@ export class EnvCommandError extends Error {
   }
 }
 
-export type EnvStatus = "set" | "default" | "optional" | "missing" | "invalid";
-export type ParsedEnvArgs = {
-  readonly command: "check" | "example" | "explain" | "list";
-  readonly name?: string;
-  readonly environment?: string;
-  readonly projectRoot?: string;
-  readonly examplePath?: string;
-  readonly write: boolean;
-};
-export type EnvCommandOptions = {
-  readonly projectRoot?: string;
-  readonly definition?: import("@relkit/config").EnvDefinition<import("@relkit/config").EnvShape>;
-  readonly source?: import("@relkit/config").EnvSource;
-  readonly environment?: string;
-  readonly envPath?: string;
-  readonly examplePath?: string;
-};
-export type SafeEnvIssue = Pick<EnvIssue, "name" | "code" | "sensitive"> & {
-  readonly message: string;
-};
-
+/**
+ * Parses environment flags without reading source values.
+ * @param args - Subcommand and literal flags.
+ * @returns Parsed selection with optional overrides retained.
+ * @throws EnvCommandError for usage failures.
+ */
 export function parseEnvArgs(args: readonly string[]): ParsedEnvArgs {
   const command = args[0];
   if (command !== "check" && command !== "example" && command !== "explain" && command !== "list")
@@ -76,6 +74,11 @@ export function parseEnvArgs(args: readonly string[]): ParsedEnvArgs {
   };
 }
 
+/**
+ * Formats a safe example, redacting sensitive fields before considering values.
+ * @param field - Value-free projected field metadata.
+ * @returns A literal or safe placeholder for an example file.
+ */
 export function exampleValue(field: EnvProjection): string {
   if (field.sensitive) return "[redacted]";
   if (field.example !== undefined) return envValue(field.example);
@@ -93,42 +96,63 @@ export function exampleValue(field: EnvProjection): string {
   return placeholders[field.type];
 }
 
+/**
+ * Quotes one public example value for dotenv syntax.
+ * @param value - Authored public example.
+ * @returns Stable quoted or canonical JSON text.
+ */
 function envValue(value: unknown): string {
   if (typeof value === "string") return /[\s#"'\\\r\n]/.test(value) ? JSON.stringify(value) : value;
   return canonicalJson(value);
 }
+
+/**
+ * Reads an explicit value following an environment flag.
+ * @param args - Original arguments.
+ * @param index - Value position.
+ * @param option - Flag used in failure text.
+ * @returns Literal option value.
+ * @throws EnvCommandError when missing.
+ */
 function requiredValue(args: readonly string[], index: number, option: string): string {
   const value = args[index];
   if (value === undefined || value.startsWith("-"))
     throw new EnvCommandError("RELKIT_ENV_USAGE", `${option} requires a value.`);
   return value;
 }
+
+/**
+ * Determines requirement status without evaluating defaults or source values.
+ * @param field - Declaration requirement metadata.
+ * @param environment - Selected environment name.
+ * @returns Whether the field is required in that environment.
+ */
 export function isRequired(
   field: Pick<EnvMetadata, "requiredIn" | "optional">,
   environment: string,
 ): boolean {
   return field.requiredIn.length > 0 ? field.requiredIn.includes(environment) : !field.optional;
 }
-export function formatCheck(result: {
-  readonly ok: boolean;
-  readonly environment: string;
-  readonly items: readonly { readonly name: string; readonly status: EnvStatus }[];
-}): string {
+
+/**
+ * Formats the existing secret-free check report.
+ * @param result - Safe statuses and environment name.
+ * @returns Stable human output.
+ */
+export function formatCheck(result: EnvCheckPresentation): string {
   return [
     `Environment: ${result.environment}`,
     ...result.items.map((item) => `${item.name}: ${item.status}`),
     result.ok ? "Environment is valid." : "Environment is invalid.",
   ].join("\n");
 }
-export function formatExplain(result: {
-  readonly name: string;
-  readonly type: string;
-  readonly requiredIn: readonly string[];
-  readonly required: boolean;
-  readonly hasDefault: boolean;
-  readonly sensitive: boolean;
-  readonly description?: string;
-}): string {
+
+/**
+ * Formats value-free declaration guidance.
+ * @param result - Public metadata, excluding default and source values.
+ * @returns Stable human output.
+ */
+export function formatExplain(result: EnvExplainPresentation): string {
   return [
     result.name,
     `type: ${result.type}`,
