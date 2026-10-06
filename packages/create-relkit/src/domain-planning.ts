@@ -1,165 +1,158 @@
-import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "./add-types.js";
-import { normalizeArtifactName, type NormalizedArtifactName } from "./add-name.js";
+import { Effect } from "effect";
+
+import { observeExecution } from "@relkit/contracts/operation";
+
+import { GeneratorFileSystem } from "./generator-filesystem.js";
+
+import {
+  scaffoldErrors,
+  type GeneratorDomainError,
+  type GeneratorIoError,
+} from "./generator-errors.js";
+
+import { runGeneratorPromise } from "./generator-runtime.js";
+
+import { normalizeArtifactName } from "./add-name.js";
+
 import { PlanBuilder } from "./plan-builder.js";
-import type { DiscoveredArtifact, DiscoveredService } from "./project-discovery-types.js";
+
 import { addFactoryObjectMember, addSourceImport } from "./source-edit.js";
 
-export interface DomainTarget {
-  readonly domain: NormalizedArtifactName;
-  readonly servicePath: string;
-  readonly service: DiscoveredService | undefined;
-}
-
-export interface DomainArtifact {
-  readonly name: NormalizedArtifactName;
-  readonly path: string;
-  readonly id: string;
-  readonly binding: string;
-  readonly exportKind: "default" | "named";
-}
-
-export async function resolveDomain(builder: PlanBuilder): Promise<DomainTarget> {
-  const request = builder.request;
-  if (request.service && request.createService)
-    usage("--service and --create-service are exclusive.");
-  if (request.createService) {
-    const domain = normalizeArtifactName(request.createService);
-    if (builder.discovery.services.some((service) => service.domain === domain.fileStem)) {
-      collision(`Service ${domain.fileStem} already exists.`);
+/**
+ * Plans resolve domain through the owning request and typed filesystem authority.
+ * @param builder - Per-request planning owner.
+ * @returns The normalized owning domain and existing or newly planned service source.
+ */
+export const resolveDomainEffect = Effect.fn("Scaffold.resolveDomain")(
+  function* (
+    builder: PlanBuilder,
+  ): Effect.fn.Return<DomainTarget, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem> {
+    const request = builder.request;
+    if (request.service && request.createService)
+      usage("--service and --create-service are exclusive.");
+    if (request.createService) {
+      const domain = normalizeArtifactName(request.createService);
+      if (builder.discovery.services.some((service) => service.domain === domain.fileStem)) {
+        collision(`Service ${domain.fileStem} already exists.`);
+      }
+      const servicePath = `src/${domain.fileStem}/service.ts`;
+      yield* builder.createEffect(servicePath, serviceSource(domain));
+      return { domain, servicePath, service: undefined };
     }
-    const servicePath = `src/${domain.fileStem}/service.ts`;
-    await builder.create(servicePath, serviceSource(domain));
-    return { domain, servicePath, service: undefined };
-  }
-  const generic = builder.discovery.services.filter((service) => service.capability === "generic");
-  const selected = request.service
-    ? generic.find((service) =>
-        [service.domain, service.binding].includes(
-          normalizeArtifactName(request.service!).fileStem,
-        ),
-      )
-    : generic.length === 1
-      ? generic[0]
-      : undefined;
-  if (selected === undefined) {
-    usage(
-      request.service
-        ? `Unknown generic service: ${request.service}`
-        : generic.length === 0
-          ? "No generic service exists; use --create-service <name>."
-          : "Multiple generic services exist; use --service <name>.",
+    const generic = builder.discovery.services.filter(
+      (service) => service.capability === "generic",
     );
-  }
-  return {
-    domain: normalizeArtifactName(selected.domain),
-    servicePath: selected.path,
-    service: selected,
-  };
+    const selected = request.service
+      ? generic.find((service) =>
+          [service.domain, service.binding].includes(
+            normalizeArtifactName(request.service!).fileStem,
+          ),
+        )
+      : generic.length === 1
+        ? generic[0]
+        : undefined;
+    if (selected === undefined) {
+      usage(
+        request.service
+          ? `Unknown generic service: ${request.service}`
+          : generic.length === 0
+            ? "No generic service exists; use --create-service <name>."
+            : "Multiple generic services exist; use --service <name>.",
+      );
+    }
+    return {
+      domain: normalizeArtifactName(selected.domain),
+      servicePath: selected.path,
+      service: selected,
+    };
+  },
+  (effect) => observeExecution("generator", "planning.resolveDomain", scaffoldErrors(effect)),
+);
+
+/**
+ * Plans add public member through the owning request and typed filesystem authority.
+ * @param builder - Per-request planning owner.
+ * @param target - Discovered domain or artifact target.
+ * @param category - Service member collection receiving the rendered artifact.
+ * @param artifact - Normalized artifact identity, source path, binding and export metadata.
+ * @param artifactPath - Project-relative source path of the referenced artifact.
+ * @returns Completion after the member import and service collection reference are planned.
+ */
+export const addPublicMemberEffect = Effect.fn("Scaffold.addPublicMember")(
+  function* (
+    builder: PlanBuilder,
+    target: DomainTarget,
+    category: "functions" | "events" | "tasks" | "jobs",
+    artifact: DomainArtifact,
+    artifactPath: string,
+  ): Effect.fn.Return<void, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem> {
+    const importPath = sourceModule(artifactPath);
+    yield* builder.updateEffect(target.servicePath, (source) => {
+      const imported = addSourceImport(
+        source,
+        target.servicePath,
+        sourceImport(artifact.binding, importPath, artifact.exportKind),
+      );
+      return addFactoryObjectMember(
+        imported,
+        target.servicePath,
+        ["defineService"],
+        [category],
+        artifact.binding,
+        artifact.binding,
+      );
+    });
+  },
+  (effect) => observeExecution("generator", "planning.addPublicMember", scaffoldErrors(effect)),
+);
+
+/**
+ * Preserves the resolveDomain Promise compatibility API.
+ * @param builder - Per-request planning owner.
+ * @returns The normalized owning domain and existing or newly planned service source.
+ */
+export function resolveDomain(builder: PlanBuilder): Promise<DomainTarget> {
+  return runGeneratorPromise(resolveDomainEffect(builder));
 }
 
-export async function addPublicMember(
+/**
+ * Preserves the addPublicMember Promise compatibility API.
+ * @param builder - Per-request planning owner.
+ * @param target - Discovered domain or artifact target.
+ * @param category - Service member collection receiving the rendered artifact.
+ * @param artifact - Normalized artifact identity, source path, binding and export metadata.
+ * @param artifactPath - Project-relative source path of the referenced artifact.
+ * @returns Completion after the existing contract has been applied.
+ */
+export function addPublicMember(
   builder: PlanBuilder,
   target: DomainTarget,
   category: "functions" | "events" | "tasks" | "jobs",
   artifact: DomainArtifact,
   artifactPath: string,
 ): Promise<void> {
-  const importPath = sourceModule(artifactPath);
-  await builder.update(target.servicePath, (source) => {
-    const imported = addSourceImport(
-      source,
-      target.servicePath,
-      sourceImport(artifact.binding, importPath, artifact.exportKind),
-    );
-    return addFactoryObjectMember(
-      imported,
-      target.servicePath,
-      ["defineService"],
-      [category],
-      artifact.binding,
-      artifact.binding,
-    );
-  });
-}
-
-export function domainArtifact(
-  target: DomainTarget,
-  value: string,
-  directory: string,
-  fileSuffix: string,
-  kindSuffix?: string,
-  exportKind: "default" | "named" = "default",
-): DomainArtifact {
-  const name = normalizeArtifactName(value);
-  const suffix = kindSuffix ? normalizeArtifactName(kindSuffix) : undefined;
-  return {
-    name,
-    path: `src/${target.domain.fileStem}/${directory}/${name.fileStem}.${fileSuffix}.ts`,
-    id: `${target.domain.idSegment}.${name.idSegment}${suffix ? `-${suffix.idSegment}` : ""}`,
-    binding: `${name.identifier}${suffix ? capitalize(suffix.identifier) : ""}`,
-    exportKind,
-  };
-}
-
-export function resolveArtifact(
-  builder: PlanBuilder,
-  target: DomainTarget,
-  kind: DiscoveredArtifact["kind"],
-  value: string,
-): DiscoveredArtifact {
-  const normalized = normalizeArtifactName(value);
-  const candidates = builder.artifacts.filter(
-    (artifact) => artifact.domain === target.domain.fileStem && artifact.kind === kind,
+  return runGeneratorPromise(
+    addPublicMemberEffect(builder, target, category, artifact, artifactPath),
   );
-  const exact = candidates.find((artifact) =>
-    [artifact.binding, artifact.id, fileStem(artifact.path)].includes(value),
-  );
-  const normalizedMatch = candidates.find(
-    (artifact) =>
-      normalizeArtifactName(artifact.binding).fileStem === normalized.fileStem ||
-      normalizeArtifactName(fileStem(artifact.path)).fileStem === normalized.fileStem,
-  );
-  const result = exact ?? normalizedMatch;
-  if (result === undefined) usage(`Unknown ${kind} in ${target.domain.fileStem}: ${value}`);
-  return result;
 }
 
-export function assertAvailableId(builder: PlanBuilder, id: string): void {
-  if (builder.artifacts.some((artifact) => artifact.id === id)) {
-    collision(`Descriptor ID ${id} already exists.`);
-  }
-}
+import {
+  sourceModule,
+  sourceImport,
+  serviceSource,
+  usage,
+  collision,
+  fileStem,
+} from "./domain-artifact.js";
 
-export function sourceModule(path: string): string {
-  return `@app/${path.replace(/^src\//, "").replace(/\.ts$/, ".js")}`;
-}
+export {
+  domainArtifact,
+  resolveArtifact,
+  assertAvailableId,
+  sourceModule,
+  sourceImport,
+  serviceSource,
+} from "./domain-artifact.js";
 
-export function sourceImport(
-  binding: string,
-  module: string,
-  exportKind: "default" | "named" | undefined,
-): string {
-  return exportKind === "named"
-    ? `import { ${binding} } from "${module}";`
-    : `import ${binding} from "${module}";`;
-}
-
-export function serviceSource(domain: NormalizedArtifactName): string {
-  return `import { defineService } from "@relkit/app/services";\n\nexport default defineService({ id: "${domain.idSegment}" });\n`;
-}
-
-function usage(message: string): never {
-  throw new AddScaffoldError(ADD_FAILURE_CODES.usage, message);
-}
-
-function collision(message: string): never {
-  throw new AddScaffoldError(ADD_FAILURE_CODES.collision, message);
-}
-
-function capitalize(value: string): string {
-  return `${value[0]!.toUpperCase()}${value.slice(1)}`;
-}
-
-function fileStem(path: string): string {
-  return path.split("/").at(-1)!.split(".")[0]!;
-}
+import type { DomainTarget, DomainArtifact } from "./domain-planning.types.js";
+export type { DomainTarget, DomainArtifact } from "./domain-planning.types.js";

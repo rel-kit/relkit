@@ -1,7 +1,13 @@
 import * as ts from "typescript";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
 
-/** Adds or merges one import declaration without reprinting the source file. */
+/**
+ * Adds or merges one import declaration without reprinting the source file.
+ * @param source - Authored source text inspected or transformed without execution.
+ * @param fileName - Source path used for declaration diagnostics.
+ * @param declaration - Complete import declaration source.
+ * @returns Source with the requested import added or merged into its compatible existing declaration.
+ */
 export function addSourceImport(source: string, fileName: string, declaration: string): string {
   if (source.includes(declaration)) return source;
   const file = parse(fileName, source);
@@ -39,6 +45,12 @@ export function addSourceImport(source: string, fileName: string, declaration: s
   return append(source, file, declaration);
 }
 
+/**
+ * Parses TypeScript for source inspection without executing the application.
+ * @param fileName - Source path used in parser diagnostics.
+ * @param source - Authored TypeScript source text.
+ * @returns The SourceFile AST; parse errors raise the canonical unsupported-source error.
+ */
 function parse(fileName: string, source: string): ts.SourceFile {
   const file = ts.createSourceFile(
     fileName,
@@ -59,6 +71,13 @@ function parse(fileName: string, source: string): ts.SourceFile {
   return file;
 }
 
+/**
+ * Appends a new import after existing import declarations.
+ * @param source - Authored source text inspected or transformed without execution.
+ * @param file - TypeScript SourceFile AST whose imports are inspected.
+ * @param declaration - Complete import declaration source.
+ * @returns Source with the import inserted after existing imports or before the first statement.
+ */
 function append(source: string, file: ts.SourceFile, declaration: string): string {
   const imports = file.statements.filter(ts.isImportDeclaration);
   const offset = imports.at(-1)?.getEnd() ?? 0;

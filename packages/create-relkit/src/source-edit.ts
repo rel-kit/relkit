@@ -1,15 +1,30 @@
 import * as ts from "typescript";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
+
 export { addSourceImport } from "./source-import-edit.js";
 
-/** Appends one export declaration after validating the source syntax. */
+/**
+ * Appends one export declaration after validating the source syntax.
+ * @param source - Authored source text inspected or transformed without execution.
+ * @param fileName - Source path used for declaration diagnostics.
+ * @param declaration - Complete export declaration source.
+ * @returns Original source when present, otherwise source with the validated export appended.
+ */
 export function addSourceExport(source: string, fileName: string, declaration: string): string {
   if (source.includes(declaration)) return source;
   parse(fileName, source);
   return `${source.trimEnd()}\n${declaration}\n`;
 }
 
-/** Inserts one property into a canonical factory object or one nested object property. */
+/**
+ * Inserts one property into a canonical factory object or one nested object property.
+ * @param source - Authored source text inspected or transformed without execution.
+ * @param fileName - Source path used for declaration diagnostics.
+ * @param factories - Supported final segments of factory call names.
+ * @param path - Nested static property names containing the target member.
+ * @param memberName - Static object member name being inserted.
+ * @param memberSource - Source of the object member to insert.
+ * @returns Source with the member inserted, or unchanged when an identical member already exists.
+ */
 export function addFactoryObjectMember(
   source: string,
   fileName: string,
@@ -32,6 +47,13 @@ export function addFactoryObjectMember(
   return insertMember(source, target.parent ?? target.object, insertion);
 }
 
+/**
+ * Parses the one supported factory object before editing its declarations.
+ * @param source - Authored source text inspected or transformed without execution.
+ * @param fileName - Source path used for declaration diagnostics.
+ * @param factories - Supported final segments of factory call names.
+ * @returns The uniquely matched factory's object-literal argument.
+ */
 export function readFactoryObject(
   source: string,
   fileName: string,
@@ -40,6 +62,15 @@ export function readFactoryObject(
   return factoryObject(parse(fileName, source), factories);
 }
 
+/**
+ * Reads one literal string property from a supported factory call.
+ * @param source - Authored source text inspected or transformed without execution.
+ * @param fileName - Source path used for declaration diagnostics.
+ * @param factory - Supported factory call name.
+ * @param name - Authored name or declaration key.
+ * @param argumentIndex - Zero-based factory argument containing the static options object.
+ * @returns The literal string property, or undefined when absent or nonliteral.
+ */
 export function readFactoryStringProperty(
   source: string,
   fileName: string,
@@ -54,6 +85,11 @@ export function readFactoryStringProperty(
     : undefined;
 }
 
+/**
+ * Reads statically known property names without evaluating computed expressions.
+ * @param node - Optional property-name AST inspected for a static value.
+ * @returns The static identifier/string/number property text, or undefined for computed names.
+ */
 export function staticPropertyName(node: ts.PropertyName | undefined): string | undefined {
   if (node === undefined) return undefined;
   if (ts.isIdentifier(node) || ts.isStringLiteralLike(node) || ts.isNumericLiteral(node)) {
@@ -62,130 +98,12 @@ export function staticPropertyName(node: ts.PropertyName | undefined): string | 
   return undefined;
 }
 
-function factoryObject(
-  file: ts.SourceFile,
-  factories: readonly string[],
-  argumentIndex = 0,
-): ts.ObjectLiteralExpression {
-  const matches: ts.ObjectLiteralExpression[] = [];
-  const visit = (node: ts.Node): void => {
-    if (ts.isCallExpression(node) && factories.includes(lastSegment(node.expression))) {
-      const argument = unwrap(node.arguments[argumentIndex]);
-      if (!argument || !ts.isObjectLiteralExpression(argument)) unsupported(file.fileName);
-      matches.push(argument);
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(file);
-  if (matches.length !== 1) unsupported(file.fileName);
-  return matches[0]!;
-}
-
-function descend(
-  root: ts.ObjectLiteralExpression,
-  path: readonly string[],
-  source: string,
-  memberSource: string,
-): {
-  readonly object: ts.ObjectLiteralExpression;
-  readonly parent?: ts.ObjectLiteralExpression;
-  readonly name: string;
-  readonly created: boolean;
-} {
-  let object = root;
-  for (const [index, name] of path.entries()) {
-    assertObject(object, source);
-    const found = property(object, name);
-    if (found === undefined) {
-      if (index !== path.length - 1) unsupported("nested object");
-      return { object, parent: object, name, created: true };
-    }
-    if (!ts.isPropertyAssignment(found)) unsupported(name);
-    const value = unwrap(found.initializer);
-    if (!value || !ts.isObjectLiteralExpression(value)) unsupported(name);
-    object = value;
-  }
-  return { object, name: path.at(-1) ?? memberSource, created: false };
-}
-
-function insertMember(source: string, object: ts.ObjectLiteralExpression, member: string): string {
-  const close = object.getEnd() - 1;
-  const body = source.slice(object.getStart() + 1, close);
-  if (object.properties.length === 0) {
-    return `${source.slice(0, object.getStart() + 1)} ${member} ${source.slice(close)}`;
-  }
-  if (!body.includes("\n")) {
-    const last = object.properties.at(-1)!;
-    return `${source.slice(0, last.getEnd())}, ${member}${source.slice(last.getEnd())}`;
-  }
-  const last = object.properties.at(-1)!;
-  const between = source.slice(last.getEnd(), close);
-  const comma = between.trimStart().startsWith(",") ? "" : ",";
-  const lineStart = source.lastIndexOf("\n", close - 1) + 1;
-  const closeIndent = source.slice(lineStart, close);
-  return `${source.slice(0, last.getEnd())}${comma}${source.slice(last.getEnd(), close)}${closeIndent}  ${member},\n${closeIndent}${source.slice(close)}`;
-}
-
-function assertObject(object: ts.ObjectLiteralExpression, source: string): void {
-  for (const item of object.properties) {
-    if (ts.isSpreadAssignment(item) || staticPropertyName(item.name) === undefined) {
-      unsupported(source.slice(item.getStart(), item.getEnd()));
-    }
-  }
-}
-
-function property(
-  object: ts.ObjectLiteralExpression,
-  name: string,
-): ts.ObjectLiteralElementLike | undefined {
-  return object.properties.find((item) => staticPropertyName(item.name) === name);
-}
-
-function parse(fileName: string, source: string): ts.SourceFile {
-  const file = ts.createSourceFile(
-    fileName,
-    source,
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
-  const diagnostics = (
-    file as ts.SourceFile & { readonly parseDiagnostics?: readonly ts.Diagnostic[] }
-  ).parseDiagnostics;
-  if (diagnostics?.length) unsupported(fileName);
-  return file;
-}
-
-function unwrap(value: ts.Expression | undefined): ts.Expression | undefined {
-  let current = value;
-  while (
-    current &&
-    (ts.isParenthesizedExpression(current) ||
-      ts.isAsExpression(current) ||
-      ts.isSatisfiesExpression(current))
-  )
-    current = current.expression;
-  return current;
-}
-
-function lastSegment(expression: ts.Expression): string {
-  return ts.isIdentifier(expression)
-    ? expression.text
-    : ts.isPropertyAccessExpression(expression)
-      ? expression.name.text
-      : "";
-}
-
-function collision(fileName: string, path: readonly string[]): never {
-  throw new AddScaffoldError(
-    ADD_FAILURE_CODES.collision,
-    `${fileName} already declares ${path.join(".")}.`,
-  );
-}
-
-function unsupported(label: string): never {
-  throw new AddScaffoldError(
-    ADD_FAILURE_CODES.unsupportedSourceShape,
-    `Cannot safely edit canonical object in ${label}.`,
-  );
-}
+import {
+  factoryObject,
+  descend,
+  insertMember,
+  assertObject,
+  property,
+  parse,
+  collision,
+} from "./source-factory-edit.js";
