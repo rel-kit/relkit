@@ -99,26 +99,73 @@ test("creates a function for a new service and respects explicit creation headle
   });
 });
 
-test("prompts for all omitted create choices and preserves explicit choices", async () => {
-  const prompt = driver({
-    select: {
-      "Starter template": "api",
-      "Cloud provider": "aws",
-      "Deployment adapter": "pulumi",
+test("asks only the missing creation name and defaults to minimal", async () => {
+  const questions: string[] = [];
+  const unexpected = async (): Promise<never> => {
+    throw new Error("Unexpected setup question.");
+  };
+  const prompt: PromptDriver = {
+    ...driver({}),
+    select: unexpected,
+    multiselect: unexpected,
+    confirm: unexpected,
+    text: async (options) => {
+      questions.push(options.message);
+      return "sample-app";
     },
-    text: { "Project name": "sample-app", Destination: "apps/sample" },
-    confirm: {
-      "Include examples?": false,
-      "Install dependencies?": false,
-      "Initialize a Git repository?": false,
-    },
-  });
+  };
   const resolved = await resolveCreateOptionsDetails([], {
     interactive: true,
     promptDriver: prompt,
   });
+  expect(questions).toEqual(["Project name"]);
   expect(resolved).toEqual({
     prompted: true,
+    options: {
+      name: "sample-app",
+      template: "minimal",
+      cloud: "none",
+      deploy: "none",
+      install: true,
+      git: true,
+      examples: true,
+      forceEmptyDirectory: false,
+      json: false,
+    },
+  });
+});
+
+test("retains advanced explicit creation flags without any setup question", async () => {
+  const unexpected = async (): Promise<never> => {
+    throw new Error("Unexpected setup question.");
+  };
+  const prompt: PromptDriver = {
+    ...driver({}),
+    text: unexpected,
+    select: unexpected,
+    multiselect: unexpected,
+    confirm: unexpected,
+  };
+  expect(
+    await resolveCreateOptionsDetails(
+      [
+        "sample-app",
+        "--template",
+        "api",
+        "--cloud",
+        "aws",
+        "--deploy",
+        "pulumi",
+        "--directory",
+        "apps/sample",
+        "--no-install",
+        "--no-git",
+        "--no-examples",
+      ],
+      { interactive: true, promptDriver: prompt },
+    ),
+  ).toEqual({
+    prompted: false,
     options: {
       name: "sample-app",
       template: "api",
