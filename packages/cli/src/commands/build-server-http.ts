@@ -1,17 +1,14 @@
 import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import { inspectorEndpointsSource } from "./build-server-http-inspector.js";
 
-export interface ServerSourceConfiguration {
-  readonly maxBodyBytes: number;
-  readonly apiDocs: {
-    readonly enabledInProduction: boolean;
-    readonly excludeDomains?: readonly string[];
-  };
-  readonly clientContract: boolean;
-  readonly mcp: boolean;
-  readonly maxPreviewBytes: number;
-}
+import type { ServerSourceConfiguration } from "./build-server.types.js";
+export type { ServerSourceConfiguration } from "./build-server.types.js";
 
+/**
+ * Emits HTTP transport callbacks while the typed lifecycle host owns readiness and work.
+ * @param configuration - Validated HTTP configuration.
+ * @returns Source with the existing health, status, admission, and client contracts.
+ */
 export function serverHttpSource(configuration: ServerSourceConfiguration): string {
   return `const internalEndpointsEnabled = environment !== "production" || process.env.RELKIT_INTERNAL_ENDPOINTS === "1";
 const httpMiddlewareOptions = {
@@ -74,9 +71,7 @@ const app = createApp({
       publicFingerprint,
       signal: shutdownController.signal,
       track: (task) => {
-        activeInvocations.add(task);
-        const done = () => activeInvocations.delete(task);
-        void task.then(done, done);
+        void runtimeOwner.track(task).catch(() => {});
       },
       provider: async (profile) => {
         const registry = await providerStartup;
@@ -121,8 +116,8 @@ const app = createApp({
       ? {}
       : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
     readiness: () => ({
-      ready: providerReady && nativeJobWorkerReady && databaseReady && authReady && !stopping,
-      ...(stopping ? { reason: "stopping" } : providerFailed || specializedFailed ? { reason: "unavailable" } : {}),
+      ready: runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping,
+      ...(runtimeState().stopping ? { reason: "stopping" } : runtimeState().primaryFailures.length > 0 ? { reason: "unavailable" } : {}),
     }),
   },
 });
@@ -135,11 +130,11 @@ const server = Bun.serve({
     const path = new URL(request.url).pathname;
     if (path === "/_relkit/v1/health/live") return healthResponse("ok");
     if (path === "/_relkit/v1/health/ready")
-      return healthResponse(providerReady && nativeJobWorkerReady && databaseReady && authReady && !stopping ? "ready" : "not-ready", providerReady && nativeJobWorkerReady && databaseReady && authReady && !stopping ? 200 : 503);
-    if (stopping) return Response.json({ error: "draining" }, { status: 503 });
+      return healthResponse(runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping ? "ready" : "not-ready", runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping ? 200 : 503);
+    if (runtimeState().stopping) return Response.json({ error: "draining" }, { status: 503 });
     const nativeWorker = nativeJobHandler(request);
     if (nativeWorker !== undefined) return await nativeWorker;
-    if (!providerReady || !nativeJobWorkerReady || !databaseReady || !authReady)
+    if (!runtimeState().ready.provider || !runtimeState().ready.nativeWorker || !runtimeState().ready.database || !runtimeState().ready.auth)
       return Response.json({ error: "not-ready" }, { status: 503 });
     try {
       return await app.fetch(request, bunServer);
@@ -148,6 +143,5 @@ const server = Bun.serve({
     }
   }),
 });
-nativeJobWorkerServerReady = true;
-void readyNativeJobWorkers();`;
+runtimeOwner.setReady("server", true);`;
 }
