@@ -1,5 +1,11 @@
 import type { DomainArtifact } from "./domain-planning.js";
 
+/**
+ * Renders cache Source as source text without executing user modules.
+ * @param artifact - Normalized artifact identity, source path, binding and export metadata.
+ * @param profile - Selected provider profile.
+ * @returns Cache descriptor source including schemas and bounded example TTL values.
+ */
 export function cacheSource(artifact: DomainArtifact, profile: string): string {
   return `import { defineCache } from "@relkit/app/cache";
 import { z } from "@relkit/app/schema";
@@ -17,6 +23,12 @@ export default ${artifact.binding};
 `;
 }
 
+/**
+ * Renders bucket Source as source text without executing user modules.
+ * @param artifact - Normalized artifact identity, source path, binding and export metadata.
+ * @param profile - Selected provider profile.
+ * @returns Bucket descriptor source including private visibility and example object limits.
+ */
 export function bucketSource(artifact: DomainArtifact, profile: string): string {
   return `import { defineBucket } from "@relkit/app/buckets";
 

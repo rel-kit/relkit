@@ -1,10 +1,22 @@
 import { sourceImport, type DomainArtifact } from "./domain-planning.js";
 
+/**
+ * Binding and export form of a source artifact referenced by a renderer.
+ */
 type ArtifactReference = {
   readonly binding: string;
   readonly exportKind?: "default" | "named" | undefined;
 };
 
+/**
+ * Renders tool Source as source text without executing user modules.
+ * @param artifact - Normalized artifact identity, source path, binding and export metadata.
+ * @param target - Discovered domain or artifact target.
+ * @param targetModule - Source module specifier of the referenced callable or task.
+ * @param sideEffect - Side-effect category declared by the generated tool.
+ * @param approval - Approval policy declared by the generated tool.
+ * @returns TypeScript declaring a tool wrapper for the target callable with the selected effect/approval policy.
+ */
 export function toolSource(
   artifact: DomainArtifact,
   target: ArtifactReference,
@@ -26,6 +38,14 @@ export default ${artifact.binding};
 `;
 }
 
+/**
+ * Renders agent Source as source text without executing user modules.
+ * @param artifact - Normalized artifact identity, source path, binding and export metadata.
+ * @param model - Selected model profile/ID, or undefined for the deterministic offline model.
+ * @param tools - Resolved tool bindings, module paths and export forms.
+ * @param instructions - Inline instruction text or resolved prompt import metadata.
+ * @returns TypeScript declaring the agent, resolved tools/instructions and selected or offline model.
+ */
 export function agentSource(
   artifact: DomainArtifact,
   model: string | undefined,
@@ -65,6 +85,10 @@ export default ${artifact.binding};
 `;
 }
 
+/**
+ * Renders offline Model as source text without executing user modules.
+ * @returns A deterministic FakeToolCallingModel constructor expression for generated offline examples.
+ */
 function offlineModel(): string {
   return `new FakeToolCallingModel({
     toolCalls: [[{
