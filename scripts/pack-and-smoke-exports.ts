@@ -59,9 +59,9 @@ function assertPackageManifest(
   }
   const expectedBin =
     packageDirectoryName === "cli"
-      ? { relkit: "./dist/index.js" }
+      ? { relkit: "./dist/bin.js" }
       : packageDirectoryName === "create-relkit"
-        ? { "create-relkit": "./dist/index.js" }
+        ? { "create-relkit": "./dist/bin.js" }
         : undefined;
   if (expectedBin && JSON.stringify(manifest.bin) !== JSON.stringify(expectedBin)) {
     throw new Error(`Unexpected bin entry in ${packageDirectory}`);

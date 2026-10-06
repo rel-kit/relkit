@@ -24,6 +24,14 @@ export function expectedExports(
       ]),
     ]);
   const subpaths = packageName ? integrationSubpaths[packageName] : undefined;
+  if (directoryName === "create-relkit")
+    return {
+      "./catalog-resolution": {
+        types: "./src/catalog-resolution.ts",
+        default: "./src/catalog-resolution.ts",
+      },
+      ".": rootExport,
+    };
   if (subpaths)
     return Object.fromEntries([
       [".", rootExport],
@@ -107,6 +115,10 @@ export function expectedExports(
       "./editor": {
         types: "./dist/editor.d.ts",
         require: "./dist/editor.cjs",
+      },
+      "./internal/server-runtime": {
+        types: "./dist/internal/server-runtime.d.ts",
+        default: "./dist/internal/server-runtime.js",
       },
     };
   if (directoryName === "compiler")
