@@ -1,0 +1,40 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/services/dev-inspector-installation.test.ts:
+86 |       new Response(child.stdout).text(),
+87 |       new Response(child.stderr).text(),
+88 |       child.exited,
+89 |     ]);
+90 |     expect(code, stderr).toBe(1);
+91 |     expect(await Bun.file(join(directory, "compiler-started")).exists(), stdout).toBe(false);
+                                                                                      ^
+error: 00:13:33 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.436917 operation=observability.emit outcome=success
+00:13:33 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.695292 operation=activation.source-change outcome=success
+00:13:33 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.306833 operation=observability.emit outcome=failure
+00:13:33 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.03275 operation=observability.emit outcome=success
+00:13:33 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=2.249709 operation=activation.compile.failed outcome=failure
+00:13:33 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.759708 operation=proxy.stop outcome=success
+00:13:33 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.043083 operation=observability.flush outcome=success
+00:13:33 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.317417 operation=owner.dispose outcome=success
+{"error":{"code":"RELKIT_INTERNAL_ERROR","message":"Inspector exited with code 1."},"ok":false}
+
+
+Expected: false
+Received: true
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/dev-inspector-installation.test.ts:91:82)
+(fail) the executable rejects an escaped manifest before starting the initial compiler [2046.45ms]
+
+ 0 pass
+ 2 filtered out
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [2.46s]

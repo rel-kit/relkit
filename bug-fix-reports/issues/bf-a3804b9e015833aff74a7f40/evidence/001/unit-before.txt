@@ -1,0 +1,28 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/services/dev-inspector-installation.test.ts:
+13 |     const external = join(directory, "external-package.json");
+14 |     await writeFile(external, "{}");
+15 |     await symlink(external, join(root, "package.json"));
+16 |     expect(() =>
+17 |       resolveInspectorInstallation(undefined, { RELKIT_INSPECTOR_ROOT: root }),
+18 |     ).toThrow("package.json must stay inside the inspector directory");
+           ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "package.json must stay inside the inspector directory"
+
+Received function did not throw
+Received value: {
+  root: "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-inspector-installation-ObNW9v/inspector",
+  command: [ "/Users/mustafaelsayed/.bun/bin/bun", "run", "dev" ],
+}
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/dev-inspector-installation.test.ts:18:7)
+(fail) inspector overrides reject a package manifest that escapes the selected directory [16.90ms]
+
+ 0 pass
+ 2 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [500.00ms]
