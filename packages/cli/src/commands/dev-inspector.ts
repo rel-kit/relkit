@@ -1,5 +1,5 @@
-import { existsSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { existsSync, realpathSync } from "node:fs";
+import { join, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { Effect, Layer } from "effect";
 import { CliCompiler, compilerLayer } from "../services/compiler.service.js";
@@ -129,7 +129,15 @@ export function resolveInspectorInstallation(
  * @returns Native development process inputs after installation validation.
  */
 function sourceInstallation(root: string): InspectorInstallation {
-  if (!existsSync(join(root, "package.json")))
+  let directory: string;
+  let manifest: string;
+  try {
+    directory = realpathSync(resolve(root));
+    manifest = realpathSync(join(directory, "package.json"));
+  } catch {
     throw new Error(`RELKIT_INSPECTOR_ROOT does not contain an inspector app: ${root}`);
-  return { root, command: [process.execPath, "run", "dev"] };
+  }
+  if (!manifest.startsWith(join(directory, sep)))
+    throw new Error("RELKIT_INSPECTOR_ROOT package.json must stay inside the inspector directory.");
+  return { root: directory, command: [process.execPath, "run", "dev"] };
 }

@@ -29,16 +29,15 @@ test("capture retains stdout, stderr and nonzero status", async () => {
 });
 
 test("inherited-terminal cancellation kills an ignoring parent and its descendant group", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "relkit-contributor-group-"));
+  const directory = await mkdtemp(join(tmpdir(), "relkit-contributor 'quoted'-"));
   const receipt = join(directory, "pids.json");
   const controller = new AbortController();
   let running: Promise<unknown> | undefined;
   try {
-    const childSource = 'process.on("SIGTERM",()=>{});setInterval(()=>{},1000);';
-    const source = `const {spawn}=require("node:child_process");const {writeFileSync}=require("node:fs");process.on("SIGTERM",()=>{});const child=spawn(process.execPath,["-e",${JSON.stringify(childSource)}],{stdio:"ignore"});writeFileSync(${JSON.stringify(receipt)},JSON.stringify([process.pid,child.pid]));setInterval(()=>{},1000);`;
+    const fixture = join(import.meta.dir, "process-group.fixture.ts");
     running = runCliEffect(
       Effect.flatMap(ContributorTerminal, (service) =>
-        service.run([process.execPath, "-e", source], directory),
+        service.run([process.execPath, fixture], directory),
       ),
       contributorTerminalLayer,
       controller.signal,
@@ -90,11 +89,7 @@ test("source executable forwards the existing version and pure index stays passi
   ]);
   expect(result).toEqual(["relkit 0.6.0\n", "", 0]);
   const imported = Bun.spawn(
-    [
-      process.execPath,
-      "-e",
-      `await import(${JSON.stringify(join(import.meta.dir, "../../src/index.ts"))});console.log("passive");`,
-    ],
+    [process.execPath, join(import.meta.dir, "passive-import.fixture.ts")],
     { stdout: "pipe", stderr: "pipe" },
   );
   expect(

@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, realpath, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, expect, test } from "bun:test";
@@ -381,7 +381,7 @@ test("prefers source when a compiled CLI also contains the packaged inspector", 
 
   const options = resolveInspectorInstallation(compiled, {});
   expect(options.command).toEqual([process.execPath, "run", "dev"]);
-  expect(options.root).toBe(source);
+  expect(options.root).toBe(await realpath(source));
 });
 
 test("reads the inspector port from relkit.config.ts unless the CLI overrides it", async () => {

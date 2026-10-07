@@ -1,15 +1,29 @@
 import { expect, it } from "@effect/vitest";
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 import { Effect } from "effect";
+
+it.live("uses Bun regardless of a BUN executable override", () =>
+  Effect.promise(async () => {
+    const previous = process.env.BUN;
+    process.env.BUN = "echo";
+    try {
+      const result = await runBun(["--version"], process.cwd());
+      expect(result.code).toBe(0);
+      expect(result.stderr).toBe("");
+      expect(result.stdout).toMatch(/^\d+\.\d+\.\d+\n$/);
+    } finally {
+      if (previous === undefined) delete process.env.BUN;
+      else process.env.BUN = previous;
+    }
+  }),
+);
 
 it.live("keeps source barrel imports passive and executable JSON stdout singular", () =>
   Effect.promise(async () => {
     const root = process.cwd();
-    const index = pathToFileURL(resolve(root, "packages/create-relkit/src/index.ts")).href;
     const imported = await runBun(
-      ["-e", "await import(" + JSON.stringify(index) + '); process.stdout.write("loaded");'],
+      [resolve(root, "packages/create-relkit/tests/passive-import.fixture.ts")],
       root,
     );
     expect(imported).toEqual({ stdout: "loaded", stderr: "", code: 0 });
@@ -38,7 +52,7 @@ function runBun(
   cwd: string,
 ): Promise<{ stdout: string; stderr: string; code: number }> {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.env.BUN ?? "bun", args, {
+    const child = spawn("bun", args, {
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
       timeout: 5_000,
