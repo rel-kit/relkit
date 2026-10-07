@@ -1,0 +1,20 @@
+{
+  "key": "relkit dev inspector discovery",
+  "matches": {
+    "bf-a3804b9e015833aff74a7f40": {
+      "id": "bf-a3804b9e015833aff74a7f40",
+      "status": "verified",
+      "what": "Inspector discovery accepts a package manifest symlinked outside the selected source directory.",
+      "root_cause": "packages/cli/src/commands/dev-inspector.ts:131 sourceInstallation previously tested only manifest existence. A symlink could select an external manifest and admit initial compilation.",
+      "fixed_by": "Canonicalize the source directory and package manifest, require the manifest to stay inside that directory, and return the canonical installation root. Real CLI replay rejects escaped manifests before initial compiler admission; valid alternate checkouts, relative paths, directory symlinks, reload/persistence and cance",
+      "files": [
+        "packages/cli/src/commands/dev-inspector.ts",
+        "packages/cli/tests/services/dev-inspector-installation.test.ts",
+        "packages/cli/dev.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-07T00:32:47+00:00",
+      "report": "bug-fix-reports/issues/bf-a3804b9e015833aff74a7f40/report.md"
+    }
+  }
+}
