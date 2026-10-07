@@ -1,0 +1,9 @@
+$ bun run scripts/test-generator.ts
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  7 passed (7)
+      Tests  18 passed (18)
+   Start at  03:20:43
+   Duration  7.94s (tests 68%, transform 18%, import 14%)

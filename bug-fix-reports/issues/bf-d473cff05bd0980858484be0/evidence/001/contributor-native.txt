@@ -1,0 +1,11 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/contributor/native.acceptance.ts:
+(pass) capture retains stdout, stderr and nonzero status [34.27ms]
+(pass) inherited-terminal cancellation kills an ignoring parent and its descendant group [5098.52ms]
+(pass) source executable forwards the existing version and pure index stays passive [1891.13ms]
+
+ 3 pass
+ 0 fail
+ 9 expect() calls
+Ran 3 tests across 1 file. [7.24s]
