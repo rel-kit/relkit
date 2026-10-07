@@ -1,0 +1,22 @@
+{
+  "key": "GeneratorExecutableTests",
+  "matches": {
+    "bf-d473cff05bd0980858484be0": {
+      "id": "bf-d473cff05bd0980858484be0",
+      "status": "verified",
+      "what": "Generator executable acceptance permits the BUN environment variable to select an arbitrary command.",
+      "root_cause": "packages/create-relkit/tests/executable.effect.test.ts runBun previously selected its executable from process.env.BUN. Contributor native acceptance also assembled JavaScript using JSON.stringify; static fixtures remove that unnecessary code-construction pattern.",
+      "fixed_by": "Use the literal Bun executable and static passive-import/process-group fixtures. The BUN=echo regression and harmless override replay pass, preserving passive imports, singular JSON usage output, version output, native stdout/stderr/nonzero status and cancellation of a parent plus descendants in a quoted directory.",
+      "files": [
+        "packages/create-relkit/tests/executable.effect.test.ts",
+        "packages/create-relkit/tests/passive-import.fixture.ts",
+        "packages/cli/tests/contributor/native.acceptance.ts",
+        "packages/cli/tests/contributor/passive-import.fixture.ts",
+        "packages/cli/tests/contributor/process-group.fixture.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-07T00:32:47+00:00",
+      "report": "bug-fix-reports/issues/bf-d473cff05bd0980858484be0/report.md"
+    }
+  }
+}
