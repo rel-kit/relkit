@@ -1,0 +1,25 @@
+import exportOrders from "export-orders.task.js";
+
+export default defineJob({
+  name: "exportOrders",
+  id: "orders.export-orders",
+  task: exportOrders,
+
+  // Export daily at midnight UTC; skip missed runs.
+  schedules: [
+    {
+      id: "dailyOrderExport",
+      cron: "0 0 * * *",
+      timezone: "UTC",
+      input: { orderIds: ["order-1"] },
+      overlap: "skip",
+      misfire: "skip",
+    },
+  ],
+
+  client: {
+    public: true,
+    operations: ["trigger", "get", "list", "watch"],
+    fields: ["status", "progress", "output"],
+  },
+});

@@ -1,0 +1,26 @@
+"use client";
+
+export function OrderReport() {
+  const report = useStream("GET /reports/:reportId");
+
+  const start = () =>
+    void report.start({ reportId: "daily-orders" });
+
+  return (
+    <section>
+      <button onClick={start}>
+        Generate order report
+      </button>
+
+      <button onClick={() => report.cancel()}>
+        Cancel
+      </button>
+
+      <p>
+        {report.items
+          .map((item) => item.completed)
+          .join(", ")}
+      </p>
+    </section>
+  );
+}

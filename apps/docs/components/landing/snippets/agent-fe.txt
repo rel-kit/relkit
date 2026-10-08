@@ -1,0 +1,16 @@
+"use client";
+
+export function OrderSupport() {
+  const support = useAgent("orders.support");
+  const threadId = "order-1-support";
+
+  const ask = () =>
+    void support.send("Where is order-1?", { threadId });
+
+  return (
+    <section>
+      <button onClick={ask}>Track my order</button>
+      <p>{support.output?.answer ?? support.status}</p>
+    </section>
+  );
+}

@@ -1,0 +1,34 @@
+"use client";
+
+export function OrderReview() {
+  const review = useAgent("orders.review");
+  const threadId = "order-1-review";
+
+  const start = () =>
+    void review.run(
+      { orderId: "order-1" },
+      { threadId },
+    );
+
+  const approve = () =>
+    void review.run(true, {
+      threadId,
+      resume: true,
+    });
+
+  return (
+    <section>
+      <button onClick={start}>
+        Review order
+      </button>
+      {review.waiting && (
+        <button onClick={approve}>
+          Approve order
+        </button>
+      )}
+      <p>
+        {review.output?.result ?? review.status}
+      </p>
+    </section>
+  );
+}

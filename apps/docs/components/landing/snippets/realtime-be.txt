@@ -1,0 +1,15 @@
+export default defineChannel({
+  id: "chat.messages",
+  params: z.object({ roomId: z.string() }),
+  events: {
+    message: z.object({
+      id: z.string(),
+      sender: z.string(),
+      text: z.string(),
+    }),
+  },
+
+  client: { public: true },
+  // Replay recent messages when reconnecting.
+  replay: { retentionMs: 300_000, maxEvents: 1_000 },
+});

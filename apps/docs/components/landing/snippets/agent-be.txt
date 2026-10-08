@@ -1,0 +1,20 @@
+import lookupOrder from "lookup-order.tool.js";
+import { createCommerceModel } from "commerce-model.js";
+
+const model = createCommerceModel("support");
+const instructions =
+  "Answer customer questions about their orders.";
+
+export default defineAgent({
+  id: "orders.support",
+  input: z.object({ message: z.string() }),
+  output: z.object({ answer: z.string() }),
+  model,
+  instructions,
+  tools: [lookupOrder],
+  stateProfile: "default",
+  client: { public: true },
+  chat: { input: "message", output: "answer" },
+  controls: ["stop"],
+  limits: { maxSteps: 4, maxToolCalls: 4 },
+});

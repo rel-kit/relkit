@@ -1,0 +1,20 @@
+import * as store from "order-agent-persistence.js";
+
+// Order state and review/finish nodes are defined above.
+export default defineGraph({
+  id: "orders.review",
+  state,
+  input: z.object({ orderId: z.string() }),
+  output: z.object({ result: z.string() }),
+  nodes: [review, finish],
+  edges: (graph) =>
+    graph
+      .addEdge(START, "review")
+      .addEdge("review", "finish")
+      .addEdge("finish", END),
+
+  // Persist the review while waiting for approval.
+  checkpointer: store.orderCheckpoints,
+  stateProfile: "default",
+  client: { public: true },
+});

@@ -1,0 +1,32 @@
+"use client";
+
+type Message = {
+  id: string;
+  sender: string;
+  text: string;
+};
+const initial: Message[] = [];
+
+export function OrderChat() {
+  const [messages, setMessages] = useState(initial);
+
+  // Append incoming chat payloads; no HTTP refetch.
+  const chat = useChannel("chat.messages", {
+    params: { roomId: "order-1" },
+    on: {
+      message: (event) =>
+        setMessages((items) => [...items, event]),
+    },
+  });
+
+  return (
+    <section>
+      <p>{chat.status}</p>
+      {messages.map((message) => (
+        <p key={message.id}>
+          {message.sender}: {message.text}
+        </p>
+      ))}
+    </section>
+  );
+}
