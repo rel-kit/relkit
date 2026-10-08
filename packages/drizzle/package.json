@@ -37,7 +37,7 @@
     "@relkit/invocation": "workspace:*",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
-    "zod": "4.4.3"
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
