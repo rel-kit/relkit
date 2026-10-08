@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.7.2
+
+### Changes
+
+- Publish the unscoped relkit package so bunx relkit runs the existing RELKIT CLI.
+
 ## 0.7.1
 
 ### Changes
