@@ -1,14 +1,6 @@
-import type { RenderedLandingExample } from "./data";
+import type { HeroExample } from "./hero-examples";
 import { ExampleSwitcher } from "./example-switcher";
 
-export function LandingExamples({
-  examples,
-}: {
-  readonly examples: readonly RenderedLandingExample[];
-}) {
-  return (
-    <section id="examples" className="landing-container landing-section" aria-label="Examples">
-      <ExampleSwitcher examples={examples} />
-    </section>
-  );
+export function LandingExamples({ examples }: { readonly examples: readonly HeroExample[] }) {
+  return <ExampleSwitcher examples={examples} />;
 }

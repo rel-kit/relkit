@@ -1,0 +1,250 @@
+.hero-tabs-row {
+  height: 80px;
+}
+
+.hero-tabs-row,
+.hero-panel-row {
+  border-bottom: 1px solid var(--hero-line);
+}
+
+.hero-tabs-container {
+  position: relative;
+  height: 80px;
+  border-inline: 1px solid var(--hero-line);
+}
+
+.hero-tabs-container::before,
+.hero-tabs-container::after {
+  position: absolute;
+  z-index: 3;
+  top: -3px;
+  width: 4px;
+  height: 4px;
+  background: #a3a3a3;
+  content: "";
+}
+
+.hero-tabs-container::before {
+  left: -2px;
+}
+
+.hero-tabs-container::after {
+  right: -2px;
+}
+
+.hero-tab-scroll,
+.hero-tab-viewport {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-tab-viewport > div {
+  min-width: 100%;
+}
+
+.hero-tab-list {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 20px;
+}
+
+.hero-tab {
+  flex: none;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  color: var(--hero-muted);
+  font-size: 14px;
+  line-height: 21px;
+  cursor: pointer;
+}
+
+.hero-tab[data-state="active"],
+.hero-tab:hover {
+  color: var(--hero-ink);
+  background: var(--hero-soft);
+}
+
+.hero-tab-arrow {
+  position: absolute;
+  z-index: 2;
+  top: 24px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 4px;
+  color: #525252;
+  background: var(--hero-soft);
+  cursor: pointer;
+}
+
+.hero-tab-next {
+  right: 12px;
+  box-shadow:
+    -16px 0 0 8px var(--hero-bg),
+    12px 0 0 var(--hero-bg);
+}
+
+.hero-tab-prev {
+  left: 12px;
+  box-shadow:
+    16px 0 0 8px var(--hero-bg),
+    -12px 0 0 var(--hero-bg);
+}
+
+.hero-tab-arrow:hover {
+  background: #eeeeee;
+}
+
+.hero-tab-scrollbar {
+  z-index: 4;
+  height: 3px;
+}
+
+.hero-tab-thumb {
+  border-radius: 3px;
+  background: #a3a3a3;
+}
+
+.hero-code-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 799px;
+  border-inline: 1px solid var(--hero-line);
+}
+
+.hero-code-grid[data-single-panel="true"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.hero-design .hero-code-panel {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.hero-code-panel + .hero-code-panel {
+  border-left: 1px solid var(--hero-line);
+}
+
+.hero-design .hero-code-panel > div:first-child {
+  height: 80px;
+  padding: 0 32px;
+  border-color: var(--hero-line);
+}
+
+.hero-code-heading {
+  display: grid;
+  min-width: 0;
+  gap: 10px;
+  font-family: var(--hero-mono), monospace;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.hero-code-heading strong {
+  color: #262626;
+  text-transform: uppercase;
+}
+
+.hero-code-heading a {
+  overflow: hidden;
+  color: var(--hero-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hero-code-heading a:hover {
+  color: var(--hero-ink);
+  text-decoration: underline;
+}
+
+.hero-design .hero-code-viewport {
+  max-height: none;
+  overflow: visible;
+  padding: 40px 32px;
+  background: transparent;
+}
+
+.hero-design .hero-source {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: #2e2e4b;
+  background: transparent;
+  font-family:
+    var(--hero-neon), "Monaspace Neon", var(--hero-code), "Fira Code", "MesloLGS Nerd Font Mono",
+    monospace;
+  font-size: 14px;
+  line-height: 30px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 2;
+}
+
+.hero-source code {
+  font-family: inherit;
+  font-variant-ligatures: common-ligatures contextual;
+  font-feature-settings:
+    "calt" 1,
+    "liga" 1,
+    "ss03" 1,
+    "ss09" 1;
+}
+
+.hero-design .hero-source .line {
+  padding-inline: 0;
+}
+
+@media (max-width: 800px) {
+  .hero-code-grid {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 640px;
+  }
+  .hero-code-panel + .hero-code-panel {
+    border-top: 1px solid var(--hero-line);
+    border-left: 0;
+  }
+  .hero-code-panel:only-child {
+    min-height: 640px;
+  }
+  .hero-design .hero-source {
+    font-size: 13px;
+    line-height: 28px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-tabs-row,
+  .hero-tabs-container {
+    height: 64px;
+  }
+  .hero-tab-list {
+    padding: 16px;
+  }
+  .hero-tab {
+    font-size: 13px;
+  }
+  .hero-tab-arrow {
+    top: 16px;
+  }
+  .hero-code-grid {
+    min-height: 560px;
+  }
+  .hero-code-panel:only-child {
+    min-height: 560px;
+  }
+  .hero-design .hero-code-panel > div:first-child {
+    padding-inline: 24px;
+  }
+  .hero-design .hero-code-viewport {
+    padding: 40px 24px;
+  }
+}
