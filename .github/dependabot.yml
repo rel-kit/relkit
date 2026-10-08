@@ -1,8 +1,10 @@
 version: 2
+# Routine upgrades are manual; security updates remain enabled in repository settings.
 updates:
   - package-ecosystem: bun
     directory: /
     exclude-paths: ["repos/**"]
+    open-pull-requests-limit: 0
     schedule:
       interval: weekly
       day: monday
@@ -22,6 +24,7 @@ updates:
         update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
+    open-pull-requests-limit: 0
     schedule:
       interval: weekly
       day: monday
