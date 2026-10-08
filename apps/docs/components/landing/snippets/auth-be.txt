@@ -1,0 +1,16 @@
+// src/auth/service.ts — customer authentication service.
+export default defineBetterAuthService({
+  baseURL: process.env.BETTER_AUTH_URL,
+  emailAndPassword: { enabled: true },
+});
+
+// src/routes/api/auth/[[...auth]]/route.ts
+import auth from "service.js";
+
+// Require customer sign-in for order endpoints.
+export const ALL = defineRoute({
+  handler: auth.handler,
+  auth: {
+    protected: ["/orders", "/orders/*"],
+  },
+});

@@ -1,0 +1,17 @@
+import getOrder from "get-order.function.js";
+import rateLimits from "rate-limits.cache.js";
+
+// Read one order through its public service function.
+export const GET = defineRoute({
+  target: getOrder,
+  client: { operation: "query" },
+  timeoutMs: 5_000,
+
+  // Limit each customer to 20 reads per minute.
+  rateLimit: {
+    limit: 20,
+    windowMs: 60_000,
+    key: http.header("x-customer-email"),
+    store: rateLimits,
+  },
+});

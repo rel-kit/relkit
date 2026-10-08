@@ -1,0 +1,13 @@
+import getOrder from "get-order.function.js";
+import searchOrders from "search-orders.function.js";
+import createOrder from "create-order.function.js";
+
+const orders = defineService({
+  functions: {
+    getOrder,
+    searchOrders,
+    createOrder,
+  },
+});
+
+export default orders;
