@@ -42,6 +42,7 @@ export async function packPackages(
   manifests: Map<string, { directory: string; manifest: Manifest }>,
 ): Promise<Map<string, string>> {
   const names = [
+    "relkit",
     "@relkit/cli",
     "@relkit/app",
     "@relkit/config",

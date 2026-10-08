@@ -153,6 +153,7 @@ async function main(): Promise<void> {
       join(artifactRoot, "manifest.json"),
       `${JSON.stringify(stable(manifest), null, 2)}\n`,
     );
+    await command(bun, ["run", "scripts/pack-and-smoke-relkit.ts", "--artifacts", artifactRoot]);
     await command(bun, ["run", "check"]);
     await command(bun, ["run", "scripts/check-public-declarations.ts"]);
     await command(bun, ["run", "scripts/pack-and-smoke-postgres.ts", "--artifacts", artifactRoot]);

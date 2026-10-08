@@ -45,8 +45,8 @@ function assertPackageManifest(
   const expectedName =
     relative(repositoryRoot, packageDirectory) === "integrations/catalog"
       ? "@relkit/integrations"
-      : packageDirectoryName === "create-relkit"
-        ? "create-relkit"
+      : packageDirectoryName === "create-relkit" || packageDirectoryName === "relkit"
+        ? packageDirectoryName
         : `@relkit/${packageDirectoryName}`;
   if (manifest.name !== expectedName) {
     throw new Error(`Unexpected package name in ${packageDirectory}: ${manifest.name}`);
@@ -58,7 +58,7 @@ function assertPackageManifest(
     throw new Error(`Unsupported export map in ${packageDirectory}`);
   }
   const expectedBin =
-    packageDirectoryName === "cli"
+    packageDirectoryName === "cli" || packageDirectoryName === "relkit"
       ? { relkit: "./dist/bin.js" }
       : packageDirectoryName === "create-relkit"
         ? { "create-relkit": "./dist/bin.js" }
