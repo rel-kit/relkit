@@ -1,6 +1,6 @@
 {
   "name": "@relkit/inngest",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Inngest durable-jobs integration for RELKIT.",
   "license": "MIT",
   "repository": {
