@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.7.1
+
+### Changes
+
+- Update shared Next.js and Hono dependencies to patched versions and retain the Next.js template security fix through release synchronization.
+- chore(deps): bump next from 16.3.6 to 16.3.8 in /templates/default/v1/fullstack
+- chore(deps): bump the bun-dependencies group across 1 directory with 24 updates
+
 ## 0.7.0
 
 ### Changes
