@@ -1,0 +1,29 @@
+import receipts from "receipts.bucket.js";
+
+export default defineFunction({
+  input: z.object({
+    orderId: z.string(),
+    file: z.file({
+      mediaTypes: ["application/pdf"],
+    }),
+  }),
+
+  output: z.object({
+    key: z.string(),
+  }),
+
+  dependencies: { buckets: { receipts } },
+
+  handler: async ({ orderId, file }, context) => {
+    const key = `orders/${orderId}/receipt.pdf`;
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+
+    // Store the receipt in the private order bucket.
+    await context.buckets.receipts.put(key, bytes, {
+      contentType: file.type,
+    });
+
+    return { key };
+  },
+});

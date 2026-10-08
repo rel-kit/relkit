@@ -1,0 +1,20 @@
+export default defineFunction({
+  input: z.object({ reportId: z.string() }),
+  output: streamOf(
+    z.object({
+      completed: z.number(),
+      total: z.number(),
+    }),
+  ),
+
+  // Stream progress as the order report is generated.
+  handler: async function* (_input, context) {
+    const total = 10;
+
+    for (let done = 1; done <= total; done++) {
+      if (context.signal.aborted) return;
+
+      yield { completed: done, total };
+    }
+  },
+});

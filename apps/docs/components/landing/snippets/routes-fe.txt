@@ -1,0 +1,14 @@
+"use client";
+
+export function OrderDetails() {
+  const order = useRoute("GET /orders/:orderId", {
+    input: { orderId: "order-1" },
+    staleTime: 30_000,
+  });
+
+  return (
+    <p>
+      Order {order.data?.orderId}: {order.data?.status}
+    </p>
+  );
+}

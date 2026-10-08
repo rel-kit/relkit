@@ -1,0 +1,30 @@
+const createOrder = defineFunction({
+  input: z.object({
+    orderId: z.string(),
+    sku: z.string(),
+    quantity: z.number().int().positive(),
+  }),
+
+  output: z.object({
+    orderId: z.string(),
+    totalCents: z.number(),
+  }),
+
+  onBefore: (input) => ({
+    ...input,
+    sku: input.sku.trim(),
+  }),
+
+  // Demo price: 1,000 cents per item.
+  handler: async ({ orderId, quantity }) => ({
+    orderId,
+    totalCents: quantity * 1_000,
+  }),
+
+  onAfter: (order, context) => {
+    context.log.info("Order created", order);
+    return order;
+  },
+});
+
+export default createOrder;

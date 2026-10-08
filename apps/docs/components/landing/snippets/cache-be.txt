@@ -1,0 +1,9 @@
+export default defineCache({
+  id: "orders.prices",
+  profile: "requests",
+  key: z.object({ sku: z.string() }),
+  value: z.number(),
+
+  // Reuse product prices during checkout for one minute.
+  defaultTtlMs: 60_000,
+});

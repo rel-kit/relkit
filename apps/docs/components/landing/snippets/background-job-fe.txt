@@ -1,0 +1,27 @@
+"use client";
+
+export function ExportOrders() {
+  const [runId, setRunId] = useState("");
+
+  // Start an order export and capture its run ID.
+  const job = useJobTrigger("exportOrders", {
+    onSuccess: (run) => setRunId(run.runId),
+  });
+
+  // Watch the export for live progress and completion.
+  const { run } = useJobRun("exportOrders", {
+    runId,
+    enabled: Boolean(runId),
+  });
+
+  const start = () =>
+    job.mutate({ input: { orderIds: ["order-1"] } });
+
+  const label = run?.progress?.completed ?? run?.status;
+
+  return (
+    <button onClick={start} disabled={job.isPending}>
+      {label ?? "Export orders"}
+    </button>
+  );
+}

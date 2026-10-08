@@ -1,0 +1,16 @@
+import orders from "service.js";
+
+// List orders with GET; create an order with POST.
+export const { GET, POST } = defineServiceRoutes(
+  orders,
+  {
+    GET: {
+      member: "searchOrders",
+      client: { operation: "query" },
+    },
+    POST: {
+      member: "createOrder",
+      successStatus: 201,
+    },
+  },
+);

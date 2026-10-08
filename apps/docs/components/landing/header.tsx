@@ -1,23 +1,37 @@
+"use client";
+
 import Link from "next/link";
-import { ThemeSwitch } from "fumadocs-ui/layouts/shared/slots/theme-switch";
+import * as motion from "motion/react-m";
+import { ArrowUpRight, Grid2X2 } from "lucide-react";
 import { RelkitLogo } from "./logo";
 
 export function LandingHeader() {
   return (
-    <header className="landing-header">
-      <div className="landing-container landing-header-inner">
-        <Link className="landing-brand" href="/" aria-label="Relkit home">
-          <RelkitLogo />
-          <span>Relkit</span>
+    <motion.header className="hero-navigation">
+      <motion.div className="hero-container hero-navigation-inner">
+        <Link className="hero-brand" href="/" aria-label="Relkit home">
+          <Grid2X2
+            className="hero-logo"
+            size={28}
+            viewBox="3 3 18 18"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth={2}
+            aria-hidden="true"
+          />
+          RELKIT
         </Link>
-        <div className="landing-header-actions">
-          <ThemeSwitch className="landing-theme-switch" />
-          <Link className="landing-button landing-button-small" href="/docs/start/create-an-app">
-            Get Started
+        <motion.nav className="hero-navigation-links" aria-label="Main navigation">
+          <Link href="/docs">Documentation</Link>
+          <Link href="https://github.com/rel-kit/relkit">
+            GitHub <ArrowUpRight size={12} aria-hidden="true" />
           </Link>
-        </div>
-      </div>
-    </header>
+          <Link href="/docs/start/create-an-app">
+            Start building <ArrowUpRight size={12} aria-hidden="true" />
+          </Link>
+        </motion.nav>
+      </motion.div>
+    </motion.header>
   );
 }
 

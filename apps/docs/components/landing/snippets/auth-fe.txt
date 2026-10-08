@@ -1,0 +1,22 @@
+export const authClient = createAuthClient({
+  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
+  basePath: "/api/auth",
+  fetchOptions: { credentials: "include" },
+});
+
+// Customers sign in before opening their order history.
+export async function signInToViewOrders(
+  email: string,
+  password: string,
+) {
+  const { data, error } = await authClient.signIn.email({
+    email,
+    password,
+  });
+
+  if (error) {
+    throw new Error(error.message ?? "Sign-in failed");
+  }
+
+  return data;
+}

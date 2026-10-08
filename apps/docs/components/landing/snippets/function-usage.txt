@@ -1,0 +1,21 @@
+import createOrder from "create-order.function.js";
+
+export default defineFunction({
+  input: z.object({
+    orderId: z.string(),
+    sku: z.string(),
+    quantity: z.number().int().positive(),
+  }),
+
+  output: z.object({
+    orderId: z.string(),
+    totalCents: z.number(),
+  }),
+
+  handler: async (input) => {
+    // Invoke with validation, hooks, and tracing.
+    const order = await createOrder.invoke(input);
+
+    return order;
+  },
+});

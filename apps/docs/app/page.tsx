@@ -1,6 +1,4 @@
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import { codeToHtml } from "shiki";
+import { Container } from "fumadocs-ui/layouts/home/slots/container";
 import { LandingExamples } from "../components/landing/examples";
 import { LandingFooter, LandingHeader } from "../components/landing/header";
 import { LandingHero } from "../components/landing/hero";
@@ -12,31 +10,22 @@ import {
   GuideCards,
   InspectorShowcase,
 } from "../components/landing/showcase";
-import { exampleDefinitions, primaryCapabilities } from "../components/landing/data";
+import { primaryCapabilities } from "../components/landing/data";
+import { HeroDesign } from "../components/landing/hero-design";
+import { heroCode, heroMono, heroNeon, heroSans } from "../components/landing/fonts";
+import { highlightHeroExamples } from "../components/landing/highlight-hero-examples";
 
 export default async function HomePage() {
-  const repositoryRoot = resolve(process.cwd(), "../..");
-  const examples = await Promise.all(
-    exampleDefinitions.map(async (example) => {
-      const source = await readFile(
-        resolve(/* turbopackIgnore: true */ repositoryRoot, example.source),
-        "utf8",
-      );
-      return {
-        ...example,
-        highlightedCode: await codeToHtml(source.trim(), {
-          lang: "typescript",
-          themes: { light: "github-light", dark: "github-dark" },
-          defaultColor: false,
-        }),
-      };
-    }),
-  );
+  const examples = await highlightHeroExamples();
   return (
-    <main className="landing-root">
-      <LandingHeader />
-      <LandingHero />
-      <LandingExamples examples={examples} />
+    <Container className="landing-root">
+      <HeroDesign
+        className={`${heroSans.variable} ${heroMono.variable} ${heroNeon.variable} ${heroCode.variable}`}
+      >
+        <LandingHeader />
+        <LandingHero />
+        <LandingExamples examples={examples} />
+      </HeroDesign>
       <Capabilities features={primaryCapabilities} />
       <Statistics />
       <DeveloperWorkflows />
@@ -46,6 +35,6 @@ export default async function HomePage() {
       <GuideCards />
       <FinalCallToAction />
       <LandingFooter />
-    </main>
+    </Container>
   );
 }

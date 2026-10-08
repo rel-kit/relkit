@@ -1,0 +1,26 @@
+export default defineFunction({
+  input: z.object({
+    orderId: z.string(),
+    quantity: z.number().int().positive(),
+  }),
+
+  output: z.object({
+    orderId: z.string(),
+    totalCents: z.number(),
+  }),
+
+  publishes: ["orders.created"],
+
+  handler: async ({ orderId, quantity }, context) => {
+    const order = {
+      orderId,
+      totalCents: quantity * 1_000,
+    };
+
+    // Notify the order-confirmation subscriber.
+    const created = context.events["orders.created"];
+    await created.publish(order);
+
+    return order;
+  },
+});
