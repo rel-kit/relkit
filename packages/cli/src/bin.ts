@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
-import { resolve } from "node:path";
-import { contributorLauncherEffect, contributorLauncherLayer } from "./contributor-launcher.js";
+import { runCli } from "./main.js";
+import { contributorCallback } from "./contributor-callback.js";
+import { Layer } from "effect";
 import { runCliEffect } from "./cli-runtime.js";
 import { installSignals } from "./main-support.js";
 import { isJsonMode } from "./cli-effect-runtime.js";
@@ -15,13 +16,12 @@ export async function run(args: readonly string[] = process.argv.slice(2)): Prom
   const removeSignals = installSignals(controller);
   try {
     return await runCliEffect(
-      contributorLauncherEffect(
-        resolve(import.meta.dir, "../../.."),
-        process.cwd(),
-        args,
+      contributorCallback(
+        "cli.main",
+        (signal) => runCli(args, { signal, installSignalHandlers: false }),
         controller.signal,
       ),
-      contributorLauncherLayer,
+      Layer.empty,
       controller.signal,
       {
         json: isJsonMode(args),

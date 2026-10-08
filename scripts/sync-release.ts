@@ -64,6 +64,7 @@ const descriptions: Record<string, string> = {
   "@relkit/trigger": "Trigger.dev jobs integration for RELKIT.",
   "@relkit/effect-mq": "Effect MQ retryable-jobs integration for RELKIT.",
   "create-relkit": "Create a RELKIT application from a supported project template.",
+  relkit: "The RELKIT CLI for bunx relkit and global installation.",
 };
 type TemplateManifest = Record<string, unknown> &
   Partial<Record<(typeof dependencyFields)[number], Record<string, string>>>;

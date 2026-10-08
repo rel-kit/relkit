@@ -39,7 +39,7 @@ test("source overrides retain different checkouts, relative paths and directory 
     expect(
       resolveInspectorInstallation(undefined, { RELKIT_INSPECTOR_ROOT: "apps/inspector" }).root,
     ).toBe(await realpath(workspace));
-    expect(resolveInspectorInstallation(undefined, {}).root).toBe(await realpath(workspace));
+    expect(resolveInspectorInstallation(undefined, {}).command).toEqual(["node", "server.js"]);
     expect(() =>
       resolveInspectorInstallation(undefined, { RELKIT_INSPECTOR_ROOT: directory }),
     ).toThrow("does not contain an inspector app");

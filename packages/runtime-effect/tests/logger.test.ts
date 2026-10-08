@@ -3,6 +3,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { Cause, Effect, Logger, References } from "effect";
 import { normalizeProtocolId } from "@relkit/contracts";
+import { observeExecution } from "@relkit/contracts/operation";
 import { createObservabilityCollector } from "@relkit/observability";
 import {
   createLoggerLayer,
@@ -27,6 +28,43 @@ function capture(): {
     json: { write: (record) => records.push(record) },
   };
 }
+
+test("keeps operation evidence out of the default console while retaining requests and errors", async () => {
+  for (const minimumLevel of ["info", "debug"] as const) {
+    const human = capture();
+    const json = capture();
+    const collector = createObservabilityCollector();
+    await Effect.runPromise(
+      Effect.gen(function* () {
+        yield* observeExecution("runtime", "server.readiness", Effect.void);
+        yield* Effect.exit(observeExecution("runtime", "server.resource", Effect.fail("failed")));
+        yield* Effect.logInfo("GET /hello → 200");
+        yield* Effect.logError("Database startup failed");
+      }).pipe(
+        Effect.provide(
+          createLoggerLayer({
+            minimumLevel,
+            human: human.human,
+            json: json.json,
+            collector,
+          }),
+        ),
+      ),
+    );
+    expect(human.records.map((record) => record.message)).toEqual(
+      minimumLevel === "info"
+        ? ["GET /hello → 200", "Database startup failed"]
+        : [
+            "Execution operation completed",
+            "Execution operation failed",
+            "GET /hello → 200",
+            "Database startup failed",
+          ],
+    );
+    expect(json.records).toHaveLength(4);
+    expect(collector.read()).toHaveLength(4);
+  }
+});
 
 test("filters levels and writes human/json records", async () => {
   const output = capture();

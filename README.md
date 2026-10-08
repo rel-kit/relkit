@@ -18,6 +18,16 @@ cd my-app
 bun run dev
 ```
 
+Run the CLI directly through its unscoped npm package:
+
+```sh
+bunx relkit --help
+bunx relkit@latest create my-app
+```
+
+`relkit` delegates to the same release of `@relkit/cli`, which remains the CLI
+dependency in generated applications.
+
 For an existing Bun project, install the primary authoring API:
 
 ```sh
@@ -143,9 +153,8 @@ bun run dev
 Cloud and deployment both default to `none`. `bun run dev` starts the generated
 backend on `http://localhost:3000` and the real Next inspector on
 `http://localhost:3210`; source saves keep the last-known-good backend active.
-When the generated project links `@relkit/cli` from this checkout, development
-automatically uses `apps/inspector`; published CLI installs use the packaged
-inspector instead.
+The CLI uses the packaged production inspector, including when linked from this
+checkout. Set `RELKIT_INSPECTOR_ROOT` explicitly to develop inspector source.
 The example route is:
 
 ```sh
@@ -180,7 +189,7 @@ release pull request, auto-merges it after `CI Gate`, and publishes through a
 separate GitHub release workflow using npm trusted publishing. Documentation
 and internal chores outside release paths merge without a release.
 
-`@relkit/app`, `create-relkit`, and the explicitly documented optional
+`@relkit/app`, `create-relkit`, `relkit`, and the explicitly documented optional
 integrations are supported public entry points. Packages described as
 unsupported internals are published only so workspace dependencies remain
 resolvable; application code should not depend on them directly.

@@ -33,6 +33,12 @@ In a TTY, omitted choices open the interactive wizard and an optional staged
 artifact loop. `relkit create` and `bunx create-relkit` share that resolver,
 staging transaction, and generator.
 
+The unscoped CLI package provides the same generator through `bunx relkit`:
+
+```sh
+bunx relkit@latest create relkit-orders --template api
+```
+
 Available templates are `minimal`, `api`, and `agent`. Use `--no-install`,
 `--no-git`, or `--no-examples` only when surrounding automation owns that step.
 See `bunx create-relkit@latest --help` for the current generated reference.

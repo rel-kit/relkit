@@ -47,6 +47,7 @@
     { "path": "./packages/providers-local" },
     { "path": "./packages/providers-standard" },
     { "path": "./packages/realtime" },
+    { "path": "./packages/relkit" },
     { "path": "./packages/routes" },
     { "path": "./packages/runtime-effect" },
     { "path": "./packages/runtime-hono" },

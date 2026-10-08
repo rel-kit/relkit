@@ -117,11 +117,11 @@ export function resolveInspectorInstallation(
 ): InspectorInstallation {
   const configured = source.RELKIT_INSPECTOR_ROOT;
   if (configured !== undefined) return sourceInstallation(configured);
-  const workspace = resolve(baseDirectory, "../../../../apps/inspector");
-  if (existsSync(join(workspace, "package.json"))) return sourceInstallation(workspace);
-  const packaged = resolve(baseDirectory, "../inspector");
-  if (existsSync(join(packaged, "server.js")))
-    return { root: packaged, command: ["node", "server.js"] };
+  for (const location of ["../inspector", "../../dist/inspector"]) {
+    const packaged = resolve(baseDirectory, location);
+    if (existsSync(join(packaged, "server.js")))
+      return { root: packaged, command: ["node", "server.js"] };
+  }
   throw new Error("The packaged RELKIT inspector is missing. Reinstall @relkit/cli.");
 }
 /** Validates an explicit source inspector installation and prepares its launch inputs.

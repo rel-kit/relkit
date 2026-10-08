@@ -146,6 +146,15 @@ scaffold smoke. The automated release uses `--ci-pack` to validate the exact
 archive manifest and checksums without those long smoke tests; the full command
 remains available from a clean checkout or after committing the change.
 
+Both release modes run the packed `bunx relkit` smoke test from an empty
+directory with an isolated cache and no global CLI on `PATH`. It checks bare,
+latest, and pinned commands, CLI help and exit status, and scaffold parity with
+`@relkit/cli`. To repeat it against saved release archives:
+
+```sh
+bun run scripts/pack-and-smoke-relkit.ts --artifacts /path/to/npm-release
+```
+
 ## Verification of these guides
 
 From the repository root, check the documentation and OpenSpec change with:

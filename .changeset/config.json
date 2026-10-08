@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
   "changelog": false,
   "commit": false,
-  "fixed": [["@relkit/*", "create-relkit"]],
+  "fixed": [["@relkit/*", "create-relkit", "relkit"]],
   "linked": [],
   "access": "public",
   "baseBranch": "main",

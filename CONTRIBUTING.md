@@ -31,6 +31,23 @@ preserves that explicit release intent. All public packages ship on one fixed
 version, so select the package whose public behavior changed rather than the
 whole workspace.
 
+## Bootstrap the unscoped CLI package
+
+The first `relkit` publication requires an authenticated maintainer. Publish
+the validated `relkit-<version>.tgz` archive from the release artifact directory
+with `npm publish`, then configure the same trusted publisher used by the other
+packages:
+
+```sh
+npm trust github relkit --repository rel-kit/relkit \
+  --file ci.yml --environment npm --allow-publish
+```
+
+The package must exist and the account must have write access and 2FA enabled
+before configuring [npm trusted publishing](https://docs.npmjs.com/cli/v11/commands/npm-trust/).
+Subsequent releases publish the wrapper after its exact `@relkit/cli` dependency
+through the existing release workflow.
+
 ## Pull requests
 
 Keep changes focused, add the smallest regression check that proves non-trivial

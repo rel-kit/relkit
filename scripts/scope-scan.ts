@@ -9,7 +9,7 @@ export type ScopeViolation = {
   message: string;
 };
 const approvedPackages = new Set(
-  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-relkit deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs local-service observability openapi provider providers-local providers-standard realtime routes runtime-effect runtime-hono schema services supervisor testing tools".split(
+  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-relkit deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs local-service observability openapi provider providers-local providers-standard realtime relkit routes runtime-effect runtime-hono schema services supervisor testing tools".split(
     " ",
   ),
 );

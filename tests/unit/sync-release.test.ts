@@ -38,7 +38,7 @@ test("release sync retains the CLI editor assets and remains idempotent", async 
       join(root, "patches/drizzle-orm.patch"),
       join(fixture, "patches/drizzle-orm.patch"),
     );
-    for (const name of ["cli", "app"]) {
+    for (const name of ["cli", "app", "relkit"]) {
       const directory = join(fixture, "packages", name);
       await mkdir(directory, { recursive: true });
       await copyFile(join(root, "packages", name, "package.json"), join(directory, "package.json"));
@@ -65,6 +65,11 @@ test("release sync retains the CLI editor assets and remains idempotent", async 
     const app = JSON.parse(await readFile(join(fixture, "packages/app/package.json"), "utf8"));
     expect(cli.files).toEqual(["dist", "editor"]);
     expect(app.files).toEqual(["dist"]);
+    const wrapper = JSON.parse(
+      await readFile(join(fixture, "packages/relkit/package.json"), "utf8"),
+    );
+    expect(wrapper.files).toEqual(["dist"]);
+    expect(wrapper.dependencies["@relkit/cli"]).toBe("workspace:*");
     const generator = JSON.parse(
       await readFile(join(fixture, "packages/create-relkit/package.json"), "utf8"),
     );
