@@ -1,6 +1,6 @@
 {
   "name": "@relkit/providers-standard",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Empty compatibility package retained for RELKIT tooling.",
   "license": "MIT",
   "repository": {
