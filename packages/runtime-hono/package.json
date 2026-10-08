@@ -58,7 +58,7 @@
     "@effect/vitest": "catalog:",
     "@langchain/core": "catalog:",
     "@langchain/langgraph": "catalog:",
-    "@modelcontextprotocol/client": "2.0.0",
+    "@modelcontextprotocol/client": "2.2.0",
     "@orpc/client": "catalog:",
     "@relkit/client": "workspace:*",
     "@relkit/providers-local": "workspace:*",
