@@ -1,0 +1,7 @@
+export default defineBucket({
+  id: "orders.receipts",
+  profile: "receipts",
+  visibility: "private",
+  maxObjectBytes: 5_000_000,
+  allowedContentTypes: ["application/pdf"],
+});

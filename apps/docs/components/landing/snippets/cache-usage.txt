@@ -1,0 +1,16 @@
+import prices from "prices.cache.js";
+
+export default defineFunction({
+  input: z.object({ sku: z.string() }),
+  output: z.number(),
+
+  dependencies: { cache: { prices } },
+
+  handler: ({ sku }, context) =>
+    context.cache.prices.getOrSet(
+      { sku },
+
+      // Compute the item price on a cache miss.
+      async () => 1_000,
+    ),
+});

@@ -1,0 +1,15 @@
+const orders = sqliteTable("orders", {
+  orderId: text("order_id").primaryKey(),
+  totalCents: integer("total_cents").notNull(),
+});
+
+export default defineDrizzleService({
+  schema: { orders },
+
+  client: ({ env }) => {
+    const sqlite = new Database(env.DATABASE_PATH);
+    return drizzle({ client: sqlite });
+  },
+
+  dispose: (database) => database.$client.close(),
+});

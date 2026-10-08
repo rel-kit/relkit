@@ -1,0 +1,21 @@
+export default defineFunction({
+  input: z.object({}),
+  output: z.array(
+    z.object({
+      orderId: z.string(),
+      totalCents: z.number(),
+    }),
+  ),
+
+  handler: async (_input, context) => {
+    const orders = await context.database.orders.findMany();
+
+    return orders.map(({ orderId, totalCents }) => ({
+      orderId,
+      totalCents,
+    }));
+  },
+});
+
+// Example output for a stored order:
+// [{ orderId: "order-1", totalCents: 2_000 }]

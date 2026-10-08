@@ -1,0 +1,29 @@
+import { orderInput, createOrderOutput } from "schemas.js";
+import { receiptObjectName } from "receipt-object.js";
+
+export default defineFunction({
+  input: orderInput,
+  output: createOrderOutput,
+
+  handler: async (input, context) => {
+    // Trace the order's pricing calculation.
+    const totalCents = await context.trace.span(
+      "orders.calculate-total",
+      { attributes: { "order.id": input.orderId } },
+      async () => input.quantity * 1_000,
+    );
+
+    context.trace.event("orders.priced", { totalCents });
+
+    context.log.info("Order created", {
+      orderId: input.orderId,
+      totalCents,
+    });
+
+    return {
+      orderId: input.orderId,
+      receiptKey: receiptObjectName(input.orderId),
+      totalCents,
+    };
+  },
+});
