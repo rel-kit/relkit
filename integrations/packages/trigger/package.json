@@ -72,6 +72,6 @@
     "@relkit/provider": "workspace:*"
   },
   "optionalDependencies": {
-    "@trigger.dev/sdk": "4.5.16"
+    "@trigger.dev/sdk": "4.7.2"
   }
 }
