@@ -1,3 +1,4 @@
+/** Pure descriptor and request-context wiring; generated source retains RELKIT APIs. */
 export const SERVER_REGISTRATION_SOURCE = `
 function bindAgents() {
   for (const node of plan.agents) {

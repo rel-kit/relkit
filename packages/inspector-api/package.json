@@ -32,8 +32,8 @@
     "@relkit/contracts": "workspace:*",
     "@relkit/observability": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
-    "hono": "4.13.5",
-    "effect": "4.0.0-rc.115"
+    "hono": "catalog:",
+    "effect": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",
@@ -41,7 +41,7 @@
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false"
   },
   "devDependencies": {
-    "@effect/vitest": "4.0.0-rc.115",
-    "vitest": "5.0.1"
+    "@effect/vitest": "catalog:",
+    "vitest": "catalog:"
   }
 }

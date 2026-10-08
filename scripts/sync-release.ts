@@ -2,6 +2,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { workspacePackageDirectories } from "./workspace-packages.js";
 import { packedTemplates } from "./release-templates.js";
+import { buildCatalog, nativeBuildCatalogSource, patchRegistrations } from "./build-catalog.js";
+import { dependencyFields, resolveCatalogVersion } from "./catalog-manifest.js";
 
 const root = resolve(import.meta.dir, "..");
 const repository = "https://github.com/rel-kit/relkit";
@@ -63,24 +65,33 @@ const descriptions: Record<string, string> = {
   "@relkit/effect-mq": "Effect MQ retryable-jobs integration for RELKIT.",
   "create-relkit": "Create a RELKIT application from a supported project template.",
 };
-const dependencyFields = [
-  "dependencies",
-  "devDependencies",
-  "optionalDependencies",
-  "peerDependencies",
-] as const;
 type TemplateManifest = Record<string, unknown> &
   Partial<Record<(typeof dependencyFields)[number], Record<string, string>>>;
 const write = process.argv.includes("--write");
 const stale: string[] = [];
 
 async function syncJson(path: string, value: Record<string, unknown>): Promise<void> {
-  const output = `${JSON.stringify(value, null, 2)}\n`;
-  if ((await readFile(path, "utf8")) === output) return;
+  await syncText(path, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+async function syncText(path: string, output: string): Promise<void> {
+  try {
+    if ((await readFile(path, "utf8")) === output) return;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  }
   if (write) await writeFile(path, output);
   else stale.push(path);
 }
 
+const rootPath = join(root, "package.json");
+const rootManifest = JSON.parse(await readFile(rootPath, "utf8")) as Record<string, unknown>;
+await syncJson(rootPath, {
+  ...rootManifest,
+  patchedDependencies: patchRegistrations(rootManifest),
+});
+const catalog = await buildCatalog(root, rootManifest);
+const metadataPackages = new Set(["@relkit/cli", "create-relkit", "@relkit/effect-mq"]);
 const versions = new Set<string>();
 for (const directory of workspacePackageDirectories(root)) {
   const path = join(directory, "package.json");
@@ -107,14 +118,33 @@ for (const directory of workspacePackageDirectories(root)) {
     version,
     description,
     license: "MIT",
-    repository: { type: "git", url: `${repository}.git`, directory: relative(root, directory) },
+    repository: {
+      type: "git",
+      url: `${repository}.git`,
+      directory: relative(root, directory),
+    },
     homepage: `${repository}#readme`,
     bugs: { url: `${repository}/issues` },
-    files: name === "@relkit/cli" ? ["dist", "editor"] : ["dist"],
+    files:
+      name === "@relkit/cli"
+        ? ["dist", "editor"]
+        : name === "create-relkit"
+          ? ["dist", "src/catalog-resolution.ts", "src/catalog-resolution.types.ts"]
+          : ["dist"],
     publishConfig: { access: "public" },
     engines: { bun: ">=1.3.10" },
     ...rest,
+    ...(metadataPackages.has(name)
+      ? {
+          relkit: {
+            ...(manifest.relkit as Record<string, unknown> | undefined),
+            buildCatalog: catalog,
+          },
+        }
+      : {}),
   });
+  if (name === "@relkit/effect-mq")
+    await syncText(join(directory, "src/build-catalog.ts"), nativeBuildCatalogSource(catalog));
 }
 
 if (versions.size !== 1)
@@ -126,8 +156,13 @@ for (const template of packedTemplates) {
   for (const field of dependencyFields) {
     const dependencies = manifest[field];
     if (dependencies === undefined) continue;
-    for (const name of Object.keys(dependencies))
+    for (const name of Object.keys(dependencies)) {
       if (name.startsWith("@relkit/") || name === "create-relkit") dependencies[name] = version;
+      else
+        dependencies[name] =
+          catalog.dependencies[name] ??
+          resolveCatalogVersion(rootManifest, name, dependencies[name]);
+    }
   }
   await syncJson(path, manifest);
 }

@@ -1,9 +1,11 @@
+import { effectVersion, effectMqSdk } from "../build-catalog.js";
+
 export interface EffectMqDeploymentProfile {
   readonly provider: "effect-mq";
   readonly compatibility: "native";
   readonly adapterId: "effect-mq";
-  readonly effect: "4.0.0-rc.115";
-  readonly sdk: "effect-mq@0.7.0";
+  readonly effect: typeof effectVersion;
+  readonly sdk: typeof effectMqSdk;
   readonly database: "postgresql";
   readonly durableSleep: false;
   readonly workerRuntime: "bun";
@@ -29,8 +31,8 @@ export const deploymentProfile: EffectMqDeploymentProfile = Object.freeze({
   provider: "effect-mq",
   compatibility: "native",
   adapterId: "effect-mq",
-  effect: "4.0.0-rc.115",
-  sdk: "effect-mq@0.7.0",
+  effect: effectVersion,
+  sdk: effectMqSdk,
   database: "postgresql",
   durableSleep: false,
   workerRuntime: "bun",

@@ -1,0 +1,15 @@
+[FAIL] FAILURES:
+  (fail) Phase 0 guardrails > package exports resolve only through the public entry [180002.42ms]
+  (fail) Phase 0 guardrails > package exports resolve only through the public entry [180002.42ms]
+  error: expect(received).toBe(expected)
+  Expected: 0
+  Received: 143
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/phase0.test.ts:359:29)
+
+SUMMARY:
+   27 pass
+   1 fail
+   1 error
+  Ran 28 tests across 1 file. [189.52s]
+
+[full output: rtk recall 22f9641fdd78]

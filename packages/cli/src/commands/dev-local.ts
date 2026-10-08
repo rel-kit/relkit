@@ -1,21 +1,32 @@
-import { formatDiagnostics, type Diagnostic } from "@relkit/diagnostics";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import type { LocalServiceRecipeInput } from "@relkit/local-service";
-import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
-import { buildProject } from "./build.js";
-import { checkDevProject } from "./dev-check.js";
-import { localPlanFrom, reconcileLocalServices } from "./dev-local-services.js";
-export { checkedLocalArtifacts } from "./dev-local-services.js";
-import type { DevLocalServiceOwner } from "./dev-local-runtime.js";
+import { Cause, Context, Effect, Layer, ManagedRuntime } from "effect";
+import { createLoggerLayer } from "@relkit/runtime-effect";
+import { runExecutionPromise } from "@relkit/contracts/operation";
+import { cliOriginalError, cliPromise } from "../cli-errors.js";
+import { CliCleanup } from "../services/cleanup.service.js";
+import { localCapabilitiesLayer } from "../services/local-capabilities.js";
+import { cliCleanupSnapshotUnsafe, retainCliCleanupFailures } from "../cli-cleanup-evidence.js";
+import { makeDevLocalCompilerEffect } from "./dev-local-compiler.js";
 import type { TelemetryConfiguration } from "@relkit/observability";
-import { localWorkerArtifacts, prepareLocalWorkerOverrides } from "./local-service-options.js";
+import type { DevLocalCompiler, EffectDevLocalCompiler } from "./dev-local.types.js";
+export { checkedLocalArtifacts } from "./dev-local-services.js";
+export { formatDevDiagnostics } from "./dev-local-diagnostics.js";
+export { makeDevLocalCompilerEffect } from "./dev-local-compiler.js";
+export type { DevLocalCompiler } from "./dev-local.types.js";
 
-export interface DevLocalCompiler {
-  readonly compile: CandidateCompile;
-  readonly close: () => Promise<void>;
-}
+/** Private manual SDK compatibility owner; CLI commands use native factory acquisition. */
+class ManualCompiler extends Context.Service<ManualCompiler, EffectDevLocalCompiler>()(
+  "relkit/cli/ManualDevCompiler",
+) {}
 
+/**
+ * Retains the public compiler/close Promise facade with one reused service runtime.
+ * @param projectRoot - Authored project root.
+ * @param localEnabled - Existing local-service policy.
+ * @param configureTelemetry - Optional foreign configuration callback.
+ * @param color - Existing diagnostic presentation.
+ * @param backendPort - Stable backend port.
+ * @returns Manual owner; concurrent closes join the same resources.
+ */
 export function createDevLocalCompiler(
   projectRoot: string,
   localEnabled = true,
@@ -23,98 +34,62 @@ export function createDevLocalCompiler(
   color = false,
   backendPort = 3000,
 ): DevLocalCompiler {
-  let owner: DevLocalServiceOwner | undefined;
-  const recipes = new Map<string, LocalServiceRecipeInput>();
-  return Object.freeze({
-    compile: async (request: CandidateCompileRequest) => {
-      const checked = await checkDevProject(
-        {
-          projectRoot,
-          generationId: `dev-${request.token.sourceToken}-${request.token.generationToken}`,
-        },
-        request.signal,
-      );
-      if (!checked.ok)
-        throw new Error(formatDevDiagnostics(projectRoot, checked.diagnostics, color));
-      if (configureTelemetry) {
-        const graph = JSON.parse(checked.outputs.graph) as {
-          nodes: { kind: string; telemetry?: TelemetryConfiguration }[];
-        };
-        await configureTelemetry(graph.nodes.find((node) => node.kind === "app")?.telemetry ?? {});
-      }
-      let local = localEnabled
-        ? await reconcileLocalServices(projectRoot, checked, recipes, owner, request, backendPort)
-        : undefined;
-      owner = local?.owner ?? owner;
-      const built = await buildProject({
+  const runtime = ManagedRuntime.make(
+    Layer.effect(
+      ManualCompiler,
+      makeDevLocalCompilerEffect({
         projectRoot,
-        mode: "development",
-        buildDirectory: request.outputDirectory,
-        signal: request.signal,
-        check: async () => checked,
-        ...(local?.generationId === undefined
-          ? {}
-          : { providerOverridesGeneration: local.generationId }),
-      });
-      if (!built.ok) throw new Error(formatDevDiagnostics(projectRoot, built.diagnostics, color));
-      if (local !== undefined && local.workerBindings.length > 0) {
-        const workerOverridesFile = await prepareLocalWorkerOverrides(local.owner.overrideFile);
-        const activated = await reconcileLocalServices(
-          projectRoot,
-          checked,
-          recipes,
-          local.owner,
-          request,
-          backendPort,
-          true,
-          localWorkerArtifacts(
-            localPlanFrom(checked).services,
-            local.workerBindings,
-            request.outputDirectory,
-            resolve(projectRoot, "node_modules"),
-            workerOverridesFile,
-          ),
-        );
-        if (activated === undefined) throw new Error("Local worker activation produced no owner.");
-        local = activated;
-        owner = local.owner;
-      }
-      return {
-        entrypoint: "server/index.js",
-        ...(local === undefined
-          ? {}
-          : {
-              environment: {
-                RELKIT_LOCAL_SERVICE_INSPECTOR_STATE: local.inspectorState,
-                ...(local.generationId === undefined
-                  ? {}
-                  : {
-                      RELKIT_PROVIDER_OVERRIDES_FILE: local.owner.overrideFile,
-                      ...(local.workerBindings.length === 0 ? {} : { RELKIT_WORKER_ROLE: "api" }),
-                    }),
-              },
-            }),
-      };
-    },
-    close: async () => owner?.close(),
-  });
-}
-
-export function formatDevDiagnostics(
-  projectRoot: string,
-  diagnostics: readonly Diagnostic[],
-  color = false,
-): string {
-  if (diagnostics.length === 0) return "Project check failed.";
-  return formatDiagnostics(diagnostics, {
-    projectRoot,
-    color,
-    source: (file) => {
+        localEnabled,
+        color,
+        backendPort,
+        ...(configureTelemetry
+          ? {
+              configureTelemetry: (configuration: TelemetryConfiguration) =>
+                cliPromise("dev.telemetry.callback", () =>
+                  Promise.resolve(configureTelemetry(configuration)),
+                ).pipe(Effect.uninterruptible),
+            }
+          : {}),
+      }),
+    ).pipe(
+      Layer.provideMerge(localCapabilitiesLayer),
+      Layer.provideMerge(createLoggerLayer({ component: "cli", human: false, json: false })),
+    ),
+  );
+  let closing: Promise<void> | undefined;
+  const owner: DevLocalCompiler = {
+    compile: async (request) => {
+      const cleanup = await runExecutionPromise(runtime, CliCleanup);
       try {
-        return readFileSync(resolve(projectRoot, file), "utf8");
-      } catch {
-        return undefined;
+        return await runExecutionPromise(
+          runtime,
+          ManualCompiler.use((service) => service.compileEffect(request)).pipe(
+            Effect.mapError(cliOriginalError),
+          ),
+          { signal: request.signal },
+        );
+      } catch (error) {
+        const original = request.signal?.aborted ? request.signal.reason : error;
+        retainCliCleanupFailures(original, cliCleanupSnapshotUnsafe(cleanup));
+        throw original;
       }
     },
-  });
+    close: () =>
+      (closing ??= (async () => {
+        const cleanup = await runExecutionPromise(runtime, CliCleanup);
+        let failure: unknown;
+        try {
+          await runtime.dispose();
+        } catch (error) {
+          failure = error;
+        }
+        retainCliCleanupFailures(owner, [
+          ...cliCleanupSnapshotUnsafe(cleanup),
+          ...(failure === undefined
+            ? []
+            : [{ operation: "dev.compiler.runtime.release", cause: Cause.fail(failure) }]),
+        ]);
+      })()),
+  };
+  return Object.freeze(owner);
 }

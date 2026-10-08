@@ -1,13 +1,16 @@
 import { option } from "./cli-help-builders.js";
 
+/** Reused static project-directory flag; discovery occurs only during execution. */
 export const projectRoot = option(
   "project-root",
   "string",
   "Application directory (defaults to cwd)",
 );
+/** Reused configuration selector; help never reads environment values. */
 export const environment = option("environment", "string", "Provider environment configuration", [
   "env",
 ]);
+/** Shared deployment syntax; secret values are accepted by the owning command boundary. */
 export const deployOptions = [
   projectRoot,
   option("stack", "string", "Pulumi stack name (default: development)"),

@@ -1,0 +1,115 @@
+{
+  "reviewer": "/root",
+  "author": "/root/native_gate",
+  "status": "accepted at current hashes; independent EOF and controlled/native/strict gates passed",
+  "files": [
+    {
+      "path": "packages/cli/src/bin.ts",
+      "lines": 48,
+      "sha256": "edac55c1b97059b94cc5c420fe9f5e8b7b687af8bfe6c84f0ff55041946ba759",
+      "classification": "Effect domain/native compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/contributor-callback.ts",
+      "lines": 48,
+      "sha256": "cbeca2715611ee33ff59e848b9b50161abf3529de4530d18d436ca6b1b942559",
+      "classification": "Effect domain/native compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/contributor-launcher.ts",
+      "lines": 36,
+      "sha256": "fbbc443a5ec47d33cfd4344f861fe9ff5138851f76aa537752842fe969139f30",
+      "classification": "Effect domain/native compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/contributor-process.service.ts",
+      "lines": 117,
+      "sha256": "2b31a6726913938502e880b263de233280207f6fc873c4aa51fb18e9d54b3605",
+      "classification": "Effect domain/native compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/contributor-process.types.ts",
+      "lines": 19,
+      "sha256": "85d3d2fbc19bb6328598e956c67d2f2434772b4f4f41037398519b52042a5f94",
+      "classification": "pure Schema/type contract"
+    },
+    {
+      "path": "packages/cli/src/contributor-workspace.service.ts",
+      "lines": 236,
+      "sha256": "e168246fed842c0433be183ca8a32bd76c5deed095623211e8f7450070b86fd3",
+      "classification": "Effect domain/native compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/contributor.schemas.ts",
+      "lines": 29,
+      "sha256": "c88686a2259f24d6042a5f8ea3d36876d57478a7641db5bd84f786c75c7a2312",
+      "classification": "pure Schema/type contract"
+    },
+    {
+      "path": "packages/cli/src/contributor.types.ts",
+      "lines": 45,
+      "sha256": "0f72b323dea20323d58c31c1aaed925cd71cb41df8aab825c5f6082ef834efd9",
+      "classification": "pure Schema/type contract"
+    },
+    {
+      "path": "packages/cli/src/index.ts",
+      "lines": 2,
+      "sha256": "384ac6a5c2d8f191d835c6f67f07f1e2ff7f21e3a7b4fca708fd06e06a5779d8",
+      "classification": "pure barrel"
+    },
+    {
+      "path": "packages/cli/src/local-workspaces.ts",
+      "lines": 38,
+      "sha256": "a19ceb84e2e27115a70065d258fce01b0edd2eea7637d645a5f7ac752d538677",
+      "classification": "Effect domain/native compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/local.ts",
+      "lines": 146,
+      "sha256": "d39b7a6f97fedda5ee1162dc27632c2bf84828b62689d92dbe1b212d4d5427ab",
+      "classification": "Effect domain/native compatibility edge"
+    },
+    {
+      "path": "packages/cli/tests/contributor/cancellation.test.ts",
+      "classification": "controlled or native acceptance",
+      "lines": 25,
+      "sha256": "3dc083ce928b50148e20850c9900bdce94a523b29e3c491c36eaf627868a1976"
+    },
+    {
+      "path": "packages/cli/tests/contributor/concurrency.test.ts",
+      "lines": 40,
+      "sha256": "0833828cfe49a3321ce95a7a99c3210e5ef77ac600b3dcbc049e129db5fd8bff",
+      "classification": "controlled or native acceptance"
+    },
+    {
+      "path": "packages/cli/tests/contributor/domain.test.ts",
+      "lines": 142,
+      "sha256": "911c8097733479a2f859e1fff1b5ad5e9bd173bf36b81a11fefb52c21d38092b",
+      "classification": "controlled or native acceptance"
+    },
+    {
+      "path": "packages/cli/tests/contributor/native.acceptance.ts",
+      "lines": 107,
+      "sha256": "b99d566e654b49d3d766f37ade843502badd6f6c655fbad968e656259fbfece2",
+      "classification": "controlled or native acceptance"
+    },
+    {
+      "path": "packages/cli/tests/contributor/type-probes.test.ts",
+      "lines": 82,
+      "sha256": "696ea895f558d6f0fe7cf4ab4ae0a29f9103dcf5bebb323c503b97fd72ac718e",
+      "classification": "controlled or native acceptance"
+    },
+    {
+      "path": "packages/cli/tests/contributor/workspace.fixture.ts",
+      "lines": 102,
+      "sha256": "7709bbcd847e6b11d615bffe0707c173c4096fa150fb36bf9b6a9a1e787032a0",
+      "classification": "controlled or native acceptance"
+    },
+    {
+      "path": "tests/generator/local-workspace.test.ts",
+      "lines": 240,
+      "sha256": "00443605d8ddbe2a9940f752fc31272658e721e522b6b29906dda857b3eca648",
+      "classification": "controlled or native acceptance"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, realpath, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, expect, test } from "bun:test";
@@ -199,6 +199,36 @@ test("keeps the active backend when a later candidate fails", async () => {
   expect(await (await fetch(`http://127.0.0.1:${session.backendPort}/hello`)).text()).toBe("hello");
 });
 
+test("retains fingerprints only for active or draining generations across failed verifications", async () => {
+  const root = await makeRoot();
+  const graphHash = "sha256:bounded-fingerprints";
+  let attempts = 0;
+  const session = await startDev({
+    ...options(root, graphHash),
+    healthTimeoutMs: 150,
+    compile: async ({ outputDirectory }) => {
+      const entrypoint = join(outputDirectory, "server.ts");
+      await writeFile(
+        entrypoint,
+        serverSource(++attempts % 2 === 0 ? "sha256:rejected" : graphHash),
+      );
+      return { entrypoint };
+    },
+  });
+  sessions.push(session);
+  for (let version = 1; version <= 6; version += 1) {
+    const previous = session.active;
+    expect(await session.notifySourceChange(version, ["relkit.config.ts"])).toBe(version % 2 === 0);
+    if (version % 2 === 1) expect(session.active).toBe(previous);
+    expect(session.fingerprints.size).toBe(1);
+    expect(session.drains.size).toBe(1);
+    expect(session.fingerprints.has(session.active!.token.generationToken)).toBe(true);
+  }
+  await session.stop();
+  expect(session.fingerprints.size).toBe(0);
+  expect(session.drains.size).toBe(0);
+}, 15_000);
+
 test("preserves the initial candidate failure", async () => {
   const root = await makeRoot();
   const logs: Parameters<NonNullable<DevOptions["onLog"]>>[0][] = [];
@@ -351,7 +381,7 @@ test("prefers source when a compiled CLI also contains the packaged inspector", 
 
   const options = resolveInspectorInstallation(compiled, {});
   expect(options.command).toEqual([process.execPath, "run", "dev"]);
-  expect(options.root).toBe(source);
+  expect(options.root).toBe(await realpath(source));
 });
 
 test("reads the inspector port from relkit.config.ts unless the CLI overrides it", async () => {

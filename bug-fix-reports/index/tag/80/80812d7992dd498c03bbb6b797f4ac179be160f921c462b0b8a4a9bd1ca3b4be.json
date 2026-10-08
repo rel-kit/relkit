@@ -1,0 +1,35 @@
+{
+  "key": "cancellation",
+  "matches": {
+    "bf-ff09d06c286b307e995bf735": {
+      "id": "bf-ff09d06c286b307e995bf735",
+      "status": "verified",
+      "what": "Cancelling relkit add can let an installer descendant overwrite restored project source and both lock formats.",
+      "root_cause": "packages/create-relkit/src/generator-process.ts nativeRun uses interruptible wrappers for native drain promises but the finalizer only joins the immediate child.",
+      "fixed_by": "Acquire the native stdout/stderr Promises once and retain an allSettled barrier. Uninterruptible process release joins child exit and both physical drains before transaction rollback, preserving primary and cleanup error handling.",
+      "files": [
+        "packages/create-relkit/src/generator-process.ts",
+        "packages/create-relkit/tests/native-process.effect.test.ts",
+        "packages/create-relkit/tests/native-transaction.effect.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-06T20:24:07+00:00",
+      "report": "bug-fix-reports/issues/bf-ff09d06c286b307e995bf735/report.md"
+    },
+    "bf-1c471c67a9bc9b72de77cc3d": {
+      "id": "bf-1c471c67a9bc9b72de77cc3d",
+      "status": "verified",
+      "what": "A jobs request waiting for HTTP headers ignores caller cancellation and keeps the CLI alive after SIGINT.",
+      "root_cause": "packages/cli/src/services/http.service.ts httpLayer.request uses acquireRelease with its default uninterruptible acquisition, masking interruption of the fetch Promise.",
+      "fixed_by": "Opt into interruptible acquisition for the scoped native fetch. Cancellation reaches its AbortSignal before response headers arrive while existing response/body finalizers and byte bounds remain intact.",
+      "files": [
+        "packages/cli/src/services/http.service.ts",
+        "packages/cli/tests/services/http.test.ts",
+        "packages/cli/tests/services/http-native.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-06T20:24:07+00:00",
+      "report": "bug-fix-reports/issues/bf-1c471c67a9bc9b72de77cc3d/report.md"
+    }
+  }
+}

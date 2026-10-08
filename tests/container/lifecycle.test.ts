@@ -170,6 +170,7 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "buckets",
     "cache",
     "cloud-aws",
+    "cli",
     "compiler",
     "config",
     "contracts",

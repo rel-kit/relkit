@@ -1,0 +1,70 @@
+{
+  "coverage": 6,
+  "review": "Independent reviewer provenance is per row: root accepted the retained container fixture, CLI workspace-link delta and narrow release-listing contract with regressions; native_gate accepted both external generator test files and the package-runner integration. The original container row is unchanged.",
+  "files": [
+    {
+      "path": "tests/container/lifecycle.test.ts",
+      "lines": 278,
+      "sha256": "3d72b2542583c21365d543dda1246314ea4224e8d87cd8cfe92b3beb6f731e34",
+      "author": "native_gate",
+      "reviewer": "root",
+      "status": "accepted",
+      "classification": "retained native container acceptance fixture; CLI workspace link added for emitted private helper"
+    },
+    {
+      "path": "tests/generator/add-resolver.test.ts",
+      "lines": 201,
+      "sha256": "c6469560b097d584349345ae543a741390be05f9b1b6160bccc4e2c582c07c57",
+      "author": "plan_create_relkit",
+      "reviewer": "native_gate",
+      "status": "accepted",
+      "classification": "native generator flow compatibility acceptance fixture; shortened name/final-confirmation creation and retained explicit advanced flags",
+      "review": "Complete current EOF and exact diff independently reviewed; controlled prompts reject retired questions, consent/cancellation precedes staging, headless generation retains no-prompt behavior.",
+      "verification": "rtk proxy bun test tests/generator/add-resolver.test.ts tests/generator/create-additions.test.ts;10/10 passed; /tmp/relkit-generator-external-review.log"
+    },
+    {
+      "path": "tests/generator/create-additions.test.ts",
+      "lines": 115,
+      "sha256": "f139c300ddc9a8278c700e8268a0569158e08a29f9e38ca23be1d445909fc659",
+      "author": "plan_create_relkit",
+      "reviewer": "native_gate",
+      "status": "accepted",
+      "classification": "native generator flow compatibility acceptance fixture; shortened name/final-confirmation creation and retained explicit advanced flags",
+      "review": "Complete current EOF and exact diff independently reviewed; controlled prompts reject retired questions, consent/cancellation precedes staging, headless generation retains no-prompt behavior.",
+      "verification": "rtk proxy bun test tests/generator/add-resolver.test.ts tests/generator/create-additions.test.ts;10/10 passed; /tmp/relkit-generator-external-review.log"
+    },
+    {
+      "path": "scripts/test-packages.ts",
+      "lines": 107,
+      "sha256": "d4a78af99e044c8478e1346ae9b584b7735dc81c124ab01a256a1d3410b38c42",
+      "author": "root",
+      "reviewer": "native_gate",
+      "status": "accepted",
+      "classification": "package test execution boundary; generator Effect suites run serially under their required native Bun configuration",
+      "review": "Complete current EOF and exact diff independently reviewed. Vitest partition is exhaustive and disjoint; every discovered test remains admitted. Generator files use the same Bun runtime/configuration as the generator gate, other Vitest files retain Node, and existing Bun groups remain unchanged. Fixed worker count, opt-in cloud/Docker disabling and nonzero-exit propagation are preserved.",
+      "verification": "rtk proxy bun test tests/unit/package-tests.test.ts; discovery 1/1 passed with five assertions. Full combined execution remains owned by root's final verification gate."
+    },
+    {
+      "path": "scripts/release-check-listing.ts",
+      "lines": 49,
+      "sha256": "ced08440cc604c379a54f9e44ae69b171141ed19bb351464202c95a7362735d8",
+      "author": "native_gate",
+      "reviewer": "root",
+      "status": "accepted",
+      "classification": "pure release archive contract; exact required portable catalog source pair with unchanged development-file exclusion",
+      "review": "Full EOF and exact two-file allowlist reviewed independently. Both assets are required for create-relkit regardless of export metadata; no prefix, nested path or unrelated-package exception is introduced.",
+      "verification": "Independent root listing and cold actual-tarball regression gate: 7/7 passed, 14 assertions."
+    },
+    {
+      "path": "tests/unit/release-check-listing.test.ts",
+      "lines": 55,
+      "sha256": "f7ffa0b490d2a236be417be58777f170b3eb20528ff5eb6cc9c65c7c2426ebfa",
+      "author": "native_gate",
+      "reviewer": "root",
+      "status": "accepted",
+      "classification": "pure archive contract regression coverage; exact pair accepted, each missing member and unrelated or rogue sources rejected",
+      "review": "Full EOF independently reviewed. Tests exercise complete generator assets, both absent members without export hints, four non-allowlisted source variants and both exact names in another package.",
+      "verification": "Independent root listing and cold actual-tarball regression gate: 7/7 passed, 14 assertions."
+    }
+  ]
+}

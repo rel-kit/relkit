@@ -1,0 +1,239 @@
+{
+  "status": "verified",
+  "what": "A jobs request waiting for HTTP headers ignores caller cancellation and keeps the CLI alive after SIGINT.",
+  "expected": "Caller abort and CLI SIGINT promptly interrupt fetch while response headers are pending.",
+  "observed": "The fetch signal was not aborted; the public jobs adapter and CLI stayed pending until the test backend released headers.",
+  "root_cause": "packages/cli/src/services/http.service.ts httpLayer.request uses acquireRelease with its default uninterruptible acquisition, masking interruption of the fetch Promise.",
+  "fixed_by": "Opt into interruptible acquisition for the scoped native fetch. Cancellation reaches its AbortSignal before response headers arrive while existing response/body finalizers and byte bounds remain intact.",
+  "files": [
+    "packages/cli/src/services/http.service.ts",
+    "packages/cli/tests/services/http.test.ts",
+    "packages/cli/tests/services/http-native.test.ts"
+  ],
+  "tags": [
+    "cancellation",
+    "http",
+    "jobs-cli"
+  ],
+  "related": [],
+  "scope": {
+    "modules": [
+      "CliHttp",
+      "CliJobs",
+      "CLI invocation runtime"
+    ],
+    "entrypoints": [
+      "fetchJobsJson",
+      "relkit jobs capabilities"
+    ],
+    "invariants": [
+      "Caller abort and CLI SIGINT promptly interrupt fetch while response headers are pending.",
+      "Accepted bodies remain bounded and cleaned up; backend failures keep the existing public diagnostic."
+    ]
+  },
+  "environment": {
+    "package": "packages/cli",
+    "revision": "HEAD e081bde6054c8395209cdec145d8217c5d9c0dfd with uncommitted changes; baseline.json and after-baseline.json retain per-file SHA-256.",
+    "target": "Local macOS; Bun 1.3.10 and installed Effect 4.0.1; temporary loopback HTTP server and temporary project fixtures.",
+    "api_exposed": false,
+    "e2e_available": true,
+    "monitoring": "Existing operation observation and error/cleanup presentation exercised by native test harnesses. No external monitoring service was required or accessed."
+  },
+  "reproduction": [
+    "Start a real loopback server that accepts requests and withholds headers.",
+    "Abort a public jobs request after the backend receives it; require completion before releasing headers.",
+    "Spawn the actual jobs CLI, wait for its request, deliver SIGINT, and require exit 130 before releasing headers.",
+    "Replay successful JSON decoding and an HTTP 503 failure through the same live jobs facade."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Interrupting request acquisition aborts the native fetch signal before headers arrive."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/integration-before.txt",
+        "note": "Public caller cancellation and SIGINT exit complete before the backend releases headers."
+      }
+    ],
+    "after": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-after.txt",
+        "note": "Interrupting request acquisition aborts the native fetch signal before headers arrive."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/integration-after.txt",
+        "note": "Public caller cancellation and SIGINT exit complete before the backend releases headers."
+      },
+      {
+        "kind": "e2e",
+        "path": "evidence/001/integration-after.txt",
+        "note": "The actual jobs capabilities CLI exits 130 on SIGINT while the backend still withholds headers."
+      },
+      {
+        "kind": "check",
+        "path": "evidence/001/after-baseline.json",
+        "note": "Final code revision, pinned Effect version, and source/test hashes."
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "rtk bun x vitest run packages/cli/tests/services/http.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Interrupting request acquisition aborts the native fetch signal before headers arrive.",
+        "output": "evidence/001/unit-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk bun x vitest run packages/cli/tests/services/http.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Interrupting request acquisition aborts the native fetch signal before headers arrive.",
+        "output": "evidence/001/unit-after.txt"
+      }
+    },
+    "runtime": {
+      "kind": "integration",
+      "reason": "The owning workflows are CLI and generator operations, with no owning API endpoint to invoke.",
+      "boundary": "fetchJobsJson and native relkit jobs capabilities executable -> invocation-owned jobs and HTTP layers -> native fetch -> loopback HTTP server",
+      "dependencies": [
+        "Actual public fetchJobsJson and CLI executable, live jobs and HTTP layers, native fetch, and a loopback HTTP backend.",
+        "The backend withholds headers until after cancellation; successful JSON and HTTP 503 responses exercise adjacent consumer behavior."
+      ],
+      "steps": [
+        "Start a real loopback server that accepts requests and withholds headers.",
+        "Abort a public jobs request after the backend receives it; require completion before releasing headers.",
+        "Spawn the actual jobs CLI, wait for its request, deliver SIGINT, and require exit 130 before releasing headers.",
+        "Replay successful JSON decoding and an HTTP 503 failure through the same live jobs facade."
+      ],
+      "before": {
+        "status": "failed",
+        "command": "rtk bun test packages/cli/tests/services/http-native.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Public caller cancellation and SIGINT exit complete before the backend releases headers.",
+        "output": "evidence/001/integration-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk bun test packages/cli/tests/services/http-native.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Public caller cancellation and SIGINT exit complete before the backend releases headers.",
+        "output": "evidence/001/integration-after.txt"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "rtk bun test packages/cli/tests/services/http-native.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "The actual jobs capabilities CLI exits 130 on SIGINT while the backend still withholds headers.",
+      "output": "evidence/001/integration-after.txt"
+    },
+    "checks": [
+      {
+        "name": "package build and strict source types",
+        "status": "passed",
+        "command": "rtk proxy bun x tsc -b packages/create-relkit packages/cli --force --pretty false",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Both affected packages and their referenced dependencies compile.",
+        "output": "evidence/001/package-build.txt"
+      },
+      {
+        "name": "strict regression test types",
+        "status": "passed",
+        "command": "rtk proxy bun x tsc -p /Users/mustafaelsayed/Workspace/relkit/bug-fix-reports/issues/bf-1c471c67a9bc9b72de77cc3d/evidence/001/http-tests.tsconfig.json --pretty false",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Added regressions satisfy the package's strict TypeScript settings.",
+        "output": "evidence/001/test-typecheck.txt"
+      },
+      {
+        "name": "boundary check",
+        "status": "passed",
+        "command": "rtk bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Repository dependency and scope boundaries hold.",
+        "output": "evidence/001/boundaries.txt"
+      },
+      {
+        "name": "authoring lint",
+        "status": "passed",
+        "command": "rtk bun run lint",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Public authoring conventions hold.",
+        "output": "evidence/001/lint.txt"
+      },
+      {
+        "name": "formatting",
+        "status": "passed",
+        "command": "rtk bun x prettier --check packages/create-relkit/src/generator-process.ts packages/create-relkit/tests/native-process.effect.test.ts packages/create-relkit/tests/native-transaction.effect.test.ts packages/cli/src/services/http.service.ts packages/cli/tests/services/http.test.ts packages/cli/tests/services/http-native.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "All six changed source/test files match shared formatting.",
+        "output": "evidence/001/formatting.txt"
+      },
+      {
+        "name": "repository guardrails",
+        "status": "passed",
+        "command": "rtk bun test tests/phase0.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "All 28 guardrails, including packed exports, pass on the isolated retry.",
+        "output": "evidence/001/guardrails-isolated.txt"
+      },
+      {
+        "name": "previously timed-out compiler probes",
+        "status": "passed",
+        "command": "rtk bun x vitest run packages/cli/tests/read-services/type-probes.test.ts packages/cli/tests/start-doctor/type-probes.test.ts --maxWorkers=1",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Positive and negative service-environment compiler probes pass without weaker deadlines.",
+        "output": "evidence/001/compiler-probes-isolated.txt"
+      }
+    ],
+    "regressions": [
+      {
+        "kind": "integration",
+        "boundary": "fetchJobsJson and native relkit jobs capabilities executable -> invocation-owned jobs and HTTP layers -> native fetch -> loopback HTTP server",
+        "status": "passed",
+        "command": "rtk bun test packages/cli/tests/services/http-native.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Live jobs JSON still decodes, HTTP 503 retains its public failure, and both caller abort and executable SIGINT finish before headers.",
+        "output": "evidence/001/integration-after.txt"
+      },
+      {
+        "kind": "integration",
+        "boundary": "CliHttp -> native ReadableStream reader -> scoped cleanup",
+        "status": "passed",
+        "command": "rtk bun x vitest run packages/cli/tests/services/http.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Declared and streamed byte bounds still reject excessive bodies; stalled-body cancellation cancels once and unlocks its reader.",
+        "output": "evidence/001/unit-after.txt"
+      }
+    ],
+    "limitations": [
+      "The broad test:packages run is not claimed as passing: it encountered compiler timeouts and missing-module failures after root node_modules disappeared. Frozen dependencies were restored; affected tests, strict types, previously timed-out CLI compiler probes, and repository guardrails were rerun successfully.",
+      "The read-only repos/effect checkout lacks core Effect/Scope reference files; API behavior was verified against installed effect 4.0.1 source and native runtime tests."
+    ]
+  },
+  "notes": [
+    "Both reported failures were reproduced and recorded before editing either application adapter.",
+    "Initial generator/package runs overlapped and hit time limits; generator acceptance and guardrail retries passed in isolation without deadline changes.",
+    "Source edits use existing adapters and resource scopes; no exports, dependency pins, commits, staging, pushes or protected documents were changed."
+  ]
+}

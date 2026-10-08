@@ -22,6 +22,12 @@ const profile = option(
   "Compatible profile name; otherwise reuse a default/unique profile or scaffold a local profile",
 );
 const internal = option("internal", "boolean", "Keep the artifact out of the public service API");
+/** Builds a named artifact's static help with the common add flags.
+ * @param name - Artifact kind used in invocation syntax.
+ * @param description - Artifact purpose.
+ * @param options - Kind-specific options appended after common flags.
+ * @returns The pure artifact command node.
+ */
 const named = (
   name: string,
   description: string,
@@ -32,6 +38,7 @@ const named = (
     options: [...common, ...options],
   });
 
+/** Pure artifact command tree; prompting and transactions belong to generator services. */
 export const addHelp = command("add", "Add a compile-ready artifact", "relkit add <kind>", {
   commands: [
     named("service", "Create a domain service", [

@@ -1,8 +1,13 @@
-import type { LogRecord, LogLevel } from "@relkit/runtime-effect";
+import type { LogRecord } from "@relkit/runtime-effect";
+import { Schema } from "effect";
 import type { DevLogEvent } from "./dev.js";
+import { runtimeLogSchema } from "./dev-log-record.schemas.js";
 
-const levels = new Set(["trace", "debug", "info", "warn", "error", "fatal"]);
-
+/**
+ * Projects SDK events into the existing admitted-log presentation envelope.
+ * @param event - Native event and bounded child output.
+ * @returns Original forwarding/transient policy with ANSI-only presentation removed.
+ */
 export function devLogRecord(event: DevLogEvent) {
   const child = event.event === "candidate.startup-output" || event.event === "inspector.output";
   const origin = event.event.startsWith("inspector.")
@@ -66,30 +71,24 @@ export function devLogRecord(event: DevLogEvent) {
   return { record, origin, forwarded: presentation, transient };
 }
 
+/**
+ * Validates a child presentation copy without projecting away live envelope metadata.
+ * @param output - One bounded child JSON log line.
+ * @returns The original complete log envelope, absent for malformed output.
+ */
 function parseRuntimeLog(output: string): LogRecord | undefined {
   try {
-    const value = JSON.parse(output) as Partial<LogRecord>;
-    if (
-      value === null ||
-      value.version !== 2 ||
-      value.signal !== "log" ||
-      typeof value.timestamp !== "string" ||
-      typeof value.component !== "string" ||
-      typeof value.message !== "string" ||
-      !levels.has(value.level as LogLevel) ||
-      value.fields === null ||
-      typeof value.fields !== "object" ||
-      Array.isArray(value.fields)
-    )
-      return;
-    for (const key of ["requestId", "traceId", "spanId", "functionId", "serviceId"] as const)
-      if (value[key] !== undefined && typeof value[key] !== "string") return;
-    return value as LogRecord;
+    const value: unknown = JSON.parse(output);
+    return Schema.is(runtimeLogSchema)(value) ? value : undefined;
   } catch {
     return undefined;
   }
 }
 
+/** Removes native terminal styling before admitting structured child output.
+ * @param value - Child terminal output.
+ * @returns Content with native ANSI presentation removed before JSON admission.
+ */
 function stripAnsi(value: string): string {
   return value
     .replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, "")

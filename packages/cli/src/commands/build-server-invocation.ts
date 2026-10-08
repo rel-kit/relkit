@@ -1,3 +1,4 @@
+/** Pure invocation/auth wiring; physical completion is tracked by the typed runtime owner. */
 export const SERVER_INVOCATION_SOURCE = `
 function jobsRuntimeForInvocation() {
   const preferred = (plan.jobs ?? []).find((job) => job.default === true) ?? (plan.jobs ?? [])[0];
@@ -42,12 +43,7 @@ async function invokeHttp(request) {
   const task = request.auth === undefined
     ? execute()
     : authRequestStorage.run(request.auth, execute);
-  activeInvocations.add(task);
-  try {
-    return await task;
-  } finally {
-    activeInvocations.delete(task);
-  }
+  return await runtimeOwner.track(task);
 }
 
 async function invocationContext({ invocation, signal, env, time }, spanId) {

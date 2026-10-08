@@ -1,17 +1,22 @@
 import { Effect, Option } from "effect";
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import {
   document,
   optionArgs,
-  optionalChoice,
   optionalInteger,
   optionalString,
-  repeatedString,
   type SelectInvocation,
 } from "./cli-command-shared.js";
 import { runCommands } from "./cli-command-jobs-runs.js";
+import type { OptionalStringFlag } from "./cli-command.types.js";
+/** Builds job control syntax while native clients and streams remain execution-owned.
+ *
+ * @param select - Invocation recorder.
+ *
+ * @returns The pure jobs parser tree.
+ */
 export function jobsCommand(select: SelectInvocation) {
-  const list = command(select, "list", [optionalString, optionalString, optionalString]);
+  const list = command(select, "list");
   const runs = runCommands(select);
   const schedules = Command.make("schedules").pipe(
     Command.withSubcommands([
@@ -41,16 +46,22 @@ export function jobsCommand(select: SelectInvocation) {
     ["jobs"],
   );
 }
-type FlagFactory = typeof optionalString;
-function command(select: SelectInvocation, name: "list", factories: readonly FlagFactory[]) {
+/**
+ * Builds the job definition listing parser.
+ * @param select - Invocation recorder.
+ * @param name - Definition listing operation.
+ *
+ * @returns Listing syntax with project, environment and service selection.
+ */
+function command(select: SelectInvocation, name: "list") {
   const path = ["jobs", name] as const;
   return document(
     Command.make(
       name,
       {
-        projectRoot: factories[0]!(path, "project-root"),
-        environment: factories[1]!(path, "environment"),
-        service: factories[2]!(path, "service"),
+        projectRoot: optionalString(path, "project-root"),
+        environment: optionalString(path, "environment"),
+        service: optionalString(path, "service"),
       },
       (value) =>
         Effect.sync(() =>
@@ -65,6 +76,11 @@ function command(select: SelectInvocation, name: "list", factories: readonly Fla
     path,
   );
 }
+/**
+ * Builds native schedule listing syntax.
+ * @param select - Invocation recorder.
+ * @returns Native schedule listing syntax.
+ */
 function scheduleList(select: SelectInvocation) {
   const path = ["jobs", "schedules", "list"] as const;
   return document(
@@ -83,6 +99,11 @@ function scheduleList(select: SelectInvocation) {
     path,
   );
 }
+/**
+ * Builds native schedule identity syntax.
+ * @param select - Invocation recorder.
+ * @returns Native schedule identity syntax.
+ */
 function scheduleGet(select: SelectInvocation) {
   const path = ["jobs", "schedules", "get"] as const;
   return document(
@@ -99,6 +120,13 @@ function scheduleGet(select: SelectInvocation) {
     path,
   );
 }
+/**
+ * Builds native schedule mutation syntax.
+ * @param select - Invocation recorder.
+ * @param name - Native schedule operation.
+ *
+ * @returns Explicit control identity and optional upsert definition syntax.
+ */
 function scheduleWrite(select: SelectInvocation, name: "upsert" | "pause" | "resume" | "delete") {
   const path = ["jobs", "schedules", name] as const;
   const fields = {
@@ -116,22 +144,36 @@ function scheduleWrite(select: SelectInvocation, name: "upsert" | "pause" | "res
     path,
   );
 }
+/**
+ * Builds typed dynamic job-control flags.
+ * @param select - Invocation recorder.
+ * @param name - Job control operation.
+ *
+ * @param options - Operation-specific literal flag names.
+ *
+ * @returns A typed dynamic string-flag parser without erased command input.
+ */
 function simple(
   select: SelectInvocation,
   name: "trigger" | "cancel" | "retry" | "capabilities",
   options: readonly string[],
 ) {
   const path = ["jobs", name] as const;
-  const fields: Record<string, unknown> = {};
+  const fields: Record<string, OptionalStringFlag> = {};
   for (const option of ["project-root", "environment", "service", ...options])
     fields[option.replaceAll("-", "_")] = optionalString(path, option);
   return document(
-    Command.make(name, fields as never, (value) =>
+    Command.make(name, fields, (value) =>
       Effect.sync(() => select("jobs", [name, ...serialize(value)])),
     ),
     path,
   );
 }
+/**
+ * Serializes parsed fields in their established order.
+ * @param value - Parsed job fields.
+ * @returns Literal flags in existing field order.
+ */
 function serialize(value: Readonly<Record<string, unknown>>): readonly string[] {
   return Object.entries(value).flatMap(([name, raw]) => {
     const option = name

@@ -17,7 +17,7 @@ test("generated specialized debug logs reach the configured dev sink with retain
     },
   );
   const start = source.indexOf("const specializedInstrumentation =");
-  const end = source.indexOf("const databaseNode =", start);
+  const end = source.indexOf("const databaseStartup =", start);
   expect(start).toBeGreaterThan(0);
   expect(end).toBeGreaterThan(start);
   const capture = new Function(

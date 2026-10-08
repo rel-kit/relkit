@@ -1,6 +1,12 @@
 import { basename, join } from "node:path";
 import { fail } from "../main-support.js";
 
+/**
+ * Preserves actionable DuckDB ownership guidance and existing public failure codes.
+ * @param root - Explicit local telemetry storage root.
+ * @param cause - Original native open failure.
+ * @returns Existing lock/unavailable error without exposing raw lock-provider noise.
+ */
 export function telemetryOpenFailure(root: string, cause: unknown): Error {
   const detail = cause instanceof Error ? cause.message : String(cause);
   const owner = /Conflicting lock is held in (.+?) \(PID (\d+)\)/.exec(detail);

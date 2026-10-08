@@ -1,0 +1,176 @@
+{
+  "reviewer": "native_gate",
+  "review": "Full current EOF reread plus earlier independent functional review; current bytes accepted. No earlier SHA snapshot is claimed as a byte-for-byte drift proof.",
+  "coverage": 21,
+  "findings": "No unresolved findings",
+  "files": [
+    {
+      "path": "packages/cli/src/commands/env.ts",
+      "classification": "Effect composition and compatibility boundary",
+      "lines": 144,
+      "sha256": "b3f3ac5ef692e36120b7d368b6f3f3823513838aebbd2d8d3750743e7cb27c9c",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/env-support.ts",
+      "classification": "Effect composition and compatibility boundary",
+      "lines": 178,
+      "sha256": "2cf8abd08ac550ca48dcce732377a1601f377add17a78482bfa4a857da386142",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/env-format.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 165,
+      "sha256": "f519359086944ef006ec2113f2d6cd7fd57e8e3ed20bf735e5eb8c900078498d",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/env-project.service.ts",
+      "classification": "native or project Context service with captured authority",
+      "lines": 135,
+      "sha256": "9f9c40239d86ee34beb405abfe9799c95ca37fbec22b199e3ec829f2ea0f84cb",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/env-project.types.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 28,
+      "sha256": "85e063de4a26789626dba69ce6cff966704314ca6d696fe98b9b9bedff3cbc30",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/env.schemas.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 6,
+      "sha256": "97ae6c4ee86bcd3cb58969d70d5fc1a9cfdf942939fb93a6b48123db13e4d375",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/env.types.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 57,
+      "sha256": "aa42294da5ec68f4a6ac137de9cf12ea4e0e0e3d7b8c4ea34579ddb5c96d971c",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/graph.ts",
+      "classification": "Effect composition and compatibility boundary",
+      "lines": 141,
+      "sha256": "11489f23df01b9b3ea9f7ff31fcc5c4eff1ea1d051abd86b8529e0ee9b853a55",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/graph-support.ts",
+      "classification": "Effect composition and compatibility boundary",
+      "lines": 101,
+      "sha256": "b36106c85678b97437251d76975f71108b48b16f9dfdbe830de6f57593076da7",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/graph-file.service.ts",
+      "classification": "native or project Context service with captured authority",
+      "lines": 187,
+      "sha256": "e9e67c18b828a705670720f81356f2b8f5680e943c0dd585b86641bfd61cc83c",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/graph.schemas.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 4,
+      "sha256": "d5fe976fb335293e37fb42abd75ab813a744d76e1aa17a8fe172a82b5ced08ee",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/graph.types.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 83,
+      "sha256": "7ffbdff103d6282125509f514558a46cee5b4872490b9c35eda3c4d5e7eac504",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/graph-error.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 14,
+      "sha256": "a91ada4cb93f00ad9949f97e47ba5943b8101265bd35f17db9937b51c8208c1c",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/ports.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 84,
+      "sha256": "660872670829f25844b2e55d6a06854d38001cb7491589e79a8e457fb79a4f28",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/ports.types.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 6,
+      "sha256": "c0043578714ea503153aebf03a5ed25c6560a76248f69d3c60bca1db57b528d7",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/port-availability.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 30,
+      "sha256": "1771f712983d96d518b70311b87509ba5025e000967ee8a2c253000c42b9acec",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/port-availability.service.ts",
+      "classification": "native or project Context service with captured authority",
+      "lines": 111,
+      "sha256": "a52d32d1c343e540241aa0f57cb6bf00f7d533ad7737c91db80ad66d68155570",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/commands/port-availability.types.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 18,
+      "sha256": "e4a82b463cd18daccd16ea9ebedc6d19f845b95b2757f1bfbf84f9c7724e124a",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/tests/read-services/domain.test.ts",
+      "classification": "test or typed fixture",
+      "lines": 244,
+      "sha256": "83faf7981de35fda32cb96bf1001ca9bedc8a32a9850a9b58b39911e7b783d5b",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/tests/read-services/test-files.ts",
+      "classification": "test or typed fixture",
+      "lines": 28,
+      "sha256": "38926366f5359e9e775469a3e34440314ed3bf58ad1bbcc4ccae84c517c47bd0",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/tests/read-services/type-probes.test.ts",
+      "classification": "test or typed fixture",
+      "lines": 91,
+      "sha256": "cba4cbbf5b512d9f4e103412f9f964fb5e33c91a355f48cf7db4c9b9303c003e",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    }
+  ]
+}

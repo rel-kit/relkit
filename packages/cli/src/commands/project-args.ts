@@ -1,16 +1,16 @@
 import { fail } from "../main-support.js";
 import type { MinimumLogLevel } from "@relkit/runtime-effect";
+import { Schema } from "effect";
+import { minimumLogLevelSchema } from "./project-args.schemas.js";
+import type { ProjectArgs } from "./project-args.types.js";
+export type { ProjectArgs } from "./project-args.types.js";
 
-export type ProjectArgs = {
-  readonly projectRoot?: string;
-  readonly port?: number;
-  readonly inspectorPort?: number;
-  readonly local?: "on" | "off";
-  readonly logLevel?: MinimumLogLevel;
-  readonly verbose?: boolean;
-  readonly noColor?: boolean;
-};
-
+/**
+ * Parses the established shared flags without reading configuration or acquiring services.
+ * @param args - Original option tokens.
+ * @param command - Selected command used by existing usage diagnostics.
+ * @returns Explicit validated overrides; unknown options retain usage status two.
+ */
 export function parseProjectArgs(args: readonly string[], command: string): ProjectArgs {
   let projectRoot: string | undefined;
   let port: number | undefined;
@@ -35,9 +35,9 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
     else if (argument === "--no-color" && command === "dev") noColor = true;
     else if (argument === "--log-level" && command === "dev") {
       const selected = value(args, ++index, argument, command);
-      if (!["all", "trace", "debug", "info", "warn", "error", "fatal", "none"].includes(selected))
+      if (!Schema.is(minimumLogLevelSchema)(selected))
         throw fail("RELKIT_DEV_USAGE", "Unknown log level.", 2);
-      logLevel = selected as MinimumLogLevel;
+      logLevel = selected;
     } else
       throw fail(
         `RELKIT_${command.toUpperCase()}_USAGE`,
@@ -56,6 +56,14 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
   };
 }
 
+/**
+ * Requires one following option value while preserving usage error wording.
+ * @param args - Original tokens.
+ * @param index - Position following the current option.
+ * @param option - Option label used in the diagnostic.
+ * @param command - Selected command used by the error code.
+ * @returns The accepted non-option token.
+ */
 function value(args: readonly string[], index: number, option: string, command: string): string {
   const result = args[index];
   if (result === undefined || result.startsWith("-"))
@@ -63,6 +71,12 @@ function value(args: readonly string[], index: number, option: string, command: 
   return result;
 }
 
+/**
+ * Validates a native listener override, including an ephemeral port of zero.
+ * @param value - Original decimal token.
+ * @param command - Selected command used by the error code.
+ * @returns A safe integer from zero through 65535.
+ */
 function portValue(value: string, command: string): number {
   const port = Number(value);
   if (!Number.isSafeInteger(port) || port < 0 || port > 65_535)

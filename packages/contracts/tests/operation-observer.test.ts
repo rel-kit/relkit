@@ -5,7 +5,14 @@ import type { ExecutionDomain } from "../src/operation.types.js";
 
 it.effect("records each standalone consumer owner with declaration-owned labels", () =>
   Effect.gen(function* () {
-    const domains: readonly ExecutionDomain[] = ["client", "inspector", "supervisor", "testing"];
+    const domains: readonly ExecutionDomain[] = [
+      "client",
+      "inspector",
+      "supervisor",
+      "testing",
+      "cli",
+      "generator",
+    ];
     const registry: Metric.MetricRegistry = new Map();
     const caller = { domain: "untrusted-id", operation: "untrusted-input", kind: "untrusted-kind" };
     yield* Effect.gen(function* () {
@@ -25,7 +32,7 @@ it.effect("records each standalone consumer owner with declaration-owned labels"
     const snapshots = [...registry.values()];
     expect(
       snapshots.filter((entry) => entry.id === "relkit_execution_operations_total"),
-    ).toHaveLength(4);
+    ).toHaveLength(domains.length);
     expect(
       snapshots.some((entry) => Object.values(entry.attributes ?? {}).includes("untrusted-id")),
     ).toBe(false);

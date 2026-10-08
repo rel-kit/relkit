@@ -1,10 +1,18 @@
 import type { LogRecord } from "@relkit/runtime-effect";
+import { Schema } from "effect";
+import { errorDetailSchema } from "./dev-log-record.schemas.js";
 
+/**
+ * Selects bounded nested error details from an already redacted envelope.
+ * @param record - Admitted log and optional error/correlation fields.
+ * @param verbose - Whether internal frames and full metadata are requested.
+ * @returns Pure presentation details, with depth and ordinary stack display bounded.
+ */
 export function devLogDetails(record: LogRecord, verbose: boolean): string[] {
   const lines: string[] = [];
   const visit = (value: unknown, depth = 0): void => {
-    if (depth > 6 || value === null || typeof value !== "object") return;
-    const error = value as Record<string, unknown>;
+    if (depth > 6 || !Schema.is(errorDetailSchema)(value)) return;
+    const error = value;
     const code = error.code ?? (depth === 0 ? record.fields.code : undefined);
     if (typeof error.message === "string" && record.fields.message !== error.message)
       lines.push(
@@ -28,7 +36,8 @@ export function devLogDetails(record: LogRecord, verbose: boolean): string[] {
     }
     visit(error.cause, depth + 1);
     if (Array.isArray(error.reasons))
-      for (const reason of error.reasons) visit(reason?.detail, depth);
+      for (const reason of error.reasons)
+        if (Schema.is(errorDetailSchema)(reason)) visit(reason.detail, depth);
   };
   visit(record.fields.error ?? record.fields.cause);
   if (!verbose && !["cli.dev", "app", "inspector", "runtime.http"].includes(record.component)) {

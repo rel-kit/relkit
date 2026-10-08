@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { checkProject } from "../../packages/cli/src/commands/check.ts";
 import { createRegistrationPlan, type ApplicationGraph } from "../../packages/graph/src/index.ts";
+import { prepareProjectDependencyPatch } from "../../packages/create-relkit/src/dependency-patches.ts";
 import {
   ADD_FAILURE_CODES,
   applyScaffoldPlan,
@@ -326,6 +327,7 @@ async function project(template: string): Promise<string> {
   roots.push(parent);
   const root = join(parent, "app");
   await cp(join(templateRoot, template), root, { recursive: true });
+  await prepareProjectDependencyPatch(root);
   return root;
 }
 

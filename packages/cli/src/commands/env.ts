@@ -1,15 +1,22 @@
 import {
   createExample,
+  createExampleEffect,
   EnvCommandError,
   formatCheck,
   formatExplain,
   loadEnvDefinition,
+  loadEnvDefinitionEffect,
   parseEnvArgs,
   resolveStatus,
+  resolveStatusEffect,
   isRequired,
   type EnvCommandOptions,
 } from "./env-support.js";
-import { projectEnv } from "@relkit/config";
+import { projectEnvEffect } from "@relkit/config";
+import { Effect } from "effect";
+import { cliAdapterError, cliTry } from "../cli-errors.js";
+import { observeCli, runCliEffect } from "../cli-runtime.js";
+import { environmentProjectLayer } from "./env-project.service.js";
 import { CLI_EXIT_CODES, type CliCommandContext } from "../main-support.js";
 
 export {
@@ -24,32 +31,66 @@ export {
 };
 export type { EnvCommandOptions } from "./env-support.js";
 
-/** Runs the secret-safe environment command family through the shared reporter. */
+/**
+ * Runs environment commands through the established reporter and exit boundary.
+ * @param args - Subcommand and flags.
+ * @param context - Existing output policy.
+ * @param options - Injected definition, explicit source, and path overrides.
+ * @returns Existing success, failure, or usage status with values excluded from output.
+ */
 export async function runEnv(
   args: readonly string[],
   context: Pick<CliCommandContext, "json" | "reporter">,
   options: EnvCommandOptions = {},
 ): Promise<number> {
   try {
-    const parsed = parseEnvArgs(args);
+    return await runCliEffect(runEnvEffect(args, context, options), environmentProjectLayer);
+  } catch (error) {
+    const code = error instanceof EnvCommandError ? error.code : "RELKIT_ENV_FAILED";
+    context.reporter.error(code, error instanceof Error ? error.message : String(error));
+    return code === "RELKIT_ENV_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
+  }
+}
+
+/**
+ * Composes environment operations lazily within the caller's service graph.
+ * @param args - Subcommand and flags.
+ * @param context - Reporter receiving the unchanged public result shapes.
+ * @param options - Explicit declaration/source injection and path settings.
+ * @returns Lazy exit status requiring CliEnvironmentProject.
+ */
+export const runEnvEffect = Effect.fn("Environment.command")(
+  function* (
+    args: readonly string[],
+    context: Pick<CliCommandContext, "json" | "reporter">,
+    options: EnvCommandOptions = {},
+  ) {
+    const parsed = yield* cliTry("env.args", () => parseEnvArgs(args));
     const settings = {
       ...options,
       ...(parsed.projectRoot === undefined ? {} : { projectRoot: parsed.projectRoot }),
       ...(parsed.environment === undefined ? {} : { environment: parsed.environment }),
       ...(parsed.examplePath === undefined ? {} : { examplePath: parsed.examplePath }),
     };
-    const definition = await loadEnvDefinition(settings);
+    const definition = yield* loadEnvDefinitionEffect(settings);
     const environment = settings.environment ?? process.env.NODE_ENV ?? "development";
     const source = settings.source ?? process.env;
-    const fields = projectEnv(definition);
+    const fields = yield* projectEnvEffect(definition).pipe(
+      Effect.mapError((error) =>
+        cliAdapterError(
+          "env.project",
+          error.syntax ? new SyntaxError(error.message) : new TypeError(error.message),
+        ),
+      ),
+    );
 
     if (parsed.command === "example") {
-      const result = await createExample(fields, settings, parsed.write);
+      const result = yield* createExampleEffect(fields, settings, parsed.write);
       context.reporter.output(result, result.content);
       return CLI_EXIT_CODES.success;
     }
 
-    const resolution = resolveStatus(definition, fields, environment, source);
+    const resolution = yield* resolveStatusEffect(definition, fields, environment, source);
     if (parsed.command === "check") {
       const result = {
         ok: resolution.ok,
@@ -77,9 +118,11 @@ export async function runEnv(
 
     const field = fields.find(({ name }) => name === parsed.name);
     if (field === undefined)
-      throw new EnvCommandError(
-        "RELKIT_ENV_UNKNOWN",
-        `Unknown environment variable: ${parsed.name}`,
+      return yield* Effect.fail(
+        cliAdapterError(
+          "env.explain",
+          new EnvCommandError("RELKIT_ENV_UNKNOWN", `Unknown environment variable: ${parsed.name}`),
+        ),
       );
     const result = {
       ok: true as const,
@@ -96,9 +139,6 @@ export async function runEnv(
     };
     context.reporter.output(result, formatExplain(result));
     return CLI_EXIT_CODES.success;
-  } catch (error) {
-    const code = error instanceof EnvCommandError ? error.code : "RELKIT_ENV_FAILED";
-    context.reporter.error(code, error instanceof Error ? error.message : String(error));
-    return code === "RELKIT_ENV_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
-  }
-}
+  },
+  (effect) => observeCli("env.command", effect),
+);

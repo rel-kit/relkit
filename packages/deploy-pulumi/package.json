@@ -29,12 +29,12 @@
     }
   },
   "dependencies": {
-    "@pulumi/pulumi": "3.259.0",
+    "@pulumi/pulumi": "catalog:",
     "@relkit/contracts": "workspace:*",
     "@relkit/deploy": "workspace:*",
     "@relkit/observability": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
-    "effect": "4.0.0-rc.115"
+    "effect": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",

@@ -1,19 +1,16 @@
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { CliJobs, jobsLiveLayer } from "../services/jobs.service.js";
+import { runCliEffect } from "../cli-runtime.js";
+import type { JobsManifestView } from "./jobs.types.js";
+export type { JobsManifestView } from "./jobs.types.js";
 
-export interface JobsManifestView {
-  readonly jobs?: readonly unknown[];
-  readonly recipes?: readonly unknown[];
-  readonly serviceGenerations?: readonly unknown[];
-  readonly jobsProtocolVersion?: number;
-}
-
-export async function readJobsManifest(root: string): Promise<JobsManifestView | undefined> {
-  try {
-    return JSON.parse(
-      await readFile(resolve(root, ".relkit/generated/jobs.manifest.json"), "utf8"),
-    ) as JobsManifestView;
-  } catch {
-    return undefined;
-  }
+/**
+ * Reads the optional compiled jobs manifest at its established Promise edge.
+ * @param root - Existing explicit project root.
+ * @returns Accepted projection or the existing undefined fallback.
+ */
+export function readJobsManifest(root: string): Promise<JobsManifestView | undefined> {
+  return runCliEffect(
+    CliJobs.use((jobs) => jobs.manifest(root)),
+    jobsLiveLayer(),
+  );
 }

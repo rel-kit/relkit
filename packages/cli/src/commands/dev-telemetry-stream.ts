@@ -1,5 +1,10 @@
 import type { ObservabilityRecord, ObservabilityStreamEventType } from "@relkit/observability";
 
+/**
+ * Maps admitted records onto the existing public stream event names.
+ * @param record - Producer/model-owned admitted record.
+ * @returns Existing event name, or undefined for signals without a stream projection.
+ */
 export function streamTypeForRecord(
   record: ObservabilityRecord,
 ): ObservabilityStreamEventType | undefined {

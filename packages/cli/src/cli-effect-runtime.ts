@@ -1,21 +1,22 @@
-import { Console, Effect, FileSystem, Layer, Path, Result, Stdio, Terminal } from "effect";
-import { CliConfig, CliError, Command, GlobalFlag } from "effect/unstable/cli";
-import { ChildProcessSpawner } from "effect/unstable/process";
+import {
+  Console,
+  Effect,
+  FileSystem,
+  Layer,
+  MutableRef,
+  Path,
+  Ref,
+  Result,
+  Stdio,
+  Terminal,
+} from "effect";
+import { CliConfig, CliError, Command, GlobalFlag } from "effect/cli";
+import { ChildProcessSpawner } from "effect/process";
 import { createCliCommand } from "./cli-command.js";
 import { findCliHelp } from "./cli-help-model.js";
-
-export interface CliInvocation {
-  readonly command: string;
-  readonly args: readonly string[];
-}
-export interface CliParseResult {
-  readonly argv: readonly string[];
-  readonly invocation?: CliInvocation;
-  readonly error?: CliError.CliError;
-  readonly stdout: string;
-  readonly stderr: string;
-  readonly helpPath: readonly string[];
-}
+import { observeCli, runCliEffect } from "./cli-runtime.js";
+import type { CliInvocation, CliParseResult } from "./cli-effect-runtime.types.js";
+export type { CliInvocation, CliParseResult } from "./cli-effect-runtime.types.js";
 
 const cliLayer = Layer.mergeAll(
   FileSystem.layerNoop({}),
@@ -40,39 +41,65 @@ const cliLayer = Layer.mergeAll(
   ),
 );
 
-/** Parses and validates one invocation through Effect CLI without running product handlers. */
-export async function parseEffectCli(
-  input: readonly string[],
-  version: string,
-): Promise<CliParseResult> {
-  const argv = normalizeActionAliases(input);
-  let invocation: CliInvocation | undefined;
-  const stdout: string[] = [];
-  const stderr: string[] = [];
-  const command = createCliCommand((name, args) => {
-    invocation = Object.freeze({ command: name, args: Object.freeze([...args]) });
-  });
-  const capture = captureConsole(stdout, stderr);
-  const result = await Effect.runPromise(
-    Effect.result(
+/**
+ * Parses one invocation with parser-only services acquired inside its effect.
+ * @param input - Caller-owned arguments, including built-in help and version flags.
+ * @param version - Version presented by the built-in version command.
+ * @returns The captured parse result, requiring no product service or runtime.
+ * @remarks Native parser and Console callbacks synchronously update invocation-local Refs;
+ * they never execute an Effect or share state with another parse.
+ */
+export const parseEffectCliEffect = Effect.fn("Cli.parse")(
+  function* (
+    input: readonly string[],
+    version: string,
+  ): Generator<Effect.Effect<unknown>, CliParseResult, never> {
+    const argv = normalizeActionAliases(input);
+    const invocation = yield* Ref.make<CliInvocation | undefined>(undefined);
+    const stdout = yield* Ref.make<readonly string[]>([]);
+    const stderr = yield* Ref.make<readonly string[]>([]);
+    const command = createCliCommand((name, args) => {
+      MutableRef.set(
+        invocation.ref,
+        Object.freeze({ command: name, args: Object.freeze([...args]) }),
+      );
+    });
+    const capture = captureConsole(stdout, stderr);
+    const result = yield* Effect.result(
       Command.runWith(command, { version, renderErrors: true })(argv).pipe(
         Effect.provide(cliLayer),
         Effect.provideService(Console.Console, capture),
       ),
-    ),
-  );
-  return Object.freeze({
-    argv: Object.freeze([...argv]),
-    ...(invocation ? { invocation } : {}),
-    ...(Result.isFailure(result) && CliError.isCliError(result.failure)
-      ? { error: result.failure }
-      : {}),
-    stdout: stdout.join("\n"),
-    stderr: stderr.join("\n"),
-    helpPath: Object.freeze(helpPath(argv)),
-  });
+    );
+    const selected = yield* Ref.get(invocation);
+    return Object.freeze({
+      argv: Object.freeze([...argv]),
+      ...(selected ? { invocation: selected } : {}),
+      ...(Result.isFailure(result) && CliError.isCliError(result.failure)
+        ? { error: result.failure }
+        : {}),
+      stdout: (yield* Ref.get(stdout)).join("\n"),
+      stderr: (yield* Ref.get(stderr)).join("\n"),
+      helpPath: Object.freeze(helpPath(argv)),
+    });
+  },
+  (effect, _input, _version) => observeCli("command.parse", effect),
+);
+
+/**
+ * Adapts standalone parser use to the shared CLI Promise execution edge.
+ * @param input - Arguments to validate without running product handlers.
+ * @param version - Version displayed by the built-in version command.
+ * @returns One isolated parser result after its lifetime completes.
+ */
+export function parseEffectCli(input: readonly string[], version: string): Promise<CliParseResult> {
+  return runCliEffect(parseEffectCliEffect(input, version), Layer.empty);
 }
 
+/** Selects the final JSON flag value using the established CLI precedence.
+ * @param argv - Original CLI arguments.
+ * @returns The last explicit JSON-mode setting, preserving false overrides.
+ */
 export function isJsonMode(argv: readonly string[]): boolean {
   let enabled = false;
   for (const argument of argv) {
@@ -82,6 +109,10 @@ export function isJsonMode(argv: readonly string[]): boolean {
   return enabled;
 }
 
+/** Projects parser failures into the established public error wording.
+ * @param error - Validated Effect CLI parser failure.
+ * @returns Existing public wording, including the required-name compatibility message.
+ */
 export function cliErrorMessage(error: CliError.CliError): string {
   if (
     error._tag === "ShowHelp" &&
@@ -94,6 +125,10 @@ export function cliErrorMessage(error: CliError.CliError): string {
     : error.message;
 }
 
+/** Recognizes unknown-command parser failures for public presentation.
+ * @param error - Validated parser failure.
+ * @returns Existing unknown-command wording, absent for unrelated failures.
+ */
 export function unknownCommandMessage(error: CliError.CliError): string | undefined {
   if (error._tag !== "ShowHelp") return undefined;
   const unknown = error.errors.find((entry) => entry._tag === "UnknownSubcommand");
@@ -103,6 +138,10 @@ export function unknownCommandMessage(error: CliError.CliError): string | undefi
     : unknown.message;
 }
 
+/** Normalizes help and version action aliases before parsing.
+ * @param argv - Original invocation tokens.
+ * @returns The existing help/version action aliases expressed as parser flags.
+ */
 function normalizeActionAliases(argv: readonly string[]): readonly string[] {
   const command = argv.findIndex((argument) => !argument.startsWith("-"));
   if (command < 0) return argv;
@@ -113,6 +152,10 @@ function normalizeActionAliases(argv: readonly string[]): readonly string[] {
   return argv;
 }
 
+/** Selects the static help path from normalized invocation tokens.
+ * @param argv - Normalized invocation tokens.
+ * @returns The matching static help tree path without executing a command.
+ */
 function helpPath(argv: readonly string[]): readonly string[] {
   const path: string[] = [];
   let node = findCliHelp(path);
@@ -125,16 +168,26 @@ function helpPath(argv: readonly string[]): readonly string[] {
   return path;
 }
 
-function captureConsole(stdout: string[], stderr: string[]): Console.Console {
+/**
+ * Captures native parser console callbacks into invocation-owned Refs.
+ * @param stdout - This parse's borrowed output admission.
+ * @param stderr - This parse's diagnostic admission.
+ * @returns A synchronous Console substitute; callbacks never execute an Effect.
+ */
+function captureConsole(
+  stdout: Ref.Ref<readonly string[]>,
+  stderr: Ref.Ref<readonly string[]>,
+): Console.Console {
   const write =
-    (target: string[]) =>
+    (target: Ref.Ref<readonly string[]>) =>
     (...values: readonly unknown[]) => {
-      target.push(values.map(String).join(" "));
+      MutableRef.update(target.ref, (lines) => [...lines, values.map(String).join(" ")]);
     };
-  return Object.assign(Object.create(console) as Console.Console, {
+  return {
+    ...console,
     log: write(stdout),
     info: write(stdout),
     error: write(stderr),
     warn: write(stderr),
-  });
+  };
 }

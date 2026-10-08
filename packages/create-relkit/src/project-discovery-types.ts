@@ -1,11 +1,17 @@
 import type { SourceFactoryKind } from "@relkit/compiler";
 import type { DatabaseDialect } from "./add-types.js";
 
+/**
+ * Statically discovered service member name and referenced binding.
+ */
 export interface DiscoveredServiceMember {
   readonly name: string;
   readonly targetBinding?: string;
 }
 
+/**
+ * Source-declared service identity, capability, members and optional database facts.
+ */
 export interface DiscoveredService {
   readonly domain: string;
   readonly path: string;
@@ -16,6 +22,9 @@ export interface DiscoveredService {
   readonly members: readonly DiscoveredServiceMember[];
 }
 
+/**
+ * Static descriptor kind, identity, export form and owning source path.
+ */
 export interface DiscoveredArtifact {
   readonly kind: SourceFactoryKind;
   readonly path: string;
@@ -28,6 +37,9 @@ export interface DiscoveredArtifact {
   readonly options: readonly string[];
 }
 
+/**
+ * Static provider capability, name, adapter/model identity and default selection.
+ */
 export interface DiscoveredProfile {
   readonly capability: "bucket" | "cache" | "job" | "event" | "model";
   readonly name: string;
@@ -36,6 +48,9 @@ export interface DiscoveredProfile {
   readonly isDefault: boolean;
 }
 
+/**
+ * Deterministic source-only app, provider, service and artifact facts for one project.
+ */
 export interface ProjectDiscovery {
   readonly projectRoot: string;
   readonly packagePath: string;

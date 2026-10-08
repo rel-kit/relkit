@@ -40,7 +40,7 @@ test("append transaction and query share one native connection permit", async ()
             ? [{ name: "origin_request_id" }, { name: "span_id" }]
             : sql.includes("RETURNING key")
               ? [{ key: "ordered" }]
-              : sql.includes("RETURNING id")
+              : sql.includes("SELECT nextval")
                 ? [{ id: "1" }]
                 : [],
       }),
@@ -77,6 +77,7 @@ test("append transaction and query share one native connection permit", async ()
             level: "info",
             component: "test",
             message: "ordered",
+            fields: {},
           },
         },
       ]),
@@ -108,7 +109,7 @@ test("commit failure attempts rollback and remains a tagged storage failure", as
       getRowObjectsJson: () =>
         sql.includes("RETURNING key")
           ? [{ key: "commit-test" }]
-          : sql.includes("RETURNING id")
+          : sql.includes("SELECT nextval")
             ? [{ id: "1" }]
             : [],
     }),
@@ -128,6 +129,7 @@ test("commit failure attempts rollback and remains a tagged storage failure", as
             level: "info",
             component: "test",
             message: "commit",
+            fields: {},
           },
         },
       ]),

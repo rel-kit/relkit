@@ -1,6 +1,9 @@
 import { resolve } from "node:path";
 import { ADD_FAILURE_CODES, ADD_KINDS, AddScaffoldError, type AddKind } from "./add-types.js";
 
+/**
+ * Add flags that consume a string value.
+ */
 const VALUE_OPTIONS = new Set([
   "project-root",
   "service",
@@ -31,8 +34,14 @@ const VALUE_OPTIONS = new Set([
   "database-dialect",
   "base-path",
 ]);
+/**
+ * Add flags that do not accept a value.
+ */
 const BOOLEAN_OPTIONS = new Set(["full", "internal", "no-install"]);
 
+/**
+ * Parsed add kind, argument values, flags, project root and explicit service selection.
+ */
 export interface ParsedAddArguments {
   readonly kind: AddKind;
   readonly positional?: string;
@@ -44,6 +53,12 @@ export interface ParsedAddArguments {
   readonly install: boolean;
 }
 
+/**
+ * Parses the add kind, positional name and explicit flags.
+ * @param args - Literal flag and positional arguments.
+ * @param cwd - Working directory for the operation.
+ * @returns An immutable argument projection with repeated values and resolved project root.
+ */
 export function parseAddArguments(
   args: readonly string[],
   cwd: string = process.cwd(),
@@ -85,6 +100,12 @@ export function parseAddArguments(
   });
 }
 
+/**
+ * Reads an option that may occur at most once.
+ * @param values - Parsed values grouped by flag name.
+ * @param name - Flag name without leading dashes.
+ * @returns The sole argument value, or undefined when omitted; repeated values raise a usage error.
+ */
 export function one(
   values: ReadonlyMap<string, readonly string[]>,
   name: string,
@@ -94,6 +115,12 @@ export function one(
   return entries[0];
 }
 
+/**
+ * Projects repeated option values in their input order.
+ * @param values - Parsed values grouped by flag name.
+ * @param name - Flag name without leading dashes.
+ * @returns A frozen copy of all values, including an empty array when omitted.
+ */
 export function many(
   values: ReadonlyMap<string, readonly string[]>,
   name: string,
@@ -101,6 +128,15 @@ export function many(
   return Object.freeze([...(values.get(name) ?? [])]);
 }
 
+/**
+ * Validates a finite command-line choice.
+ * @typeParam Value - Union of allowed option values.
+ * @param value - Raw option value before finite-choice validation.
+ * @param name - Flag name used in diagnostics.
+ * @param allowed - Supported literal values.
+ * @param fallback - Literal returned when the option is omitted.
+ * @returns The declared literal choice, or the supplied fallback when omitted.
+ */
 export function choice<const Value extends string>(
   value: string | undefined,
   name: string,
@@ -112,11 +148,25 @@ export function choice<const Value extends string>(
   usage(`--${name} must be one of: ${allowed.join("|")}.`);
 }
 
+/**
+ * Requires a nonempty argument and trims its whitespace.
+ * @param value - Raw argument that may be omitted or blank.
+ * @param message - Usage diagnostic for missing or blank input.
+ * @returns The trimmed value; missing or blank input raises a usage error.
+ */
 export function required(value: string | undefined, message: string): string {
   if (value?.trim()) return value.trim();
   usage(message);
 }
 
+/**
+ * Omits absent fields when constructing a public result.
+ * @typeParam Name - Literal property key retained in the mapped result.
+ * @typeParam Value - Value type retained for the optional property.
+ * @param name - Result property key.
+ * @param value - Defined property value or undefined to omit it.
+ * @returns An empty object for undefined, otherwise an object containing the named field.
+ */
 export function optional<Name extends string, Value>(
   name: Name,
   value: Value | undefined,
@@ -124,6 +174,11 @@ export function optional<Name extends string, Value>(
   return value === undefined ? {} : ({ [name]: value } as { readonly [Key in Name]: Value });
 }
 
+/**
+ * Rejects unsupported or incomplete scaffold arguments.
+ * @param message - Diagnostic explaining the unsupported arguments.
+ * @returns No value; throws AddScaffoldError with RELKIT_ADD_USAGE.
+ */
 export function usage(message: string): never {
   throw new AddScaffoldError(ADD_FAILURE_CODES.usage, message);
 }

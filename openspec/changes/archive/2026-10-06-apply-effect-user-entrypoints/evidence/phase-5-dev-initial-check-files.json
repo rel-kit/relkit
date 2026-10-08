@@ -1,0 +1,57 @@
+{
+  "reviewer": "/root/startup_reviewer",
+  "author": "/root/startup_author",
+  "status": "independently accepted complete EOF and current hashes for all seven TypeScript files",
+  "verification": "Author-run checks inspected by the read-only reviewer: final strict actual seven files and test bodies had zero diagnostics; Node service and negative type probes passed 6/6; final native initial-command cancellation passed 1/1 with eight assertions; existing isolated compiler cases passed 4/4; development/inspector cases passed 14/14. Immutable source-packed readiness and complete repository verification remain separate gates.",
+  "files": [
+    {
+      "path": "packages/cli/src/services/project.types.ts",
+      "lines": 33,
+      "sha256": "02e4f94373fe96a22d4a27153031dd3f29d9f891238d808ac1625b25fb872cb4",
+      "classification": "pure explicit project capability contract; isolated development transport retains its typed failure channel",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/cli/src/services/project.service.ts",
+      "lines": 65,
+      "sha256": "cefe7e8fa12eca9f8a04b65291fc24fdf91243debe87d121f862b89f27a959e1",
+      "classification": "replaceable Context project domain captures cleanup and delegates to the existing scoped native compiler owner",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-command-operation.ts",
+      "lines": 164,
+      "sha256": "6b72a17681a5dcf29484f9476dda0fca8ff2a9d88d72a20750341cac439d6cea",
+      "classification": "initial development check routes through explicit service authority before retention, telemetry and session admission",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-inspector.ts",
+      "lines": 135,
+      "sha256": "97be74549355c12880d15e8978be4392cb648f095eb8f5b5c48623acdeaed61b",
+      "classification": "native installation adapter; module directory uses portable URL resolution under Bun and Node",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/cli/tests/services/dev-initial-check.test.ts",
+      "lines": 193,
+      "sha256": "1571d6cf6924ba22f21b391fac7e203dbcc90ab3ba79ea7c3452486babf0bcc3",
+      "classification": "deterministic service substitution, fresh identity, failure preservation and Deferred-controlled interruption join regressions",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/cli/tests/services/dev-initial-native.test.ts",
+      "lines": 160,
+      "sha256": "406e9ae640914ed6305d863225f8c549f07df4e0fd39e582c2b7a35a8a4c65a2",
+      "classification": "actual CLI SIGTERM, CPU-bound initial compiler and descendant release within the unchanged two-second limit; immediately owned fixture cleanup",
+      "reviewStatus": "accepted full EOF"
+    },
+    {
+      "path": "packages/cli/tests/services/type-probes.test.ts",
+      "lines": 139,
+      "sha256": "5b31034a412eb026c011dcc8b7c34cdad3aa2f7d0b28ef6a7cd571586a655a6f",
+      "classification": "strict documented composition and negative missing-project/native/Scope authority probes, including the new development capability",
+      "reviewStatus": "accepted full EOF"
+    }
+  ]
+}

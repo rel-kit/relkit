@@ -28,7 +28,7 @@ async function check(root: string) {
   const child = Bun.spawn(
     [
       process.execPath,
-      join(repository, "packages/cli/dist/index.js"),
+      join(repository, "packages/cli/dist/bin.js"),
       "check",
       "--project-root",
       root,

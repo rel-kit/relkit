@@ -1,66 +1,49 @@
-import { createInterface } from "node:readline/promises";
-import {
-  createPulumiWorkspace,
-  writePulumiProgram,
-  type PulumiBackend,
-} from "@relkit/deploy-pulumi";
-import type { DeploymentPlan } from "@relkit/deploy";
-import type { CliCommandContext, CliFailure } from "../main-support.js";
-import type { BuildOptions, BuildResult } from "./build.js";
-import type { CheckOptions, CheckResult } from "./check.js";
-import type { LoadedDeploymentIntegrations } from "./deployment-integrations.js";
-import type { loadDeploymentIntegrations } from "./deployment-integrations.js";
+import { Schema } from "effect";
+import type { PulumiBackend } from "@relkit/deploy-pulumi";
+import { CliFailureError } from "../cli-errors.js";
+import { DEPLOY_COMMANDS, deployOperationSchema } from "./deploy.schemas.js";
+import type { ConfigMap, ParsedDeployArgs } from "./deploy-support.types.js";
+export { DEPLOY_COMMANDS } from "./deploy.schemas.js";
+export { confirmDeployment, confirmDeploymentEffect } from "./deploy-confirmation.js";
+export type {
+  ConfigMap,
+  DeployCommandOptions,
+  DeployContext,
+  DeployOperation,
+  ParsedDeployArgs,
+  Prepared,
+  ProgramFiles,
+  WorkspaceHandle,
+} from "./deploy-support.types.js";
 
-export const DEPLOY_COMMANDS = ["init", "preview", "up", "refresh", "outputs", "destroy"] as const;
-export type DeployOperation = (typeof DEPLOY_COMMANDS)[number];
-
-export type ConfigMap = Record<string, { readonly value: string; readonly secret?: boolean }>;
-
-export type DeployContext = Pick<CliCommandContext, "json" | "reporter"> &
-  Partial<Pick<CliCommandContext, "signal" | "log">>;
-export type WorkspaceHandle = Awaited<ReturnType<typeof createPulumiWorkspace>>;
-export type ProgramFiles = Awaited<ReturnType<typeof writePulumiProgram>>;
-
-export interface Prepared {
-  readonly root: string;
-  readonly plan: DeploymentPlan;
-  readonly previousPlan?: DeploymentPlan;
-  readonly files: ProgramFiles;
-  readonly integrations: LoadedDeploymentIntegrations;
-}
-
-export interface DeployCommandOptions {
-  readonly projectRoot?: string;
-  readonly check?: (options: CheckOptions) => Promise<CheckResult>;
-  readonly build?: (options: BuildOptions) => Promise<BuildResult>;
-  readonly createWorkspace?: typeof createPulumiWorkspace;
-  readonly writeProgram?: typeof writePulumiProgram;
-  readonly loadIntegrations?: typeof loadDeploymentIntegrations;
-  readonly confirm?: (question: string, signal: AbortSignal) => Promise<boolean>;
-}
-
-export interface ParsedDeployArgs {
-  readonly command: DeployOperation;
-  readonly projectRoot?: string;
-  readonly stack: string;
-  readonly backend: PulumiBackend;
-  readonly config: ConfigMap;
-  readonly nonInteractive: boolean;
-}
-
-export class DeployCommandError extends Error {
-  readonly code: string;
-
+/** An expected deployment usage or cohort failure with its original public code. */
+export class DeployCommandError extends Schema.TaggedError<DeployCommandError>()(
+  "DeployCommandError",
+  {
+    code: Schema.String,
+    message: Schema.String,
+  },
+) {
+  /**
+   * Creates the existing public positional error contract.
+   * @param code - Stable deployment failure code.
+   * @param message - Public, redacted-at-presentation message.
+   */
   constructor(code: string, message: string) {
-    super(message);
+    super({ code, message });
     this.name = "DeployCommandError";
-    this.code = code;
   }
 }
 
+/**
+ * Validates operation/options before acquiring any SDK capability.
+ * @param args - Arguments after the deploy command.
+ * @returns Validated deployment configuration with existing defaults.
+ * @throws DeployCommandError for usage errors.
+ */
 export function parseDeployArgs(args: readonly string[]): ParsedDeployArgs {
   const command = args[0];
-  if (!(DEPLOY_COMMANDS as readonly string[]).includes(command ?? ""))
+  if (!Schema.is(deployOperationSchema)(command))
     throw new DeployCommandError(
       "RELKIT_DEPLOY_USAGE",
       "Usage: relkit deploy init|preview|up|refresh|outputs|destroy [options]",
@@ -83,7 +66,7 @@ export function parseDeployArgs(args: readonly string[]): ParsedDeployArgs {
   }
   if (stack.trim() === "") throw new DeployCommandError("RELKIT_DEPLOY_USAGE", "--stack is empty.");
   return {
-    command: command as DeployOperation,
+    command,
     ...(projectRoot === undefined ? {} : { projectRoot }),
     stack,
     backend,
@@ -92,6 +75,11 @@ export function parseDeployArgs(args: readonly string[]): ParsedDeployArgs {
   };
 }
 
+/**
+ * Parses the explicitly selected persistence backend.
+ * @param value - CLI backend spelling or object-storage URL.
+ * @returns The supported Pulumi backend without creating any state.
+ */
 export function parseBackend(value: string): PulumiBackend {
   if (value === "cloud") return { kind: "cloud" };
   if (value === "local") return { kind: "local" };
@@ -102,19 +90,12 @@ export function parseBackend(value: string): PulumiBackend {
   );
 }
 
-export async function confirmDeployment(question: string, signal: AbortSignal): Promise<boolean> {
-  if (signal.aborted) throw signal.reason ?? new Error("Deployment was interrupted.");
-  if (!process.stdin.isTTY) return false;
-  const readline = createInterface({ input: process.stdin, output: process.stderr });
-  try {
-    const answer = await readline.question(`${question} [y/N] `, { signal });
-    if (signal.aborted) throw signal.reason ?? new Error("Deployment was interrupted.");
-    return /^(y|yes)$/i.test(answer.trim());
-  } finally {
-    readline.close();
-  }
-}
-
+/**
+ * Redacts configured values from public expected-error presentation.
+ * @param error - Original native or domain failure.
+ * @param redactions - Values owned by this invocation.
+ * @returns A message containing no configured secret values.
+ */
 export function safeErrorMessage(error: unknown, redactions: readonly string[] = []): string {
   let message = error instanceof Error ? error.message : String(error);
   for (const value of redactions)
@@ -122,6 +103,12 @@ export function safeErrorMessage(error: unknown, redactions: readonly string[] =
   return message;
 }
 
+/** Validates and records one Pulumi configuration option with its secrecy policy.
+ * @param config - Invocation-owned option map.
+ * @param value - Original name=value token.
+ * @param secret - Whether Pulumi must encrypt it.
+ * @returns No value after validating and inserting the option.
+ */
 function addConfig(config: ConfigMap, value: string, secret: boolean): void {
   const separator = value.indexOf("=");
   if (separator < 1)
@@ -130,6 +117,12 @@ function addConfig(config: ConfigMap, value: string, secret: boolean): void {
   config[name] = { value: value.slice(separator + 1), ...(secret ? { secret: true } : {}) };
 }
 
+/** Validates the required value following a deployment option.
+ * @param args - Original option tokens.
+ * @param index - Required value position.
+ * @param option - Diagnostic label.
+ * @returns The accepted non-option token.
+ */
 function required(args: readonly string[], index: number, option: string): string {
   const value = args[index];
   if (value === undefined || value.startsWith("-"))
@@ -137,12 +130,17 @@ function required(args: readonly string[], index: number, option: string): strin
   return value;
 }
 
-export function interrupted(signal: AbortSignal): CliFailure {
-  const reason = signal.reason as Partial<CliFailure> | undefined;
-  const code = reason?.code === "RELKIT_INTERRUPTED" ? reason.code : "RELKIT_INTERRUPTED";
-  const exitCode = reason?.exitCode === 143 ? 143 : 130;
-  return Object.assign(new Error(reason?.message ?? "Deployment interrupted."), {
-    code,
-    exitCode,
-  }) as CliFailure;
+/**
+ * Retains signal-specific exit behavior without asserting an arbitrary abort reason.
+ * @param signal - Caller signal that interrupted deployment.
+ * @returns The established typed interruption failure.
+ */
+export function interrupted(signal: AbortSignal): CliFailureError {
+  const reason: unknown = signal.reason;
+  const exitCode =
+    typeof reason === "object" && reason !== null && "exitCode" in reason && reason.exitCode === 143
+      ? 143
+      : 130;
+  const message = reason instanceof Error ? reason.message : "Deployment interrupted.";
+  return new CliFailureError({ code: "RELKIT_INTERRUPTED", exitCode, message });
 }

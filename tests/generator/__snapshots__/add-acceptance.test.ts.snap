@@ -105,6 +105,9 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
     "@relkit/testing": "<release-version>",
     "@types/bun": "1.3.10",
     "typescript": "5.9.3"
+  },
+  "patchedDependencies": {
+    "drizzle-orm@1.0.0-rc.5-169397b": "patches/drizzle-orm@1.0.0-rc.5-169397b.patch"
   }
 }
 "
@@ -340,6 +343,9 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     "@relkit/testing": "<release-version>",
     "@types/bun": "1.3.10",
     "typescript": "5.9.3"
+  },
+  "patchedDependencies": {
+    "drizzle-orm@1.0.0-rc.5-169397b": "patches/drizzle-orm@1.0.0-rc.5-169397b.patch"
   }
 }
 "

@@ -1,0 +1,236 @@
+$ bun run scripts/test-generator.ts
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  7 passed (7)
+      Tests  17 passed (17)
+   Start at  23:02:17
+   Duration  6.40s (tests 68%, transform 17%, import 15%)
+
+bun test v1.3.10 (30e609e0)
+bun test v1.3.10 (30e609e0)
+bun test v1.3.10 (30e609e0)
+
+tests/generator/add-acceptance.test.ts:
+
+tests/generator/add-acceptance.test.ts:
+
+tests/generator/scaffold-catalog.test.ts:
+(pass) keeps scaffold dependency versions aligned with owning manifests [16.16ms]
+
+tests/generator/option-matrix.test.ts:
+(pass) covers every template and examples/install/Git combination [1317.14ms]
+(pass) agent starters ship executable native and typed client examples [0.59ms]
+(pass) accepts valid names and rejects invalid names without mutation [2.20ms]
+(pass) handles absent, empty, and non-empty destinations atomically [50.24ms]
+(pass) normalizes JSON options and keeps generated results JSON-safe [29.26ms]
+(pass) adds AWS and Pulumi only when explicitly selected [28.37ms]
+(pass) reports only the create milestones that run [58.33ms]
+(pass) produces byte-identical content from separate destinations [41.74ms]
+(pass) rolls back every pre-rename failure and removes its temporary sibling [103.74ms]
+
+tests/generator/create-additions.test.ts:
+(pass) asks only final consent and validates the completed project once [16.93ms]
+(pass) retains no-install behavior without offering artifact additions [16.42ms]
+(pass) declined consent creates no stage and preserves cancellation exit 130 [2.98ms]
+(pass) headless creation never invokes prompt authority [22.15ms]
+
+tests/generator/job-dot-access.test.ts:
+(pass) generates name-based job dot access without exposing private jobs [7.35ms]
+
+tests/generator/add-options.test.ts:
+(pass) add option resolution > normalizes friendly names and common defaults [2.66ms]
+(pass) add option resolution > resolves command defaults and repeatable values
+(pass) add option resolution > requires unambiguous headless agent and route choices [0.60ms]
+(pass) add option resolution > supports creating a tool function and rejects conflicting targets [0.09ms]
+(pass) add option resolution > accepts an existing model selector or the offline default [0.07ms]
+
+tests/generator/plan-manifest.test.ts:
+(pass) scaffold preserves @relkit/aws's existing Bun link in dependencies [0.42ms]
+(pass) scaffold preserves @relkit/aws's existing Bun link in devDependencies
+(pass) scaffold preserves @relkit/better-auth's existing Bun link in dependencies [0.12ms]
+(pass) scaffold preserves @relkit/better-auth's existing Bun link in devDependencies
+(pass) scaffold preserves @relkit/cloudflare's existing Bun link in dependencies [0.03ms]
+(pass) scaffold preserves @relkit/cloudflare's existing Bun link in devDependencies
+(pass) scaffold preserves @relkit/docker's existing Bun link in dependencies [0.07ms]
+(pass) scaffold preserves @relkit/docker's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves @relkit/effect-mq's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves @relkit/effect-mq's existing Bun link in devDependencies [0.06ms]
+(pass) scaffold preserves @relkit/inngest's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/inngest's existing Bun link in devDependencies [0.05ms]
+(pass) scaffold preserves @relkit/drizzle's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves @relkit/drizzle's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves @relkit/local's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/local's existing Bun link in devDependencies
+(pass) scaffold preserves @relkit/pulumi's existing Bun link in dependencies [0.07ms]
+(pass) scaffold preserves @relkit/pulumi's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/redis's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves @relkit/redis's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves @relkit/s3's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/s3's existing Bun link in devDependencies [0.04ms]
+(pass) scaffold preserves @relkit/trigger's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/trigger's existing Bun link in devDependencies [0.04ms]
+(pass) scaffold preserves better-auth's existing Bun link in dependencies [0.04ms]
+(pass) scaffold preserves better-auth's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves drizzle-kit's existing Bun link in dependencies
+(pass) scaffold preserves drizzle-kit's existing Bun link in devDependencies
+(pass) scaffold preserves drizzle-orm's existing Bun link in dependencies
+(pass) scaffold preserves drizzle-orm's existing Bun link in devDependencies [0.08ms]
+(pass) scaffold preserves langchain's existing Bun link in dependencies
+(pass) scaffold preserves langchain's existing Bun link in devDependencies
+(pass) scaffold still rejects conflicting versions and links to another package [0.22ms]
+
+tests/generator/local-workspace.test.ts:
+(pass) local create asks only final confirmation when the project name is explicit [1014.32ms]
+(pass) local create preserves unrelated dependency versions when linking RELKIT packages [77.24ms]
+(pass) local create shares matching native dependencies without changing different versions [57.80ms]
+(pass) local links keep web dependencies local and repair previously linked inspector packages [26.74ms]
+(pass) doctor accepts local RELKIT package links [2.51ms]
+(pass) API starter integration tests run after adding a full service without Docker [4780.97ms]
+(pass) local add installs workspace integration exports for a full service bundle [6545.53ms]
+(pass) local launcher exposes the shared add API for events and routes [2390.08ms]
+(pass) the full bundle compiles in every starter and preserves its graph relationships [22975.19ms]
+killed 1 dangling process
+(fail) local launcher and linked CLI hide workspace build output [20011.00ms]
+  ^ this test timed out after 20000ms.
+
+tests/generator/jobs-profiles.test.ts:
+(pass) Docker Jobs starters include the local orchestrator and documented config [275.19ms]
+
+tests/generator/failure-cleanup.test.ts:
+(pass) cleans the staged sibling after an injected copy failure [6.58ms]
+(fail) reused Docker profiles retain the post-scaffold startup reminder [9956.70ms]
+  ^ this test timed out after 5000ms.
+(pass) cleans the staged sibling after an injected substitute failure [78.21ms]
+
+# Unhandled error between tests
+-------------------------------
+134 |       ]),
+135 |     ),
+136 |   ).rejects.toMatchObject({ code: ADD_FAILURE_CODES.collision });
+137 |   await add(root, ["service", "Billing", "--full"]);
+138 |   await linkDependencies(root);
+139 |   expect((await checkProject({ projectRoot: root })).diagnostics).toEqual([]);
+                                                                        ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   {
++     "code": "RELKIT_CHECK_FAILED",
++     "message": "ENOENT: no such file or directory, open '<project>/package.json'",
++     "severity": "error",
++   },
++ ]
+
+- Expected  - 1
++ Received  + 7
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/add-acceptance.test.ts:139:67)
+-------------------------------
+
+(pass) cleans the staged sibling after an injected install failure [63.76ms]
+(pass) cleans the staged sibling after an injected git failure [98.38ms]
+(pass) cleans the staged sibling after an injected doctor failure [75.35ms]
+(pass) cleans the staged sibling after an injected check failure [68.43ms]
+(pass) cleans the staged sibling after an injected rename failure [63.36ms]
+(pass) preserves an existing empty destination when publication fails [84.07ms]
+(pass) refuses broad cleanup paths without recursive deletion [4.30ms]
+
+tests/generator/project-discovery.test.ts:
+(pass) scaffold project discovery > appends exports while preserving leading and internal whitespace [11.63ms]
+(pass) scaffold project discovery > discovers canonical services, members, tools, prompts, profiles, and imported env [217.57ms]
+(pass) scaffold project discovery > requires real AWS and Pulumi imports before offering provisioning [4.56ms]
+(pass) scaffold project discovery > plans byte-preserving canonical insertions and refuses unsafe shapes [2.14ms]
+
+tests/generator/local-agent-create.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+238 |       ["auth", "--database-dialect", "sqlite"],
+239 |     ])
+240 |       await add(root, [...args, "--no-install"]);
+241 |     await linkDependencies(root);
+242 |     const result = await checkProject({ projectRoot: root });
+243 |     expect(result.diagnostics).toEqual([]);
+                                     ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   {
++     "code": "RELKIT_CHECK_FAILED",
++     "message": "ENOENT: no such file or directory, open '<project>/relkit.config.ts'",
++     "severity": "error",
++   },
++ ]
+
+- Expected  - 1
++ Received  + 7
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/add-acceptance.test.ts:243:32)
+-------------------------------
+
+(fail) every standalone add kind compiles in every starter [30026.07ms]
+  ^ this test timed out after 30000ms.
+(pass) tool function creation rejects collisions without changing existing files [16.22ms]
+(pass) snapshots simple, custom, and full service plans [115.77ms]
+(pass) rejects ambiguous services and existing route methods before mutation [49.31ms]
+
+ 4 pass
+ 4 filtered out
+ 1 fail
+ 1 error
+ 3 snapshots, 20 expect() calls
+Ran 5 tests across 1 file. [35.34s]
+acceptance additions: 35.4s
+(pass) route platform and singleton additions compile in every starter [10432.61ms]
+(pass) local create installs and validates the agent starter with shared native packages [18810.11ms]
+(pass) database and auth-chained schemas compile for all Bun-native dialects [10454.22ms]
+
+ 3 pass
+ 5 filtered out
+ 1 fail
+ 1 error
+ 61 expect() calls
+Ran 4 tests across 1 file. [54.18s]
+acceptance compilation: 54.2s
+(pass) local create installs and validates the fullstack starter with shared native packages [26359.94ms]
+
+tests/generator/add-resolver.test.ts:
+(pass) resolves an interactive add through the same normalized request [16.61ms]
+(pass) uses unique services and explicit model selectors headlessly [17.81ms]
+(pass) offers existing functions and function creation when adding a tool [14.26ms]
+(pass) creates a function for a new service and respects explicit creation headlessly [9.18ms]
+(pass) asks only the missing creation name and defaults to minimal [0.90ms]
+(pass) retains advanced explicit creation flags without any setup question [0.24ms]
+
+tests/generator/add-transaction.test.ts:
+(pass) add scaffold transaction > validates with the project CLI instead of an unrelated global install [354.61ms]
+(pass) add scaffold transaction > restores bytes, modes, lockfile, and leaves unrelated dirty files [12.59ms]
+(pass) add scaffold transaction > rolls back validation failure and applies a successful plan [14.32ms]
+(pass) add scaffold transaction > skips checking unavailable packages with no install [2.51ms]
+(pass) add scaffold transaction > refuses project-local symlinks without writing through them [9.75ms]
+
+1 tests failed:
+(fail) local launcher and linked CLI hide workspace build output [20011.00ms]
+  ^ this test timed out after 20000ms.
+
+ 87 pass
+ 1 fail
+ 892 expect() calls
+Ran 88 tests across 13 files. [79.67s]
+other generator: 79.7s
+51 |     console.log(`${name}: ${((performance.now() - startedAt) / 1000).toFixed(1)}s`);
+52 |     return { name, code };
+53 |   }),
+54 | );
+55 | const failure = results.find(({ code }) => code !== 0);
+56 | if (failure !== undefined) throw new Error(`${failure.name} failed.`);
+                                          ^
+error: acceptance compilation failed.
+      at /Users/mustafaelsayed/Workspace/relkit/scripts/test-generator.ts:56:38
+
+Bun v1.3.10 (macOS arm64)
+error: script "test:generator" exited with code 1

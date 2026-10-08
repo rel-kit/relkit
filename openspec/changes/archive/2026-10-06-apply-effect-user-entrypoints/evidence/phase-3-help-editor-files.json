@@ -1,0 +1,144 @@
+{
+  "reviewer": "native_gate",
+  "review": "Full current EOF reread plus earlier independent functional review; current bytes accepted. No earlier SHA snapshot is claimed as a byte-for-byte drift proof.",
+  "coverage": 17,
+  "findings": "No unresolved findings",
+  "files": [
+    {
+      "path": "packages/cli/src/cli-help-add.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 193,
+      "sha256": "4c66c407892668e3f15377cf4b5bbc9069939aef296c767a958dc9f19af9ccfe",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/cli-help-builders.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 83,
+      "sha256": "ac1a46c76e166d517f8f2481a408a67cc84e426a379c15b6b90fada250d41481",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/cli-help-client.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 23,
+      "sha256": "84c90d70b16556f7b870058432066f2b4aaf49c936a5fd5d35a5f70562cdf01a",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/cli-help-jobs.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 146,
+      "sha256": "1de1b4792c9730ceec2a4bd0a69a2b23381624cef7cdb819ac7cab954e21bb5a",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/cli-help-model.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 107,
+      "sha256": "efb8efe1e83b6a1399e6ab0a04358191d7aab41c7e46ad8c3e3765fccdb4d5ad",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/cli-help-model.types.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 32,
+      "sha256": "2598e6c11319aa8e3cc3b9231ffabfd530800c301a53afbf75423be681b74b6c",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/cli-help-options.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 21,
+      "sha256": "2487a1d64f44f004299aa0451b022d8d1b1ec2b4ece0aef361a44906c3702716",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/cli-help-system.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 123,
+      "sha256": "1f5a7cd66d3157d869c893a2667d09d35e31afbb7906e2828e07298b3ae2c547",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/cli-help-types.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 2,
+      "sha256": "867314bcc5e761800a2e1d3f3aaf4677436b9a1878f87494454562e981ca0095",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/editor.ts",
+      "classification": "synchronous host-owned editor hooks",
+      "lines": 100,
+      "sha256": "02a9066fe66fb8582bd15286b41c9967bea0591d056aa99904cde65c65b1eed2",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/src/editor.types.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 6,
+      "sha256": "f04640b2b23ab547d06ed87ca35d1f6458d373f795d68e1a43fdf6e478fc1247",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/editor.test.ts",
+      "classification": "test or typed fixture",
+      "lines": 140,
+      "sha256": "dccbfcc53998810fc5ce3f3c08b452edc21f8fe86ee2544f4150ebb8fb420a95",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/cli/editor-compatibility.test.ts",
+      "classification": "test or typed fixture",
+      "lines": 97,
+      "sha256": "3007318b5b830d2b4678f726faed85ed15ed2340c147cd2286c816c7e9da36a6",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "scripts/scaffold-smoke-terminal.ts",
+      "classification": "native terminal acceptance boundary",
+      "lines": 144,
+      "sha256": "849c6d01b0ebaa28727684045a0bebf589b24fb051ed64bcd0c511dbfb892b5c",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "scripts/scaffold-smoke-terminal.types.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 5,
+      "sha256": "e1aba000d75438f1dec145bdc83e766d6c02b7bc67bd1cb6cf92a19e7b8aa0f5",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    },
+    {
+      "path": "scripts/release-package-contract.ts",
+      "classification": "pure package export contract; coordinator authorship plus native_gate bootstrap delta",
+      "lines": 215,
+      "sha256": "1de518e5b42ff5031dd725bf5599d5456c7a59e3d939193e741bf0be046e5b8c",
+      "reviewer": "native_gate for coordinator base; root for native_gate bootstrap delta",
+      "status": "accepted"
+    },
+    {
+      "path": "packages/compiler/src/index.ts",
+      "classification": "pure contract, schema, parsing or presentation",
+      "lines": 31,
+      "sha256": "1fdc17db53a64c918637552bdebef20c5bc236faa8ecf846411438a8d52d29dd",
+      "reviewer": "native_gate",
+      "status": "accepted"
+    }
+  ]
+}

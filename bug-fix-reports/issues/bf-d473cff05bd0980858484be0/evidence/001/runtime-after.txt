@@ -1,0 +1,10 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 1 skipped (2)
+   Start at  03:14:30
+   Duration  617ms (tests 79%, import 17%, transform 4%, worker 1%)
+
+Existing executable acceptance exit: 0; arbitrary BUN override executed: False

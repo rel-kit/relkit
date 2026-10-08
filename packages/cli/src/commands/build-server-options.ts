@@ -2,17 +2,15 @@ import { LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
 import type { ApplicationGraph } from "@relkit/graph";
 import type { RuntimeActivationFingerprint } from "@relkit/contracts";
 
-export interface ServerSourceOptions {
-  readonly specializedImports: string;
-  readonly localServicesImport: string;
-  readonly jobsManifestImport: string;
-  readonly jobsManifestVerification: string;
-  readonly localServicesVerification: string;
-  readonly localServicesInspectorSource: string;
-  readonly providerOverridesImport: string;
-  readonly providerOverridesSource: string;
-}
+import type { ServerSourceOptions } from "./build-server.types.js";
+export type { ServerSourceOptions } from "./build-server.types.js";
 
+/**
+ * Derives feature imports and immutable activation checks without acquiring resources.
+ * @param graph - Validated declarations that select optional integrations.
+ * @param activation - Fingerprint selecting generated artifact checks.
+ * @returns Pure source fragments; optional integration dependencies stay feature-gated.
+ */
 export function serverSourceOptions(
   graph: ApplicationGraph,
   activation: RuntimeActivationFingerprint,

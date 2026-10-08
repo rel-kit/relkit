@@ -1,0 +1,45 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+stdout | packages/create-relkit/tests/executable.effect.test.ts > uses Bun regardless of a BUN executable override
+[03:13:31.928] ERROR (#1): Error [AssertionError]: expected '--version\n' to match /^\d+\.\d+\.\d+\n$/
+    at native
+    at /Users/mustafaelsayed/Workspace/relkit/packages/create-relkit/tests/executable.effect.test.ts:15:29
+    at processTicksAndRejections (native) {
+  actual: '--version\n',
+  expected: /^\d+\.\d+\.\d+\n$/,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+
+ ❯ packages/create-relkit/tests/executable.effect.test.ts (2 tests | 1 failed | 1 skipped) 16ms
+   × uses Bun regardless of a BUN executable override 14ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 skipped (2)
+   Start at  03:13:31
+   Duration  241ms (import 60%, transform 27%, tests 10%, worker 2%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/create-relkit/tests/executable.effect.test.ts > uses Bun regardless of a BUN executable override
+AssertionError: expected '--version\n' to match /^\d+\.\d+\.\d+\n$/
+
+- Expected:
+/^\d+\.\d+\.\d+\n$/
+
++ Received:
+"--version
+"
+
+ ❯ packages/create-relkit/tests/executable.effect.test.ts:15:29
+     13|       expect(result.code).toBe(0);
+     14|       expect(result.stderr).toBe("");
+     15|       expect(result.stdout).toMatch(/^\d+\.\d+\.\d+\n$/);
+       |                             ^
+     16|     } finally {
+     17|       if (previous === undefined) delete process.env.BUN;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

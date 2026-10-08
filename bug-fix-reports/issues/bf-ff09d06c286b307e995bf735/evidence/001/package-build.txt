@@ -1,0 +1,2 @@
+Command: rtk proxy bun x tsc -b packages/create-relkit packages/cli --force --pretty false
+Exit code: 0

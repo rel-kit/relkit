@@ -1,0 +1,380 @@
+{
+  "phase": 3,
+  "lane": "independent-retained-cli-tests-and-fixtures",
+  "reviewer": "/root/plan_create_relkit",
+  "scope": "All authored top-level packages/cli/*.ts except editor.test.ts and editor-compatibility.test.ts, covered by the other independent lane.",
+  "status": "accepted at recorded hashes; all three integration findings corrected and independently verified",
+  "counts": {
+    "total": 37,
+    "bunTests": 34,
+    "vitestTests": 1,
+    "fixtures": 2
+  },
+  "supportingFixReads": [
+    {
+      "path": "packages/cli/src/commands/start-built-workflow.ts",
+      "lines": 220,
+      "sha256": "b5f5f65fd769edaac85d68dc467c712190b616cf651f21b3c3cf73afb8020eb1",
+      "readThroughEof": true,
+      "classification": "typed-start-domain-fix",
+      "reason": "Independently reviewed integration correction preserving built diagnostics and inherited native output ownership."
+    },
+    {
+      "path": "packages/cli/src/commands/start-process.service.ts",
+      "lines": 129,
+      "sha256": "52cb6453156c3d23b80a9acc109da445b2ab5ce4e6f8b8c947bf6238c38e2629",
+      "readThroughEof": true,
+      "classification": "typed-start-domain-fix",
+      "reason": "Independently reviewed integration correction preserving built diagnostics and inherited native output ownership."
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/compatibility.test.ts",
+      "lines": 38,
+      "sha256": "e42120c3ca2d2b31bb3be335a0add3f97e921bf5b0d0d8f258eb99328a4d61f9",
+      "readThroughEof": true,
+      "classification": "effect-compatibility-regression",
+      "reason": "Independently reviewed integration correction preserving built diagnostics and inherited native output ownership."
+    }
+  ],
+  "files": [
+    {
+      "path": "packages/cli/api-docs-source.test.ts",
+      "lines": 14,
+      "sha256": "40e5a71d63f9619f9d89aa86cbf7d2ca3b7c926173270802c6f5644682435b77",
+      "framework": "bun",
+      "classification": "pure-contract-regression",
+      "reason": "Retains deterministic public parser/source/configuration assertions, including existing identity/activation contracts, without application IO authority.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/build-activation.test.ts",
+      "lines": 41,
+      "sha256": "d1f982985807047dfcab03d2ebe099a1629ea75152eb0dc9dec874ad1ab3742f",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/build-server.test.ts",
+      "lines": 94,
+      "sha256": "f711a1e1ae48a7584055497b03079e497f2fd76aa1818e834a9cbf4e9ae29f87",
+      "framework": "bun",
+      "classification": "pure-contract-regression",
+      "reason": "Retains deterministic public parser/source/configuration assertions, including existing identity/activation contracts, without application IO authority.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/build-support.test.ts",
+      "lines": 151,
+      "sha256": "1685176c799e6b7a4af4c71187a7bebfaea977be1556117df3aefaf246cdbcf2",
+      "preFormattingSha256": "eeb3d7691110392b3a8d6bae5635deae2d7cdecd65e3b6e1d85274b8631c6013",
+      "formattingTokenSha256": "bf3cd833a9dca9640c9e103aae28569be82736c6c28db41afbb3f8e930ffa085",
+      "formattingSemanticAstSha256": "ef42595efa0f577d96ca735de4c31fa997893998d8d12d950821635d40b12393",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/client.test.ts",
+      "lines": 64,
+      "sha256": "0c0be540a20963bc68cea7303b3b619fe79b128cbcfd0b21bd05e55db7e538fa",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/commands-core.test.ts",
+      "lines": 369,
+      "sha256": "06a907f80bc0247bb92d31a38d2e61f035a98054ca2e10e3a736247759219d5d",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/commands-protocol.test.ts",
+      "lines": 229,
+      "sha256": "d3198484ad2f3b742fa3cf7a9425af305cb43840023eaab4a3b574bdbdc36eee",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/deepagent-bucket-registration.test.ts",
+      "lines": 35,
+      "sha256": "a4775f400ca2ad3adce7c62fe9710c6508004e88f514cfaeb9ffd751d113bd82",
+      "framework": "bun",
+      "classification": "pure-contract-regression",
+      "reason": "Retains deterministic public parser/source/configuration assertions, including existing identity/activation contracts, without application IO authority.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/deploy.test.ts",
+      "lines": 257,
+      "sha256": "4278f84bb19ce248875e5a738f6477b85413a5a6657008d8ec9d76559f6a6508",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/deployment-integrations.test.ts",
+      "lines": 111,
+      "sha256": "246edf7f3090ae0bd32c2dc22eae6c60f8f99f9af2d1c4723996fd1bf6b64bf0",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/dev-check.test.ts",
+      "lines": 111,
+      "sha256": "cc4d0af994ef67cb568ce70c7376e5b6264982bf8304de7cc7b852bbafdc2069",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/dev-logging.test.ts",
+      "lines": 358,
+      "sha256": "859e2598db15e6d06ebbc0961ef740339d1ae6682ba1298c5896e56188b3d111",
+      "framework": "bun",
+      "classification": "logging-boundary-regression",
+      "reason": "Exercises real log instrumentation/presentation, native child framing and secret/annotation/minimum-level behavior.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/dev-persistence.test.ts",
+      "lines": 229,
+      "sha256": "2259e13bad914f0783fba5c4cf72387db8617f19b9bd4e953703b14d9f14c47a",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/dev-shutdown.test.ts",
+      "lines": 43,
+      "sha256": "85247ecaabfe7b9284b870665de9effc3c62441c5506707fa2b9646b7d09096d",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/dev-telemetry-error.test.ts",
+      "lines": 40,
+      "sha256": "04ed32014a94f57e3571c232940f285431c28eeb23e9f6161b133b817cd401ce",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/dev.test.ts",
+      "lines": 455,
+      "sha256": "ad6b79030a47733c93568ebb6d7812f27d4a5eed96041a9b042f21031b7b25a0",
+      "preFormattingSha256": "4ead30f17457f8dcdb06493e3438ab99b2b2bd1318ba930c0a6244f56df99d51",
+      "formattingTokenSha256": "88a703b7757c1413efad798b69fda26995e18350f34aa02f63f421d96c6a19ae",
+      "formattingSemanticAstSha256": "cfba606eb8915257689541461f0bce4a4bf71aab44431703e7406599298d560f",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/doctor.test.ts",
+      "lines": 74,
+      "sha256": "ca940cd2c3a63a6cdc2788a9b38a8c2d5f28af611390b124e8d468a2f847d6e6",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/env.test.ts",
+      "lines": 71,
+      "sha256": "8199ae6c8f4f6dfb88676021cd2ffeee144a51f0b412e3a17ccb7351a1dfa975",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/environment-runtime.test.ts",
+      "lines": 45,
+      "sha256": "c4c96bd779ec37b72850cf1e1f5a1b81f8ade9b20c48d4c348fb41aebfc33079",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/jobs-commands.test.ts",
+      "lines": 262,
+      "sha256": "efefae6350ba5a6029061191b6a52a99fd5609866a1921d1009875360f91d009",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/jobs-identity.test.ts",
+      "lines": 39,
+      "sha256": "52bc6acfaf94018af2dd054649138f6d8d80f72df7fc54a69a72c367f80c2c09",
+      "framework": "bun",
+      "classification": "pure-contract-regression",
+      "reason": "Retains deterministic public parser/source/configuration assertions, including existing identity/activation contracts, without application IO authority.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/local-service-options.test.ts",
+      "lines": 95,
+      "sha256": "a1b816554cba30a9728e1fcb090ea78883c570a4b2c6f4a26db4a7deb87ebfb6",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/local.test.ts",
+      "lines": 181,
+      "sha256": "17a61475b750108c392282cf19725e27bffcaca58c67abc44bbdc1116dd00e9c",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/main.test.ts",
+      "lines": 319,
+      "sha256": "5b1e8df8d5a016d634d3bb455e0ab5f03ee812f4c7b2a8c5f5b07123a4a6e4f1",
+      "framework": "vitest",
+      "classification": "public-invocation-regression",
+      "reason": "Retains existing Promise/exit/output/Clack consent contracts with controlled injected generator or prompt boundaries.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/port-availability.test.ts",
+      "lines": 17,
+      "sha256": "4026b1da2f60ec0673209683d6fa525f4af3fa0c2f227e265628feeb68d558ee",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/ports.test.ts",
+      "lines": 32,
+      "sha256": "ded79f4d409e216b46bc35794f388bceb00774f67a6d5ac4d533f305b83fb8df",
+      "framework": "bun",
+      "classification": "pure-contract-regression",
+      "reason": "Retains deterministic public parser/source/configuration assertions, including existing identity/activation contracts, without application IO authority.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/product-runtime.test.ts",
+      "lines": 180,
+      "sha256": "53e3545d5f2c32b4da5bfb35ef3ebc7b86eaeddadb409101850d62940222fddc",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/regression-13-13-fixtures.ts",
+      "lines": 121,
+      "sha256": "8d2408cd54aa3d68287c4b140fdbf7f259c09d5d673f2e9a47dddb5124134651",
+      "framework": "fixture",
+      "classification": "controlled-test-fixture",
+      "reason": "Renders controlled native candidate servers and owns test-only setup/polling. Sessions and temporary roots are joined/released by the calling regression.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/regression-13-13.test.ts",
+      "lines": 165,
+      "sha256": "dd7b814fd71b4c5348afdff04974c714986f2913bd6b6ae4369126e1a84fb3ba",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/route-module-check.test.ts",
+      "lines": 56,
+      "sha256": "b2dd526d611a7216e4512886ba3051a45d2d6df2763d854f41857034e7a384e6",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/route-path-input.test.ts",
+      "lines": 74,
+      "sha256": "5b17a0570af6d9f31de025752b45a093f2f753735b3991dfb6fbddb852836045",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/route-review-regressions.test.ts",
+      "lines": 140,
+      "sha256": "83fc0e74a744baaaebf48089ae4055b0dc98b166057f1ac428814f437d7a0ea3",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/scaffold-local.test.ts",
+      "lines": 144,
+      "sha256": "6ab5bfabc9861982f8e236da22029dabcc5657bb5f54cefa897007341a4b7dbb",
+      "framework": "bun",
+      "classification": "public-invocation-regression",
+      "reason": "Retains existing Promise/exit/output/Clack consent contracts with controlled injected generator or prompt boundaries.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/scaffolding.test.ts",
+      "lines": 182,
+      "sha256": "bc8b6758c0c0dbfff7df90c80fa80d20136c85a53b7de2f2377c79bd0f5c5b4d",
+      "framework": "bun",
+      "classification": "public-invocation-regression",
+      "reason": "Retains existing Promise/exit/output/Clack consent contracts with controlled injected generator or prompt boundaries.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/specialized-logging.test.ts",
+      "lines": 80,
+      "sha256": "dea7b6a58df43cba2bc0d565a4ac9514fe19438927e3cc37918872c21312ef2b",
+      "framework": "bun",
+      "classification": "logging-boundary-regression",
+      "reason": "Exercises real log instrumentation/presentation, native child framing and secret/annotation/minimum-level behavior.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/start-built.test.ts",
+      "lines": 95,
+      "sha256": "421d910e8e5ea901cf350ba427c17651e51aecaacf5beabd212e90981ebf0028",
+      "framework": "bun",
+      "classification": "native-or-injected-boundary-regression",
+      "reason": "Exercises real filesystem/process/runtime boundaries or explicit domain fake callbacks through the preserved public API; temporary resources are fixture-owned and cleaned.",
+      "readThroughEof": true
+    },
+    {
+      "path": "packages/cli/test-workspace.ts",
+      "lines": 23,
+      "sha256": "9b88bb076fd5f1e411492764e3cad43c371a14fa108266a57b758a613e3bbbee",
+      "framework": "fixture",
+      "classification": "controlled-test-fixture",
+      "reason": "Creates only fixture-owned dependency symlinks; each caller owns/removes its temporary root. This test setup is not an application domain service.",
+      "readThroughEof": true
+    }
+  ]
+}

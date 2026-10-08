@@ -1,6 +1,11 @@
 import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import type { ServerSourceConfiguration } from "./build-server-http.js";
 
+/**
+ * Emits inspector callbacks against the generated host's existing runtime adapters.
+ * @param configuration - Validated inspector preview configuration.
+ * @returns Pure source retaining query, native jobs, and resource inspection contracts.
+ */
 export function inspectorEndpointsSource(configuration: ServerSourceConfiguration): string {
   return `installInspectorEndpoints(app, {
   mode: environment,

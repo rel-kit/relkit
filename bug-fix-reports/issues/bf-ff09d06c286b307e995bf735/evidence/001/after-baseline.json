@@ -1,0 +1,9 @@
+{
+  "head": "e081bde6054c8395209cdec145d8217c5d9c0dfd",
+  "effect_version": "4.0.1",
+  "files": {
+    "packages/create-relkit/src/generator-process.ts": "07d5132795cf4d25c6394dba06bb86bc1259fa7b5d9ae8a6bd7d8779eaa54d55",
+    "packages/create-relkit/tests/native-process.effect.test.ts": "238d023f41b8cd54352079aea1cab2ec9e6f78db0d750055e021741f11afe194",
+    "packages/create-relkit/tests/native-transaction.effect.test.ts": "04aa064088568cf8c277584e81b111e2d4db0d0e73c5802e376f7e68a7a0c9e7"
+  }
+}

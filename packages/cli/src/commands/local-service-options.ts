@@ -1,17 +1,12 @@
-import { randomUUID } from "node:crypto";
-import { chmod, readFile, rename, rm, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { serializeJson, type JsonValue } from "@relkit/contracts";
-import {
-  assertProviderOverrideStateVersion,
-  type LocalServicePlanEntry,
-  type LocalServiceWorkerArtifact,
-  type ProviderOverrideState,
-} from "@relkit/local-service";
+import { join } from "node:path";
+import { type LocalServicePlanEntry, type LocalServiceWorkerArtifact } from "@relkit/local-service";
 
-const LOOPBACK_URL_HOST =
-  /^(?<scheme>[a-z][a-z\d+.-]*:\/\/)(?:127\.0\.0\.1|localhost|\[::1\])(?=[:/?#]|$)/iu;
-
+/**
+ * Associates local worker bindings with the accepted job generation for their profile.
+ * @param services - Accepted local binding plans.
+ * @param generation - One generation or profile-indexed compiler generations.
+ * @returns An immutable binding-to-generation projection.
+ */
 export function localServiceGenerations(
   services: readonly LocalServicePlanEntry[],
   generation: string | Readonly<Record<string, string>>,
@@ -28,6 +23,10 @@ export function localServiceGenerations(
   );
 }
 
+/** Collects validated service generation identities for local job profiles.
+ * @param graph - Validated job node projection.
+ * @returns Accepted service generation identities indexed by job profile.
+ */
 export function localJobServiceGenerations(graph: {
   readonly nodes: readonly {
     readonly kind: string;
@@ -48,6 +47,13 @@ export function localJobServiceGenerations(graph: {
   );
 }
 
+/**
+ * Projects host and in-network worker endpoints for selected Inngest bindings.
+ * @param services - Accepted local binding plans.
+ * @param backendPort - Stable backend listener port.
+ * @param workerEnabled - Whether the generated worker container is available.
+ * @returns Immutable endpoints and unit-specific environment additions.
+ */
 export function localServiceRuntimeOptions(
   services: readonly LocalServicePlanEntry[],
   backendPort: number,
@@ -89,6 +95,15 @@ export function localServiceRuntimeOptions(
   });
 }
 
+/**
+ * Projects generated worker artifact locations for the selected local bindings.
+ * @param services - Accepted local binding plans.
+ * @param bindingIds - Bindings whose recipes require a worker.
+ * @param buildDirectory - Complete generated build root.
+ * @param nodeModulesDirectory - Authored dependency resolution root.
+ * @param providerOverridesFile - Secret-protected local worker override file.
+ * @returns An immutable artifact map without reading or writing any files.
+ */
 export function localWorkerArtifacts(
   services: readonly LocalServicePlanEntry[],
   bindingIds: readonly string[],
@@ -117,50 +132,15 @@ export function localWorkerArtifacts(
   return Object.freeze(values);
 }
 
-export async function prepareLocalWorkerOverrides(providerOverridesFile: string): Promise<string> {
-  const source = JSON.parse(await readFile(providerOverridesFile, "utf8")) as unknown;
-  assertProviderOverrideStateVersion(source);
-  const rewritten: ProviderOverrideState = {
-    ...source,
-    bindings: source.bindings.map((binding) => ({
-      ...binding,
-      values: rewriteWorkerValues(binding.values),
-    })),
-  };
-  const target = join(dirname(providerOverridesFile), "worker-provider-overrides.json");
-  const temporary = join(dirname(target), `.worker-overrides-${randomUUID()}.tmp`);
-  try {
-    await writeFile(temporary, `${serializeJson(rewritten)}\n`, { flag: "wx", mode: 0o600 });
-    await rename(temporary, target);
-    await chmod(target, 0o600);
-  } finally {
-    await rm(temporary, { force: true });
-  }
-  return target;
-}
+export {
+  prepareLocalWorkerOverrides,
+  prepareLocalWorkerOverridesEffect,
+} from "./local-worker-overrides.js";
 
-function rewriteWorkerValues(
-  values: Readonly<Record<string, JsonValue>>,
-): Readonly<Record<string, JsonValue>> {
-  return Object.freeze(
-    Object.fromEntries(
-      Object.entries(values).map(([key, value]) => [key, rewriteWorkerValue(value)]),
-    ),
-  );
-}
-
-function rewriteWorkerValue(value: JsonValue): JsonValue {
-  if (typeof value === "string")
-    return value.replace(LOOPBACK_URL_HOST, "$<scheme>host.docker.internal");
-  if (Array.isArray(value)) return value.map(rewriteWorkerValue);
-  if (value !== null && typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, nested]) => [key, rewriteWorkerValue(nested)]),
-    );
-  }
-  return value;
-}
-
+/** Converts a declared profile name into its portable local HTTP route segment.
+ * @param value - Declared profile name.
+ * @returns The existing portable Inngest route segment.
+ */
 function safeEndpointSegment(value: string): string {
   return value.replace(/[^a-zA-Z0-9_.-]/gu, "-");
 }

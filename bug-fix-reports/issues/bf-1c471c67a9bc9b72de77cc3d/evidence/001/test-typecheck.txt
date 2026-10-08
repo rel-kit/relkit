@@ -1,0 +1,2 @@
+Command: rtk proxy bun x tsc -p /Users/mustafaelsayed/Workspace/relkit/bug-fix-reports/issues/bf-1c471c67a9bc9b72de77cc3d/evidence/001/http-tests.tsconfig.json --pretty false
+Exit code: 0

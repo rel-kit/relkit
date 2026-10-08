@@ -1,15 +1,42 @@
+/**
+ * Templates supported by explicit --template selection.
+ */
 export const CREATE_TEMPLATES = ["minimal", "api", "agent", "fullstack"] as const;
+/**
+ * Supported template selected by an explicit creation flag.
+ */
 export type CreateTemplate = (typeof CREATE_TEMPLATES)[number];
 
+/**
+ * Supported cloud selections; none is the default.
+ */
 export const CREATE_CLOUDS = ["aws", "none"] as const;
+/**
+ * Supported cloud choice for project generation.
+ */
 export type CreateCloud = (typeof CREATE_CLOUDS)[number];
 
+/**
+ * Supported deployment selections; none is the default.
+ */
 export const CREATE_DEPLOYMENTS = ["pulumi", "none"] as const;
+/**
+ * Supported deployment choice for project generation.
+ */
 export type CreateDeployment = (typeof CREATE_DEPLOYMENTS)[number];
 
+/**
+ * Supported explicit local job-provider selections.
+ */
 export const CREATE_JOBS = ["inngest-docker", "effect-mq-docker", "trigger-docker"] as const;
+/**
+ * Supported local job provider selected by an explicit creation flag.
+ */
 export type CreateJobs = (typeof CREATE_JOBS)[number];
 
+/**
+ * Minimal local defaults applied before explicit create flags are parsed.
+ */
 export const CREATE_OPTION_DEFAULTS = Object.freeze({
   template: "minimal" as CreateTemplate,
   cloud: "none" as CreateCloud,
@@ -22,6 +49,9 @@ export const CREATE_OPTION_DEFAULTS = Object.freeze({
   json: false as boolean,
 });
 
+/**
+ * Normalized creation flags preserving omitted directory and job-provider fields.
+ */
 export interface CreateOptions {
   readonly name: string;
   readonly template: CreateTemplate;
@@ -36,20 +66,39 @@ export interface CreateOptions {
   readonly json: boolean;
 }
 
+/**
+ * Additional JSON output policy used while parsing creation flags.
+ */
 export interface CreateOptionsContext {
   readonly json?: boolean;
 }
 
+/**
+ * Public creation-flag usage failure with the stable RELKIT_CREATE_USAGE code.
+ */
 export class CreateOptionsError extends Error {
+  /**
+   * Stable usage code reported by CreateOptionsError.
+   */
   readonly code = "RELKIT_CREATE_USAGE" as const;
 
+  /**
+   * Creates the public create-option usage failure.
+   * @param message - User-facing diagnostic or prompt text.
+   * @returns The canonical CreateOptionsError instance.
+   */
   constructor(message: string) {
     super(message);
     this.name = "CreateOptionsError";
   }
 }
 
-/** Parses non-interactive create flags and applies the cloud-free defaults. */
+/**
+ * Parses non-interactive create flags and applies the cloud-free defaults.
+ * @param args - Literal flag and positional arguments.
+ * @param context - Optional JSON output policy applied before argument parsing.
+ * @returns Validated creation flags using minimal defaults and preserving omitted directory/jobs fields.
+ */
 export function normalizeCreateOptions(
   args: readonly string[],
   context: CreateOptionsContext = {},
@@ -118,6 +167,14 @@ export function normalizeCreateOptions(
   });
 }
 
+/**
+ * Reads an inline or following value for a creation flag.
+ * @param args - Literal flag and positional arguments.
+ * @param index - Index of the current flag.
+ * @param argument - Current literal flag token.
+ * @param option - Flag spelling used for inline matching and diagnostics.
+ * @returns The nonempty flag value and last consumed argument index.
+ */
 function readValue(
   args: readonly string[],
   index: number,
@@ -135,6 +192,14 @@ function readValue(
   throw new CreateOptionsError(`${option} requires a value.`);
 }
 
+/**
+ * Validates a finite command-line choice.
+ * @typeParam T - Union of allowed option values.
+ * @param value - Raw option value before finite-choice validation.
+ * @param option - Flag spelling used in diagnostics.
+ * @param allowed - Supported literal values.
+ * @returns The supported literal value; unsupported input raises CreateOptionsError.
+ */
 function choice<T extends string>(value: string, option: string, allowed: readonly T[]): T {
   if (allowed.includes(value as T)) return value as T;
   throw new CreateOptionsError(`${option} must be one of: ${allowed.join("|")}.`);

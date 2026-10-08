@@ -1,6 +1,9 @@
 import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
 import type { ScaffoldDependencyName } from "./scaffold-catalog.js";
 
+/**
+ * Provider constructor source, imports, dependencies and environment declarations.
+ */
 export interface ProviderDefinition {
   readonly adapter: string;
   readonly expression: string;
@@ -10,11 +13,20 @@ export interface ProviderDefinition {
   readonly warning?: { readonly code: string; readonly message: string };
 }
 
+/**
+ * Next step for newly scaffolded Docker-backed resource profiles.
+ */
 const dockerWarning = {
   code: "docker-required",
   message: "Run `relkit local up` before using this local resource.",
 };
 
+/**
+ * Builds source, imports and dependencies for a Docker-wrapped resource.
+ * @param adapter - Underlying Redis or S3 resource adapter.
+ * @param expression - Rendered Docker/resource constructor expression.
+ * @returns The provider definition including the local Docker startup warning.
+ */
 function dockerDefinition(adapter: "redis" | "s3", expression: string): ProviderDefinition {
   return {
     adapter: "docker",
@@ -29,6 +41,12 @@ function dockerDefinition(adapter: "redis" | "s3", expression: string): Provider
   } as ProviderDefinition;
 }
 
+/**
+ * Builds source, imports and dependencies for an AWS-wrapped resource.
+ * @param adapter - Underlying Redis or S3 resource adapter.
+ * @param expression - Rendered AWS/resource constructor expression.
+ * @returns The provider definition using AWS and its underlying resource adapter.
+ */
 function awsDefinition(adapter: "redis" | "s3", expression: string): ProviderDefinition {
   return {
     adapter: "aws",
@@ -42,6 +60,10 @@ function awsDefinition(adapter: "redis" | "s3", expression: string): ProviderDef
   } as ProviderDefinition;
 }
 
+/**
+ * Builds an externally connected Redis profile definition.
+ * @returns Redis constructor source and the required REDIS_URL secret declaration.
+ */
 function connectedRedis(): ProviderDefinition {
   return {
     adapter: "redis",
@@ -55,6 +77,10 @@ function connectedRedis(): ProviderDefinition {
   };
 }
 
+/**
+ * Builds an externally connected S3 profile definition.
+ * @returns S3 constructor source and endpoint, bucket, region and credential declarations.
+ */
 function connectedS3(): ProviderDefinition {
   return {
     adapter: "s3",
@@ -74,6 +100,11 @@ function connectedS3(): ProviderDefinition {
   };
 }
 
+/**
+ * Builds an externally connected Cloudflare KV or R2 definition.
+ * @param adapter - Cloudflare KV or R2 resource adapter.
+ * @returns The selected Cloudflare adapter source and required environment declarations.
+ */
 function connectedCloudflare(adapter: "kv" | "r2"): ProviderDefinition {
   const r2 = adapter === "r2";
   return {
@@ -101,6 +132,9 @@ function connectedCloudflare(adapter: "kv" | "r2"): ProviderDefinition {
   };
 }
 
+/**
+ * Pure constructors and warnings shared by provider profile selection.
+ */
 export const providerDefinitions = {
   awsDefinition,
   connectedCloudflare,
@@ -110,6 +144,13 @@ export const providerDefinitions = {
   dockerWarning,
 };
 
+/**
+ * Chooses the conventional profile name for a resource selection.
+ * @param capability - Requested provider capability.
+ * @param provider - Requested provider adapter.
+ * @param source - Requested infrastructure source.
+ * @returns The Cloudflare/connected/AWS profile name, otherwise local.
+ */
 export function defaultProviderProfile(
   capability: "cache" | "bucket" | "event" | "job",
   provider?: string,
@@ -121,6 +162,11 @@ export function defaultProviderProfile(
   return "local";
 }
 
+/**
+ * Requires an existing AWS/Pulumi deployment before planning AWS resources.
+ * @param available - Whether declaration discovery found AWS/Pulumi deployment support.
+ * @returns Completion when deployment exists; otherwise a usage error is thrown.
+ */
 export function requireAwsDeployment(available: boolean): void {
   if (!available) {
     throw new AddScaffoldError(

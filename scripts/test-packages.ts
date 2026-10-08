@@ -21,7 +21,7 @@ export function packageTestFiles(repositoryRoot: string): string[] {
   return [...files].sort();
 }
 
-/** Runs unchanged suites with one Vitest worker and serial Bun runner groups.
+/** Runs unchanged suites with one Vitest worker and their required native runtime.
  * @param environment - Parent configuration; opt-in AWS and Docker probes remain disabled here.
  * @returns After all Vitest and Bun owners settle, rejecting any failed group.
  */
@@ -34,11 +34,15 @@ export async function runPackageTests(environment: NodeJS.ProcessEnv = process.e
     ),
   );
   const vitestFiles = files.filter((_, index) => importsVitest[index]);
+  const generatorVitestFiles = vitestFiles.filter((file) =>
+    file.startsWith("packages/create-relkit/"),
+  );
+  const nodeVitestFiles = vitestFiles.filter((file) => !file.startsWith("packages/create-relkit/"));
   const bunFiles = files.filter((_, index) => !importsVitest[index]);
   const cliFiles = bunFiles.filter((file) => file.startsWith("packages/cli/"));
   const otherFiles = bunFiles.filter((file) => !file.startsWith("packages/cli/"));
   console.log(
-    `Running ${vitestFiles.length} Vitest and ${bunFiles.length} Bun package test files.`,
+    `Running ${vitestFiles.length} Vitest (${generatorVitestFiles.length} native Bun) and ${bunFiles.length} Bun package test files.`,
   );
   const testEnvironment = {
     ...environment,
@@ -46,7 +50,23 @@ export async function runPackageTests(environment: NodeJS.ProcessEnv = process.e
     RELKIT_MCP_INSPECTOR_CLI: "0",
     RELKIT_TEST_DOCKER: "0",
   };
-  if (vitestFiles.length > 0)
+  if (generatorVitestFiles.length > 0)
+    await runTests(
+      [
+        process.execPath,
+        "x",
+        "--bun",
+        "vitest",
+        "run",
+        "--config",
+        "packages/create-relkit/vitest.config.ts",
+        "--maxWorkers=1",
+        "--disableConsoleIntercept",
+        ...generatorVitestFiles,
+      ],
+      testEnvironment,
+    );
+  if (nodeVitestFiles.length > 0)
     await runTests(
       [
         process.execPath,
@@ -55,7 +75,7 @@ export async function runPackageTests(environment: NodeJS.ProcessEnv = process.e
         "run",
         "--maxWorkers=1",
         "--disableConsoleIntercept",
-        ...vitestFiles,
+        ...nodeVitestFiles,
       ],
       testEnvironment,
     );

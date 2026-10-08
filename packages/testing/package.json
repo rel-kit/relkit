@@ -29,7 +29,7 @@
     }
   },
   "dependencies": {
-    "@langchain/core": "1.2.9",
+    "@langchain/core": "catalog:",
     "@relkit/agents": "workspace:*",
     "@relkit/buckets": "workspace:*",
     "@relkit/cache": "workspace:*",
@@ -50,7 +50,7 @@
     "@relkit/runtime-hono": "workspace:*",
     "@relkit/schema": "workspace:*",
     "@relkit/tools": "workspace:*",
-    "effect": "4.0.0-rc.115"
+    "effect": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",
@@ -58,9 +58,9 @@
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false"
   },
   "devDependencies": {
-    "@effect/vitest": "4.0.0-rc.115",
+    "@effect/vitest": "catalog:",
     "@relkit/routes": "workspace:*",
-    "drizzle-orm": "1.0.0-rc.5-169397b",
-    "vitest": "5.0.1"
+    "drizzle-orm": "catalog:",
+    "vitest": "catalog:"
   }
 }

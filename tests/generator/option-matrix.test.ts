@@ -14,6 +14,7 @@ import {
   type GenerateProjectContext,
 } from "../../packages/create-relkit/src/index.ts";
 import appManifest from "../../packages/app/package.json" with { type: "json" };
+import workspaceManifest from "../../package.json" with { type: "json" };
 
 const roots: string[] = [];
 const templateRoot = resolve(import.meta.dir, "../../templates/default/v1");
@@ -87,27 +88,27 @@ test("covers every template and examples/install/Git combination", async () => {
           expect(manifest.dependencies).toEqual({
             ...(["agent", "fullstack"].includes(template)
               ? {
-                  "@langchain/langgraph": "1.4.14",
+                  "@langchain/langgraph": workspaceManifest.catalog["@langchain/langgraph"],
                   "@relkit/local": appManifest.version,
-                  langchain: "1.5.10",
+                  langchain: workspaceManifest.catalog.langchain,
                 }
               : {}),
             "@relkit/app": appManifest.version,
             ...(template === "fullstack"
               ? {
                   "@relkit/client": appManifest.version,
-                  "@tanstack/react-query": "5.102.3",
-                  next: "16.3.3",
-                  react: "19.2.8",
-                  "react-dom": "19.2.8",
+                  "@tanstack/react-query": workspaceManifest.catalog["@tanstack/react-query"],
+                  next: workspaceManifest.catalog.next,
+                  react: workspaceManifest.catalog.react,
+                  "react-dom": workspaceManifest.catalog["react-dom"],
                 }
               : {}),
           });
           expect(manifest.devDependencies).toMatchObject({
-            "@types/bun": "1.3.10",
+            "@types/bun": workspaceManifest.catalog["@types/bun"],
             "@relkit/cli": appManifest.version,
             "@relkit/testing": appManifest.version,
-            typescript: "5.9.3",
+            typescript: workspaceManifest.catalog.typescript,
           });
           expect(tsconfig.compilerOptions).toMatchObject({
             baseUrl: ".",

@@ -1,5 +1,5 @@
 import { Effect, Option } from "effect";
-import { Argument, Command, Flag } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import {
   booleanFlag,
   docs,
@@ -12,21 +12,24 @@ import {
 } from "./cli-command-shared.js";
 import type { CliHelpOption } from "./cli-help-types.js";
 
-type AddParameter = Argument.Argument<unknown> | Flag.Flag<unknown>;
+import type { AddParameter } from "./cli-command.types.js";
 
+/** Builds metadata-driven artifact parsers without invoking prompts or writes.
+ *
+ * @param select - Records the artifact invocation for the existing dispatcher.
+ *
+ * @returns The pure add command tree.
+ */
 export function addCommand(select: SelectInvocation) {
   const commands = docs(["add"]).commands.map((metadata) => {
     const path = ["add", metadata.name];
     const config: Record<string, AddParameter> = {};
     for (const argument of metadata.arguments) {
-      config[argument.name] = (
-        argument.required
-          ? stringArgument(path, argument.name, true)
-          : stringArgument(path, argument.name, false)
-      ) as AddParameter;
+      config[argument.name] = argument.required
+        ? stringArgument(path, argument.name, true)
+        : stringArgument(path, argument.name, false);
     }
-    for (const option of metadata.options)
-      config[option.name] = addFlag(path, option) as AddParameter;
+    for (const option of metadata.options) config[option.name] = addFlag(path, option);
     return document(
       Command.make(metadata.name, config, (values) =>
         Effect.sync(() => {
@@ -51,6 +54,13 @@ export function addCommand(select: SelectInvocation) {
   return document(parent, ["add"]);
 }
 
+/** Selects a parser from static option metadata.
+ *
+ * @param path - Command help path.
+ * @param option - Authored flag metadata.
+ *
+ * @returns A typed flag preserving repetition, choice and default behavior.
+ */
 function addFlag(path: readonly string[], option: CliHelpOption) {
   if (option.repeatable) return repeatedString(path, option.name);
   if (option.type === "boolean") return booleanFlag(path, option.name);
@@ -58,6 +68,16 @@ function addFlag(path: readonly string[], option: CliHelpOption) {
   return optionalString(path, option.name);
 }
 
+/** Serializes already-parsed artifact values in metadata order.
+ *
+ * @param kind - Artifact kind.
+ * @param arguments_ - Ordered positional names.
+ *
+ * @param options - Ordered flags.
+ * @param values - Parsed values from Effect CLI.
+ *
+ * @returns Literal arguments accepted by the existing artifact resolver.
+ */
 function serialize(
   kind: string,
   arguments_: readonly string[],

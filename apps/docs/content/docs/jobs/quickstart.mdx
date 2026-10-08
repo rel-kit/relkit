@@ -63,14 +63,14 @@ Use [job clients](/docs/jobs/clients) for the complete trigger/watch lifecycle a
 ```sh title="Terminal — examples/commerce"
 bun run check
 bun run typecheck
-bun ../../packages/cli/dist/index.js local up --detach
-bun ../../packages/cli/dist/index.js local status
+bun ../../packages/cli/dist/bin.js local up --detach
+bun ../../packages/cli/dist/bin.js local status
 ```
 
 Start `bun run dev` after the provider reports ready. In another terminal, submit a run:
 
 ```sh title="Second terminal — examples/commerce"
-bun ../../packages/cli/dist/index.js jobs capabilities
+bun ../../packages/cli/dist/bin.js jobs capabilities
 curl -i -X POST http://127.0.0.1:4000/orders/export \
   -H 'content-type: application/json' \
   -d '{"orderIds":["order-1"]}'

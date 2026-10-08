@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import {
@@ -15,33 +15,31 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
 
-test("offers staged additions and validates the completed project once", async () => {
+test("asks only final consent and validates the completed project once", async () => {
   const root = await temporaryRoot();
-  const commands: readonly string[][] = [];
+  const commands: string[][] = [];
+  const questions: string[] = [];
   const result = await generateProject(normalizeCreateOptions(["demo", "--install", "--no-git"]), {
     cwd: root,
     templateRoot,
     interactive: true,
-    promptDriver: additionDriver("simple"),
+    promptDriver: confirmationDriver(questions),
     commandRunner: async (command) => {
-      (commands as string[][]).push([...command]);
+      commands.push([...command]);
       return { exitCode: 0 };
     },
     relkitExecutable: "relkit",
   });
-
-  expect(result.additions).toHaveLength(1);
-  expect(result.additions[0]).toMatchObject({
-    kind: "service",
-    verification: { status: "skipped" },
-  });
-  expect(result.files).toContain("src/billing/functions/example.function.ts");
+  expect(questions).toEqual(["Create this project?"]);
+  expect(result.additions).toEqual([]);
+  expect(result.files).not.toContain("src/billing/functions/example.function.ts");
   expect(commands.map((command) => command[1])).toEqual(["install", "doctor", "check"]);
   expect(result.nextSteps.commands.install).toBeUndefined();
 });
 
-test("defers validation when a no-install staged addition needs packages", async () => {
+test("retains no-install behavior without offering artifact additions", async () => {
   const root = await temporaryRoot();
+  const questions: string[] = [];
   let commands = 0;
   const result = await generateProject(
     normalizeCreateOptions(["demo", "--no-install", "--no-git"]),
@@ -49,15 +47,16 @@ test("defers validation when a no-install staged addition needs packages", async
       cwd: root,
       templateRoot,
       interactive: true,
-      promptDriver: additionDriver("full"),
+      promptDriver: confirmationDriver(questions),
       commandRunner: async () => {
         commands += 1;
         return { exitCode: 0 };
       },
     },
   );
-
+  expect(questions).toEqual(["Create this project?"]);
   expect(commands).toBe(0);
+  expect(result.additions).toEqual([]);
   expect(result.warnings).toContainEqual(expect.objectContaining({ code: "validation-skipped" }));
   expect(result.nextSteps.commands).toMatchObject({
     install: "bun install",
@@ -65,55 +64,49 @@ test("defers validation when a no-install staged addition needs packages", async
   });
 });
 
-test("cleans the staged project and preserves cancellation exit 130", async () => {
+test("declined consent creates no stage and preserves cancellation exit 130", async () => {
   const root = await temporaryRoot();
-  const destination = join(root, "demo");
-  const prompt = additionDriver("simple");
+  const questions: string[] = [];
   await expect(
     generateProject(normalizeCreateOptions(["demo", "--no-install", "--no-git"]), {
       cwd: root,
       templateRoot,
       interactive: true,
-      promptDriver: {
-        ...prompt,
-        confirm: async (options) => {
-          if (options.message === "Add an artifact before finishing?") {
-            throw Object.assign(new Error("Scaffolding was cancelled."), {
-              code: "RELKIT_CREATE_CANCELLED",
-              exitCode: 130,
-            });
-          }
-          return prompt.confirm(options);
-        },
-      },
+      promptDriver: confirmationDriver(questions, false),
     }),
   ).rejects.toMatchObject({ code: "RELKIT_CREATE_CANCELLED", exitCode: 130 });
-  expect(await Bun.file(destination).exists()).toBeFalse();
+  expect(questions).toEqual(["Create this project?"]);
+  expect(await readdir(root)).toEqual([]);
+});
+
+test("headless creation never invokes prompt authority", async () => {
+  const root = await temporaryRoot();
+  const questions: string[] = [];
+  await generateProject(normalizeCreateOptions(["demo", "--no-install", "--no-git"]), {
+    cwd: root,
+    templateRoot,
+    promptDriver: confirmationDriver(questions, false),
+  });
+  expect(questions).toEqual([]);
 });
 
 async function temporaryRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "relkit-create-additions-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-create-consent-"));
   roots.push(root);
   return root;
 }
 
-function additionDriver(mode: "simple" | "full"): PromptDriver {
-  let addQuestions = 0;
+function confirmationDriver(questions: string[], consent = true): PromptDriver {
+  const unexpected = async (): Promise<never> => {
+    throw new Error("Unexpected setup question.");
+  };
   return {
-    text: async (options) =>
-      options.message === "service name" ? "Billing" : (options.initialValue ?? "value"),
-    select: async (options) => {
-      if (options.message === "What would you like to add?") return "service" as never;
-      if (options.message === "Service contents") return mode as never;
-      return (options.initialValue ?? options.options[0]!.value) as never;
-    },
-    multiselect: async () => [],
+    text: unexpected,
+    select: unexpected,
+    multiselect: unexpected,
     confirm: async (options) => {
-      if (options.message.includes("Add an artifact") || options.message.includes("Add another")) {
-        addQuestions += 1;
-        return addQuestions === 1;
-      }
-      return true;
+      questions.push(options.message);
+      return consent;
     },
     note: () => undefined,
     intro: () => undefined,

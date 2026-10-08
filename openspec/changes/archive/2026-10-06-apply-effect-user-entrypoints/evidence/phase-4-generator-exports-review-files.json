@@ -1,0 +1,22 @@
+{
+  "status": "accepted at current hashes; final public export/type delta read through EOF independently",
+  "verification": "source typecheck/build and six actual packed cold catalog consumer tests passed; no additional resource acquisition in exports",
+  "files": [
+    {
+      "path": "packages/create-relkit/src/index.ts",
+      "classification": "pure public export/type contract",
+      "author": "/root/plan_create_relkit and supporting catalog integration",
+      "reviewer": "/root",
+      "sha256": "14b4af5c375f58fba29c1b66ed1cc9f721ea6b1780195883461d8945cac82b19",
+      "lines": 36
+    },
+    {
+      "path": "packages/create-relkit/src/catalog-resolution.types.ts",
+      "classification": "pure public export/type contract",
+      "author": "/root/plan_create_relkit and supporting catalog integration",
+      "reviewer": "/root",
+      "sha256": "c485146cc029126b3848502471a96358525b48392bfe993586644c0ab666b77e",
+      "lines": 2
+    }
+  ]
+}

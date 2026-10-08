@@ -1,23 +1,16 @@
 import { resolve } from "node:path";
 
-export interface ParsedJobs {
-  readonly path: readonly string[];
-  readonly options: Readonly<Record<string, string>>;
-  readonly repeated: Readonly<Record<string, readonly string[]>>;
-  readonly projectRoot: string;
-}
+import { JobsCommandError } from "./jobs-error.js";
+import type { ParsedJobs } from "./jobs.types.js";
+export { JobsCommandError } from "./jobs-error.js";
+export type { ParsedJobs } from "./jobs.types.js";
 
-export class JobsCommandError extends Error {
-  constructor(
-    readonly code:
-      "RELKIT_JOBS_USAGE" | "RELKIT_JOBS_REQUEST_FAILED" | "RELKIT_JOB_SUBMISSION_UNKNOWN",
-    message: string,
-  ) {
-    super(message);
-    this.name = "JobsCommandError";
-  }
-}
-
+/**
+ * Parses existing literal jobs arguments without native authority.
+ * @param args - Original arguments following jobs.
+ * @returns Stable paths, single/repeated values and resolved root.
+ * @throws JobsCommandError on an absent required flag value.
+ */
 export function parse(args: readonly string[]): ParsedJobs {
   const path: string[] = [];
   const options: Record<string, string> = {};
@@ -42,15 +35,34 @@ export function parse(args: readonly string[]): ParsedJobs {
   return { path, options, repeated, projectRoot: resolve(options["project-root"] ?? ".") };
 }
 
+/**
+ * Enforces an existing command-specific required value.
+ * @param parsed - Pure normalized arguments.
+ * @param name - Required literal flag name.
+ * @param required - Whether this command requires the value.
+ * @returns Nothing after validation.
+ * @throws JobsCommandError with the existing usage diagnostic.
+ */
 export function requireOption(parsed: ParsedJobs, name: string, required = true): void {
   if (required && !parsed.options[name]) throw usage(`--${name} is required.`);
 }
 
+/**
+ * Encodes an opaque locator after preserving missing-locator validation.
+ * @param value - Existing public locator.
+ * @returns URL-encoded locator.
+ * @throws JobsCommandError if no locator was supplied.
+ */
 export function encode(value: string | undefined): string {
   if (!value) throw usage("A locator is required.");
   return encodeURIComponent(value);
 }
 
+/**
+ * Creates the existing public usage failure.
+ * @param message - Existing usage diagnostic.
+ * @returns Original public error constructor and code.
+ */
 export function usage(message: string): JobsCommandError {
   return new JobsCommandError("RELKIT_JOBS_USAGE", message);
 }

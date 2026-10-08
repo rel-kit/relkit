@@ -1,5 +1,6 @@
 import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 
+/** Pure lookup, health, and structured log adapters for the generated runtime host. */
 export const SERVER_RUNTIME_SUPPORT_SOURCE = `
 function provider(providerRegistry, capability, profile) {
   return providerRegistry.resolve(capability, profile).value;
@@ -78,22 +79,11 @@ function queueProvider(providerRegistry, context) {
     throw new Error(\`Job provider profile "\${context.profile}" cannot materialize queues.\`);
   return value.createQueue(context);
 }
-function startJobWorker(jobs) {
-  let running = false;
-  const worker = setInterval(async () => {
-    if (running || stopping) return;
-    running = true;
-    try {
+async function startJobWorker(jobs) {
+  await runtimeOwner.worker("job-worker", async () => {
       await jobs.tick(new Date());
-      await Promise.all([...jobs.jobs.keys()].map((jobId) => jobs.runNext(jobId)));
-    } catch (error) {
-      recordRuntimeFailure("runtime.job-worker", "Job worker failed", error, "job");
-    } finally {
-      running = false;
-    }
-  }, environment === "production" ? 1_000 : 100);
-  worker.unref?.();
-  return worker;
+      await runtimeOwner.each([...jobs.jobs.keys()], (jobId) => jobs.runNext(jobId));
+  });
 }
 function errorCode(error) {
   if (error !== null && typeof error === "object" && typeof error.code === "string") return error.code;
@@ -125,23 +115,7 @@ function writeRuntimeLog(record) {
   else consoleHumanSink.write(formatHumanLog(record), record);
 }
 function healthResponse(status, code = 200) {
-  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, activationFingerprint, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && nativeJobWorkerReady && !stopping, databaseReady: databaseReady && !stopping, authReady: authReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
-}
-function tokenFrom(value) {
-  const parsed = Number(value);
-  return Number.isSafeInteger(parsed) ? parsed : undefined;
-}
-function readLocalServiceInspectorState(value) {
-  if (value === undefined) return undefined;
-  try {
-    const parsed = JSON.parse(value);
-    if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
-  } catch {}
-  return { lease: { status: "blocked" } };
-}
-function resolveEnvironment(value, nodeEnvironment) {
-  if (value === "development" || value === "test" || value === "production") return value;
-  return nodeEnvironment === "production" ? "production" : "development";
+  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, activationFingerprint, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: runtimeState().ready.provider && runtimeState().ready.nativeWorker && !runtimeState().stopping, databaseReady: runtimeState().ready.database && !runtimeState().stopping, authReady: runtimeState().ready.auth && !runtimeState().stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
 }
 function resolveRuntimeEnvironment(definition, environment, source) {
   try {
@@ -158,10 +132,5 @@ function resolveRuntimeEnvironment(definition, environment, source) {
 }
 function runtimeEnvironmentValue(value) {
   return value;
-}
-function waitForProviderReady() {
-  const milliseconds = timeoutFrom(process.env.RELKIT_PROVIDER_READY_DELAY_MS, 0);
-  if (milliseconds === 0) return Promise.resolve();
-  return new Promise((resolve, reject) => { const timer = setTimeout(resolve, milliseconds); shutdownController.signal.addEventListener("abort", () => { clearTimeout(timer); reject(shutdownController.signal.reason ?? new Error("Provider startup was aborted.")); }, { once: true }); });
 }
 `;

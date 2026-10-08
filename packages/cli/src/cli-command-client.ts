@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import {
   document,
   optionArgs,
@@ -8,7 +8,19 @@ import {
   type SelectInvocation,
 } from "./cli-command-shared.js";
 
+/** Builds client contract syntax without fetching a running application.
+ *
+ * @param select - Invocation recorder.
+ *
+ * @returns The pure client pull/check parser tree.
+ */
 export function clientCommand(select: SelectInvocation) {
+  /** Constructs one client operation with the shared URL and output syntax.
+   *
+   * @param name - Client operation.
+   *
+   * @returns Its URL/output argument parser.
+   */
   const command = (name: "pull" | "check") => {
     const path = ["client", name] as const;
     return document(

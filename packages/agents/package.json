@@ -30,19 +30,19 @@
   },
   "dependencies": {
     "@cfworker/json-schema": "4.1.1",
-    "@langchain/core": "1.2.9",
-    "@langchain/langgraph": "1.4.14",
+    "@langchain/core": "catalog:",
+    "@langchain/langgraph": "catalog:",
     "@relkit/contracts": "workspace:*",
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*",
     "@relkit/tools": "workspace:*",
-    "effect": "4.0.0-rc.115",
-    "langchain": "1.5.10",
+    "effect": "catalog:",
+    "langchain": "catalog:",
     "langsmith": "0.9.0"
   },
   "peerDependencies": {
-    "deepagents": "1.13.3"
+    "deepagents": "catalog:"
   },
   "peerDependenciesMeta": {
     "deepagents": {
@@ -50,14 +50,14 @@
     }
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "5.0.1",
+    "@vitest/coverage-v8": "catalog:",
     "@langchain/langgraph-checkpoint-mongodb": "1.4.1",
     "@langchain/langgraph-checkpoint-postgres": "1.0.5",
     "@langchain/langgraph-checkpoint-redis": "1.0.11",
     "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
     "@relkit/buckets": "workspace:*",
-    "deepagents": "1.13.3",
-    "vitest": "5.0.1"
+    "deepagents": "catalog:",
+    "vitest": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",

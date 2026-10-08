@@ -1,0 +1,1036 @@
+{
+  "audit": "/root/acceptance_auditor; continuing /root/final_auditor reconciliation",
+  "capturedAt": "2026-10-06T09:42:54Z",
+  "status": "All current package and supporting bytes have independent accepted review provenance; evidence frozen for coordinator verification.",
+  "counts": {
+    "packages": 518,
+    "cli": 383,
+    "generator": 135,
+    "baseline": 207,
+    "retainedBaseline": 206,
+    "retiredBaseline": 1,
+    "addedAuthoredPackageFiles": 312,
+    "supportingTypeScript": 58,
+    "supportingAuthored": 57,
+    "supportingGenerated": 1,
+    "currentPackageAndSupportingUnion": 576
+  },
+  "checks": {
+    "acceptedPackageCoverage": 518,
+    "missingOrDifferentAcceptedHashes": 0,
+    "duplicateCliRows": 0,
+    "obsoleteCliRows": 0,
+    "reviewerOwnershipMismatches": 0,
+    "classifiedCurrentCliFiles": 383,
+    "authorInventoryPaths": 380,
+    "lateAcceptedInventoryAdditions": 3,
+    "supersededImmutableBaseRows": 7
+  },
+  "cliExclusiveGroups": {
+    "baseline test/fixture authority; generator review": 37,
+    "root: synchronous help/editor; native review": 13,
+    "native: contributor/bin/passive exports; root review": 17,
+    "plan_cli: shared project/capabilities/execution; root review": 52,
+    "native: pure command definitions; root review": 11,
+    "root: invocation/scaffold; generator review": 21,
+    "native: emitted server/scoped runtime; root review": 30,
+    "plan_cli: client/deploy/local/dev domain; native review": 101,
+    "startup_author: initial development capability/inspector/tests; startup_reviewer review": 7,
+    "root: telemetry; generator review": 19,
+    "native: doctor/start; root review": 31,
+    "root: read command services; native review": 21,
+    "root: jobs; generator review": 23
+  },
+  "cliClassificationCounts": {
+    "test": 85,
+    "Added executable native compatibility edge": 1,
+    "edge": 10,
+    "pure": 65,
+    "types": 64,
+    "native": 127,
+    "schema": 20,
+    "Added owned compatibility/lifetime edge over native Context operations": 1,
+    "Added native Context/service/scoped workflow": 1,
+    "Refactored owned Promise command-entry edge": 1,
+    "Added service/lifetime/strict consumer test or fixture": 1,
+    "pure explicit project capability contract; isolated development transport retains its typed failure channel": 1,
+    "replaceable Context project domain captures cleanup and delegates to the existing scoped native compiler owner": 1,
+    "initial development check routes through explicit service authority before retention, telemetry and session admission": 1,
+    "native installation adapter; module directory uses portable URL resolution under Bun and Node": 1,
+    "deterministic service substitution, fresh identity, failure preservation and Deferred-controlled interruption join regressions": 1,
+    "actual CLI SIGTERM, CPU-bound initial compiler and descendant release within the unchanged two-second limit; immediately owned fixture cleanup": 1,
+    "strict documented composition and negative missing-project/native/Scope authority probes, including the new development capability": 1
+  },
+  "generatorClassificationCounts": {
+    "pure-option-parsing": 5,
+    "pure-output-formatting": 2,
+    "cohesive-domain-service": 5,
+    "type-contract": 31,
+    "typed-resolution-workflow": 9,
+    "private-ref-state": 3,
+    "compatibility-edge": 4,
+    "scoped-transaction-workflow": 3,
+    "process-workflow": 2,
+    "runtime-edge": 3,
+    "typed-planning-workflow": 14,
+    "pure-catalog-manifest": 4,
+    "typed-io-workflow": 10,
+    "pure-source-rendering": 10,
+    "diagnostic-ownership": 2,
+    "schema-boundary": 2,
+    "native-io-service": 4,
+    "pure-barrel": 2,
+    "pure-ast-discovery": 6,
+    "public-error-contract": 1,
+    "foundation-regression-test": 3,
+    "test-fixture": 2,
+    "effect-regression-test": 6,
+    "compiler-probe": 1,
+    "test-configuration": 1
+  },
+  "baselineRetirements": [
+    {
+      "path": "packages/create-relkit/src/create-additions.ts",
+      "classification": "retired-interactive-workflow",
+      "reason": "The approved creation flow asks only a missing name and final confirmation. The staged artifact question loop is removed; artifact generation remains available through relkit add."
+    }
+  ],
+  "scopeInventories": [
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/inventory.md",
+      "sha256": "da86d1cd007d71044f575b2b871b37fd1adda3158445cd4e1ffa6cf043a2dc63",
+      "files": 207,
+      "role": "historical read-through-EOF baseline; preserved"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-inventory.md",
+      "sha256": "5ac95c49fea56667c03e213c4f4073319283532c04f49408b2bb6cbd805dbce9",
+      "files": 380,
+      "role": "Preserved author path/origin/classification matrix plus three explicitly accepted late tests: background observation and initial development deterministic/native checks"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-generator-review.md",
+      "sha256": "414f56fec78ed4f69c6b5e47825edd60575a9c1a5e457ae6d114c759eb1e4f84",
+      "files": 135,
+      "role": "independent generator EOF acceptance; root overlays preserve later export ownership"
+    }
+  ],
+  "acceptedByteInventories": [
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-baseline-review-files.json",
+      "sha256": "2a93d7cea725fe00fd901daddcc426a433a1b4b7d74214dd7eb0ca7afa36e124",
+      "files": 37,
+      "reviewer": "/root/plan_create_relkit",
+      "acceptance": "phase-3-cli-baseline-review.md"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-invocation-jobs-review-files.json",
+      "sha256": "dcf808e5afa643879663d5affd0062f2889ebfaf4787c256c078f0591bb473eb",
+      "files": 48,
+      "reviewer": "/root/plan_create_relkit",
+      "acceptance": "phase-3-invocation-jobs-review.md"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-telemetry-review-files.json",
+      "sha256": "ccdc1613bd1d6e327cdca01b17e661c2ef7f74f733861619a9221c9ac9118506",
+      "files": 19,
+      "reviewer": "/root/plan_create_relkit",
+      "acceptance": "phase-3-telemetry-review.md"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-contributor-review-files.json",
+      "sha256": "834758964d5092ebe7aef4ce675c682b75f3945daeb9ca80f592bb0e43401368",
+      "files": 18,
+      "reviewer": "/root",
+      "acceptance": "phase-3-contributor-review.md"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-4-native-review-files.json",
+      "sha256": "868fe6d74293e64b271c6b45ede01f059d14ffa3af511b6718cb65e6e61069a1",
+      "files": 82,
+      "reviewer": "/root",
+      "acceptance": "phase-4-runtime-review.md and companion phase evidence"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-read-services-files.json",
+      "sha256": "a283096ded71088c4b846d372f0093311464dfa190193ea859c737171158bf3a",
+      "files": 21,
+      "reviewer": "/root/native_gate",
+      "acceptance": "phase-3-read-services-review.md"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-help-editor-files.json",
+      "sha256": "25e5b365c110dd8f5ef2e36c58f6ea99786cf20b658e8ce2cce602fa9829e13c",
+      "files": 17,
+      "reviewer": "/root/native_gate",
+      "acceptance": "phase-3-help-editor-review.md"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-shared-review-files.json",
+      "sha256": "a5b000fa05dc7c3e7a600002652cd6d607b5bb10caafaf0b8eaa76de72ee5cf3",
+      "files": 55,
+      "reviewer": "/root",
+      "acceptance": "phase-3-cli-shared-review.md"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-domain-files.json",
+      "sha256": "72de13c86aacd3745e893bb60ed2d160c8e67b43bd3e55501c72a00b93817eb2",
+      "files": 102,
+      "reviewer": "/root/native_gate",
+      "acceptance": "phase-3-cli-domain-review.md"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-4-generator-exports-review-files.json",
+      "sha256": "6c1d1cc17a705b59491b500455cf365d802e2698f869b139b80feb69fbad2348",
+      "files": 2,
+      "reviewer": "/root",
+      "acceptance": "phase-4-catalog-bootstrap.md"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-4-native-supporting-review-files.json",
+      "sha256": "5de752bc58b4e0653fbb96daeb6dce1b1ba9807460c8aedf1dd9f988b6baec83",
+      "files": 5,
+      "reviewer": "/root/native_gate",
+      "acceptance": "independent EOF supporting receipt"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-native-supporting-files.json",
+      "sha256": "38a3eea74f80b37598d5366c354143f1858a37d5eaeb10a51af25d73f321b67b",
+      "files": 6,
+      "reviewer": "/root for container/listing contracts; /root/native_gate for external generator tests and package runner",
+      "acceptance": "Independent current EOF/hash receipts with explicit per-file reviewer ownership; phase-five container and generator/runner compatibility acceptance"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-generator-files.json",
+      "sha256": "c9c77a7c021be2bdea64b5aba73db0ac1539c1945d0cc383a210f93309611725",
+      "files": 135,
+      "reviewer": "/root/native_gate",
+      "acceptance": "Independent 135-file EOF/hash receipt in phase-3-generator-review.md; later public exports use root overlays."
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-cli-candidate-cancellation-files.json",
+      "sha256": "a43c9f176e8280d13c27a9896950559b8ba6f7e556939e41c4505e14a992b971",
+      "files": 2,
+      "reviewer": "/root/native_gate",
+      "acceptance": "independently accepted complete EOF and current SHA-256 bytes for both files; packed replay remains a separate gate"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-observation-supporting-files.json",
+      "sha256": "ae0f6e16d7e5cd8b48ba97a23d2cd6848f4ee997c3d535a2dac0d65ce6d596f4",
+      "files": 3,
+      "reviewer": "/root/native_gate",
+      "acceptance": "independently accepted complete EOF and current hashes for all three TypeScript files"
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-duckdb-batch-files.json",
+      "sha256": "d205f8c73158cfe4ec634be247a50eda7f2ed93f3f38ab371b78637a3676105a",
+      "files": 6,
+      "reviewer": "/root",
+      "acceptance": "phase-5-duckdb-batch-review.md; final six corrected files read through EOF; all 181 observability tests across 64 files passed; immutable release remains separate."
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-dev-initial-check-files.json",
+      "sha256": "f7ec19e3cb7ccaa437c2d8e11bc2b3290406a07ac2739eba570582df64485c92",
+      "files": 7,
+      "reviewer": "/root/startup_reviewer",
+      "acceptance": "phase-5-dev-initial-check-review.md; independent complete EOF/current hashes for all seven files; source-packed and full verification remain separate."
+    },
+    {
+      "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-compiler-fixture-files.json",
+      "sha256": "38693da0618276b89c0b2c225f1719ffed89b4ceb49edc0018dd4eb4a3d092f1",
+      "files": 1,
+      "reviewer": "/root/compiler_fixture_reviewer",
+      "acceptance": "phase-5-compiler-fixture-review.md; independent complete EOF/current hash and deterministic physical-settlement regression; full verification remains separate."
+    }
+  ],
+  "foundation": {
+    "path": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-2-files.json",
+    "sha256": "44cb56d85ea3a8f5ea82af60c82beb955468a435ee90333ac5fbf8d911207340",
+    "historicalFiles": 66,
+    "unchangedCurrentHashes": 34,
+    "laterAcceptedOverlays": 32,
+    "overlays": [
+      {
+        "path": "packages/cli/src/cli-command-add.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-command-basic.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-command-client.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-command-deploy.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-command-groups.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-command-jobs-runs.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-command-jobs.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-command-local.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-command-shared.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-command.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/cli-effect-runtime.ts",
+        "evidence": "phase-3-cli-shared-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/commands/doctor-compat.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/cli/src/local.ts",
+        "evidence": "phase-3-contributor-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/create-relkit/src/add-transaction-files.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/add-transaction.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/build-catalog.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/catalog-resolution.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/create-relkit/src/dependency-patch-installation.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/dependency-patches.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/dependency-patches.types.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/generate.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/index.ts",
+        "evidence": "phase-4-generator-exports-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "packages/create-relkit/src/plan-builder.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/plan-manifest.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/project-catalog.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/create-relkit/src/scaffold-catalog.ts",
+        "evidence": "phase-3-generator-review.md + phase-3-generator-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "scripts/catalog-manifest.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "scripts/catalog-manifest.types.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "scripts/release-check-listing.ts",
+        "evidence": "phase-5-native-supporting-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "scripts/release-check-support.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "scripts/sync-release.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      },
+      {
+        "path": "tests/unit/sync-release.test.ts",
+        "evidence": "phase-4-native-review-files.json",
+        "reviewer": "/root"
+      }
+    ]
+  },
+  "supportingFiles": [
+    {
+      "path": "integrations/packages/effect-mq/src/build-catalog.ts",
+      "sha256": "420fa96d51ca2909ed9dd28428d7be01f9aac9d62b8321750945e4c7b45d4a6a",
+      "classification": "generated portable catalog literal",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review",
+      "generated": true
+    },
+    {
+      "path": "integrations/packages/effect-mq/src/deployment/index.ts",
+      "sha256": "a68866a42459ad261e28e6d67fe256213854e34f5826d933ff304ec4543103f0",
+      "classification": "pure export barrel",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "integrations/packages/effect-mq/src/postgres-listen.ts",
+      "sha256": "74894319d9872b3e9d33096b1e6b207c5e499231657c62fab10589bd82c1d596",
+      "classification": "native PostgreSQL LISTEN integration",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "integrations/packages/effect-mq/tests/postgres-declarations.test.ts",
+      "sha256": "c007208c407dc44b9608c4c98f0bdc0e289aff8f2167770caf8d0547fc5da228",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root/plan_cli",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "integrations/packages/effect-mq/tests/postgres-declarations.ts",
+      "sha256": "04a5e5db592ece3fea8fab3f1ecadd3562323ffb9f6114facd55d0389252d6b8",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root/plan_cli",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "integrations/packages/effect-mq/tests/postgres-listen.test.ts",
+      "sha256": "71b09e4a5fa4ba4c2dcb0506b589d3c860fb87d682f09241bfee93d1fedc39c5",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "packages/compiler/src/config-loader-types.ts",
+      "sha256": "f3368cb1bbcdb7bda790e296b5c5791c193cb59d6f78a1f31148a32af70b970b",
+      "classification": "pure Schema and metadata",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-4-native-supporting-review-files.json"
+    },
+    {
+      "path": "packages/compiler/src/index.ts",
+      "sha256": "1fdc17db53a64c918637552bdebef20c5bc236faa8ecf846411438a8d52d29dd",
+      "classification": "pure contract, schema, parsing or presentation",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-3-help-editor-files.json"
+    },
+    {
+      "path": "packages/contracts/src/operation-observer.ts",
+      "sha256": "e687082ba1e064546e2214756cc8f166aa49ca7eafb90b61840f6883f318795f",
+      "classification": "shared Effect observation policy; metrics, spans and all failure paths retained",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-5-observation-supporting-files.json: independent current EOF and native observation verification"
+    },
+    {
+      "path": "packages/contracts/src/operation-runtime.ts",
+      "sha256": "12d894cab2af8632f1d1caec922607a5a7aaa359b13d50f81cf97ca322514de6",
+      "classification": "captured-owner public execution runners",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-4-native-supporting-review-files.json"
+    },
+    {
+      "path": "packages/contracts/src/operation.ts",
+      "sha256": "409a2f467956229010729cb205e5121a3d22dfcf091326df5611af99bce7e13a",
+      "classification": "pure compatibility barrel",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-5-observation-supporting-files.json: independent current EOF and native observation verification"
+    },
+    {
+      "path": "packages/contracts/src/operation.types.ts",
+      "sha256": "e5766b2aa9707672c644dc6b5acf47f477dfb0cd3d12cd10b1a9bdf6f64f4c7b",
+      "classification": "pure type contract",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "packages/contracts/tests/operation-log-policy.test.ts",
+      "sha256": "76b14051bb618916acf393379772f607dd94c60c8234432f31bda00a28dc2ae8",
+      "classification": "deterministic Context inheritance, metrics, failure identity and application logging regression",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-5-observation-supporting-files.json: independent current EOF and native observation verification"
+    },
+    {
+      "path": "packages/contracts/tests/operation-observer.test.ts",
+      "sha256": "1f678bc2bd8ecadf3ed91a7f32a7b9f64263853b7dbb0c525e5db8dc810db065",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "packages/observability/src/local/duckdb-batch.ts",
+      "sha256": "1888d23996f39adaafaf29561beffa08c9d484debce468b88ab80108d6168bc9",
+      "classification": "bounded Effect batch admission and parameter-bound SQL; deterministic BigInt cursor assignment",
+      "reviewer": "/root",
+      "evidence": "phase-5-duckdb-batch-files.json + phase-5-duckdb-batch-review.md: independent full EOF/current hashes and complete native/controlled suite"
+    },
+    {
+      "path": "packages/observability/src/local/duckdb-batch.types.ts",
+      "sha256": "d4ffa1ce00ebea0fd0d422e461cb83beeb8e7455853112fb0edb87c61f1a2a48",
+      "classification": "pure readonly prepared-record contract",
+      "reviewer": "/root",
+      "evidence": "phase-5-duckdb-batch-files.json + phase-5-duckdb-batch-review.md: independent full EOF/current hashes and complete native/controlled suite"
+    },
+    {
+      "path": "packages/observability/src/local/duckdb-storage.ts",
+      "sha256": "3e23c73bc8993c543eeb2e39c9564a91a11eca841619045c94ee60fb4bb283c8",
+      "classification": "serialized transaction owner; native lifetime, retention, typed failures and rollback preserved",
+      "reviewer": "/root",
+      "evidence": "phase-5-duckdb-batch-files.json + phase-5-duckdb-batch-review.md: independent full EOF/current hashes and complete native/controlled suite"
+    },
+    {
+      "path": "packages/observability/src/local/duckdb-worker-process.ts",
+      "sha256": "c20e1dd75fa3ccc8a2cbc15bb4728def2c8219c75ae0b48957d4416f2549221f",
+      "classification": "native Effect scope compatibility boundary",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "packages/observability/src/local/duckdb-worker.ts",
+      "sha256": "35b72cf1fe4624d3da48c70b0a3c1fdb32f101793591315b03cb15cbbb6f065a",
+      "classification": "native Effect scope compatibility boundary",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "packages/observability/tests/duckdb-batch-native.test.ts",
+      "sha256": "5d31c96adb8aa1672c911c5b496a2cb62936ec3adc53f5dccb8e4120396c1795",
+      "classification": "actual native DuckDB deduplication, bound, rollback, retry and cursor regressions with immediately owned fixtures",
+      "reviewer": "/root",
+      "evidence": "phase-5-duckdb-batch-files.json + phase-5-duckdb-batch-review.md: independent full EOF/current hashes and complete native/controlled suite"
+    },
+    {
+      "path": "packages/observability/tests/duckdb-batch.test.ts",
+      "sha256": "432e5080499537535210c700cfd7acf00d54e8099393adb8ef6f46624e5c2338",
+      "classification": "deterministic allocation, invalid duplicate, transaction failure and physical cancellation regressions",
+      "reviewer": "/root",
+      "evidence": "phase-5-duckdb-batch-files.json + phase-5-duckdb-batch-review.md: independent full EOF/current hashes and complete native/controlled suite"
+    },
+    {
+      "path": "packages/observability/tests/duckdb-concurrency.test.ts",
+      "sha256": "d001f218c68b6d57e8e35a5069491be1c1aa37550357f0ccbcf1b47de1ca9981",
+      "classification": "existing connection serialization and commit failure regressions; allocation fixture and strict record fields updated",
+      "reviewer": "/root",
+      "evidence": "phase-5-duckdb-batch-files.json + phase-5-duckdb-batch-review.md: independent full EOF/current hashes and complete native/controlled suite"
+    },
+    {
+      "path": "scripts/build-catalog.ts",
+      "sha256": "c65a5573fcd4356464e529dd896181673d2b8066bdfcecf68a01c73f59877d7a",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/build-catalog.types.ts",
+      "sha256": "1f484ef40f228a8977b385d0c5cca41f0c3c68de3aa5dd4d1dbbac02704b3bcb",
+      "classification": "pure type contract",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/build.ts",
+      "sha256": "33572bdccd1ba006af0a9706a1746df23b79ff272b0ea94d72a7613c2332741a",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/catalog-manifest.ts",
+      "sha256": "4f0e1d4c5b870a5bfc226ecc8b054d3e678dfe85b5d214ccb40a1b55a75bf53a",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "reviewer": "/root",
+      "evidence": "phase-4-native-review-files.json"
+    },
+    {
+      "path": "scripts/catalog-manifest.types.ts",
+      "sha256": "5e7480255d46a91e6203d168189d358cfd8d4ddfd726a175a00de63fb39ed3bc",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "reviewer": "/root",
+      "evidence": "phase-4-native-review-files.json"
+    },
+    {
+      "path": "scripts/pack-and-smoke-create-relkit-pack.ts",
+      "sha256": "fa04c06198912984b913dfa55030b8d3a84bc73563a2d162e0a8e9878de036b0",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/pack-and-smoke-exports.ts",
+      "sha256": "037b1e42229241cdfe01123f033fc0d0c6bdc9a3de370ac168c963415f4381f7",
+      "classification": "native verification orchestration",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-4-native-supporting-review-files.json"
+    },
+    {
+      "path": "scripts/pack-and-smoke-postgres.ts",
+      "sha256": "f6aa196271b5f05ebd6c545dc261fd78cd110ff38e8d84e18b2b9deeed47993a",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/package-create-relkit-templates.ts",
+      "sha256": "6b9ec2ef8cc9a03e815dc50f064782224bd0d5eba32980dfc1b575e406dc88d6",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/packed-postgres-consumer.ts",
+      "sha256": "e27178624475b163a682468bc98b8d2c351e3257c634797ca958a2a6cc9aee6e",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/release-check-artifacts.ts",
+      "sha256": "2e820ef86148dbfb66010ceeffc64417bcfa360447e345fed8bf5e9a6addf44e",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/release-check-listing.ts",
+      "sha256": "ced08440cc604c379a54f9e44ae69b171141ed19bb351464202c95a7362735d8",
+      "classification": "pure release archive contract; exact required portable catalog source pair with unchanged development-file exclusion",
+      "reviewer": "/root",
+      "evidence": "phase-5-native-supporting-files.json: independent full EOF/diff and focused verification"
+    },
+    {
+      "path": "scripts/release-check-support.ts",
+      "sha256": "fb4874ac2340e24872dde924c0244172186fbd1a17b7cafdd153d1110d068275",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "reviewer": "/root",
+      "evidence": "phase-4-native-review-files.json"
+    },
+    {
+      "path": "scripts/release-check-templates.ts",
+      "sha256": "59967e58eabf1a31b0cdbadc98e7838704131412ce8d76d4efc6246f3aeeb3bd",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/release-check.ts",
+      "sha256": "512e319b9a3bf02578ca0538f6f1f1b595eda79115e935a8c38917f24b6a5ba1",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/release-package-contract.ts",
+      "sha256": "1de518e5b42ff5031dd725bf5599d5456c7a59e3d939193e741bf0be046e5b8c",
+      "classification": "pure package export contract; coordinator authorship plus native_gate bootstrap delta",
+      "reviewer": "native_gate for coordinator base; root for native_gate bootstrap delta",
+      "evidence": "phase-3-help-editor-files.json"
+    },
+    {
+      "path": "scripts/release-stage.ts",
+      "sha256": "0257304660f300dec0e7aaae91e435ec5ffc0fa237eb5e6c611e3f90e5734814",
+      "classification": "catalog/release/packed native verification tooling",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "scripts/scaffold-smoke-terminal.ts",
+      "sha256": "849c6d01b0ebaa28727684045a0bebf589b24fb051ed64bcd0c511dbfb892b5c",
+      "classification": "native terminal acceptance boundary",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-3-help-editor-files.json"
+    },
+    {
+      "path": "scripts/scaffold-smoke-terminal.types.ts",
+      "sha256": "e1aba000d75438f1dec145bdc83e766d6c02b7bc67bd1cb6cf92a19e7b8aa0f5",
+      "classification": "pure contract, schema, parsing or presentation",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-3-help-editor-files.json"
+    },
+    {
+      "path": "scripts/sync-release.ts",
+      "sha256": "ecdb4580597221bd8a2a66e4146bb084df4be6440e00a664c103fce5faa28c61",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "reviewer": "/root",
+      "evidence": "phase-4-native-review-files.json"
+    },
+    {
+      "path": "scripts/test-generator.ts",
+      "sha256": "ed850f84df49eac3536df825a8076aa51405f2e48938805eaec3a2af4d95eb88",
+      "classification": "native verification orchestration",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-4-native-supporting-review-files.json"
+    },
+    {
+      "path": "scripts/test-packages.ts",
+      "sha256": "d4a78af99e044c8478e1346ae9b584b7735dc81c124ab01a256a1d3410b38c42",
+      "classification": "package test execution boundary; generator Effect suites run serially under their required native Bun configuration",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-5-native-supporting-files.json: independent full EOF/diff and focused verification"
+    },
+    {
+      "path": "tests/compiler/project-typecheck.test.ts",
+      "sha256": "5ac4d04943f0c01ea234dd74eae5cc3c64b6e9227fe9d090d786d5dfe2871a9e",
+      "classification": "native compiler fixture boundary with per-invocation Effect resource ownership, physical Promise settlement before cleanup, and deterministic interruption, independent fixture and primary failure regression",
+      "reviewer": "/root/compiler_fixture_reviewer",
+      "evidence": "phase-5-compiler-fixture-files.json + independent complete EOF review"
+    },
+    {
+      "path": "tests/container/lifecycle.test.ts",
+      "sha256": "3d72b2542583c21365d543dda1246314ea4224e8d87cd8cfe92b3beb6f731e34",
+      "classification": "retained native container acceptance fixture; CLI workspace link added for emitted private helper",
+      "reviewer": "/root",
+      "evidence": "phase-5-native-supporting-files.json"
+    },
+    {
+      "path": "tests/generator/add-acceptance.test.ts",
+      "sha256": "89f448b7c739867f9ae1767d6e27f36174dfeb925157b9a1749ba921a3f254dc",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "tests/generator/add-resolver.test.ts",
+      "sha256": "c6469560b097d584349345ae543a741390be05f9b1b6160bccc4e2c582c07c57",
+      "classification": "native generator flow compatibility acceptance fixture; shortened name/final-confirmation creation and retained explicit advanced flags",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-5-native-supporting-files.json: independent full EOF/diff and focused verification"
+    },
+    {
+      "path": "tests/generator/create-additions.test.ts",
+      "sha256": "f139c300ddc9a8278c700e8268a0569158e08a29f9e38ca23be1d445909fc659",
+      "classification": "native generator flow compatibility acceptance fixture; shortened name/final-confirmation creation and retained explicit advanced flags",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-5-native-supporting-files.json: independent full EOF/diff and focused verification"
+    },
+    {
+      "path": "tests/generator/local-workspace.test.ts",
+      "sha256": "00443605d8ddbe2a9940f752fc31272658e721e522b6b29906dda857b3eca648",
+      "classification": "controlled or native acceptance",
+      "reviewer": "/root",
+      "evidence": "phase-3-contributor-review-files.json"
+    },
+    {
+      "path": "tests/generator/option-matrix.test.ts",
+      "sha256": "c665d56d24b4f55df8038c4e4cb1458b3337e9dc051583cbdbd867b717afb07c",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "tests/generator/scaffold-catalog.test.ts",
+      "sha256": "a5cfc849619673f9242d839d3cc6fd5e3505a30a055964c1f5e24ddf4afdb62e",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "tests/unit/build-catalog.test.ts",
+      "sha256": "c331b4463c8fef004a605b74f11d9db280c42865887d30aa2c61b54c3fa6019a",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "tests/unit/catalog-bootstrap.test.ts",
+      "sha256": "e09ec1db324dfdd583e5de64e33c12600fba7d670198cb09f72d64c8b9b76a80",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "reviewer": "/root",
+      "evidence": "phase-4-native-review-files.json"
+    },
+    {
+      "path": "tests/unit/catalog-manifest.test.ts",
+      "sha256": "cb16b6c70d6a2872e31fa2cd3fcb4befbbd923b38acdcdd267f3474d3a9c77e6",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "tests/unit/packed-registry.test.ts",
+      "sha256": "37c9a0b7f4aaf0123b55b8c5c83eca3c84ff825369a0acb21d6297a8d9e50490",
+      "classification": "controlled/native acceptance test or compiler fixture",
+      "reviewer": "/root/native_gate",
+      "evidence": "phase-2-files.json + independent phase-two review"
+    },
+    {
+      "path": "tests/unit/release-check-listing.test.ts",
+      "sha256": "f7ffa0b490d2a236be417be58777f170b3eb20528ff5eb6cc9c65c7c2426ebfa",
+      "classification": "pure archive contract regression coverage; exact pair accepted, each missing member and unrelated or rogue sources rejected",
+      "reviewer": "/root",
+      "evidence": "phase-5-native-supporting-files.json: independent full EOF/diff and focused verification"
+    },
+    {
+      "path": "tests/unit/sync-release.test.ts",
+      "sha256": "15bde6b0cd4b4c5644e0057ed4e2e9d03b728bff21ada07525d1686a0c926b11",
+      "classification": "pure source resolver boundary/release integration or actual packed consumer test",
+      "reviewer": "/root",
+      "evidence": "phase-4-native-review-files.json"
+    }
+  ],
+  "lateAcceptedOverlays": {
+    "immutableBaseSupersessions": [
+      {
+        "path": "packages/cli/src/services/dev-supervisor.service.ts",
+        "previousSha256": "6adff7240048c52676afcc20b2665ed483cc56abcde1b99eb202e40aabdaf5ca",
+        "currentSha256": "b43860fda2d06ebdbecf791cdd302cd3d6da8f8b9624e43af1a1371c67a16eb6",
+        "baseInventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-domain-files.json",
+        "acceptedOverlay": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-cli-candidate-cancellation-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/contracts/src/operation.ts",
+        "previousSha256": "c066c8a39ad4550534d43040f28b8941eed3ec604a999e293f298208eace305e",
+        "currentSha256": "409a2f467956229010729cb205e5121a3d22dfcf091326df5611af99bce7e13a",
+        "baseInventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-4-native-supporting-review-files.json",
+        "acceptedOverlay": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-observation-supporting-files.json",
+        "reviewer": "/root/native_gate"
+      },
+      {
+        "path": "packages/cli/src/services/project.types.ts",
+        "previousSha256": "f3db8029350560642cbe3ce7ab7127406d6c150f466f7981a6f45af96b2c3b95",
+        "currentSha256": "02e4f94373fe96a22d4a27153031dd3f29d9f891238d808ac1625b25fb872cb4",
+        "baseInventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-shared-review-files.json",
+        "acceptedOverlay": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-dev-initial-check-files.json",
+        "reviewer": "/root/startup_reviewer"
+      },
+      {
+        "path": "packages/cli/src/services/project.service.ts",
+        "previousSha256": "3371e30d15d2deedea0d55d2a9c605ce74a5c6d597177370c0173b60679bf8fd",
+        "currentSha256": "cefe7e8fa12eca9f8a04b65291fc24fdf91243debe87d121f862b89f27a959e1",
+        "baseInventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-shared-review-files.json",
+        "acceptedOverlay": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-dev-initial-check-files.json",
+        "reviewer": "/root/startup_reviewer"
+      },
+      {
+        "path": "packages/cli/src/commands/dev-command-operation.ts",
+        "previousSha256": "15b1fa7b18af02439647bd4f55e1884afab07de53b80e6ef41cbd9ee89bc76c4",
+        "currentSha256": "6b72a17681a5dcf29484f9476dda0fca8ff2a9d88d72a20750341cac439d6cea",
+        "baseInventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-domain-files.json",
+        "acceptedOverlay": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-dev-initial-check-files.json",
+        "reviewer": "/root/startup_reviewer"
+      },
+      {
+        "path": "packages/cli/src/commands/dev-inspector.ts",
+        "previousSha256": "0e4d3ba4ac5155215179b4c6b9d0bfeec2b9d1b4ad2cd977b01af61a6ae90101",
+        "currentSha256": "97be74549355c12880d15e8978be4392cb648f095eb8f5b5c48623acdeaed61b",
+        "baseInventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-domain-files.json",
+        "acceptedOverlay": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-dev-initial-check-files.json",
+        "reviewer": "/root/startup_reviewer"
+      },
+      {
+        "path": "packages/cli/tests/services/type-probes.test.ts",
+        "previousSha256": "55db5aa80822dee565502ec9e0792f0f17c51d21cb97145c88981f7a1868661c",
+        "currentSha256": "5b31034a412eb026c011dcc8b7c34cdad3aa2f7d0b28ef6a7cd571586a655a6f",
+        "baseInventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-3-cli-shared-review-files.json",
+        "acceptedOverlay": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-dev-initial-check-files.json",
+        "reviewer": "/root/startup_reviewer"
+      }
+    ],
+    "addedPackageFiles": [
+      {
+        "path": "packages/cli/tests/server-runtime/telemetry-shutdown.test.ts",
+        "classification": "deterministic lifecycle ordering and cleanup failure regression",
+        "reviewer": "/root",
+        "evidence": "phase-4-native-review-files.json"
+      },
+      {
+        "path": "packages/cli/tests/services/dev-candidate-cancellation.test.ts",
+        "classification": "actual native cancellation and physical child settlement regression",
+        "reviewer": "/root/native_gate",
+        "evidence": "phase-5-cli-candidate-cancellation-files.json"
+      },
+      {
+        "path": "packages/cli/tests/server-runtime/background-observation.test.ts",
+        "classification": "actual native SDK async context, metrics, errors and user log regression",
+        "reviewer": "/root",
+        "evidence": "phase-4-native-review-files.json"
+      },
+      {
+        "path": "packages/cli/tests/services/dev-initial-check.test.ts",
+        "classification": "deterministic service substitution, fresh identity, failure preservation and Deferred-controlled interruption join regressions",
+        "reviewer": "/root/startup_reviewer",
+        "evidence": "phase-5-dev-initial-check-files.json"
+      },
+      {
+        "path": "packages/cli/tests/services/dev-initial-native.test.ts",
+        "classification": "actual CLI SIGTERM, CPU-bound initial compiler and descendant release within the unchanged two-second limit; immediately owned fixture cleanup",
+        "reviewer": "/root/startup_reviewer",
+        "evidence": "phase-5-dev-initial-check-files.json"
+      }
+    ],
+    "authorInventoryLateRows": [
+      "packages/cli/tests/server-runtime/background-observation.test.ts",
+      "packages/cli/tests/services/dev-initial-check.test.ts",
+      "packages/cli/tests/services/dev-initial-native.test.ts"
+    ],
+    "demoReview": {
+      "evidence": "phase-5-demo.md",
+      "helper": "/tmp/relkit-effect-demo-links-replay.py",
+      "reviewer": "/root/plan_create_relkit",
+      "review": "Complete helper and final demo receipt read through EOF; independent read-only snapshot comparison passed 153 captured links and 9 file dispositions; controlled replay and missing paid-key prerequisite remain explicitly distinguished.",
+      "verification": "rtk proxy python3 /tmp/relkit-effect-demo-links-replay.py verify: exit 0; 153 links, 9 file dispositions"
+    },
+    "runtimeReadinessDelta": {
+      "evidence": "phase-5-runtime-shutdown-review.md",
+      "reviewer": "/root",
+      "previousInventorySha256": "a347f9cea819ecfbb7943190bdb375e02ede4bba1ee874427e981606ba8cdd63",
+      "currentInventorySha256": "868fe6d74293e64b271c6b45ede01f059d14ffa3af511b6718cb65e6e61069a1",
+      "scope": "Two existing package files; this independently reviewed delta added no coverage paths.",
+      "reason": "Private synchronous readiness snapshot reads suppress only successful completion records through the existing Context policy; successful metrics/spans, failures, application logs and direct service logging remain covered.",
+      "verification": "Independent root policy/runtime 30/30 and CLI 34-task build passed; isolated immutable packed acceptance remains a coordinator gate.",
+      "files": [
+        {
+          "path": "packages/cli/src/server-runtime/server-runtime-host.ts",
+          "lines": 230,
+          "sha256": "43095e8c4845f57e178ba629008697461e64dc4280ab7e2d8cec29bbba0a820b",
+          "classification": "typed runtime Service/lifecycle owner or Schema/type contract",
+          "reviewer": "/root"
+        },
+        {
+          "path": "packages/cli/tests/server-runtime/background-observation.test.ts",
+          "lines": 103,
+          "sha256": "f77be40a692c3be36336b161af725a8cb03fe87f932f3fae42df03bda8e0bf61",
+          "classification": "actual native SDK async context, metrics, errors and user log regression",
+          "reviewer": "/root"
+        }
+      ]
+    },
+    "storageBatchDelta": {
+      "evidence": "phase-5-duckdb-batch-review.md",
+      "inventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-duckdb-batch-files.json",
+      "reviewer": "/root",
+      "author": "/root/native_gate",
+      "addedSupportingCoveragePaths": 6,
+      "newAuthoredFiles": 4,
+      "existingFileChanges": 2,
+      "scope": "Six supporting TypeScript files outside the selected CLI/generator scope; package scope was 516 at this earlier storage acceptance.",
+      "review": "Complete independent storage MD/JSON and updated verification receipt read through EOF. Final immediately owned fixtures and accepted source hashes are recorded in the root receipt; no source changes were made by this auditor.",
+      "verification": "Root independently passed all 181 observability tests across 64 files, exit 0 in 7.55s. Fresh temporary packed proof passed both unchanged strict sessions in 206.57ms and 234.18ms with complete history and host logging; immutable source-packed release and full verification remain coordinator gates."
+    },
+    "initialDevelopmentDelta": {
+      "evidence": "phase-5-dev-initial-check-review.md",
+      "reviewSha256": "cee22b5b2d530290084caa7387705fa03f52a246c86cb396742836e11907c3b0",
+      "inventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-dev-initial-check-files.json",
+      "reviewer": "/root/startup_reviewer",
+      "author": "/root/startup_author",
+      "addedPackageCoveragePaths": 2,
+      "existingFileChanges": 5,
+      "scope": "Seven CLI TypeScript files; five existing hashes/classes/reviewers superseded by this accepted overlay and two new deterministic/native tests added.",
+      "review": "The final auditor read the independent MD/JSON and latest verification receipt through EOF, verified all seven accepted current hashes, and reconciled every authored package path without self-accepting source.",
+      "verification": "Final actual seven-file/body strict checking had zero diagnostics; Node service/type 6/6, native initial 1/1 with eight assertions, existing isolated compiler 4/4, development/inspector 14/14. Root frozen install and 34-task build passed. Timing-only installed-consumer comparisons retain their history/live-route limitation and are not immutable release receipts.",
+      "verificationDocumentSha256": "17780610432a7caa8d95760be2832fd70231899dfe24b5a9c75cfba430ea98aa"
+    },
+    "compilerFixtureDelta": {
+      "evidence": "phase-5-compiler-fixture-review.md",
+      "reviewSha256": "fdd3deb0e11bcfbc06b7a0e323d1819c3079f479df590b5724d4f917f50d7cfc",
+      "inventory": "openspec/changes/apply-effect-user-entrypoints/evidence/phase-5-compiler-fixture-files.json",
+      "reviewer": "/root/compiler_fixture_reviewer",
+      "author": "/root/compiler_fixture_author",
+      "addedSupportingCoveragePaths": 1,
+      "newAuthoredFiles": 0,
+      "existingFileChanges": 1,
+      "scope": "One existing supporting compiler test outside the selected CLI/generator scope; original scenarios and validation calls retained.",
+      "review": "The acceptance auditor read the accepted independent MD/JSON through EOF and verified its current source hash; all prior accepted inventory and scope anchors remain unchanged.",
+      "verification": "Author-run four-test focused gate passed with sixteen assertions in 5.75 seconds under unchanged 15000 ms limits; strict compilation of the actual test body and formatting passed. Independent deterministic regression checks native settlement, distinct fixture ownership, original failure and cleanup. Complete compiler, repository and packed acceptance remain coordinator gates."
+    }
+  },
+  "errors": [],
+  "limits": [
+    "This reconciliation verifies existing independent acceptance and current bytes; the auditor does not self-accept authored generator work.",
+    "Historical phase-two and rolling snapshots remain unchanged and are superseded only by explicit independent current overlays.",
+    "Combined repository/demo acceptance and worktree delivery are coordinator gates, separate from source review coverage."
+  ],
+  "formattingRefresh": {
+    "capturedAt": "2026-10-05T21:04:40.475Z",
+    "sourcePatch": "/tmp/relkit-final-format.patch",
+    "previousBaselineInventorySha256": "6726ee63ba6fda70dcbde9799e5f80e986716aa793121e750d1f46d288878cea",
+    "currentBaselineInventorySha256": "2a93d7cea725fe00fd901daddcc426a433a1b4b7d74214dd7eb0ca7afa36e124",
+    "method": "Exact previous/current bytes, full EOF reread, zero parse diagnostics, identical semantic AST and parser token equivalence with optional trailing commas normalized.",
+    "files": [
+      {
+        "path": "packages/cli/build-support.test.ts",
+        "previousSha256": "eeb3d7691110392b3a8d6bae5635deae2d7cdecd65e3b6e1d85274b8631c6013",
+        "currentSha256": "1685176c799e6b7a4af4c71187a7bebfaea977be1556117df3aefaf246cdbcf2",
+        "acceptedOldMatches": true,
+        "patchNewMatches": true,
+        "parseDiagnostics": [0, 0],
+        "parserTokenEquivalence": true,
+        "tokenCount": 1055,
+        "tokenSha256": "bf3cd833a9dca9640c9e103aae28569be82736c6c28db41afbb3f8e930ffa085",
+        "structuralAstIdentical": true,
+        "semanticAstSha256": "ef42595efa0f577d96ca735de4c31fa997893998d8d12d950821635d40b12393",
+        "previousLines": 142,
+        "currentLines": 151
+      },
+      {
+        "path": "packages/cli/dev.test.ts",
+        "previousSha256": "4ead30f17457f8dcdb06493e3438ab99b2b2bd1318ba930c0a6244f56df99d51",
+        "currentSha256": "ad6b79030a47733c93568ebb6d7812f27d4a5eed96041a9b042f21031b7b25a0",
+        "acceptedOldMatches": true,
+        "patchNewMatches": true,
+        "parseDiagnostics": [0, 0],
+        "parserTokenEquivalence": true,
+        "tokenCount": 3575,
+        "tokenSha256": "88a703b7757c1413efad798b69fda26995e18350f34aa02f63f421d96c6a19ae",
+        "structuralAstIdentical": true,
+        "semanticAstSha256": "cfba606eb8915257689541461f0bce4a4bf71aab44431703e7406599298d560f",
+        "previousLines": 451,
+        "currentLines": 455
+      }
+    ]
+  }
+}

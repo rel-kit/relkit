@@ -5,15 +5,16 @@ import {
   bun,
   command,
   digest,
-  exportTargets,
-  packageFields,
   readJson,
   root,
   stable,
   type PackageInfo,
   type RecordValue,
 } from "./release-check-support.js";
-import { expectedTemplateScripts, packedTemplates } from "./release-templates.js";
+import { assertPackedDependencies } from "./catalog-manifest.js";
+import { stageReleaseRoot } from "./release-stage.js";
+import { assertListing } from "./release-check-listing.js";
+export { templateInputs } from "./release-check-templates.js";
 async function readJsonFromTar(artifact: string): Promise<RecordValue> {
   return JSON.parse(await command("tar", ["-xOf", artifact, "package/package.json"]));
 }
@@ -42,57 +43,34 @@ export function publicationOrder(items: PackageInfo[]): PackageInfo[] {
 }
 async function stagePackages(items: PackageInfo[]): Promise<string> {
   const staging = await mkdtemp(join(tmpdir(), "relkit-release-stage-"));
-  await mkdir(join(staging, "packages"));
-  await writeFile(
-    join(staging, "package.json"),
-    `${JSON.stringify({ private: true, workspaces: ["packages/*"] }, null, 2)}\n`,
-  );
-  for (const item of items) {
-    const target = join(staging, "packages", basename(item.directory));
-    await mkdir(target);
-    for (const file of item.manifest.files as string[])
-      await cp(join(item.directory, file), join(target, file), {
-        recursive: true,
-        filter: (path) => !/(?:^|\/)tsconfig\.tsbuildinfo$/.test(path),
-      });
-    await cp(join(item.directory, "package.json"), join(target, "package.json"));
-    await cp(join(root, "LICENSE"), join(target, "LICENSE"));
-    try {
-      await cp(join(item.directory, "README.md"), join(target, "README.md"));
-    } catch {
-      await writeFile(
-        join(target, "README.md"),
-        `# ${item.name}\n\n${item.manifest.description}\n\nSee [@relkit/app](https://github.com/rel-kit/relkit) for supported application APIs.\n`,
-      );
+  try {
+    await mkdir(join(staging, "packages"));
+    await stageReleaseRoot(root, staging, await readJson(join(root, "package.json")));
+    for (const item of items) {
+      const target = join(staging, "packages", basename(item.directory));
+      await mkdir(target);
+      for (const file of item.manifest.files as string[])
+        await cp(join(item.directory, file), join(target, file), {
+          recursive: true,
+          filter: (path) => !/(?:^|\/)tsconfig\.tsbuildinfo$/.test(path),
+        });
+      await cp(join(item.directory, "package.json"), join(target, "package.json"));
+      await cp(join(root, "LICENSE"), join(target, "LICENSE"));
+      try {
+        await cp(join(item.directory, "README.md"), join(target, "README.md"));
+      } catch {
+        await writeFile(
+          join(target, "README.md"),
+          `# ${item.name}\n\n${item.manifest.description}\n\nSee [@relkit/app](https://github.com/rel-kit/relkit) for supported application APIs.\n`,
+        );
+      }
     }
+    await command(bun, ["install", "--lockfile-only", "--ignore-scripts"], staging);
+    return staging;
+  } catch (error) {
+    await rm(staging, { recursive: true, force: true });
+    throw error;
   }
-  await command(bun, ["install", "--lockfile-only", "--ignore-scripts"], staging);
-  return staging;
-}
-function assertListing(item: PackageInfo, listing: string[], packed: RecordValue): void {
-  for (const target of [...exportTargets(packed.exports), ...exportTargets(packed.bin)])
-    if (!listing.includes(`package/${target.replace(/^\.\//, "")}`))
-      throw new Error(`Packed export target is missing: ${item.name} -> ${target}`);
-  for (const required of ["package/LICENSE", "package/README.md", "package/package.json"])
-    if (!listing.includes(required))
-      throw new Error(`Packed file is missing: ${item.name} -> ${required}`);
-  if (item.name === "@relkit/cli" && !listing.includes("package/editor/package.json"))
-    throw new Error("Packed CLI editor resolver entry is missing.");
-  const forbidden = listing.filter(
-    (path) =>
-      !(item.name === "create-relkit" && path.startsWith("package/dist/templates/")) &&
-      (/\/(?:src|tests?|__tests__|\.turbo|\.cache)\//.test(path) ||
-        /(?:^|\/)[^/]+\.(?:test|spec)\.[^/]+$/.test(path) ||
-        /(?:tsconfig\.tsbuildinfo|\.tsbuildinfo)$/.test(path) ||
-        (/\.ts$/.test(path) && !/\.d\.ts$/.test(path))),
-  );
-  if (forbidden.length > 0)
-    throw new Error(`Packed development files found in ${item.name}: ${forbidden.join(", ")}`);
-  if (item.name === "create-relkit")
-    for (const template of packedTemplates)
-      for (const file of ["package.json", "gitignore"])
-        if (!listing.includes(`package/dist/templates/default/v1/${template}/${file}`))
-          throw new Error(`Packed create-relkit template is missing: ${template}/${file}`);
 }
 export async function packAll(
   items: PackageInfo[],
@@ -101,6 +79,8 @@ export async function packAll(
 ): Promise<RecordValue[]> {
   await mkdir(destination, { recursive: true });
   const ordered = publicationOrder(items);
+  const rootManifest = await readJson(join(root, "package.json"));
+  const workspaceNames = new Set(items.map((item) => item.name));
   const staging = await stagePackages(ordered);
   try {
     const artifacts: RecordValue[] = [];
@@ -123,10 +103,9 @@ export async function packAll(
         (await readFile(join(root, "LICENSE"), "utf8"))
       )
         throw new Error(`Packed license mismatch: ${item.name}`);
-      for (const field of packageFields)
-        for (const [name, spec] of Object.entries(packed[field] ?? {}))
-          if (items.some((candidate) => candidate.name === name) && spec !== version)
-            throw new Error(`Packed internal version mismatch: ${item.name} -> ${name}@${spec}`);
+      assertPackedDependencies(item.manifest, packed, rootManifest, workspaceNames, version);
+      if (JSON.stringify(stable(packed.relkit)) !== JSON.stringify(stable(item.manifest.relkit)))
+        throw new Error(`Packed RELKIT metadata mismatch: ${item.name}`);
       if (JSON.stringify(stable(packed.files)) !== JSON.stringify(stable(item.manifest.files)))
         throw new Error(`Packed files allowlist mismatch: ${item.name}`);
       assertListing(item, listing, packed);
@@ -145,50 +124,4 @@ export async function packAll(
   } finally {
     await rm(staging, { recursive: true, force: true });
   }
-}
-export async function templateInputs(
-  version: string,
-  rootManifest: RecordValue,
-): Promise<RecordValue[]> {
-  const result: RecordValue[] = [];
-  const forbidden =
-    /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
-  const fullstackForbidden =
-    /(?:from|import)\s*["'](?:effect|hono|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
-  for (const name of packedTemplates) {
-    const directory = join(root, "templates/default/v1", name);
-    const manifest = await readJson(join(directory, "package.json"));
-    for (const field of packageFields)
-      for (const [dependency, spec] of Object.entries(manifest[field] ?? {}))
-        if (dependency.startsWith("@relkit/") && spec !== version)
-          throw new Error(`Template ${name} has incompatible ${dependency}@${spec}`);
-    if (
-      manifest.packageManager !== rootManifest.packageManager ||
-      manifest.devDependencies?.typescript !== rootManifest.devDependencies?.typescript ||
-      manifest.devDependencies?.["@types/bun"] !== rootManifest.devDependencies?.["@types/bun"]
-    )
-      throw new Error(`Template ${name} tooling versions differ from the workspace`);
-    const expectedScripts = expectedTemplateScripts(name);
-    if (JSON.stringify(stable(manifest.scripts)) !== JSON.stringify(stable(expectedScripts)))
-      throw new Error(`Template ${name} scripts differ from the template contract`);
-    const files = [...new Bun.Glob("**/*").scanSync({ cwd: directory, onlyFiles: true })].sort();
-    for (const file of files) {
-      const text = await readFile(join(directory, file), "utf8");
-      if (
-        text.includes("workspace:*") ||
-        text.includes("<compatible-version>") ||
-        (name === "fullstack" ? fullstackForbidden : forbidden).test(text)
-      )
-        throw new Error(`Template scan failed: ${file}`);
-    }
-    const tree = digest(
-      (
-        await Promise.all(
-          files.map(async (file) => `${file}\0${await readFile(join(directory, file), "utf8")}\0`),
-        )
-      ).join(""),
-    );
-    result.push({ name, files: files.length, sha256: tree });
-  }
-  return result;
 }

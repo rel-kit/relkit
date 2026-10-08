@@ -1,0 +1,15 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 1 skipped (2)
+   Start at  03:12:36
+   Duration  1.11s (tests 88%, import 9%, transform 3%)
+
+Existing executable acceptance exit: 0; arbitrary BUN override executed: True
+Traceback (most recent call last):
+  File "/Users/mustafaelsayed/Workspace/relkit/bug-fix-reports/issues/bf-d473cff05bd0980858484be0/evidence/001/replay.py", line 23, in <module>
+    assert not selected, "The native runner must ignore the BUN executable override."
+           ^^^^^^^^^^^^
+AssertionError: The native runner must ignore the BUN executable override.

@@ -1,5 +1,8 @@
 import type { DatabaseDialect } from "./add-types.js";
 
+/**
+ * Dialect-specific Drizzle constructor tokens used to render authentication tables.
+ */
 interface AuthDialect {
   readonly imports: string;
   readonly table: string;
@@ -9,6 +12,9 @@ interface AuthDialect {
   readonly timestamp: string;
 }
 
+/**
+ * Dialect-specific Drizzle constructors used by generated authentication tables.
+ */
 const DIALECTS: Readonly<Record<DatabaseDialect, AuthDialect>> = {
   sqlite: {
     imports: "integer, sqliteTable, text, uniqueIndex",
@@ -36,6 +42,11 @@ const DIALECTS: Readonly<Record<DatabaseDialect, AuthDialect>> = {
   },
 };
 
+/**
+ * Renders the authentication tables for a supported database dialect.
+ * @param dialect - Database dialect selected for the auth service.
+ * @returns Drizzle schema source for user, session, account and verification tables.
+ */
 export function authSchemaSource(dialect: DatabaseDialect): string {
   const value = DIALECTS[dialect];
   const module = dialect === "postgresql" ? "pg" : dialect;

@@ -1,11 +1,11 @@
-import manifest from "../package.json" with { type: "json" };
-
-export type DependencySection = "dependencies" | "devDependencies";
-
-export interface ScaffoldDependency {
-  readonly version: string;
-  readonly section: DependencySection;
-}
+import manifest from "../package.json";
+import { buildCatalogDependency } from "./build-catalog.js";
+import type { ScaffoldDependency, ScaffoldDependencyName } from "./scaffold-catalog.types.js";
+export type {
+  DependencySection,
+  ScaffoldDependency,
+  ScaffoldDependencyName,
+} from "./scaffold-catalog.types.js";
 
 /** Versions copied into generated projects; first-party packages share this fixed release train. */
 export const SCAFFOLD_DEPENDENCIES = Object.freeze({
@@ -21,14 +21,17 @@ export const SCAFFOLD_DEPENDENCIES = Object.freeze({
   "@relkit/redis": { version: manifest.version, section: "dependencies" },
   "@relkit/s3": { version: manifest.version, section: "dependencies" },
   "@relkit/trigger": { version: manifest.version, section: "dependencies" },
-  "better-auth": { version: "1.7.1", section: "dependencies" },
-  "drizzle-kit": { version: "1.0.0-rc.5-ab785fc", section: "devDependencies" },
-  "drizzle-orm": { version: "1.0.0-rc.5-169397b", section: "dependencies" },
-  langchain: { version: "1.5.10", section: "dependencies" },
+  "better-auth": { version: buildCatalogDependency("better-auth"), section: "dependencies" },
+  "drizzle-kit": { version: buildCatalogDependency("drizzle-kit"), section: "devDependencies" },
+  "drizzle-orm": { version: buildCatalogDependency("drizzle-orm"), section: "dependencies" },
+  langchain: { version: buildCatalogDependency("langchain"), section: "dependencies" },
 } satisfies Readonly<Record<string, ScaffoldDependency>>);
 
-export type ScaffoldDependencyName = keyof typeof SCAFFOLD_DEPENDENCIES;
-
+/**
+ * Selects one supported dependency from the release's portable scaffold catalog.
+ * @param name - Intentional dependency name supported by the scaffold planner.
+ * @returns Its concrete version and manifest section.
+ */
 export function scaffoldDependency(name: ScaffoldDependencyName): ScaffoldDependency {
   return SCAFFOLD_DEPENDENCIES[name];
 }

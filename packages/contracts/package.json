@@ -44,11 +44,11 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "effect": "4.0.0-rc.115"
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "@effect/vitest": "4.0.0-rc.115",
-    "@vitest/coverage-v8": "5.0.1",
-    "vitest": "5.0.1"
+    "@effect/vitest": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "vitest": "catalog:"
   }
 }

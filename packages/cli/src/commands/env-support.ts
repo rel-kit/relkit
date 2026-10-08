@@ -1,25 +1,17 @@
-import { readFile, writeFile } from "node:fs/promises";
-import { isAbsolute, join, relative, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { Effect } from "effect";
 import {
   EnvResolutionError,
   resolveEnv,
+  resolveEnvEffect,
   type EnvDefinition,
   type EnvProjection,
   type EnvShape,
   type EnvSource,
 } from "@relkit/config";
-import {
-  exampleValue,
-  EnvCommandError,
-  formatCheck,
-  formatExplain,
-  isRequired,
-  parseEnvArgs,
-  type EnvCommandOptions,
-  type EnvStatus,
-  type SafeEnvIssue,
-} from "./env-format.js";
+import { cliAdapterError } from "../cli-errors.js";
+import { observeCli, runCliEffect } from "../cli-runtime.js";
+import { CliEnvironmentProject, environmentProjectLayer } from "./env-project.service.js";
+import type { EnvCommandOptions, EnvStatus, SafeEnvIssue } from "./env.types.js";
 
 export {
   EnvCommandError,
@@ -28,77 +20,71 @@ export {
   isRequired,
   parseEnvArgs,
 } from "./env-format.js";
-export type { EnvCommandOptions, EnvStatus, ParsedEnvArgs, SafeEnvIssue } from "./env-format.js";
+export type { EnvCommandOptions, EnvStatus, ParsedEnvArgs, SafeEnvIssue } from "./env.types.js";
 
-export async function loadEnvDefinition(
+/**
+ * Loads an opaque environment declaration through caller-provided capabilities.
+ * @param options - Definition injection or contained module path.
+ * @returns A lazy declaration requiring CliEnvironmentProject.
+ */
+export const loadEnvDefinitionEffect = Effect.fn("Environment.load")(
+  (options: Pick<EnvCommandOptions, "definition" | "projectRoot" | "envPath">) =>
+    CliEnvironmentProject.use((project) => project.load(options)),
+);
+
+/**
+ * Preserves the public opaque declaration-loading Promise boundary.
+ * @param options - Definition injection or contained module path.
+ * @returns Owner declaration retaining callback and object identity.
+ */
+export function loadEnvDefinition(
   options: Pick<EnvCommandOptions, "definition" | "projectRoot" | "envPath">,
 ): Promise<EnvDefinition<EnvShape>> {
-  if (options.definition !== undefined) return options.definition;
-  const root = resolve(options.projectRoot ?? process.cwd());
-  const path = resolve(root, options.envPath ?? join("src", "env.ts"));
-  if (!inside(root, path))
-    throw new EnvCommandError(
-      "RELKIT_ENV_USAGE",
-      "Environment path must remain inside the project root.",
-    );
-  let loaded: unknown;
-  try {
-    loaded = await import(`${pathToFileURL(path).href}?relkit_env=1`);
-  } catch {
-    throw new EnvCommandError(
-      "RELKIT_ENV_NOT_FOUND",
-      `Environment contract was not found at ${relative(root, path)}.`,
-    );
-  }
-  const module = loaded as { readonly default?: unknown; readonly env?: unknown };
-  const value = module.default ?? module.env ?? loaded;
-  const definition =
-    isRecord(value) && value.kind === "env-definition"
-      ? value
-      : isRecord(value)
-        ? value.env
-        : undefined;
-  if (!isRecord(definition) || definition.kind !== "env-definition")
-    throw new EnvCommandError(
-      "RELKIT_ENV_INVALID",
-      "The environment module does not export an environment definition.",
-    );
-  return definition as EnvDefinition<EnvShape>;
+  return runCliEffect(loadEnvDefinitionEffect(options), environmentProjectLayer);
 }
 
-export async function createExample(
+/**
+ * Produces an example through caller-supplied project authority.
+ * @param fields - Value-free field metadata.
+ * @param options - Project root and example path.
+ * @param write - Explicit write authorization.
+ * @returns Lazy safe example output.
+ */
+export const createExampleEffect = Effect.fn("Environment.example")(
+  (
+    fields: readonly EnvProjection[],
+    options: Pick<EnvCommandOptions, "projectRoot" | "examplePath">,
+    write: boolean,
+  ) => CliEnvironmentProject.use((project) => project.example(fields, options, write)),
+);
+
+/**
+ * Preserves the example Promise boundary and existing overwrite policy.
+ * @param fields - Value-free field metadata.
+ * @param options - Project root and example path.
+ * @param write - Explicit write authorization.
+ * @returns Safe example output after any write settles.
+ */
+export function createExample(
   fields: readonly EnvProjection[],
   options: Pick<EnvCommandOptions, "projectRoot" | "examplePath">,
   write: boolean,
 ) {
-  const content = `${fields.map((field) => `${field.name}=${exampleValue(field)}`).join("\n")}\n`;
-  const root = resolve(options.projectRoot ?? process.cwd());
-  const path = resolve(root, options.examplePath ?? ".env.example");
-  if (!inside(root, path))
-    throw new EnvCommandError(
-      "RELKIT_ENV_USAGE",
-      "Example path must remain inside the project root.",
-    );
-  let existing = false;
-  try {
-    await readFile(path);
-    existing = true;
-  } catch (error) {
-    if (!isNotFound(error)) throw error;
-  }
-  if (write) await writeFile(path, content, "utf8");
-  return {
-    ok: true as const,
-    command: "example" as const,
-    path,
-    existing,
-    written: write,
-    content,
-  };
+  return runCliEffect(createExampleEffect(fields, options, write), environmentProjectLayer);
 }
 
-export function resolveStatus(
-  definition: EnvDefinition<EnvShape>,
+/**
+ * Preserves the synchronous secret-free environment status projection.
+ * @typeParam Shape - The config owner's concrete declaration shape.
+ * @param definition - Opaque config-owner declaration.
+ * @param fields - Value-free field metadata.
+ * @param environment - Selected environment name.
+ * @param source - Explicit raw values, excluded from output.
+ * @returns Safe statuses and redacted issue messages.
+ * @throws The config owner's existing error for malformed input.
+ */
+export function resolveStatus<Shape extends EnvShape>(
+  definition: EnvDefinition<Shape>,
   fields: readonly EnvProjection[],
   environment: string,
   source: EnvSource,
@@ -117,6 +103,61 @@ export function resolveStatus(
       }));
     }
   })();
+  return statusProjection(fields, source, issues);
+}
+
+/**
+ * Resolves values through the config owner's native Effect without retaining them.
+ * @typeParam Shape - The config owner's concrete declaration shape.
+ * @param definition - Opaque owner declaration.
+ * @param fields - Value-free metadata.
+ * @param environment - Selected environment name.
+ * @param source - Raw source, excluded from all output and telemetry.
+ * @returns Lazy redacted statuses; malformed declarations retain their TypeError boundary.
+ */
+export const resolveStatusEffect = Effect.fn("Environment.status")(
+  function* <Shape extends EnvShape>(
+    definition: EnvDefinition<Shape>,
+    fields: readonly EnvProjection[],
+    environment: string,
+    source: EnvSource,
+  ) {
+    const issues = yield* resolveEnvEffect(definition, { environment, source }).pipe(
+      Effect.as<readonly SafeEnvIssue[]>([]),
+      Effect.catchTag("EnvResolutionError", (error) =>
+        Effect.succeed(
+          error.issues.map(({ name, code, sensitive }) => ({
+            name,
+            code,
+            sensitive,
+            message: code === "missing" ? "Required value is missing" : "Value is invalid",
+          })),
+        ),
+      ),
+      Effect.mapError((error) =>
+        cliAdapterError(
+          "env.status",
+          error.syntax ? new SyntaxError(error.message) : new TypeError(error.message),
+        ),
+      ),
+    );
+    return statusProjection(fields, source, issues);
+  },
+  (effect) => observeCli("env.status", effect),
+);
+
+/**
+ * Projects safe field status without returning parsed or default values.
+ * @param fields - Declaration metadata.
+ * @param source - Raw source used only to determine presence.
+ * @param issues - Already redacted owner failures.
+ * @returns Safe field statuses and issues.
+ */
+function statusProjection(
+  fields: readonly EnvProjection[],
+  source: EnvSource,
+  issues: readonly SafeEnvIssue[],
+) {
   const issueByName = new Map(issues.map((issue) => [issue.name, issue]));
   const items = fields.map((field) => {
     const issue = issueByName.get(field.name);
@@ -134,15 +175,4 @@ export function resolveStatus(
     return { name: field.name, status };
   });
   return { ok: issues.length === 0, items, issues };
-}
-
-function inside(root: string, path: string): boolean {
-  const pathFromRoot = relative(root, path);
-  return pathFromRoot === "" || (!pathFromRoot.startsWith("..") && !isAbsolute(pathFromRoot));
-}
-function isNotFound(error: unknown): boolean {
-  return error instanceof Error && "code" in error && error.code === "ENOENT";
-}
-function isRecord(value: unknown): value is Record<string, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

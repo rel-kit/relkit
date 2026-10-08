@@ -1,5 +1,5 @@
 import { Effect, Option } from "effect";
-import { Command } from "effect/unstable/cli";
+import { Command } from "effect/cli";
 import {
   document,
   optionalChoice,
@@ -8,11 +8,22 @@ import {
   repeatedString,
   type SelectInvocation,
 } from "./cli-command-shared.js";
+/** Builds run-list/get/watch syntax without acquiring run streams.
+ *
+ * @param select - Invocation recorder.
+ *
+ * @returns The pure runs parser group.
+ */
 export function runCommands(select: SelectInvocation) {
   return Command.make("runs").pipe(
     Command.withSubcommands([runList(select), runGet(select), runWatch(select)]),
   );
 }
+/**
+ * Builds native run-filter syntax.
+ * @param select - Invocation recorder.
+ * @returns Typed native run filter syntax.
+ */
 function runList(select: SelectInvocation) {
   const path = ["jobs", "runs", "list"] as const;
   return document(
@@ -37,6 +48,11 @@ function runList(select: SelectInvocation) {
     path,
   );
 }
+/**
+ * Builds opaque run-identity syntax.
+ * @param select - Invocation recorder.
+ * @returns Opaque run identity syntax.
+ */
 function runGet(select: SelectInvocation) {
   const path = ["jobs", "runs", "get"] as const;
   return document(
@@ -53,6 +69,11 @@ function runGet(select: SelectInvocation) {
     path,
   );
 }
+/**
+ * Builds resume-aware run-watch syntax.
+ * @param select - Invocation recorder.
+ * @returns Resume-aware run watch syntax.
+ */
 function runWatch(select: SelectInvocation) {
   const path = ["jobs", "runs", "watch"] as const;
   return document(
@@ -70,6 +91,11 @@ function runWatch(select: SelectInvocation) {
     path,
   );
 }
+/**
+ * Serializes parsed fields in their established order.
+ * @param value - Parsed run fields.
+ * @returns Literal flags in existing field order.
+ */
 function serialize(value: Readonly<Record<string, unknown>>): readonly string[] {
   return Object.entries(value).flatMap(([name, raw]) => {
     const option = name

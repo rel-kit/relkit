@@ -1,0 +1,930 @@
+{
+  "scope": "packages/cli",
+  "group": "domain",
+  "reviewer": "native_gate",
+  "authoredFileCount": 102,
+  "baselineReadThroughEof": true,
+  "reviewStatus": "independently accepted; no unresolved findings",
+  "independentHashValidation": "102/102 final raw SHA-256 rows matched current bytes. Independent comment-free TypeScript printer verified 101/102 unchanged before the final terminology overlay; the sole code delta was the accepted real SupervisorProxy Object.assign fixture. Final dev-drain purpose correction and all seven watcher terminology files were independently reread through EOF. Five watcher deltas are documentation-only; the remaining two consistently rename the cleanup operation to dev.watch.registration.release without changing control flow or authority.",
+  "independentVerification": "8/8 controlled lifecycle cases across four files; affected supervisor2/2 rerun; strict compilation of all four actual bodies with skipLibCheck:false, exactOptionalPropertyTypes and noUncheckedIndexedAccess. Root independently accepted documented authority/type mutation probes and source Scope provisioning examples. Final watcher overlay independently passed both source-watch cases under the Node-backed Vitest runner, exit 0; /tmp/relkit-cli-watcher-overlay-review.log.",
+  "files": [
+    {
+      "path": "packages/cli/src/commands/client-check.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 95,
+      "sha256": "34a0dd12015f6602c604c17473b35ddbdea5ded91831dee256c396eecdb8f745",
+      "printedCodeSha256": "13771f198f1219f22187fe9bcfe5ace0a5c9dc6af651cdd7d184e9eb155c0fe6",
+      "semanticAstSha256": "c1ebbdcd8e67d9ce1e4854f261861ec7ae80561f2eb073261b28f0a275be93ce"
+    },
+    {
+      "path": "packages/cli/src/commands/client-document.ts",
+      "origin": "added",
+      "classification": "pure",
+      "lines": 92,
+      "sha256": "c0f98a4b0dce8709ba65064e536b7e13b1863f7a860bfcb49b66b6cb2f0f477f",
+      "printedCodeSha256": "346591567a1a692d0e611707b7b98d5845ebe99f0652109d9f231762d03835a7",
+      "semanticAstSha256": "7af33e573f9a6178de7fbadc533e017c5c552fee422d9389985d3a6b4d4e502a"
+    },
+    {
+      "path": "packages/cli/src/commands/client.schemas.ts",
+      "origin": "added",
+      "classification": "schema",
+      "lines": 36,
+      "sha256": "08a58cfd1d7a65da95c0a57939f81adbcffca86893db86238caabfbeb64442c5",
+      "printedCodeSha256": "3ed06e667fa098c60d95e5a3f8a9c9daf766affbfeacb7e6173c6e6fa6cdb6b3",
+      "semanticAstSha256": "f43826ec9fec768aea5bf074e75c7818ae3921f185f7ba5babadd8df76f6dbd1"
+    },
+    {
+      "path": "packages/cli/src/commands/client.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 58,
+      "sha256": "bef44e495c0577557c595af889bfe513c363da4a01f6aaea6b2a82b165e8e2fb",
+      "printedCodeSha256": "aefb14e9c43180ef22a43abf8b6ad77fe501626b99687505d8d9e1f4aea58443",
+      "semanticAstSha256": "c2c8d776fea22e8600cd1a520c4d714317298ec94e178a499744dcb372e63ce8"
+    },
+    {
+      "path": "packages/cli/src/commands/client.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 31,
+      "sha256": "228d27cda88fe9d32f59da9bd66c4af099b9914ef4a5ecff103b16329e2242d5",
+      "printedCodeSha256": "d39ccc4cf9a30b3025a7cc15a549d9b2958e1f65fc3d6d038a75d6a519deecd7",
+      "semanticAstSha256": "695937bc4dded235396130c90f40530c9024915c2fd5ea4fba85da728231120d"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-confirmation.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 45,
+      "sha256": "8b265746b37fd4726fedbc0bb756778fd6d4b6f5ad83fc6c074ebf04770ab62e",
+      "printedCodeSha256": "ae4845ae193eb1aa98a9c1e2894beb21f0076b94ada898df5d000e9bf254e4d8",
+      "semanticAstSha256": "5cc467d3d2a17b9fc082406cef8f83653937a873ca20e9331fad1a05870bee25"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-operations.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 204,
+      "sha256": "0a8ab5ef3fbcfc27985ea8998a8427545217911536f6ed5fecc228cd69516145",
+      "printedCodeSha256": "5e8865303202696a28fd180f8ab9ab9b4533b478462138e609d0e86bf8142b7b",
+      "semanticAstSha256": "3cf15e570788b125672dc3d211cc6b05d4aadf1d9c4e2cf9b370284f80aebe75"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-preparation.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 202,
+      "sha256": "1ce7686142c6a55e35a331ad2fd4c5646ee7204797f8c3a834a62f52df9330e9",
+      "printedCodeSha256": "b8a596d8ecedb3f5476c5a618ce25ac94590ebfda1e4c607ecf57c261bcf39fe",
+      "semanticAstSha256": "8381e7adfebdda386cdbdbc191d720322080968d37d67d2adaed2cedf9250b71"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-report.ts",
+      "origin": "baseline",
+      "classification": "edge",
+      "lines": 234,
+      "sha256": "240d5a07459e000040c83823ca5bd4680d76fbf792c1269dbfdb33f45fd9b045",
+      "printedCodeSha256": "144f2cdf172009263095940183f211eba9fdce730d070ea307e25f61b96451e6",
+      "semanticAstSha256": "749bf945e6957af779c5fcfdeac0976670749f7fca4f45fe6b75d98840c4a7f1"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-support.ts",
+      "origin": "baseline",
+      "classification": "pure",
+      "lines": 146,
+      "sha256": "fb34e8cb58f17a392d16d36c3cd7511f99145507809e1dc71036f207464d0435",
+      "printedCodeSha256": "17b210cb18db0d026d5081c63b65219b0e28269f4a24447436e95ffea9225ae9",
+      "semanticAstSha256": "0b682ad180e2948434d362b3ecb83ac8f7ef6f3ab66bdc5218346f6feb5a8de7"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy-support.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 82,
+      "sha256": "fb4dc7696d0240344eb5ab69e45dd74bec2b4a41f5388a205744382fbc978b00",
+      "printedCodeSha256": "90b86e52e67e008994ff86a749a3760b5b8c3dd2c786445e8c0cd69daec319b9",
+      "semanticAstSha256": "43d6f384991ee8c5d1b8550aed4ba5dd3d25dd38d40a4165fb62984aa64841da"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy.schemas.ts",
+      "origin": "added",
+      "classification": "schema",
+      "lines": 6,
+      "sha256": "275a35c23e3d1817ef90b047c6119c9da50c15566d84db9cb6b8b3ae0e915ed5",
+      "printedCodeSha256": "501e5eb2c2d7f6eaa58af2c0a196375eb44b748263916d1f0b6b21881f83a277",
+      "semanticAstSha256": "d23eaa93f21dc28ef7c20d357e716388792362bd2988ae6b3df152297bee735b"
+    },
+    {
+      "path": "packages/cli/src/commands/deploy.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 119,
+      "sha256": "5f01eb24d668438b10196123e346aed11241aec11cd8820056773efa340870e7",
+      "printedCodeSha256": "069965260bcc51c53b7c92da27939682b233c5aa8a5f32e4cf8981a0453be7d4",
+      "semanticAstSha256": "9ae495c7d7bf9afaeb3553a251a55c0da27be5b1a28870c7bdd36b911ee53a64"
+    },
+    {
+      "path": "packages/cli/src/commands/deployment-integrations.schemas.ts",
+      "origin": "added",
+      "classification": "schema",
+      "lines": 10,
+      "sha256": "ce991fd3555c22158035591e9154aa4ad334f40b4ba16f74546349d587afd104",
+      "printedCodeSha256": "98ea30328c0ef1b861bd738cb1aa583904e6858c64e282d2d53529e008945b25",
+      "semanticAstSha256": "bceed9d4a1061e069744d875a4dd27b28c660d6f41193caf2a256b0a7e6d248e"
+    },
+    {
+      "path": "packages/cli/src/commands/deployment-integrations.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 195,
+      "sha256": "df3f1f83f328d8300897dd54438ca978268de97a58690a16baba3733f2e44623",
+      "printedCodeSha256": "66893412dd2016bf7d432f1d5da5f06e7ad81ad1a5ad4e234cde5866e5af542f",
+      "semanticAstSha256": "723ad4adffe7e4ea13fb4256934f43c72c0d475f7aa03a251ce9324385a22c5b"
+    },
+    {
+      "path": "packages/cli/src/commands/deployment-integrations.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 19,
+      "sha256": "0d1b40e19e7765123034f96776445893b567a2e49586cf153644452e8f990a8e",
+      "printedCodeSha256": "6b190fb0f47049c2d3d8b51d13fdacaf15176f043df39e232baf1fd15a4b1ea7",
+      "semanticAstSha256": "c540a1c8f1572507ab198522fdfe0cba4b9db675baa42c1c2666ca4aab3c123c"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-activation-fingerprint.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 53,
+      "sha256": "bf5f05c506ac46c19791bf7e5d0eb54d32606951f38e6e7ac3561f7eb4b7a66a",
+      "printedCodeSha256": "b61eba025084ca99c1835f1d985af98d399a33e40044e2077d28d604f5707786",
+      "semanticAstSha256": "cca582df36df27f246dd40a99fae40cae056584bfdec49020457b2fd1f7f31a0"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-activation.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 245,
+      "sha256": "6b6fc80359a2b2d157d646184f02acf42fd634ee5c6116fc571ebd2dd2eea378",
+      "printedCodeSha256": "fcc930bb8a3ca77140d161a24bd28bba9e8410f88d2db136152b29ee61b51bab",
+      "semanticAstSha256": "bd662624b148d36d93247449e1f97086b1520b2e3ab7db1f5c056f97233c8e0f"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-check-worker.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 40,
+      "sha256": "0bb27e23059255a1abf600107d4e76230df2bc61a9f8bfab133244d778099c58",
+      "printedCodeSha256": "0e86f11ed0ac6f6f432bce0b79eed7b8ed78ced1294205dc5e382ac6c5770f6e",
+      "semanticAstSha256": "87f27519acdb5ef530b956670f860c2f74f8d84bb35583eba2a0cc248b394840"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-check.schemas.ts",
+      "origin": "added",
+      "classification": "schema",
+      "lines": 59,
+      "sha256": "9b2a4c09e1366a6fa0a426090f9815749bf41d91e735406a081c407b06538784",
+      "printedCodeSha256": "782fb33ee85edd13c3d2327ade66c5ba4b64d92a746566e2c36fa81949f4a55c",
+      "semanticAstSha256": "40a8151842796aff25b9b531d54387d456bffe6969849d5beb9d67f8846d1e2e"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-check.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 137,
+      "sha256": "43f43823bfd74a8adbba4c0f0d897f324d8386b65b51c2ab7d60b38cc9281147",
+      "printedCodeSha256": "0cfb256f442c4414dbe835027f8b1774cf22beb9c57d33ea5bdc5a0f6ee51779",
+      "semanticAstSha256": "e877307a7d831398db3e2f5186a5a2b380a1685972e55533f2083e15c6c25aa7"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-check.types.ts",
+      "origin": "baseline",
+      "classification": "types",
+      "lines": 10,
+      "sha256": "0558868bde3d9e672e45ffcedd12eb543d1544a33759edeace6d7b6623ff3c37",
+      "printedCodeSha256": "c628bccd57b01d076325d6a9c245ef23dae9a1f140bee03cabb070fa01a07e44",
+      "semanticAstSha256": "0c04ad8bc1e06e64d5f6c691e0b60867e39a84c709ade0e767e6d985a5d2b21c"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-command-operation.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 159,
+      "sha256": "15b1fa7b18af02439647bd4f55e1884afab07de53b80e6ef41cbd9ee89bc76c4",
+      "printedCodeSha256": "2d7f2a32fb2bff2f5f12a27d216e68f3fa9a23bf40e199af7f53ed624b214c0d",
+      "semanticAstSha256": "6075f1a166a0892ca2d2756305b000e0f5d8c3f28f95de8164c73472ce72b914"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-command.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 24,
+      "sha256": "78394f8c46133c31b3ca3fd7ba2c98f67f54f51ca227ece0cbd4e684dd6cf42b",
+      "printedCodeSha256": "c8b9dd31504d41e4b0f30b0a93df45df151d2b82af14b9b0480f6a722f302cf6",
+      "semanticAstSha256": "37cfce4f469e7a0bfd5101e1592204ef93014132158d45fc14558e3276959e51"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-compiler-bridge.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 84,
+      "sha256": "78c7f238aa80d38e22e79a084059684865bead7cbbc746dd877e2f626a45e559",
+      "printedCodeSha256": "94bb6b6a7897751be0e76aec670f3cc6cf2c2892e8189451dc5c42604b6762ce",
+      "semanticAstSha256": "ebe6b3a3fe0cd3ad156f1744803099c4a08b83be32aebc0275039245e06d7297"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-drain.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 78,
+      "sha256": "482f621c6dc2282d4cf6da704cd9bf850ad070d09b321476a33edf5f59e4fe28",
+      "printedCodeSha256": "3b8f8e7c2cc70125307183367ca08f1e32e483ba85732a20af34ee6d843947b8",
+      "semanticAstSha256": "b0ab7247ad66da6e93690d552a03edc35066235583dfb96edb7c502d5fd7e1b3"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-generation-key.ts",
+      "origin": "added",
+      "classification": "pure",
+      "lines": 9,
+      "sha256": "b4b7e6e6eaeddb13f4515d68a84c69b17c2040877d89221dfd0ef382a9584058",
+      "printedCodeSha256": "d173b79c6d03c8ed6f7b449f1b4f63a3fb42ef7e25445bb4df294d8164f04956",
+      "semanticAstSha256": "8742819808f356aba62ff7c4de42ffbafbca73c6e9045c784b1ba615b6d6967c"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-inspector.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 135,
+      "sha256": "0e4d3ba4ac5155215179b4c6b9d0bfeec2b9d1b4ad2cd977b01af61a6ae90101",
+      "printedCodeSha256": "be18678380cbce2148475fddddc8d35b0368dc33820c32f9424ab1778bf69091",
+      "semanticAstSha256": "b7cedc4a2b60cdddcf4efd6b25793d11217ecfcae022bc6d7f70515dbc88d7d3"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-inspector.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 11,
+      "sha256": "85d1f0ff4bc6729e19edec3c424ab6c6e9d99674889a32a2ceb0d52d442cfed9",
+      "printedCodeSha256": "184f1198e686b9d744cb40db3b338055e5b4c30f1dc7fed95b28498aede46fc4",
+      "semanticAstSha256": "9d0bb2ed525db688a13bd9de58cef69e62232034876af41c44a86b405b28d71b"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-compiler.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 226,
+      "sha256": "c43a42fb81fd6fdc9e35e0cd150112e6b9d9d548dd331abbb44a7edc57de1666",
+      "printedCodeSha256": "d2851e8df450b6f1761cddc5521ac2ac4dcc7d436a6116c64ba4f170f3c04cc1",
+      "semanticAstSha256": "5a80e78e81f1542d5095ad24cd77e7b488cdd1ca365dc33a7b6917bf66aa3e68"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-diagnostics.ts",
+      "origin": "added",
+      "classification": "edge",
+      "lines": 29,
+      "sha256": "9a40c1a0e07126c72a51368b7fbe65ab1e80db1dcd7661e3762f7205271eb539",
+      "printedCodeSha256": "6c6f71363580148ddebf89122171792042a20f03c94cce2f97963971c5213f20",
+      "semanticAstSha256": "8fd993989579c3ee8f1be91fb943562100fe3684d549397022efe8d3cff4e28f"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-runtime.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 127,
+      "sha256": "7682dce9c8a60a94a79415ee858d099a07cd0076df110353033d471a566b323c",
+      "printedCodeSha256": "91cce723ceed25ab7e67253eb0fda7f1c6b51528f0d3a2e43bf4ba16c400aa94",
+      "semanticAstSha256": "e0bc116a003d573f41cbad3b45c7d8d29c90391fedd7ab55daaa8e4492de9aac"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-runtime.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 25,
+      "sha256": "a6b48b7a8f02fa4c8b050f161503c0f06eadf56066440538f6354e568be47e3a",
+      "printedCodeSha256": "6740812d861a8644580cdf9b7f2b1f6cca6d416fd08a193789c4c87f8f27935a",
+      "semanticAstSha256": "e0b133c4b3ebb51f948440e101b14141a2e6c3526f86dc174387a3f4121b54f2"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-services.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 127,
+      "sha256": "69e577cae611d0a94ae7a06e635ac47c1cd9bda411bd0c6a3fc805c169e9f030",
+      "printedCodeSha256": "06838977e95710872e5e0d8a7ab28448007295befa04fb8bbfd3dc826e88aabf",
+      "semanticAstSha256": "7864e386618b1f4365b70e666482533a5ee42be7c30ac3f90b00fc768f2141ff"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local-services.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 17,
+      "sha256": "a4738ad555b3b1af5733db6ae4b693c3ad9352020ad47979c36bf1fcc4b93676",
+      "printedCodeSha256": "ab852aebec2d31fc5978231c841b04243d2bf28e97cedd36a01e0383e10f969a",
+      "semanticAstSha256": "0f6ea7939778ebfcd68dbfc43f63700b3a4d08cebedd0653efab558f82e730e0"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 95,
+      "sha256": "270816310c0b4beb2a2bb4a3bbf0dbe7046c0a04eb37a59c407c803145ae565d",
+      "printedCodeSha256": "5c2648cec34baf1f2bb069ce787b328a4cb0caa02b8123d95271efdcd9f0105e",
+      "semanticAstSha256": "51743f1456878fd7ca8010b60b66dd33b3b95ac0827e15be102bb4ae29e3851d"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-local.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 71,
+      "sha256": "add67cfa94e01e244b0f2ef8110e5429f997af62d3712fd8e051144afd1b538d",
+      "printedCodeSha256": "f7bfd18c2c2e2515116b06d6041f1c4984914582aeb69bb87f51e2297742958f",
+      "semanticAstSha256": "2572d94677359c56df3e87a2e9e15c1226663d04b2d8bde662dd6ef34212a2e7"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-details.ts",
+      "origin": "baseline",
+      "classification": "pure",
+      "lines": 57,
+      "sha256": "216c7d25d07d0b632dbfd603c8d5df3282da691fd92b7db5acba4a066029865a",
+      "printedCodeSha256": "8015db84360cbcee053514ce2cc2b109d71bbfaefcfa6aacaba63670c176533d",
+      "semanticAstSha256": "812b1a77ea1061cfbf24249f6811fa5e0e2c5a7e7bf278e66443471f90bfd805"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-format.ts",
+      "origin": "baseline",
+      "classification": "pure",
+      "lines": 180,
+      "sha256": "904e21c7107bb47eae99439a103dcbf17f2b61e5637539f002110636ce7ade63",
+      "printedCodeSha256": "62fb39b1ac42507e68f9417c3dba0c7ec7a3e487e215422dce3ed86354c00961",
+      "semanticAstSha256": "6b91db1adffdcdd2b6f47f233f2eb866524a2f503e0e5ce16f6b126b1089bad1"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-format.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 6,
+      "sha256": "6d643fbcc17f4d9782a4c7ca93fcb300b0399b70881d2fd84eb95571ec3eea22",
+      "printedCodeSha256": "fcda2253121773d1b0434f9f2115f9b70c14d382e33a99328f31f49969633648",
+      "semanticAstSha256": "2cc1e6154bdf9b19c5b260e0ec522bd25a0be072ffa43e5da6c21f50d049ab57"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-record.schemas.ts",
+      "origin": "added",
+      "classification": "schema",
+      "lines": 26,
+      "sha256": "a27e4be272ab1e7a98a1a482e1fa5b1a7f4d713c41b228dc4399c01c74ec0283",
+      "printedCodeSha256": "521cbd7711567b041f0e45b5c61347c3ef3fd50e48c1d29a38e4a73ab064d97c",
+      "semanticAstSha256": "6a042b25efacc0351c0ee21bb3fd40f1972e80f8de59ee02eb16ac20b55119e2"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-log-record.ts",
+      "origin": "baseline",
+      "classification": "pure",
+      "lines": 96,
+      "sha256": "a3091c235f7defe2f4c5e9fffdfcf88e07f137db3a56efcd42ee24ccbd355b4d",
+      "printedCodeSha256": "a5b396f3a9f9c3b9585f645ab9f3ea09a8241617b582dbbe94ec9a84ca9813a9",
+      "semanticAstSha256": "122c5788ed81d30f40c7436a81bde40dd81aa7d57ae62ea53a108b55afd35c81"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-logger.ts",
+      "origin": "baseline",
+      "classification": "edge",
+      "lines": 87,
+      "sha256": "a56d05663942e90b268883a7ef5940d0d0b7873c210f8f474dff8a0441498d4a",
+      "printedCodeSha256": "12b3d98904ad94ed4cabe10114f12cee7e836135fade426ac02719db6308e2bd",
+      "semanticAstSha256": "17863069876218a61429c6199aad24e24461165bc0471ef160a84f01a5c27347"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-process-output.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 80,
+      "sha256": "9f8d32307909119107577ef901afaacaede4fa5ddafd341b8c1a9a943c933dfd",
+      "printedCodeSha256": "06f2ed5ee5d027b6abe4d226b218ceec87239fa8d4ee0049e3e3afa8445a447e",
+      "semanticAstSha256": "a44199133f6ef402b989074a71da14afc5785c57cc88e2d7d8f6c73233413a42"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-process.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 211,
+      "sha256": "aa20f376f950506022c70abd360367fb0d2427b7b6d58e6a3de066ab277a34d3",
+      "printedCodeSha256": "13f455fcb84d1356a06b443eb520d4ff99eec059f745bc7b30dfe22804183630",
+      "semanticAstSha256": "b07f728e73b1c592b7a5c628a6d2541ae0d82e1de98357c71c97af8543f3daaf"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-process.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 33,
+      "sha256": "0805a1259200ab8e643c3f0fae9171a84805662cec488fbba9b9cb82e27b6be1",
+      "printedCodeSha256": "e6e89ba9233b727e1f751457ccaa32b06f86f097b631fddb8e6d933de1d0f91e",
+      "semanticAstSha256": "90ad8946b6e5ca1c88d6ef95ebfee0c65c77bdd595f39c08d6394e5f35df7316"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-ready.ts",
+      "origin": "baseline",
+      "classification": "edge",
+      "lines": 28,
+      "sha256": "d2305855fcee1a94e99f4891cf3eada1cfa617fe0961ac0ad34777deb175ed1d",
+      "printedCodeSha256": "07c906191a6a724b81ae92b3952c7fb022e08680cdc53462d675d40bd5a8441d",
+      "semanticAstSha256": "2ad86f41acf0e259003526ac01ba496b17a35bd6885eea30331c8067f8209283"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-recipe-cache.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 67,
+      "sha256": "97643c066daae99f76817741c27a10827adb52c16defc1a4c18bd29553ca8e61",
+      "printedCodeSha256": "c02a869116466ceded0faeb7437cd8dd70738c241fe2d09cd67693ebee2925dd",
+      "semanticAstSha256": "33dbfcde368dea30f1b57403697aaec4f90885efb1d915ee06c2923dce8c511e"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-recipe-cache.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 18,
+      "sha256": "eb7d2f7fa776b10eb6287b046dad90ed738538af4f103aeb9b4ebdc13b313d97",
+      "printedCodeSha256": "8d6f5cc33bb70448527cb99c41ad306f917427aa5e204992c83edea07759b954",
+      "semanticAstSha256": "c30aef49307409e178c5adb3de516cc6a7d4b7f9fd5a1fdad33d271099e904d2"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-session-engine.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 216,
+      "sha256": "189ebfe57f4068ae343ede65384775ab1d6465d4af899ae645f9dc4130f71148",
+      "printedCodeSha256": "ed4e0fce18938b08307cab9b4e213c1d0611bde58c208b808be32a66c4f45992",
+      "semanticAstSha256": "0da03e426fc56b9e797524d00c915780c4042ed37209050c14c4e4f56174e0a2"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-session-native.ts",
+      "origin": "added",
+      "classification": "edge",
+      "lines": 53,
+      "sha256": "f608f5bc402442e1fb5ae394e51e5692bc7ab7dd03067ff2aaecd09fa4e1e694",
+      "printedCodeSha256": "a0eeb5c83eb39a625e03a10aae114e91cb6462b7f5dc7537c7a2b00640818c02",
+      "semanticAstSha256": "4e58418be2fe0c56db9b6c0e6aa972ed926f495f1575daff652ec4ad0050968c"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-session-owner.ts",
+      "origin": "added",
+      "classification": "Added owned compatibility/lifetime edge over native Context operations",
+      "lines": 137,
+      "sha256": "87bddb1cd8f44901c0fda69adca0c00a40efb7c054b4cc8a02bc56fc48114be4",
+      "printedCodeSha256": "2db68a7b00615c1eb7fa01d264bdccfa99c3194753df22535cdfcc63c74dad9a",
+      "semanticAstSha256": "6274cf1fbcda3a6fe61ce752a94677a8d14887638afa1b234234c362d4e75c79"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-session.ts",
+      "origin": "baseline",
+      "classification": "edge",
+      "lines": 239,
+      "sha256": "616b5b1255d1df4ae1051c45d8a0bc75f0ff93bdb376e947919fcc0533b0a5e1",
+      "printedCodeSha256": "cba45c82bb73dca7fc47ed9a54f341434830bd38db27fe92a44a35b6663e8d57",
+      "semanticAstSha256": "915791d03163de8ed22dcf05b281d09f96787d9326b1459f0b8b29c1ab6eee5c"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-session.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 79,
+      "sha256": "91b4f96982b6097aa83fe0381d06c6e540e1bf293ee2791dfd65ec80c4ba95a6",
+      "printedCodeSha256": "8b968843831b47d99fef0e79e304ec189fd9551a1694e4ced2e3d0be50355837",
+      "semanticAstSha256": "59d6d2671ee425b75cd6feedbc5db8143d2914276b6ac97005c08710cf177088"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-shutdown.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 118,
+      "sha256": "131ffdb042202b843254f0efdb9460333a6c1d334c6ebf4bc386f9dad9c2b43b",
+      "printedCodeSha256": "ab1241c96d84e7b9838986c0a57278734e03bf439b6b7ed720a4ed2c40080439",
+      "semanticAstSha256": "33941d4a83ccbe79f45262bd004a5362c3506a826f051b47d7ca45f1b1b85701"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-signals.ts",
+      "origin": "baseline",
+      "classification": "edge",
+      "lines": 46,
+      "sha256": "525da0de54fdff6e965640b729e0c90a61a6d574acc6e44b0f4c18eef41e356d",
+      "printedCodeSha256": "fcb1daf44e2f0522b371acba467a384cf6c27ea7722b5a073468a10192af03ac",
+      "semanticAstSha256": "a55ffd9a983e4ba3ea552729d3c6532da55a28099175797be0548c033bebdb46"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-watch.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 191,
+      "sha256": "5331d6c4f984d401fb972fb0d3f8c88e89d629d7bc76c2a388db79665769b575",
+      "printedCodeSha256": "0314606d2179c72fca0691e619ed0eb8a389c9cf31dff94f070cf415d27f9959",
+      "semanticAstSha256": "299021a5775dee566431b405def4741dde1274b4e1080df971549f459a6e9ff3"
+    },
+    {
+      "path": "packages/cli/src/commands/dev-watch.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 15,
+      "sha256": "e696e417e4c0ac17d17ea6f41ff8eb65fdf4db2680cdd75931f4b49a02f7bc48",
+      "printedCodeSha256": "84b53edbe7cd9144fd99ef90451f3210d2434c64d1efe51916acac65a1b5b91c",
+      "semanticAstSha256": "7a3414df21f6602e73a4d86a77cd7499a043db6483c40d44a210fed2ac466fee"
+    },
+    {
+      "path": "packages/cli/src/commands/dev.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 49,
+      "sha256": "ccaf9da5c5364fc2c0b1ac5cabea2297feaf6766ee8b1e5e033cc391c02c74d0",
+      "printedCodeSha256": "6ab703f8a7d97eb16e571ff25bcf64d58820ff20df4d160b0cc85cbc3c37ee8a",
+      "semanticAstSha256": "36af8a3a35e014b63dfbd2858d576403eae78e500b4de037b8c5c57e2c5a40e5"
+    },
+    {
+      "path": "packages/cli/src/commands/dev.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 94,
+      "sha256": "dd15adbeb7fd5131cc9113dadbd43d94bc3397aac122459392a7b8e3b64894a0",
+      "printedCodeSha256": "c3183c66e10b9b09b21c4152839e0b3977ffb2148538e1034321928c143c730a",
+      "semanticAstSha256": "6589fc5c48dda11b3636f4ff4d29cf84f560a2946abdc16f9aa34bc43b5e74bb"
+    },
+    {
+      "path": "packages/cli/src/commands/local-args.ts",
+      "origin": "added",
+      "classification": "pure",
+      "lines": 59,
+      "sha256": "a210e607077b530e57e656fa59e9880b85496ce06e1ae1a75dab073bbfa078aa",
+      "printedCodeSha256": "02f709fd6b9f60d1cd51cfe5f9a1de155d151cc6b01cf2021bdac87aa612dd7c",
+      "semanticAstSha256": "b66430050c939e82b5f1da7d55b38f2ac3b9a3b2d7ca5d50b1f4b979031e0d3f"
+    },
+    {
+      "path": "packages/cli/src/commands/local-command-operation.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 83,
+      "sha256": "de85b07e8f59fc599e7644ddef12431133f056d9dd5bc4234c97ad106e4bc4c8",
+      "printedCodeSha256": "be5e8269ed4557bd04cb5ead357c7f4233698d891e61a102c31a53d37b972dbb",
+      "semanticAstSha256": "5ab05bf2725de3ec491ffd4de237a51f87d238702ff748f39ce7186eff343a33"
+    },
+    {
+      "path": "packages/cli/src/commands/local-confirmation.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 59,
+      "sha256": "14fc7880fadafcf3b8d7ba255f4ef955d1957ee9d38c77c431809d3ecdfbbfa7",
+      "printedCodeSha256": "443b36bc486b58ea33602599201f86960a73e807ed75444dac990a53d141e2d4",
+      "semanticAstSha256": "33cb41057fb48e3187b78ba3f2f89b7333fcc06677f3265079fe7926b4a10be8"
+    },
+    {
+      "path": "packages/cli/src/commands/local-materializer.ts",
+      "origin": "added",
+      "classification": "pure",
+      "lines": 11,
+      "sha256": "f90d8d97b368ab887ca09e66f54087a17fbfe55a32803174aca75ec8d56e691c",
+      "printedCodeSha256": "1ca0a561f8a15f29b0cd109bfa3d6ee97ba4a859ff8ee1b7046e3f6772e506e3",
+      "semanticAstSha256": "0cf1d67a35255855be41d98a62968056610aa6e848e395aeaefa602ea9fa6a0e"
+    },
+    {
+      "path": "packages/cli/src/commands/local-operation-support.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 162,
+      "sha256": "a7d00fc1bb490ce72bbeac54621d3c302ed62c7fe21c4976c7974905c65e6beb",
+      "printedCodeSha256": "511e78d1d241a7e656950265a9bf4566e51a67213aa4406baae0512a84711f6a",
+      "semanticAstSha256": "7ca65bc5da61dc58ed1834dce32be7878b51ec14ee7225a4fc27d6ad7e8560df"
+    },
+    {
+      "path": "packages/cli/src/commands/local-operations.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 171,
+      "sha256": "e5b3c31ff2ad4b54ef6145c491818b4786e518dffe9427e8a4410e4283d2e85b",
+      "printedCodeSha256": "77b514806d81f16524e06e6d0feaaae5a5e85d9706e60821c8f82e6e306afa40",
+      "semanticAstSha256": "960467ad7855608a5a781e070d0e785bf8c8c013ca0b0fed8d470b2e860d88c9"
+    },
+    {
+      "path": "packages/cli/src/commands/local-plan.ts",
+      "origin": "baseline",
+      "classification": "pure",
+      "lines": 30,
+      "sha256": "dc43f485234785a98f9caf5b87524315af6e74d2afb972d3b0944d7a7f892e23",
+      "printedCodeSha256": "13191def740ddf276c66e67493d70fa802fe765fd3ad670c9f20303cd4e79fde",
+      "semanticAstSha256": "e794da8c05328ed56afadb48ec2bc0906027a502738bdb470b9ae8f51e71502e"
+    },
+    {
+      "path": "packages/cli/src/commands/local-recipe.schemas.ts",
+      "origin": "added",
+      "classification": "schema",
+      "lines": 94,
+      "sha256": "c483dc8ae9de74b7e21070b61883fd03eb61ee1d1d36a76ec3e5dfa3c48310f3",
+      "printedCodeSha256": "7ab43acd4b4e93f37a310d7261e94cbf570a84302ec04b7cabefd3718df40739",
+      "semanticAstSha256": "909c2dcbafe164f638a71a9000a737718de75b556d76c5af9dec397c6d3f9816"
+    },
+    {
+      "path": "packages/cli/src/commands/local-runtime-modules.schemas.ts",
+      "origin": "added",
+      "classification": "schema",
+      "lines": 31,
+      "sha256": "76d6a109721929e54c40ff6f6448020e76880722c64bfc77e32be5437c2bde8e",
+      "printedCodeSha256": "91b9da5de30e586fece3ebff44dfc987dda2761ea309a597b01aa48cbf0e1822",
+      "semanticAstSha256": "2ec4b961e9803bac864248fc8a284e31085ea74db332f14c2f5c852d50c68a77"
+    },
+    {
+      "path": "packages/cli/src/commands/local-runtime-modules.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 159,
+      "sha256": "01896945a4c9351a7438ed346949771523c01aaf5bf7149d6293c01ef8b6ff25",
+      "printedCodeSha256": "f9276f196481a724b299f6c372f6971aaf28e01c9d996c5477abbc9ac318cd17",
+      "semanticAstSha256": "bf2814d59431de0019b02854cfb3c10582ddbb36dbfd3f3999914ea6a409be32"
+    },
+    {
+      "path": "packages/cli/src/commands/local-runtime-modules.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 156,
+      "sha256": "fd88527fe658e0f3167da3c80b14076e1cba05650ee22f94f7809c192e23ebe5",
+      "printedCodeSha256": "8fb32116193dfe5a0ded2df7ae487d56d74c624582216319a3b916abe57bf49a",
+      "semanticAstSha256": "5fbc85df04523867c1607fdf86a973260bb8f587b2b46e5d66f592b3c0b50b7d"
+    },
+    {
+      "path": "packages/cli/src/commands/local-service-options.ts",
+      "origin": "baseline",
+      "classification": "pure",
+      "lines": 146,
+      "sha256": "0a2d63653187e8e6a1bc00612c83ae1f3cd88b83961c83b11a981738f8ebf6b4",
+      "printedCodeSha256": "9782f01bf90d7c29a638b6316813875db44ac3f7eacceff62bb0967d3c75ac02",
+      "semanticAstSha256": "910d0cd2018e8a1cb334273766d55e15f9014cc0dd46e62abf28b3864a99d19c"
+    },
+    {
+      "path": "packages/cli/src/commands/local-status-stop.ts",
+      "origin": "baseline",
+      "classification": "pure",
+      "lines": 3,
+      "sha256": "5d53f2992bdde5c967bff66ab4f98e474b4d23c2e862f9e1558b41f06f0a2cda",
+      "printedCodeSha256": "8fd5cdceb8d6c031c8430616c3b6bbdcbafef84889272819905d111dabc02a58",
+      "semanticAstSha256": "4801304e7c5ce98069f39c8f9cea3fcafe2396e9b3c983cfa740fb70414234cf"
+    },
+    {
+      "path": "packages/cli/src/commands/local-status.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 122,
+      "sha256": "addf17db39ce7c83f70cc92ec20e2b6debab038186b7771a48bf484408d34595",
+      "printedCodeSha256": "fae021c9828caafcebaf1a42ea08921053811f45565d78b2a5ef4d0763f03645",
+      "semanticAstSha256": "7b4022452eeda9d0fc6e8cf0c6911546b9c68d0210e519cfb51d3f0fabb27b0c"
+    },
+    {
+      "path": "packages/cli/src/commands/local-stop.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 186,
+      "sha256": "624afa8f2ad7e282bc430761e6a6af87d688ca517851e38ca1b64e14357c51be",
+      "printedCodeSha256": "37473bc11ac1bdc24f765943c371c267c22e136ebffb38b78776f8ef9ee4bcd1",
+      "semanticAstSha256": "00ac2a5e3a8aff7d1aaadbbd846c0fd268d038a8ef2d8b7d33e4caa55e9287d9"
+    },
+    {
+      "path": "packages/cli/src/commands/local-worker-overrides.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 99,
+      "sha256": "e69a53634c8ea6e47fe45fffe8e7d9c86254fae9351fbea84eaf97609c134f0b",
+      "printedCodeSha256": "bfba8f4e70d129e19d5c616dc83f669b5a16c9ffe26f18995ef6f87294c389e5",
+      "semanticAstSha256": "707525c58d11d37c70b37a110ceb24b2d9a80d84558e8371695b36da45cd62a7"
+    },
+    {
+      "path": "packages/cli/src/commands/local.ts",
+      "origin": "baseline",
+      "classification": "native",
+      "lines": 83,
+      "sha256": "04791d0850479e7fa4fbc2cb0a25837e0830e445ca592d152127786f5d6670c0",
+      "printedCodeSha256": "8f2a81d93f05a8c3758229fac5a4b9d1f18e0b60eff544ab95658af5c6af3ef5",
+      "semanticAstSha256": "e6da18257c63340026bfb5acad4eecdbdc5fe60ed919f1a477730da84bc5e47a"
+    },
+    {
+      "path": "packages/cli/src/commands/local.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 25,
+      "sha256": "2e5374c709a2ab11fb68e6707442ff7f4b718fe979075c6d813c1f8072cd35e0",
+      "printedCodeSha256": "ba81d50d15d08673c3dc3c1c315885a506d3418b9be464c66414e0980ae49924",
+      "semanticAstSha256": "d59efadf9655d6c015412849309ef1cafd14967553b123885701550ed3173cac"
+    },
+    {
+      "path": "packages/cli/src/commands/project-args.schemas.ts",
+      "origin": "added",
+      "classification": "schema",
+      "lines": 13,
+      "sha256": "d4ed009550a67ff27b99c8e9a0c31842378ca707d7f89b8ed1f0a0c127a7a409",
+      "printedCodeSha256": "b004887e6610cc73d20a70450bfe402b3eb85b266a4750bb3652602c74d3c32b",
+      "semanticAstSha256": "812e32aaf71f9265adcfbe80820ede8f3009f687c786a4aa1e370f3a1e3deddc"
+    },
+    {
+      "path": "packages/cli/src/commands/project-args.ts",
+      "origin": "baseline",
+      "classification": "pure",
+      "lines": 85,
+      "sha256": "79b7787568d9ef52be954c1e2b625b699e6fbb38e67c6c7aa68367566dda6dce",
+      "printedCodeSha256": "12457d01b6264b099ea801e55dacadcaea243fe41b25e3c2ab6b682b7b846bd3",
+      "semanticAstSha256": "41baa3f302e8bfcee767a143fdbe93316933baa0a916073d05a4224855e81097"
+    },
+    {
+      "path": "packages/cli/src/commands/project-args.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 12,
+      "sha256": "fe9398b930d47be867d4c946f9056ddfac790762fd3ec8322415ebe9e90c0207",
+      "printedCodeSha256": "e67967da6bcf5c2349cbb16d70fac6e7f48eab5580c3aa237beab5218c38d176",
+      "semanticAstSha256": "5172e3d2d43595d428323dffe9111316f51d9d817319e90888111529daf45832"
+    },
+    {
+      "path": "packages/cli/src/services/client.service.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 159,
+      "sha256": "d780c4e8b17ff3def45600a305f73969279348a31237e7f919b62712a0463c1e",
+      "printedCodeSha256": "6805ea56764347adf1d24f8beab36d1b2f7f977cf6ddc17571510c0ccb5add78",
+      "semanticAstSha256": "1294ca20453ac94f754757ef8f18d7a4649d7cabc31a2aa99999a48892cc033e"
+    },
+    {
+      "path": "packages/cli/src/services/client.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 32,
+      "sha256": "a474679d986dde39f34584ad36158280ab304ad370341244ed1e71297efbe7b7",
+      "printedCodeSha256": "def4af4d1657bb502dbc4ef48dfa273df27471668b0ed6a0df86180bc52c6451",
+      "semanticAstSha256": "b1a583e531dc892335e002c855f2143650bb6a9597a6654cf9f34b033b7ef33c"
+    },
+    {
+      "path": "packages/cli/src/services/deploy-confirmation.service.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 38,
+      "sha256": "ebe5e6a112c84d6ade0582de416419bb883029a2481ac90f9f35d7e108e00b4a",
+      "printedCodeSha256": "d235bcbfca937af984a3b92231a086547b053657630275cd09d7338376f46bba",
+      "semanticAstSha256": "e97bcc34a74440435bcb64df586fe5e907440f75d72f235ca033893bf7d46789"
+    },
+    {
+      "path": "packages/cli/src/services/deploy-confirmation.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 12,
+      "sha256": "67cb806cb680edddf20b891dca603f53acb2af28345df572eb9f66599da62ea0",
+      "printedCodeSha256": "cd3b46d3e32951d72d6371dc3d2fa4bc7bdc997eb58bd29513f2b57fdf215bef",
+      "semanticAstSha256": "0e21da2118366aaa9de2ed58538310609ce09275616c40c20b63794468925754"
+    },
+    {
+      "path": "packages/cli/src/services/deployment.service.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 95,
+      "sha256": "4be65b8b574d54b3625660e996c03b3544de9bafc580524f498ac6f9be2e78fc",
+      "printedCodeSha256": "283c827e3fe08ca47fb448a2a02efcf7a53e2efadcccdce521022330eba0c04d",
+      "semanticAstSha256": "89a6a0435a6d3d53ead14c3ca41986cf8036b755f0f620eead987617c7a5e348"
+    },
+    {
+      "path": "packages/cli/src/services/deployment.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 24,
+      "sha256": "fa215f956f06a158f9df079285886ca7143840bd84a55bffd9f63b473f3fcda9",
+      "printedCodeSha256": "d715981720e1ed6525d6e0a85a934c7324bf3bc84907b2b824e1212b23a082ea",
+      "semanticAstSha256": "2c9e9b043d3deec4bc892b24600e90ac2fc4a60ea568638d0deb61ed087ae9d4"
+    },
+    {
+      "path": "packages/cli/src/services/dev-supervisor.service.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 97,
+      "sha256": "6adff7240048c52676afcc20b2665ed483cc56abcde1b99eb202e40aabdaf5ca",
+      "printedCodeSha256": "923b705a40a06e18983fe4ebe89f1c49ec67ef8a968c410b044aadc23338e457",
+      "semanticAstSha256": "849f768c5ad158ebc8b3fd6fb6a015a53d910fa332ef4c5be3bf097d4fa47f1e"
+    },
+    {
+      "path": "packages/cli/src/services/dev-supervisor.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 45,
+      "sha256": "733b0bdf4db31c08fcdb821163d9e3ce2e2d99d8a4c29fd25fc1d419e0714e03",
+      "printedCodeSha256": "96f6242fbd008e6df4da58533fb4abd2860251938640a0be8229cc74263fbd26",
+      "semanticAstSha256": "455eb527b731452e97c97e15c3c2c145e7a4d28a906b8f78fee993133458256a"
+    },
+    {
+      "path": "packages/cli/src/services/dev.service.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 71,
+      "sha256": "df48f4552a7f87ba88b122d2769e7a31301b973f707604015e8f6a304efbc848",
+      "printedCodeSha256": "b3cc45fc9d5a648305a849b42d7dae30482575e4baac9738e0d5d197cc90f29f",
+      "semanticAstSha256": "fde8154192e7771fd32fa0b7cbd1807cd0eb602019e492233f44d23813f7b4ee"
+    },
+    {
+      "path": "packages/cli/src/services/dev.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 16,
+      "sha256": "37f422c489929644de82dd27665db915fcf0900d4b5c48a788472abaca1c7acc",
+      "printedCodeSha256": "3167d4b6d78e54285d75f6a43cdfca3e6cc9eaeb83444db041054255257819f4",
+      "semanticAstSha256": "dc264f51493f9ecc4ce3e4a5ad83ddae28f9cb60c3e1a2bf21b359f230d5cd7a"
+    },
+    {
+      "path": "packages/cli/src/services/local-capabilities.ts",
+      "origin": "added",
+      "classification": "pure",
+      "lines": 15,
+      "sha256": "df38cae11def26a5c9c0efae084a1a69742b7c418491a4ada1912cf768cfffc1",
+      "printedCodeSha256": "5d549f3553d8b99ed38f3032399239b878a058c18bbebcecf194dbf8864d9fae",
+      "semanticAstSha256": "21c7ad552067c7de5883836dee65a72bc2567698a73ac608078c3f2571e2cd6f"
+    },
+    {
+      "path": "packages/cli/src/services/local.service.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 69,
+      "sha256": "1e1573171d39aa6ae22db6a63a8feddcd7129914c6c77f9049bb95305abb9da1",
+      "printedCodeSha256": "39e5da3b968b72a22eba71f4fff350eca788b07538ca34e1c8540f0df6272473",
+      "semanticAstSha256": "f124bb6814a44c4eb0f4466668bac15340b97f53c827e45faf534c18d1504339"
+    },
+    {
+      "path": "packages/cli/src/services/local.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 18,
+      "sha256": "8c10b98c2e0e2284460957fbdc3348cbc6c3c681c6d5d63634b7e1bde0753660",
+      "printedCodeSha256": "7e5e03c6965f13478a044f5b2386e5e54208f380b78b82d9fac48f38870b4100",
+      "semanticAstSha256": "d60adc4da854f06a9e3f1979762fb7bee5d9031f276e4883ef572354a72ec4a7"
+    },
+    {
+      "path": "packages/cli/src/services/pulumi.service.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 103,
+      "sha256": "63913f532a019e6aece59501b0d9a581f8816146ab771717833243dfc6534ac8",
+      "printedCodeSha256": "dee05b7964520540f923ffc45ca656d271262daaf4584c4d41b1510db0d25bdc",
+      "semanticAstSha256": "7c5d64d67f26f6b415bbc62de6886171f65a68acb1a72051624fc87f18e999bf"
+    },
+    {
+      "path": "packages/cli/src/services/pulumi.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 78,
+      "sha256": "a951de68cca7aa4a00860c36b999c0b09bfd01ced764907b54d32c0042ab84bf",
+      "printedCodeSha256": "0f36b7b8119f68bb863db5af70baefaf80524107162f1813552911d53e410726",
+      "semanticAstSha256": "e7fa70456fb97b90d1f3cd0dae16e48a05dceb2ac8c2c837d41205aec489f277"
+    },
+    {
+      "path": "packages/cli/src/services/source-watch.service.ts",
+      "origin": "added",
+      "classification": "native",
+      "lines": 57,
+      "sha256": "e3ae0168311e63916eeccd69a6e86cc09d60cdb48641126dec20c9518383a7e7",
+      "printedCodeSha256": "d2fbf4506a8332bf809e5cd7adffcd217fe25754cf7da0991fc7fff017bd6e47",
+      "semanticAstSha256": "24c83123f83d6b50569ac17071a168db13800898a56e80cd9f99871444253fcf"
+    },
+    {
+      "path": "packages/cli/src/services/source-watch.types.ts",
+      "origin": "added",
+      "classification": "types",
+      "lines": 27,
+      "sha256": "a0fdc1d79cce330b3d43289cad4d06910bca2ebb0448c93fd9af48812be092d8",
+      "printedCodeSha256": "95d46a299befb43a7548c0500716265e8fd00f3a778701cbe20b662393c24fe9",
+      "semanticAstSha256": "e2ddc60c9d16bece52e22463badcf52ecf63660ab68fd41d80d56e4c06f33caa"
+    },
+    {
+      "path": "packages/cli/tests/services/compiler-bridge.test.ts",
+      "origin": "added",
+      "classification": "test",
+      "lines": 103,
+      "sha256": "43fa6a36a5e588807dd79285f19ed585fd96684aba9ad9fdd875fd9d78c3d1de",
+      "printedCodeSha256": "98453e37d11144ae2c8bfa6dbe417d50aa9b14ca209266b56eb46161c63ed6dd",
+      "semanticAstSha256": "b828e472764987b9796ed670e56a8d3b4700ce51dff13e2635641aa2c75d1d72"
+    },
+    {
+      "path": "packages/cli/tests/services/dev-supervisor.test.ts",
+      "origin": "added",
+      "classification": "test",
+      "lines": 118,
+      "sha256": "5c56a33b1b30a1a19aa59ad20a0f1e87fca41a2d96de7f61bc885b5077a71b1c",
+      "printedCodeSha256": "05e70db4aa8598a62c051c3e6857a91504efe844784c4907bd8d4d41c6a1b18a",
+      "semanticAstSha256": "604917f3a195ce1e876659139329e3c2e9af16420fe087635c103975bfcf8f3e"
+    },
+    {
+      "path": "packages/cli/tests/services/recipe-cache.test.ts",
+      "origin": "added",
+      "classification": "test",
+      "lines": 108,
+      "sha256": "105be738409bad8141c12300ea732d53061bccb39f9a361db516de9214881ecc",
+      "printedCodeSha256": "84bfa2fafe99e88c48557a2258b80b9a5dbe5074641f96d944d33af382c0d9d5",
+      "semanticAstSha256": "3a91e4864a56006287ecc94532c8f0de02a966a8d2874857404b6c4fa02c13ba"
+    },
+    {
+      "path": "packages/cli/tests/services/source-watch.test.ts",
+      "origin": "added",
+      "classification": "test",
+      "lines": 160,
+      "sha256": "0c60122f5be5c2d64a7bb99529682310f7cdddddcca26ca1e2294a94d0a610df",
+      "printedCodeSha256": "0e7eff8bf560969a7d14095037e9535b735d97eb8f31b167705e773f868d805b",
+      "semanticAstSha256": "80aed7a81d8460c4b61172355592ab735eb993f3f2cd7f4d9fc8fec4de516990"
+    }
+  ]
+}

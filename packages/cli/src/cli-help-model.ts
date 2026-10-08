@@ -1,13 +1,13 @@
 import { deepFreeze } from "@relkit/contracts";
 import { argument, command, devLogOptions, option, title } from "./cli-help-builders.js";
-import type { CliHelpCommand, CliHelpModel } from "./cli-help-types.js";
+import type { CliHelpCommand, CliHelpModel } from "./cli-help-model.types.js";
 import { addHelp } from "./cli-help-add.js";
 import { clientHelp } from "./cli-help-client.js";
 import { deploy, env, graph, local } from "./cli-help-system.js";
 import { jobs } from "./cli-help-jobs.js";
 import { projectRoot } from "./cli-help-options.js";
 
-export type * from "./cli-help-types.js";
+export type * from "./cli-help-model.types.js";
 
 const root = command(
   "relkit",
@@ -86,10 +86,19 @@ const root = command(
   },
 );
 
+/** Returns a frozen static help tree without acquiring command services.
+ * @param version - Published CLI version to display at the root.
+ * @returns Deeply immutable command metadata for terminal or documentation rendering.
+ * @remarks Help remains synchronous and deterministic, including before project discovery.
+ */
 export function getCliHelpModel(version: string): CliHelpModel {
   return deepFreeze({ ...root, version });
 }
 
+/** Resolves a command path in the static tree without executing the command.
+ * @param path - Ordered subcommand names relative to the root; empty selects the root.
+ * @returns The matching command, or undefined when any path segment is unknown.
+ */
 export function findCliHelp(path: readonly string[]): CliHelpCommand | undefined {
   return path.reduce<CliHelpCommand | undefined>(
     (current, name) => current?.commands.find((entry) => entry.name === name),

@@ -1,4 +1,4 @@
-import { Cause, Clock, Effect, Exit, Metric } from "effect";
+import { Cause, Clock, Context, Effect, Exit, Metric } from "effect";
 import type {
   ExecutionDomain,
   ExecutionOutcome,
@@ -12,6 +12,23 @@ export type {
   ExecutionTerminalPolicy,
   ExecutionWorkload,
 } from "./operation.types.js";
+
+/**
+ * Controls successful operation completion logs in an explicitly provided context.
+ * @remarks Background polling can retain metrics, spans, failures, interruption,
+ * and application logs without persisting a success record for every idle pass.
+ * Existing consumers retain successful completion logs by default. Children and
+ * native adapters inherit a local override; unrelated invocations remain unchanged.
+ * @example
+ * ```ts
+ * const polling = observeExecution("runtime", "poll", Effect.void).pipe(
+ *   Effect.provideService(ExecutionSuccessLogs, false));
+ * ```
+ */
+export const ExecutionSuccessLogs = Context.Reference<boolean>(
+  "@relkit/contracts/ExecutionSuccessLogs",
+  { defaultValue: () => true },
+);
 
 const calls = Metric.counter("relkit_execution_operations_total", { incremental: true });
 
@@ -104,6 +121,7 @@ export function observeExecution<A, E, R>(
             "execution.outcome": outcome,
             ...(elapsed === undefined ? {} : { "execution.duration_ms": elapsed }),
           });
+          if (outcome === "success" && !(yield* ExecutionSuccessLogs)) return;
           const log =
             outcome === "failure" || outcome === "defect"
               ? Effect.logError("Execution operation failed")

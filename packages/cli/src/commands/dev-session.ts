@@ -1,200 +1,239 @@
 import { resolve } from "node:path";
+import { Deferred, Effect, Layer, MutableRef, Ref } from "effect";
 import type { RuntimeActivationFingerprint } from "@relkit/contracts";
-import {
-  createSupervisorObservability,
-  createSupervisorProxy,
-  createSupervisorStateMachine,
-  type StartedCandidate,
-  type SupervisorCandidateToken,
-  type SupervisorGenerationDrain,
-} from "@relkit/supervisor";
-import { startInspector, type DevInspector } from "./dev-process.js";
-import type { DevLog, DevOptions } from "./dev.js";
-import { activateCandidate, drainCandidate } from "./dev-activation.js";
+import type { StartedCandidate, SupervisorCandidateToken } from "@relkit/supervisor";
+import { runCliEffect } from "../cli-runtime.js";
 import { createDevLogger } from "./dev-logger.js";
-import { installDevSignals } from "./dev-signals.js";
-import { shutdownDev } from "./dev-shutdown.js";
-import { logDevReady } from "./dev-ready.js";
-import { assertPortAvailable } from "./port-availability.js";
+import type { DevOptions, DevLog } from "./dev.types.js";
+import type { DevSessionEngine, DevSessionState } from "./dev-session.types.js";
+import { createDevNativeSession } from "./dev-session-native.js";
+import { ManualDevSessionOwner, ManualSessionEngine } from "./dev-session-owner.js";
 
-/** Owns the stable development proxy and every child generation it starts. */
+/** Public Promise/synchronous facade over one native session owner. */
 export class DevSession {
-  readonly stateMachine;
-  readonly proxy;
   readonly projectRoot: string;
   readonly options: DevOptions;
   readonly abortController = new AbortController();
-  readonly fingerprints = new Map<number, RuntimeActivationFingerprint>();
-  readonly drains = new Map<string, SupervisorGenerationDrain>();
-  readonly controllers = new Set<AbortController>();
+  readonly state = Ref.makeUnsafe<DevSessionState>({
+    latestVersion: -1,
+    started: false,
+    stopping: false,
+    active: undefined,
+    fingerprint: undefined,
+    inspector: undefined,
+    signals: undefined,
+    fingerprints: new Map(),
+    drains: new Map(),
+    controllers: new Set(),
+    pending: [],
+  });
   readonly log: DevLog;
   readonly observability;
-  private readonly shutdownPromise: Promise<void>;
-  private resolveShutdown!: () => void;
-  private activationTail: Promise<boolean> = Promise.resolve(true);
-  private activeCandidate: StartedCandidate | undefined;
-  private activeFingerprint: RuntimeActivationFingerprint | undefined;
-  private inspector: DevInspector | undefined;
-  private removeSignals: (() => void) | undefined;
-  private latestVersion = -1;
-  private stopPromise: Promise<void> | undefined;
-  private started = false;
-  private stopping = false;
+  readonly stateMachine;
+  readonly proxy;
+  private engine: DevSessionEngine | undefined;
+  private readonly owner: ManualDevSessionOwner<this>;
 
+  /** Creates the synchronous public facade over an explicitly acquired session engine.
+   * @param options - Explicit project, compiler, logging and lifetime policy.
+   */
   constructor(options: DevOptions) {
     this.options = options;
     this.projectRoot = resolve(options.projectRoot ?? process.cwd());
     this.log = createDevLogger(options);
-    this.observability = createSupervisorObservability({
-      ...(options.observability ?? {}),
-      activationFingerprint: (token) =>
-        this.fingerprints.get(token.generationToken) ?? this.activeFingerprint,
-    });
-    this.stateMachine = createSupervisorStateMachine({
-      onTelemetry: (event) => {
-        this.observability.emit(event);
-        this.log({
-          level: event.type === "outcome" && event.outcome.endsWith("failed") ? "error" : "info",
-          event: `supervisor.${event.type}`,
-          fields: {
-            phase: event.type === "outcome" ? event.phase : event.from,
-            state: event.type === "transition" ? event.to : event.outcome,
-            sourceToken: event.sourceToken,
-            generationToken: event.generationToken,
-          },
-        });
-      },
-    });
-    this.proxy = createSupervisorProxy({
-      ...(options.intercept === undefined ? {} : { intercept: options.intercept }),
-      ...(options.hostname === undefined ? {} : { hostname: options.hostname }),
-      ...(options.stablePort === undefined ? {} : { port: options.stablePort }),
-      track: (token) =>
-        this.drains.get(`${token.sourceToken}:${token.generationToken}`)?.track(token),
-    });
-    this.shutdownPromise = new Promise((resolveShutdown) => {
-      this.resolveShutdown = resolveShutdown;
-    });
+    const native = createDevNativeSession(options, this.state, this.log);
+    this.observability = native.observability;
+    this.stateMachine = native.stateMachine;
+    this.proxy = native.proxy;
+    this.owner = new ManualDevSessionOwner(this);
   }
 
+  /** Reads the stable proxy's current listening port.
+   * @returns Stable listener port, including the SDK's allocated ephemeral port.
+   */
   get backendPort(): number {
     return this.proxy.port;
   }
+  /** Reads the session-owned inspector's current listening port.
+   * @returns Optional inspector listener port.
+   */
   get inspectorPort(): number | undefined {
-    return this.inspector?.port;
+    return Ref.getUnsafe(this.state).inspector?.port;
   }
+  /** Reads the stable proxy's published target.
+   * @returns Current stable proxy target.
+   */
   get activeTarget() {
     return this.proxy.activeTarget;
   }
-
-  async start(): Promise<this> {
-    if (this.started) return this;
-    if (this.options.signal?.aborted)
-      throw this.options.signal.reason ?? new Error("Development startup was aborted.");
-    this.started = true;
-    this.log({ level: "info", event: "dev.starting" });
-    this.removeSignals = installDevSignals(this.options, this.log, (reason) => this.stop(reason));
-    try {
-      await assertPortAvailable(this.backendPort, this.options.hostname ?? "127.0.0.1", "--port");
-      await this.proxy.listen();
-      if (this.options.inspector !== undefined && this.options.inspector !== false) {
-        this.inspector = await startInspector(
-          this.options.inspector,
-          this.backendPort,
-          this.log,
-          this.options.spawn,
-        );
-        void this.inspector.process.exited.then((exitCode) => {
-          if (!this.stopping) void this.stop(new Error(`Inspector exited with code ${exitCode}.`));
-        });
-      }
-      if (!(await this.activate(0)))
-        throw this.options.signal?.reason ?? new Error("Initial development candidate failed.");
-      logDevReady(
-        this.log,
-        this.options.hostname ?? "127.0.0.1",
-        this.backendPort,
-        this.inspectorPort,
-      );
-      return this;
-    } catch (error) {
-      await this.stop(error);
-      throw error;
-    }
+  /** Reads the captured engine, rejecting use before acquisition.
+   * @returns Captured native engine after session acquisition.
+   */
+  get nativeEngine(): DevSessionEngine {
+    if (!this.engine) throw new Error("Development session has not been acquired.");
+    return this.engine;
+  }
+  /** Captures the acquired engine for the public compatibility facade.
+   * @param engine - Invocation-scoped operations.
+   * @returns No value.
+   */
+  attach(engine: DevSessionEngine): void {
+    this.engine = engine;
+    this.owner.attach(engine);
   }
 
-  /** Queues one source version; newer versions obsolete queued work. */
-  activate(
-    version = this.latestVersion + 1,
-    changedFiles: readonly string[] = [],
-  ): Promise<boolean> {
-    if (version < this.latestVersion) return Promise.resolve(false);
-    this.latestVersion = version;
-    for (const controller of this.controllers)
-      controller.abort(new Error("A newer source version superseded this candidate."));
-    const task = this.activationTail.then(
-      () =>
-        this.stopping || version !== this.latestVersion
-          ? false
-          : activateCandidate(this, version, changedFiles),
-      () => false,
-    );
-    this.activationTail = task.catch(() => false);
-    return task;
+  /**
+   * Acquires the manual public owner once; concurrent callers share startup.
+   * @returns This session after the initial candidate becomes active.
+   */
+  start(): Promise<this> {
+    return this.owner.start();
   }
 
-  notifySourceChange(version: number, changedFiles: readonly string[] = []): Promise<boolean> {
-    return this.activate(version, changedFiles);
+  /** Joins one requested source activation through the captured engine.
+   * @param version - Source version, defaulting to the next version.
+   * @param files - Changed paths.
+   * @returns Joined activation acceptance.
+   */
+  activate(version?: number, files: readonly string[] = []): Promise<boolean> {
+    if (this.isStopping) return Promise.resolve(false);
+    return this.owner.run(ManualSessionEngine.use((engine) => engine.activate(version, files)));
   }
-
+  /** Forwards an explicit source version to the serialized activation owner.
+   * @param version - Source version.
+   * @param files - Changed paths.
+   * @returns Joined activation acceptance.
+   */
+  notifySourceChange(version: number, files: readonly string[] = []): Promise<boolean> {
+    return this.activate(version, files);
+  }
+  /** Joins the captured session's shared shutdown completion.
+   * @returns Completion after all session cleanup has joined.
+   */
   waitForShutdown(): Promise<void> {
-    return this.shutdownPromise;
+    return this.engine
+      ? runCliEffect(this.engine.wait, Layer.empty)
+      : this.owner.run(ManualSessionEngine.use((engine) => engine.wait));
   }
 
+  /** Closes the manual public owner and joins its shared release.
+   * @param reason - Shutdown cause.
+   * @returns The shared, joined manual release.
+   */
   stop(reason: unknown = new Error("Development session stopped.")): Promise<void> {
-    if (this.stopPromise !== undefined) return this.stopPromise;
-    this.stopPromise = shutdownDev(this, reason);
-    return this.stopPromise;
+    return this.owner.stop(reason);
   }
 
-  async drain(previous: StartedCandidate, activeToken: SupervisorCandidateToken): Promise<void> {
-    await drainCandidate(this, previous, activeToken);
+  /** Reads the last accepted backend generation.
+   * @returns Last accepted backend generation.
+   */
+  get active() {
+    return Ref.getUnsafe(this.state).active;
   }
-
-  get active(): StartedCandidate | undefined {
-    return this.activeCandidate;
+  /** Publishes the retained synchronous backend generation assignment.
+   * @param active - Existing synchronous compatibility assignment.
+   */
+  set active(active: StartedCandidate | undefined) {
+    MutableRef.update(this.state.ref, (state) => ({ ...state, active }));
   }
-
-  set active(candidate: StartedCandidate | undefined) {
-    this.activeCandidate = candidate;
+  /** Reads the currently published activation identity.
+   * @returns Current activation fingerprint.
+   */
+  get activeActivationFingerprint() {
+    return Ref.getUnsafe(this.state).fingerprint;
   }
-
-  get activeActivationFingerprint(): RuntimeActivationFingerprint | undefined {
-    return this.activeFingerprint;
+  /** Publishes the retained synchronous activation identity assignment.
+   * @param fingerprint - Existing synchronous compatibility assignment.
+   */
+  set activeActivationFingerprint(fingerprint: RuntimeActivationFingerprint | undefined) {
+    MutableRef.update(this.state.ref, (state) => ({ ...state, fingerprint }));
   }
-  set activeActivationFingerprint(value: RuntimeActivationFingerprint | undefined) {
-    this.activeFingerprint = value;
-  }
+  /** Reads whether session shutdown has closed admission.
+   * @returns Whether shutdown admission has closed.
+   */
   get isStopping(): boolean {
-    return this.stopping;
+    return Ref.getUnsafe(this.state).stopping;
   }
-
-  markStopping(): void {
-    this.stopping = true;
+  /** Projects the inspector owner into the established Promise facade.
+   * @returns Existing inspector owner.
+   */
+  get inspectorChild() {
+    const owner = Ref.getUnsafe(this.state).inspector;
+    return owner
+      ? {
+          port: owner.port,
+          process: owner.process,
+          output: runCliEffect(owner.output, Layer.empty),
+          stop: () => runCliEffect(owner.stop, Layer.empty),
+        }
+      : undefined;
   }
-  get pendingActivations(): Promise<boolean> {
-    return this.activationTail;
+  /** Reads the currently owned generation drain entries.
+   * @returns Current generation drain owners.
+   */
+  get drains() {
+    return Ref.getUnsafe(this.state).drains;
   }
-
-  get inspectorChild(): DevInspector | undefined {
-    return this.inspector;
+  /** Reads the currently owned candidate cancellation controllers.
+   * @returns Current candidate abort controllers.
+   */
+  get controllers() {
+    return Ref.getUnsafe(this.state).controllers;
   }
-  clearSignals(): void {
-    this.removeSignals?.();
-    this.removeSignals = undefined;
+  /** Reads the session-local generation identities retained by active owners.
+   * @returns Existing session-local generation identity map.
+   */
+  get fingerprints() {
+    return Ref.getUnsafe(this.state).fingerprints;
   }
-
+  /** Joins a retired generation's drain through the captured engine.
+   * @param previous - Old generation.
+   * @param active - Active SDK token.
+   * @returns Joined native drain.
+   */
+  drain(previous: StartedCandidate, active: SupervisorCandidateToken): Promise<void> {
+    return this.owner.run(ManualSessionEngine.use((engine) => engine.drain(previous, active)));
+  }
+  /** Completes the synchronous compatibility shutdown latch.
+   * @returns No value; retained synchronous public shutdown latch boundary.
+   */
   resolveShutdownPromise(): void {
-    this.resolveShutdown();
+    this.engine?.finish();
+  }
+  /** Joins the activation requests currently admitted by this session.
+   * @returns Joined outcomes of admitted requests at the time of the call.
+   */
+  get pendingActivations(): Promise<boolean> {
+    return this.owner.run(
+      Effect.forEach(
+        Ref.getUnsafe(this.state).pending,
+        (request) => Effect.exit(Deferred.await(request.result)),
+        { concurrency: "unbounded" },
+      ).pipe(Effect.as(true)),
+    );
+  }
+  /** Closes the captured signal registration and clears its synchronous facade.
+   * @returns No value; closes synchronous signal admission.
+   */
+  clearSignals(): void {
+    Ref.getUnsafe(this.state).signals?.();
+    MutableRef.update(this.state.ref, (state) => ({ ...state, signals: undefined }));
+  }
+  /** Closes synchronous startup and activation admission.
+   * @returns No value; retained synchronous stopping presentation edge.
+   */
+  markStopping(): void {
+    MutableRef.update(this.state.ref, (state) => ({ ...state, stopping: true }));
+  }
+
+  /**
+   * Executes the retained synchronous watcher edge.
+   * @typeParam A - Result.
+   * @typeParam E - Failure.
+   * @param effect - Captured native work.
+   * @returns Its synchronous result.
+   */
+  runSynchronous<A, E>(effect: Effect.Effect<A, E>): A {
+    return this.owner.runSync(effect);
   }
 }

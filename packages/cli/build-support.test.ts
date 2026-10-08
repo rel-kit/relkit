@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { cp, lstat, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { cp, lstat, mkdir, mkdtemp, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -61,6 +61,10 @@ test("missing required imports still fail bundling and remove the temporary modu
   }
 });
 
+/**
+ * Relocates the actual helper and its native Effect adapters without optional peers.
+ * @returns An isolated build fixture whose bundler cannot see workspace DeepAgents.
+ */
 async function createFixture() {
   // Relocate the CLI helper so workspace devDependencies cannot mask missing peers.
   const root = await mkdtemp(join(tmpdir(), "relkit-build-optional-peer-"));
@@ -70,7 +74,33 @@ async function createFixture() {
   await mkdir(dirname(helper), { recursive: true });
   await mkdir(join(modules, "@relkit/agents"), { recursive: true });
   await mkdir(server);
-  await cp(join(import.meta.dir, "src/commands/build-support.ts"), helper);
+  for (const relative of [
+    "commands/build-support.ts",
+    "cli-errors.ts",
+    "cli-runtime.ts",
+    "cli-runtime.types.ts",
+    "cli-cleanup-evidence.ts",
+    "cli-cleanup-presentation.ts",
+    "services/filesystem.service.ts",
+    "services/filesystem.types.ts",
+    "services/filesystem-exclusive.ts",
+    "services/filesystem-exclusive.types.ts",
+    "services/process.service.ts",
+    "services/process.types.ts",
+    "services/cleanup.service.ts",
+    "services/cleanup.types.ts",
+  ]) {
+    const target = join(root, "cli/src", relative);
+    await mkdir(dirname(target), { recursive: true });
+    await cp(join(import.meta.dir, "src", relative), target);
+  }
+  // Only the helper's runtime cohort is visible here; @relkit/agents remains the
+  // isolated fixture below, so optional DeepAgents resolution is still exercised.
+  for (const name of ["effect", "@relkit/contracts", "@relkit/runtime-effect"]) {
+    const target = join(modules, name);
+    await mkdir(dirname(target), { recursive: true });
+    await symlink(await realpath(join(import.meta.dir, "node_modules", name)), target, "dir");
+  }
   await writeFile(
     join(modules, "@relkit/agents/package.json"),
     JSON.stringify({ name: "@relkit/agents", type: "module", exports: "./index.js" }),
@@ -104,6 +134,12 @@ await bundleServer(${JSON.stringify(server)}, ${JSON.stringify(root)}, ${develop
   };
 }
 
+/**
+ * Captures one native Bun process and both pipes through physical completion.
+ * @param args - Fixture-owned Bun arguments.
+ * @param cwd - Isolated fixture root.
+ * @returns Joined status and existing stdout/stderr bytes.
+ */
 async function run(args: string[], cwd: string) {
   const child = Bun.spawn([process.execPath, ...args], { cwd, stdout: "pipe", stderr: "pipe" });
   const [code, stdout, stderr] = await Promise.all([

@@ -2,15 +2,25 @@ import { strict as assert } from "node:assert";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+import type { PromptDriver } from "create-relkit";
+import type { ScaffoldTerminalResult } from "./scaffold-smoke-terminal.types.js";
 
 const SCAFFOLD_TERMINAL_TIMEOUT_MS = 600_000;
 
+/** Runs a real packed CLI in a bounded native terminal and answers prompts in order.
+ * @param command - Script executable and its literal argument vector.
+ * @param cwd - Standalone application directory.
+ * @param answers - Expected prompt fragments and terminal input, in display order.
+ * @param env - Explicit overrides for this child only.
+ * @returns The physical child exit and captured terminal display after every answer was sent.
+ * @remarks Native Bun.Terminal behavior is the acceptance boundary, including Ctrl-C.
+ */
 export async function runScaffoldTerminal(
   command: string[],
   cwd: string,
   answers: readonly (readonly [string, string])[],
   env: Record<string, string> = {},
-): Promise<{ code: number; output: string }> {
+): Promise<ScaffoldTerminalResult> {
   let output = "";
   let answered = 0;
   const terminal = new Bun.Terminal({
@@ -41,6 +51,11 @@ export async function runScaffoldTerminal(
   }
 }
 
+/** Verifies packed artifact cancellation and the separate Docker startup consent.
+ * @param root - Installed standalone application with the billing service.
+ * @param cli - Actual packed CLI executable.
+ * @returns After cancellation, declined consent, failed startup, and successful startup assertions.
+ */
 export async function verifyScaffoldTerminal(root: string, cli: string): Promise<void> {
   const cancelled = await runScaffoldTerminal([cli, "add", "service"], root, [
     ["service name", "\x03"],
@@ -73,22 +88,39 @@ export async function verifyScaffoldTerminal(root: string, cli: string): Promise
   }
 }
 
+/** Verifies the packed public resolver's creation choices and explicit advanced flags.
+ * @param root - Registry consumer containing the actual packed generator.
+ * @returns After asserting omitted choices are prompted and explicit flags bypass their questions.
+ */
 export async function verifyInteractiveResolver(root: string): Promise<void> {
-  const api = await import(
+  // Release staging verifies this package/version before installation; assert the
+  // packed public contract against the same authored API used by scaffold callers.
+  const api = (await import(
     pathToFileURL(join(root, "node_modules/create-relkit/dist/index.js")).href
-  );
-  const answers = {
-    text: async ({ message }: { readonly message: string }) =>
-      message === "Project name" ? "interactive-app" : "interactive-project",
-    select: async ({ message }: { readonly message: string }) =>
-      ({
-        "Starter template": "api",
-        "Cloud provider": "none",
-        "Deployment adapter": "none",
-        "Jobs service": "none",
-      })[message as "Starter template" | "Cloud provider" | "Deployment adapter" | "Jobs service"],
-    multiselect: async () => [],
-    confirm: async () => false,
+  )) as typeof import("create-relkit");
+  const requested: string[] = [];
+  const answers: PromptDriver = {
+    text: async ({ message }) => {
+      requested.push(message);
+      if (message === "Project name") return "interactive-app";
+      assert.equal(message, "Destination");
+      return "interactive-project";
+    },
+    select: async ({ message, options }) => {
+      requested.push(message);
+      assert.ok(message === "Starter template" || message === "Jobs service");
+      const selected = options.find(
+        (option) => option.value === (message === "Starter template" ? "minimal" : "none"),
+      );
+      assert.ok(selected);
+      return selected.value;
+    },
+    multiselect: async () => {
+      throw new Error("Creation requested an unexpected multiselect.");
+    },
+    confirm: async () => {
+      throw new Error("Confirmation belongs to generation, after option resolution.");
+    },
     note: () => undefined,
     intro: () => undefined,
     outro: () => undefined,
@@ -98,6 +130,33 @@ export async function verifyInteractiveResolver(root: string): Promise<void> {
     promptDriver: answers,
   });
   assert.equal(resolved.options.name, "interactive-app");
-  assert.equal(resolved.options.template, "api");
+  assert.equal(resolved.options.template, "minimal");
   assert.equal(resolved.options.directory, "interactive-project");
+  assert.equal(resolved.options.cloud, "none");
+  assert.equal(resolved.options.deploy, "none");
+  assert.equal(resolved.options.jobs, undefined);
+  assert.equal(resolved.options.install, true);
+  assert.equal(resolved.options.git, true);
+  assert.equal(resolved.options.examples, true);
+  assert.deepEqual(requested, ["Project name", "Starter template", "Jobs service", "Destination"]);
+  requested.length = 0;
+  const explicit = await api.resolveCreateOptionsDetails(
+    [
+      "named-app",
+      "--template",
+      "api",
+      "--jobs",
+      "effect-mq-docker",
+      "--directory",
+      "explicit-project",
+      "--no-install",
+    ],
+    { interactive: true, promptDriver: answers },
+  );
+  assert.equal(explicit.options.name, "named-app");
+  assert.equal(explicit.options.template, "api");
+  assert.equal(explicit.options.jobs, "effect-mq-docker");
+  assert.equal(explicit.options.directory, "explicit-project");
+  assert.equal(explicit.options.install, false);
+  assert.deepEqual(requested, []);
 }

@@ -1,5 +1,12 @@
 import { LocalCommandError } from "./local-operation-support.js";
 
+/**
+ * Selects authored local services without changing any cohort metadata.
+ * @typeParam T - Complete accepted plan retaining its existing metadata.
+ * @param plan - Validated local plan.
+ * @param service - Optional binding ID, profile or capability filter.
+ * @returns The original plan or its selected service projection.
+ */
 export function selectPlan<
   T extends {
     readonly services: readonly {

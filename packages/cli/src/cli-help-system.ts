@@ -1,6 +1,7 @@
 import { argument, command, option, title } from "./cli-help-builders.js";
 import { deployOptions, environment, projectRoot } from "./cli-help-options.js";
 
+/** Static graph command metadata; no application graph is read to render help. */
 export const graph = command(
   "graph",
   "Inspect deterministic application graphs",
@@ -36,6 +37,7 @@ export const graph = command(
   },
 );
 
+/** Static environment command metadata without reading or exposing user values. */
 export const env = command(
   "env",
   "Inspect value-free environment contracts",
@@ -64,6 +66,7 @@ export const env = command(
   },
 );
 
+/** Static deployment metadata; native workspaces are acquired only by deployment services. */
 export const deploy = command("deploy", "Manage Pulumi deployments", "relkit deploy <command>", {
   commands: ["init", "preview", "up", "refresh", "outputs", "destroy"].map((name) =>
     command(name, `${title(name)} the Pulumi stack`, `relkit deploy ${name}`, {
@@ -72,6 +75,7 @@ export const deploy = command("deploy", "Manage Pulumi deployments", "relkit dep
   ),
 });
 
+/** Static local-service command tree; container and lease ownership remains in the service. */
 export const local = command(
   "local",
   "Manage project-scoped local services",

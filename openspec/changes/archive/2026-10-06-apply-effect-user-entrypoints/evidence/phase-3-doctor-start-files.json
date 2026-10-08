@@ -1,0 +1,191 @@
+{
+  "status": "author ready; independent root review pending",
+  "files": [
+    {
+      "path": "packages/cli/src/commands/doctor-checks.ts",
+      "lines": 212,
+      "sha256": "227e2ba509966693ee8ff854c23c0af803e58858e3455aab9d9d8f716e937c03",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-compat.ts",
+      "lines": 202,
+      "sha256": "3bf6303020a8de23041b1c23415a6d0171ace541a1924d7cffe7d88332ba5f75",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-config.ts",
+      "lines": 85,
+      "sha256": "56e3c7310ecaf318b1dde84acd50bd1efff3ac8bdf2894d44d0f4ba002301c09",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-error.ts",
+      "lines": 15,
+      "sha256": "572bd9ecca98d7eadd7a10030d41f29c06efa25fb8496fcbabbef874828b60ef",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-native.ts",
+      "lines": 98,
+      "sha256": "d0d91782b0b20a3514c87dac55af863599653d320700e4a8e9c444664fff0a0b",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-project.service.ts",
+      "lines": 131,
+      "sha256": "8030525f2e073d0026234de9aea6b93f2b9358f7e3a8971b45e53f0c7a51c90d",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-roots.ts",
+      "lines": 53,
+      "sha256": "692594c909ff2f709074c688a99744ef941e264369fe2ea4c2ed585cd702c7f1",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-support.ts",
+      "lines": 90,
+      "sha256": "0859152fa5974804a6e402a5916b9a01bac90f4dbad50cd6fd48a07bd256b7b8",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-toolchain.service.ts",
+      "lines": 43,
+      "sha256": "e026807b21b8ec2f2b6bb26601276fd10749d3018bd44ea12f1914416f3f2867",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor-toolchain.types.ts",
+      "lines": 29,
+      "sha256": "71f34573b64fc00169093d317c98cc65126930acaab2e03e85ab9ca63a7ce1c5",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor.schemas.ts",
+      "lines": 23,
+      "sha256": "1705375f4041070def9e708bb99445839ef8cc0878c92f9d6918ec070e99a302",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor.ts",
+      "lines": 82,
+      "sha256": "542a85e94e577caabbba220b4f83f9c7d6caa15d3501555b15eb710810727cb1",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/doctor.types.ts",
+      "lines": 49,
+      "sha256": "16a1c6d0423b4c0346b72311c8b95e73d7a03e2218c65305a3fc6277cb422411",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/src/commands/start-built-validation.ts",
+      "lines": 69,
+      "sha256": "e4468d0c60387da4e7ff088bc8418dd8c46c955eb97a2fd70ba3486bf1c1301a",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/src/commands/start-built-workflow.ts",
+      "lines": 220,
+      "sha256": "b5f5f65fd769edaac85d68dc467c712190b616cf651f21b3c3cf73afb8020eb1",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/start-built.schemas.ts",
+      "lines": 26,
+      "sha256": "536fc2ff512d39acfa8c2f76144fc813c1fa616aaac71e527c5d9accf21ebef7",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/src/commands/start-built.ts",
+      "lines": 45,
+      "sha256": "742026c2be5fad95b2e453fcc46cbeb2fa021baef69a4481e759af021fceaab3",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/start-built.types.ts",
+      "lines": 22,
+      "sha256": "f9ce3b262bada48f7888987f4e1e5ad21b100623e8cac647c498ff12aa88fbd5",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/src/commands/start-health.ts",
+      "lines": 61,
+      "sha256": "8acd8ba36a7ddd71e6460b7941c80872d331730e770ff24cbbdc0a97203097b9",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/start-native.service.ts",
+      "lines": 74,
+      "sha256": "86b609cf399f32346ab29b757802c4c17c91f5e9f8ef76b502df8f3b81e4cbdd",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/start-process.service.ts",
+      "lines": 129,
+      "sha256": "52cb6453156c3d23b80a9acc109da445b2ab5ce4e6f8b8c947bf6238c38e2629",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/start-process.types.ts",
+      "lines": 10,
+      "sha256": "47e3b15f8ee7aa3ae192711c9e4ade4d9d19c4c4174bfe7e361b8bf388c45842",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/src/commands/start.service.ts",
+      "lines": 136,
+      "sha256": "a38c11315eb79e4e3cf4196115619e5b4f892e957c2de3b742f9fbf9e7a5c2fb",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/start.ts",
+      "lines": 169,
+      "sha256": "f77f5093d82f76a99e0669999276c434a4524564529dbec4ded07e241fd93fe1",
+      "classification": "Effect service/workflow/native or compatibility edge"
+    },
+    {
+      "path": "packages/cli/src/commands/start.types.ts",
+      "lines": 90,
+      "sha256": "83d2ec4100b42af4f42a1fca1edc22afd0c61a280b20abbbb1f474e3509e83f0",
+      "classification": "pure contract or Schema"
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/domain.test.ts",
+      "lines": 226,
+      "sha256": "2c8316ee6de73222ab6e24298bef024299c8f58f116ae672696cc641f97f8fd4",
+      "classification": "test/strict/native verification"
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/native-fixture.ts",
+      "lines": 70,
+      "sha256": "a5df44fabb0d97b97630b1303e73e8e40dc49935561aa6e329b27a3f96c88ae6",
+      "classification": "test/strict/native verification"
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/native.acceptance.ts",
+      "lines": 171,
+      "sha256": "3ba685a1cb147f9d1c063069514ae1dee524bcf5867ee5839fa805bf55898cd0",
+      "classification": "test/strict/native verification"
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/observation.test.ts",
+      "lines": 55,
+      "sha256": "cf1d1765f6571662dca44abd2184c25313f617f57e7538743d0a70269e2ae37d",
+      "classification": "test/strict/native verification"
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/type-probes.test.ts",
+      "lines": 107,
+      "sha256": "3622e19aa63b696fb375b6d3eadc503bfd99860d085ae80c06c474ebb8b2a9d8",
+      "classification": "test/strict/native verification"
+    },
+    {
+      "path": "packages/cli/tests/start-doctor/compatibility.test.ts",
+      "classification": "controlled startup compatibility regression",
+      "sha256": "e42120c3ca2d2b31bb3be335a0add3f97e921bf5b0d0d8f258eb99328a4d61f9",
+      "lines": 38
+    }
+  ]
+}

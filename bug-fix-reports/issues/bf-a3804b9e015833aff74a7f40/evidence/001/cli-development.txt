@@ -1,0 +1,1800 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/dev.test.ts:
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.484084 operation=observability.emit outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.697292 operation=activation.source-change outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.448625 operation=candidate.compile outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=12.457583 operation=candidate.start outcome=success
+00:19:37 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.395792 operation=observability.emit outcome=failure
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.037542 operation=observability.emit outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.9605 operation=activation.compile.succeeded outcome=success
+00:19:37 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.083 operation=observability.emit outcome=failure
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.027875 operation=observability.emit outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.107791 operation=activation.start.succeeded outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=92.24175 operation=candidate.verify outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.784334 operation=observability.emit outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.032708 operation=observability.emit outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.958417 operation=activation.verification.succeeded outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.121458 operation=proxy.switch outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.398709 operation=observability.emit outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.024 operation=observability.emit outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.389 operation=activation.switch outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.030667 operation=observability.emit outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.472542 operation=activation.source-change outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.961041 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.741416 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.751125 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.648458 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.787708 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.897833 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.598958 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.531459 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.847833 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.944625 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.583042 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.621833 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.583541 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.5555 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.497083 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.9475 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.062375 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.67275 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.521834 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.931959 operation=proxy.request outcome=success
+00:19:37 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.610167 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.0465 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.797042 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.03075 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.696042 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.610417 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.491625 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.481875 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.567708 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.480084 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.676209 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.515834 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.442875 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.557792 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.483542 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.657458 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.466167 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.528291 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.500166 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.718167 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.426 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.558 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.454584 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.427459 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.538042 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.521541 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.458333 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.431917 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.40775 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.546334 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.514125 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.538667 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.523416 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.656083 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.006917 operation=proxy.request outcome=success
+00:19:38 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.453625 operation=proxy.request outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.492292 operation=proxy.request outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.454625 operation=proxy.request outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.488167 operation=proxy.request outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.489541 operation=proxy.request outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.38575 operation=proxy.request outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.473791 operation=proxy.request outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.641584 operation=proxy.request outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.524459 operation=proxy.request outcome=success
+00:19:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=1840.429 operation=candidate.compile outcome=failure
+00:19:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=1840.759917 operation=candidate.start outcome=failure
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.407584 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.025416 operation=observability.emit outcome=success
+00:19:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=1.379625 operation=activation.compile.failed outcome=failure
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.028208 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.647416 operation=activation.source-change outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.841625 operation=candidate.compile outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.779208 operation=candidate.start outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.293333 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016834 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.953583 operation=activation.compile.succeeded outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.221416 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014417 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.776375 operation=activation.start.succeeded outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=27.365083 operation=candidate.verify outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.336958 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.03475 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.425167 operation=activation.verification.succeeded outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.024708 operation=proxy.switch outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.364584 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014417 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.946458 operation=activation.switch outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2019.498125 operation=candidate.output outcome=success
+00:19:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=2010.604375 operation=candidate.exit outcome=failure
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.281792 operation=candidate.stop outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.879 operation=generation.drain outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.364208 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.029834 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.450375 operation=activation.drain outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.663833 operation=proxy.stop outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=56.005792 operation=candidate.output outcome=success
+00:19:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=58.316875 operation=candidate.exit outcome=failure
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=19.683416 operation=candidate.stop outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=24.747667 operation=generation.drain outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.05475 operation=observability.flush outcome=success
+(pass) serves the active generation throughout a CPU-heavy failed check and recovers [2091.57ms]
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.02925 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.720125 operation=activation.source-change outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.148084 operation=candidate.compile outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.488125 operation=candidate.start outcome=success
+00:19:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.088459 operation=observability.emit outcome=failure
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.022416 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.744625 operation=activation.compile.succeeded outcome=success
+00:19:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.06675 operation=observability.emit outcome=failure
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.018167 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.638875 operation=activation.start.succeeded outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=28.436708 operation=candidate.verify outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.373666 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016708 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.338667 operation=activation.verification.succeeded outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.034625 operation=proxy.switch outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.272209 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015917 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.96375 operation=activation.switch outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.025666 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.7325 operation=activation.source-change outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.692167 operation=candidate.compile outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.859584 operation=candidate.start outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.310375 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015666 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.955292 operation=activation.compile.succeeded outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.227875 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013375 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.797584 operation=activation.start.succeeded outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.926375 operation=candidate.verify outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.308958 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016042 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.0665 operation=activation.verification.succeeded outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.327417 operation=proxy.switch outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.566 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.040958 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.316958 operation=activation.switch outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=641.621166 operation=candidate.output outcome=success
+00:19:39 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=638.768583 operation=candidate.exit outcome=failure
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.818708 operation=candidate.stop outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.0165 operation=generation.drain outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.361125 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015875 operation=observability.emit outcome=success
+00:19:39 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.095291 operation=activation.drain outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.029375 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.692708 operation=activation.source-change outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.926834 operation=candidate.compile outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.230333 operation=candidate.start outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.305375 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017125 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.970083 operation=activation.compile.succeeded outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.2195 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.020416 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.814459 operation=activation.start.succeeded outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.356583 operation=candidate.verify outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.4325 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.021542 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.190834 operation=activation.verification.succeeded outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.020917 operation=proxy.switch outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.347875 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017958 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.881333 operation=activation.switch outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=169.171292 operation=candidate.output outcome=success
+00:19:40 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=166.476959 operation=candidate.exit outcome=failure
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.7055 operation=candidate.stop outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.975708 operation=generation.drain outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.276625 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015792 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.820875 operation=activation.drain outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.027416 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.718 operation=activation.source-change outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.014333 operation=candidate.compile outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.775958 operation=candidate.start outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.303334 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015167 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.969666 operation=activation.compile.succeeded outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.197292 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011625 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.777042 operation=activation.start.succeeded outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=24.48575 operation=candidate.verify outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.3285 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.035125 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.049625 operation=activation.verification.succeeded outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.023208 operation=proxy.switch outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.389875 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013542 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.94575 operation=activation.switch outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=769.871208 operation=candidate.output outcome=success
+00:19:40 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=766.912833 operation=candidate.exit outcome=failure
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.570042 operation=candidate.stop outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.204666 operation=generation.drain outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.481833 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011291 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.183417 operation=activation.drain outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.027167 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.731792 operation=activation.source-change outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.985333 operation=candidate.compile outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.438625 operation=candidate.start outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.325708 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.020583 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.045708 operation=activation.compile.succeeded outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.239916 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.019458 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.808542 operation=activation.start.succeeded outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.22725 operation=candidate.verify outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.331416 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0165 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.033208 operation=activation.verification.succeeded outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.025292 operation=proxy.switch outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.355834 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017083 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.888584 operation=activation.switch outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=151.958208 operation=candidate.output outcome=success
+00:19:40 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=148.919708 operation=candidate.exit outcome=failure
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.553125 operation=candidate.stop outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.8085 operation=generation.drain outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.299917 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0115 operation=observability.emit outcome=success
+00:19:40 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.878792 operation=activation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.033583 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.762875 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.034958 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.708708 operation=candidate.start outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.430542 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016375 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.22975 operation=activation.compile.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.217291 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012791 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.791792 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.103375 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.297791 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016416 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.132 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0325 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.393792 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016916 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.986709 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=158.764 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=155.928458 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.959584 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.661375 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.264875 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014166 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.92125 operation=activation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.040875 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.097833 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.395084 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.205458 operation=candidate.start outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.416 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.019375 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.28475 operation=activation.compile.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.285541 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.022958 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.992125 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.781959 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.301709 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.961667 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.021041 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.374625 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.956666 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=314.396917 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=310.894416 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.836416 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.65675 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.309 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0205 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.029667 operation=activation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.329208 operation=proxy.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=46.92925 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=43.164375 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.3435 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.174166 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.019917 operation=observability.flush outcome=success
+(pass) holds reload until a real scaffold transaction finishes installation or rollback [2054.63ms]
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.021292 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.623292 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.244875 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.658958 operation=candidate.start outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.061792 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.038667 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.675083 operation=activation.compile.succeeded outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.041208 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013917 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.553458 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=27.945 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.28625 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015041 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.926833 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.021208 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.229666 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011833 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.938625 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.556625 operation=proxy.request outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.271917 operation=proxy.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=38.904875 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=36.62575 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.634583 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.299167 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.018208 operation=observability.flush outcome=success
+(pass) owns a stable proxy, dynamic backend, candidate, and clean stop [53.32ms]
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.023459 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.586917 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.019375 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.121291 operation=candidate.start outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.067209 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014209 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.625958 operation=activation.compile.succeeded outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.033959 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011042 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.47675 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=27.274125 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.352958 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.01725 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.646416 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.033292 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.276667 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.024875 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.540333 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0215 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.481333 operation=activation.source-change outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=2.864334 operation=candidate.compile outcome=failure
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=3.179417 operation=candidate.start outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.401584 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.020584 operation=observability.emit outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=1.1705 operation=activation.compile.failed outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.496875 operation=proxy.request outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.269792 operation=proxy.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=47.45325 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=45.421666 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.733083 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.366417 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.01225 operation=observability.flush outcome=success
+(pass) keeps the active backend when a later candidate fails [59.84ms]
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.067958 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.600959 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.118167 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.229292 operation=candidate.start outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.060917 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014041 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.651125 operation=activation.compile.succeeded outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.043709 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017708 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.597875 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=25.992625 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.329041 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.054042 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.019208 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.210167 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.747 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.010667 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.281333 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.794083 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.896416 operation=candidate.start outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.301375 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012167 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.895666 operation=activation.compile.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.196666 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011833 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.685542 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=31.785333 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=29.455958 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.611209 operation=candidate.stop outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=30.251084 operation=candidate.verify outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.28825 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014791 operation=observability.emit outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.927667 operation=activation.verification.failed outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.010666 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.277167 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.795292 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.608 operation=candidate.start outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.315833 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015875 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.991291 operation=activation.compile.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.206334 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.756125 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=28.483542 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.369375 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013667 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.092792 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.019209 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.336458 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0115 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.9125 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=114.25775 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=111.953708 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.452875 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.191541 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.310125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011541 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.953209 operation=activation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.306958 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.270125 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.055958 operation=candidate.start outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.296875 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016208 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.916542 operation=activation.compile.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.20375 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.009875 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.727417 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=29.568625 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=26.813125 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.7375 operation=candidate.stop outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=27.686875 operation=candidate.verify outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.288084 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012209 operation=observability.emit outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.883 operation=activation.verification.failed outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.010458 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.305083 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.771875 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.041416 operation=candidate.start outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.290083 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013542 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.920208 operation=activation.compile.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.215833 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011166 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.747875 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.323834 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.301125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011917 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.961209 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.021792 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.379584 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015917 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.010333 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=118.638 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=115.859375 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.649875 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.3155 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.219959 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014458 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.743959 operation=activation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.010583 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.247167 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.619042 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.824541 operation=candidate.start outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.277375 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011333 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.812875 operation=activation.compile.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.183583 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.009666 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.6685 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=31.395292 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=29.203125 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.668292 operation=candidate.stop outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=30.162542 operation=candidate.verify outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.321791 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014791 operation=observability.emit outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=1.031667 operation=activation.verification.failed outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013083 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.283667 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.640792 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.003125 operation=candidate.start outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.366 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.01825 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.004417 operation=activation.compile.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.207458 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.01175 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.737458 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=27.873584 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.329917 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.01425 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.016708 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.02675 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.352958 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013458 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.941583 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=116.843666 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=114.143167 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.469458 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.075792 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.2305 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012916 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.780209 operation=activation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.231709 operation=proxy.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=40.665375 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=38.587834 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.807708 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.609542 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012083 operation=observability.flush outcome=success
+(pass) retains fingerprints only for active or draining generations across failed verifications [301.66ms]
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.021125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.498584 operation=activation.source-change outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.668708 operation=candidate.compile outcome=failure
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.87575 operation=candidate.start outcome=failure
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.055 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015458 operation=observability.emit outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.574959 operation=activation.compile.failed outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.135875 operation=proxy.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0125 operation=observability.flush outcome=success
+(pass) preserves the initial candidate failure [8.75ms]
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.021625 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.461875 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.658875 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.431875 operation=candidate.start outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.065041 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.018542 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.67925 operation=activation.compile.succeeded outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.044542 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012875 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.56325 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.045542 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.283791 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014375 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.9365 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.022542 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.221625 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.010083 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.781167 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.798625 operation=proxy.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=35.802417 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=33.525666 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.681375 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.488875 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016292 operation=observability.flush outcome=success
+(pass) stops an inspector child through the external shutdown signal [53.65ms]
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0315 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.557417 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.972 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.946333 operation=candidate.start outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.065625 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016625 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.642917 operation=activation.compile.succeeded outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.033667 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012167 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.5375 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=32.591708 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.434625 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.02075 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.25075 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.039125 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.227791 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.019125 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.934625 operation=activation.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.404125 operation=proxy.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=44.061208 operation=candidate.output outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=42.284375 operation=candidate.exit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.276209 operation=candidate.stop outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.933541 operation=generation.drain outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014209 operation=observability.flush outcome=success
+(pass) releases the backend port when its terminal closes [60.26ms]
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.030083 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.607042 operation=activation.source-change outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.601292 operation=candidate.compile outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.343459 operation=candidate.start outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.063708 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.019 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.66625 operation=activation.compile.succeeded outcome=success
+00:19:41 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.044625 operation=observability.emit outcome=failure
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014833 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.486291 operation=activation.start.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=36.072125 operation=candidate.verify outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.325042 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.01725 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.959666 operation=activation.verification.succeeded outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.02425 operation=proxy.switch outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.230041 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.0105 operation=observability.emit outcome=success
+00:19:41 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.728209 operation=activation.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.057583 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.384375 operation=activation.source-change outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.877666 operation=candidate.compile outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.953833 operation=candidate.start outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.297916 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015459 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.916125 operation=activation.compile.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.21875 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011083 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.719333 operation=activation.start.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=39.08325 operation=candidate.verify outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.390583 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013333 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.118875 operation=activation.verification.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.029042 operation=proxy.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.310208 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011167 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.787125 operation=activation.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=191.748041 operation=candidate.output outcome=success
+00:19:42 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=189.554542 operation=candidate.exit outcome=failure
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.204709 operation=candidate.stop outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.04475 operation=generation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.237417 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.01225 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.859916 operation=activation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.030041 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.644333 operation=activation.source-change outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.801208 operation=candidate.compile outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=14.244958 operation=candidate.start outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.343083 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.01475 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.034458 operation=activation.compile.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.236958 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011083 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.765292 operation=activation.start.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=47.422792 operation=candidate.verify outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.480208 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017708 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.289791 operation=activation.verification.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.036916 operation=proxy.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.34875 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013167 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.906917 operation=activation.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=206.05625 operation=candidate.output outcome=success
+00:19:42 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=203.439292 operation=candidate.exit outcome=failure
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.49575 operation=candidate.stop outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.1785 operation=generation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.273916 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.024166 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.090417 operation=activation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.073916 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.464125 operation=activation.source-change outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=71.540166 operation=candidate.compile outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=205.563125 operation=candidate.start outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.374667 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014875 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.081041 operation=activation.compile.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.206292 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.010709 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.730583 operation=activation.start.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=29.496833 operation=candidate.verify outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.335625 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.038625 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.160875 operation=activation.verification.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.029459 operation=proxy.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.569083 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.023708 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.878333 operation=activation.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=396.662042 operation=candidate.output outcome=success
+00:19:42 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=394.084542 operation=candidate.exit outcome=failure
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.352459 operation=candidate.stop outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=10.552166 operation=generation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.306667 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.027333 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.633625 operation=activation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.025166 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.673667 operation=activation.source-change outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.030209 operation=candidate.compile outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.418541 operation=candidate.start outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.347792 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016292 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.032583 operation=activation.compile.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.211209 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013208 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.765292 operation=activation.start.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=31.163292 operation=candidate.verify outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.356208 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.024208 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.062791 operation=activation.verification.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.026625 operation=proxy.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.613958 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.018209 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.307834 operation=activation.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=185.049208 operation=candidate.output outcome=success
+00:19:42 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=181.987208 operation=candidate.exit outcome=failure
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.6755 operation=candidate.stop outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.323375 operation=generation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.254333 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.010458 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.765125 operation=activation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.027666 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.710542 operation=activation.source-change outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.265375 operation=candidate.compile outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.098959 operation=candidate.start outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.330167 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014125 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.972042 operation=activation.compile.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.207917 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.010042 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.724583 operation=activation.start.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=23.6585 operation=candidate.verify outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.305292 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014625 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.0345 operation=activation.verification.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.042458 operation=proxy.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.398625 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.958333 operation=activation.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=158.498041 operation=candidate.output outcome=success
+00:19:42 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=155.824792 operation=candidate.exit outcome=failure
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.980125 operation=candidate.stop outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.604042 operation=generation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.227875 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012583 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.790833 operation=activation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.02775 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.693334 operation=activation.source-change outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.388833 operation=candidate.compile outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.860834 operation=candidate.start outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.326916 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013833 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.994583 operation=activation.compile.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.195709 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011166 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.706417 operation=activation.start.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=40.134166 operation=candidate.verify outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.302 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012791 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.965959 operation=activation.verification.succeeded outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.021875 operation=proxy.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.338417 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.020625 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.89775 operation=activation.switch outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=167.5895 operation=candidate.output outcome=success
+00:19:42 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=164.746792 operation=candidate.exit outcome=failure
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.630459 operation=candidate.stop outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.141167 operation=generation.drain outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.365375 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017459 operation=observability.emit outcome=success
+00:19:42 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.982792 operation=activation.drain outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.026042 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.83275 operation=activation.source-change outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.174791 operation=candidate.compile outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=6.056333 operation=candidate.start outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.294959 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014125 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.926834 operation=activation.compile.succeeded outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.249416 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.00975 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.756583 operation=activation.start.succeeded outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=31.758625 operation=candidate.verify outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.285541 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.023417 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.103875 operation=activation.verification.succeeded outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.027833 operation=proxy.switch outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.305083 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.009625 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.759208 operation=activation.switch outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=175.09225 operation=candidate.output outcome=success
+00:19:43 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=172.30675 operation=candidate.exit outcome=failure
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.878833 operation=candidate.stop outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.615125 operation=generation.drain outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.28225 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.012916 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.869958 operation=activation.drain outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.31625 operation=proxy.stop outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=57.0715 operation=candidate.output outcome=success
+00:19:43 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=54.56125 operation=candidate.exit outcome=failure
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.253209 operation=candidate.stop outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3.874625 operation=generation.drain outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017625 operation=observability.flush outcome=success
+(pass) forwards source, directory, and root configuration changes through the watcher [1237.49ms]
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.021042 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.659084 operation=activation.source-change outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.086042 operation=candidate.compile outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.561708 operation=candidate.start outcome=success
+00:19:43 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.063375 operation=observability.emit outcome=failure
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015458 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.566459 operation=activation.compile.succeeded outcome=success
+00:19:43 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.029916 operation=observability.emit outcome=failure
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.01175 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.456333 operation=activation.start.succeeded outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=26.304958 operation=candidate.verify outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.309875 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017083 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.007292 operation=activation.verification.succeeded outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.060875 operation=proxy.switch outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.259667 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014208 operation=observability.emit outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.836792 operation=activation.switch outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.580416 operation=proxy.request outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.447459 operation=proxy.stop outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=64.578417 operation=candidate.output outcome=success
+00:19:43 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=68.203833 operation=candidate.exit outcome=failure
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=7.64325 operation=candidate.stop outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=9.152375 operation=generation.drain outcome=success
+00:19:43 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.014541 operation=observability.flush outcome=success
+(pass) forwards backend console output through dev logs [88.76ms]
+(pass) redacts candidate output before callbacks and human sinks [0.89ms]
+(pass) prefers the workspace Next inspector and configured port by default [0.36ms]
+(pass) prefers source when a compiled CLI also contains the packaged inspector [1.68ms]
+(pass) reads the inspector port from relkit.config.ts unless the CLI overrides it [26.85ms]
+
+packages/cli/dev-persistence.test.ts:
+00:19:44 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.071916 operation=observability.emit outcome=success
+00:19:44 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.043875 operation=activation.source-change outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3660.456875 operation=candidate.compile outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3665.933959 operation=candidate.start outcome=success
+00:19:48 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.099792 operation=observability.emit outcome=failure
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.019792 operation=observability.emit outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.87575 operation=activation.compile.succeeded outcome=success
+00:19:48 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.038625 operation=observability.emit outcome=failure
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011042 operation=observability.emit outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.694625 operation=activation.start.succeeded outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=414.7535 operation=candidate.verify outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.462708 operation=observability.emit outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017833 operation=observability.emit outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.989625 operation=activation.verification.succeeded outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.035542 operation=proxy.switch outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.261292 operation=observability.emit outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.013167 operation=observability.emit outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.185292 operation=activation.switch outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=4.144125 operation=observability.append outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.159875 operation=observability.append outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.157541 operation=observability.append outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.14075 operation=observability.append outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=65.32825 operation=proxy.request outcome=success
+00:19:48 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=14.174917 operation=proxy.request outcome=success
+00:19:49 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=1.081041 operation=observability.open outcome=success
+00:19:49 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.140583 operation=proxy.intercept outcome=success
+00:19:49 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.028625 operation=observability.emit outcome=success
+00:19:49 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.94175 operation=activation.source-change outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2562.739583 operation=candidate.compile outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2567.494375 operation=candidate.start outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.580583 operation=observability.emit outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.018375 operation=observability.emit outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.835208 operation=activation.compile.succeeded outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.228583 operation=observability.emit outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.011375 operation=observability.emit outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.083042 operation=activation.start.succeeded outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.379709 operation=observability.append outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.137417 operation=observability.append outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.13325 operation=observability.append outcome=success
+00:19:51 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.118167 operation=observability.append outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=422.133083 operation=candidate.verify outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.320834 operation=observability.emit outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.020625 operation=observability.emit outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.50325 operation=activation.verification.succeeded outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.020833 operation=proxy.switch outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.331667 operation=observability.emit outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016125 operation=observability.emit outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.083333 operation=activation.switch outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2.963292 operation=observability.append outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.124167 operation=observability.append outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.144834 operation=observability.append outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.132917 operation=observability.append outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.118083 operation=observability.append outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3851.101875 operation=candidate.output outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=3848.840334 operation=candidate.exit outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=34.79575 operation=candidate.stop outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=36.811584 operation=generation.drain outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.312291 operation=observability.emit outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.015167 operation=observability.emit outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.415667 operation=activation.drain outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.416292 operation=observability.append outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.271542 operation=observability.append outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.983042 operation=proxy.stop outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=522.1385 operation=candidate.output outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=517.211833 operation=candidate.exit outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=47.590959 operation=candidate.stop outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=49.823041 operation=generation.drain outcome=success
+00:19:52 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.023833 operation=observability.flush outcome=success
+00:19:52 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.257917 operation=owner.dispose outcome=success
+00:19:54 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.069833 operation=observability.emit outcome=success
+00:19:54 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.277583 operation=activation.source-change outcome=success
+00:19:57 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2952.547417 operation=candidate.compile outcome=success
+00:19:57 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=2959.102958 operation=candidate.start outcome=success
+00:19:57 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.196834 operation=observability.emit outcome=failure
+00:19:57 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.035834 operation=observability.emit outcome=success
+00:19:57 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.768375 operation=activation.compile.succeeded outcome=success
+00:19:57 ERROR supervisor Execution operation failed
+               domain=supervisor duration_ms=0.096792 operation=observability.emit outcome=failure
+00:19:57 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.016417 operation=observability.emit outcome=success
+00:19:57 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.214042 operation=activation.start.succeeded outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=422.477 operation=candidate.verify outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.39025 operation=observability.emit outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.037 operation=observability.emit outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.820209 operation=activation.verification.succeeded outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.038542 operation=proxy.switch outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.223916 operation=observability.emit outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.020166 operation=observability.emit outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=1.279834 operation=activation.switch outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=5.833042 operation=observability.append outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.15375 operation=observability.append outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.171125 operation=observability.append outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.142042 operation=observability.append outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=64.871791 operation=proxy.request outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.558167 operation=proxy.stop outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=692.776959 operation=candidate.output outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=688.714125 operation=candidate.exit outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=34.517042 operation=candidate.stop outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=36.508375 operation=generation.drain outcome=success
+00:19:58 INFO  supervisor Execution operation completed
+               domain=supervisor duration_ms=0.017167 operation=observability.flush outcome=success
+00:19:58 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.076292 operation=owner.dispose outcome=success
+00:19:58 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.043542 operation=owner.dispose outcome=success
+(pass) generated backend reloads preserve committed telemetry without bundling the native driver [14675.25ms]
+00:19:58 INFO  inspector Execution operation completed
+               domain=inspector duration_ms=0.076208 operation=owner.dispose outcome=success
+(pass) remote capture redacts before transport and reports dropped records without failing application work [282.29ms]
+
+packages/cli/tests/services/dev-inspector-installation.test.ts:
+(pass) inspector overrides reject a package manifest that escapes the selected directory [1.39ms]
+(pass) source overrides retain different checkouts, relative paths and directory symlinks [1.01ms]
+(pass) the executable rejects an escaped manifest before starting the initial compiler [858.66ms]
+
+packages/cli/tests/services/dev-initial-native.test.ts:
+(pass) initial development SIGTERM joins the CPU-bound compiler group within the strict shutdown limit [1025.26ms]
+
+ 20 pass
+ 0 fail
+ 182 expect() calls
+Ran 20 tests across 4 files. [23.98s]

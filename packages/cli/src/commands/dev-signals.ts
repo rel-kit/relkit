@@ -1,5 +1,12 @@
 import type { DevLog, DevOptions } from "./dev.js";
 
+/**
+ * Admits native shutdown requests into the owning engine's synchronous latch.
+ * @param options - Manual-owner signal policy; CLI frontend handles INT/TERM separately.
+ * @param log - Borrowed shutdown presentation callback.
+ * @param stop - Synchronous native request latch or legacy public shutdown edge.
+ * @returns Exact listener removal; the caller's Scope owns this release.
+ */
 export function installDevSignals(
   options: DevOptions,
   log: DevLog,

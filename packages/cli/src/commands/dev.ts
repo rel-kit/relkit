@@ -1,68 +1,49 @@
-import type { LoggerOptions, LogLevel, LogRecord } from "@relkit/runtime-effect";
-import type { JsonValue } from "@relkit/contracts";
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
-import type {
-  CandidateCompile,
-  StartedCandidate,
-  SupervisorObservabilityOptions,
-} from "@relkit/supervisor";
+import { Effect } from "effect";
+import { cliTry } from "../cli-errors.js";
+import { observeCli } from "../cli-runtime.js";
+import { makeDevSessionEngineEffect } from "./dev-session-engine.js";
 import { DevSession } from "./dev-session.js";
-import type { DevInspectorOptions } from "./dev-process.js";
-
-export interface DevLogEvent {
-  readonly level: LogLevel;
-  readonly event: string;
-  readonly fields?: Readonly<Record<string, JsonValue>>;
-}
-export type DevLog = (event: DevLogEvent) => void;
-export type DevActivationFingerprint =
-  | RuntimeActivationFingerprint
-  | ((
-      candidate: StartedCandidate,
-    ) => RuntimeActivationFingerprint | PromiseLike<RuntimeActivationFingerprint>);
-
-export interface DevLocalServices {
-  readonly close: () => Promise<void>;
-}
-
-export interface DevOptions {
-  readonly projectRoot?: string;
-  readonly compile: CandidateCompile;
-  readonly activationFingerprint?: DevActivationFingerprint;
-  readonly hostname?: string;
-  readonly candidateHostname?: string;
-  readonly stablePort?: number;
-  readonly generatedDirectory?: string;
-  readonly environment?: Readonly<Record<string, string | undefined>>;
-  readonly maxStartupOutputBytes?: number;
-  readonly candidateStopTimeoutMs?: number;
-  readonly healthTimeoutMs?: number;
-  readonly drainTimeoutMs?: number;
-  readonly inspector?: DevInspectorOptions | false;
-  readonly spawn?: typeof Bun.spawn;
-  readonly signal?: AbortSignal;
-  readonly installSignalHandlers?: boolean;
-  readonly logger?: Omit<LoggerOptions, "component">;
-  readonly onLog?: DevLog;
-  readonly onRecord?: (record: LogRecord, origin: "application" | "relkit" | "inspector") => void;
-  readonly intercept?: (request: Request) => Promise<Response> | undefined;
-  readonly onStopping?: () => void;
-  readonly terminal?: {
-    readonly verbose?: boolean;
-    readonly color?: boolean;
-    readonly columns?: number;
-  };
-  readonly observability?: Omit<SupervisorObservabilityOptions, "activationFingerprint">;
-  readonly localServices?: DevLocalServices;
-}
-
+import type { DevOptions } from "./dev.types.js";
+export type {
+  DevActivationFingerprint,
+  DevLog,
+  DevLogEvent,
+  DevLocalServices,
+  DevOptions,
+} from "./dev.types.js";
 export { DevSession } from "./dev-session.js";
 
-export async function startDev(options: DevOptions): Promise<DevSession> {
+/**
+ * Acquires a session in the caller's native lifetime.
+ * @param options - Explicit compiler, output, process and logging policy.
+ * @returns Started facade with captured native operations; Scope release joins shutdown.
+ */
+export const acquireDevSessionEffect = Effect.fn("Dev.session")(
+  function* (options: DevOptions) {
+    const session = yield* cliTry("dev.session.create", () => new DevSession(options));
+    const engine = yield* makeDevSessionEngineEffect(session);
+    yield* engine.start;
+    return session;
+  },
+  (effect, _options: DevOptions) => observeCli("dev.session.acquire", effect),
+);
+
+/** Starts and returns the manually owned public development session.
+ * @param options - Development policy.
+ * @returns Public manually owned session.
+ */
+export function startDev(options: DevOptions): Promise<DevSession> {
   return new DevSession(options).start();
 }
-
+/** Runs development until the session's scoped shutdown completes.
+ * @param options - Development policy.
+ * @returns Completion after joined session shutdown.
+ */
 export async function runDev(options: DevOptions): Promise<void> {
   const session = await startDev(options);
-  await session.waitForShutdown();
+  try {
+    await session.waitForShutdown();
+  } finally {
+    await session.stop();
+  }
 }

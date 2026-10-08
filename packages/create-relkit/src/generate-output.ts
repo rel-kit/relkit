@@ -1,24 +1,14 @@
 import { basename, relative, resolve } from "node:path";
+
 import type { CreateOptions } from "./options.js";
 
-export interface GenerateNextSteps {
-  readonly commands: Readonly<{
-    readonly cd: string;
-    readonly install?: "bun install";
-    readonly dev: "bun run dev";
-    readonly test: "bun run test";
-    readonly check: "bun run check";
-    readonly build: "bun run build";
-  }>;
-  readonly endpoints: Readonly<{
-    readonly backend: "http://localhost:3000";
-    readonly inspector: "http://localhost:3210";
-    readonly openapi: "http://localhost:3000/_relkit/v1/openapi.json";
-    readonly apiReference: "http://localhost:3000/_relkit/v1/api-reference";
-    readonly route?: "GET http://localhost:3000/hello?name=RelKit";
-  }>;
-}
-
+/**
+ * Builds local commands and endpoints for a generated project.
+ * @param options - Installation and examples flags.
+ * @param destination - Generated project's absolute destination path.
+ * @param cwd - Working directory for the operation.
+ * @returns Frozen commands and endpoints reflecting installation and example choices.
+ */
 export function createGenerateNextSteps(
   options: Pick<CreateOptions, "examples" | "install">,
   destination: string,
@@ -43,6 +33,11 @@ export function createGenerateNextSteps(
   return Object.freeze({ commands, endpoints });
 }
 
+/**
+ * Formats a recognizable generation result for terminal display.
+ * @param value - Generation result or an unrecognized output value.
+ * @returns Success details, commands, endpoints and warnings; other values use JSON serialization.
+ */
 export function formatGenerateResult(value: unknown): string {
   if (!isRecord(value) || !isNextSteps(value.nextSteps)) return JSON.stringify(value);
   const { commands, endpoints } = value.nextSteps;
@@ -74,11 +69,21 @@ export function formatGenerateResult(value: unknown): string {
   ].join("\n");
 }
 
+/**
+ * Quotes a generated directory as one safe shell argument.
+ * @param value - Directory path placed in the displayed cd command.
+ * @returns The literal safe word or a single-quoted word with escaped apostrophes.
+ */
 function shellWord(value: string): string {
   if (/^[A-Za-z0-9_./@-]+$/.test(value)) return value.startsWith("-") ? `./${value}` : value;
   return `'${value.replaceAll("'", "'\\''")}'`;
 }
 
+/**
+ * Checks that an unknown result contains the supported commands and endpoints.
+ * @param value - Unknown nextSteps field.
+ * @returns Whether the value matches the generated next-steps contract.
+ */
 function isNextSteps(value: unknown): value is GenerateNextSteps {
   if (!isRecord(value) || !isRecord(value.commands) || !isRecord(value.endpoints)) return false;
   const commands = value.commands;
@@ -99,6 +104,14 @@ function isNextSteps(value: unknown): value is GenerateNextSteps {
   );
 }
 
-function isRecord(value: unknown): value is Record<string, any> {
+/**
+ * Narrows an unknown value to a non-null object excluding arrays.
+ * @param value - Unknown value at the object boundary.
+ * @returns Whether the value is a non-null, non-array object.
+ */
+function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
+
+import type { GenerateNextSteps } from "./generate-output.types.js";
+export type { GenerateNextSteps } from "./generate-output.types.js";

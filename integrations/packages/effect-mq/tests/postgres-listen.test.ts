@@ -1,7 +1,7 @@
 import { PgClient, type PgConnection } from "@effect/sql-pg";
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber, Queue, Stream } from "effect";
-import { ConnectionError, SqlError } from "effect/unstable/sql/SqlError";
+import { ConnectionError, SqlError } from "effect/sql/SqlError";
 import { JobStore } from "effect-mq";
 import { DrizzleJobStore } from "effect-mq/drizzle-postgres";
 import { createEffectMqPostgresSchema } from "../src/postgres.js";
