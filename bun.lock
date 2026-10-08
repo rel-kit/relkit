@@ -189,7 +189,7 @@
     },
     "integrations/catalog": {
       "name": "@relkit/integrations",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/aws": "workspace:*",
         "@relkit/cloudflare": "workspace:*",
@@ -207,7 +207,7 @@
     },
     "integrations/packages/aws": {
       "name": "@relkit/aws",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@pulumi/aws": "catalog:",
         "@relkit/deploy": "workspace:*",
@@ -216,7 +216,7 @@
     },
     "integrations/packages/cloudflare": {
       "name": "@relkit/cloudflare",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/buckets": "workspace:*",
         "@relkit/cache": "workspace:*",
@@ -226,7 +226,7 @@
     },
     "integrations/packages/docker": {
       "name": "@relkit/docker",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/local-service": "workspace:*",
         "@relkit/provider": "workspace:*",
@@ -234,7 +234,7 @@
     },
     "integrations/packages/effect-mq": {
       "name": "@relkit/effect-mq",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@effect/sql-pg": "catalog:",
         "@relkit/contracts": "workspace:*",
@@ -253,7 +253,7 @@
     },
     "integrations/packages/inngest": {
       "name": "@relkit/inngest",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/jobs": "workspace:*",
@@ -264,7 +264,7 @@
     },
     "integrations/packages/local": {
       "name": "@relkit/local",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/local-service": "workspace:*",
@@ -274,7 +274,7 @@
     },
     "integrations/packages/otlp": {
       "name": "@relkit/otlp",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/observability": "workspace:*",
@@ -283,14 +283,14 @@
     },
     "integrations/packages/pulumi": {
       "name": "@relkit/pulumi",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/deploy": "workspace:*",
       },
     },
     "integrations/packages/redis": {
       "name": "@relkit/redis",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/agents": "workspace:*",
         "@relkit/cache": "workspace:*",
@@ -303,7 +303,7 @@
     },
     "integrations/packages/s3": {
       "name": "@relkit/s3",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/buckets": "workspace:*",
         "@relkit/local-service": "workspace:*",
@@ -312,7 +312,7 @@
     },
     "integrations/packages/sentry": {
       "name": "@relkit/sentry",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/observability": "workspace:*",
         "@relkit/provider": "workspace:*",
@@ -321,7 +321,7 @@
     },
     "integrations/packages/trigger": {
       "name": "@relkit/trigger",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/jobs": "workspace:*",
@@ -334,7 +334,7 @@
     },
     "packages/agents": {
       "name": "@relkit/agents",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@cfworker/json-schema": "4.1.1",
         "@langchain/core": "catalog:",
@@ -367,7 +367,7 @@
     },
     "packages/app": {
       "name": "@relkit/app",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/agents": "workspace:*",
         "@relkit/buckets": "workspace:*",
@@ -394,7 +394,7 @@
     },
     "packages/better-auth": {
       "name": "@relkit/better-auth",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/client": "workspace:*",
         "@relkit/contracts": "workspace:*",
@@ -417,7 +417,7 @@
     },
     "packages/buckets": {
       "name": "@relkit/buckets",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "effect": "catalog:",
@@ -429,7 +429,7 @@
     },
     "packages/cache": {
       "name": "@relkit/cache",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/schema": "workspace:*",
@@ -442,7 +442,7 @@
     },
     "packages/cli": {
       "name": "@relkit/cli",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "bin": {
         "relkit": "./dist/bin.js",
       },
@@ -485,7 +485,7 @@
     },
     "packages/client": {
       "name": "@relkit/client",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@orpc/client": "catalog:",
         "@orpc/contract": "catalog:",
@@ -510,7 +510,7 @@
     },
     "packages/client-generator": {
       "name": "@relkit/client-generator",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/graph": "workspace:*",
@@ -522,7 +522,7 @@
     },
     "packages/cloud-aws": {
       "name": "@relkit/cloud-aws",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@pulumi/aws": "catalog:",
         "@pulumi/awsx": "3.8.0",
@@ -539,7 +539,7 @@
     },
     "packages/compiler": {
       "name": "@relkit/compiler",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/client-generator": "workspace:*",
         "@relkit/contracts": "workspace:*",
@@ -558,7 +558,7 @@
     },
     "packages/config": {
       "name": "@relkit/config",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/provider": "workspace:*",
         "effect": "catalog:",
@@ -570,7 +570,7 @@
     },
     "packages/contracts": {
       "name": "@relkit/contracts",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -582,7 +582,7 @@
     },
     "packages/create-relkit": {
       "name": "create-relkit",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "bin": {
         "create-relkit": "./dist/bin.js",
       },
@@ -600,7 +600,7 @@
     },
     "packages/deploy": {
       "name": "@relkit/deploy",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/graph": "workspace:*",
@@ -608,7 +608,7 @@
     },
     "packages/deploy-pulumi": {
       "name": "@relkit/deploy-pulumi",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@pulumi/pulumi": "catalog:",
         "@relkit/contracts": "workspace:*",
@@ -620,7 +620,7 @@
     },
     "packages/diagnostics": {
       "name": "@relkit/diagnostics",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "effect": "catalog:",
@@ -632,7 +632,7 @@
     },
     "packages/drizzle": {
       "name": "@relkit/drizzle",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/invocation": "workspace:*",
@@ -647,7 +647,7 @@
     },
     "packages/engine": {
       "name": "@relkit/engine",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/app": "workspace:*",
         "@relkit/buckets": "workspace:*",
@@ -670,7 +670,7 @@
     },
     "packages/events": {
       "name": "@relkit/events",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/functions": "workspace:*",
@@ -686,7 +686,7 @@
     },
     "packages/functions": {
       "name": "@relkit/functions",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/buckets": "workspace:*",
         "@relkit/cache": "workspace:*",
@@ -702,7 +702,7 @@
     },
     "packages/graph": {
       "name": "@relkit/graph",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "effect": "catalog:",
@@ -713,7 +713,7 @@
     },
     "packages/inspector-api": {
       "name": "@relkit/inspector-api",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/observability": "workspace:*",
@@ -728,7 +728,7 @@
     },
     "packages/invocation": {
       "name": "@relkit/invocation",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/schema": "workspace:*",
@@ -741,7 +741,7 @@
     },
     "packages/jobs": {
       "name": "@relkit/jobs",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/functions": "workspace:*",
@@ -755,7 +755,7 @@
     },
     "packages/local-service": {
       "name": "@relkit/local-service",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/provider": "workspace:*",
@@ -768,7 +768,7 @@
     },
     "packages/observability": {
       "name": "@relkit/observability",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@duckdb/node-api": "1.5.5-r.4",
         "@relkit/contracts": "workspace:*",
@@ -781,7 +781,7 @@
     },
     "packages/openapi": {
       "name": "@relkit/openapi",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/graph": "workspace:*",
@@ -794,7 +794,7 @@
     },
     "packages/provider": {
       "name": "@relkit/provider",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "effect": "catalog:",
@@ -806,7 +806,7 @@
     },
     "packages/providers-local": {
       "name": "@relkit/providers-local",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/agents": "workspace:*",
         "@relkit/buckets": "workspace:*",
@@ -826,11 +826,11 @@
     },
     "packages/providers-standard": {
       "name": "@relkit/providers-standard",
-      "version": "0.6.0",
+      "version": "0.7.0",
     },
     "packages/realtime": {
       "name": "@relkit/realtime",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/schema": "workspace:*",
@@ -843,7 +843,7 @@
     },
     "packages/routes": {
       "name": "@relkit/routes",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/functions": "workspace:*",
@@ -861,7 +861,7 @@
     },
     "packages/runtime-effect": {
       "name": "@relkit/runtime-effect",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node-shared": "catalog:",
@@ -879,7 +879,7 @@
     },
     "packages/runtime-hono": {
       "name": "@relkit/runtime-hono",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@ag-ui/core": "0.0.59",
         "@modelcontextprotocol/server": "2.0.0",
@@ -916,7 +916,7 @@
     },
     "packages/schema": {
       "name": "@relkit/schema",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -927,7 +927,7 @@
     },
     "packages/services": {
       "name": "@relkit/services",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/events": "workspace:*",
@@ -944,7 +944,7 @@
     },
     "packages/supervisor": {
       "name": "@relkit/supervisor",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/observability": "workspace:*",
@@ -958,7 +958,7 @@
     },
     "packages/testing": {
       "name": "@relkit/testing",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@langchain/core": "catalog:",
         "@relkit/agents": "workspace:*",
@@ -992,7 +992,7 @@
     },
     "packages/tools": {
       "name": "@relkit/tools",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/functions": "workspace:*",
@@ -1037,11 +1037,11 @@
     "drizzle-orm": "1.0.0-rc.5-169397b",
     "effect": "4.0.1",
     "effect-mq": "0.7.0",
-    "hono": "4.13.5",
+    "hono": "4.13.7",
     "inngest": "4.20.0",
     "langchain": "1.5.10",
     "lucide-react": "1.34.0",
-    "next": "16.3.6",
+    "next": "16.3.8",
     "prettier": "3.9.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -1535,23 +1535,23 @@
 
     "@mongodb-js/saslprep": ["@mongodb-js/saslprep@1.5.2", "", { "dependencies": { "sparse-bitfield": "^3.0.3" } }, "sha512-UBvCBdPHAmiiDNEpD2ORBGzna4qYr06fLELfGDPW3/KZ9uLK+cGT9npAc/x/6/8SLzdbILMuc3HWFQ0FvJMhCw=="],
 
-    "@next/env": ["@next/env@16.3.6", "", {}, "sha512-x9Vblze1EbtltQYnNH38xCPWU3TVfBd1eXqA3+w9+BTpedkkdNpAaltXlGQ/nsc1+E0mVTNrtcbX3GoO09zeLQ=="],
+    "@next/env": ["@next/env@16.3.8", "", {}, "sha512-Al9zqHVV7TJv0eFuOU4U7Lvv74PTih4Ch63sk2xCIpSTkE3udFnaOcnzP2lQVymiL7yS9Cj2iClUXlR3EQ5sEw=="],
 
-    "@next/swc-darwin-arm64": ["@next/swc-darwin-arm64@16.3.6", "", { "os": "darwin", "cpu": "arm64" }, "sha512-E/7GEqaUkt8mk/T8v9lAnrhzR06kdq1ZBkC12F8tAMkdIadwNp3H1KqHynDHrpcTlGCUdq/qu6vUL2aYVyYBdw=="],
+    "@next/swc-darwin-arm64": ["@next/swc-darwin-arm64@16.3.8", "", { "os": "darwin", "cpu": "arm64" }, "sha512-2JPRMh2nmQG5CiL7cXGL9AGwnPWJQ//cTtAUCT+w511QHk79SYz3LGv/pc5X643B/WEO0rvu3Yww0hqwt3kgeA=="],
 
-    "@next/swc-darwin-x64": ["@next/swc-darwin-x64@16.3.6", "", { "os": "darwin", "cpu": "x64" }, "sha512-yBE893/nDWTlaiBD1p+qgt7NUen4U5R6FXyH0s67Npq1S3E0cVSef1WIXC2xBRgQvwAvJq6DnS6Y6PrY0cy4Ew=="],
+    "@next/swc-darwin-x64": ["@next/swc-darwin-x64@16.3.8", "", { "os": "darwin", "cpu": "x64" }, "sha512-GZtCCOBKJ4leVIT/Th0llWKhD1ca92lzbQiS5R5ON9QkoiFnilFsebDae1JU2a3HWoKMEmEZWGs1AGLavVM72Q=="],
 
-    "@next/swc-linux-arm64-gnu": ["@next/swc-linux-arm64-gnu@16.3.6", "", { "os": "linux", "cpu": "arm64" }, "sha512-KJDpjBqBPYlvkivmyrp+Qys6k/7ksbqGQvRVc6ZEGfR+cjQxx+nUkJaWmNZJsmoOrqYNbaXByF8wa0lBwDhB3Q=="],
+    "@next/swc-linux-arm64-gnu": ["@next/swc-linux-arm64-gnu@16.3.8", "", { "os": "linux", "cpu": "arm64" }, "sha512-O659ygeQYqneJ1fBKMpFxIFqYkYswu8IAS1OCKK/4f3ZgJJm1dRz4fVJZRi/kLLWjnBKnebOePA4WNv+sV1pVA=="],
 
-    "@next/swc-linux-arm64-musl": ["@next/swc-linux-arm64-musl@16.3.6", "", { "os": "linux", "cpu": "arm64" }, "sha512-mqNg2K+hvWskSRb/QM+Ix412DvBsuSF0XV+frTSw5vmoucNnIlynFwKYew8D01bfATErMOM7Bujrf0BA5DRKFA=="],
+    "@next/swc-linux-arm64-musl": ["@next/swc-linux-arm64-musl@16.3.8", "", { "os": "linux", "cpu": "arm64" }, "sha512-dSjKSyWpzxoO1d3DIZZcP4XJcNaKeLmxQMFOiYl5vuBRMmweIqnAhty8tAmRsvTss779cK1FtYnDMj40e4TQlg=="],
 
-    "@next/swc-linux-x64-gnu": ["@next/swc-linux-x64-gnu@16.3.6", "", { "os": "linux", "cpu": "x64" }, "sha512-nFncBNGAYouRHjRVaITs9beZRfhX4ssVwpnvPIAbkZVH6LtGoAVlH4bJ8Cnf9SOo9bsXgPFer/GdHtEE3JNOkw=="],
+    "@next/swc-linux-x64-gnu": ["@next/swc-linux-x64-gnu@16.3.8", "", { "os": "linux", "cpu": "x64" }, "sha512-lbqOuz3RPRcv+o9msNsJw5x4+Y1ZwPTs6vmL6DCf7i0fZfvng/F59wyeDwqHIvV0mK//RBy/jJkZ+nCKsSMXjQ=="],
 
-    "@next/swc-linux-x64-musl": ["@next/swc-linux-x64-musl@16.3.6", "", { "os": "linux", "cpu": "x64" }, "sha512-5Mf3cHDGR/Iz0ng2Bj3zUR3p5QS9YK3Hn2QiAfavFmyF48zwThAjpFoiTKNIcOHLYS4zEk+gzyJ/9deQ2ZB8yQ=="],
+    "@next/swc-linux-x64-musl": ["@next/swc-linux-x64-musl@16.3.8", "", { "os": "linux", "cpu": "x64" }, "sha512-+316WswI8ScVgZeUd+1KGaXkHhaYQzCjvH/05TZSpJ8zBizb1a4G7DtO7F12jcBIqMOtsz9ji1t48fmKtzqsGA=="],
 
-    "@next/swc-win32-arm64-msvc": ["@next/swc-win32-arm64-msvc@16.3.6", "", { "os": "win32", "cpu": "arm64" }, "sha512-0jkJy0C2kbrJWTk4YLa3xk80pVBpx8FCHJym7CnUfDAXe/FWv5qT7SQJbR0KuemyxaEDlEx5WT4VQJoTW+/9Qw=="],
+    "@next/swc-win32-arm64-msvc": ["@next/swc-win32-arm64-msvc@16.3.8", "", { "os": "win32", "cpu": "arm64" }, "sha512-ji0gd4kMYUxO+1fJBIbiBVRCjzG/lloiyCccnlebvb1ZJ5qXCPZqYg4Jl1DrrixnWNMKylzgpmMWx0yNDYXlzw=="],
 
-    "@next/swc-win32-x64-msvc": ["@next/swc-win32-x64-msvc@16.3.6", "", { "os": "win32", "cpu": "x64" }, "sha512-/YXjI1e5OXcZ7YpxRwgP/1jAV/SBKTzeVKqN2mk7mLpcICsyn3Gl5+dIfDTJp70M0ccMhyMMRso4v6mPDCGepg=="],
+    "@next/swc-win32-x64-msvc": ["@next/swc-win32-x64-msvc@16.3.8", "", { "os": "win32", "cpu": "x64" }, "sha512-WcTlaKt/TWkh5kUjdJcUmB1XgZ+1c6fz4Y9fDHL73YNSdGaUWjceeWrrlwF0nv19iABYWC4iAq1oX1w4Bn0vfg=="],
 
     "@noble/ciphers": ["@noble/ciphers@2.3.0", "", {}, "sha512-Clu/xdfgVTf9o7ngLOURaxePwR0j8sjclKEtVij10/jGulwFsPWCvvRgG/XjUVf8Nei+jLG6uwyXzUTGY1DQrw=="],
 
@@ -2815,7 +2815,7 @@
 
     "hastscript": ["hastscript@9.0.1", "", { "dependencies": { "@types/hast": "^3.0.0", "comma-separated-tokens": "^2.0.0", "hast-util-parse-selector": "^4.0.0", "property-information": "^7.0.0", "space-separated-tokens": "^2.0.0" } }, "sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w=="],
 
-    "hono": ["hono@4.13.5", "", {}, "sha512-O6+/eCYRkzzzy0rPWwKLiGBR1nFuUPZynnwjxN1MBA62NNqbT0wQEzQyK2gSO5yDIDB336sXQleAhOHrzlYyKw=="],
+    "hono": ["hono@4.13.7", "", {}, "sha512-c8/gF9ac8Y78/agExVocyLevgR+JlpNB444Py0FSX8pJoPdYUfUzRcXtYEYGwt6l19qIlVZPN5Mfsw9jFShmQQ=="],
 
     "hono-rate-limiter": ["hono-rate-limiter@0.5.3", "", { "peerDependencies": { "hono": "^4.10.8", "unstorage": "^1.17.3" }, "optionalPeers": ["unstorage"] }, "sha512-M0DxbVMpPELEzLi0AJg1XyBHLGJXz7GySjsPoK+gc5YeeBsdGDGe+2RvVuCAv8ydINiwlbxqYMNxUEyYfRji/A=="],
 
@@ -3211,7 +3211,7 @@
 
     "negotiator": ["negotiator@1.0.0", "", {}, "sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg=="],
 
-    "next": ["next@16.3.6", "", { "dependencies": { "@next/env": "16.3.6", "@swc/helpers": "0.5.23", "baseline-browser-mapping": "^2.9.19", "caniuse-lite": "^1.0.30001579", "postcss": "8.5.23", "styled-jsx": "5.1.6" }, "optionalDependencies": { "@next/swc-darwin-arm64": "16.3.6", "@next/swc-darwin-x64": "16.3.6", "@next/swc-linux-arm64-gnu": "16.3.6", "@next/swc-linux-arm64-musl": "16.3.6", "@next/swc-linux-x64-gnu": "16.3.6", "@next/swc-linux-x64-musl": "16.3.6", "@next/swc-win32-arm64-msvc": "16.3.6", "@next/swc-win32-x64-msvc": "16.3.6", "sharp": "^0.35.4" }, "peerDependencies": { "@opentelemetry/api": "^1.1.0", "@playwright/test": "^1.51.1", "babel-plugin-react-compiler": "*", "react": "^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0", "react-dom": "^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0", "sass": "^1.3.0" }, "optionalPeers": ["@opentelemetry/api", "@playwright/test", "babel-plugin-react-compiler", "sass"], "bin": { "next": "dist/bin/next" } }, "sha512-L+otWM/aQbYTx98aZhgEoMb4bZAXx1YVW4UMA/vuCyCoWG5HJyZUili8QAkqzrcC+5///tsz3s0M+SlyB5bLMw=="],
+    "next": ["next@16.3.8", "", { "dependencies": { "@next/env": "16.3.8", "@swc/helpers": "0.5.23", "baseline-browser-mapping": "^2.9.19", "caniuse-lite": "^1.0.30001579", "postcss": "8.5.23", "styled-jsx": "5.1.6" }, "optionalDependencies": { "@next/swc-darwin-arm64": "16.3.8", "@next/swc-darwin-x64": "16.3.8", "@next/swc-linux-arm64-gnu": "16.3.8", "@next/swc-linux-arm64-musl": "16.3.8", "@next/swc-linux-x64-gnu": "16.3.8", "@next/swc-linux-x64-musl": "16.3.8", "@next/swc-win32-arm64-msvc": "16.3.8", "@next/swc-win32-x64-msvc": "16.3.8", "sharp": "^0.35.4" }, "peerDependencies": { "@opentelemetry/api": "^1.1.0", "@playwright/test": "^1.51.1", "babel-plugin-react-compiler": "*", "react": "^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0", "react-dom": "^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0", "sass": "^1.3.0" }, "optionalPeers": ["@opentelemetry/api", "@playwright/test", "babel-plugin-react-compiler", "sass"], "bin": { "next": "dist/bin/next" } }, "sha512-U7QEZaTini6wKrb8A8hqLLqYQyCetegKjCpJOyxk642vWoMoU1x5PyZCJFvgYgiptA8xc5j/9xYlZFO7w9Sjmw=="],
 
     "next-themes": ["next-themes@0.4.6", "", { "peerDependencies": { "react": "^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc", "react-dom": "^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc" } }, "sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA=="],
 
