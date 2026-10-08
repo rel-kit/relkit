@@ -28,6 +28,7 @@ export function devLogSinks(
  */
 export function createDevLogger(options: DevOptions): DevLog {
   let startupFailed = false;
+  let stopping = false;
   return (event) => {
     try {
       const { record, origin, forwarded, transient } = devLogRecord(event);
@@ -46,9 +47,21 @@ export function createDevLogger(options: DevOptions): DevLog {
       const minimum =
         options.logger?.minimumLevel ?? (options.terminal?.verbose ? "debug" : "info");
       if (safe.message === "dev.build.started") startupFailed = false;
+      if (safe.message === "dev.shutdown.started") stopping = true;
       if (!isLogLevelEnabled(safe.level, minimum)) return;
       if (options.logger?.json) options.logger.json.write(safe);
       if (options.logger?.human === false) return;
+      if (stopping && origin === "inspector" && !options.terminal?.verbose) return;
+      if (
+        !options.terminal?.verbose &&
+        minimum !== "debug" &&
+        minimum !== "trace" &&
+        minimum !== "all" &&
+        typeof safe.fields.domain === "string" &&
+        typeof safe.fields.operation === "string" &&
+        /^Execution operation (?:completed|failed|interrupted)$/.test(safe.message)
+      )
+        return;
       if (
         /^runtime\.(provider|database|auth)$/.test(safe.component) &&
         safe.level === "error" &&

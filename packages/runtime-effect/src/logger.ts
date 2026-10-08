@@ -66,7 +66,12 @@ export function createEffectLogger(
       collector,
     );
     if (record === undefined) return;
-    deliverLog(record, human, json);
+    const operation =
+      typeof record.fields.domain === "string" &&
+      typeof record.fields.operation === "string" &&
+      /^Execution operation (?:completed|failed|interrupted)$/.test(record.message);
+    const diagnostics = minimum === "all" || minimum === "trace" || minimum === "debug";
+    deliverLog(record, operation && !diagnostics ? undefined : human, json);
   });
 }
 

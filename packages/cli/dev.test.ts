@@ -363,14 +363,81 @@ test("redacts candidate output before callbacks and human sinks", () => {
   expect(JSON.stringify({ callbacks, output })).not.toContain(secret);
 });
 
-test("prefers the workspace Next inspector and configured port by default", () => {
+test("hides internal child operations while retaining request logs, evidence and verbose diagnostics", () => {
+  for (const verbose of [false, true]) {
+    const output: string[] = [];
+    const records: unknown[] = [];
+    const log = createDevLogger({
+      compile: async () => {
+        throw new Error("unused");
+      },
+      terminal: { verbose },
+      logger: {
+        human: { write: (line) => output.push(line) },
+        collector: { collect: (record) => records.push(record) },
+      },
+    });
+    for (const message of [
+      "Execution operation completed",
+      "GET /hello → 200",
+      "Database startup failed",
+    ]) {
+      log({
+        level: "info",
+        event: "candidate.startup-output",
+        fields: {
+          output:
+            "\u001e" +
+            JSON.stringify({
+              version: 2,
+              signal: "log",
+              timestamp: new Date().toISOString(),
+              level: "info",
+              component: "runtime.lifecycle",
+              message,
+              fields: { domain: "runtime", operation: "server.readiness" },
+            }),
+        },
+      });
+    }
+    expect(records).toHaveLength(3);
+    expect(output.some((line) => line.includes("Execution operation completed"))).toBe(verbose);
+    expect(output.some((line) => line.includes("GET /hello"))).toBe(true);
+    expect(output.some((line) => line.includes("Database startup failed"))).toBe(true);
+  }
+});
+
+test("uses the production inspector and configured port by default", () => {
   const options = defaultInspectorOptions(3217);
-  expect(options.command).toEqual([process.execPath, "run", "dev"]);
-  expect(options.cwd?.endsWith("/apps/inspector")).toBe(true);
+  expect(options.command).toEqual(["node", "server.js"]);
+  expect(options.cwd?.endsWith("/dist/inspector")).toBe(true);
   expect(options.port).toBe(3217);
 });
 
-test("prefers source when a compiled CLI also contains the packaged inspector", async () => {
+test("keeps inspector disconnect output out of normal shutdown while retaining cleanup failures", () => {
+  const output: string[] = [];
+  const log = createDevLogger({
+    compile: async () => {
+      throw new Error("unused");
+    },
+    logger: { human: { write: (line) => output.push(line) } },
+  });
+  log({ level: "info", event: "dev.shutdown.started" });
+  log({
+    level: "warn",
+    event: "inspector.output",
+    fields: { output: "fetch failed ECONNREFUSED" },
+  });
+  log({
+    level: "error",
+    event: "dev.local-services.cleanup-failed",
+    fields: { message: "cleanup timed out" },
+  });
+  expect(output.some((line) => line.includes("ECONNREFUSED"))).toBe(false);
+  expect(output.some((line) => line.includes("cleanup timed out"))).toBe(true);
+});
+
+test("prefers production when a compiled CLI also contains inspector source", async () => {
   const root = await makeRoot();
   const source = join(root, "apps", "inspector");
   const compiled = join(root, "packages", "cli", "dist", "commands");
@@ -380,8 +447,8 @@ test("prefers source when a compiled CLI also contains the packaged inspector", 
   await writeFile(join(compiled, "..", "inspector", "server.js"), "\n");
 
   const options = resolveInspectorInstallation(compiled, {});
-  expect(options.command).toEqual([process.execPath, "run", "dev"]);
-  expect(options.root).toBe(await realpath(source));
+  expect(options.command).toEqual(["node", "server.js"]);
+  expect(options.root).toBe(join(compiled, "..", "inspector"));
 });
 
 test("reads the inspector port from relkit.config.ts unless the CLI overrides it", async () => {
