@@ -1,36 +1,41 @@
+"use client";
+
 import Link from "next/link";
-import { HeroScene } from "./hero-scene";
-import { landingStack, StackIcon } from "./stack-icons";
+import { Heading } from "fumadocs-ui/components/heading";
+import { buttonVariants } from "fumadocs-ui/components/ui/button";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import * as motion from "motion/react-m";
 
 export function LandingHero() {
   return (
-    <section className="landing-container landing-hero" aria-labelledby="landing-title">
-      <div className="landing-hero-copy">
-        <Link className="landing-pill" href="/docs/start/create-an-app">
-          <span>🛠️ New</span> A complete TypeScript backend model <b aria-hidden="true">→</b>
-        </Link>
-        <h1 id="landing-title">Relkit</h1>
-        <p className="landing-lede">
-          Build typed backend workflows from one checked application graph. Run selected services
-          locally, replace them explicitly in tests, and deploy only the resources you own.
-        </p>
-        <div className="landing-actions">
-          <Link className="landing-button" href="/docs/start/create-an-app">
-            <span aria-hidden="true">〉_</span> Get Started
+    <motion.section className="hero-copy-row" aria-label="The TypeScript Kit Framework">
+      <motion.div
+        className="hero-container hero-copy"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+      >
+        <motion.p className="hero-eyebrow">THE TYPESCRIPT APPLICATION KIT</motion.p>
+        <Heading as="h1" className="hero-title">
+          <motion.span>The TypeScript</motion.span>
+          <motion.span>Kit Framework</motion.span>
+        </Heading>
+        <motion.p className="hero-description">
+          Everything you need to build reliable, robust, scalable, observable
+          <motion.span>TypeScript applications for agents and engineers.</motion.span>
+        </motion.p>
+        <motion.div className="hero-actions">
+          <Link
+            className={buttonVariants({ className: "hero-start", variant: "primary" })}
+            href="/docs/start/create-an-app"
+          >
+            Start building <ArrowUpRight size={14} aria-hidden="true" />
           </Link>
-        </div>
-        <p className="landing-availability">Local-first. No cloud credentials required.</p>
-      </div>
-      <div className="landing-hero-visual" aria-label="Interactive Relkit application graph">
-        <HeroScene />
-      </div>
-      <div className="landing-stack" aria-label="Relkit technology stack">
-        {landingStack.map((item) => (
-          <span key={item.name}>
-            <StackIcon name={item.name} icon={item.icon} /> {item.name}
-          </span>
-        ))}
-      </div>
-    </section>
+          <Link className="hero-docs-link" href="/docs">
+            Read the docs <ArrowRight size={14} aria-hidden="true" />
+          </Link>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }

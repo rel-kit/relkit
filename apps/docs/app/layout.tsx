@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import "./globals.css";
 import "./landing.css";
+import "./hero.css";
+import "./hero-examples.css";
 
 export const metadata: Metadata = {
   title: {

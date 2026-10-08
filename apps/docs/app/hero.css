@@ -1,0 +1,249 @@
+.landing-root {
+  --landing-width: 1120px;
+  display: block;
+}
+
+.hero-design {
+  --hero-bg: #ffffff;
+  --hero-ink: #171717;
+  --hero-muted: #737373;
+  --hero-line: #e5e5e5;
+  --hero-soft: #f9fafb;
+  position: relative;
+  isolation: isolate;
+  color: var(--hero-ink);
+  background: var(--hero-bg);
+  font-family: var(--hero-sans), sans-serif;
+}
+
+.hero-design::before {
+  position: absolute;
+  z-index: -1;
+  inset: 438px 0 auto;
+  height: 940px;
+  content: "";
+  background-image: radial-gradient(#c7c7c7 0.75px, transparent 0.75px);
+  background-size: 20px 20px;
+  mask-image: linear-gradient(transparent, #0003 22%, #0003 74%, transparent);
+  pointer-events: none;
+}
+
+.hero-design::after {
+  display: block;
+  height: 80px;
+  content: "";
+  border-bottom: 1px solid var(--hero-line);
+  background:
+    linear-gradient(var(--hero-line), var(--hero-line)) left max(24px, calc((100% - 1120px) / 2))
+      top / 1px 100% no-repeat,
+    linear-gradient(var(--hero-line), var(--hero-line)) right max(24px, calc((100% - 1120px) / 2))
+      top / 1px 100% no-repeat;
+}
+
+.hero-container {
+  width: min(calc(100% - 48px), 1120px);
+  margin-inline: auto;
+}
+
+.hero-navigation {
+  height: 88px;
+  border-bottom: 1px solid var(--hero-line);
+}
+
+.hero-navigation-inner {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hero-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.hero-logo {
+  background: var(--hero-ink);
+}
+
+.hero-logo rect {
+  stroke: none;
+}
+
+.hero-navigation-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.hero-navigation-links a,
+.hero-docs-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.hero-navigation-links a:hover,
+.hero-docs-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.hero-copy-row {
+  border-bottom: 1px solid var(--hero-line);
+}
+
+.hero-copy {
+  padding: 64px 24px 31px;
+  border-inline: 1px solid var(--hero-line);
+  text-align: center;
+}
+
+.hero-eyebrow {
+  margin: 0;
+  color: var(--hero-muted);
+  font-family: var(--hero-mono), monospace;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.96px;
+}
+
+.hero-title {
+  margin: 24px 0 0;
+  font-size: 72px;
+  font-weight: 500;
+  line-height: 76px;
+  letter-spacing: -3.96px;
+}
+
+.hero-title span,
+.hero-description span {
+  display: block;
+}
+
+.hero-description {
+  max-width: 720px;
+  margin: 24px auto 0;
+  color: var(--hero-muted);
+  font-size: 17px;
+  line-height: 27px;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 28px;
+  font-size: 14px;
+}
+
+.hero-design .hero-start {
+  width: 156px;
+  height: 49px;
+  padding: 0;
+  gap: 12px;
+  border-radius: 6px;
+  background: var(--hero-ink);
+  color: #fafafa;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.hero-start:hover {
+  background: #303030;
+}
+
+.hero-design a:focus-visible,
+.hero-design button:focus-visible {
+  outline: 2px solid #737373;
+  outline-offset: 4px;
+}
+
+@media (max-width: 800px) {
+  .hero-navigation-links {
+    gap: 20px;
+    font-size: 13px;
+  }
+  .hero-title {
+    font-size: 60px;
+    line-height: 64px;
+    letter-spacing: -3.3px;
+  }
+  .hero-copy {
+    padding: 56px 24px 32px;
+  }
+  .hero-description {
+    max-width: 560px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-container {
+    width: calc(100% - 32px);
+  }
+  .hero-navigation {
+    height: 72px;
+  }
+  .hero-brand {
+    gap: 8px;
+    font-size: 16px;
+  }
+  .hero-logo {
+    width: 24px;
+    height: 24px;
+  }
+  .hero-navigation-links {
+    gap: 16px;
+    font-size: 12px;
+  }
+  .hero-navigation-links a:last-child {
+    display: none;
+  }
+  .hero-copy {
+    padding: 48px 16px 32px;
+  }
+  .hero-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.6px;
+  }
+  .hero-title {
+    font-size: clamp(34px, 9.5vw, 52px);
+    line-height: 1.06;
+    letter-spacing: -0.055em;
+  }
+  .hero-description {
+    max-width: 360px;
+    font-size: 15px;
+    line-height: 24px;
+  }
+  .hero-description span {
+    display: inline;
+  }
+  .hero-description span::before {
+    content: " ";
+  }
+  .hero-actions {
+    gap: 16px;
+    font-size: 12px;
+  }
+  .hero-design .hero-start {
+    width: 144px;
+    height: 46px;
+    font-size: 12px;
+  }
+  .hero-design::after {
+    height: 48px;
+    background-position:
+      left 16px top,
+      right 16px top;
+  }
+}
