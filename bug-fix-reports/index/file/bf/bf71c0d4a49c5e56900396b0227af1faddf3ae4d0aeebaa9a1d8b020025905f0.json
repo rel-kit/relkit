@@ -1,0 +1,33 @@
+{
+  "key": "packages/cli/src/commands/build-server-runtime.ts",
+  "matches": {
+    "bf-379960edd4d6f5dd49beed02": {
+      "id": "bf-379960edd4d6f5dd49beed02",
+      "status": "unverified",
+      "what": "Prepared runtime, readiness certification, benchmark accounting, and telemetry handoff behavior violated eight invariants identified during review.",
+      "root_cause": "The readiness implementation optimized individual phases without carrying required runtime metadata, integrity anchors, evidence identity, preparation attempts, or pre-storage telemetry state across their boundaries.",
+      "fixed_by": "Added descriptor target loaders, exact identifier matching, signed deferred integrity verification, stronger capability/evidence gates, preparation-attempt accounting, reconfigurable early retention, bounded storage acquisition, and buffered query/live-stream integration with focused regressions.",
+      "files": [
+        "packages/cli/src/commands/build-prepared-manifest.ts",
+        "packages/cli/src/commands/build-prepared-manifest-source.ts",
+        "packages/cli/src/commands/build-server-http-options.ts",
+        "packages/cli/src/commands/build-server-invocation.ts",
+        "packages/cli/src/commands/build-server-imports.ts",
+        "packages/cli/src/commands/build-server-runtime.ts",
+        "packages/cli/src/dev-snapshot/snapshot-candidate.service.ts",
+        "packages/cli/src/commands/dev-telemetry-relay-query.ts",
+        "packages/cli/src/commands/dev-telemetry-relay.service.ts",
+        "packages/cli/src/commands/dev-telemetry-storage.service.ts",
+        "packages/runtime-hono/src/materialize-routes.types.ts",
+        "packages/runtime-hono/src/materialize-routes-utils.ts",
+        "packages/create-relkit/src/create-capabilities.ts",
+        "packages/observability/src/early-records.service.ts",
+        "scripts/benchmark-packed-dev.ts",
+        "scripts/dev-readiness/benchmark-packed-summary.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-10T16:14:52+00:00",
+      "report": "bug-fix-reports/issues/bf-379960edd4d6f5dd49beed02/report.md"
+    }
+  }
+}
