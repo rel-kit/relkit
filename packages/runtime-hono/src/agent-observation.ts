@@ -1,21 +1,29 @@
-import { Clock, Context, Effect, Layer, Option, Stream } from "effect";
-import { agentClientEvents } from "@relkit/agents";
-import { REALTIME_RUNTIME_LIMITS } from "@relkit/contracts";
-import { httpBoundary, httpIterable, HttpBoundaryError, observeHttp } from "./http-effect.js";
+/**
+ * Opens request-owned authorized journal streams through a replaceable Effect
+ * service. The native iterable edge preserves scoped waits and cancellation;
+ * page projection loads no agent execution or language-model runtime.
+ */
+import { Context, Effect, Layer, Schema, Stream } from "effect";
+import { httpBoundary, httpIterable, HttpBoundaryError } from "./http-effect.js";
 import { agentContext, requireAgentThreadId, type AgentInput } from "./agent-rpc-support.js";
 import { assertExpectedIdentity } from "./rpc-identity.js";
-import { clientAgentSnapshot } from "./agent-compatibility.js";
+import { ObservationCheckpoint } from "./agent-observation.schemas.js";
+import { readObservationPage } from "./agent-observation-pages.js";
+import { observeHttpStream } from "./http-stream-observation.js";
 import type { RpcContext } from "./rpc.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
-import type { AgentObservationFrame } from "./agent-observation.types.js";
-import { observeHttpStream } from "./http-stream-observation.js";
+import type {
+  AgentObservationFrame,
+  AgentObservationOperations,
+} from "./agent-observation.types.js";
 
-/** Builds a journal feed whose waits and iterator scope are owned by its consumer.
- * @param input - Agent identity, thread and required resume checkpoint.
- * @param context - Trusted transport request context.
- * @param options - Active generation and provider configuration.
- * @param signal - Optional transport cancellation signal.
- * @returns A lazy stream with typed native failures and fresh authorization before every frame.
+/**
+ * Builds a journal feed with fresh authorization before pages and frames.
+ * @param input - Request agent/thread identity and submitted checkpoint.
+ * @param context - Trusted transport context for this consumer.
+ * @param options - Active generation and provider authority.
+ * @param signal - Optional native transport cancellation.
+ * @returns Lazy scoped stream with typed boundary failures and decoded cursors.
  */
 function observation(
   input: AgentInput,
@@ -27,15 +35,11 @@ function observation(
     Effect.gen(function* () {
       const threadId = requireAgentThreadId(input.threadId);
       if (input.after === undefined)
-        return yield* Effect.fail(
-          new HttpBoundaryError({
-            operation: "agent.observe",
-            cause: new TypeError("checkpoint is required."),
-          }),
-        );
-      /** Refreshes the principal and checks observation authorization before a page or frame.
-       * @returns The currently authorized agent provider scope.
-       */
+        return yield* new HttpBoundaryError({
+          operation: "agent.observe",
+          cause: new TypeError("checkpoint is required."),
+        });
+      /** Refreshes request identity and provider authorization. @returns The current authorized provider scope. */
       const authorize = Effect.fn("AgentObservation.authorize")(function* () {
         yield* httpBoundary("agent.observe.identity", () =>
           assertExpectedIdentity(context, options.clientIdentity!, input.expectedIdentity),
@@ -44,93 +48,47 @@ function observation(
           agentContext({ ...input, threadId }, context, options, "observe"),
         );
       });
-      const initial = yield* authorize();
-      const checkpoint = input.after as Parameters<typeof initial.provider.readJournal>[0]["after"];
-      return Stream.paginate(
-        { after: checkpoint, wait: false },
-        Effect.fn("AgentObservation.readPage")(function* (state) {
-          if (signal?.aborted) return [[], Option.none<typeof state>()] as const;
-          const resolved = yield* authorize();
-          if (state.wait) {
-            const now = yield* Clock.currentTimeMillis;
-            yield* httpBoundary("agent.observe.wait", (fiberSignal) =>
-              resolved.provider.waitForJournal({
-                ...resolved.scope,
-                threadId,
-                after: state.after,
-                deadlineMs: now + 15_000,
-                signal: signal === undefined ? fiberSignal : AbortSignal.any([signal, fiberSignal]),
-              }),
-            );
-          }
-          const page = yield* observeHttp(
-            "agent.observe.read",
-            httpBoundary("agent.observe.read", () =>
-              resolved.provider.readJournal({
-                ...resolved.scope,
-                threadId,
-                after: state.after,
-                limit: 100,
-                maxEncodedBytes: 1024 * 1024,
-              }),
-            ),
-          );
-          const frames: AgentObservationFrame[] = [];
-          if (page.gap !== undefined) {
-            const snapshot = clientAgentSnapshot(
-              yield* httpBoundary("agent.observe.snapshot", () =>
-                resolved.provider.loadThread({
-                  ...resolved.scope,
-                  threadId,
-                  maxEncodedBytes: REALTIME_RUNTIME_LIMITS.initialSnapshotBytes,
-                }),
-              ),
-            );
-            frames.push({ kind: "gap", reason: page.gap, snapshot });
-            return [frames, Option.some({ after: snapshot.checkpoint, wait: false })] as const;
-          }
-          for (const record of page.records)
-            for (const event of agentClientEvents(record)) frames.push({ kind: "event", event });
-          if (
-            page.records.some((record) =>
-              ["approval", "control", "terminal", "interruption"].includes(record.kind),
-            )
-          ) {
-            const snapshot = clientAgentSnapshot(
-              yield* httpBoundary("agent.observe.snapshot", () =>
-                resolved.provider.loadThread({
-                  ...resolved.scope,
-                  threadId,
-                  maxEncodedBytes: REALTIME_RUNTIME_LIMITS.initialSnapshotBytes,
-                }),
-              ),
-            );
-            frames.push({ kind: "snapshot", snapshot });
-          }
-          return [frames, Option.some({ after: page.checkpoint, wait: !page.hasMore })] as const;
-        }),
+      yield* authorize();
+      const checkpoint = yield* Schema.decodeUnknownEffect(ObservationCheckpoint)(input.after).pipe(
+        Effect.mapError(
+          () =>
+            new HttpBoundaryError({
+              operation: "agent.observe",
+              cause: new TypeError("checkpoint is invalid."),
+            }),
+        ),
+      );
+      return Stream.paginate({ after: checkpoint, wait: false }, (state) =>
+        readObservationPage(authorize, threadId, state, signal),
       ).pipe(Stream.mapEffect((frame) => authorize().pipe(Effect.as(frame))));
     }),
   );
 }
 
-/** Journal observations preserve fresh authorization, bounded pages and cancellable waits. */
+/** Per-request journal observations; service acquisition captures no request context. */
 export class AgentObservation extends Context.Service<
   AgentObservation,
-  { readonly observe: typeof observation }
->()("@relkit/runtime-hono/AgentObservation") {}
+  AgentObservationOperations
+>()("@relkit/runtime-hono/AgentObservation", {
+  make: Effect.sync(
+    () =>
+      ({
+        observe: (...args: Parameters<typeof observation>) =>
+          observeHttpStream("agent.observe", observation(...args)),
+      }) satisfies AgentObservationOperations,
+  ),
+}) {}
 
-/** Live observation implementation; each consumer owns its stream scope. */
-export const AgentObservationLive = Layer.succeed(AgentObservation, {
-  observe: (...args) => observeHttpStream("agent.observe", observation(...args)),
-});
+/** Builds the concrete service; callers can supply the same contract through a test Layer. */
+export const AgentObservationLive = Layer.effect(AgentObservation, AgentObservation.make);
 
-/** Opens an authorized agent journal at the native transport edge.
- * @param input - Agent identity, thread and checkpoint.
+/**
+ * Opens an authorized journal at the native transport edge.
+ * @param input - Submitted agent identity, thread and checkpoint.
  * @param context - Trusted transport context.
- * @param options - Generation dependencies.
- * @param signal - Optional transport cancellation.
- * @returns A lazy iterable; returning releases its pending provider wait.
+ * @param options - Active generation dependencies.
+ * @param signal - Optional native cancellation.
+ * @returns Lazy iterable; returning joins the pending provider wait through its scope.
  */
 export function observeAgent(
   input: AgentInput,
