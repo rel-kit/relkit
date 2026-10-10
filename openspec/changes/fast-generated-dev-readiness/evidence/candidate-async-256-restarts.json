@@ -1,0 +1,57 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "command": "bun dev",
+  "mode": "baseline",
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 Pro",
+    "load": [
+      3.55517578125,
+      3.24267578125,
+      3.58447265625
+    ]
+  },
+  "request": {
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-zGkfP3/readiness-baseline",
+    "url": "http://127.0.0.1:3000/hello?name=RelKit",
+    "expectedStatus": 200,
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "sample": {
+        "durationMs": 822.848375,
+        "outcome": "response",
+        "output": "$ relkit dev\n18:31:07.112 INFO  relkit            Starting development server\n18:31:07.126 INFO  build             Compiling application\n18:31:07.331 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n18:31:07.358 INFO  build             Compiled in 231ms\n18:31:07.358 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n18:31:07.350 INFO  http              GET /hello → 200 in 57ms\n18:31:07.381 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n18:31:07.401 INFO  relkit            Stopping development server\n18:31:07.395 INFO  http              GET /hello → 200 in 32ms\n18:31:07.410 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 2,
+      "sample": {
+        "durationMs": 819.703,
+        "outcome": "response",
+        "output": "$ relkit dev\n18:31:07.951 INFO  relkit            Starting development server\n18:31:07.964 INFO  build             Compiling application\n18:31:08.169 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n18:31:08.196 INFO  build             Compiled in 231ms\n18:31:08.197 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n18:31:08.188 INFO  http              GET /hello → 200 in 57ms\n18:31:08.223 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n18:31:08.242 INFO  relkit            Stopping development server\n18:31:08.238 INFO  http              GET /hello → 200 in 35ms\n18:31:08.261 INFO  relkit            Development server stopped\n18:31:08.262 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable.\n18:31:08.279 \u001b[33mWARN \u001b[0m relkit            dev.telemetry.uncommitted\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 3,
+      "sample": {
+        "durationMs": 809.495667,
+        "outcome": "response",
+        "output": "$ relkit dev\n18:31:08.811 INFO  relkit            Starting development server\n18:31:08.824 INFO  build             Compiling application\n18:31:09.030 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n18:31:09.055 INFO  build             Compiled in 230ms\n18:31:09.056 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n18:31:09.048 INFO  http              GET /hello → 200 in 56ms\n18:31:09.078 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n18:31:09.097 INFO  relkit            Stopping development server\n18:31:09.093 INFO  http              GET /hello → 200 in 32ms\n18:31:09.118 INFO  relkit            Development server stopped\n18:31:09.119 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable.\n18:31:09.136 \u001b[33mWARN \u001b[0m relkit            dev.telemetry.uncommitted\nerror: script \"dev\" exited with code 143\n"
+      }
+    }
+  ],
+  "summary": {
+    "runs": 3,
+    "medianMs": 819.703,
+    "p95Ms": 822.848375,
+    "maximumMs": 822.848375,
+    "passed": false
+  }
+}

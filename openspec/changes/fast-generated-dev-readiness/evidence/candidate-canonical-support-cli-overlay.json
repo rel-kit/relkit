@@ -1,0 +1,75 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "command": "bun dev",
+  "mode": "diagnostic-canonical-support-cli-overlay",
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 Pro",
+    "load": [
+      3.7109375,
+      4.134765625,
+      3.59033203125
+    ]
+  },
+  "request": {
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ZiuiWR/readiness-baseline",
+    "url": "http://127.0.0.1:55360/hello?name=RelKit",
+    "expectedStatus": 200,
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "sample": {
+        "durationMs": 1530.30375,
+        "outcome": "response",
+        "output": "$ relkit dev\n06:13:55.707 INFO  relkit            Starting development server\n06:13:55.725 INFO  build             Compiling application\n06:13:56.041 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:13:56.089 INFO  build             Compiled in 363ms\n06:13:56.090 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n06:13:56.073 INFO  http              GET /hello → 200 in 80ms\n06:13:56.410 INFO  relkit            dev.inspector.ready\n06:13:56.435 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:13:56.457 INFO  http              GET /hello → 200 in 59ms\n06:13:56.502 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 2,
+      "sample": {
+        "durationMs": 1122.654833,
+        "outcome": "response",
+        "output": "$ relkit dev\n06:13:56.832 INFO  relkit            Starting development server\n06:13:56.848 INFO  build             Compiling application\n06:13:57.175 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:13:57.190 INFO  relkit            dev.inspector.ready\n06:13:57.206 INFO  build             Compiled in 357ms\n06:13:57.207 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n06:13:57.196 INFO  http              GET /hello → 200 in 72ms\n06:13:57.497 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:13:57.508 INFO  http              GET /hello → 200 in 33ms\n06:13:57.641 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 3,
+      "sample": {
+        "durationMs": 907.250708,
+        "outcome": "response",
+        "output": "$ relkit dev\n06:13:57.983 INFO  relkit            Starting development server\n06:13:57.999 INFO  build             Compiling application\n06:13:58.303 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:13:58.335 INFO  build             Compiled in 336ms\n06:13:58.336 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n06:13:58.340 INFO  relkit            dev.inspector.ready\n06:13:58.325 INFO  http              GET /hello → 200 in 69ms\n06:13:58.580 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:13:58.596 INFO  http              GET /hello → 200 in 45ms\n06:13:58.630 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 4,
+      "sample": {
+        "durationMs": 962.685084,
+        "outcome": "child-exited",
+        "exitCode": 1,
+        "output": "$ relkit dev\n06:13:58.927 INFO  relkit            Starting development server\n06:13:58.941 INFO  build             Compiling application\n06:13:59.234 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:13:59.260 INFO  build             Compiled in 318ms\n06:13:59.261 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n06:13:59.265 INFO  relkit            dev.inspector.ready\n06:13:59.251 INFO  http              GET /hello → 200 in 62ms\n06:13:59.485 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n============================================================\nBun v1.3.10 (30e609e0) macOS Silicon\nmacOS v15.7.1\nCPU: fp aes crc32 atomics\nArgs: \"bun\" \"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ZiuiWR/readiness-baseline/node_modules/.bin/relkit\" \"dev\"\nFeatures: Bun.stderr(2) fetch(28) http_server(5) jsc spawn(3) transpiler_cache(19) tsconfig tsconfig_paths process_dlopen \nBuiltins: \"bun:main\" \"node:async_hooks\" \"node:child_process\" \"node:crypto\" \"node:fs\" \"node:fs/promises\" \"node:module\" \"node:os\" \"node:path\" \"node:readline\" \"node:url\" \nElapsed: 799ms | User: 635ms | Sys: 150ms\nRSS: 0.16GB | Peak: 0.16GB | Commit: 1.07GB | Faults: 83 | Machine: 17.18GB\n\npanic(main thread): Segmentation fault at address 0x0\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.3.10/Ma130e609einEigooC_+qk8Z+uwktBm5vktBujprkBu4krkBup4qkB+64qkBuzzxGmopwGu2q2Fuiz1kBu0miFuv0iFutqiF279oF2hrB+giB__A2AA\n\nerror: script \"dev\" was terminated by signal SIGTRAP (Trace or breakpoint trap)\n"
+      }
+    },
+    {
+      "run": 5,
+      "sample": {
+        "durationMs": 264.426792,
+        "outcome": "child-exited",
+        "exitCode": 1,
+        "output": "$ relkit dev\n06:13:59.874 INFO  relkit            Starting development server\n06:13:59.890 INFO  build             Compiling application\n06:13:59.907 INFO  relkit            Stopping development server\n06:13:59.909 INFO  relkit            Development server stopped\nEEXIST: file already exists, mkdir '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ZiuiWR/readiness-baseline/.relkit/generated/generation-1'\n    path: \"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ZiuiWR/readiness-baseline/.relkit/generated/generation-1\",\n syscall: \"mkdir\",\n   errno: -17,\n    code: \"EEXIST\"\n\nnote: missing sourcemaps for /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ZiuiWR/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
+      }
+    }
+  ],
+  "summary": {
+    "runs": 5,
+    "medianMs": 962.685084,
+    "p95Ms": 1530.30375,
+    "maximumMs": 1530.30375,
+    "passed": false
+  }
+}

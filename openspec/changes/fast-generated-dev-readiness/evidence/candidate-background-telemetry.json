@@ -1,0 +1,73 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "command": "bun dev",
+  "mode": "candidate-background-telemetry-preparation-overlay",
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 Pro",
+    "load": [
+      3.4990234375,
+      3.4326171875,
+      3.4609375
+    ]
+  },
+  "request": {
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ZiuiWR/readiness-baseline",
+    "url": "http://127.0.0.1:55360/hello?name=RelKit",
+    "expectedStatus": 200,
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "sample": {
+        "durationMs": 1116.07975,
+        "outcome": "response",
+        "output": "$ relkit dev\n05:45:41.368 INFO  relkit            Starting development server\n05:45:41.388 INFO  build             Compiling application\n05:45:41.717 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n05:45:41.766 INFO  build             Compiled in 378ms\n05:45:41.769 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n05:45:41.775 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable; backend remains serving.\n05:45:41.749 INFO  http              GET /hello → 200 in 79ms\n[05:45:41.789] INFO (#863): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.body.release\",\n  outcome: \"success\",\n  duration_ms: 0.06125,\n}\n[05:45:41.790] INFO (#863): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.text\",\n  outcome: \"success\",\n  duration_ms: 1.962209,\n}\n05:45:41.814 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n[05:45:41.830] INFO (#863): Execution operation completed {\n  domain: \"cli\",\n  operation: \"dev.telemetry.early-ingress\",\n  outcome: \"success\",\n  duration_ms: 43.034292,\n}\n"
+      }
+    },
+    {
+      "run": 2,
+      "sample": {
+        "durationMs": 766.397958,
+        "outcome": "response",
+        "output": "$ relkit dev\n05:45:42.384 INFO  relkit            Starting development server\n05:45:42.400 INFO  build             Compiling application\n05:45:42.733 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n05:45:42.761 INFO  build             Compiled in 361ms\n05:45:42.763 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n05:45:42.767 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable; backend remains serving.\n[05:45:42.775] INFO (#865): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.body.release\",\n  outcome: \"success\",\n  duration_ms: 0.074084,\n}\n[05:45:42.776] INFO (#865): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.text\",\n  outcome: \"success\",\n  duration_ms: 3.20775,\n}\n05:45:42.751 INFO  http              GET /hello → 200 in 65ms\n05:45:42.797 INFO  relkit            dev.inspector.ready\n05:45:42.792 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 3,
+      "sample": {
+        "durationMs": 837.328417,
+        "outcome": "response",
+        "output": "$ relkit dev\n05:45:43.254 INFO  relkit            Starting development server\n05:45:43.269 INFO  build             Compiling application\n05:45:43.611 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n05:45:43.644 INFO  build             Compiled in 375ms\n05:45:43.645 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n05:45:43.650 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable; backend remains serving.\n[05:45:43.661] INFO (#863): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.body.release\",\n  outcome: \"success\",\n  duration_ms: 0.072959,\n}\n[05:45:43.661] INFO (#863): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.text\",\n  outcome: \"success\",\n  duration_ms: 1.989125,\n}\n05:45:43.629 INFO  http              GET /hello → 200 in 64ms\n05:45:43.671 INFO  relkit            dev.inspector.ready\n05:45:43.678 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 4,
+      "sample": {
+        "durationMs": 928.123625,
+        "outcome": "response",
+        "output": "$ relkit dev\n05:45:44.250 INFO  relkit            Starting development server\n05:45:44.266 INFO  build             Compiling application\n05:45:44.588 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n05:45:44.618 INFO  build             Compiled in 351ms\n05:45:44.619 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n05:45:44.623 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable; backend remains serving.\n[05:45:44.637] INFO (#861): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.body.release\",\n  outcome: \"success\",\n  duration_ms: 0.061,\n}\n[05:45:44.638] INFO (#861): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.text\",\n  outcome: \"success\",\n  duration_ms: 1.857917,\n}\n05:45:44.607 INFO  http              GET /hello → 200 in 62ms\n05:45:44.645 INFO  relkit            dev.inspector.ready\n05:45:44.650 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 5,
+      "sample": {
+        "durationMs": 687.450958,
+        "outcome": "response",
+        "output": "$ relkit dev\n05:45:45.002 INFO  relkit            Starting development server\n05:45:45.017 INFO  build             Compiling application\n05:45:45.321 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n05:45:45.334 INFO  relkit            dev.inspector.ready\n05:45:45.347 INFO  build             Compiled in 330ms\n05:45:45.348 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n05:45:45.352 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable; backend remains serving.\n[05:45:45.358] INFO (#872): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.body.release\",\n  outcome: \"success\",\n  duration_ms: 0.019458,\n}\n[05:45:45.358] INFO (#872): Execution operation completed {\n  domain: \"cli\",\n  operation: \"http.text\",\n  outcome: \"success\",\n  duration_ms: 0.733583,\n}\n05:45:45.339 INFO  http              GET /hello → 200 in 61ms\n[05:45:45.385] INFO (#872): Execution operation completed {\n  domain: \"cli\",\n  operation: \"dev.telemetry.early-ingress\",\n  outcome: \"success\",\n  duration_ms: 28.196292,\n}\n05:45:45.375 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    }
+  ],
+  "summary": {
+    "runs": 5,
+    "medianMs": 837.328417,
+    "p95Ms": 1116.07975,
+    "maximumMs": 1116.07975,
+    "passed": false
+  }
+}
