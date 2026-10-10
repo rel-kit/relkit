@@ -22,17 +22,14 @@ export const CandidatePlatformLive = Layer.succeed(
     cleanup: cleanupCandidate,
     port: resolvePort,
     spawn: (entrypoint, options, environment) =>
-      Bun.spawn<"ignore", "pipe", "pipe">(
-        [process.execPath, "run", "--no-env-file", "--no-install", "--silent", entrypoint],
-        {
-          cwd: options.projectRoot,
-          env: environment,
-          stdin: "ignore",
-          stdout: "pipe",
-          stderr: "pipe",
-          ...(options.signal === undefined ? {} : { signal: options.signal }),
-        },
-      ),
+      Bun.spawn<"ignore", "pipe", "pipe">([process.execPath, "--no-env-file", entrypoint], {
+        cwd: options.projectRoot,
+        env: environment,
+        stdin: "ignore",
+        stdout: "pipe",
+        stderr: "pipe",
+        ...(options.signal === undefined ? {} : { signal: options.signal }),
+      }),
     stop: terminate,
     output: (child, options, directory, limit, signal) =>
       captureOutput(child, options.logger, options.token, directory, limit, signal),

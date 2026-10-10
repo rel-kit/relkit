@@ -33,8 +33,8 @@ it.effect("standalone watcher records typed invalid admission and owned scheduli
           createWatcherLayer({ compile: () => undefined }, machine),
           createLoggerLayer({
             minimumLevel: "error",
-            json: false,
-            human: { write: (_line, record) => logs.push(record) },
+            human: false,
+            json: { write: (record) => logs.push(record) },
           }),
         ),
       ),

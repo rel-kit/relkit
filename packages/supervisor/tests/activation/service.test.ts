@@ -89,8 +89,8 @@ it.effect("configured logs and metrics preserve redaction, threshold and domain 
       createActivationLayer(),
       createLoggerLayer({
         minimumLevel: "error",
-        json: false,
-        human: { write: (_line, record) => records.push(record) },
+        human: false,
+        json: { write: (record) => records.push(record) },
       }),
     );
     yield* Effect.gen(function* () {
