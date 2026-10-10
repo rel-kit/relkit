@@ -27,20 +27,20 @@ Create a new RELKIT application
 | -------- | -------- | -------------------------------- |
 | name     | optional | npm package and application name |
 
-| Option                  | Value                                            | Description                         |
-| ----------------------- | ------------------------------------------------ | ----------------------------------- |
-| --template              | minimal, api, agent, fullstack                   | Starter template                    |
-| --cloud                 | aws, none                                        | Cloud provider                      |
-| --deploy                | pulumi, none                                     | Deployment adapter                  |
-| --jobs                  | inngest-docker, effect-mq-docker, trigger-docker | Jobs service and local recipe       |
-| --directory             | string                                           | Destination directory               |
-| --install               | boolean                                          | Install generated project setup     |
-| --no-install            | boolean                                          | No install generated project setup  |
-| --git                   | boolean                                          | Git generated project setup         |
-| --no-git                | boolean                                          | No git generated project setup      |
-| --examples              | boolean                                          | Examples generated project setup    |
-| --no-examples           | boolean                                          | No examples generated project setup |
-| --force-empty-directory | boolean                                          | Allow an existing empty destination |
+| Option                  | Value                                            | Description                                           |
+| ----------------------- | ------------------------------------------------ | ----------------------------------------------------- |
+| --template              | minimal, api, agent, fullstack                   | Candidate template; certified tuples only             |
+| --cloud                 | aws, none                                        | Candidate cloud selection; certified tuples only      |
+| --deploy                | pulumi, none                                     | Candidate deployment selection; certified tuples only |
+| --jobs                  | inngest-docker, effect-mq-docker, trigger-docker | Candidate jobs service; certified native tuples only  |
+| --directory             | string                                           | Destination directory                                 |
+| --install               | boolean                                          | Install generated project setup                       |
+| --no-install            | boolean                                          | No install generated project setup                    |
+| --git                   | boolean                                          | Git generated project setup                           |
+| --no-git                | boolean                                          | No git generated project setup                        |
+| --examples              | boolean                                          | Examples generated project setup                      |
+| --no-examples           | boolean                                          | No examples generated project setup                   |
+| --force-empty-directory | boolean                                          | Allow an existing empty destination                   |
 
 #### Examples
 
@@ -427,15 +427,16 @@ Create Better Auth and its catch-all route
 
 Run app, inspector, OpenAPI, and Scalar
 
-| Option           | Value                                             | Description                                     |
-| ---------------- | ------------------------------------------------- | ----------------------------------------------- |
-| --project-root   | string                                            | Application directory (defaults to cwd)         |
-| --port           | integer                                           | Application port                                |
-| --inspector-port | integer                                           | Inspector port                                  |
-| --local          | on, off                                           | Start required local services                   |
-| --log-level      | all, trace, debug, info, warn, error, fatal, none | Minimum terminal severity (default: info)       |
-| --verbose        | boolean                                           | Show debug events and full retained diagnostics |
-| --no-color       | boolean                                           | Disable terminal colors                         |
+| Option           | Value                                             | Description                                                |
+| ---------------- | ------------------------------------------------- | ---------------------------------------------------------- |
+| --project-root   | string                                            | Application directory (defaults to cwd)                    |
+| --prepare        | boolean                                           | Prepare a validated dev snapshot and exit without a server |
+| --port           | integer                                           | Application port                                           |
+| --inspector-port | integer                                           | Inspector port                                             |
+| --local          | on, off                                           | Start required local services                              |
+| --log-level      | all, trace, debug, info, warn, error, fatal, none | Minimum terminal severity (default: info)                  |
+| --verbose        | boolean                                           | Show debug events and full retained diagnostics            |
+| --no-color       | boolean                                           | Disable terminal colors                                    |
 
 #### Examples
 

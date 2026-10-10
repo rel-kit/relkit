@@ -1,7 +1,7 @@
 # Getting started
 
 RELKIT projects are TypeScript applications managed by Bun. This walkthrough
-creates a credential-free orders API, changes it, tests it, and produces a
+creates a credential-free API, changes it, tests it, and produces a
 production build. Pulumi and AWS are optional and are not required here.
 
 ## 1. Verify the prerequisite
@@ -19,8 +19,7 @@ Install or switch Bun before continuing unless the output is `1.3.10`.
 Run the supported generator from the directory that should contain the project:
 
 ```sh
-bunx create-relkit@latest relkit-orders \
-  --template api
+bunx create-relkit@latest relkit-orders
 cd relkit-orders
 cp .env.example .env
 ```
@@ -36,18 +35,30 @@ staging transaction, and generator.
 The unscoped CLI package provides the same generator through `bunx relkit`:
 
 ```sh
-bunx relkit@latest create relkit-orders --template api
+bunx relkit@latest create relkit-orders
 ```
 
-Available templates are `minimal`, `api`, and `agent`. Use `--no-install`,
-`--no-git`, or `--no-examples` only when surrounding automation owns that step.
+The packaged capability table currently certifies the default `minimal` template with examples,
+no jobs service, no cloud, and no deployment adapter. Other parsed combinations are rejected
+before staging or installation until their fresh-start and restart evidence passes. Use `--no-install`
+or `--no-git` only when surrounding automation owns that step.
 See `bunx create-relkit@latest --help` for the current generated reference.
+
+After `--no-install`, install and prepare exactly once before the first server:
+
+```sh
+bun install
+bunx --no-install relkit dev --prepare
+```
+
+Preparation exits without opening a listener. `bun run dev` validates the
+prepared receipt against the current project and falls back to the full safe
+check whenever any input no longer matches.
 
 Framework contributors can test the current checkout without publishing:
 
 ```sh
-bun run relkit:local -- create relkit-orders \
-  --template api
+bun run relkit:local -- create relkit-orders
 ```
 
 ## 3. Inspect and check the project
@@ -63,12 +74,6 @@ relkit-orders/
 │   ├── platform/
 │   │   └── env.ts
 │   ├── hello/
-│   │   ├── service.ts
-│   │   └── functions/
-│   ├── echo/
-│   │   ├── service.ts
-│   │   └── functions/
-│   ├── orders/
 │   │   ├── service.ts
 │   │   └── functions/
 │   └── routes/
@@ -93,7 +98,7 @@ bun run relkit doctor --no-pulumi
 bun run check
 ```
 
-The API template needs no provider credentials. `--no-pulumi` skips Pulumi and
+The minimal template needs no provider credentials. `--no-pulumi` skips Pulumi and
 AWS credential checks for this local-only journey. `doctor` still verifies Bun,
 configuration, and ports. `check` discovers descriptors, validates the
 application graph, and writes graph, manifest, OpenAPI, client, event registry,
