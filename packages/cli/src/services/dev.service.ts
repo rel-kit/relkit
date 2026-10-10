@@ -1,3 +1,8 @@
+/**
+ * Owns development command policy with native authorities captured at make.
+ * Acquisition never imports project configuration or starts children; run uses
+ * the caller's session Scope and retains its logging/cancellation context.
+ */
 import { Context, Effect, Layer } from "effect";
 import { devCommandOperationEffect } from "../commands/dev-command-operation.js";
 import { CliCompiler } from "./compiler.service.js";
@@ -15,9 +20,38 @@ import {
 import { localCapabilitiesLayer } from "./local-capabilities.js";
 import { devSessionCapabilitiesLayer } from "../commands/dev-session-engine.js";
 import type { DevOperations } from "./dev.types.js";
+import { CliInspectorSupport } from "../commands/dev-inspector-support.service.js";
 
 /** Development domain capturing authority without importing configuration during acquisition. */
-export class CliDev extends Context.Service<CliDev, DevOperations>()("relkit/cli/Dev") {}
+export class CliDev extends Context.Service<CliDev, DevOperations>()("relkit/cli/Dev", {
+  make: Effect.gen(function* () {
+    const compiler = yield* CliCompiler;
+    const files = yield* CliFileSystem;
+    const modules = yield* CliModules;
+    const cleanup = yield* CliCleanup;
+    const project = yield* CliProject;
+    const supervisor = yield* CliDevSupervisor;
+    const sourceWatch = yield* CliSourceWatch;
+    const ports = yield* CliPortProbe;
+    const telemetry = yield* CliTelemetryNative;
+    const inspector = yield* CliInspectorSupport;
+    return {
+      run: (args, context) =>
+        devCommandOperationEffect(args, context).pipe(
+          Effect.provideService(CliCompiler, compiler),
+          Effect.provideService(CliFileSystem, files),
+          Effect.provideService(CliModules, modules),
+          Effect.provideService(CliCleanup, cleanup),
+          Effect.provideService(CliProject, project),
+          Effect.provideService(CliDevSupervisor, supervisor),
+          Effect.provideService(CliSourceWatch, sourceWatch),
+          Effect.provideService(CliPortProbe, ports),
+          Effect.provideService(CliTelemetryNative, telemetry),
+          Effect.provideService(CliInspectorSupport, inspector),
+        ),
+    } satisfies DevOperations;
+  }),
+}) {}
 
 /**
  * Captures explicit project, generation, telemetry and native adapters once.
@@ -30,34 +64,7 @@ export class CliDev extends Context.Service<CliDev, DevOperations>()("relkit/cli
  * await Effect.runPromise(Effect.scoped(CliDev.use((dev) => dev.run([], context))).pipe(Effect.provide(devLiveLayer())));
  * ```
  */
-export const devLayer = Layer.effect(
-  CliDev,
-  Effect.gen(function* () {
-    const compiler = yield* CliCompiler;
-    const files = yield* CliFileSystem;
-    const modules = yield* CliModules;
-    const cleanup = yield* CliCleanup;
-    const project = yield* CliProject;
-    const supervisor = yield* CliDevSupervisor;
-    const sourceWatch = yield* CliSourceWatch;
-    const ports = yield* CliPortProbe;
-    const telemetry = yield* CliTelemetryNative;
-    return CliDev.of({
-      run: (args, context) =>
-        devCommandOperationEffect(args, context).pipe(
-          Effect.provideService(CliCompiler, compiler),
-          Effect.provideService(CliFileSystem, files),
-          Effect.provideService(CliModules, modules),
-          Effect.provideService(CliCleanup, cleanup),
-          Effect.provideService(CliProject, project),
-          Effect.provideService(CliDevSupervisor, supervisor),
-          Effect.provideService(CliSourceWatch, sourceWatch),
-          Effect.provideService(CliPortProbe, ports),
-          Effect.provideService(CliTelemetryNative, telemetry),
-        ),
-    });
-  }),
-);
+export const devLayer = Layer.effect(CliDev, CliDev.make);
 
 /** Composes the selected development graph with session-local import ownership.
  * @returns One selected dev dependency graph, including only session-local import caches.
