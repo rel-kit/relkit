@@ -1,5 +1,12 @@
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+/**
+ * Emits HTTP admission and health policy from the checked server configuration.
+ * Prepared capsules own their deferred transport facade through the existing host;
+ * production keeps the canonical synchronous app and both paths use its REST app
+ * for inspector registration before listener acquisition.
+ */
+import { serverHttpOptionsSource } from "./build-server-http-options.js";
 import { inspectorEndpointsSource } from "./build-server-http-inspector.js";
+import { preparedInspectorSource } from "./build-server-deferred-inspector.js";
 
 import type { ServerSourceConfiguration } from "./build-server.types.js";
 export type { ServerSourceConfiguration } from "./build-server.types.js";
@@ -10,6 +17,16 @@ export type { ServerSourceConfiguration } from "./build-server.types.js";
  * @returns Source with the existing health, status, admission, and client contracts.
  */
 export function serverHttpSource(configuration: ServerSourceConfiguration): string {
+  let applicationSource = "const app = createApp(httpApplicationOptions);";
+  let dispatchSource = "app.fetch(request, bunServer)";
+  let inspectorSource = inspectorEndpointsSource(configuration);
+  if (configuration.httpApplication === "prepared") {
+    applicationSource = `const preparedApplication = await runtimeOwner.resource("http.application", async () => createPreparedApp(httpApplicationOptions, ${preparedInspectorSource(configuration)}), (value) => value.close());
+const app = preparedApplication.app;
+`;
+    dispatchSource = "preparedApplication.fetch(request, bunServer)";
+    inspectorSource = "";
+  }
   return `const internalEndpointsEnabled = environment !== "production" || process.env.RELKIT_INTERNAL_ENDPOINTS === "1";
 const httpMiddlewareOptions = {
   generationId, graphHash, observability: telemetry, spanRuntime, maxBodyBytes: ${configuration.maxBodyBytes},
@@ -22,106 +39,8 @@ const httpMiddlewareOptions = {
       fields: { method: event.method, path: event.path, status: event.status, durationMs: event.durationMs } }));
   } }),
 };
-const app = createApp({
-  upgradeWebSocket,
-  plan,
-  manifest: executableManifest,
-  engine: { invoke: invokeHttp },
-  observability: telemetry,
-  responseMapping: { mode: environment },
-  middlewareContext: routeMiddlewareContext,
-  middleware: httpMiddlewareOptions,
-  apiDocs: {
-    mode: environment,
-    document: openapiDocument,
-    enabledInProduction: ${String(configuration.apiDocs.enabledInProduction)},
-    excludeDomains: ${JSON.stringify(configuration.apiDocs.excludeDomains ?? [])},
-    ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
-      ? {}
-      : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
-  },
-  clientContract: {
-    enabled: ${String(configuration.clientContract)},
-    document: clientContractDocument,
-  },
-  clientIdentity: {
-    applicationId: graph.appId,
-    publicFingerprint,
-    ...((plan.jobs ?? []).length === 0 ? {} : { jobs: { protocol: "relkit.jobs", version: 1 } }),
-    resolve: ({ request, session }) => resolveClientIdentityRegistration(request, session),
-  },
-  transportSecurity: transportSecurityRegistration(),
-  ...((plan.channels ?? []).length === 0 ? {} : {
-    realtime: {
-      applicationId: graph.appId,
-      environment,
-      provider: async (profile) => {
-        const registry = await providerStartup;
-        if (registry === undefined) throw new Error("Realtime provider registry unavailable.");
-        return provider(registry, "realtime", profile);
-      },
-      trustedContext: ({ request, auth }) => ({ request, auth }),
-    },
-  }),
-  ...(plan.agents.every((node) => node.client === undefined) ? {} : {
-    agentRuntime: {
-      applicationId: graph.appId,
-      environment,
-      generationId,
-      publicFingerprint,
-      signal: shutdownController.signal,
-      track: (task) => {
-        void runtimeOwner.track(task).catch(() => {});
-      },
-      provider: async (profile) => {
-        const registry = await providerStartup;
-        if (registry === undefined) throw new Error("Agent-state provider registry unavailable.");
-        return provider(registry, "agent-state", profile);
-      },
-      trustedContext: ({ request, auth }) => ({ request, auth }),
-    },
-  }),
-  ...((plan.jobs ?? []).length === 0 ? {} : {
-    jobs: {
-      runtimes: () => nativeJobsRuntimes,
-      descriptors: runtimeManifest.jobs,
-      tasks: runtimeManifest.tasks,
-      application: graph.appId,
-      environment,
-      publicFingerprint,
-      protocolVersion: 1,
-      ...(process.env.RELKIT_JOBS_CURSOR_SECRET === undefined
-        ? {}
-        : { cursorSecret: process.env.RELKIT_JOBS_CURSOR_SECRET }),
-    },
-  }),
-  mcp: { enabled: ${String(configuration.mcp)} },
-  staticFiles: { root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
-  rateLimitRuntime: { resolveStore: resolveRateLimitStore },
-  ...(authRuntime === undefined ? {} : { auth: authRuntime }),
-  internalEndpoints: {
-    mode: environment,
-    enabled: internalEndpointsEnabled,
-    graph: {
-      generationId,
-      graphHash,
-      activationFingerprint,
-      manifestGraphHash: runtimeManifest.graphHash,
-      graphContractVersion: ${GRAPH_VERSION},
-      manifestContractVersion: ${MANIFEST_VERSION},
-      manifestGeneratorVersion: ${GENERATOR_VERSION},
-      graph,
-    },
-    ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
-      ? {}
-      : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
-    readiness: () => ({
-      ready: runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping,
-      ...(runtimeState().stopping ? { reason: "stopping" } : runtimeState().primaryFailures.length > 0 ? { reason: "unavailable" } : {}),
-    }),
-  },
-});
-${inspectorEndpointsSource(configuration)}
+${serverHttpOptionsSource(configuration)}${applicationSource}
+${inspectorSource}
 const server = Bun.serve({
   hostname: "0.0.0.0",
   port: Number(process.env.PORT ?? 3000),
@@ -137,7 +56,7 @@ const server = Bun.serve({
     if (!runtimeState().ready.provider || !runtimeState().ready.nativeWorker || !runtimeState().ready.database || !runtimeState().ready.auth)
       return Response.json({ error: "not-ready" }, { status: 503 });
     try {
-      return await app.fetch(request, bunServer);
+      return await ${dispatchSource};
     } catch {
       return Response.json({ error: "internal-error" }, { status: 500 });
     }
