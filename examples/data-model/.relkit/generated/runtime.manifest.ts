@@ -1,5 +1,5 @@
 import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };
-import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app";
+import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app/internal/runtime";
 import * as __relkit_module_0 from "../../relkit.config.ts";
 import * as __relkit_module_1 from "../../src/database/service.ts";
 import * as __relkit_module_2 from "../../src/routes/users/route.ts";
