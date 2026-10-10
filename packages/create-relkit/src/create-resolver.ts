@@ -1,12 +1,7 @@
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import {
-  CREATE_JOBS,
-  CREATE_OPTION_DEFAULTS,
-  CREATE_TEMPLATES,
-  normalizeCreateOptions,
-  type CreateOptions,
-} from "./options.js";
+import { CREATE_OPTION_DEFAULTS, normalizeCreateOptions, type CreateOptions } from "./options.js";
+import { assertCreateCapability, supportedCreateTemplates } from "./create-capabilities.js";
 import { createClackPromptDriver } from "./prompt-driver.js";
 import { GeneratorPrompt, generatorPromptLayer } from "./generator-prompt.js";
 import { domainTry } from "./generator-errors.js";
@@ -44,9 +39,14 @@ export const resolveCreateOptionsDetailsEffect = Effect.fn("CreateResolution.res
         prompted = true;
       }
       if (!has(output, "template")) {
+        const templates = supportedCreateTemplates(explicitCapabilityOptions(output));
+        if (templates.length === 0)
+          return yield* domainTry(() => {
+            throw new Error("No certified starter template matches the explicit creation flags.");
+          });
         const template = yield* prompt.select({
           message: "Starter template",
-          options: CREATE_TEMPLATES.map((value) => ({ value, label: title(value) })),
+          options: templates.map((value) => ({ value, label: title(value) })),
           initialValue: CREATE_OPTION_DEFAULTS.template,
         });
         output.push("--template", template);
@@ -55,10 +55,7 @@ export const resolveCreateOptionsDetailsEffect = Effect.fn("CreateResolution.res
       if (!has(output, "jobs")) {
         const jobs = yield* prompt.select({
           message: "Jobs service",
-          options: [
-            { value: "none", label: "None" },
-            ...CREATE_JOBS.map((value) => ({ value, label: title(value) })),
-          ],
+          options: [{ value: "none", label: "None" }],
           initialValue: "none",
         });
         if (jobs !== "none") output.push("--jobs", jobs);
@@ -77,10 +74,30 @@ export const resolveCreateOptionsDetailsEffect = Effect.fn("CreateResolution.res
     const options = yield* domainTry(() =>
       normalizeCreateOptions(output, context.json === undefined ? {} : { json: context.json }),
     );
+    yield* domainTry(() => assertCreateCapability(options));
     return { options, prompted };
   },
   (effect) => observeExecution("generator", "create.resolve", effect),
 );
+
+function explicitCapabilityOptions(args: readonly string[]) {
+  return {
+    cloud: explicitValue(args, "cloud") ?? CREATE_OPTION_DEFAULTS.cloud,
+    deploy: explicitValue(args, "deploy") ?? CREATE_OPTION_DEFAULTS.deploy,
+    ...(explicitValue(args, "jobs") === undefined
+      ? {}
+      : { jobs: explicitValue(args, "jobs") as CreateOptions["jobs"] }),
+    examples: !args.includes("--no-examples"),
+  };
+}
+
+function explicitValue(args: readonly string[], name: string): string | undefined {
+  const flag = `--${name}`;
+  const inline = args.find((argument) => argument.startsWith(`${flag}=`));
+  if (inline !== undefined) return inline.slice(flag.length + 1);
+  const index = args.indexOf(flag);
+  return index < 0 ? undefined : args[index + 1];
+}
 
 /**
  * Preserves normalized creation's Promise compatibility API.
