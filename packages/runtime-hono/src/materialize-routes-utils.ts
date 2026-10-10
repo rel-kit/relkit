@@ -65,10 +65,16 @@ const handleRoute = Effect.fn("HttpRoutes.handle")(function* (
   frameworkTrace.event("http.route.matched", { "http.route": trigger.config.path });
   recordDetail(builder, { kind: "match", targetId: trigger.id, outcome: "success" });
   const responseOptions = responseOptionsFor(options, state?.signal);
+  const target =
+    options.resolveTarget === undefined
+      ? getEntry(options.manifest.targets ?? {}, trigger.targetFunctionId)
+      : yield* httpBoundary("route.resolveTarget", () =>
+          Promise.resolve(options.resolveTarget!(trigger.targetFunctionId)),
+        );
 
   const input = yield* httpBoundary("route.mapInput", () =>
     mapInputWithRecord(
-      () => routeInput(request, trigger, trigger.targetFunctionId, options),
+      () => routeInput(request, trigger, trigger.targetFunctionId, options, target),
       builder,
       trigger.targetFunctionId,
     ),
@@ -87,6 +93,7 @@ const handleRoute = Effect.fn("HttpRoutes.handle")(function* (
           {
             functionId: trigger.targetFunctionId,
             input,
+            ...(target === undefined ? {} : { target }),
             source: "http",
             ...(state?.signal === undefined ? {} : { signal: state.signal }),
             ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
@@ -184,6 +191,7 @@ export async function routeInput(
   trigger: HttpTriggerRegistration,
   targetFunctionId: string,
   options: RouteMaterializationOptions,
+  target = getEntry(options.manifest.targets ?? {}, trigger.targetFunctionId),
 ): Promise<unknown> {
   if (options.mapInput !== undefined)
     return options.mapInput(request, trigger, targetFunctionId, trigger.config.request);
@@ -198,8 +206,11 @@ export async function routeInput(
     ? result
     : decodeInferredInput(
         result.value,
-        getEntry(options.manifest.routes ?? {}, trigger.id),
-        getEntry(options.manifest.targets ?? {}, trigger.targetFunctionId),
+        getEntry(options.manifest.routes ?? {}, trigger.id) ??
+          (isRecord(trigger.config.request) && trigger.config.request.kind === "input"
+            ? {}
+            : { request: trigger.config.request }),
+        target,
       );
 }
 
