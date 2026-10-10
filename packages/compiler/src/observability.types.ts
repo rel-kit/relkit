@@ -1,3 +1,8 @@
+/**
+ * Restricts compiler operation and workload labels to declaration-owned names.
+ * Standalone and composed operations share these metrics; source paths and
+ * project identities never become metric attributes.
+ */
 /** Compiler stage names with bounded metric cardinality. */
 export type CompilerStage = "normalization" | "generation" | "discovery" | "configuration";
 
@@ -136,6 +141,7 @@ export type CompilerOperation =
   | "snapshotSchema"
   | "sourceParts"
   | "typecheckProject"
+  | "typecheckInputs"
   | "validateBoundaries"
   | "validateConfig"
   | "validateDependencies"
