@@ -1,0 +1,9 @@
+Command:
+rtk bun run test:generator
+
+Result:
+Initial Vitest phase: 9 files passed, 24 tests passed.
+Acceptance compilation: 4 passed, 0 failed.
+Acceptance additions: 5 passed, 0 failed.
+Remaining generator suite: 93 passed, 0 failed, 999 assertions.
+Exit code 0.

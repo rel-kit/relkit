@@ -1,0 +1,13 @@
+Command:
+rtk bunx vitest run packages/cli/build-prepared-manifest.test.ts packages/cli/tests/dev-snapshot/sealed-installation.test.ts packages/cli/tests/dev-snapshot/prepared-plan.test.ts packages/runtime-hono/tests/prepared-app.test.ts packages/create-relkit/tests/create-capabilities.effect.test.ts packages/cli/tests/services/telemetry-relay.test.ts packages/cli/tests/services/telemetry-relay-handoff.test.ts packages/observability/tests/early-records.test.ts scripts/tests/benchmark-packed-dev.test.ts
+
+Result:
+Test Files  9 passed (9)
+Tests       35 passed (35)
+Exit code   0
+
+Additional shared-module regression:
+rtk bunx vitest run packages/cli/build-prepared-manifest.test.ts
+Test Files  1 passed (1)
+Tests       6 passed (6)
+Exit code   0
