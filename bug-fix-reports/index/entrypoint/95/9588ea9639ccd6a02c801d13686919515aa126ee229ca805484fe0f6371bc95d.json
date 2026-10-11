@@ -1,0 +1,19 @@
+{
+  "key": "relkit dev --prepare",
+  "matches": {
+    "bf-d161dc4fb489e64ff2aa9252": {
+      "id": "bf-d161dc4fb489e64ff2aa9252",
+      "status": "verified",
+      "what": "Installed minimal creation cannot prepare its development snapshot after HTML-safe import encoding.",
+      "root_cause": "packages/cli/src/commands/build-support.ts:138-140 rebaseManifest matched only raw slash prefixes. preparedRuntimeManifest emits deferred dynamic imports with literal\\u002F slash escapes, so loadBuildStageCohort retained the old depth when relocating into the deeper sealed build directory. Actual Bun split bundling the",
+      "fixed_by": "Rebase the encoded dynamic-import prefix alongside ordinary imports while preserving script-safe escaping. The previously failing prepared-manifest regression passes, including closing-script safety after relocation. The actual installed dev --prepare command publishes its returned generation; packed generated projects",
+      "files": [
+        "packages/cli/src/commands/build-support.ts",
+        "packages/cli/build-prepared-manifest.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-11T09:31:49+00:00",
+      "report": "bug-fix-reports/issues/bf-d161dc4fb489e64ff2aa9252/report.md"
+    }
+  }
+}
