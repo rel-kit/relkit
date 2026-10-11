@@ -94,6 +94,14 @@ function apiDocsOptions(options: CreateAppOptions): ApiDocsOptions {
   const authorize = docs.authorize ?? internal.authorize;
   return {
     ...docs,
+    ...(docs.getAuthDocument !== undefined ||
+    options.auth?.getOpenApiDocument === undefined ||
+    options.plan.services?.some(
+      (service) =>
+        service.capability?.kind === "better-auth" && docs.excludeDomains?.includes(service.id),
+    )
+      ? {}
+      : { getAuthDocument: options.auth.getOpenApiDocument }),
     mode: docs.mode ?? internal.environment ?? internal.mode ?? "development",
     ...(bearerToken === undefined ? {} : { bearerToken }),
     ...(authorize === undefined ? {} : { authorize }),

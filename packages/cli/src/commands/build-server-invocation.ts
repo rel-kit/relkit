@@ -92,6 +92,7 @@ function createAuthRegistration(applicationGraph, routes = {}, authStartup) {
     return createHttpAuthRuntime({
       protected: route.auth.protected,
       publicPaths,
+      getOpenApiDocument: async () => generateBetterAuthOpenApi(await authStartup, specializedInstrumentation),
       getSession: async (headers) => {
         const auth = await authStartup;
         return (await auth.api.getSession({ headers })) ?? null;

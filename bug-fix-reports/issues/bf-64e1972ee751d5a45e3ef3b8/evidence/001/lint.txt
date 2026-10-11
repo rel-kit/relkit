@@ -1,0 +1,2 @@
+$ bun run scripts/lint.ts
+Public authoring scan passed (90 source/example fragments).

@@ -1,0 +1,9 @@
+{
+  "deleted": true,
+  "missing": true,
+  "persistedUpdate": true,
+  "scalarCreate": true,
+  "scalarList": true,
+  "scalarSignIn": true,
+  "update": true
+}

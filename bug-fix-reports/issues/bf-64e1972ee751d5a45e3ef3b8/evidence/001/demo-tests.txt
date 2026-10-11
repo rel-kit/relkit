@@ -1,0 +1,20 @@
+$ bun test
+bun test v1.3.10 (30e609e0)
+
+tests/unit/hello.function.test.ts:
+(pass) hello returns a greeting [59.00ms]
+
+tests/unit/todos.auth.test.ts:
+(pass) direct todo function calls require authentication without relying on HTTP protection [74.51ms]
+
+tests/integration/todos.route.test.ts:
+2026-10-11T13:47:31.779Z WARN [Better Auth]: Invalid password
+(pass) authenticated todos support CRUD, isolate users, and survive an application restart [1972.32ms]
+
+tests/integration/hello.route.test.ts:
+(pass) GET /hello [41.11ms]
+
+ 4 pass
+ 0 fail
+ 55 expect() calls
+Ran 4 tests across 4 files. [3.89s]

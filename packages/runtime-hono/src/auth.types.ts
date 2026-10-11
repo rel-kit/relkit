@@ -1,3 +1,5 @@
+import type { JsonValue } from "@relkit/contracts";
+
 /** Contract for http auth invocation used by auth. */
 export interface HttpAuthInvocation {
   readonly getSession: (options?: { readonly fresh?: boolean }) => Promise<unknown | null>;
@@ -9,6 +11,7 @@ export interface HttpAuthRuntime {
   readonly publicPaths: readonly string[];
   readonly contextFor: (request: Request) => HttpAuthInvocation;
   readonly protects: (path: string) => boolean;
+  readonly getOpenApiDocument?: () => Promise<JsonValue>;
 }
 
 /** create http auth runtime options configuring dependencies, callbacks and runtime policy. */
@@ -16,4 +19,5 @@ export interface CreateHttpAuthRuntimeOptions {
   readonly protected: readonly string[];
   readonly publicPaths: readonly string[];
   readonly getSession: (headers: Headers) => Promise<unknown | null>;
+  readonly getOpenApiDocument?: () => Promise<JsonValue>;
 }

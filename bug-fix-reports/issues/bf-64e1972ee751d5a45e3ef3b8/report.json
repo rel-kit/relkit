@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "id": "bf-64e1972ee751d5a45e3ef3b8",
+  "fingerprint": "64e1972ee751d5a45e3ef3b8b0e148d25ecd9cae92d1bb01ee15d25c5c9da1a5",
+  "identity": {
+    "entrypoint": "GET /_relkit/v1/openapi.json",
+    "module": "api-docs",
+    "symptom": "better auth endpoints absent from scalar",
+    "scenario": "login and authenticated todos",
+    "error": ""
+  },
+  "attempt": 1,
+  "created_at": "2026-10-11T13:29:00+00:00",
+  "updated_at": "2026-10-11T13:47:52+00:00",
+  "status": "verified",
+  "what": "Better Auth endpoints were absent from Scalar, preventing discovery of login before using authenticated todos.",
+  "expected": "Scalar includes native authentication endpoints and instructions, and browser login enables protected todo requests.",
+  "observed": "The live application document contained hello and todo operations but no /api/auth/sign-in/email operation.",
+  "root_cause": "packages/runtime-hono/src/api-docs.ts served only the graph-derived application document. The raw Better Auth catch-all handler did not contribute its native endpoint schemas, and the generated auth runtime supplied session lookup only.",
+  "fixed_by": "Added lazy native Better Auth schema generation, mounted paths and isolated schema names, merged it into authorized API docs, wired generated and testing auth runtimes, and added same-origin login instructions. Verified browser signup/login and todo CRUD with session cookies.",
+  "files": [
+    "packages/better-auth/src/index.ts",
+    "packages/better-auth/src/openapi.ts",
+    "packages/better-auth/tests/openapi.test.ts",
+    "packages/cli/src/commands/build-server-invocation.ts",
+    "packages/cli/src/commands/build-server-options.ts",
+    "packages/runtime-hono/src/api-docs.ts",
+    "packages/runtime-hono/src/api-docs-auth.ts",
+    "packages/runtime-hono/src/api-docs.types.ts",
+    "packages/runtime-hono/src/auth.ts",
+    "packages/runtime-hono/src/auth.types.ts",
+    "packages/runtime-hono/src/create-rest-app.ts",
+    "packages/runtime-hono/tests/api-docs-auth.test.ts",
+    "packages/testing/src/application-services.ts"
+  ],
+  "tags": [
+    "better-auth",
+    "scalar",
+    "openapi"
+  ],
+  "related": [],
+  "scope": {
+    "modules": [
+      "better-auth",
+      "runtime-hono/api-docs",
+      "cli/generated-auth-runtime"
+    ],
+    "entrypoints": [
+      "GET /_relkit/v1/openapi.json",
+      "GET /_relkit/v1/api-reference",
+      "POST /api/auth/sign-in/email",
+      "/todos"
+    ],
+    "invariants": [
+      "Auth schemas describe their real mount",
+      "Documentation authorization precedes schema acquisition",
+      "Same-origin browser sessions authenticate todo requests",
+      "Unauthenticated and cross-user access stays denied"
+    ]
+  },
+  "environment": {
+    "package": "@relkit/better-auth and @relkit/runtime-hono",
+    "revision": "HEAD plus scoped uncommitted changes",
+    "target": "http://127.0.0.1:3000",
+    "api_exposed": true,
+    "e2e_available": true,
+    "monitoring": "Existing RELKIT HTTP logs and development telemetry. Local request logs confirmed signup/login 200, todo creation 201, CRUD success, denial 401 and missing item 404."
+  },
+  "reproduction": [
+    "Fetch the live OpenAPI document and assert /api/auth/sign-in/email exists.",
+    "Open Scalar and submit signup or login using Test Request.",
+    "Create and list a todo through Scalar with no manual auth header.",
+    "Read the persisted todo, update it, read back the update, delete it, and assert later reads return 404."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "api",
+        "path": "evidence/001/api-before.txt",
+        "note": "Live schema lacks login route"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Native document callback is ignored"
+      }
+    ],
+    "after": [
+      {
+        "kind": "api",
+        "path": "evidence/001/api-after.txt",
+        "note": "Mounted login is documented"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-after.txt",
+        "note": "34 Effect/native/schema/runtime tests pass"
+      },
+      {
+        "kind": "e2e",
+        "path": "evidence/001/browser-final.txt",
+        "note": "Scalar sign-in, creation, listing and persisted CRUD assertions pass"
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "rtk bun x vitest run packages/runtime-hono/tests/api-docs-auth.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Authentication operations and schema are merged into the application document",
+        "output": "evidence/001/unit-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk bun x vitest run packages/better-auth/tests/auth packages/better-auth/tests/openapi.test.ts packages/better-auth/tests/react.test.ts packages/runtime-hono/tests/api-docs-auth.test.ts packages/runtime-hono/tests/api-docs.test.ts packages/runtime-hono/tests/auth.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Authentication operations and schema are merged into the application document",
+        "output": "evidence/001/unit-after.txt"
+      }
+    },
+    "runtime": {
+      "kind": "api",
+      "boundary": "Generated CLI server -> auth activation -> protected OpenAPI document -> native Better Auth schema",
+      "dependencies": [
+        "Real linked RELKIT packages",
+        "Better Auth 1.7.1",
+        "Real demo SQLite/Drizzle database"
+      ],
+      "steps": [
+        "Run the demo with its local framework links",
+        "Fetch active OpenAPI document",
+        "Assert login is documented"
+      ],
+      "before": {
+        "status": "failed",
+        "command": "rtk bun bug-fix-reports/issues/bf-64e1972ee751d5a45e3ef3b8/evidence/001/reproduce.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Scalar's live schema contains /api/auth/sign-in/email",
+        "output": "evidence/001/api-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk bun bug-fix-reports/issues/bf-64e1972ee751d5a45e3ef3b8/evidence/001/reproduce.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Scalar's live schema contains /api/auth/sign-in/email",
+        "output": "evidence/001/api-after.txt"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "rtk agent-browser --session relkit-auth-docs eval '(async()=>{const response=await fetch(\"/todos\");const data=await response.json();const todo=data.todos.find(t=>t.title===\"Scalar browser acceptance final\");if(!todo)throw Error(\"Scalar todo was not persisted\");const patch=await fetch(\"/todos/\"+todo.id,{method:\"PATCH\",headers:{\"content-type\":\"application/json\"},body:JSON.stringify({completed:true})});const read=await fetch(\"/todos/\"+todo.id);const stored=await read.json();const deleted=await fetch(\"/todos/\"+todo.id,{method:\"DELETE\"});const missing=await fetch(\"/todos/\"+todo.id);const result={scalarSignIn:window.scalarChecks.some(x=>x.path===\"/api/auth/sign-in/email\"&&x.status===200),scalarCreate:window.scalarChecks.some(x=>x.path===\"/todos\"&&x.status===201),scalarList:window.scalarChecks.some(x=>x.path===\"/todos\"&&x.status===200),update:patch.status===200,persistedUpdate:stored.completed===true,deleted:deleted.status===200,missing:missing.status===404};if(Object.values(result).some(x=>!x))throw Error(JSON.stringify(result));return result;})()'",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Scalar login stores the session; todo creation/listing work without copied tokens; updates persist and deletion returns 404",
+      "output": "evidence/001/browser-final.txt"
+    },
+    "checks": [
+      {
+        "name": "typecheck",
+        "status": "passed",
+        "command": "rtk bun x tsc -b --pretty false",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/typecheck.txt"
+      },
+      {
+        "name": "check",
+        "status": "passed",
+        "command": "rtk bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/check.txt"
+      },
+      {
+        "name": "lint",
+        "status": "passed",
+        "command": "rtk bun run lint",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/lint.txt"
+      },
+      {
+        "name": "native auth service",
+        "status": "passed",
+        "command": "rtk bun test packages/better-auth/tests/service.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/auth-service.txt"
+      },
+      {
+        "name": "Phase 0 exports guard",
+        "status": "pre-existing",
+        "command": "rtk bun scripts/pack-and-smoke-exports.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "baseline_exit_code": 1,
+        "baseline": "evidence/001/guard-baseline.txt",
+        "output": "evidence/001/guard-after.txt",
+        "reason": "create-relkit's existing export map disagrees with the guard expectation. Both the manifest and guard are identical to HEAD."
+      }
+    ],
+    "regressions": [
+      {
+        "kind": "api",
+        "boundary": "Scalar -> native auth -> todo route -> SQLite",
+        "status": "passed",
+        "command": "rtk agent-browser --session relkit-auth-docs eval '(async()=>{const response=await fetch(\"/todos\");const data=await response.json();const todo=data.todos.find(t=>t.title===\"Scalar browser acceptance final\");if(!todo)throw Error(\"Scalar todo was not persisted\");const patch=await fetch(\"/todos/\"+todo.id,{method:\"PATCH\",headers:{\"content-type\":\"application/json\"},body:JSON.stringify({completed:true})});const read=await fetch(\"/todos/\"+todo.id);const stored=await read.json();const deleted=await fetch(\"/todos/\"+todo.id,{method:\"DELETE\"});const missing=await fetch(\"/todos/\"+todo.id);const result={scalarSignIn:window.scalarChecks.some(x=>x.path===\"/api/auth/sign-in/email\"&&x.status===200),scalarCreate:window.scalarChecks.some(x=>x.path===\"/todos\"&&x.status===201),scalarList:window.scalarChecks.some(x=>x.path===\"/todos\"&&x.status===200),update:patch.status===200,persistedUpdate:stored.completed===true,deleted:deleted.status===200,missing:missing.status===404};if(Object.values(result).some(x=>!x))throw Error(JSON.stringify(result));return result;})()'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Authenticated todo CRUD and persisted read-back succeed; deleted todos return 404",
+        "output": "evidence/001/browser-final.txt"
+      },
+      {
+        "kind": "integration",
+        "boundary": "Demo auth and todo services through actual test application with SQLite",
+        "status": "passed",
+        "command": "rtk bun --cwd /Users/mustafaelsayed/Workspace/typescripts/myrelkitapp-after-benchmarks test",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "CRUD, user isolation, unauthorized access, validation, restart persistence, sign-out and sign-in checks pass",
+        "output": "evidence/001/demo-tests.txt"
+      }
+    ],
+    "limitations": [
+      "The existing Phase 0 exports guard fails for an unchanged create-relkit manifest.",
+      "The demo uses temporary local dependency links without manifest or lockfile changes; reinstalling dependencies restores published versions.",
+      "Existing inspector Playwright fixtures have no Better Auth login scenario; focused browser acceptance used agent-browser against the real demo."
+    ]
+  },
+  "notes": [
+    "No demo source files were changed. Local links unify the framework and Drizzle package identities.",
+    "Native schema generation installs no additional public Better Auth docs endpoints.",
+    "Browser request-body editing initially appended JSON; those 400 responses were test-driver errors. Final valid request bodies and all recorded acceptance assertions pass.",
+    "No commit, push or release performed."
+  ]
+}

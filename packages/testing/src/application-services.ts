@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { activateBetterAuthService } from "@relkit/better-auth";
+import { activateBetterAuthService, generateBetterAuthOpenApi } from "@relkit/better-auth";
 import { activateDrizzleService } from "@relkit/drizzle";
 import { createHttpAuthRuntime } from "@relkit/runtime-hono";
 import type { TestRawRoute, TestRoute } from "./application-routes.js";
@@ -134,6 +134,7 @@ export function testServicesLayer(
             : createHttpAuthRuntime({
                 protected: mount.auth?.protected ?? [],
                 publicPaths: [basePath(mount), mount.path],
+                getOpenApiDocument: () => generateBetterAuthOpenApi(activeAuth, instrumentation),
                 getSession: async (headers) =>
                   (await activeAuth.api.getSession({ headers })) ?? null,
               });

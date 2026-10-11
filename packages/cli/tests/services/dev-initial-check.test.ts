@@ -4,121 +4,32 @@
  * interruption cleanup. Default inspector resolution follows packaged policy.
  */
 import { expect, it } from "@effect/vitest";
-import { loadConfig } from "@relkit/compiler";
-import { Cause, Deferred, Effect, Exit, Fiber, Layer, Logger } from "effect";
+import { Cause, Deferred, Effect, Exit, Fiber, Logger } from "effect";
 import { cliAdapterError } from "../../src/cli-errors.js";
 import { devCommandOperationEffect } from "../../src/commands/dev-command-operation.js";
-import { CliTelemetryNative } from "../../src/commands/dev-telemetry-native.service.js";
-import { CliPortProbe } from "../../src/commands/port-availability.service.js";
-import { CliDevSupervisor } from "../../src/services/dev-supervisor.service.js";
-import { CliSourceWatch } from "../../src/services/source-watch.service.js";
-import { cleanupLayer } from "../../src/services/cleanup.service.js";
-import { CliModules } from "../../src/services/modules.service.js";
-import { CliProject } from "../../src/services/project.service.js";
-import { compilerTestLayer, filesystemTestLayer } from "./test-layers.js";
 import type { DevCheckRequest } from "../../src/commands/dev-check.types.js";
-import type { ProjectCapabilities } from "../../src/services/project.types.js";
-import type { CheckResult } from "../../src/commands/check-result.types.js";
-import type { CliCommandContext } from "../../src/main-support-types.js";
-
-const root = "/relkit-initial-check";
-const args = ["--project-root", root, "--port", "12345", "--inspector-port", "12346"];
-const context: CliCommandContext = {
-  command: "dev",
+import {
   args,
-  json: false,
-  signal: new AbortController().signal,
-  reporter: { output: () => undefined, error: () => undefined },
-  log: () => undefined,
-};
-
-/**
- * Supplies only the initial check; every later filesystem/compiler operation is forbidden.
- * @param checkDevelopment - Deterministic substitute for the scoped native check capability.
- * @returns A complete command graph whose native session acquisition remains lazy.
- */
-function layer(checkDevelopment: ProjectCapabilities["checkDevelopment"]) {
-  const unexpected = () => Effect.die(new Error("Unexpected ordinary project operation."));
-  const forbidden = () =>
-    Effect.die(new Error("Session or telemetry admitted before initial check."));
-  return Layer.mergeAll(
-    cleanupLayer,
-    Layer.succeed(
-      CliDevSupervisor,
-      CliDevSupervisor.of({
-        start: forbidden,
-        verify: forbidden,
-        dispose: forbidden,
-        drain: forbidden,
-        listen: forbidden,
-        stopProxy: forbidden,
-      }),
-    ),
-    Layer.succeed(CliSourceWatch, CliSourceWatch.of({ watch: forbidden, poll: forbidden })),
-    Layer.succeed(CliPortProbe, CliPortProbe.of({ check: forbidden })),
-    Layer.succeed(
-      CliTelemetryNative,
-      CliTelemetryNative.of({
-        worker: forbidden,
-        stream: forbidden,
-        listen: forbidden,
-        closeWorker: forbidden,
-      }),
-    ),
-    Layer.succeed(
-      CliProject,
-      CliProject.of({
-        check: unexpected,
-        checkDevelopment,
-        build: unexpected,
-      }),
-    ),
-    compilerTestLayer({ loadConfig: () => Effect.succeed(loadConfig({}, root)) }),
-    filesystemTestLayer(),
-    Layer.succeed(
-      CliModules,
-      CliModules.of({
-        load: () => Effect.succeed({ default: {} }),
-        invalidate: () => Effect.void,
-      }),
-    ),
-  );
-}
-
-/** Failed diagnostics need no generated artifact paths because admission ends before reading them. */
-const failed: CheckResult = {
-  ok: false,
-  activatable: false,
-  projectRoot: root,
-  generatedDirectory: `${root}/.relkit/generated`,
-  diagnostics: [{ code: "TEST_INITIAL", severity: "error", message: "Initial check failed." }],
-  outputs: {
-    graph: "",
-    manifest: "",
-    runtimeActivation: "",
-    runtimeIntegrations: "",
-    runtimeIntegrationImports: "",
-    localServices: "",
-    diagnostics: "",
-    openapi: "",
-    client: "",
-    contract: "",
-    clientContract: "",
-    clientRegistry: "",
-    clientManifest: "",
-  },
-};
+  context,
+  failed,
+  initialCheckTestLayer as layer,
+} from "./dev-initial-check.fixture.js";
 
 it.effect(
   "initial development uses the substitute with fresh identity and preserves diagnostics",
   () =>
     Effect.gen(function* () {
       const requests: DevCheckRequest[] = [];
-      const graph = layer((request) =>
-        Effect.sync(() => {
-          requests.push(request);
-          return failed;
-        }),
+      let watchesClosed = 0;
+      const graph = layer(
+        (request) =>
+          Effect.sync(() => {
+            requests.push(request);
+            return failed;
+          }),
+        () => {
+          watchesClosed += 1;
+        },
       );
       for (let attempt = 0; attempt < 2; attempt++) {
         const failure = yield* Effect.flip(
@@ -134,7 +45,8 @@ it.effect(
         }
       }
       expect(requests).toHaveLength(2);
-      expect(requests[0]?.projectRoot).toBe(root);
+      expect(watchesClosed).toBe(2);
+      expect(requests[0]?.projectRoot).toBe(context.args[1]);
       expect(requests[0]?.generationId).toMatch(/^dev-initial-/);
       expect(requests[1]?.generationId).not.toBe(requests[0]?.generationId);
     }),
@@ -145,13 +57,22 @@ it.effect(
   () =>
     Effect.gen(function* () {
       const failure = cliAdapterError("dev.compiler.spawn", new Error("Cannot spawn compiler."));
+      let watchesClosed = 0;
       const outcome = yield* Effect.flip(
         Effect.scoped(devCommandOperationEffect(args, context)).pipe(
-          Effect.provide(layer(() => Effect.fail(failure))),
+          Effect.provide(
+            layer(
+              () => Effect.fail(failure),
+              () => {
+                watchesClosed += 1;
+              },
+            ),
+          ),
           Effect.provide(Logger.layer([])),
         ),
       );
       expect(outcome).toBe(failure);
+      expect(watchesClosed).toBe(1);
     }),
 );
 
@@ -160,13 +81,18 @@ it.effect("interrupting the initial capability joins its release before admittin
     const entered = yield* Deferred.make<void>();
     const releasing = yield* Deferred.make<void>();
     const released = yield* Deferred.make<void>();
-    const graph = layer(() =>
-      Deferred.succeed(entered, undefined).pipe(
-        Effect.andThen(Effect.never),
-        Effect.ensuring(
-          Deferred.succeed(releasing, undefined).pipe(Effect.andThen(Deferred.await(released))),
+    let watchesClosed = 0;
+    const graph = layer(
+      () =>
+        Deferred.succeed(entered, undefined).pipe(
+          Effect.andThen(Effect.never),
+          Effect.ensuring(
+            Deferred.succeed(releasing, undefined).pipe(Effect.andThen(Deferred.await(released))),
+          ),
         ),
-      ),
+      () => {
+        watchesClosed += 1;
+      },
     );
     const running = yield* Effect.scoped(devCommandOperationEffect(args, context)).pipe(
       Effect.provide(graph),
@@ -179,6 +105,7 @@ it.effect("interrupting the initial capability joins its release before admittin
     expect(interrupting.pollUnsafe()).toBeUndefined();
     yield* Deferred.succeed(released, undefined);
     yield* Fiber.join(interrupting);
+    expect(watchesClosed).toBe(1);
     const outcome = yield* Fiber.await(running);
     expect(Exit.isFailure(outcome)).toBe(true);
     if (Exit.isFailure(outcome)) expect(Cause.hasInterruptsOnly(outcome.cause)).toBe(true);

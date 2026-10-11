@@ -15,6 +15,7 @@ import { BETTER_AUTH_HANDLER, BETTER_AUTH_RUNTIME } from "./symbols.js";
 
 export { activateBetterAuthService };
 export { BETTER_AUTH_HANDLER };
+export { generateBetterAuthOpenApi } from "./openapi.js";
 export { AuthFailure } from "./auth.errors.js";
 export { AuthFactory, authFactoryLiveLayer } from "./auth.factory.js";
 export { AuthService, authServiceLayer, authLiveLayer } from "./auth.service.js";

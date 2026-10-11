@@ -1,0 +1,11 @@
+{"status":200,"paths":["/hello","/todos","/todos/{id}"],"loginDocumented":false}
+1 | const response = await fetch("http://127.0.0.1:3000/_relkit/v1/openapi.json");
+2 | const document = await response.json();
+3 | const paths = Object.keys(document.paths);
+4 | console.log(JSON.stringify({ status: response.status, paths, loginDocumented: paths.includes("/api/auth/sign-in/email") }));
+5 | if (!paths.includes("/api/auth/sign-in/email")) throw new Error("Better Auth login is missing from Scalar's document");
+                                                              ^
+error: Better Auth login is missing from Scalar's document
+      at /Users/mustafaelsayed/Workspace/relkit/bug-fix-reports/issues/bf-64e1972ee751d5a45e3ef3b8/evidence/001/reproduce.ts:5:59
+
+Bun v1.3.10 (macOS arm64)
