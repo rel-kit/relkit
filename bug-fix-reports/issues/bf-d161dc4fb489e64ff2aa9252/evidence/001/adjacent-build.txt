@@ -1,0 +1,7 @@
+SUMMARY:
+   6 pass
+   0 fail
+  Ran 6 tests across 1 file. [2.71s]
+
+
+Exit code: 0

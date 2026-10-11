@@ -420,16 +420,16 @@ The benchmark SHALL start a monotonic clock immediately before spawning the gene
 
 #### Scenario: Poll observes a response after the threshold
 
-- **WHEN** correct complete response observation occurs at or above 500 ms
+- **WHEN** correct complete response observation occurs at or above 1,000 ms
 - **THEN** the sample fails without subtracting polling delay or rounding it below the threshold
 
 ### Requirement: Every supported creation combination passes every measured start
 
-Readiness certification SHALL enumerate every valid normalized runtime-affecting combination, including fullstack, jobs, cloud/deploy selections, and examples enabled/disabled. Each shipped combination SHALL pass a controlled 20-start fresh-installed set and a separate controlled 20-start unchanged-restart set on the current Apple M1 Pro/macOS arm64 reference host with pinned Bun. Every run SHALL be strictly below 500 ms. The record SHALL include every attempt plus median, nearest-rank 95th percentile, and maximum, without discarding warmups, failures, outliers, or cleanup failures. Post-install preparation for `--no-install` SHALL receive equivalent functional and readiness evidence.
+Readiness certification SHALL enumerate every valid normalized runtime-affecting combination, including fullstack, jobs, cloud/deploy selections, and examples enabled/disabled. Each shipped combination SHALL pass a controlled 20-start fresh-installed set and a separate controlled 20-start unchanged-restart set on the current Apple M1 Pro/macOS arm64 reference host with pinned Bun. Every run SHALL be strictly below 1,000 ms. The record SHALL include every attempt plus median, nearest-rank 95th percentile, and maximum, without discarding warmups, failures, outliers, or cleanup failures. Post-install preparation for `--no-install` SHALL receive equivalent functional and readiness evidence.
 
 #### Scenario: One combination has a slow run
 
-- **WHEN** one required run is at or above 500 ms despite a passing median or p95
+- **WHEN** one required run is at or above 1,000 ms despite a passing median or p95
 - **THEN** that combination fails certification, is hidden interactively, and its explicit flags are rejected
 
 #### Scenario: Default combination fails
@@ -463,12 +463,12 @@ Example-bearing projects SHALL be timed against an actual safe generated backend
 
 ### Requirement: Docker provisioning and fallback have separate correctness evidence
 
-Required Docker services SHALL be healthy and safely adoptable before t0 in gated starts. Cold provisioning, installation, and edited-source fallback SHALL be recorded separately without the 500 ms gate. Every cold setup SHALL retain visible prerequisite progress and fail safely if required services cannot become healthy. Missing/stale/corrupt snapshots SHALL exercise full validation, and invalid edits SHALL never activate or displace the last-known-good generation.
+Required Docker services SHALL be healthy and safely adoptable before t0 in gated starts. Cold provisioning, installation, and edited-source fallback SHALL be recorded separately without the 1,000 ms gate. Every cold setup SHALL retain visible prerequisite progress and fail safely if required services cannot become healthy. Missing/stale/corrupt snapshots SHALL exercise full validation, and invalid edits SHALL never activate or displace the last-known-good generation.
 
 #### Scenario: Cold Docker setup is required
 
 - **WHEN** a generated jobs project needs images or services provisioned
-- **THEN** setup time is reported separately and only a subsequent launch with verified healthy services is subject to the 500 ms gate
+- **THEN** setup time is reported separately and only a subsequent launch with verified healthy services is subject to the 1,000 ms gate
 
 #### Scenario: Required service is unhealthy or its lease mismatches
 

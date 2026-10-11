@@ -1,0 +1,25 @@
+Command: rtk bun test tests/unit/release-check.test.ts
+[FAIL] FAILURES:
+  (fail) the release certifies default creation using its actual tool identity [5.04ms]
+  error: expect(received).toEqual(expected)
+  {
+  "bun": "1.3.10",
+  "packageCatalogDigest": "ac7c2f56e61fca5ab890775cf4c483722cb590e488ee7fc4741224cbb4f50ccd",
+  -   "release": "0.7.3",
+  +   "release": "0.7.2",
+  "snapshotProtocol": 1,
+  "template": "default/v1/minimal",
+  "typescript": "5.9.3",
+  }
+  - Expected  - 1
+  + Received  + 1
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/unit/release-check.test.ts:13:56)
+
+SUMMARY:
+   2 pass
+   1 fail
+  Ran 3 tests across 1 file. [384.00ms]
+
+[full output: rtk recall 289aba8116f8]
+
+Exit code: 1

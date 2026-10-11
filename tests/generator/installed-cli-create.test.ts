@@ -25,6 +25,34 @@ test("normal CLI installs external projects from packed packages without contrib
       npm_config_registry: registry,
       BUN_INSTALL_CACHE_DIR: join(parent, "cache"),
     };
+    const unsupported = join(parent, "unsupported");
+    const rejected = Bun.spawn(
+      [
+        process.execPath,
+        join(import.meta.dir, "../../packages/cli/src/bin.ts"),
+        "create",
+        "unsupported",
+        "--directory",
+        unsupported,
+        "--template",
+        "agent",
+        "--no-install",
+        "--no-git",
+        "--json",
+      ],
+      { cwd: parent, env: registryEnvironment, stdout: "pipe", stderr: "pipe" },
+    );
+    const [rejectedOutput, rejectedError, rejectedCode] = await Promise.all([
+      new Response(rejected.stdout).text(),
+      new Response(rejected.stderr).text(),
+      rejected.exited,
+    ]);
+    expect(rejectedCode, rejectedError).toBe(2);
+    expect(JSON.parse(rejectedOutput).error).toMatchObject({
+      code: "RELKIT_CREATE_USAGE",
+      message: expect.stringContaining("not certified"),
+    });
+    await expect(stat(unsupported)).rejects.toMatchObject({ code: "ENOENT" });
     const child = Bun.spawn(
       [
         process.execPath,

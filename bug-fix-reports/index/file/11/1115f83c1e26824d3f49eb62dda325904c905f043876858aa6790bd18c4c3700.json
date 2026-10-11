@@ -1,0 +1,29 @@
+{
+  "key": "scripts/dev-readiness/benchmark.service.ts",
+  "matches": {
+    "bf-66bc5f16fd0b62c4095cf1e3": {
+      "id": "bf-66bc5f16fd0b62c4095cf1e3",
+      "status": "verified",
+      "what": "Release 0.7.3 rejects default minimal creation and the npm artifact job fails.",
+      "root_cause": "packages/create-relkit/src/create-capabilities.ts:49 pinned release 0.7.2 while the package and template manifests were 0.7.3. The template digest was stale too. Tests injected the table identity instead of checking the actual tool identity and read removed pre-archive evidence paths. Artifact building did not validate",
+      "fixed_by": "Certify the actual 0.7.3 identity and template, keep versioned evidence paths, check the current identity without injection, and validate evidence before building artifacts. The user-authorized limit is strictly below 1,000 ms for each start, including preparation. The final 20 fresh starts peaked at 777.006458 ms, the",
+      "files": [
+        "packages/create-relkit/src/create-capabilities.ts",
+        "packages/create-relkit/tests/create-capabilities.test.ts",
+        "scripts/release-check.ts",
+        "tests/unit/release-check.test.ts",
+        "tests/generator/installed-cli-create.test.ts",
+        "scripts/benchmark-generated-dev.ts",
+        "scripts/benchmark-packed-dev.ts",
+        "scripts/dev-readiness/benchmark-packed-summary.ts",
+        "scripts/dev-readiness/benchmark.service.ts",
+        "scripts/tests/benchmark-packed-dev.test.ts",
+        "openspec/specs/acceptance-verification/spec.md",
+        "openspec/specs/cli-scaffolding/spec.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-11T09:31:48+00:00",
+      "report": "bug-fix-reports/issues/bf-66bc5f16fd0b62c4095cf1e3/report.md"
+    }
+  }
+}

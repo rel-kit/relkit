@@ -1,0 +1,147 @@
+Command: rtk bun run scripts/benchmark-packed-dev.ts --runs 20 --set restart --output docs/evidence/create-capabilities/0.7.3/restart.json
+[11:38:05.369] INFO (#1): Packing and installing the candidate fixture
+[11:40:18.523] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 586.28,
+}
+[11:40:19.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 600.993583,
+}
+[11:40:19.651] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 518.971875,
+}
+[11:40:20.159] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 505.184,
+}
+[11:40:20.666] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 504.644125,
+}
+[11:40:21.195] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 525.531958,
+}
+[11:40:21.694] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 497.232334,
+}
+[11:40:22.196] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 497.928209,
+}
+[11:40:22.725] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 527.361875,
+}
+[11:40:23.251] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 510.926,
+}
+[11:40:23.769] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 515.449542,
+}
+[11:40:24.291] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 520.027208,
+}
+[11:40:24.779] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 485.464708,
+}
+[11:40:25.277] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 495.305,
+}
+[11:40:25.781] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 501.2165,
+}
+[11:40:26.297] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 513.70425,
+}
+[11:40:26.812] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 512.515708,
+}
+[11:40:27.397] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 583.005167,
+}
+[11:40:28.077] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 676.955542,
+}
+[11:40:28.629] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 550.225875,
+}
+[11:40:29.662] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 1029.964041,
+}
+[11:40:29.680] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.identity",
+  outcome: "success",
+  duration_ms: 17.762375,
+}
+[11:40:29.682] INFO (#1): Packed candidate recorded {
+  path: "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/create-capabilities/0.7.3/restart.json",
+  summary: {
+    runs: 20,
+    medianMs: 470.1706875,
+    p95Ms: 632.706833,
+    maximumMs: 988.1655,
+    passed: false,
+    preparationPassed: false,
+  },
+}
+
+Exit code: 0

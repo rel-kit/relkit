@@ -1,0 +1,8 @@
+Command: rtk bun x vitest run packages/cli/build-prepared-manifest.test.ts
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  11:30:24
+   Duration  2.10s (transform 76%, import 20%, tests 3%)
+
+Exit code: 0

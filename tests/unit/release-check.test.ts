@@ -3,6 +3,18 @@ import { join } from "node:path";
 import { releaseNotes } from "../../scripts/release-check.ts";
 import { publicationOrder } from "../../scripts/release-check-artifacts.ts";
 import { checkManifests, packages, readJson, root } from "../../scripts/release-check-support.ts";
+import {
+  assertCreateCapability,
+  currentCreateCapabilityIdentity,
+  CREATE_CAPABILITY_TABLE,
+} from "../../packages/create-relkit/src/create-capabilities.ts";
+
+test("the release certifies default creation using its actual tool identity", () => {
+  expect(CREATE_CAPABILITY_TABLE.entries[0]?.identity).toEqual(currentCreateCapabilityIdentity());
+  expect(() =>
+    assertCreateCapability({ template: "minimal", cloud: "none", deploy: "none", examples: true }),
+  ).not.toThrow();
+});
 
 test("accepts the unscoped CLI package and publishes its dependency first", async () => {
   const items = await packages();

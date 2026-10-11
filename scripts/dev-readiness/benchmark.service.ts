@@ -119,7 +119,7 @@ const pollResponse = Effect.fn("ReadinessBenchmark.poll")(function* (
 /**
  * Aggregates every attempt with nearest-rank p95 and a strict unrounded gate.
  * @param samples - All launches in the controlled set, without discarded warmups.
- * @param thresholdMs - Strict per-run target, normally 500 ms.
+ * @param thresholdMs - Strict per-run target, normally 1,000 ms.
  * @returns Full-precision summary; an empty or failed set never passes.
  */
 export function summarizeStarts(

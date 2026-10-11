@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   CREATE_CAPABILITY_TABLE,
   assertCreateCapability,
+  currentCreateCapabilityIdentity,
   supportedCreateTemplates,
 } from "../src/create-capabilities.js";
 
@@ -17,12 +18,23 @@ const supported = {
 } as const;
 
 describe("creation capability evidence", () => {
+  it("certifies the default tuple for the actual packaged release identity", () => {
+    expect(() => assertCreateCapability(supported)).not.toThrow();
+    expect(identity).toEqual(currentCreateCapabilityIdentity());
+    expect(supportedCreateTemplates({ cloud: "none", deploy: "none", examples: true })).toEqual([
+      "minimal",
+    ]);
+  });
+
   it("accepts only the current fully evidenced tuple", () => {
     expect(() => assertCreateCapability(supported, identity)).not.toThrow();
     expect(() => assertCreateCapability({ ...supported, template: "agent" }, identity)).toThrow(
       "not certified",
     );
     expect(() => assertCreateCapability(supported, { ...identity, bun: "1.3.11" })).toThrow(
+      "none for this tool identity",
+    );
+    expect(() => assertCreateCapability(supported, { ...identity, release: "0.7.2" })).toThrow(
       "none for this tool identity",
     );
     expect(() => assertCreateCapability(supported, { ...identity, typescript: "5.9.4" })).toThrow(
@@ -48,10 +60,7 @@ describe("creation capability evidence", () => {
   });
 
   it("gates every table entry on complete passing evidence", () => {
-    const root = join(
-      import.meta.dirname,
-      "../../../openspec/changes/fast-generated-dev-readiness/evidence",
-    );
+    const root = join(import.meta.dirname, "../../..");
     for (const entry of CREATE_CAPABILITY_TABLE.entries) {
       expectEvidence(join(root, entry.freshEvidence), entry, "fresh");
       expectEvidence(join(root, entry.restartEvidence), entry, "restart");
@@ -71,6 +80,7 @@ function expectEvidence(
     mode: "candidate-certification",
     set,
     command: "bun dev",
+    thresholdMs: 1_000,
     summary: { runs: 20, passed: true },
     identity: {
       bun: { version: entry.identity.bun },
@@ -82,7 +92,7 @@ function expectEvidence(
   expect(report.attempts).toHaveLength(20);
   expect(
     report.attempts.every(
-      (attempt: any) => attempt.sample?.outcome === "response" && attempt.sample.durationMs < 500,
+      (attempt: any) => attempt.sample?.outcome === "response" && attempt.sample.durationMs < 1_000,
     ),
   ).toBe(true);
   expect(Array.isArray(report.identity.artifacts)).toBe(true);

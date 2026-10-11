@@ -1,0 +1,206 @@
+# bf-d161dc4fb489e64ff2aa9252: Installed minimal creation cannot prepare its development snapshot after HTML-safe import encoding.
+
+Status: **verified**
+Attempt: 1 · Updated: 2026-10-11T09:31:49+00:00
+
+## What
+
+Installed minimal creation cannot prepare its development snapshot after HTML-safe import encoding.
+
+## Expected
+
+Prepared dynamic imports preserve their target when the compiler manifest moves to the deeper sealed build directory; creation finishes and /hello serves correctly.
+
+## Observed before
+
+Real packed create fails with RELKIT_CREATE_PREPARE_FAILED; relkit dev --prepare exits 1 at preparation.bundle; real Bun split bundle cannot resolve ../../src/hello/functions/hello.function.ts.
+
+## Root cause
+
+packages/cli/src/commands/build-support.ts:138-140 rebaseManifest matched only raw slash prefixes. preparedRuntimeManifest emits deferred dynamic imports with literal\u002F slash escapes, so loadBuildStageCohort retained the old depth when relocating into the deeper sealed build directory. Actual Bun split bundling then could not resolve the hello function.
+
+## Fixed by
+
+Rebase the encoded dynamic-import prefix alongside ordinary imports while preserving script-safe escaping. The previously failing prepared-manifest regression passes, including closing-script safety after relocation. The actual installed dev --prepare command publishes its returned generation; packed generated projects serve correct HTTP responses, recover corrupt pointers and build/start for production. Generator, adjacent bundler and prepush checks pass. Changes are uncommitted and unpushed.
+
+## Changed files
+
+- packages/cli/src/commands/build-support.ts
+- packages/cli/build-prepared-manifest.test.ts
+
+## Reproduction
+
+- Create minimal project through packed create-relkit with --install; observe prepare failure
+- Retain an equivalent --no-install project, install the same private-registry packages, run real relkit dev --prepare --json
+- Run buildProject with bundleInputInventory bun.inputs.json against the installed CLI to capture Bun's resolution diagnostic
+- Run focused prepared-manifest regression
+
+## Evidence
+
+- before: [integration](evidence/001/runtime-before.txt) — Retained baseline output.
+- before: [integration](evidence/001/packed-create-before.txt) — Retained baseline output.
+- before: [integration](evidence/001/bundle-before.txt) — Retained baseline output.
+- before: [unit](evidence/001/unit-before.txt) — Retained baseline output.
+- after: [integration](evidence/001/runtime-after.txt) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [unit](evidence/001/unit-after-final.txt) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [e2e](evidence/001/e2e-generator.txt) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [integration](evidence/001/adjacent-build.txt) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [integration](evidence/001/fresh-passed.json) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [integration](evidence/001/restart-passed.json) — Retained replay evidence; actual outcomes are recorded in verification.
+
+## Scope
+
+```json
+{
+  "modules": [
+    "prepared runtime manifest",
+    "build cohort rebasing",
+    "Bun split bundler",
+    "development snapshot preparation",
+    "generated app runtime"
+  ],
+  "entrypoints": [
+    "create-relkit --install",
+    "relkit dev --prepare",
+    "bun dev"
+  ],
+  "invariants": [
+    "Relocation preserves import targets",
+    "HTML script delimiters stay encoded",
+    "Only a successful complete bundle becomes activatable"
+  ]
+}
+```
+
+## Environment
+
+```json
+{
+  "package": "packages/cli",
+  "revision": "4f5242ab6681d11cfd6cb16c916b9e1ba7b12ef4 plus the uncommitted scoped fixes and regression coverage",
+  "target": "Local isolated private registry and actual packed0.7.3 external projects; Apple M1 Pro/macOS24.6.0 arm64, Bun1.3.10",
+  "api_exposed": false,
+  "e2e_available": true,
+  "monitoring": "Existing local execution spans show build.bundleServer, project.build and dev.snapshot.prepare succeeding in runtime-after.txt. Low-level snapshot-read and rename failure spans occur during successful fallback; they do not indicate a failed bundle or preparation. No remoteAPM was used."
+}
+```
+
+## Verification
+
+```json
+{
+  "unit": {
+    "before": {
+      "status": "failed",
+      "command": "rtk bun x vitest run packages/cli/build-prepared-manifest.test.ts",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Deferred escaped imports target the source correctly after relocation to a deeper directory",
+      "output": "evidence/001/unit-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk bun x vitest run packages/cli/build-prepared-manifest.test.ts scripts/tests/benchmark-packed-dev.test.ts scripts/tests/dev-readiness/benchmark.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "All15 tests pass, including rebased escaped imports and preserved closing-script encoding",
+      "output": "evidence/001/unit-after-final.txt"
+    }
+  },
+  "runtime": {
+    "kind": "integration",
+    "reason": "Snapshot preparation is a CLI workflow. The actual installed CLI, Bun compiler/bundler and disk snapshot publication are exercised; generated HTTP runtime is separately checked by E2E and complete-response timing sets.",
+    "boundary": "installed relkit dev--prepare -> manifest rebasing -> real Bun split bundle -> snapshot publication",
+    "dependencies": [
+      "Actual packed0.7.3 CLI outside workspace",
+      "Actual Bun1.3.10 bundler and installed runtime modules",
+      "Resettable generated minimal project and local disk"
+    ],
+    "steps": [
+      "Create minimal project through packed create-relkit with --install; observe prepare failure",
+      "Retain an equivalent --no-install project, install the same private-registry packages, run real relkit dev --prepare --json",
+      "Run buildProject with bundleInputInventory bun.inputs.json against the installed CLI to capture Bun's resolution diagnostic",
+      "Run focused prepared-manifest regression"
+    ],
+    "before": {
+      "status": "failed",
+      "command": "rtk bun x --no-install relkit dev --prepare --json",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Prepare exits0 with a usable snapshot; instead it exits1 at preparation.bundle",
+      "output": "evidence/001/runtime-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk bun x --no-install relkit dev --prepare --json",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Prepare exits0 and its returned generation matches the actual current snapshot pointer",
+      "output": "evidence/001/runtime-after.txt"
+    }
+  },
+  "e2e": {
+    "status": "passed",
+    "command": "rtk proxy bun run test:generator",
+    "cwd": ".",
+    "exit_code": 0,
+    "assertion": "Actual packed external installation and manual no-install preparation serve the exact /hello body, preserve unchanged snapshots, recover corrupt pointers, pass generated check/typecheck/test/build, start production, and expose inspector contracts; an uncertified agent tuple exits2 without creating a destination.",
+    "output": "evidence/001/e2e-generator.txt"
+  },
+  "checks": [
+    {
+      "name": "repository prepush",
+      "status": "passed",
+      "command": "rtk bun run prepush",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/prepush.txt"
+    }
+  ],
+  "regressions": [
+    {
+      "kind": "integration",
+      "boundary": "relocated sealed bundles -> real Bun runtime",
+      "status": "passed",
+      "command": "rtk bun test packages/cli/build-support.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "All6 tests pass: missing/hoisted/nested optional dependencies, runnable relocated lazy bundle, and missing required import failure/cleanup",
+      "output": "evidence/001/adjacent-build.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "prepared snapshot -> actual generated HTTP and inspector",
+      "status": "passed",
+      "command": "rtk proxy bun run test:generator",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Correct /hello responses from unchanged snapshots and corrupt-pointer fallback; successful manual preparation, generated build and production start",
+      "output": "evidence/001/e2e-generator.txt"
+    }
+  ],
+  "limitations": [
+    "Validation ran locally on Apple M1 Pro/macOS arm64 with Bun1.3.10. The supplied Ubuntu GitHub Actions job was not rerun; changes remain uncommitted and unpushed.",
+    "User explicitly revised acceptance to every run strictly below1000ms. All earlier failed complete sets remain retained: original fresh max2546.593458ms; original restart max988.1655ms under the old500ms gate; a later restart set max1070.459083ms failed the new gate. The final separate20-fresh/20-restart sets and preparation launch passed; this does not guarantee latency under arbitrary host contention."
+  ]
+}
+```
+
+## Related reports
+
+```json
+[
+  "bf-66bc5f16fd0b62c4095cf1e3"
+]
+```
+
+## Notes
+
+```json
+[
+  "Prior build-support report bf-b7ee23d5a794f98a368839bd concerns optional DeepAgents, not this cause; the observed missing import is the actual local hello function.",
+  "The scoped change is pure source-prefix rewriting and does not change Effect services, layers, or error contracts.",
+  "Preparation4.55s is setup, distinct from timed prepared bun dev launches. Qualifying fresh/restart readiness and exact response assertions are retained in copied raw reports.",
+  "No Effect services, concurrency rules, integrity validation, error contracts or script-safe encoding were relaxed."
+]
+```

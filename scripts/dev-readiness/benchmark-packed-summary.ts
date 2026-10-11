@@ -14,11 +14,11 @@ export function candidateSummary(
   const samples = attempts.flatMap((attempt) =>
     attempt.sample === undefined ? [] : [attempt.sample],
   );
-  const summary = summarizeStarts(samples, 500);
+  const summary = summarizeStarts(samples, 1_000);
   const preparationPassed =
     preparationAttempt === undefined ||
     (preparationAttempt.sample?.outcome === "response" &&
-      preparationAttempt.sample.durationMs < 500 &&
+      preparationAttempt.sample.durationMs < 1_000 &&
       preparationAttempt.sample.cleanupFailure === undefined);
   return {
     ...summary,

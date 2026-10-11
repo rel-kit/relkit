@@ -1,0 +1,237 @@
+# bf-66bc5f16fd0b62c4095cf1e3: Release 0.7.3 rejects default minimal creation and the npm artifact job fails.
+
+Status: **verified**
+Attempt: 1 · Updated: 2026-10-11T09:31:48+00:00
+
+## What
+
+Release 0.7.3 rejects default minimal creation and the npm artifact job fails.
+
+## Expected
+
+Packed relkit, scoped CLI, and create-relkit accept the certified minimal/no jobs/no cloud/no deploy/examples-on tuple for the actual release, retaining rejection of uncertified tuples.
+
+## Observed before
+
+CI and local --ci-pack fail with RELKIT_CREATE_USAGE: none for this tool identity. Capability tests additionally show a stale template digest and missing pre-archive evidence path.
+
+## Root cause
+
+packages/create-relkit/src/create-capabilities.ts:49 pinned release 0.7.2 while the package and template manifests were 0.7.3. The template digest was stale too. Tests injected the table identity instead of checking the actual tool identity and read removed pre-archive evidence paths. Artifact building did not validate certification evidence before packing.
+
+## Fixed by
+
+Certify the actual 0.7.3 identity and template, keep versioned evidence paths, check the current identity without injection, and validate evidence before building artifacts. The user-authorized limit is strictly below 1,000 ms for each start, including preparation. The final 20 fresh starts peaked at 777.006458 ms, the 20 restarts at 554.307 ms, and preparation at 685.158291 ms. The full --ci-pack replay, generator suite and prepush passed. Earlier failed sets remain retained. Changes are uncommitted and unpushed.
+
+## Changed files
+
+- packages/create-relkit/src/create-capabilities.ts
+- packages/create-relkit/tests/create-capabilities.test.ts
+- scripts/release-check.ts
+- tests/unit/release-check.test.ts
+- tests/generator/installed-cli-create.test.ts
+- scripts/benchmark-generated-dev.ts
+- scripts/benchmark-packed-dev.ts
+- scripts/dev-readiness/benchmark-packed-summary.ts
+- scripts/dev-readiness/benchmark.service.ts
+- scripts/tests/benchmark-packed-dev.test.ts
+- openspec/specs/acceptance-verification/spec.md
+- openspec/specs/cli-scaffolding/spec.md
+
+## Reproduction
+
+- Run bun run scripts/release-check.ts --ci-pack --allow-dirty --output <empty temporary directory> on Bun 1.3.10
+- Assert packed CLI default creation exits 0 and writes the generated project; observed exit 2 with no certified identity
+- Run native Bun Vitest create-capabilities.effect.test.ts and tests/unit/release-check.test.ts
+
+## Evidence
+
+- before: [integration](evidence/001/runtime-before.txt) — Retained baseline output.
+- before: [unit](evidence/001/unit-before.txt) — Retained baseline output.
+- before: [unit](evidence/001/release-unit-before.txt) — Retained baseline output.
+- before: [monitoring](evidence/001/ci-before.txt) — Retained baseline output.
+- after: [integration](evidence/001/runtime-after.txt) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [unit](evidence/001/unit-after-final.txt) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [e2e](evidence/001/e2e-generator.txt) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [integration](evidence/001/fresh-passed.json) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [integration](evidence/001/restart-passed.json) — Retained replay evidence; actual outcomes are recorded in verification.
+- after: [integration](evidence/001/fresh-first-complete-failed.json) — Retained complete failed set; its outcome is documented in verification limitations.
+- after: [integration](evidence/001/restart-first-complete-failed.json) — Retained complete failed set; its outcome is documented in verification limitations.
+- after: [integration](evidence/001/restart-one-second-failed.json) — Retained complete failed set; its outcome is documented in verification limitations.
+- after: [integration](evidence/001/runtime-after-killed.txt) — Retained process-kill failure; the final independent replay passed.
+
+## Scope
+
+```json
+{
+  "modules": [
+    "create-relkit capability gate",
+    "CLI wrapper and scoped CLI",
+    "release validation"
+  ],
+  "entrypoints": [
+    "bun x relkit create",
+    "bun x --package @relkit/cli relkit create",
+    "scripts/release-check.ts --ci-pack"
+  ],
+  "invariants": [
+    "Only the certified tuple is accepted; unsupported candidates are rejected before staging",
+    "Certification matches actual release, catalog and template identity",
+    "Every attempt in the qualifying20-fresh and20-restart sets, including preparation, is strictly below1000ms with complete responses and successful cleanup; all previous attempts remain retained"
+  ]
+}
+```
+
+## Environment
+
+```json
+{
+  "package": "packages/create-relkit and scripts/release-check.ts",
+  "revision": "4f5242ab6681d11cfd6cb16c916b9e1ba7b12ef4 plus the uncommitted scoped fixes and regression coverage",
+  "target": "Local isolated private registry and actual packed0.7.3 external projects; Apple M1 Pro/macOS24.6.0 arm64, Bun1.3.10",
+  "api_exposed": false,
+  "e2e_available": true,
+  "monitoring": "GitHub Actions logs and local CLI stderr; no active Sentry/APM in capability/release entrypoints"
+}
+```
+
+## Verification
+
+```json
+{
+  "unit": {
+    "before": {
+      "status": "failed",
+      "command": "rtk bun x --bun vitest run --config packages/create-relkit/vitest.config.ts packages/create-relkit/tests/create-capabilities.effect.test.ts",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Actual current identity is certified, template digest matches and all named current evidence is complete",
+      "output": "evidence/001/unit-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk bun x --bun vitest run --config packages/create-relkit/vitest.config.ts packages/create-relkit/tests/create-capabilities.effect.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "All five capability tests pass against actual current identity, template digest and full current evidence",
+      "output": "evidence/001/unit-after-final.txt"
+    }
+  },
+  "runtime": {
+    "kind": "integration",
+    "reason": "This workflow is a CLI artifact/scaffolding pipeline and exposes no API. The actual packed executable and private registry are exercised.",
+    "boundary": "release-check -> packAll -> isolated registry -> bare/scoped/wrapper CLI -> capability validation -> rendered project",
+    "dependencies": [
+      "Actual 53 package archives and installed CLI dependencies",
+      "Resettable local private registry proxies external npm dependencies",
+      "PATH and Bun caches isolated by packed CLI smoke harness"
+    ],
+    "steps": [
+      "Run bun run scripts/release-check.ts --ci-pack --allow-dirty --output <empty temporary directory> on Bun 1.3.10",
+      "Assert packed CLI default creation exits 0 and writes the generated project; observed exit 2 with no certified identity",
+      "Run native Bun Vitest create-capabilities.effect.test.ts and tests/unit/release-check.test.ts"
+    ],
+    "before": {
+      "status": "failed",
+      "command": "rtk bun run scripts/release-check.ts --ci-pack --allow-dirty --output /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-ci-before-4mjje_hh",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Packed default minimal creation exits 0 and writes equivalent projects through all aliases; instead it exits 2 with RELKIT_CREATE_USAGE",
+      "output": "evidence/001/runtime-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk proxy bun run scripts/release-check.ts --ci-pack --allow-dirty --output /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-ci-final-pnh18s3a",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "All artifact validation assertions pass, including help/version/usage exits and byte-identical default scaffolds through bare, scoped and wrapper commands",
+      "output": "evidence/001/runtime-after.txt"
+    }
+  },
+  "e2e": {
+    "status": "passed",
+    "command": "rtk proxy bun run test:generator",
+    "cwd": ".",
+    "exit_code": 0,
+    "assertion": "Actual packed external installation and manual no-install preparation serve the exact /hello body, preserve unchanged snapshots, recover corrupt pointers, pass generated check/typecheck/test/build, start production, and expose inspector contracts; an uncertified agent tuple exits2 without creating a destination.",
+    "output": "evidence/001/e2e-generator.txt"
+  },
+  "checks": [
+    {
+      "name": "repository prepush",
+      "status": "passed",
+      "command": "rtk bun run prepush",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/prepush.txt"
+    },
+    {
+      "name": "strict1000ms boundary",
+      "status": "passed",
+      "command": "rtk bun x vitest run scripts/tests/benchmark-packed-dev.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/threshold-unit.txt"
+    }
+  ],
+  "regressions": [
+    {
+      "kind": "integration",
+      "boundary": "public CLI validation before staging",
+      "status": "passed",
+      "command": "rtk proxy bun run test:generator",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Uncertified agent template exits2 with RELKIT_CREATE_USAGE and leaves no destination",
+      "output": "evidence/001/e2e-generator.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "manual install -> snapshot preparation -> generated backend and inspector",
+      "status": "passed",
+      "command": "rtk proxy bun run test:generator",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "No-install commands remain usable; manual preparation and exact HTTP responses pass, including corrupt snapshot fallback and production start",
+      "output": "evidence/001/e2e-generator.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "release aliases -> renderer",
+      "status": "passed",
+      "command": "rtk proxy bun run scripts/release-check.ts --ci-pack --allow-dirty --output /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-ci-final-pnh18s3a",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Bare relkit, scoped CLI and wrapper preserve usage exit behavior and generate byte-identical certified projects",
+      "output": "evidence/001/runtime-after.txt"
+    }
+  ],
+  "limitations": [
+    "Validation ran locally on Apple M1 Pro/macOS arm64 with Bun1.3.10. The supplied Ubuntu GitHub Actions job was not rerun; changes remain uncommitted and unpushed.",
+    "User explicitly revised acceptance to every run strictly below1000ms. All earlier failed complete sets remain retained: original fresh max2546.593458ms; original restart max988.1655ms under the old500ms gate; a later restart set max1070.459083ms failed the new gate. The final separate20-fresh/20-restart sets and preparation launch passed; this does not guarantee latency under arbitrary host contention.",
+    "An intermediate artifact replay was killed with137 before assertion output; runtime-after-killed.txt retains that result. The final full replay passed. The cause of the signal was not established."
+  ]
+}
+```
+
+## Related reports
+
+```json
+[
+  "bf-d161dc4fb489e64ff2aa9252"
+]
+```
+
+## Notes
+
+```json
+[
+  "Source/destination certification identities are checked using actual Bun 1.3.10 and current 0.7.3 manifests.",
+  "All twenty full fresh attempts were retained. All returned the expected response; fresh timing summary failed under recorded host load [19.56,19.36,22.58]. A successful benchmark process exit does not imply passing certification.",
+  "The first recertification attempt additionally exposed escaped import-prefix rebasing; tracked separately in bf-d161dc4fb489e64ff2aa9252.",
+  "User instruction on 2026-10-11: should be under 1 second at max. Updated current acceptance specs, benchmark gates and boundary tests; exactly 1,000 ms remains a failure. Retained old restart evidence too (maximum 988.1655ms, preparation 539.233583ms).",
+  "The user-authorized 1000ms fresh rerun passed all20 (maximum777.006458ms). The new full restart set retained one failing outlier at1070.459083ms; preparation485.582333ms, allresponsescorrect. Saved restart-one-second-failed.json; certification remains in-progress, with no failing attempt silently removed.",
+  "Final native capability tests5/5; generator Effect suite25/25 and native suites4+5+93=102passed; prepared-manifest/threshold/benchmark unit suites15/15; adjacent native bundler6/6. All repository prepush gates passed.",
+  "Both successful and failed raw readiness reports retain actual host load, artifact identity, every attempt and process cleanup. Existing GitHub failure logs supplied the baseline; current local CLI/runtime logs supplied replay evidence."
+]
+```

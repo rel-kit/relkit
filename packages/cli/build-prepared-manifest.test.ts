@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { GRAPH_VERSION } from "@relkit/contracts";
 import type { ApplicationGraph } from "@relkit/graph";
 import { preparedRuntimeManifest } from "./src/commands/build-prepared-manifest.js";
+import { rebaseManifest } from "./src/commands/build-support.js";
 
 const source = `import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };
 import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app/internal/runtime";
@@ -61,6 +62,26 @@ const graph = {
 } as unknown as ApplicationGraph;
 
 describe("preparedRuntimeManifest", () => {
+  it("rebases escaped deferred imports alongside ordinary imports for a deeper build", () => {
+    const prepared = preparedRuntimeManifest(
+      source,
+      graph,
+      "/project",
+      "/project/.relkit/generated",
+    );
+    const rebased = rebaseManifest(
+      prepared,
+      "/project",
+      "/project/.relkit/generated",
+      "/project/.relkit/build/server",
+    );
+    expect(rebased).toContain('from "../../../relkit.config.ts"');
+    expect(rebased).toContain(
+      'import("..\\u002F..\\u002F..\\u002Fsrc\\u002Fhello\\u002Ffunctions\\u002Fhello.function.ts")',
+    );
+    expect(rebased).toContain('from "@relkit/app/internal/runtime"');
+  });
+
   it("partitions HTTP-only executable modules behind one single-flight loader", () => {
     const prepared = preparedRuntimeManifest(
       source,
@@ -198,6 +219,16 @@ describe("preparedRuntimeManifest", () => {
     expect(prepared).not.toContain("</script>");
     expect(prepared).toContain(
       "..\\u002F..\\u002Fsrc\\u002F\\u003C\\u002Fscript\\u003E\\u002Fhello.function.ts",
+    );
+    const rebased = rebaseManifest(
+      prepared,
+      "/project",
+      "/project/.relkit/generated",
+      "/project/.relkit/build/server",
+    );
+    expect(rebased).not.toContain("</script>");
+    expect(rebased).toContain(
+      "..\\u002F..\\u002F..\\u002Fsrc\\u002F\\u003C\\u002Fscript\\u003E\\u002Fhello.function.ts",
     );
   });
 
