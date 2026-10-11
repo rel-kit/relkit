@@ -56,6 +56,11 @@ export function createHttpAuthRuntime(options: CreateHttpAuthRuntimeOptions): Ht
   return Object.freeze({
     protected: Object.freeze([...options.protected]),
     publicPaths: Object.freeze([...options.publicPaths]),
+    ...(options.getOpenApiDocument === undefined
+      ? {}
+      : {
+          getOpenApiDocument: options.getOpenApiDocument,
+        }),
     /** Returns the stable authentication context owned by one native request.
      * @param request - Native request whose headers, body and cancellation signal define this operation.
      * @returns The existing request context or a new context sharing a lazily cached session lookup.

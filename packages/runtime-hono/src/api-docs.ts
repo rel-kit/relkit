@@ -1,15 +1,22 @@
+/**
+ * Installs protected JSON and Scalar routes for the shared application reference.
+ * Configuration is validated before registration; authorization precedes lazy
+ * document generation through ApiDocuments, executed at each HTTP request edge.
+ */
 import {
   API_BASE_PATH,
   API_VERSION,
-  CONTRACT_VERSION,
+  assertJsonValue,
   canonicalJson,
   type JsonValue,
 } from "@relkit/contracts";
-import type { ApplicationGraph, RegistrationPlan } from "@relkit/graph";
-import { generateOpenApi, type OpenApiDocument } from "@relkit/openapi";
+import type { RegistrationPlan } from "@relkit/graph";
+import { Effect, Layer } from "effect";
 import { Scalar } from "@scalar/hono-api-reference";
 import type { Context, Hono, Next } from "hono";
 import type { ApiDocsOptions } from "./api-docs.types.js";
+import { ApiDocuments, documentFrom } from "./api-docs-document.js";
+import { runHttp } from "./http-effect.js";
 import { isAuthorized, jsonResponse } from "./internal-endpoints-utils.js";
 import type { InternalEndpointMode, InternalEndpointOptions } from "./internal-endpoints.js";
 export type { ApiDocsOptions } from "./api-docs.types.js";
@@ -40,14 +47,31 @@ export function installApiDocs(
     mode === "production" ? options.enabledInProduction === true : options.enabled !== false;
   validate(mode, enabled, options);
   if (!enabled) return;
-  const document = filterDomains(options.document ?? documentFrom(plan), options.excludeDomains);
+  const baseDocument = options.document ?? documentFrom(plan);
+  assertJsonValue(baseDocument);
+  const documents = Layer.effect(ApiDocuments, ApiDocuments.make(baseDocument, options));
+  const document = (signal: AbortSignal) =>
+    runHttp(ApiDocuments.use((service) => service.get()).pipe(Effect.provide(documents)), signal);
   const auth = authorization(options);
   const embed =
     mode === "production" || auth.bearerToken !== undefined || auth.authorize !== undefined;
-  const reference = Scalar({
-    ...(embed ? { content: canonicalJson(document as JsonValue) } : { url: "./openapi.json" }),
-    pageTitle: "RELKIT API Reference",
-  });
+  registerDocumentRoutes(app, document, auth, embed);
+}
+
+/**
+ * Registers both representations behind the same authorization barrier.
+ * @param app - Hono application with already validated exposure policy.
+ * @param document - Lazy JSON reader executed only for an authorized request.
+ * @param auth - Existing internal endpoint authorization policy.
+ * @param embed - Whether Scalar must embed JSON to avoid a second protected fetch.
+ * @returns Nothing; installs two request handlers.
+ */
+function registerDocumentRoutes(
+  app: Hono,
+  document: (signal: AbortSignal) => Promise<JsonValue>,
+  auth: InternalEndpointOptions,
+  embed: boolean,
+): void {
   /** Require the configured inspector authorization before serving API documentation.
    * @param handler - Document or reference-UI handler to run after authorization.
    * @returns A handler yielding the protected response or a bearer-authentication challenge.
@@ -66,8 +90,8 @@ export function installApiDocs(
   app.get(
     OPENAPI_PATH,
     protect(
-      async () =>
-        new Response(canonicalJson(document as JsonValue), {
+      async (context) =>
+        new Response(canonicalJson(await document(context.req.raw.signal)), {
           headers: responseHeaders("application/json"),
         }),
     ),
@@ -75,6 +99,12 @@ export function installApiDocs(
   app.get(
     API_REFERENCE_PATH,
     protect(async (context, next) => {
+      const reference = Scalar({
+        ...(embed
+          ? { content: canonicalJson(await document(context.req.raw.signal)) }
+          : { url: "./openapi.json" }),
+        pageTitle: "RELKIT API Reference",
+      });
       const response = await reference(context, next);
       if (!(response instanceof Response)) return response;
       return new Response(response.body, {
@@ -87,26 +117,6 @@ export function installApiDocs(
       });
     }),
   );
-}
-
-/** Builds the OpenAPI document from the registered application graph.
- * @param plan - Validated application registration plan.
- * @returns The generated OpenAPI document for valid function targets and raw routes.
- */
-function documentFrom(plan: RegistrationPlan): OpenApiDocument {
-  const functions = new Set(plan.functions.map(({ id }) => id));
-  return generateOpenApi({
-    contractVersion: CONTRACT_VERSION,
-    nodes: [
-      ...plan.functions,
-      ...plan.httpTriggers.filter(
-        ({ config, targetFunctionId }) =>
-          (isRecord(config) && config.rawHandler === true) || functions.has(targetFunctionId),
-      ),
-      ...(plan.services ?? []),
-    ],
-    edges: [],
-  } as unknown as ApplicationGraph);
 }
 
 /** Selects the configured API-document authorization policy.
@@ -155,61 +165,4 @@ function responseHeaders(contentType: string): Record<string, string> {
     "content-type": contentType,
     "x-relkit-api-version": String(API_VERSION),
   };
-}
-
-/** Removes excluded service domains from the generated API document.
- * @param document - Generated API document to project for public exposure.
- * @param excluded - Service domains excluded from the published API document.
- * @returns The document with excluded service operations and unused tags removed.
- */
-function filterDomains(
-  document: OpenApiDocument | JsonValue,
-  excluded: readonly string[] = [],
-): OpenApiDocument | JsonValue {
-  if (excluded.length === 0 || !isRecord(document) || !isRecord(document.paths)) return document;
-  const domains = new Set(excluded);
-  const methods = new Set(["get", "put", "post", "delete", "options", "head", "patch", "trace"]);
-  const paths = Object.fromEntries(
-    Object.entries(document.paths).flatMap<[string, unknown]>(([path, item]) => {
-      if (!isRecord(item)) return [[path, item]];
-      const entries = Object.entries(item);
-      const kept = entries.filter(([method, operation]) => {
-        if (!methods.has(method) || !isRecord(operation)) return true;
-        const metadata = operation["x-relkit"];
-        return (
-          !isRecord(metadata) ||
-          typeof metadata.serviceId !== "string" ||
-          !domains.has(metadata.serviceId)
-        );
-      });
-      if (kept.length < entries.length && !kept.some(([method]) => methods.has(method))) return [];
-      return [[path, Object.fromEntries(kept)]];
-    }),
-  );
-  const usedTags = new Set(
-    Object.values(paths).flatMap((item) =>
-      !isRecord(item)
-        ? []
-        : Object.entries(item).flatMap(([method, operation]) =>
-            methods.has(method) && isRecord(operation) && Array.isArray(operation.tags)
-              ? operation.tags
-              : [],
-          ),
-    ),
-  );
-  return {
-    ...document,
-    paths,
-    ...(Array.isArray(document.tags)
-      ? { tags: document.tags.filter((tag) => isRecord(tag) && usedTags.has(tag.name)) }
-      : {}),
-  } as JsonValue;
-}
-
-/** Recognizes a non-null object before reading its named properties.
- * @param value - Value inspected, validated or projected by this operation.
- * @returns Whether the inspected value satisfies the declared type guard.
- */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

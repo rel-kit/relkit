@@ -11,4 +11,6 @@ export interface ApiDocsOptions {
   readonly bearerToken?: string;
   readonly authorize?: InternalEndpointOptions["authorize"];
   readonly document?: OpenApiDocument | JsonValue;
+  /** Native authentication schema, acquired only for authorized documentation requests. */
+  readonly getAuthDocument?: () => Promise<JsonValue>;
 }
