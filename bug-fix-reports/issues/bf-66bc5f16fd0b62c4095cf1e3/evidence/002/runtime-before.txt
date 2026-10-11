@@ -1,0 +1,66 @@
+31 |     new Response(child.stdout).text(),
+32 |     new Response(child.stderr).text(),
+33 |     child.exited,
+34 |   ]);
+35 |   if (code !== 0)
+36 |     throw new Error(`${executable} ${args.join(" ")} failed (${code})\n${stdout}${stderr}`);
+                   ^
+error: /Users/mustafaelsayed/.bun/bin/bun x --bun vitest run --config packages/create-relkit/vitest.config.ts packages/create-relkit/tests/create-capabilities.effect.test.ts failed (1)
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+ ❯ packages/create-relkit/tests/create-capabilities.effect.test.ts (5 tests | 2 failed) 36ms
+   ❯ creation capability evidence (5)
+     × certifies the default tuple for the actual packaged release identity 9ms
+     × pins the certified source template bytes 15ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+   Start at  13:05:27
+   Duration  527ms (transform 81%, tests 11%, import 6%, worker 2%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/create-relkit/tests/create-capabilities.effect.test.ts > creation capability evidence > certifies the default tuple for the actual packaged release identity
+AssertionError: expected [Function] to not throw an error but 'CreateOptionsError: Creation combinat…' was thrown
+
+- Expected:
+undefined
+
++ Received:
+"CreateOptionsError: Creation combination is not certified: template=minimal/jobs=none/cloud=none/deploy=none/examples=on. Supported: none for this tool identity."
+
+ ❯ packages/create-relkit/tests/create-capabilities.test.ts:22:57
+     20| describe("creation capability evidence", () => {
+     21|   it("certifies the default tuple for the actual packaged release iden…
+     22|     expect(() => assertCreateCapability(supported)).not.toThrow();
+       |                                                         ^
+     23|     expect(identity).toEqual(currentCreateCapabilityIdentity());
+     24|     expect(supportedCreateTemplates({ cloud: "none", deploy: "none", e…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  packages/create-relkit/tests/create-capabilities.effect.test.ts > creation capability evidence > pins the certified source template bytes
+AssertionError: expected 'd5fdd807e4320b957c1343274c27b0208c26e…' to be 'c96c437af4bf747a0202d466779cf5b46e5cd…' // Object.is equality
+
+Expected: "c96c437af4bf747a0202d466779cf5b46e5cd79d1dff9cac129515dcb5c1030a"
+Received: "d5fdd807e4320b957c1343274c27b0208c26e8e51d858a20c61191601bfa8098"
+
+ ❯ packages/create-relkit/tests/create-capabilities.test.ts:59:34
+     57|   it("pins the certified source template bytes", () => {
+     58|     const root = join(import.meta.dirname, "../../../templates/default…
+     59|     expect(templateDigest(root)).toBe(CREATE_CAPABILITY_TABLE.entries[…
+       |                                  ^
+     60|   });
+     61|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+      at command (/Users/mustafaelsayed/Workspace/relkit/scripts/release-check-support.ts:36:15)
+      at async main (/Users/mustafaelsayed/Workspace/relkit/scripts/release-check.ts:114:9)
+
+Bun v1.3.10 (macOS arm64)
+
+Exit code: 1
