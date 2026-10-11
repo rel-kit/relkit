@@ -1,0 +1,141 @@
+Command: rtk bun run scripts/benchmark-packed-dev.ts --runs 20 --set fresh --output docs/evidence/create-capabilities/0.7.3/fresh.json
+[11:30:28.535] INFO (#1): Packing and installing the candidate fixture
+[11:32:49.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 546.365166,
+}
+[11:33:07.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 1149.5615,
+}
+[11:34:06.570] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 2610.321292,
+}
+[11:34:19.405] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 815.274708,
+}
+[11:34:31.901] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 612.861416,
+}
+[11:34:42.219] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 461.035083,
+}
+[11:34:50.597] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 509.73225,
+}
+[11:34:59.435] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 454.21525,
+}
+[11:35:08.541] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 537.893,
+}
+[11:35:17.386] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 478.928,
+}
+[11:35:29.075] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 593.946458,
+}
+[11:35:41.411] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 741.341458,
+}
+[11:35:50.897] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 516.333709,
+}
+[11:36:01.993] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 466.900583,
+}
+[11:36:11.370] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 525.244375,
+}
+[11:36:20.238] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 573.579584,
+}
+[11:36:33.812] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 478.853959,
+}
+[11:36:42.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 493.970292,
+}
+[11:36:51.362] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 495.981208,
+}
+[11:37:02.624] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 700.513625,
+}
+[11:37:02.656] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.identity",
+  outcome: "success",
+  duration_ms: 30.874125,
+}
+[11:37:02.663] INFO (#1): Packed candidate recorded {
+  path: "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/create-capabilities/0.7.3/fresh.json",
+  summary: {
+    runs: 20,
+    medianMs: 490.626521,
+    p95Ms: 1056.828625,
+    maximumMs: 2546.593458,
+    passed: false,
+    preparationPassed: true,
+  },
+}
+
+Exit code: 0
