@@ -111,6 +111,15 @@ async function main(): Promise<void> {
     );
     return;
   }
+  await command(bun, [
+    "x",
+    "--bun",
+    "vitest",
+    "run",
+    "--config",
+    "packages/create-relkit/vitest.config.ts",
+    "packages/create-relkit/tests/create-capabilities.effect.test.ts",
+  ]);
   if (!skipBuild)
     await command(
       bun,
