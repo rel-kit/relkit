@@ -1,0 +1,20 @@
+{
+  "key": "release",
+  "matches": {
+    "bf-66bc5f16fd0b62c4095cf1e3": {
+      "id": "bf-66bc5f16fd0b62c4095cf1e3",
+      "status": "verified",
+      "what": "The 0.7.4 release PR fails CI and cannot certify default minimal creation.",
+      "root_cause": "packages/create-relkit/src/create-capabilities.ts:49 and :56 still pinned release 0.7.3 and its source-template digest after PR #111 changed package and template manifests to 0.7.4. Exact identity and byte matching correctly rejected those stale certification inputs. The release versioning workflow does not automatical",
+      "fixed_by": "Pin the actual 0.7.4 release and exact minimal-template digest; generate new versioned evidence with all 20 fresh starts, 20 restarts, and preparation strictly below 1000 ms. Current-identity regressions, the complete evidence gate, packed release replay, 62 E2E assertions, and required prepush checks all pass.",
+      "files": [
+        "packages/create-relkit/src/create-capabilities.ts",
+        "docs/evidence/create-capabilities/0.7.4/fresh.json",
+        "docs/evidence/create-capabilities/0.7.4/restart.json"
+      ],
+      "attempt": 2,
+      "updated_at": "2026-10-11T10:55:57+00:00",
+      "report": "bug-fix-reports/issues/bf-66bc5f16fd0b62c4095cf1e3/report.md"
+    }
+  }
+}
