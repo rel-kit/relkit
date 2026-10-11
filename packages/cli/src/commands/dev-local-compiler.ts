@@ -1,30 +1,22 @@
+/** Owns the compiler bridge and captured session resources; generation stages live in dev-local-generation. */
 import { Deferred, Effect, Exit, Ref, Scope, Semaphore } from "effect";
-import { isStableId, type RuntimeIntegrationPlan } from "@relkit/contracts";
-import { resolve } from "node:path";
-import { cliTry } from "../cli-errors.js";
+import type { RuntimeIntegrationPlan } from "@relkit/contracts";
 import { observeCli } from "../cli-runtime.js";
 import { CliProject } from "../services/project.service.js";
 import { CliCompiler } from "../services/compiler.service.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { CliModules } from "../services/modules.service.js";
 import { CliCleanup, cleanupEffect } from "../services/cleanup.service.js";
-import { checkDevProjectEffect } from "./dev-check.js";
-import { formatDevDiagnostics } from "./dev-local-diagnostics.js";
-import {
-  checkedLocalArtifacts,
-  localPlanFrom,
-  reconcileLocalServicesEffect,
-} from "./dev-local-services.js";
-import { acquireLocalServiceOwnerEffect } from "./dev-local-runtime.js";
 import { makeDevRecipeCacheEffect } from "./dev-recipe-cache.js";
-import {
-  localWorkerArtifacts,
-  prepareLocalWorkerOverridesEffect,
-} from "./local-service-options.js";
 import { makeDevCompilerBridgeEffect } from "./dev-compiler-bridge.js";
-import { telemetryConfigurationFromGraphEffect } from "./dev-telemetry.js";
+import { compileDevGenerationEffect } from "./dev-local-generation.js";
 import type { EffectLocalServiceOwner } from "./dev-local-runtime.types.js";
 import type { DevCompilerOptions, EffectDevLocalCompiler } from "./dev-local.types.js";
+import type {
+  DevGenerationState,
+  CompilerCloseOptions,
+  DevCompilerCapabilities,
+} from "./dev-local-generation.types.js";
 
 /**
  * Owns one compiler callback worker, local lease and success-only recipe cache.
@@ -33,194 +25,138 @@ import type { DevCompilerOptions, EffectDevLocalCompiler } from "./dev-local.typ
  */
 export const makeDevLocalCompilerEffect = Effect.fn("Dev.localCompiler")(
   function* (options: DevCompilerOptions) {
-    const project = yield* CliProject;
-    const compiler = yield* CliCompiler;
-    const files = yield* CliFileSystem;
-    const modules = yield* CliModules;
-    const cleanup = yield* CliCleanup;
+    const capabilities = yield* compilerCapabilities;
     const workerScope = yield* Scope.make();
     const resourceScope = yield* Scope.make();
-    const owner = yield* Ref.make<EffectLocalServiceOwner | undefined>(undefined);
-    const currentPlan = yield* Ref.make<RuntimeIntegrationPlan | undefined>(undefined);
     const serial = yield* Semaphore.make(1);
-    const closing = yield* Ref.make(false);
     const closed = yield* Deferred.make<void>();
-    const capture = <A, E, R>(
-      effect: Effect.Effect<A, E, R | CliCompiler | CliFileSystem | CliModules | CliCleanup>,
-    ) =>
-      effect.pipe(
-        Effect.provideService(CliCompiler, compiler),
-        Effect.provideService(CliFileSystem, files),
-        Effect.provideService(CliModules, modules),
-        Effect.provideService(CliCleanup, cleanup),
-      );
-    const recipes = yield* capture(makeDevRecipeCacheEffect(options.projectRoot, currentPlan));
-    const invalidateEffect = recipes.invalidate;
+    const state = yield* provideCompilerCapabilities(
+      capabilities,
+      generationState(options, resourceScope),
+    );
     const compileEffect: EffectDevLocalCompiler["compileEffect"] = (request) =>
       observeCli(
         "dev.compiler.generation",
         serial.withPermits(1)(
-          Effect.gen(function* () {
-            if (yield* Ref.get(closing))
-              return yield* cliTry("dev.compiler.closed", () => {
-                throw new Error("Development compiler is closed.");
-              });
-            const checked = yield* capture(
-              checkDevProjectEffect({
-                projectRoot: options.projectRoot,
-                generationId: `dev-${request.token.sourceToken}-${request.token.generationToken}`,
-              }),
-            );
-            if (!checked.ok)
-              return yield* cliTry("dev.compiler.diagnostics", () => {
-                throw new Error(
-                  formatDevDiagnostics(options.projectRoot, checked.diagnostics, options.color),
-                );
-              });
-            if (options.configureTelemetry)
-              yield* telemetryConfigurationFromGraphEffect(checked.outputs.graph).pipe(
-                Effect.flatMap(options.configureTelemetry),
-              );
-            let local;
-            if (options.localEnabled !== false) {
-              const { graph, localPlan, runtimePlan } = yield* cliTry(
-                "dev.local.requirements",
-                () => checkedLocalArtifacts(options.projectRoot, checked),
-              );
-              const oldPlan = yield* Ref.get(currentPlan);
-              if (oldPlan && oldPlan.graphHash !== runtimePlan.graphHash) yield* invalidateEffect;
-              yield* Ref.set(currentPlan, runtimePlan);
-              const required = localPlan.services.filter((entry) => entry.requiredBy.length > 0);
-              let selected = yield* Ref.get(owner);
-              if (required.length || selected) {
-                if (!selected) {
-                  const materializers = new Set(required.map((entry) => entry.materializerId));
-                  if (materializers.size > 1)
-                    return yield* cliTry("dev.local.materializer", () => {
-                      throw new Error("Local bindings require multiple materializers.");
-                    });
-                  const applicationId = yield* cliTry("dev.local.identity", () => {
-                    if (!isStableId(graph.appId))
-                      throw new Error("Local application identity is invalid.");
-                    return graph.appId;
-                  });
-                  selected = yield* capture(
-                    acquireLocalServiceOwnerEffect(
-                      options.projectRoot,
-                      applicationId,
-                      [...materializers][0] ?? "docker",
-                    ),
-                  ).pipe(Effect.provideService(Scope.Scope, resourceScope));
-                  yield* Ref.set(owner, selected);
-                }
-                const values = yield* Effect.forEach(
-                  [...new Set(required.map((entry) => entry.recipe.integrationId))],
-                  (id) => recipes.get(id).pipe(Effect.map((recipe) => [id, recipe] as const)),
-                  { concurrency: 4 },
-                );
-                local = yield* reconcileLocalServicesEffect(
-                  checked,
-                  selected,
-                  Object.fromEntries(values),
-                  options.backendPort ?? 3000,
-                );
-              }
-            }
-            const built = yield* project.build({
-              projectRoot: options.projectRoot,
-              mode: "development",
-              buildDirectory: request.outputDirectory,
-              check: async () => checked,
-              ...(local?.generationId === undefined
-                ? {}
-                : { providerOverridesGeneration: local.generationId }),
-            });
-            if (!built.ok)
-              return yield* cliTry("dev.build.diagnostics", () => {
-                throw new Error(
-                  formatDevDiagnostics(options.projectRoot, built.diagnostics, options.color),
-                );
-              });
-            if (local && local.workerBindings.length) {
-              const override = yield* capture(
-                prepareLocalWorkerOverridesEffect(local.owner.overrideFile),
-              );
-              const values = yield* Effect.forEach(
-                [
-                  ...new Set(
-                    localPlanFrom(checked)
-                      .services.filter((entry) => entry.requiredBy.length)
-                      .map((entry) => entry.recipe.integrationId),
-                  ),
-                ],
-                (id) => recipes.get(id).pipe(Effect.map((recipe) => [id, recipe] as const)),
-                { concurrency: 4 },
-              );
-              const artifacts = yield* cliTry("dev.local.workers", () =>
-                localWorkerArtifacts(
-                  localPlanFrom(checked).services,
-                  local!.workerBindings,
-                  request.outputDirectory,
-                  resolve(options.projectRoot, "node_modules"),
-                  override,
-                ),
-              );
-              local = yield* reconcileLocalServicesEffect(
-                checked,
-                local.owner,
-                Object.fromEntries(values),
-                options.backendPort ?? 3000,
-                true,
-                artifacts,
-              );
-            }
-            return {
-              entrypoint: "server/index.js",
-              ...(local === undefined
-                ? {}
-                : {
-                    environment: {
-                      RELKIT_LOCAL_SERVICE_INSPECTOR_STATE: local.inspectorState,
-                      ...(local.generationId === undefined
-                        ? {}
-                        : {
-                            RELKIT_PROVIDER_OVERRIDES_FILE: local.owner.overrideFile,
-                            ...(local.workerBindings.length ? { RELKIT_WORKER_ROLE: "api" } : {}),
-                          }),
-                    },
-                  }),
-            };
-          }),
+          provideCompilerCapabilities(
+            capabilities,
+            compileDevGenerationEffect(options, state, request),
+          ),
         ),
       );
     const bridge = yield* makeDevCompilerBridgeEffect(compileEffect, workerScope);
-    const closeEffect = observeCli(
-      "dev.compiler.close",
-      Effect.uninterruptible(
-        Effect.gen(function* () {
-          if (!(yield* Ref.getAndSet(closing, true))) {
-            bridge.close();
-            yield* Deferred.complete(
-              closed,
-              Scope.close(workerScope, Exit.void).pipe(
-                Effect.andThen(
-                  cleanupEffect("dev.local.owner.release", Scope.close(resourceScope, Exit.void)),
-                ),
-                Effect.provideService(CliCleanup, cleanup),
-              ),
-            );
-          }
-          yield* Deferred.await(closed);
-        }),
-      ),
-    );
+    const closeEffect = compilerCloseEffect({
+      closeAdmission: bridge.close,
+      workerScope,
+      resourceScope,
+      closing: state.closing,
+      closed,
+      cleanup: capabilities.cleanup,
+    });
     yield* Effect.addFinalizer(() => closeEffect);
     return {
       compile: bridge.compile,
       compileEffect,
-      invalidateEffect,
+      invalidateEffect: state.invalidateEffect,
       closeEffect,
     } satisfies EffectDevLocalCompiler;
   },
   (effect, _options: DevCompilerOptions) => observeCli("dev.compiler.acquire", effect),
 );
+
+/** Captures shared authority once during compiler acquisition. */
+const compilerCapabilities = Effect.gen(function* () {
+  return {
+    project: yield* CliProject,
+    compiler: yield* CliCompiler,
+    files: yield* CliFileSystem,
+    modules: yield* CliModules,
+    cleanup: yield* CliCleanup,
+  } satisfies DevCompilerCapabilities;
+});
+
+/**
+ * Provides only shared compiler dependencies while retaining genuine caller requirements.
+ * @typeParam A - Workflow success value.
+ * @typeParam E - Workflow failures retained unchanged.
+ * @typeParam R - Remaining caller authority.
+ * @param capabilities - Acquired session dependencies.
+ * @param effect - Lazy generation or cache workflow.
+ * @returns Provided workflow with all remaining E/R contracts preserved.
+ */
+function provideCompilerCapabilities<A, E, R>(
+  capabilities: DevCompilerCapabilities,
+  effect: Effect.Effect<
+    A,
+    E,
+    R | CliProject | CliCompiler | CliFileSystem | CliModules | CliCleanup
+  >,
+) {
+  return effect.pipe(
+    Effect.provideService(CliProject, capabilities.project),
+    Effect.provideService(CliCompiler, capabilities.compiler),
+    Effect.provideService(CliFileSystem, capabilities.files),
+    Effect.provideService(CliModules, capabilities.modules),
+    Effect.provideService(CliCleanup, capabilities.cleanup),
+  );
+}
+
+/**
+ * Allocates initial validation, recipe epochs and local ownership for one session.
+ * @param options - Initial check/discard policy and project root.
+ * @param resourceScope - Lifetime owning the eventual local service lease.
+ * @returns Mutable state shared only by this compiler's serialized generations.
+ */
+const generationState = Effect.fn("Dev.generationState")(function* (
+  options: DevCompilerOptions,
+  resourceScope: Scope.Closeable,
+) {
+  const owner = yield* Ref.make<EffectLocalServiceOwner | undefined>(undefined);
+  const currentPlan = yield* Ref.make<RuntimeIntegrationPlan | undefined>(undefined);
+  const recipes = yield* makeDevRecipeCacheEffect(options.projectRoot, currentPlan);
+  const initialCheck = yield* Ref.make(options.initialCheck);
+  const invalidateEffect = Ref.set(initialCheck, undefined).pipe(
+    Effect.andThen(options.discardInitialCheck ?? Effect.void),
+    Effect.andThen(recipes.invalidate),
+  );
+  return {
+    owner,
+    currentPlan,
+    recipes,
+    resourceScope,
+    closing: yield* Ref.make(false),
+    initialCheck,
+    invalidateEffect,
+  } satisfies DevGenerationState;
+});
+
+/**
+ * Closes admission and joins both resource scopes once across all shutdown callers.
+ * @param options - Shared completion/state and native scopes owned by this compiler.
+ * @returns Uninterruptible cleanup after accepted work settles.
+ */
+function compilerCloseEffect(options: CompilerCloseOptions) {
+  return observeCli(
+    "dev.compiler.close",
+    Effect.uninterruptible(
+      Effect.gen(function* () {
+        if (!(yield* Ref.getAndSet(options.closing, true))) {
+          options.closeAdmission();
+          yield* Deferred.complete(
+            options.closed,
+            Scope.close(options.workerScope, Exit.void).pipe(
+              Effect.andThen(
+                cleanupEffect(
+                  "dev.local.owner.release",
+                  Scope.close(options.resourceScope, Exit.void),
+                ),
+              ),
+              Effect.provideService(CliCleanup, options.cleanup),
+            ),
+          );
+        }
+        yield* Deferred.await(options.closed);
+      }),
+    ),
+  );
+}

@@ -2,6 +2,7 @@ import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervis
 import type { TelemetryConfiguration } from "@relkit/observability";
 import type { Effect } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
+import type { CheckResult } from "./check-result.types.js";
 
 /** Existing manual compiler facade expected by the supervisor SDK. */
 export interface DevLocalCompiler {
@@ -41,6 +42,10 @@ export interface EffectDevLocalCompiler {
 /** Captured generation and local orchestration policy. */
 export interface DevCompilerOptions {
   readonly projectRoot: string;
+  /** Single-use initial validation, absent after an intervening input edit. */
+  readonly initialCheck?: Effect.Effect<CheckResult | undefined, CliAdapterError>;
+  /** Releases the initial input watch when an edit invalidates reuse before consumption. */
+  readonly discardInitialCheck?: Effect.Effect<void>;
   readonly localEnabled?: boolean;
   /**
    * Applies accepted generation telemetry policy through captured native authority.
