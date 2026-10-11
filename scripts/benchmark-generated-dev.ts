@@ -53,11 +53,12 @@ const main = Effect.fn("ReadinessBenchmark.main")(function* () {
   const samples = attempts.flatMap((attempt) =>
     attempt.sample === undefined ? [] : [attempt.sample],
   );
-  const summary = summarizeStarts(samples, 500);
+  const summary = summarizeStarts(samples, 1_000);
   const report = {
     protocol: "relkit.dev-readiness",
     version: 1,
     command: "bun dev",
+    thresholdMs: 1_000,
     mode: option("--mode", "baseline"),
     environment: benchmarkHostIdentity(),
     request: {

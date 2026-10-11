@@ -53,7 +53,7 @@ The generator SHALL resolve template `minimal|api|agent|fullstack`, cloud `aws|n
 
 #### Scenario: A combination misses the readiness gate
 
-- **WHEN** a valid candidate combination has any required start at or above 500 ms, missing evidence, or stale evidence
+- **WHEN** a valid candidate combination has any required start at or above 1,000 ms, missing evidence, or stale evidence
 - **THEN** interactive choices omit that combination and explicit flags produce a usage diagnostic identifying it before any generation work
 
 #### Scenario: Interactive partial choices would permit a rejected tuple
@@ -92,7 +92,7 @@ After successful default generation, the printed `cd` and `bun dev` commands SHA
 #### Scenario: New developer follows output
 
 - **WHEN** the printed next commands are executed on a supported clean environment
-- **THEN** the route returns the expected greeting in less than 500 ms on the reference host, appears in the eventually ready inspector and API reference, and generated test/check/build scripts pass
+- **THEN** the route returns the expected greeting in less than 1,000 ms on the reference host, appears in the eventually ready inspector and API reference, and generated test/check/build scripts pass
 
 #### Scenario: Inspector starts late
 

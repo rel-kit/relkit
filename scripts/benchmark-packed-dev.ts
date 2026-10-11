@@ -149,6 +149,7 @@ function packedReport(
     mode: set === "diagnostic" ? "candidate-diagnostic" : "candidate-certification",
     set,
     command: "bun dev",
+    thresholdMs: 1_000,
     environment: benchmarkHostIdentity(),
     fixture,
     identity,
