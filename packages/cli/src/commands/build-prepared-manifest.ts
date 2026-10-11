@@ -110,10 +110,11 @@ export function preparedRuntimeManifest(
     .filter(([alias]) => removable.includes(alias))
     .map(([alias, loader]) => {
       const specifier = imports.get(alias)!.specifier;
+      const encodedSpecifier = codeStringLiteral(specifier);
       const identity = identityStatements(source, alias).map((line) =>
         line.replace(identifierPattern(alias, "gu"), "module"),
       );
-      return `let ${loader}Promise: Promise<typeof import(${JSON.stringify(specifier)})> | undefined;\nconst ${loader} = () => (${loader}Promise ??= import(${JSON.stringify(specifier)}).then((module) => { ${identity.join(" ")} return module; }));`;
+      return `let ${loader}Promise: Promise<typeof import(${encodedSpecifier})> | undefined;\nconst ${loader} = () => (${loader}Promise ??= import(${encodedSpecifier}).then((module) => { ${identity.join(" ")} return module; }));`;
     });
   if (declarations.length === 0) return source;
   const insertion = output.indexOf("\n\n");
@@ -166,4 +167,14 @@ function removableServices(
 
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+/** Encodes a JavaScript string literal without leaving HTML script delimiters intact. */
+function codeStringLiteral(value: string): string {
+  return JSON.stringify(value)
+    .replaceAll("<", "\\u003C")
+    .replaceAll(">", "\\u003E")
+    .replaceAll("/", "\\u002F")
+    .replaceAll("\u2028", "\\u2028")
+    .replaceAll("\u2029", "\\u2029");
 }

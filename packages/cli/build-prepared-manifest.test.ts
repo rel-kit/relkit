@@ -176,6 +176,31 @@ describe("preparedRuntimeManifest", () => {
     );
   });
 
+  it("escapes HTML-significant characters in generated import expressions", () => {
+    const specifier = "../../src/</script>/hello.function.ts";
+    const unsafeSource = source.replace("../../src/hello/functions/hello.function.ts", specifier);
+    const unsafeGraph = {
+      ...graph,
+      nodes: graph.nodes.map((node) =>
+        node.kind === "function"
+          ? { ...node, source: { ...node.source, file: "src/</script>/hello.function.ts" } }
+          : node,
+      ),
+    } as ApplicationGraph;
+
+    const prepared = preparedRuntimeManifest(
+      unsafeSource,
+      unsafeGraph,
+      "/project",
+      "/project/.relkit/generated",
+    );
+
+    expect(prepared).not.toContain("</script>");
+    expect(prepared).toContain(
+      "..\\u002F..\\u002Fsrc\\u002F\\u003C\\u002Fscript\\u003E\\u002Fhello.function.ts",
+    );
+  });
+
   it("shares one real module initialization across simultaneous requests", async () => {
     const directory = await mkdtemp(join(tmpdir(), "relkit-deferred-route-"));
     const counter = "__relkitDeferredRouteInitializations";
