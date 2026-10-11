@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.7.3
+
+### Changes
+
+- feat: serve prepared generated apps in under 500 ms
+
 ## 0.7.2
 
 ### Changes
