@@ -4,11 +4,10 @@ RELKIT deployment is generated from the checked application graph. Pulumi is the
 first deployment engine and AWS ECS is the first host, but engine, host,
 application infrastructure, access, and runtime wiring are separate roles.
 
-Cloud and deployment default to `none`. Generate an AWS/Pulumi project explicitly:
-
-```sh
-bunx create-relkit@latest my-app --cloud aws --deploy pulumi
-```
+Cloud and deployment default to `none`. The packaged creation capability table currently rejects
+the AWS/Pulumi generator tuple because it does not have current reference-host readiness evidence.
+This restriction applies to new-project generation, not to deployment commands for an existing
+configured project.
 
 For an existing project, install `@relkit/aws` and `@relkit/pulumi`, load them from
 `relkit.config.ts`, and select `deployment: { engine: "pulumi", host: "aws" }` in

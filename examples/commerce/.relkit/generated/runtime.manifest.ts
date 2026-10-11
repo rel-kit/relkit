@@ -1,6 +1,6 @@
 import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };
-import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app";
-import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "@relkit/app";
+import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app/internal/runtime";
+import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "@relkit/app/agents";
 import * as __relkit_module_0 from "../../relkit.config.ts";
 import * as __relkit_module_1 from "../../src/account/functions/account-session.function.ts";
 import * as __relkit_module_2 from "../../src/account/service.ts";

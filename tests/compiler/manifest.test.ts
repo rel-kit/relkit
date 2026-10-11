@@ -14,6 +14,7 @@ import {
   MANIFEST_CODES,
   normalizeCompilation,
 } from "../../packages/compiler/src/index.ts";
+import { renderManifest } from "../../packages/compiler/src/generate-manifest-format.ts";
 
 const graph = { contractVersion: GRAPH_VERSION, nodes: [], edges: [] } as const;
 const graphHash = hashGraph(graph);
@@ -143,6 +144,22 @@ describe("runtime manifest generation", () => {
       manifestHash: expect.stringMatching(/^sha256:/),
       runtimeIntegrationsPlanHash: expect.stringMatching(/^sha256:/),
     });
+  });
+
+  test("imports event target binding from the events authoring facade", () => {
+    const source = renderManifest(
+      { graphHash, descriptors: [] },
+      new Map(),
+      new Map(),
+      new Map([["orders.created", "__relkit_bindFunctionEvents(target, consumed, published)"]]),
+      new Map(),
+      new Map(),
+      new Map(),
+    );
+    expect(source).toContain(
+      'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "@relkit/app/events";',
+    );
+    expect(source).not.toContain('from "@relkit/app/functions"');
   });
 
   test("does not activate without executable references or with a hash mismatch", () => {

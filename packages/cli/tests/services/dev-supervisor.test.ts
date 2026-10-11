@@ -1,8 +1,14 @@
+/**
+ * Exercises development-session native ownership under cancellation. Test Layers
+ * replace every listener, compiler and inspector boundary so assertions prove
+ * joined cleanup and closed startup admission without opening external resources.
+ */
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Exit, Fiber, Layer } from "effect";
 import { createSupervisorProxy, type SupervisorProxy } from "@relkit/supervisor";
 import { CliDevSupervisor, devSupervisorLayer } from "../../src/services/dev-supervisor.service.js";
 import { CliPortProbe } from "../../src/commands/port-availability.service.js";
+import { CliInspectorSupport } from "../../src/commands/dev-inspector-support.service.js";
 import { sourceWatchLayer } from "../../src/services/source-watch.service.js";
 import { cleanupLayer } from "../../src/services/cleanup.service.js";
 import { makeDevSessionEngineEffect } from "../../src/commands/dev-session-engine.js";
@@ -80,6 +86,7 @@ it.live(
         cleanupLayer,
         filesystemTestLayer(),
         Layer.succeed(CliPortProbe, CliPortProbe.of({ check: () => Effect.void })),
+        Layer.succeed(CliInspectorSupport, CliInspectorSupport.of({ run: forbidden })),
       );
       const session = new DevSession({
         projectRoot: process.cwd(),

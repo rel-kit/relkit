@@ -1,0 +1,73 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "command": "bun dev",
+  "mode": "candidate-bootstrap-diagnostic-incomplete-support",
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 Pro",
+    "load": [
+      3.68212890625,
+      3.96826171875,
+      3.7998046875
+    ]
+  },
+  "request": {
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-O7pqQR/readiness-baseline",
+    "url": "http://127.0.0.1:3000/hello?name=RelKit",
+    "expectedStatus": 200,
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "sample": {
+        "durationMs": 903.62575,
+        "outcome": "response",
+        "output": "$ relkit dev\n04:46:15.062 INFO  relkit            Starting development server\n04:46:15.078 INFO  build             Compiling application\n04:46:15.407 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n04:46:15.447 INFO  build             Compiled in 368ms\n04:46:15.447 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n04:46:15.437 INFO  http              GET /hello → 200 in 70ms\n04:46:15.499 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 2,
+      "sample": {
+        "durationMs": 773.829167,
+        "outcome": "response",
+        "output": "$ relkit dev\n04:46:15.959 INFO  relkit            Starting development server\n04:46:15.973 INFO  build             Compiling application\n04:46:16.284 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n04:46:16.303 INFO  build             Compiled in 329ms\n04:46:16.303 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n04:46:16.298 INFO  http              GET /hello → 200 in 51ms\n04:46:16.323 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 3,
+      "sample": {
+        "durationMs": 728.140458,
+        "outcome": "response",
+        "output": "$ relkit dev\n04:46:16.722 INFO  relkit            Starting development server\n04:46:16.736 INFO  build             Compiling application\n04:46:17.033 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n04:46:17.054 INFO  build             Compiled in 318ms\n04:46:17.054 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n04:46:17.047 INFO  http              GET /hello → 200 in 49ms\n04:46:17.075 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 4,
+      "sample": {
+        "durationMs": 736.695334,
+        "outcome": "response",
+        "output": "$ relkit dev\n04:46:17.472 INFO  relkit            Starting development server\n04:46:17.486 INFO  build             Compiling application\n04:46:17.789 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n04:46:17.809 INFO  build             Compiled in 323ms\n04:46:17.810 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n04:46:17.803 INFO  http              GET /hello → 200 in 50ms\n04:46:17.831 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 5,
+      "sample": {
+        "durationMs": 738.609917,
+        "outcome": "response",
+        "output": "$ relkit dev\n04:46:18.229 INFO  relkit            Starting development server\n04:46:18.242 INFO  build             Compiling application\n04:46:18.548 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n04:46:18.569 INFO  build             Compiled in 326ms\n04:46:18.569 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n04:46:18.562 INFO  http              GET /hello → 200 in 53ms\n04:46:18.589 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    }
+  ],
+  "summary": {
+    "runs": 5,
+    "medianMs": 738.609917,
+    "p95Ms": 903.62575,
+    "maximumMs": 903.62575,
+    "passed": false
+  }
+}

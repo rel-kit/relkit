@@ -8,21 +8,19 @@ Orders CSV and inspect the native queue row after submitting it. You need Bun 1.
 running Docker daemon. Start where `relkit-effect-mq` does not already exist. This example
 returns CSV text; it does not write a file or query the Orders database.
 
-## Create the provider-backed app
+## Configure an existing app
 
-```sh title="Terminal — parent directory"
-bunx create-relkit@latest relkit-effect-mq --jobs effect-mq-docker --json
-cd relkit-effect-mq
-```
+The `--jobs effect-mq-docker` creation tuple is currently rejected before staging because its native
+and timing evidence is incomplete. Begin with an existing project and add `@relkit/docker`,
+`@relkit/effect-mq`, and `@relkit/local` before applying the configuration below.
 
-The generator installs `@relkit/docker`, `@relkit/effect-mq`, and `@relkit/local`, and creates
-the task and job. Open `relkit.config.ts`; the generated binding should match this source.
+The binding in `relkit.config.ts` should match this source.
 `jobs.default` connects to Effect MQ through Docker, while `defaults.jobs` selects it for
 jobs without an explicit profile. In an existing app, install the three packages and extend
 its config with those two entries, retaining its own ID and server settings.
 
-The generator also installs an application-owned Drizzle declaration patch before running
-Bun. This repair updates Drizzle's SQL error imports for stable Effect 4 and makes its
+Effect MQ also requires an application-owned Drizzle declaration patch before running Bun. This
+repair updates Drizzle's SQL error imports for stable Effect 4 and makes its
 optional PostgreSQL configuration fields compatible with strict declarations. Keep the
 generated `patches/` asset and `package.json` `patchedDependencies` entry together.
 

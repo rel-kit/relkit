@@ -13,7 +13,8 @@
     "jobs:trigger": "relkit jobs trigger --job exportOrders --input-file examples/export-orders.json --operation-id example-trigger"
   },
   "dependencies": {
-    "@relkit/app": "0.7.2"
+    "@relkit/app": "0.7.2",
+    "effect": "4.0.1"
   },
   "devDependencies": {
     "@types/bun": "1.3.10",

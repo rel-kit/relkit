@@ -1,7 +1,9 @@
+/** Selects finite preparation or the scoped interactive dev session at the command edge. */
 import { Effect } from "effect";
 import { runCliEffect } from "../cli-runtime.js";
 import { CliDev, devLiveLayer } from "../services/dev.service.js";
 import type { CliCommandContext } from "../main-support-types.js";
+import { prepareSnapshotCommand } from "../dev-snapshot/snapshot-prepare-command.js";
 
 /**
  * Executes selected development work through one explicit native domain.
@@ -11,7 +13,9 @@ import type { CliCommandContext } from "../main-support-types.js";
  */
 export const runDevCommandEffect = Effect.fn("Dev.run")(
   (args: readonly string[], context: CliCommandContext) =>
-    CliDev.use((dev) => dev.run(args, context)),
+    args.includes("--prepare")
+      ? prepareSnapshotCommand(args, context)
+      : CliDev.use((dev) => dev.run(args, context)),
 );
 
 /** Runs the native development command at its public Promise boundary.

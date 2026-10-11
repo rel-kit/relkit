@@ -3,7 +3,7 @@ import { z } from "@relkit/app/schema";
 import { FakeToolCallingModel, todoListMiddleware, tool } from "langchain";
 import lookup from "@app/hello/tools/lookup.tool.js";
 
-const uppercase = tool(async ({ text }) => text.toUpperCase(), {
+const uppercase = tool(async ({ text }: { readonly text: string }) => text.toUpperCase(), {
   name: "uppercase",
   description: "Uppercase text without leaving the process",
   schema: z.object({ text: z.string() }),

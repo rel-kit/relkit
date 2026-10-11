@@ -5,6 +5,8 @@ export interface GenerateNextSteps {
   readonly commands: Readonly<{
     readonly cd: string;
     readonly install?: "bun install";
+    /** Finite validation/preparation required after a skipped dependency installation. */
+    readonly prepare?: "bunx --no-install relkit dev --prepare";
     readonly dev: "bun run dev";
     readonly test: "bun run test";
     readonly check: "bun run check";

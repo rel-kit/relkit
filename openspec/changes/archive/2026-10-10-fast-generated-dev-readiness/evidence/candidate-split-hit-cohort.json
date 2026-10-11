@@ -1,0 +1,194 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "command": "bun dev",
+  "mode": "candidate-split-hit-cohort",
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 Pro",
+    "load": [
+      4.49609375,
+      5.5693359375,
+      6.7109375
+    ]
+  },
+  "request": {
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ysY8BK/readiness-baseline",
+    "url": "http://127.0.0.1:3000/hello?name=RelKit",
+    "expectedStatus": 200,
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "sample": {
+        "durationMs": 484.3715,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:28.328 INFO  relkit            Starting development server\n21:28:28.349 INFO  build             Compiling application\n21:28:28.593 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:28.626 INFO  build             Compiled in 276ms\n21:28:28.626 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:28.633 INFO  relkit            Stopping development server\n21:28:28.612 INFO  http              GET /hello → 200 in 56ms\n21:28:28.642 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 2,
+      "sample": {
+        "durationMs": 487.891166,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:28.822 INFO  relkit            Starting development server\n21:28:28.843 INFO  build             Compiling application\n21:28:29.102 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:29.136 INFO  build             Compiled in 292ms\n21:28:29.137 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:29.143 INFO  relkit            Stopping development server\n21:28:29.123 INFO  http              GET /hello → 200 in 61ms\n21:28:29.152 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 3,
+      "sample": {
+        "durationMs": 476.62725,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:29.323 INFO  relkit            Starting development server\n21:28:29.344 INFO  build             Compiling application\n21:28:29.605 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:29.633 INFO  build             Compiled in 288ms\n21:28:29.633 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:29.638 INFO  relkit            Stopping development server\n21:28:29.625 INFO  http              GET /hello → 200 in 57ms\n21:28:29.647 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 4,
+      "sample": {
+        "durationMs": 481.492792,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:29.820 INFO  relkit            Starting development server\n21:28:29.842 INFO  build             Compiling application\n21:28:30.106 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:30.132 INFO  build             Compiled in 290ms\n21:28:30.133 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:30.139 INFO  relkit            Stopping development server\n21:28:30.125 INFO  http              GET /hello → 200 in 56ms\n21:28:30.150 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 5,
+      "sample": {
+        "durationMs": 481.465166,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:30.326 INFO  relkit            Starting development server\n21:28:30.349 INFO  build             Compiling application\n21:28:30.603 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:30.637 INFO  build             Compiled in 287ms\n21:28:30.637 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:30.643 INFO  relkit            Stopping development server\n21:28:30.623 INFO  http              GET /hello → 200 in 60ms\n21:28:30.652 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 6,
+      "sample": {
+        "durationMs": 525.596333,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:30.832 INFO  relkit            Starting development server\n21:28:30.856 INFO  build             Compiling application\n21:28:31.148 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:31.181 INFO  build             Compiled in 324ms\n21:28:31.182 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:31.187 INFO  relkit            Stopping development server\n21:28:31.168 INFO  http              GET /hello → 200 in 62ms\n21:28:31.197 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 7,
+      "sample": {
+        "durationMs": 699.70125,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:31.412 INFO  relkit            Starting development server\n21:28:31.465 INFO  build             Compiling application\n21:28:31.852 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:31.893 INFO  build             Compiled in 427ms\n21:28:31.894 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:31.872 INFO  http              GET /hello → 200 in 66ms\n21:28:31.917 INFO  relkit            Stopping development server\n21:28:31.933 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 8,
+      "sample": {
+        "durationMs": 579.029083,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:32.137 INFO  relkit            Starting development server\n21:28:32.161 INFO  build             Compiling application\n21:28:32.466 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:32.517 INFO  build             Compiled in 355ms\n21:28:32.518 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:32.525 INFO  relkit            Stopping development server\n21:28:32.497 INFO  http              GET /hello → 200 in 82ms\n21:28:32.548 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 9,
+      "sample": {
+        "durationMs": 1513.522792,
+        "outcome": "child-exited",
+        "exitCode": 1,
+        "output": "$ relkit dev\n21:28:32.840 INFO  relkit            Starting development server\n21:28:33.031 INFO  build             Compiling application\n21:28:34.040 INFO  relkit            Stopping development server\n21:28:34.054 INFO  relkit            Development server stopped\nAbortError: The connection was closed.\nDOMException {\n  stack: \"\",\n  code: 20,\n  name: \"AbortError\",\n  message: \"The connection was closed.\",\n  INDEX_SIZE_ERR: 1,\n  DOMSTRING_SIZE_ERR: 2,\n  HIERARCHY_REQUEST_ERR: 3,\n  WRONG_DOCUMENT_ERR: 4,\n  INVALID_CHARACTER_ERR: 5,\n  NO_DATA_ALLOWED_ERR: 6,\n  NO_MODIFICATION_ALLOWED_ERR: 7,\n  NOT_FOUND_ERR: 8,\n  NOT_SUPPORTED_ERR: 9,\n  INUSE_ATTRIBUTE_ERR: 10,\n  INVALID_STATE_ERR: 11,\n  SYNTAX_ERR: 12,\n  INVALID_MODIFICATION_ERR: 13,\n  NAMESPACE_ERR: 14,\n  INVALID_ACCESS_ERR: 15,\n  VALIDATION_ERR: 16,\n  TYPE_MISMATCH_ERR: 17,\n  SECURITY_ERR: 18,\n  NETWORK_ERR: 19,\n  ABORT_ERR: 20,\n  URL_MISMATCH_ERR: 21,\n  QUOTA_EXCEEDED_ERR: 22,\n  TIMEOUT_ERR: 23,\n  INVALID_NODE_TYPE_ERR: 24,\n  DATA_CLONE_ERR: 25,\n  toString: [Function: toString],\n}\nnote: missing sourcemaps for /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
+      }
+    },
+    {
+      "run": 10,
+      "sample": {
+        "durationMs": 1414.855584,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:34.536 INFO  relkit            Starting development server\n21:28:34.808 INFO  build             Compiling application\n21:28:35.400 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:35.485 INFO  build             Compiled in 630ms\n21:28:35.485 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:35.463 INFO  http              GET /hello → 200 in 136ms\n21:28:35.503 INFO  relkit            Stopping development server\n21:28:35.521 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 11,
+      "sample": {
+        "durationMs": 789.332375,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:35.726 INFO  relkit            Starting development server\n21:28:35.753 INFO  build             Compiling application\n21:28:36.208 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:36.311 INFO  build             Compiled in 557ms\n21:28:36.312 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:36.275 INFO  http              GET /hello → 200 in 179ms\n21:28:36.347 INFO  relkit            Stopping development server\n21:28:36.377 INFO  relkit            Development server stopped\n21:28:36.377 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable.\n21:28:36.393 \u001b[33mWARN \u001b[0m relkit            dev.telemetry.uncommitted\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 12,
+      "sample": {
+        "durationMs": 864.8395,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:36.592 INFO  relkit            Starting development server\n21:28:36.619 INFO  build             Compiling application\n21:28:37.202 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:37.258 INFO  build             Compiled in 639ms\n21:28:37.260 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:37.227 INFO  http              GET /hello → 200 in 88ms\n21:28:37.273 INFO  relkit            Stopping development server\n21:28:37.301 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 13,
+      "sample": {
+        "durationMs": 519.576958,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:37.499 INFO  relkit            Starting development server\n21:28:37.525 INFO  build             Compiling application\n21:28:37.794 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:37.827 INFO  build             Compiled in 302ms\n21:28:37.828 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:37.834 INFO  relkit            Stopping development server\n21:28:37.815 INFO  http              GET /hello → 200 in 68ms\n21:28:37.858 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 14,
+      "sample": {
+        "durationMs": 558.408834,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:38.060 INFO  relkit            Starting development server\n21:28:38.087 INFO  build             Compiling application\n21:28:38.384 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:38.421 INFO  build             Compiled in 333ms\n21:28:38.422 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:38.405 INFO  http              GET /hello → 200 in 68ms\n21:28:38.437 INFO  relkit            Stopping development server\n21:28:38.453 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 15,
+      "sample": {
+        "durationMs": 517.54725,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:38.635 INFO  relkit            Starting development server\n21:28:38.660 INFO  build             Compiling application\n21:28:38.939 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:38.975 INFO  build             Compiled in 314ms\n21:28:38.976 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:38.982 INFO  relkit            Stopping development server\n21:28:38.960 INFO  http              GET /hello → 200 in 67ms\n21:28:39.005 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 16,
+      "sample": {
+        "durationMs": 517.340875,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:39.198 INFO  relkit            Starting development server\n21:28:39.223 INFO  build             Compiling application\n21:28:39.496 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:39.527 INFO  build             Compiled in 303ms\n21:28:39.528 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:39.533 INFO  relkit            Stopping development server\n21:28:39.518 INFO  http              GET /hello → 200 in 63ms\n21:28:39.545 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 17,
+      "sample": {
+        "durationMs": 521.67525,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:39.729 INFO  relkit            Starting development server\n21:28:39.754 INFO  build             Compiling application\n21:28:40.031 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:40.070 INFO  build             Compiled in 314ms\n21:28:40.071 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:40.056 INFO  http              GET /hello → 200 in 71ms\n21:28:40.092 INFO  relkit            Stopping development server\n21:28:40.113 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 18,
+      "sample": {
+        "durationMs": 519.91775,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:40.310 INFO  relkit            Starting development server\n21:28:40.334 INFO  build             Compiling application\n21:28:40.612 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:40.640 INFO  build             Compiled in 305ms\n21:28:40.641 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:40.647 INFO  relkit            Stopping development server\n21:28:40.631 INFO  http              GET /hello → 200 in 59ms\n21:28:40.657 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 19,
+      "sample": {
+        "durationMs": 538.907375,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:40.849 INFO  relkit            Starting development server\n21:28:40.876 INFO  build             Compiling application\n21:28:41.168 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:41.202 INFO  build             Compiled in 325ms\n21:28:41.203 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:41.209 INFO  relkit            Stopping development server\n21:28:41.190 INFO  http              GET /hello → 200 in 67ms\n21:28:41.231 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    },
+    {
+      "run": 20,
+      "sample": {
+        "durationMs": 530.664041,
+        "outcome": "response",
+        "output": "$ relkit dev\n21:28:41.422 INFO  relkit            Starting development server\n21:28:41.446 INFO  build             Compiling application\n21:28:41.734 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n21:28:41.766 INFO  build             Compiled in 319ms\n21:28:41.767 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n21:28:41.772 INFO  relkit            Stopping development server\n21:28:41.754 INFO  http              GET /hello → 200 in 64ms\n21:28:41.784 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      }
+    }
+  ],
+  "summary": {
+    "runs": 20,
+    "medianMs": 523.6357915,
+    "p95Ms": 1414.855584,
+    "maximumMs": 1513.522792,
+    "passed": false
+  }
+}

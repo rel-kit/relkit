@@ -1,215 +1,53 @@
+/**
+ * Declares exact export maps for release validation and packed smoke resolution.
+ * Pure tables describe intentional leaf boundaries; callers compare these maps
+ * against manifests before accepting package bytes. No filesystem work occurs here.
+ */
 import {
   appSubpaths,
   catalogSubpaths,
   integrationSubpaths,
 } from "./release-package-contract-tables.js";
+import { packageLeafExports } from "./release-package-leaves.js";
+import type { ReleaseExports } from "./release-package-contract.types.js";
 
 const rootExport = { types: "./dist/index.d.ts", import: "./dist/index.js" };
 
-/** Declares the exact packed entry points, including intentional leaf exports.
+/**
+ * Declares packed entry points, preserving intentional import conditions.
  * @param directoryName - Workspace directory basename.
  * @param packageName - Published name for integration-specific subpaths.
- * @returns The ordered export map required by manifest and packed-resolution checks.
+ * @returns The export map required by manifest and packed-resolution checks.
  */
-export function expectedExports(
-  directoryName: string,
-  packageName?: string,
-): Record<string, unknown> {
+export function expectedExports(directoryName: string, packageName?: string): ReleaseExports {
   if (packageName === "@relkit/integrations")
     return Object.fromEntries([
       [".", rootExport],
-      ...catalogSubpaths.map((subpath) => [
-        `./${subpath}`,
-        { types: `./dist/${subpath}.d.ts`, import: `./dist/${subpath}.js` },
-      ]),
+      ...catalogSubpaths.map((subpath) => [`./${subpath}`, leaf(subpath)]),
     ]);
   const subpaths = packageName ? integrationSubpaths[packageName] : undefined;
-  if (directoryName === "create-relkit")
-    return {
-      "./catalog-resolution": {
-        types: "./src/catalog-resolution.ts",
-        default: "./src/catalog-resolution.ts",
-      },
-      ".": rootExport,
-    };
   if (subpaths)
     return Object.fromEntries([
       [".", rootExport],
-      ...subpaths.map((subpath) => [
-        `./${subpath}`,
-        {
-          types: `./dist/${subpath}/index.d.ts`,
-          import: `./dist/${subpath}/index.js`,
-        },
-      ]),
+      ...subpaths.map((subpath) => [`./${subpath}`, leaf(`${subpath}/index`)]),
     ]);
-  if (directoryName === "cloud-aws")
-    return {
-      ".": rootExport,
-      "./runtime": {
-        types: "./dist/runtime/index.d.ts",
-        import: "./dist/runtime/index.js",
-      },
-    };
-  if (directoryName === "contracts")
-    return {
-      ".": rootExport,
-      "./operation": {
-        types: "./dist/operation.d.ts",
-        import: "./dist/operation.js",
-      },
-      "./jobs": {
-        types: "./dist/jobs.d.ts",
-        import: "./dist/jobs.js",
-      },
-    };
-  if (directoryName === "runtime-effect")
-    return {
-      "./logger": {
-        types: "./dist/logger.d.ts",
-        import: "./dist/logger.js",
-      },
-      ".": rootExport,
-    };
-  if (directoryName === "events")
-    return {
-      ".": rootExport,
-      "./effect": {
-        types: "./dist/effect.d.ts",
-        import: "./dist/effect.js",
-      },
-    };
-  if (directoryName === "jobs")
-    return {
-      ".": rootExport,
-      "./adapter": {
-        types: "./dist/adapter.d.ts",
-        import: "./dist/adapter.js",
-      },
-      "./server": {
-        types: "./dist/server.d.ts",
-        import: "./dist/server.js",
-      },
-      "./legacy": {
-        types: "./dist/legacy.d.ts",
-        import: "./dist/legacy.js",
-      },
-    };
   if (directoryName === "app")
     return Object.fromEntries([
       [".", rootExport],
-      ...appSubpaths.map((subpath) => [
-        `./${subpath}`,
-        subpath === "jobs/legacy"
-          ? { types: "./dist/jobs-legacy.d.ts", import: "./dist/jobs-legacy.js" }
-          : { types: `./dist/${subpath}.d.ts`, import: `./dist/${subpath}.js` },
-      ]),
+      ...appSubpaths.map((subpath) => {
+        if (subpath === "jobs/legacy") return [`./${subpath}`, leaf("jobs-legacy")];
+        if (subpath === "internal/runtime") return [`./${subpath}`, leaf("internal-runtime")];
+        return [`./${subpath}`, leaf(subpath)];
+      }),
     ]);
-  if (directoryName === "cli")
-    return {
-      ".": rootExport,
-      "./help": {
-        types: "./dist/cli-help-model.d.ts",
-        import: "./dist/cli-help-model.js",
-      },
-      "./editor": {
-        types: "./dist/editor.d.ts",
-        require: "./dist/editor.cjs",
-      },
-      "./internal/server-runtime": {
-        types: "./dist/internal/server-runtime.d.ts",
-        default: "./dist/internal/server-runtime.js",
-      },
-    };
-  if (directoryName === "compiler")
-    return {
-      ".": rootExport,
-      "./editor": {
-        types: "./dist/editor.d.ts",
-        import: "./dist/editor.js",
-      },
-    };
-  if (directoryName === "config")
-    return {
-      ".": rootExport,
-      "./internal/config": {
-        types: "./dist/internal/config.d.ts",
-        import: "./dist/internal/config.js",
-      },
-    };
-  if (directoryName === "drizzle" || directoryName === "functions")
-    return {
-      ".": rootExport,
-      "./internal": {
-        types: "./dist/internal.d.ts",
-        import: "./dist/internal.js",
-      },
-    };
-  if (directoryName === "client")
-    return {
-      ".": rootExport,
-      "./server": {
-        types: "./dist/server.d.ts",
-        bun: "./dist/server.js",
-      },
-      "./tanstack-query": {
-        types: "./dist/tanstack-query.d.ts",
-        import: "./dist/tanstack-query.js",
-      },
-      "./react": {
-        types: "./dist/react/index.d.ts",
-        import: "./dist/react/index.js",
-      },
-      "./jobs": {
-        types: "./dist/jobs/index.d.ts",
-        import: "./dist/jobs/index.js",
-      },
-      "./build/next": {
-        types: "./dist/build/next.d.ts",
-        import: "./dist/build/next.js",
-        default: "./dist/build/next.js",
-      },
-      "./build/vite": {
-        types: "./dist/build/vite.d.ts",
-        import: "./dist/build/vite.js",
-        default: "./dist/build/vite.js",
-      },
-    };
-  if (directoryName === "better-auth")
-    return {
-      ".": rootExport,
-      "./react": {
-        types: "./dist/react.d.ts",
-        import: "./dist/react.js",
-      },
-    };
-  if (directoryName === "realtime")
-    return {
-      ".": rootExport,
-      "./operation-id": {
-        types: "./dist/operation-id.d.ts",
-        import: "./dist/operation-id.js",
-      },
-    };
-  if (directoryName === "runtime-hono")
-    return {
-      ".": rootExport,
-      "./bun": {
-        types: "./dist/bun.d.ts",
-        import: "./dist/bun.js",
-      },
-    };
-  if (directoryName === "observability")
-    return {
-      ".": rootExport,
-      "./telemetry": {
-        types: "./dist/telemetry.d.ts",
-        import: "./dist/telemetry.js",
-      },
-      "./local": {
-        types: "./dist/local/index.d.ts",
-        import: "./dist/local/index.js",
-      },
-    };
-  return { ".": rootExport };
+  return { ".": rootExport, ...packageLeafExports[directoryName] };
+}
+
+/**
+ * Maps one dist leaf into its declaration and ESM implementation conditions.
+ * @param path - Exact package-relative dist module stem.
+ * @returns Pure export conditions used by generated table entries.
+ */
+function leaf(path: string) {
+  return { types: `./dist/${path}.d.ts`, import: `./dist/${path}.js` };
 }

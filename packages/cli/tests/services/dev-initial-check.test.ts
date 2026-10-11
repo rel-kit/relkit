@@ -1,11 +1,13 @@
+/**
+ * Verifies the initial validation barrier before any session/support acquisition.
+ * Injected capabilities preserve diagnostic/transport failure identity and join
+ * interruption cleanup. Default inspector resolution follows packaged policy.
+ */
 import { expect, it } from "@effect/vitest";
 import { loadConfig } from "@relkit/compiler";
-import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { Cause, Deferred, Effect, Exit, Fiber, Layer, Logger } from "effect";
 import { cliAdapterError } from "../../src/cli-errors.js";
 import { devCommandOperationEffect } from "../../src/commands/dev-command-operation.js";
-import { resolveInspectorInstallation } from "../../src/commands/dev-inspector.js";
 import { CliTelemetryNative } from "../../src/commands/dev-telemetry-native.service.js";
 import { CliPortProbe } from "../../src/commands/port-availability.service.js";
 import { CliDevSupervisor } from "../../src/services/dev-supervisor.service.js";
@@ -106,15 +108,6 @@ const failed: CheckResult = {
     clientManifest: "",
   },
 };
-
-it.effect(
-  "default inspector discovery resolves the module directory under the Node test runtime",
-  () =>
-    Effect.sync(() => {
-      const expected = fileURLToPath(new URL("../../../../apps/inspector", import.meta.url));
-      expect(resolveInspectorInstallation(undefined, {}).root).toBe(resolve(expected));
-    }),
-);
 
 it.effect(
   "initial development uses the substitute with fresh identity and preserves diagnostics",

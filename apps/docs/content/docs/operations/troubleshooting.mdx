@@ -29,8 +29,9 @@ repairs. Review output before sharing it; external tools can still print values 
 | Environment is incomplete          | `relkit env check` and `relkit env explain NAME` | Supply the declared value; do not add a hidden runtime branch.                                  |
 | Local integration will not start   | `relkit local status` and Docker health          | Repair the recipe or use `dev --local=off` with connected values.                               |
 | A new generation will not activate | Candidate diagnostic and readiness               | Fix graph, manifest, integration, or readiness state; the last valid generation remains active. |
+| A prepared start falls back        | `relkit --json check` and `relkit dev --prepare` | Repair stale inputs or an ineligible dynamic configuration; fallback keeps the full safe check. |
 | Route is unavailable               | `/_relkit/v1/health/live` and the route URL      | Confirm the active project, port, method, and route-to-function edge.                           |
-| Inspector is stale                 | `/_relkit/v1/graph` and displayed graph hash     | Reconnect to the active backend or fix the rejected candidate.                                  |
+| Inspector is stale or absent       | `/_relkit/v1/graph` and support diagnostics      | Confirm backend health, then repair the Inspector port or persistence support failure.          |
 | Build will not start               | `bun run build` and manifest/hash diagnostic     | Start only the current unedited build output.                                                   |
 | Deployment preview fails           | `relkit --json doctor --pulumi` and preview      | Fix the first Pulumi, backend, role, integration, or environment diagnostic.                    |
 | Test is flaky                      | The smallest test file                           | Use deterministic fakes and explicit completion; remove arbitrary sleeps.                       |

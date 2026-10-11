@@ -1,5 +1,15 @@
-/** Pure framework shutdown wiring; typed helper owns drains, scopes, and deadlines. */
-export const SERVER_SHUTDOWN_SOURCE = `
+/**
+ * Emits common shutdown wiring plus graph-selected resource release. The typed
+ * runtime host owns joined drains/scopes/deadlines; this emitter acquires nothing.
+ */
+
+/**
+ * Includes only lifecycle resources actually registered by the generated host.
+ * @param agentRelease - Pure graph-selected agent release statement, or empty.
+ * @returns Generated shutdown handlers with existing telemetry and server cleanup.
+ */
+export function serverShutdownSource(agentRelease: string): string {
+  return `
 function flushTelemetry() {
   const flush = globalThis["__relkit_flush_telemetry"];
   return typeof flush === "function" ? Promise.resolve(flush()) : Promise.resolve();
@@ -8,7 +18,7 @@ function flushTelemetry() {
 async function shutdown() {
   await runtimeOwner.shutdown(async () => {
     spanRuntime.close();
-    await runtimeOwner.cleanup("agents.release", () => releaseAgentPersistence(Object.values(runtimeManifest.agents ?? {})));
+    ${agentRelease}
   }, async () => {
     await runtimeOwner.cleanup("telemetry.flush", flushTelemetry);
   });
@@ -19,3 +29,4 @@ async function shutdown() {
 process.once("SIGINT", () => void shutdown());
 process.once("SIGTERM", () => void shutdown());
 `;
+}

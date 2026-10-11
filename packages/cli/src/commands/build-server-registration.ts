@@ -1,26 +1,9 @@
-/** Pure descriptor and request-context wiring; generated source retains RELKIT APIs. */
+/**
+ * Emits request-context registration shared by all servers and a separate optional
+ * agent fragment. The source owner selects the latter only for declared agents;
+ * generated calls retain per-request context and typed runtime resource ownership.
+ */
 export const SERVER_REGISTRATION_SOURCE = `
-function bindAgents() {
-  for (const node of plan.agents) {
-    const agent = runtimeManifest.agents?.[node.id];
-    if (agent === undefined) throw new Error(\`Agent descriptor "\${node.id}" is unavailable.\`);
-    const functionId = \`relkit.agent.\${node.id}.invoke\`;
-    const handler = createGeneratedAgentFunction(
-      node.id,
-      (input, context) => invokeBoundAgent(node, agent, input, context),
-    );
-    executableManifest.functions[functionId] = handler;
-    if (node.backendBucketId !== undefined) {
-      executableManifest.targets[functionId] = {
-        id: functionId,
-        input: agent.input,
-        output: agent.output,
-        handler,
-        dependencies: { buckets: { backend: agent.backend } },
-      };
-    }
-  }
-}
 function resolveClientIdentityRegistration(request, session) {
   const userId = session?.user?.id;
   const sessionId = session?.session?.id;
@@ -84,6 +67,31 @@ function routeMiddlewareContext({ middlewareId, signal, request, auth }) {
       warn: logger("warn"), error: logger("error"),
     }),
   };
+}
+`;
+
+/** Agent invocation/persistence wiring included only when the graph needs it. */
+export const SERVER_AGENT_REGISTRATION_SOURCE = `
+function bindAgents() {
+  for (const node of plan.agents) {
+    const agent = runtimeManifest.agents?.[node.id];
+    if (agent === undefined) throw new Error(\`Agent descriptor "\${node.id}" is unavailable.\`);
+    const functionId = \`relkit.agent.\${node.id}.invoke\`;
+    const handler = createGeneratedAgentFunction(
+      node.id,
+      (input, context) => invokeBoundAgent(node, agent, input, context),
+    );
+    executableManifest.functions[functionId] = handler;
+    if (node.backendBucketId !== undefined) {
+      executableManifest.targets[functionId] = {
+        id: functionId,
+        input: agent.input,
+        output: agent.output,
+        handler,
+        dependencies: { buckets: { backend: agent.backend } },
+      };
+    }
+  }
 }
 async function invokeBoundAgent(node, agent, input, context) {
   let modelRegistry;

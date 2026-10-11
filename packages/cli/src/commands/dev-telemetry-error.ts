@@ -1,5 +1,5 @@
 import { basename, join } from "node:path";
-import { fail } from "../main-support.js";
+import { CliFailureError } from "../cli-errors.js";
 
 /**
  * Preserves actionable DuckDB ownership guidance and existing public failure codes.
@@ -12,7 +12,7 @@ export function telemetryOpenFailure(root: string, cause: unknown): Error {
   const owner = /Conflicting lock is held in (.+?) \(PID (\d+)\)/.exec(detail);
   const database = join(root, "observability.duckdb");
   if (owner !== null || /Could not set lock/.test(detail))
-    return fail(
+    return failure(
       "RELKIT_DEV_TELEMETRY_LOCKED",
       [
         "Local telemetry is already in use by another dev session.",
@@ -23,8 +23,13 @@ export function telemetryOpenFailure(root: string, cause: unknown): Error {
         "Stop that session with Ctrl-C, then run `bun dev` again.",
       ].join("\n"),
     );
-  return fail(
+  return failure(
     "RELKIT_DEV_TELEMETRY_UNAVAILABLE",
     [`Cannot open the local telemetry database at ${database}.`, `Cause: ${detail}`].join("\n"),
   );
+}
+
+/** Constructs the fixed telemetry product failure without importing the full CLI dispatch graph. */
+function failure(code: string, message: string): CliFailureError {
+  return new CliFailureError({ code, message, exitCode: 1 });
 }

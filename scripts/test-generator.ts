@@ -39,21 +39,17 @@ await runServiceGate("generator Effect services", [
   "packages/create-relkit/vitest.config.ts",
 ]);
 
-const results = await Promise.all(
-  suites.map(async ({ name, args }) => {
-    const startedAt = performance.now();
-    const child = Bun.spawn([process.execPath, "test", ...args], {
-      cwd: root,
-      stdout: "inherit",
-      stderr: "inherit",
-    });
-    const code = await child.exited;
-    console.log(`${name}: ${((performance.now() - startedAt) / 1000).toFixed(1)}s`);
-    return { name, code };
-  }),
-);
-const failure = results.find(({ code }) => code !== 0);
-if (failure !== undefined) throw new Error(`${failure.name} failed.`);
+for (const { name, args } of suites) {
+  const startedAt = performance.now();
+  const child = Bun.spawn([process.execPath, "test", ...args], {
+    cwd: root,
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+  const code = await child.exited;
+  console.log(`${name}: ${((performance.now() - startedAt) / 1000).toFixed(1)}s`);
+  if (code !== 0) throw new Error(`${name} failed.`);
+}
 
 /**
  * Joins a required generator service gate before the native fixture suites run.

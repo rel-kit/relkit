@@ -1,0 +1,430 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "mode": "candidate-diagnostic",
+  "command": "bun dev",
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 Pro",
+    "load": [
+      11.57080078125,
+      8.71142578125,
+      7.828125
+    ]
+  },
+  "fixture": {
+    "temporary": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo",
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/readiness-baseline",
+    "version": "0.7.2",
+    "registry": "http://127.0.0.1:55094",
+    "examples": "examples",
+    "artifacts": [
+      {
+        "name": "@relkit/contracts",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-contracts-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/schema",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-schema-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/buckets",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-buckets-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/cache",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-cache-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/diagnostics",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-diagnostics-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/graph",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-graph-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/invocation",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-invocation-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/observability",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-observability-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/provider",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-provider-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/realtime",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-realtime-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/client",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-client-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/client-generator",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-client-generator-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/config",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-config-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/deploy",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-deploy-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/drizzle",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-drizzle-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/functions",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-functions-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/local-service",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-local-service-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/openapi",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-openapi-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/compiler",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-compiler-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/docker",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-docker-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/jobs",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-jobs-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/runtime-effect",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-runtime-effect-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/s3",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-s3-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/tools",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-tools-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/agents",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-agents-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/deploy-pulumi",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-deploy-pulumi-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/effect-mq",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-effect-mq-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/events",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-events-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/inngest",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-inngest-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/inspector-api",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-inspector-api-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/supervisor",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-supervisor-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/trigger",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-trigger-0.7.2.tgz"
+      },
+      {
+        "name": "create-relkit",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/create-relkit-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/providers-local",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-providers-local-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/services",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-services-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/local",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-local-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/redis",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-redis-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/routes",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-routes-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/app",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-app-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/better-auth",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-better-auth-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/engine",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-engine-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/runtime-hono",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-runtime-hono-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/cli",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-cli-0.7.2.tgz"
+      },
+      {
+        "name": "@relkit/testing",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-testing-0.7.2.tgz"
+      },
+      {
+        "name": "relkit",
+        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/release-artifacts/relkit-0.7.2.tgz"
+      }
+    ]
+  },
+  "identity": {
+    "bun": {
+      "path": "/Users/mustafaelsayed/.bun/bin/bun",
+      "realpath": "/Users/mustafaelsayed/.bun/bin/bun",
+      "version": "1.3.10"
+    },
+    "cli": {
+      "name": "@relkit/cli",
+      "version": "0.7.2",
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/readiness-baseline/node_modules/.bin/relkit",
+      "realpath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/readiness-baseline/node_modules/@relkit/cli/dist/bin.js"
+    },
+    "typescript": {
+      "name": "typescript",
+      "version": "5.9.3"
+    },
+    "lockHash": "sha256:5d9d4eff6c1bf102c64a8af3d6440a776fd93daccbdf8d4fe66d9da906c4e467",
+    "artifacts": [
+      {
+        "name": "@relkit/contracts",
+        "hash": "sha256:e5f838f54745c1e7f289febc3fb888c9ee195227c3b9db31b96399009c0740c8"
+      },
+      {
+        "name": "@relkit/schema",
+        "hash": "sha256:65f0be066b5dad5a46559e301f89dc383a3d7f2b5082d8e87dedc3532583db9e"
+      },
+      {
+        "name": "@relkit/buckets",
+        "hash": "sha256:cc4fbd00849d59523b57f4a2cf8e3981a5a79132529f82ecb4393d6ac9dc459f"
+      },
+      {
+        "name": "@relkit/cache",
+        "hash": "sha256:1333d1ca69c1be311579263b209265f3a96a03bc409522d09493d3893f2c507d"
+      },
+      {
+        "name": "@relkit/diagnostics",
+        "hash": "sha256:940d46876785500319e5b178ac20c92187f322639b63409fbf8237768f038ba8"
+      },
+      {
+        "name": "@relkit/graph",
+        "hash": "sha256:ac4e4d87b0011255a61702458815b7d962bafeae08fd2fe4b89beb9669d058f8"
+      },
+      {
+        "name": "@relkit/invocation",
+        "hash": "sha256:e330594664c3f0af8b398095f0c890750e8912ca2f8fa03698c4370e14bb390d"
+      },
+      {
+        "name": "@relkit/observability",
+        "hash": "sha256:b3d548dea3e25eb60686e4f3523035d6afd786fc01320d25a4f91ff54e0be5af"
+      },
+      {
+        "name": "@relkit/provider",
+        "hash": "sha256:e86a6836b613e877cdc3a2f39e9635b43a2d4bedcce2e63e8809c599d400e828"
+      },
+      {
+        "name": "@relkit/realtime",
+        "hash": "sha256:edd65464bb24f70e95e712114a94ee8302d6dcc036858902cc84612dfd7cb94f"
+      },
+      {
+        "name": "@relkit/client",
+        "hash": "sha256:0ca516ce697ad2b6c14d52337b8b0071de7cfb97a9f2bfdcad353bb6b987a01d"
+      },
+      {
+        "name": "@relkit/client-generator",
+        "hash": "sha256:67fa032d9bd75fd13fefa7b02a59f92150723ae1e838fed785e85f131d89dad6"
+      },
+      {
+        "name": "@relkit/config",
+        "hash": "sha256:369978b12f7b5579df34012912dc6fe51d226c908c94309cfda0e6e4d5e75ed6"
+      },
+      {
+        "name": "@relkit/deploy",
+        "hash": "sha256:e3203384ff29b4c567be4f4f983526e67ad5845686e81934fd66482a5c2973b2"
+      },
+      {
+        "name": "@relkit/drizzle",
+        "hash": "sha256:d781b28e83b4a15d823f5cde5088d9f7264750d4246b526a2fd16ea690d2a742"
+      },
+      {
+        "name": "@relkit/functions",
+        "hash": "sha256:62d1132f7c4d23c2603c73d017103d34301e50e5a1aee29772bd1d33f874ad70"
+      },
+      {
+        "name": "@relkit/local-service",
+        "hash": "sha256:c89dd807fd41484b2d014ae70a49539705eb887c5d5232850147bd9e0e6d382f"
+      },
+      {
+        "name": "@relkit/openapi",
+        "hash": "sha256:6495b573dc5b1c1977cb1f4aed9a708c59a887fb26cac27ae0e881622dc2e980"
+      },
+      {
+        "name": "@relkit/compiler",
+        "hash": "sha256:d698cd11af54cd00676b30f924cc225575d33278bfc3e35a135652d69623445d"
+      },
+      {
+        "name": "@relkit/docker",
+        "hash": "sha256:382bfa49cfb146b9b0afcf924cd2bc836d9ecc92c184a5ffacc7acc10828d49e"
+      },
+      {
+        "name": "@relkit/jobs",
+        "hash": "sha256:ab602651ed4ca327f575886ffead6299f495244b1e79484346d3442ccd80a14d"
+      },
+      {
+        "name": "@relkit/runtime-effect",
+        "hash": "sha256:53ff934bcbe049310cb65de8be2d31ee1269bad40f1f0b6ff3263a862bcbb383"
+      },
+      {
+        "name": "@relkit/s3",
+        "hash": "sha256:49b936fdc9cde54b5a2a0e28b221d019ee18215291fd45834886695d445ce9f3"
+      },
+      {
+        "name": "@relkit/tools",
+        "hash": "sha256:6bdaf3fca2d9fbddcf4cc2112dd85b526db5c2cd8603929017147822235263d0"
+      },
+      {
+        "name": "@relkit/agents",
+        "hash": "sha256:5ccde09cd6e905a96d495e2f4feb995b9a24be314ec59ee7d3a0447512d6bfbc"
+      },
+      {
+        "name": "@relkit/deploy-pulumi",
+        "hash": "sha256:69ed68775338da975ec421f90419db0f9511cf95165fa4ed1c7f8783733ac1df"
+      },
+      {
+        "name": "@relkit/effect-mq",
+        "hash": "sha256:e6b4718aa20a10d8a5f466648999f29ad4167347f881662b59b51a584974edb2"
+      },
+      {
+        "name": "@relkit/events",
+        "hash": "sha256:fd8987ed68ba41edc8379cb48b674836bf7400f8fde7c9f62df97cf5423bbbde"
+      },
+      {
+        "name": "@relkit/inngest",
+        "hash": "sha256:4e14f4cb137b32a59fa36d5c3483e429630f4acde5328679b063692de4b8a0ef"
+      },
+      {
+        "name": "@relkit/inspector-api",
+        "hash": "sha256:0e59682845a0ca26311eeb7c43386369f4a28ed9d7b2186ff03cc6837e94dbe5"
+      },
+      {
+        "name": "@relkit/supervisor",
+        "hash": "sha256:86572dfb80bc6e399216fb2c57248a4c8e790912b3bf231714d1617a0b9c9b38"
+      },
+      {
+        "name": "@relkit/trigger",
+        "hash": "sha256:c591bbac44ba3ea88b64c6d6fd382024423a203166a2df273bf2091471120850"
+      },
+      {
+        "name": "create-relkit",
+        "hash": "sha256:a949caf4bd9cea42b78e430cf56f513eb352119c866f2f2458410b8a3b843552"
+      },
+      {
+        "name": "@relkit/providers-local",
+        "hash": "sha256:8264e1f7c9a56d80fe557ccfc89447e6189334d6c7bbcdcec4f34d2d02b7f5ab"
+      },
+      {
+        "name": "@relkit/services",
+        "hash": "sha256:da59b29c67b4d8ba966264a65e70a63013cd8cffeb391bfcad7d69f21547c658"
+      },
+      {
+        "name": "@relkit/local",
+        "hash": "sha256:e68ad1c620c44c7aa5ed6f937d8a3899f28fdc4afd69f2e0ffa9b9415b47dd48"
+      },
+      {
+        "name": "@relkit/redis",
+        "hash": "sha256:0f37e76211d27a9453625700f0c5fd3a001d9c8525f6e2aa728a73c48e9bc6f8"
+      },
+      {
+        "name": "@relkit/routes",
+        "hash": "sha256:1e7115beaf91688058d4b668fdeca675ef78ccd71bf0aca6c344e6ee6d2a0409"
+      },
+      {
+        "name": "@relkit/app",
+        "hash": "sha256:d9bd8d738c808e4be4059841f248047fc46832b9de5a8b9d7979f741822d0e6b"
+      },
+      {
+        "name": "@relkit/better-auth",
+        "hash": "sha256:39955d32f833923a615df13ac0926e3c11a4a7e01f141009e202ab9bce13bfb8"
+      },
+      {
+        "name": "@relkit/engine",
+        "hash": "sha256:b50aed0790a910c714523ae2d49defb94e85f340d72c3c7ab31b909aec5f0693"
+      },
+      {
+        "name": "@relkit/runtime-hono",
+        "hash": "sha256:bf15e0fe1e6f925b6be179c051d7d1b4f40eab8ae6244874f24fb8df544f2400"
+      },
+      {
+        "name": "@relkit/cli",
+        "hash": "sha256:98e1a5248d20be1c8c85bba93c69bfafc204129b376079e9defabb07699bd56a"
+      },
+      {
+        "name": "@relkit/testing",
+        "hash": "sha256:fb0684a0b773ff5d34c2ad84dc314e8a20e8f14cb80965667d3cce674d7b3916"
+      },
+      {
+        "name": "relkit",
+        "hash": "sha256:a80b1c52e94c9e7d4ee16e21d60eba8bef952fab4392b610d8a2893a04bf6a0b"
+      }
+    ],
+    "inspectorOverride": "absent"
+  },
+  "request": {
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-rWEjYo/readiness-baseline",
+    "url": "http://127.0.0.1:54815/hello?name=RelKit",
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "sample": {
+        "durationMs": 563.220834,
+        "outcome": "response",
+        "output": "$ relkit dev\n20:36:26.887 INFO  relkit            Starting development server\n20:36:26.910 INFO  build             Compiling application\n20:36:27.198 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n20:36:27.229 INFO  build             Compiled in 318ms\n20:36:27.230 INFO  server            Ready\n                                     API        http://127.0.0.1:54815\n                                     Reference  http://127.0.0.1:54815/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:54815/_relkit/v1/openapi.json\n20:36:27.221 INFO  http              GET /hello → 200 in 64ms\n20:36:27.255 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n20:36:27.280 INFO  relkit            Stopping development server\n20:36:27.270 INFO  http              GET /hello → 200 in 35ms\n20:36:27.307 INFO  relkit            Development server stopped\n20:36:27.307 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable.\n20:36:27.322 \u001b[33mWARN \u001b[0m relkit            dev.telemetry.uncommitted\nerror: script \"dev\" exited with code 143\n"
+      }
+    }
+  ],
+  "summary": {
+    "runs": 1,
+    "medianMs": 563.220834,
+    "p95Ms": 563.220834,
+    "maximumMs": 563.220834,
+    "passed": false
+  }
+}

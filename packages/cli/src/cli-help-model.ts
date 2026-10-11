@@ -1,3 +1,4 @@
+/** Static CLI help metadata; rendering never evaluates projects or starts support services. */
 import { deepFreeze } from "@relkit/contracts";
 import { argument, command, devLogOptions, option, title } from "./cli-help-builders.js";
 import type { CliHelpCommand, CliHelpModel } from "./cli-help-model.types.js";
@@ -22,16 +23,28 @@ const root = command(
           option(
             "template",
             "choice",
-            "Starter template",
+            "Candidate template; certified tuples only",
             [],
             ["minimal", "api", "agent", "fullstack"],
           ),
-          option("cloud", "choice", "Cloud provider", [], ["aws", "none"]),
-          option("deploy", "choice", "Deployment adapter", [], ["pulumi", "none"]),
+          option(
+            "cloud",
+            "choice",
+            "Candidate cloud selection; certified tuples only",
+            [],
+            ["aws", "none"],
+          ),
+          option(
+            "deploy",
+            "choice",
+            "Candidate deployment selection; certified tuples only",
+            [],
+            ["pulumi", "none"],
+          ),
           option(
             "jobs",
             "choice",
-            "Jobs service and local recipe",
+            "Candidate jobs service; certified native tuples only",
             [],
             ["inngest-docker", "effect-mq-docker", "trigger-docker"],
           ),
@@ -46,6 +59,11 @@ const root = command(
       command("dev", "Run app, inspector, OpenAPI, and Scalar", "relkit dev", {
         options: [
           projectRoot,
+          option(
+            "prepare",
+            "boolean",
+            "Prepare a validated dev snapshot and exit without a server",
+          ),
           option("port", "integer", "Application port"),
           option("inspector-port", "integer", "Inspector port"),
           option("local", "choice", "Start required local services", [], ["on", "off"]),

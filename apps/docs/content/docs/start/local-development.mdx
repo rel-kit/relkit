@@ -23,6 +23,17 @@ Start `bun run dev` and open the Inspector. Choose **Routes**, then `POST /order
 public function it targets. Open **Functions** and find the Orders pricing and creation
 operations. The inspector shows the checked application, not a second configuration to edit.
 
+On an unchanged installed project, development reuses a prepared snapshot only after checking its
+complete source, generated graph, dependency, and tool identities. A missing, stale, corrupt, or
+ineligible snapshot returns to the normal full validation path; it never weakens candidate health or
+last-known-good switching. Run `bunx --no-install relkit dev --prepare` when you want to perform that
+finite validation ahead of the interactive session.
+
+Backend readiness is independent from optional support startup. Telemetry persistence and the
+Inspector start in the session's scoped background support path, so a delayed or failed Inspector
+does not make a healthy backend unavailable. RELKIT prints an Inspector URL only after that support
+listener is actually ready.
+
 The commerce demo below shows the same **Routes** navigation item and **Open route** action
 you will use in your app:
 

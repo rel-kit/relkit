@@ -5,13 +5,19 @@
     "--json": { type: "boolean", description: "Emit machine-readable output" },
     "--template": {
       type: '"minimal" | "api" | "agent" | "fullstack"',
-      description: "Starter template",
+      description: "Candidate template; certified tuples only",
     },
-    "--cloud": { type: '"aws" | "none"', description: "Cloud provider" },
-    "--deploy": { type: '"pulumi" | "none"', description: "Deployment adapter" },
+    "--cloud": {
+      type: '"aws" | "none"',
+      description: "Candidate cloud selection; certified tuples only",
+    },
+    "--deploy": {
+      type: '"pulumi" | "none"',
+      description: "Candidate deployment selection; certified tuples only",
+    },
     "--jobs": {
       type: '"inngest-docker" | "effect-mq-docker" | "trigger-docker"',
-      description: "Jobs service and local recipe",
+      description: "Candidate jobs service; certified native tuples only",
     },
     "--directory": { type: "string", description: "Destination directory" },
     "--install": { type: "boolean", description: "Install generated project setup" },

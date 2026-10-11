@@ -145,7 +145,7 @@ test("asks for name, template, jobs and destination while keeping silent default
   });
 });
 
-test("retains advanced explicit creation flags without any setup question", async () => {
+test("rejects unsupported explicit creation flags without any setup question", async () => {
   const unexpected = async (): Promise<never> => {
     throw new Error("Unexpected setup question.");
   };
@@ -156,8 +156,8 @@ test("retains advanced explicit creation flags without any setup question", asyn
     multiselect: unexpected,
     confirm: unexpected,
   };
-  expect(
-    await resolveCreateOptionsDetails(
+  await expect(
+    resolveCreateOptionsDetails(
       [
         "sample-app",
         "--template",
@@ -176,90 +176,67 @@ test("retains advanced explicit creation flags without any setup question", asyn
       ],
       { interactive: true, promptDriver: prompt },
     ),
-  ).toEqual({
-    prompted: false,
-    options: {
-      name: "sample-app",
-      template: "api",
-      cloud: "aws",
-      deploy: "pulumi",
-      jobs: "effect-mq-docker",
-      install: false,
-      git: false,
-      examples: false,
-      directory: "apps/sample",
-      forceEmptyDirectory: false,
-      json: false,
-    },
-  });
+  ).rejects.toThrow("not certified");
 });
 
-test("honors the chosen starter template and custom destination", async () => {
+test("offers the certified starter template and honors a custom destination", async () => {
   const resolved = await resolveCreateOptionsDetails(["sample-app"], {
     interactive: true,
     promptDriver: driver({
-      select: { "Starter template": "api", "Jobs service": "none" },
+      select: { "Starter template": "minimal", "Jobs service": "none" },
       text: { Destination: "apps/sample-api" },
     }),
   });
   expect(resolved).toMatchObject({
     prompted: true,
-    options: { name: "sample-app", template: "api", directory: "apps/sample-api", git: true },
+    options: { name: "sample-app", template: "minimal", directory: "apps/sample-api", git: true },
   });
   expect(resolved.options.jobs).toBeUndefined();
 });
 
-test("skips inline template and destination flags while still offering jobs", async () => {
+test("rejects an uncertified inline template after filtering jobs", async () => {
   const questions: string[] = [];
   const unexpected = async (): Promise<never> => {
     throw new Error("Unexpected setup question.");
   };
-  const resolved = await resolveCreateOptionsDetails(
-    ["sample-app", "--template=agent", "--directory=apps/sample", "--no-git"],
-    {
-      interactive: true,
-      promptDriver: {
-        ...driver({}),
-        text: unexpected,
-        confirm: unexpected,
-        select: async (options) => {
-          questions.push(options.message);
-          const selected = options.options.find((option) => option.value === "none");
-          if (!selected) throw new Error("Missing jobs default.");
-          return selected.value;
-        },
-      },
-    },
-  );
-  expect(questions).toEqual(["Jobs service"]);
-  expect(resolved).toMatchObject({
-    prompted: true,
-    options: { template: "agent", directory: "apps/sample", git: false },
-  });
-  expect(resolved.options.jobs).toBeUndefined();
-});
-
-test("resolves every jobs provider selected interactively", async () => {
-  for (const jobs of ["inngest-docker", "effect-mq-docker", "trigger-docker"]) {
-    const questions: string[] = [];
-    const resolved = await resolveCreateOptionsDetails(
-      ["sample-app", "--template=minimal", "--directory=sample-app"],
+  await expect(
+    resolveCreateOptionsDetails(
+      ["sample-app", "--template=agent", "--directory=apps/sample", "--no-git"],
       {
         interactive: true,
         promptDriver: {
           ...driver({}),
+          text: unexpected,
+          confirm: unexpected,
           select: async (options) => {
             questions.push(options.message);
-            const selected = options.options.find((option) => option.value === jobs);
-            if (!selected) throw new Error("Missing jobs provider.");
+            const selected = options.options.find((option) => option.value === "none");
+            if (!selected) throw new Error("Missing jobs default.");
             return selected.value;
           },
         },
       },
-    );
-    expect(questions).toEqual(["Jobs service"]);
-    expect(resolved.options).toMatchObject({ jobs, git: true });
-  }
+    ),
+  ).rejects.toThrow("not certified");
+  expect(questions).toEqual(["Jobs service"]);
+});
+
+test("hides uncertified jobs providers interactively", async () => {
+  const resolved = await resolveCreateOptionsDetails(
+    ["sample-app", "--template=minimal", "--directory=sample-app"],
+    {
+      interactive: true,
+      promptDriver: {
+        ...driver({}),
+        select: async (options) => {
+          expect(options.message).toBe("Jobs service");
+          expect(options.options).toEqual([{ value: "none", label: "None" }]);
+          return "none" as never;
+        },
+      },
+    },
+  );
+  expect(resolved.options.jobs).toBeUndefined();
 });
 
 test("retains headless defaults without requesting interactive choices", async () => {

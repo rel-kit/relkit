@@ -8,7 +8,7 @@ function jobsRuntimeForInvocation() {
 async function invokeHttp(request) {
   const providerRegistry = await providerStartup;
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
-  const target = targetFor(request.functionId);
+  const target = request.target ?? targetFor(request.functionId);
   let invocationSpanId;
   const execute = () => {
     const run = () => invoke({

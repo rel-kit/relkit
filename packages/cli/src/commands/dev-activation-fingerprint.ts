@@ -1,5 +1,6 @@
+/** Resolves each child's complete activation identity without repeating full graph validation. */
 import { join } from "node:path";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Schema } from "effect";
 import {
   RUNTIME_ACTIVATION_FILE,
   isRuntimeActivationFingerprint,
@@ -19,12 +20,20 @@ import type { DevSession } from "./dev-session.js";
  */
 export const resolveActivationFingerprintEffect = Effect.fn("Dev.fingerprint")(
   function* (session: DevSession, candidate: StartedCandidate) {
+    const prepared = session.options.preparedActivationFingerprint?.(candidate);
+    if (prepared !== undefined) return prepared;
     const value = session.options.activationFingerprint;
-    const fingerprint: unknown =
+    const fingerprint =
       value === undefined
         ? yield* CliFileSystem.use((files) =>
             files.readText(join(candidate.directory, "server", RUNTIME_ACTIVATION_FILE)),
-          ).pipe(Effect.flatMap((text) => cliTry("dev.fingerprint.parse", () => JSON.parse(text))))
+          ).pipe(
+            Effect.flatMap((text) =>
+              cliTry("dev.fingerprint.parse", () =>
+                Schema.decodeUnknownSync(Schema.Json)(JSON.parse(text)),
+              ),
+            ),
+          )
         : typeof value === "function"
           ? yield* cliPromise("dev.fingerprint.callback", () =>
               Promise.resolve(value(candidate)),

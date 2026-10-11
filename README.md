@@ -161,11 +161,9 @@ The example route is:
 curl 'http://localhost:3000/hello?name=RelKit'
 ```
 
-Add AWS hosting through Pulumi only when you intend to deploy it:
-
-```sh
-bunx create-relkit@latest my-app --cloud aws --deploy pulumi
-```
+AWS/Pulumi creation flags remain parsed for precise diagnostics but are rejected until that tuple
+has current reference-host readiness evidence. Configure an existing project as described in
+`docs/deployment.md`; deployment itself still requires explicit authorization.
 
 Useful generated commands are `bun run test`, `bun run check`, `bun run
 typecheck`, `bun run build`, and `bun run start` after a build. Stop a dev or

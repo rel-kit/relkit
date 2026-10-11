@@ -23,11 +23,14 @@ test("keeps a single ordered Orders journey with optional scaffolding last", () 
     expect(existsSync(resolve(content, `../generated/related/start-${page}.mdx`))).toBe(false);
   }
 });
-test("uses the same Orders app from creation through the production build", () => {
-  expect(read("create-an-app")).toContain("--template api");
-  expect(read("create-an-app")).toContain("POST http://localhost:3000/orders");
+test("extends the certified minimal app into the same Orders journey", () => {
+  expect(read("create-an-app")).toContain("certified `minimal` template");
+  expect(read("create-an-app")).toContain("/hello?name=RELKIT");
   expect(read("first-route")).toContain(
     "../../templates/default/v1/api/src/routes/orders/route.ts",
+  );
+  expect(read("first-route")).toContain(
+    "../../templates/default/v1/api/src/orders/functions/create-order.function.ts",
   );
   expect(read("save-orders")).toContain("src/database/schema/index.ts");
   expect(read("protect-orders")).toContain("session's user ID");

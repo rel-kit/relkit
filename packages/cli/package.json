@@ -39,6 +39,10 @@
       "types": "./dist/editor.d.ts",
       "require": "./dist/editor.cjs"
     },
+    "./internal/tooling": {
+      "types": "./dist/internal/tooling.d.ts",
+      "import": "./dist/internal/tooling.js"
+    },
     "./internal/server-runtime": {
       "types": "./dist/internal/server-runtime.d.ts",
       "default": "./dist/internal/server-runtime.js"
@@ -81,7 +85,7 @@
     "vitest": "catalog:"
   },
   "scripts": {
-    "build": "tsc -b && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-inspector.ts",
+    "build": "tsc -b && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-inspector.ts && bun run ../../scripts/package-dev-bootstrap.ts",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false && bun run ../../scripts/package-editor.ts"
   },

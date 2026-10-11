@@ -29,7 +29,19 @@ test("the emitted server rejects missing production environment before provider 
       spawn: (command, options) => Bun.spawn(command, { ...options, stderr: "inherit" }),
     }),
   ).rejects.toThrow();
-});
+  const started = await startProject({
+    projectRoot: root,
+    port: 0,
+    healthTimeoutMs: 10_000,
+    environment: {
+      NODE_ENV: "production",
+      REQUIRED_TOKEN: "activation-only-token",
+      CACHE_URL: "redis://127.0.0.1:6379",
+    },
+    spawn: (command, options) => Bun.spawn(command, { ...options, stderr: "inherit" }),
+  });
+  await started.stop();
+}, 20_000);
 
 async function copyFullProject(): Promise<string> {
   const root = await mkdtemp(join(process.cwd(), ".relkit-environment-test-"));

@@ -1,6 +1,33 @@
 import { SERVER_RUNTIME_SUPPORT_SOURCE } from "./build-server-runtime-support.js";
 /** Pure provider/task adapters; the typed host owns serial worker polling and draining. */
 export const SERVER_RUNTIME_SOURCE = `
+const deferredIntegrityChecks = new Map();
+async function verifyDeferredFunction(functionId) {
+  const existing = deferredIntegrityChecks.get(functionId);
+  if (existing !== undefined) return existing;
+  const verification = (async () => {
+    const candidateRoot = new URL("../", import.meta.url);
+    const routes = plan.httpTriggers.filter((route) => route.targetFunctionId === functionId).map((route) => route.id);
+    const imports = JSON.parse(await readFile(new URL("imports.json", candidateRoot), "utf8"));
+    const integrityBytes = await readFile(new URL("deferred-integrity.json", candidateRoot));
+    const expectedIntegrityHash = process.env.RELKIT_DEFERRED_INTEGRITY_HASH;
+    const actualIntegrityHash = "sha256:" + createHash("sha256").update(integrityBytes).digest("hex");
+    if (expectedIntegrityHash === undefined || actualIntegrityHash !== expectedIntegrityHash)
+      throw new Error("Deferred runtime integrity index verification failed.");
+    const integrity = JSON.parse(integrityBytes.toString("utf8"));
+    const members = new Set(imports.filter((entry) => routes.includes(entry.routeId)).flatMap((entry) => entry.members));
+    for (const member of members) {
+      const expected = integrity[member];
+      if (expected === undefined) throw new Error("Deferred runtime integrity metadata is unavailable.");
+      const bytes = await readFile(new URL(member, candidateRoot));
+      const hash = "sha256:" + createHash("sha256").update(bytes).digest("hex");
+      if (bytes.byteLength !== expected.bytes || hash !== expected.hash)
+        throw new Error("Deferred runtime integrity verification failed.");
+    }
+  })();
+  deferredIntegrityChecks.set(functionId, verification);
+  return verification;
+}
 function targetFor(functionId) {
   const target = executableManifest.targets?.[functionId];
   return target !== null && typeof target === "object" && typeof target.handler === "function"

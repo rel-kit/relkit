@@ -61,30 +61,21 @@ export function createVerificationLayer(options: CandidateVerificationOptions) {
               });
               const workflow = Effect.gen(function* () {
                 const deadline = (yield* Clock.currentTimeMillis) + timeout;
-                let identitySeen = false;
-                const live = yield* pollHealth(
+                const liveProbe = pollHealth(
                   options,
                   "/health/live",
                   deadline,
                   (probe) => {
-                    identitySeen =
-                      verifyIdentity(probe.payload, options.candidate.token) || identitySeen;
                     verifyActivationFingerprint(probe.payload, options.activationFingerprint);
                     return probe.response.ok && probe.payload.status === "ok";
                   },
                   fetcher,
                 );
-                identitySeen =
-                  (yield* validateVerification(() =>
-                    verifyIdentity(live.payload, options.candidate.token),
-                  )) || identitySeen;
-                const ready = yield* pollHealth(
+                const readyProbe = pollHealth(
                   options,
                   "/health/ready",
                   deadline,
                   (probe) => {
-                    identitySeen =
-                      verifyIdentity(probe.payload, options.candidate.token) || identitySeen;
                     verifyActivationFingerprint(probe.payload, options.activationFingerprint);
                     const readiness = readinessState(probe.payload);
                     return (
@@ -95,6 +86,12 @@ export function createVerificationLayer(options: CandidateVerificationOptions) {
                     );
                   },
                   fetcher,
+                );
+                const [live, ready] = options.concurrentHealth
+                  ? yield* Effect.all([liveProbe, readyProbe], { concurrency: "unbounded" })
+                  : [yield* liveProbe, yield* readyProbe];
+                let identitySeen = yield* validateVerification(() =>
+                  verifyIdentity(live.payload, options.candidate.token),
                 );
                 identitySeen =
                   (yield* validateVerification(() =>

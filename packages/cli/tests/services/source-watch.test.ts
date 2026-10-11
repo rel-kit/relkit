@@ -3,6 +3,7 @@ import { Deferred, Effect, Layer } from "effect";
 import { CliSourceWatch } from "../../src/services/source-watch.service.js";
 import { CliDevSupervisor } from "../../src/services/dev-supervisor.service.js";
 import { CliPortProbe } from "../../src/commands/port-availability.service.js";
+import { CliInspectorSupport } from "../../src/commands/dev-inspector-support.service.js";
 import { CliCleanup, cleanupLayer } from "../../src/services/cleanup.service.js";
 import { makeDevSessionEngineEffect } from "../../src/commands/dev-session-engine.js";
 import { makeDevSourceWatcherEffect } from "../../src/commands/dev-watch.js";
@@ -52,6 +53,7 @@ it.live(
         sdk,
         filesystemTestLayer(),
         cleanupLayer,
+        Layer.succeed(CliInspectorSupport, { run: () => Effect.never }),
         Layer.succeed(CliPortProbe, CliPortProbe.of({ check: forbidden })),
       );
       const session = new DevSession({
@@ -127,6 +129,7 @@ it.live(
         sdk,
         filesystemTestLayer(),
         cleanupLayer,
+        Layer.succeed(CliInspectorSupport, { run: () => Effect.never }),
         Layer.succeed(CliPortProbe, CliPortProbe.of({ check: forbidden })),
       );
       const session = new DevSession({

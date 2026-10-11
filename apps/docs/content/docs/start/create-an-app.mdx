@@ -1,33 +1,45 @@
 ---
 title: Create and run an application
-description: Generate the Orders API starter and make your first successful request.
+description: Generate the certified minimal starter and make your first successful request.
 ---
 
-You will build an Orders API in this series. This chapter generates `relkit-orders`, starts it locally,
+You will build a RELKIT API in this series. This chapter generates `relkit-orders`, starts it locally,
 and proves it answers a request. You need Bun 1.3.10 and a terminal; no database, cloud account, or
 deployment tool is needed yet.
 
 ## Create the project
 
-Run the generator in the directory where you want the new project. Select the `api` template with
-the flag below so your files match this guide. Choose **None** for the jobs service, accept the
-suggested destination, then confirm creation:
+Run the generator in the directory where you want the new project. The packaged capability table
+currently offers the certified `minimal` template with examples, no jobs service, no cloud, and no
+deployment adapter. Accept the suggested destination, then confirm creation:
 
 ```sh title="Terminal — parent directory"
-bunx create-relkit@latest relkit-orders --template api
+bunx create-relkit@latest relkit-orders
 cd relkit-orders
 cp .env.example .env
 ```
 
-The generator installs dependencies and checks the initial app. The API template already contains
-Hello, Echo, and Orders; later chapters **extend those files** rather than create a second Orders domain.
+The generator installs dependencies, checks the initial app, and prepares its first development
+snapshot. The minimal template contains the Hello domain and route.
 The commands from here onward run in `relkit-orders`.
 
-Interactive creation asks for a missing project name, then offers the starter template, jobs service,
-and destination before final confirmation. Explicit `--template`, `--jobs`, and `--directory` flags
-skip their corresponding questions. Git initializes by default without a question; use `--no-git`
-to disable it. Headless creation defaults to `minimal`, no jobs service, and a destination derived
-from the project name. Add more artifacts afterward with [`relkit add`](/docs/start/add-artifacts).
+When another tool owns installation, pass `--no-install`, then run the exact finite workflow printed
+by the generator:
+
+```sh title="Terminal — generated project"
+bun install
+bunx --no-install relkit dev --prepare
+```
+
+Preparation validates the installed project, publishes an unchanged-development snapshot, and exits
+without opening the backend or Inspector ports. The next `bun run dev` still verifies that snapshot
+against the current source, dependencies, toolchain, and runtime environment before activation.
+
+Interactive creation asks for a missing project name, filters choices through the same packaged
+capability table used by headless creation, and asks for the destination before final confirmation.
+Uncertified explicit combinations fail before staging or installation. Git initializes by default;
+use `--no-git` to disable it. Add more artifacts afterward with
+[`relkit add`](/docs/start/add-artifacts).
 
 ## Run it and make a request
 
@@ -38,25 +50,22 @@ bun run dev
 ```
 
 The backend normally listens on `http://localhost:3000`; the Inspector runs on
-`http://localhost:3210`. In a second terminal, ask the existing Orders route to price three books:
+`http://localhost:3210`. In a second terminal, invoke the generated Hello route:
 
 ```sh title="Second terminal — relkit-orders"
-curl -i -X POST http://localhost:3000/orders \
-  -H 'content-type: application/json' \
-  -d '{"orderId":"order-1","sku":"book","quantity":3}'
+curl -i 'http://localhost:3000/hello?name=RELKIT'
 ```
 
-Expect HTTP `201` and JSON containing `orderId: "order-1"`, `sku: "book"`, and
-`totalCents: 300`. This route calculates a response but does **not** save the order yet.
+Expect HTTP `200` and `{"message":"Hello, RELKIT!"}`.
 
 If startup fails, run `bun run check` and read its first diagnostic. The template's cloud and
 deployment choices default to `none`; this local path needs no AWS or Pulumi credentials.
 
 ## What the starter gave you
 
-- `src/orders/functions/` contains pricing and order creation behavior.
-- `src/orders/service.ts` selects the Orders operations other code may use.
-- `src/routes/orders/route.ts` connects `POST /orders` to that service.
+- `src/hello/functions/` contains the greeting behavior.
+- `src/hello/service.ts` exposes the public Hello operation.
+- `src/routes/hello/route.ts` connects `GET /hello` to that service.
 - `relkit.config.ts` sets the server and Inspector defaults.
 
 You edit these TypeScript files; `.relkit/generated` is checked output, not an authoring directory.

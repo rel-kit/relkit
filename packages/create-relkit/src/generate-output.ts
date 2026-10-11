@@ -1,4 +1,12 @@
+/**
+ * Renders local onboarding from the generated project's actual installation state.
+ * Pure command construction exposes finite preparation after skipped installation;
+ * schema guards recognize presentation values without promoting arbitrary output
+ * into the generated-result contract. Formatting performs no runtime acquisition.
+ */
 import { basename, relative, resolve } from "node:path";
+import { Schema } from "effect";
+import { GeneratePresentation } from "./generate-output.schemas.js";
 
 import type { CreateOptions } from "./options.js";
 
@@ -17,7 +25,12 @@ export function createGenerateNextSteps(
   const directory = relative(resolve(cwd), resolve(destination)) || basename(destination);
   const commands = Object.freeze({
     cd: `cd ${shellWord(directory)}`,
-    ...(options.install ? {} : { install: "bun install" as const }),
+    ...(options.install
+      ? {}
+      : {
+          install: "bun install" as const,
+          prepare: "bunx --no-install relkit dev --prepare" as const,
+        }),
     dev: "bun run dev" as const,
     test: "bun run test" as const,
     check: "bun run check" as const,
@@ -35,18 +48,15 @@ export function createGenerateNextSteps(
 
 /**
  * Formats a recognizable generation result for terminal display.
+ * @typeParam T - Native presentation input narrowed by the generated-result schema.
  * @param value - Generation result or an unrecognized output value.
  * @returns Success details, commands, endpoints and warnings; other values use JSON serialization.
  */
-export function formatGenerateResult(value: unknown): string {
-  if (!isRecord(value) || !isNextSteps(value.nextSteps)) return JSON.stringify(value);
+export function formatGenerateResult<T>(value: T): string {
+  if (!Schema.is(GeneratePresentation)(value)) return JSON.stringify(value);
   const { commands, endpoints } = value.nextSteps;
-  const additions = Array.isArray(value.additions) ? value.additions.length : 0;
-  const warnings = Array.isArray(value.warnings)
-    ? value.warnings.flatMap((warning) =>
-        isRecord(warning) && typeof warning.message === "string" ? [warning.message] : [],
-      )
-    : [];
+  const additions = value.additions?.length ?? 0;
+  const warnings = value.warnings?.map((warning) => warning.message) ?? [];
   return [
     ...(typeof value.name === "string" && typeof value.destination === "string"
       ? [`Success! Created ${value.name} at ${value.destination}.`, ""]
@@ -54,6 +64,7 @@ export function formatGenerateResult(value: unknown): string {
     ...(additions ? [`additions: ${additions}`, ""] : []),
     commands.cd,
     ...(commands.install ? [commands.install] : []),
+    ...(commands.prepare ? [commands.prepare] : []),
     commands.dev,
     "",
     `backend:   ${endpoints.backend}`,
@@ -77,40 +88,6 @@ export function formatGenerateResult(value: unknown): string {
 function shellWord(value: string): string {
   if (/^[A-Za-z0-9_./@-]+$/.test(value)) return value.startsWith("-") ? `./${value}` : value;
   return `'${value.replaceAll("'", "'\\''")}'`;
-}
-
-/**
- * Checks that an unknown result contains the supported commands and endpoints.
- * @param value - Unknown nextSteps field.
- * @returns Whether the value matches the generated next-steps contract.
- */
-function isNextSteps(value: unknown): value is GenerateNextSteps {
-  if (!isRecord(value) || !isRecord(value.commands) || !isRecord(value.endpoints)) return false;
-  const commands = value.commands;
-  const endpoints = value.endpoints;
-  return (
-    typeof commands.cd === "string" &&
-    (commands.install === undefined || commands.install === "bun install") &&
-    commands.dev === "bun run dev" &&
-    commands.test === "bun run test" &&
-    commands.check === "bun run check" &&
-    commands.build === "bun run build" &&
-    endpoints.backend === "http://localhost:3000" &&
-    endpoints.inspector === "http://localhost:3210" &&
-    endpoints.openapi === "http://localhost:3000/_relkit/v1/openapi.json" &&
-    endpoints.apiReference === "http://localhost:3000/_relkit/v1/api-reference" &&
-    (endpoints.route === undefined ||
-      endpoints.route === "GET http://localhost:3000/hello?name=RelKit")
-  );
-}
-
-/**
- * Narrows an unknown value to a non-null object excluding arrays.
- * @param value - Unknown value at the object boundary.
- * @returns Whether the value is a non-null, non-array object.
- */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 import type { GenerateNextSteps } from "./generate-output.types.js";

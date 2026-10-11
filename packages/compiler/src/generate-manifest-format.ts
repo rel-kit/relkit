@@ -1,3 +1,8 @@
+/**
+ * Renders deterministic executable manifest source from accepted compiler maps.
+ * Generated framework imports target their owners so an ordinary function graph
+ * does not evaluate unrelated agent runtimes; this emitter acquires no resources.
+ */
 import {
   GENERATOR_VERSION,
   MANIFEST_VERSION,
@@ -55,22 +60,7 @@ export function renderManifest(
         `import * as ${alias} from ${JSON.stringify(importPath(module, input))};`,
     )
     .join("\n");
-  const generatedImports = [
-    'import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };',
-    identityBindings.length > 0
-      ? 'import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app";'
-      : "",
-    [...functions.values()].some((value) =>
-      value.startsWith("__relkit_createGeneratedAgentFunction("),
-    )
-      ? 'import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "@relkit/app";'
-      : "",
-    [...targets.values()].some((value) => value.startsWith("__relkit_bindFunctionEvents("))
-      ? 'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "@relkit/app";'
-      : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const generatedImports = frameworkImports(identityBindings, functions, targets);
   return [
     [generatedImports, imports].filter(Boolean).join("\n"),
     ...(generatedImports !== "" || imports !== "" ? [""] : []),
@@ -104,6 +94,36 @@ export function renderManifest(
     "} as const;",
     "",
   ].join("\n");
+}
+
+/**
+ * Selects the same identity and event owners exposed by the authoring facade.
+ * @param identityBindings - Checked statements requiring descriptor identity binding.
+ * @param functions - Function expressions selecting generated agent wrappers.
+ * @param targets - Target expressions selecting event dependency binding.
+ * @returns Feature-selected imports with no broad application barrel evaluation.
+ */
+function frameworkImports(
+  identityBindings: readonly string[],
+  functions: ReadonlyMap<string, string>,
+  targets: ReadonlyMap<string, string>,
+): string {
+  return [
+    'import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };',
+    identityBindings.length > 0
+      ? 'import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app/internal/runtime";'
+      : "",
+    [...functions.values()].some((value) =>
+      value.startsWith("__relkit_createGeneratedAgentFunction("),
+    )
+      ? 'import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "@relkit/app/agents";'
+      : "",
+    [...targets.values()].some((value) => value.startsWith("__relkit_bindFunctionEvents("))
+      ? 'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "@relkit/app/events";'
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 /**

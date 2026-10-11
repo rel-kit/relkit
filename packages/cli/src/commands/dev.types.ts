@@ -1,3 +1,4 @@
+/** Explicit development policy keeps resourceful work in the session's Effect scope. */
 import type { LoggerOptions, LogLevel, LogRecord } from "@relkit/runtime-effect";
 import type { Effect } from "effect";
 import type { JsonValue, RuntimeActivationFingerprint } from "@relkit/contracts";
@@ -7,6 +8,7 @@ import type {
   SupervisorObservabilityOptions,
 } from "@relkit/supervisor";
 import type { DevInspectorOptions } from "./dev-process.types.js";
+import type { CliAdapterError } from "../cli-errors.js";
 
 /** One admitted development log, rendered by the existing terminal policy. */
 export interface DevLogEvent {
@@ -43,6 +45,34 @@ export interface DevOptions {
   readonly projectRoot?: string;
   readonly compile: CandidateCompile;
   readonly activationFingerprint?: DevActivationFingerprint;
+  /**
+   * Reuses the prepared identity only for a child installed from that validated receipt.
+   * @param candidate - SDK child associated with one immutable preparation result.
+   * @returns Its accepted identity, or absence for an independently checked fallback child.
+   */
+  readonly preparedActivationFingerprint?: (
+    candidate: StartedCandidate,
+  ) => RuntimeActivationFingerprint | undefined;
+  /**
+   * Proves application readiness after mandatory SDK cohort verification.
+   * @param candidate - Unpublished child already matched to its graph/cohort.
+   * @param signal - Activation cancellation consumed by readiness HTTP work.
+   * @returns Joined proof or typed rejection before switching traffic.
+   */
+  readonly candidateVerificationEffect?: (
+    candidate: StartedCandidate,
+    signal: AbortSignal,
+  ) => Effect.Effect<void, CliAdapterError>;
+  /** Releases any request retained as the candidate's real route proof after publication. */
+  readonly candidateVerificationPublished?: (candidate: StartedCandidate) => void;
+  /** Releases a request retained by a candidate that could not be published. */
+  readonly candidateVerificationRejected?: (candidate: StartedCandidate) => void;
+  /**
+   * Checks the final input epoch in the atomic traffic-switch turn.
+   * @param candidate - Verified unpublished child.
+   * @returns False when its prepared input epoch is obsolete.
+   */
+  readonly candidateAdmission?: (candidate: StartedCandidate) => boolean;
   readonly hostname?: string;
   readonly candidateHostname?: string;
   readonly stablePort?: number;
@@ -51,8 +81,14 @@ export interface DevOptions {
   readonly maxStartupOutputBytes?: number;
   readonly candidateStopTimeoutMs?: number;
   readonly healthTimeoutMs?: number;
+  /** Permits immutable prepared candidates to overlap independent health reads. */
+  readonly candidateVerificationConcurrentHealth?: boolean;
+  /** Native verification transport; prepared sessions restrict bearer credentials to internal probes. */
+  readonly candidateVerificationFetch?: typeof fetch;
   readonly drainTimeoutMs?: number;
   readonly inspector?: DevInspectorOptions | false;
+  /** Grace period after backend activation before optional inspector acquisition. */
+  readonly supportStartupDelayMs?: number;
   readonly spawn?: typeof Bun.spawn;
   readonly signal?: AbortSignal;
   readonly installSignalHandlers?: boolean;

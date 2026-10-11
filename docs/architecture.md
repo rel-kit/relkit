@@ -69,6 +69,19 @@ startup fails, the last known good candidate remains active and the diagnostic
 is reported. Candidate activation drains the old server before shutdown and
 flushes telemetry within bounded time.
 
+`relkit dev --prepare` performs the finite check/build preparation without
+opening application or Inspector listeners. A later unchanged `relkit dev`
+validates the content-addressed receipt, immutable execution capsule, generated
+cohort, installed dependency bytes, and runtime environment before using it.
+Any missing, stale, corrupt, incompatible, or dynamically ineligible input
+returns to the ordinary full validation path.
+
+The backend owns early bounded, redacted observation before canonical telemetry
+storage is ready. Persistence and Inspector acquisition run as session-scoped
+support work with independent readiness; their delay or failure does not turn a
+healthy backend into a false failure, and no Inspector URL is announced before
+its listener is ready.
+
 Compilation writes local recipe data without probing Docker. Development
 reconciles only graph-required recipes, scopes containers and volumes to the
 canonical project identity, and waits for health before readiness. `--local=off`

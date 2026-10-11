@@ -1,8 +1,14 @@
+/**
+ * Describes accepted build inputs and staged cohort data shared by the build
+ * workflow. These readonly contracts carry validated graph identities between
+ * filesystem steps without acquiring resources or evaluating application code.
+ */
 import type { RuntimeActivationFingerprint } from "@relkit/contracts";
 import type { Diagnostic } from "@relkit/diagnostics";
 import type { CheckOptions } from "./check.types.js";
 import type { CheckResult } from "./check-result.types.js";
-import type { LoadedToolingConfig } from "@relkit/compiler";
+import type { JobsManifest, LoadedToolingConfig } from "@relkit/compiler";
+import type { ApplicationGraph } from "@relkit/graph";
 
 /** Build inputs; an injected check remains the established public compatibility seam. */
 export interface BuildOptions extends CheckOptions {
@@ -14,6 +20,8 @@ export interface BuildOptions extends CheckOptions {
    */
   readonly check?: (options: CheckOptions) => Promise<CheckResult>;
   readonly providerOverridesGeneration?: string;
+  /** Internal preparation requests Bun's consumed-input inventory beside the entrypoint. */
+  readonly bundleInputInventory?: "bun.inputs.json";
 }
 
 /** Published build cohort or deterministic failure diagnostics. */
@@ -43,4 +51,16 @@ export interface BuildManifestInputs {
   readonly hasJobs: boolean;
   readonly hasLocalServices: boolean;
   readonly tooling: Pick<LoadedToolingConfig, "server" | "inspector">;
+}
+
+/** Validated sources and identity captured once before materializing a stage. */
+export interface BuildStageCohort {
+  readonly graph: ApplicationGraph;
+  readonly graphHash: string;
+  readonly jobsManifest: JobsManifest | undefined;
+  readonly manifestSource: string;
+  readonly localServicesPlanSource: string | undefined;
+  readonly activationFingerprint: RuntimeActivationFingerprint;
+  readonly tooling: Pick<LoadedToolingConfig, "server" | "inspector">;
+  readonly serverDirectory: string;
 }

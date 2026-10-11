@@ -1,0 +1,222 @@
+# bf-379960edd4d6f5dd49beed02: Prepared runtime, readiness certification, benchmark accounting, and telemetry handoff behavior violated eight invariants identified during review.
+
+Status: **unverified**
+Attempt: 1 · Updated: 2026-10-10T16:14:52+00:00
+
+## What
+
+Prepared runtime, readiness certification, benchmark accounting, and telemetry handoff behavior violated eight invariants identified during review.
+
+## Expected
+
+Prepared routes retain descriptor semantics and verified chunks; certification proves the exact package catalog and readiness evidence; restart preparation is counted; telemetry preserves configured retention, terminates acquisition, and exposes buffered records.
+
+## Observed before
+
+The reviewed code removed targets, matched aliases by substring, trusted mutable chunks, under-validated capability evidence, excluded warmup, kept stale telemetry policy, retried storage indefinitely, and omitted pending records.
+
+## Root cause
+
+The readiness implementation optimized individual phases without carrying required runtime metadata, integrity anchors, evidence identity, preparation attempts, or pre-storage telemetry state across their boundaries.
+
+## Fixed by
+
+Added descriptor target loaders, exact identifier matching, signed deferred integrity verification, stronger capability/evidence gates, preparation-attempt accounting, reconfigurable early retention, bounded storage acquisition, and buffered query/live-stream integration with focused regressions.
+
+## Changed files
+
+- packages/cli/src/commands/build-prepared-manifest.ts
+- packages/cli/src/commands/build-prepared-manifest-source.ts
+- packages/cli/src/commands/build-server-http-options.ts
+- packages/cli/src/commands/build-server-invocation.ts
+- packages/cli/src/commands/build-server-imports.ts
+- packages/cli/src/commands/build-server-runtime.ts
+- packages/cli/src/dev-snapshot/snapshot-candidate.service.ts
+- packages/cli/src/commands/dev-telemetry-relay-query.ts
+- packages/cli/src/commands/dev-telemetry-relay.service.ts
+- packages/cli/src/commands/dev-telemetry-storage.service.ts
+- packages/runtime-hono/src/materialize-routes.types.ts
+- packages/runtime-hono/src/materialize-routes-utils.ts
+- packages/create-relkit/src/create-capabilities.ts
+- packages/observability/src/early-records.service.ts
+- scripts/benchmark-packed-dev.ts
+- scripts/dev-readiness/benchmark-packed-summary.ts
+
+## Reproduction
+
+- Inspect the reviewed prepared-manifest, candidate-integrity, certification, benchmark, and telemetry handoff paths.
+- Exercise each invariant through its focused regression test.
+- Run the generator suite to validate generated-project consumers.
+
+## Evidence
+
+- before: [review](evidence/001/review-before.md) — Eight changed-line defects from the pre-fix review; no executable pre-fix snapshot was retained.
+- after: [integration](evidence/001/after-focused.txt) — Focused regressions passed.
+- after: [integration](evidence/001/after-generator.txt) — Generator acceptance passed.
+- after: [check](evidence/001/after-gates.txt) — Static repository gates passed.
+
+## Scope
+
+```json
+{
+  "modules": [
+    "CLI prepared runtime",
+    "runtime-hono",
+    "create-relkit certification",
+    "observability relay",
+    "readiness benchmark"
+  ],
+  "entrypoints": [
+    "bun run dev",
+    "generated HTTP routes",
+    "create capability gate",
+    "telemetry relay queries"
+  ],
+  "invariants": [
+    "Deferred routes preserve target descriptors and module identity",
+    "Verified candidate bytes cannot change before import",
+    "Certification validates package identity and every readiness sample",
+    "All startup work is represented in benchmark outcomes",
+    "Pending telemetry follows active retention and is observable"
+  ]
+}
+```
+
+## Environment
+
+```json
+{
+  "package": "RELKIT monorepo",
+  "revision": "4665a7fea plus current uncommitted changes",
+  "target": "local Bun 1.3.10 test and generator harnesses",
+  "role": "contributor",
+  "api_exposed": true,
+  "e2e_available": false,
+  "monitoring": "No external monitoring was required; affected observability behavior was exercised through local service tests."
+}
+```
+
+## Verification
+
+```json
+{
+  "unit": {
+    "before": {
+      "status": "pending"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk bunx vitest run packages/cli/build-prepared-manifest.test.ts packages/cli/tests/dev-snapshot/sealed-installation.test.ts packages/cli/tests/dev-snapshot/prepared-plan.test.ts packages/runtime-hono/tests/prepared-app.test.ts packages/create-relkit/tests/create-capabilities.effect.test.ts packages/cli/tests/services/telemetry-relay.test.ts packages/cli/tests/services/telemetry-relay-handoff.test.ts packages/observability/tests/early-records.test.ts scripts/tests/benchmark-packed-dev.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "All eight reviewed invariants and the shared-module descriptor case pass focused regressions.",
+      "output": "evidence/001/after-focused.txt"
+    }
+  },
+  "runtime": {
+    "kind": "integration",
+    "reason": "The defects cross generated runtime, filesystem candidate, benchmark, and in-process telemetry boundaries rather than one live API.",
+    "boundary": "generator and prepared manifest -> candidate filesystem -> generated HTTP runtime; dev relay -> storage and inspector query consumers",
+    "dependencies": [
+      "Bun 1.3.10",
+      "local RELKIT workspace packages",
+      "temporary generated projects"
+    ],
+    "steps": [
+      "Run focused integration tests",
+      "Generate and validate starter projects",
+      "Assert candidate integrity and telemetry handoff behavior"
+    ],
+    "before": {
+      "status": "pending"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk bun run test:generator",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Generated project consumers compile, install, and validate after the readiness fixes.",
+      "output": "evidence/001/after-generator.txt"
+    }
+  },
+  "e2e": {
+    "status": "not-applicable",
+    "reason": "No single browser workflow covers the cross-cutting build, integrity, benchmark, and telemetry service invariants."
+  },
+  "checks": [
+    {
+      "name": "typecheck",
+      "status": "passed",
+      "command": "rtk bun run typecheck",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/after-gates.txt"
+    },
+    {
+      "name": "boundaries",
+      "status": "passed",
+      "command": "rtk bun run check",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/after-gates.txt"
+    },
+    {
+      "name": "lint",
+      "status": "passed",
+      "command": "rtk bun run lint",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/after-gates.txt"
+    }
+  ],
+  "regressions": [
+    {
+      "kind": "integration",
+      "boundary": "prepared manifest -> runtime descriptor loader -> HTTP route",
+      "status": "passed",
+      "command": "rtk bunx vitest run packages/cli/build-prepared-manifest.test.ts packages/runtime-hono/tests/prepared-app.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Deferred route descriptors, distinct same-module targets, alias matching, and invocation semantics are preserved.",
+      "output": "evidence/001/after-focused.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "dev snapshot -> deferred chunk import",
+      "status": "passed",
+      "command": "rtk bunx vitest run packages/cli/tests/dev-snapshot/sealed-installation.test.ts packages/cli/tests/dev-snapshot/prepared-plan.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Candidate integrity index and deferred chunk verification reject mutable bytes.",
+      "output": "evidence/001/after-focused.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "early telemetry buffer -> storage/query/live stream",
+      "status": "passed",
+      "command": "rtk bunx vitest run packages/cli/tests/services/telemetry-relay.test.ts packages/cli/tests/services/telemetry-relay-handoff.test.ts packages/observability/tests/early-records.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Retention reconfiguration, bounded acquisition, buffered querying, and live delivery behave consistently.",
+      "output": "evidence/001/after-focused.txt"
+    }
+  ],
+  "limitations": [
+    "The pre-fix state existed only as uncommitted review input; no executable failing snapshot was retained, so the report remains unverified despite passing after-fix coverage."
+  ]
+}
+```
+
+## Related reports
+
+```json
+[]
+```
+
+## Notes
+
+```json
+[
+  "No staging, commit, push, cloud operation, or user-owned unrelated change was performed."
+]
+```

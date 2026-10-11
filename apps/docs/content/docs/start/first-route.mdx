@@ -1,26 +1,43 @@
 ---
-title: Understand and change an endpoint
-description: Trace POST /orders through the route, service, and functions, then change pricing and verify validation.
+title: Create and change an endpoint
+description: Add POST /orders to the certified minimal starter, then change pricing and verify validation.
 ---
 
-This chapter continues the `relkit-orders` app from [Create and run an application](/docs/start/create-an-app).
-You will change the price for bulk orders and verify both successful and invalid requests. Keep `bun run dev`
-running and use a second terminal for commands.
+This chapter continues the certified minimal `relkit-orders` app from
+[Create and run an application](/docs/start/create-an-app). You will add an Orders domain beside the
+generated Hello example, change the price for bulk orders, and verify both successful and invalid
+requests. Keep `bun run dev` running and use a second terminal for commands.
 
-## Follow the request
+## Add the Orders domain
 
-The path and HTTP method come from `src/routes/orders/route.ts`. The route selects the public
-`createOrder` operation and returns `201` after it succeeds:
+Create `src/orders/functions` and `src/routes/orders`, then add the following four files. These are the
+same executable Orders sources used by RELKIT's API candidate template; the template itself is not an
+offered creation capability until it has separate readiness evidence.
+
+<include cwd lang="ts" meta='title="src/orders/functions/price-order.function.ts"'>
+  ../../templates/default/v1/api/src/orders/functions/price-order.function.ts
+</include>
+
+<include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
+  ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
+</include>
+
+<include cwd lang="ts" meta='title="src/orders/service.ts"'>
+  ../../templates/default/v1/api/src/orders/service.ts
+</include>
 
 <include cwd lang="ts" meta='title="src/routes/orders/route.ts"'>
   ../../templates/default/v1/api/src/routes/orders/route.ts
 </include>
 
-The service exposes `createOrder` and `priceOrder` from the Orders domain:
+The running development session validates the new source and activates it only after the generated
+route returns the expected response.
 
-<include cwd lang="ts" meta='title="src/orders/service.ts"'>
-  ../../templates/default/v1/api/src/orders/service.ts
-</include>
+## Follow the request
+
+The path and HTTP method come from `src/routes/orders/route.ts`. The route selects the public
+`createOrder` operation and returns `201` after it succeeds. The service exposes `createOrder` and
+`priceOrder` from the Orders domain.
 
 `createOrder` validates `orderId`, `sku`, and a positive integer `quantity`, then invokes `priceOrder`.
 That function owns the price rule. The route stays small so the same behavior can serve other callers.
@@ -31,7 +48,7 @@ POST /orders → route → Orders service → createOrder → priceOrder → val
 
 ## Change one rule
 
-Open the **existing** `src/orders/functions/price-order.function.ts`. Replace its handler with the
+Open `src/orders/functions/price-order.function.ts`. Replace its handler with the
 source below. Orders of 10 or more units now cost 90 cents each; smaller orders still cost 100 cents
 each. The input and output schemas remain unchanged.
 

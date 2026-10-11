@@ -4,7 +4,7 @@ import {
   type LocalWorkerError,
   type LocalWorkerEffects,
   type LocalWorkerCommand,
-} from "@relkit/observability/local";
+} from "@relkit/observability/local/worker";
 import { Cause, Clock, Context, Effect, Exit, Layer } from "effect";
 import { cliAdapterError, cliPromise, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
@@ -14,47 +14,59 @@ import type { TelemetryNativeOperations } from "./dev-telemetry-native.types.js"
 export class CliTelemetryNative extends Context.Service<
   CliTelemetryNative,
   TelemetryNativeOperations
->()("relkit/cli/TelemetryNative") {}
+>()("relkit/cli/TelemetryNative", {
+  make: Effect.sync(
+    () =>
+      ({
+        worker: (failure) =>
+          observeCli(
+            "dev.telemetry.worker-start",
+            startLocalWorkerEffect(failure).pipe(
+              Effect.catchCause((cause) => Effect.failCause(Cause.map(cause, workerFailure))),
+            ),
+          ),
+        stream: () =>
+          observeCli(
+            "dev.telemetry.stream-create",
+            cliTry("dev.telemetry.stream-create", () => createObservabilityStream()),
+          ),
+        listen: telemetryListener,
+        closeWorker: (worker) =>
+          observeCli("dev.telemetry.worker-close", closeWorkerEffect(worker)),
+      }) satisfies TelemetryNativeOperations,
+  ),
+}) {}
 
 /** Live native factories; construction never opens a process, listener, or stream. */
-export const telemetryNativeLayer = Layer.succeed(
-  CliTelemetryNative,
-  CliTelemetryNative.of({
-    worker: (failure) =>
-      observeCli(
-        "dev.telemetry.worker-start",
-        startLocalWorkerEffect(failure).pipe(Effect.mapError(workerFailure)),
-      ),
-    stream: () =>
-      observeCli(
-        "dev.telemetry.stream-create",
-        cliTry("dev.telemetry.stream-create", () => createObservabilityStream()),
-      ),
-    listen: (handler) =>
-      observeCli(
-        "dev.telemetry.listen",
-        cliTry("dev.telemetry.listen", () => {
-          const server = Bun.serve({
-            hostname: "127.0.0.1",
-            port: 0,
-            maxRequestBodySize: 2 * 1024 * 1024,
-            fetch: handler,
-          });
-          return {
-            url: `http://127.0.0.1:${server.port}`,
-            stop: observeCli(
-              "dev.telemetry.listener-stop",
-              cliPromise("dev.telemetry.listener-stop", () => server.stop(true)).pipe(
-                Effect.asVoid,
-                Effect.uninterruptible,
-              ),
-            ),
-          };
-        }),
-      ),
-    closeWorker: (worker) => observeCli("dev.telemetry.worker-close", closeWorkerEffect(worker)),
-  }),
-);
+export const telemetryNativeLayer = Layer.effect(CliTelemetryNative, CliTelemetryNative.make);
+
+/**
+ * Acquires a loopback listener whose caller retains its stop operation.
+ * @param handler - Owner-captured authenticated ingress callback.
+ * @returns Actual listener URL and joined physical stop, without importing DuckDB.
+ */
+const telemetryListener: TelemetryNativeOperations["listen"] = (handler) =>
+  observeCli(
+    "dev.telemetry.listen",
+    cliTry("dev.telemetry.listen", () => {
+      const server = Bun.serve({
+        hostname: "127.0.0.1",
+        port: 0,
+        maxRequestBodySize: 2 * 1024 * 1024,
+        fetch: handler,
+      });
+      return {
+        url: `http://127.0.0.1:${server.port}`,
+        stop: observeCli(
+          "dev.telemetry.listener-stop",
+          cliPromise("dev.telemetry.listener-stop", () => server.stop(true)).pipe(
+            Effect.asVoid,
+            Effect.uninterruptible,
+          ),
+        ),
+      };
+    }),
+  );
 
 /**
  * Restores established public query errors from the native worker's typed failure.
@@ -77,7 +89,9 @@ function workerFailure(error: LocalWorkerError) {
 export function telemetryWorkerCall(worker: LocalWorkerEffects, command: LocalWorkerCommand) {
   return observeCli(
     "dev.telemetry.worker-call",
-    worker.call(command).pipe(Effect.mapError(workerFailure)),
+    worker
+      .call(command)
+      .pipe(Effect.catchCause((cause) => Effect.failCause(Cause.map(cause, workerFailure)))),
   );
 }
 
@@ -89,7 +103,11 @@ export function telemetryWorkerCall(worker: LocalWorkerEffects, command: LocalWo
 const closeWorkerEffect = Effect.fn("DevTelemetry.closeWorker")(function* (
   worker: LocalWorkerEffects,
 ) {
-  const closed = yield* Effect.exit(worker.close().pipe(Effect.mapError(workerFailure)));
+  const closed = yield* Effect.exit(
+    worker
+      .close()
+      .pipe(Effect.catchCause((cause) => Effect.failCause(Cause.map(cause, workerFailure)))),
+  );
   const reaped = yield* Effect.exit(
     worker.pid === undefined ? Effect.void : reapWorkerEffect(worker.pid),
   );
