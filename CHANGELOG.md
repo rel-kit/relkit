@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.7.4
+
+### Changes
+
+- fix: restore certified creation and prepared bundles
+
 ## 0.7.3
 
 ### Changes
