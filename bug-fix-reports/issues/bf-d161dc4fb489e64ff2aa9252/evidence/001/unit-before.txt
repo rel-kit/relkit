@@ -1,0 +1,44 @@
+Command: rtk bun x vitest run packages/cli/build-prepared-manifest.test.ts
+Cwd: /Users/mustafaelsayed/Workspace/relkit
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+ ❯ packages/cli/build-prepared-manifest.test.ts (8 tests | 1 failed) 49ms
+   ❯ preparedRuntimeManifest (8)
+     × rebases escaped deferred imports alongside ordinary imports for a deeper build 8ms
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 passed (8)
+   Start at  11:29:37
+   Duration  2.27s (transform 68%, import 29%, tests 2%)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  packages/cli/build-prepared-manifest.test.ts > preparedRuntimeManifest > rebases escaped deferred imports alongside ordinary imports for a deeper build
+AssertionError: expected 'import runtimeActivationFingerprint f…' to contain 'import("..\u002F..\u002F..\u002Fsrc\u…'
+- Expected
++ Received
+- import("..\u002F..\u002F..\u002Fsrc\u002Fhello\u002Ffunctions\u002Fhello.function.ts")
++ import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };
++ import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app/internal/runtime";
++ import * as __relkit_module_0 from "../../../relkit.config.ts";
++ let __relkit_deferred_0Promise: Promise<typeof import("..\u002F..\u002Fsrc\u002Fhello\u002Ffunctions\u002Fhello.function.ts")> | undefined;
++ const __relkit_deferred_0 = () => (__relkit_deferred_0Promise ??= import("..\u002F..\u002Fsrc\u002Fhello\u002Ffunctions\u002Fhello.function.ts").then((module) => { __relkit_bindDescriptorIdentity(module["default"], "hello.greet"); return module; }));
++
++
++ __relkit_bindDescriptorIdentity(__relkit_module_0["default"], "example");
++
++ export const runtimeManifest = {
++   functions: { "hello.greet": (...args) => __relkit_deferred_0().then((module) => module["default"].handler(...args)) },
++   targetLoaders: { "hello.greet": () => __relkit_deferred_0().then((module) => module["default"]) },
++   targets: {  },
++   routes: {  },
++   services: {  },
++   application: __relkit_module_0["default"],
++ } as const;
++
+ ❯ packages/cli/build-prepared-manifest.test.ts:79:21
+     77|     );
+     78|     expect(rebased).toContain('from "../../../relkit.config.ts"');
+     79|     expect(rebased).toContain(
+       |                     ^
+     80|       'import("..\\u002F..\\u002F..\\u002Fsrc\\u002Fhello\\u002Ffuncti…
+     81|     );
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+Exit code: 1

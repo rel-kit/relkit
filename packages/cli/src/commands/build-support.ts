@@ -135,9 +135,16 @@ export function rebaseManifest(
 ): string {
   const sourcePrefix = manifestImportPrefix(sourceDirectory, projectRoot);
   const targetPrefix = manifestImportPrefix(targetDirectory, projectRoot);
-  return source
-    .replaceAll(`from "${sourcePrefix}`, `from "${targetPrefix}`)
-    .replaceAll(`import("${sourcePrefix}`, `import("${targetPrefix}`);
+  return (
+    source
+      .replaceAll(`from "${sourcePrefix}`, `from "${targetPrefix}`)
+      .replaceAll(`import("${sourcePrefix}`, `import("${targetPrefix}`)
+      // Deferred imports encode slashes for script safety; preserve that encoding.
+      .replaceAll(
+        `import("${sourcePrefix.replaceAll("/", "\\u002F")}`,
+        `import("${targetPrefix.replaceAll("/", "\\u002F")}`,
+      )
+  );
 }
 
 /** Projects an expected build failure into its existing diagnostic message.
