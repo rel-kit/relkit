@@ -15,9 +15,9 @@
   },
   "dependencies": {
     "@langchain/langgraph": "1.4.14",
-    "@relkit/app": "0.7.4",
-    "@relkit/client": "0.7.4",
-    "@relkit/local": "0.7.4",
+    "@relkit/app": "0.7.5",
+    "@relkit/client": "0.7.5",
+    "@relkit/local": "0.7.5",
     "@tanstack/react-query": "5.102.3",
     "effect": "4.0.1",
     "langchain": "1.5.10",
@@ -26,8 +26,8 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@relkit/cli": "0.7.4",
-    "@relkit/testing": "0.7.4",
+    "@relkit/cli": "0.7.5",
+    "@relkit/testing": "0.7.5",
     "@types/bun": "1.3.10",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
