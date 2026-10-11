@@ -1,3 +1,8 @@
+/**
+ * Bundles a staged backend through owned filesystem and subprocess services and
+ * rebases compiler manifest imports for publication. Temporary module links and
+ * process groups share one scope, so failed or cancelled bundles cannot leak them.
+ */
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect, Layer } from "effect";
@@ -7,65 +12,29 @@ import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.j
 import { CliProcess, processLayer } from "../services/process.service.js";
 import { cleanupEffect, cleanupLayer } from "../services/cleanup.service.js";
 
-const BUN_IMAGE =
-  "oven/bun:1.3.10@sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e";
-
-/** Renders the container build and startup source for the accepted artifact cohort.
- * @param includeJobs - Whether the accepted cohort includes immutable workers.
- * @returns The existing pinned Bun image and container startup source.
- */
-export function dockerfile(includeJobs = false): string {
-  const jobs = includeJobs ? "COPY jobs.manifest.json ./\nCOPY jobs/ ./jobs/\n" : "";
-  return `FROM ${BUN_IMAGE}
-ARG SOURCE_DATE_EPOCH=0
-WORKDIR /app
-COPY server/index.js ./server/index.js
-COPY application.graph.json manifest.json openapi.json ./
-${jobs}COPY public/ ./public/
-RUN mkdir -p .relkit/state .relkit/observability && chown -R bun:bun .relkit
-USER bun
-ENV NODE_ENV=production
-EXPOSE 3000
-STOPSIGNAL SIGTERM
-CMD ["bun", "run", "--no-env-file", "server/index.js"]
-`;
-}
-
-/** Renders the container context allowlist for backend and optional worker artifacts.
- * @param includeJobs - Whether worker artifacts belong to the build context.
- * @returns The existing minimal context allowlist excluding environment/state files.
- */
-export function dockerignore(includeJobs = false): string {
-  const jobs = includeJobs ? "!jobs.manifest.json\n!jobs/\n!jobs/**\n" : "";
-  return `*
-!Dockerfile
-!.dockerignore
-!manifest.json
-!application.graph.json
-!openapi.json
-${jobs}!public/
-!public/**
-!server/
-!server/index.js
-.env
-.env.*
-.relkit/state
-.relkit/observability
-`;
-}
+export { dockerfile, dockerignore } from "./build-container.js";
 
 /**
  * Bundles one staged server with a scoped process group and temporary module link.
  * @param serverDirectory - Owned staging directory containing the emitted entrypoint.
  * @param projectRoot - Root used by Bun resolution.
  * @param development - Whether to retain inline source maps.
+ * @param inventoryFile - Preparation inventory filename; enables sealed lazy chunks.
  * @returns Lazy bundling requiring filesystem and subprocess authority.
  */
 export const bundleServerEffect = Effect.fn("Project.bundleServer")(
-  function* (serverDirectory: string, projectRoot: string, development = false) {
+  function* (
+    serverDirectory: string,
+    projectRoot: string,
+    development = false,
+    inventoryFile?: "bun.inputs.json",
+  ) {
     const files = yield* CliFileSystem;
     const processes = yield* CliProcess;
-    const runtimeModules = resolve(dirname(fileURLToPath(import.meta.url)), "../../node_modules");
+    const runtimeModules =
+      inventoryFile === undefined
+        ? resolve(dirname(fileURLToPath(import.meta.url)), "../../node_modules")
+        : join(projectRoot, "node_modules");
     const moduleLink = join(serverDirectory, "node_modules");
     yield* Effect.scoped(
       Effect.gen(function* () {
@@ -84,7 +53,12 @@ export const bundleServerEffect = Effect.fn("Project.bundleServer")(
             ...externals,
             ...(development ? ["--sourcemap=inline"] : ["--minify", "--sourcemap=none"]),
             "--env=disable",
-            `--outfile=${join(serverDirectory, "index.js")}`,
+            ...(inventoryFile === undefined
+              ? []
+              : [`--metafile=${join(serverDirectory, inventoryFile)}`]),
+            ...(inventoryFile === undefined
+              ? [`--outfile=${join(serverDirectory, "index.js")}`]
+              : ["--splitting", `--outdir=${serverDirectory}`]),
             join(serverDirectory, "index.ts"),
           ],
           cwd: projectRoot,
@@ -100,8 +74,13 @@ export const bundleServerEffect = Effect.fn("Project.bundleServer")(
       }),
     );
   },
-  (effect, _serverDirectory: string, _projectRoot: string, _development = false) =>
-    observeCli("build.bundleServer", effect),
+  (
+    effect,
+    _serverDirectory: string,
+    _projectRoot: string,
+    _development = false,
+    _inventoryFile?: "bun.inputs.json",
+  ) => observeCli("build.bundleServer", effect),
 );
 
 /**
@@ -156,14 +135,17 @@ export function rebaseManifest(
 ): string {
   const sourcePrefix = manifestImportPrefix(sourceDirectory, projectRoot);
   const targetPrefix = manifestImportPrefix(targetDirectory, projectRoot);
-  return source.replaceAll(`from "${sourcePrefix}`, `from "${targetPrefix}`);
+  return source
+    .replaceAll(`from "${sourcePrefix}`, `from "${targetPrefix}`)
+    .replaceAll(`import("${sourcePrefix}`, `import("${targetPrefix}`);
 }
 
 /** Projects an expected build failure into its existing diagnostic message.
+ * @typeParam T - Original precise error input retained at the compatibility edge.
  * @param error - Original expected native/build failure.
  * @returns Its existing public diagnostic message.
  */
-export function errorMessage(error: unknown): string {
+export function errorMessage<T>(error: T): string {
   return error instanceof Error ? error.message : String(error);
 }
 

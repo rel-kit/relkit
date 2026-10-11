@@ -36,8 +36,8 @@ it.effect(
               "127.0.0.1",
             ),
             createLoggerLayer({
-              human: { write: (_line, record) => logs.push(record) },
-              json: false,
+              human: false,
+              json: { write: (record) => logs.push(record) },
             }),
           ),
         ),
@@ -75,8 +75,8 @@ it.effect("standalone compare-and-switch records typed validation and keeps admi
           createProxyLayer({}, "127.0.0.1"),
           createLoggerLayer({
             minimumLevel: "error",
-            json: false,
-            human: { write: (_line, record) => logs.push(record) },
+            human: false,
+            json: { write: (record) => logs.push(record) },
           }),
         ),
       ),

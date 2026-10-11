@@ -1,0 +1,42 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "command": "bun dev",
+  "mode": "candidate-request-assisted-debug2",
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 Pro",
+    "load": [
+      8.78369140625,
+      6.798828125,
+      7.09619140625
+    ]
+  },
+  "request": {
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ysY8BK/readiness-baseline",
+    "url": "http://127.0.0.1:3000/hello?name=RelKit",
+    "expectedStatus": 200,
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "sample": {
+        "durationMs": 1027.596542,
+        "outcome": "child-exited",
+        "exitCode": 1,
+        "output": "$ relkit dev\n21:09:35.427 INFO  relkit            Starting development server\n21:09:35.448 INFO  build             Compiling application\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-claim true /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\nreadiness-intercept GET /hello?name=RelKit /hello?name=RelKit\n21:09:35.823 INFO  relkit            Stopping development server\n21:09:35.825 INFO  relkit            Development server stopped\nAbortError: The connection was closed.\nDOMException {\n  stack: \"\",\n  code: 20,\n  name: \"AbortError\",\n  message: \"The connection was closed.\",\n  INDEX_SIZE_ERR: 1,\n  DOMSTRING_SIZE_ERR: 2,\n  HIERARCHY_REQUEST_ERR: 3,\n  WRONG_DOCUMENT_ERR: 4,\n  INVALID_CHARACTER_ERR: 5,\n  NO_DATA_ALLOWED_ERR: 6,\n  NO_MODIFICATION_ALLOWED_ERR: 7,\n  NOT_FOUND_ERR: 8,\n  NOT_SUPPORTED_ERR: 9,\n  INUSE_ATTRIBUTE_ERR: 10,\n  INVALID_STATE_ERR: 11,\n  SYNTAX_ERR: 12,\n  INVALID_MODIFICATION_ERR: 13,\n  NAMESPACE_ERR: 14,\n  INVALID_ACCESS_ERR: 15,\n  VALIDATION_ERR: 16,\n  TYPE_MISMATCH_ERR: 17,\n  SECURITY_ERR: 18,\n  NETWORK_ERR: 19,\n  ABORT_ERR: 20,\n  URL_MISMATCH_ERR: 21,\n  QUOTA_EXCEEDED_ERR: 22,\n  TIMEOUT_ERR: 23,\n  INVALID_NODE_TYPE_ERR: 24,\n  DATA_CLONE_ERR: 25,\n  toString: [Function: toString],\n}\nnote: missing sourcemaps for /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
+      }
+    }
+  ],
+  "summary": {
+    "runs": 1,
+    "medianMs": 1027.596542,
+    "p95Ms": 1027.596542,
+    "maximumMs": 1027.596542,
+    "passed": false
+  }
+}

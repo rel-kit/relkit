@@ -1,0 +1,73 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "command": "bun dev",
+  "mode": "diagnostic-shared-runtime-fixed-publication",
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 Pro",
+    "load": [
+      3.3623046875,
+      3.1748046875,
+      3.095703125
+    ]
+  },
+  "request": {
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ZiuiWR/readiness-baseline",
+    "url": "http://127.0.0.1:55360/hello?name=RelKit",
+    "expectedStatus": 200,
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "sample": {
+        "durationMs": 1097.514791,
+        "outcome": "response",
+        "output": "$ relkit dev\n06:37:58.978 INFO  relkit            Starting development server\n06:37:58.994 INFO  build             Compiling application\n06:37:59.281 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:37:59.309 INFO  build             Compiled in 315ms\n06:37:59.310 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n06:37:59.299 INFO  http              GET /hello → 200 in 58ms\n06:37:59.375 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 2,
+      "sample": {
+        "durationMs": 647.771083,
+        "outcome": "response",
+        "output": "$ relkit dev\n06:37:59.713 INFO  relkit            Starting development server\n06:37:59.728 INFO  build             Compiling application\n06:38:00.015 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:38:00.045 INFO  build             Compiled in 315ms\n06:38:00.045 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n06:38:00.033 INFO  http              GET /hello → 200 in 61ms\n06:38:00.088 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 3,
+      "sample": {
+        "durationMs": 768.402417,
+        "outcome": "response",
+        "output": "$ relkit dev\n06:38:00.470 INFO  relkit            Starting development server\n06:38:00.492 INFO  build             Compiling application\n06:38:00.816 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:38:00.843 INFO  build             Compiled in 350ms\n06:38:00.844 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n06:38:00.833 INFO  http              GET /hello → 200 in 58ms\n06:38:00.885 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:38:00.901 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable.\n06:38:00.903 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable; backend remains serving.\n"
+      }
+    },
+    {
+      "run": 4,
+      "sample": {
+        "durationMs": 610.769459,
+        "outcome": "response",
+        "output": "$ relkit dev\n06:38:01.173 INFO  relkit            Starting development server\n06:38:01.186 INFO  build             Compiling application\n06:38:01.462 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:38:01.489 INFO  build             Compiled in 302ms\n06:38:01.489 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n06:38:01.479 INFO  http              GET /hello → 200 in 59ms\n06:38:01.532 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    },
+    {
+      "run": 5,
+      "sample": {
+        "durationMs": 607.026917,
+        "outcome": "response",
+        "output": "$ relkit dev\n06:38:01.839 INFO  relkit            Starting development server\n06:38:01.852 INFO  build             Compiling application\n06:38:02.110 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n06:38:02.135 INFO  build             Compiled in 282ms\n06:38:02.136 INFO  server            Ready\n                                     API        http://127.0.0.1:55360\n                                     Reference  http://127.0.0.1:55360/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:55360/_relkit/v1/openapi.json\n06:38:02.127 INFO  http              GET /hello → 200 in 55ms\n06:38:02.190 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable.\n06:38:02.192 \u001b[31mERROR\u001b[0m relkit            Telemetry storage unavailable; restart dev to recover\n                                     Telemetry storage unavailable; backend remains serving.\n06:38:02.178 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n"
+      }
+    }
+  ],
+  "summary": {
+    "runs": 5,
+    "medianMs": 647.771083,
+    "p95Ms": 1097.514791,
+    "maximumMs": 1097.514791,
+    "passed": false
+  }
+}

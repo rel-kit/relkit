@@ -1,5 +1,4 @@
 import { Context, Effect, Layer } from "effect";
-import { checkProjectEffect } from "../commands/check.js";
 import { buildProjectEffect } from "../commands/build.js";
 import { checkDevProjectEffect } from "../commands/dev-check.js";
 import { CliCompiler } from "./compiler.service.js";
@@ -9,6 +8,8 @@ import { CliProcess } from "./process.service.js";
 import { CliCleanup } from "./cleanup.service.js";
 import { buildCapabilitiesLayer } from "./project-capabilities.js";
 import type { ProjectCapabilities } from "./project.types.js";
+import { SnapshotFiles, snapshotFilesLive } from "../dev-snapshot/snapshot-files.service.js";
+import { checkProjectWithCurrentReceiptEffect } from "../dev-snapshot/snapshot-check-execution.js";
 
 /** Project authoring domain; compilation/build resources belong to individual operation scopes. */
 export class CliProject extends Context.Service<CliProject, ProjectCapabilities>()(
@@ -40,12 +41,14 @@ export const projectLayer = Layer.effect(
     const modules = yield* CliModules;
     const processes = yield* CliProcess;
     const cleanup = yield* CliCleanup;
+    const snapshotFiles = yield* SnapshotFiles;
     return CliProject.of({
       check: (options) =>
-        checkProjectEffect(options).pipe(
+        checkProjectWithCurrentReceiptEffect(options).pipe(
           Effect.provideService(CliCompiler, compiler),
           Effect.provideService(CliFileSystem, files),
           Effect.provideService(CliModules, modules),
+          Effect.provideService(SnapshotFiles, snapshotFiles),
         ),
       checkDevelopment: (request) =>
         checkDevProjectEffect(request).pipe(Effect.provideService(CliCleanup, cleanup)),
@@ -62,4 +65,6 @@ export const projectLayer = Layer.effect(
 );
 
 /** Invocation-owned live project graph; tests replace projectLayer's capability inputs. */
-export const projectLiveLayer = projectLayer.pipe(Layer.provide(buildCapabilitiesLayer));
+export const projectLiveLayer = projectLayer.pipe(
+  Layer.provide(Layer.merge(buildCapabilitiesLayer, snapshotFilesLive)),
+);

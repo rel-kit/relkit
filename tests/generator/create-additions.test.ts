@@ -1,3 +1,8 @@
+/**
+ * Verifies creation consent and its finite installed-preparation dispatch using
+ * a captured command adapter. Real sibling stages are isolated per test and
+ * removed afterward; declined consent must allocate no stage or subprocess.
+ */
 import { afterEach, expect, test } from "bun:test";
 import { mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -33,7 +38,8 @@ test("asks only final consent and validates the completed project once", async (
   expect(questions).toEqual(["Create this project?"]);
   expect(result.additions).toEqual([]);
   expect(result.files).not.toContain("src/billing/functions/example.function.ts");
-  expect(commands.map((command) => command[1])).toEqual(["install", "doctor", "check"]);
+  expect(commands.map((command) => command[1])).toEqual(["install", "doctor", "dev"]);
+  expect(commands[2]?.slice(1, 4)).toEqual(["dev", "--prepare", "--project-root"]);
   expect(result.nextSteps.commands.install).toBeUndefined();
 });
 
@@ -90,12 +96,20 @@ test("headless creation never invokes prompt authority", async () => {
   expect(questions).toEqual([]);
 });
 
+/** Allocates a test-owned root registered with the cleanup hook.
+ * @returns A private temporary directory; native allocation errors reject the test.
+ */
 async function temporaryRoot(): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "relkit-create-consent-"));
   roots.push(root);
   return root;
 }
 
+/** Supplies only the authorized final confirmation prompt.
+ * @param questions - Test-owned ordered prompt evidence.
+ * @param consent - Confirmation answer used by this test.
+ * @returns Driver rejecting any unexpected setup prompt.
+ */
 function confirmationDriver(questions: string[], consent = true): PromptDriver {
   const unexpected = async (): Promise<never> => {
     throw new Error("Unexpected setup question.");

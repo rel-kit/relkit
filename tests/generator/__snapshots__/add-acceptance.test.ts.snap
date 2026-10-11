@@ -98,7 +98,8 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
   },
   "dependencies": {
     "@relkit/app": "<release-version>",
-    "@relkit/local": "<release-version>"
+    "@relkit/local": "<release-version>",
+    "effect": "4.0.1"
   },
   "devDependencies": {
     "@relkit/cli": "<release-version>",
@@ -336,6 +337,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     "@relkit/local": "<release-version>",
     "@relkit/redis": "<release-version>",
     "@relkit/s3": "<release-version>",
+    "effect": "4.0.1",
     "langchain": "1.5.10"
   },
   "devDependencies": {

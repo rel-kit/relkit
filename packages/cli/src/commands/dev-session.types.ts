@@ -1,3 +1,8 @@
+/**
+ * Defines state and native operations owned by one development session.
+ * Stop reasons remain precise generic values at compatibility edges; queued
+ * activation and scoped workers preserve their original typed failure contracts.
+ */
 import type { RuntimeActivationFingerprint } from "@relkit/contracts";
 import type { StartedCandidate, SupervisorGenerationDrain } from "@relkit/supervisor";
 import type { Deferred, Effect, Fiber, Queue, Scope } from "effect";
@@ -50,7 +55,7 @@ export interface DevSessionEngine {
    * @param reason - Original shutdown reason retained for callbacks and receipts.
    * @returns Shared shutdown completion with secondary failures recorded separately.
    */
-  readonly stop: (reason?: unknown) => Effect.Effect<void>;
+  readonly stop: <Reason>(reason?: Reason) => Effect.Effect<void>;
   /** Awaits the shared shutdown receipt without acquiring another resource owner. */
   readonly wait: Effect.Effect<void>;
   /** Acquires source watchers and their debounced worker in the session Scope. */
@@ -60,7 +65,7 @@ export interface DevSessionEngine {
    * @param reason - Native signal, watcher or child-exit failure.
    * @returns No value; the owned shutdown fiber consumes this request.
    */
-  readonly requestStop: (reason: unknown) => void;
+  readonly requestStop: <Reason>(reason: Reason) => void;
   /**
    * Completes the retained synchronous shutdown-latch compatibility edge.
    * @returns No value; native session callers use the joined stop operation.

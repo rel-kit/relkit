@@ -1,6 +1,14 @@
+/**
+ * Defines pure authoring and integration subpath inventories for release checks.
+ * Export rendering owns conditions and dist mappings; these lists authorize only
+ * intentional entry points, including the prepared server's internal app leaf.
+ */
+
+/** Application authoring and internal runtime leaves required by packed manifests. */
 export const appSubpaths = [
   "schema",
   "config",
+  "internal/runtime",
   "routes",
   "functions",
   "events",
@@ -15,6 +23,7 @@ export const appSubpaths = [
   "services",
 ] as const;
 
+/** Integration packages expose finite capability leaves beside their catalog root. */
 export const integrationSubpaths: Readonly<Record<string, readonly string[]>> = {
   "@relkit/aws": ["host", "infrastructure", "access"],
   "@relkit/cloudflare": ["runtime"],
@@ -30,6 +39,7 @@ export const integrationSubpaths: Readonly<Record<string, readonly string[]>> = 
   "@relkit/effect-mq": ["runtime", "local-recipe", "deployment"],
 };
 
+/** Side-effect-free catalog entry points map directly to named dist files. */
 export const catalogSubpaths = [
   "redis",
   "s3",

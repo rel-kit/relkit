@@ -1,3 +1,4 @@
+/** Builds direct-command syntax as pure metadata without acquiring domain services. */
 import { Effect, Option } from "effect";
 import { Command } from "effect/cli";
 import {
@@ -19,6 +20,22 @@ import {
  * @returns Create, dev, check, build, start and doctor in root help order.
  */
 export function basicCommands(select: SelectInvocation) {
+  return [
+    createCommand(select),
+    projectCommand(select, "dev", true, true),
+    projectCommand(select, "check"),
+    projectCommand(select, "build"),
+    projectCommand(select, "start", true),
+    doctorCommand(select),
+  ] as const;
+}
+
+/**
+ * Builds creation syntax independently from project startup options.
+ * @param select - Invocation recorder supplied by the root parser.
+ * @returns Pure creation command with existing literal argument serialization.
+ */
+function createCommand(select: SelectInvocation) {
   const createPath = ["create"] as const;
   const create = document(
     Command.make(
@@ -59,14 +76,7 @@ export function basicCommands(select: SelectInvocation) {
     ),
     createPath,
   );
-  return [
-    create,
-    projectCommand(select, "dev", true, true),
-    projectCommand(select, "check"),
-    projectCommand(select, "build"),
-    projectCommand(select, "start", true),
-    doctorCommand(select),
-  ] as const;
+  return create;
 }
 
 /** Builds one project parser with only its supported optional flags.
@@ -99,6 +109,7 @@ function projectCommand(
               logLevel: optionalChoice(path, "log-level"),
               verbose: booleanFlag(path, "verbose"),
               noColor: booleanFlag(path, "no-color"),
+              prepare: booleanFlag(path, "prepare"),
             }
           : {}),
       },
@@ -114,6 +125,7 @@ function projectCommand(
             ...("logLevel" in value ? optionArgs("log-level", value.logLevel) : []),
             ...("verbose" in value ? booleanArgs("verbose", value.verbose) : []),
             ...("noColor" in value ? booleanArgs("no-color", value.noColor) : []),
+            ...("prepare" in value ? booleanArgs("prepare", value.prepare) : []),
           ]),
         ),
     ),

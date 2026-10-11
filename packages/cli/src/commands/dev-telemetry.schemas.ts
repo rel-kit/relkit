@@ -1,9 +1,10 @@
+/** Native IPC codecs delegate model authority to the local record validator without loading DuckDB. */
 import { Schema } from "effect";
 import {
   validateLocalRecord,
   type LocalRecord,
   type StoredLocalRecord,
-} from "@relkit/observability/local";
+} from "@relkit/observability/local/record";
 import type {
   ObservabilityRecord,
   LogRecord,
@@ -18,8 +19,9 @@ export const telemetryEnvelopeSchema = Schema.declare<LocalRecord>(
     try {
       validateLocalRecord(value);
       return true;
-    } catch {
-      return false;
+    } catch (cause) {
+      if (cause instanceof TypeError) return false;
+      throw cause;
     }
   },
 );
@@ -29,7 +31,7 @@ export const telemetryEnvelopeSchema = Schema.declare<LocalRecord>(
  * @param value - Original worker record, still untrusted after IPC transport.
  * @returns Whether the original local envelope validator accepts this record.
  */
-function isRecord(value: unknown): value is ObservabilityRecord {
+function isRecord<T>(value: T): value is T & ObservabilityRecord {
   return Schema.is(telemetryEnvelopeSchema)({
     key: "worker-schema",
     origin: "relkit",

@@ -1,3 +1,8 @@
+/**
+ * Exposes compiler-owned discovery, checking and deterministic artifact APIs.
+ * Optional typecheck journals are preparation authorities; ordinary authoring
+ * checks and synchronous compatibility exports preserve their existing behavior.
+ */
 export * from "./conventions.js";
 export * from "./activation-fingerprint.js";
 export * from "./config-loader.js";
@@ -14,6 +19,9 @@ export * from "./integration-package-resolution.js";
 export * from "./local-service-plan.js";
 export * from "./normalize.js";
 export * from "./project-typecheck.js";
+export { TypecheckInputs, typecheckInputsLayer } from "./typecheck-inputs.service.js";
+export { TypecheckInputError } from "./typecheck-inputs-error.js";
+export type { TypecheckInputOperations, TypecheckInputWitness } from "./typecheck-inputs.types.js";
 export * from "./route-module-checks.js";
 export * from "./route-file.js";
 export * from "./runtime-integration-plan.js";

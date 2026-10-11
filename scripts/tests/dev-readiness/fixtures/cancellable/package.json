@@ -1,0 +1,7 @@
+{
+  "name": "relkit-readiness-cancellation-fixture",
+  "private": true,
+  "scripts": {
+    "dev": "bun server.ts"
+  }
+}

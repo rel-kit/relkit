@@ -26,6 +26,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./client-events": {
+      "types": "./dist/client-events.d.ts",
+      "import": "./dist/client-events.js"
+    },
+    "./continuation-validation": {
+      "types": "./dist/continuation-validation.d.ts",
+      "import": "./dist/continuation-validation.js"
     }
   },
   "dependencies": {

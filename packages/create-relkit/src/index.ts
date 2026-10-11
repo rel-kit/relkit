@@ -1,4 +1,5 @@
 export * from "./options.js";
+export * from "./create-capabilities.js";
 export * from "./add-types.js";
 export * from "./add-name.js";
 export * from "./add-options.js";

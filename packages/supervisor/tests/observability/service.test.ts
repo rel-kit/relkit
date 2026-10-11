@@ -108,8 +108,8 @@ it.effect(
             }),
             createLoggerLayer({
               minimumLevel: "error",
-              json: false,
-              human: { write: (_line, record) => logs.push(record) },
+              human: false,
+              json: { write: (record) => logs.push(record) },
             }),
           ),
         ),

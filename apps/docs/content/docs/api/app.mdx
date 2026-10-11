@@ -2233,6 +2233,46 @@ declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: stri
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
 
+## `internal-runtime.ts`
+
+Exposes the framework-owned descriptor identity and application context wiring
+needed by emitted hosts. Both exports preserve their authoring facade identity;
+this entrypoint avoids evaluating unrelated agent and transport declarations.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [bindDescriptorIdentity](#binddescriptoridentity)
+  - [createApplicationContextResolver](#createapplicationcontextresolver)
+
+---
+
+# utils
+
+## bindDescriptorIdentity
+
+**Signature**
+
+```ts
+declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L6)
+
+## createApplicationContextResolver
+
+**Signature**
+
+```ts
+declare const createApplicationContextResolver: (
+  options: ApplicationContextOptions,
+) => ApplicationContextResolver;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L7)
+
 ## `jobs-legacy.ts`
 
 ---

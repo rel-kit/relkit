@@ -1,0 +1,67 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "command": "bun dev",
+  "mode": "candidate-split-bundle-incomplete-support",
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 Pro",
+    "load": [
+      3.67529296875,
+      4.46484375,
+      4.060546875
+    ]
+  },
+  "request": {
+    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-3zzqwz/readiness-baseline",
+    "url": "http://127.0.0.1:55350/hello?name=RelKit",
+    "expectedStatus": 200,
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "failure": "failure",
+      "message": "Measurement or owned cleanup failed; inspect retained operation diagnostics."
+    },
+    {
+      "run": 2,
+      "sample": {
+        "durationMs": 30006.17525,
+        "outcome": "timeout",
+        "output": "$ relkit dev\n05:18:58.816 INFO  relkit            Starting development server\n05:18:58.830 INFO  build             Compiling application\n05:18:59.144 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n05:18:59.163 INFO  build             Compiled in 333ms\n05:18:59.164 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n05:18:59.158 INFO  http              GET /hello → 200 in 49ms\n05:18:59.214 INFO  relkit            dev.inspector.ready\n"
+      }
+    },
+    {
+      "run": 3,
+      "sample": {
+        "durationMs": 30006.175208,
+        "outcome": "timeout",
+        "output": "$ relkit dev\n05:19:29.077 INFO  relkit            Starting development server\n05:19:29.093 INFO  build             Compiling application\n05:19:29.556 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n05:19:29.606 INFO  build             Compiled in 513ms\n05:19:29.607 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n05:19:29.590 INFO  http              GET /hello → 200 in 169ms\n05:19:29.696 INFO  relkit            dev.inspector.ready\n"
+      }
+    },
+    {
+      "run": 4,
+      "sample": {
+        "durationMs": 30000.371167,
+        "outcome": "timeout",
+        "output": "$ relkit dev\n05:19:59.091 INFO  relkit            Starting development server\n05:19:59.105 INFO  build             Compiling application\n05:19:59.488 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n05:19:59.507 INFO  build             Compiled in 402ms\n05:19:59.508 INFO  server            Ready\n                                     API        http://127.0.0.1:3000\n                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json\n05:19:59.501 INFO  http              GET /hello → 200 in 47ms\n05:19:59.540 INFO  relkit            dev.inspector.ready\n"
+      }
+    },
+    {
+      "run": 5,
+      "failure": "failure",
+      "message": "Measurement or owned cleanup failed; inspect retained operation diagnostics."
+    }
+  ],
+  "summary": {
+    "runs": 3,
+    "medianMs": 30006.175208,
+    "p95Ms": 30006.17525,
+    "maximumMs": 30006.17525,
+    "passed": false
+  }
+}

@@ -1,4 +1,5 @@
-import { fail } from "../main-support.js";
+/** Parses explicit project flags without importing application code or acquiring resources. */
+import { CliFailureError } from "../cli-errors.js";
 import type { MinimumLogLevel } from "@relkit/runtime-effect";
 import { Schema } from "effect";
 import { minimumLogLevelSchema } from "./project-args.schemas.js";
@@ -19,6 +20,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
   let logLevel: MinimumLogLevel | undefined;
   let verbose = false;
   let noColor = false;
+  let prepare = false;
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]!;
     if (argument === "--project-root") projectRoot = value(args, ++index, argument, command);
@@ -33,6 +35,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
       local = selected;
     } else if (argument === "--verbose" && command === "dev") verbose = true;
     else if (argument === "--no-color" && command === "dev") noColor = true;
+    else if (argument === "--prepare" && command === "dev") prepare = true;
     else if (argument === "--log-level" && command === "dev") {
       const selected = value(args, ++index, argument, command);
       if (!Schema.is(minimumLogLevelSchema)(selected))
@@ -53,7 +56,19 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
     ...(logLevel === undefined ? {} : { logLevel }),
     verbose,
     noColor,
+    ...(prepare ? { prepare } : {}),
   };
+}
+
+/**
+ * Constructs the established usage error without importing command dispatch.
+ * @param code - Selected command's existing public code.
+ * @param message - Safe parser diagnostic.
+ * @param exitCode - Existing usage status.
+ * @returns The same typed public failure contract.
+ */
+function fail(code: string, message: string, exitCode: number): CliFailureError {
+  return new CliFailureError({ code, message, exitCode });
 }
 
 /**

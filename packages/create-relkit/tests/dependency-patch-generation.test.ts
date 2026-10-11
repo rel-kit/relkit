@@ -32,7 +32,7 @@ test("every starter owns the canonical declaration repair before its first insta
           },
         },
       );
-      expect(commands).toEqual(["install", "doctor", "check"]);
+      expect(commands).toEqual(["install", "doctor", "dev"]);
       expect(result.files).toContain(patch.path);
       expect(await readFile(join(result.destination, patch.path), "utf8")).toBe(patch.content);
     }

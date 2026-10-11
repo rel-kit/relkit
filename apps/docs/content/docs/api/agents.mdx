@@ -2878,6 +2878,62 @@ declare const agentClientEventsEffect: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-events.ts#L21)
 
+## `continuation-validation.ts`
+
+Exposes graph identity and continuation validators to transport adapters without
+importing the agent execution barrel. Validation remains owned by its existing
+implementations and preserves their public failure and reply contracts.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [isGraphDescriptor](#isgraphdescriptor)
+  - [validateGraphResumeInput](#validategraphresumeinput)
+  - [validateNativeAgentResumeInput](#validatenativeagentresumeinput)
+
+---
+
+# utils
+
+## isGraphDescriptor
+
+**Signature**
+
+```ts
+declare const isGraphDescriptor: (value: unknown) => value is GraphDescriptor;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/continuation-validation.ts#L6)
+
+## validateGraphResumeInput
+
+**Signature**
+
+```ts
+declare const validateGraphResumeInput: (
+  descriptor: GraphDescriptor,
+  requests: readonly AgentWaitingRequest[],
+  value: unknown,
+) => Promise<unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/continuation-validation.ts#L7)
+
+## validateNativeAgentResumeInput
+
+**Signature**
+
+```ts
+declare const validateNativeAgentResumeInput: (
+  requests: readonly AgentWaitingRequest[],
+  value: unknown,
+) => unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/continuation-validation.ts#L8)
+
 ## `deepagent-bucket-backend.ts`
 
 ---

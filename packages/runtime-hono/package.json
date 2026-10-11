@@ -27,6 +27,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./internal/prepared": {
+      "types": "./dist/prepared-app.d.ts",
+      "import": "./dist/prepared-app.js"
+    },
     "./bun": {
       "types": "./dist/bun.d.ts",
       "import": "./dist/bun.js"

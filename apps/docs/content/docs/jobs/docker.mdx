@@ -3,7 +3,8 @@ title: Docker providers
 description: Run local job providers with persisted state.
 ---
 
-Choose a Docker-backed provider when creating a project:
+Docker-backed creation tuples are not currently exposed because their native and timing evidence is
+not complete. The explicit `--jobs` flags below are rejected before staging or installation:
 
 ```sh
 relkit create my-app --jobs inngest-docker
@@ -11,9 +12,9 @@ relkit create my-app --jobs effect-mq-docker
 relkit create my-app --jobs trigger-docker
 ```
 
-The generator creates an Orders task and binds the selected provider in `relkit.config.ts`.
-The local CLI also needs `@relkit/local` in the application, so run `bun add @relkit/local`
-from the generated project before starting the provider. Follow the provider-specific setup:
+For an existing project, install the provider packages and bind the selected provider in
+`relkit.config.ts`; do not interpret performance evidence as native-provider certification.
+The local CLI also needs `@relkit/local` in the application. Follow the provider-specific setup:
 [Inngest](/docs/jobs/providers/inngest), [Effect MQ](/docs/jobs/providers/effect-mq), or
 [Trigger.dev](/docs/jobs/providers/trigger).
 

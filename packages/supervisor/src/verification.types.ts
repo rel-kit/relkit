@@ -25,6 +25,8 @@ export interface CandidateVerificationOptions {
   readonly manifestGeneratorVersion?: number;
   readonly hostname?: string;
   readonly healthTimeoutMs?: number;
+  /** Starts liveness and readiness polling together for immutable prepared candidates. */
+  readonly concurrentHealth?: boolean;
   readonly signal?: AbortSignal;
   readonly fetch?: typeof fetch;
 }

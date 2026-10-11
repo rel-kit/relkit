@@ -165,8 +165,8 @@ test("keeps current guidance on the domain-first application layout", async () =
   }
 
   const createSource = await readFile(createPage, "utf8");
-  expect(createSource).toContain("src/orders/service.ts");
-  expect(createSource).toContain("src/routes/orders/route.ts");
+  expect(createSource).toContain("src/hello/service.ts");
+  expect(createSource).toContain("src/routes/hello/route.ts");
   expect(createSource).not.toContain("src/services/");
 });
 

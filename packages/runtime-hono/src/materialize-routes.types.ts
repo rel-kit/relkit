@@ -27,6 +27,7 @@ export interface RuntimeManifest {
   readonly activationFingerprint: import("@relkit/contracts").RuntimeActivationFingerprint;
   readonly runtimeIntegrationsPlan: import("@relkit/contracts").RuntimeIntegrationPlanReference;
   readonly functions: ManifestEntries<unknown>;
+  readonly targetLoaders?: ManifestEntries<() => Promise<unknown>>;
   readonly targets?: ManifestEntries<unknown>;
   readonly agents?: ManifestEntries<unknown>;
   readonly channels?: ManifestEntries<unknown>;
@@ -48,6 +49,7 @@ export interface RuntimeManifest {
 export interface HttpInvocationOptions {
   readonly functionId: string;
   readonly input: unknown;
+  readonly target?: unknown;
   readonly source: "http" | "tool";
   readonly signal?: AbortSignal;
   readonly requestId?: string;
@@ -93,6 +95,7 @@ export interface RouteMaterializationOptions {
   readonly plan: RegistrationPlan;
   readonly manifest: RuntimeManifest;
   readonly engine: HttpEngine;
+  readonly resolveTarget?: (functionId: string) => MaybePromise<unknown>;
   readonly mapInput?: HttpInputMapper;
   readonly requestMapping?: RequestMappingOptions;
   readonly responseMapping?: import("./response-mapping.js").ResponseMappingOptions;
