@@ -1,0 +1,44 @@
+2026-10-11T08:10:56.6118696Z ##[group]Run bun run scripts/release-check.ts --ci-pack --output "$RUNNER_TEMP/npm-release"
+2026-10-11T08:10:56.6119342Z [36;1mbun run scripts/release-check.ts --ci-pack --output "$RUNNER_TEMP/npm-release"[0m
+2026-10-11T08:10:56.6156243Z shell: /usr/bin/bash -e {0}
+2026-10-11T08:10:56.6156504Z env:
+2026-10-11T08:10:56.6156707Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-11T08:10:56.6157096Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-11T08:10:56.6157342Z ##[endgroup]
+2026-10-11T08:13:12.9305005Z 31 |     new Response(child.stdout).text(),
+2026-10-11T08:13:12.9305742Z 32 |     new Response(child.stderr).text(),
+2026-10-11T08:13:12.9306409Z 33 |     child.exited,
+2026-10-11T08:13:12.9306905Z 34 |   ]);
+2026-10-11T08:13:12.9307229Z 35 |   if (code !== 0)
+2026-10-11T08:13:12.9308016Z 36 |     throw new Error(`${executable} ${args.join(" ")} failed (${code})\n${stdout}${stderr}`);
+2026-10-11T08:13:12.9308811Z                    ^
+2026-10-11T08:13:12.9309960Z error: /home/runner/.bun/bin/bun run scripts/pack-and-smoke-relkit.ts --artifacts /home/runner/work/_temp/npm-release failed (1)
+2026-10-11T08:13:12.9311075Z 55 |       const [stdout, stderr, code] = await Promise.all([
+2026-10-11T08:13:12.9311737Z 56 |         new Response(child.stdout).text(),
+2026-10-11T08:13:12.9312364Z 57 |         new Response(child.stderr).text(),
+2026-10-11T08:13:12.9312877Z 58 |         child.exited,
+2026-10-11T08:13:12.9313267Z 59 |       ]);
+2026-10-11T08:13:12.9314086Z 60 |       assert.equal(code, expectedCode, `bun ${args.join(" ")}\n${stdout}${stderr}`);
+2026-10-11T08:13:12.9314790Z                   ^
+2026-10-11T08:13:12.9316249Z AssertionError: bun x relkit create alias-app --template minimal --cloud none --deploy none --no-install --no-git --json --directory /tmp/relkit-bunx-smoke-it7P9W/consumer/alias-project
+2026-10-11T08:13:12.9317685Z {"error":{"code":"RELKIT_CREATE_USAGE","message":"Creation combination is not certified: template=minimal/jobs=none/cloud=none/deploy=none/examples=on. Supported: none for this tool identity."},"ok":false}
+2026-10-11T08:13:12.9318586Z
+2026-10-11T08:13:12.9318594Z
+2026-10-11T08:13:12.9318687Z 2 !== 0
+2026-10-11T08:13:12.9318801Z
+2026-10-11T08:13:12.9318911Z  generatedMessage: false,
+2026-10-11T08:13:12.9319147Z      actual: 2,
+2026-10-11T08:13:12.9319353Z    expected: 0,
+2026-10-11T08:13:12.9319566Z    operator: "strictEqual",
+2026-10-11T08:13:12.9319843Z        code: "ERR_ASSERTION"
+2026-10-11T08:13:12.9319999Z
+2026-10-11T08:13:12.9320278Z       at /home/runner/work/relkit/relkit/scripts/pack-and-smoke-relkit.ts:60:14
+2026-10-11T08:13:12.9320733Z       at processTicksAndRejections (native:7:39)
+2026-10-11T08:13:12.9320936Z
+2026-10-11T08:13:12.9321046Z Bun v1.3.10 (Linux x64)
+2026-10-11T08:13:12.9321189Z
+2026-10-11T08:13:12.9321478Z       at command (/home/runner/work/relkit/relkit/scripts/release-check-support.ts:36:15)
+2026-10-11T08:13:12.9322072Z       at async main (/home/runner/work/relkit/relkit/scripts/release-check.ts:156:11)
+2026-10-11T08:13:12.9322375Z
+2026-10-11T08:13:12.9322491Z Bun v1.3.10 (Linux x64)
+2026-10-11T08:13:12.9361398Z ##[error]Process completed with exit code 1.

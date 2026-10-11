@@ -1,0 +1,39 @@
+Command: rtk bun run scripts/release-check.ts --ci-pack --allow-dirty --output /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-ci-before-4mjje_hh
+31 |     new Response(child.stdout).text(),
+32 |     new Response(child.stderr).text(),
+33 |     child.exited,
+34 |   ]);
+35 |   if (code !== 0)
+36 |     throw new Error(`${executable} ${args.join(" ")} failed (${code})\n${stdout}${stderr}`);
+                   ^
+error: /Users/mustafaelsayed/.bun/bin/bun run scripts/pack-and-smoke-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-ci-before-4mjje_hh failed (1)
+55 |       const [stdout, stderr, code] = await Promise.all([
+56 |         new Response(child.stdout).text(),
+57 |         new Response(child.stderr).text(),
+58 |         child.exited,
+59 |       ]);
+60 |       assert.equal(code, expectedCode, `bun ${args.join(" ")}\n${stdout}${stderr}`);
+                  ^
+AssertionError: bun x relkit create alias-app --template minimal --cloud none --deploy none --no-install --no-git --json --directory /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-bunx-smoke-NDWh4N/consumer/alias-project
+{"error":{"code":"RELKIT_CREATE_USAGE","message":"Creation combination is not certified: template=minimal/jobs=none/cloud=none/deploy=none/examples=on. Supported: none for this tool identity."},"ok":false}
+
+
+2 !== 0
+
+ generatedMessage: false,
+     actual: 2,
+   expected: 0,
+   operator: "strictEqual",
+       code: "ERR_ASSERTION"
+
+      at /Users/mustafaelsayed/Workspace/relkit/scripts/pack-and-smoke-relkit.ts:60:14
+      at processTicksAndRejections (native:7:39)
+
+Bun v1.3.10 (macOS arm64)
+
+      at command (/Users/mustafaelsayed/Workspace/relkit/scripts/release-check-support.ts:36:15)
+      at async main (/Users/mustafaelsayed/Workspace/relkit/scripts/release-check.ts:156:11)
+
+Bun v1.3.10 (macOS arm64)
+
+Exit code: 1

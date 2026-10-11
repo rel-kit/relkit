@@ -1,0 +1,38 @@
+Command: rtk bun run scripts/benchmark-packed-dev.ts --runs 20 --set fresh --output docs/evidence/create-capabilities/0.7.3/fresh.json
+[11:25:06.766] INFO (#1): Packing and installing the candidate fixture
+40 |  * @param operation - Declaration-owned boundary label.
+41 |  * @param cause - Original native rejection or thrown value.
+42 |  * @returns The typed adapter failure.
+43 |  */
+44 | export function cliAdapterError(operation, cause) {
+45 |     return new CliAdapterError({
+                ^
+error: /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-WU0up9/node_modules/.bin/create-relkit readiness-baseline --template minimal --cloud none --deploy none --install --no-git --examples --json failed in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-WU0up9
+{"ok":false,"error":{"code":"RELKIT_CREATE_PREPARE_FAILED","message":"prepare failed with exit code 1.\nDevelopment snapshot ineligible during preparation.bundle. Temporary directory cleaned: /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-WU0up9/.readiness-baseline-relkit-WaYqA2."}}
+
+      _tag: "CliAdapterError",
+ operation: "benchmark.create",
+
+      at cliAdapterError (/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/cli-errors.js:45:12)
+      at ~effect/Utils/internal (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/Utils.js:76:16)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:773:21)
+      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
+
+29 |   const [stdout, stderr, code] = await Promise.all([
+30 |     new Response(child.stdout).text(),
+31 |     new Response(child.stderr).text(),
+32 |     child.exited,
+33 |   ]);
+34 |   if (code !== 0) throw new Error(`${args.join(" ")} failed in ${cwd}\n${stdout}${stderr}`);
+                                 ^
+error: /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-WU0up9/node_modules/.bin/create-relkit readiness-baseline --template minimal --cloud none --deploy none --install --no-git --examples --json failed in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-WU0up9
+{"ok":false,"error":{"code":"RELKIT_CREATE_PREPARE_FAILED","message":"prepare failed with exit code 1.\nDevelopment snapshot ineligible during preparation.bundle. Temporary directory cleaned: /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-WU0up9/.readiness-baseline-relkit-WaYqA2."}}
+
+      at runCommand (/Users/mustafaelsayed/Workspace/relkit/scripts/pack-and-smoke-create-relkit-support.ts:34:29)
+
+Bun v1.3.10 (macOS arm64)
+
+Exit code: 1
