@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.7.5
+
+### Changes
+
+- fix: document auth endpoints and reuse initial dev validation
+
 ## 0.7.4
 
 ### Changes
