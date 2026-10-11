@@ -18,7 +18,7 @@ export async function hashSnapshotMembers(
   const worker = fileURLToPath(new URL("./snapshot-hash-worker.js", import.meta.url));
   const partitions = partition(paths, WORKERS);
   const children = partitions.map((members) =>
-    Bun.spawn([process.execPath, worker, root, String(limit)], {
+    Bun.spawn([process.execPath, worker, String(limit)], {
       cwd: root,
       env: process.env,
       stdin: new Blob([JSON.stringify(members)]),
@@ -60,7 +60,7 @@ export async function findSnapshotMismatch(
   const worker = fileURLToPath(new URL("./snapshot-hash-worker.js", import.meta.url));
   const partitions = partition(members, WORKERS);
   const children = partitions.map((partition) =>
-    Bun.spawn([process.execPath, worker, root, String(limit), "verify"], {
+    Bun.spawn([process.execPath, worker, String(limit), "verify"], {
       cwd: root,
       env: process.env,
       stdin: new Blob([

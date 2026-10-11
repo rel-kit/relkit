@@ -1,7 +1,8 @@
 /**
  * Hashes one internal verification partition in an isolated Bun process. The
- * parent supplies already-decoded relative paths; this boundary repeats lexical,
- * root, parent, descriptor and current-path checks before returning identities.
+ * parent selects the root as this process's working directory and supplies
+ * already-decoded relative paths; this boundary repeats lexical, root, parent,
+ * descriptor and current-path checks before returning identities.
  */
 import {
   closeSync,
@@ -30,15 +31,14 @@ const PATH =
 /** Executes the fixed stdin/stdout worker protocol without printing native details. */
 function main(): void {
   try {
-    const requestedRoot = process.argv[2];
-    const limit = Number(process.argv[3]);
-    if (requestedRoot === undefined || !Number.isSafeInteger(limit) || limit < 0) throw new Error();
+    const limit = Number(process.argv[2]);
+    if (!Number.isSafeInteger(limit) || limit < 0) throw new Error();
     const input = JSON.parse(readFileSync(0, "utf8"));
     if (!Array.isArray(input) || input.length > 5_000) throw new Error();
-    const root = realpathSync(requestedRoot);
+    const root = realpathSync(".");
     const physical = root;
     const rootIdentity = statSync(root);
-    if (process.argv[4] === "verify") {
+    if (process.argv[3] === "verify") {
       process.stdout.write(String(firstMismatch(root, physical, rootIdentity, input, limit)));
       return;
     }
