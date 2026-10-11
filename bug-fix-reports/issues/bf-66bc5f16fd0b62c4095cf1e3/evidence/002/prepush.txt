@@ -1,0 +1,283 @@
+$ bun install --frozen-lockfile && bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md && bun run lint && bun run check && bun run konsistent -- validate && bun run scripts/check-observability-sinks.ts && bun x turbo run typecheck --filter='./packages/*' --filter='./integrations/catalog' --filter='./integrations/packages/*' --output-logs=errors-only && bun x tsc -b --pretty false && bun run test:types && bun run test:unit && bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts && bun run test:graph && bun run test:contracts && bun run test:security
+[0.34ms] ".env"
+bun install v1.3.10 (30e609e0)
+Resolving dependencies
+Resolved, downloaded and extracted [1]
+
+Checked 1455 installs across 1554 packages (no changes) [363.00ms]
+Checking formatting...
+All matched files use Prettier code style!
+$ bun run scripts/lint.ts
+Public authoring scan passed (90 source/example fragments).
+$ bun run scripts/check-boundaries.ts
+Boundary check passed (62 roots, 4721 TypeScript files).
+$ konsistent validate
+Configuration is valid.
+Observability sink source scan passed.
+
+   • turbo 2.11.7
+   • Packages in scope: @relkit/agents, @relkit/app, @relkit/aws, @relkit/better-auth, @relkit/buckets, @relkit/cache, @relkit/cli, @relkit/client, @relkit/client-generator, @relkit/cloud-aws, @relkit/cloudflare, @relkit/compiler, @relkit/config, @relkit/contracts, @relkit/deploy, @relkit/deploy-pulumi, @relkit/diagnostics, @relkit/docker, @relkit/drizzle, @relkit/effect-mq, @relkit/engine, @relkit/events, @relkit/functions, @relkit/graph, @relkit/inngest, @relkit/inspector-api, @relkit/integrations, @relkit/invocation, @relkit/jobs, @relkit/local, @relkit/local-service, @relkit/observability, @relkit/openapi, @relkit/otlp, @relkit/provider, @relkit/providers-local, @relkit/providers-standard, @relkit/pulumi, @relkit/realtime, @relkit/redis, @relkit/routes, @relkit/runtime-effect, @relkit/runtime-hono, @relkit/s3, @relkit/schema, @relkit/sentry, @relkit/services, @relkit/supervisor, @relkit/testing, @relkit/tools, @relkit/trigger, create-relkit, relkit
+   • Running typecheck in 53 packages
+   • Remote caching disabled
+
+
+ Tasks:    53 successful, 53 total
+Cached:    0 cached, 53 total
+  Time:    14.932s
+
+$ bun run scripts/test-types.ts
+Type fixtures passed (public descriptor inference and boundary rejection).
+$ bun test ./tests/unit
+bun test v1.3.10 (30e609e0)
+
+tests/unit/release-check.test.ts:
+(pass) the release certifies default creation using its actual tool identity [4.04ms]
+(pass) accepts the unscoped CLI package and publishes its dependency first [20.66ms]
+(pass) tracked release notes exclude rebuild-dependent tarball hashes [0.63ms]
+
+tests/unit/build-catalog.test.ts:
+(pass) catalog metadata derives exact patch identity, bytes, and native literal types [5.65ms]
+(pass) release staging provides catalogs, overrides, and patch bytes before installation [5.28ms]
+
+tests/unit/root-scripts.test.ts:
+(pass) test:all points to a checked-in orchestration script [1.54ms]
+
+tests/unit/job-name.test.ts:
+(pass) accepts safe camelCase job names [9.84ms]
+(pass) rejects unsafe and reserved job names [4.91ms]
+
+tests/unit/jobs-mutation-gate.test.ts:
+(pass) requires killed mutants in all retained semantic responsibilities [0.67ms]
+(pass) old facade line numbers cannot satisfy migrated stale-epoch ownership [0.08ms]
+(pass) mutation execution errors fail even when every semantic requirement has a kill [0.07ms]
+
+tests/unit/auto-changeset.test.ts:
+(pass) release paths map to their published packages [0.15ms]
+(pass) shared packaged inputs release the fixed train [0.03ms]
+(pass) Changesets are detected and rendered deterministically [0.03ms]
+(pass) release diffs retain deletions and both sides of renames [0.08ms]
+(pass) a deleted Changeset does not satisfy release policy [0.03ms]
+
+tests/unit/version-packages.test.ts:
+(pass) the release train promotes Unreleased into one root changelog entry [0.27ms]
+(pass) the Changesets action receives an untracked package changelog [0.03ms]
+
+tests/unit/catalog-manifest.test.ts:
+(pass) catalog resolution preserves concrete declarations and named peer ranges [0.08ms]
+(pass) missing or recursive catalogs fail without inventing a dependency version [0.28ms]
+(pass) packed dependency validation requires concrete pins in every dependency field [0.27ms]
+
+tests/unit/package-tests.test.ts:
+(pass) package test discovery includes standalone integrations without build output [68.92ms]
+
+tests/unit/ci-workflow.test.ts:
+(pass) fast CI gates merges and only green main runs start releases [1.61ms]
+
+tests/unit/release-check-listing.test.ts:
+(pass) accepts the complete generator's exact portable catalog source pair [0.37ms]
+(pass) retains development-file rejection beside approved catalog assets [0.08ms]
+(pass) requires the portable catalog asset package/src/catalog-resolution.ts even without an export target [0.17ms]
+(pass) requires the portable catalog asset package/src/catalog-resolution.types.ts even without an export target [0.05ms]
+(pass) forbids the same catalog source pair in every unrelated package [0.02ms]
+
+tests/unit/catalog-bootstrap.test.ts:
+(pass) pure catalog subpath boots before any generator or framework dist exists [92.01ms]
+(pass) actual generator tarball carries the same source resolver and works without dist [383.86ms]
+
+tests/unit/packed-registry.test.ts:
+(pass) smoke registry serves verified tarball metadata instead of workspace metadata [24.25ms]
+
+tests/unit/sync-release.test.ts:
+(pass) release sync retains the CLI editor assets and remains idempotent [129.13ms]
+
+tests/unit/public-declarations.test.ts:
+(pass) allows the documented native Effect constructors and injectable services [24.85ms]
+(pass) follows split Next middleware types within the existing middleware exception [16.18ms]
+(pass) still rejects unrelated framework, cloud, and internal provider declarations [24.52ms]
+
+ 35 pass
+ 0 fail
+ 192 expect() calls
+Ran 35 tests across 15 files. [1153.00ms]
+bun test v1.3.10 (30e609e0)
+
+tests/compiler/manifest.test.ts:
+(pass) runtime manifest generation > sorts imports and emits handlers plus the runtime-integration plan reference [11.36ms]
+(pass) runtime manifest generation > keeps provider topology in graph data and factories out of executable manifest [29.32ms]
+(pass) runtime manifest generation > imports event target binding from the events authoring facade [0.17ms]
+(pass) runtime manifest generation > does not activate without executable references or with a hash mismatch [1.57ms]
+
+tests/compiler/graph-construction.test.ts:
+(pass) compiler graph construction > projects triggers, ordered middleware/transforms, and declared edges [71.10ms]
+(pass) compiler graph construction > keeps direct descriptor normalization independent of source-domain validation [8.14ms]
+
+tests/compiler/job-names.test.ts:
+(pass) task/job compiler discovery > creates one private implicit job with the task durable ID [26.50ms]
+(pass) task/job compiler discovery > requires an explicit job for ambiguous task aliases [6.40ms]
+(pass) task/job compiler discovery > does not invent an implicit job from a service facade alone [3.92ms]
+(pass) task/job compiler discovery > deduplicates a service facade alias against the canonical task export [10.08ms]
+(pass) task/job compiler discovery > keeps task and task-backed job graph identities distinct [10.19ms]
+(pass) task/job compiler discovery > emits stable task hook nodes without changing legacy hook phases [13.83ms]
+(pass) task/job compiler discovery > emits one deterministic versioned jobs manifest and runtime task/job maps [12.43ms]
+(pass) task/job compiler discovery > keeps schedule inputs out of the data-only jobs manifest [7.88ms]
+(pass) task/job compiler discovery > keeps manifest identity stable when discovery order changes [29.38ms]
+(pass) task/job compiler discovery > changes public identity without replacing a pinned job durable ID [14.19ms]
+(pass) task/job compiler discovery > keeps executable build identity separate from task semantic version [18.67ms]
+(pass) task/job compiler discovery > keeps executable identity stable when an implicit export is renamed [14.31ms]
+(pass) task/job compiler discovery > keeps task-scoped directional schema hashes across equal durable IDs [7.27ms]
+(pass) task/job compiler discovery > uses inputWire for a transformed task's canonical projection [7.17ms]
+(pass) task/job compiler discovery > diagnoses a graph-only synthetic identity collision [9.63ms]
+(pass) task/job compiler discovery > rejects duplicate IDs within one durable namespace [14.17ms]
+(pass) task/job compiler discovery > reserves the root jobs namespace for exposed task-backed jobs [25.92ms]
+
+ 23 pass
+ 0 fail
+ 96 expect() calls
+Ran 23 tests across 3 files. [810.00ms]
+$ vitest run --config packages/graph/vitest.config.ts
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  20 passed (20)
+      Tests  175 passed (175)
+   Start at  13:54:45
+   Duration  1.34s (import 69%, transform 24%, tests 6%, worker 1%)
+
+$ bun test ./tests/contracts
+bun test v1.3.10 (30e609e0)
+
+tests/contracts/descriptor-cohort.test.ts:
+(pass) Phase 2 descriptor cohort > brands, freezes, and keeps explicit stable refs immutable [11.73ms]
+(pass) Phase 2 descriptor cohort > narrows declared dependencies and creates typed declared errors [14.10ms]
+(pass) Phase 2 descriptor cohort > serializes route ASTs and named transform projections without closures [6.90ms]
+(pass) Phase 2 descriptor cohort > keeps application environment and binding references value-free [5.92ms]
+(pass) Phase 2 descriptor cohort > validates job policies and omits executable handlers [1.63ms]
+(pass) Phase 2 descriptor cohort > keeps bucket/cache contracts logical and tools/agents handler-free [8.21ms]
+(pass) Phase 2 descriptor cohort > keeps service members identity-preserving and cohesive [40.44ms]
+(pass) Phase 2 descriptor cohort > rejects invalid declarations and keeps the public cohort immutable [2.90ms]
+(pass) Phase 2 descriptor cohort > emits every convention warning without excluding a descriptor [5.32ms]
+
+tests/contracts/events.test.ts:
+(pass) event contract: deterministic testing event harness > publishes a validated payload as one correlated envelope [107.54ms]
+(pass) event contract: deterministic testing event harness > rejects invalid payload before acceptance or delivery [9.73ms]
+(pass) event contract: deterministic testing event harness > exposes honest ephemeral and durable delivery capabilities [0.11ms]
+(pass) event contract: deterministic testing event harness > fans out independently and invokes the selected target [83.58ms]
+(pass) event contract: deterministic testing event harness > recovers durable work, exposes duplicates, retries, and dead-letters safely [168.98ms]
+(pass) event contract: deterministic testing event harness > does not claim recovery for in-flight ephemeral delivery [30.46ms]
+
+tests/contracts/cache.test.ts:
+(pass) cache contract: local provider > covers get, set, delete, has, getOrSet, and increment [29.96ms]
+(pass) cache contract: local provider > uses canonical object keys and deterministic TTL expiry [4.22ms]
+(pass) cache contract: local provider > rejects invalid keys, values, and TTLs without replacing a value [4.79ms]
+(pass) cache contract: local provider > runs one producer per key for concurrent misses [3.03ms]
+(pass) cache contract: local provider > keeps cache observations free of raw keys and values [28.37ms]
+(pass) cache contract: local provider > rejects an unavailable increment capability explicitly [9.93ms]
+(pass) cache contract: local provider > rejects reads after the provider goes out of service [1.33ms]
+(pass) cache contract: local provider > evicts the least recently used entry within the configured bound [3.33ms]
+(pass) cache contract: test fake > covers get, set, delete, has, getOrSet, and increment [11.06ms]
+(pass) cache contract: test fake > uses canonical object keys and deterministic TTL expiry [3.65ms]
+(pass) cache contract: test fake > rejects invalid keys, values, and TTLs without replacing a value [2.56ms]
+(pass) cache contract: test fake > runs one producer per key for concurrent misses [1.79ms]
+(pass) cache contract: test fake > keeps cache observations free of raw keys and values [1.53ms]
+(pass) cache contract: test fake > rejects an unavailable increment capability explicitly [2.19ms]
+(pass) cache contract: test fake > rejects reads after the provider goes out of service [1.88ms]
+(pass) cache contract: test fake > preserves the prior entry when a write outage is injected [9.21ms]
+
+tests/contracts/optional-ids.test.ts:
+(pass) optional authoring IDs > uses process-local unbound identities for eligible factories [5.03ms]
+(pass) optional authoring IDs > keeps durable identities mandatory at runtime [2.42ms]
+
+tests/contracts/declared-errors.test.ts:
+(pass) declared error retry metadata > normalizes omission and legacy strings while retaining delay hints [1.56ms]
+(pass) declared error retry metadata > rejects invalid delay hints [1.23ms]
+(pass) declared error retry metadata > binds inferred IDs into instances and safe envelopes [1.02ms]
+
+tests/contracts/buckets.test.ts:
+(pass) bucket contract: local provider > round-trips every operation and metadata [16.81ms]
+(pass) bucket contract: local provider > rejects traversal, absolute keys, and policy violations [4.20ms]
+(pass) bucket contract: local provider > reports signed URL support through capabilities [2.20ms]
+(pass) bucket contract: local provider > rejects operations after the provider goes out of service [2.86ms]
+(pass) bucket contract: local provider > returns sorted, cursor-based pages without duplicates [13.12ms]
+(pass) bucket contract: test fake > round-trips every operation and metadata [8.06ms]
+(pass) bucket contract: test fake > rejects traversal, absolute keys, and policy violations [3.91ms]
+(pass) bucket contract: test fake > reports signed URL support through capabilities [2.55ms]
+(pass) bucket contract: test fake > rejects operations after the provider goes out of service [5.72ms]
+(pass) bucket contract: test fake > keeps the prior object visible across injected write failures [5.21ms]
+
+tests/contracts/jobs.test.ts:
+(pass) job contract: deterministic testing job harness > publishes durable at-least-once capabilities without exactly-once claims [0.01ms]
+(pass) job contract: deterministic testing job harness > rejects invalid input before durable acceptance or target invocation [12.34ms]
+(pass) job contract: deterministic testing job harness > enqueues, consumes through the engine, and acknowledges completion [38.52ms]
+(pass) job contract: deterministic testing job harness > uses deterministic retry delay and succeeds on the next attempt [46.98ms]
+(pass) job contract: deterministic testing job harness > dead-letters an exhausted retry with safe failure metadata [38.09ms]
+(pass) job contract: deterministic testing job harness > returns an expired lease to available without inventing a state [42.70ms]
+(pass) job contract: deterministic testing job harness > makes acknowledgement-gap duplicates visible after lease recovery [55.05ms]
+(pass) job contract: deterministic testing job harness > retains idempotency keys, returns duplicates, and accepts after expiry [12.71ms]
+(pass) job contract: deterministic testing job harness > enforces the stricter function and consumer concurrency limit [46.05ms]
+(pass) job contract: deterministic testing job harness > fires schedules through enqueue and applies skip/allow overlap policies [88.65ms]
+(pass) job contract: deterministic testing job harness > recovers delayed state and completed state across a restart [41.03ms]
+(pass) job contract: deterministic testing job harness > quarantines malformed durable records while preserving valid work [61.88ms]
+(pass) job contract: deterministic testing job harness > cancels an in-flight enqueue before the provider accepts work [10.56ms]
+
+tests/contracts/canonical-contracts.test.ts:
+(pass) canonical contracts > sorts object keys recursively while preserving array order [4.20ms]
+(pass) canonical contracts > rejects invalid JSON values with stable paths [7.10ms]
+(pass) canonical contracts > normalizes explicit IDs and protocol IDs without source paths [6.13ms]
+(pass) canonical contracts > normalizes source locations across roots and separators [0.97ms]
+(pass) canonical contracts > validates one-based source positions with stable errors [1.01ms]
+(pass) canonical contracts > versions graph and manifest shapes independently from v1 protocols [0.04ms]
+
+tests/contracts/redis.test.ts:
+(pass) cache contract: Redis integration > covers get, set, delete, has, getOrSet, and increment [3.22ms]
+(pass) cache contract: Redis integration > uses canonical object keys and deterministic TTL expiry [1.47ms]
+(pass) cache contract: Redis integration > rejects invalid keys, values, and TTLs without replacing a value [1.54ms]
+(pass) cache contract: Redis integration > runs one producer per key for concurrent misses [0.69ms]
+(pass) cache contract: Redis integration > keeps cache observations free of raw keys and values [1.78ms]
+(pass) cache contract: Redis integration > rejects an unavailable increment capability explicitly [1.13ms]
+(pass) cache contract: Redis integration > rejects reads after the provider goes out of service [0.52ms]
+
+tests/contracts/descriptor.test.ts:
+(pass) descriptor contracts > uses the global brand and normalized immutable refs [0.99ms]
+(pass) descriptor contracts > rejects forged or mismatched values and freezes nested cycles [0.38ms]
+(pass) descriptor contracts > flattens task and job members while retaining descriptor identity [9.44ms]
+
+tests/contracts/s3.test.ts:
+(pass) bucket contract: S3 integration > round-trips every operation and metadata [9.01ms]
+(pass) bucket contract: S3 integration > rejects traversal, absolute keys, and policy violations [2.60ms]
+(pass) bucket contract: S3 integration > reports signed URL support through capabilities [1.39ms]
+(pass) bucket contract: S3 integration > rejects operations after the provider goes out of service [1.50ms]
+
+tests/contracts/version-cohort.test.ts:
+(pass) exposes the provider-architecture contract cohort [0.08ms]
+(pass) publishes the native agent stream capability cohort [0.02ms]
+(pass) keeps runtime integration and provider override contracts JSON-safe [0.09ms]
+(pass) rejects a previous runtime-integration plan without a compatibility reader [0.36ms]
+
+ 83 pass
+ 0 fail
+ 579 expect() calls
+Ran 83 tests across 12 files. [2.07s]
+$ bun test ./tests/security
+bun test v1.3.10 (30e609e0)
+
+tests/security/evidence-origin-probe.test.ts:
+(pass) origin evidence probe rejects unapproved destinations before making requests [309.02ms]
+(pass) origin evidence probe preserves HTTP and WebSocket checks for both recorded origins [3082.61ms]
+(pass) origin evidence probe never follows HTTP or WebSocket redirects [1606.42ms]
+
+tests/security/secret-scan.test.ts:
+(pass) recursively scans values and release artifacts without exposing raw matches [10.14ms]
+
+tests/security/source-scan-paths.test.ts:
+(pass) source scans reject symlinks outside their owned roots [3.05ms]
+
+tests/security/redaction/redaction.test.ts:
+(pass) recursively finds no synthetic secret in observable flows or sinks [475.17ms]
+
+ 6 pass
+ 0 fail
+ 56 expect() calls
+Ran 6 tests across 4 files. [6.21s]
+
+Exit code: 0

@@ -1,0 +1,146 @@
+[13:48:15.294] INFO (#1): Packing and installing the candidate fixture
+[13:49:21.337] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 448.869416,
+}
+[13:49:21.805] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 464.730708,
+}
+[13:49:22.259] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 450.790959,
+}
+[13:49:22.734] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 472.619417,
+}
+[13:49:23.251] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 514.735084,
+}
+[13:49:23.706] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 451.777208,
+}
+[13:49:24.155] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 446.894666,
+}
+[13:49:24.955] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 797.886459,
+}
+[13:49:25.558] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 601.205042,
+}
+[13:49:26.052] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 491.557375,
+}
+[13:49:26.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 451.785875,
+}
+[13:49:26.978] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 468.509959,
+}
+[13:49:27.423] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 442.783042,
+}
+[13:49:27.900] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 474.798834,
+}
+[13:49:28.346] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 443.872792,
+}
+[13:49:28.824] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 476.17825,
+}
+[13:49:29.307] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 480.487375,
+}
+[13:49:29.776] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 466.272459,
+}
+[13:49:30.250] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 472.107917,
+}
+[13:49:30.720] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 467.246,
+}
+[13:49:31.205] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 482.548958,
+}
+[13:49:31.217] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.identity",
+  outcome: "success",
+  duration_ms: 12.14775,
+}
+[13:49:31.219] INFO (#1): Packed candidate recorded {
+  path: "/Users/mustafaelsayed/Workspace/relkit/bug-fix-reports/issues/bf-66bc5f16fd0b62c4095cf1e3/evidence/002/restart-attempt-1.json",
+  summary: {
+    runs: 20,
+    medianMs: 434.494729,
+    p95Ms: 559.338958,
+    maximumMs: 754.358208,
+    passed: true,
+    preparationPassed: true,
+  },
+}
+
+Exit code: 0

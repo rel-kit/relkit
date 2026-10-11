@@ -1,0 +1,3 @@
+{"protocol":"relkit.release-check","version":"0.7.4","packages":53,"artifacts":53,"templates":5,"inputFingerprint":"785b865d260524cb86641406377a3bc01c2284a07d90d61dcf47513362140634"}
+
+Exit code: 0

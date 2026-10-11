@@ -1,0 +1,140 @@
+[13:43:48.161] INFO (#1): Packing and installing the candidate fixture
+[13:44:46.738] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 506.47325,
+}
+[13:44:55.844] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 489.519708,
+}
+[13:45:05.382] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 557.70125,
+}
+[13:45:14.951] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 530.910625,
+}
+[13:45:23.979] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 502.066041,
+}
+[13:45:35.404] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 481.541292,
+}
+[13:45:46.370] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 549.791667,
+}
+[13:46:00.110] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 595.128416,
+}
+[13:46:11.500] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 591.125083,
+}
+[13:46:24.805] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 532.194208,
+}
+[13:46:34.676] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 481.460375,
+}
+[13:46:44.009] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 590.514917,
+}
+[13:46:52.727] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 701.8895,
+}
+[13:47:03.420] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 542.22775,
+}
+[13:47:13.153] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 534.201333,
+}
+[13:47:23.137] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 754.888666,
+}
+[13:47:32.614] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 472.066541,
+}
+[13:47:40.975] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 552.746167,
+}
+[13:47:50.365] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 507.805792,
+}
+[13:47:58.847] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 535.856208,
+}
+[13:47:58.867] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.identity",
+  outcome: "success",
+  duration_ms: 19.204625,
+}
+[13:47:58.869] INFO (#1): Packed candidate recorded {
+  path: "/Users/mustafaelsayed/Workspace/relkit/bug-fix-reports/issues/bf-66bc5f16fd0b62c4095cf1e3/evidence/002/fresh-attempt-3.json",
+  summary: {
+    runs: 20,
+    medianMs: 493.7399585,
+    p95Ms: 665.371875,
+    maximumMs: 713.191583,
+    passed: true,
+    preparationPassed: true,
+  },
+}
+
+Exit code: 0

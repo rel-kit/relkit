@@ -1,6 +1,6 @@
 {
   "name": "@relkit/schema",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "RELKIT schema API; prefer @relkit/app/schema in applications.",
   "license": "MIT",
   "repository": {

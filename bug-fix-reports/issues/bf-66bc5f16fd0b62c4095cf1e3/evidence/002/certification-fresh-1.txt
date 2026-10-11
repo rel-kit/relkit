@@ -1,0 +1,4 @@
+[13:06:39.269] INFO (#1): Packing and installing the candidate fixture
+[rtk] bun: process terminated by signal 9
+
+Exit code: 137
