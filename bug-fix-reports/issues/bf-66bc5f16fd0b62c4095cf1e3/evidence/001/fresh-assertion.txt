@@ -1,0 +1,9 @@
+PASS: all 20 actual fresh packed starts return the exact response below 1000ms, with no premature exits or cleanup failures.
+{
+  "runs": 20,
+  "medianMs": 489.40218749999997,
+  "p95Ms": 579.381083,
+  "maximumMs": 777.006458,
+  "passed": true,
+  "preparationPassed": true
+}

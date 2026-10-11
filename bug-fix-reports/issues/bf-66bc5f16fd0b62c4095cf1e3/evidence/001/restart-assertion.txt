@@ -1,0 +1,10 @@
+PASS: all 20 restarts and the retained preparation start return the expected response below1000ms without premature exit or cleanup failure.
+{
+  "runs": 20,
+  "medianMs": 469.3586875,
+  "p95Ms": 554.032292,
+  "maximumMs": 554.307,
+  "passed": true,
+  "preparationPassed": true
+}
+Preparation ms: 685.158291

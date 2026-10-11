@@ -1,0 +1,178 @@
+Command: rtk proxy bun run test:generator
+$ bun run scripts/test-generator.ts
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  9 passed (9)
+      Tests  25 passed (25)
+   Start at  11:58:59
+   Duration  9.47s (tests 57%, transform 30%, import 13%)
+
+  Transform  transforming modules took 2.66s · 30% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+bun test v1.3.10 (30e609e0)
+
+tests/generator/add-acceptance.test.ts:
+(pass) the full bundle compiles in every starter and preserves its graph relationships [10121.11ms]
+(pass) reused Docker profiles retain the post-scaffold startup reminder [2065.25ms]
+(pass) route platform and singleton additions compile in every starter [8403.97ms]
+(pass) database and auth-chained schemas compile for all Bun-native dialects [9814.77ms]
+
+ 4 pass
+ 5 filtered out
+ 0 fail
+ 61 expect() calls
+Ran 4 tests across 1 file. [30.78s]
+acceptance compilation: 30.8s
+bun test v1.3.10 (30e609e0)
+
+tests/generator/add-acceptance.test.ts:
+(pass) API starter integration tests run after adding a full service without Docker [3452.46ms]
+(pass) every standalone add kind compiles in every starter [10277.99ms]
+(pass) tool function creation rejects collisions without changing existing files [12.72ms]
+(pass) snapshots simple, custom, and full service plans [34.90ms]
+(pass) rejects ambiguous services and existing route methods before mutation [17.31ms]
+
+ 5 pass
+ 4 filtered out
+ 0 fail
+ 3 snapshots, 22 expect() calls
+Ran 5 tests across 1 file. [14.25s]
+acceptance additions: 14.3s
+bun test v1.3.10 (30e609e0)
+
+tests/generator/scaffold-catalog.test.ts:
+(pass) keeps scaffold dependency versions aligned with owning manifests [19.84ms]
+
+tests/generator/option-matrix.test.ts:
+(pass) covers every template and examples/install/Git combination [676.50ms]
+(pass) agent starters ship executable native and typed client examples [0.52ms]
+(pass) reports only the create milestones that run [29.66ms]
+(pass) produces byte-identical content from separate destinations [33.41ms]
+
+tests/generator/create-additions.test.ts:
+(pass) asks only final consent and validates the completed project once [16.29ms]
+(pass) retains no-install behavior without offering artifact additions [14.44ms]
+(pass) declined consent creates no stage and preserves cancellation exit 130 [1.60ms]
+(pass) headless creation never invokes prompt authority [13.50ms]
+
+tests/generator/job-dot-access.test.ts:
+(pass) generates name-based job dot access without exposing private jobs [6.94ms]
+
+tests/generator/add-options.test.ts:
+(pass) add option resolution > normalizes friendly names and common defaults [2.38ms]
+(pass) add option resolution > resolves command defaults and repeatable values
+(pass) add option resolution > requires unambiguous headless agent and route choices [0.85ms]
+(pass) add option resolution > supports creating a tool function and rejects conflicting targets [0.02ms]
+(pass) add option resolution > accepts an existing model selector or the offline default [0.10ms]
+
+tests/generator/plan-manifest.test.ts:
+(pass) scaffold preserves @relkit/aws's existing Bun link in dependencies [0.11ms]
+(pass) scaffold preserves @relkit/aws's existing Bun link in devDependencies [0.04ms]
+(pass) scaffold preserves @relkit/better-auth's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/better-auth's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/cloudflare's existing Bun link in dependencies [0.03ms]
+(pass) scaffold preserves @relkit/cloudflare's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/docker's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves @relkit/docker's existing Bun link in devDependencies [0.04ms]
+(pass) scaffold preserves @relkit/effect-mq's existing Bun link in dependencies [0.03ms]
+(pass) scaffold preserves @relkit/effect-mq's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/inngest's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves @relkit/inngest's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/drizzle's existing Bun link in dependencies [0.04ms]
+(pass) scaffold preserves @relkit/drizzle's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/local's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves @relkit/local's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/pulumi's existing Bun link in dependencies [0.03ms]
+(pass) scaffold preserves @relkit/pulumi's existing Bun link in devDependencies
+(pass) scaffold preserves @relkit/redis's existing Bun link in dependencies [0.04ms]
+(pass) scaffold preserves @relkit/redis's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves @relkit/s3's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves @relkit/s3's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves @relkit/trigger's existing Bun link in dependencies [0.03ms]
+(pass) scaffold preserves @relkit/trigger's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves better-auth's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves better-auth's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves drizzle-kit's existing Bun link in dependencies [0.03ms]
+(pass) scaffold preserves drizzle-kit's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves drizzle-orm's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves drizzle-orm's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves langchain's existing Bun link in dependencies [0.01ms]
+(pass) scaffold preserves langchain's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold still rejects conflicting versions and links to another package [0.18ms]
+
+tests/generator/local-workspace.test.ts:
+(pass) local create asks for jobs and final confirmation when other choices are explicit [676.58ms]
+(pass) local create preserves unrelated dependency versions when linking RELKIT packages [14.28ms]
+(pass) local create shares matching native dependencies without changing different versions [20.85ms]
+(pass) local links keep web dependencies local and repair previously linked inspector packages [18.04ms]
+(pass) doctor accepts local RELKIT package links [2.59ms]
+(pass) local add installs workspace integration exports for a full service bundle [5995.73ms]
+(pass) local launcher exposes the shared add API for events and routes [1230.95ms]
+(pass) local launcher and linked CLI hide workspace build output [2426.36ms]
+
+tests/generator/jobs-profiles.test.ts:
+(pass) Docker Jobs starters include the local orchestrator and documented config [59.74ms]
+
+tests/generator/option-matrix-destinations.test.ts:
+(pass) accepts valid names and rejects invalid names without mutation [1.39ms]
+(pass) handles absent, empty, and non-empty destinations atomically [35.00ms]
+(pass) rolls back every pre-rename failure and removes its temporary sibling [85.48ms]
+
+tests/generator/failure-cleanup.test.ts:
+(pass) cleans the staged sibling after an injected copy failure [2.82ms]
+(pass) cleans the staged sibling after an injected substitute failure [13.25ms]
+(pass) cleans the staged sibling after an injected install failure [12.89ms]
+(pass) cleans the staged sibling after an injected git failure [14.93ms]
+(pass) cleans the staged sibling after an injected doctor failure [14.47ms]
+(pass) cleans the staged sibling after an injected check failure [14.64ms]
+(pass) cleans the staged sibling after an injected rename failure [12.37ms]
+(pass) preserves an existing empty destination when publication fails [14.03ms]
+(pass) refuses broad cleanup paths without recursive deletion [0.40ms]
+
+tests/generator/project-discovery.test.ts:
+(pass) scaffold project discovery > appends exports while preserving leading and internal whitespace [5.90ms]
+(pass) scaffold project discovery > discovers canonical services, members, tools, prompts, profiles, and imported env [55.61ms]
+(pass) scaffold project discovery > requires real AWS and Pulumi imports before offering provisioning [2.45ms]
+(pass) scaffold project discovery > plans byte-preserving canonical insertions and refuses unsafe shapes [1.26ms]
+
+tests/generator/installed-cli-create.test.ts:
+(pass) normal CLI installs external projects from packed packages without contributor links [87677.17ms]
+
+tests/generator/local-agent-create.test.ts:
+(pass) candidate acceptance installs and validates the agent starter with shared native packages [22383.61ms]
+(pass) candidate acceptance installs and validates the fullstack starter with shared native packages [37910.75ms]
+
+tests/generator/add-resolver.test.ts:
+(pass) resolves an interactive add through the same normalized request [14.64ms]
+(pass) uses unique services and explicit model selectors headlessly [11.18ms]
+(pass) offers existing functions and function creation when adding a tool [12.16ms]
+(pass) creates a function for a new service and respects explicit creation headlessly [7.49ms]
+(pass) asks for name, template, jobs and destination while keeping silent defaults [1.77ms]
+(pass) rejects unsupported explicit creation flags without any setup question [0.41ms]
+(pass) offers the certified starter template and honors a custom destination [0.41ms]
+(pass) rejects an uncertified inline template after filtering jobs [0.05ms]
+(pass) hides uncertified jobs providers interactively [0.27ms]
+(pass) retains headless defaults without requesting interactive choices [0.20ms]
+
+tests/generator/add-transaction.test.ts:
+(pass) add scaffold transaction > validates with the project CLI instead of an unrelated global install [277.83ms]
+(pass) add scaffold transaction > restores bytes, modes, lockfile, and leaves unrelated dirty files [6.74ms]
+(pass) add scaffold transaction > rolls back validation failure and applies a successful plan [3.64ms]
+(pass) add scaffold transaction > skips checking unavailable packages with no install [1.78ms]
+(pass) add scaffold transaction > refuses project-local symlinks without writing through them [1.35ms]
+
+tests/generator/option-matrix-output.test.ts:
+(pass) normalizes JSON options and keeps generated results JSON-safe [26.81ms]
+(pass) adds AWS and Pulumi only when explicitly selected [20.06ms]
+
+ 93 pass
+ 0 fail
+ 1002 expect() calls
+Ran 93 tests across 16 files. [160.88s]
+other generator: 160.9s
+
+Exit code: 0

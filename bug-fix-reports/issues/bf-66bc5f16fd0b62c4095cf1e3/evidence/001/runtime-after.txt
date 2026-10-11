@@ -1,0 +1,4 @@
+Command: rtk proxy bun run scripts/release-check.ts --ci-pack --allow-dirty --output /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-ci-final-pnh18s3a
+{"protocol":"relkit.release-check","version":"0.7.3","packages":53,"artifacts":53,"templates":5,"inputFingerprint":"e33eaabb5ea1879bf735486901dfcf7a00fcef20357ff1baa379adb4bb547662"}
+
+Exit code: 0

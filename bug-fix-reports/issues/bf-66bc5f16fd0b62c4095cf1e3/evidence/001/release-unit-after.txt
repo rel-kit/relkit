@@ -1,0 +1,8 @@
+Command: rtk bun test tests/unit/release-check.test.ts
+SUMMARY:
+   3 pass
+   0 fail
+  Ran 3 tests across 1 file. [583.00ms]
+
+
+Exit code: 0
