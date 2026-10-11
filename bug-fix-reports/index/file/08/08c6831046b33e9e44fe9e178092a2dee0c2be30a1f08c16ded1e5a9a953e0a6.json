@@ -1,0 +1,30 @@
+{
+  "key": "packages/cli/src/commands/build-server-options.ts",
+  "matches": {
+    "bf-64e1972ee751d5a45e3ef3b8": {
+      "id": "bf-64e1972ee751d5a45e3ef3b8",
+      "status": "verified",
+      "what": "Better Auth endpoints were absent from Scalar, preventing discovery of login before using authenticated todos.",
+      "root_cause": "packages/runtime-hono/src/api-docs.ts served only the graph-derived application document. The raw Better Auth catch-all handler did not contribute its native endpoint schemas, and the generated auth runtime supplied session lookup only.",
+      "fixed_by": "Added lazy native Better Auth schema generation, mounted paths and isolated schema names, merged it into authorized API docs, wired generated and testing auth runtimes, and added same-origin login instructions. Verified browser signup/login and todo CRUD with session cookies.",
+      "files": [
+        "packages/better-auth/src/index.ts",
+        "packages/better-auth/src/openapi.ts",
+        "packages/better-auth/tests/openapi.test.ts",
+        "packages/cli/src/commands/build-server-invocation.ts",
+        "packages/cli/src/commands/build-server-options.ts",
+        "packages/runtime-hono/src/api-docs.ts",
+        "packages/runtime-hono/src/api-docs-auth.ts",
+        "packages/runtime-hono/src/api-docs.types.ts",
+        "packages/runtime-hono/src/auth.ts",
+        "packages/runtime-hono/src/auth.types.ts",
+        "packages/runtime-hono/src/create-rest-app.ts",
+        "packages/runtime-hono/tests/api-docs-auth.test.ts",
+        "packages/testing/src/application-services.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-11T13:47:52+00:00",
+      "report": "bug-fix-reports/issues/bf-64e1972ee751d5a45e3ef3b8/report.md"
+    }
+  }
+}
