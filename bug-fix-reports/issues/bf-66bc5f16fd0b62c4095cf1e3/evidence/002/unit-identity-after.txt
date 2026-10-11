@@ -1,0 +1,13 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/release-check.test.ts:
+(pass) the release certifies default creation using its actual tool identity [3.58ms]
+(pass) accepts the unscoped CLI package and publishes its dependency first [14.07ms]
+(pass) tracked release notes exclude rebuild-dependent tarball hashes [1.22ms]
+
+ 3 pass
+ 0 fail
+ 11 expect() calls
+Ran 3 tests across 1 file. [467.00ms]
+
+Exit code: 0

@@ -1,0 +1,11 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/installed-cli-create.test.ts:
+(pass) normal CLI installs external projects from packed packages without contributor links [151579.89ms]
+
+ 1 pass
+ 0 fail
+ 62 expect() calls
+Ran 1 test across 1 file. [151.63s]
+
+Exit code: 0
