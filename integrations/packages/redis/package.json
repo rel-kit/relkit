@@ -1,6 +1,6 @@
 {
   "name": "@relkit/redis",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Redis integration for RELKIT.",
   "license": "MIT",
   "repository": {

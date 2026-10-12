@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.7.6
+
+### Changes
+
+- feat(generator): bundle RELKIT application skills in every starter
+
 ## 0.7.5
 
 ### Changes

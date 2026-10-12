@@ -1,6 +1,6 @@
 {
   "name": "@relkit/graph",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Unsupported internal RELKIT graph model; use @relkit/app.",
   "license": "MIT",
   "repository": {
