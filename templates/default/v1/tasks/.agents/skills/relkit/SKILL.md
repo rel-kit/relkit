@@ -26,6 +26,7 @@ Read only the reference relevant to the requested change. These examples describ
 - [Database, auth, cache, and storage](references/data-apis.md)
 - [Realtime channels](references/realtime-apis.md)
 - [Observability and tracing](references/observability-apis.md)
+- [Testing functions, routes, and providers](references/testing-apis.md)
 
 ## Working conventions
 
