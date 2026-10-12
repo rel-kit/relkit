@@ -23,6 +23,7 @@ const templateFiles = [
   ".agents/skills/relkit/references/data-apis.md",
   ".agents/skills/relkit/references/realtime-apis.md",
   ".agents/skills/relkit/references/observability-apis.md",
+  ".agents/skills/relkit/references/testing-apis.md",
 ];
 const completeGenerator = [
   ...metadata,

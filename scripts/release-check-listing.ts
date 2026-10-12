@@ -56,6 +56,7 @@ export function assertListing(item: PackageInfo, listing: string[], packed: Reco
         ".agents/skills/relkit/references/data-apis.md",
         ".agents/skills/relkit/references/realtime-apis.md",
         ".agents/skills/relkit/references/observability-apis.md",
+        ".agents/skills/relkit/references/testing-apis.md",
       ])
         if (!listing.includes(`package/dist/templates/default/v1/${template}/${file}`))
           throw new Error(`Packed create-relkit template is missing: ${template}/${file}`);
