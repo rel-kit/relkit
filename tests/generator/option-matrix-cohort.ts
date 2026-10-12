@@ -10,7 +10,7 @@ import { Schema } from "effect";
 import { generateProject } from "../../packages/create-relkit/src/generate.js";
 import appManifest from "../../packages/app/package.json" with { type: "json" };
 import workspaceManifest from "../../package.json" with { type: "json" };
-import { createOptions, contextFor } from "./option-matrix-fixture.js";
+import { createOptions, contextFor, templateRoot } from "./option-matrix-fixture.js";
 import { GeneratedManifest, GeneratedTsconfig } from "./option-matrix.schemas.js";
 import { scanGeneratedProject } from "./option-matrix-scan.js";
 import type { CreationTuple, GeneratedManifestValue } from "./option-matrix.types.js";
@@ -38,6 +38,24 @@ export async function verifyCreationTuple(root: string, selection: CreationTuple
   expect(tsconfig.compilerOptions).toMatchObject({ baseUrl: ".", paths: { "@app/*": ["src/*"] } });
   expect(result.files.some((path) => path.startsWith("src/hello/functions/"))).toBe(true);
   expect(result.files.some((path) => path.startsWith("tests/"))).toBe(examples);
+  for (const path of [
+    ".agents/skills/relkit/SKILL.md",
+    ".agents/skills/relkit/references/cli.md",
+    ".agents/skills/relkit/references/config-environments.md",
+    ".agents/skills/relkit/references/domain-apis.md",
+    ".agents/skills/relkit/references/http-apis.md",
+    ".agents/skills/relkit/references/streaming-apis.md",
+    ".agents/skills/relkit/references/jobs-apis.md",
+    ".agents/skills/relkit/references/agent-apis.md",
+    ".agents/skills/relkit/references/data-apis.md",
+    ".agents/skills/relkit/references/realtime-apis.md",
+    ".agents/skills/relkit/references/observability-apis.md",
+  ]) {
+    expect(result.files).toContain(path);
+    expect(await readFile(join(result.destination, path), "utf8")).toBe(
+      await readFile(join(templateRoot, template, path), "utf8"),
+    );
+  }
   expect(await scanGeneratedProject(result.destination)).toEqual([]);
   verifyCreationCommands(commands, selection);
   if (!install)

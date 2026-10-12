@@ -9,19 +9,46 @@ const catalogAssets = [
 ];
 const metadata = ["package/LICENSE", "package/README.md", "package/package.json"];
 const generator: PackageInfo = { name: "create-relkit", directory: "/fixture", manifest: {} };
+const templateFiles = [
+  "package.json",
+  "gitignore",
+  ".agents/skills/relkit/SKILL.md",
+  ".agents/skills/relkit/references/cli.md",
+  ".agents/skills/relkit/references/config-environments.md",
+  ".agents/skills/relkit/references/domain-apis.md",
+  ".agents/skills/relkit/references/http-apis.md",
+  ".agents/skills/relkit/references/streaming-apis.md",
+  ".agents/skills/relkit/references/jobs-apis.md",
+  ".agents/skills/relkit/references/agent-apis.md",
+  ".agents/skills/relkit/references/data-apis.md",
+  ".agents/skills/relkit/references/realtime-apis.md",
+  ".agents/skills/relkit/references/observability-apis.md",
+];
 const completeGenerator = [
   ...metadata,
   ...catalogAssets,
   ...packedTemplates.flatMap((template) =>
-    ["package.json", "gitignore"].map(
-      (file) => `package/dist/templates/default/v1/${template}/${file}`,
-    ),
+    templateFiles.map((file) => `package/dist/templates/default/v1/${template}/${file}`),
   ),
 ];
 
 test("accepts the complete generator's exact portable catalog source pair", () => {
   expect(() => assertListing(generator, completeGenerator, {})).not.toThrow();
 });
+
+for (const template of packedTemplates)
+  test(`requires the relkit skill in the ${template} template`, () => {
+    const skill = `package/dist/templates/default/v1/${template}/.agents/skills/relkit/SKILL.md`;
+    expect(() =>
+      assertListing(
+        generator,
+        completeGenerator.filter((path) => path !== skill),
+        {},
+      ),
+    ).toThrow(
+      `Packed create-relkit template is missing: ${template}/.agents/skills/relkit/SKILL.md`,
+    );
+  });
 
 test("retains development-file rejection beside approved catalog assets", () => {
   for (const rogue of [

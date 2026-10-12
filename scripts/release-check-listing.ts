@@ -42,7 +42,21 @@ export function assertListing(item: PackageInfo, listing: string[], packed: Reco
       if (!listing.includes(`package/dist/${patch.asset}`))
         throw new Error(`Packed create-relkit patch is missing: ${patch.asset}`);
     for (const template of packedTemplates)
-      for (const file of ["package.json", "gitignore"])
+      for (const file of [
+        "package.json",
+        "gitignore",
+        ".agents/skills/relkit/SKILL.md",
+        ".agents/skills/relkit/references/cli.md",
+        ".agents/skills/relkit/references/config-environments.md",
+        ".agents/skills/relkit/references/domain-apis.md",
+        ".agents/skills/relkit/references/http-apis.md",
+        ".agents/skills/relkit/references/streaming-apis.md",
+        ".agents/skills/relkit/references/jobs-apis.md",
+        ".agents/skills/relkit/references/agent-apis.md",
+        ".agents/skills/relkit/references/data-apis.md",
+        ".agents/skills/relkit/references/realtime-apis.md",
+        ".agents/skills/relkit/references/observability-apis.md",
+      ])
         if (!listing.includes(`package/dist/templates/default/v1/${template}/${file}`))
           throw new Error(`Packed create-relkit template is missing: ${template}/${file}`);
   }
