@@ -1,4 +1,6 @@
+/** Verifies contributor workspace substitution, exact packaged fallback versions and uncancellable native callback ownership. */
 import { expect, it } from "@effect/vitest";
+import cliManifest from "../../package.json" with { type: "json" };
 import { Effect, Fiber, Logger, Ref } from "effect";
 import { ContributorWorkspace } from "../../src/contributor-workspace.service.js";
 import { cliOriginalError } from "../../src/cli-errors.js";
@@ -81,7 +83,9 @@ it.effect("materializes stale web fallbacks while preserving unrelated metadata"
     yield* Effect.flatMap(ContributorWorkspace, (service) => service.rewrite("/app")).pipe(
       Effect.provide(fixture.layer),
     );
-    expect(fixture.project().dependencies?.next).toBe("16.3.6");
+    expect(fixture.project().dependencies?.next).toBe(
+      cliManifest.relkit.buildCatalog.dependencies.next,
+    );
     expect(fixture.project().dependencies?.["@relkit/a"]).toBe("link:@relkit/a");
     expect(fixture.project().custom).toEqual({ keep: [1] });
     expect(fixture.unlinked).toEqual(["/app/node_modules/next"]);

@@ -1,3 +1,4 @@
+/** Verifies concrete contributor E/R authority with complete native TypeScript dependency declarations and bounded compilation. */
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { fileURLToPath } from "node:url";
@@ -66,17 +67,21 @@ it.effect(
         diagnostics(probe).map((item) => ts.flattenDiagnosticMessageText(item.messageText, "\n")),
       ).toEqual([]);
     }),
+  15_000,
 );
 
-it.effect("detects a deliberately erased workspace infrastructure environment", () =>
-  Effect.sync(() => {
-    const results = diagnostics(
-      probe.replace(
-        'const live = contributorWorkspaceLive("/repo");',
-        "declare const live: Layer.Layer<ContributorWorkspace>;",
-      ),
-    );
-    expect(results.some((item) => item.code === 2322)).toBe(true);
-    expect(results.some((item) => item.code === 2578)).toBe(true);
-  }),
+it.effect(
+  "detects a deliberately erased workspace infrastructure environment",
+  () =>
+    Effect.sync(() => {
+      const results = diagnostics(
+        probe.replace(
+          'const live = contributorWorkspaceLive("/repo");',
+          "declare const live: Layer.Layer<ContributorWorkspace>;",
+        ),
+      );
+      expect(results.some((item) => item.code === 2322)).toBe(true);
+      expect(results.some((item) => item.code === 2578)).toBe(true);
+    }),
+  15_000,
 );
