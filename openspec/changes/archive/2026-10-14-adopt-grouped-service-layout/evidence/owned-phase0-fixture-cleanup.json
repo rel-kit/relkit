@@ -1,0 +1,20 @@
+{
+  "protocol": "relkit.grouped-layout.owned-cleanup",
+  "version": 1,
+  "entries": [
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-export-smoke-4iwikT",
+      "birthtime": "2026-10-13T21:11:46.280Z",
+      "mode": 448,
+      "owner": "failed Phase-0 packed export child",
+      "status": "released"
+    },
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-export-smoke-dzJm0L",
+      "birthtime": "2026-10-13T21:15:20.624Z",
+      "mode": 448,
+      "owner": "failed Phase-0 packed export child",
+      "status": "released"
+    }
+  ]
+}

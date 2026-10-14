@@ -1,0 +1,133 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  01:17:45
+   Duration  939ms (transform 53%, import 28%, tests 19%)
+
+bun test v1.3.10 (30e609e0)
+
+tests/phase0.test.ts:
+[22:17:46.500] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 1.457542,
+}
+[22:17:46.503] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.manifest",
+  outcome: "success",
+  duration_ms: 1.003833,
+}
+[22:17:46.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.824584,
+}
+[22:17:46.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.385417,
+}
+[22:17:46.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.342541,
+}
+[22:17:46.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.190208,
+}
+[22:17:46.506] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.320583,
+}
+[22:17:46.506] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.240041,
+}
+[22:17:46.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.244584,
+}
+[22:17:46.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.252708,
+}
+[22:17:46.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.246792,
+}
+[22:17:46.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.185625,
+}
+[22:17:46.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.144709,
+}
+[22:17:46.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.179,
+}
+[22:17:46.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.165,
+}
+[22:17:46.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.196792,
+}
+[22:17:46.514] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 5.577875,
+}
+[22:17:46.516] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 1.80575,
+}
+[22:17:46.516] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 21.419292,
+}
+(pass) Phase 0 guardrails > scope exclusions report each affected path and rule [24.10ms]
+
+ 1 pass
+ 27 filtered out
+ 0 fail
+ 14 expect() calls
+Ran 1 test across 1 file. [259.00ms]
