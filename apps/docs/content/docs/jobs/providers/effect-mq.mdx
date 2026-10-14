@@ -52,24 +52,52 @@ app's PostgreSQL container with the command below; its name ends in `service-pos
 docker ps --filter 'name=service-postgres' --format '{{.Names}} {{.ID}}'
 ```
 
+## Add the Orders boundary
+
+These instructions extend an existing application; they do not create a jobs starter.
+For a grouped minimal app, create `src/services/orders/functions`, `tasks` and `jobs`.
+Add the following boundary and health function. In a compatible flat app, use its
+existing `src/orders/` root consistently instead. If Orders already exists, extend
+its public functions rather than replacing the boundary.
+
+<include cwd lang="ts" meta='title="src/services/orders/service.ts"'>
+  ../../templates/default/v1/tasks/src/services/orders/service.ts
+</include>
+
+<include cwd lang="ts" meta='title="src/services/orders/functions/health.function.ts"'>
+  ../../templates/default/v1/tasks/src/services/orders/functions/health.function.ts
+</include>
+
+Add `src/services/orders/jobs/export-orders.job.ts` from the maintained task fixture:
+
+<include cwd lang="ts" meta='title="src/services/orders/jobs/export-orders.job.ts"'>
+  ../../templates/default/v1/tasks/src/services/orders/jobs/export-orders.job.ts
+</include>
+
+For this provider, set that job's `client.operations` to `["trigger"]` before checking.
+
+The task file below supplies the job's imported target. Create the sample input file
+when absent. Keep existing durable task/job IDs and bump the task version when
+changing an already deployed contract.
+
 ## Read the task before running it
 
-**Replace** the generated `src/orders/tasks/export-orders.task.ts` with this task. It
+**Add or update** `src/services/orders/tasks/export-orders.task.ts` with this task. It
 validates each order line, computes cents without floating-point currency arithmetic, and
 returns CSV text with a total. `retryable` matches Effect MQ's execution model. The IDs and
 SKUs here contain no commas or newlines; escape fields before accepting arbitrary text.
 This fresh app keeps version `1`; bump it after a deployed contract change.
 
-<include cwd lang="ts" meta='title="src/orders/tasks/export-orders.task.ts"'>
+<include cwd lang="ts" meta='title="src/services/orders/tasks/export-orders.task.ts"'>
   ../../apps/docs/examples/jobs/providers/effect-mq-task.ts
 </include>
 
-The generated `src/orders/jobs/export-orders.job.ts` exposes `exportOrders` for triggering.
+The explicit `src/services/orders/jobs/export-orders.job.ts` exposes `exportOrders` for triggering.
 This profile advertises only the `trigger` client operation; do not assume run listing, watch,
 or progress is available through that job client. The CLI below can inspect the accepted run
 through the backend's Jobs API.
 
-**Replace** `examples/export-orders.json` with two order rows. A successful task computes
+**Create or update** `examples/export-orders.json` with two order rows. A successful task computes
 `orderCount: 2`, `totalCents: 2100`, and CSV line totals `900` and `1200`.
 
 <include cwd lang="json" meta='title="examples/export-orders.json"'>
@@ -111,12 +139,13 @@ completed run must have `state = completed` and an `exit` value containing the C
 docker exec <postgres-container-id> psql -U relkit -d relkit -c "select name, state, metadata->>'relkitTaskId' as task_id, exit from effect_mq order by enqueued_at desc limit 1"
 ```
 
-In a fresh local-source run, `jobs list` registered `orders.export-orders-job` and the
+In a historical flat-layout local-source run, `jobs list` registered `orders.export-orders-job` and the
 PostgreSQL row reached `completed` after one attempt. Its native `exit` contained the CSV
 lines and `totalCents: 2100`; `jobs runs list --limit 1` returned the same completed output.
 The screenshot below is PostgreSQL's actual `psql -H` result for that run. It selects the
 task ID from Effect MQ metadata and the order count and total from its stored exit value;
-it is a database query result, not a RELKIT mock or a provider dashboard.
+it is a database query result. This evidence predates the grouped move and does not certify
+a new grouped creation tuple.
 
 ![PostgreSQL query of Effect MQ showing the Orders task completed with two orders and 2100 cents](/jobs-effect-mq-completed.png)
 

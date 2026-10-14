@@ -6,8 +6,12 @@ description: Report typed progress and consume bounded live output.
 Progress is an observation channel, not a second source of truth. Define its shape and emit snapshots from
 the task:
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
-  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  ../../examples/commerce/src/services/orders/tasks/export-orders.task.ts
 </include>
 
 Progress and stream items are limited to 64 KiB. Keep payloads small, include a sequence or cursor when consumers need ordering, and store durable results in the task output or application database.

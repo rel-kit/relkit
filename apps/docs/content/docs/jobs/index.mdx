@@ -18,12 +18,20 @@ Jobs are the public API for work that may outlive the request that started it. D
 
 ## The model
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
-  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  ../../examples/commerce/src/services/orders/tasks/export-orders.task.ts
 </include>
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/jobs/export-orders.job.ts"'>
-  ../../examples/commerce/src/orders/jobs/export-orders.job.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/jobs/export-orders.job.ts"'
+>
+  ../../examples/commerce/src/services/orders/jobs/export-orders.job.ts
 </include>
 
 Tasks own execution code, schemas, retry policy, limits, and hooks. Jobs own the public API name, admission, schedules, service selection, and client projection. The task ID, version, input schema, output schema, and policy are part of the durable identity of a run.

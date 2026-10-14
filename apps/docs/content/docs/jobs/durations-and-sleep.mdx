@@ -6,8 +6,12 @@ description: Bound task duration and use provider-backed durable sleep.
 Set `maxDuration` or `maxElapsed` on the task. Duration values are enforced by the runtime and should be
 shorter than the provider's own request timeout.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
-  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  ../../examples/commerce/src/services/orders/tasks/export-orders.task.ts
 </include>
 
 Durable sleep records a continuation with the provider. A durable task calls
