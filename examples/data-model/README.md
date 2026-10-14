@@ -14,7 +14,7 @@ bun test
 bun run dev
 ```
 
-Drizzle Kit generates migrations from `src/database/schema/index.ts`; the initial
+Drizzle Kit generates migrations from `src/services/database/schema/index.ts`; the initial
 migration is already included. After editing a table, run `bun run db:generate --name=your-change`,
 review the output, then migrate. The service opens a connection; it does not create tables.
 Do not apply the initial migration to an existing database without establishing a baseline.

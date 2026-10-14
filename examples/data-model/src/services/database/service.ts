@@ -1,3 +1,4 @@
+/** Owns lazy SQLite registration and disposal, supplying users-model extensions and an inactive-user lookup override. */
 import { Database } from "bun:sqlite";
 import { defineDrizzleService } from "@relkit/drizzle";
 import { drizzle } from "drizzle-orm/bun-sqlite";

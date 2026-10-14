@@ -1,3 +1,4 @@
+/** Extends the native users model with email-domain selection and an update that conceals missing or inactive rows. */
 import { defineModel, type UpdateArgs } from "@relkit/drizzle";
 import { eq, like } from "drizzle-orm";
 import { users } from "../schema/index.js";

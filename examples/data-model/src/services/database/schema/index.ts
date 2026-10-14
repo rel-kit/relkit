@@ -1,3 +1,4 @@
+/** Registers SQLite users and organization memberships with unique email and organization/user membership identities. */
 import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 // #region users-table
