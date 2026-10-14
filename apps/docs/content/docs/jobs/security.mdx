@@ -7,8 +7,12 @@ Jobs are private unless their `client` policy sets `public: true` or provides `a
 the selected operations are exposed; it does not disable input validation, admission, authorization, or
 output limits.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/jobs/export-orders.job.ts"'>
-  ../../examples/commerce/src/orders/jobs/export-orders.job.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/jobs/export-orders.job.ts"'
+>
+  ../../examples/commerce/src/services/orders/jobs/export-orders.job.ts
 </include>
 
 - Authorize the caller before triggering, reading, watching, cancelling, or retrying a run.

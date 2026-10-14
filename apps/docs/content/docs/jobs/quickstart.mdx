@@ -14,8 +14,12 @@ A task owns durable execution. This one accepts order IDs, emits progress, and r
 Its helper `exportOrderCsv` lives in the commerce example; if adapting the pattern to your app,
 replace that helper with your own business operation and keep its schemas explicit.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
-  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  ../../examples/commerce/src/services/orders/tasks/export-orders.task.ts
 </include>
 
 The task ID and version are stable compatibility identifiers. Change the version when the input or output contract is intentionally incompatible.
@@ -25,8 +29,12 @@ The task ID and version are stable compatibility identifiers. Change the version
 The job gives the task a public name and client policy. The HTTP route below is a separate
 entry point; its handler accepts a run and returns `202`, not the CSV output.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/jobs/export-orders.job.ts"'>
-  ../../examples/commerce/src/orders/jobs/export-orders.job.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/jobs/export-orders.job.ts"'
+>
+  ../../examples/commerce/src/services/orders/jobs/export-orders.job.ts
 </include>
 
 <include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/export/route.ts"'>
