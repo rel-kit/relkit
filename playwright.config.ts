@@ -1,3 +1,4 @@
+/** Configures native Inspector browser acceptance against the application's pinned Next executable and controlled backend, preserving all browser/readiness assertions and deadlines. */
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
@@ -20,7 +21,7 @@ export default defineConfig({
     },
     {
       command:
-        "CI=1 RELKIT_INSPECTOR_DIST_DIR=.relkit/next-e2e NEXT_PUBLIC_RELKIT_BACKEND_URL=http://127.0.0.1:3212 NEXT_PUBLIC_RELKIT_SOURCE_EDITOR=vscode bunx next dev apps/inspector -p 3211",
+        "CI=1 RELKIT_INSPECTOR_DIST_DIR=.relkit/next-e2e NEXT_PUBLIC_RELKIT_BACKEND_URL=http://127.0.0.1:3212 NEXT_PUBLIC_RELKIT_SOURCE_EDITOR=vscode bun run --cwd apps/inspector dev -- --port 3211",
       url: "http://127.0.0.1:3211",
       timeout: 120_000,
       reuseExistingServer: !process.env.CI,
