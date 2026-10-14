@@ -1,3 +1,4 @@
+/** Verifies quiet native Promise edges and configured diagnostic logs/metrics across engine callbacks without changing terminal failure identity. */
 import { expect, it } from "@effect/vitest";
 import type { InvocationRunner } from "@relkit/invocation";
 import { createLoggerLayer, type LogRecord } from "@relkit/runtime-effect";
@@ -46,7 +47,7 @@ it.effect("retains configured logging and isolated metrics across native callbac
         },
       },
       json: false,
-      minimumLevel: "info",
+      minimumLevel: "debug",
     });
     yield* Effect.gen(function* () {
       const operation = makeGeneration().pipe(
@@ -72,6 +73,7 @@ it.effect("retains configured logging and isolated metrics across native callbac
 it("uses the existing invocation runner for engine diagnostics", async () => {
   const records: LogRecord[] = [];
   const layer = createLoggerLayer({
+    minimumLevel: "debug",
     human: {
       write: (_line, record) => {
         records.push(record);
