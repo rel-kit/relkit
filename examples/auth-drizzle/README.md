@@ -24,7 +24,7 @@ valid session. The HTML page exercises these flows without a frontend framework.
 `src/platform/browser-client.ts` is a separate RELKIT transport-header example:
 setting a bearer header does not enable server-side bearer authentication.
 
-Tables live in `src/database/schema/index.ts`. After changing them, run
+Tables live in `src/services/database/schema/index.ts`. After changing them, run
 `bun run db:generate`, review the generated migration, and run `bun run db:migrate`
 against the explicitly selected database. Startup does not create tables. Tests
 migrate a temporary database and clean it up; they never use your local database.
