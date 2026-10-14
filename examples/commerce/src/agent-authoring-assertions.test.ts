@@ -1,16 +1,17 @@
+/** Executes offline native support/delegation tools and checkpointed graph interruption/resume with the original public descriptors. */
 import { expect, test } from "bun:test";
 import { GraphInterruptedError, invokeAgent } from "@relkit/app/agents";
-import deepAgent from "@app/orders/agents/order-deep.agent.js";
-import orderReview from "@app/orders/agents/order-review.agent.js";
-import supportAgent from "@app/orders/agents/order-support.agent.js";
-import cancelOrder from "@app/orders/tools/cancel-order.tool.js";
-import lookupOrder from "@app/orders/tools/lookup-order.tool.js";
-import { orderCheckpoints, orderMemory } from "@app/orders/agents/order-agent-persistence.js";
+import deepAgent from "./services/orders/agents/order-deep.agent.js";
+import orderReview from "./services/orders/agents/order-review.agent.js";
+import supportAgent from "./services/orders/agents/order-support.agent.js";
+import cancelOrder from "./services/orders/tools/cancel-order.tool.js";
+import lookupOrder from "./services/orders/tools/lookup-order.tool.js";
+import { orderCheckpoints, orderMemory } from "./services/orders/agents/order-agent-persistence.js";
 
 const unusedEngine = { invoke: () => Promise.reject(new Error("Unexpected RELKIT tool.")) };
 
 test("native support agent executes mixed tools and publishes todo state", async () => {
-  const values: unknown[] = [];
+  const values: string[] = [];
   await expect(
     invokeAgent({
       agent: supportAgent,
@@ -21,7 +22,7 @@ test("native support agent executes mixed tools and publishes todo state", async
       contentSink: {
         emitOutput: () => undefined,
         emitEvent: (event) => {
-          if (event.kind === "values") values.push(event.value);
+          if (event.kind === "values") values.push(JSON.stringify(event.value));
         },
       },
     }),
@@ -31,12 +32,14 @@ test("native support agent executes mixed tools and publishes todo state", async
     "orders.cancel-order",
     "order_status",
   ]);
-  expect(values).toContainEqual({
-    todos: [
-      { content: "Find the order", status: "completed" },
-      { content: "Explain its state", status: "completed" },
-    ],
-  });
+  expect(values).toContain(
+    JSON.stringify({
+      todos: [
+        { content: "Find the order", status: "completed" },
+        { content: "Explain its state", status: "completed" },
+      ],
+    }),
+  );
 });
 
 test("DeepAgent executes with inherited subagent, skills, memory, and bucket backend", async () => {
