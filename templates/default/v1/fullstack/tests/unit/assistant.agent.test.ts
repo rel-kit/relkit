@@ -1,7 +1,8 @@
+/** Checks assistant.agent through the supported public RELKIT APIs. */
 import { expect, test } from "bun:test";
 import { invokeAgent } from "@relkit/app/agents";
-import assistant from "@app/hello/agents/assistant.agent.js";
-import lookup from "@app/hello/tools/lookup.tool.js";
+import assistant from "@app/services/hello/agents/assistant.agent.js";
+import lookup from "@app/services/hello/tools/lookup.tool.js";
 
 test("assistant runs with native todo middleware and the offline model", async () => {
   expect(assistant.client?.state).toEqual(["todos"]);
