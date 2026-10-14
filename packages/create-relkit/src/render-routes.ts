@@ -1,3 +1,4 @@
+/** Plans HTTP routes, middleware and transforms through typed scaffold filesystem authority. */
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
@@ -43,7 +44,10 @@ export const renderRouteEffect = Effect.fn("Scaffold.renderRoute")(
       if (members && !members.has(member))
         usage(`Service ${target.domain.fileStem} has no public member ${member}.`);
     }
-    yield* builder.createEffect(path, serviceRouteSource(target.domain.fileStem, request.maps));
+    yield* builder.createEffect(
+      path,
+      serviceRouteSource(target.domain.fileStem, request.maps, target.servicePath),
+    );
   },
   (effect) => observeExecution("generator", "planning.renderRoute", scaffoldErrors(effect)),
 );
