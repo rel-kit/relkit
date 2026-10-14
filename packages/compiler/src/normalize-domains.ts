@@ -1,141 +1,44 @@
+/**
+ * Assigns declaration-driven service ownership and validates public membership,
+ * capabilities and dependency direction in one observed compiler stage. The shared
+ * layout retains physical boundaries while source identity remains grouping-neutral.
+ */
 import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import { validateBoundariesEffect } from "./normalize-boundaries.js";
+import { assignDomain, sourcePath } from "./normalize-domain-helpers.js";
+import { indexDomainMembers, assignDomainExposure } from "./normalize-domain-index.js";
 import {
-  assignDomain,
-  collectPublicMembers,
-  domainDiagnostic,
-  domainFor,
-  LEGACY_ROOTS,
-  sourcePath,
-  validateDomainId,
-  validateServiceFileEffect,
-} from "./normalize-domain-helpers.js";
+  normalizationLayoutEffect,
+  validateLayoutSourcesEffect,
+  validateLayoutCapabilities,
+} from "./normalize-domain-layout.js";
 import { validateDomainServicesAndRoutesEffect } from "./normalize-domain-routes.js";
-import { add } from "./normalize-pass-utils.js";
-import {
-  NORMALIZE_CODES,
-  type NormalizedDescriptor,
-  type NormalizationWork,
-} from "./normalize-types.js";
-import { isRecord, refId } from "./normalize-utils.js";
+import type { NormalizationWork } from "./normalize-types.js";
 
 /**
- * Assigns domain ownership and checks domain exports and dependency boundaries.
- * @param work - Invocation-owned descriptors, indexes, and diagnostics.
- * @returns A lazy effect yielding the checked result; findings append to the workspace diagnostics.
- * @remarks Unexpected metadata access failures remain defects.
- * @see {@link normalizeCompilationEffect} for ordered stage composition.
+ * Assigns logical service ownership and checks declaration and import boundaries.
+ * @param work - Invocation-owned descriptor indexes and diagnostic accumulator.
+ * @returns A lazy diagnostic update; syntax/path failures retain their typed channel.
+ * @remarks Direct descriptor normalization without source inputs does not require boundaries.
  */
 export const validateDomainsEffect = Effect.fn("Compiler.validateDomains")(
   function* (work: NormalizationWork) {
     const sources = new Map(
-      (work.input.sources ?? []).map((source) => [sourcePath(source.fileName, work), source.text]),
+      (work.input.sources ?? [])
+        .map((source) => [sourcePath(source.fileName, work), source.text] as const)
+        .filter(([file]) => file !== ""),
     );
-    const domains = new Set<string>();
-    for (const file of sources.keys()) {
-      const domain = domainFor(file);
-      if (domain !== undefined) domains.add(domain);
-    }
-    yield* Effect.forEach(
-      [...domains].sort(),
-      (domain) =>
-        Effect.gen(function* () {
-          if (LEGACY_ROOTS.has(domain)) {
-            domainDiagnostic(
-              work,
-              `src/${domain}`,
-              `Legacy layer-first root "src/${domain}" must become a domain.`,
-            );
-          }
-          if (!/^[a-z][a-z0-9-]*$/.test(domain)) {
-            domainDiagnostic(
-              work,
-              `src/${domain}`,
-              `Domain directory "${domain}" is not a valid domain ID.`,
-            );
-          }
-          yield* validateServiceFileEffect(work, domain, sources.get(`src/${domain}/service.ts`));
-        }),
-      { discard: true },
-    );
-
-    work.descriptors = work.descriptors.map((descriptor) => assignDomain(descriptor));
-    const byId = new Map(
-      work.descriptors.map((descriptor) => [`${descriptor.kind}:${descriptor.id}`, descriptor]),
-    );
-    const publicIds = new Set<string>();
-    const publicErrorIds = new Set<string>();
-    const services = new Map<string, NormalizedDescriptor>();
-
-    for (const descriptor of work.descriptors) {
-      if (descriptor.domainId === undefined) continue;
-      if (descriptor.kind === "service") {
-        const previous = services.get(descriptor.domainId);
-        if (previous !== undefined) {
-          add(
-            work,
-            descriptor,
-            NORMALIZE_CODES.domain,
-            `Domain "${descriptor.domainId}" has multiple services.`,
-            "error",
-            previous,
-          );
-        } else services.set(descriptor.domainId, descriptor);
-        validateDomainId(work, descriptor);
-        collectPublicMembers(work, descriptor, byId, publicIds);
-      } else validateDomainId(work, descriptor);
-    }
-
-    for (const domain of domains) {
-      const service = services.get(domain);
-      if (service === undefined) {
-        domainDiagnostic(
-          work,
-          `src/${domain}/service.ts`,
-          `Domain "${domain}" must export exactly one service.`,
-        );
-        continue;
-      }
-      const artifacts = work.descriptors.filter(
-        (descriptor) => descriptor.domainId === domain && descriptor.kind !== "service",
-      );
-      const capability = isRecord(service.value) ? service.value.capability : undefined;
-      if (artifacts.length === 0 && !isRecord(capability)) {
-        add(
-          work,
-          service,
-          NORMALIZE_CODES.domain,
-          `Domain "${domain}" has no graph-visible artifacts.`,
-        );
-      }
-    }
-
-    for (const descriptor of work.descriptors) {
-      if (descriptor.kind !== "function" || !publicIds.has(`function:${descriptor.id}`)) continue;
-      const value = isRecord(descriptor.value) ? descriptor.value : {};
-      if (Array.isArray(value.errors)) {
-        for (const error of value.errors) {
-          const errorId = refId(error);
-          if (errorId !== undefined) publicErrorIds.add(errorId);
-        }
-      }
-    }
-    work.descriptors = work.descriptors.map((descriptor) => ({
-      ...descriptor,
-      ...(["function", "event", "error"].includes(descriptor.kind)
-        ? {
-            exposure:
-              publicIds.has(`${descriptor.kind}:${descriptor.id}`) ||
-              publicErrorIds.has(descriptor.id)
-                ? ("public" as const)
-                : ("internal" as const),
-          }
-        : {}),
-    }));
+    const layout = yield* normalizationLayoutEffect(work, sources);
+    const hasSourceEvidence = work.input.sources !== undefined;
+    if (hasSourceEvidence) yield* validateLayoutSourcesEffect(work, layout, sources);
+    work.descriptors = work.descriptors.map((descriptor) => assignDomain(descriptor, layout));
+    const members = indexDomainMembers(work);
+    if (hasSourceEvidence) validateLayoutCapabilities(work, layout, members.services);
+    assignDomainExposure(work, members.publicIds);
     yield* validateDomainServicesAndRoutesEffect(work, sources);
-    yield* validateBoundariesEffect(work, sources, services);
+    yield* validateBoundariesEffect(work, sources, members.services, layout);
   },
   (effect, work) =>
     observeCompiler("normalization", "validateDomains", effect, () => ({
@@ -145,12 +48,10 @@ export const validateDomainsEffect = Effect.fn("Compiler.validateDomains")(
 );
 
 /**
- * Assigns domain ownership and checks domain exports and dependency boundaries.
- * @param work - Invocation-owned descriptors, indexes, and diagnostics.
- * @returns The checked result after executing the Effect at the compatibility boundary.
- * @remarks Unexpected metadata access failures remain defects.
- * @see {@link normalizeCompilationEffect} for ordered stage composition.
+ * Executes service validation at the existing synchronous compatibility boundary.
+ * @param work - Invocation-owned normalization state and diagnostics.
+ * @returns Nothing; compiler findings update only this invocation's state.
  */
 export function validateDomains(work: NormalizationWork): void {
-  return runCompilerSync(validateDomainsEffect(work));
+  runCompilerSync(validateDomainsEffect(work));
 }
