@@ -1,3 +1,4 @@
+/** Defines auth navigation and native Better Auth example relations; catalog construction acquires no auth or database client. */
 import { feature, type ApiPackage } from "./documentation-catalog.js";
 
 export const authFeature = feature(
@@ -7,7 +8,7 @@ export const authFeature = feature(
   "auth/index",
   "better-auth",
   [["packages/better-auth/src/index.ts", "defineBetterAuthService"]],
-  ["examples/auth-drizzle/src/auth/service.ts"],
+  ["examples/auth-drizzle/src/services/auth/service.ts"],
 );
 
 export const authGuideGroup = {
@@ -30,17 +31,17 @@ export const authGuideRelations = [
   {
     path: "auth/index",
     api: ["better-auth", "services"],
-    examples: ["examples/auth-drizzle/src/auth/service.ts"],
+    examples: ["examples/auth-drizzle/src/services/auth/service.ts"],
   },
   {
     path: "auth/better-auth",
     api: ["better-auth", "drizzle", "config"],
-    examples: ["examples/auth-drizzle/src/auth/service.ts"],
+    examples: ["examples/auth-drizzle/src/services/auth/service.ts"],
   },
   {
     path: "auth/sessions",
     api: ["better-auth", "functions"],
-    examples: ["examples/auth-drizzle/src/account/functions/session.function.ts"],
+    examples: ["examples/auth-drizzle/src/services/account/functions/session.function.ts"],
   },
   {
     path: "auth/protect-routes",
@@ -59,8 +60,8 @@ export const authGuideRelations = [
     path: "auth/customization",
     api: ["better-auth", "drizzle"],
     examples: [
-      "examples/auth-drizzle/src/auth/service.ts",
-      "examples/auth-drizzle/src/database/schema/index.ts",
+      "examples/auth-drizzle/src/services/auth/service.ts",
+      "examples/auth-drizzle/src/services/database/schema/index.ts",
     ],
   },
   {
