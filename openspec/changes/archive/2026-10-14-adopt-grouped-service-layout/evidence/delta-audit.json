@@ -1,0 +1,250 @@
+{
+  "protocol": "relkit.grouped-layout.delta-audit",
+  "version": 1,
+  "complete": true,
+  "deltas": [
+    {
+      "spec": "openspec/changes/adopt-grouped-service-layout/specs/domain-services/spec.md",
+      "sha256": "9215df82b85d4821a800a486ae3416f50cf710f9f79d3518f46bcd250eb3c72e",
+      "requirements": [
+        "Every graph-visible domain has one service boundary",
+        "Cross-domain imports use service boundaries",
+        "Applications select one service layout from authored evidence"
+      ],
+      "scenarios": [
+        "Domain descriptors are discovered",
+        "Helpers and specialized services are discovered",
+        "Grouping or nested boundary is authored",
+        "Internal module is imported across domains",
+        "Allowed service dependency is used",
+        "Helper attempts a layer escape",
+        "All normative obligations are evaluated",
+        "Flat application contains an empty grouping directory",
+        "Mixed layout contains different names",
+        "Same domain exists twice",
+        "Empty application or removed layer-first form is supplied"
+      ],
+      "review": "complete source reviewed through EOF; remaining normative-obligation scenarios included",
+      "checks": [
+        "workspace-full10",
+        "native-commerce-consistency",
+        "native-specialized-pair",
+        "native-security",
+        "native-migration-vitest-final"
+      ],
+      "disposition": "Shared authored-evidence classifier handles flat/grouped/empty roots and ownership; native compiler rejection coverage preserves missing/mixed/duplicate/nested/aggregate/case/traversal/symlink and import-direction rules. Helpers remain opaque, conventions remain warnings, specialized services retain their APIs."
+    },
+    {
+      "spec": "openspec/changes/adopt-grouped-service-layout/specs/compiler-graph/spec.md",
+      "sha256": "a9c2296edabdf3b974efad39635d62ca6916bddfb67b4f2fb5bb348a5ffbdae1",
+      "requirements": [
+        "Source-scoped IDs are derived deterministically",
+        "Incremental compilation preserves full-build truth",
+        "Layout interpretation is consistent and path safe",
+        "Boundary analysis resolves supported source dependencies",
+        "Platform configuration fragments retain explicit composition"
+      ],
+      "scenarios": [
+        "Route ID is inferred",
+        "Function ID is inferred",
+        "Service member ID is inferred",
+        "Error ID is inferred",
+        "Inference is ambiguous",
+        "Two IDs collide",
+        "Complete service moves beneath grouping directory",
+        "One descriptor changes during watch mode",
+        "Layout or an imported support module changes",
+        "All normative obligations are evaluated",
+        "Portable path forms are supplied",
+        "Path alias escapes or duplicates ownership",
+        "Only a convention differs",
+        "All normative obligations are evaluated",
+        "Alias or literal dynamic import targets internals",
+        "Dynamic target cannot be resolved",
+        "All normative obligations are evaluated",
+        "Explicit provider fragment is imported",
+        "Unimported fragment or environment example exists"
+      ],
+      "review": "complete source reviewed through EOF; remaining normative-obligation scenarios included",
+      "checks": [
+        "workspace-full10",
+        "native-compiler-navigation",
+        "native-commerce-consistency",
+        "native-development",
+        "native-prepared-cohort",
+        "native-config-environment"
+      ],
+      "disposition": "Identity-neutral source projection retains full logical contracts and real physical paths. Native paired probes verify executable lookup and offline/Pulumi mock identities; clean/session bytes agree for each final state. Static aliases/.js/type/barrel/literal dependencies enforce actual owners; computed targets disclose limits. Platform fragments are explicitly imported and compilation activates no providers."
+    },
+    {
+      "spec": "openspec/changes/adopt-grouped-service-layout/specs/cli-scaffolding/spec.md",
+      "sha256": "6c1c1751a1d045f17540708f5e46ae8d04bbcf12a4963400d6c08f556862f80d",
+      "requirements": [
+        "Generated templates teach service composition",
+        "Add commands preserve the selected application layout",
+        "Layout migration starts with a read-only preview",
+        "Applied layout migration is coordinated and recoverable",
+        "Migration results follow the CLI contract"
+      ],
+      "scenarios": [
+        "API template is generated",
+        "Minimal template is generated",
+        "Fullstack template is exercised",
+        "All normative obligations are evaluated",
+        "Artifact is added to an existing application",
+        "Database or auth is added",
+        "Middleware is added or layout is mixed",
+        "All normative obligations are evaluated",
+        "Flat application is previewed",
+        "Computed tooling path is found",
+        "Migration is repeated",
+        "All normative obligations are evaluated",
+        "Staged application changes identity",
+        "Write conflicts with user edits",
+        "Publication fails partway through",
+        "Rollback encounters a later edit",
+        "All normative obligations are evaluated",
+        "Headless migration fails"
+      ],
+      "review": "complete source reviewed through EOF; remaining normative-obligation scenarios included",
+      "checks": [
+        "workspace-generator",
+        "native-jobs-profiles",
+        "native-no-examples",
+        "native-migration-vitest-final",
+        "packed-final-consumer",
+        "packed-final-docker",
+        "workspace-full10"
+      ],
+      "disposition": "Create uses grouped backend roots; add preserves valid flat roots and specialized singleton contracts. Native Git/non-Git preview/write/conflict/failure/crash/rollback/no-op tests and packed flows verify complete moves, staged logical checks, exact bytes/modes, local restricted receipts, JSON/exit statuses, and protected persistent resources. Fullstack frontend/wrapper and public certification remain unchanged."
+    },
+    {
+      "spec": "openspec/changes/adopt-grouped-service-layout/specs/development-inspector/spec.md",
+      "sha256": "664c9dd77ef8c30d55b0801856a7999344e2a02115b7457fb3708ad48caf0fd4",
+      "requirements": [
+        "Inspector presents the domain model",
+        "Layout rebuilds preserve active behavior and persistent state"
+      ],
+      "scenarios": [
+        "Developer inspects a domain",
+        "Grouped generation replaces flat source",
+        "All normative obligations are evaluated",
+        "Watch observes an incomplete manual move",
+        "Compatible move is restarted"
+      ],
+      "review": "complete source reviewed through EOF; remaining normative-obligation scenarios included",
+      "checks": [
+        "native-development",
+        "native-prepared-cohort",
+        "native-environment-persistence",
+        "native-restart-final",
+        "native-compiler-navigation",
+        "native-browser-pair",
+        "workspace-full10"
+      ],
+      "disposition": "Actual CLI watch and prepared cohorts preserve last-valid serving behavior, persistent state, accepted-work identities and atomic activation. Source navigation consumes matching-generation metadata; no source scanning or services identity prefix. Paired native dev hosts and full Inspector browser suite pass."
+    },
+    {
+      "spec": "openspec/changes/adopt-grouped-service-layout/specs/developer-documentation/spec.md",
+      "sha256": "8e6e0725684e4f2407998108514e79f2bc2421bb690a19982abbc9cddefd8dcc",
+      "requirements": [
+        "Domain service migration is documented and executable",
+        "Application placement reference distinguishes rules from guidance",
+        "Repository skills match the implemented application layout"
+      ],
+      "scenarios": [
+        "Existing application is migrated",
+        "Valid flat application adopts grouping",
+        "All normative obligations are evaluated",
+        "Developer locates an existing capability",
+        "Developer configures the environment",
+        "Examples and generated guidance are verified",
+        "All normative obligations are evaluated",
+        "Application skill is followed after implementation",
+        "Supporting skill asset contains a stale path",
+        "Migration instructions are followed"
+      ],
+      "review": "complete source reviewed through EOF; remaining normative-obligation scenarios included",
+      "checks": [
+        "workspace-full10",
+        "native-docs-late",
+        "workspace-generator",
+        "packed-final-consumer",
+        "packed-final-docker",
+        "skill-frontmatter-final",
+        "skill-links-final"
+      ],
+      "disposition": "Directory/config/environment/optional migration guides distinguish enforced boundaries from warnings and ordinary TypeScript helpers. Three repository skills plus five distributed bundles teach certified grouped creation, supported flat additions, safe preview/write/rollback and unchanged public descriptors. Generic/global/third-party skills and archived history have explicit no-change dispositions."
+    },
+    {
+      "spec": "openspec/changes/adopt-grouped-service-layout/specs/acceptance-verification/spec.md",
+      "sha256": "b7ee16ec92d8c0340cecc9a08d504205558508a3101111682cfa35d041c9abd1",
+      "requirements": [
+        "Domain-first services have layered release evidence",
+        "Grouped layout compatibility has executable paired evidence",
+        "Runtime and security behavior survives service movement",
+        "Migration and development failure paths are demonstrated",
+        "Grouped distribution refreshes affected certification",
+        "Every changed authored file receives use-effect review",
+        "Skill update acceptance is part of layout completion"
+      ],
+      "scenarios": [
+        "Breaking release is verified",
+        "All normative obligations are evaluated",
+        "Source-only move is compared",
+        "Structural and import rejection matrix runs",
+        "All normative obligations are evaluated",
+        "Authorization parity is exercised",
+        "Accepted work and threads survive the move",
+        "All normative obligations are evaluated",
+        "Migration fails after publication begins",
+        "Incremental and clean builds are compared",
+        "All normative obligations are evaluated",
+        "Template digest changes",
+        "Fullstack candidate is valid but uncertified",
+        "All normative obligations are evaluated",
+        "A supporting file changes late",
+        "Effect imports exist but behavior is unverified",
+        "A file requires no runtime Effect implementation",
+        "All normative obligations are evaluated",
+        "Framework tests pass but skill guidance is stale"
+      ],
+      "review": "complete source reviewed through EOF; remaining normative-obligation scenarios included",
+      "checks": [
+        "workspace-full10",
+        "native-phase0",
+        "native-phase0-ownership",
+        "native-security",
+        "native-specialized-pair",
+        "native-restart-final",
+        "native-compiler-navigation",
+        "native-development",
+        "native-browser-pair",
+        "packed-final-consumer",
+        "packed-final-docker",
+        "capability-current-evidence",
+        "source-audit-final",
+        "skill-frontmatter-final",
+        "skill-links-final"
+      ],
+      "disposition": "Native, repository, packed, exact-identity 20 fresh plus 20 restart readiness and per-file review are separate evidence layers. All startup samples pass the unchanged 1000ms threshold; failed attempts remain retained. Real AWS acceptance stays separately unrun. Pure/public/native SDK/type/schema/UI/docs/generated responsibilities are explicitly reconciled."
+    }
+  ],
+  "noRedesignBoundaries": [
+    "Public descriptor and specialized database/auth APIs preserved",
+    "Valid flat roots remain supported; migration is optional and preview-first",
+    "Logical/durable/deployed resource identity unchanged by source movement",
+    "No paid model/provider calls or real cloud resource acquisition",
+    "No root checkout Git mutations; no global or third-party skill rewrites",
+    "Fullstack wrapper/frontend and uncertified public tuple refusals preserved"
+  ],
+  "impactInventory": "../evidence.md#inventory-and-boundaries",
+  "noChangeConsumers": [
+    "compiler arbitrary-depth manifest/context/reference consumers",
+    "logical client/public manifest and runtime-effect/runtime-hono contracts",
+    "Inspector graph/topology/source-link consumers",
+    "offline deployment logical ownership and integration object keys",
+    "generic Effect/konsistent/OpenSpec/Vitest/Turborepo/TypeScript skills"
+  ],
+  "supportingAuthoredInventory": "rg --files --hidden --no-ignore with explicit dependency/vendor/build/generated/binary exclusions; final authored reconciliation includes all changed hidden guidance, companions, tests and operational helpers"
+}

@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "id": "adopt-grouped-service-layout",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 42
+    }
+  ],
+  "summary": {
+    "totals": {
+      "items": 1,
+      "passed": 1,
+      "failed": 0
+    },
+    "byType": {
+      "change": {
+        "items": 1,
+        "passed": 1,
+        "failed": 0
+      }
+    }
+  },
+  "version": "1.0",
+  "root": {
+    "path": "/Users/mustafaelsayed/Workspace/relkit",
+    "source": "nearest"
+  }
+}
