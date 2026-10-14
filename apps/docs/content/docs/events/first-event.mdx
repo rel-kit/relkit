@@ -11,7 +11,7 @@ Create the files shown below. If your app already has the Orders example, update
   <Step>
     ### Define the event
 
-    <include cwd lang="ts" meta='title="src/orders/events/order-created.event.ts"'>
+    <include cwd lang="ts" meta='title="src/services/orders/events/order-created.event.ts"'>
       ../../apps/docs/examples/events/order-created.event.ts
     </include>
 
@@ -23,13 +23,13 @@ Create the files shown below. If your app already has the Orders example, update
 
     Add a pricing function. For this example, each item costs 100 cents:
 
-    <include cwd lang="ts" meta='title="src/orders/functions/price-order.function.ts"'>
-      ../../templates/default/v1/api/src/orders/functions/price-order.function.ts
+    <include cwd lang="ts" meta='title="src/services/orders/functions/price-order.function.ts"'>
+      ../../templates/default/v1/api/src/services/orders/functions/price-order.function.ts
     </include>
 
     Create the order and publish its details:
 
-    <include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
+    <include cwd lang="ts" meta='title="src/services/orders/functions/create-order.function.ts"'>
       ../../apps/docs/examples/events/create-order.function.ts
     </include>
 
@@ -39,7 +39,7 @@ Create the files shown below. If your app already has the Orders example, update
   <Step>
     ### Consume the event
 
-    <include cwd lang="ts" meta='title="src/orders/functions/order-confirmation.function.ts"'>
+    <include cwd lang="ts" meta='title="src/services/orders/functions/order-confirmation.function.ts"'>
       ../../apps/docs/examples/events/order-confirmation.function.ts
     </include>
 
@@ -51,8 +51,8 @@ Create the files shown below. If your app already has the Orders example, update
 
     Expose the order-creating function through an Orders service. If you already have this service, add these members alongside your existing ones:
 
-    <include cwd lang="ts" meta='title="src/orders/service.ts"'>
-      ../../templates/default/v1/api/src/orders/service.ts
+    <include cwd lang="ts" meta='title="src/services/orders/service.ts"'>
+      ../../templates/default/v1/api/src/services/orders/service.ts
     </include>
 
     Connect it to `POST /orders`:
@@ -89,7 +89,7 @@ Create the files shown below. If your app already has the Orders example, update
 In a second terminal, open your app's root directory and copy the consumer:
 
 ```sh
-cp src/orders/functions/order-confirmation.function.ts src/orders/functions/order-analytics.function.ts
+cp src/services/orders/functions/order-confirmation.function.ts src/services/orders/functions/order-analytics.function.ts
 ```
 
 Change the copy's `id` to `orders.analytics` and its log message to `order.analytics.recorded`. Keep `event: "orders.created"`.

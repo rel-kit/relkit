@@ -7,8 +7,8 @@ description: Decide how long values stay useful and remove them when the origina
 
 A time to live (**TTL**) is how long a cached value can be reused. The prices cache uses one minute by default:
 
-<include cwd lang="ts" meta='title="src/orders/cache/prices.cache.ts"'>
-  ../../examples/commerce/src/orders/cache/prices.cache.ts
+<include cwd lang="ts" meta='title="src/services/orders/cache/prices.cache.ts"'>
+  ../../examples/commerce/src/services/orders/cache/prices.cache.ts
 </include>
 
 To use a shorter lifetime for one write, call `await context.cache.prices.set({ sku: "book" }, 1200, { ttlMs: 10_000 })`. `getOrSet()` accepts the same options as its third argument when saving a newly loaded value.

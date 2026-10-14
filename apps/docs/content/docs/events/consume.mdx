@@ -12,7 +12,7 @@ bun run relkit add event-function "On Order Created" --service orders \
   --event orders.created --delivery durable
 ```
 
-Creates `src/orders/functions/on-order-created.function.ts`. `--event` selects an existing
+Creates `src/services/orders/functions/on-order-created.function.ts`. `--event` selects an existing
 event by ID, binding, or filename. The default delivery is `durable`; choose `transient` for
 non-durable delivery. `--profile` selects a compatible event provider profile. In a terminal,
 omitted choices are prompted; headless execution needs an unambiguous event target.
@@ -24,9 +24,9 @@ For every subscriber scaffolding flag, see the [CLI reference](/docs/operations/
 
 ## Create a subscriber
 
-Use `defineEventFunction` to run work when an event is published. After [defining `orders.created`](/docs/events/define), create `src/orders/functions/order-confirmation.function.ts`:
+Use `defineEventFunction` to run work when an event is published. After [defining `orders.created`](/docs/events/define), create `src/services/orders/functions/order-confirmation.function.ts`:
 
-<include cwd lang="ts" meta='title="src/orders/functions/order-confirmation.function.ts"'>
+<include cwd lang="ts" meta='title="src/services/orders/functions/order-confirmation.function.ts"'>
   ../../apps/docs/examples/events/order-confirmation.function.ts
 </include>
 
