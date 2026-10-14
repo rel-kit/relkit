@@ -1,4 +1,5 @@
-import hello from "@app/hello/functions/hello.function.js";
+/** Exposes the hello function as a read-only greeting tool with its existing two-second timeout. */
+import hello from "@app/services/hello/functions/hello.function.js";
 
 export default hello.asTool({
   id: "hello.lookup",
