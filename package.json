@@ -26,7 +26,7 @@
     "test:e2e": "bun run scripts/test-e2e.ts",
     "test:generator": "bun run scripts/test-generator.ts",
     "test:scaffold": "RELKIT_TEST_DOCKER=1 bun run scripts/pack-and-smoke-create-relkit.ts",
-    "test:examples": "bunx turbo run check typecheck test build --filter='./examples/*'",
+    "test:examples": "bunx turbo run check typecheck test build --filter='./examples/*' --concurrency=1",
     "test:docs": "bunx turbo run check test --filter=@relkit/docs",
     "test:deployment": "bun test ./tests/deployment",
     "test:aws-integration": "bun test ./tests/deployment/aws-integration.test.ts",
