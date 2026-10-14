@@ -1,7 +1,7 @@
+/** Verifies published documentation against maintained source, layout and catalogs. */
 import { expect, test } from "bun:test";
 import { readFile, readdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { features } from "../scripts/feature-catalog.js";
 import { apiPackageDefinitions } from "../scripts/documentation-catalog.js";
 import { exampleDefinitions, primaryCapabilities } from "../components/landing/data.js";
 import {
@@ -10,8 +10,7 @@ import {
   renderRelated,
 } from "../scripts/generate-guides.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
-import { getCliHelpModel } from "@relkit/cli/help";
-
+import { markdownFiles } from "./documentation-fixture.js";
 const content = resolve(import.meta.dir, "../content/docs");
 
 test("publishes authored, CLI, and application-facing API documentation", async () => {
@@ -102,165 +101,10 @@ test("documents current Docker-backed service versions from integration source",
     const recipe = await readFile(resolve(import.meta.dir, "../../..", source), "utf8");
     const image = recipe.match(/"([^\"]+@sha256:[a-f0-9]{64})"/)?.[1];
     expect(image).toBeDefined();
-    const [tag, digest] = image!.split("@");
-    expect(guide).toContain(tag!);
-    expect(guide).toContain(digest!);
+    if (!image) throw new Error("Recipe has no pinned image");
+    const [tag, digest] = image.split("@");
+    if (!tag || !digest) throw new Error("Recipe has an invalid image");
+    expect(guide).toContain(tag);
+    expect(guide).toContain(digest);
   }
 });
-
-test("keeps guides backed by executable examples and self-hosted discovery", async () => {
-  const files = await markdownFiles(content);
-  const routes = await readFile(resolve(content, "http/routes.mdx"), "utf8");
-  const events = await readFile(resolve(content, "events/define.mdx"), "utf8");
-  const listeners = await readFile(resolve(content, "events/consume.mdx"), "utf8");
-  expect(routes).toContain("examples/commerce/src/routes/orders/[orderId]/route.ts");
-  expect(events).toContain("apps/docs/examples/events/order-created.event.ts");
-  expect(listeners).toContain("apps/docs/examples/events/order-confirmation.function.ts");
-  expect(await Bun.file(resolve(import.meta.dir, "../app/api/search/route.ts")).text()).toContain(
-    "createFromSource(source)",
-  );
-  expect(await Bun.file(resolve(import.meta.dir, "../app/llms.txt/route.ts")).text()).toContain(
-    "llms(source).index()",
-  );
-
-  for (const file of files.filter((file) => !file.includes("/api/"))) {
-    const contents = await readFile(file, "utf8");
-    for (const block of contents.matchAll(/^```(?:ts|tsx)[^\n]*\n([\s\S]*?)^```/gm)) {
-      expect(block[1]?.split("\n").length).toBeLessThanOrEqual(36);
-    }
-  }
-
-  for (const removedBundle of [
-    "start/check-build-deploy.mdx",
-    "fundamentals/schemas-errors-context.mdx",
-    "http/uploads-middleware-rate-limits.mdx",
-    "http/responses-openapi-clients.mdx",
-    "resources-ai/buckets-cache.mdx",
-    "resources-ai/tools-agents.mdx",
-    "async/events.mdx",
-    "async/jobs.mdx",
-    "async/listeners.mdx",
-    "async/schedules.mdx",
-    "fundamentals/providers.mdx",
-    "fundamentals/services.mdx",
-    "fundamentals/domain-first-migration.mdx",
-  ]) {
-    expect(files).not.toContain(resolve(content, removedBundle));
-  }
-});
-
-test("keeps current guidance on the domain-first application layout", async () => {
-  const createPage = resolve(content, "start/create-an-app.mdx");
-  const currentSources = [
-    ...(await markdownFiles(content)).filter((file) => !file.includes("/api/")),
-    ...(await sourceFiles(resolve(import.meta.dir, "../examples/landing"))),
-    resolve(import.meta.dir, "../../../docs/getting-started.md"),
-    resolve(import.meta.dir, "../../../docs/testing.md"),
-  ];
-  const legacyPath =
-    /(?:^|[\s"'`(])(?:src\/(?:env\.ts|(?:functions|events|services|agents|jobs|cache|buckets|tools|middleware|transforms|shared)(?:\/|\b))|@app\/(?:functions|events|services|agents|jobs|cache|buckets|tools|middleware|transforms|shared)(?:\/|\b))/m;
-
-  for (const file of currentSources) {
-    expect(await readFile(file, "utf8")).not.toMatch(legacyPath);
-  }
-
-  const createSource = await readFile(createPage, "utf8");
-  expect(createSource).toContain("src/hello/service.ts");
-  expect(createSource).toContain("src/routes/hello/route.ts");
-  expect(createSource).not.toContain("src/services/");
-});
-
-test("builds and starts from the repository root on Railway", async () => {
-  const manifest = (await Bun.file(resolve(import.meta.dir, "../package.json")).json()) as {
-    scripts: Record<string, string>;
-  };
-  const railway = (await Bun.file(resolve(import.meta.dir, "../../../railway.json")).json()) as {
-    build: { builder: string; dockerfilePath: string };
-    deploy: { startCommand: string; healthcheckPath: string };
-  };
-
-  expect(manifest.scripts.start).toBe("next start --hostname 0.0.0.0");
-  expect(railway.build).toEqual({
-    builder: "DOCKERFILE",
-    dockerfilePath: "Dockerfile.docs",
-  });
-  expect(railway.deploy).toMatchObject({
-    startCommand: "bun --cwd=apps/docs run start",
-    healthcheckPath: "/docs",
-  });
-});
-
-test("derives capability and related-guide content from the typed catalogs", async () => {
-  const capabilities = renderCapabilities();
-  for (const feature of features) {
-    expect(capabilities).toContain(feature.title);
-    expect(capabilities).toContain(`/docs/${feature.guide}`);
-    expect(capabilities).toContain(`/docs/api/${feature.apiPackage}`);
-  }
-
-  for (const relation of guideRelations) {
-    const generated = await readFile(
-      resolve(content, `../generated/related/${relation.path.replaceAll("/", "-")}.mdx`),
-      "utf8",
-    );
-    expect(generated).toBe(renderRelated(relation));
-    expect(generated).toContain("Do not edit");
-  }
-
-  const create = getCliHelpModel("test").commands.find(({ name }) => name === "create")!;
-  const generatedOptions = await readFile(
-    resolve(content, "../generated/create-options.mdx"),
-    "utf8",
-  );
-  expect(renderCommandOptions(create)).toContain("Generated by apps/docs/scripts/generate.ts");
-  for (const option of create.options) expect(generatedOptions).toContain(`--${option.name}`);
-
-  const coverage = (await Bun.file(resolve(content, "../generated/coverage.json")).json()) as {
-    features: { id: string }[];
-    guides: { path: string }[];
-  };
-  expect(coverage.features.map(({ id }) => id)).toEqual(features.map(({ id }) => id));
-  expect(coverage.guides.map(({ path }) => path)).toEqual(guideRelations.map(({ path }) => path));
-});
-
-test("keeps learning guides focused and actionable", async () => {
-  const directories = new Set<string>(guideGroups.map(({ directory }) => directory));
-  for (const { directory, pages } of guideGroups.filter(
-    ({ directory }) => directory !== "operations",
-  )) {
-    for (const page of pages) {
-      if (directories.has(`${directory}/${page}`)) continue;
-      const source = await readFile(resolve(content, directory, `${page}.mdx`), "utf8");
-      expect(source).toMatch(/^---\ntitle: .+\ndescription: .+\n---/);
-      expect(source).not.toContain("content/generated/add-");
-      expect(source).not.toContain("packages/client/jobs-watch.test.ts");
-      expect(source).not.toContain("packages/client/src/react/pending.ts");
-      const focusedGuide =
-        ["events", "storage", "caching", "ai"].includes(directory) ||
-        (directory === "async" && ["events", "listeners"].includes(page));
-      if (focusedGuide) {
-        expect(source).not.toContain("content/generated/related/");
-      } else {
-        expect(source).toContain(
-          `content/generated/related/${directory.replaceAll("/", "-")}-${page}.mdx`,
-        );
-      }
-    }
-  }
-});
-
-async function markdownFiles(directory: string): Promise<string[]> {
-  const found: string[] = [];
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    const path = join(directory, entry.name);
-    if (entry.isDirectory()) found.push(...(await markdownFiles(path)));
-    else if (/\.mdx?$/.test(entry.name)) found.push(path);
-  }
-  return found;
-}
-
-async function sourceFiles(directory: string): Promise<string[]> {
-  return (await readdir(directory, { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".ts"))
-    .map((entry) => join(directory, entry.name));
-}

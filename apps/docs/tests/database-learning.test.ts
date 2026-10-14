@@ -1,3 +1,4 @@
+/** Checks authored database guidance and grouped native examples through finite synchronous read-only source assertions. */
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -6,6 +7,10 @@ import { databaseGuideGroup } from "../scripts/database-guide-catalog.js";
 import { features } from "../scripts/feature-catalog.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
+/** Reads one owned database guide at the native synchronous test boundary.
+ * @param page - Database guide path selected by this suite.
+ * @returns Original guide text; missing input fails the native test.
+ */
 const read = (page: string) => readFileSync(resolve(content, `database/${page}.mdx`), "utf8");
 test("connects Database guides and the generated Drizzle reference", () => {
   const groups = guideGroups.map(({ directory }) => directory);
@@ -38,14 +43,14 @@ test("uses application workflows and Drizzle Kit rather than SQL bootstrap or te
   expect(tutorial).toContain("existing RELKIT app");
   for (const path of [
     "src/platform/env.ts",
-    "src/database/service.ts",
-    "src/database/schema/index.ts",
-    "src/database/models/users.model.ts",
-    "src/users/functions/list-users.function.ts",
-    "src/users/service.ts",
+    "src/services/database/service.ts",
+    "src/services/database/schema/index.ts",
+    "src/services/database/models/users.model.ts",
+    "src/services/users/functions/list-users.function.ts",
+    "src/services/users/service.ts",
     "src/routes/users/route.ts",
-    "src/users/functions/register-member.function.ts",
-    "src/users/functions/update-user-email.function.ts",
+    "src/services/users/functions/register-member.function.ts",
+    "src/services/users/functions/update-user-email.function.ts",
     "drizzle.config.ts",
   ])
     expect(tutorial).toContain(`../../examples/data-model/${path}`);
@@ -62,7 +67,7 @@ test("uses application workflows and Drizzle Kit rather than SQL bootstrap or te
     if (page !== "testing") expect(source).not.toMatch(/\.\.\/\.\.\/examples\/[^\n]+\.test\.ts/);
   }
   const service = readFileSync(
-    resolve(content, "../../../../examples/data-model/src/database/service.ts"),
+    resolve(content, "../../../../examples/data-model/src/services/database/service.ts"),
     "utf8",
   );
   expect(service).not.toMatch(/\.exec\(|create table/i);
@@ -91,7 +96,9 @@ test("explains generated data shapes and Better Auth's native-client boundary", 
     expect(schemas).toContain(name);
   expect(schemas).toContain("not the complete CRUD argument wrapper");
   expect(schemas).toContain("does not automatically run these Zod schemas");
-  expect(read("transactions")).toContain("src/users/functions/register-member.function.ts");
+  expect(read("transactions")).toContain(
+    "src/services/users/functions/register-member.function.ts",
+  );
   const auth = read("better-auth");
   expect(auth).toContain("native Drizzle client");
   expect(auth).toContain("Do not set `database` or `basePath`");
