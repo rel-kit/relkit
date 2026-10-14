@@ -1,5 +1,6 @@
+/** Finds descriptor syntax after portable paths and native source ownership are verified. */
 import { observeCompiler } from "../observability.js";
-import { normalizeSourcePathEffect } from "@relkit/contracts";
+import { normalizeAuthoredModulesEffect } from "./source-path-policy.js";
 import { Effect } from "effect";
 import { DEFAULT_TOOLING_CONFIG } from "../config-loader-types.js";
 import { matchesExcludeEffect, scanSourceEffect } from "./ast-prefilter-utils.js";
@@ -39,13 +40,7 @@ export type {
 export const prefilterSourcesEffect = Effect.fn("Discovery.prefilterSources")(
   function* (modules: readonly AstSourceModule[], options: AstPrefilterOptions = {}) {
     const excludes = options.exclude ?? DEFAULT_TOOLING_CONFIG.exclude;
-    const ordered = yield* Effect.forEach(modules, (module) =>
-      Effect.map(normalizeSourcePathEffect(module.fileName, options.projectRoot), (fileName) => ({
-        fileName,
-        text: module.text,
-      })),
-    );
-    ordered.sort((left, right) => left.fileName.localeCompare(right.fileName));
+    const ordered = yield* normalizeAuthoredModulesEffect(modules, options.projectRoot);
     const candidates: AstPrefilterCandidate[] = [];
     const skipped: AstPrefilterSkipped[] = [];
     yield* Effect.forEach(

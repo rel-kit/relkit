@@ -1,4 +1,13 @@
-import { normalizeIdEffect, normalizeSourcePathEffect } from "@relkit/contracts";
+/**
+ * Derives logical descriptor hierarchy independently of source provenance. The
+ * grouped service container is projected away before existing category/binding
+ * rules run; diagnostics and executable module references retain physical paths.
+ */
+import {
+  normalizeIdEffect,
+  normalizeSourcePathEffect,
+  serviceIdentityPath,
+} from "@relkit/contracts";
 import { Effect } from "effect";
 import { observeCompiler } from "../observability.js";
 import type { SourceFactoryKind } from "./source-facts-types.js";
@@ -35,7 +44,7 @@ const KIND_RULES: Readonly<Record<SourceFactoryKind, KindRule>> = {
 export const sourcePartsEffect = Effect.fn("discovery.identity.source-parts")(
   function* (source: string, kind: SourceFactoryKind, projectRoot: string | undefined) {
     const normalized = yield* relativeSourceEffect(source, projectRoot);
-    const parts = normalized.split("/").filter(Boolean);
+    const parts = serviceIdentityPath(normalized).split("/").filter(Boolean);
     if (parts[0] === "src") parts.shift();
     const rule = KIND_RULES[kind];
     if (kind === "route" && parts[0] === "routes") parts.shift();
@@ -88,7 +97,8 @@ const relativeSourceEffect = Effect.fn("discovery.identity.relative-source")(fun
 export const finishEffect = Effect.fn("discovery.identity.finish")(
   function* (parts: readonly string[]) {
     const value = join(parts);
-    return value === undefined ? undefined : yield* normalizeIdEffect(value);
+    if (value === undefined) return undefined;
+    return yield* normalizeIdEffect(value);
   },
   (effect, parts) =>
     observeCompiler("discovery", "finish", effect, () => ({ entries: parts.length }), false),
