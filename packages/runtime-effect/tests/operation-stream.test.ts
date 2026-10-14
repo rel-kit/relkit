@@ -1,3 +1,4 @@
+/** Verifies lazy native stream telemetry, terminal cause preservation and owned cancellation cleanup with explicit diagnostic sink policy. */
 import { expect, it } from "@effect/vitest";
 import { Cause, Deferred, Effect, Exit, Fiber, Metric, Stream } from "effect";
 import { TestClock } from "effect/testing";
@@ -79,6 +80,7 @@ it.effect("starts stream observation lazily and joins terminal duration", () =>
       Effect.provideService(Metric.MetricRegistry, new Map()),
       Effect.provide(
         createLoggerLayer({
+          minimumLevel: "debug",
           human: { write: (_line, record) => records.push(record) },
           json: false,
         }),
@@ -116,6 +118,7 @@ it.effect("keeps failure and defect causes while observing stream outcomes", () 
     }).pipe(
       Effect.provide(
         createLoggerLayer({
+          minimumLevel: "debug",
           human: { write: (_line, record) => records.push(record) },
           json: false,
         }),
