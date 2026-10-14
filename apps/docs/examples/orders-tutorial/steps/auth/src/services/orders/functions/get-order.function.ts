@@ -1,3 +1,4 @@
+/** Reads a validated order ID only within the authenticated user's ownership and returns a concealed missing result otherwise. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
 export default defineFunction({

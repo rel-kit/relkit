@@ -1,3 +1,4 @@
+/** Registers tutorial order ownership columns alongside native Better Auth user/session/account/verification tables. */
 import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const orders = sqliteTable("orders", {
@@ -20,6 +21,7 @@ export const user = sqliteTable("user", {
   image: text(),
   ...timestamps,
 });
+
 export const session = sqliteTable("session", {
   id: text().primaryKey(),
   expiresAt: integer({ mode: "timestamp" }).notNull(),
@@ -29,6 +31,7 @@ export const session = sqliteTable("session", {
   userId: text().notNull(),
   ...timestamps,
 });
+
 export const account = sqliteTable(
   "account",
   {
@@ -48,6 +51,7 @@ export const account = sqliteTable(
   },
   (table) => [uniqueIndex("account_issuer_account_id").on(table.issuer, table.accountId)],
 );
+
 export const verification = sqliteTable("verification", {
   id: text().primaryKey(),
   identifier: text().notNull(),

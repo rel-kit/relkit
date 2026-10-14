@@ -1,6 +1,7 @@
+/** Prices validated order input and persists it with the authenticated session user's ownership. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
-import priceOrder from "@app/orders/functions/price-order.function.js";
+import priceOrder from "@app/services/orders/functions/price-order.function.js";
 const order = z.object({
   orderId: z.string().min(1),
   sku: z.string().min(1),

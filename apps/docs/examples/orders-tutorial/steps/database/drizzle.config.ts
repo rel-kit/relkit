@@ -1,3 +1,4 @@
+/** Configures native tutorial schema migrations against grouped order tables and an explicitly selected SQLite file. */
 import { defineConfig } from "drizzle-kit";
 
 const path = process.env.DATABASE_PATH;
@@ -6,7 +7,7 @@ if (path === undefined || path.trim() === "" || path === ":memory:") {
 }
 
 export default defineConfig({
-  schema: "./src/database/schema/index.ts",
+  schema: "./src/services/database/schema/index.ts",
   dialect: "sqlite",
   out: "./drizzle",
   dbCredentials: { url: path },

@@ -1,3 +1,4 @@
+/** Declares email/password Better Auth using the configured URL and the sole database owner's native tables. */
 import { defineBetterAuthService } from "@relkit/better-auth";
 
 export default defineBetterAuthService({
