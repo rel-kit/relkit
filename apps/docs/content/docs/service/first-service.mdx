@@ -1,25 +1,25 @@
 ---
 title: Your first service
-description: Trace the API starter's Orders function through its public service and HTTP route.
+description: Trace the Orders extension's function through its public service and HTTP route.
 ---
 
-Use the `relkit-orders` app from [Create and run an application](/docs/start/create-an-app).
+Use the `relkit-orders` app after [adding the Orders endpoint](/docs/start/first-route).
 You will identify which file owns pricing, which operations the Orders service exposes, and
-how a route reaches them. These files already exist in the API starter; read them before
-changing anything. Run commands from the app root.
+how a route reaches them. That chapter adds these maintained API-candidate sources to the certified
+minimal starter; it does not require an uncertified creation tuple. Run commands from the app root.
 
 ## Keep behavior in the Orders domain
 
-`src/orders/functions/create-order.function.ts` validates an order request and asks
+`src/services/orders/functions/create-order.function.ts` validates an order request and asks
 `priceOrder` to calculate the total. It does not parse an HTTP request:
 
-<include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
-  ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
+<include cwd lang="ts" meta='title="src/services/orders/functions/create-order.function.ts"'>
+  ../../templates/default/v1/api/src/services/orders/functions/create-order.function.ts
 </include>
 
 The function can be called from HTTP, a job, or another function. Its input and output
-schemas apply on every invocation. The starter's focused unit test invokes it without
-starting a server:
+schemas apply on every invocation. Create `tests/unit/orders.function.test.ts` with this focused
+candidate test to invoke it without starting a server:
 
 <include cwd lang="ts" meta='title="tests/unit/orders.function.test.ts"'>
   ../../templates/default/v1/api/tests/unit/orders.function.test.ts
@@ -27,12 +27,12 @@ starting a server:
 
 ## Expose only selected operations
 
-The existing `src/orders/service.ts` selects the functions that other parts of the app may
+The existing `src/services/orders/service.ts` selects the functions that other parts of the app may
 call. `priceOrder` and `createOrder` remain separate operations, so changing a price rule
 does not require moving it into a route:
 
-<include cwd lang="ts" meta='title="src/orders/service.ts"'>
-  ../../templates/default/v1/api/src/orders/service.ts
+<include cwd lang="ts" meta='title="src/services/orders/service.ts"'>
+  ../../templates/default/v1/api/src/services/orders/service.ts
 </include>
 
 The compiler discovers this service from source. You do not add it to a registration array.
@@ -50,6 +50,9 @@ identity and ownership.
 
 From `relkit-orders`, run:
 
+Create `tests/integration/orders.route.test.ts` from the [HTTP route test](/docs/http/first-route)
+before running its command below. These tests are Orders extensions, not files shipped by minimal.
+
 ```sh
 bun run check
 bun run typecheck
@@ -57,7 +60,7 @@ bun test tests/unit/orders.function.test.ts
 bun test tests/integration/orders.route.test.ts
 ```
 
-Expect all four commands to succeed in the fresh starter. The unit test checks the reusable
+Expect all four commands to succeed after adding the Orders sources and tests. The unit test checks the reusable
 operation; the HTTP test checks the public route's status and body. Continue with
 [the endpoint chapter](/docs/start/first-route) to change pricing and verify the result.
 
