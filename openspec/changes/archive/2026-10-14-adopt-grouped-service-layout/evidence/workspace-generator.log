@@ -1,0 +1,3069 @@
+$ bun run scripts/test-generator.ts
+generator strict services: 4.3s
+[22:15:13.122] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 4319.649208,
+}
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  10 passed (10)
+      Tests  28 passed (28)
+   Start at  22:15:13
+   Duration  8.06s (tests 66%, import 18%, transform 15%)
+
+    Isolate  10 workers spawned · ~51ms startup each (spawn + environment, per file)
+             at least ~457ms faster with isolate: false — reuses workers across files instead of one per file
+
+generator Effect services: 8.5s
+[22:15:21.588] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 8462.098917,
+}
+
+tests/generator/add-kind-acceptance.test.ts:
+
+tests/generator/add-acceptance.test.ts:
+
+tests/generator/add-platform-acceptance.test.ts:
+(pass) route platform and singleton additions compile in every starter [10996.53ms]
+(pass) database and auth-chained schemas compile for all Bun-native dialects [16361.18ms]
+
+tests/generator/add-resource-acceptance.test.ts:
+(pass) reused Docker profiles retain the post-scaffold startup reminder [3745.00ms]
+
+tests/generator/add-bundle-acceptance.test.ts:
+(pass) the full bundle compiles in every starter and preserves its graph relationships [10693.24ms]
+
+ 4 pass
+ 5 filtered out
+ 0 fail
+ 61 expect() calls
+Ran 4 tests across 5 files. [42.24s]
+bun test v1.3.10 (30e609e0)
+[19:15:21.957] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.9185,
+}
+[19:15:21.959] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.929125,
+}
+[19:15:21.971] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 12.094292,
+}
+[19:15:22.016] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 44.138542,
+}
+[19:15:22.033] INFO (#78): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 16.729375,
+}
+[19:15:22.049] INFO (#94): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 16.566666,
+}
+[19:15:22.077] INFO (#112): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 28.155375,
+}
+[19:15:22.114] INFO (#143): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 36.253708,
+}
+[19:15:22.115] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.427542,
+}
+[19:15:22.115] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.191417,
+}
+[19:15:22.115] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.160167,
+}
+[19:15:22.115] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.143708,
+}
+[19:15:22.115] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.159041,
+}
+[19:15:22.116] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.174875,
+}
+[19:15:22.116] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.164917,
+}
+[19:15:22.116] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.131416,
+}
+[19:15:22.116] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.160125,
+}
+[19:15:22.116] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.194542,
+}
+[19:15:22.117] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.120333,
+}
+[19:15:22.117] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.118625,
+}
+[19:15:22.117] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.216834,
+}
+[19:15:24.790] INFO (#502): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.183625,
+}
+[19:15:24.791] INFO (#502): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.926458,
+}
+[19:15:24.795] INFO (#502): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.819458,
+}
+[19:15:24.821] INFO (#504): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 25.927958,
+}
+[19:15:24.845] INFO (#533): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.374958,
+}
+[19:15:24.869] INFO (#563): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.806292,
+}
+[19:15:24.899] INFO (#595): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.006917,
+}
+[19:15:24.935] INFO (#640): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 35.748917,
+}
+[19:15:24.936] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.403917,
+}
+[19:15:24.936] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.165917,
+}
+[19:15:24.936] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.121,
+}
+[19:15:24.936] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.120125,
+}
+[19:15:24.936] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.129541,
+}
+[19:15:24.937] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.123167,
+}
+[19:15:24.937] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.104,
+}
+[19:15:24.937] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.094292,
+}
+[19:15:24.937] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.093584,
+}
+[19:15:24.937] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.16575,
+}
+[19:15:24.937] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099958,
+}
+[19:15:24.937] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122667,
+}
+[19:15:24.938] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.2075,
+}
+[19:15:27.050] INFO (#1240): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.271334,
+}
+[19:15:27.051] INFO (#1240): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.974458,
+}
+[19:15:27.054] INFO (#1240): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.83225,
+}
+[19:15:27.075] INFO (#1242): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 20.28625,
+}
+[19:15:27.095] INFO (#1263): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 20.422375,
+}
+[19:15:27.119] INFO (#1285): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.985459,
+}
+[19:15:27.151] INFO (#1309): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.049833,
+}
+[19:15:27.183] INFO (#1346): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.308875,
+}
+[19:15:27.183] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.312375,
+}
+[19:15:27.183] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.142666,
+}
+[19:15:27.184] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.225625,
+}
+[19:15:27.184] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.192875,
+}
+[19:15:27.184] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.193542,
+}
+[19:15:27.184] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.123791,
+}
+[19:15:27.184] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.123417,
+}
+[19:15:27.185] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.132791,
+}
+[19:15:27.185] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.176958,
+}
+[19:15:27.185] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.204542,
+}
+[19:15:27.185] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.14325,
+}
+[19:15:27.186] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.179209,
+}
+[19:15:27.186] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.170959,
+}
+[19:15:29.574] INFO (#1907): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.343542,
+}
+[19:15:29.575] INFO (#1907): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.410041,
+}
+[19:15:29.579] INFO (#1907): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.596334,
+}
+[19:15:29.608] INFO (#1909): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.165792,
+}
+[19:15:29.635] INFO (#1930): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 26.582334,
+}
+[19:15:29.683] INFO (#1952): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 47.513375,
+}
+[19:15:29.720] INFO (#1976): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 37.41175,
+}
+[19:15:29.759] INFO (#2013): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 39.106958,
+}
+[19:15:29.760] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.294208,
+}
+[19:15:29.761] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.98525,
+}
+[19:15:29.761] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.247792,
+}
+[19:15:29.761] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.157708,
+}
+[19:15:29.762] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.125208,
+}
+[19:15:29.762] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.178917,
+}
+[19:15:29.762] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.111333,
+}
+[19:15:29.762] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.177833,
+}
+[19:15:29.763] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.224833,
+}
+[19:15:29.763] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.24,
+}
+[19:15:29.763] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.145833,
+}
+[19:15:29.763] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.447292,
+}
+[19:15:29.767] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 3.137583,
+}
+[19:15:32.927] INFO (#2542): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.35625,
+}
+[19:15:32.935] INFO (#2542): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 8.312125,
+}
+[19:15:32.943] INFO (#2542): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 7.372625,
+}
+[19:15:32.950] INFO (#2542): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.597958,
+}
+[19:15:32.952] INFO (#2543): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.594833,
+}
+[19:15:32.953] INFO (#2543): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.781125,
+}
+[19:15:32.957] INFO (#2543): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.536541,
+}
+[19:15:32.976] INFO (#2546): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 18.767084,
+}
+[19:15:32.976] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.22925,
+}
+[19:15:32.976] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.101917,
+}
+[19:15:32.976] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095125,
+}
+[19:15:32.976] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126583,
+}
+[19:15:32.977] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095208,
+}
+[19:15:32.977] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.149334,
+}
+[19:15:32.977] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.194708,
+}
+[19:15:32.977] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.101583,
+}
+[19:15:32.977] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09625,
+}
+[19:15:32.977] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.15725,
+}
+[19:15:32.977] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.103375,
+}
+[19:15:32.978] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.152375,
+}
+[19:15:32.978] INFO (#2571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.158084,
+}
+[19:15:37.291] INFO (#2794): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.407208,
+}
+[19:15:37.292] INFO (#2794): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.182541,
+}
+[19:15:37.311] INFO (#2794): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 17.988625,
+}
+[19:15:37.404] INFO (#2796): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 93.093167,
+}
+[19:15:37.404] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.415542,
+}
+[19:15:37.405] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.552708,
+}
+[19:15:37.406] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.377625,
+}
+[19:15:37.406] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.270583,
+}
+[19:15:37.407] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.674791,
+}
+[19:15:37.407] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.244291,
+}
+[19:15:37.407] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.147,
+}
+[19:15:37.408] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.189917,
+}
+[19:15:37.409] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 1.092834,
+}
+[19:15:37.410] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.424333,
+}
+[19:15:37.410] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.276,
+}
+[19:15:37.411] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.733084,
+}
+[19:15:37.412] INFO (#2826): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.65575,
+}
+[19:15:39.847] INFO (#3099): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.398833,
+}
+[19:15:39.848] INFO (#3099): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.070125,
+}
+[19:15:39.875] INFO (#3099): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 27.00325,
+}
+[19:15:39.895] INFO (#3101): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 19.508459,
+}
+[19:15:39.895] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.378042,
+}
+[19:15:39.895] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.120917,
+}
+[19:15:39.896] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.128334,
+}
+[19:15:39.896] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.146209,
+}
+[19:15:39.896] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.11175,
+}
+[19:15:39.896] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.100959,
+}
+[19:15:39.896] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.094875,
+}
+[19:15:39.896] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.14775,
+}
+[19:15:39.897] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.12025,
+}
+[19:15:39.897] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.260875,
+}
+[19:15:39.897] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.160917,
+}
+[19:15:39.897] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1495,
+}
+[19:15:39.897] INFO (#3126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.190875,
+}
+[19:15:43.627] INFO (#3348): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.265042,
+}
+[19:15:43.628] INFO (#3348): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.749959,
+}
+[19:15:43.634] INFO (#3348): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 5.540166,
+}
+[19:15:43.674] INFO (#3350): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 40.09175,
+}
+[19:15:43.674] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.403875,
+}
+[19:15:43.675] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.162459,
+}
+[19:15:43.675] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.12275,
+}
+[19:15:43.675] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.179666,
+}
+[19:15:43.675] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.154459,
+}
+[19:15:43.675] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.132792,
+}
+[19:15:43.676] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.138041,
+}
+[19:15:43.676] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.20675,
+}
+[19:15:43.676] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.141667,
+}
+[19:15:43.676] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.254,
+}
+[19:15:43.676] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.182208,
+}
+[19:15:43.677] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.177958,
+}
+[19:15:43.677] INFO (#3380): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.245167,
+}
+[19:15:45.629] INFO (#3652): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.194375,
+}
+[19:15:45.630] INFO (#3652): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.649625,
+}
+[19:15:45.633] INFO (#3652): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.781917,
+}
+[19:15:45.651] INFO (#3654): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 18.825292,
+}
+[19:15:45.652] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.305292,
+}
+[19:15:45.652] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.106,
+}
+[19:15:45.652] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.117166,
+}
+[19:15:45.652] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105792,
+}
+[19:15:45.652] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.115959,
+}
+[19:15:45.653] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.104084,
+}
+[19:15:45.653] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099167,
+}
+[19:15:45.653] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092667,
+}
+[19:15:45.653] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.141541,
+}
+[19:15:45.653] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.171458,
+}
+[19:15:45.653] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.129041,
+}
+[19:15:45.653] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.125334,
+}
+[19:15:45.654] INFO (#3679): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.233583,
+}
+[19:15:47.360] INFO (#3901): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.201458,
+}
+[19:15:47.361] INFO (#3901): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.684666,
+}
+[19:15:47.364] INFO (#3901): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.872834,
+}
+[19:15:47.388] INFO (#3903): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.695458,
+}
+[19:15:47.388] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.293,
+}
+[19:15:47.388] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1195,
+}
+[19:15:47.388] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.104542,
+}
+[19:15:47.388] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126292,
+}
+[19:15:47.389] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.128792,
+}
+[19:15:47.389] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.117333,
+}
+[19:15:47.389] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.139875,
+}
+[19:15:47.389] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.153625,
+}
+[19:15:47.389] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.136666,
+}
+[19:15:47.390] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.203375,
+}
+[19:15:47.390] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.138084,
+}
+[19:15:47.390] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.115208,
+}
+[19:15:47.390] INFO (#3933): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.212375,
+}
+[19:15:49.283] INFO (#4205): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.618208,
+}
+[19:15:49.290] INFO (#4205): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.154125,
+}
+[19:15:49.296] INFO (#4205): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.048084,
+}
+[19:15:49.301] INFO (#4205): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 4.950958,
+}
+[19:15:49.307] INFO (#4205): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.515416,
+}
+[19:15:49.312] INFO (#4205): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.408292,
+}
+[19:15:49.317] INFO (#4206): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.228042,
+}
+[19:15:49.318] INFO (#4206): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.789583,
+}
+[19:15:49.349] INFO (#4206): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 31.19975,
+}
+[19:15:49.391] INFO (#4209): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 42.345959,
+}
+[19:15:49.673] INFO (#4397): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 74.731708,
+}
+[19:15:49.673] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.341208,
+}
+[19:15:49.674] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.192208,
+}
+[19:15:49.674] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.158458,
+}
+[19:15:49.674] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.258459,
+}
+[19:15:49.674] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.220667,
+}
+[19:15:49.675] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.188667,
+}
+[19:15:49.675] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.153875,
+}
+[19:15:49.675] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.162125,
+}
+[19:15:49.675] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.167875,
+}
+[19:15:49.676] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.300333,
+}
+[19:15:49.676] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.198375,
+}
+[19:15:49.676] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.165667,
+}
+[19:15:49.676] INFO (#4454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.216125,
+}
+[19:15:53.061] INFO (#5843): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 9.22575,
+}
+[19:15:53.073] INFO (#5844): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.326792,
+}
+[19:15:53.074] INFO (#5844): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.801875,
+}
+[19:15:53.080] INFO (#5844): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 5.782291,
+}
+[19:15:53.112] INFO (#5847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.169167,
+}
+[19:15:53.112] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.280334,
+}
+[19:15:53.119] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 6.084292,
+}
+[19:15:53.119] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.3675,
+}
+[19:15:53.119] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.193209,
+}
+[19:15:53.120] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.180083,
+}
+[19:15:53.120] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.157,
+}
+[19:15:53.120] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.176125,
+}
+[19:15:53.120] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.138167,
+}
+[19:15:53.120] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.137208,
+}
+[19:15:53.120] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.190417,
+}
+[19:15:53.121] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.165958,
+}
+[19:15:53.121] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.152875,
+}
+[19:15:53.121] INFO (#5884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.216208,
+}
+[19:15:55.070] INFO (#6748): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.260916,
+}
+[19:15:55.071] INFO (#6748): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.937,
+}
+[19:15:55.077] INFO (#6748): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 5.534667,
+}
+[19:15:55.118] INFO (#6750): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 41.071125,
+}
+[19:15:55.118] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.259125,
+}
+[19:15:55.119] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.124208,
+}
+[19:15:55.119] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.102875,
+}
+[19:15:55.119] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.104833,
+}
+[19:15:55.119] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.107334,
+}
+[19:15:55.119] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.109833,
+}
+[19:15:55.119] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.131791,
+}
+[19:15:55.120] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.188083,
+}
+[19:15:55.120] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.129542,
+}
+[19:15:55.120] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.192791,
+}
+[19:15:55.120] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.114125,
+}
+[19:15:55.120] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.132417,
+}
+[19:15:55.120] INFO (#6801): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.199625,
+}
+[19:15:57.130] INFO (#7913): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.254583,
+}
+[19:15:57.131] INFO (#7913): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.013834,
+}
+[19:15:57.134] INFO (#7913): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.346291,
+}
+[19:15:57.176] INFO (#7915): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 42.780375,
+}
+[19:15:57.177] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.42025,
+}
+[19:15:57.177] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.154708,
+}
+[19:15:57.177] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.155292,
+}
+[19:15:57.178] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.139625,
+}
+[19:15:57.179] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.848083,
+}
+[19:15:57.179] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1305,
+}
+[19:15:57.179] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.12375,
+}
+[19:15:57.179] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.132625,
+}
+[19:15:57.179] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.110125,
+}
+[19:15:57.179] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.164541,
+}
+[19:15:57.179] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.125125,
+}
+[19:15:57.180] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.114125,
+}
+[19:15:57.180] INFO (#7956): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.163958,
+}
+[19:15:59.688] INFO (#8996): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.278041,
+}
+[19:15:59.691] INFO (#8996): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.960875,
+}
+[19:15:59.714] INFO (#8996): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 23.679,
+}
+[19:15:59.755] INFO (#8998): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 40.715792,
+}
+[19:15:59.756] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.208417,
+}
+[19:15:59.756] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.094625,
+}
+[19:15:59.756] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09,
+}
+[19:15:59.756] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122125,
+}
+[19:15:59.756] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.102125,
+}
+[19:15:59.756] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.101834,
+}
+[19:15:59.757] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.091792,
+}
+[19:15:59.757] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.085958,
+}
+[19:15:59.757] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.114167,
+}
+[19:15:59.757] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1415,
+}
+[19:15:59.757] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09025,
+}
+[19:15:59.757] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.089125,
+}
+[19:15:59.757] INFO (#9039): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.137208,
+}
+[19:16:03.811] INFO (#10079): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 7.996584,
+}
+[19:16:03.818] INFO (#10079): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 7.596083,
+}
+[19:16:03.829] INFO (#10079): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 10.462959,
+}
+[19:16:03.836] INFO (#10079): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 7.071417,
+}
+acceptance compilation: 42.3s
+[22:16:03.934] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 42272.511042,
+}
+bun test v1.3.10 (30e609e0)
+[19:16:04.372] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.154959,
+}
+[19:16:04.377] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.711667,
+}
+[19:16:04.391] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 13.589041,
+}
+[19:16:04.440] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 48.698333,
+}
+[19:16:04.461] INFO (#78): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 20.7935,
+}
+[19:16:04.485] INFO (#96): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.939125,
+}
+[19:16:04.507] INFO (#122): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.917959,
+}
+[19:16:04.539] INFO (#145): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.302542,
+}
+[19:16:04.576] INFO (#169): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 37.118375,
+}
+[19:16:04.608] INFO (#196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.336458,
+}
+[19:16:04.638] INFO (#226): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.086833,
+}
+[19:16:04.666] INFO (#262): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.96025,
+}
+[19:16:04.689] INFO (#299): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.068708,
+}
+[19:16:04.716] INFO (#333): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 26.408667,
+}
+[19:16:04.746] INFO (#371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.634375,
+}
+[19:16:04.775] INFO (#413): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 28.52075,
+}
+[19:16:04.807] INFO (#459): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.486625,
+}
+[19:16:04.837] INFO (#511): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.742708,
+}
+[19:16:04.870] INFO (#561): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.318541,
+}
+[19:16:04.903] INFO (#614): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.769584,
+}
+[19:16:04.935] INFO (#668): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.342709,
+}
+[19:16:05.001] INFO (#724): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 65.893708,
+}
+[19:16:05.049] INFO (#793): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 48.1705,
+}
+[19:16:05.050] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.3525,
+}
+[19:16:05.050] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.163208,
+}
+[19:16:05.051] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.152167,
+}
+[19:16:05.051] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.11925,
+}
+[19:16:05.051] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.113792,
+}
+[19:16:05.051] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.226125,
+}
+[19:16:05.051] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.159166,
+}
+[19:16:05.052] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.117541,
+}
+[19:16:05.052] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.115666,
+}
+[19:16:05.052] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.162875,
+}
+[19:16:05.052] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.127625,
+}
+[19:16:05.052] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126042,
+}
+[19:16:05.053] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.260792,
+}
+[19:16:07.823] INFO (#2094): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.28675,
+}
+[19:16:07.824] INFO (#2094): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.948125,
+}
+[19:16:07.826] INFO (#2094): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.476625,
+}
+[19:16:07.851] INFO (#2096): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.206875,
+}
+[19:16:07.874] INFO (#2125): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 22.837792,
+}
+[19:16:07.902] INFO (#2157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 28.26275,
+}
+[19:16:07.928] INFO (#2197): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 26.500291,
+}
+[19:16:07.957] INFO (#2234): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 28.185125,
+}
+[19:16:07.985] INFO (#2272): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.767,
+}
+[19:16:08.015] INFO (#2313): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.33075,
+}
+[19:16:08.045] INFO (#2357): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.731541,
+}
+[19:16:08.079] INFO (#2407): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.889542,
+}
+[19:16:08.109] INFO (#2458): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.102125,
+}
+[19:16:08.143] INFO (#2506): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.726333,
+}
+[19:16:08.178] INFO (#2558): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 34.873875,
+}
+[19:16:08.214] INFO (#2614): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 36.31275,
+}
+[19:16:08.252] INFO (#2674): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 37.810791,
+}
+[19:16:08.290] INFO (#2740): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 38.16425,
+}
+[19:16:08.331] INFO (#2804): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 40.323292,
+}
+[19:16:08.373] INFO (#2871): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 41.994125,
+}
+[19:16:08.413] INFO (#2939): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 40.488708,
+}
+[19:16:08.463] INFO (#3009): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 49.545084,
+}
+[19:16:08.513] INFO (#3092): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 50.133625,
+}
+[19:16:08.513] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.284458,
+}
+[19:16:08.514] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.140625,
+}
+[19:16:08.514] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.147042,
+}
+[19:16:08.514] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.116542,
+}
+[19:16:08.514] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122291,
+}
+[19:16:08.514] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.101708,
+}
+[19:16:08.514] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.117416,
+}
+[19:16:08.515] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.096,
+}
+[19:16:08.515] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126208,
+}
+[19:16:08.515] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.165834,
+}
+[19:16:08.515] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.11725,
+}
+[19:16:08.515] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.116875,
+}
+[19:16:08.515] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.188208,
+}
+[19:16:10.670] INFO (#4552): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.314209,
+}
+[19:16:10.671] INFO (#4552): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.892084,
+}
+[19:16:10.673] INFO (#4552): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.622375,
+}
+[19:16:10.694] INFO (#4554): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 20.258292,
+}
+[19:16:10.713] INFO (#4575): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 18.767916,
+}
+[19:16:10.736] INFO (#4599): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.587667,
+}
+[19:16:10.758] INFO (#4628): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.355917,
+}
+[19:16:10.780] INFO (#4657): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 22.1065,
+}
+[19:16:10.803] INFO (#4687): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.34,
+}
+[19:16:10.830] INFO (#4720): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 26.474084,
+}
+[19:16:10.857] INFO (#4756): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.142125,
+}
+[19:16:10.886] INFO (#4798): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.032917,
+}
+[19:16:10.918] INFO (#4841): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.705,
+}
+[19:16:10.959] INFO (#4881): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 41.465792,
+}
+[19:16:10.992] INFO (#4925): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.603834,
+}
+[19:16:11.024] INFO (#4973): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.106583,
+}
+[19:16:11.056] INFO (#5025): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.227125,
+}
+[19:16:11.089] INFO (#5079): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.252958,
+}
+[19:16:11.123] INFO (#5135): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.792959,
+}
+[19:16:11.157] INFO (#5194): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.692667,
+}
+[19:16:11.191] INFO (#5254): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 34.427542,
+}
+[19:16:11.231] INFO (#5316): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 39.778958,
+}
+[19:16:11.274] INFO (#5391): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 43.1775,
+}
+[19:16:11.275] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.251333,
+}
+[19:16:11.275] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.109917,
+}
+[19:16:11.275] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.096666,
+}
+[19:16:11.275] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.094417,
+}
+[19:16:11.275] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.091,
+}
+[19:16:11.275] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090625,
+}
+[19:16:11.275] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: 
+tests/generator/add-kind-acceptance.test.ts:
+(pass) every standalone add kind compiles in every starter [12357.90ms]
+
+tests/generator/add-acceptance.test.ts:
+(pass) tool function creation rejects collisions without changing existing files [17.03ms]
+(pass) snapshots simple, custom, and full service plans [53.11ms]
+(pass) rejects ambiguous services and existing route methods before mutation [37.54ms]
+
+tests/generator/add-platform-acceptance.test.ts:
+
+tests/generator/add-resource-acceptance.test.ts:
+
+tests/generator/add-bundle-acceptance.test.ts:
+(pass) API starter integration tests run after adding a full service without Docker [2986.57ms]
+
+ 5 pass
+ 4 filtered out
+ 0 fail
+ 3 snapshots, 22 expect() calls
+Ran 5 tests across 5 files. [15.88s]
+"success",
+  duration_ms: 0.092375,
+}
+[19:16:11.275] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092125,
+}
+[19:16:11.276] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092167,
+}
+[19:16:11.276] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.154,
+}
+[19:16:11.276] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.087959,
+}
+[19:16:11.276] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.087875,
+}
+[19:16:11.276] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.138125,
+}
+[19:16:13.603] INFO (#6771): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.158417,
+}
+[19:16:13.604] INFO (#6771): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.792834,
+}
+[19:16:13.606] INFO (#6771): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.172792,
+}
+[19:16:13.624] INFO (#6773): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 18.295042,
+}
+[19:16:13.642] INFO (#6794): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 17.629084,
+}
+[19:16:13.664] INFO (#6818): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 22.073625,
+}
+[19:16:13.684] INFO (#6847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 20.206334,
+}
+[19:16:13.705] INFO (#6876): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.0835,
+}
+[19:16:13.730] INFO (#6906): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.073167,
+}
+[19:16:13.755] INFO (#6939): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.89525,
+}
+[19:16:13.781] INFO (#6975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 26.764125,
+}
+[19:16:13.809] INFO (#7017): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.439916,
+}
+[19:16:13.835] INFO (#7060): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 26.154583,
+}
+[19:16:13.869] INFO (#7100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 34.246375,
+}
+[19:16:13.902] INFO (#7144): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.71475,
+}
+[19:16:13.933] INFO (#7192): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.300917,
+}
+[19:16:13.964] INFO (#7244): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.053042,
+}
+[19:16:13.997] INFO (#7298): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.934,
+}
+[19:16:14.029] INFO (#7354): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.483083,
+}
+[19:16:14.064] INFO (#7413): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 34.20525,
+}
+[19:16:14.099] INFO (#7473): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 35.159333,
+}
+[19:16:14.137] INFO (#7535): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 38.50925,
+}
+[19:16:14.178] INFO (#7610): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 40.73175,
+}
+[19:16:14.179] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.233375,
+}
+[19:16:14.179] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099375,
+}
+[19:16:14.179] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09575,
+}
+[19:16:14.179] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092125,
+}
+[19:16:14.179] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.0875,
+}
+[19:16:14.179] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.086709,
+}
+[19:16:14.179] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.091083,
+}
+[19:16:14.179] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095291,
+}
+[19:16:14.179] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.094583,
+}
+[19:16:14.180] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.162292,
+}
+[19:16:14.180] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.093417,
+}
+[19:16:14.180] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.085041,
+}
+[19:16:14.180] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.130333,
+}
+[19:16:16.693] INFO (#8990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 8.513375,
+}
+[19:16:16.701] INFO (#8990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 8.320416,
+}
+[19:16:16.710] INFO (#8990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 8.590916,
+}
+[19:16:16.719] INFO (#8990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 9.070125,
+}
+[19:16:16.722] INFO (#8991): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.2685,
+}
+[19:16:16.723] INFO (#8991): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.741083,
+}
+[19:16:16.725] INFO (#8991): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.341792,
+}
+[19:16:16.738] INFO (#9005): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 2.866208,
+}
+[19:16:16.739] INFO (#9006): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.155667,
+}
+[19:16:16.739] INFO (#9006): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.620417,
+}
+[19:16:16.741] INFO (#9006): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.185708,
+}
+[19:16:16.753] INFO (#9020): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 2.551958,
+}
+[19:16:16.754] INFO (#9020): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.815584,
+}
+[19:16:16.756] INFO (#9020): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.347542,
+}
+[19:16:16.764] INFO (#9033): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.162083,
+}
+[19:16:16.765] INFO (#9033): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.711208,
+}
+[19:16:16.767] INFO (#9033): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 1.836,
+}
+[19:16:16.785] INFO (#9047): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 2.793125,
+}
+[19:16:16.788] INFO (#9047): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.046375,
+}
+[19:16:16.791] INFO (#9047): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.028792,
+}
+[19:16:16.792] INFO (#9048): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.158667,
+}
+[19:16:16.794] INFO (#9048): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 2.451417,
+}
+[19:16:16.796] INFO (#9048): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.347375,
+}
+[19:16:16.829] INFO (#9102): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.932917,
+}
+[19:16:16.840] INFO (#9103): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.24275,
+}
+[19:16:16.841] INFO (#9103): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.910792,
+}
+[19:16:16.843] INFO (#9103): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.076125,
+}
+[19:16:16.878] INFO (#9106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 34.097792,
+}
+[19:16:16.878] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.323042,
+}
+[19:16:16.878] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.192458,
+}
+[19:16:16.879] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.13625,
+}
+[19:16:16.879] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.125916,
+}
+[19:16:16.879] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.118542,
+}
+[19:16:16.879] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.10125,
+}
+[19:16:16.879] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.098375,
+}
+[19:16:16.879] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.110958,
+}
+[19:16:16.879] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.151625,
+}
+[19:16:16.880] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.155708,
+}
+[19:16:16.880] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.124125,
+}
+[19:16:16.880] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.141375,
+}
+[19:16:16.880] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.2395,
+}
+[19:16:19.826] INFO (#10208): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 7.724666,
+}
+acceptance additions: 15.9s
+[22:16:19.855] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 15919.842541,
+}
+bun test v1.3.10 (30e609e0)
+[19:16:22.629] INFO (#164): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.terminal",
+  outcome: "success",
+  duration_ms: 682.552209,
+}
+other generator: 201.6s
+
+tests/generator/scaffold-catalog.test.ts:
+(pass) keeps scaffold dependency versions aligned with owning manifests [18.57ms]
+
+tests/generator/option-matrix.test.ts:
+(pass) covers every template and examples/install/Git combination [1008.83ms]
+(pass) agent starters ship executable native and typed client examples [0.72ms]
+(pass) reports only the create milestones that run [49.81ms]
+(pass) produces byte-identical content from separate destinations [46.68ms]
+
+tests/generator/create-additions.test.ts:
+(pass) asks only final consent and validates the completed project once [27.08ms]
+(pass) retains no-install behavior without offering artifact additions [21.27ms]
+(pass) declined consent creates no stage and preserves cancellation exit 130 [1.90ms]
+(pass) headless creation never invokes prompt authority [22.47ms]
+
+tests/generator/job-dot-access.test.ts:
+(pass) generates name-based job dot access without exposing private jobs [8.27ms]
+
+tests/generator/add-options.test.ts:
+(pass) add option resolution > normalizes friendly names and common defaults [0.72ms]
+(pass) add option resolution > resolves command defaults and repeatable values [0.26ms]
+(pass) add option resolution > requires unambiguous headless agent and route choices [0.75ms]
+(pass) add option resolution > supports creating a tool function and rejects conflicting targets [0.12ms]
+(pass) add option resolution > accepts an existing model selector or the offline default [0.08ms]
+
+tests/generator/plan-manifest.test.ts:
+(pass) scaffold preserves @relkit/aws's existing Bun link in dependencies [0.44ms]
+(pass) scaffold preserves @relkit/aws's existing Bun link in devDependencies [0.04ms]
+(pass) scaffold preserves @relkit/better-auth's existing Bun link in dependencies [0.03ms]
+(pass) scaffold preserves @relkit/better-auth's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/cloudflare's existing Bun link in dependencies [0.03ms]
+(pass) scaffold preserves @relkit/cloudflare's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves @relkit/docker's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/docker's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/effect-mq's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves @relkit/effect-mq's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves @relkit/inngest's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/inngest's existing Bun link in devDependencies [0.04ms]
+(pass) scaffold preserves @relkit/drizzle's existing Bun link in dependencies [0.02ms]
+(pass) scaffold preserves @relkit/drizzle's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves @relkit/local's existing Bun link in dependencies [0.04ms]
+(pass) scaffold preserves @relkit/local's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/pulumi's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/pulumi's existing Bun link in devDependencies
+(pass) scaffold preserves @relkit/redis's existing Bun link in dependencies [0.04ms]
+(pass) scaffold preserves @relkit/redis's existing Bun link in devDependencies
+(pass) scaffold preserves @relkit/s3's existing Bun link in dependencies [0.05ms]
+(pass) scaffold preserves @relkit/s3's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/trigger's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/trigger's existing Bun link in devDependencies
+(pass) scaffold preserves better-auth's existing Bun link in dependencies [0.08ms]
+(pass) scaffold preserves better-auth's existing Bun link in devDependencies
+(pass) scaffold preserves drizzle-kit's existing Bun link in dependencies
+(pass) scaffold preserves drizzle-kit's existing Bun link in devDependencies
+(pass) scaffold preserves drizzle-orm's existing Bun link in dependencies [0.12ms]
+(pass) scaffold preserves drizzle-orm's existing Bun link in devDependencies [0.03ms]
+(pass) scaffold preserves langchain's existing Bun link in dependencies
+(pass) scaffold preserves langchain's existing Bun link in devDependencies
+(pass) scaffold still rejects conflicting versions and links to another package [0.25ms]
+
+tests/generator/local-workspace.test.ts:
+(pass) local create asks for jobs and final confirmation when other choices are explicit [688.79ms]
+(pass) local create preserves unrelated dependency versions when linking RELKIT packages [18.13ms]
+(pass) local create shares matching native dependencies without changing different versions [22.97ms]
+(pass) local links keep web dependencies local and repair previously linked inspector packages [20.43ms]
+(pass) doctor accepts local RELKIT package links [2.55ms]
+(pass) local add installs workspace integration exports for a full service bundle [10080.78ms]
+(pass) local launcher exposes the shared add API for events and routes [1222.40ms]
+(pass) local launcher and linked CLI hide workspace build output [8749.48ms]
+
+tests/generator/jobs-profiles.test.ts:
+(pass) Docker Jobs starters include the local orchestrator and documented config [91.61ms]
+
+tests/generator/option-matrix-destinations.test.ts:
+(pass) accepts valid names and rejects invalid names without mutation [1.37ms]
+(pass) handles absent, empty, and non-empty destinations atomically [52.67ms]
+(pass) rolls back every pre-rename failure and removes its temporary sibling [122.28ms]
+
+tests/generator/failure-cleanup.test.ts:
+(pass) cleans the staged sibling after an injected copy failure [2.53ms]
+(pass) cleans the staged sibling after an injected substitute failure [15.00ms]
+(pass) cleans the staged sibling after an injected install failure [18.79ms]
+(pass) cleans the staged sibling after an injected git failure [20.30ms]
+(pass) cleans the staged sibling after an injected doctor failure [21.93ms]
+(pass) cleans the staged sibling after an injected check failure [23.03ms]
+(pass) cleans the staged sibling after an injected rename failure [20.60ms]
+(pass) preserves an existing empty destination when publication fails [22.82ms]
+(pass) refuses broad cleanup paths without recursive deletion [0.41ms]
+
+tests/generator/project-discovery.test.ts:
+(pass) scaffold project discovery > appends exports while preserving leading and internal whitespace [6.23ms]
+(pass) scaffold project discovery > discovers canonical services, members, tools, prompts, profiles, and imported env [81.61ms]
+(pass) scaffold project discovery > requires real AWS and Pulumi imports before offering provisioning [3.49ms]
+(pass) scaffold project discovery > plans byte-preserving canonical insertions and refuses unsafe shapes [1.37ms]
+
+tests/generator/installed-cli-create.test.ts:
+(pass) normal CLI installs external projects from packed packages without contributor links [86257.08ms]
+
+tests/generator/local-agent-create.test.ts:
+(pass) candidate acceptance installs and validates the agent starter with shared native packages [37296.73ms]
+(pass) candidate acceptance installs and validates the fullstack starter with shared native packages [53362.50ms]
+
+tests/generator/no-examples-layout.test.ts:
+(pass) grouped candidate example removal retains the useful hello boundary and platform inputs [542.99ms]
+
+tests/generator/add-resolver.test.ts:
+(pass) resolves an interactive add through the same normalized request [21.18ms]
+(pass) uses unique services and explicit model selectors headlessly [27.80ms]
+(pass) offers existing functions and function creation when adding a tool [22.88ms]
+(pass) creates a function for a new service and respects explicit creation headlessly [18.77ms]
+(pass) asks for name, template, jobs and destination while keeping silent defaults [1.73ms]
+(pass) rejects unsupported explicit creation flags without any setup question [0.49ms]
+(pass) offers the certified starter template and honors a custom destination [0.39ms]
+(pass) rejects an uncertified inline template after filtering jobs [0.34ms]
+(pass) hides uncertified jobs providers interactively [0.26ms]
+(pass) retains headless defaults without requesting interactive choices [0.17ms]
+
+tests/generator/add-transaction.test.ts:
+(pass) add scaffold transaction > validates with the project CLI instead of an unrelated global install [469.93ms]
+(pass) add scaffold transaction > restores bytes, modes, lockfile, and leaves unrelated dirty files [5.98ms]
+(pass) add scaffold transaction > rolls back validation failure and applies a successful plan [3.76ms]
+(pass) add scaffold transaction > skips checking unavailable packages with no install [1.85ms]
+(pass) add scaffold transaction > refuses project-local symlinks without writing through them [1.34ms]
+
+tests/generator/option-matrix-output.test.ts:
+(pass) normalizes JSON options and keeps generated results JSON-safe [26.50ms]
+(pass) adds AWS and Pulumi only when explicitly selected [19.63ms]
+
+ 94 pass
+ 0 fail
+ 1801 expect() calls
+Ran 94 tests across 17 files. [201.52s]
+[22:19:41.431] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 201575.495541,
+}
