@@ -1,6 +1,7 @@
+/** Exercises the tutorial's checked price function with a controlled cache clock, hits, expiry, deletion and invalid writes. */
 import { expect, test } from "bun:test";
 import { createTestCacheFake, invokeFunction } from "@relkit/testing";
-import prices from "@app/orders/cache/prices.cache.js";
+import prices from "../src/services/orders/cache/prices.cache.js";
 import getPrice from "./fixtures/get-price.function.js";
 
 test("cached-price tutorial reads hits and reloads after expiry or deletion", async () => {
@@ -9,8 +10,8 @@ test("cached-price tutorial reads hits and reloads after expiry or deletion", as
     cacheId: prices.id,
     keySchema: prices.key,
     valueSchema: prices.value,
-    defaultTtlMs: prices.defaultTtlMs!,
-    maxTtlMs: prices.maxTtlMs!,
+    defaultTtlMs: prices.defaultTtlMs ?? 60_000,
+    maxTtlMs: prices.maxTtlMs ?? 300_000,
     clock: () => now,
   });
   const key = { sku: "book" };

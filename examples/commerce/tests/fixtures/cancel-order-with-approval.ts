@@ -1,6 +1,7 @@
+/** Connects an on-write order tool to a trusted asynchronous confirmation callback, preserving denied invocation failures. */
 // #region approval-tool
 import { defineTool } from "@relkit/app/tools";
-import deleteOrder from "@app/orders/functions/delete-order.function.js";
+import deleteOrder from "../../src/services/orders/functions/delete-order.function.js";
 
 export const cancelOrder = defineTool({
   id: "orders.cancel-order-on-write",
@@ -15,6 +16,11 @@ export const cancelOrder = defineTool({
 // #endregion approval-tool
 
 // #region approval-callback
+/** Invokes cancellation only after the trusted confirmation flow approves the exact order.
+ * @param orderId - Order identity shown to confirmation and passed to the tool.
+ * @param confirm - Trusted asynchronous decision callback.
+ * @returns The native checked deletion result when approval succeeds.
+ * @throws The original invocation failure when confirmation denies or fails. */
 export async function cancelOrderWithApproval(
   orderId: string,
   confirm: (message: string) => Promise<boolean>,

@@ -1,6 +1,7 @@
+/** Exercises the real prices dependency with a logged cache-miss producer and validated SKU/price results. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
-import prices from "@app/orders/cache/prices.cache.js";
+import prices from "../../src/services/orders/cache/prices.cache.js";
 
 const getPrice = defineFunction({
   id: "orders.get-price",
