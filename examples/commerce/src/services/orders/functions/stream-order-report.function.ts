@@ -1,3 +1,4 @@
+/** Supplies the report route with ten validated stream items, stopping when its invocation signal aborts. */
 import { defineFunction, streamOf } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
 
