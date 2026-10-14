@@ -45,7 +45,7 @@ const forbiddenScope = new RegExp(
   "i",
 );
 const legacyApplicationRoot =
-  /^src\/(?:env\.ts|(?:functions|events|services|agents|jobs|cache|buckets|tools|middleware|transforms|shared)(?:\/|$))/;
+  /^src\/(?:env\.ts|services\/service\.ts|(?:functions|events|agents|jobs|cache|buckets|tools|middleware|transforms|shared)(?:\/|$))/;
 
 /** Scans fixture files for forbidden public APIs and application-relative imports.
  * @param root - Published project under the test-owned temporary root.
@@ -62,7 +62,9 @@ export async function scanGeneratedProject(root: string): Promise<string[]> {
     if (forbiddenImport.test(text)) violations.push(`${path}:forbidden-import`);
     if (forbiddenScope.test(text)) violations.push(`${path}:out-of-scope`);
     for (const match of text.matchAll(/(?:from\s+|import\s*\()\s*["'](\.\.?\/[^"']+)["']/g)) {
-      const target = resolve(dirname(join(root, path)), match[1]!);
+      const specifier = match[1];
+      if (specifier === undefined) continue;
+      const target = resolve(dirname(join(root, path)), specifier);
       const sourcePath = relative(sourceRoot, target);
       if (!sourcePath.startsWith("..") && !isAbsolute(sourcePath)) {
         violations.push(`${path}:relative-app-import`);

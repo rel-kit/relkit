@@ -31,11 +31,11 @@ test("covers every template and examples/install/Git combination", async () => {
 
 test("agent starters ship executable native and typed client examples", async () => {
   const agent = await readFile(
-    join(templateRoot, "agent/src/hello/agents/assistant.agent.ts"),
+    join(templateRoot, "agent/src/services/hello/agents/assistant.agent.ts"),
     "utf8",
   );
   const graph = await readFile(
-    join(templateRoot, "agent/src/hello/agents/review.agent.ts"),
+    join(templateRoot, "agent/src/services/hello/agents/review.agent.ts"),
     "utf8",
   );
   const page = await readFile(join(templateRoot, "fullstack/web/app/page.tsx"), "utf8");
