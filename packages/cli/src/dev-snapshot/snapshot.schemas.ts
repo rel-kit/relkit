@@ -5,6 +5,7 @@
  * decoding; decoding alone never grants execution authority.
  */
 import { Schema } from "effect";
+import { APPLICATION_LAYOUT_VERSION } from "@relkit/contracts";
 
 /** Project-relative paths exclude traversal, drive letters, escapes and empty segments. */
 export const SnapshotPath = Schema.String.check(
@@ -81,6 +82,7 @@ export const SnapshotActivation = Schema.Struct({
 
 /** All runtime-affecting versions participate in snapshot compatibility. */
 export const SnapshotTools = Schema.Struct({
+  layout: Schema.Literal(APPLICATION_LAYOUT_VERSION),
   bun: Schema.String.check(Schema.isMaxLength(128)),
   effect: Schema.String.check(Schema.isMaxLength(128)),
   typescript: Schema.String.check(Schema.isMaxLength(128)),

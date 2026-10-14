@@ -5,6 +5,7 @@
  */
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit } from "effect";
+import { APPLICATION_LAYOUT_VERSION } from "@relkit/contracts";
 import {
   decodeSnapshotEffect,
   MAX_SNAPSHOT_RECEIPT_BYTES,
@@ -32,6 +33,7 @@ const receipt = {
   importIndex: "imports.json",
   activation: { graphHash: hash, manifestHash: hash, runtimeIntegrationsPlanHash: hash },
   tools: {
+    layout: APPLICATION_LAYOUT_VERSION,
     bun: "1.3.10",
     effect: "4.0.1",
     typescript: "5.9.3",

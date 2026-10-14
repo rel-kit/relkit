@@ -58,9 +58,9 @@ export const checkProjectWithCurrentReceiptEffect = Effect.fn("Project.checkWith
     const checked = yield* checkProjectEffect({ ...options, projectRoot: root }).pipe(
       Effect.provideService(TypecheckInputs, journal),
     );
-    if (!checked.ok || !checked.activatable || checked.graphHash === undefined) return checked;
     const witnesses = yield* optional(journal.evidence);
-    if (witnesses === undefined) return checked;
+    if (witnesses === undefined) return yield* checkProjectEffect(options);
+    if (!checked.ok || !checked.activatable || checked.graphHash === undefined) return checked;
     const files = yield* SnapshotFiles;
     const typecheckInputs = yield* optional(captureSnapshotTypecheckInputs(files, root, witnesses));
     if (typecheckInputs === undefined) return checked;
