@@ -1,3 +1,4 @@
+/** Checks installed PostgreSQL declarations and deliberate E/R mutations with a bounded whole-program compiler lifetime. */
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { checkPostgresConsumer, formatPostgresDiagnostics } from "./postgres-declarations.js";
@@ -34,35 +35,44 @@ Effect.runPromise(PgDrizzle.makeWithDefaults());
 Effect.runPromise(listen);
 `;
 
-it.effect("checks native PostgreSQL declarations without skipping dependency errors", () =>
-  Effect.sync(() => {
-    const diagnostics = checkPostgresConsumer(consumer);
-    expect(formatPostgresDiagnostics(diagnostics)).toBe("");
-  }),
+it.effect(
+  "checks native PostgreSQL declarations without skipping dependency errors",
+  () =>
+    Effect.sync(() => {
+      const diagnostics = checkPostgresConsumer(consumer);
+      expect(formatPostgresDiagnostics(diagnostics)).toBe("");
+    }),
+  30_000,
 );
 
-it.effect("rejects a transaction error channel widened to any", () =>
-  Effect.sync(() => {
-    const diagnostics = checkPostgresConsumer(
-      consumer.replace(
-        "const transaction = db.transaction(() => Effect.succeed(1));",
-        "declare const transaction: Effect.Effect<number, any>;",
-      ),
-    );
-    expect(formatPostgresDiagnostics(diagnostics)).toContain("transactionIsAny");
-    expect(diagnostics.some((diagnostic) => diagnostic.code === 2322)).toBe(true);
-  }),
+it.effect(
+  "rejects a transaction error channel widened to any",
+  () =>
+    Effect.sync(() => {
+      const diagnostics = checkPostgresConsumer(
+        consumer.replace(
+          "const transaction = db.transaction(() => Effect.succeed(1));",
+          "declare const transaction: Effect.Effect<number, any>;",
+        ),
+      );
+      expect(formatPostgresDiagnostics(diagnostics)).toContain("transactionIsAny");
+      expect(diagnostics.some((diagnostic) => diagnostic.code === 2322)).toBe(true);
+    }),
+  30_000,
 );
 
-it.effect("rejects a transaction error channel with its SqlError removed", () =>
-  Effect.sync(() => {
-    const diagnostics = checkPostgresConsumer(
-      consumer.replace(
-        "const transaction = db.transaction(() => Effect.succeed(1));",
-        "declare const transaction: Effect.Effect<number>;",
-      ),
-    );
-    expect(formatPostgresDiagnostics(diagnostics)).toContain("transactionHasSqlError");
-    expect(diagnostics.some((diagnostic) => diagnostic.code === 2322)).toBe(true);
-  }),
+it.effect(
+  "rejects a transaction error channel with its SqlError removed",
+  () =>
+    Effect.sync(() => {
+      const diagnostics = checkPostgresConsumer(
+        consumer.replace(
+          "const transaction = db.transaction(() => Effect.succeed(1));",
+          "declare const transaction: Effect.Effect<number>;",
+        ),
+      );
+      expect(formatPostgresDiagnostics(diagnostics)).toContain("transactionHasSqlError");
+      expect(diagnostics.some((diagnostic) => diagnostic.code === 2322)).toBe(true);
+    }),
+  30_000,
 );
