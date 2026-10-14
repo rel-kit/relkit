@@ -7,8 +7,16 @@ description: Prepare, preview, and deploy a RELKIT application to AWS with Pulum
 
 RELKIT's supported application deployment path uses AWS hosting with Pulumi. Work from the
 generated application's root. Check `relkit.config.ts` and the installed CLI help before
-assuming an existing app has AWS and Pulumi integrations; a new app can opt in with
-`bunx create-relkit@latest <name> --cloud aws --deploy pulumi`.
+assuming an existing app has AWS and Pulumi integrations. Public creation currently
+certifies only minimal with examples enabled and no jobs/cloud/deployment. AWS/Pulumi
+creation is an internal candidate until exact release certification permits it; do not
+advertise that tuple as supported or bypass the CLI's certification rejection.
+
+New app services use `src/services/<name>/service.ts`; existing flat apps remain supported.
+Deployment reads logical ownership and provider declarations from the graph, so a source-only
+layout move must retain IDs, policies, bindings, and resource identities. Explicit deployment
+and provider fragments belong in `src/platform` and are imported by `relkit.config.ts`.
+Keep acquisition lazy; compiling or comparing an offline plan must not activate providers.
 
 ## Prepare a reviewable plan
 

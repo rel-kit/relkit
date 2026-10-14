@@ -1,13 +1,16 @@
 # RelKit documentation
 
-The current application model is domain-first. Revision 3 records the original
+The current application model groups domain boundaries under `src/services/<name>/service.ts`.
+Existing flat `src/<name>/service.ts` apps remain supported. Revision 3 records the original
 POC baseline and is retained as historical design evidence.
 
 ## Start here
 
 1. Read `getting-started.md` for the current generated application layout and local workflow.
 2. Read `architecture.md`, `testing.md`, and `deployment.md` for current contributor guidance.
-3. Use `apps/docs/content/docs/service/organization.mdx` when migrating a layer-first application.
+3. Use `apps/docs/content/docs/service/organization.mdx` for source placement and repairing
+   unsupported layer-first roots. Valid flat apps can optionally use
+   `apps/docs/content/docs/service/migration.mdx` for preview/write/guarded rollback.
 4. Consult `relkit-typescript-poc-technical-spec-v3.md` and its review gates only for the historical POC baseline.
 
 ## Final architecture at a glance

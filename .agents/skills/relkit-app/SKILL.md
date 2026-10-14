@@ -7,13 +7,16 @@ description: Build or extend a RELKIT TypeScript backend using domain services, 
 
 Work in the application's root, where `relkit.config.ts` and `package.json` live. If it is an
 existing app, read its domains, routes, configuration, and tests before adding files. Keep its
-installed RELKIT version and conventions. For a new API app, start with
-`bunx create-relkit@latest <name> --template api`; cloud and deployment default to `none`.
+installed RELKIT version and conventions. For a new app, start with
+`bunx create-relkit@latest <name>`. The publicly certified tuple is minimal with
+examples enabled, no jobs, no cloud, and no deployment. API/agent/fullstack/jobs
+and cloud creation are internal candidates until their exact release evidence is certified.
 
 ## Put behavior in the right place
 
-- `src/<domain>/` owns one business area. Keep its functions and other artifacts together.
-- `src/<domain>/service.ts` selects public functions, events, tasks, and jobs. It does not
+- `src/services/<domain>/` owns one business area. Keep functions, specialized service
+  schemas, events, tasks, jobs, agents, tools, channels, helpers, and assets together.
+- `src/services/<domain>/service.ts` selects public functions, events, tasks, and jobs. It does not
   automatically expose HTTP endpoints or authorize callers.
 - A function owns validated input, business behavior, output, and declared domain errors.
   Keep rules needed by every caller in the function, not only in a route or middleware.
@@ -21,6 +24,20 @@ installed RELKIT version and conventions. For a new API app, start with
   transport concerns such as request mapping, status, and headers there.
 - Bind providers and resource ownership explicitly in `relkit.config.ts`. Add a local profile
   first when it satisfies the task; cloud resources are optional.
+- Put environment contracts and explicitly imported configuration fragments in `src/platform`.
+  Platform cannot depend on services or Routes; cross-service and route imports must use the
+  other service's `service.ts`. Helpers are ordinary modules and do not invent a service.
+
+Flat `src/<domain>/service.ts` apps remain supported. Add preserves their layout; empty
+projects default to grouped. Do not mix layouts, nest service boundaries, or create an
+aggregate `src/services/service.ts`. Database and auth use the same selected service root
+and remain singletons. Preserve lazy native client ownership and auth's borrowed database.
+Application descriptors remain plain TypeScript; Effect imports are not required.
+
+For an optional move, preview `bun run relkit migrate layout`, review conflicts, then use
+`--write`. Guarded restoration uses `--rollback <receipt>`. Keep IDs, exposure, durable
+versions, and providers stable. After either operation, run check, typecheck, and
+`bun run relkit dev --prepare` before `bun run dev`. Retain the private recovery receipt.
 
 Use the public `@relkit/app/*` authoring paths and documented optional integrations. Do not
 import RELKIT compiler/runtime internals or edit `.relkit/generated` or `.relkit/build`.
@@ -41,6 +58,10 @@ Exercise a changed endpoint against `bun run dev` and check its actual status an
 Test success and relevant failure paths, including invalid input and unauthorized access.
 For protected data, derive the owner from the authenticated session and enforce ownership in
 the domain operation; never accept a submitted owner ID as authority.
+For protected streams, check the session and ownership inside the function as well.
+Exercise an authorized stream through real HTTP until its completion event, then
+check foreign user/tenant denial and cancellation cleanup. An in-memory invocation
+alone does not verify the generated server's request context or iterator lifetime.
 
 Follow the [Orders tutorial](https://relkit.up.railway.app/docs/start/create-an-app) for a
 continuous first app, [Service](https://relkit.up.railway.app/docs/service) for code placement,
