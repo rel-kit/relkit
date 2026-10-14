@@ -1,3 +1,4 @@
+/** Defines storage navigation and grouped bucket/function source relations as pure documentation catalog data. */
 import type { ApiPackage } from "./documentation-catalog.js";
 
 export const storageGuideGroup = {
@@ -11,7 +12,7 @@ export const storageGuideRelations = storageGuideGroup.pages.map((page) => ({
   path: `storage/${page}`,
   api: ["buckets", "functions"] satisfies readonly ApiPackage[],
   examples: [
-    "examples/commerce/src/assets/buckets/assets.bucket.ts",
-    "examples/commerce/src/assets/functions/upload-assets.function.ts",
+    "examples/commerce/src/services/assets/buckets/assets.bucket.ts",
+    "examples/commerce/src/services/assets/functions/upload-assets.function.ts",
   ],
 }));
