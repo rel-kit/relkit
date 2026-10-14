@@ -1,0 +1,95 @@
+bun test v1.3.10 (30e609e0)
+
+tests/security/evidence-origin-probe.test.ts:
+[15:35:34.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 85.164875,
+}
+[15:35:34.537] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 33.224625,
+}
+[15:35:34.588] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 50.309125,
+}
+[15:35:34.642] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 53.384042,
+}
+[15:35:34.684] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 41.533625,
+}
+[15:35:34.718] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 33.965792,
+}
+[15:35:34.760] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 41.510125,
+}
+[15:35:34.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 25.910667,
+}
+[15:35:34.812] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 25.678583,
+}
+(pass) origin evidence probe rejects unapproved destinations before making requests [413.91ms]
+[15:35:36.366] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 1545.936542,
+}
+[15:35:37.906] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 1535.559041,
+}
+(pass) origin evidence probe preserves both recorded branches at owned HTTP and WebSocket origins [3092.36ms]
+[15:35:37.961] INFO (#3): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 44.229542,
+}
+[15:35:37.995] INFO (#3): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 31.365583,
+}
+[15:35:39.536] INFO (#3): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 1537.628625,
+}
+(pass) origin evidence probe never follows HTTP or WebSocket redirects [1629.21ms]
+
+ 3 pass
+ 0 fail
+ 37 expect() calls
+Ran 3 tests across 1 file. [6.03s]
