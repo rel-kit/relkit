@@ -29,18 +29,25 @@ function generatorSuites() {
   );
   if (acceptance.length === 0) throw new Error("No generator acceptance owners were found.");
   const accepted = new Set(acceptance);
-  const compilationNames =
-    "(?:the full bundle|route platform|database and auth|reused Docker profiles)";
+  const compilationPrefixes = [
+    "the full bundle",
+    "route platform",
+    "database and auth",
+    "reused Docker profiles",
+  ];
+  const compilationNames = `(?:${compilationPrefixes.join("|")})`;
   return [
-    {
-      name: "acceptance compilation",
-      args: ["test", "--test-name-pattern", `^${compilationNames}`, ...acceptance],
-    },
+    ...compilationPrefixes.map((prefix) => ({
+      name: `acceptance compilation: ${prefix}`,
+      args: ["test", "--test-name-pattern", `^${prefix}`, ...acceptance],
+    })),
     {
       name: "acceptance additions",
       args: ["test", "--test-name-pattern", `^(?!${compilationNames})`, ...acceptance],
     },
-    { name: "other generator", args: ["test", ...files.filter((file) => !accepted.has(file))] },
+    ...files
+      .filter((file) => !accepted.has(file))
+      .map((file) => ({ name: `generator: ${file}`, args: ["test", file] })),
   ];
 }
 
