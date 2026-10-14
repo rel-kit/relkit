@@ -1,103 +1,117 @@
-import { access, readFile, readdir, stat } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { join, relative } from "node:path";
-export type Manifest = {
-  name: string;
-  version: string;
-  dependencies?: Record<string, string>;
-  [key: string]: unknown;
-};
-type Snapshot = Record<string, { mode: number; content: string }>;
-export async function runCommand(
+/** Captures command authority for grouped project verification and exposes finite Promise edges to packed acceptance callers. */
+import { Context, Effect, Layer } from "effect";
+import { observeExecution } from "@relkit/contracts/operation";
+import { ScaffoldProcess, scaffoldProcessLayer } from "./scaffold-process.js";
+import { projectSnapshot, verifyProjectFiles } from "./scaffold-project-files.js";
+import { devSmokeAttempt } from "./pack-and-smoke-create-relkit-dev.js";
+import type { ProjectSnapshot } from "./scaffold-process.types.js";
+export type { Manifest } from "./scaffold-process.types.js";
+
+/** Installed command authority is captured once; each development child owns its own scope. */
+class ScaffoldProject extends Context.Service<ScaffoldProject>()("relkit.scripts.ScaffoldProject", {
+  make: Effect.gen(function* () {
+    const process = yield* ScaffoldProcess;
+    return {
+      verify: (
+        root: string,
+        registry: string,
+        cacheDir: string,
+        exercise?: (port: number) => Promise<void>,
+      ) =>
+        observeExecution(
+          "testing",
+          "scaffold.project",
+          verifyInstalledProject(process.run, root, registry, cacheDir, exercise),
+        ),
+    };
+  }),
+}) {}
+const projectLayer = Layer.effect(ScaffoldProject, ScaffoldProject.make).pipe(
+  Layer.provide(scaffoldProcessLayer),
+);
+
+/**
+ * Checks a real installed project before starting backend and packaged Inspector.
+ * @param run - Captured finite command capability.
+ * @param root - Standalone application.
+ * @param registry - Exact candidate package registry.
+ * @param cacheDir - Isolated install cache.
+ * @param exercise - Optional caller-owned public HTTP acceptance callback.
+ * @returns Completion after frozen install, check/typecheck and owned native development runs.
+ */
+const verifyInstalledProject = Effect.fn("ScaffoldProject.verify")(function* (
+  run: Effect.Success<typeof ScaffoldProcess.make>["run"],
+  root: string,
+  registry: string,
+  cacheDir: string,
+  exercise?: (port: number) => Promise<void>,
+) {
+  const tasks = yield* verifyProjectFiles(root);
+  yield* run({
+    args: ["install", "--frozen-lockfile", "--registry", registry],
+    cwd: root,
+    registry,
+    cacheDir,
+  });
+  for (const script of ["check", "typecheck"]) yield* run({ args: ["run", script], cwd: root });
+  if (!tasks || process.env.RELKIT_TEST_DOCKER === "1")
+    for (let attempt = 0; attempt < (exercise === undefined ? 1 : 2); attempt++)
+      yield* devSmokeAttempt(root, exercise);
+});
+
+/**
+ * Runs one native Bun command with complete child/output settlement.
+ * @param args - Literal Bun argument vector.
+ * @param cwd - Standalone project root.
+ * @param registry - Optional candidate registry.
+ * @param cacheDir - Optional isolated install cache.
+ * @returns Complete stdout after owned command cleanup.
+ */
+export function runCommand(
   args: string[],
   cwd: string,
   registry?: string,
   cacheDir?: string,
 ): Promise<string> {
-  const child = Bun.spawn([process.execPath, ...args], {
-    cwd,
-    env: {
-      ...process.env,
-      ...(registry === undefined
-        ? {}
-        : { BUN_CONFIG_REGISTRY: registry, npm_config_registry: registry }),
-      ...(cacheDir === undefined ? {} : { BUN_INSTALL_CACHE_DIR: cacheDir }),
-    },
-    stdout: "pipe",
-    stderr: "pipe",
-  });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-    child.exited,
-  ]);
-  if (code !== 0) throw new Error(`${args.join(" ")} failed in ${cwd}\n${stdout}${stderr}`);
-  return stdout;
+  return Effect.runPromise(
+    Effect.flatMap(ScaffoldProcess, (process) =>
+      process.run({
+        args,
+        cwd,
+        ...(registry === undefined ? {} : { registry }),
+        ...(cacheDir === undefined ? {} : { cacheDir }),
+      }),
+    ).pipe(Effect.provide(scaffoldProcessLayer)),
+  );
 }
-export async function snapshotProject(root: string, current = root): Promise<Snapshot> {
-  const result: Snapshot = {};
-  for (const entry of (await readdir(current, { withFileTypes: true })).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  )) {
-    if (["node_modules", ".git", ".next", "bun.lock"].includes(entry.name)) continue;
-    const path = join(current, entry.name);
-    if (entry.isDirectory()) Object.assign(result, await snapshotProject(root, path));
-    else if (entry.isFile()) {
-      const name = relative(root, path).replaceAll("\\", "/");
-      if (name === ".relkit/build/server/index.js") continue;
-      const bytes = await readFile(path);
-      const text = /\.(?:json|lock|md|toml|ts|tsx|js|jsx|yaml|yml)$/.test(name);
-      result[name] = {
-        mode: (await stat(path)).mode & 0o777,
-        content: text
-          ? bytes.toString("utf8").replaceAll(root, "<project>")
-          : Buffer.from(bytes).toString("base64"),
-      };
-    }
-  }
-  return result;
+
+/**
+ * Exposes deterministic file inventory at the native script boundary.
+ * @param root - Standalone application root.
+ * @param current - Recursive directory, initially the root.
+ * @returns Exact normalized bytes and modes after all reads settle.
+ */
+export function snapshotProject(root: string, current = root): Promise<ProjectSnapshot> {
+  return Effect.runPromise(projectSnapshot(root, current));
 }
-export async function verifyProject(
+
+/**
+ * Exposes real installed application acceptance at the script boundary.
+ * @param root - Standalone application.
+ * @param registry - Exact candidate registry.
+ * @param cacheDir - Isolated installation cache.
+ * @param exercise - Optional public HTTP acceptance callback.
+ * @returns Completion after every owned native development child has terminated.
+ */
+export function verifyProject(
   root: string,
   registry: string,
   cacheDir: string,
   exercise?: (port: number) => Promise<void>,
 ): Promise<void> {
-  const taskProject = existsSync(join(root, "src/orders/tasks/export-orders.task.ts"));
-  const required = taskProject
-    ? [
-        "src/orders/functions/health.function.ts",
-        "src/orders/service.ts",
-        "src/orders/tasks/export-orders.task.ts",
-        "src/orders/jobs/export-orders.job.ts",
-        "src/routes/health/route.ts",
-        "tests/unit/export-orders.task.test.ts",
-      ]
-    : [
-        "src/hello/functions/hello.function.ts",
-        "src/hello/service.ts",
-        "src/routes/hello/route.ts",
-        "tests/integration/hello.route.test.ts",
-      ];
-  for (const file of [
-    "package.json",
-    "bun.lock",
-    "relkit.config.ts",
-    "src/platform/env.ts",
-    ...required,
-    ".gitignore",
-  ])
-    await access(join(root, file));
-  await runCommand(
-    ["install", "--frozen-lockfile", "--registry", registry],
-    root,
-    registry,
-    cacheDir,
+  return Effect.runPromise(
+    Effect.flatMap(ScaffoldProject, (project) =>
+      project.verify(root, registry, cacheDir, exercise),
+    ).pipe(Effect.provide(projectLayer)),
   );
-  for (const script of ["check", "typecheck"]) await runCommand(["run", script], root);
-  if (!taskProject || process.env.RELKIT_TEST_DOCKER === "1")
-    for (let run = 0; run < (exercise ? 2 : 1); run++)
-      await import("./pack-and-smoke-create-relkit-dev.js").then(({ devSmoke }) =>
-        devSmoke(root, exercise),
-      );
 }

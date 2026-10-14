@@ -8,7 +8,11 @@ import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Effect } from "effect";
-import { readManifests, startRegistry } from "../pack-and-smoke-create-relkit-pack.js";
+import {
+  loadReleaseTarballs,
+  readManifests,
+  startRegistry,
+} from "../pack-and-smoke-create-relkit-pack.js";
 import { runCommand } from "../pack-and-smoke-create-relkit-support.js";
 import { ownedNativePromise } from "@relkit/cli/internal/tooling";
 import { packBaselineArtifacts } from "./packed-artifacts.js";
@@ -17,6 +21,7 @@ import { packBaselineArtifacts } from "./packed-artifacts.js";
  * Packs the candidate and prepares one fresh installed minimal project.
  * @param repository - Framework checkout used only for producing tarballs.
  * @param examples - Generated route policy; absence uses protected live graph proof.
+ * @param artifactDirectory - Optional previously packed release closure, reused without rebuilding.
  * @returns The outside-workspace fixture and registry identity in the caller Scope.
  * @remarks Packing utilities lack cancellation; the adapter joins their physical
  * settlement on interruption rather than detaching writes or children.
@@ -24,6 +29,7 @@ import { packBaselineArtifacts } from "./packed-artifacts.js";
 export const preparePackedFixture = Effect.fn("ReadinessBenchmark.preparePacked")(function* (
   repository: string,
   examples: "examples" | "no-examples" = "examples",
+  artifactDirectory?: string,
 ) {
   const temporary = yield* ownedNativePromise("benchmark.temporary", () =>
     mkdtemp(join(tmpdir(), "relkit-readiness-")),
@@ -31,7 +37,13 @@ export const preparePackedFixture = Effect.fn("ReadinessBenchmark.preparePacked"
   const manifests = yield* ownedNativePromise("benchmark.manifests", () =>
     readManifests(repository),
   );
-  const tarballs = yield* packBaselineArtifacts(temporary, manifests);
+  let tarballs: Map<string, string>;
+  if (artifactDirectory === undefined)
+    tarballs = yield* packBaselineArtifacts(temporary, manifests);
+  else
+    tarballs = yield* ownedNativePromise("benchmark.loadArtifacts", () =>
+      loadReleaseTarballs(resolve(artifactDirectory)),
+    );
   const server = yield* Effect.acquireRelease(
     ownedNativePromise("benchmark.registry", () => startRegistry(temporary, tarballs, manifests)),
     (server) => Effect.promise(() => server.stop(true)),

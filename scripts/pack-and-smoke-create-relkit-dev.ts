@@ -1,131 +1,89 @@
+/** Runs installed development acceptance with Effect-owned child groups, drains and listener cleanup. */
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { Effect, Schema } from "effect";
 import { scanGeneratedSource } from "./scaffold-smoke-source.js";
-import { runCommand } from "./pack-and-smoke-create-relkit-support.js";
+import { scaffoldChild } from "./scaffold-process.js";
+import { awaitScaffoldHttp, scaffoldPort, assertScaffoldPortReleased } from "./scaffold-http.js";
+import { verifyScaffoldDevContracts } from "./scaffold-dev-contracts.js";
 
-async function freePort(): Promise<number> {
-  const server = Bun.serve({ port: 0, fetch: () => new Response() });
-  const port = server.port;
-  await server.stop(true);
-  if (port === undefined) throw new Error("Could not allocate a dynamic port.");
-  return port;
-}
+const packageScripts = Schema.Struct({
+  scripts: Schema.optional(Schema.Record(Schema.String, Schema.String)),
+});
 
-async function waitFor(check: () => Promise<boolean>, timeoutMs = 30_000): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    try {
-      if (await check()) return;
-    } catch {}
-    await new Promise((resolveDelay) => setTimeout(resolveDelay, 50));
-  }
-  throw new Error("Timed out waiting for the generated development server.");
-}
-
-async function devSmokeAttempt(
+/**
+ * Owns one installed application's backend and packaged Inspector until assertions finish.
+ * @param root - Standalone installed application.
+ * @param exercise - Optional caller-owned native acceptance callback.
+ * @returns Completion after the child group and output readers have terminated.
+ */
+export const devSmokeAttempt = Effect.fn("ScaffoldDev.attempt")(function* (
   root: string,
   exercise?: (port: number) => Promise<void>,
-): Promise<void> {
-  const port = await freePort();
-  const inspector = await freePort();
-  const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8")) as {
-    readonly scripts?: Readonly<Record<string, string>>;
-  };
+) {
+  const port = yield* scaffoldPort;
+  const inspector = yield* scaffoldPort;
+  const text = yield* Effect.promise(() => readFile(join(root, "package.json"), "utf8"));
+  const manifest = Schema.decodeUnknownSync(Schema.fromJsonString(packageScripts))(text);
   const devScript = manifest.scripts?.["dev:api"] === undefined ? "dev" : "dev:api";
-  const child = Bun.spawn(
-    [
-      process.execPath,
-      "run",
-      devScript,
-      "--",
-      "--project-root",
-      root,
-      "--port",
-      String(port),
-      "--inspector-port",
-      String(inspector),
-    ],
-    {
-      cwd: root,
-      env: { ...process.env, PORT: String(port) },
-      stdout: "pipe",
-      stderr: "pipe",
-    },
+  const taskProject = existsSync(join(root, "src/services/orders/tasks/export-orders.task.ts"));
+  yield* Effect.scoped(
+    Effect.gen(function* () {
+      const owner = yield* scaffoldChild({
+        cwd: root,
+        env: { PORT: String(port) },
+        args: [
+          "run",
+          devScript,
+          "--",
+          "--project-root",
+          root,
+          "--port",
+          String(port),
+          "--inspector-port",
+          String(inspector),
+        ],
+      });
+      yield* awaitScaffoldHttp(owner.process, [
+        `http://127.0.0.1:${port}${taskProject ? "/health" : "/hello?name=RelKit"}`,
+        `http://127.0.0.1:${inspector}`,
+      ]).pipe(
+        Effect.catchCause((cause) =>
+          Effect.sync(() => console.error(owner.output())).pipe(
+            Effect.andThen(Effect.failCause(cause)),
+          ),
+        ),
+      );
+      yield* verifyScaffoldDevContracts(port, inspector, taskProject);
+      if (exercise !== undefined) yield* Effect.promise(() => exercise(port));
+    }),
   );
-  const output = Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-  ]);
-  let failure: unknown;
-  const taskProject = existsSync(join(root, "src/orders/tasks/export-orders.task.ts"));
-  const healthPath = taskProject ? "/health" : "/hello?name=RelKit";
-  try {
-    await waitFor(
-      async () => {
-        if (child.exitCode !== null)
-          throw new Error(`Development process exited with ${child.exitCode}.`);
-        const response = await fetch(`http://127.0.0.1:${port}${healthPath}`);
-        if (!response.ok) throw new Error(`${response.status}: ${await response.text()}`);
-        return (await fetch(`http://127.0.0.1:${inspector}`)).ok;
-      },
-      taskProject ? 90_000 : undefined,
-    );
-    const route = await (await fetch(`http://127.0.0.1:${port}${healthPath}`)).json();
-    if (taskProject && JSON.stringify(route) !== JSON.stringify({ ok: true }))
-      throw new Error("Task health route returned an unexpected response.");
-    if (!taskProject && (route as { message?: string }).message !== "Hello, RelKit!")
-      throw new Error("Example route returned an unexpected greeting.");
-    const graph = await fetch(`http://127.0.0.1:${port}/_relkit/v1/graph`);
-    if (!graph.ok || !(await graph.text()).includes('"graphHash"'))
-      throw new Error("Inspector graph API failed.");
-    const inspectorGraph = await fetch(
-      `http://127.0.0.1:${inspector}/_relkit/backend/_relkit/v1/graph`,
-    );
-    if (!inspectorGraph.ok || !(await inspectorGraph.text()).includes('"graphHash"'))
-      throw new Error("Packaged inspector proxy failed.");
-    const openapi = await fetch(`http://127.0.0.1:${port}/_relkit/v1/openapi.json`);
-    if (!openapi.ok || !(await openapi.text()).includes('"openapi":"3.1.0"'))
-      throw new Error("OpenAPI endpoint failed.");
-    const scalar = await fetch(`http://127.0.0.1:${port}/_relkit/v1/api-reference`);
-    if (!scalar.ok || !(await scalar.text()).toLowerCase().includes("scalar"))
-      throw new Error("Scalar API reference failed.");
-    await exercise?.(port);
-  } catch (error) {
-    failure = error;
-  } finally {
-    if (child.exitCode === null) child.kill("SIGTERM");
-    await Promise.race([child.exited, new Promise((resolve) => setTimeout(resolve, 2_000))]);
-    if (child.exitCode === null) child.kill("SIGKILL");
-  }
-  const exitCode = await child.exited;
-  const [stdout, stderr] = await output;
-  if (failure !== undefined) throw new Error(`${failure}\n${stdout}${stderr}`);
-  if (exitCode !== 0 && exitCode !== 143)
-    throw new Error(`Development process exited with ${exitCode}.\n${stdout}${stderr}`);
-  for (const released of [port, inspector]) {
-    const probe = Bun.serve({ hostname: "127.0.0.1", port: released, fetch: () => new Response() });
-    await probe.stop(true);
-  }
+  yield* assertScaffoldPortReleased(port);
+  yield* assertScaffoldPortReleased(inspector);
+});
+
+/**
+ * Exposes the native smoke boundary while keeping all child resources scoped.
+ * @param root - Installed project.
+ * @param exercise - Optional live acceptance.
+ * @returns Completion after one complete run; failures remain visible to the evidence owner.
+ */
+export function devSmoke(root: string, exercise?: (port: number) => Promise<void>): Promise<void> {
+  return Effect.runPromise(devSmokeAttempt(root, exercise));
 }
 
-export async function devSmoke(
-  root: string,
-  exercise?: (port: number) => Promise<void>,
-): Promise<void> {
-  for (let attempt = 0; ; attempt++) {
-    try {
-      return await devSmokeAttempt(root, exercise);
-    } catch (error) {
-      if (attempt === 2 || !String(error).match(/already in use|EADDRINUSE/)) throw error;
-    }
-  }
-}
-
-export async function verifyGeneratedProject(
-  root: string,
-  exercise?: (port: number) => Promise<void>,
-): Promise<void> {
-  await devSmoke(root, exercise);
-  await scanGeneratedSource(root);
+/**
+ * Verifies live behavior and then checks authored generated source conventions.
+ * @param root - Installed candidate project.
+ * @param exercise - Optional live acceptance.
+ * @returns Completion after both checks.
+ */
+export function verifyGeneratedProject(root: string, exercise?: (port: number) => Promise<void>) {
+  return Effect.runPromise(
+    Effect.gen(function* () {
+      yield* devSmokeAttempt(root, exercise);
+      yield* Effect.promise(() => scanGeneratedSource(root));
+    }),
+  );
 }
