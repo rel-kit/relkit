@@ -1,16 +1,22 @@
-import { Effect } from "effect";
+/**
+ * Interprets convention inputs and physical layout-aware suggestion paths without
+ * evaluating descriptor implementations. Provenance is decoded before inspection;
+ * the owning compiler operation controls warning emission and observation.
+ */
+import { Effect, Option, Schema } from "effect";
+import { ConventionProvenance } from "./convention-input.schemas.js";
 import type {
   ConventionCheckInput,
   ConventionCheckOptions,
   KindRule,
+  ConventionDescriptor,
 } from "./conventions.types.js";
 import {
-  isDescriptor,
   isDescriptorKind,
   normalizeSourcePathEffect,
-  type DescriptorAny,
   type DescriptorKind,
   type SourceLocation,
+  serviceSource,
 } from "@relkit/contracts";
 
 /**
@@ -22,29 +28,52 @@ import {
  */
 export function ruleFor(rule: KindRule, kind: DescriptorKind, path: string): KindRule {
   if (kind === "app" || kind === "route" || kind === "middleware") return rule;
-  const domain = path.split("/")[1] ?? "<domain>";
+  const root = serviceSource(path)?.root ?? "src/<domain>";
   return kind === "service"
-    ? { ...rule, directory: `src/${domain}` }
-    : { ...rule, directory: `src/${domain}/${rule.directory}` };
+    ? { ...rule, directory: root }
+    : { ...rule, directory: `${root}/${rule.directory}` };
 }
 
 /**
  * Selects structured or positional source convention input.
+ * @typeParam Input - Caller value narrowed to a descriptor and decoded provenance.
  * @param value - Declared metadata inspected without coercion.
  * @param sourcePath - Authored source filename.
  * @param options - Caller-supplied configuration for this operation.
  * @returns Structured convention input, or undefined for an unsupported call shape.
  */
-export function readInput(
-  value: ConventionCheckInput | unknown,
+export function readInput<Input>(
+  value: Input,
   sourcePath: string | undefined,
   options: ConventionCheckOptions,
 ): ConventionCheckInput | undefined {
   if (sourcePath !== undefined) {
+    if (!isConventionDescriptor(value)) return undefined;
     return { ...options, descriptor: value, sourcePath };
   }
-  if (!isRecord(value) || typeof value.descriptor === "undefined") return undefined;
-  return value as unknown as ConventionCheckInput;
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    !("descriptor" in value) ||
+    !isConventionDescriptor(value.descriptor)
+  )
+    return undefined;
+  const provenance = Schema.decodeUnknownOption(ConventionProvenance)(value);
+  if (Option.isNone(provenance)) return undefined;
+  const fileDescriptors =
+    "fileDescriptors" in value && Array.isArray(value.fileDescriptors)
+      ? value.fileDescriptors.filter(isConventionDescriptor)
+      : undefined;
+  const fileKinds =
+    "fileKinds" in value && Array.isArray(value.fileKinds)
+      ? value.fileKinds.filter(isDescriptorKind)
+      : undefined;
+  return {
+    ...provenance.value,
+    descriptor: value.descriptor,
+    ...(fileDescriptors === undefined ? {} : { fileDescriptors }),
+    ...(fileKinds === undefined ? {} : { fileKinds }),
+  };
 }
 
 /**
@@ -98,7 +127,7 @@ export function recommendedPattern(rule: KindRule): string {
  * @returns True when the descriptor lacks its recommended default export.
  */
 export function hasExportWarning(input: ConventionCheckInput): boolean {
-  if (isDescriptor(input.descriptor) && input.descriptor.kind === "task") return false;
+  if (input.descriptor.kind === "task") return false;
   if (input.exports !== undefined) {
     return !input.exports.some(
       (entry) => entry.isDefault ?? entry.defaultExport ?? entry.name === "default",
@@ -119,23 +148,31 @@ export function hasExportWarning(input: ConventionCheckInput): boolean {
  */
 export function descriptorKinds(
   input: ConventionCheckInput,
-  descriptor: DescriptorAny,
+  descriptor: ConventionDescriptor,
 ): DescriptorKind[] {
   const kinds = new Set<DescriptorKind>([descriptor.kind]);
   for (const kind of input.fileKinds ?? []) {
     if (isDescriptorKind(kind)) kinds.add(kind);
   }
   for (const candidate of input.fileDescriptors ?? []) {
-    if (isDescriptor(candidate)) kinds.add(candidate.kind);
+    if (isConventionDescriptor(candidate)) kinds.add(candidate.kind);
   }
   return [...kinds].sort();
 }
 
 /**
- * Recognizes nonnull nonarray objects for metadata inspection.
- * @param value - Declared metadata inspected without coercion.
- * @returns True for a nonnull, nonarray metadata object.
+ * Checks convention metadata without requiring an executable descriptor brand.
+ * @typeParam Value - Caller metadata type.
+ * @param value - A runtime descriptor or compiler's kind/ID projection.
+ * @returns Whether kind and identity are valid for nonfatal convention checks.
  */
-export function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+function isConventionDescriptor<Value>(value: Value): value is Value & ConventionDescriptor {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    "kind" in value &&
+    isDescriptorKind(value.kind) &&
+    "id" in value &&
+    typeof value.id === "string"
+  );
 }

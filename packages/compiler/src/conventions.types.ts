@@ -1,30 +1,35 @@
-import type { SourceLocation } from "@relkit/contracts";
+/**
+ * Defines convention inputs with concrete descriptor and decoded provenance types.
+ * Generic callers retain their descriptor input type at the checking boundary;
+ * only recognized descriptors/kinds participate in nonfatal warning calculations.
+ */
+import type { DescriptorKind } from "@relkit/contracts";
+import type { Schema } from "effect";
+import type * as Models from "./convention-input.schemas.js";
 
-import type { CONVENTION_CODES } from "./conventions.js";
+import type { CONVENTION_CODES } from "./convention-findings.js";
+import type { Diagnostic } from "@relkit/diagnostics";
 
 /** Stable warning codes for source authoring conventions. */
 export type ConventionCode = (typeof CONVENTION_CODES)[keyof typeof CONVENTION_CODES];
 
 /** Source export evidence used by naming and default-export checks. */
-export interface ConventionExport {
-  readonly name?: string;
-  readonly isDefault?: boolean;
-  readonly defaultExport?: boolean;
+export interface ConventionExport extends Schema.Schema.Type<typeof Models.ConventionExport> {}
+
+/** Descriptor and source provenance for convention diagnostics.
+ * @typeParam Descriptor - Caller descriptor type preserved until runtime guard validation.
+ */
+export interface ConventionDescriptor {
+  readonly kind: DescriptorKind;
+  readonly id: string;
 }
 
-/** Descriptor and source provenance for convention diagnostics. */
-export interface ConventionCheckInput {
-  readonly descriptor: unknown;
-  readonly sourcePath: string;
-  readonly projectRoot?: string;
-  readonly location?: Pick<SourceLocation, "line" | "column">;
-  readonly exportName?: string;
-  readonly exportKind?: "default" | "named" | "none";
-  readonly isDefaultExport?: boolean;
-  readonly defaultExport?: boolean;
-  readonly exports?: readonly ConventionExport[];
-  readonly fileDescriptors?: readonly unknown[];
-  readonly fileKinds?: readonly unknown[];
+export interface ConventionCheckInput<Descriptor = ConventionDescriptor> extends Schema.Schema.Type<
+  typeof Models.ConventionProvenance
+> {
+  readonly descriptor: Descriptor;
+  readonly fileDescriptors?: readonly Descriptor[];
+  readonly fileKinds?: readonly DescriptorKind[];
 }
 
 /** Optional root, location, and export evidence for positional convention callers. */
@@ -35,3 +40,10 @@ export type KindRule = {
   readonly directory: string;
   readonly suffix: string;
 };
+
+/** Invocation-local pure warning accumulator with validated descriptor provenance. */
+export interface ConventionFindingContext {
+  readonly input: ConventionCheckInput;
+  readonly path: string;
+  readonly diagnostics: Diagnostic[];
+}
