@@ -11,8 +11,8 @@ the user; the verified user ID is `session.user.id`, not a user-supplied request
 
 The example's account operation supports anonymous and authenticated requests:
 
-<include cwd lang="ts" meta='title="src/account/functions/session.function.ts"'>
-  ../../examples/auth-drizzle/src/account/functions/session.function.ts
+<include cwd lang="ts" meta='title="src/services/account/functions/session.function.ts"'>
+  ../../examples/auth-drizzle/src/services/account/functions/session.function.ts
 </include>
 
 Its output deliberately returns only an authentication flag and user ID. Do not return the complete
@@ -28,8 +28,8 @@ Inspect `.relkit/generated/context-registry.d.ts` if the expected auth type is m
 
 The operation is registered by an ordinary domain service:
 
-<include cwd lang="ts" meta='title="src/account/service.ts"'>
-  ../../examples/auth-drizzle/src/account/service.ts
+<include cwd lang="ts" meta='title="src/services/account/service.ts"'>
+  ../../examples/auth-drizzle/src/services/account/service.ts
 </include>
 
 Its public route is:

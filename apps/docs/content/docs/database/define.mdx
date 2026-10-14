@@ -4,7 +4,7 @@ description: Install compatible dependencies, configure a Drizzle client and env
 ---
 
 This guide configures the [Drizzle integration](/docs/database/drizzle). Use `defineDrizzleService`
-from `@relkit/drizzle` in `src/database/service.ts`. Do not wrap it in an
+from `@relkit/drizzle` in `src/services/database/service.ts`. Do not wrap it in an
 ordinary `defineService`, add a `database` member to another service, or add a database provider profile
 to `relkit.config.ts`. The specialized service is the registration.
 
@@ -37,8 +37,8 @@ use `:memory:`, which is isolated to a connection and disappears when it closes.
 
 The complete service includes optional models and overrides:
 
-<include cwd lang="ts" meta='title="src/database/service.ts"'>
-  ../../examples/data-model/src/database/service.ts
+<include cwd lang="ts" meta='title="src/services/database/service.ts"'>
+  ../../examples/data-model/src/services/database/service.ts
 </include>
 
 `schema` is the flat map of table exports. `client({ env })` returns the actual Drizzle database, or a

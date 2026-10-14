@@ -16,7 +16,7 @@ verify it. Continue with [Auth getting started](/docs/auth) for the architecture
 ## Understand the shared connection
 
 ```text
-src/database/service.ts → activated native Drizzle client
+src/services/database/service.ts → activated native Drizzle client
   ├─ RELKIT table clients → business functions via context.database
   └─ Better Auth Drizzle adapter → auth handler and session lookup
 
@@ -35,8 +35,8 @@ The current integration requires one Drizzle service, one Better Auth service, a
 The executable `examples/auth-drizzle` application uses Better Auth `1.7.1` and the repository's pinned
 Drizzle version. Its table definitions are:
 
-<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
-  ../../examples/auth-drizzle/src/database/schema/index.ts
+<include cwd lang="ts" meta='title="src/services/database/schema/index.ts"'>
+  ../../examples/auth-drizzle/src/services/database/schema/index.ts
 </include>
 
 The singular export keys `user`, `session`, `account`, and `verification` match the adapter's default
@@ -45,7 +45,7 @@ installed Better Auth version. This version's account model includes `issuer` an
 `issuer`/`accountId` identity; do not substitute an older four-table example without comparing it.
 
 Add these table exports to the schema map already passed to `defineDrizzleService`. If you split them
-into `src/database/schema/auth.ts`, re-export them from the schema entry point used by both the service
+into `src/services/database/schema/auth.ts`, re-export them from the schema entry point used by both the service
 and Drizzle Kit. Do not replace existing business table exports or nest the auth tables under an `auth`
 property: the service needs direct table exports.
 
@@ -83,8 +83,8 @@ bun add @relkit/better-auth@0.0.5
 
 The local showcase enables email/password authentication:
 
-<include cwd lang="ts" meta='title="src/auth/service.ts — local demonstration"'>
-  ../../examples/auth-drizzle/src/auth/service.ts
+<include cwd lang="ts" meta='title="src/services/auth/service.ts — local demonstration"'>
+  ../../examples/auth-drizzle/src/services/auth/service.ts
 </include>
 
 The service uses Better Auth's native `BETTER_AUTH_SECRET` process-environment lookup and has no
@@ -118,8 +118,8 @@ See [Protect routes](/docs/auth/protect-routes) for path matching, public auth e
 
 A business function can read the request's session:
 
-<include cwd lang="ts" meta='title="src/account/functions/session.function.ts"'>
-  ../../examples/auth-drizzle/src/account/functions/session.function.ts
+<include cwd lang="ts" meta='title="src/services/account/functions/session.function.ts"'>
+  ../../examples/auth-drizzle/src/services/account/functions/session.function.ts
 </include>
 
 Matching a protected route requires authentication, not permission to every row. Enforce ownership,

@@ -9,8 +9,8 @@ the installed Better Auth API. The `drizzle` option configures its adapter separ
 
 The executable example starts with email/password only:
 
-<include cwd lang="ts" meta='title="src/auth/service.ts"'>
-  ../../examples/auth-drizzle/src/auth/service.ts
+<include cwd lang="ts" meta='title="src/services/auth/service.ts"'>
+  ../../examples/auth-drizzle/src/services/auth/service.ts
 </include>
 
 This page identifies the configuration points and work each change requires. The example does not
@@ -43,8 +43,8 @@ denied, and failed callbacks as well as successful sign-in.
 
 The example's auth tables are ordinary Drizzle definitions owned by the database domain:
 
-<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
-  ../../examples/auth-drizzle/src/database/schema/index.ts
+<include cwd lang="ts" meta='title="src/services/database/schema/index.ts"'>
+  ../../examples/auth-drizzle/src/services/database/schema/index.ts
 </include>
 
 For additional stored user/session fields, coordinate three changes: Better Auth's model

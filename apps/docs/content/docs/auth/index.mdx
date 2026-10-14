@@ -15,7 +15,7 @@ clients connect those responsibilities without becoming a second authentication 
 
 | What you need to add                          | Where it belongs                                                      | Continue with                                                                                       |
 | --------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Sign-in methods, session policy, auth plugins | `src/auth/service.ts`, using the chosen integration                   | [Better Auth service](/docs/auth/better-auth)                                                       |
+| Sign-in methods, session policy, auth plugins | `src/services/auth/service.ts`, using the chosen integration          | [Better Auth service](/docs/auth/better-auth)                                                       |
 | Auth tables, connection, schema changes       | The existing database domain and migration tooling                    | [Database integration](/docs/database/better-auth)                                                  |
 | Public authentication endpoints               | A filesystem route under `src/routes/`                                | [Protect routes](/docs/auth/protect-routes)                                                         |
 | The current caller in a business operation    | The owning domain's function                                          | [Read sessions](/docs/auth/sessions)                                                                |

@@ -29,8 +29,9 @@ PostgreSQL, or MySQL when creating the database; an existing Drizzle service mus
 The default `--base-path /api/auth` produces
 `src/routes/api/auth/[[...auth]]/route.ts`. Use `--base-path /session-auth` for a different mount.
 
-Auth is a singleton under `src/auth`; `--service` and `--create-service` do not select its
-location. A second auth service or conflicting schema exports are rejected without overwriting them.
+Auth is a singleton under the detected service root: `src/services/auth` in grouped apps and
+`src/auth` in existing flat apps. `--service` and `--create-service` do not select its location.
+A second auth service or conflicting schema exports are rejected without overwriting them.
 The scaffold enables email/password only; add other providers and protection rules in source.
 
 For every scaffolding flag, see the [CLI reference](/docs/operations/cli-reference).
@@ -57,8 +58,8 @@ store a stable secret securely for subsequent runs. Do not commit it or the SQLi
 
 Add the authentication tables to the database schema:
 
-<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
-  ../../examples/auth-drizzle/src/database/schema/index.ts
+<include cwd lang="ts" meta='title="src/services/database/schema/index.ts"'>
+  ../../examples/auth-drizzle/src/services/database/schema/index.ts
 </include>
 
 Keep the direct `user`, `session`, `account`, and `verification` exports. These definitions match the
@@ -68,8 +69,8 @@ before adapting IDs, custom fields, or existing accounts. The example does not d
 
 Add or extend the database service:
 
-<include cwd lang="ts" meta='title="src/database/service.ts"'>
-  ../../examples/auth-drizzle/src/database/service.ts
+<include cwd lang="ts" meta='title="src/services/database/service.ts"'>
+  ../../examples/auth-drizzle/src/services/database/service.ts
 </include>
 
 This service opens and closes the connection. Table creation belongs to migration tooling, not startup.
@@ -100,10 +101,10 @@ See [Migrations](/docs/database/migrations) for changes to an existing database 
 
 ## Add the auth service and mount
 
-Create `src/auth/service.ts`:
+Create `src/services/auth/service.ts`:
 
-<include cwd lang="ts" meta='title="src/auth/service.ts"'>
-  ../../examples/auth-drizzle/src/auth/service.ts
+<include cwd lang="ts" meta='title="src/services/auth/service.ts"'>
+  ../../examples/auth-drizzle/src/services/auth/service.ts
 </include>
 
 Mount its raw handler:
@@ -122,14 +123,14 @@ Run `bun run check` now to generate auth/database context types before adding th
 
 Create the function in the Account domain:
 
-<include cwd lang="ts" meta='title="src/account/functions/session.function.ts"'>
-  ../../examples/auth-drizzle/src/account/functions/session.function.ts
+<include cwd lang="ts" meta='title="src/services/account/functions/session.function.ts"'>
+  ../../examples/auth-drizzle/src/services/account/functions/session.function.ts
 </include>
 
 Expose it through the owning service:
 
-<include cwd lang="ts" meta='title="src/account/service.ts"'>
-  ../../examples/auth-drizzle/src/account/service.ts
+<include cwd lang="ts" meta='title="src/services/account/service.ts"'>
+  ../../examples/auth-drizzle/src/services/account/service.ts
 </include>
 
 Add the public optional-session route:
