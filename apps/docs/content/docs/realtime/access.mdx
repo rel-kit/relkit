@@ -20,9 +20,9 @@ The commerce example protects each order partition:
 <include
   cwd
   lang="ts"
-  meta='title="examples/commerce/src/orders/channels/order-updates.channel.ts"'
+  meta='title="examples/commerce/src/services/orders/channels/order-updates.channel.ts"'
 >
-  ../../examples/commerce/src/orders/channels/order-updates.channel.ts
+  ../../examples/commerce/src/services/orders/channels/order-updates.channel.ts
 </include>
 
 The guard receives validated channel parameters and trusted server context. It should answer one question: may this principal observe this partition now? Authentication alone is often insufficient; an order channel should also verify that the principal can read that order in the active tenant.

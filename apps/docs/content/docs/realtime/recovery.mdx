@@ -39,9 +39,9 @@ The order-updates channel keeps a bounded five-minute replay window:
 <include
   cwd
   lang="ts"
-  meta='title="examples/commerce/src/orders/channels/order-updates.channel.ts"'
+  meta='title="examples/commerce/src/services/orders/channels/order-updates.channel.ts"'
 >
-  ../../examples/commerce/src/orders/channels/order-updates.channel.ts
+  ../../examples/commerce/src/services/orders/channels/order-updates.channel.ts
 </include>
 
 Retention is bounded by provider and application-wide storage limits. Reaching a limit does not silently evict unrelated unexpired work; the append fails with a typed overload response.
