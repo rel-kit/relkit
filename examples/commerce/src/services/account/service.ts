@@ -1,3 +1,4 @@
+/** Declares the account service boundary without acquiring native clients. */
 import { defineService } from "@relkit/app/services";
 import accountSession from "./functions/account-session.function.js";
 

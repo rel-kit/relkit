@@ -1,3 +1,4 @@
+/** Reads the invocation's native auth session and returns validated authenticated/user identity fields. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
 
