@@ -1,0 +1,13 @@
+{
+  "protocol": "relkit.grouped-layout.structural-disposition",
+  "command": "bun run konsistent -- check --format=json",
+  "status": "advisory; existing verifier policy unchanged",
+  "configurationValidation": "passed",
+  "findings": 77,
+  "changedFileFindings": [],
+  "source": "/tmp/grouped-prepush-full-current-10.log",
+  "interleavedNativeStderr": [
+    "$ konsistent check \"--format=json\" \"--max-diagnostics=1000\"",
+    "error: script \"konsistent\" exited with code 1"
+  ]
+}
