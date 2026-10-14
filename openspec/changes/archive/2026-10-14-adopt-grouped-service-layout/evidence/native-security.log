@@ -1,0 +1,2152 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/database/generated-protection.test.ts:
+[13:37:42.964] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.root",
+  outcome: "success",
+  duration_ms: 7.587333,
+}
+[13:37:42.972] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.copy",
+  outcome: "success",
+  duration_ms: 2.07075,
+}
+[13:37:42.973] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.378375,
+}
+[13:37:42.974] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.630917,
+}
+[13:37:42.975] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.copy",
+  outcome: "success",
+  duration_ms: 1.162458,
+}
+[13:37:42.977] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.config.read",
+  outcome: "success",
+  duration_ms: 2.245875,
+}
+[13:37:42.980] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.config.write",
+  outcome: "success",
+  duration_ms: 0.681666,
+}
+[13:37:42.981] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.modules.directory",
+  outcome: "success",
+  duration_ms: 0.422875,
+}
+[13:37:42.982] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.modules.list",
+  outcome: "success",
+  duration_ms: 0.788,
+}
+[13:37:42.983] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.30925,
+}
+[13:37:42.983] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.183667,
+}
+[13:37:42.983] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.148416,
+}
+[13:37:42.983] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.131833,
+}
+[13:37:42.984] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.147833,
+}
+[13:37:42.984] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.15075,
+}
+[13:37:42.984] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.directory",
+  outcome: "success",
+  duration_ms: 0.149708,
+}
+[13:37:42.984] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.list",
+  outcome: "success",
+  duration_ms: 0.2335,
+}
+[13:37:42.985] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.176292,
+}
+[13:37:42.985] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.131208,
+}
+[13:37:42.985] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.119125,
+}
+[13:37:42.985] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.144625,
+}
+[13:37:42.985] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.130584,
+}
+[13:37:42.986] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.17375,
+}
+[13:37:42.986] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.140584,
+}
+[13:37:42.986] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.effect.link",
+  outcome: "success",
+  duration_ms: 0.148667,
+}
+[13:37:42.987] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.schema.read",
+  outcome: "success",
+  duration_ms: 0.279833,
+}
+[13:37:42.987] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.schema.write",
+  outcome: "success",
+  duration_ms: 0.58825,
+}
+[13:37:42.988] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.344708,
+}
+[13:37:42.988] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.307542,
+}
+[13:37:42.988] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.20325,
+}
+[13:37:42.989] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.187167,
+}
+[13:37:42.989] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.072917,
+}
+[13:37:42.989] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.163792,
+}
+[13:37:42.989] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.154625,
+}
+[13:37:42.992] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 2.675042,
+}
+[13:37:42.992] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.123459,
+}
+[13:37:42.993] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.29725,
+}
+[13:37:42.993] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.223041,
+}
+[13:37:42.993] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.210333,
+}
+[13:37:42.994] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.12675,
+}
+[13:37:42.994] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.188791,
+}
+[13:37:42.994] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.169791,
+}
+[13:37:42.994] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.155333,
+}
+[13:37:42.994] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.fixture",
+  outcome: "success",
+  duration_ms: 25.036125,
+}
+[13:37:43.002] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.fixture.stage",
+  outcome: "success",
+  duration_ms: 7.021333,
+}
+[13:37:43.120] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.flatten",
+  outcome: "success",
+  duration_ms: 118.074958,
+}
+[13:37:43.134] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.sql",
+  outcome: "success",
+  duration_ms: 0.625417,
+}
+[13:37:53.007] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.build",
+  outcome: "success",
+  duration_ms: 9858.26525,
+}
+[13:37:53.021] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 2.163208,
+}
+[13:37:53.050] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.978875,
+}
+[13:37:53.082] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 2.677959,
+}
+[13:37:53.111] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.421833,
+}
+[13:37:53.144] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 4.362541,
+}
+[13:37:53.175] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.597209,
+}
+[13:37:53.203] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.423875,
+}
+[13:37:53.232] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.43775,
+}
+[13:37:53.261] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.480667,
+}
+[13:37:53.289] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.425042,
+}
+[13:37:53.318] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 1.039958,
+}
+[13:37:53.349] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.875083,
+}
+[13:37:53.378] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.429084,
+}
+[13:37:53.410] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 2.627292,
+}
+[13:37:53.439] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.593792,
+}
+[13:37:53.469] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.508167,
+}
+[13:37:53.497] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.429584,
+}
+[13:37:53.527] ERROR (#1791): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.626875,
+}
+[13:37:54.446] INFO (#1791): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 890.35125,
+}
+[13:37:54.450] INFO (#1791): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.ready.body",
+  outcome: "success",
+  duration_ms: 0.824292,
+}
+[13:37:54.452] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.start",
+  outcome: "success",
+  duration_ms: 11483.082709,
+}
+[13:37:54.652] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 199.583292,
+}
+[13:37:54.654] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.158458,
+}
+[13:37:54.670] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 15.89325,
+}
+[13:37:54.671] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.402375,
+}
+[13:37:54.786] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 115.439791,
+}
+[13:37:54.786] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.065959,
+}
+[13:37:54.802] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 14.961875,
+}
+[13:37:54.802] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.044958,
+}
+[13:37:54.946] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 143.617833,
+}
+[13:37:54.946] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.209584,
+}
+[13:37:54.985] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 38.261833,
+}
+[13:37:54.985] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.055,
+}
+[13:37:55.025] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 39.648042,
+}
+[13:37:55.026] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.152209,
+}
+[13:37:55.254] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 227.559166,
+}
+[13:37:55.254] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.080833,
+}
+[13:37:55.320] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 65.804459,
+}
+[13:37:55.320] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.059584,
+}
+[13:37:55.404] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 83.167791,
+}
+[13:37:55.404] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.251625,
+}
+[13:37:55.546] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 140.761083,
+}
+[13:37:55.546] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.121458,
+}
+[13:37:55.571] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 24.757459,
+}
+[13:37:55.571] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.047083,
+}
+[13:37:55.681] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 110.016834,
+}
+[13:37:55.683] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.786167,
+}
+[13:37:55.750] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 67.248958,
+}
+[13:37:55.750] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.072209,
+}
+[13:37:55.805] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 53.889875,
+}
+[13:37:55.805] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.092833,
+}
+[13:37:55.897] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 91.593417,
+}
+[13:37:55.897] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.0775,
+}
+[13:37:55.919] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 21.66475,
+}
+[13:37:55.919] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.061667,
+}
+[13:37:55.995] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 75.366291,
+}
+[13:37:55.995] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.053208,
+}
+[13:37:56.058] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 62.921292,
+}
+[13:37:56.058] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.193291,
+}
+[13:37:56.117] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 58.208209,
+}
+[13:37:56.117] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.058458,
+}
+[13:37:56.195] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 78.035916,
+}
+[13:37:56.195] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.068709,
+}
+[13:37:56.213] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 16.691417,
+}
+[13:37:56.213] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.094958,
+}
+[13:37:56.256] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 43.089666,
+}
+[13:37:56.256] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.066708,
+}
+[13:37:56.268] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 3.16,
+}
+[13:37:56.268] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.03625,
+}
+[13:37:56.305] ERROR (#1798): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 34.64375,
+}
+[13:37:56.305] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.anonymous",
+  outcome: "success",
+  duration_ms: 35.25525,
+}
+[13:37:56.362] INFO (#1800): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 56.682125,
+}
+[13:37:56.362] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.accept",
+  outcome: "success",
+  duration_ms: 56.930125,
+}
+[13:37:56.451] INFO (#1802): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 88.437,
+}
+[13:37:56.452] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.load",
+  outcome: "success",
+  duration_ms: 88.764916,
+}
+[13:37:56.776] INFO (#1803): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 293.284958,
+}
+[13:37:56.776] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.load",
+  outcome: "success",
+  duration_ms: 293.927458,
+}
+[13:37:56.950] INFO (#1804): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 141.954417,
+}
+[13:37:56.950] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.load",
+  outcome: "success",
+  duration_ms: 142.805833,
+}
+[13:37:56.966] INFO (#1805): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 14.781791,
+}
+[13:37:56.966] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.stream",
+  outcome: "success",
+  duration_ms: 15.121125,
+}
+[13:37:57.070] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.frame",
+  outcome: "success",
+  duration_ms: 103.523125,
+}
+[13:37:57.072] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.close",
+  outcome: "success",
+  duration_ms: 1.621375,
+}
+[13:37:57.132] ERROR (#1808): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 54.529417,
+}
+[13:37:57.132] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.foreign",
+  outcome: "success",
+  duration_ms: 55.109666,
+}
+[13:37:57.170] INFO (#1810): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 36.955666,
+}
+[13:37:57.170] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.threads",
+  outcome: "success",
+  duration_ms: 37.477542,
+}
+[13:37:57.205] ERROR (#1813): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 34.505291,
+}
+[13:37:57.207] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.foreign",
+  outcome: "success",
+  duration_ms: 36.882667,
+}
+[13:37:57.260] INFO (#1815): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 51.317375,
+}
+[13:37:57.260] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.threads",
+  outcome: "success",
+  duration_ms: 52.868959,
+}
+[13:37:57.264] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 2.450875,
+}
+[13:37:57.264] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.118,
+}
+[13:37:57.283] INFO (#1818): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 17.910083,
+}
+[13:37:57.283] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 18.265417,
+}
+[13:37:57.284] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.denied",
+  outcome: "success",
+  duration_ms: 0.708,
+}
+[13:37:57.284] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.09425,
+}
+[13:37:57.295] INFO (#1822): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 10.510542,
+}
+[13:37:57.295] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 10.718916,
+}
+[13:37:57.316] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.denied",
+  outcome: "success",
+  duration_ms: 21.064292,
+}
+[13:37:57.316] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.064333,
+}
+[13:37:57.323] INFO (#1826): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 5.92225,
+}
+[13:37:57.323] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 6.286042,
+}
+[13:37:57.340] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.denied",
+  outcome: "success",
+  duration_ms: 17.309,
+}
+[13:37:57.341] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.085875,
+}
+[13:37:57.347] INFO (#1830): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 5.8845,
+}
+[13:37:57.347] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 6.097334,
+}
+[13:37:57.353] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.denied",
+  outcome: "success",
+  duration_ms: 5.803875,
+}
+[13:37:57.353] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.077083,
+}
+[13:37:57.365] INFO (#1834): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 11.350834,
+}
+[13:37:57.366] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 11.624334,
+}
+[13:37:57.421] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 54.921,
+}
+[13:37:57.517] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 94.330459,
+}
+[13:37:57.517] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.publish.body",
+  outcome: "success",
+  duration_ms: 0.135916,
+}
+[13:37:57.517] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 0.166792,
+}
+[13:37:57.594] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 76.473667,
+}
+[13:37:57.595] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.269459,
+}
+[13:37:57.701] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 105.81925,
+}
+[13:37:57.702] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.071792,
+}
+[13:37:57.789] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 87.025333,
+}
+[13:37:57.789] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.publish.body",
+  outcome: "success",
+  duration_ms: 0.0755,
+}
+[13:37:57.796] INFO (#1838): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 5.661833,
+}
+[13:37:57.796] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 5.882916,
+}
+[13:37:57.845] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 49.306792,
+}
+[13:37:57.886] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 40.03525,
+}
+[13:37:57.886] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.184959,
+}
+[13:37:57.928] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 41.438208,
+}
+[13:37:57.928] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.signout.body",
+  outcome: "success",
+  duration_ms: 0.098875,
+}
+[13:37:57.936] INFO (#1842): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 7.17425,
+}
+[13:37:57.936] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 7.503417,
+}
+[13:37:57.945] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.revoked",
+  outcome: "success",
+  duration_ms: 8.351625,
+}
+[13:37:57.945] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.075792,
+}
+[13:38:00.015] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.release",
+  outcome: "success",
+  duration_ms: 11.700167,
+}
+(pass) native subject authorization preserves flat user and tenant denial [17062.95ms]
+[13:38:00.017] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.root",
+  outcome: "success",
+  duration_ms: 0.349917,
+}
+[13:38:00.018] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.73975,
+}
+[13:38:00.018] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.221,
+}
+[13:38:00.019] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.41725,
+}
+[13:38:00.019] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.406083,
+}
+[13:38:00.020] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.config.read",
+  outcome: "success",
+  duration_ms: 0.818625,
+}
+[13:38:00.022] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.config.write",
+  outcome: "success",
+  duration_ms: 0.433542,
+}
+[13:38:00.023] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.modules.directory",
+  outcome: "success",
+  duration_ms: 1.240875,
+}
+[13:38:00.043] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.modules.list",
+  outcome: "success",
+  duration_ms: 9.705875,
+}
+[13:38:00.049] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.997,
+}
+[13:38:00.051] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 1.135041,
+}
+[13:38:00.052] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 1.010167,
+}
+[13:38:00.053] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.607417,
+}
+[13:38:00.053] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.143708,
+}
+[13:38:00.053] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.module.link",
+  outcome: "success",
+  duration_ms: 0.166792,
+}
+[13:38:00.053] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.directory",
+  outcome: "success",
+  duration_ms: 0.197667,
+}
+[13:38:00.054] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.list",
+  outcome: "success",
+  duration_ms: 0.169375,
+}
+[13:38:00.054] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.184208,
+}
+[13:38:00.054] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.181833,
+}
+[13:38:00.054] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.165,
+}
+[13:38:00.054] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.085208,
+}
+[13:38:00.055] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.134167,
+}
+[13:38:00.057] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 0.160417,
+}
+[13:38:00.060] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.sdk.link",
+  outcome: "success",
+  duration_ms: 3.113959,
+}
+[13:38:00.061] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.effect.link",
+  outcome: "success",
+  duration_ms: 0.271083,
+}
+[13:38:00.061] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.schema.read",
+  outcome: "success",
+  duration_ms: 0.281416,
+}
+[13:38:00.062] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.schema.write",
+  outcome: "success",
+  duration_ms: 0.268208,
+}
+[13:38:00.062] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.180625,
+}
+[13:38:00.062] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.332042,
+}
+[13:38:00.063] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.259625,
+}
+[13:38:00.063] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.223667,
+}
+[13:38:00.063] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.146125,
+}
+[13:38:00.064] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.254583,
+}
+[13:38:00.064] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.072208,
+}
+[13:38:00.064] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.504583,
+}
+[13:38:00.065] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.226792,
+}
+[13:38:00.065] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.405125,
+}
+[13:38:00.065] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.184625,
+}
+[13:38:00.066] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.232083,
+}
+[13:38:00.066] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.159833,
+}
+[13:38:00.066] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.238209,
+}
+[13:38:00.067] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.directory",
+  outcome: "success",
+  duration_ms: 0.14825,
+}
+[13:38:00.067] INFO (#1847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.fixture.source.write",
+  outcome: "success",
+  duration_ms: 0.15875,
+}
+[13:38:00.067] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.fixture",
+  outcome: "success",
+  duration_ms: 49.774667,
+}
+[13:38:00.076] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.fixture.stage",
+  outcome: "success",
+  duration_ms: 8.502916,
+}
+[13:38:00.079] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.sql",
+  outcome: "success",
+  duration_ms: 2.2815,
+}
+[13:38:05.254] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.build",
+  outcome: "success",
+  duration_ms: 5170.205959,
+}
+[13:38:05.264] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 1.974667,
+}
+[13:38:05.305] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 4.830708,
+}
+[13:38:05.335] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.553417,
+}
+[13:38:05.363] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.407875,
+}
+[13:38:05.394] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.490458,
+}
+[13:38:05.423] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.742041,
+}
+[13:38:05.451] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.436083,
+}
+[13:38:05.480] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.881458,
+}
+[13:38:05.510] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.427333,
+}
+[13:38:05.539] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.539,
+}
+[13:38:05.565] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.576542,
+}
+[13:38:05.593] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.423792,
+}
+[13:38:05.622] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.383583,
+}
+[13:38:05.650] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 0.407,
+}
+[13:38:05.683] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 1.751083,
+}
+[13:38:05.712] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 1.122875,
+}
+[13:38:05.743] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 2.808375,
+}
+[13:38:05.775] ERROR (#3550): Execution operation failed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "failure",
+  duration_ms: 3.671792,
+}
+[13:38:05.922] INFO (#3550): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 117.582292,
+}
+[13:38:05.923] INFO (#3550): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.ready.body",
+  outcome: "success",
+  duration_ms: 0.349167,
+}
+[13:38:05.923] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.start",
+  outcome: "success",
+  duration_ms: 5906.177917,
+}
+[13:38:06.031] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 107.028459,
+}
+[13:38:06.031] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.156458,
+}
+[13:38:06.042] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 10.335,
+}
+[13:38:06.042] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.145,
+}
+[13:38:06.135] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 92.743625,
+}
+[13:38:06.135] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.071459,
+}
+[13:38:06.145] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 9.809042,
+}
+[13:38:06.145] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.050792,
+}
+[13:38:06.236] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 90.312208,
+}
+[13:38:06.236] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.071917,
+}
+[13:38:06.247] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 10.492083,
+}
+[13:38:06.247] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.046666,
+}
+[13:38:06.262] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 15.441792,
+}
+[13:38:06.263] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.050083,
+}
+[13:38:06.316] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 53.010791,
+}
+[13:38:06.316] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.06475,
+}
+[13:38:06.361] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 45.051958,
+}
+[13:38:06.361] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.131334,
+}
+[13:38:06.420] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 57.333833,
+}
+[13:38:06.420] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.056584,
+}
+[13:38:06.461] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 40.859458,
+}
+[13:38:06.461] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.050042,
+}
+[13:38:06.486] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 24.091208,
+}
+[13:38:06.486] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.049417,
+}
+[13:38:06.554] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 68.245416,
+}
+[13:38:06.554] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.039083,
+}
+[13:38:06.619] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 64.884833,
+}
+[13:38:06.620] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.039416,
+}
+[13:38:06.681] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 60.825416,
+}
+[13:38:06.681] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.138583,
+}
+[13:38:06.735] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 53.639375,
+}
+[13:38:06.735] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.033167,
+}
+[13:38:06.749] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 14.288375,
+}
+[13:38:06.749] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.039625,
+}
+[13:38:06.810] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 61.019667,
+}
+[13:38:06.811] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.060125,
+}
+[13:38:06.866] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 55.464292,
+}
+[13:38:06.866] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.043166,
+}
+[13:38:06.926] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 60.012333,
+}
+[13:38:06.926] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.038416,
+}
+[13:38:07.038] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 111.788042,
+}
+[13:38:07.038] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.051083,
+}
+[13:38:07.049] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 10.061208,
+}
+[13:38:07.049] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.076667,
+}
+[13:38:07.103] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 53.829708,
+}
+[13:38:07.103] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.03975,
+}
+[13:38:07.117] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 6.895708,
+}
+[13:38:07.117] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.067875,
+}
+[13:38:07.156] ERROR (#3557): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 28.405709,
+}
+[13:38:07.160] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.anonymous",
+  outcome: "success",
+  duration_ms: 29.636458,
+}
+[13:38:07.234] INFO (#3559): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 72.790334,
+}
+[13:38:07.234] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.accept",
+  outcome: "success",
+  duration_ms: 73.076583,
+}
+[13:38:07.571] INFO (#3561): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 337.360166,
+}
+[13:38:07.571] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.load",
+  outcome: "success",
+  duration_ms: 337.594875,
+}
+[13:38:07.604] INFO (#3562): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 27.241666,
+}
+[13:38:07.604] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.stream",
+  outcome: "success",
+  duration_ms: 32.469875,
+}
+[13:38:07.664] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.frame",
+  outcome: "success",
+  duration_ms: 59.709833,
+}
+[13:38:07.666] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.close",
+  outcome: "success",
+  duration_ms: 2.098084,
+}
+[13:38:07.732] ERROR (#3565): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 64.091125,
+}
+[13:38:07.732] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.foreign",
+  outcome: "success",
+  duration_ms: 64.362083,
+}
+[13:38:07.777] INFO (#3567): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 44.8855,
+}
+[13:38:07.777] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.threads",
+  outcome: "success",
+  duration_ms: 45.101166,
+}
+[13:38:07.810] ERROR (#3570): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 32.010375,
+}
+[13:38:07.810] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.foreign",
+  outcome: "success",
+  duration_ms: 32.211458,
+}
+[13:38:07.836] INFO (#3572): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 26.032708,
+}
+[13:38:07.836] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.agent.threads",
+  outcome: "success",
+  duration_ms: 26.293666,
+}
+[13:38:07.841] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 4.849916,
+}
+[13:38:07.841] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.body",
+  outcome: "success",
+  duration_ms: 0.038917,
+}
+[13:38:07.869] INFO (#3575): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 27.106,
+}
+[13:38:07.869] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 27.405417,
+}
+[13:38:07.876] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.denied",
+  outcome: "success",
+  duration_ms: 2.0875,
+}
+[13:38:07.876] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.137541,
+}
+[13:38:07.897] INFO (#3579): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 20.5105,
+}
+[13:38:07.897] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 20.704209,
+}
+[13:38:07.916] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.denied",
+  outcome: "success",
+  duration_ms: 18.17,
+}
+[13:38:07.916] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.060375,
+}
+[13:38:07.921] INFO (#3583): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 5.281959,
+}
+[13:38:07.921] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 5.439625,
+}
+[13:38:07.937] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.denied",
+  outcome: "success",
+  duration_ms: 15.190625,
+}
+[13:38:07.937] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.047667,
+}
+[13:38:07.947] INFO (#3587): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 10.044375,
+}
+[13:38:07.948] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 10.234667,
+}
+[13:38:07.956] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.denied",
+  outcome: "success",
+  duration_ms: 8.168083,
+}
+[13:38:07.956] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.087,
+}
+[13:38:07.962] INFO (#3591): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 5.869083,
+}
+[13:38:07.962] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 6.054167,
+}
+[13:38:08.011] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 48.288583,
+}
+[13:38:08.089] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 76.789625,
+}
+[13:38:08.089] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.publish.body",
+  outcome: "success",
+  duration_ms: 0.065,
+}
+[13:38:08.089] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 0.173333,
+}
+[13:38:08.131] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 41.539709,
+}
+[13:38:08.132] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.15225,
+}
+[13:38:08.215] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 83.540791,
+}
+[13:38:08.215] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.http.body",
+  outcome: "success",
+  duration_ms: 0.058167,
+}
+[13:38:08.264] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 48.742875,
+}
+[13:38:08.264] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.publish.body",
+  outcome: "success",
+  duration_ms: 0.02725,
+}
+[13:38:08.270] INFO (#3595): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 4.900167,
+}
+[13:38:08.270] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 5.069459,
+}
+[13:38:08.321] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 51.0765,
+}
+[13:38:08.374] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.next",
+  outcome: "success",
+  duration_ms: 53.156375,
+}
+[13:38:08.375] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.191834,
+}
+[13:38:08.398] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "generated.host.http",
+  outcome: "success",
+  duration_ms: 22.625333,
+}
+[13:38:08.398] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.signout.body",
+  outcome: "success",
+  duration_ms: 0.055459,
+}
+[13:38:08.411] INFO (#3599): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 12.764667,
+}
+[13:38:08.411] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.open",
+  outcome: "success",
+  duration_ms: 13.34275,
+}
+[13:38:08.417] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.revoked",
+  outcome: "success",
+  duration_ms: 5.167,
+}
+[13:38:08.417] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.protection.stream.close",
+  outcome: "success",
+  duration_ms: 0.062417,
+}
+[13:38:10.512] INFO (#1846): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.release",
+  outcome: "success",
+  duration_ms: 10.536209,
+}
+(pass) native subject authorization preserves grouped user and tenant denial [10500.19ms]
+
+ 2 pass
+ 0 fail
+ 98 expect() calls
+Ran 2 tests across 1 file. [28.50s]
