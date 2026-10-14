@@ -6,39 +6,16 @@
  */
 import { createHash } from "node:crypto";
 import { realpathSync } from "node:fs";
-import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import ts from "typescript";
+import { registerDependencyAlias } from "./typecheck-inputs-aliases.js";
 import type { TypecheckInputState, TypecheckInputWitness } from "./typecheck-inputs.types.js";
-
-/**
- * Normalizes both lexical and physical aliases of a project into portable paths.
- * @param state - Acquired project containment witnesses.
- * @param path - Native absolute or project-relative host query.
- * @returns Relative identity, dot for the root, or absence for ancestor resolution.
- */
-export function typecheckInputPath(state: TypecheckInputState, path: string): string | undefined {
-  const absolute = isAbsolute(path) ? path : resolve(state.root, path);
-  const contained = containedPath(state, absolute);
-  if (contained !== undefined) return contained;
-  const aliases = [...state.dependencyAliases].sort(
-    ([left], [right]) => right.length - left.length,
-  );
-  for (const [physical, lexical] of aliases) {
-    const child = relative(physical, absolute);
-    if (child !== ".." && !child.startsWith("../") && !isAbsolute(child))
-      return relative(state.root, resolve(lexical, child)) || ".";
-  }
-  return undefined;
-}
-
-/** Resolves only paths physically or lexically contained by the project itself. */
-function containedPath(state: TypecheckInputState, absolute: string): string | undefined {
-  for (const root of [state.root, state.physicalRoot]) {
-    const local = relative(root, absolute);
-    if (local !== ".." && !local.startsWith("../") && !isAbsolute(local)) return local || ".";
-  }
-  return undefined;
-}
+import {
+  containedPath,
+  typecheckAncestorDirectory,
+  typecheckInputPath,
+} from "./typecheck-inputs-paths.js";
+export { typecheckInputPath } from "./typecheck-inputs-paths.js";
 
 /**
  * Retains a bounded observation and detects inconsistent repeated host queries.
@@ -56,7 +33,7 @@ function record(state: TypecheckInputState, witness: TypecheckInputWitness): voi
   if (
     previous !== undefined &&
     JSON.stringify(previous) !== JSON.stringify(witness) &&
-    !witness.path.startsWith("node_modules/")
+    (!witness.path.startsWith("node_modules/") || witness.kind === "read")
   )
     state.failure = "changed";
   state.witnesses.set(key, witness);
@@ -75,10 +52,9 @@ function recordRead(state: TypecheckInputState, path: string, text: string): voi
     state.failure = "escaped";
     return;
   }
-  // Installed dependency bytes are captured by the separate complete dependency
-  // inventory. Keeping them in this authored-input journal would duplicate that
-  // authority and make linked package aliases collide under portable identities.
-  if (local.startsWith("node_modules/")) return;
+  // Runtime bundle closure does not prove declaration-only dependencies. Contained
+  // consumed declarations need independent byte witnesses. External linked declarations
+  // cannot be replayed by the contained file authority and must use ordinary checking.
   if (containedPath(state, realpathSync(path)) === undefined) {
     state.failure = "escaped";
     return;
@@ -99,47 +75,49 @@ export function typecheckInputSystem(state: TypecheckInputState): ts.System {
   return {
     ...ts.sys,
     getExecutingFilePath: () => join(state.root, "node_modules/typescript/lib/typescript.js"),
+
+    /** Reads native source text only through the check's contained authority.
+     * @param path - Native filename queried by TypeScript.
+     * @param encoding - Original optional TypeScript encoding hint.
+     * @returns Consumed text with a byte witness, or undefined for missing/escaped input. */
     readFile(path, encoding) {
-      if (typecheckInputPath(state, path) === undefined) return undefined;
+      if (typecheckInputPath(state, path) === undefined) {
+        if (ts.sys.fileExists(path)) state.failure = "escaped";
+        return undefined;
+      }
       const text = ts.sys.readFile(path, encoding);
       if (text !== undefined) recordRead(state, path, text);
       return text;
     },
     fileExists: (path) => exists(state, path, "fileExists"),
     directoryExists: (path) => exists(state, path, "directoryExists"),
+
+    /** Resolves native identity while retaining contained dependency alias evidence.
+     * @param path - Native module/config path requested by TypeScript.
+     * @returns Original physical identity; escaped declaration reads still reject reuse. */
     realpath(path) {
       const local = typecheckInputPath(state, path);
       const physical = resolve(ts.sys.realpath?.(path) ?? path);
       if (local?.startsWith("node_modules/") && containedPath(state, physical) === undefined)
-        registerDependencyAlias(state, physical, resolve(state.root, local));
+        registerDependencyAlias(state.dependencyAliases, physical, resolve(state.root, local));
       return physical;
     },
+
+    /** Journals contained directory results used by native module resolution.
+     * @param path - Native directory queried by TypeScript.
+     * @returns Sorted native entries inside the root, or the isolated empty ancestor result. */
     getDirectories(path) {
       const local = typecheckInputPath(state, path);
-      if (local === undefined) return [];
+      if (local === undefined) {
+        // Outside directory discovery is deliberately empty for this isolated host.
+        // Its native contents are never observed or granted resolution authority.
+        return [];
+      }
       const entries = ts.sys.getDirectories(path).sort();
       record(state, { kind: "directories", path: local, entries });
       return entries;
     },
   };
-}
-
-/** Registers one resolved package and the sibling container used for transitive imports. */
-function registerDependencyAlias(
-  state: TypecheckInputState,
-  physical: string,
-  lexical: string,
-): void {
-  const previous = state.dependencyAliases.get(physical);
-  if (previous === undefined || lexical.length < previous.length)
-    state.dependencyAliases.set(physical, lexical);
-  const parent = dirname(physical);
-  const container = basename(parent).startsWith("@") ? dirname(parent) : parent;
-  if (basename(container) !== "node_modules") return;
-  const nested = join(lexical, "node_modules");
-  const current = state.dependencyAliases.get(container);
-  if (current === undefined || nested.length < current.length)
-    state.dependencyAliases.set(container, nested);
 }
 
 /**
@@ -155,7 +133,14 @@ function exists(
   kind: "fileExists" | "directoryExists",
 ): boolean {
   const local = typecheckInputPath(state, path);
-  if (local === undefined) return false;
+  if (local === undefined) {
+    if (kind === "directoryExists" && typecheckAncestorDirectory(state, path)) return true;
+    // TypeScript routinely searches ancestor node_modules for optional peers.
+    // Suppressing that directory is stable host policy, not an external input.
+    // A requested external file/config still rejects reusable evidence.
+    if (kind === "fileExists" && ts.sys.fileExists(path)) state.failure = "escaped";
+    return false;
+  }
   const present = kind === "fileExists" ? ts.sys.fileExists(path) : ts.sys.directoryExists(path);
   record(state, { kind, path: local, exists: present });
   return present;
@@ -185,8 +170,18 @@ export function typecheckInputHost(
     directoryExists: system.directoryExists,
     getDirectories: system.getDirectories,
     realpath: (path) => system.realpath?.(path) ?? path,
+
+    /** Preserves native parsing and records the exact source text it consumes.
+     * @param path - Native source filename requested by the compiler.
+     * @param languageVersion - Original syntax/parsing options.
+     * @param onError - Original compiler-owned read diagnostic callback.
+     * @param shouldCreateNewSourceFile - Original native source reuse choice.
+     * @returns The native parsed source with its witness, or undefined for missing/escaped input. */
     getSourceFile(path, languageVersion, onError, shouldCreateNewSourceFile) {
-      if (typecheckInputPath(state, path) === undefined) return undefined;
+      if (typecheckInputPath(state, path) === undefined) {
+        if (ts.sys.fileExists(path)) state.failure = "escaped";
+        return undefined;
+      }
       const source = native.getSourceFile(
         path,
         languageVersion,
