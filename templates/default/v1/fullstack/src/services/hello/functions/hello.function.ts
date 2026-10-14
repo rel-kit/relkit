@@ -1,3 +1,4 @@
+/** Supplies the hello service and frontend with a schema-validated greeting for the requested name. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
 
