@@ -1,6 +1,7 @@
+/** Stores a receipt through its declared bucket; storage failures become a declared error while cancellation propagates. */
 import { defineFunction } from "@relkit/app/functions";
-import receipts from "@app/receipts/buckets/receipts.bucket.js";
-import { receiptInput, receiptOutput } from "@app/platform/schemas.js";
+import receipts from "../buckets/receipts.bucket.js";
+import { receiptInput, receiptOutput } from "../../../platform/schemas.js";
 import receiptStorageUnavailable from "../errors/receipt-storage-unavailable.error.js";
 
 const sendReceipt = defineFunction({
