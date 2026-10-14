@@ -9,7 +9,7 @@ Generated projects use Bun's test runner and `@relkit/testing`. Start with the e
 ```ts
 import { expect, test } from "bun:test";
 import { invokeFunction } from "@relkit/testing";
-import orders from "@app/orders/service.js";
+import orders from "@app/services/orders/service.js";
 
 test("createOrder calculates its total", async () => {
   await expect(
