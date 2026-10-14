@@ -28,6 +28,13 @@ export type MutableCompilerWorkload = {
 
 /** Declaration-owned operation labels; caller IDs and paths cannot enter metric attributes. */
 export type CompilerOperation =
+  | "authoredPaths"
+  | "applicationLayout"
+  | "normalizationLayout"
+  | "validateLayoutSources"
+  | "validateBoundarySource"
+  | "resolveSourceDependency"
+  | "sourceResolutionOptions"
   | "extensionArtifact"
   | "sourceReaderExists"
   | "sourceReaderRead"
