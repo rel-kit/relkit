@@ -3,14 +3,14 @@ title: Define the schema
 description: Model tables, defaults, primary and unique keys, relationships, and validation without confusing TypeScript declarations with applied database changes.
 ---
 
-Write ordinary Drizzle tables in `src/database/schema/` and export them from its `index.ts`. The service's
+Write ordinary Drizzle tables in `src/services/database/schema/` and export them from its `index.ts`. The service's
 `schema` map determines which tables appear on `context.database`. You do not need a custom model file
 for every table: base operations are provided automatically.
 
 ## Model columns and defaults
 
-<include cwd lang="ts" meta='title="src/database/schema/index.ts — users"'>
-  ../../examples/data-model/src/database/schema/index.ts#users-table
+<include cwd lang="ts" meta='title="src/services/database/schema/index.ts — users"'>
+  ../../examples/data-model/src/services/database/schema/index.ts#users-table
 </include>
 
 The exported key `users` becomes `context.database.users`; `sqliteTable("users", ...)` names the stored
@@ -30,8 +30,8 @@ not nested namespace objects. Non-table exports do not become portable table cli
 Single-row operations require a complete primary or unique selector. The example's membership identity
 is a pair, not just an organization ID:
 
-<include cwd lang="ts" meta='title="src/database/schema/index.ts — memberships"'>
-  ../../examples/data-model/src/database/schema/index.ts#memberships-table
+<include cwd lang="ts" meta='title="src/services/database/schema/index.ts — memberships"'>
+  ../../examples/data-model/src/services/database/schema/index.ts#memberships-table
 </include>
 
 You can select a membership by its `id`, or by both `organizationId` and `userId`. A non-unique index

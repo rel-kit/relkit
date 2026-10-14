@@ -13,14 +13,14 @@ query, and migration APIs belong to the chosen integration.
 
 ## Keep the responsibilities separate
 
-| Responsibility      | What belongs here                                                          | Typical location                                          |
-| ------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------- |
-| Database service    | Connection configuration, lifecycle, and integration-specific registration | `src/database/service.ts`                                 |
-| Data model          | Stored record shapes, identities, relationships, and constraints           | `src/database/schema/` in the current Drizzle integration |
-| Data operations     | Reusable queries and persistence-specific customization                    | `src/database/models/` for Drizzle custom methods         |
-| Business domain     | Validation, authorization, and workflows such as registering a member      | `src/users/functions/` or another owning domain           |
-| Operational tooling | Schema migrations, backfills, backups, and recovery                        | Application-root tooling, outside business handlers       |
-| HTTP interface      | Which business operations callers can invoke                               | `src/routes/`                                             |
+| Responsibility      | What belongs here                                                          | Typical location                                                   |
+| ------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Database service    | Connection configuration, lifecycle, and integration-specific registration | `src/services/database/service.ts`                                 |
+| Data model          | Stored record shapes, identities, relationships, and constraints           | `src/services/database/schema/` in the current Drizzle integration |
+| Data operations     | Reusable queries and persistence-specific customization                    | `src/services/database/models/` for Drizzle custom methods         |
+| Business domain     | Validation, authorization, and workflows such as registering a member      | `src/services/users/functions/` or another owning domain           |
+| Operational tooling | Schema migrations, backfills, backups, and recovery                        | Application-root tooling, outside business handlers                |
+| HTTP interface      | Which business operations callers can invoke                               | `src/routes/`                                                      |
 
 A Users function decides whether someone may join an organization. The database stores the user and
 membership and enforces the configured constraints. A route exposes that workflow only when the product
