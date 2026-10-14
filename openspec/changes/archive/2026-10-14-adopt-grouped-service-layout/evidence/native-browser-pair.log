@@ -1,0 +1,66 @@
+[15:51:45.434] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.host.root",
+  outcome: "success",
+  duration_ms: 3.440542,
+}
+[15:51:45.467] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.host.stage",
+  outcome: "success",
+  duration_ms: 29.639625,
+}
+[15:51:45.489] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.generated.host.flatten",
+  outcome: "success",
+  duration_ms: 21.868,
+}
+[15:51:57.206] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 2137.396209,
+}
+
+Running 1 test using 1 worker
+
+  ✓  1 tests/e2e-commerce/generated-ai-regressions.spec.ts:4:1 › generated dev host admits its browser origin and classifies malformed AI input (982ms)
+
+  1 passed (1.7s)
+[15:51:57.263] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.host.release",
+  outcome: "success",
+  duration_ms: 8.733292,
+}
+[15:51:57.264] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.host.root",
+  outcome: "success",
+  duration_ms: 0.264,
+}
+[15:51:57.283] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.host.stage",
+  outcome: "success",
+  duration_ms: 18.907792,
+}
+[15:52:05.467] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1333.29675,
+}
+
+Running 1 test using 1 worker
+
+  ✓  1 tests/e2e-commerce/generated-ai-regressions.spec.ts:4:1 › generated dev host admits its browser origin and classifies malformed AI input (570ms)
+
+  1 passed (1.0s)
+[15:52:05.518] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.host.release",
+  outcome: "success",
+  duration_ms: 8.189458,
+}
