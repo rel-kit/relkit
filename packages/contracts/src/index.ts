@@ -1,4 +1,10 @@
+/**
+ * Exposes internal portable contracts used across RELKIT compiler and runtime
+ * packages. Application authoring facades select their public APIs separately;
+ * layout evidence and path calculations do not create authoring descriptors.
+ */
 export * from "./id.js";
+export * from "./application-layout.js";
 export * from "./descriptor.js";
 export * from "./json.js";
 export * from "./source-location.js";
