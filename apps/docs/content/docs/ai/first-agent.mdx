@@ -15,22 +15,22 @@ bun add langchain @langchain/langgraph
 
 ## Add the greeting function
 
-<include cwd lang="ts" meta='title="src/hello/functions/hello.function.ts"'>
-  ../../templates/default/v1/agent/src/hello/functions/hello.function.ts
+<include cwd lang="ts" meta='title="src/services/hello/functions/hello.function.ts"'>
+  ../../templates/default/v1/agent/src/services/hello/functions/hello.function.ts
 </include>
 
 ## Make it a tool
 
-<include cwd lang="ts" meta='title="src/hello/tools/lookup.tool.ts"'>
-  ../../templates/default/v1/agent/src/hello/tools/lookup.tool.ts
+<include cwd lang="ts" meta='title="src/services/hello/tools/lookup.tool.ts"'>
+  ../../templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts
 </include>
 
 The tool tells the model what the function does. Its input and output come from the function.
 
 ## Add the agent
 
-<include cwd lang="ts" meta='title="src/hello/agents/assistant.agent.ts"'>
-  ../../templates/default/v1/agent/src/hello/agents/assistant.agent.ts
+<include cwd lang="ts" meta='title="src/services/hello/agents/assistant.agent.ts"'>
+  ../../templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
 </include>
 
 The agent can use the RelKit `hello.lookup` tool and native `uppercase` tool. Its real

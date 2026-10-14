@@ -33,8 +33,12 @@ checkpointer or store fails protocol validation instead of being cast to a suppo
 This agent passes a native model, native tool, real `todoListMiddleware()`, and RelKit function-backed
 tools through one declaration:
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/agents/order-support.agent.ts"'>
-  ../../examples/commerce/src/orders/agents/order-support.agent.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/agents/order-support.agent.ts"'
+>
+  ../../examples/commerce/src/services/orders/agents/order-support.agent.ts
 </include>
 
 RelKit function tools still execute through the common function engine, including schema validation,
@@ -54,8 +58,12 @@ discriminator with `unknown` data instead of widening every known event or tool.
 
 This declaration adds a subagent, skills, memory files, a RelKit bucket backend, checkpointer, and store:
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/agents/order-deep.agent.ts"'>
-  ../../examples/commerce/src/orders/agents/order-deep.agent.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/agents/order-deep.agent.ts"'
+>
+  ../../examples/commerce/src/services/orders/agents/order-deep.agent.ts
 </include>
 
 Children inherit the parent model unless they declare one. They share the caller-supplied root thread and

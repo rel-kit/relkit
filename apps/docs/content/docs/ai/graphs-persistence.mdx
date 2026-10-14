@@ -16,8 +16,12 @@ agent continuation contract.
 The commerce review graph runs two branches, joins them, loops once, interrupts for a boolean, and returns
 only its selected output:
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/agents/order-review.agent.ts"'>
-  ../../examples/commerce/src/orders/agents/order-review.agent.ts#review-graph
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/agents/order-review.agent.ts"'
+>
+  ../../examples/commerce/src/services/orders/agents/order-review.agent.ts#review-graph
 </include>
 
 `StateSchema` owns native state and reducer behavior. A `defineGraphNode` input schema projects the fields
@@ -38,9 +42,9 @@ Checkpoint history and long-term memory are separate resources:
 <include
   cwd
   lang="ts"
-  meta='title="examples/commerce/src/orders/agents/order-agent-persistence.ts"'
+  meta='title="examples/commerce/src/services/orders/agents/order-agent-persistence.ts"'
 >
-  ../../examples/commerce/src/orders/agents/order-agent-persistence.ts
+  ../../examples/commerce/src/services/orders/agents/order-agent-persistence.ts
 </include>
 
 `defineCheckpointerDb` accepts a native `BaseCheckpointSaver`; `defineMemoryDb` accepts a native
