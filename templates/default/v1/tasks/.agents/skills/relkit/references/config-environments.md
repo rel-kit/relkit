@@ -50,7 +50,7 @@ export default defineApp({
 });
 ```
 
-`defineApp` also accepts `id`, `defaults`, `deployment`, and provider capabilities `bucket`, `cache`, `jobs`, `event`, `model`, `realtime`, and `"agent-state"`. A capability can have one `default` profile or a named profile map. `defaults.<capability>` must name a configured profile. The `jobs` key is the public spelling for the job provider. Add only providers the app uses; the base template has none. Configure cloud and deployment only when needed, for example `--cloud aws --deploy pulumi` at creation time.
+`defineApp` also accepts `id`, `defaults`, `deployment`, and provider capabilities `bucket`, `cache`, `jobs`, `event`, `model`, `realtime`, and `"agent-state"`. A capability can have one `default` profile or a named profile map. `defaults.<capability>` must name a configured profile. The `jobs` key is the public spelling for the job provider. Add only providers the app uses; the base template has none. Public creation currently certifies only the minimal starter with examples, no jobs, no cloud, and no deployment. API, agent, fullstack, jobs, and AWS/Pulumi creation tuples are internal candidates and must remain rejected until their exact release evidence is certified. Configure an existing app's optional integrations only when the installed version supports them and the task requires them.
 
 For a one-machine realtime provider and a named Docker-backed cache profile, the complete configuration shape is:
 
@@ -75,6 +75,10 @@ export default defineApp({
 ```
 
 Merge only the needed capabilities into the existing `defineApp`, preserving its other settings. Install the optional integration packages before importing them. `binding.secret("REQUESTS_REDIS_URL")` is a value-free provider binding; it is not a `context.env` field unless `defineEnv` declares that name too. Stable topology belongs in source; machine, stack, and secret values belong in environment bindings.
+
+Platform fragments may explicitly export server, Inspector, telemetry, deployment, or provider settings and be imported by `relkit.config.ts`. Unimported files are not autoloaded. Keep provider acquisition in supported lazy factories and compose one `defineApp`.
+
+CLI `--environment` selects provider configuration; `RELKIT_ENV` selects the application environment. `.env` and `.env.local` supply runtime values according to existing CLI loading; `.env.example` is informational and is not loaded as credentials.
 
 ## Inspect and verify environment values
 
