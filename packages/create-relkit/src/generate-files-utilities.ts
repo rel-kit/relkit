@@ -1,32 +1,15 @@
+/** Validates and mutates only owned staged generator files; captured filesystem/error authorities retain native failure and cleanup disposition. */
 import { basename, dirname, join, relative, resolve } from "node:path";
-
 import { Effect, Exit } from "effect";
-
 import { observeExecution } from "@relkit/contracts/operation";
-
 import { GenerateProjectError } from "./generate-types.js";
-
 import { GeneratorFileSystem } from "./generator-filesystem.js";
-
 import { domainError } from "./generator-errors.js";
-
 import type { GeneratorDomainError, GeneratorIoError } from "./generator-errors.js";
-
 import { recordCleanupFailure } from "./generator-cleanup.js";
-
 import type { StageCleanupResult } from "./generate-files-utilities.types.js";
-
 export type { StageCleanupResult } from "./generate-files-utilities.types.js";
-
-/** Canonical example-only paths removed by the existing --no-examples flag. */
-export const EXAMPLE_PATH_PREFIXES = [
-  "src/routes",
-  "src/orders",
-  "src/echo",
-  "src/hello/tools",
-  "src/hello/agents",
-  "tests",
-] as const;
+export { EXAMPLE_PATH_PREFIXES, removeExamplesEffect } from "./generate-examples.js";
 
 /**
  * Cleans only a verified sibling staging directory owned by this generation invocation.
@@ -150,21 +133,6 @@ export const replaceOnceEffect = Effect.fn("ProjectFiles.replaceOnce")(
 );
 
 /**
- * Removes only the established template examples, with ordered physical settlement.
- * @param root - Absolute project or owned resource root.
- * @returns Completion after the known example source directories are removed from the staged project.
- */
-export const removeExamplesEffect = Effect.fn("ProjectFiles.removeExamples")(
-  function* (root: string) {
-    const fs = yield* GeneratorFileSystem;
-    yield* Effect.forEach(EXAMPLE_PATH_PREFIXES, (directory) =>
-      fs.remove(join(root, directory), { recursive: true, force: true }),
-    );
-  },
-  (effect) => observeExecution("generator", "generation.removeExamples", effect),
-);
-
-/**
  * Lists generated source files in deterministic order, excluding generated and installed state.
  * @param root - Absolute project or owned resource root.
  * @param current - Directory currently traversed beneath the project root.
@@ -209,7 +177,8 @@ export function projectId(name: string): string {
  * @returns Negative, zero or positive ordering using a deterministic string comparison.
  */
 export function compareNames(left: { name: string }, right: { name: string }): number {
-  return left.name < right.name ? -1 : left.name > right.name ? 1 : 0;
+  if (left.name === right.name) return 0;
+  return left.name < right.name ? -1 : 1;
 }
 
 export {

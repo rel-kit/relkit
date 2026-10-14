@@ -1,10 +1,8 @@
+/** Composes explicit deployment/provider source and grouped task-fixture patches through captured generator services; public creation certification stays unchanged. */
 import { join } from "node:path";
-import { Effect, Schema } from "effect";
+import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
-import { GenerateProjectError } from "./generate-types.js";
-import { domainError, domainTry } from "./generator-errors.js";
-import { TemplateManifest, JsonObject } from "./project-manifest.schemas.js";
+import { customizeDeploymentManifestEffect } from "./generate-deployment-manifest.js";
 import { replaceOnceEffect } from "./generate-files-utilities.js";
 import type { CreateOptions } from "./options.js";
 
@@ -45,47 +43,7 @@ export const customizeDeploymentEffect = Effect.fn("ProjectFiles.customizeDeploy
     );
     yield* customizeTaskFixtureEffect(root, options);
 
-    const manifestPath = join(root, "package.json");
-    const source = yield* (yield* GeneratorFileSystem).readText(manifestPath);
-    const fs = yield* GeneratorFileSystem;
-    const parsed = yield* domainTry(() => JSON.parse(source) as unknown);
-    const decoded = yield* Schema.decodeUnknownEffect(TemplateManifest)(parsed).pipe(
-      Effect.mapError(domainError),
-    );
-    const original = yield* Schema.decodeUnknownEffect(JsonObject)(parsed).pipe(
-      Effect.mapError(domainError),
-    );
-    const manifest = {
-      ...original,
-      ...decoded,
-      dependencies: { ...decoded.dependencies },
-      scripts: { ...decoded.scripts },
-    };
-    const version = manifest.dependencies["@relkit/app"];
-    if (version === undefined)
-      return yield* Effect.fail(
-        domainError(
-          new GenerateProjectError(
-            "RELKIT_CREATE_TEMPLATE_INVALID",
-            "Template has no @relkit/app dependency.",
-          ),
-        ),
-      );
-    if (options.cloud === "aws") manifest.dependencies["@relkit/aws"] = version;
-    if (options.deploy === "pulumi") manifest.dependencies["@relkit/pulumi"] = version;
-    if (options.jobs !== undefined) {
-      manifest.dependencies["@relkit/docker"] = version;
-      manifest.dependencies["@relkit/local"] = version;
-      manifest.dependencies[`@relkit/${options.jobs.replace(/-docker$/u, "")}`] = version;
-    }
-    if (options.cloud === "aws" && options.deploy === "pulumi") {
-      manifest.scripts["deploy:preview"] = "relkit deploy preview";
-      manifest.scripts.deploy = "relkit deploy up";
-    }
-    manifest.scripts = sorted(manifest.scripts);
-    manifest.dependencies = sorted(manifest.dependencies);
-    yield* fs.write(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-    yield* fs.chmod(manifestPath, 0o644);
+    yield* customizeDeploymentManifestEffect(root, options);
   },
   (effect) => observeExecution("generator", "generation.deployment", effect),
 );
@@ -99,8 +57,8 @@ export const customizeDeploymentEffect = Effect.fn("ProjectFiles.customizeDeploy
 export const customizeTaskFixtureEffect = Effect.fn("ProjectFiles.customizeTasks")(
   function* (root: string, options: CreateOptions) {
     if (options.jobs === undefined || options.jobs === "inngest-docker") return;
-    const taskPath = join(root, "src/orders/tasks/export-orders.task.ts");
-    const jobPath = join(root, "src/orders/jobs/export-orders.job.ts");
+    const taskPath = join(root, "src/services/orders/tasks/export-orders.task.ts");
+    const jobPath = join(root, "src/services/orders/jobs/export-orders.job.ts");
     if (options.jobs === "effect-mq-docker")
       yield* replaceOnceEffect(taskPath, 'execution: "durable"', 'execution: "retryable"');
     yield* replaceOnceEffect(
@@ -127,14 +85,3 @@ export const customizeTaskFixtureEffect = Effect.fn("ProjectFiles.customizeTasks
   },
   (effect) => observeExecution("generator", "generation.customizeTasks", effect),
 );
-
-/**
- * Sorts owned manifest fields deterministically.
- * @param values - Ordered declarations or argument values.
- * @returns A new manifest string record sorted by key.
- */
-function sorted(values: Record<string, string>): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(values).sort(([left], [right]) => left.localeCompare(right)),
-  );
-}
