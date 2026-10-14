@@ -54,7 +54,7 @@
       "entrypoints": [
         { "source": "packages/functions/src/define-function.ts", "name": "defineFunction" }
       ],
-      "examples": ["examples/commerce/src/orders/functions/create-order.function.ts"]
+      "examples": ["examples/commerce/src/services/orders/functions/create-order.function.ts"]
     },
     {
       "id": "errors",
@@ -65,7 +65,7 @@
       "entrypoints": [
         { "source": "packages/functions/src/define-error.ts", "name": "defineError" }
       ],
-      "examples": ["examples/commerce/src/orders/errors/order-not-found.error.ts"]
+      "examples": ["examples/commerce/src/services/orders/errors/order-not-found.error.ts"]
     },
     {
       "id": "services",
@@ -76,7 +76,7 @@
       "entrypoints": [
         { "source": "packages/services/src/define-service.ts", "name": "defineService" }
       ],
-      "examples": ["examples/commerce/src/orders/service.ts"]
+      "examples": ["examples/commerce/src/services/orders/service.ts"]
     },
     {
       "id": "database",
@@ -89,7 +89,7 @@
         { "source": "packages/drizzle/src/model.ts", "name": "defineModel" },
         { "source": "packages/drizzle/src/activation.ts", "name": "activateDrizzleService" }
       ],
-      "examples": ["examples/data-model/src/database/service.ts"]
+      "examples": ["examples/data-model/src/services/database/service.ts"]
     },
     {
       "id": "auth",
@@ -100,7 +100,7 @@
       "entrypoints": [
         { "source": "packages/better-auth/src/index.ts", "name": "defineBetterAuthService" }
       ],
-      "examples": ["examples/auth-drizzle/src/auth/service.ts"]
+      "examples": ["examples/auth-drizzle/src/services/auth/service.ts"]
     },
     {
       "id": "http",
@@ -138,7 +138,7 @@
       "guide": "realtime/index",
       "apiPackage": "realtime",
       "entrypoints": [{ "source": "packages/realtime/src/channel.ts", "name": "defineChannel" }],
-      "examples": ["examples/commerce/src/announcements/channels/announcements.channel.ts"]
+      "examples": ["examples/commerce/src/services/announcements/channels/announcements.channel.ts"]
     },
     {
       "id": "events",
@@ -162,7 +162,7 @@
         { "source": "packages/jobs/src/define-task.ts", "name": "defineTask" },
         { "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }
       ],
-      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
+      "examples": ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"]
     },
     {
       "id": "schedules",
@@ -171,7 +171,7 @@
       "guide": "jobs/schedules",
       "apiPackage": "jobs",
       "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
-      "examples": ["examples/commerce/src/orders/jobs/cleanup-orders.job.ts"]
+      "examples": ["examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts"]
     },
     {
       "id": "buckets",
@@ -182,7 +182,7 @@
       "entrypoints": [
         { "source": "packages/buckets/src/define-bucket.ts", "name": "defineBucket" }
       ],
-      "examples": ["examples/commerce/src/assets/buckets/assets.bucket.ts"]
+      "examples": ["examples/commerce/src/services/assets/buckets/assets.bucket.ts"]
     },
     {
       "id": "cache",
@@ -191,7 +191,7 @@
       "guide": "caching/define",
       "apiPackage": "cache",
       "entrypoints": [{ "source": "packages/cache/src/define-cache.ts", "name": "defineCache" }],
-      "examples": ["examples/commerce/src/orders/cache/prices.cache.ts"]
+      "examples": ["examples/commerce/src/services/orders/cache/prices.cache.ts"]
     },
     {
       "id": "tools",
@@ -200,7 +200,7 @@
       "guide": "ai/tools",
       "apiPackage": "tools",
       "entrypoints": [{ "source": "packages/tools/src/define-tool.ts", "name": "defineTool" }],
-      "examples": ["examples/commerce/src/orders/tools/lookup-order.tool.ts"]
+      "examples": ["examples/commerce/src/services/orders/tools/lookup-order.tool.ts"]
     },
     {
       "id": "approvals",
@@ -212,7 +212,7 @@
         { "source": "packages/agents/src/approval.ts", "name": "approveApproval" },
         { "source": "packages/agents/src/approval.ts", "name": "denyApproval" }
       ],
-      "examples": ["examples/commerce/src/orders/tools/cancel-order.tool.ts"]
+      "examples": ["examples/commerce/src/services/orders/tools/cancel-order.tool.ts"]
     },
     {
       "id": "agents",
@@ -221,7 +221,7 @@
       "guide": "ai/agents",
       "apiPackage": "agents",
       "entrypoints": [{ "source": "packages/agents/src/define-agent.ts", "name": "defineAgent" }],
-      "examples": ["examples/commerce/src/orders/agents/order-support.agent.ts"]
+      "examples": ["examples/commerce/src/services/orders/agents/order-support.agent.ts"]
     },
     {
       "id": "testing",
@@ -258,13 +258,13 @@
     {
       "path": "start/save-orders",
       "api": ["drizzle", "functions"],
-      "examples": ["examples/data-model/src/database/service.ts"],
+      "examples": ["examples/data-model/src/services/database/service.ts"],
       "next": "start/protect-orders"
     },
     {
       "path": "start/protect-orders",
       "api": ["better-auth", "drizzle"],
-      "examples": ["examples/auth-drizzle/src/auth/service.ts"],
+      "examples": ["examples/auth-drizzle/src/services/auth/service.ts"],
       "next": "start/test-orders"
     },
     {
@@ -288,7 +288,7 @@
     {
       "path": "start/add-artifacts",
       "api": ["services", "functions", "routes"],
-      "examples": ["templates/default/v1/api/src/orders/service.ts"]
+      "examples": ["templates/default/v1/api/src/services/orders/service.ts"]
     },
     {
       "path": "fundamentals/index",
@@ -303,7 +303,9 @@
     {
       "path": "fundamentals/functions",
       "api": ["functions"],
-      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"]
+      "examples": [
+        "templates/default/v1/api/src/services/orders/functions/create-order.function.ts"
+      ]
     },
     {
       "path": "fundamentals/schemas",
@@ -313,12 +315,12 @@
     {
       "path": "fundamentals/errors",
       "api": ["functions"],
-      "examples": ["examples/commerce/src/orders/errors/order-not-found.error.ts"]
+      "examples": ["examples/commerce/src/services/orders/errors/order-not-found.error.ts"]
     },
     {
       "path": "fundamentals/context",
       "api": ["functions"],
-      "examples": ["examples/commerce/src/orders/functions/create-order.function.ts"]
+      "examples": ["examples/commerce/src/services/orders/functions/create-order.function.ts"]
     },
     {
       "path": "fundamentals/environment",
@@ -326,9 +328,14 @@
       "examples": ["templates/default/v1/api/src/platform/env.ts"]
     },
     {
+      "path": "service/migration",
+      "api": ["services", "functions"],
+      "examples": ["packages/cli/tests/migration/layout.probe.ts"]
+    },
+    {
       "path": "service/index",
       "api": ["services", "functions"],
-      "examples": ["examples/commerce/src/orders/service.ts"]
+      "examples": ["examples/commerce/src/services/orders/service.ts"]
     },
     {
       "path": "service/domains",
@@ -339,14 +346,14 @@
       "path": "service/organization",
       "api": ["services", "functions", "tools", "agents", "jobs", "events", "cache", "buckets"],
       "examples": [
-        "examples/commerce/src/orders/functions/create-order.function.ts",
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts"
+        "examples/commerce/src/services/orders/functions/create-order.function.ts",
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"
       ]
     },
     {
       "path": "service/define",
       "api": ["services", "functions"],
-      "examples": ["examples/commerce/src/orders/service.ts"]
+      "examples": ["examples/commerce/src/services/orders/service.ts"]
     },
     {
       "path": "service/routes",
@@ -357,7 +364,7 @@
       "path": "service/first-service",
       "api": ["services", "functions", "routes", "testing"],
       "examples": [
-        "templates/default/v1/minimal/src/hello/service.ts",
+        "templates/default/v1/minimal/src/services/hello/service.ts",
         "templates/default/v1/minimal/tests/unit/hello.function.test.ts"
       ]
     },
@@ -454,45 +461,45 @@
     {
       "path": "jobs/index",
       "api": ["jobs", "services", "client"],
-      "examples": ["examples/commerce/src/orders/jobs/export-orders.job.ts"]
+      "examples": ["examples/commerce/src/services/orders/jobs/export-orders.job.ts"]
     },
     {
       "path": "jobs/quickstart",
       "api": ["app", "jobs", "schema", "client"],
       "examples": [
-        "examples/commerce/src/orders/tasks/export-orders.task.ts",
-        "examples/commerce/src/orders/jobs/export-orders.job.ts",
+        "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
+        "examples/commerce/src/services/orders/jobs/export-orders.job.ts",
         "examples/commerce/src/routes/orders/export/route.ts"
       ]
     },
     {
       "path": "jobs/tasks",
       "api": ["jobs", "schema"],
-      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
+      "examples": ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"]
     },
     {
       "path": "jobs/bindings",
       "api": ["app", "jobs", "integrations/docker", "integrations/inngest"],
       "examples": [
         "examples/commerce/relkit.config.ts",
-        "examples/commerce/src/orders/jobs/export-orders.job.ts"
+        "examples/commerce/src/services/orders/jobs/export-orders.job.ts"
       ]
     },
     {
       "path": "jobs/durations-and-sleep",
       "api": ["jobs"],
-      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
+      "examples": ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"]
     },
     {
       "path": "jobs/execution-policy",
       "api": ["jobs"],
-      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
+      "examples": ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"]
     },
     {
       "path": "jobs/retries-and-idempotency",
       "api": ["jobs", "testing"],
       "examples": [
-        "examples/commerce/src/orders/tasks/export-orders.task.ts",
+        "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
         "packages/jobs/tests/task-policy.test.ts"
       ]
     },
@@ -504,18 +511,18 @@
     {
       "path": "jobs/progress-and-streams",
       "api": ["jobs", "client"],
-      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
+      "examples": ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"]
     },
     {
       "path": "jobs/security",
       "api": ["jobs", "client"],
-      "examples": ["examples/commerce/src/orders/jobs/export-orders.job.ts"]
+      "examples": ["examples/commerce/src/services/orders/jobs/export-orders.job.ts"]
     },
     {
       "path": "jobs/schedules",
       "api": ["jobs", "integrations/inngest", "integrations/effect-mq"],
       "examples": [
-        "examples/commerce/src/orders/jobs/cleanup-orders.job.ts",
+        "examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts",
         "packages/jobs/tests/schedule-reconciliation.test.ts"
       ]
     },
@@ -570,47 +577,47 @@
     {
       "path": "database/index",
       "api": ["services"],
-      "examples": ["examples/data-model/src/users/service.ts"]
+      "examples": ["examples/data-model/src/services/users/service.ts"]
     },
     {
       "path": "database/drizzle",
       "api": ["drizzle", "services"],
-      "examples": ["examples/data-model/src/database/service.ts"]
+      "examples": ["examples/data-model/src/services/database/service.ts"]
     },
     {
       "path": "database/define",
       "api": ["drizzle", "config"],
-      "examples": ["examples/data-model/src/database/service.ts"]
+      "examples": ["examples/data-model/src/services/database/service.ts"]
     },
     {
       "path": "database/schema",
       "api": ["drizzle", "schema"],
-      "examples": ["examples/data-model/src/database/schema/index.ts"]
+      "examples": ["examples/data-model/src/services/database/schema/index.ts"]
     },
     {
       "path": "database/queries",
       "api": ["drizzle", "functions"],
-      "examples": ["examples/data-model/src/users/functions/update-user-email.function.ts"]
+      "examples": ["examples/data-model/src/services/users/functions/update-user-email.function.ts"]
     },
     {
       "path": "database/generated-schemas",
       "api": ["drizzle", "schema"],
-      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"]
+      "examples": ["examples/data-model/src/services/users/functions/register-member.function.ts"]
     },
     {
       "path": "database/models",
       "api": ["drizzle"],
-      "examples": ["examples/data-model/src/database/models/users.model.ts"]
+      "examples": ["examples/data-model/src/services/database/models/users.model.ts"]
     },
     {
       "path": "database/overrides",
       "api": ["drizzle"],
-      "examples": ["examples/data-model/src/database/service.ts"]
+      "examples": ["examples/data-model/src/services/database/service.ts"]
     },
     {
       "path": "database/transactions",
       "api": ["drizzle"],
-      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"]
+      "examples": ["examples/data-model/src/services/users/functions/register-member.function.ts"]
     },
     {
       "path": "database/migrations",
@@ -621,8 +628,8 @@
       "path": "database/better-auth",
       "api": ["drizzle", "routes"],
       "examples": [
-        "examples/auth-drizzle/src/auth/service.ts",
-        "examples/auth-drizzle/src/database/schema/index.ts"
+        "examples/auth-drizzle/src/services/auth/service.ts",
+        "examples/auth-drizzle/src/services/database/schema/index.ts"
       ]
     },
     {
@@ -633,22 +640,22 @@
     {
       "path": "database/first-database",
       "api": ["drizzle", "functions", "routes"],
-      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"]
+      "examples": ["examples/data-model/src/services/users/functions/register-member.function.ts"]
     },
     {
       "path": "auth/index",
       "api": ["better-auth", "services"],
-      "examples": ["examples/auth-drizzle/src/auth/service.ts"]
+      "examples": ["examples/auth-drizzle/src/services/auth/service.ts"]
     },
     {
       "path": "auth/better-auth",
       "api": ["better-auth", "drizzle", "config"],
-      "examples": ["examples/auth-drizzle/src/auth/service.ts"]
+      "examples": ["examples/auth-drizzle/src/services/auth/service.ts"]
     },
     {
       "path": "auth/sessions",
       "api": ["better-auth", "functions"],
-      "examples": ["examples/auth-drizzle/src/account/functions/session.function.ts"]
+      "examples": ["examples/auth-drizzle/src/services/account/functions/session.function.ts"]
     },
     {
       "path": "auth/protect-routes",
@@ -667,8 +674,8 @@
       "path": "auth/customization",
       "api": ["better-auth", "drizzle"],
       "examples": [
-        "examples/auth-drizzle/src/auth/service.ts",
-        "examples/auth-drizzle/src/database/schema/index.ts"
+        "examples/auth-drizzle/src/services/auth/service.ts",
+        "examples/auth-drizzle/src/services/database/schema/index.ts"
       ]
     },
     {
@@ -685,47 +692,47 @@
       "path": "storage/index",
       "api": ["buckets", "functions"],
       "examples": [
-        "examples/commerce/src/assets/buckets/assets.bucket.ts",
-        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+        "examples/commerce/src/services/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/services/assets/functions/upload-assets.function.ts"
       ]
     },
     {
       "path": "storage/define",
       "api": ["buckets", "functions"],
       "examples": [
-        "examples/commerce/src/assets/buckets/assets.bucket.ts",
-        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+        "examples/commerce/src/services/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/services/assets/functions/upload-assets.function.ts"
       ]
     },
     {
       "path": "storage/upload",
       "api": ["buckets", "functions"],
       "examples": [
-        "examples/commerce/src/assets/buckets/assets.bucket.ts",
-        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+        "examples/commerce/src/services/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/services/assets/functions/upload-assets.function.ts"
       ]
     },
     {
       "path": "storage/read-delete",
       "api": ["buckets", "functions"],
       "examples": [
-        "examples/commerce/src/assets/buckets/assets.bucket.ts",
-        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+        "examples/commerce/src/services/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/services/assets/functions/upload-assets.function.ts"
       ]
     },
     {
       "path": "storage/first-upload",
       "api": ["buckets", "functions"],
       "examples": [
-        "examples/commerce/src/assets/buckets/assets.bucket.ts",
-        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+        "examples/commerce/src/services/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/services/assets/functions/upload-assets.function.ts"
       ]
     },
     {
       "path": "caching/index",
       "api": ["cache", "functions"],
       "examples": [
-        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/src/services/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
       ]
     },
@@ -733,7 +740,7 @@
       "path": "caching/define",
       "api": ["cache", "functions"],
       "examples": [
-        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/src/services/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
       ]
     },
@@ -741,7 +748,7 @@
       "path": "caching/read-write",
       "api": ["cache", "functions"],
       "examples": [
-        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/src/services/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
       ]
     },
@@ -749,7 +756,7 @@
       "path": "caching/expiration",
       "api": ["cache", "functions"],
       "examples": [
-        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/src/services/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
       ]
     },
@@ -757,7 +764,7 @@
       "path": "caching/first-cache",
       "api": ["cache", "functions"],
       "examples": [
-        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/src/services/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
       ]
     },
@@ -765,88 +772,88 @@
       "path": "ai/index",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/agents",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/native-runtime",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/graphs-persistence",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/streaming",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/threads-recovery",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/approvals",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/tools",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/function-tools",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/mcp",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
       "path": "ai/first-agent",
       "api": ["agents", "tools", "functions", "testing"],
       "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
       ]
     },
     {
@@ -887,12 +894,12 @@
     {
       "path": "realtime/index",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce/src/announcements/channels/announcements.channel.ts"]
+      "examples": ["examples/commerce/src/services/announcements/channels/announcements.channel.ts"]
     },
     {
       "path": "realtime/access",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"]
+      "examples": ["examples/commerce/src/services/orders/channels/order-updates.channel.ts"]
     },
     {
       "path": "realtime/react",
@@ -902,12 +909,12 @@
     {
       "path": "realtime/presence",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"]
+      "examples": ["examples/commerce/src/services/orders/channels/order-updates.channel.ts"]
     },
     {
       "path": "realtime/recovery",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"]
+      "examples": ["examples/commerce/src/services/orders/channels/order-updates.channel.ts"]
     },
     {
       "path": "realtime/providers",
@@ -935,7 +942,7 @@
     {
       "path": "operations/observability",
       "api": ["functions", "routes"],
-      "examples": ["templates/default/v1/api/src/hello/functions/hello.function.ts"]
+      "examples": ["templates/default/v1/api/src/services/hello/functions/hello.function.ts"]
     },
     {
       "path": "operations/inspector",
