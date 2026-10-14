@@ -16,12 +16,12 @@ the database service already in the app. It does not apply a migration or create
 bun run relkit add auth --adapter better-auth --database-dialect sqlite
 ```
 
-**Extend** `src/database/schema/index.ts` with the auth tables. The complete source below
+**Extend** `src/services/database/schema/index.ts` with the auth tables. The complete source below
 retains `orders` and adds the `user`, `session`, `account`, and `verification` exports Better Auth
 requires. Do not replace an existing business table when adapting this to your own application.
 
-<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/auth/src/database/schema/index.ts
+<include cwd lang="ts" meta='title="src/services/database/schema/index.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/services/database/schema/index.ts
 </include>
 
 Replace `src/platform/env.ts` with the existing fields plus the auth secret and base URL:
@@ -41,10 +41,10 @@ printf 'BETTER_AUTH_URL=%s\nBETTER_AUTH_SECRET=%s\n' \
   "$BETTER_AUTH_URL" "$BETTER_AUTH_SECRET" >> .env
 ```
 
-Review `src/auth/service.ts` and make it match the email/password configuration below:
+Review `src/services/auth/service.ts` and make it match the email/password configuration below:
 
-<include cwd lang="ts" meta='title="src/auth/service.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/auth/src/auth/service.ts
+<include cwd lang="ts" meta='title="src/services/auth/service.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/services/auth/service.ts
 </include>
 
 The auth mount handles `/api/auth` and rejects signed-out calls to both `/orders` and
@@ -69,12 +69,12 @@ Replace the two Orders functions below. `createOrder` obtains the user ID from t
 and stores it with the row. `getOrder` matches both `orderId` and the session's user ID;
 someone else's order returns `found: false`.
 
-<include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/auth/src/orders/functions/create-order.function.ts
+<include cwd lang="ts" meta='title="src/services/orders/functions/create-order.function.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/services/orders/functions/create-order.function.ts
 </include>
 
-<include cwd lang="ts" meta='title="src/orders/functions/get-order.function.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/auth/src/orders/functions/get-order.function.ts
+<include cwd lang="ts" meta='title="src/services/orders/functions/get-order.function.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/services/orders/functions/get-order.function.ts
 </include>
 
 ```text

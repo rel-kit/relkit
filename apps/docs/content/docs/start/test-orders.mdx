@@ -16,28 +16,23 @@ to check the regular and bulk prices directly, without starting a server:
   ../../apps/docs/examples/orders-tutorial/steps/tests/tests/unit/orders-pricing.test.ts
 </include>
 
-Replace the API starter's `tests/unit/orders.function.test.ts` with the version below. Its
-original expectation predates persistence and calls order creation without a database; this
-version tests the public pricing operation instead.
+Add `tests/unit/orders.function.test.ts` with the version below. It tests the public
+pricing operation without acquiring a database.
 
 <include cwd lang="ts" meta='title="tests/unit/orders.function.test.ts"'>
   ../../apps/docs/examples/orders-tutorial/steps/database/tests/unit/orders.function.test.ts
 </include>
 
-Replace the starter's Hello and Echo integration tests with the versions below. The endpoints
-are unchanged, but every test application now needs the auth secret declared in `src/platform/env.ts`.
+Replace the minimal starter's Hello integration test with the version below. The endpoint
+is unchanged, but every test application now needs the auth secret declared in `src/platform/env.ts`.
 
 <include cwd lang="ts" meta='title="tests/integration/hello.route.test.ts"'>
   ../../apps/docs/examples/orders-tutorial/steps/tests/tests/integration/hello.route.test.ts
 </include>
 
-<include cwd lang="ts" meta='title="tests/integration/echo.route.test.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/tests/tests/integration/echo.route.test.ts
-</include>
-
 ## Test the HTTP and database boundary
 
-Replace the starter's `tests/integration/orders.route.test.ts` with this test. It migrates a
+Add `tests/integration/orders.route.test.ts` with this test. It migrates a
 temporary SQLite database, signs up Alice and Bob, creates an order for Alice, checks Bob cannot
 read it, and rejects invalid input. It also checks that a signed-out request receives `401`.
 
