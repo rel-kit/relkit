@@ -1,6 +1,6 @@
 {
   "name": "@relkit/cache",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "RELKIT cache authoring API; prefer @relkit/app/cache in applications.",
   "license": "MIT",
   "repository": {
