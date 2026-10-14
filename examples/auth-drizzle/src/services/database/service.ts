@@ -1,3 +1,4 @@
+/** Lazily opens the configured SQLite client for native auth tables and closes that owned client on disposal. */
 import { Database } from "bun:sqlite";
 import { defineDrizzleService } from "@relkit/drizzle";
 import { drizzle } from "drizzle-orm/bun-sqlite";

@@ -1,3 +1,4 @@
+/** Declares native Better Auth SQLite user/session/account/verification tables, retaining timestamp modes and account uniqueness. */
 import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 const timestamps = {
@@ -13,6 +14,7 @@ export const user = sqliteTable("user", {
   image: text(),
   ...timestamps,
 });
+
 export const session = sqliteTable("session", {
   id: text().primaryKey(),
   expiresAt: integer({ mode: "timestamp" }).notNull(),
@@ -22,6 +24,7 @@ export const session = sqliteTable("session", {
   userId: text().notNull(),
   ...timestamps,
 });
+
 export const account = sqliteTable(
   "account",
   {
@@ -41,6 +44,7 @@ export const account = sqliteTable(
   },
   (table) => [uniqueIndex("account_issuer_account_id").on(table.issuer, table.accountId)],
 );
+
 export const verification = sqliteTable("verification", {
   id: text().primaryKey(),
   identifier: text().notNull(),
