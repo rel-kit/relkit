@@ -30,12 +30,13 @@ before starting the generated providers.
 For `Shipping --full`, the domain files are:
 
 ```text
-src/shipping/
+src/services/shipping/
   service.ts
   functions/example.function.ts
   functions/on-example.function.ts
   errors/example.error.ts
   events/example.event.ts
+  tasks/example.task.ts
   jobs/example.job.ts
   cache/example.cache.ts
   buckets/example.bucket.ts
@@ -46,17 +47,17 @@ src/shipping/
 src/routes/shipping/route.ts
 ```
 
-The service exposes the example function and event. The function declares its sample error and
-publishes the event; the event-only function consumes it. The job and tool target the example
-function, the agent uses the tool and prompt, and the route maps `GET` to the public `example`
+The service exposes the example function, event, task, and job. The function declares its sample error
+and publishes the event; the event-only function consumes it. The job targets the task, the tool
+targets the callable function, the agent uses the tool and prompt, and the route maps `GET` to `example`
 member. Provider configuration, environment examples, and package dependencies are merged as needed.
 
 For every scaffolding flag, see the [CLI reference](/docs/operations/cli-reference).
 
 ## Select public members
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/service.ts"'>
-  ../../examples/commerce/src/orders/service.ts
+<include cwd lang="ts" meta='title="examples/commerce/src/services/orders/service.ts"'>
+  ../../examples/commerce/src/services/orders/service.ts
 </include>
 
 `functions` contains ordinary callable function descriptors. `events` contains handler-free event
@@ -88,7 +89,7 @@ or a switch controlling MCP tool visibility.
 
 ## Use another domain's service
 
-Import `@app/orders/service.js`, then invoke a member such as
+Import `@app/services/orders/service.js`, then invoke a member such as
 `orders.getOrder.invoke({ orderId: "order-1" })` from your function handler. Use `.invoke()`, not
 `.handler()`, so the call goes through the common validation and execution boundary.
 
@@ -129,7 +130,7 @@ With an existing `orders` service, run from the application root:
 bun run relkit add constants "Receipt Settings" --service orders
 ```
 
-Creates `src/orders/constants/receipt-settings.constants.ts` with a domain-qualified key and
+Creates `src/services/orders/constants/receipt-settings.constants.ts` with a domain-qualified key and
 a `"replace-me"` value. Replace that placeholder in source. Constants remain internal and are
 not added to service member maps. There is no CLI flag for the final value.
 
@@ -152,9 +153,10 @@ Public member names must be nonempty, normalized, and distinct across both maps.
 as `id`, `ref`, `functions`, `events`, and `handler` are reserved member names. See the
 [Services API](/docs/api/services) for the full type and validation reference.
 
-Moving a file with an inferred ID can change its graph identity. Review generated changes when
-refactoring. Renaming the domain changes its required ID prefix, so treat it as a contract migration,
-not just a cosmetic folder rename.
+The recognized flat-to-grouped move preserves explicit and inferred logical IDs: `src/orders` becomes
+`src/services/orders` without introducing a `services.` identity prefix. Diagnostics, source maps,
+manifests, and editor links retain the real physical path. Other file moves or renaming the domain can
+change inferred IDs and their required prefix; review those as contract migrations.
 
 ## Can a service expose nothing?
 

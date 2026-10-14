@@ -19,8 +19,8 @@ With an existing `orders` service, run from the application root:
 bun run relkit add function "Send Receipt" --service orders
 ```
 
-This creates `src/orders/functions/send-receipt.function.ts` and exposes `sendReceipt` through
-`src/orders/service.ts`. The placeholder accepts and returns a string `value`; replace its schemas
+This creates `src/services/orders/functions/send-receipt.function.ts` and exposes `sendReceipt` through
+`src/services/orders/service.ts`. The placeholder accepts and returns a string `value`; replace its schemas
 and handler with your domain behavior. Its stable ID is `orders.send-receipt`.
 
 Pass `--internal` to omit public service exposure. Use `--create-service orders` instead of
@@ -33,9 +33,9 @@ For every scaffolding flag, see the [CLI reference](/docs/operations/cli-referen
 <include
   cwd
   lang="ts"
-  meta='title="templates/default/v1/api/src/orders/functions/create-order.function.ts"'
+  meta='title="templates/default/v1/api/src/services/orders/functions/create-order.function.ts"'
 >
-  ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
+  ../../templates/default/v1/api/src/services/orders/functions/create-order.function.ts
 </include>
 
 The handler receives validated input. Its return value is validated before the invocation succeeds. The example
