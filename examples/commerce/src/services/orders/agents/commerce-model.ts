@@ -1,3 +1,4 @@
+/** Supplies deterministic native LangChain turns for support/delegation demos; model calls use only supplied messages. */
 import type { CallbackManagerForLLMRun } from "@langchain/core/callbacks/manager";
 import {
   BaseChatModel,
@@ -16,21 +17,34 @@ const completedTodos = [
   { content: "Explain its state", status: "completed" },
 ];
 
-type ModelMode = "support" | "deep";
+import type { CommerceModelMode, CommerceToolArguments } from "./commerce-model.types.js";
 
+/** Native LangChain adapter selecting pure demo turns without remote model acquisition. */
 class CommerceModel extends BaseChatModel {
-  constructor(private readonly mode: ModelMode) {
+  /** Selects the pure response sequence while retaining native LangChain ownership.
+   * @param mode - Support or specialist-delegation conversation behavior. */
+  constructor(private readonly mode: CommerceModelMode) {
     super({} satisfies BaseChatModelParams);
   }
 
+  /** Identifies this deterministic model to native LangChain instrumentation.
+   * @returns The stable commerce model name for the selected mode. */
   _llmType(): string {
     return `commerce-${this.mode}`;
   }
 
+  /** Accepts native tool binding without changing the fixed offline response sequence.
+   * @param _tools - Native caller declarations; scripted turns already name their tools.
+   * @returns This model, preserving the SDK's fluent binding contract. */
   override bindTools(_tools: BindToolsInput[]): this {
     return this;
   }
 
+  /** Produces the next native response from the current demo conversation.
+   * @param messages - Native LangChain messages observed so far.
+   * @param _options - Borrowed SDK call options; this offline model requires none.
+   * @param _runManager - Borrowed SDK callback manager retained by the caller.
+   * @returns A native chat result containing text or one deterministic tool call. */
   override async _generate(
     messages: BaseMessage[],
     _options?: this["ParsedCallOptions"],
@@ -48,10 +62,16 @@ class CommerceModel extends BaseChatModel {
   }
 }
 
-export function createCommerceModel(mode: ModelMode): BaseChatModel {
+/** Creates the offline model used by support and inventory-delegation agents.
+ * @param mode - Selects the deterministic tool-call sequence.
+ * @returns A native LangChain chat model with no remote transport. */
+export function createCommerceModel(mode: CommerceModelMode): BaseChatModel {
   return new CommerceModel(mode);
 }
 
+/** Advances the support workflow according to completed native tool messages.
+ * @param messages - Current conversation, including observed tool completions.
+ * @returns The next todo/status call or validated final-output call. */
 function supportTurn(messages: BaseMessage[]) {
   const completedTools = messages.filter((message) => message.getType() === "tool").length;
   if (completedTools === 0) return call("write_todos", { todos: pendingTodos }, "todo-start");
@@ -60,6 +80,9 @@ function supportTurn(messages: BaseMessage[]) {
   return output("Order demo-1 is ready.");
 }
 
+/** Answers specialist prompts or advances the parent inventory delegation.
+ * @param messages - Native conversation containing prompt and completed tools.
+ * @returns A specialist answer, delegation call or final-output call. */
 function deepTurn(messages: BaseMessage[]) {
   const prompt = messages.map((message) => String(message.content)).join("\n");
   if (
@@ -78,10 +101,18 @@ function deepTurn(messages: BaseMessage[]) {
       );
 }
 
+/** Constructs the native final-answer tool call consumed by RELKIT output validation.
+ * @param answer - Deterministic answer text.
+ * @returns The established relkit_output call envelope. */
 function output(answer: string) {
   return call("relkit_output", { value: { answer } }, "final-output");
 }
 
-function call(name: string, args: Record<string, unknown>, id: string) {
+/** Constructs one native tool-call envelope while preserving its supplied identity.
+ * @param name - Registered native tool name.
+ * @param args - Exact demo arguments for that tool.
+ * @param id - Stable conversation-local tool-call identity.
+ * @returns The native LangChain tool call consumed by the agent loop. */
+function call(name: string, args: CommerceToolArguments, id: string) {
   return { name, args, id, type: "tool_call" as const };
 }
