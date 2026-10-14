@@ -1,3 +1,4 @@
+/** Checks declared root orchestration and bounded native terminal ownership; runtime prompting/interruption has separate native acceptance. */
 import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -22,7 +23,7 @@ test("test:all points to a checked-in orchestration script", async () => {
   expect(await readFile(join(root, ".github/workflows/checks.yml"), "utf8")).not.toContain(
     "bun run test:scaffold",
   );
-  expect(await readFile(join(root, "scripts", "scaffold-smoke-terminal.ts"), "utf8")).toContain(
-    "SCAFFOLD_TERMINAL_TIMEOUT_MS = 600_000",
+  expect(await readFile(join(root, "scripts", "scaffold-terminal-owner.ts"), "utf8")).toContain(
+    'Effect.timeout("10 minutes")',
   );
 });
