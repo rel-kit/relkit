@@ -1,3 +1,4 @@
+/** Reads the requested database order and returns validated selected fields or an explicit missing result. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
 export default defineFunction({

@@ -1,6 +1,7 @@
+/** Prices validated order input and persists its selected fields through the tutorial's native database context. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
-import priceOrder from "@app/orders/functions/price-order.function.js";
+import priceOrder from "@app/services/orders/functions/price-order.function.js";
 const order = z.object({
   orderId: z.string().min(1),
   sku: z.string().min(1),
