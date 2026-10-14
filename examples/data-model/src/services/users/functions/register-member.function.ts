@@ -1,3 +1,4 @@
+/** Validates native user data and creates the user/membership in one borrowed database transaction, retaining rollback failures. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
 

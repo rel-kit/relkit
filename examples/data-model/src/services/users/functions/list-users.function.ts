@@ -1,3 +1,4 @@
+/** Lists validated user fields through the database model's email-domain extension. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
 

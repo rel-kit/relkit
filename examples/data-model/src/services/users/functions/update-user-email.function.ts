@@ -1,3 +1,4 @@
+/** Validates native update/select data and returns the changed user's email or null when its row is unavailable. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
 

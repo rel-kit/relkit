@@ -1,10 +1,11 @@
+/** Runs native Drizzle migrations in an owned SQLite fixture, checking invalid targets and row preservation across repeat migration. */
 import { expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import { users, memberships } from "@app/database/schema/index.js";
+import { users, memberships } from "@app/services/database/schema/index.js";
 
 test("rejects empty and in-memory migration targets", async () => {
   for (const path of ["", ":memory:"]) {
@@ -20,7 +21,7 @@ test("rejects empty and in-memory migration targets", async () => {
   }
 });
 
-// Two Drizzle CLI cold starts share CPU with the parallel example checks in CI.
+// The finite harness allowance includes two native Drizzle CLI cold starts.
 test("applies the initial migration once and keeps rows on a second run", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-database-migrations-"));
   const path = join(root, "test.sqlite");
@@ -47,9 +48,10 @@ test("applies the initial migration once and keeps rows on a second run", async 
             .insert(users)
             .values({ email: "one@example.com" })
             .returning();
+          if (user === undefined) throw new Error("User insert did not return a row");
           await database.insert(memberships).values({
             organizationId: "org",
-            userId: user!.id,
+            userId: user.id,
             role: "owner",
           });
         }
