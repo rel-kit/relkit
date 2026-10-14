@@ -1,3 +1,4 @@
+/** Declares the auth service boundary without acquiring native clients. */
 import { defineBetterAuthService } from "@relkit/better-auth";
 
 export default defineBetterAuthService({

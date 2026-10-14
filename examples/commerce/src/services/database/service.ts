@@ -1,3 +1,4 @@
+/** Declares the database service boundary without acquiring native clients. */
 import { Database } from "bun:sqlite";
 import { defineDrizzleService } from "@relkit/drizzle";
 import { drizzle } from "drizzle-orm/bun-sqlite";
