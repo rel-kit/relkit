@@ -1,8 +1,9 @@
+/** Composes the offline support model, explicit order/native tools, todo middleware and shared checkpoint/memory drivers. */
 import { defineAgent } from "@relkit/app/agents";
 import { todoListMiddleware } from "langchain";
-import { supportInput, supportOutput } from "@app/platform/schemas.js";
-import lookupOrder from "@app/orders/tools/lookup-order.tool.js";
-import cancelOrder from "@app/orders/tools/cancel-order.tool.js";
+import { supportInput, supportOutput } from "../../../platform/schemas.js";
+import lookupOrder from "../tools/lookup-order.tool.js";
+import cancelOrder from "../tools/cancel-order.tool.js";
 import { createCommerceModel } from "./commerce-model.js";
 import { orderCheckpoints, orderMemory } from "./order-agent-persistence.js";
 import { orderStatus } from "./order-native-tool.js";

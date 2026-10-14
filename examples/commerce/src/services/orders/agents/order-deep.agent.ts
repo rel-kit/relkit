@@ -1,7 +1,8 @@
+/** Delegates offline inventory checks to an inherited-model specialist using shared persistence and a private bucket workspace. */
 import { defineAgent } from "@relkit/app/agents";
-import { supportInput, supportOutput } from "@app/platform/schemas.js";
-import agentWorkspace from "@app/orders/buckets/agent-workspace.bucket.js";
-import lookupOrder from "@app/orders/tools/lookup-order.tool.js";
+import { supportInput, supportOutput } from "../../../platform/schemas.js";
+import agentWorkspace from "../buckets/agent-workspace.bucket.js";
+import lookupOrder from "../tools/lookup-order.tool.js";
 import { createCommerceModel } from "./commerce-model.js";
 import { orderCheckpoints, orderMemory } from "./order-agent-persistence.js";
 

@@ -1,3 +1,4 @@
+/** Demonstrates parallel inventory/risk nodes, retry edges and checkpointed approval/resume on the order graph. */
 import { Command, END, START, StateSchema, interrupt } from "@langchain/langgraph";
 import { defineGraph, defineGraphNode } from "@relkit/app/agents";
 import { z } from "@relkit/app/schema";

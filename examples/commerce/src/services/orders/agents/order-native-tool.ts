@@ -1,3 +1,4 @@
+/** Supplies a schema-validated native LangChain inventory tool returning deterministic order status. */
 import { tool } from "langchain";
 import { z } from "@relkit/app/schema";
 

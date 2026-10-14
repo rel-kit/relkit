@@ -1,3 +1,4 @@
+/** Declares per-order status events with a native auth-context check, bounded replay and count presence. */
 import { defineChannel } from "@relkit/app/realtime";
 import { z } from "@relkit/app/schema";
 
@@ -12,7 +13,7 @@ const orderUpdates = defineChannel({
     }),
   },
   client: {
-    authorize: async (_params: unknown, context: unknown) =>
+    authorize: async (_params, context) =>
       typeof context === "object" && context !== null && "auth" in context,
   },
   replay: { retentionMs: 300_000, maxEvents: 10_000 },
