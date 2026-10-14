@@ -1,0 +1,9 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  5 passed (5)
+      Tests  12 passed (12)
+   Start at  17:07:42
+   Duration  39.75s (tests 84%, transform 9%, import 7%)
+
