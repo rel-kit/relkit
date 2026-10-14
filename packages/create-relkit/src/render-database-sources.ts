@@ -1,3 +1,8 @@
+/**
+ * Renders native Drizzle service/schema/tooling declarations for supported dialects.
+ * The selected physical schema path is passed by layout-aware planning; connection
+ * factories stay lazy and source rendering never opens a database client.
+ */
 import type { DatabaseDialect } from "./add-types.js";
 
 /**
@@ -60,9 +65,10 @@ export const items = mysqlTable("items", {
 /**
  * Renders drizzle Config Source as source text without executing user modules.
  * @param dialect - Supported database dialect.
+ * @param schemaPath - Selected physical application schema registration source.
  * @returns Drizzle Kit configuration source using the dialect's explicit environment connection.
  */
-export function drizzleConfigSource(dialect: DatabaseDialect): string {
+export function drizzleConfigSource(dialect: DatabaseDialect, schemaPath: string): string {
   const variable = dialect === "sqlite" ? "DATABASE_PATH" : "DATABASE_URL";
   const value = dialect === "sqlite" ? "path" : "url";
   const invalid = dialect === "sqlite" ? ` || path === ":memory:"` : "";
@@ -74,7 +80,7 @@ if (${value} === undefined || ${value}.trim() === ""${invalid}) {
 }
 
 export default defineConfig({
-  schema: "./src/database/schema/index.ts",
+  schema: "./${schemaPath}",
   dialect: "${dialect}",
   out: "./drizzle",
   dbCredentials: { url: ${value} },

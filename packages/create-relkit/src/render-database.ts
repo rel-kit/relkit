@@ -1,4 +1,14 @@
+/**
+ * Plans one native Drizzle service at the selected application boundary, including
+ * schema tooling and environment declarations. Generator filesystem authority owns
+ * source publication; no database client or migration runs during this workflow.
+ */
 import { Effect } from "effect";
+import { dirname } from "node:path";
+import { scaffoldServiceBoundary } from "./scaffold-layout.js";
+import { domainError, domainTry } from "./generator-errors.js";
+import type { RenderedDatabase } from "./render-database.types.js";
+export type { RenderedDatabase } from "./render-database.types.js";
 import { observeExecution } from "@relkit/contracts/operation";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import {
@@ -18,15 +28,6 @@ import {
 } from "./render-database-sources.js";
 
 /**
- * Validated database dialect and planned/discovered service and schema paths.
- */
-export interface RenderedDatabase {
-  readonly dialect: Extract<AddRequest, { kind: "database" }>["dialect"];
-  readonly servicePath: string;
-  readonly schemaPath: string;
-}
-
-/**
  * Plans database through the owning request and typed filesystem authority.
  * @param builder - Per-request planning owner.
  * @param request - Normalized scaffold request.
@@ -42,16 +43,23 @@ export const renderDatabaseEffect = Effect.fn("Scaffold.renderDatabase")(
     GeneratorFileSystem
   > {
     if (builder.discovery.services.some((service) => service.capability === "database")) {
-      throw new AddScaffoldError(ADD_FAILURE_CODES.collision, "A database service already exists.");
+      return yield* domainError(
+        new AddScaffoldError(ADD_FAILURE_CODES.collision, "A database service already exists."),
+      );
     }
-    const servicePath = "src/database/service.ts";
-    const schemaPath = "src/database/schema/index.ts";
+    const servicePath = yield* domainTry(() =>
+      scaffoldServiceBoundary(builder.discovery, "database"),
+    );
+    const schemaPath = `${dirname(servicePath)}/schema/index.ts`;
     yield* builder.createEffect(servicePath, databaseServiceSource(request.dialect));
     yield* builder.createEffect(
       schemaPath,
       request.authSchema ? authSchemaSource(request.dialect) : itemsSchemaSource(request.dialect),
     );
-    yield* builder.createEffect("drizzle.config.ts", drizzleConfigSource(request.dialect));
+    yield* builder.createEffect(
+      "drizzle.config.ts",
+      drizzleConfigSource(request.dialect, schemaPath),
+    );
     for (const dependency of ["@relkit/drizzle", "drizzle-orm", "drizzle-kit"] as const) {
       yield* builder.dependencyEffect(dependency);
     }
