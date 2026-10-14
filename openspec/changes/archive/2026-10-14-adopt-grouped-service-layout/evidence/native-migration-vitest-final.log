@@ -1,0 +1,65 @@
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+[13:15:48.215] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 1.658042
+}
+[13:15:48.218] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 13903.070834
+}
+[13:15:56.373] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 1.308542
+}
+[13:15:56.376] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 7808.623584
+}
+[13:16:04.090] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 1.329458
+}
+[13:16:04.092] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 7395.420667
+}
+[13:16:04.872] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 0.845625
+}
+[13:16:04.873] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 447.676583
+}
+[13:16:05.500] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 0.960541
+}
+[13:16:05.502] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 350.040542
+}
+ Test Files  9 passed (9)
+      Tests  15 passed (15)
+   Start at  13:15:33
+   Duration  38.27s (tests 80%, import 11%, transform 9%)
