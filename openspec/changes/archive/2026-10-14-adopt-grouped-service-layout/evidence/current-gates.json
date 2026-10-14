@@ -1,0 +1,632 @@
+{
+  "protocol": "relkit.grouped-layout.acceptance",
+  "version": 1,
+  "complete": true,
+  "gates": [
+    {
+      "id": "native-security",
+      "command": "bun test tests/integration/database/generated-protection.test.ts",
+      "tests": 2,
+      "assertions": 98,
+      "source": "/tmp/grouped-protection-native-20.log",
+      "log": "native-security.log",
+      "sha256": "cdebf825ffb877faea611ceb401ac76e19fedca485ae3cad01878d3abd71d5ba",
+      "status": "passed"
+    },
+    {
+      "id": "native-development",
+      "command": "bun test tests/integration/layout-development-parity.test.ts",
+      "tests": 1,
+      "assertions": 59,
+      "source": "/tmp/grouped-development-native-3.log",
+      "log": "native-development.log",
+      "sha256": "7ee513287ce5734070e9f59b3caaa0912d986115452e6558c22b2304ad730e37",
+      "status": "passed"
+    },
+    {
+      "id": "native-prepared-cohort",
+      "command": "bun x vitest run --maxWorkers=1 packages/cli/tests/dev-snapshot/layout-version.test.ts packages/cli/tests/dev-snapshot/typecheck-journal.test.ts packages/cli/tests/dev-snapshot/typecheck-inputs.test.ts packages/cli/tests/dev-snapshot/typecheck-resolution.test.ts packages/cli/tests/dev-snapshot/inventory-concurrency.test.ts packages/cli/tests/dev-snapshot/sealed-installation.test.ts packages/cli/tests/dev-snapshot/cohort.test.ts packages/cli/tests/dev-snapshot/publication-native.test.ts packages/cli/tests/dev-snapshot/stale-command.test.ts packages/cli/tests/dev-snapshot/integrity-process.test.ts packages/cli/tests/services/watch-config.test.ts packages/cli/tests/services/source-watch.test.ts",
+      "tests": 26,
+      "files": 12,
+      "source": "/tmp/grouped-prepared-cohort-final.log",
+      "log": "native-prepared-cohort.log",
+      "sha256": "a1f17d999e5634247585aa0b3425812fec8fab9fb527981d081cb5d29f839508",
+      "status": "passed"
+    },
+    {
+      "id": "native-package-repairs",
+      "command": "bun x vitest run --maxWorkers=1 integrations/packages/effect-mq/tests/postgres-declarations.test.ts packages/cli/tests/start-doctor/type-probes.test.ts packages/compiler/tests/jobs-documentation.test.ts packages/events/tests/source-export.test.ts packages/cli/tests/services/source-watch.test.ts",
+      "tests": 12,
+      "files": 5,
+      "source": "/tmp/grouped-package-repairs-final.log",
+      "log": "native-package-repairs.log",
+      "sha256": "d436adb527cb66528a350475dbc6d4657d6b412569efe51a750edcc6b728922a",
+      "status": "passed"
+    },
+    {
+      "id": "native-environment-persistence",
+      "command": "bun test packages/cli/env.test.ts packages/cli/environment-runtime.test.ts packages/cli/dev-persistence.test.ts",
+      "tests": 5,
+      "assertions": 32,
+      "source": "/tmp/grouped-environment-persistence-final.log",
+      "log": "native-environment-persistence.log",
+      "sha256": "629327ccea89bdd22c04605a61be84525a7e1b2a9daef124d2f67f59145fe5ca",
+      "status": "passed"
+    },
+    {
+      "id": "native-config-environment",
+      "command": "bun x vitest run --config packages/config/vitest.config.ts packages/config/tests/env.test.ts",
+      "tests": 7,
+      "source": "/tmp/grouped-config-environment-final.log",
+      "log": "native-config-environment.log",
+      "sha256": "35553f19a6ac264ed3add197a1f084a9c7958a92c260d979700d3a7e5dd9ceb6",
+      "status": "passed"
+    },
+    {
+      "id": "workspace-build",
+      "command": "bun run build",
+      "tasks": 59,
+      "source": "/tmp/grouped-final-build-4.log",
+      "log": "workspace-build.log",
+      "sha256": "2520d106148847f0026803a1ca8d6f7cdb33a7dd144ba415b88329ce666f3196",
+      "status": "passed"
+    },
+    {
+      "id": "workspace-packages",
+      "command": "bun run test:packages",
+      "status": "passed",
+      "generatorTests": 23,
+      "nodeTests": 2783,
+      "nodeSkipped": 5,
+      "cliTests": 123,
+      "cliAssertions": 732,
+      "otherNativeTests": 285,
+      "otherNativeAssertions": 1344,
+      "log": "workspace-packages.log",
+      "sha256": "b5b3e0ee544c113d2878644a5df8a90f0de018bf3a21d267cbc212246dc2da13"
+    },
+    {
+      "id": "packed-current-consumer",
+      "validity": "historical; superseded by later create-relkit product changes",
+      "command": "bun scripts/pack-and-smoke-create-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-JEIhPi/release-artifacts",
+      "status": "passed",
+      "durationMs": 210881.729833,
+      "log": "packed-current-consumer.log",
+      "sha256": "46415c2a43061d17ea694408c88743e9536a83373deb9ecb37eadca53eab3611"
+    },
+    {
+      "id": "packed-current-docker",
+      "validity": "historical; superseded by later create-relkit product changes",
+      "command": "RELKIT_TEST_DOCKER=1 bun scripts/pack-and-smoke-create-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-JEIhPi/release-artifacts",
+      "status": "passed",
+      "durationMs": 350817.153166,
+      "log": "packed-current-docker.log",
+      "sha256": "aa4c287e4d550890576dbc9b7a0ddd55173a7ba5ee37c777e49bf27db304e106"
+    },
+    {
+      "id": "workspace-prepush",
+      "validity": "historical; final rerun required after late changes",
+      "command": "bun run prepush",
+      "status": "passed",
+      "log": "workspace-prepush.log",
+      "sha256": "f6ce52017d74857a2ec2a25b3735982344315a4895b4e3df495922e1ff014f80"
+    },
+    {
+      "id": "native-origin-probe",
+      "command": "bun test tests/security/evidence-origin-probe.test.ts",
+      "status": "passed",
+      "log": "native-origin-probe.log",
+      "sha256": "60482060fc8cdb25afff7529ff23a69615f5d64de8093f29036a2d98c7d2ec06"
+    },
+    {
+      "id": "execution-test-types",
+      "command": "bun run test:execution:types",
+      "status": "passed",
+      "log": "execution-test-types.log",
+      "sha256": "8709713038b74f3bc1df836708c7d334f44626d16ff4e0bd63244015a22cca0c"
+    },
+    {
+      "id": "native-prepared-http",
+      "command": "bun x vitest run --maxWorkers=1 packages/runtime-hono/tests/prepared-app.test.ts",
+      "status": "passed",
+      "log": "native-prepared-http.log",
+      "sha256": "c708d28c9aff3486ed5fd974649cf491a0faaee05266ad88f3b11bc238c92a46"
+    },
+    {
+      "id": "native-full2-deadline-repairs",
+      "command": "bun x vitest run --maxWorkers=1 packages/compiler/tests/application-layout.test.ts packages/observability/tests/local-trace-pages.test.ts",
+      "status": "passed",
+      "log": "native-full2-deadline-repairs.log",
+      "sha256": "b82f27536ba3e92929bf4ba047f52f0701a6383119004ed17980db8f578c5e09"
+    },
+    {
+      "id": "native-docs-late",
+      "command": "bun test apps/docs/tests/auth-learning.test.ts apps/docs/tests/database-learning.test.ts apps/docs/tests/http-learning.test.ts apps/docs/tests/jobs-learning.test.ts apps/docs/tests/service-learning.test.ts apps/docs/tests/start-learning.test.ts",
+      "status": "passed",
+      "log": "native-docs-late.log",
+      "sha256": "6279cb824c69c74b2be1bccb07364e25a59cb4e55d8a6a5f65f47d0d9343ff8d"
+    },
+    {
+      "id": "workspace-generator",
+      "command": "bun run test:generator",
+      "status": "passed",
+      "log": "workspace-generator.log",
+      "sha256": "228b450f16a2a999a4c732b00225843ea6adb4d7efd07bd3f2a13d4b346a6a3d"
+    },
+    {
+      "id": "native-jobs-profiles",
+      "command": "bun test tests/generator/jobs-profiles.test.ts",
+      "status": "passed",
+      "log": "native-jobs-profiles.log",
+      "sha256": "9b209ecb5a57b082248396b0fd67f32e74f27bbc8814a58a3060a91dae66b7a2"
+    },
+    {
+      "id": "native-no-examples",
+      "command": "bun test tests/generator/no-examples-layout.test.ts",
+      "status": "passed",
+      "log": "native-no-examples.log",
+      "sha256": "8c36b93724bafdcc8a88a5d7dd352c866304255ae8260b4104a3aaa78a1f6f42"
+    },
+    {
+      "id": "native-security-tail",
+      "source": "/tmp/grouped-verifier-security-tail-final.log",
+      "command": "bun run scripts/secret-scan.ts && bun run test:security && bun run scripts/check-public-declarations.ts && bun test tests/agents/source-boundaries.test.ts tests/compiler/commerce-example.test.ts",
+      "status": "passed",
+      "log": "native-security-tail.log",
+      "sha256": "22c584f017a9602e5a17603f79d3afc2568300c701291db14171b527a5f71f4c"
+    },
+    {
+      "id": "native-workspace-build-owner",
+      "source": "/tmp/grouped-workspace-build-serial-current.log",
+      "command": "bun run build",
+      "status": "passed",
+      "log": "native-workspace-build-owner.log",
+      "sha256": "b5f53b6486db57c92533c9856fe81e6e16e2e73de166dfcee414145659f5a687"
+    },
+    {
+      "id": "native-commerce-consistency",
+      "source": "/tmp/grouped-commerce-consistency-final.log",
+      "command": "bun test tests/integration/commerce-example-consistency.test.ts tests/integration/paired-commerce-layout.test.ts",
+      "status": "passed",
+      "log": "native-commerce-consistency.log",
+      "sha256": "22c6a800b7cee3afcafa00604e064ebc6ad2b7f0776e11aee7e39962d15ce483"
+    },
+    {
+      "id": "native-exports-diagnosis",
+      "source": "/tmp/grouped-exports-current-native-diagnosis.log",
+      "command": "bun run scripts/pack-and-smoke-exports.ts",
+      "status": "passed",
+      "log": "native-exports-diagnosis.log",
+      "sha256": "b91930ff24bdf308290e12f2d03ae1d2c5c9cc6a2bb1b8c80f21eae9f1c2b17d"
+    },
+    {
+      "id": "native-phase0",
+      "source": "/tmp/grouped-phase0-final-4.log",
+      "command": "bun test tests/phase0.test.ts",
+      "status": "passed",
+      "log": "native-phase0.log",
+      "sha256": "f1d8d05958cecb92408276678c78651fe539e28f310620a52a8656e8c5d5a95c"
+    },
+    {
+      "id": "native-phase0-ownership",
+      "source": "/tmp/grouped-phase0-ownership-native-1.log",
+      "command": "bun test tests/unit/phase0-harness-ownership.test.ts",
+      "status": "passed",
+      "log": "native-phase0-ownership.log",
+      "sha256": "ec068e91bad7ceee617cb5ab221c3b28cf7d9ba29c0be896f5806a9133550055"
+    },
+    {
+      "id": "native-phase0-types",
+      "source": "/tmp/grouped-phase0-owner-types-2.log",
+      "command": "bun x tsc --noEmit --strict --skipLibCheck --allowImportingTsExtensions --target ES2023 --module ESNext --moduleResolution Bundler --types bun --lib ES2023,DOM scripts/scaffold-process.types.ts scripts/scaffold-process.ts tests/phase0-harness.types.ts tests/phase0-harness-operations.ts tests/phase0-harness.ts tests/phase0-contracts.ts tests/phase0-allowed-packages.ts tests/phase0-boundary-cases.ts tests/phase0-boundaries.ts tests/phase0-packed.ts tests/phase0-scope-fixture.ts tests/phase0-scope.ts tests/phase0-guidance.ts tests/phase0-files.ts tests/phase0-workspace.ts tests/phase0.test.ts tests/unit/phase0-harness-ownership.test.ts",
+      "status": "passed",
+      "log": "native-phase0-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "packed-final-consumer",
+      "source": "/tmp/grouped-packed-final-consumer-1.log",
+      "command": "bun run scripts/pack-and-smoke-create-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-grouped-final-artifacts-EByLNA",
+      "status": "passed",
+      "log": "packed-final-consumer.log",
+      "sha256": "1fd9965433eb381a20b48884aa37170618f51394b665802361088fe6cb6f8ce9"
+    },
+    {
+      "id": "packed-final-docker",
+      "source": "/tmp/grouped-packed-final-docker-3.log",
+      "command": "RELKIT_TEST_DOCKER=1 bun run scripts/pack-and-smoke-create-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-grouped-final-artifacts-EByLNA",
+      "status": "passed",
+      "log": "packed-final-docker.log",
+      "sha256": "fc9f5658613f8e7419d649efe94963895e8c6c08b799c2502f8b40be7c9bd05c"
+    },
+    {
+      "id": "capability-current-evidence",
+      "source": "/tmp/grouped-capability-final-evidence-native.log",
+      "command": "bun x --bun vitest run --config packages/create-relkit/vitest.config.ts packages/create-relkit/tests/create-capabilities.effect.test.ts",
+      "status": "passed",
+      "log": "capability-current-evidence.log",
+      "sha256": "a2a53707da3f50eb7a86b9256d9c83c5c0f0e895c7b94452941859cf403f9f00"
+    },
+    {
+      "id": "native-phase0-event-scan",
+      "source": "/tmp/grouped-phase0-event-scan-fix-native.log",
+      "command": "bun x vitest run --maxWorkers=1 packages/events/tests/source-export.test.ts && bun test tests/phase0.test.ts --test-name-pattern 'scope exclusions report each affected path and rule'",
+      "status": "passed",
+      "log": "native-phase0-event-scan.log",
+      "sha256": "e7c3a137718afb272a4c28b0f3d7467dd2b3a79962f30013175f8a6baa692839"
+    },
+    {
+      "id": "workspace-full1",
+      "source": "/tmp/grouped-prepush-full-current-1.log",
+      "command": "bun run prepush:full",
+      "status": "failed",
+      "log": "workspace-full1.log",
+      "sha256": "78b8b93762ba05014f50cce4a442e2ab208374b699bd4a359f1cf21c10c37cfe",
+      "validity": "historical failed attempt; superseded by full10"
+    },
+    {
+      "id": "workspace-full2",
+      "source": "/tmp/grouped-prepush-full-current-2.log",
+      "command": "bun run prepush:full",
+      "status": "failed",
+      "log": "workspace-full2.log",
+      "sha256": "14d4f9a6c9ad281c696b2f3261f453b99e020971efb9c01e30ab15955a8eccd6",
+      "validity": "historical failed attempt; superseded by full10"
+    },
+    {
+      "id": "workspace-full3",
+      "source": "/tmp/grouped-prepush-full-current-3.log",
+      "command": "bun run prepush:full",
+      "status": "failed",
+      "log": "workspace-full3.log",
+      "sha256": "0a42b0c116c18b1ad3204c2a379be2c8a08ac5e83c1b03e33e9276abff041134",
+      "validity": "historical failed attempt; superseded by full10"
+    },
+    {
+      "id": "workspace-full4",
+      "source": "/tmp/grouped-prepush-full-current-4.log",
+      "command": "bun run prepush:full",
+      "status": "failed",
+      "log": "workspace-full4.log",
+      "sha256": "bf2990b85c3880478d80023f96a5b77c3d4716861e48c34c1c463a945f28a027",
+      "validity": "historical failed attempt; superseded by full10"
+    },
+    {
+      "id": "workspace-full5",
+      "source": "/tmp/grouped-prepush-full-current-5.log",
+      "command": "bun run prepush:full",
+      "status": "failed",
+      "log": "workspace-full5.log",
+      "sha256": "c303ff13e1165b5345b246ce71c5da91be98a20ffbdd6016074df7fda49371c8",
+      "validity": "historical failed attempt; superseded by full10"
+    },
+    {
+      "id": "workspace-full6",
+      "source": "/tmp/grouped-prepush-full-current-6.log",
+      "command": "bun run prepush:full",
+      "status": "failed",
+      "log": "workspace-full6.log",
+      "sha256": "b89c19f2c9843940b99bf627af1f3bc1a7174f0b683e473c177cc84bd5a98cda",
+      "validity": "historical failed attempt; superseded by full10"
+    },
+    {
+      "id": "workspace-full7",
+      "source": "/tmp/grouped-prepush-full-current-7.log",
+      "command": "bun run prepush:full",
+      "status": "failed",
+      "log": "workspace-full7.log",
+      "sha256": "77bd61a0c68458ca2073ea9d577c057136640f937f5b2e389ca47e3336ea37e6",
+      "validity": "historical failed attempt; superseded by full10"
+    },
+    {
+      "id": "workspace-full8",
+      "source": "/tmp/grouped-prepush-full-current-8.log",
+      "command": "bun run prepush && bun run prepush:full",
+      "status": "failed",
+      "log": "workspace-full8.log",
+      "sha256": "769cf035fba8ae2eb956572f7385916b03bd8d1b4dc56c0b60c23f7ba631deb6",
+      "validity": "historical failed attempt; superseded by full10"
+    },
+    {
+      "id": "workspace-full9",
+      "source": "/tmp/grouped-prepush-full-current-9.log",
+      "command": "bun run prepush && bun run prepush:full",
+      "status": "failed",
+      "log": "workspace-full9.log",
+      "sha256": "8f719f608a67055ad5f8be3eb45b640474798284bd8c62dde1273d2dfc3718f4",
+      "validity": "historical failed attempt; superseded by full10"
+    },
+    {
+      "id": "workspace-full10",
+      "source": "/tmp/grouped-prepush-full-current-10.log",
+      "command": "bun run prepush && bun run prepush:full",
+      "status": "passed",
+      "log": "workspace-full10.log",
+      "sha256": "854caa54a2bf3c398d233829b3d8b12c04e93d1f3fbf25ea3b1aafd6bbd2eb31",
+      "validity": "current accepted aggregate"
+    },
+    {
+      "id": "native-full7-tail",
+      "source": "/tmp/grouped-full7-tail-native-1.log",
+      "command": "bun run test:scaffold && bun run test:container && bun run test:local-docker && bun run test:deployment && bun run test:inspector:browser && bun run test:e2e",
+      "status": "failed",
+      "log": "native-full7-tail.log",
+      "sha256": "9d47ca1a4b857d5f13c01854d21dff9ee502e3b59cc3a9085504e8d90b17cbf4",
+      "passedThrough": [
+        "test:scaffold",
+        "test:container",
+        "test:local-docker",
+        "test:deployment",
+        "test:inspector:browser"
+      ],
+      "failure": "Inspector E2E boot used unpinned Next 16.4.0; corrected to installed 16.3.8",
+      "validity": "historical partial tail; complete workspace-full10 passes"
+    },
+    {
+      "id": "native-e2e-pinned-next",
+      "source": "/tmp/grouped-e2e-pinned-next-1.log",
+      "command": "bun run test:e2e",
+      "status": "passed",
+      "log": "native-e2e-pinned-next.log",
+      "sha256": "381e2bcd5921ec0fae16755d0b607e455771c888807eea1abc4b136e5b77cf58",
+      "inspectorPassed": 31,
+      "commercePassed": 2,
+      "commerceSkipped": 1
+    },
+    {
+      "id": "native-dev-check-atomic",
+      "source": "/tmp/grouped-dev-check-atomic-native-1.log",
+      "command": "bun test packages/cli/dev-check.test.ts",
+      "status": "passed",
+      "log": "native-dev-check-atomic.log",
+      "sha256": "c7d6dffa7715d894c83779da9935452e5961742b9d9217305a365d7eed005486",
+      "tests": 4,
+      "assertions": 12
+    },
+    {
+      "id": "native-dev-check-atomic-types",
+      "source": "/tmp/grouped-dev-check-atomic-types-1.log",
+      "command": "bun x tsc --noEmit --strict --skipLibCheck --allowImportingTsExtensions --target ES2023 --module ESNext --moduleResolution Bundler --types bun --lib ES2023,DOM packages/cli/dev-check.test.ts packages/cli/dev-check-fixture.ts packages/cli/dev-check-fixture.schemas.ts",
+      "status": "passed",
+      "log": "native-dev-check-atomic-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "native-dev-check-atomic-owner",
+      "source": "/tmp/grouped-dev-check-atomic-ownership-cohort-2.log",
+      "command": "bun run check; Vitest events source-export; Bun phase0 owner and dev-check; strict native-Bun typecheck",
+      "status": "passed",
+      "log": "native-dev-check-atomic-owner.log",
+      "sha256": "073c8d7422f641b63e91bc9ab2c785daf7639a6dced445614bc8205bba798264",
+      "eventTests": 4,
+      "nativeTests": 6,
+      "nativeAssertions": 21
+    },
+    {
+      "id": "native-cli-atomic-final",
+      "source": "/tmp/grouped-cli-atomic-final-cohort.log",
+      "command": "bun test packages/cli/*.test.ts",
+      "status": "passed",
+      "log": "native-cli-atomic-final.log",
+      "sha256": "02bcdc60a84931a11a7481787ae247e068fe2ea5322c1e93acb010c321c8510e",
+      "tests": 131,
+      "assertions": 1518,
+      "files": 45
+    },
+    {
+      "id": "native-commerce-comment-types",
+      "source": "/tmp/grouped-commerce-final-doc-types.log",
+      "command": "bun run typecheck (examples/commerce)",
+      "status": "passed",
+      "log": "native-commerce-comment-types.log",
+      "sha256": "57f4ffeded91214efcfa606d4ee9044eea190ba0c79211010e705ffadaf33447"
+    },
+    {
+      "id": "native-commerce-comment-tests",
+      "source": "/tmp/grouped-commerce-final-doc-native.log",
+      "command": "bun test (examples/commerce)",
+      "status": "passed",
+      "log": "native-commerce-comment-tests.log",
+      "sha256": "f150fb5319ec211889816917544798fc6d81f27241d0c1f22323ab6d947a3aa5",
+      "tests": 10,
+      "assertions": 45
+    },
+    {
+      "id": "native-specialized-pair",
+      "source": "/tmp/grouped-specialized-paired-native-final.log",
+      "command": "bun test tests/integration/database/generated-host.test.ts",
+      "status": "passed",
+      "log": "native-specialized-pair.log",
+      "sha256": "4fe58e76773188e0bc083d4ae13a128cb2e735a8163bdefb1771dd32d74f5690",
+      "tests": 2,
+      "assertions": 38
+    },
+    {
+      "id": "native-restart-final",
+      "source": "/tmp/grouped-restart-final.log",
+      "command": "RELKIT_TEST_DOCKER=1 bun test ./tests/restart",
+      "status": "passed",
+      "log": "native-restart-final.log",
+      "sha256": "7d8bfd2975fd0843ca3c6d49b9f62b9646d8be966619fe34b09a91b8dc85b573",
+      "tests": 12,
+      "assertions": 74
+    },
+    {
+      "id": "native-compiler-navigation",
+      "source": "/tmp/grouped-compiler-navigation-native.log",
+      "command": "bun x vitest run --maxWorkers=1 packages/compiler/tests/grouped-layout.test.ts",
+      "status": "passed",
+      "log": "native-compiler-navigation.log",
+      "sha256": "5e31ce71afa7bbcd3e3fba5d57f495431c81c06d37df605236b855494842add1",
+      "tests": 3
+    },
+    {
+      "id": "native-browser-pair",
+      "source": "/tmp/grouped-browser-pair-2.log",
+      "command": "bun run scripts/test-generated-host-browser.ts (paired flat/grouped native dev hosts)",
+      "status": "passed",
+      "log": "native-browser-pair.log",
+      "sha256": "59af2bf81695e97051cbde20f14c8378fef09fe6c4205efe387f1ac621bc8e0d",
+      "tests": 2
+    },
+    {
+      "id": "native-generated-host-browser",
+      "source": "/tmp/grouped-generated-host-browser-final.log",
+      "command": "bun run scripts/test-generated-host-browser.ts",
+      "status": "passed",
+      "log": "native-generated-host-browser.log",
+      "sha256": "273798d3f0583781d20d5357187cc522529b17d4f41f82328d3772f5dd02732b",
+      "tests": 1,
+      "validity": "earlier controlled one-host case; current native-browser-pair covers both layouts"
+    },
+    {
+      "id": "native-migration-final",
+      "source": "/tmp/grouped-migration-final.log",
+      "command": "bun test packages/cli/tests/migration/*.test.ts (incorrect runner for Vitest files)",
+      "status": "failed",
+      "log": "native-migration-final.log",
+      "sha256": "251d8e77305240f3eb78685031b9f0742f73548a7e9a915eeb07543622fa64b8",
+      "validity": "historical wrong-runner failure; native-migration-vitest-final and workspace-full10 pass"
+    },
+    {
+      "id": "native-migration-vitest-final",
+      "source": "/tmp/grouped-migration-final-vitest.log",
+      "command": "bun x vitest run --maxWorkers=1 packages/cli/tests/migration",
+      "status": "passed",
+      "log": "native-migration-vitest-final.log",
+      "sha256": "4a8928edaa94fc7e23af1da3ab3695c2185bb26271e2c58922c596bfbb3a744f"
+    },
+    {
+      "id": "skill-frontmatter-final",
+      "source": "/tmp/grouped-skills-closure-frontmatter.log",
+      "command": "uv run --with pyyaml python skill-creator/scripts/quick_validate.py (each of 8 affected entrypoints)",
+      "status": "passed",
+      "log": "skill-frontmatter-final.log",
+      "sha256": "fd71c022c9d340bd95767384e53ffebb3cf478eaf367a656bb1ba23fc4275b69",
+      "entrypoints": 8
+    },
+    {
+      "id": "skill-links-final",
+      "source": "/tmp/grouped-skills-final-links.log",
+      "command": "affected skill relative-link inventory",
+      "status": "passed",
+      "log": "skill-links-final.log",
+      "sha256": "b42ce526ef00ff10d1cfd509613923aab42b9df796b18ed0ba7a847f72b9da77",
+      "entrypoints": 8,
+      "files": 68,
+      "links": 95
+    },
+    {
+      "id": "source-audit-final",
+      "source": "/tmp/grouped-final-source-audit-3.json",
+      "command": "TypeScript AST audit of final scoped authored files",
+      "status": "passed",
+      "log": "source-audit-final.json",
+      "sha256": "00abf01ca24eacf095313bdb7ada826f629a59de85e147889500d652bef5555a",
+      "files": 562,
+      "findings": 0,
+      "missingHeaders": 0,
+      "fileOrBodyCapViolations": 0,
+      "callableDocumentationFindings": 0
+    },
+    {
+      "id": "structural-disposition-final",
+      "source": "/tmp/grouped-full10-structural-audit.json",
+      "command": "extract native Konsistent diagnostics from full10",
+      "status": "passed",
+      "log": "structural-disposition-final.json",
+      "sha256": "66bd33e8f2f1f70d3d4d85d00a4133e7da112bc320c60aec3397fc9fc71d6619",
+      "configurationValidation": "passed",
+      "existingAdvisoryFindings": 77,
+      "changedFileFindings": 0
+    },
+    {
+      "id": "workspace-prepush-closure",
+      "source": "/tmp/grouped-prepush-closure-final.log",
+      "command": "bun run prepush",
+      "status": "passed",
+      "log": "workspace-prepush-closure.log",
+      "sha256": "2cdca28e8fa7075c70453e86e772cab020aa9d543235797e1e3e867f854f92cd"
+    },
+    {
+      "id": "openspec-strict-closure",
+      "source": "/tmp/grouped-openspec-closure-final.json",
+      "command": "openspec validate adopt-grouped-service-layout --strict --json",
+      "status": "passed",
+      "log": "openspec-strict-closure.json",
+      "sha256": "30441f9c1cdd8e27a0567e4e7770dd4fae78634c9eef10a9bc033a10c527e555"
+    },
+    {
+      "id": "whitespace-closure",
+      "source": "/tmp/grouped-whitespace-closure-final.log",
+      "command": "git diff --check",
+      "status": "passed",
+      "log": "whitespace-closure.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "readiness": {
+    "validity": "current exact 53-archive closure; source template digest and native copy projection verified",
+    "fresh": {
+      "report": "packed-fresh-6.json",
+      "status": "passed",
+      "maximumMs": 637.892959
+    },
+    "restart": {
+      "report": "packed-restart-4.json",
+      "status": "passed",
+      "maximumMs": 833.899042,
+      "preparationPassed": true
+    },
+    "allAttemptsRetained": true,
+    "artifactsMatchReleaseManifest": true,
+    "packageCount": 53,
+    "packedTemplateProof": "packed-template-proof.json"
+  },
+  "completion": {
+    "tasksChecked": 56,
+    "tasksTotal": 56,
+    "remaining": [],
+    "requiredRepositoryAggregate": "workspace-full10",
+    "repositoryAggregateExitCode": 0,
+    "phase0": "native-phase0",
+    "scopeInputsEquivalent": "phase0-scope-input-parity.log",
+    "mutationGate": "passed in full10; 793 mutants, 501 killed, 9 timeout, 266 survived, 17 not covered, 0 errors; existing thresholds and semantic checks unchanged",
+    "throughEOFReconciliation": "authored-review.json",
+    "deltaAudit": "delta-audit.json",
+    "closureProof": "closure-proof.json",
+    "supportingInventory": "support-inventory-final.json",
+    "currentSkillLinks": "skill-links-closure.json",
+    "finalCommentOnlyRecheck": ["native-commerce-comment-types", "native-commerce-comment-tests"],
+    "finalPrepush": "workspace-prepush-closure",
+    "strictOpenSpec": "openspec-strict-closure",
+    "whitespace": "whitespace-closure",
+    "openSpecApplyState": "all_done",
+    "finalAuthoredFiles": 734,
+    "finalTypeScriptFiles": 562
+  },
+  "separateResults": {
+    "cloud": {
+      "status": "not run; real AWS acceptance requires separate authorization",
+      "mockAndOfflineDeployment": "passed",
+      "realAwsTestsSkipped": 1
+    },
+    "browser": {
+      "full10InspectorPassed": 31,
+      "full10CommercePassed": 2,
+      "full10OptionalGeneratedAppSkipped": 1,
+      "controlledGeneratedAppSeparatelyPassed": 1,
+      "pairedControlledGeneratedAppPassed": 2
+    },
+    "nodePackageTests": {
+      "passed": 2783,
+      "skipped": 5
+    },
+    "konsistent": {
+      "configuration": "passed",
+      "structuralDiagnostics": "existing advisory policy; 77 findings, 0 on changed files"
+    },
+    "lintCoverage": "repository configured lint passes; the 17 late Phase0 TS paths are ignored by the existing ESLint configuration, not claimed as linted",
+    "git": "original checkout has no staged, committed, pushed or archived changes from this task"
+  }
+}

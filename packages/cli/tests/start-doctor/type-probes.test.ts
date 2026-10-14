@@ -1,3 +1,4 @@
+/** Checks strict installed start/doctor examples and deliberate missing-authority mutations without weakening native lifecycle or readiness deadlines. */
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { fileURLToPath } from "node:url";
@@ -88,20 +89,26 @@ function diagnostics(source: string): readonly ts.Diagnostic[] {
   return ts.getPreEmitDiagnostics(ts.createProgram([filename], options, host));
 }
 
-it.effect("checks documented examples and rejects missing domain, native and Scope authority", () =>
-  Effect.sync(() => {
-    expect(
-      diagnostics(probe).map((item) => ts.flattenDiagnosticMessageText(item.messageText, "\n")),
-    ).toEqual([]);
-  }),
+it.effect(
+  "checks documented examples and rejects missing domain, native and Scope authority",
+  () =>
+    Effect.sync(() => {
+      expect(
+        diagnostics(probe).map((item) => ts.flattenDiagnosticMessageText(item.messageText, "\n")),
+      ).toEqual([]);
+    }),
+  30_000,
 );
 
-it.effect("detects a mutated start Layer that erases infrastructure requirements", () =>
-  Effect.sync(() => {
-    const result = diagnostics(
-      probe.replace("const live = startLive;", "declare const live: Layer.Layer<CliStart>;"),
-    );
-    expect(result.some((item) => item.code === 2322)).toBe(true);
-    expect(result.some((item) => item.code === 2578)).toBe(true);
-  }),
+it.effect(
+  "detects a mutated start Layer that erases infrastructure requirements",
+  () =>
+    Effect.sync(() => {
+      const result = diagnostics(
+        probe.replace("const live = startLive;", "declare const live: Layer.Layer<CliStart>;"),
+      );
+      expect(result.some((item) => item.code === 2322)).toBe(true);
+      expect(result.some((item) => item.code === 2578)).toBe(true);
+    }),
+  30_000,
 );

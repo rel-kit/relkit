@@ -47,7 +47,7 @@ bun run relkit add prompt "Greeting Policy" --service hello \
   --text "Answer greeting questions." --text "Keep answers brief."
 ```
 
-The prompt is saved as `src/hello/prompts/greeting-policy.prompt.ts`; repeated non-empty `--text`
+The prompt is saved as `src/services/hello/prompts/greeting-policy.prompt.ts`; repeated non-empty `--text`
 values preserve separate prompt segments. In headless execution at least one `--text` is required.
 Prompts are internal descriptors, not public service members. Pass the prompt descriptor as the
 agent's `instructions` when you need reusable policy text.
@@ -58,8 +58,8 @@ For every prompt scaffolding flag, see the [CLI reference](/docs/operations/cli-
 
 This agent answers greeting questions using a single tool. Create it after [defining the lookup tool](/docs/ai/function-tools).
 
-<include cwd lang="ts" meta='title="src/hello/agents/assistant.agent.ts"'>
-  ../../templates/default/v1/agent/src/hello/agents/assistant.agent.ts
+<include cwd lang="ts" meta='title="src/services/hello/agents/assistant.agent.ts"'>
+  ../../templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
 </include>
 
 `input` describes what your app sends; `output` describes the answer your app expects. RelKit validates both. Output validation checks the shape, not whether the model's answer is factually correct.

@@ -11,8 +11,8 @@ by schema table key, then by one of the six reserved CRUD names.
 
 The data-model example hides inactive users from `findOne`:
 
-<include cwd lang="ts" meta='title="src/database/service.ts — overrides"'>
-  ../../examples/data-model/src/database/service.ts#user-overrides
+<include cwd lang="ts" meta='title="src/services/database/service.ts — overrides"'>
+  ../../examples/data-model/src/services/database/service.ts#user-overrides
 </include>
 
 The callback receives `{ args, base }`. `args` has that operation's argument shape. `base(args)` runs

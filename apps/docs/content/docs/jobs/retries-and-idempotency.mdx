@@ -5,8 +5,12 @@ description: Make transient failure safe to retry.
 
 The default retry policy is three attempts with a one-second initial delay, a 30-second maximum delay, factor two, and no jitter.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
-  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  ../../examples/commerce/src/services/orders/tasks/export-orders.task.ts
 </include>
 
 Set `retry` on `defineTask`, using `maxAttempts`, readable `initialDelay` and `maxDelay`, `factor`, and

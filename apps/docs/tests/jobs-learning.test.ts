@@ -1,3 +1,4 @@
+/** Checks authored job/provider guidance and native evidence references through finite synchronous read-only test adapters. */
 import { expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -6,6 +7,10 @@ import { renderRelated } from "../scripts/generate-guides.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 import { jobsGuideGroup } from "../scripts/jobs-guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
+/** Reads one owned job guide at the native synchronous test boundary.
+ * @param page - Job/provider guide path selected by this suite.
+ * @returns Original guide text; missing input fails the native test.
+ */
 const read = (page: string) => readFileSync(resolve(content, `jobs/${page}.mdx`), "utf8");
 test("connects Jobs between Events and Database with source-backed guides", () => {
   expect(guideGroups.map(({ directory }) => directory).slice(0, 7)).toEqual([
@@ -23,9 +28,9 @@ test("connects Jobs between Events and Database with source-backed guides", () =
     pages: jobsGuideGroup.pages,
   });
   expect(guideRelations.find(({ path }) => path === "events/first-event")?.next).toBeUndefined();
-  expect(
-    renderRelated(guideRelations.find(({ path }) => path === "events/first-event")!),
-  ).not.toContain("Next step");
+  const relation = guideRelations.find(({ path }) => path === "events/first-event");
+  if (relation === undefined) throw new Error("The first-event guide relation is missing");
+  expect(renderRelated(relation)).not.toContain("Next step");
   expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBeUndefined();
   expect(features.find(({ id }) => id === "jobs")?.guide).toBe("jobs/quickstart");
   expect(features.find(({ id }) => id === "schedules")?.guide).toBe("jobs/schedules");
@@ -39,8 +44,8 @@ test("connects Jobs between Events and Database with source-backed guides", () =
 test("teaches task admission and completion using executable documentation sources", () => {
   const tutorial = read("quickstart");
   for (const path of [
-    "examples/commerce/src/orders/tasks/export-orders.task.ts",
-    "examples/commerce/src/orders/jobs/export-orders.job.ts",
+    "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
+    "examples/commerce/src/services/orders/jobs/export-orders.job.ts",
     "examples/commerce/src/routes/orders/export/route.ts",
   ]) {
     expect(tutorial).toContain(`../../${path}`);

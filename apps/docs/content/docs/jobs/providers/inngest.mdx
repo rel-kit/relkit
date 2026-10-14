@@ -40,37 +40,59 @@ docker ps --filter 'name=service-inngest' --format '{{.Names}} {{.Ports}}'
 ```
 
 In the dashboard, **Functions** must list the Orders export function after the backend
-starts. This screenshot is from a fresh generated app running the task below; the native
-Inngest function list shows that it was registered, beyond RELKIT's compiled `jobs list`.
+starts. This historical screenshot records a fresh flat-layout local-source fixture; its
+native registration evidence predates the grouped move and does not certify a new creation tuple.
 
 ![Inngest local Functions page showing the registered Orders export function](/jobs-inngest-registered.png)
 
+## Add the Orders boundary
+
+These instructions extend an existing application; they do not create a jobs starter.
+For a grouped minimal app, create `src/services/orders/functions`, `tasks` and `jobs`.
+Add the following boundary and health function. In a compatible flat app, use its
+existing `src/orders/` root consistently instead. If Orders already exists, extend
+its public functions rather than replacing the boundary.
+
+<include cwd lang="ts" meta='title="src/services/orders/service.ts"'>
+  ../../templates/default/v1/tasks/src/services/orders/service.ts
+</include>
+
+<include cwd lang="ts" meta='title="src/services/orders/functions/health.function.ts"'>
+  ../../templates/default/v1/tasks/src/services/orders/functions/health.function.ts
+</include>
+
+Add `src/services/orders/jobs/export-orders.job.ts` from the maintained task fixture:
+
+<include cwd lang="ts" meta='title="src/services/orders/jobs/export-orders.job.ts"'>
+  ../../templates/default/v1/tasks/src/services/orders/jobs/export-orders.job.ts
+</include>
+
+The task file below supplies the job's imported target. Create the sample input file
+when absent. Keep existing durable task/job IDs and bump the task version when
+changing an already deployed contract.
+
 ## Read the task before running it
 
-**Replace** the generated `src/orders/tasks/export-orders.task.ts` with this example. The
+**Add or update** `src/services/orders/tasks/export-orders.task.ts` with this example. The
 input describes actual order lines; the task calculates each line total and returns CSV text
 plus a reconciled total. It emits progress after each row. The IDs and SKUs in this example
 are simple values without commas or newlines; add CSV escaping before accepting arbitrary
 customer-provided text. Since this is a fresh app and no run has been deployed, the version
 remains `1`. Bump it when changing a deployed task contract.
 
-<include cwd lang="ts" meta='title="src/orders/tasks/export-orders.task.ts"'>
+<include cwd lang="ts" meta='title="src/services/orders/tasks/export-orders.task.ts"'>
   ../../apps/docs/examples/jobs/providers/inngest-task.ts
 </include>
 
-The generated `src/orders/jobs/export-orders.job.ts` names the public `exportOrders` job and
+The explicit `src/services/orders/jobs/export-orders.job.ts` names the public `exportOrders` job and
 allows trigger, get, list, and watch operations. The task owns execution; the job controls
 admission and the client-facing operations.
 
-**Replace** `examples/export-orders.json` with the following input. The two rows produce
+**Create or update** `examples/export-orders.json` with the following input. The two rows produce
 `orderCount: 2`, `totalCents: 2100`, and CSV lines with totals `900` and `1200`.
 
 <include cwd lang="json" meta='title="examples/export-orders.json"'>
   ../../apps/docs/examples/jobs/providers/export-orders.json
-</include>
-
-<include cwd lang="ts" meta='title="src/orders/jobs/export-orders.job.ts"'>
-  ../../templates/default/v1/tasks/src/orders/jobs/export-orders.job.ts
 </include>
 
 ## Start and submit a run

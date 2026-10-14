@@ -30,15 +30,15 @@ that second profile here. `requests` starts a Docker Redis recipe during local d
 
 ## Define the prices cache
 
-<include cwd lang="ts" meta='title="src/orders/cache/prices.cache.ts"'>
-  ../../examples/commerce/src/orders/cache/prices.cache.ts
+<include cwd lang="ts" meta='title="src/services/orders/cache/prices.cache.ts"'>
+  ../../examples/commerce/src/services/orders/cache/prices.cache.ts
 </include>
 
 Each product code has its own cached price, which expires one minute after it is saved.
 
 ## Add the lookup function
 
-<include cwd lang="ts" meta='title="src/orders/functions/get-price.function.ts"'>
+<include cwd lang="ts" meta='title="src/services/orders/functions/get-price.function.ts"'>
   ../../examples/commerce/tests/fixtures/get-price.function.ts
 </include>
 

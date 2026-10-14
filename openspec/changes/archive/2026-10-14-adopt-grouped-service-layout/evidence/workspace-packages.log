@@ -1,0 +1,6441 @@
+$ bun run scripts/test-packages.ts
+Running 738 Vitest (10 native Bun) and 133 Bun package test files.
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  9 passed (9)
+      Tests  23 passed (23)
+   Start at  17:42:31
+   Duration  8.95s (tests 68%, import 17%, transform 15%)
+
+    Isolate  9 workers spawned · ~56ms startup each (spawn + environment, per file)
+             at least ~449ms faster with isolate: false — reuses workers across files instead of one per file
+
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+[17:42:56.617] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 1.195459
+}
+[17:42:56.619] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 12944.311875
+}
+[17:43:38.074] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 1.100042
+}
+[17:43:38.077] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 7868.794084
+}
+[17:43:45.897] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 1.472292
+}
+[17:43:45.899] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 7483.612625
+}
+[17:44:40.550] INFO (#8): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 58.776125
+}
+[17:44:40.562] INFO (#10): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 10.042417
+}
+[17:44:40.573] INFO (#11): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 10.490208
+}
+[17:44:40.582] INFO (#14): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'success',
+  duration_ms: 6.286125
+}
+[17:44:40.587] INFO (#12): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 13.507166
+}
+[17:44:41.317] ERROR (#17): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'failure',
+  duration_ms: 1.603666
+}
+[17:44:46.877] INFO (#81): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 18.064709
+}
+[17:44:46.956] INFO (#260): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 4.094917
+}
+[17:44:47.358] INFO (#368): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'success',
+  duration_ms: 28.215083
+}
+[17:44:47.366] INFO (#366): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 37.965667
+}
+[17:44:47.392] ERROR (#371): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'failure',
+  duration_ms: 2.289167
+}
+[17:44:48.597] ERROR (#113): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 38.675
+}
+[17:44:48.607] ERROR (#143): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 6.978125
+}
+[17:44:48.627] INFO (#174): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 19.700583
+}
+[17:44:48.648] INFO (#244): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'success',
+  duration_ms: 18.925833
+}
+[17:44:48.678] INFO (#242): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 51.032625
+}
+[17:44:48.698] INFO (#261): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 19.661916
+}
+[17:44:48.705] INFO (#312): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 4.205084
+}
+[17:44:48.712] INFO (#350): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 5.917958
+}
+[17:44:48.727] INFO (#416): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 4.729375
+}
+[17:44:48.735] INFO (#457): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 8.2615
+}
+[17:44:48.758] INFO (#524): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 22.17625
+}
+[17:44:48.763] INFO (#582): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 5.038792
+}
+[17:44:48.768] INFO (#620): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 4.51425
+}
+[17:44:48.785] INFO (#658): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 4.965708
+}
+[17:44:48.802] INFO (#696): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.800708
+}
+[17:44:48.829] INFO (#736): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 16.98425
+}
+[17:44:48.864] INFO (#787): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 24.002166
+}
+[17:44:48.873] ERROR (#825): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'failure',
+  duration_ms: 2.192584
+}
+[17:44:48.884] INFO (#888): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 7.155708
+}
+[17:44:48.903] INFO (#956): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 17.090166
+}
+[17:44:48.913] ERROR (#1008): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 9.147792
+}
+[17:44:48.923] INFO (#1096): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.563375
+}
+[17:44:48.943] INFO (#1155): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 19.617833
+}
+[17:44:48.968] INFO (#1211): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 25.165
+}
+[17:44:50.502] INFO (#4): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.telemetry.acquire-relay',
+  outcome: 'success',
+  duration_ms: 2.4965
+}
+[17:44:51.042] INFO (#16409): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.telemetry.relay-status',
+  outcome: 'success',
+  duration_ms: 1.295375
+}
+[17:44:51.059] INFO (#4): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.telemetry.relay.release',
+  outcome: 'success',
+  duration_ms: 0.025
+}
+[17:44:53.486] INFO (#131): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 28.898208
+}
+[17:44:53.714] INFO (#193): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 227.814708
+}
+[17:44:53.762] INFO (#326): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 37.168875
+}
+[17:44:53.812] INFO (#495): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 39.548958
+}
+[17:44:53.829] INFO (#653): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 13.322916
+}
+[17:44:53.981] INFO (#708): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 152.101792
+}
+[17:44:56.291] INFO (#323): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 28.377584
+}
+[17:44:56.346] INFO (#385): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 54.470875
+}
+[17:44:56.362] INFO (#896): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 7.699875
+}
+[17:44:56.399] INFO (#958): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 37.234041
+}
+[17:44:56.412] INFO (#1469): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.71475
+}
+[17:44:56.464] INFO (#1531): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 51.533875
+}
+[17:44:56.475] INFO (#2069): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 7.195166
+}
+[17:44:56.510] INFO (#2131): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 35.169291
+}
+[17:44:56.523] INFO (#2678): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.869667
+}
+[17:44:56.541] INFO (#2740): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 17.339791
+}
+[17:44:56.554] INFO (#3116): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.646417
+}
+[17:44:56.571] INFO (#3178): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 17.150542
+}
+[17:44:56.584] INFO (#3555): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 7.255916
+}
+[17:44:56.623] INFO (#3617): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 38.153875
+}
+[17:44:56.631] INFO (#3837): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 8.334834
+}
+[17:44:56.677] INFO (#3895): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 45.13325
+}
+[17:44:56.694] INFO (#4527): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 11.629084
+}
+[17:44:56.732] INFO (#4589): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 37.739042
+}
+[17:44:56.739] INFO (#4809): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.27925
+}
+[17:44:56.797] INFO (#4867): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 58.2345
+}
+[17:44:56.811] INFO (#5504): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 7.9155
+}
+[17:44:56.848] INFO (#5566): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 37.547625
+}
+[17:44:56.857] INFO (#5800): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 7.089083
+}
+[17:44:56.874] INFO (#5862): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 17.610667
+}
+[17:44:56.886] INFO (#6237): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.258208
+}
+[17:44:56.922] INFO (#6299): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 35.596
+}
+[17:44:56.930] INFO (#6533): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.848292
+}
+[17:44:56.975] INFO (#6595): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 44.572834
+}
+[17:44:56.985] INFO (#7224): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 5.848708
+}
+[17:44:57.010] INFO (#7286): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 24.802958
+}
+[17:44:57.023] ERROR (#7520): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 12.439375
+}
+[17:44:57.028] INFO (#7576): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 4.358625
+}
+[17:44:57.074] INFO (#7624): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 46.344625
+}
+[17:44:58.490] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 8.883959
+}
+[17:44:58.502] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 1110.480625
+}
+[17:45:03.568] INFO (#5): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 39.529084
+}
+[17:45:03.585] INFO (#7): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 10.570958
+}
+[17:45:03.595] INFO (#8): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 9.924541
+}
+[17:45:03.604] INFO (#9): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 7.62375
+}
+[17:45:03.616] INFO (#14): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'success',
+  duration_ms: 7.331791
+}
+[17:45:03.622] INFO (#12): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 16.228959
+}
+[17:45:03.629] INFO (#17): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 4.294083
+}
+[17:45:03.634] INFO (#22): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'success',
+  duration_ms: 2.922167
+}
+[17:45:03.638] ERROR (#20): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 8.571333
+}
+[17:45:03.643] ERROR (#27): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 4.184958
+}
+[17:45:03.645] ERROR (#29): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 2.55025
+}
+[17:45:03.652] ERROR (#30): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'failure',
+  duration_ms: 1.466
+}
+[17:45:03.654] ERROR (#33): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'failure',
+  duration_ms: 1.457583
+}
+[17:45:04.454] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.release',
+  outcome: 'success',
+  duration_ms: 1.190542
+}
+[17:45:04.456] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'process.run',
+  outcome: 'success',
+  duration_ms: 524.442833
+}
+[17:45:08.527] INFO (#20): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 15.18025
+}
+[17:45:08.536] INFO (#63): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 5.368583
+}
+[17:45:37.428] INFO (#323): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 25.996959
+}
+[17:45:37.502] INFO (#385): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 72.784917
+}
+[17:45:37.512] INFO (#919): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.344584
+}
+[17:45:37.524] INFO (#962): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 10.947709
+}
+[17:45:37.582] ERROR (#960): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 68.543291
+}
+[17:45:37.591] INFO (#1338): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 8.262875
+}
+[17:45:40.213] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.acquire',
+  outcome: 'success',
+  duration_ms: 0.748083
+}
+[17:45:40.221] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.config-inputs',
+  outcome: 'success',
+  duration_ms: 5.359958
+}
+[17:45:40.221] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.start',
+  outcome: 'success',
+  duration_ms: 6.274917
+}
+[17:45:40.226] INFO (#74): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.stopping.callback',
+  outcome: 'success',
+  duration_ms: 0.037042
+}
+[17:45:40.226] INFO (#79): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.proxy.release',
+  outcome: 'success',
+  duration_ms: 0.072416
+}
+[17:45:40.229] INFO (#74): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.observability.release',
+  outcome: 'success',
+  duration_ms: 1.879333
+}
+[17:45:40.229] INFO (#74): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.shutdown',
+  outcome: 'success',
+  duration_ms: 5.373584
+}
+[17:45:40.229] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.wait',
+  outcome: 'success',
+  duration_ms: 3.162459
+}
+[17:45:40.230] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.worker.release',
+  outcome: 'success',
+  duration_ms: 0.264459
+}
+[17:45:40.230] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'cleanup.record',
+  outcome: 'success',
+  duration_ms: 0.029
+}
+[17:45:40.230] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'cleanup.record',
+  outcome: 'success',
+  duration_ms: 0.015583
+}
+[17:45:40.230] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.close',
+  outcome: 'success',
+  duration_ms: 0.699417
+}
+[17:45:40.230] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.worker.release',
+  outcome: 'success',
+  duration_ms: 0.011208
+}
+[17:45:40.230] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.close',
+  outcome: 'success',
+  duration_ms: 0.094667
+}
+[17:45:40.231] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'cleanup.snapshot',
+  outcome: 'success',
+  duration_ms: 0.019375
+}
+[17:45:40.231] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.worker.release',
+  outcome: 'success',
+  duration_ms: 0.0205
+}
+[17:45:40.232] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.close',
+  outcome: 'success',
+  duration_ms: 0.219333
+}
+[17:45:40.232] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.stop',
+  outcome: 'success',
+  duration_ms: 0.044708
+}
+[17:45:40.234] INFO (#95): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.acquire',
+  outcome: 'success',
+  duration_ms: 0.123708
+}
+[17:45:40.235] INFO (#95): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.config-inputs',
+  outcome: 'success',
+  duration_ms: 1.422834
+}
+[17:45:40.236] INFO (#95): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.start',
+  outcome: 'success',
+  duration_ms: 1.697041
+}
+[17:45:40.314] INFO (#117): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.config-inputs',
+  outcome: 'success',
+  duration_ms: 1.370125
+}
+[17:45:40.315] INFO (#117): Execution operation completed {
+  domain: 'cli',
+  operation: 'cleanup.record',
+  outcome: 'success',
+  duration_ms: 0.022583
+}
+[17:45:40.315] INFO (#116): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.stopping.callback',
+  outcome: 'success',
+  duration_ms: 0.016042
+}
+[17:45:40.315] INFO (#121): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.proxy.release',
+  outcome: 'success',
+  duration_ms: 0.0325
+}
+[17:45:40.316] INFO (#116): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.observability.release',
+  outcome: 'success',
+  duration_ms: 0.6355
+}
+[17:45:40.316] INFO (#116): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.shutdown',
+  outcome: 'success',
+  duration_ms: 1.588917
+}
+[17:45:40.317] INFO (#95): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.wait',
+  outcome: 'success',
+  duration_ms: 1.096375
+}
+[17:45:40.317] INFO (#95): Execution operation completed {
+  domain: 'cli',
+  operation: 'cleanup.snapshot',
+  outcome: 'success',
+  duration_ms: 0.011833
+}
+[17:45:40.317] INFO (#95): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.worker.release',
+  outcome: 'success',
+  duration_ms: 0.010792
+}
+[17:45:40.317] INFO (#95): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.close',
+  outcome: 'success',
+  duration_ms: 0.102375
+}
+[17:45:40.317] INFO (#95): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.stop',
+  outcome: 'success',
+  duration_ms: 0.014375
+}
+[17:45:41.223] INFO (#218): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 28.421375
+}
+[17:45:41.341] INFO (#280): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 117.604583
+}
+[17:45:41.402] ERROR (#498): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 50.141708
+}
+[17:45:41.421] ERROR (#541): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 18.280791
+}
+[17:45:41.436] INFO (#592): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 13.384792
+}
+[17:45:41.445] ERROR (#631): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 6.65225
+}
+[17:45:41.461] INFO (#674): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 15.363542
+}
+[17:45:41.518] INFO (#732): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 56.097458
+}
+[17:45:41.525] INFO (#978): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 6.423666
+}
+[17:45:41.554] ERROR (#1021): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 28.55375
+}
+[17:45:48.455] INFO (#54): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 29.186875
+}
+[17:45:48.486] INFO (#112): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 30.029541
+}
+[17:45:48.498] INFO (#182): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 9.823958
+}
+[17:45:48.509] INFO (#183): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 21.293167
+}
+[17:45:48.513] INFO (#266): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 4.168208
+}
+[17:45:48.546] INFO (#313): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 22.254459
+}
+[17:45:48.554] INFO (#366): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 7.414
+}
+[17:45:59.866] INFO (#4): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.telemetry.acquire-relay',
+  outcome: 'success',
+  duration_ms: 2.926208
+}
+[17:45:59.875] WARN (#20): Retrying acknowledged-key telemetry batch { attempt: 1 }
+[17:45:59.905] INFO (#4): Execution operation completed {
+  domain: 'cli',
+  operation: 'cleanup.snapshot',
+  outcome: 'success',
+  duration_ms: 0.051084
+}
+[17:45:59.907] INFO (#4): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.telemetry.relay.release',
+  outcome: 'success',
+  duration_ms: 0.042667
+}
+[17:45:59.909] INFO (#37): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.telemetry.acquire-relay',
+  outcome: 'success',
+  duration_ms: 0.824125
+}
+[17:45:59.914] INFO (#37): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.telemetry.relay.release',
+  outcome: 'success',
+  duration_ms: 0.033167
+}
+[17:46:06.544] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.524166
+}
+[17:46:06.553] INFO (#14): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 2.276417
+}
+[17:46:06.554] INFO (#14): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 5.707959
+}
+[17:46:06.555] INFO (#11): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 7.305875
+}
+[17:46:06.571] INFO (#16): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.session',
+  outcome: 'success',
+  duration_ms: 15.669375
+}
+[17:46:06.572] INFO (#19): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.063792
+}
+[17:46:06.574] ERROR (#21): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.session',
+  outcome: 'failure',
+  duration_ms: 0.708875
+}
+[17:46:07.081] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.550791
+}
+[17:46:07.087] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.052958
+}
+[17:46:07.087] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 2.748458
+}
+[17:46:07.093] INFO (#16): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.122458
+}
+[17:46:08.017] ERROR (#26): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 8.277458
+}
+[17:46:08.024] INFO (#69): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 3.565542
+}
+[17:46:08.027] ERROR (#99): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 2.271208
+}
+[17:46:08.029] ERROR (#127): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 1.77
+}
+[17:46:08.651] WARN (#34): Compiler jobs operation failed {
+  'compiler.stage': 'jobs',
+  operation: 'routingRead',
+  outcome: 'failure',
+  duration_ms: 0.298709
+}
+[17:46:08.651] WARN (#33): Compiler jobs operation failed {
+  'compiler.stage': 'jobs',
+  operation: 'writeWorkers',
+  outcome: 'failure',
+  duration_ms: 0.989792
+}
+[17:46:19.387] ERROR (#63): Execution operation failed {
+  domain: 'cli',
+  operation: 'filesystem.exclusive',
+  outcome: 'failure',
+  duration_ms: 0.514334
+}
+[17:46:26.201] INFO (#19): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.126792
+}
+[17:46:26.204] INFO (#23): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.087291
+}
+[17:46:26.205] INFO (#32): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.122666
+}
+[17:46:26.206] INFO (#37): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.087042
+}
+[17:46:26.208] INFO (#46): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.570416
+}
+[17:46:26.209] INFO (#50): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.060583
+}
+[17:46:26.210] INFO (#59): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.098084
+}
+[17:46:26.211] INFO (#62): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.030667
+}
+[17:46:26.212] INFO (#71): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.048959
+}
+[17:46:26.213] INFO (#73): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.062166
+}
+[17:46:27.149] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.470334
+}
+[17:46:27.157] INFO (#12): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 2.371667
+}
+[17:46:27.159] INFO (#14): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findOne',
+  outcome: 'success',
+  duration_ms: 0.213417
+}
+[17:46:27.160] INFO (#12): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 7.689459
+}
+[17:46:27.161] INFO (#17): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.066708
+}
+[17:46:27.163] INFO (#26): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.080958
+}
+[17:46:27.164] INFO (#28): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.024375
+}
+[17:46:27.164] INFO (#28): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 0.396583
+}
+[17:46:27.166] INFO (#29): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.handler',
+  outcome: 'success',
+  duration_ms: 1.048208
+}
+[17:46:27.167] INFO (#32): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 1.154834
+}
+[17:46:27.168] INFO (#37): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findOne',
+  outcome: 'success',
+  duration_ms: 0.693792
+}
+[17:46:27.168] INFO (#41): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.038
+}
+[17:46:27.169] INFO (#50): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.058083
+}
+[17:46:27.171] INFO (#52): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 1.228459
+}
+[17:46:27.172] INFO (#59): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.434125
+}
+[17:46:27.172] INFO (#59): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 1.626083
+}
+[17:46:27.173] INFO (#62): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.024583
+}
+[17:46:27.174] INFO (#71): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.059208
+}
+[17:46:27.175] INFO (#76): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.353333
+}
+[17:46:27.175] INFO (#78): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findOne',
+  outcome: 'success',
+  duration_ms: 0.075916
+}
+[17:46:27.176] ERROR (#76): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'failure',
+  duration_ms: 2.091375
+}
+[17:46:27.177] INFO (#81): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findOne',
+  outcome: 'success',
+  duration_ms: 0.063667
+}
+[17:46:27.177] INFO (#84): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.026875
+}
+[17:46:27.178] INFO (#93): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.067958
+}
+[17:46:27.179] INFO (#95): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.016208
+}
+[17:46:27.179] INFO (#95): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 0.269292
+}
+[17:46:27.179] INFO (#103): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.session',
+  outcome: 'success',
+  duration_ms: 0.08925
+}
+[17:46:27.180] INFO (#97): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.handler',
+  outcome: 'success',
+  duration_ms: 0.612416
+}
+[17:46:27.180] INFO (#104): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.05525
+}
+[17:46:30.362] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.4905
+}
+[17:46:30.370] INFO (#13): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 2.335625
+}
+[17:46:30.374] ERROR (#13): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'failure',
+  duration_ms: 7.790709
+}
+[17:46:30.375] INFO (#21): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.383291
+}
+[17:46:30.376] INFO (#21): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 1.198584
+}
+[17:46:30.377] INFO (#26): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.05425
+}
+[17:46:30.379] INFO (#37): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.082375
+}
+[17:46:30.380] INFO (#39): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.576875
+}
+[17:46:30.380] INFO (#39): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 0.902
+}
+[17:46:30.380] INFO (#44): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.031416
+}
+[17:46:30.381] INFO (#53): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.104459
+}
+[17:46:30.383] ERROR (#58): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'failure',
+  duration_ms: 0.541
+}
+[17:46:30.384] ERROR (#62): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'failure',
+  duration_ms: 0.254083
+}
+[17:46:30.385] ERROR (#66): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'failure',
+  duration_ms: 0.183125
+}
+[17:46:30.385] ERROR (#70): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'failure',
+  duration_ms: 0.194542
+}
+[17:46:30.386] ERROR (#74): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'failure',
+  duration_ms: 0.139667
+}
+[17:46:30.386] INFO (#78): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.336583
+}
+[17:46:30.387] INFO (#78): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 0.768625
+}
+[17:46:30.387] INFO (#81): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.027125
+}
+[17:46:35.892] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.56675
+}
+[17:46:35.900] INFO (#11): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.insert',
+  outcome: 'success',
+  duration_ms: 4.16925
+}
+[17:46:35.903] INFO (#18): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.update',
+  outcome: 'success',
+  duration_ms: 1.264917
+}
+[17:46:35.904] INFO (#23): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.upsert',
+  outcome: 'success',
+  duration_ms: 0.590041
+}
+[17:46:35.906] INFO (#28): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.delete',
+  outcome: 'success',
+  duration_ms: 0.758375
+}
+[17:46:35.907] INFO (#33): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'success',
+  duration_ms: 0.2765
+}
+[17:46:35.908] INFO (#36): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.058667
+}
+[17:46:35.922] INFO (#45): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 3.776875
+}
+[17:46:35.924] INFO (#47): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.insert',
+  outcome: 'success',
+  duration_ms: 0.546417
+}
+[17:46:35.925] INFO (#51): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.update',
+  outcome: 'success',
+  duration_ms: 0.2085
+}
+[17:46:35.925] INFO (#53): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.upsert',
+  outcome: 'success',
+  duration_ms: 0.150416
+}
+[17:46:35.926] INFO (#55): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.delete',
+  outcome: 'success',
+  duration_ms: 0.160375
+}
+[17:46:35.926] INFO (#57): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'success',
+  duration_ms: 0.071417
+}
+[17:46:35.926] INFO (#60): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.022875
+}
+[17:46:35.929] INFO (#69): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.117667
+}
+[17:46:35.931] INFO (#71): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.extension',
+  outcome: 'success',
+  duration_ms: 0.391458
+}
+[17:46:35.931] INFO (#73): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.extension',
+  outcome: 'success',
+  duration_ms: 0.105959
+}
+[17:46:35.932] INFO (#77): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.extension',
+  outcome: 'success',
+  duration_ms: 0.032584
+}
+[17:46:35.932] INFO (#75): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 0.504833
+}
+[17:46:35.932] INFO (#80): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.021958
+}
+[17:46:35.934] INFO (#89): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.188083
+}
+[17:46:35.936] ERROR (#91): Execution operation failed {
+  domain: 'runtime',
+  operation: 'database.insert',
+  outcome: 'failure',
+  duration_ms: 1.383541
+}
+[17:46:35.937] ERROR (#93): Execution operation failed {
+  domain: 'runtime',
+  operation: 'database.findOne',
+  outcome: 'failure',
+  duration_ms: 0.126333
+}
+[17:46:35.937] ERROR (#95): Execution operation failed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'failure',
+  duration_ms: 0.084042
+}
+[17:46:35.937] ERROR (#97): Execution operation failed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'failure',
+  duration_ms: 0.155583
+}
+[17:46:35.938] INFO (#100): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.024417
+}
+[17:46:37.133] INFO (#62): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.proxy.stop',
+  outcome: 'success',
+  duration_ms: 6.412834
+}
+[17:46:37.139] INFO (#63): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.acquire',
+  outcome: 'success',
+  duration_ms: 0.449167
+}
+[17:46:37.144] INFO (#89): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.stopping.callback',
+  outcome: 'success',
+  duration_ms: 0.035917
+}
+[17:46:37.144] INFO (#93): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.proxy.release',
+  outcome: 'success',
+  duration_ms: 0.035458
+}
+[17:46:37.147] INFO (#89): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.observability.release',
+  outcome: 'success',
+  duration_ms: 1.804167
+}
+[17:46:37.147] INFO (#89): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.shutdown',
+  outcome: 'success',
+  duration_ms: 3.866667
+}
+[17:46:37.147] INFO (#85): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.stop',
+  outcome: 'success',
+  duration_ms: 4.193208
+}
+[17:46:37.147] ERROR (#85): Execution operation failed {
+  domain: 'cli',
+  operation: 'dev.session.start',
+  outcome: 'failure',
+  duration_ms: 8.053291
+}
+[17:46:37.147] INFO (#89): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.stop',
+  outcome: 'success',
+  duration_ms: 5.54875
+}
+[17:46:37.148] INFO (#63): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.stop',
+  outcome: 'success',
+  duration_ms: 0.040167
+}
+[17:46:37.809] WARN (#38): Compiler jobs operation failed {
+  'compiler.stage': 'jobs',
+  operation: 'taskBuildId',
+  outcome: 'defect',
+  duration_ms: 0.068959
+}
+[17:46:40.411] INFO (#24): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.340625
+}
+[17:46:40.415] ERROR (#26): Execution operation failed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'failure',
+  duration_ms: 0.557208
+}
+[17:46:40.416] INFO (#29): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.049875
+}
+[17:46:40.420] INFO (#63): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.072417
+}
+[17:46:40.421] INFO (#70): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.insert',
+  outcome: 'success',
+  duration_ms: 0.11275
+}
+[17:46:40.422] INFO (#65): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 0.970291
+}
+[17:46:40.422] INFO (#71): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.056417
+}
+[17:46:47.058] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.532792
+}
+[17:46:47.062] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.041583
+}
+[17:46:47.062] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 2.46025
+}
+[17:46:47.064] INFO (#11): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.session',
+  outcome: 'success',
+  duration_ms: 0.198458
+}
+[17:46:47.064] INFO (#13): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.api',
+  outcome: 'success',
+  duration_ms: 0.193375
+}
+[17:46:47.065] INFO (#16): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.063125
+}
+[17:46:47.067] ERROR (#21): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.handler',
+  outcome: 'failure',
+  duration_ms: 0.750083
+}
+[17:46:47.067] ERROR (#22): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.handler',
+  outcome: 'failure',
+  duration_ms: 0.103541
+}
+[17:46:47.068] ERROR (#23): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.session',
+  outcome: 'failure',
+  duration_ms: 0.088125
+}
+[17:46:47.068] ERROR (#24): Execution operation failed {
+  domain: 'runtime',
+  operation: 'auth.api',
+  outcome: 'failure',
+  duration_ms: 0.080541
+}
+[17:46:47.071] INFO (#34): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.098417
+}
+[17:46:47.071] INFO (#37): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.071125
+}
+[17:46:47.072] INFO (#37): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 0.644667
+}
+[17:46:47.072] INFO (#40): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.035666
+}
+[17:46:47.074] INFO (#50): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.196208
+}
+[17:46:47.074] INFO (#52): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.0165
+}
+[17:46:47.074] INFO (#52): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 0.309791
+}
+[17:46:47.078] INFO (#58): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.066375
+}
+[17:46:51.092] INFO (#1): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.api',
+  outcome: 'success',
+  duration_ms: 23.380917
+}
+[17:46:59.976] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.550916
+}
+[17:46:59.980] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.049625
+}
+[17:46:59.981] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 2.647708
+}
+[17:46:59.983] INFO (#11): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 1.571542
+}
+[17:46:59.984] INFO (#13): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.handler',
+  outcome: 'success',
+  duration_ms: 1.716125
+}
+[17:46:59.985] INFO (#14): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.session',
+  outcome: 'success',
+  duration_ms: 1.982792
+}
+[17:46:59.986] INFO (#19): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.073125
+}
+[17:46:59.988] INFO (#28): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.0725
+}
+[17:46:59.989] INFO (#30): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.factory',
+  outcome: 'success',
+  duration_ms: 0.021833
+}
+[17:46:59.989] INFO (#30): Execution operation completed {
+  domain: 'runtime',
+  operation: 'auth.acquire',
+  outcome: 'success',
+  duration_ms: 0.37475
+}
+[17:46:59.990] INFO (#32): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findOne',
+  outcome: 'success',
+  duration_ms: 0.119542
+}
+[17:46:59.991] INFO (#36): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.032125
+}
+[17:47:01.722] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.535458
+}
+[17:47:01.728] INFO (#17): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'success',
+  duration_ms: 0.354417
+}
+[17:47:01.730] INFO (#19): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.080875
+}
+[17:47:01.732] INFO (#28): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.167375
+}
+[17:47:01.733] INFO (#36): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'success',
+  duration_ms: 0.126791
+}
+[17:47:01.739] INFO (#37): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.06825
+}
+[17:47:01.740] INFO (#46): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.093042
+}
+[17:47:01.741] INFO (#48): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 0.473042
+}
+[17:47:01.742] INFO (#51): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'success',
+  duration_ms: 0.350583
+}
+[17:47:01.742] INFO (#54): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.023959
+}
+[17:47:05.601] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.538625
+}
+[17:47:05.612] INFO (#10): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.079958
+}
+[17:47:06.558] INFO (#20): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 1.894209
+}
+[17:47:06.817] INFO (#26): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 0.200083
+}
+[17:47:06.818] INFO (#28): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 0.059875
+}
+[17:47:06.819] ERROR (#29): Execution operation failed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'failure',
+  duration_ms: 0.328
+}
+[17:47:07.330] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.586625
+}
+[17:47:07.343] INFO (#10): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.061417
+}
+[17:47:08.410] INFO (#27): Execution operation completed {
+  domain: 'cli',
+  operation: 'modules.load',
+  outcome: 'success',
+  duration_ms: 1.381083
+}
+[17:47:08.410] INFO (#27): Execution operation completed {
+  domain: 'cli',
+  operation: 'modules.load',
+  outcome: 'success',
+  duration_ms: 0.124625
+}
+[17:47:12.791] INFO (#9): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.714959
+}
+[17:47:12.794] INFO (#11): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'success',
+  duration_ms: 0.422375
+}
+[17:47:12.795] INFO (#13): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 1.139333
+}
+[17:47:12.797] INFO (#18): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.057875
+}
+[17:47:12.799] INFO (#29): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.150709
+}
+[17:47:12.800] INFO (#31): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 0.223417
+}
+[17:47:12.802] INFO (#35): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'success',
+  duration_ms: 0.112959
+}
+[17:47:12.803] INFO (#38): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.030834
+}
+[17:47:12.806] INFO (#63): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.068917
+}
+[17:47:12.807] INFO (#67): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.findMany',
+  outcome: 'success',
+  duration_ms: 0.336708
+}
+[17:47:12.807] INFO (#65): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.transaction',
+  outcome: 'success',
+  duration_ms: 1.142417
+}
+[17:47:12.807] INFO (#70): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.039667
+}
+[17:47:15.718] INFO (#45): Execution operation completed {
+  domain: 'runtime',
+  operation: 'clock.sleep',
+  outcome: 'success',
+  duration_ms: 0.763834
+}
+[17:47:17.365] INFO (#19): Execution operation completed {
+  domain: 'http',
+  operation: 'prepared.transports.initialize',
+  outcome: 'success',
+  duration_ms: 0.312084
+}
+[17:47:17.367] INFO (#17): Execution operation completed {
+  domain: 'http',
+  operation: 'prepared.transports.load',
+  outcome: 'success',
+  duration_ms: 2.144709
+}
+[17:47:17.367] INFO (#20): Execution operation completed {
+  domain: 'http',
+  operation: 'prepared.transports.load',
+  outcome: 'success',
+  duration_ms: 0.068625
+}
+[17:47:17.373] INFO (#35): Execution operation completed {
+  domain: 'http',
+  operation: 'prepared.transports.initialize',
+  outcome: 'success',
+  duration_ms: 0.937125
+}
+[17:47:23.517] INFO (#1): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.config-inputs',
+  outcome: 'success',
+  duration_ms: 5.765959
+}
+[17:47:23.525] INFO (#1): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.config-inputs',
+  outcome: 'success',
+  duration_ms: 0.866917
+}
+[17:47:23.527] INFO (#1): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.config-inputs',
+  outcome: 'success',
+  duration_ms: 0.860375
+}
+[17:47:23.527] INFO (#1): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.worker.release',
+  outcome: 'success',
+  duration_ms: 0.06275
+}
+[17:47:23.528] INFO (#1): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.close',
+  outcome: 'success',
+  duration_ms: 0.477209
+}
+[17:47:23.528] INFO (#1): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.worker.release',
+  outcome: 'success',
+  duration_ms: 0.018334
+}
+[17:47:23.528] INFO (#1): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.close',
+  outcome: 'success',
+  duration_ms: 0.15425
+}
+[17:47:27.756] INFO (#52): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.feed.borrow',
+  outcome: 'success',
+  duration_ms: 0.13625
+}
+[17:47:40.088] INFO (#7): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.acquire',
+  outcome: 'success',
+  duration_ms: 0.507292
+}
+[17:47:40.092] INFO (#8): Execution operation completed {
+  domain: 'runtime',
+  operation: 'database.close',
+  outcome: 'success',
+  duration_ms: 0.077917
+}
+[17:47:45.248] INFO (#4): Execution operation completed {
+  domain: 'inspector',
+  operation: 'query.access',
+  outcome: 'success',
+  duration_ms: 0.725125
+}
+[17:47:45.256] INFO (#28): Execution operation completed {
+  domain: 'inspector',
+  operation: 'observability.open',
+  outcome: 'success',
+  duration_ms: 0.359791
+}
+[17:47:55.982] INFO (#25): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'success',
+  duration_ms: 3.121917
+}
+[17:47:55.991] INFO (#31): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.connect',
+  outcome: 'success',
+  duration_ms: 1.120333
+}
+[17:47:58.205] WARN (#4): Compiler jobs operation failed {
+  'compiler.stage': 'jobs',
+  operation: 'workerPath',
+  outcome: 'failure',
+  duration_ms: 0.200833
+}
+[17:47:58.207] WARN (#5): Compiler jobs operation failed {
+  'compiler.stage': 'jobs',
+  operation: 'workerPath',
+  outcome: 'failure',
+  duration_ms: 0.124042
+}
+[17:47:58.207] WARN (#5): Compiler jobs operation failed {
+  'compiler.stage': 'jobs',
+  operation: 'writeWorkers',
+  outcome: 'failure',
+  duration_ms: 0.445625
+}
+[17:48:01.836] INFO (#6): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.content.open',
+  outcome: 'success',
+  duration_ms: 1.48275
+}
+[17:48:01.839] ERROR (#9): Execution operation failed {
+  domain: 'client',
+  operation: 'jobs.content.frames',
+  outcome: 'failure',
+  duration_ms: 0.646875
+}
+[17:48:18.524] INFO (#8): Execution operation completed {
+  domain: 'client',
+  operation: 'rpc.invoke',
+  outcome: 'success',
+  duration_ms: 0.948708
+}
+[17:48:18.528] INFO (#11): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 1.8145
+}
+[17:48:31.672] INFO (#1): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.compiler.bridge',
+  outcome: 'success',
+  duration_ms: 0.855459
+}
+[17:48:31.676] INFO (#5): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.compiler.bridge',
+  outcome: 'success',
+  duration_ms: 0.066
+}
+[17:49:08.464] INFO (#2): Execution operation completed {
+  domain: 'cli',
+  operation: 'contributor.callback',
+  outcome: 'success',
+  duration_ms: 1.310292
+}
+
+ Test Files  727 passed | 1 skipped (728)
+      Tests  2783 passed | 5 skipped (2788)
+   Start at  17:42:42
+   Duration  396.79s (import 50%, tests 44%, transform 5%)
+
+     Import  4340 modules were evaluated 15025 times · 173.10s total, 50% of tracked time
+             ~123.10s faster with isolate: false — shared modules are evaluated once per worker instead of once per file
+             learn more: https://vitest.dev/guide/improving-performance#test-isolation
+
+bun test v1.3.10 (30e609e0)
+.................
+
+packages/cli/commands-core-start.test.ts:
+[14:49:24.564] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.329417,
+}
+[14:49:24.573] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 3.424,
+}
+[14:49:24.574] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.40275,
+}
+[14:49:24.574] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.282083,
+}
+[14:49:24.584] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 9.878625,
+}
+[14:49:25.623] INFO (#4377): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.health.body",
+  outcome: "success",
+  duration_ms: 0.113875,
+}
+[14:49:25.623] INFO (#4377): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.graph.body",
+  outcome: "success",
+  duration_ms: 0.068209,
+}
+[14:49:25.671] INFO (#4377): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.routes.body",
+  outcome: "success",
+  duration_ms: 0.198625,
+}
+[14:49:25.671] INFO (#4377): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.functions.body",
+  outcome: "success",
+  duration_ms: 0.040667,
+}
+[14:49:25.747] INFO (#4377): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.route.body",
+  outcome: "success",
+  duration_ms: 0.099416,
+}
+[14:49:25.784] INFO (#4377): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.action.body",
+  outcome: "success",
+  duration_ms: 0.100583,
+}
+[14:49:25.891] INFO (#4377): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.logs.body",
+  outcome: "success",
+  duration_ms: 0.083375,
+}
+[14:49:25.902] INFO (#4377): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.logs.next",
+  outcome: "success",
+  duration_ms: 0.079625,
+}
+[14:49:25.944] INFO (#4417): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 6.298916,
+}
+.
+[14:49:25.945] INFO (#4418): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.22375,
+}
+[14:49:25.946] INFO (#4418): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.674292,
+}
+[14:49:25.946] INFO (#4418): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.173625,
+}
+[14:49:25.946] INFO (#4418): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.062625,
+}
+[14:49:25.958] INFO (#4418): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 11.367875,
+}
+[14:49:26.824] INFO (#4779): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 4.80025,
+}
+.
+[14:49:26.825] INFO (#4780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.200625,
+}
+[14:49:26.826] INFO (#4780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.768125,
+}
+[14:49:26.826] INFO (#4780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.275333,
+}
+[14:49:26.827] INFO (#4780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.098708,
+}
+[14:49:26.837] INFO (#4780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 9.794375,
+}
+[14:49:27.712] INFO (#5139): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 5.212625,
+}
+.
+
+packages/cli/dev-candidates.test.ts:
+[14:49:27.720] INFO (#5140): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.660708,
+}
+[14:49:27.831] INFO (#5466): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 6.515291,
+}
+[14:49:27.832] INFO (#5466): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.32225,
+}
+.
+[14:49:27.832] INFO (#5543): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.220625,
+}
+[14:49:28.071] INFO (#7238): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.013791,
+}
+[14:49:28.072] INFO (#7238): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.295875,
+}
+.
+[14:49:28.072] INFO (#7239): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.217833,
+}
+.[14:49:28.081] INFO (#7375): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.29325,
+}
+..
+
+packages/cli/dev-scaffold.test.ts:
+[14:49:28.103] INFO (#7435): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.304334,
+}
+[14:49:30.195] INFO (#9367): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 6.559917,
+}
+[14:49:30.196] INFO (#9367): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.878917,
+}
+......
+
+packages/cli/commands-core-build.test.ts:
+[14:49:31.870] INFO (#9506): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.226792,
+}
+[14:49:31.871] INFO (#9506): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.681417,
+}
+[14:49:31.871] INFO (#9506): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.163333,
+}
+[14:49:31.871] INFO (#9506): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.048125,
+}
+[14:49:31.878] INFO (#9506): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 6.587917,
+}
+[14:49:34.816] INFO (#9720): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 4.136625,
+}
+.
+[14:49:34.817] INFO (#9721): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.252916,
+}
+[14:49:34.818] INFO (#9721): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.7475,
+}
+[14:49:34.818] INFO (#9721): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.231333,
+}
+[14:49:34.818] INFO (#9721): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.075791,
+}
+[14:49:34.829] INFO (#9721): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 10.671209,
+}
+[14:49:35.600] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.187459,
+}
+[14:49:35.600] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.08525,
+}
+[14:49:35.600] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.129875,
+}
+[14:49:35.600] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.105667,
+}
+[14:49:35.600] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.079292,
+}
+[14:49:35.604] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 3.884208,
+}
+[14:49:35.605] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.189125,
+}
+[14:49:35.605] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.115792,
+}
+[14:49:35.605] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.063125,
+}
+[14:49:35.605] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.0565,
+}
+[14:49:35.605] INFO (#9980): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.043709,
+}
+[14:49:36.203] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.15175,
+}
+[14:49:36.203] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.070125,
+}
+[14:49:36.203] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.060417,
+}
+[14:49:36.203] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.100041,
+}
+[14:49:36.203] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.084291,
+}
+[14:49:36.204] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.8645,
+}
+[14:49:36.204] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.135666,
+}
+[14:49:36.204] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.06175,
+}
+[14:49:36.204] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.087167,
+}
+[14:49:36.205] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.066375,
+}
+[14:49:36.205] INFO (#10230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.040041,
+}
+[14:49:36.212] INFO (#10305): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.14875,
+}
+[14:49:36.213] INFO (#10305): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.612917,
+}
+[14:49:36.213] INFO (#10305): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.20325,
+}
+[14:49:36.213] INFO (#10305): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.038666,
+}
+[14:49:36.224] INFO (#10305): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 10.458333,
+}
+[14:49:36.650] INFO (#10500): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 3.182167,
+}
+[14:49:36.655] INFO (#10500): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 4.841958,
+}
+.
+[14:49:36.655] INFO (#10501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.11325,
+}
+[14:49:36.656] INFO (#10501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.490208,
+}
+[14:49:36.656] INFO (#10501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.1555,
+}
+[14:49:36.656] INFO (#10501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.033333,
+}
+[14:49:36.666] INFO (#10501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 9.485125,
+}
+[14:49:37.040] INFO (#10761): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 3.599166,
+}
+.
+[14:49:37.041] INFO (#10762): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.132084,
+}
+[14:49:37.042] INFO (#10762): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.632291,
+}
+[14:49:37.042] INFO (#10762): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.159416,
+}
+[14:49:37.042] INFO (#10762): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.037166,
+}
+[14:49:37.048] INFO (#10762): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 6.218083,
+}
+[14:49:37.592] INFO (#11011): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 4.817708,
+}
+.
+
+packages/cli/commands-core.test.ts:
+[14:49:38.404] INFO (#11014): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.303875,
+}
+[14:49:38.405] INFO (#11014): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.604459,
+}
+[14:49:38.405] INFO (#11014): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.163458,
+}
+[14:49:38.405] INFO (#11014): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.056125,
+}
+[14:49:38.418] INFO (#11014): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 13.192291,
+}
+[14:49:39.170] INFO (#11408): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.861667,
+}
+[14:49:39.171] INFO (#11408): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.794833,
+}
+[14:49:39.171] INFO (#11408): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.155958,
+}
+[14:49:39.171] INFO (#11408): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.073166,
+}
+[14:49:39.178] INFO (#11408): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 6.2265,
+}
+[14:49:39.526] INFO (#11555): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 2.24075,
+}
+[14:49:39.530] INFO (#11555): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 3.36225,
+}
+.[14:49:39.531] INFO (#11556): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.199917,
+}
+
+[14:49:39.531] INFO (#11556): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.539792,
+}
+[14:49:39.531] INFO (#11556): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.146709,
+}
+[14:49:39.531] INFO (#11556): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.03975,
+}
+[14:49:39.542] INFO (#11556): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 10.0045,
+}
+[14:49:40.279] INFO (#11784): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 3.500083,
+}
+.
+[14:49:40.280] INFO (#11785): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.112125,
+}
+[14:49:40.280] INFO (#11785): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.374208,
+}
+[14:49:40.280] INFO (#11785): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.12575,
+}
+[14:49:40.281] INFO (#11785): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.030459,
+}
+[14:49:40.288] INFO (#11785): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 7.461125,
+}
+[14:49:41.184] INFO (#11883): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 2.890833,
+}
+.
+[14:49:41.184] INFO (#11884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.161208,
+}
+[14:49:41.185] INFO (#11884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.814917,
+}
+[14:49:41.185] INFO (#11884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.25625,
+}
+[14:49:41.186] INFO (#11884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.089875,
+}
+[14:49:41.192] INFO (#11884): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 6.646709,
+}
+[14:49:41.203] INFO (#11912): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 2.60025,
+}
+....
+
+packages/cli/dev.test.ts:
+[14:49:49.048] INFO (#11913): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.649292,
+}
+[14:49:51.039] INFO (#13341): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 4.4305,
+}
+[14:49:51.039] INFO (#13341): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.458584,
+}
+.
+[14:49:51.040] INFO (#13415): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.1665,
+}
+[14:49:51.090] INFO (#13738): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.021791,
+}
+[14:49:51.091] INFO (#13738): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.341417,
+}
+.
+
+packages/cli/route-review-regressions.test.ts:
+[14:49:51.110] INFO (#13740): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.324875,
+}
+[14:49:51.111] INFO (#13740): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.087791,
+}
+[14:49:51.117] INFO (#13740): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 5.827583,
+}
+[14:49:51.117] INFO (#13739): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.route.fixture.canonical",
+  outcome: "success",
+  duration_ms: 8.280375,
+}
+[14:49:51.118] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.36375,
+}
+[14:49:51.118] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095334,
+}
+[14:49:51.118] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.11,
+}
+[14:49:51.118] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09125,
+}
+[14:49:51.119] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099416,
+}
+[14:49:51.119] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095209,
+}
+[14:49:51.119] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.138416,
+}
+[14:49:51.119] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122958,
+}
+[14:49:51.119] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.152542,
+}
+[14:49:51.119] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.165667,
+}
+[14:49:51.120] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126,
+}
+[14:49:51.120] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.107584,
+}
+[14:49:51.120] INFO (#13743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.159792,
+}
+[14:49:54.891] INFO (#13747): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.route.graph.read",
+  outcome: "success",
+  duration_ms: 1.272125,
+}
+[14:49:57.737] INFO (#13820): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.213375,
+}
+.
+[14:49:57.738] INFO (#13822): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.341458,
+}
+[14:49:57.739] INFO (#13822): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.762708,
+}
+[14:49:57.745] INFO (#13822): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 6.009875,
+}
+[14:49:57.745] INFO (#13821): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.route.fixture.canonical",
+  outcome: "success",
+  duration_ms: 7.828375,
+}
+[14:49:57.746] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.3785,
+}
+[14:49:57.746] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.121,
+}
+[14:49:57.746] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.170958,
+}
+[14:49:57.746] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.135791,
+}
+[14:49:57.747] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.180875,
+}
+[14:49:57.747] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.224833,
+}
+[14:49:57.747] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.162084,
+}
+[14:49:57.747] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.171375,
+}
+[14:49:57.748] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.179417,
+}
+[14:49:57.748] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.292125,
+}
+[14:49:57.748] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.178125,
+}
+[14:49:57.749] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.181125,
+}
+[14:49:57.749] INFO (#13825): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.218792,
+}
+[14:50:21.866] INFO (#13835): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.739167,
+}
+.....
+
+packages/cli/route-module-check.test.ts:
+[14:50:36.884] INFO (#19587): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.2455,
+}
+[14:50:36.885] INFO (#19587): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.69625,
+}
+[14:50:36.888] INFO (#19587): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.165042,
+}
+[14:50:36.888] INFO (#19586): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.route.fixture.canonical",
+  outcome: "success",
+  duration_ms: 4.749625,
+}
+[14:50:36.888] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.238459,
+}
+[14:50:36.888] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105125,
+}
+[14:50:36.889] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1095,
+}
+[14:50:36.889] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.128625,
+}
+[14:50:36.889] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105583,
+}
+[14:50:36.889] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09025,
+}
+[14:50:36.889] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.110583,
+}
+[14:50:36.889] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105667,
+}
+[14:50:36.889] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099375,
+}
+[14:50:36.890] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.13475,
+}
+[14:50:36.890] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.093375,
+}
+[14:50:36.890] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.086292,
+}
+[14:50:36.890] INFO (#19590): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.145542,
+}
+[14:50:43.307] INFO (#20171): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.021584,
+}
+............
+
+packages/cli/build-support.test.ts:
+[14:50:51.170] INFO (#21684): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.6075,
+}
+[14:50:51.170] INFO (#21684): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 175.616292,
+}
+[14:50:51.186] INFO (#21684): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.188459,
+}
+[14:50:51.186] INFO (#21684): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 15.853042,
+}
+[14:50:51.222] INFO (#21684): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.161708,
+}
+[14:50:51.222] INFO (#21684): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 35.885375,
+}
+.
+[14:50:51.375] INFO (#21700): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.19375,
+}
+[14:50:51.375] INFO (#21700): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 145.807084,
+}
+[14:50:51.389] INFO (#21700): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.143667,
+}
+[14:50:51.389] INFO (#21700): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 13.732333,
+}
+[14:50:51.409] INFO (#21700): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.196625,
+}
+[14:50:51.409] INFO (#21700): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 19.44575,
+}
+.
+[14:50:51.566] INFO (#21716): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.716417,
+}
+[14:50:51.566] INFO (#21716): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 149.012125,
+}
+[14:50:51.583] INFO (#21716): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.159,
+}
+[14:50:51.583] INFO (#21716): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 15.341291,
+}
+.
+[14:50:51.747] INFO (#21727): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.230833,
+}
+[14:50:51.747] INFO (#21727): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 156.842375,
+}
+[14:50:51.762] INFO (#21727): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.148375,
+}
+[14:50:51.762] INFO (#21727): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 14.587333,
+}
+.
+[14:50:51.933] INFO (#21738): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.241333,
+}
+[14:50:51.933] INFO (#21738): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 165.422,
+}
+.
+[14:50:52.190] INFO (#21744): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.313917,
+}
+[14:50:52.190] INFO (#21744): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 243.342208,
+}
+[14:50:52.221] INFO (#21744): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.203875,
+}
+[14:50:52.221] INFO (#21744): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 27.864625,
+}
+.........
+
+packages/cli/jobs-commands.test.ts:
+[14:50:52.281] INFO (#21821): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 3.878167,
+}
+.
+[14:50:52.290] ERROR (#21844): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 0.928542,
+}
+..
+[14:50:52.302] INFO (#21905): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 2.098667,
+}
+..........[14:50:55.200] INFO (#26695): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.309667,
+}
+
+
+packages/cli/dev-ownership.test.ts:
+[14:50:55.275] INFO (#27017): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.162375,
+}
+[14:50:55.279] INFO (#27017): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 3.78775,
+}
+.[14:50:55.280] INFO (#27034): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.196,
+}
+
+[14:50:55.329] INFO (#27338): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.276458,
+}
+[14:50:55.330] INFO (#27338): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.505875,
+}
+.
+[14:50:55.330] INFO (#27355): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.178791,
+}
+[14:50:56.235] INFO (#29571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 3.812167,
+}
+[14:50:56.236] INFO (#29571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 1.06075,
+}
+.
+[14:50:56.237] INFO (#29648): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.174708,
+}
+[14:50:56.309] INFO (#29895): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 3.34425,
+}
+[14:50:56.309] INFO (#29895): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.279292,
+}
+..................
+
+packages/cli/dev-inspector-installation.test.ts:
+[14:50:56.486] INFO (#31081): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.27125,
+}
+[14:50:56.487] INFO (#31083): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.599292,
+}
+.
+[14:50:56.488] INFO (#31084): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.104334,
+}
+[14:50:56.490] INFO (#31122): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.205292,
+}
+............
+
+123 pass
+0 fail
+732 expect() calls
+Ran 123 tests across 46 files. [103.48s]
+bun test v1.3.10 (30e609e0)
+........................................................................
+
+integrations/packages/inngest/inngest.test.ts:
+A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
+323 |   const runtime = createInngestRuntime({
+324 |     appId: "relkit-test",
+325 |     baseUrl: "http://inngest.test",
+326 |     eventKey: "event-key",
+327 |     fetch: async () => {
+328 |       throw new Error("network disconnected");
+                      ^
+error: network disconnected
+      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+
+A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
+323 |   const runtime = createInngestRuntime({
+324 |     appId: "relkit-test",
+325 |     baseUrl: "http://inngest.test",
+326 |     eventKey: "event-key",
+327 |     fetch: async () => {
+328 |       throw new Error("network disconnected");
+                      ^
+error: network disconnected
+      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+
+A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
+323 |   const runtime = createInngestRuntime({
+324 |     appId: "relkit-test",
+325 |     baseUrl: "http://inngest.test",
+326 |     eventKey: "event-key",
+327 |     fetch: async () => {
+328 |       throw new Error("network disconnected");
+                      ^
+error: network disconnected
+      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+
+A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
+323 |   const runtime = createInngestRuntime({
+324 |     appId: "relkit-test",
+325 |     baseUrl: "http://inngest.test",
+326 |     eventKey: "event-key",
+327 |     fetch: async () => {
+328 |       throw new Error("network disconnected");
+                      ^
+error: network disconnected
+      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+
+A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
+323 |   const runtime = createInngestRuntime({
+324 |     appId: "relkit-test",
+325 |     baseUrl: "http://inngest.test",
+326 |     eventKey: "event-key",
+327 |     fetch: async () => {
+328 |       throw new Error("network disconnected");
+                      ^
+error: network disconnected
+      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+
+..................................
+
+packages/better-auth/tests/service.test.ts:
+[14:51:08.240] INFO (#2062): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 2.417166,
+}
+[14:51:08.245] INFO (#2066): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 1.842958,
+}
+2026-10-13T14:51:08.246Z WARN [Better Auth]: [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[14:51:08.247] INFO (#2066): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 5.387625,
+}
+[14:51:08.248] INFO (#2070): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.12125,
+}
+..
+[14:51:08.249] INFO (#2076): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.109333,
+}
+[14:51:08.250] INFO (#2079): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 0.297791,
+}
+2026-10-13T14:51:08.250Z WARN [Better Auth]: [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[14:51:08.250] INFO (#2079): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 0.777958,
+}
+[14:51:08.251] INFO (#2082): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 0.222208,
+}
+2026-10-13T14:51:08.251Z WARN [Better Auth]: [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[14:51:08.251] INFO (#2082): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 0.564417,
+}
+[14:51:08.252] INFO (#2085): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 0.290959,
+}
+2026-10-13T14:51:08.252Z WARN [Better Auth]: [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[14:51:08.252] INFO (#2085): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 0.708583,
+}
+[14:51:08.253] INFO (#2090): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.09725,
+}
+.
+[14:51:08.254] INFO (#2096): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.162333,
+}
+[14:51:08.254] INFO (#2099): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.factory",
+  outcome: "success",
+  duration_ms: 0.295625,
+}
+[14:51:08.255] INFO (#2099): Execution operation completed {
+  domain: "runtime",
+  operation: "auth.acquire",
+  outcome: "success",
+  duration_ms: 0.757833,
+}
+[14:51:08.255] INFO (#2104): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.050541,
+}
+............................
+
+packages/drizzle/tests/activation-contract.test.ts:
+[14:51:08.667] INFO (#2221): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.106292,
+}
+[14:51:08.667] INFO (#2224): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.032167,
+}
+.
+[14:51:08.670] ERROR (#2228): Execution operation failed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "failure",
+  duration_ms: 1.327792,
+}
+[14:51:08.670] INFO (#2231): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.039417,
+}
+[14:51:08.670] INFO (#2234): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.038292,
+}
+.
+[14:51:08.672] INFO (#2240): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.047541,
+}
+[14:51:08.672] INFO (#2242): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.073417,
+}
+[14:51:08.674] ERROR (#2247): Execution operation failed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "failure",
+  duration_ms: 0.204541,
+}
+[14:51:08.674] INFO (#2244): Execution operation completed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "success",
+  duration_ms: 1.426959,
+}
+[14:51:08.675] INFO (#2248): Execution operation completed {
+  domain: "runtime",
+  operation: "database.transaction",
+  outcome: "success",
+  duration_ms: 0.717791,
+}
+[14:51:08.675] INFO (#2253): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.059666,
+}
+[14:51:08.675] INFO (#2254): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.059792,
+}
+.
+
+packages/drizzle/tests/activation.test.ts:
+[14:51:08.683] INFO (#2258): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.570625,
+}
+[14:51:08.683] INFO (#2260): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.131125,
+}
+[14:51:08.683] INFO (#2263): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.069458,
+}
+[14:51:08.687] INFO (#2265): Execution operation completed {
+  domain: "runtime",
+  operation: "database.insert",
+  outcome: "success",
+  duration_ms: 3.305542,
+}
+[14:51:08.688] INFO (#2267): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findMany",
+  outcome: "success",
+  duration_ms: 0.987458,
+}
+[14:51:08.689] INFO (#2269): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.130583,
+}
+[14:51:08.689] INFO (#2271): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findMany",
+  outcome: "success",
+  duration_ms: 0.143583,
+}
+[14:51:08.689] INFO (#2274): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.047541,
+}
+[14:51:08.689] INFO (#2277): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.024708,
+}
+.
+[14:51:08.690] INFO (#2281): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.027083,
+}
+[14:51:08.690] INFO (#2284): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.042792,
+}
+[14:51:08.690] INFO (#2286): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 0.017041,
+}
+[14:51:08.690] INFO (#2287): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.014292,
+}
+........................
+
+packages/inspector-api/tests/compatibility/jobs.test.ts:
+14:51:08 WARN  inspector Inspector native jobs service unavailable
+...............................................
+
+packages/testing/tests/compatibility/runtime.test.ts:
+RELKIT_KEEP_TEST_STATE=1 retained test state at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-test-5hLoJF/.relkit/state
+....
+
+packages/client/tests/compatibility/agent-thread-identity.test.ts:
+[14:51:11.916] INFO (#47914): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.090291,
+}
+[14:51:11.917] INFO (#47914): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.208625,
+}
+[14:51:11.917] INFO (#47914): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 1.626958,
+}
+[14:51:11.917] INFO (#47917): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.07975,
+}
+[14:51:11.917] INFO (#47918): Execution operation completed {
+  domain: "client",
+  operation: "pending.clear",
+  outcome: "success",
+  duration_ms: 0.101625,
+}
+[14:51:11.917] INFO (#47919): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.013334,
+}
+.....
+
+packages/client/tests/compatibility/jobs-watch.test.ts:
+[14:51:11.953] INFO (#47952): Execution operation completed {
+  domain: "client",
+  operation: "jobs.watch.frames",
+  outcome: "success",
+  duration_ms: 0.209917,
+}
+[14:51:11.956] INFO (#47953): Execution operation completed {
+  domain: "client",
+  operation: "jobs.watch.frames",
+  outcome: "success",
+  duration_ms: 0.192875,
+}
+[14:51:11.957] INFO (#47951): Execution operation completed {
+  domain: "client",
+  operation: "jobs.observe",
+  outcome: "success",
+  duration_ms: 3.574666,
+}
+.
+[14:51:11.959] INFO (#47961): Execution operation completed {
+  domain: "client",
+  operation: "jobs.watch.frames",
+  outcome: "success",
+  duration_ms: 0.141,
+}
+[14:51:11.959] INFO (#47960): Execution operation completed {
+  domain: "client",
+  operation: "jobs.observe",
+  outcome: "success",
+  duration_ms: 0.559084,
+}
+..
+[14:51:11.966] INFO (#47973): Execution operation completed {
+  domain: "client",
+  operation: "jobs.feed.borrow",
+  outcome: "success",
+  duration_ms: 0.088125,
+}
+[14:51:11.966] INFO (#47973): Execution operation completed {
+  domain: "client",
+  operation: "jobs.refetch",
+  outcome: "success",
+  duration_ms: 0.886125,
+}
+..
+[14:51:11.968] INFO (#47997): Execution operation completed {
+  domain: "client",
+  operation: "jobs.observe",
+  outcome: "success",
+  duration_ms: 0.53525,
+}
+.
+[14:51:11.975] ERROR (#48006): Execution operation failed {
+  domain: "client",
+  operation: "jobs.watch.frames",
+  outcome: "failure",
+  duration_ms: 1.548625,
+}
+[14:51:11.975] ERROR (#48005): Execution operation failed {
+  domain: "client",
+  operation: "jobs.observe",
+  outcome: "failure",
+  duration_ms: 2.301917,
+}
+.
+[14:51:11.976] INFO (#48013): Execution operation completed {
+  domain: "client",
+  operation: "jobs.observe",
+  outcome: "success",
+  duration_ms: 0.561042,
+}
+.[14:51:11.977] ERROR (#48020): Execution operation failed {
+  domain: "client",
+  operation: "jobs.observe",
+  outcome: "failure",
+  duration_ms: 0.25025,
+}
+
+..
+[14:51:11.986] INFO (#48043): Execution operation completed {
+  domain: "client",
+  operation: "jobs.observe",
+  outcome: "success",
+  duration_ms: 0.436667,
+}
+[14:51:11.986] INFO (#48049): Execution operation completed {
+  domain: "client",
+  operation: "jobs.observe",
+  outcome: "success",
+  duration_ms: 0.431375,
+}
+.
+[14:51:11.988] ERROR (#48056): Execution operation failed {
+  domain: "client",
+  operation: "jobs.content.open",
+  outcome: "failure",
+  duration_ms: 1.641875,
+}
+.
+[14:51:11.989] INFO (#48057): Execution operation completed {
+  domain: "client",
+  operation: "jobs.content.open",
+  outcome: "success",
+  duration_ms: 0.259,
+}
+[14:51:11.990] INFO (#48072): Execution operation completed {
+  domain: "client",
+  operation: "jobs.content.open",
+  outcome: "success",
+  duration_ms: 0.073209,
+}
+[14:51:11.994] ERROR (#48075): Execution operation failed {
+  domain: "client",
+  operation: "jobs.content.frames",
+  outcome: "failure",
+  duration_ms: 4.501084,
+}
+[14:51:11.995] INFO (#48083): Execution operation completed {
+  domain: "client",
+  operation: "jobs.content.open",
+  outcome: "success",
+  duration_ms: 0.116542,
+}
+[14:51:12.018] ERROR (#48086): Execution operation failed {
+  domain: "client",
+  operation: "jobs.content.frames",
+  outcome: "failure",
+  duration_ms: 23.271875,
+}
+[14:51:12.018] INFO (#48092): Execution operation completed {
+  domain: "client",
+  operation: "jobs.content.open",
+  outcome: "success",
+  duration_ms: 0.133042,
+}
+[14:51:12.040] ERROR (#48095): Execution operation failed {
+  domain: "client",
+  operation: "jobs.content.frames",
+  outcome: "failure",
+  duration_ms: 21.353917,
+}
+......
+
+packages/client/tests/compatibility/pending.test.ts:
+[14:51:12.165] INFO (#48899): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.026084,
+}
+[14:51:12.166] INFO (#48899): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.245167,
+}
+[14:51:12.166] INFO (#48899): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.541708,
+}
+[14:51:12.166] INFO (#48901): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.102666,
+}
+[14:51:12.166] INFO (#48903): Execution operation completed {
+  domain: "client",
+  operation: "pending.request",
+  outcome: "success",
+  duration_ms: 0.023709,
+}
+[14:51:12.166] INFO (#48904): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018084,
+}
+[14:51:12.166] INFO (#48904): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.064834,
+}
+[14:51:12.166] INFO (#48904): Execution operation completed {
+  domain: "client",
+  operation: "pending.matches",
+  outcome: "success",
+  duration_ms: 0.257333,
+}
+[14:51:12.166] INFO (#48906): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.017375,
+}
+[14:51:12.167] INFO (#48906): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.075583,
+}
+[14:51:12.167] INFO (#48906): Execution operation completed {
+  domain: "client",
+  operation: "pending.matches",
+  outcome: "success",
+  duration_ms: 0.15475,
+}
+[14:51:12.167] INFO (#48908): Execution operation completed {
+  domain: "client",
+  operation: "pending.update",
+  outcome: "success",
+  duration_ms: 0.057042,
+}
+[14:51:12.167] INFO (#48909): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.010875,
+}
+[14:51:12.167] INFO (#48910): Execution operation completed {
+  domain: "client",
+  operation: "pending.clear",
+  outcome: "success",
+  duration_ms: 0.013875,
+}
+.
+[14:51:12.167] INFO (#48911): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.008125,
+}
+[14:51:12.167] INFO (#48911): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.052833,
+}
+[14:51:12.167] INFO (#48911): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.129833,
+}
+[14:51:12.167] INFO (#48913): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.013958,
+}
+[14:51:12.167] INFO (#48913): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.046042,
+}
+[14:51:12.167] INFO (#48913): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.144833,
+}
+[14:51:12.167] INFO (#48915): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.008667,
+}
+[14:51:12.167] INFO (#48915): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.037292,
+}
+[14:51:12.167] INFO (#48915): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.117375,
+}
+[14:51:12.167] INFO (#48917): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.010125,
+}
+[14:51:12.167] INFO (#48917): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.039083,
+}
+[14:51:12.167] INFO (#48917): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.115875,
+}
+[14:51:12.168] INFO (#48919): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.010958,
+}
+[14:51:12.168] INFO (#48919): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.115958,
+}
+[14:51:12.168] INFO (#48919): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.324834,
+}
+[14:51:12.168] INFO (#48921): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.014167,
+}
+[14:51:12.168] INFO (#48921): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.079208,
+}
+[14:51:12.168] INFO (#48921): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.187125,
+}
+[14:51:12.168] INFO (#48923): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.010167,
+}
+[14:51:12.168] INFO (#48923): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.03825,
+}
+[14:51:12.168] INFO (#48923): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.163459,
+}
+[14:51:12.168] INFO (#48925): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.01175,
+}
+[14:51:12.168] INFO (#48925): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.037,
+}
+[14:51:12.168] INFO (#48925): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.132666,
+}
+[14:51:12.168] INFO (#48927): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.013584,
+}
+[14:51:12.169] INFO (#48927): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.0405,
+}
+[14:51:12.169] INFO (#48927): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.13025,
+}
+[14:51:12.169] INFO (#48929): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.0135,
+}
+[14:51:12.169] INFO (#48929): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.038625,
+}
+[14:51:12.169] INFO (#48929): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.134583,
+}
+[14:51:12.169] INFO (#48931): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.010875,
+}
+[14:51:12.169] INFO (#48931): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.037708,
+}
+[14:51:12.169] INFO (#48931): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.114542,
+}
+[14:51:12.169] INFO (#48933): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.014375,
+}
+[14:51:12.169] INFO (#48933): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.03675,
+}
+[14:51:12.169] INFO (#48933): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.115458,
+}
+[14:51:12.169] INFO (#48935): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.025875,
+}
+[14:51:12.169] INFO (#48935): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.038666,
+}
+[14:51:12.169] INFO (#48935): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.127042,
+}
+[14:51:12.169] INFO (#48937): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.014708,
+}
+[14:51:12.169] INFO (#48937): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.044292,
+}
+[14:51:12.169] INFO (#48937): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.145542,
+}
+[14:51:12.169] INFO (#48939): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.011,
+}
+[14:51:12.169] INFO (#48939): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.035542,
+}
+[14:51:12.170] INFO (#48939): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.14025,
+}
+[14:51:12.170] INFO (#48941): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.01375,
+}
+[14:51:12.170] INFO (#48941): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.033959,
+}
+[14:51:12.170] INFO (#48941): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.11925,
+}
+[14:51:12.170] INFO (#48943): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018708,
+}
+[14:51:12.170] INFO (#48943): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.035666,
+}
+[14:51:12.170] INFO (#48943): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.121916,
+}
+[14:51:12.170] INFO (#48945): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.024584,
+}
+[14:51:12.170] INFO (#48945): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.040792,
+}
+[14:51:12.170] INFO (#48945): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.134917,
+}
+[14:51:12.170] INFO (#48947): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.015292,
+}
+[14:51:12.170] INFO (#48947): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.033083,
+}
+[14:51:12.170] INFO (#48947): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.114042,
+}
+[14:51:12.170] INFO (#48949): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.012416,
+}
+[14:51:12.170] INFO (#48949): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.032833,
+}
+[14:51:12.170] INFO (#48949): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.126042,
+}
+[14:51:12.170] INFO (#48951): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.015667,
+}
+[14:51:12.170] INFO (#48951): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.031875,
+}
+[14:51:12.170] INFO (#48951): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.119292,
+}
+[14:51:12.170] INFO (#48953): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.014333,
+}
+[14:51:12.171] INFO (#48953): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.051708,
+}
+[14:51:12.171] INFO (#48953): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.130417,
+}
+[14:51:12.171] INFO (#48955): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.017,
+}
+[14:51:12.171] INFO (#48955): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.031416,
+}
+[14:51:12.171] INFO (#48955): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.112292,
+}
+[14:51:12.171] INFO (#48957): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.0115,
+}
+[14:51:12.171] INFO (#48957): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.034625,
+}
+[14:51:12.171] INFO (#48957): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.114875,
+}
+[14:51:12.171] INFO (#48959): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.011958,
+}
+[14:51:12.171] INFO (#48959): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.030709,
+}
+[14:51:12.171] INFO (#48959): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.109375,
+}
+[14:51:12.171] INFO (#48961): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.01875,
+}
+[14:51:12.171] INFO (#48961): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.03125,
+}
+[14:51:12.171] INFO (#48961): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.112833,
+}
+[14:51:12.171] INFO (#48963): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.011375,
+}
+[14:51:12.171] INFO (#48963): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.029959,
+}
+[14:51:12.171] INFO (#48963): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.123417,
+}
+[14:51:12.171] INFO (#48965): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.033584,
+}
+[14:51:12.172] INFO (#48965): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.10475,
+}
+[14:51:12.172] INFO (#48965): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.327542,
+}
+[14:51:12.172] INFO (#48967): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.0315,
+}
+[14:51:12.172] INFO (#48967): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.056625,
+}
+[14:51:12.172] INFO (#48967): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.18525,
+}
+[14:51:12.172] INFO (#48969): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.016125,
+}
+[14:51:12.172] INFO (#48969): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.040125,
+}
+[14:51:12.172] INFO (#48969): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.140583,
+}
+[14:51:12.172] INFO (#48971): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.015208,
+}
+[14:51:12.172] INFO (#48971): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.045209,
+}
+[14:51:12.172] INFO (#48971): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.1405,
+}
+[14:51:12.172] INFO (#48973): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018083,
+}
+[14:51:12.172] INFO (#48973): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.042542,
+}
+[14:51:12.172] INFO (#48973): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.146459,
+}
+[14:51:12.172] INFO (#48975): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018625,
+}
+[14:51:12.173] INFO (#48975): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.038333,
+}
+[14:51:12.173] INFO (#48975): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.136125,
+}
+[14:51:12.173] INFO (#48977): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.016667,
+}
+[14:51:12.173] INFO (#48977): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.029791,
+}
+[14:51:12.173] INFO (#48977): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.115542,
+}
+[14:51:12.173] INFO (#48979): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.012875,
+}
+[14:51:12.173] INFO (#48979): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.034375,
+}
+[14:51:12.173] INFO (#48979): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.133083,
+}
+[14:51:12.173] INFO (#48981): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.017834,
+}
+[14:51:12.173] INFO (#48981): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.036291,
+}
+[14:51:12.173] INFO (#48981): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.141166,
+}
+[14:51:12.173] INFO (#48983): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.021083,
+}
+[14:51:12.173] INFO (#48983): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.033625,
+}
+[14:51:12.173] INFO (#48983): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.123542,
+}
+[14:51:12.173] INFO (#48985): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.01325,
+}
+[14:51:12.173] INFO (#48985): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.034084,
+}
+[14:51:12.173] INFO (#48985): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.117458,
+}
+[14:51:12.173] INFO (#48987): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.016542,
+}
+[14:51:12.173] INFO (#48987): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.032667,
+}
+[14:51:12.173] INFO (#48987): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.118209,
+}
+[14:51:12.174] INFO (#48989): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.016292,
+}
+[14:51:12.174] INFO (#48989): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.03325,
+}
+[14:51:12.174] INFO (#48989): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.139375,
+}
+[14:51:12.174] INFO (#48991): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.022208,
+}
+[14:51:12.174] INFO (#48991): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.03575,
+}
+[14:51:12.174] INFO (#48991): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.119416,
+}
+[14:51:12.174] INFO (#48993): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.013208,
+}
+[14:51:12.174] INFO (#48993): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.034709,
+}
+[14:51:12.174] INFO (#48993): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.1185,
+}
+[14:51:12.174] INFO (#48995): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.017125,
+}
+[14:51:12.174] INFO (#48995): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.028917,
+}
+[14:51:12.174] INFO (#48995): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.118458,
+}
+[14:51:12.174] INFO (#48997): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.023708,
+}
+[14:51:12.174] INFO (#48997): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.035041,
+}
+[14:51:12.174] INFO (#48997): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.125458,
+}
+[14:51:12.174] INFO (#48999): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.016625,
+}
+[14:51:12.174] INFO (#48999): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.033042,
+}
+[14:51:12.174] INFO (#48999): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.118833,
+}
+[14:51:12.174] INFO (#49001): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.015417,
+}
+[14:51:12.174] INFO (#49001): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.046375,
+}
+[14:51:12.174] INFO (#49001): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.129959,
+}
+[14:51:12.175] INFO (#49003): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.014708,
+}
+[14:51:12.175] INFO (#49003): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.031,
+}
+[14:51:12.175] INFO (#49003): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.238833,
+}
+[14:51:12.175] INFO (#49005): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.023875,
+}
+[14:51:12.175] INFO (#49005): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.037375,
+}
+[14:51:12.175] INFO (#49005): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.135292,
+}
+[14:51:12.175] INFO (#49007): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.017042,
+}
+[14:51:12.175] INFO (#49007): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.031458,
+}
+[14:51:12.175] INFO (#49007): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.11575,
+}
+[14:51:12.175] INFO (#49009): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.017875,
+}
+[14:51:12.175] INFO (#49009): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.032,
+}
+[14:51:12.175] INFO (#49009): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.111875,
+}
+[14:51:12.175] INFO (#49011): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.01875,
+}
+[14:51:12.175] INFO (#49011): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.044041,
+}
+[14:51:12.175] INFO (#49011): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.1305,
+}
+[14:51:12.175] INFO (#49013): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.017167,
+}
+[14:51:12.175] INFO (#49013): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.03125,
+}
+[14:51:12.175] INFO (#49013): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.1195,
+}
+[14:51:12.176] INFO (#49015): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.019083,
+}
+[14:51:12.176] INFO (#49015): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.029,
+}
+[14:51:12.176] INFO (#49015): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.112792,
+}
+[14:51:12.176] INFO (#49017): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018166,
+}
+[14:51:12.176] INFO (#49017): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.0315,
+}
+[14:51:12.176] INFO (#49017): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.116875,
+}
+[14:51:12.176] INFO (#49019): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.026417,
+}
+[14:51:12.176] INFO (#49019): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.034708,
+}
+[14:51:12.176] INFO (#49019): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.126666,
+}
+[14:51:12.176] INFO (#49021): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.041708,
+}
+[14:51:12.176] INFO (#49021): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.0595,
+}
+[14:51:12.176] INFO (#49021): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.225041,
+}
+[14:51:12.176] INFO (#49023): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.02,
+}
+[14:51:12.176] INFO (#49023): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.033708,
+}
+[14:51:12.176] INFO (#49023): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.126667,
+}
+[14:51:12.176] INFO (#49025): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018459,
+}
+[14:51:12.176] INFO (#49025): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.036708,
+}
+[14:51:12.177] INFO (#49025): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.1305,
+}
+[14:51:12.177] INFO (#49027): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.01625,
+}
+[14:51:12.177] INFO (#49027): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.028291,
+}
+[14:51:12.177] INFO (#49027): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.114292,
+}
+[14:51:12.177] INFO (#49029): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.015625,
+}
+[14:51:12.177] INFO (#49029): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.029041,
+}
+[14:51:12.177] INFO (#49029): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.112167,
+}
+[14:51:12.177] INFO (#49031): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.026334,
+}
+[14:51:12.177] INFO (#49031): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.028292,
+}
+[14:51:12.177] INFO (#49031): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.118209,
+}
+[14:51:12.177] INFO (#49033): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.02175,
+}
+[14:51:12.177] INFO (#49033): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.027083,
+}
+[14:51:12.177] INFO (#49033): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.110583,
+}
+[14:51:12.177] INFO (#49035): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.015083,
+}
+[14:51:12.177] INFO (#49035): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.028416,
+}
+[14:51:12.177] INFO (#49035): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.105375,
+}
+[14:51:12.177] INFO (#49037): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.012042,
+}
+[14:51:12.177] INFO (#49037): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.028,
+}
+[14:51:12.177] INFO (#49037): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.101916,
+}
+[14:51:12.177] INFO (#49039): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.0255,
+}
+[14:51:12.177] INFO (#49039): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.02625,
+}
+[14:51:12.177] INFO (#49039): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.121458,
+}
+[14:51:12.177] INFO (#49041): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018083,
+}
+[14:51:12.178] INFO (#49041): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.028042,
+}
+[14:51:12.178] INFO (#49041): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.118542,
+}
+[14:51:12.178] INFO (#49043): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.01425,
+}
+[14:51:12.178] INFO (#49043): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.034375,
+}
+[14:51:12.178] INFO (#49043): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.121292,
+}
+[14:51:12.178] INFO (#49045): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.026333,
+}
+[14:51:12.178] INFO (#49045): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.031209,
+}
+[14:51:12.178] INFO (#49045): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.127959,
+}
+[14:51:12.178] INFO (#49047): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.0165,
+}
+[14:51:12.178] INFO (#49047): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.041167,
+}
+[14:51:12.178] INFO (#49047): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.139667,
+}
+[14:51:12.178] INFO (#49049): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.016917,
+}
+[14:51:12.178] INFO (#49049): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.029458,
+}
+[14:51:12.178] INFO (#49049): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.11925,
+}
+[14:51:12.178] INFO (#49051): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.021417,
+}
+[14:51:12.178] INFO (#49051): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.028125,
+}
+[14:51:12.178] INFO (#49051): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.12175,
+}
+[14:51:12.178] INFO (#49053): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.015166,
+}
+[14:51:12.178] INFO (#49053): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.02725,
+}
+[14:51:12.178] INFO (#49053): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.12725,
+}
+[14:51:12.179] INFO (#49055): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.016916,
+}
+[14:51:12.179] INFO (#49055): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.030375,
+}
+[14:51:12.179] INFO (#49055): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.1235,
+}
+[14:51:12.179] INFO (#49057): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.021333,
+}
+[14:51:12.179] INFO (#49057): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.029,
+}
+[14:51:12.179] INFO (#49057): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.124417,
+}
+[14:51:12.179] INFO (#49059): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.0155,
+}
+[14:51:12.179] INFO (#49059): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.030375,
+}
+[14:51:12.179] INFO (#49059): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.127958,
+}
+[14:51:12.179] INFO (#49061): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.019458,
+}
+[14:51:12.179] INFO (#49061): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.044292,
+}
+[14:51:12.179] INFO (#49061): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.133375,
+}
+[14:51:12.179] INFO (#49063): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.019625,
+}
+[14:51:12.179] INFO (#49063): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.027417,
+}
+[14:51:12.179] INFO (#49063): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.120417,
+}
+[14:51:12.179] INFO (#49065): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018208,
+}
+[14:51:12.179] INFO (#49065): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.026459,
+}
+[14:51:12.179] INFO (#49065): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.120125,
+}
+[14:51:12.179] INFO (#49067): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.01925,
+}
+[14:51:12.179] INFO (#49067): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.026584,
+}
+[14:51:12.179] INFO (#49067): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.129667,
+}
+[14:51:12.180] INFO (#49069): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018833,
+}
+[14:51:12.180] INFO (#49069): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.025959,
+}
+[14:51:12.180] INFO (#49069): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.1175,
+}
+[14:51:12.180] INFO (#49071): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.017666,
+}
+[14:51:12.180] INFO (#49071): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.027,
+}
+[14:51:12.180] INFO (#49071): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.115709,
+}
+[14:51:12.180] INFO (#49073): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.02325,
+}
+[14:51:12.180] INFO (#49073): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.0285,
+}
+[14:51:12.180] INFO (#49073): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.121875,
+}
+[14:51:12.180] INFO (#49075): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.025542,
+}
+[14:51:12.180] INFO (#49075): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.026,
+}
+[14:51:12.180] INFO (#49075): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.120541,
+}
+[14:51:12.180] INFO (#49077): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.016958,
+}
+[14:51:12.180] INFO (#49077): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.04225,
+}
+[14:51:12.180] INFO (#49077): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.17575,
+}
+[14:51:12.180] INFO (#49079): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018209,
+}
+[14:51:12.180] INFO (#49079): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.045042,
+}
+[14:51:12.180] INFO (#49079): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.133458,
+}
+[14:51:12.180] INFO (#49081): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.0385,
+}
+[14:51:12.181] INFO (#49081): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.031417,
+}
+[14:51:12.181] INFO (#49081): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.147917,
+}
+[14:51:12.181] INFO (#49083): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.01975,
+}
+[14:51:12.181] INFO (#49083): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.027208,
+}
+[14:51:12.181] INFO (#49083): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.116167,
+}
+[14:51:12.181] INFO (#49085): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.017042,
+}
+[14:51:12.181] INFO (#49085): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.0355,
+}
+[14:51:12.181] INFO (#49085): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.132083,
+}
+[14:51:12.181] INFO (#49087): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.018834,
+}
+[14:51:12.181] INFO (#49087): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.026709,
+}
+[14:51:12.181] INFO (#49087): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.117,
+}
+[14:51:12.181] INFO (#49089): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.019625,
+}
+[14:51:12.181] INFO (#49089): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.030208,
+}
+[14:51:12.181] INFO (#49089): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.124084,
+}
+[14:51:12.181] INFO (#49091): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.022375,
+}
+[14:51:12.181] INFO (#49091): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.024875,
+}
+[14:51:12.181] INFO (#49091): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.175875,
+}
+[14:51:12.182] INFO (#49093): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.067167,
+}
+[14:51:12.182] INFO (#49093): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.097334,
+}
+[14:51:12.182] INFO (#49093): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.284917,
+}
+[14:51:12.182] INFO (#49095): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.023542,
+}
+[14:51:12.182] INFO (#49095): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.03575,
+}
+[14:51:12.182] INFO (#49095): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.136458,
+}
+[14:51:12.182] INFO (#49097): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.019209,
+}
+[14:51:12.182] INFO (#49097): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.035333,
+}
+[14:51:12.182] INFO (#49097): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.137875,
+}
+[14:51:12.182] INFO (#49099): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.033333,
+}
+[14:51:12.182] INFO (#49099): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.032375,
+}
+[14:51:12.182] INFO (#49099): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.144458,
+}
+[14:51:12.182] INFO (#49101): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.020208,
+}
+[14:51:12.182] INFO (#49101): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.037334,
+}
+[14:51:12.182] INFO (#49101): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.147625,
+}
+[14:51:12.182] INFO (#49103): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.019291,
+}
+[14:51:12.183] INFO (#49103): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.043375,
+}
+[14:51:12.183] INFO (#49103): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.153916,
+}
+[14:51:12.183] INFO (#49105): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.034125,
+}
+[14:51:12.183] INFO (#49105): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.056458,
+}
+[14:51:12.183] INFO (#49105): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.179459,
+}
+[14:51:12.183] INFO (#49107): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.023583,
+}
+[14:51:12.183] INFO (#49107): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.037833,
+}
+[14:51:12.183] INFO (#49107): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.152958,
+}
+[14:51:12.183] INFO (#49109): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.023291,
+}
+[14:51:12.183] INFO (#49109): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.029542,
+}
+[14:51:12.183] INFO (#49109): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.210375,
+}
+[14:51:12.183] INFO (#49111): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.026083,
+}
+[14:51:12.183] ERROR (#49111): Execution operation failed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "failure",
+  duration_ms: 0.177958,
+}
+[14:51:12.183] INFO (#49112): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.024167,
+}
+[14:51:12.184] INFO (#49113): Execution operation completed {
+  domain: "client",
+  operation: "pending.clear",
+  outcome: "success",
+  duration_ms: 0.030625,
+}
+.
+[14:51:12.184] INFO (#49114): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.006209,
+}
+[14:51:12.188] INFO (#49114): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 3.8745,
+}
+[14:51:12.188] INFO (#49114): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 4.0765,
+}
+[14:51:12.188] INFO (#49116): Execution operation completed {
+  domain: "client",
+  operation: "pending.update",
+  outcome: "success",
+  duration_ms: 0.018917,
+}
+[14:51:12.188] INFO (#49117): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.03275,
+}
+[14:51:12.188] INFO (#49117): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.116417,
+}
+[14:51:12.188] ERROR (#49117): Execution operation failed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "failure",
+  duration_ms: 0.366083,
+}
+[14:51:12.188] INFO (#49119): Execution operation completed {
+  domain: "client",
+  operation: "pending.update",
+  outcome: "success",
+  duration_ms: 0.008542,
+}
+[14:51:12.188] INFO (#49120): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.007917,
+}
+[14:51:12.189] INFO (#49120): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.129084,
+}
+[14:51:12.189] INFO (#49120): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.29875,
+}
+[14:51:12.189] INFO (#49122): Execution operation completed {
+  domain: "client",
+  operation: "pending.update",
+  outcome: "success",
+  duration_ms: 0.025792,
+}
+[14:51:12.189] INFO (#49123): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.013542,
+}
+[14:51:12.189] INFO (#49123): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.083584,
+}
+[14:51:12.189] ERROR (#49123): Execution operation failed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "failure",
+  duration_ms: 0.200458,
+}
+[14:51:12.189] INFO (#49125): Execution operation completed {
+  domain: "client",
+  operation: "pending.clear",
+  outcome: "success",
+  duration_ms: 0.016125,
+}
+.
+
+packages/client/tests/compatibility/http-cancellation.test.ts:
+[14:51:12.198] INFO (#49128): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 3.139542,
+}
+.
+[14:51:12.201] ERROR (#49133): Execution operation failed {
+  domain: "client",
+  operation: "rpc.connect",
+  outcome: "failure",
+  duration_ms: 2.2375,
+}
+[14:51:12.202] INFO (#49132): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 2.873625,
+}
+.......
+
+packages/client/tests/compatibility/agent-observer.test.ts:
+[14:51:12.227] ERROR (#49139): Execution operation failed {
+  domain: "client",
+  operation: "agent.observe.frames",
+  outcome: "failure",
+  duration_ms: 0.268291,
+}
+.
+[14:51:12.283] INFO (#49141): Execution operation completed {
+  domain: "client",
+  operation: "agent.observe",
+  outcome: "success",
+  duration_ms: 0.400708,
+}
+.
+
+packages/client/tests/compatibility/client.test.ts:
+[14:51:12.296] ERROR (#49145): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 0.431125,
+}
+[14:51:12.296] ERROR (#49147): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 0.119833,
+}
+[14:51:12.296] ERROR (#49148): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 0.078167,
+}
+.
+[14:51:12.297] ERROR (#49151): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 0.142917,
+}
+[14:51:12.297] ERROR (#49153): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 0.069791,
+}
+.
+[14:51:12.299] INFO (#49168): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 1.005917,
+}
+.
+[14:51:12.299] ERROR (#49198): Execution operation failed {
+  domain: "client",
+  operation: "rpc.connect",
+  outcome: "failure",
+  duration_ms: 0.139834,
+}
+[14:51:12.299] ERROR (#49197): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 0.339416,
+}
+.
+
+packages/client/tests/compatibility/agent-continuation.test.ts:
+[14:51:12.308] INFO (#49201): Execution operation completed {
+  domain: "client",
+  operation: "agent.continuation",
+  outcome: "success",
+  duration_ms: 0.147417,
+}
+.
+[14:51:12.308] INFO (#49202): Execution operation completed {
+  domain: "client",
+  operation: "agent.continuation",
+  outcome: "success",
+  duration_ms: 0.07825,
+}
+.
+[14:51:12.309] INFO (#49203): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.04225,
+}
+[14:51:12.309] INFO (#49203): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.095959,
+}
+[14:51:12.309] INFO (#49203): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.40125,
+}
+[14:51:12.309] INFO (#49206): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.040375,
+}
+[14:51:12.309] INFO (#49206): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.043417,
+}
+[14:51:12.309] INFO (#49206): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.248208,
+}
+[14:51:12.309] INFO (#49209): Execution operation completed {
+  domain: "client",
+  operation: "pending.clear",
+  outcome: "success",
+  duration_ms: 0.0255,
+}
+.
+[14:51:12.310] INFO (#49210): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.010584,
+}
+[14:51:12.310] INFO (#49210): Execution operation completed {
+  domain: "client",
+  operation: "pending.digest",
+  outcome: "success",
+  duration_ms: 0.049459,
+}
+[14:51:12.310] INFO (#49210): Execution operation completed {
+  domain: "client",
+  operation: "pending.remember",
+  outcome: "success",
+  duration_ms: 0.1995,
+}
+[14:51:12.310] INFO (#49213): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.02225,
+}
+[14:51:12.310] INFO (#49213): Execution operation completed {
+  domain: "client",
+  operation: "pending.forget",
+  outcome: "success",
+  duration_ms: 0.031083,
+}
+[14:51:12.310] INFO (#49213): Execution operation completed {
+  domain: "client",
+  operation: "agent.reconcile",
+  outcome: "success",
+  duration_ms: 0.401459,
+}
+[14:51:12.310] INFO (#49214): Execution operation completed {
+  domain: "client",
+  operation: "pending.list",
+  outcome: "success",
+  duration_ms: 0.0095,
+}
+..........................
+
+285 pass
+0 fail
+1344 expect() calls
+Ran 285 tests across 87 files. [9.97s]

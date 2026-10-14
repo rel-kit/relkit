@@ -1,5 +1,6 @@
+/** Checks lookup.tool.ts through the supported public RELKIT APIs. */
 import { defineTool } from "@relkit/app/tools";
-import hello from "@app/hello/functions/hello.function.js";
+import hello from "@app/services/hello/functions/hello.function.js";
 
 export default defineTool({
   id: "hello.lookup",

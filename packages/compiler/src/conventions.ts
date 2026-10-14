@@ -1,36 +1,29 @@
+/**
+ * Runs observable convention checks against physical flat/grouped source paths.
+ * Descriptor values are guarded and provenance decoded before pure warning
+ * calculations; all recommendations retain their established nonfatal severity.
+ */
 import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
-import {
-  readInput,
-  normalizePathEffect,
-  ruleFor,
-  diagnosticLocation,
-  recommendedPattern,
-  hasExportWarning,
-  descriptorKinds,
-} from "./conventions-support.js";
+import { readInput, normalizePathEffect, ruleFor } from "./conventions-support.js";
+import { conventionFindings } from "./convention-findings.js";
 import type {
-  ConventionCode,
   ConventionCheckInput,
   ConventionCheckOptions,
   KindRule,
 } from "./conventions.types.js";
+import type { DescriptorKind } from "@relkit/contracts";
+import type { Diagnostic } from "@relkit/diagnostics";
+
+export { CONVENTION_CODES } from "./convention-findings.js";
 export type {
   ConventionCode,
   ConventionExport,
   ConventionCheckInput,
   ConventionCheckOptions,
 } from "./conventions.types.js";
-import { isDescriptor, type DescriptorKind } from "@relkit/contracts";
-import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
-export const CONVENTION_CODES = Object.freeze({
-  directory: "RELKIT_CONVENTION_DIRECTORY",
-  suffix: "RELKIT_CONVENTION_SUFFIX",
-  export: "RELKIT_CONVENTION_EXPORT",
-  multipleKinds: "RELKIT_CONVENTION_MULTIPLE_KINDS",
-  idStyle: "RELKIT_CONVENTION_ID_STYLE",
-} as const);
+
 const rules: Readonly<Record<DescriptorKind, KindRule>> = {
   app: { directory: ".", suffix: "relkit.config.ts" },
   function: { directory: "functions", suffix: ".function.ts" },
@@ -49,106 +42,60 @@ const rules: Readonly<Record<DescriptorKind, KindRule>> = {
   constants: { directory: "constants", suffix: ".constants.ts" },
   prompt: { directory: "prompts", suffix: ".prompt.ts" },
 };
+
 /**
- * Checks source naming conventions without evaluating executable descriptor members.
- * @param inputOrDescriptor - Structured convention input or positional descriptor.
- * @param sourcePath - Source filename for the positional form.
- * @param options - Project root and source export evidence.
- * @returns A lazy effect yielding immutable warning diagnostics; metadata access defects propagate.
- * @see {@link normalizeCompilationEffect} for the compiler execution boundary.
+ * Checks authoring conventions without evaluating executable descriptor members.
+ * @typeParam Input - Caller descriptor or structured input narrowed before use.
+ * @param inputOrDescriptor - Structured provenance or positional descriptor.
+ * @param sourcePath - Physical filename for positional calls.
+ * @param options - Source/export metadata for positional calls.
+ * @returns Lazy immutable nonfatal warnings; unexpected descriptor getter defects propagate.
  */
 export const checkConventionsEffect = Effect.fn("Compiler.checkConventions")(
-  function* (
-    inputOrDescriptor: ConventionCheckInput | unknown,
+  function* <Input>(
+    inputOrDescriptor: Input,
     sourcePath?: string,
     options: ConventionCheckOptions = {},
   ) {
     const input = readInput(inputOrDescriptor, sourcePath, options);
-    if (input === undefined || !isDescriptor(input.descriptor)) return Object.freeze([]);
+    if (!input) return Object.freeze([]);
     const path = yield* normalizePathEffect(input.sourcePath, input.projectRoot);
-    const descriptor = input.descriptor;
-    const rule = ruleFor(rules[descriptor.kind], descriptor.kind, path);
-    const diagnostics: Diagnostic[] = [];
-    const add = (code: ConventionCode, message: string, suggestion: string): void => {
-      const location = diagnosticLocation(path, input);
-      diagnostics.push(
-        createDiagnostic(
-          {
-            code,
-            severity: "warning",
-            message,
-            descriptorId: descriptor.id,
-            ...(location === undefined ? {} : { location }),
-            suggestion,
-          },
-          input.projectRoot === undefined ? {} : { projectRoot: input.projectRoot },
-        ),
-      );
-    };
-    const fileName = path.split("/").pop() ?? "";
-    const pattern = recommendedPattern(rule);
-    if (
-      descriptor.kind !== "route" &&
-      descriptor.kind !== "app" &&
-      !path.startsWith(`${rule.directory}/`)
-    ) {
-      add(
-        CONVENTION_CODES.directory,
-        `Descriptor "${descriptor.id}" has kind "${descriptor.kind}" outside its recommended directory.`,
-        `Move the descriptor under ${pattern}`,
-      );
-    }
-    if (descriptor.kind !== "route" && !fileName.endsWith(rule.suffix)) {
-      add(
-        CONVENTION_CODES.suffix,
-        `Descriptor "${descriptor.id}" does not use the recommended "${rule.suffix}" suffix.`,
-        `Rename the file to use ${rule.suffix}`,
-      );
-    }
-    if (descriptor.kind !== "route" && hasExportWarning(input)) {
-      add(
-        CONVENTION_CODES.export,
-        `Descriptor file should default-export "${descriptor.id}".`,
-        `Export "${descriptor.id}" as the file's default descriptor`,
-      );
-    }
-    const kinds = descriptorKinds(input, descriptor);
-    if (kinds.length > 1) {
-      add(
-        CONVENTION_CODES.multipleKinds,
-        `File contains descriptors of multiple kinds: ${kinds.join(", ")}.`,
-        "Keep unrelated descriptor kinds in separate files",
-      );
-    }
-    if (!/^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/.test(descriptor.id)) {
-      add(
-        CONVENTION_CODES.idStyle,
-        `Descriptor ID "${descriptor.id}" is not in the recommended lower-case dot/kebab style.`,
-        "Use lower-case alphanumeric segments separated by dots or hyphens",
-      );
-    }
-    return Object.freeze(diagnostics);
+    const rule = ruleFor(rules[input.descriptor.kind], input.descriptor.kind, path);
+    return conventionFindings(input, path, rule);
   },
   (effect) => observeCompiler("normalization", "checkConventions", effect),
 );
 
-export function checkConventions(input: ConventionCheckInput): readonly Diagnostic[];
+/** Checks a descriptor using its structured source and export provenance.
+ * @typeParam Descriptor - Caller descriptor type narrowed by runtime validation.
+ * @param input - Complete descriptor/provenance input.
+ * @returns Immutable nonfatal convention diagnostics with physical source locations. */
+export function checkConventions<Descriptor>(
+  input: ConventionCheckInput<Descriptor>,
+): readonly Diagnostic[];
 
-export function checkConventions(
-  descriptor: unknown,
+/** Checks a descriptor using the positional compatibility API.
+ * @typeParam Descriptor - Caller descriptor type narrowed by runtime validation.
+ * @param descriptor - Candidate authoring descriptor.
+ * @param sourcePath - Physical source filename in either supported layout.
+ * @param options - Optional source, export and project-root provenance.
+ * @returns Immutable nonfatal convention diagnostics with stable warning codes. */
+export function checkConventions<Descriptor>(
+  descriptor: Descriptor,
   sourcePath: string,
   options?: ConventionCheckOptions,
 ): readonly Diagnostic[];
 
 /**
- * Checks descriptor filename, directory, export, and identity style.
- * @param inputOrDescriptor - Structured convention input or positional descriptor.
- * @param sourcePath - Authored source filename.
- * @param options - Caller-supplied configuration for this operation.
- * @returns Frozen filename, directory, export, and ID-style warning diagnostics.
+ * Executes the existing synchronous convention compatibility boundary.
+ * @typeParam Input - Caller descriptor/input type, preserved until runtime validation.
+ * @param inputOrDescriptor - Structured provenance or positional descriptor.
+ * @param sourcePath - Physical filename when using the positional form.
+ * @param options - Root/location/export metadata for positional callers.
+ * @returns Frozen warning diagnostics with accurate physical paths and stable codes.
  */
-export function checkConventions(
-  inputOrDescriptor: ConventionCheckInput | unknown,
+export function checkConventions<Input>(
+  inputOrDescriptor: Input,
   sourcePath?: string,
   options: ConventionCheckOptions = {},
 ): readonly Diagnostic[] {

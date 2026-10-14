@@ -1,0 +1,213 @@
+$ bun run scripts/check-boundaries.ts
+Boundary check passed (62 roots, 4929 TypeScript files).
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  02:25:53
+   Duration  835ms (transform 49%, import 30%, tests 20%)
+
+bun test v1.3.10 (30e609e0)
+
+tests/unit/phase0-harness-ownership.test.ts:
+[23:25:54.667] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 1.44125,
+}
+[23:25:54.670] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.manifest",
+  outcome: "success",
+  duration_ms: 1.101417,
+}
+[23:25:54.671] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.568708,
+}
+[23:25:54.672] ERROR (#1): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "failure",
+  duration_ms: 1.052958,
+}
+[23:25:54.673] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.319292,
+}
+[23:25:54.673] ERROR (#1): Execution operation failed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "failure",
+  duration_ms: 8.182375,
+}
+(pass) guardrail fixtures release after native assertion failure [12.38ms]
+[23:25:54.674] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.326541,
+}
+[23:25:55.185] ERROR (#3): Execution operation failed {
+  domain: "testing",
+  operation: "guardrail.command",
+  outcome: "failure",
+  duration_ms: 509.86575,
+}
+[23:25:55.185] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 510.933833,
+}
+[23:25:55.186] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.291209,
+}
+[23:25:55.186] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 512.049625,
+}
+(pass) guardrail command timeout joins the actual child before root release [512.73ms]
+
+packages/cli/dev-check.test.ts:
+[23:25:55.347] INFO (#58): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 3.859541,
+}
+[23:25:55.632] INFO (#58): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 285.607833,
+}
+[23:25:55.633] INFO (#58): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.443125,
+}
+[23:25:55.633] INFO (#58): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 290.322334,
+}
+(pass) isolated development checks retain ordinary diagnostics [290.60ms]
+[23:25:55.633] INFO (#71): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.162167,
+}
+[23:25:55.890] INFO (#71): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 256.9745,
+}
+[23:25:55.891] INFO (#71): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.249375,
+}
+[23:25:55.891] INFO (#71): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 257.639792,
+}
+(pass) an abruptly exited compiler reports its bounded stderr instead of hanging [257.84ms]
+[23:25:55.891] INFO (#84): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.186459,
+}
+[23:25:56.147] INFO (#97): Execution operation completed {
+  domain: "testing",
+  operation: "dev-check.pids",
+  outcome: "success",
+  duration_ms: 0.941333,
+}
+[23:25:56.147] INFO (#98): Execution operation completed {
+  domain: "testing",
+  operation: "dev-check.reap",
+  outcome: "success",
+  duration_ms: 0.159708,
+}
+[23:25:56.147] INFO (#84): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 255.972209,
+}
+[23:25:56.148] INFO (#84): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.448959,
+}
+[23:25:56.148] INFO (#84): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 256.822458,
+}
+(pass) a completed check releases imported timers and owned descendants [257.02ms]
+[23:25:56.148] INFO (#99): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.139125,
+}
+[23:25:56.409] INFO (#105): Execution operation completed {
+  domain: "testing",
+  operation: "dev-check.pids",
+  outcome: "success",
+  duration_ms: 260.23675,
+}
+[23:25:56.414] INFO (#114): Execution operation completed {
+  domain: "testing",
+  operation: "dev-check.reap",
+  outcome: "success",
+  duration_ms: 0.078834,
+}
+[23:25:56.414] INFO (#99): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 265.687708,
+}
+[23:25:56.414] INFO (#99): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.278792,
+}
+[23:25:56.414] INFO (#99): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 266.310167,
+}
+(pass) cancellation joins a CPU-bound compiler and terminates its evaluator process group [266.44ms]
+
+ 6 pass
+ 0 fail
+ 21 expect() calls
+Ran 6 tests across 2 files. [1.87s]

@@ -1,3 +1,4 @@
+/** Verifies source-backed storage guides and grouped Assets placement. */
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
@@ -40,9 +41,9 @@ test("teaches an existing-app upload with source-backed examples and local verif
   expect(tutorial).toContain("bun run dev --local=off");
   expect(tutorial).toContain("explicit replacements for profile `assets`");
   for (const source of [
-    "assets/buckets/assets.bucket.ts",
-    "assets/functions/upload-assets.function.ts",
-    "assets/service.ts",
+    "services/assets/buckets/assets.bucket.ts",
+    "services/assets/functions/upload-assets.function.ts",
+    "services/assets/service.ts",
     "routes/uploads/route.ts",
   ]) {
     expect(tutorial).toContain(`../../examples/commerce/src/${source}`);

@@ -1,0 +1,587 @@
+{
+  "protocol": "relkit.layout-test-fixture-cleanup",
+  "baseline": "initial worktree contained only the change directory",
+  "owner": "tests/fixtures/cli/commands-core-fixture.ts",
+  "roots": [
+    {
+      "root": ".relkit-cli-test-FSPe9m",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-El8N3b",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-Vz6xp4",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-tFsquh",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-hfGUGI",
+      "package": null,
+      "entries": [
+        ".relkit"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-42QN43",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-xRqJHu",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-VxlEJO",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src",
+        "tsconfig.json"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-vXPPmH",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-EPpilP",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-8gTnEl",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-upw6ud",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-milMQz",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-6V2jew",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-tIRlTK",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-W3ONoH",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-q4LWKO",
+      "package": null,
+      "entries": [
+        ".relkit"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-qLUCBW",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-gigIml",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-DCVpFi",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-0myiIH",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-VXUNsj",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-Qlmkyz",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-NDz85t",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-70OxrD",
+      "package": null,
+      "entries": [
+        ".relkit"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-BwFywV",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-c0QiB9",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-G0GeWG",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-FPE2XN",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src",
+        "tsconfig.json"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-PFhuQe",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-oqh5oP",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-zMv2UR",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-Q2pfFk",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src",
+        "tsconfig.json"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-vsxsLZ",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-alE57A",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-q5zv9H",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-Do922H",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-irX5V2",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-9NK0vy",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-lTW1fM",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-jDrAhv",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src",
+        "tsconfig.json"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-Sc14Wq",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-LBFF9U",
+      "package": null,
+      "entries": [
+        ".relkit"
+      ]
+    },
+    {
+      "root": ".relkit-cli-test-uKMnaZ",
+      "package": "@relkit/example-commerce",
+      "entries": [
+        ".relkit",
+        "expected.diagnostics.json",
+        "expected.exit-code",
+        "expected.graph.json",
+        "node_modules",
+        "package.json",
+        "relkit.config.ts",
+        "src"
+      ]
+    }
+  ]
+}

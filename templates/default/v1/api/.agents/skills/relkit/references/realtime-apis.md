@@ -4,7 +4,7 @@ Use a channel to notify connected clients about a change. Keep the authoritative
 
 ## `defineChannel`
 
-Create `src/announcements/channels/announcements.channel.ts`:
+Create `src/services/announcements/channels/announcements.channel.ts`:
 
 ```ts
 import { defineChannel } from "@relkit/app/realtime";
@@ -30,7 +30,7 @@ After the application change succeeds, publish one validated event from a backen
 ```ts
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
-import announcements from "@app/announcements/channels/announcements.channel.js";
+import announcements from "@app/services/announcements/channels/announcements.channel.js";
 
 export default defineFunction({
   id: "announcements.post",

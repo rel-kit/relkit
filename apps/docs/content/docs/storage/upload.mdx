@@ -9,8 +9,8 @@ Import your [bucket](/docs/storage/define) and add it to `dependencies.buckets`.
 
 This function accepts a primary image and attachments, writes their bytes, and returns their keys:
 
-<include cwd lang="ts" meta='title="src/assets/functions/upload-assets.function.ts"'>
-  ../../examples/commerce/src/assets/functions/upload-assets.function.ts
+<include cwd lang="ts" meta='title="src/services/assets/functions/upload-assets.function.ts"'>
+  ../../examples/commerce/src/services/assets/functions/upload-assets.function.ts
 </include>
 
 `put()` takes a key, a `Uint8Array`, and optional settings such as `contentType` and `metadata`. Await it before reporting a successful upload.

@@ -1,0 +1,2 @@
+$ bun ../../packages/cli/dist/bin.js check && tsc --noEmit
+Checked /Users/mustafaelsayed/Workspace/relkit/examples/commerce

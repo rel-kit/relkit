@@ -15,11 +15,11 @@ understand where it belongs and how the rest of the app should reach it.
 
 These three terms describe different things:
 
-| Term     | Meaning                                                                              | Example                                                                            |
-| -------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| Domain   | A cohesive area of application responsibility, including its private implementation. | `src/orders/` owns order creation, pricing, order events, and order-support tools. |
-| Service  | The domain's public boundary, assembled in one `service.ts`.                         | `orders.createOrder` and `orders.orderCreated` are selected public members.        |
-| Function | A validated operation that does the work.                                            | `create-order.function.ts` calculates a total and publishes an event.              |
+| Term     | Meaning                                                                              | Example                                                                                     |
+| -------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Domain   | A cohesive area of application responsibility, including its private implementation. | `src/services/orders/` owns order creation, pricing, order events, and order-support tools. |
+| Service  | The domain's public boundary, assembled in one `service.ts`.                         | `orders.createOrder` and `orders.orderCreated` are selected public members.                 |
+| Function | A validated operation that does the work.                                            | `create-order.function.ts` calculates a total and publishes an event.                       |
 
 When we say a service contains tools, agents, caches, tasks, or jobs, we mean they belong to its **domain**.
 `defineService` accepts public `functions`, `events`, `tasks`, and `jobs`; it is not a registry of every file
@@ -32,18 +32,19 @@ durable execution.
 relkit.config.ts              application settings and provider bindings
 src/
 ├── platform/                 shared environment and infrastructure support
-├── orders/                   an application domain
-│   ├── service.ts            public functions, events, tasks, and jobs
-│   ├── functions/            business operations and event subscribers
-│   ├── events/               facts this domain publishes
-│   ├── tools/                model-callable operations
-│   ├── agents/               bounded model workflows
-│   └── cache/                domain-owned cached data
-├── receipts/                 another domain, with its own service.ts
-│   ├── service.ts
-│   ├── functions/
-│   ├── tasks/
-│   └── jobs/
+├── services/
+│   ├── orders/               an application domain
+│   │   ├── service.ts        public functions, events, tasks, and jobs
+│   │   ├── functions/        business operations and event subscribers
+│   │   ├── events/           facts this domain publishes
+│   │   ├── tools/            model-callable operations
+│   │   ├── agents/           bounded model workflows
+│   │   └── cache/            domain-owned cached data
+│   └── receipts/             another domain, with its own service.ts
+│       ├── service.ts
+│       ├── functions/
+│       ├── tasks/
+│       └── jobs/
 └── routes/                   URL paths, HTTP methods, and request policy
 ```
 
@@ -55,11 +56,15 @@ The compiler discovers exported descriptors, checks their relationships, and pro
 graph and runtime manifest. The runtime, Inspector, and deployment tooling use that checked model.
 Application authors use ordinary TypeScript descriptors; no Effect imports are required.
 
+Existing flat `src/<name>/service.ts` apps remain supported. Scaffolding preserves their detected
+layout, while empty projects default to grouped. Keep one boundary shape throughout the app;
+`src/services/service.ts` is not an aggregate boundary. See [optional migration](/docs/service/migration).
+
 ## Follow an operation through the layers
 
-In the commerce example, an HTTP route selects `orders.createOrder`. The function validates domain input,
-reads the Orders price cache, and publishes `orders.created`. A Receipts event function reacts, looks up
-the order through the Orders service, and triggers receipt work through a task-first job.
+In the commerce example, an HTTP route selects `orders.createOrder`. The function validates domain input
+and reads the Orders price cache. The [event examples](/docs/events) show how a producing service can
+publish a fact and a receiving service can own its reaction; [jobs](/docs/jobs) describe durable work.
 
 Each part has a different job:
 
@@ -74,8 +79,8 @@ permission to call it. Transport exposure and authorization remain explicit.
 
 ## Read a real public boundary
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/service.ts"'>
-  ../../examples/commerce/src/orders/service.ts
+<include cwd lang="ts" meta='title="examples/commerce/src/services/orders/service.ts"'>
+  ../../examples/commerce/src/services/orders/service.ts
 </include>
 
 Notice what is absent: the Orders cache, support agent, tools, and event subscribers. They still belong

@@ -1,0 +1,16 @@
+$ bun install --frozen-lockfile && bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md && bun run lint && bun run check && bun run konsistent -- validate && bun run scripts/check-observability-sinks.ts && bun x turbo run typecheck --filter='./packages/*' --filter='./integrations/catalog' --filter='./integrations/packages/*' --output-logs=errors-only && bun x tsc -b --pretty false && bun run test:types && bun run test:unit && bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts && bun run test:graph && bun run test:contracts && bun run test:security
+[0.02ms] ".env"
+bun install v1.3.10 (30e609e0)
+Resolving dependencies
+Resolved, downloaded and extracted [1]
+
+Checked 1455 installs across 1554 packages (no changes) [61.00ms]
+Checking formatting...
+All matched files use Prettier code style!
+$ bun run scripts/lint.ts
+Public authoring scan passed (92 source/example fragments).
+$ bun run scripts/check-boundaries.ts
+packages/cli/dev-check-fixture.ts:7:40 [cross-package-relative-import] @relkit/cli imports relkit-workspace through "../../scripts/scaffold-process.errors.js"
+Boundary/scope check failed with 1 violation(s).
+error: script "check" exited with code 1
+error: script "prepush" exited with code 1

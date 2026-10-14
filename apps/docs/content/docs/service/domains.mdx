@@ -7,8 +7,9 @@ A domain is an area of the product with a coherent responsibility and vocabulary
 means to create, price, update, or cancel an order. Receipts knows how to prepare and send a receipt.
 Both may use functions, events, and storage, but those technologies do not define their boundaries.
 
-In RelKit, a domain is represented by a top-level application directory such as `src/orders/`, with one
-`service.ts` describing what other domains and routes may use.
+In RelKit, a domain is an immediate child of the selected service root, such as `src/services/orders/`
+in a new grouped app or `src/orders/` in an existing flat app. One `service.ts` describes what other
+domains and routes may use. Keep the app's boundary shape consistent.
 
 ## Why have domains?
 
@@ -51,7 +52,8 @@ application. You do not need one domain per endpoint, database table, function, 
 
 Keep order-specific functions, schemas, errors, tools, and agents in Orders while they share the same
 business rules. A new file or subdirectory is often enough; a new service is not required for each
-feature. Nested directories remain part of the top-level domain, not independent child services.
+feature. Nested directories remain part of that owning domain. A nested `service.ts` cannot create an
+independent child service; add another immediate service-root child when a separate boundary is needed.
 
 Consider a separate domain when it has a responsibility you can name independently, can expose a small
 useful contract, and evolves without requiring callers to understand its internal details. Receipts is
@@ -68,7 +70,7 @@ retry considerations, so they are not a substitute for every function call.
 
 This subscriber illustrates the receiving side of that relationship:
 
-<include cwd lang="ts" meta='title="src/orders/functions/order-confirmation.function.ts"'>
+<include cwd lang="ts" meta='title="src/services/orders/functions/order-confirmation.function.ts"'>
   ../../apps/docs/examples/events/order-confirmation.function.ts
 </include>
 

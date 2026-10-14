@@ -18,9 +18,9 @@ The protected order channel enables connection counts:
 <include
   cwd
   lang="ts"
-  meta='title="examples/commerce/src/orders/channels/order-updates.channel.ts"'
+  meta='title="examples/commerce/src/services/orders/channels/order-updates.channel.ts"'
 >
-  ../../examples/commerce/src/orders/channels/order-updates.channel.ts
+  ../../examples/commerce/src/services/orders/channels/order-updates.channel.ts
 </include>
 
 Member presence is allowed only on a protected channel. Its `member` schema defines the public information, `resolve(params, context)` derives that information from trusted server context, and `maxMembers` limits the returned list. It does not limit how many connections may join; provider admission limits are separate.

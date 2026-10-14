@@ -527,12 +527,14 @@ declare const localRecipe: Readonly<{
 
 ## `postgres.ts`
 
+Builds lazy native PostgreSQL job-store Layers with scoped driver ownership and explicit timestamp compatibility.
+
 ---
 
 ## Exports Grouped by Category
 
 - [utils](#utils)
-  - [EffectMqPostgresSchema (interface)](#effectmqpostgresschema-interface)
+  - [EffectMqPostgresSchema](#effectmqpostgresschema)
   - [createEffectMqPostgresLayer](#createeffectmqpostgreslayer)
   - [createEffectMqPostgresSchema](#createeffectmqpostgresschema)
   - [runEffectMq](#runeffectmq)
@@ -541,27 +543,19 @@ declare const localRecipe: Readonly<{
 
 # utils
 
-## EffectMqPostgresSchema (interface)
+## EffectMqPostgresSchema
 
 **Signature**
 
 ```ts
-export interface EffectMqPostgresSchema {
-  readonly jobs: ReturnType<typeof mqJobs>;
-  readonly attempts: ReturnType<typeof mqJobAttempts>;
-  readonly schedules: ReturnType<typeof mqSchedules>;
-  readonly queues: ReturnType<typeof mqQueueControl>;
-  readonly dedupe: ReturnType<typeof mqDedupe>;
-  readonly flowChildren: ReturnType<typeof mqFlowChildren>;
-  readonly flowOutbox: ReturnType<typeof mqFlowOutbox>;
-}
+declare const EffectMqPostgresSchema: EffectMqPostgresSchema;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L17)
 
 ## createEffectMqPostgresLayer
 
-Creates the native PostgreSQL store layer; migrations remain owned by this service.
+Builds the native PostgreSQL store Layer; the calling application owns schema migration and Layer lifetime.
 
 **Signature**
 
@@ -569,12 +563,17 @@ Creates the native PostgreSQL store layer; migrations remain owned by this servi
 declare const createEffectMqPostgresLayer: (
   postgresUrl: string,
   prefix?: string,
-) => Layer.Layer<any, any, any>;
+) => Layer.Layer<
+  JobStore.JobStore,
+  JobStore.JobStoreError | Layer.Error<ReturnType<typeof PgClient.layer>>
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L44)
 
 ## createEffectMqPostgresSchema
+
+Builds the existing native store's complete schema without opening a database connection.
 
 **Signature**
 
@@ -582,9 +581,11 @@ declare const createEffectMqPostgresLayer: (
 declare const createEffectMqPostgresSchema: (prefix?: string) => EffectMqPostgresSchema;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L24)
 
 ## runEffectMq
+
+Existing native Promise edge; callers supply and own the complete store/worker Layer lifetime.
 
 **Signature**
 
@@ -595,7 +596,49 @@ declare const runEffectMq: <A, E>(
 ) => Promise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L86)
+
+## `postgres.types.ts`
+
+Describes the complete native Drizzle PostgreSQL schema used by the scoped effect-mq integration.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [EffectMqPostgresSchema (interface)](#effectmqpostgresschema-interface)
+
+---
+
+# utils
+
+## EffectMqPostgresSchema (interface)
+
+Native table handles retain the SDK's exact row, query and foreign-key contracts.
+
+**Signature**
+
+```ts
+export interface EffectMqPostgresSchema {
+  /** Durable job state and acceptance metadata. */
+  readonly jobs: ReturnType<typeof mqJobs>;
+  /** Ordered native attempt ledger. */
+  readonly attempts: ReturnType<typeof mqJobAttempts>;
+  /** Provider-owned schedule definitions and next occurrences. */
+  readonly schedules: ReturnType<typeof mqSchedules>;
+  /** Native queue pause controls. */
+  readonly queues: ReturnType<typeof mqQueueControl>;
+  /** Native deduplication keys and windows. */
+  readonly dedupe: ReturnType<typeof mqDedupe>;
+  /** Durable child-flow admission and completion state. */
+  readonly flowChildren: ReturnType<typeof mqFlowChildren>;
+  /** Provider-owned parent-flow completion outbox. */
+  readonly flowOutbox: ReturnType<typeof mqFlowOutbox>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.types.ts#L13)
 
 ## `index.ts`
 

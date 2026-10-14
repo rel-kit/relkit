@@ -4,7 +4,7 @@ declare global {
   namespace Relkit {
     interface ApplicationEnv extends RelkitApplicationEnv {}
     interface ApplicationContextRegistry {
-    readonly database: import("@relkit/drizzle").DatabaseContext<typeof import("../../src/database/service.js")["default"]>;
+    readonly database: import("@relkit/drizzle").DatabaseContext<typeof import("../../src/services/database/service.js")["default"]>;
     }
     interface TaskRegistry {
     }

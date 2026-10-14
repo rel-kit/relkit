@@ -1,0 +1,26 @@
+bun test v1.3.10 (30e609e0)
+
+tests/http.test.ts:
+(pass) exercises file routes, inferred requests, middleware, methods, and uploads [140.54ms]
+(pass) preserves concurrent announcements [990.41ms]
+
+tests/cache.test.ts:
+(pass) cached-price tutorial reads hits and reloads after expiry or deletion [63.13ms]
+
+tests/tool-approvals.test.ts:
+(pass) never permits a read without a separate approval [7.24ms]
+(pass) on-write and always require a decision before cancelling [2.37ms]
+(pass) synchronous approval callbacks accept booleans or decision strings [9.12ms]
+(pass) asynchronous confirmation receives the exact action and fails closed [3.13ms]
+
+src/agent-authoring-assertions.test.ts:
+(pass) native support agent executes mixed tools and publishes todo state [81.84ms]
+(pass) DeepAgent executes with inherited subagent, skills, memory, and bucket backend [190.05ms]
+(pass) order graph runs parallel work, loops, interrupts, and resumes [86.73ms]
+
+src/authoring-assertions.test.ts:
+
+ 10 pass
+ 0 fail
+ 45 expect() calls
+Ran 10 tests across 5 files. [2.53s]

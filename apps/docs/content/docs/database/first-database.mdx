@@ -28,7 +28,8 @@ the shown Users and Memberships schema instead of adding a second database servi
 
 SQLite is the headless default and uses `bun:sqlite`; PostgreSQL and MySQL use
 `drizzle-orm/bun-sql`. `--orm` accepts only `drizzle`. Database is a singleton under
-`src/database`; `--service` and `--create-service` do not select its location.
+the detected service root: `src/services/database` in grouped apps or `src/database` in existing flat
+apps. `--service` and `--create-service` do not select its location.
 
 For every scaffolding flag, see the [CLI reference](/docs/operations/cli-reference).
 
@@ -49,20 +50,20 @@ Start with a new local file, not an existing database with unrelated tables or d
 
 ## Define tables and a custom model
 
-Create or extend `src/database/schema/index.ts`:
+Create or extend `src/services/database/schema/index.ts`:
 
-<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
-  ../../examples/data-model/src/database/schema/index.ts
+<include cwd lang="ts" meta='title="src/services/database/schema/index.ts"'>
+  ../../examples/data-model/src/services/database/schema/index.ts
 </include>
 
 Users has an integer identity, unique email, and active flag. Memberships has its own identity and a
 composite unique key. Its `userId` is not a foreign-key constraint in this demonstration; add the
 [relationships and constraints](/docs/database/schema) your application needs.
 
-Add `src/database/models/users.model.ts`:
+Add `src/services/database/models/users.model.ts`:
 
-<include cwd lang="ts" meta='title="src/database/models/users.model.ts"'>
-  ../../examples/data-model/src/database/models/users.model.ts
+<include cwd lang="ts" meta='title="src/services/database/models/users.model.ts"'>
+  ../../examples/data-model/src/services/database/models/users.model.ts
 </include>
 
 The custom methods receive `{ table, database }` automatically. Read [Custom models](/docs/database/models)
@@ -70,10 +71,10 @@ for the sample's pattern-matching, pagination, and atomicity limits before adapt
 
 ## Register the database service
 
-Create or merge `src/database/service.ts`:
+Create or merge `src/services/database/service.ts`:
 
-<include cwd lang="ts" meta='title="src/database/service.ts"'>
-  ../../examples/data-model/src/database/service.ts
+<include cwd lang="ts" meta='title="src/services/database/service.ts"'>
+  ../../examples/data-model/src/services/database/service.ts
 </include>
 
 This connects the schema and model, adds an inactive-user override for `findOne`, and closes SQLite on
@@ -109,8 +110,8 @@ bun run check
 
 Add the registration workflow:
 
-<include cwd lang="ts" meta='title="src/users/functions/register-member.function.ts"'>
-  ../../examples/data-model/src/users/functions/register-member.function.ts
+<include cwd lang="ts" meta='title="src/services/users/functions/register-member.function.ts"'>
+  ../../examples/data-model/src/services/users/functions/register-member.function.ts
 </include>
 
 The table service provides `users.insert`, `memberships.insert`, and the insert validator without
@@ -120,8 +121,8 @@ See [Generated CRUD and schemas](/docs/database/generated-schemas) and
 
 Add the email-change workflow, which uses the generated update/select schemas:
 
-<include cwd lang="ts" meta='title="src/users/functions/update-user-email.function.ts"'>
-  ../../examples/data-model/src/users/functions/update-user-email.function.ts
+<include cwd lang="ts" meta='title="src/services/users/functions/update-user-email.function.ts"'>
+  ../../examples/data-model/src/services/users/functions/update-user-email.function.ts
 </include>
 
 These are trusted internal examples, not authorized public write APIs. Add ownership/organization
@@ -129,16 +130,16 @@ checks before exposing them to callers. This tutorial mounts only a read route.
 
 ## Expose a Users operation
 
-Add `src/users/functions/list-users.function.ts`:
+Add `src/services/users/functions/list-users.function.ts`:
 
-<include cwd lang="ts" meta='title="src/users/functions/list-users.function.ts"'>
-  ../../examples/data-model/src/users/functions/list-users.function.ts
+<include cwd lang="ts" meta='title="src/services/users/functions/list-users.function.ts"'>
+  ../../examples/data-model/src/services/users/functions/list-users.function.ts
 </include>
 
 Add it to the Users service:
 
-<include cwd lang="ts" meta='title="src/users/service.ts"'>
-  ../../examples/data-model/src/users/service.ts
+<include cwd lang="ts" meta='title="src/services/users/service.ts"'>
+  ../../examples/data-model/src/services/users/service.ts
 </include>
 
 Connect the public operation to HTTP if you want an endpoint:

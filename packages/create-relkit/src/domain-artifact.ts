@@ -1,3 +1,9 @@
+/**
+ * Derives scaffold source destinations from an already selected public boundary
+ * while preserving logical artifact IDs and bindings. Pure compatibility helpers
+ * report usage/collision exceptions; owning generator workflows translate them.
+ */
+import { dirname } from "node:path";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
 
 import { normalizeArtifactName, type NormalizedArtifactName } from "./add-name.js";
@@ -28,7 +34,7 @@ export function domainArtifact(
   const suffix = kindSuffix ? normalizeArtifactName(kindSuffix) : undefined;
   return {
     name,
-    path: `src/${target.domain.fileStem}/${directory}/${name.fileStem}.${fileSuffix}.ts`,
+    path: `${dirname(target.servicePath)}/${directory}/${name.fileStem}.${fileSuffix}.ts`,
     id: `${target.domain.idSegment}.${name.idSegment}${suffix ? `-${suffix.idSegment}` : ""}`,
     binding: `${name.identifier}${suffix ? capitalize(suffix.identifier) : ""}`,
     exportKind,
@@ -137,7 +143,8 @@ export function collision(message: string): never {
  * @returns The identifier with its first character capitalized.
  */
 export function capitalize(value: string): string {
-  return `${value[0]!.toUpperCase()}${value.slice(1)}`;
+  if (value.length === 0) throw new TypeError("A normalized identifier must not be empty.");
+  return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
 }
 
 /**
@@ -146,7 +153,7 @@ export function capitalize(value: string): string {
  * @returns The final path component up to its first dot.
  */
 export function fileStem(path: string): string {
-  return path.split("/").at(-1)!.split(".")[0]!;
+  return path.split("/").at(-1)?.split(".")[0] ?? "";
 }
 
 import type { DomainTarget, DomainArtifact } from "./domain-planning.types.js";

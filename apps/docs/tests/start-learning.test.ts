@@ -1,8 +1,13 @@
+/** Checks the certified starter journey and source-backed grouped tutorial links through finite synchronous read-only test adapters. */
 import { expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { guideGroups, guideRelations, startJourney } from "../scripts/guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
+/** Reads one owned starter guide at the native synchronous test boundary.
+ * @param page - Starter guide path selected by this suite.
+ * @returns Original guide text; missing input fails the native test.
+ */
 const read = (page: string) => readFileSync(resolve(content, `start/${page}.mdx`), "utf8");
 test("keeps a single ordered Orders journey with optional scaffolding last", () => {
   const pages = [...startJourney.map((path) => path.slice(6)), "add-artifacts"];
@@ -30,9 +35,9 @@ test("extends the certified minimal app into the same Orders journey", () => {
     "../../templates/default/v1/api/src/routes/orders/route.ts",
   );
   expect(read("first-route")).toContain(
-    "../../templates/default/v1/api/src/orders/functions/create-order.function.ts",
+    "../../templates/default/v1/api/src/services/orders/functions/create-order.function.ts",
   );
-  expect(read("save-orders")).toContain("src/database/schema/index.ts");
+  expect(read("save-orders")).toContain("src/services/database/schema/index.ts");
   expect(read("protect-orders")).toContain("session's user ID");
   expect(read("test-orders")).toContain("bun run test");
   expect(read("build-and-run")).toContain("bun run start");

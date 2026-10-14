@@ -28,7 +28,15 @@ All repository paths below are relative to the repository root.
 - Read applicable `AGENTS.md` instructions and inspect overlapping dirty changes before editing.
 - Read `docs/README.md`, relevant current guidance, and adjacent pages for terminology and style.
   Verify claims against package source, tests, `examples/commerce`, and `templates/default/v1`.
-- Document the current domain-first application layout. Revision-3 POC specifications are
+- Document grouped `src/services/<name>/service.ts` placement for new apps, including
+  database/auth and colocated descriptors, helpers, and assets. Label flat
+  `src/<name>/service.ts` examples as supported compatibility; add preserves their layout.
+  Never teach mixed roots, nested boundaries, or an aggregate service boundary.
+  Routes remain in `src/routes`, Platform/config support in `src/platform`, and the
+  root `relkit.config.ts` explicitly composes imported fragments without autoloading them.
+  Cross-service and route imports use public `service.ts`; Platform cannot import services.
+  Keep source provenance distinct from stable logical IDs and durable versions.
+  Revision-3 POC specifications are
   historical evidence, not the source for current behavior. Do not rewrite protected normative
   documents or OpenSpec artifacts as a side effect of a documentation task.
 - Distinguish public application APIs from internal implementation: application authors use
@@ -37,6 +45,11 @@ All repository paths below are relative to the repository root.
 - Confirm commands, defaults, paths, and ports from current source. Distinguish repository-root
   commands from generated-project commands and local workflows from cloud deployment.
   Do not incur cloud costs without authorization.
+- Verify create examples against exact current certification. Only minimal, examples enabled,
+  no jobs/cloud/deployment is currently publicly offered. Candidate API/agent/fullstack/jobs
+  and AWS/Pulumi templates are not supported public creation tuples merely because tests pass.
+  Document optional `relkit migrate layout` preview, validated `--write`, guarded
+  `--rollback <receipt>`, and fresh `dev --prepare` after either operation.
 - Use local repository sources freely. Consult external websites only when the user provides
   a link and asks you to consult it; report uncertainty when local evidence is insufficient.
 

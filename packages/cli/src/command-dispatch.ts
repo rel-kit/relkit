@@ -1,16 +1,18 @@
+/** Selects lazy command domains and supplies only their invocation-owned capabilities. */
 import { Cause, Effect, Layer } from "effect";
-import { formatDiagnostics } from "@relkit/diagnostics";
-import { parseProjectArgs } from "./commands/project-args.js";
+import { runMigrateEffect } from "./commands/migrate.js";
+import { layoutMigrationLayer } from "./migration/layout-migration.service.js";
+import { executeProjectEffect } from "./command-project.js";
+import { executeStartEffect } from "./command-start.js";
 import { runDevCommandEffect } from "./commands/dev-command.js";
 import { runDeployEffect } from "./commands/deploy.js";
 import { runDoctorEffect } from "./commands/doctor.js";
 import { runEnvEffect } from "./commands/env.js";
 import { runGraphEffect } from "./commands/graph.js";
 import { runLocalEffect } from "./commands/local.js";
-import { runStartEffect } from "./commands/start.js";
 import { runClientEffect } from "./commands/client.js";
 import { runJobsEffect } from "./commands/jobs.js";
-import { CliProject, projectLiveLayer } from "./services/project.service.js";
+import { projectLiveLayer } from "./services/project.service.js";
 import { clientLiveLayer } from "./services/client.service.js";
 import { deploymentLiveLayer } from "./services/deployment.service.js";
 import { doctorLiveLayer } from "./commands/doctor-project.service.js";
@@ -20,12 +22,10 @@ import { devLiveLayer } from "./services/dev.service.js";
 import { jobsLiveLayer } from "./services/jobs.service.js";
 import { environmentProjectLayer } from "./commands/env-project.service.js";
 import { graphFilesLayer } from "./commands/graph-file.service.js";
-import { cliOriginalError, cliValidation } from "./cli-errors.js";
+import { cliOriginalError } from "./cli-errors.js";
 import { observeCli, runCliEffect } from "./cli-runtime.js";
 import { CLI_EXIT_CODES, fail, type CliCommandContext } from "./main-support.js";
 import type { CliInvocation } from "./cli-effect-runtime.js";
-import type { CheckResult } from "./commands/check.js";
-import type { BuildResult } from "./commands/build.js";
 
 /**
  * Executes the established public Promise dispatch boundary.
@@ -60,7 +60,12 @@ export function executeCommandEffect(
   Effect.Error<ReturnType<typeof selectCommandEffect>>,
   Effect.Services<ReturnType<typeof selectCommandEffect>>
 > {
-  return observeCli("invocation.dispatch", selectCommandEffect(invocation, context));
+  const selected: Effect.Effect<
+    number,
+    Effect.Error<ReturnType<typeof selectCommandEffect>>,
+    Effect.Services<ReturnType<typeof selectCommandEffect>>
+  > = selectCommandEffect(invocation, context);
+  return observeCli("invocation.dispatch", selected);
 }
 
 /**
@@ -83,14 +88,7 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
         Effect.as(CLI_EXIT_CODES.success),
       );
     case "start":
-      return Effect.gen(function* () {
-        const options = yield* cliValidation(() => parseProjectArgs(args, "start"));
-        return yield* runStartEffect({
-          ...optionalProjectRoot(options.projectRoot),
-          ...(options.port === undefined ? {} : { port: options.port }),
-          signal: context.signal,
-        });
-      }).pipe(Effect.provide(startLiveLayer()));
+      return executeStartEffect(args, context).pipe(Effect.provide(startLiveLayer()));
     case "graph":
       return reportReadFailure(
         runGraphEffect(args, context).pipe(Effect.provide(graphFilesLayer)),
@@ -113,40 +111,14 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
       return runClientEffect(args, context).pipe(Effect.provide(clientLiveLayer));
     case "jobs":
       return runJobsEffect(args, context).pipe(Effect.provide(jobsLiveLayer()));
+    case "migrate":
+      return runMigrateEffect(args, context).pipe(Effect.provide(layoutMigrationLayer));
     default:
       return Effect.fail(
         fail("RELKIT_COMMAND_UNAVAILABLE", `Command is not implemented: ${invocation.command}`),
       );
   }
 }
-
-/**
- * Composes project checking/building and stable diagnostic formatting.
- * @param invocation - Selected check or build invocation.
- * @param context - Result presentation and cancellation.
- * @returns Lazy diagnostic-dependent status requiring CliProject.
- */
-const executeProjectEffect = Effect.fn("Cli.project-command")(function* (
-  invocation: CliInvocation,
-  context: CliCommandContext,
-) {
-  const options = yield* cliValidation(() => parseProjectArgs(invocation.args, invocation.command));
-  const project = yield* CliProject;
-  if (invocation.command === "check") {
-    const result = yield* project.check({
-      ...optionalProjectRoot(options.projectRoot),
-      signal: context.signal,
-    });
-    context.reporter.output(result, formatCheckResult(result));
-    return result.ok ? CLI_EXIT_CODES.success : CLI_EXIT_CODES.failure;
-  }
-  const result = yield* project.build({
-    ...optionalProjectRoot(options.projectRoot),
-    signal: context.signal,
-  });
-  context.reporter.output(result, formatBuildResult(result));
-  return result.ok ? CLI_EXIT_CODES.success : CLI_EXIT_CODES.failure;
-});
 
 /**
  * Retains each read command's existing terminal error presentation policy.
@@ -176,37 +148,4 @@ function reportReadFailure<E, R>(
           }),
     ),
   );
-}
-
-/**
- * Formats stable project-check diagnostics.
- * @param result - Complete check result.
- * @returns Existing human output.
- */
-function formatCheckResult(result: CheckResult): string {
-  return result.ok
-    ? `Checked ${result.projectRoot}`
-    : formatDiagnostics(result.diagnostics) || "Application check failed.";
-}
-
-/**
- * Formats stable build diagnostics.
- * @param result - Complete build result.
- * @returns Existing human output.
- */
-function formatBuildResult(result: BuildResult): string {
-  return result.ok
-    ? `Built ${result.buildDirectory}`
-    : formatDiagnostics(result.diagnostics) || "Application build failed.";
-}
-
-/**
- * Preserves absent project-root defaults for the selected domain.
- * @param projectRoot - Optional explicit root.
- * @returns The existing optional argument shape.
- */
-function optionalProjectRoot(
-  projectRoot: string | undefined,
-): { readonly projectRoot?: never } | { readonly projectRoot: string } {
-  return projectRoot === undefined ? {} : { projectRoot };
 }

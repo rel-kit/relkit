@@ -5,8 +5,12 @@ description: Run jobs on provider-backed schedules.
 
 Schedules belong to jobs and use the same task input and admission rules as an on-demand trigger.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/jobs/cleanup-orders.job.ts"'>
-  ../../examples/commerce/src/orders/jobs/cleanup-orders.job.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts"'
+>
+  ../../examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts
 </include>
 
 Use `schedules`, an array of definitions with an explicit `id`, canonical `input`, and either a cron/timezone

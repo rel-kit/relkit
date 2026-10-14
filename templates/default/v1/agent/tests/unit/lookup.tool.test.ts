@@ -1,5 +1,6 @@
+/** Checks lookup.tool through the supported public RELKIT APIs. */
 import { expect, test } from "bun:test";
-import hello from "@app/hello/functions/hello.function.js";
+import hello from "@app/services/hello/functions/hello.function.js";
 import lookup from "../fixtures/lookup.tool.js";
 import { mcpDisabled, privateLookup } from "../fixtures/mcp-options.js";
 

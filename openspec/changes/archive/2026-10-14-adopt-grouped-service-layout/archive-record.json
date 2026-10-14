@@ -1,0 +1,391 @@
+{
+  "protocol": "relkit.openspec.archive-record",
+  "version": 1,
+  "change": "adopt-grouped-service-layout",
+  "schema": "spec-driven",
+  "archiveDate": "2026-10-14",
+  "archivedTo": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/archive/2026-10-14-adopt-grouped-service-layout",
+  "originalChangePath": "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/adopt-grouped-service-layout",
+  "tasksComplete": 56,
+  "incompleteArtifacts": [],
+  "incompleteTasks": 0,
+  "specSync": {
+    "protocol": "relkit.openspec.archive-sync-verification",
+    "change": "adopt-grouped-service-layout",
+    "complete": true,
+    "specRules": "one valid archive-supplied snapshot; no custom rules returned",
+    "capabilities": [
+      {
+        "capability": "acceptance-verification",
+        "status": "already synced; nothing left to apply",
+        "added": 6,
+        "updated": 1,
+        "purposePreserved": true,
+        "existingRequirementsPreserved": 42,
+        "existingScenariosPreserved": 65,
+        "mainSha256": "ec47ea516942e72d4ecd4772b7ba8b499d21cf218198c607b0bc0d759113bd93",
+        "deltaSha256": "b7ee16ec92d8c0340cecc9a08d504205558508a3101111682cfa35d041c9abd1"
+      },
+      {
+        "capability": "cli-scaffolding",
+        "status": "already synced; nothing left to apply",
+        "added": 4,
+        "updated": 1,
+        "purposePreserved": true,
+        "existingRequirementsPreserved": 26,
+        "existingScenariosPreserved": 57,
+        "mainSha256": "1deb9021a1ace2b948b390b02c8e8934eede03c49d1fabfdfd882a09f4725c04",
+        "deltaSha256": "6c1c1751a1d045f17540708f5e46ae8d04bbcf12a4963400d6c08f556862f80d"
+      },
+      {
+        "capability": "compiler-graph",
+        "status": "already synced; nothing left to apply",
+        "added": 3,
+        "updated": 2,
+        "purposePreserved": true,
+        "existingRequirementsPreserved": 34,
+        "existingScenariosPreserved": 75,
+        "mainSha256": "d027e62aa5d2210a7efde1624b68a9b5d2d2b1147a7b2c1655502a4847aa5440",
+        "deltaSha256": "a9c2296edabdf3b974efad39635d62ca6916bddfb67b4f2fb5bb348a5ffbdae1"
+      },
+      {
+        "capability": "developer-documentation",
+        "status": "already synced; nothing left to apply",
+        "added": 2,
+        "updated": 1,
+        "purposePreserved": true,
+        "existingRequirementsPreserved": 14,
+        "existingScenariosPreserved": 17,
+        "mainSha256": "912c8bd327e9d99d145e8ae019d1594592e521fb975dd8068862f08b414fd3bb",
+        "deltaSha256": "8e6e0725684e4f2407998108514e79f2bc2421bb690a19982abbc9cddefd8dcc"
+      },
+      {
+        "capability": "development-inspector",
+        "status": "already synced; nothing left to apply",
+        "added": 1,
+        "updated": 1,
+        "purposePreserved": true,
+        "existingRequirementsPreserved": 37,
+        "existingScenariosPreserved": 59,
+        "mainSha256": "5c0eaddc02cf06f33455d3aac92e5d6f9a2ec0335796e37e04262232605b3f22",
+        "deltaSha256": "664c9dd77ef8c30d55b0801856a7999344e2a02115b7457fb3708ad48caf0fd4"
+      },
+      {
+        "capability": "domain-services",
+        "status": "already synced; nothing left to apply",
+        "added": 1,
+        "updated": 2,
+        "purposePreserved": true,
+        "existingRequirementsPreserved": 13,
+        "existingScenariosPreserved": 21,
+        "mainSha256": "a67bd704cb629428c3b1e3bd21749441b66543a5230f0d61c5c32331bcced40d",
+        "deltaSha256": "9215df82b85d4821a800a486ae3416f50cf710f9f79d3518f46bcd250eb3c72e"
+      }
+    ]
+  },
+  "mainSpecValidation": [
+    {
+      "capability": "acceptance-verification",
+      "valid": true,
+      "issues": [
+        {
+          "level": "WARNING",
+          "path": "requirements[15]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[22]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[30]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[31]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[33]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[34]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[36]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[37]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[38]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[39]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[41]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        }
+      ]
+    },
+    {
+      "capability": "cli-scaffolding",
+      "valid": true,
+      "issues": [
+        {
+          "level": "WARNING",
+          "path": "requirements[2]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[3]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[4]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[9]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[16]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[20]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[21]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[22]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        }
+      ]
+    },
+    {
+      "capability": "compiler-graph",
+      "valid": true,
+      "issues": [
+        {
+          "level": "WARNING",
+          "path": "requirements[4]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[8]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[14]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[27]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[30]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[31]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[32]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        }
+      ]
+    },
+    {
+      "capability": "developer-documentation",
+      "valid": true,
+      "issues": [
+        {
+          "level": "WARNING",
+          "path": "requirements[6]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[13]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        }
+      ]
+    },
+    {
+      "capability": "development-inspector",
+      "valid": true,
+      "issues": [
+        {
+          "level": "WARNING",
+          "path": "requirements[0]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[14]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[15]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[22]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[32]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[33]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[34]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        }
+      ]
+    },
+    {
+      "capability": "domain-services",
+      "valid": true,
+      "issues": [
+        {
+          "level": "WARNING",
+          "path": "requirements[0]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[3]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        },
+        {
+          "level": "WARNING",
+          "path": "requirements[12]",
+          "message": "Requirement text is very long (>500 characters). Move examples and edge cases into scenarios, or split it into separate requirements that each state one behavior."
+        }
+      ]
+    }
+  ],
+  "descriptionLengthWarnings": {
+    "baseline": [
+      {
+        "capability": "acceptance-verification",
+        "warnings": 10,
+        "errors": 0
+      },
+      {
+        "capability": "cli-scaffolding",
+        "warnings": 7,
+        "errors": 0
+      },
+      {
+        "capability": "compiler-graph",
+        "warnings": 5,
+        "errors": 0
+      },
+      {
+        "capability": "developer-documentation",
+        "warnings": 1,
+        "errors": 0
+      },
+      {
+        "capability": "development-inspector",
+        "warnings": 6,
+        "errors": 0
+      },
+      {
+        "capability": "domain-services",
+        "warnings": 1,
+        "errors": 0
+      }
+    ],
+    "current": [
+      {
+        "capability": "acceptance-verification",
+        "warnings": 11,
+        "errors": 0
+      },
+      {
+        "capability": "cli-scaffolding",
+        "warnings": 8,
+        "errors": 0
+      },
+      {
+        "capability": "compiler-graph",
+        "warnings": 7,
+        "errors": 0
+      },
+      {
+        "capability": "developer-documentation",
+        "warnings": 2,
+        "errors": 0
+      },
+      {
+        "capability": "development-inspector",
+        "warnings": 7,
+        "errors": 0
+      },
+      {
+        "capability": "domain-services",
+        "warnings": 3,
+        "errors": 0
+      }
+    ],
+    "reason": "Thirty prior description-length warnings remain; eight updated complete requirement descriptions retain their exact delta text, as the specs instructions prohibit trimming MODIFIED content solely for length. No validation errors."
+  },
+  "changeStrictValidation": "passed",
+  "formatting": "passed",
+  "whitespace": "passed",
+  "sourceReview": "Six normative Markdown merges preserve all unmentioned requirements, old scenario names, authoritative Purpose sections and exact delta descriptions/scenarios; no runtime Effect changes apply. Implementation and native acceptance remain the recorded completion snapshot.",
+  "historicalEvidencePaths": "Implementation evidence remains byte-identical and retains its original pre-archive paths as provenance. Resolve paths under originalChangePath relative to archivedTo for archived artifacts.",
+  "preservedPreArchiveFiles": 99,
+  "preservedMetadata": {
+    "sha256": "1dfdca412094f24473d8b842866201ec26f200b29b17064b03f1e4982c35a7b9",
+    "mode": 420
+  }
+}

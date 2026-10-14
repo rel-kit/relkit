@@ -22,7 +22,7 @@ and client contracts.
 | HTTP middleware and request authentication                  | The Routes layer.                          |
 | Rules that must also apply to jobs, tools, and direct calls | The function, not only HTTP middleware.    |
 
-Routes import `@app/orders/service.js`, never Orders' private function files. Domain functions do not
+Routes import `@app/services/orders/service.js`, never Orders' private function files. Domain functions do not
 import routes. That direction lets you add another transport without pulling HTTP concerns into the
 business operation.
 

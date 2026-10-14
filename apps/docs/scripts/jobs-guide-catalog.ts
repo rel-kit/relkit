@@ -1,3 +1,4 @@
+/** Defines job guide ordering and grouped task/job/provider evidence relations; catalog construction schedules no work. */
 import type { ApiPackage } from "./documentation-catalog.js";
 
 export const jobsGuideGroup = {
@@ -30,45 +31,45 @@ export const jobsGuideRelations = [
   {
     path: "jobs/index",
     api: ["jobs", "services", "client"],
-    examples: ["examples/commerce/src/orders/jobs/export-orders.job.ts"],
+    examples: ["examples/commerce/src/services/orders/jobs/export-orders.job.ts"],
   },
   {
     path: "jobs/quickstart",
     api: ["app", "jobs", "schema", "client"],
     examples: [
-      "examples/commerce/src/orders/tasks/export-orders.task.ts",
-      "examples/commerce/src/orders/jobs/export-orders.job.ts",
+      "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
+      "examples/commerce/src/services/orders/jobs/export-orders.job.ts",
       "examples/commerce/src/routes/orders/export/route.ts",
     ],
   },
   {
     path: "jobs/tasks",
     api: ["jobs", "schema"],
-    examples: ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
+    examples: ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"],
   },
   {
     path: "jobs/bindings",
     api: ["app", "jobs", "integrations/docker", "integrations/inngest"],
     examples: [
       "examples/commerce/relkit.config.ts",
-      "examples/commerce/src/orders/jobs/export-orders.job.ts",
+      "examples/commerce/src/services/orders/jobs/export-orders.job.ts",
     ],
   },
   {
     path: "jobs/durations-and-sleep",
     api: ["jobs"],
-    examples: ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
+    examples: ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"],
   },
   {
     path: "jobs/execution-policy",
     api: ["jobs"],
-    examples: ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
+    examples: ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"],
   },
   {
     path: "jobs/retries-and-idempotency",
     api: ["jobs", "testing"],
     examples: [
-      "examples/commerce/src/orders/tasks/export-orders.task.ts",
+      "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
       "packages/jobs/tests/task-policy.test.ts",
     ],
   },
@@ -80,18 +81,18 @@ export const jobsGuideRelations = [
   {
     path: "jobs/progress-and-streams",
     api: ["jobs", "client"],
-    examples: ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
+    examples: ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"],
   },
   {
     path: "jobs/security",
     api: ["jobs", "client"],
-    examples: ["examples/commerce/src/orders/jobs/export-orders.job.ts"],
+    examples: ["examples/commerce/src/services/orders/jobs/export-orders.job.ts"],
   },
   {
     path: "jobs/schedules",
     api: ["jobs", "integrations/inngest", "integrations/effect-mq"],
     examples: [
-      "examples/commerce/src/orders/jobs/cleanup-orders.job.ts",
+      "examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts",
       "packages/jobs/tests/schedule-reconciliation.test.ts",
     ],
   },

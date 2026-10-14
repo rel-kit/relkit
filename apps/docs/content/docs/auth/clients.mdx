@@ -24,7 +24,7 @@ The framework-independent client and a sign-in action are:
 
 Use your actual public backend origin instead of the loopback URL. `basePath` on this **client** must
 match the filesystem auth mount; it is not the reserved server-service option. Do not import
-`src/auth/service.ts`, database code, or server secrets into the browser. A public backend URL is
+`src/services/auth/service.ts`, database code, or server secrets into the browser. A public backend URL is
 configuration, not a credential.
 
 The action checks Better Auth's returned `error` before using `data`. Your UI should also handle

@@ -1,6 +1,7 @@
+/** Exercises read/write tool approval policies and trusted synchronous/asynchronous decisions, retaining denial and callback failures. */
 import { expect, test } from "bun:test";
-import lookupOrder from "@app/orders/tools/lookup-order.tool.js";
-import cancelAlways from "@app/orders/tools/cancel-order.tool.js";
+import lookupOrder from "../src/services/orders/tools/lookup-order.tool.js";
+import cancelAlways from "../src/services/orders/tools/cancel-order.tool.js";
 import { cancelOrder, cancelOrderWithApproval } from "./fixtures/cancel-order-with-approval.js";
 
 test("never permits a read without a separate approval", async () => {

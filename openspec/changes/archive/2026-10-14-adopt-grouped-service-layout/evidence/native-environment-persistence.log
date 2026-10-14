@@ -1,0 +1,17 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/env.test.ts:
+(pass) relkit env commands > checks environment-specific requirements and keeps values out of output [24.23ms]
+(pass) relkit env commands > generates deterministic redacted examples without overwriting edits [406.64ms]
+
+packages/cli/dev-persistence.test.ts:
+(pass) generated backend reloads preserve committed telemetry without bundling the native driver [17326.57ms]
+(pass) remote capture redacts before transport and reports dropped records without failing application work [411.14ms]
+
+packages/cli/environment-runtime.test.ts:
+(pass) the emitted server rejects missing production environment before provider startup [7689.33ms]
+
+ 5 pass
+ 0 fail
+ 32 expect() calls
+Ran 5 tests across 3 files. [28.56s]

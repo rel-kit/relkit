@@ -1,0 +1,6642 @@
+[17:52:23.218] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 4.109083,
+}
+[17:52:23.232] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.manifests",
+  outcome: "success",
+  duration_ms: 10.629333,
+}
+[17:52:23.233] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.tarballs",
+  outcome: "success",
+  duration_ms: 1.054375,
+}
+[17:52:23.518] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.registry",
+  outcome: "success",
+  duration_ms: 284.579167,
+}
+[17:52:23.519] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.parent.manifest",
+  outcome: "success",
+  duration_ms: 0.272209,
+}
+[17:52:40.571] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 17051.239084,
+}
+[17:52:40.703] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.resolver.import",
+  outcome: "success",
+  duration_ms: 124.630958,
+}
+[17:52:40.709] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.resolver.defaults",
+  outcome: "success",
+  duration_ms: 5.734292,
+}
+[17:52:40.709] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.resolver.explicit",
+  outcome: "success",
+  duration_ms: 0.442417,
+}
+[17:52:40.710] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.resolver",
+  outcome: "success",
+  duration_ms: 132.170417,
+}
+[17:52:40.822] ERROR (#1): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "failure",
+  duration_ms: 111.454708,
+}
+[17:52:40.946] ERROR (#1): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "failure",
+  duration_ms: 122.956709,
+}
+[17:52:41.051] ERROR (#1): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "failure",
+  duration_ms: 105.329125,
+}
+[17:52:41.157] ERROR (#1): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "failure",
+  duration_ms: 105.431375,
+}
+[17:52:41.258] ERROR (#1): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "failure",
+  duration_ms: 101.045625,
+}
+[17:52:56.057] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 14798.263375,
+}
+[17:52:56.059] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.create.destination",
+  outcome: "success",
+  duration_ms: 0.256208,
+}
+[17:53:05.781] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 9721.010041,
+}
+[17:53:05.782] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.create.destination",
+  outcome: "success",
+  duration_ms: 0.27025,
+}
+[17:53:05.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.268416,
+}
+[17:53:05.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.137583,
+}
+[17:53:05.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.197667,
+}
+[17:53:05.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.167166,
+}
+[17:53:05.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.122583,
+}
+[17:53:05.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.13775,
+}
+[17:53:05.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.054333,
+}
+[17:53:05.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.228042,
+}
+[17:53:05.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.068209,
+}
+[17:53:05.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.113125,
+}
+[17:53:05.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.048833,
+}
+[17:53:05.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.072,
+}
+[17:53:05.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.077125,
+}
+[17:53:05.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.108167,
+}
+[17:53:05.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.056459,
+}
+[17:53:05.790] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 2.499209,
+}
+[17:53:05.790] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.087375,
+}
+[17:53:05.790] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.147541,
+}
+[17:53:05.791] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.060917,
+}
+[17:53:05.791] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.094084,
+}
+[17:53:05.791] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.047333,
+}
+[17:53:05.791] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.074833,
+}
+[17:53:05.791] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.037041,
+}
+[17:53:05.791] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.117709,
+}
+[17:53:05.791] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.042167,
+}
+[17:53:05.791] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.074125,
+}
+[17:53:05.792] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.056875,
+}
+[17:53:05.792] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.102917,
+}
+[17:53:05.792] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.065834,
+}
+[17:53:05.792] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.090291,
+}
+[17:53:05.792] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.033208,
+}
+[17:53:05.792] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.207708,
+}
+[17:53:05.792] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.033084,
+}
+[17:53:05.793] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.063792,
+}
+[17:53:05.793] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.041083,
+}
+[17:53:05.793] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.0735,
+}
+[17:53:05.793] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053958,
+}
+[17:53:05.793] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.037,
+}
+[17:53:05.793] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.063875,
+}
+[17:53:05.793] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.043416,
+}
+[17:53:05.793] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.068542,
+}
+[17:53:05.793] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.081709,
+}
+[17:53:05.794] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.036375,
+}
+[17:53:05.794] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.067875,
+}
+[17:53:05.794] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019042,
+}
+[17:53:05.794] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.048625,
+}
+[17:53:05.794] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.03,
+}
+[17:53:05.794] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.094042,
+}
+[17:53:05.794] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.079584,
+}
+[17:53:05.794] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.06,
+}
+[17:53:05.794] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.041334,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.061292,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.059334,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.081292,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.035625,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.05725,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.064,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.059709,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053333,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023208,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.059625,
+}
+[17:53:05.795] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.052667,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.067375,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.085333,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.067042,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0355,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.087458,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.066708,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022791,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.050875,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023834,
+}
+[17:53:05.796] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.064084,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.038667,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.061875,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.064625,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.060875,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0645,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.035875,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.069209,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0265,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054083,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024167,
+}
+[17:53:05.797] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.055375,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020792,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054166,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0315,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0635,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.094042,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.038958,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.077041,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.043292,
+}
+[17:53:05.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.075708,
+}
+[17:53:05.799] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.05025,
+}
+[17:53:05.799] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.094292,
+}
+[17:53:05.799] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.046875,
+}
+[17:53:05.799] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.102084,
+}
+[17:53:05.799] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.043417,
+}
+[17:53:05.799] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.075,
+}
+[17:53:05.799] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.044875,
+}
+[17:53:05.799] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.067084,
+}
+[17:53:05.799] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.044542,
+}
+[17:53:05.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.216542,
+}
+[17:53:05.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027333,
+}
+[17:53:05.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.072542,
+}
+[17:53:05.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.030375,
+}
+[17:53:05.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.060083,
+}
+[17:53:05.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.089916,
+}
+[17:53:05.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.039875,
+}
+[17:53:05.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.071833,
+}
+[17:53:05.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029125,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.069667,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.089375,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.040375,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.16525,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.030375,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.062958,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.037375,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.058334,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.066917,
+}
+[17:53:05.801] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.073542,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.045375,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.048125,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.062833,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.070292,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.02675,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.046041,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.035542,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.044,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.127375,
+}
+[17:53:05.802] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.03625,
+}
+[17:53:05.803] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.091875,
+}
+[17:53:05.803] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.037,
+}
+[17:53:05.803] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.06125,
+}
+[17:53:05.803] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.048083,
+}
+[17:53:05.803] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.059375,
+}
+[17:53:05.803] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.050167,
+}
+[17:53:05.804] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.4875,
+}
+[17:53:05.804] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.154708,
+}
+[17:53:05.804] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.049375,
+}
+[17:53:05.804] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.071958,
+}
+[17:53:05.804] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.030458,
+}
+[17:53:06.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 689.961458,
+}
+[17:53:10.021] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3526.617334,
+}
+[17:53:10.691] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 669.492125,
+}
+[17:53:15.285] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4592.901792,
+}
+[17:53:23.768] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8482.469958,
+}
+[17:53:23.770] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.create.destination",
+  outcome: "success",
+  duration_ms: 0.269667,
+}
+[17:53:23.770] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.2495,
+}
+[17:53:23.770] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.119583,
+}
+[17:53:23.770] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.089916,
+}
+[17:53:23.771] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.106,
+}
+[17:53:23.771] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.118458,
+}
+[17:53:23.771] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.245541,
+}
+[17:53:23.771] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.040042,
+}
+[17:53:23.771] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.288791,
+}
+[17:53:23.771] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.044917,
+}
+[17:53:23.772] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.250042,
+}
+[17:53:23.772] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.052625,
+}
+[17:53:23.772] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.140167,
+}
+[17:53:23.772] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0495,
+}
+[17:53:23.772] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.196125,
+}
+[17:53:23.772] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.064708,
+}
+[17:53:23.773] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.193667,
+}
+[17:53:23.773] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.068416,
+}
+[17:53:23.773] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.119792,
+}
+[17:53:23.773] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029417,
+}
+[17:53:23.773] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.110833,
+}
+[17:53:23.773] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031834,
+}
+[17:53:23.773] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.082083,
+}
+[17:53:23.773] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024333,
+}
+[17:53:23.774] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.081625,
+}
+[17:53:23.774] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020959,
+}
+[17:53:23.774] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.084875,
+}
+[17:53:23.774] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028541,
+}
+[17:53:23.774] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.114292,
+}
+[17:53:23.774] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.032125,
+}
+[17:53:23.774] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.237833,
+}
+[17:53:23.774] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.047917,
+}
+[17:53:23.775] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.133167,
+}
+[17:53:23.775] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.057042,
+}
+[17:53:23.775] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.095167,
+}
+[17:53:23.775] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.040583,
+}
+[17:53:23.775] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.09225,
+}
+[17:53:23.775] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.096667,
+}
+[17:53:23.775] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023666,
+}
+[17:53:23.776] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.099209,
+}
+[17:53:23.776] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023416,
+}
+[17:53:23.776] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.140625,
+}
+[17:53:23.776] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.267,
+}
+[17:53:23.776] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029583,
+}
+[17:53:23.777] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.108791,
+}
+[17:53:23.777] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023875,
+}
+[17:53:23.777] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.114916,
+}
+[17:53:23.777] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.055417,
+}
+[17:53:23.777] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.123958,
+}
+[17:53:23.777] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.090334,
+}
+[17:53:23.777] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.105042,
+}
+[17:53:23.778] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.05575,
+}
+[17:53:23.778] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.08425,
+}
+[17:53:23.778] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.07975,
+}
+[17:53:23.778] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.13075,
+}
+[17:53:23.778] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027459,
+}
+[17:53:23.778] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.063667,
+}
+[17:53:23.778] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.0555,
+}
+[17:53:23.778] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.071584,
+}
+[17:53:23.779] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.109291,
+}
+[17:53:23.779] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.043833,
+}
+[17:53:23.779] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.112792,
+}
+[17:53:23.779] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.062625,
+}
+[17:53:23.779] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.078583,
+}
+[17:53:23.779] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.083208,
+}
+[17:53:23.779] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.107834,
+}
+[17:53:23.779] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.042875,
+}
+[17:53:23.780] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.065125,
+}
+[17:53:23.780] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.090042,
+}
+[17:53:23.780] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.034667,
+}
+[17:53:23.780] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.098625,
+}
+[17:53:23.780] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.060917,
+}
+[17:53:23.780] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.084167,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 2.255583,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.086833,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.077166,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.089834,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.065167,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.044417,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.089917,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024917,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.052375,
+}
+[17:53:23.783] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.017792,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.059209,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027958,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.07925,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.055459,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.075208,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027541,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.056334,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.025959,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.063209,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.017958,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054,
+}
+[17:53:23.784] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028459,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.071792,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027625,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.052458,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023167,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.045291,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01675,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0465,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.017208,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.204542,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023334,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.064166,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018083,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.04775,
+}
+[17:53:23.785] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.042458,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.016167,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.047667,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020208,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.038125,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.153333,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.045125,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.081208,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.065792,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.083958,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029709,
+}
+[17:53:23.786] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.045541,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.047959,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.055958,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.037917,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.032958,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.0335,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.051292,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.051791,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.052042,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.068,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.047125,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053708,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022459,
+}
+[17:53:23.787] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.065041,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021792,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.040875,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.040542,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.048917,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018958,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.050583,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.098708,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029792,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.068917,
+}
+[17:53:23.788] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023166,
+}
+[17:53:23.947] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 158.714875,
+}
+[17:53:23.948] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.create.destination",
+  outcome: "success",
+  duration_ms: 0.093583,
+}
+[17:53:25.173] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1225.685209,
+}
+[17:53:30.967] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5793.517833,
+}
+[17:53:31.022] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 54.823291,
+}
+[17:53:31.024] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.flat.move",
+  outcome: "success",
+  duration_ms: 0.307542,
+}
+[17:53:31.024] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.flat.read",
+  outcome: "success",
+  duration_ms: 0.147875,
+}
+[17:53:31.024] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.flat.reference",
+  outcome: "success",
+  duration_ms: 0.140667,
+}
+[17:53:31.024] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.flat.read",
+  outcome: "success",
+  duration_ms: 0.06575,
+}
+[17:53:31.024] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.flat.reference",
+  outcome: "success",
+  duration_ms: 0.099542,
+}
+[17:53:31.025] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.flat.read",
+  outcome: "success",
+  duration_ms: 0.060584,
+}
+[17:53:31.025] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.flat.reference",
+  outcome: "success",
+  duration_ms: 0.072542,
+}
+[17:53:31.025] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.state.directory",
+  outcome: "success",
+  duration_ms: 0.126917,
+}
+[17:53:31.025] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.state.bytes",
+  outcome: "success",
+  duration_ms: 0.137458,
+}
+[17:53:31.025] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.151416,
+}
+[17:53:31.025] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.077834,
+}
+[17:53:31.025] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.054625,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.050541,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.077417,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05975,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031292,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.051333,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028125,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.044917,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021625,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.062125,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019917,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053209,
+}
+[17:53:31.026] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.074,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.084,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.037416,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.103709,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.053166,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.059917,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0255,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053416,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.02775,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.058042,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018834,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.049541,
+}
+[17:53:31.027] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018917,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.06275,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01975,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05825,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0275,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.233125,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.025292,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0515,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028417,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.060292,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.053125,
+}
+[17:53:31.028] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.051208,
+}
+[17:53:31.029] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022833,
+}
+[17:53:31.029] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.052584,
+}
+[17:53:31.029] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.070834,
+}
+[17:53:31.029] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.098958,
+}
+[17:53:31.029] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.07,
+}
+[17:53:31.029] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.084334,
+}
+[17:53:31.029] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.041542,
+}
+[17:53:31.029] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.104208,
+}
+[17:53:31.029] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.039417,
+}
+[17:53:31.030] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.068084,
+}
+[17:53:31.030] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0455,
+}
+[17:53:31.030] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.119208,
+}
+[17:53:31.030] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.050041,
+}
+[17:53:31.030] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.091917,
+}
+[17:53:31.030] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.044,
+}
+[17:53:31.031] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.413791,
+}
+[17:53:31.031] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.056833,
+}
+[17:53:31.031] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.227167,
+}
+[17:53:31.032] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.207833,
+}
+[17:53:31.032] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.085458,
+}
+[17:53:31.032] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.303209,
+}
+[17:53:31.032] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.061833,
+}
+[17:53:31.032] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.081375,
+}
+[17:53:31.032] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020791,
+}
+[17:53:31.033] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.126084,
+}
+[17:53:31.033] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029875,
+}
+[17:53:31.033] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.080292,
+}
+[17:53:31.033] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018958,
+}
+[17:53:31.033] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.064875,
+}
+[17:53:31.033] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020625,
+}
+[17:53:31.033] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.244292,
+}
+[17:53:31.033] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024542,
+}
+[17:53:31.034] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.103875,
+}
+[17:53:31.034] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024625,
+}
+[17:53:31.034] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.113583,
+}
+[17:53:31.034] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027709,
+}
+[17:53:31.034] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.20025,
+}
+[17:53:31.034] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018709,
+}
+[17:53:31.034] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0595,
+}
+[17:53:31.034] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024334,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.108292,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019709,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.048792,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046083,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.017167,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.179125,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01625,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.088375,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01675,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.059459,
+}
+[17:53:31.035] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019625,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054542,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022917,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.07625,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022041,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.090584,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.036833,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.097833,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.02675,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05175,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020958,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.057708,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019083,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053875,
+}
+[17:53:31.036] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.016208,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.07825,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046875,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.015958,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05475,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023083,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.040625,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.015833,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.049125,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023917,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.055,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01575,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.051667,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0165,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.064417,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.02025,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0455,
+}
+[17:53:31.037] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.015458,
+}
+[17:53:31.038] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.045791,
+}
+[17:53:31.038] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.017125,
+}
+[17:53:31.038] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.03875,
+}
+[17:53:31.038] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019458,
+}
+[17:53:31.038] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046875,
+}
+[17:53:31.038] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019333,
+}
+[17:53:31.038] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.047292,
+}
+[17:53:31.038] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 1.623709,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0425,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.1115,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021125,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.062875,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.039541,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.052958,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.017083,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.048958,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.036417,
+}
+[17:53:31.040] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.016916,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.059666,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.066292,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.036709,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.061833,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029125,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.061834,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.104667,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.048959,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.066834,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.03325,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0555,
+}
+[17:53:31.041] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028083,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.075458,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.065958,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.065583,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.068208,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.041917,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.07525,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.045167,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.064875,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.06775,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.034208,
+}
+[17:53:31.042] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.057958,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.061583,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05225,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021125,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.045167,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.05025,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.048875,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.047291,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018167,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.057834,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.039042,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023458,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.059375,
+}
+[17:53:31.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022291,
+}
+[17:53:32.114] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1070.5,
+}
+[17:53:32.115] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.13375,
+}
+[17:53:32.115] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.061959,
+}
+[17:53:32.115] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.053125,
+}
+[17:53:32.115] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.127166,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.105083,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.095875,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.054625,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.070459,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.038584,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.060458,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.03475,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046084,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024333,
+}
+[17:53:32.116] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.044917,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.045833,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.060333,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.067209,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.087083,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031334,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.060125,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028417,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.058708,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.041542,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.058541,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028,
+}
+[17:53:32.117] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054791,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023709,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.04475,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024041,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.049125,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.025,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.043,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023291,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0445,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.025167,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.056125,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.043166,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.040792,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.025625,
+}
+[17:53:32.118] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.063125,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.102417,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.069083,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.042167,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.063583,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.030125,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.045459,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.035833,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046708,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027292,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053208,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.044917,
+}
+[17:53:32.119] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.043542,
+}
+[17:53:32.120] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022625,
+}
+[17:53:32.120] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.359834,
+}
+[17:53:32.120] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.030834,
+}
+[17:53:32.120] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.097833,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.116125,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029917,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.205041,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.033125,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.062167,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026208,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.074542,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.037083,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053375,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.032541,
+}
+[17:53:32.121] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.052584,
+}
+[17:53:32.122] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026667,
+}
+[17:53:32.122] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.269,
+}
+[17:53:32.122] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028083,
+}
+[17:53:32.122] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.068125,
+}
+[17:53:32.122] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024,
+}
+[17:53:32.122] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.083333,
+}
+[17:53:32.122] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027292,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.14925,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031875,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.057375,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024167,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.141958,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0255,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.055791,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.048959,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029125,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.116791,
+}
+[17:53:32.123] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024709,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.061958,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.039917,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.070958,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.041792,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024375,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.070417,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.025583,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.10525,
+}
+[17:53:32.124] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.065459,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.079459,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.035125,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.062625,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023209,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.049792,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.033833,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054792,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021167,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.067083,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.050917,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028833,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.049791,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021583,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.042416,
+}
+[17:53:32.125] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020542,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.050375,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.032291,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0445,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.028667,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.042,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.033667,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.042458,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031917,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046542,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027917,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.048083,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021041,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.055167,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020459,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.034125,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.036958,
+}
+[17:53:32.126] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019834,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.043042,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027125,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.043667,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027834,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.043,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.02125,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.050333,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023375,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.046375,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.056584,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026792,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.050958,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.035,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.038875,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.036125,
+}
+[17:53:32.127] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020083,
+}
+[17:53:32.128] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.037333,
+}
+[17:53:32.128] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.112458,
+}
+[17:53:32.128] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.097166,
+}
+[17:53:32.128] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.110417,
+}
+[17:53:32.128] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.063667,
+}
+[17:53:32.128] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.063125,
+}
+[17:53:32.128] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.033292,
+}
+[17:53:32.128] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.069167,
+}
+[17:53:32.128] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.041417,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.045167,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.040916,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027666,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.04675,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026042,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.050792,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.043083,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021625,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.060541,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.047333,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.052875,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.052583,
+}
+[17:53:32.129] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.046792,
+}
+[17:53:32.130] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.041416,
+}
+[17:53:32.130] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.062417,
+}
+[17:53:32.130] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.040416,
+}
+[17:53:32.130] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.04475,
+}
+[17:53:32.132] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.193208,
+}
+[17:53:32.132] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.121625,
+}
+[17:53:32.132] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.050584,
+}
+[17:53:32.132] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054875,
+}
+[17:53:32.132] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029083,
+}
+[17:53:40.724] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8591.106917,
+}
+[17:53:41.491] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 765.801208,
+}
+[17:53:41.492] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.421459,
+}
+[17:53:41.492] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.121125,
+}
+[17:53:41.492] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.087625,
+}
+[17:53:41.492] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.080958,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.244708,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.072125,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.03525,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.057167,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.046542,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.051583,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.032375,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0495,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.016833,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046375,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031208,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.050667,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01875,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.048791,
+}
+[17:53:41.493] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019375,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.048708,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.017791,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.047333,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022458,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053291,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021791,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.04825,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.016208,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.043417,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.015333,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.044292,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01925,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.051958,
+}
+[17:53:41.494] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020583,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.151125,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.035875,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.080958,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.063875,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.069542,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029083,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.06225,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.064292,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.060291,
+}
+[17:53:41.495] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024042,
+}
+[17:53:41.496] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054333,
+}
+[17:53:41.496] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026667,
+}
+[17:53:41.496] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.10025,
+}
+[17:53:41.496] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.05725,
+}
+[17:53:41.496] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.089917,
+}
+[17:53:41.496] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.059792,
+}
+[17:53:41.496] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.120208,
+}
+[17:53:41.496] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.035667,
+}
+[17:53:41.497] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.073875,
+}
+[17:53:41.497] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.039292,
+}
+[17:53:41.497] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.47125,
+}
+[17:53:41.497] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.063125,
+}
+[17:53:41.498] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.145292,
+}
+[17:53:41.498] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.123958,
+}
+[17:53:41.498] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.039792,
+}
+[17:53:41.498] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.227792,
+}
+[17:53:41.498] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023459,
+}
+[17:53:41.498] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.057917,
+}
+[17:53:41.499] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022167,
+}
+[17:53:41.499] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.087833,
+}
+[17:53:41.499] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.013958,
+}
+[17:53:41.499] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.057167,
+}
+[17:53:41.499] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.04725,
+}
+[17:53:41.499] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.077958,
+}
+[17:53:41.499] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024625,
+}
+[17:53:41.499] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.345125,
+}
+[17:53:41.499] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021417,
+}
+[17:53:41.500] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.121459,
+}
+[17:53:41.500] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021,
+}
+[17:53:41.500] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.132,
+}
+[17:53:41.500] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026375,
+}
+[17:53:41.500] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.170083,
+}
+[17:53:41.500] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.032833,
+}
+[17:53:41.500] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.045084,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.025542,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.133666,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.016167,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046292,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.016209,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.044125,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.015834,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.226167,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.015666,
+}
+[17:53:41.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.091083,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019833,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.064666,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023167,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.044417,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.047583,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.080584,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.03075,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.075584,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019583,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.049083,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029958,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.057459,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024709,
+}
+[17:53:41.502] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.060667,
+}
+[17:53:41.503] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.02675,
+}
+[17:53:41.503] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.057291,
+}
+[17:53:41.503] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.047083,
+}
+[17:53:41.503] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.118583,
+}
+[17:53:41.503] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.082083,
+}
+[17:53:41.503] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.086375,
+}
+[17:53:41.503] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.22075,
+}
+[17:53:41.503] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024125,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.079958,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031583,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.061833,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.037125,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.050417,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031583,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053917,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029042,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0625,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018334,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05875,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024583,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.058792,
+}
+[17:53:41.504] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021291,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.056667,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026416,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.068958,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027959,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.056833,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.039958,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.060708,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024917,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05325,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023833,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.072375,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.050083,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.068291,
+}
+[17:53:41.505] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.039083,
+}
+[17:53:41.506] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.109583,
+}
+[17:53:41.506] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.077292,
+}
+[17:53:41.506] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.106083,
+}
+[17:53:41.506] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.040708,
+}
+[17:53:41.506] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.099625,
+}
+[17:53:41.506] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.073375,
+}
+[17:53:41.506] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.047209,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.085417,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.073042,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.032208,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.081083,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.033625,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.0765,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.097375,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027625,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0915,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.036584,
+}
+[17:53:41.507] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.059792,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.025,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.080916,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.054417,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.057667,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054333,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.058292,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05975,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0265,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.055417,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054208,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026583,
+}
+[17:53:41.508] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.050166,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.052791,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.058084,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.044625,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.050875,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.059916,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.06525,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.064459,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031458,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.067458,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.075333,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027167,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.055042,
+}
+[17:53:41.509] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023375,
+}
+[17:53:49.867] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8356.31475,
+}
+[17:53:50.655] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 786.829291,
+}
+[17:53:50.656] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.fixture.state.verify",
+  outcome: "success",
+  duration_ms: 0.383417,
+}
+[17:53:56.554] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5898.0165,
+}
+[17:53:58.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1487.552625,
+}
+[17:53:58.730] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 687.552375,
+}
+[17:54:01.974] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3243.684,
+}
+[17:54:08.592] INFO (#64): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 6615.399792,
+}
+[17:54:08.593] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.artifacts",
+  outcome: "success",
+  duration_ms: 6617.552166,
+}
+[17:54:15.168] INFO (#67): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 6573.88725,
+}
+[17:54:15.168] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.artifacts",
+  outcome: "success",
+  duration_ms: 6575.347125,
+}
+[17:54:15.169] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.322416,
+}
+[17:54:15.169] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.122666,
+}
+[17:54:15.169] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.094417,
+}
+[17:54:15.169] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.088458,
+}
+[17:54:15.169] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.118625,
+}
+[17:54:15.170] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.091584,
+}
+[17:54:15.170] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0445,
+}
+[17:54:15.170] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.158458,
+}
+[17:54:15.170] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.046833,
+}
+[17:54:15.170] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.095584,
+}
+[17:54:15.170] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.032417,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.084875,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021708,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.091166,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.048375,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.068584,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026667,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.098125,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.047292,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.096792,
+}
+[17:54:15.171] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.038042,
+}
+[17:54:15.172] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.062208,
+}
+[17:54:15.172] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.030167,
+}
+[17:54:15.172] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.10075,
+}
+[17:54:15.172] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.064417,
+}
+[17:54:15.172] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.098959,
+}
+[17:54:15.172] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.038583,
+}
+[17:54:15.172] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.076833,
+}
+[17:54:15.172] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031708,
+}
+[17:54:15.173] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.080916,
+}
+[17:54:15.173] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.034125,
+}
+[17:54:15.175] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 2.512084,
+}
+[17:54:15.175] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.104042,
+}
+[17:54:15.176] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.103625,
+}
+[17:54:15.176] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027125,
+}
+[17:54:15.176] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.114791,
+}
+[17:54:15.176] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.075166,
+}
+[17:54:15.176] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026125,
+}
+[17:54:15.176] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.06475,
+}
+[17:54:15.176] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.02325,
+}
+[17:54:15.176] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.06525,
+}
+[17:54:15.176] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.073208,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019209,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.060416,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.017833,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.063375,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021709,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.0605,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.046791,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.045958,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026583,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.043291,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.049292,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.041125,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01975,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.046625,
+}
+[17:54:15.177] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.04975,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.017625,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.061834,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.054958,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.08375,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.054042,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020875,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.054709,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.128916,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0315,
+}
+[17:54:15.178] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.073875,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.067625,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.032333,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.0645,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.058875,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.06225,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.055,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0195,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.048791,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01675,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.0475,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.045791,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021291,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.047417,
+}
+[17:54:15.179] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.058,
+}
+[17:54:15.180] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018625,
+}
+[17:54:15.180] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.059875,
+}
+[17:54:15.180] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.072708,
+}
+[17:54:15.180] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.093459,
+}
+[17:54:15.180] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.025125,
+}
+[17:54:15.180] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.055125,
+}
+[17:54:15.180] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.023958,
+}
+[17:54:15.180] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.056042,
+}
+[17:54:15.180] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.0865,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.077709,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.043708,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.086084,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.0655,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.043875,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.069209,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027583,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.053458,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.072541,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.047,
+}
+[17:54:15.181] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.037041,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.062334,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.037459,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029667,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.037125,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.015958,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.03325,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027583,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.04775,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.019875,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.044292,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.034,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.048292,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.027458,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.050417,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020709,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.042292,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022625,
+}
+[17:54:15.182] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.039208,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.021333,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046292,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01525,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.033709,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.015333,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.030916,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.016292,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.033834,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018333,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.195375,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022208,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.040333,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.031334,
+}
+[17:54:15.183] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.057,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.061125,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.039083,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053375,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026875,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.051792,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.091041,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.033541,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.056709,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.033834,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.055875,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.029417,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.051958,
+}
+[17:54:15.184] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.041208,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.046375,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022625,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.037583,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.073291,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.034834,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020417,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.038667,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.041917,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.024625,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.043959,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.047667,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.035584,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.041458,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018541,
+}
+[17:54:15.185] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.036417,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.03925,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.0185,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.040792,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.043625,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.020917,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.035583,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05925,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01675,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.034333,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.053375,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.026208,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.029125,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.015916,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.061,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.057292,
+}
+[17:54:15.186] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.071417,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.086167,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.071584,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.05475,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.060959,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.062708,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.034166,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022042,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.05175,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.022875,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.038458,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.033083,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.035875,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.018875,
+}
+[17:54:15.187] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.directory",
+  outcome: "success",
+  duration_ms: 0.031584,
+}
+[17:54:15.188] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.034583,
+}
+[17:54:15.188] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.016333,
+}
+[17:54:15.188] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.bytes",
+  outcome: "success",
+  duration_ms: 0.035292,
+}
+[17:54:15.188] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.snapshot.mode",
+  outcome: "success",
+  duration_ms: 0.01675,
+}
+[17:54:19.261] INFO (#70): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4071.312917,
+}
+[17:54:19.261] INFO (#70): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.build",
+  outcome: "success",
+  duration_ms: 4072.066208,
+}
+[17:54:19.262] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.build",
+  outcome: "success",
+  duration_ms: 4073.760834,
+}
+[17:54:19.263] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.131125,
+}
+[17:54:19.264] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.096542,
+}
+[17:54:19.264] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.065958,
+}
+[17:54:19.264] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.049208,
+}
+[17:54:19.264] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.045458,
+}
+[17:54:19.264] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.039209,
+}
+[17:54:19.264] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.039375,
+}
+[17:54:19.264] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.020667,
+}
+[17:54:19.264] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.023459,
+}
+[17:54:19.306] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 42.028875,
+}
+[17:54:28.880] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 9573.280459,
+}
+[17:54:31.363] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 2481.883208,
+}
+[17:54:44.323] INFO (#84): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5100.389583,
+}
+[17:54:48.360] INFO (#84): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.routes",
+  outcome: "success",
+  duration_ms: 9216.123709,
+}
+[17:54:55.193] INFO (#125): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.routes",
+  outcome: "success",
+  duration_ms: 79.377458,
+}
+[17:54:55.239] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project",
+  outcome: "success",
+  duration_ms: 35976.008375,
+}
+[17:54:55.239] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.development",
+  outcome: "success",
+  duration_ms: 35976.834042,
+}
+[17:54:59.696] INFO (#128): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4455.58825,
+}
+[17:54:59.696] INFO (#128): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.build",
+  outcome: "success",
+  duration_ms: 4455.983834,
+}
+[17:54:59.696] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.build",
+  outcome: "success",
+  duration_ms: 4456.325833,
+}
+[17:54:59.697] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.120583,
+}
+[17:54:59.697] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.046916,
+}
+[17:54:59.697] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.063166,
+}
+[17:54:59.697] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.05375,
+}
+[17:54:59.697] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.034583,
+}
+[17:54:59.697] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.047333,
+}
+[17:54:59.697] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.039042,
+}
+[17:54:59.697] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.034875,
+}
+[17:54:59.697] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project.file",
+  outcome: "success",
+  duration_ms: 0.026959,
+}
+[17:54:59.758] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 60.017708,
+}
+[17:55:04.778] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5019.876917,
+}
+[17:55:06.574] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1795.783334,
+}
+[17:55:18.255] INFO (#142): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4670.74875,
+}
+[17:55:22.837] INFO (#142): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.routes",
+  outcome: "success",
+  duration_ms: 9313.786208,
+}
+[17:55:28.673] INFO (#185): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.routes",
+  outcome: "success",
+  duration_ms: 82.447666,
+}
+[17:55:28.722] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.project",
+  outcome: "success",
+  duration_ms: 29024.7335,
+}
+[17:55:28.722] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.development",
+  outcome: "success",
+  duration_ms: 29025.347209,
+}
+[17:55:54.096] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary.release",
+  outcome: "success",
+  duration_ms: 25367.7495,
+}
+[17:55:54.097] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.packed",
+  outcome: "success",
+  duration_ms: 210881.729833,
+}

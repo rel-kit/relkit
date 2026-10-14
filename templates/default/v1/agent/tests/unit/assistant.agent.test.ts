@@ -1,7 +1,8 @@
+/** Checks assistant.agent through the supported public RELKIT APIs. */
 import { expect, test } from "bun:test";
 import { invokeAgent } from "@relkit/app/agents";
-import assistant, { uppercase } from "@app/hello/agents/assistant.agent.js";
-import lookup from "@app/hello/tools/lookup.tool.js";
+import assistant, { uppercase } from "@app/services/hello/agents/assistant.agent.js";
+import lookup from "@app/services/hello/tools/lookup.tool.js";
 
 test("assistant runs native tools and todo middleware without a paid provider", async () => {
   expect(assistant.tools).toEqual([expect.objectContaining({ ref: lookup.ref }), uppercase]);

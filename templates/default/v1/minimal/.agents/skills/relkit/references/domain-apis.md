@@ -4,7 +4,7 @@ Generated projects map `@app/*` to `src/*`; keep the `.js` suffix on source impo
 
 ## `defineFunction` and `defineService`
 
-Put domain behavior in `src/<domain>/functions/*.function.ts`. A function validates input before its handler and validates the returned output:
+Put domain behavior in `src/services/<domain>/functions/*.function.ts`. A function validates input before its handler and validates the returned output:
 
 ```ts
 import { defineFunction } from "@relkit/app/functions";
@@ -20,11 +20,11 @@ const greet = defineFunction({
 export default greet;
 ```
 
-Expose selected functions from `src/<domain>/service.ts`:
+Expose selected functions from `src/services/<domain>/service.ts`:
 
 ```ts
 import { defineService } from "@relkit/app/services";
-import greet from "@app/hello/functions/greet.function.js";
+import greet from "@app/services/hello/functions/greet.function.js";
 
 export default defineService({ functions: { greet } });
 ```
@@ -35,7 +35,7 @@ Within a domain, import a sibling function directly. Across domains and from rou
 
 ## `defineEvent` and `defineEventFunction`
 
-Declare an event payload in `src/<domain>/events/*.event.ts`:
+Declare an event payload in `src/services/<domain>/events/*.event.ts`:
 
 ```ts
 import { defineEvent } from "@relkit/app/events";

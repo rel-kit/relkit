@@ -12,8 +12,8 @@ overrides, and validation schemas, bound to the transaction.
 Registering a new member creates two records: the user and their organization membership. Neither
 should remain without the other if a write fails:
 
-<include cwd lang="ts" meta='title="src/users/functions/register-member.function.ts"'>
-  ../../examples/data-model/src/users/functions/register-member.function.ts
+<include cwd lang="ts" meta='title="src/services/users/functions/register-member.function.ts"'>
+  ../../examples/data-model/src/services/users/functions/register-member.function.ts
 </include>
 
 The function validates input, builds the insert data with a generated schema, and awaits both writes

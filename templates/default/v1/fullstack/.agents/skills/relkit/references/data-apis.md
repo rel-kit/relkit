@@ -2,7 +2,7 @@
 
 For the full `defineApp`, `defineEnv`, provider profile, and environment binding workflow, read [Application configuration and environments](config-environments.md).
 
-The database and auth integrations are specialized services, separate from `defineService` domain maps. `relkit add database` creates the Drizzle baseline in `src/database`; `relkit add auth` creates `src/auth` and its recognized `ALL` handler route. There should be one of each. Extend an existing one while preserving schema exports, environment fields, and routes.
+The database and auth integrations are specialized services, separate from `defineService` domain maps. `relkit add database` creates the Drizzle baseline in `src/services/database`; `relkit add auth` creates `src/services/auth` and its recognized `ALL` handler route. There should be one of each. Extend an existing one while preserving schema exports, environment fields, and routes.
 
 ## `defineEnv` and `defineDrizzleService`
 

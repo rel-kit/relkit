@@ -46,19 +46,47 @@ last server release supporting v3 tasks. The server, SDK, task publication, and 
 credentials must be aligned together. Do not paste a production Trigger key into the
 generated source or assume that `local up` completing means a task is registered there.
 
+## Add the Orders boundary
+
+These instructions extend an existing application; they do not create a jobs starter.
+For a grouped minimal app, create `src/services/orders/functions`, `tasks` and `jobs`.
+Add the following boundary and health function. In a compatible flat app, use its
+existing `src/orders/` root consistently instead. If Orders already exists, extend
+its public functions rather than replacing the boundary.
+
+<include cwd lang="ts" meta='title="src/services/orders/service.ts"'>
+  ../../templates/default/v1/tasks/src/services/orders/service.ts
+</include>
+
+<include cwd lang="ts" meta='title="src/services/orders/functions/health.function.ts"'>
+  ../../templates/default/v1/tasks/src/services/orders/functions/health.function.ts
+</include>
+
+Add `src/services/orders/jobs/export-orders.job.ts` from the maintained task fixture:
+
+<include cwd lang="ts" meta='title="src/services/orders/jobs/export-orders.job.ts"'>
+  ../../templates/default/v1/tasks/src/services/orders/jobs/export-orders.job.ts
+</include>
+
+For this provider, set that job's `client.operations` to `["trigger"]` before checking.
+
+The task file below supplies the job's imported target. Create the sample input file
+when absent. Keep existing durable task/job IDs and bump the task version when
+changing an already deployed contract.
+
 ## Read the task before running it
 
-**Replace** the generated `src/orders/tasks/export-orders.task.ts` with this task. It
+**Add or update** `src/services/orders/tasks/export-orders.task.ts` with this task. It
 validates order lines and computes CSV text and a total in cents. The `durable` declaration
 does not by itself prove checkpoint or resume support. The sample IDs and SKUs contain no
 commas or newlines; escape fields for arbitrary text. This new app keeps task version `1`.
-The generated job already exposes `exportOrders`; do not add a second job.
+The explicit job exposes `exportOrders`; keep one job with this public name.
 
-<include cwd lang="ts" meta='title="src/orders/tasks/export-orders.task.ts"'>
+<include cwd lang="ts" meta='title="src/services/orders/tasks/export-orders.task.ts"'>
   ../../apps/docs/examples/jobs/providers/trigger-task.ts
 </include>
 
-**Replace** `examples/export-orders.json` with these two rows. A completed task should
+**Create or update** `examples/export-orders.json` with these two rows. A completed task should
 return `orderCount: 2`, `totalCents: 2100`, and CSV line totals `900` and `1200`.
 
 <include cwd lang="json" meta='title="examples/export-orders.json"'>

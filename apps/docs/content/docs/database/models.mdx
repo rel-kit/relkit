@@ -9,8 +9,8 @@ If the six base methods are sufficient, do not create an empty model file.
 
 ## Define an extension beside the schema
 
-<include cwd lang="ts" meta='title="src/database/models/users.model.ts"'>
-  ../../examples/data-model/src/database/models/users.model.ts
+<include cwd lang="ts" meta='title="src/services/database/models/users.model.ts"'>
+  ../../examples/data-model/src/services/database/models/users.model.ts
 </include>
 
 `table` must be the exact table object exported by the service's schema. `extend` must contain at least
@@ -22,15 +22,15 @@ or `this.table`.
 
 ## Register and call the model
 
-Import the model into `src/database/service.ts` and add `models: { users: usersModel }` to
+Import the model into `src/services/database/service.ts` and add `models: { users: usersModel }` to
 `defineDrizzleService`. The registration key must match the schema export key, and the model must use
 that same table object. A file under `models/` is not automatically registered just because it exists.
 
 After `bun run check` refreshes context types, functions call the method without supplying the injected
 first argument:
 
-<include cwd lang="ts" meta='title="src/users/functions/list-users.function.ts"'>
-  ../../examples/data-model/src/users/functions/list-users.function.ts
+<include cwd lang="ts" meta='title="src/services/users/functions/list-users.function.ts"'>
+  ../../examples/data-model/src/services/users/functions/list-users.function.ts
 </include>
 
 Keep business entry points in their owning domains and expose them through [Service](/docs/service).

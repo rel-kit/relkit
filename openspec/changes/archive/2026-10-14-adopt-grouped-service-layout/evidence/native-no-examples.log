@@ -1,0 +1,9 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/no-examples-layout.test.ts:
+(pass) grouped candidate example removal retains the useful hello boundary and platform inputs [263.78ms]
+
+ 1 pass
+ 0 fail
+ 31 expect() calls
+Ran 1 test across 1 file. [1.74s]

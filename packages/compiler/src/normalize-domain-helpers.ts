@@ -1,73 +1,56 @@
-import { SourceLocationError } from "@relkit/contracts";
-import { normalizeSourcePath } from "@relkit/contracts";
+/**
+ * Attaches evidenced service ownership and validates the one public service
+ * boundary. Compiler normalization owns diagnostics; source paths remain real
+ * project-relative paths even when grouped identity projection removes a segment.
+ */
+import {
+  SourceLocationError,
+  normalizeSourcePath,
+  serviceSource,
+  applicationSourceLayer,
+  type ApplicationLayout,
+} from "@relkit/contracts";
 import { createDiagnostic } from "@relkit/diagnostics";
 import * as ts from "typescript";
-import { readFactsEffect } from "./discovery/source-facts.js";
 import { Effect } from "effect";
+import { readFactsEffect } from "./discovery/source-facts.js";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
-import { add } from "./normalize-pass-utils.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
   type NormalizationWork,
 } from "./normalize-types.js";
-import { isRecord, refId, refKind } from "./normalize-utils.js";
 
-export const LEGACY_ROOTS = new Set([
-  "functions",
-  "services",
-  "events",
-  "errors",
-  "jobs",
-  "buckets",
-  "cache",
-  "tools",
-  "agents",
-  "middleware",
-  "transforms",
-  "data",
-  "constants",
-  "prompts",
-]);
-
-const SERVICE_BASE_FIELDS = new Set([
-  "kind",
-  "id",
-  "ref",
-  "title",
-  "description",
-  "tags",
-  "capability",
-  "handler",
-]);
+export { collectPublicMembers, validateDomainId } from "./normalize-domain-members.js";
 
 /**
- * Attaches domain ownership derived from a descriptor source path.
- * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
- * @returns The descriptor with domain ownership inferred from its source path.
+ * Attaches service ownership using the shared declaration-driven interpretation.
+ * @param descriptor - Descriptor whose physical source determines ownership.
+ * @param layout - Evidenced roots; absence preserves direct descriptor compatibility.
+ * @returns The descriptor with logical domain ownership, retaining real provenance.
  */
-export function assignDomain(descriptor: NormalizedDescriptor): NormalizedDescriptor {
-  const domainId = domainFor(descriptor.source.file);
+export function assignDomain(
+  descriptor: NormalizedDescriptor,
+  layout?: ApplicationLayout,
+): NormalizedDescriptor {
+  const layer = layout && applicationSourceLayer(layout, descriptor.source.file);
+  let domainId = domainFor(descriptor.source.file);
+  if (layout) domainId = layer?.kind === "service" ? layer.service.name : undefined;
   return domainId === undefined ? descriptor : { ...descriptor, domainId };
 }
 
 /**
- * Checks a domain's required service source file and exports.
- * @param work - Invocation-owned normalization state, indexes, and diagnostics.
- * @param domain - Source domain identity.
- * @param text - Unevaluated authored source text.
- * @returns A lazy effect updating domain diagnostics; unexpected AST defects propagate.
+ * Checks exactly one constructed/exported service at its physical boundary.
+ * @param work - Invocation-owned diagnostics and descriptor state.
+ * @param boundary - Actual flat or grouped public service source path.
+ * @param text - Unevaluated authored text; missing text is handled by ownership checks.
+ * @returns A lazy diagnostic update; unexpected AST defects propagate.
  */
 export const validateServiceFileEffect = Effect.fn("Compiler.validateServiceFile")(
-  function* (work: NormalizationWork, domain: string, text: string | undefined) {
+  function* (work: NormalizationWork, boundary: string, text: string | undefined) {
     if (text === undefined) return;
-    const source = ts.createSourceFile(
-      `src/${domain}/service.ts`,
-      text,
-      ts.ScriptTarget.Latest,
-      true,
-    );
+    const source = ts.createSourceFile(boundary, text, ts.ScriptTarget.Latest, true);
     const facts = yield* readFactsEffect(source);
     const factories = facts.factoryBindings.filter(({ kind }) => kind === "service");
     const serviceExports = [...facts.exports.values()].filter(
@@ -76,129 +59,60 @@ export const validateServiceFileEffect = Effect.fn("Compiler.validateServiceFile
     if (factories.length !== 1 || serviceExports.length !== 1 || facts.exports.size !== 1) {
       domainDiagnostic(
         work,
-        `src/${domain}/service.ts`,
-        `Domain service.ts must construct and export exactly one service runtime value.`,
+        boundary,
+        "Domain service.ts must construct and export exactly one service runtime value.",
       );
     }
   },
   (effect) => observeCompiler("normalization", "validateServiceFile", effect, () => ({ files: 1 })),
 );
 
-/** Checks a service source at the synchronous compatibility boundary. */
+/**
+ * Executes boundary validation for synchronous compiler callers.
+ * @param work - Invocation-owned diagnostics and descriptor state.
+ * @param boundary - Actual public boundary filename.
+ * @param text - Unevaluated source text when present.
+ * @returns Nothing; only supplied compiler diagnostics are updated.
+ */
 export function validateServiceFile(
   work: NormalizationWork,
-  domain: string,
+  boundary: string,
   text: string | undefined,
 ): void {
-  runCompilerSync(validateServiceFileEffect(work, domain, text));
+  runCompilerSync(validateServiceFileEffect(work, boundary, text));
 }
 
 /**
- * Checks descriptor identity against its owning domain.
- * @param work - Invocation-owned normalization state, indexes, and diagnostics.
- * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
- * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
- */
-export function validateDomainId(work: NormalizationWork, descriptor: NormalizedDescriptor): void {
-  const generated = isRecord(descriptor.value) ? descriptor.value.generated : undefined;
-  if (isRecord(generated) && generated.generated === true) return;
-  const domain = descriptor.domainId!;
-  const valid =
-    descriptor.kind === "service"
-      ? descriptor.id === domain
-      : descriptor.id.startsWith(`${domain}.`);
-  if (!valid) {
-    add(
-      work,
-      descriptor,
-      NORMALIZE_CODES.id,
-      descriptor.kind === "service"
-        ? `Service ID must equal its domain ID "${domain}".`
-        : `Domain descriptor ID must start with "${domain}.".`,
-    );
-  }
-}
-
-/**
- * Collects graph-visible public service members into the owning indexes.
- * @param work - Invocation-owned normalization state, indexes, and diagnostics.
- * @param service - Service descriptor whose public member references are inspected.
- * @param descriptors - Ordered normalized descriptors.
- * @param publicIds - Caller-owned set of public member identities.
- * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
- */
-export function collectPublicMembers(
-  work: NormalizationWork,
-  service: NormalizedDescriptor,
-  descriptors: ReadonlyMap<string, NormalizedDescriptor>,
-  publicIds: Set<string>,
-): void {
-  const value = isRecord(service.value) ? service.value : {};
-  for (const [name, member] of Object.entries(value)) {
-    if (
-      SERVICE_BASE_FIELDS.has(name) ||
-      !["function", "event", "task", "job"].includes(refKind(member) ?? "")
-    )
-      continue;
-    const memberId = refId(member);
-    const memberKind = refKind(member);
-    const target =
-      memberId === undefined || memberKind === undefined
-        ? undefined
-        : descriptors.get(`${memberKind}:${memberId}`);
-    if (target === undefined) {
-      add(
-        work,
-        service,
-        NORMALIZE_CODES.missingTarget,
-        `Public service member "${name}" does not resolve.`,
-      );
-    } else if (target.domainId !== service.domainId) {
-      add(
-        work,
-        service,
-        NORMALIZE_CODES.domain,
-        `Service member "${name}" belongs to another domain.`,
-        "error",
-        target,
-      );
-    } else publicIds.add(`${target.kind}:${target.id}`);
-  }
-}
-
-/**
- * Selects the domain directory from a conventional authored source path.
- * @param file - Portable authored source filename.
- * @returns The conventional domain directory name, or undefined.
+ * Classifies a normalized source's structural service shape.
+ * @param file - Authored path with portable or Windows separators.
+ * @returns Its logical service name, excluding Routes/Platform/grouping containers.
  */
 export function domainFor(file: string): string | undefined {
-  const parts = file.replaceAll("\\", "/").split("/");
-  return parts[0] === "src" && parts.length > 2 && parts[1] !== "routes" && parts[1] !== "platform"
-    ? parts[1]
-    : undefined;
+  return serviceSource(file.replaceAll("\\", "/"))?.name;
 }
 
 /**
- * Normalizes authored source paths for domain checks.
- * @param file - Portable authored source filename.
- * @param work - Invocation-owned normalization state, indexes, and diagnostics.
- * @returns A portable authored path used for domain ownership checks.
+ * Normalizes compiler input and reports containment failures before classification.
+ * @param file - Relative or absolute source path supplied to compilation.
+ * @param work - Invocation-owned diagnostics and project-root evidence.
+ * @returns A contained portable path; invalid paths receive no owner and a fatal finding.
  */
 export function sourcePath(file: string, work: NormalizationWork): string {
   try {
     return normalizeSourcePath(file, work.input.projectRoot);
   } catch (error) {
     if (!(error instanceof SourceLocationError)) throw error;
-    return file.replaceAll("\\", "/").replace(/^\.\//, "");
+    domainDiagnostic(work, "relkit.config.ts", `Invalid source path "${file}": ${error.reason}`);
+    return "";
   }
 }
 
 /**
- * Appends a source-scoped domain contract diagnostic.
- * @param work - Invocation-owned normalization state, indexes, and diagnostics.
- * @param file - Portable authored source filename.
- * @param message - Diagnostic message describing the rejected contract.
- * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
+ * Appends a physical source-scoped service contract diagnostic.
+ * @param work - Invocation-owned diagnostic accumulator.
+ * @param file - Portable physical source path.
+ * @param message - Safe contract explanation and remediation.
+ * @returns Nothing; no output is published by this helper.
  */
 export function domainDiagnostic(work: NormalizationWork, file: string, message: string): void {
   work.diagnostics.push(

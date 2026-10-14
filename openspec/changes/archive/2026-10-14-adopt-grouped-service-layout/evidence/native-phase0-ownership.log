@@ -1,0 +1,76 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/phase0-harness-ownership.test.ts:
+[21:43:19.790] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 19.13225,
+}
+[21:43:19.825] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.manifest",
+  outcome: "success",
+  duration_ms: 8.077334,
+}
+[21:43:19.830] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 2.699958,
+}
+[21:43:19.915] ERROR (#1): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "failure",
+  duration_ms: 82.72,
+}
+[21:43:19.927] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 7.858375,
+}
+[21:43:19.929] ERROR (#1): Execution operation failed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "failure",
+  duration_ms: 176.886584,
+}
+(pass) guardrail fixtures release after native assertion failure [215.65ms]
+[21:43:19.953] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 8.122916,
+}
+[21:43:20.528] ERROR (#3): Execution operation failed {
+  domain: "testing",
+  operation: "guardrail.command",
+  outcome: "failure",
+  duration_ms: 568.642625,
+}
+[21:43:20.531] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 577.639583,
+}
+[21:43:20.536] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 4.092625,
+}
+[21:43:20.536] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 592.462625,
+}
+(pass) guardrail command timeout joins the actual child before root release [595.16ms]
+
+ 2 pass
+ 0 fail
+ 9 expect() calls
+Ran 2 tests across 1 file. [1405.00ms]

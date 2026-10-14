@@ -17,6 +17,29 @@ The API template starts local-only: one environment contract, bounded telemetry 
 listener, and a separate Inspector listener. Cloud and deployment remain unselected unless the project was
 created with those options.
 
+## Import Platform fragments explicitly
+
+Keep domain-independent configuration under `src/platform/` when the root configuration
+becomes long. Import each fragment into `relkit.config.ts` and pass it to the existing
+`defineApp` option. For example:
+
+```ts title="src/platform/server.ts"
+export const server = { port: 3000, maxBodyBytes: 1_048_576 };
+```
+
+```ts title="relkit.config.ts"
+import { defineApp } from "@relkit/app";
+import env from "@app/platform/env.js";
+import { server } from "@app/platform/server.js";
+
+export default defineApp({ env, server });
+```
+
+The same explicit-import pattern applies to Inspector, telemetry, provider and deployment
+configuration. A filename does not activate a fragment. Unused Platform modules are not
+autoloaded, and imported configuration still must not acquire native clients or provision
+resources. Platform fragments cannot import services, routes or application tooling.
+
 Add an explicit application `id` before the application owns durable deployment state. Keep the same ID across
 staging and production; stacks isolate environments. Changing a deployed application ID can make its resources
 appear to have a new owner.

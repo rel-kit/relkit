@@ -7,37 +7,17 @@ import { createHash } from "node:crypto";
 import manifest from "../package.json";
 import { CreateOptionsError, type CreateOptions, type CreateTemplate } from "./options.js";
 
-export interface CreateCapabilityTuple {
-  readonly template: CreateOptions["template"];
-  readonly cloud: CreateOptions["cloud"];
-  readonly deploy: CreateOptions["deploy"];
-  readonly jobs?: CreateOptions["jobs"];
-  readonly examples: boolean;
-}
-
-export interface CreateCapabilityIdentity {
-  readonly release: string;
-  readonly bun: string;
-  readonly typescript: string;
-  readonly packageCatalogDigest: string;
-  readonly template: string;
-  readonly snapshotProtocol: number;
-}
-
-export interface CreateCapabilityEvidence extends CreateCapabilityTuple {
-  readonly identity: CreateCapabilityIdentity;
-  readonly templateDigest: string;
-  readonly freshEvidence: string;
-  readonly restartEvidence: string;
-}
-
-type PartialCreateCapability = Readonly<{
-  template?: string;
-  cloud?: string;
-  deploy?: string;
-  jobs?: string | undefined;
-  examples?: boolean;
-}>;
+import type {
+  CreateCapabilityTuple,
+  CreateCapabilityIdentity,
+  CreateCapabilityEvidence,
+  PartialCreateCapability,
+} from "./create-capabilities.types.js";
+export type {
+  CreateCapabilityTuple,
+  CreateCapabilityIdentity,
+  CreateCapabilityEvidence,
+} from "./create-capabilities.types.js";
 
 const entries: readonly CreateCapabilityEvidence[] = Object.freeze([
   Object.freeze({
@@ -53,7 +33,7 @@ const entries: readonly CreateCapabilityEvidence[] = Object.freeze([
       template: "default/v1/minimal",
       snapshotProtocol: 1,
     }),
-    templateDigest: "a9da10ffaacd5047269b8bb121605756623170ae31297d47d43552e9939d29af",
+    templateDigest: "4f7ce9d60c25c154a9ab0a7aacf8f92918cb9f76a80f6009af273dccd756304a",
     freshEvidence: "docs/evidence/create-capabilities/0.7.5/fresh.json",
     restartEvidence: "docs/evidence/create-capabilities/0.7.5/restart.json",
   }),
@@ -64,7 +44,10 @@ export const CREATE_CAPABILITY_TABLE = Object.freeze({
   entries,
 });
 
-/** Returns the runtime identity that packaged evidence must match exactly. */
+/**
+ * Reads the executing SDK's release and pinned dependency catalog without acquiring application clients.
+ * @returns The complete identity that packaged evidence must match exactly.
+ */
 export function currentCreateCapabilityIdentity(): CreateCapabilityIdentity {
   const catalog = manifest.relkit.buildCatalog;
   return {
@@ -77,7 +60,12 @@ export function currentCreateCapabilityIdentity(): CreateCapabilityIdentity {
   };
 }
 
-/** Rejects missing or stale runtime tuples before destination planning or installation. */
+/**
+ * Rejects missing or stale tuples before destination planning or installation.
+ * @param options - Complete public creation choice.
+ * @param identity - Executing tool identity, or an explicit identity used by compatibility checks.
+ * @returns When a current evidence entry admits the complete tuple.
+ */
 export function assertCreateCapability(
   options: Pick<CreateOptions, "template" | "cloud" | "deploy" | "jobs" | "examples">,
   identity: CreateCapabilityIdentity = currentCreateCapabilityIdentity(),
@@ -88,7 +76,12 @@ export function assertCreateCapability(
   );
 }
 
-/** Filters interactive template choices through the same evidence allow-list. */
+/**
+ * Filters interactive template choices through the same evidence allow-list.
+ * @param options - Choices resolved so far by the native prompt flow.
+ * @param identity - Executing tool identity.
+ * @returns Only templates admitted by current complete evidence entries.
+ */
 export function supportedCreateTemplates(
   options: PartialCreateCapability,
   identity: CreateCapabilityIdentity = currentCreateCapabilityIdentity(),
@@ -98,7 +91,12 @@ export function supportedCreateTemplates(
     .map((entry) => entry.template);
 }
 
-/** True only when a complete tuple and every evidence identity field match. */
+/**
+ * Checks every field of a complete tuple and its exact tool identity.
+ * @param options - Complete creation choice.
+ * @param identity - Executing tool identity.
+ * @returns Whether a current complete evidence entry admits this choice.
+ */
 export function supported(
   options: Pick<CreateOptions, "template" | "cloud" | "deploy" | "jobs" | "examples">,
   identity: CreateCapabilityIdentity = currentCreateCapabilityIdentity(),
@@ -114,12 +112,23 @@ export function supported(
   );
 }
 
+/**
+ * Formats the current complete choices for a public refusal diagnostic.
+ * @param identity - Executing tool identity.
+ * @returns Deterministic native option descriptions.
+ */
 function supportedTuples(identity: CreateCapabilityIdentity): readonly string[] {
   return CREATE_CAPABILITY_TABLE.entries
     .filter((entry) => current(entry.identity, identity))
     .map(formatTuple);
 }
 
+/**
+ * Compares all mandatory tool identity fields without ignoring patch versions.
+ * @param left - Recorded reference-host identity.
+ * @param right - Current executing identity.
+ * @returns Whether every mandatory field matches.
+ */
 function current(left: CreateCapabilityIdentity, right: CreateCapabilityIdentity): boolean {
   return (
     left.release === right.release &&
@@ -131,6 +140,12 @@ function current(left: CreateCapabilityIdentity, right: CreateCapabilityIdentity
   );
 }
 
+/**
+ * Preserves unresolved native prompt choices while filtering complete certified entries.
+ * @param entry - Complete recorded tuple.
+ * @param options - Choices already supplied by the user.
+ * @returns Whether the entry agrees with every resolved choice.
+ */
 function matchesPartial(entry: CreateCapabilityTuple, options: PartialCreateCapability): boolean {
   return (
     (options.template === undefined || entry.template === options.template) &&
@@ -141,12 +156,19 @@ function matchesPartial(entry: CreateCapabilityTuple, options: PartialCreateCapa
   );
 }
 
+/**
+ * Describes native options using the public no-jobs and wildcard semantics.
+ * @param options - Complete or partially resolved tuple.
+ * @returns One portable diagnostic string.
+ */
 function formatTuple(options: PartialCreateCapability): string {
+  let examples = "*";
+  if (options.examples !== undefined) examples = options.examples ? "on" : "off";
   return [
     `template=${options.template ?? "*"}`,
     `jobs=${options.jobs ?? "none"}`,
     `cloud=${options.cloud ?? "*"}`,
     `deploy=${options.deploy ?? "*"}`,
-    `examples=${options.examples === undefined ? "*" : options.examples ? "on" : "off"}`,
+    `examples=${examples}`,
   ].join("/");
 }

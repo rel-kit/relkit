@@ -4,7 +4,7 @@ Use a typed stream when one request returns a sequence to its caller. It ends wi
 
 ## `streamOf` with `defineFunction`
 
-Create a function in `src/reports/functions/stream-report.function.ts`:
+Create a function in `src/services/reports/functions/stream-report.function.ts`:
 
 ```ts
 import { defineFunction, streamOf } from "@relkit/app/functions";
@@ -25,13 +25,19 @@ export default defineFunction({
 
 `streamOf(itemSchema)` validates each yielded item. The iterator is lazy and single-consumer; its invocation scope stays open until completion or cancellation. Expose this function from its domain service before mapping it to HTTP.
 
+For protected data, read the authenticated session and enforce ownership inside the
+function. Verify an authorized stream through the actual generated HTTP server to
+its completion event, then check other users/tenants and cancellation cleanup.
+Direct test-runtime invocation alone does not verify request context through lazy
+iterator pulls. Keep public descriptors as plain TypeScript.
+
 ## `defineRoute` for a stream
 
 In `src/routes/reports/[reportId]/route.ts`, import the public service member:
 
 ```ts
 import { defineRoute, http } from "@relkit/app/routes";
-import reports from "@app/reports/service.js";
+import reports from "@app/services/reports/service.js";
 
 export const GET = defineRoute({
   target: reports.streamReport,

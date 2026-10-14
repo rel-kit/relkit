@@ -5,8 +5,12 @@ description: Control concurrency, duration, admission, and cancellation.
 
 Execution policy belongs to the task because it describes how the durable operation runs.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
-  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  ../../examples/commerce/src/services/orders/tasks/export-orders.task.ts
 </include>
 
 Use task fields such as `maxDuration`, `maxElapsed`, `resources`, `concurrency`, `logging`, and `retry`.

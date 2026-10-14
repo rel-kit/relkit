@@ -82,6 +82,7 @@
         "create-relkit": "workspace:*",
         "drizzle-kit": "catalog:",
         "drizzle-orm": "catalog:",
+        "effect": "catalog:",
         "prettier": "catalog:",
         "tailwindcss": "catalog:",
         "tsx": "4.23.15",
@@ -187,12 +188,13 @@
         "@relkit/testing": "workspace:*",
         "@types/bun": "catalog:",
         "drizzle-kit": "catalog:",
+        "effect": "catalog:",
         "typescript": "catalog:",
       },
     },
     "integrations/catalog": {
       "name": "@relkit/integrations",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/aws": "workspace:*",
         "@relkit/cloudflare": "workspace:*",
@@ -210,7 +212,7 @@
     },
     "integrations/packages/aws": {
       "name": "@relkit/aws",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@pulumi/aws": "catalog:",
         "@relkit/deploy": "workspace:*",
@@ -219,7 +221,7 @@
     },
     "integrations/packages/cloudflare": {
       "name": "@relkit/cloudflare",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/buckets": "workspace:*",
         "@relkit/cache": "workspace:*",
@@ -229,7 +231,7 @@
     },
     "integrations/packages/docker": {
       "name": "@relkit/docker",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/local-service": "workspace:*",
         "@relkit/provider": "workspace:*",
@@ -237,7 +239,7 @@
     },
     "integrations/packages/effect-mq": {
       "name": "@relkit/effect-mq",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@effect/sql-pg": "catalog:",
         "@relkit/contracts": "workspace:*",
@@ -256,7 +258,7 @@
     },
     "integrations/packages/inngest": {
       "name": "@relkit/inngest",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/jobs": "workspace:*",
@@ -267,7 +269,7 @@
     },
     "integrations/packages/local": {
       "name": "@relkit/local",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/local-service": "workspace:*",
@@ -277,7 +279,7 @@
     },
     "integrations/packages/otlp": {
       "name": "@relkit/otlp",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/observability": "workspace:*",
@@ -286,14 +288,14 @@
     },
     "integrations/packages/pulumi": {
       "name": "@relkit/pulumi",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/deploy": "workspace:*",
       },
     },
     "integrations/packages/redis": {
       "name": "@relkit/redis",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/agents": "workspace:*",
         "@relkit/cache": "workspace:*",
@@ -306,7 +308,7 @@
     },
     "integrations/packages/s3": {
       "name": "@relkit/s3",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/buckets": "workspace:*",
         "@relkit/local-service": "workspace:*",
@@ -315,7 +317,7 @@
     },
     "integrations/packages/sentry": {
       "name": "@relkit/sentry",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/observability": "workspace:*",
         "@relkit/provider": "workspace:*",
@@ -324,7 +326,7 @@
     },
     "integrations/packages/trigger": {
       "name": "@relkit/trigger",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/jobs": "workspace:*",
@@ -337,7 +339,7 @@
     },
     "packages/agents": {
       "name": "@relkit/agents",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@cfworker/json-schema": "4.1.1",
         "@langchain/core": "catalog:",
@@ -370,7 +372,7 @@
     },
     "packages/app": {
       "name": "@relkit/app",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/agents": "workspace:*",
         "@relkit/buckets": "workspace:*",
@@ -397,7 +399,7 @@
     },
     "packages/better-auth": {
       "name": "@relkit/better-auth",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/client": "workspace:*",
         "@relkit/contracts": "workspace:*",
@@ -420,7 +422,7 @@
     },
     "packages/buckets": {
       "name": "@relkit/buckets",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "effect": "catalog:",
@@ -432,7 +434,7 @@
     },
     "packages/cache": {
       "name": "@relkit/cache",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/schema": "workspace:*",
@@ -445,7 +447,7 @@
     },
     "packages/cli": {
       "name": "@relkit/cli",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "bin": {
         "relkit": "./dist/bin.js",
       },
@@ -488,7 +490,7 @@
     },
     "packages/client": {
       "name": "@relkit/client",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@orpc/client": "catalog:",
         "@orpc/contract": "catalog:",
@@ -513,7 +515,7 @@
     },
     "packages/client-generator": {
       "name": "@relkit/client-generator",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/graph": "workspace:*",
@@ -525,7 +527,7 @@
     },
     "packages/cloud-aws": {
       "name": "@relkit/cloud-aws",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@pulumi/aws": "catalog:",
         "@pulumi/awsx": "3.10.0",
@@ -542,7 +544,7 @@
     },
     "packages/compiler": {
       "name": "@relkit/compiler",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/client-generator": "workspace:*",
         "@relkit/contracts": "workspace:*",
@@ -561,7 +563,7 @@
     },
     "packages/config": {
       "name": "@relkit/config",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/provider": "workspace:*",
         "effect": "catalog:",
@@ -573,7 +575,7 @@
     },
     "packages/contracts": {
       "name": "@relkit/contracts",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -585,7 +587,7 @@
     },
     "packages/create-relkit": {
       "name": "create-relkit",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "bin": {
         "create-relkit": "./dist/bin.js",
       },
@@ -603,7 +605,7 @@
     },
     "packages/deploy": {
       "name": "@relkit/deploy",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/graph": "workspace:*",
@@ -611,7 +613,7 @@
     },
     "packages/deploy-pulumi": {
       "name": "@relkit/deploy-pulumi",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@pulumi/pulumi": "catalog:",
         "@relkit/contracts": "workspace:*",
@@ -623,7 +625,7 @@
     },
     "packages/diagnostics": {
       "name": "@relkit/diagnostics",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "effect": "catalog:",
@@ -635,7 +637,7 @@
     },
     "packages/drizzle": {
       "name": "@relkit/drizzle",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/invocation": "workspace:*",
@@ -650,7 +652,7 @@
     },
     "packages/engine": {
       "name": "@relkit/engine",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/app": "workspace:*",
         "@relkit/buckets": "workspace:*",
@@ -673,7 +675,7 @@
     },
     "packages/events": {
       "name": "@relkit/events",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/functions": "workspace:*",
@@ -689,7 +691,7 @@
     },
     "packages/functions": {
       "name": "@relkit/functions",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/buckets": "workspace:*",
         "@relkit/cache": "workspace:*",
@@ -705,7 +707,7 @@
     },
     "packages/graph": {
       "name": "@relkit/graph",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "effect": "catalog:",
@@ -716,7 +718,7 @@
     },
     "packages/inspector-api": {
       "name": "@relkit/inspector-api",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/observability": "workspace:*",
@@ -731,7 +733,7 @@
     },
     "packages/invocation": {
       "name": "@relkit/invocation",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/schema": "workspace:*",
@@ -744,7 +746,7 @@
     },
     "packages/jobs": {
       "name": "@relkit/jobs",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/functions": "workspace:*",
@@ -758,7 +760,7 @@
     },
     "packages/local-service": {
       "name": "@relkit/local-service",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/provider": "workspace:*",
@@ -771,7 +773,7 @@
     },
     "packages/observability": {
       "name": "@relkit/observability",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@duckdb/node-api": "1.5.5-r.4",
         "@relkit/contracts": "workspace:*",
@@ -785,7 +787,7 @@
     },
     "packages/openapi": {
       "name": "@relkit/openapi",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/graph": "workspace:*",
@@ -798,7 +800,7 @@
     },
     "packages/provider": {
       "name": "@relkit/provider",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "effect": "catalog:",
@@ -810,7 +812,7 @@
     },
     "packages/providers-local": {
       "name": "@relkit/providers-local",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/agents": "workspace:*",
         "@relkit/buckets": "workspace:*",
@@ -830,11 +832,11 @@
     },
     "packages/providers-standard": {
       "name": "@relkit/providers-standard",
-      "version": "0.7.2",
+      "version": "0.7.5",
     },
     "packages/realtime": {
       "name": "@relkit/realtime",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/schema": "workspace:*",
@@ -847,7 +849,7 @@
     },
     "packages/relkit": {
       "name": "relkit",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "bin": {
         "relkit": "./dist/bin.js",
       },
@@ -857,7 +859,7 @@
     },
     "packages/routes": {
       "name": "@relkit/routes",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/functions": "workspace:*",
@@ -875,7 +877,7 @@
     },
     "packages/runtime-effect": {
       "name": "@relkit/runtime-effect",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node-shared": "catalog:",
@@ -893,7 +895,7 @@
     },
     "packages/runtime-hono": {
       "name": "@relkit/runtime-hono",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@ag-ui/core": "0.0.59",
         "@modelcontextprotocol/server": "2.3.0",
@@ -930,7 +932,7 @@
     },
     "packages/schema": {
       "name": "@relkit/schema",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -941,7 +943,7 @@
     },
     "packages/services": {
       "name": "@relkit/services",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/events": "workspace:*",
@@ -958,7 +960,7 @@
     },
     "packages/supervisor": {
       "name": "@relkit/supervisor",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/observability": "workspace:*",
@@ -972,7 +974,7 @@
     },
     "packages/testing": {
       "name": "@relkit/testing",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@langchain/core": "catalog:",
         "@relkit/agents": "workspace:*",
@@ -1006,7 +1008,7 @@
     },
     "packages/tools": {
       "name": "@relkit/tools",
-      "version": "0.7.2",
+      "version": "0.7.5",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/functions": "workspace:*",

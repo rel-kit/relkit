@@ -73,9 +73,10 @@ relkit-orders/
 ├── src/
 │   ├── platform/
 │   │   └── env.ts
-│   ├── hello/
-│   │   ├── service.ts
-│   │   └── functions/
+│   ├── services/
+│   │   └── hello/
+│   │       ├── service.ts
+│   │       └── functions/
 │   └── routes/
 ├── tests/
 │   ├── integration/
@@ -84,12 +85,17 @@ relkit-orders/
 └── tsconfig.json
 ```
 
-Each top-level application domain owns one `service.ts` descriptor and keeps its
+Each immediate `src/services` child owns one `service.ts` descriptor and keeps its
 functions, events, errors, and other artifacts together. `routes` remains the
 transport layer and `platform` contains shared infrastructure configuration.
 `tsconfig.json` maps `@app/*` to `src/*`; use imports such as
-`@app/hello/service.js`. The `.js` extension is required by emitted ESM even
+`@app/services/hello/service.js`. The `.js` extension is required by emitted ESM even
 though the source file is TypeScript.
+
+Existing flat `src/<name>/service.ts` apps remain supported; add preserves their layout.
+Do not mix roots or put an aggregate boundary at `src/services/service.ts`. For an optional
+move, use the preview/write/guarded rollback workflow in the
+[layout migration guide](../apps/docs/content/docs/service/migration.mdx).
 
 Run diagnostics before starting development:
 

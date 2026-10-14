@@ -6,6 +6,7 @@ import effectManifest from "effect/package.json" with { type: "json" };
 import typescriptManifest from "typescript/package.json" with { type: "json" };
 import { SnapshotTools } from "./snapshot.schemas.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";
+import { APPLICATION_LAYOUT_VERSION } from "@relkit/contracts";
 
 /**
  * Captures the command's Bun version and installed package versions for reuse.
@@ -14,6 +15,7 @@ import { DevSnapshotRejected } from "./snapshot-error.js";
  */
 export const readSnapshotTools = Effect.fn("DevSnapshot.tools")(function* (_root: string) {
   return yield* Schema.decodeUnknownEffect(SnapshotTools)({
+    layout: APPLICATION_LAYOUT_VERSION,
     bun: Bun.version,
     effect: effectManifest.version,
     typescript: typescriptManifest.version,

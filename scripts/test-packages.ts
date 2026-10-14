@@ -38,6 +38,12 @@ export async function runPackageTests(environment: NodeJS.ProcessEnv = process.e
     file.startsWith("packages/create-relkit/"),
   );
   const nodeVitestFiles = vitestFiles.filter((file) => !file.startsWith("packages/create-relkit/"));
+  const compilerProbeFiles = nodeVitestFiles.filter(
+    (file) =>
+      file.endsWith("/type-probes.test.ts") || file.endsWith("/postgres-declarations.test.ts"),
+  );
+  const compilerProbes = new Set(compilerProbeFiles);
+  const otherNodeVitestFiles = nodeVitestFiles.filter((file) => !compilerProbes.has(file));
   const bunFiles = files.filter((_, index) => !importsVitest[index]);
   const cliFiles = bunFiles.filter((file) => file.startsWith("packages/cli/"));
   const otherFiles = bunFiles.filter((file) => !file.startsWith("packages/cli/"));
@@ -66,7 +72,9 @@ export async function runPackageTests(environment: NodeJS.ProcessEnv = process.e
       ],
       testEnvironment,
     );
-  if (nodeVitestFiles.length > 0)
+  // Whole-program compiler probes release their heap before the next suite starts.
+  for (const group of [...compilerProbeFiles.map((file) => [file]), otherNodeVitestFiles]) {
+    if (group.length === 0) continue;
     await runTests(
       [
         process.execPath,
@@ -75,10 +83,11 @@ export async function runPackageTests(environment: NodeJS.ProcessEnv = process.e
         "run",
         "--maxWorkers=1",
         "--disableConsoleIntercept",
-        ...nodeVitestFiles,
+        ...group,
       ],
       testEnvironment,
     );
+  }
   for (const group of [cliFiles, otherFiles])
     if (group.length > 0)
       await runTests([process.execPath, "test", "--reporter=dot", ...group], testEnvironment);

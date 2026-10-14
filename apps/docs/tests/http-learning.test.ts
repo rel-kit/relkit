@@ -1,3 +1,4 @@
+/** Checks authored HTTP guidance, grouped route examples and native catalog links using finite read-only source assertions. */
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -6,6 +7,10 @@ import { renderRelated } from "../scripts/generate-guides.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 import { httpGuideGroup } from "../scripts/http-guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
+/** Reads one owned HTTP guide at the native synchronous test boundary.
+ * @param page - HTTP guide path selected by this suite.
+ * @returns Original guide text; missing input fails the native test.
+ */
 const read = (page: string) => readFileSync(resolve(content, `http/${page}.mdx`), "utf8");
 test("connects Service to HTTP Routes without changing existing HTTP guide URLs", () => {
   expect(guideGroups.map(({ directory }) => directory).slice(0, 5)).toEqual([
@@ -21,9 +26,9 @@ test("connects Service to HTTP Routes without changing existing HTTP guide URLs"
     pages: httpGuideGroup.pages,
   });
   expect(guideRelations.find(({ path }) => path === "service/first-service")?.next).toBeUndefined();
-  expect(
-    renderRelated(guideRelations.find(({ path }) => path === "service/first-service")!),
-  ).not.toContain("Next step");
+  const relation = guideRelations.find(({ path }) => path === "service/first-service");
+  if (relation === undefined) throw new Error("The first-service guide relation is missing");
+  expect(renderRelated(relation)).not.toContain("Next step");
   expect(features.find(({ id }) => id === "http")?.guide).toBe("http/define");
   for (const page of httpGuideGroup.pages) {
     const source = read(page);
@@ -35,7 +40,7 @@ test("connects Service to HTTP Routes without changing existing HTTP guide URLs"
 test("teaches the Orders HTTP boundary with executable starter source and tests", () => {
   const tutorial = read("first-route");
   for (const path of [
-    "src/orders/service.ts",
+    "src/services/orders/service.ts",
     "src/routes/orders/route.ts",
     "tests/integration/orders.route.test.ts",
   ]) {

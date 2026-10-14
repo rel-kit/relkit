@@ -1,4 +1,4 @@
-/** Owns the ordinary dev session, generated staging directory and native hangup subscription after initial validation. */
+/** Owns the ordinary dev session, generated staging directory and native hangup listener after initial validation. */
 import { Effect } from "effect";
 import { join } from "node:path";
 import { cliTry } from "../cli-errors.js";
@@ -72,9 +72,9 @@ const acquireCommandSession = Effect.fn("Dev.acquireCommandSession")(function* (
 });
 
 /**
- * Owns the native SIGHUP subscription until scoped shutdown.
+ * Owns the native SIGHUP listener until scoped shutdown.
  * @param session - Active session receiving the stop request.
- * @returns Subscription acquisition; release removes only this listener.
+ * @returns Listener acquisition; release removes only this listener.
  */
 const installCommandHangup = Effect.fn("Dev.installCommandHangup")(function* (session: DevSession) {
   const hangup = () => {

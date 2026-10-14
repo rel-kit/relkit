@@ -39,9 +39,9 @@ This public announcements channel has one partition because its parameter schema
 <include
   cwd
   lang="ts"
-  meta='title="examples/commerce/src/announcements/channels/announcements.channel.ts"'
+  meta='title="examples/commerce/src/services/announcements/channels/announcements.channel.ts"'
 >
-  ../../examples/commerce/src/announcements/channels/announcements.channel.ts
+  ../../examples/commerce/src/services/announcements/channels/announcements.channel.ts
 </include>
 
 The declaration controls both publication and generated client types:
@@ -65,9 +65,9 @@ Call `trigger()` from backend code after the application change succeeds:
 <include
   cwd
   lang="ts"
-  meta='title="examples/commerce/src/announcements/functions/post-announcement.function.ts"'
+  meta='title="examples/commerce/src/services/announcements/functions/post-announcement.function.ts"'
 >
-  ../../examples/commerce/src/announcements/functions/post-announcement.function.ts
+  ../../examples/commerce/src/services/announcements/functions/post-announcement.function.ts
 </include>
 
 RelKit validates the partition parameters and payload before appending the event. The returned receipt contains the event ID, checkpoint, provider profile and epoch, and whether an idempotent request was a duplicate.

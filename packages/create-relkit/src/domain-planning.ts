@@ -1,4 +1,12 @@
+/**
+ * Plans service selection and public-member edits through generator filesystem
+ * authority. Shared layout discovery chooses physical destinations; operations
+ * remain lazy and translate expected scaffold failures without changing IDs.
+ */
 import { Effect } from "effect";
+import { domainError, domainTry } from "./generator-errors.js";
+import { scaffoldServiceBoundary } from "./scaffold-layout.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
 
 import { observeExecution } from "@relkit/contracts/operation";
 
@@ -29,39 +37,46 @@ export const resolveDomainEffect = Effect.fn("Scaffold.resolveDomain")(
   ): Effect.fn.Return<DomainTarget, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem> {
     const request = builder.request;
     if (request.service && request.createService)
-      usage("--service and --create-service are exclusive.");
+      return yield* domainError(
+        new AddScaffoldError(
+          ADD_FAILURE_CODES.usage,
+          "--service and --create-service are exclusive.",
+        ),
+      );
     if (request.createService) {
-      const domain = normalizeArtifactName(request.createService);
+      const domain = yield* domainTry(() => normalizeArtifactName(request.createService ?? ""));
       if (builder.discovery.services.some((service) => service.domain === domain.fileStem)) {
-        collision(`Service ${domain.fileStem} already exists.`);
+        return yield* domainError(
+          new AddScaffoldError(
+            ADD_FAILURE_CODES.collision,
+            `Service ${domain.fileStem} already exists.`,
+          ),
+        );
       }
-      const servicePath = `src/${domain.fileStem}/service.ts`;
+      const servicePath = yield* domainTry(() =>
+        scaffoldServiceBoundary(builder.discovery, domain.fileStem),
+      );
       yield* builder.createEffect(servicePath, serviceSource(domain));
       return { domain, servicePath, service: undefined };
     }
     const generic = builder.discovery.services.filter(
       (service) => service.capability === "generic",
     );
-    const selected = request.service
-      ? generic.find((service) =>
-          [service.domain, service.binding].includes(
-            normalizeArtifactName(request.service!).fileStem,
-          ),
-        )
-      : generic.length === 1
-        ? generic[0]
-        : undefined;
-    if (selected === undefined) {
-      usage(
-        request.service
-          ? `Unknown generic service: ${request.service}`
-          : generic.length === 0
-            ? "No generic service exists; use --create-service <name>."
-            : "Multiple generic services exist; use --service <name>.",
+    let selected = generic.length === 1 ? generic[0] : undefined;
+    if (request.service) {
+      const selectedName = yield* domainTry(() => normalizeArtifactName(request.service ?? ""));
+      selected = generic.find((service) =>
+        [service.domain, service.binding].includes(selectedName.fileStem),
       );
     }
+    if (selected === undefined) {
+      let message = "Multiple generic services exist; use --service <name>.";
+      if (generic.length === 0) message = "No generic service exists; use --create-service <name>.";
+      if (request.service) message = `Unknown generic service: ${request.service}`;
+      return yield* domainError(new AddScaffoldError(ADD_FAILURE_CODES.usage, message));
+    }
     return {
-      domain: normalizeArtifactName(selected.domain),
+      domain: yield* domainTry(() => normalizeArtifactName(selected.domain)),
       servicePath: selected.path,
       service: selected,
     };
@@ -136,14 +151,7 @@ export function addPublicMember(
   );
 }
 
-import {
-  sourceModule,
-  sourceImport,
-  serviceSource,
-  usage,
-  collision,
-  fileStem,
-} from "./domain-artifact.js";
+import { sourceModule, sourceImport, serviceSource } from "./domain-artifact.js";
 
 export {
   domainArtifact,

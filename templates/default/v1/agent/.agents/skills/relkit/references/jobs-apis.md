@@ -24,11 +24,11 @@ export default defineTask({
 
 ## `defineJob`
 
-Bind the task to a public job name and an explicit client policy in `src/orders/jobs/export-orders.job.ts`:
+Bind the task to a public job name and an explicit client policy in `src/services/orders/jobs/export-orders.job.ts`:
 
 ```ts
 import { defineJob } from "@relkit/app/jobs";
-import exportOrders from "@app/orders/tasks/export-orders.task.js";
+import exportOrders from "@app/services/orders/tasks/export-orders.task.js";
 
 export default defineJob({
   id: "orders.export-orders-job",

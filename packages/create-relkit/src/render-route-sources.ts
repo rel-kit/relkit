@@ -1,19 +1,23 @@
+/** Renders HTTP source declarations using the selected physical service boundary. */
 import type { RouteMethod } from "./add-types.js";
+import { sourceModule } from "./domain-artifact.js";
 
 /**
  * Renders service Route Source as source text without executing user modules.
  * @param domain - Normalized owning domain used by source imports and job names.
  * @param maps - HTTP method-to-service-member mappings.
+ * @param servicePath - Actual discovered or planned boundary in either supported layout.
  * @returns Service-route source exporting handlers for the declared HTTP method mappings.
  */
 export function serviceRouteSource(
   domain: string,
   maps: Readonly<Partial<Record<RouteMethod, string>>>,
+  servicePath: string,
 ): string {
   const binding = domain.replace(/-([a-z0-9])/g, (_, value: string) => value.toUpperCase());
   const methods = Object.keys(maps) as RouteMethod[];
   return `import { defineServiceRoutes } from "@relkit/app/routes";
-import ${binding} from "@app/${domain}/service.js";
+import ${binding} from "${sourceModule(servicePath)}";
 
 export const { ${methods.join(", ")} } = defineServiceRoutes(${binding}, {
 ${methods.map((method) => `  ${method}: "${maps[method]}",`).join("\n")}

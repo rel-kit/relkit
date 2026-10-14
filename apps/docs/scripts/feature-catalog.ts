@@ -1,3 +1,4 @@
+/** Lists documentation capabilities and their authoritative source symbols/examples as pure catalog entries. */
 import { feature, type Feature } from "./documentation-catalog.js";
 import { databaseFeature } from "./database-guide-catalog.js";
 import { authFeature } from "./auth-guide-catalog.js";
@@ -56,7 +57,7 @@ export const features = [
     "fundamentals/functions",
     "functions",
     [["packages/functions/src/define-function.ts", "defineFunction"]],
-    ["examples/commerce/src/orders/functions/create-order.function.ts"],
+    ["examples/commerce/src/services/orders/functions/create-order.function.ts"],
   ),
   feature(
     "errors",
@@ -65,7 +66,7 @@ export const features = [
     "fundamentals/errors",
     "functions",
     [["packages/functions/src/define-error.ts", "defineError"]],
-    ["examples/commerce/src/orders/errors/order-not-found.error.ts"],
+    ["examples/commerce/src/services/orders/errors/order-not-found.error.ts"],
   ),
   feature(
     "services",
@@ -74,7 +75,7 @@ export const features = [
     "service/define",
     "services",
     [["packages/services/src/define-service.ts", "defineService"]],
-    ["examples/commerce/src/orders/service.ts"],
+    ["examples/commerce/src/services/orders/service.ts"],
   ),
   databaseFeature,
   authFeature,
@@ -128,7 +129,7 @@ export const features = [
       ["packages/jobs/src/define-task.ts", "defineTask"],
       ["packages/jobs/src/define-job.ts", "defineJob"],
     ],
-    ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
+    ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"],
   ),
   feature(
     "schedules",
@@ -137,7 +138,7 @@ export const features = [
     "jobs/schedules",
     "jobs",
     [["packages/jobs/src/define-job.ts", "defineJob"]],
-    ["examples/commerce/src/orders/jobs/cleanup-orders.job.ts"],
+    ["examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts"],
   ),
   feature(
     "buckets",
@@ -146,7 +147,7 @@ export const features = [
     "storage/define",
     "buckets",
     [["packages/buckets/src/define-bucket.ts", "defineBucket"]],
-    ["examples/commerce/src/assets/buckets/assets.bucket.ts"],
+    ["examples/commerce/src/services/assets/buckets/assets.bucket.ts"],
   ),
   feature(
     "cache",
@@ -155,7 +156,7 @@ export const features = [
     "caching/define",
     "cache",
     [["packages/cache/src/define-cache.ts", "defineCache"]],
-    ["examples/commerce/src/orders/cache/prices.cache.ts"],
+    ["examples/commerce/src/services/orders/cache/prices.cache.ts"],
   ),
   feature(
     "tools",
@@ -164,7 +165,7 @@ export const features = [
     "ai/tools",
     "tools",
     [["packages/tools/src/define-tool.ts", "defineTool"]],
-    ["examples/commerce/src/orders/tools/lookup-order.tool.ts"],
+    ["examples/commerce/src/services/orders/tools/lookup-order.tool.ts"],
   ),
   feature(
     "approvals",
@@ -176,7 +177,7 @@ export const features = [
       ["packages/agents/src/approval.ts", "approveApproval"],
       ["packages/agents/src/approval.ts", "denyApproval"],
     ],
-    ["examples/commerce/src/orders/tools/cancel-order.tool.ts"],
+    ["examples/commerce/src/services/orders/tools/cancel-order.tool.ts"],
   ),
   feature(
     "agents",
@@ -185,7 +186,7 @@ export const features = [
     "ai/agents",
     "agents",
     [["packages/agents/src/define-agent.ts", "defineAgent"]],
-    ["examples/commerce/src/orders/agents/order-support.agent.ts"],
+    ["examples/commerce/src/services/orders/agents/order-support.agent.ts"],
   ),
   testingFeature,
 ] as const satisfies readonly Feature[];

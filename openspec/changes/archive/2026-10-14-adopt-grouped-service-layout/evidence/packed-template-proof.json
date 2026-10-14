@@ -1,0 +1,16 @@
+{
+  "protocol": "relkit.grouped-layout.packed-template-proof",
+  "version": 1,
+  "archive": "create-relkit-0.7.5.tgz",
+  "archiveSha256": "c05162b2084dacfde5a3784a08e9e65bda75b0c210e5f1b5a4dd65d361ff78ee",
+  "template": "default/v1/minimal",
+  "files": 26,
+  "rawPackedTemplateSha256": "e759c282c6f5a55e2ac3c63f44de78726d2c9d136615faad8caaba9badcaf643",
+  "nativeCopyProjection": {
+    "gitignore": ".gitignore"
+  },
+  "projectionImplementation": "packages/create-relkit/src/generate-files.ts:copyTemplateEffect",
+  "authoredTemplateSha256": "4f7ce9d60c25c154a9ab0a7aacf8f92918cb9f76a80f6009af273dccd756304a",
+  "allProjectedFilesMatchAuthoredBytes": true,
+  "releaseManifestMatched": true
+}

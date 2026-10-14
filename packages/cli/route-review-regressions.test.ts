@@ -1,71 +1,32 @@
-import { afterEach, expect, test } from "bun:test";
-import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
-import { generateProject, normalizeCreateOptions } from "create-relkit";
+/** Exercises actual CLI route type admission against an owned grouped application, retaining the last valid manifest on rejection. */
+import { expect, test } from "bun:test";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import {
+  routeReviewFixture as fixture,
+  checkRouteReview as check,
+} from "../../tests/fixtures/cli/route-review-fixture.js";
+import {
+  routeReviewFunction,
+  routeReviewService,
+  routeReviewPrefix,
+} from "../../tests/fixtures/cli/route-review-sources.js";
+import { assertReviewedRouteGraph } from "../../tests/fixtures/cli/route-review-graph.js";
+import { registerAddCleanup } from "../../tests/generator/add-acceptance-fixture.js";
 
-const repository = resolve(import.meta.dir, "../..");
-const roots: string[] = [];
-afterEach(async () => {
-  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
-});
-
-async function fixture(): Promise<string> {
-  await mkdir(join(repository, ".relkit"), { recursive: true });
-  const parent = await mkdtemp(join(repository, ".relkit/route-review-"));
-  roots.push(parent);
-  const root = join(parent, "app");
-  await generateProject(
-    normalizeCreateOptions(["app", "--directory", root, "--no-install", "--no-git"]),
-  );
-  // Link the generated project's dependencies without relying on workspace hoisting.
-  await mkdir(join(root, "node_modules/@relkit"), { recursive: true });
-  await symlink(join(repository, "packages/app"), join(root, "node_modules/@relkit/app"));
-  await symlink(join(repository, "packages/testing"), join(root, "node_modules/@relkit/testing"));
-  return root;
-}
-
-async function check(root: string) {
-  const child = Bun.spawn(
-    [
-      process.execPath,
-      join(repository, "packages/cli/dist/bin.js"),
-      "check",
-      "--project-root",
-      root,
-      "--json",
-    ],
-    { cwd: root, stdout: "pipe", stderr: "pipe" },
-  );
-  const [output, errors, exitCode] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-    child.exited,
-  ]);
-  return { exitCode, result: JSON.parse(output), errors };
-}
+registerAddCleanup();
 
 test("the real CLI accepts annotated explicit path mappings and still rejects missing inferred inputs", async () => {
   const root = await fixture();
-  await mkdir(join(root, "src/users/functions"), { recursive: true });
+  await mkdir(join(root, "src/services/users/functions"), { recursive: true });
   await mkdir(join(root, "src/routes/users/[id]"), { recursive: true });
   await writeFile(
-    join(root, "src/users/functions/example.function.ts"),
-    `
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
-export default defineFunction({ id: "users.example", input: z.object({ value: z.string() }),
-  output: z.object({ value: z.string() }), handler: async ({ value }) => ({ value }) });`,
+    join(root, "src/services/users/functions/example.function.ts"),
+    routeReviewFunction,
   );
-  await writeFile(
-    join(root, "src/users/service.ts"),
-    `
-import { defineService } from "@relkit/app/services";
-import example from "./functions/example.function.js";
-export default defineService({ id: "users", functions: { example } });`,
-  );
+  await writeFile(join(root, "src/services/users/service.ts"), routeReviewService);
   const route = join(root, "src/routes/users/[id]/route.ts");
-  const prefix = `import service from "../../../users/service.js";
-import { defineServiceRoutes, http, type ServiceRouteOptions } from "@relkit/app/routes";`;
+  const prefix = routeReviewPrefix;
   await writeFile(
     route,
     `${prefix}
@@ -77,17 +38,7 @@ export const { GET } = defineServiceRoutes(service, { GET: mapped });`,
   const accepted = await check(root);
   expect(accepted.exitCode, accepted.errors || JSON.stringify(accepted.result.diagnostics)).toBe(0);
   expect(accepted.result).toMatchObject({ ok: true, activatable: true, diagnostics: [] });
-  const graph = JSON.parse(
-    await readFile(join(root, ".relkit/generated/application.graph.json"), "utf8"),
-  );
-  const node = graph.nodes.find(
-    (entry: { kind: string; targetFunctionId?: string }) =>
-      entry.kind === "trigger" && entry.targetFunctionId === "users.example",
-  );
-  expect(node?.config.request).toMatchObject({
-    kind: "input",
-    fields: { value: { kind: "path", name: "id" } },
-  });
+  await assertReviewedRouteGraph(root);
   const manifestPath = join(root, ".relkit/generated/runtime.manifest.ts");
   const manifest = await readFile(manifestPath, "utf8");
   await writeFile(

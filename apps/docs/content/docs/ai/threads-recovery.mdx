@@ -9,8 +9,12 @@ Loading a thread returns one consistent snapshot and matching journal checkpoint
 the snapshot completely, then reads records strictly after that checkpoint. Older history is finite,
 authenticated cursor pagination tied to the pinned snapshot.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/agents/order-support.agent.ts"'>
-  ../../examples/commerce/src/orders/agents/order-support.agent.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/agents/order-support.agent.ts"'
+>
+  ../../examples/commerce/src/services/orders/agents/order-support.agent.ts
 </include>
 
 ## Keep uncertain work visible

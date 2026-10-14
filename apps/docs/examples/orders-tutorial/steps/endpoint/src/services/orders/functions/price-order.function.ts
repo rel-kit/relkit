@@ -1,0 +1,11 @@
+/** Calculates tutorial totals at 100 cents per item, applying the 90-cent bulk price from ten items onward. */
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+
+const priceOrder = defineFunction({
+  input: z.object({ quantity: z.number().int().positive() }),
+  output: z.object({ totalCents: z.number().int().nonnegative() }),
+  handler: ({ quantity }) => ({ totalCents: quantity * (quantity >= 10 ? 90 : 100) }),
+});
+
+export default priceOrder;

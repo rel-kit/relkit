@@ -1,4 +1,10 @@
+/**
+ * Defines immutable declaration-only scaffold discovery records. Compiler syntax
+ * supplies layout/ownership; renderers preserve logical identities and provider
+ * declarations while creating sources at their selected physical boundaries.
+ */
 import type { SourceFactoryKind } from "@relkit/compiler";
+import type { ApplicationLayout } from "@relkit/contracts";
 import type { DatabaseDialect } from "./add-types.js";
 
 /**
@@ -52,6 +58,8 @@ export interface DiscoveredProfile {
  * Deterministic source-only app, provider, service and artifact facts for one project.
  */
 export interface ProjectDiscovery {
+  /** Present on compiler-backed discovery; older supplied planning fixtures may omit it. */
+  readonly layout?: ApplicationLayout;
   readonly projectRoot: string;
   readonly packagePath: string;
   readonly appPath: string;

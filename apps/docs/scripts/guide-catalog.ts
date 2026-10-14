@@ -1,4 +1,5 @@
-import type { ApiPackage } from "./documentation-catalog.js";
+/** Pure guide metadata joins maintained source examples with the documented learning sequence. */
+import { group, relation, nextGuide } from "./guide-catalog-helpers.js";
 import { startJourney } from "../lib/start-journey.js";
 export { startJourney };
 import { eventGuideGroup, eventGuideRelations } from "./event-guide-catalog.js";
@@ -66,12 +67,12 @@ const relations = [
   relation(
     "start/save-orders",
     ["drizzle", "functions"],
-    ["examples/data-model/src/database/service.ts"],
+    ["examples/data-model/src/services/database/service.ts"],
   ),
   relation(
     "start/protect-orders",
     ["better-auth", "drizzle"],
-    ["examples/auth-drizzle/src/auth/service.ts"],
+    ["examples/auth-drizzle/src/services/auth/service.ts"],
   ),
   relation(
     "start/test-orders",
@@ -87,7 +88,7 @@ const relations = [
   relation(
     "start/add-artifacts",
     ["services", "functions", "routes"],
-    ["templates/default/v1/api/src/orders/service.ts"],
+    ["templates/default/v1/api/src/services/orders/service.ts"],
   ),
   relation(
     "fundamentals/index",
@@ -98,18 +99,18 @@ const relations = [
   relation(
     "fundamentals/functions",
     ["functions"],
-    ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
+    ["templates/default/v1/api/src/services/orders/functions/create-order.function.ts"],
   ),
   relation("fundamentals/schemas", ["schema"], ["examples/commerce/src/platform/schemas.ts"]),
   relation(
     "fundamentals/errors",
     ["functions"],
-    ["examples/commerce/src/orders/errors/order-not-found.error.ts"],
+    ["examples/commerce/src/services/orders/errors/order-not-found.error.ts"],
   ),
   relation(
     "fundamentals/context",
     ["functions"],
-    ["examples/commerce/src/orders/functions/create-order.function.ts"],
+    ["examples/commerce/src/services/orders/functions/create-order.function.ts"],
   ),
   relation(
     "fundamentals/environment",
@@ -144,7 +145,7 @@ const relations = [
   relation(
     "operations/observability",
     ["functions", "routes"],
-    ["templates/default/v1/api/src/hello/functions/hello.function.ts"],
+    ["templates/default/v1/api/src/services/hello/functions/hello.function.ts"],
   ),
   relation("operations/inspector", ["app", "routes"], ["tests/e2e/inspector-redesign.spec.ts"]),
   relation(
@@ -168,18 +169,4 @@ const relations = [
     ["templates/default/v1/api/package.json"],
   ),
 ] as const;
-export const guideRelations = relations.map((item) => ({
-  ...item,
-  next: startJourney.includes(item.path as (typeof startJourney)[number])
-    ? (startJourney[startJourney.indexOf(item.path as (typeof startJourney)[number]) + 1] ??
-      "fundamentals/index")
-    : item.path === "index"
-      ? "start/create-an-app"
-      : undefined,
-}));
-function group(directory: string, title: string, icon: string, pages: readonly string[]) {
-  return { directory, title, icon, pages };
-}
-function relation(path: string, api: readonly ApiPackage[], examples: readonly string[]) {
-  return { path, api, examples };
-}
+export const guideRelations = relations.map((item) => ({ ...item, next: nextGuide(item.path) }));

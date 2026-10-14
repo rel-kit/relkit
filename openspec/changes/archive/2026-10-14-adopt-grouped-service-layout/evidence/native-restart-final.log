@@ -1,0 +1,578 @@
+bun test v1.3.10 (30e609e0)
+
+tests/restart/layout-move-jobs.test.ts:
+[10:27:51.844] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.root",
+  outcome: "success",
+  duration_ms: 4.594792,
+}
+[10:27:51.846] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.manifest",
+  outcome: "success",
+  duration_ms: 0.364584,
+}
+[10:27:51.847] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.directory",
+  outcome: "success",
+  duration_ms: 0.297708,
+}
+[10:27:51.847] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.modules",
+  outcome: "success",
+  duration_ms: 0.189167,
+}
+[10:27:51.859] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 11.21425,
+}
+[10:27:51.866] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 6.989334,
+}
+[10:27:51.868] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 1.919084,
+}
+[10:27:51.870] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 1.789125,
+}
+[10:27:51.873] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 2.894458,
+}
+[10:27:52.617] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 742.666458,
+}
+[10:27:52.618] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.read",
+  outcome: "success",
+  duration_ms: 0.173,
+}
+[10:27:52.618] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.move",
+  outcome: "success",
+  duration_ms: 0.524417,
+}
+[10:27:53.313] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 694.525708,
+}
+[10:27:53.313] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.read",
+  outcome: "success",
+  duration_ms: 0.188791,
+}
+[10:27:53.316] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.read",
+  outcome: "success",
+  duration_ms: 0.269542,
+}
+[10:27:53.318] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.release",
+  outcome: "success",
+  duration_ms: 1.153,
+}
+(pass) recovers after-lease work through the moved original target without rewriting prior state [1480.50ms]
+[10:27:53.318] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.root",
+  outcome: "success",
+  duration_ms: 0.22,
+}
+[10:27:53.318] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.manifest",
+  outcome: "success",
+  duration_ms: 0.232625,
+}
+[10:27:53.319] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.directory",
+  outcome: "success",
+  duration_ms: 0.209917,
+}
+[10:27:53.319] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.modules",
+  outcome: "success",
+  duration_ms: 0.110459,
+}
+[10:27:53.321] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 2.2805,
+}
+[10:27:53.324] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 2.359375,
+}
+[10:27:53.325] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 1.180125,
+}
+[10:27:53.326] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 0.569125,
+}
+[10:27:53.327] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 1.053875,
+}
+[10:27:53.986] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 659.125416,
+}
+[10:27:53.987] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.read",
+  outcome: "success",
+  duration_ms: 0.161375,
+}
+[10:27:53.987] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.move",
+  outcome: "success",
+  duration_ms: 0.397041,
+}
+[10:27:54.630] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 642.147917,
+}
+[10:27:54.630] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.read",
+  outcome: "success",
+  duration_ms: 0.151833,
+}
+[10:27:54.630] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.read",
+  outcome: "success",
+  duration_ms: 0.1175,
+}
+[10:27:54.632] INFO (#6): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.release",
+  outcome: "success",
+  duration_ms: 1.228958,
+}
+(pass) recovers after-ack work through the moved original target without rewriting prior state [1314.06ms]
+
+tests/restart/layout-move-agent.test.ts:
+[10:27:54.634] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.root",
+  outcome: "success",
+  duration_ms: 0.294209,
+}
+[10:27:54.635] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.manifest",
+  outcome: "success",
+  duration_ms: 0.286125,
+}
+[10:27:54.635] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.directory",
+  outcome: "success",
+  duration_ms: 0.183458,
+}
+[10:27:54.635] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.modules",
+  outcome: "success",
+  duration_ms: 0.178625,
+}
+[10:27:54.636] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 0.999625,
+}
+[10:27:54.638] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 1.835209,
+}
+[10:27:54.640] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 1.063083,
+}
+[10:27:54.640] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 0.480042,
+}
+[10:27:54.642] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 1.425458,
+}
+[10:27:57.238] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 2595.982584,
+}
+[10:27:57.240] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.move",
+  outcome: "success",
+  duration_ms: 0.376167,
+}
+[10:27:59.196] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 1955.84325,
+}
+[10:28:01.171] INFO (#23): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.write",
+  outcome: "success",
+  duration_ms: 0.524791,
+}
+[10:28:01.210] INFO (#16): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 2013.315541,
+}
+[10:28:01.351] INFO (#19): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 2153.28625,
+}
+[10:28:03.177] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 1825.303875,
+}
+[10:28:03.177] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.read",
+  outcome: "success",
+  duration_ms: 0.155709,
+}
+[10:28:03.178] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.release",
+  outcome: "success",
+  duration_ms: 1.111917,
+}
+(pass) resumes a waiting agent through moved sources exactly once across competing native processes [8544.81ms]
+
+tests/restart/events.test.ts:
+(pass) child-process event recovery > recovers a durable listener after process loss [1299.03ms]
+(pass) child-process event recovery > makes a handler-success acknowledgement gap duplicate visible [1291.15ms]
+(pass) child-process event recovery > does not claim recovery for an ephemeral listener lost with its process [1231.14ms]
+(pass) child-process event recovery > keeps one listener completion when another listener fails [707.27ms]
+
+tests/restart/jobs.test.ts:
+(pass) child-process job restart recovery > recovers an expired lease after the worker is killed [1251.55ms]
+(pass) child-process job restart recovery > makes a handler-success acknowledgement gap duplicate visible after restart [1296.49ms]
+
+tests/restart/agent-graph-restart.test.ts:
+(pass) resumes a SQLite-checkpointed graph once across competing restart processes [7775.92ms]
+
+tests/restart/layout-move-effect-mq.test.ts:
+[10:28:18.069] INFO (#29): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.postgres.port",
+  outcome: "success",
+  duration_ms: 3.503291,
+}
+[10:28:18.123] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.root",
+  outcome: "success",
+  duration_ms: 58.674875,
+}
+[10:28:18.125] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.manifest",
+  outcome: "success",
+  duration_ms: 1.50575,
+}
+[10:28:18.125] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.directory",
+  outcome: "success",
+  duration_ms: 0.230375,
+}
+[10:28:18.126] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.modules",
+  outcome: "success",
+  duration_ms: 0.158375,
+}
+[10:28:18.128] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 1.999042,
+}
+[10:28:18.129] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 1.675459,
+}
+[10:28:18.130] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 0.898333,
+}
+[10:28:18.131] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 0.429833,
+}
+[10:28:18.132] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.copy",
+  outcome: "success",
+  duration_ms: 0.909291,
+}
+[10:28:18.887] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.643792,
+}
+[10:28:18.887] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 816.781542,
+}
+[10:28:18.914] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.23475,
+}
+[10:28:18.914] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 27.643292,
+}
+[10:28:19.052] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.261709,
+}
+[10:28:19.052] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 137.256542,
+}
+[10:28:19.103] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.227375,
+}
+[10:28:19.103] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 50.518875,
+}
+[10:28:19.251] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.30125,
+}
+[10:28:19.251] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 46.387459,
+}
+[10:28:19.399] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.222709,
+}
+[10:28:19.399] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 46.020459,
+}
+[10:28:19.550] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.229292,
+}
+[10:28:19.550] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 49.188125,
+}
+[10:28:19.706] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.21275,
+}
+[10:28:19.706] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 52.16375,
+}
+[10:28:19.858] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.212958,
+}
+[10:28:19.858] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 47.600125,
+}
+[10:28:20.015] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.22275,
+}
+[10:28:20.015] INFO (#45): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 54.9365,
+}
+[10:28:20.017] INFO (#29): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.postgres.ddl",
+  outcome: "success",
+  duration_ms: 1.602833,
+}
+[10:28:20.085] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.340708,
+}
+[10:28:20.085] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 67.821375,
+}
+[10:28:20.265] INFO (#27): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 179.35375,
+}
+[10:28:20.266] INFO (#27): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.move",
+  outcome: "success",
+  duration_ms: 0.344833,
+}
+[10:28:20.486] INFO (#27): Execution operation completed {
+  domain: "testing",
+  operation: "restart.layout.worker",
+  outcome: "success",
+  duration_ms: 220.174042,
+}
+[10:28:20.489] INFO (#95): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.restart.layout.release",
+  outcome: "success",
+  duration_ms: 0.892209,
+}
+[10:28:20.628] INFO (#91): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.230542,
+}
+[10:28:20.628] INFO (#91): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 141.272542,
+}
+[10:28:20.660] INFO (#91): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.225625,
+}
+[10:28:20.660] INFO (#91): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 31.74525,
+}
+(pass) retains the original native receipt and one schedule across a source move and worker restart [2595.87ms]
+
+tests/restart/state-root.test.ts:
+(pass) restart workers accept owned fixtures and reject outside paths, traversal, and symlinks [0.50ms]
+
+ 12 pass
+ 0 fail
+ 74 expect() calls
+Ran 12 tests across 7 files. [29.11s]

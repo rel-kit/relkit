@@ -1,5 +1,6 @@
+/** Checks mcp-options.ts through the supported public RELKIT APIs. */
 // #region private-tool
-import hello from "@app/hello/functions/hello.function.js";
+import hello from "@app/services/hello/functions/hello.function.js";
 
 export const privateLookup = hello.asTool({
   id: "hello.private-lookup",

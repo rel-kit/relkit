@@ -28,8 +28,9 @@ export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
     if (!existsSync(configPath)) return [];
     const journal = yield* Effect.serviceOption(TypecheckInputs);
     const system = Option.isSome(journal) ? journal.value.system : ts.sys;
+    const physicalRoot = system.realpath?.(projectRoot) ?? projectRoot;
     const loaded = ts.readConfigFile(configPath, system.readFile);
-    if (loaded.error) return [typescriptDiagnostic(loaded.error, projectRoot)];
+    if (loaded.error) return [typescriptDiagnostic(loaded.error, projectRoot, physicalRoot)];
 
     const parsed = ts.parseJsonConfigFileContent(
       loaded.config,
@@ -57,7 +58,7 @@ export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
         .flatMap((source) => routeModuleDiagnostics(program, source, projectRoot)),
       ...(yield* eventSourceDiagnosticsEffect(program, projectRoot)),
       ...[...parsed.errors, ...ts.getPreEmitDiagnostics(program)].map((diagnostic) =>
-        typescriptDiagnostic(diagnostic, projectRoot),
+        typescriptDiagnostic(diagnostic, projectRoot, physicalRoot),
       ),
     ];
   },
@@ -98,11 +99,24 @@ function routeValidationRoot(rootDir: string, routeChecks: string): string {
  * Converts a TypeScript diagnostic to portable compiler evidence.
  * @param diagnostic - Compiler diagnostic whose source or severity is inspected.
  * @param projectRoot - Absolute project root for portable source paths.
+ * @param physicalRoot - Same acquired root after native symlink/canonical-path resolution.
+ * @remarks Dependency errors retain their code/message while unavailable external source locations are omitted.
  * @returns A compiler diagnostic retaining TypeScript severity, message, and source position.
  */
-function typescriptDiagnostic(diagnostic: ts.Diagnostic, projectRoot: string): Diagnostic {
+function typescriptDiagnostic(
+  diagnostic: ts.Diagnostic,
+  projectRoot: string,
+  physicalRoot: string,
+): Diagnostic {
   const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
-  if (!diagnostic.file || diagnostic.start === undefined) {
+  const root =
+    diagnostic.file === undefined
+      ? undefined
+      : [projectRoot, physicalRoot].find((root) => {
+          const local = relative(root, diagnostic.file?.fileName ?? root);
+          return local !== ".." && !local.startsWith(`..${sep}`) && !isAbsolute(local);
+        });
+  if (!diagnostic.file || diagnostic.start === undefined || root === undefined) {
     return createDiagnostic({
       code: `TS${diagnostic.code}`,
       severity: severity(diagnostic.category),
@@ -119,7 +133,7 @@ function typescriptDiagnostic(diagnostic: ts.Diagnostic, projectRoot: string): D
       line: location.line + 1,
       column: location.character + 1,
     },
-    { projectRoot },
+    { projectRoot: root },
   );
 }
 

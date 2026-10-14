@@ -59,3 +59,5 @@ For streaming responses, scaffold a function and route, then edit the function's
 | Build or start a built app              | `bun run build`, `bun run start`    |
 
 Use `bun run relkit --help` to discover additional `graph`, `env`, `local`, `jobs`, `client`, and deployment commands. Start Docker-backed local services with `bun run relkit local up --detach` only when the app actually declares and needs them. Deployment commands require a configured deployment target.
+
+For optional flat-to-grouped migration, use `bun run relkit migrate layout` for preview, `--write` for validated publication, and `--rollback <receipt>` for guarded restoration. See [layout migration](layout-migration.md). After `--no-install`, install dependencies and run `bun run relkit dev --prepare` before evaluating prepared-start readiness.

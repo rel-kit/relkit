@@ -11,7 +11,7 @@ From an application's root, with an existing `orders` service:
 bun run relkit add event "Order Created" --service orders
 ```
 
-Creates `src/orders/events/order-created.event.ts`, a version-1 contract with a string `value`
+Creates `src/services/orders/events/order-created.event.ts`, a version-1 contract with a string `value`
 payload and ID `orders.order-created-event`. It registers the event's type and exposes the event
 through the service. Pass `--internal` to omit service exposure.
 
@@ -24,9 +24,9 @@ For every event scaffolding flag, see the [CLI reference](/docs/operations/cli-r
 
 ## Define the event
 
-Use `defineEvent` to name an event and describe its data. In your app, create `src/orders/events/order-created.event.ts`:
+Use `defineEvent` to name an event and describe its data. In your app, create `src/services/orders/events/order-created.event.ts`:
 
-<include cwd lang="ts" meta='title="src/orders/events/order-created.event.ts"'>
+<include cwd lang="ts" meta='title="src/services/orders/events/order-created.event.ts"'>
   ../../apps/docs/examples/events/order-created.event.ts
 </include>
 

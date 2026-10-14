@@ -5,8 +5,12 @@ description: The typed, durable unit of job execution.
 
 A task contains the code and schemas for one durable operation. A task is not a request handler: it may be resumed, retried, observed, or run after the original process exits.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
-  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  ../../examples/commerce/src/services/orders/tasks/export-orders.task.ts
 </include>
 
 ## Scaffold a task
@@ -17,7 +21,7 @@ From the application root, with an existing `orders` service:
 bun run relkit add task "Export Orders" --service orders
 ```
 
-This creates a task-first definition under `src/orders/tasks/`. Expose it through a
+This creates a task-first definition under `src/services/orders/tasks/`. Expose it through a
 [task-first job](/docs/jobs/quickstart) when callers need admission, run handles, and observation.
 
 For every task scaffolding flag, see the [CLI reference](/docs/operations/cli-reference).

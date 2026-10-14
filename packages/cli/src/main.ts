@@ -1,3 +1,4 @@
+/** Owns one native CLI invocation, its cancellation signals, presentation and scoped cleanup. */
 import { Layer } from "effect";
 import { runCliEffect } from "./cli-runtime.js";
 import { interactionLayer } from "./cli-interaction.service.js";
@@ -10,6 +11,7 @@ import {
   toFailure,
   type CliIo,
   type CliRuntime,
+  type CliReporter,
 } from "./main-support.js";
 
 export * from "./cli-help-model.js";
@@ -27,7 +29,19 @@ export async function runCli(
 ): Promise<number> {
   const io = runtime.io ?? processIo;
   const json = isJsonMode(argv);
+  const migration = argv.find((argument) => !argument.startsWith("-")) === "migrate";
   const reporter = createReporter(json, io);
+  let publish: (() => void) | undefined;
+  const commandReporter: CliReporter = migration
+    ? {
+        output: (value, human) => {
+          publish = () => reporter.output(value, human);
+        },
+        error: (code, message) => {
+          publish = () => reporter.error(code, message);
+        },
+      }
+    : reporter;
   const controller = new AbortController();
   const signal = runtime.signal
     ? AbortSignal.any([runtime.signal, controller.signal])
@@ -35,16 +49,24 @@ export async function runCli(
   const removeSignals =
     runtime.installSignalHandlers === false ? () => undefined : installSignals(controller);
   try {
-    return await runCliEffect(
-      runCliProgram(argv, runtime, reporter, io, json, signal),
+    if (signal.aborted) throw signal.reason;
+    const code = await runCliEffect(
+      runCliProgram(argv, runtime, commandReporter, io, json, signal),
       Layer.merge(fileSystemLayer, interactionLayer),
       signal,
-      { json, io },
+      { json, io: migration && json ? { stdout: io.stderr, stderr: io.stderr } : io },
     );
+    publish?.();
+    return code;
   } catch (error) {
     const failure = toFailure(error, signal);
-    reporter.error(failure.code, failure.message);
-    return failure.exitCode;
+    reporter.error(
+      failure.code,
+      migration
+        ? "Migration stopped without reporting successful publication; inspect retained local recovery receipts."
+        : failure.message,
+    );
+    return migration && signal.aborted ? 130 : failure.exitCode;
   } finally {
     removeSignals();
   }

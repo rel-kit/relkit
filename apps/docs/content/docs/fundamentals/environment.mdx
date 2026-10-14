@@ -44,6 +44,15 @@ bun run relkit env example
 describes one declaration, and `example` renders a safe template. Run `bun run check` after changing the contract
 so generated types and graph metadata stay current.
 
+Generated commands run under Bun, which loads its normal dotenv files for the process.
+An existing process environment value takes precedence. `.env.example` is an informational
+template; RELKIT does not load it as runtime configuration. Keep its placeholder values
+separate from real credentials. Moving services leaves the root dotenv files in place.
+
+The CLI's `--environment` selects the command's provider environment. It does not turn a
+custom application field named `RELKIT_ENV` into business configuration. RELKIT owns that
+reserved runtime selector; the application contract continues to describe its own values.
+
 <Callout type="warn" title="RELKIT_ENV is reserved">
   Select a provider environment with the CLI's `--environment` option. Do not declare or branch
   application behavior on a custom `RELKIT_ENV` field.

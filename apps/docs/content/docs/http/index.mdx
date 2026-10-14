@@ -19,7 +19,7 @@ HTTP request
   ↓ URL + method
 Route (src/routes/)
   ↓ policy + input mapping
-Public function (src/<domain>/)
+Public function (src/services/<domain>/)
   ↓ validated output
 HTTP response
 ```
@@ -40,19 +40,19 @@ JSON `201` response. Follow [your first HTTP route](/docs/http/first-route) to t
 
 ## Know where each change belongs
 
-| You want to change…                             | Edit…                                                | Continue with…                                                                    |
-| ----------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Business behavior, schemas, or declared errors  | `src/<domain>/functions/` and domain-local contracts | [Functions](/docs/fundamentals/functions)                                         |
-| Which functions other code may call             | `src/<domain>/service.ts`                            | [Define a service](/docs/service/define)                                          |
-| Which function a method invokes                 | `src/routes/**/route.ts`                             | [Define a route](/docs/http/define)                                               |
-| A URL or path parameter                         | Directories underneath `src/routes/`                 | [File-system routes](/docs/http/routes)                                           |
-| Headers, cookies, query fields, or body mapping | The route's `request` descriptor                     | [Requests](/docs/http/requests)                                                   |
-| Multipart parsing and upload limits             | The route plus the domain's file schema              | [Uploads](/docs/http/uploads)                                                     |
-| HTTP authentication, CORS, or response headers  | `src/routes/middleware/`                             | [Middleware](/docs/http/middleware)                                               |
-| Request frequency limits                        | The function-backed route's `rateLimit`              | [Rate limits](/docs/http/rate-limits)                                             |
-| Success status or error-to-HTTP mapping         | The route and declared domain errors                 | [Responses](/docs/http/responses)                                                 |
-| A native HTTP adapter                           | An `ALL` raw route                                   | [Raw handlers](/docs/http/raw-handlers)                                           |
-| Public API documentation or a typed caller      | Checked artifacts, generated from source             | [OpenAPI](/docs/http/openapi) · [Generated clients](/docs/http/generated-clients) |
+| You want to change…                             | Edit…                                                         | Continue with…                                                                    |
+| ----------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Business behavior, schemas, or declared errors  | `src/services/<domain>/functions/` and domain-local contracts | [Functions](/docs/fundamentals/functions)                                         |
+| Which functions other code may call             | `src/services/<domain>/service.ts`                            | [Define a service](/docs/service/define)                                          |
+| Which function a method invokes                 | `src/routes/**/route.ts`                                      | [Define a route](/docs/http/define)                                               |
+| A URL or path parameter                         | Directories underneath `src/routes/`                          | [File-system routes](/docs/http/routes)                                           |
+| Headers, cookies, query fields, or body mapping | The route's `request` descriptor                              | [Requests](/docs/http/requests)                                                   |
+| Multipart parsing and upload limits             | The route plus the domain's file schema                       | [Uploads](/docs/http/uploads)                                                     |
+| HTTP authentication, CORS, or response headers  | `src/routes/middleware/`                                      | [Middleware](/docs/http/middleware)                                               |
+| Request frequency limits                        | The function-backed route's `rateLimit`                       | [Rate limits](/docs/http/rate-limits)                                             |
+| Success status or error-to-HTTP mapping         | The route and declared domain errors                          | [Responses](/docs/http/responses)                                                 |
+| A native HTTP adapter                           | An `ALL` raw route                                            | [Raw handlers](/docs/http/raw-handlers)                                           |
+| Public API documentation or a typed caller      | Checked artifacts, generated from source                      | [OpenAPI](/docs/http/openapi) · [Generated clients](/docs/http/generated-clients) |
 
 Business rules that must apply to every caller belong in the function, not only in HTTP middleware.
 For agents, tools, jobs, events, caching, and storage, use the [domain organization guide](/docs/service/organization)

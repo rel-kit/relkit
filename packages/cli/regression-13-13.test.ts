@@ -1,4 +1,6 @@
+/** Verifies native cohort rejection, atomic traffic replacement and joined support-process shutdown. */
 import { expect, test } from "bun:test";
+import { waitFor } from "../../tests/fixtures/cli/dev-fixture.js";
 import { readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { startDev } from "./src/commands/dev.js";
@@ -46,17 +48,18 @@ test("preserves active traffic across compile, start, hash, API, and readiness f
       activeSessions.push(session);
       const active = session.activeTarget;
       expect(active).toBeDefined();
+      if (!active) throw new Error("Native activation did not publish an active target");
       expect(await responseText(session, "/hello")).toBe(
-        `generation-${active!.token.generationToken}`,
+        `generation-${active.token.generationToken}`,
       );
       expect(await session.notifySourceChange(1)).toBe(false);
       expect(session.activeTarget).toEqual(active);
       expect(await responseText(session, "/hello")).toBe(
-        `generation-${active!.token.generationToken}`,
+        `generation-${active.token.generationToken}`,
       );
       expect(attempts).toBe(2);
       expect(await readdir(join(root, ".relkit", "generated"))).toEqual([
-        `generation-${active!.token.generationToken}`,
+        `generation-${active.token.generationToken}`,
       ]);
     }
   } finally {
@@ -67,10 +70,7 @@ test("preserves active traffic across compile, start, hash, API, and readiness f
 
 test("rapid saves obsolete stale candidates and activate only the latest generation", async () => {
   const root = await makeRoot();
-  let firstStarted!: () => void;
-  const firstStartedPromise = new Promise<void>((resolve) => {
-    firstStarted = resolve;
-  });
+  const firstStarted = Promise.withResolvers<void>();
   let session: DevSession | undefined;
   try {
     session = await startDev({
@@ -79,7 +79,7 @@ test("rapid saves obsolete stale candidates and activate only the latest generat
         fingerprint(`sha256:source-${candidate.token.sourceToken}`),
       compile: async ({ outputDirectory, signal, token }) => {
         if (token.sourceToken === 2) {
-          firstStarted();
+          firstStarted.resolve();
           await new Promise<void>((resolve) =>
             signal.addEventListener("abort", resolve, { once: true }),
           );
@@ -95,7 +95,7 @@ test("rapid saves obsolete stale candidates and activate only the latest generat
       },
     });
     const stale = session.notifySourceChange(1);
-    await firstStartedPromise;
+    await firstStarted.promise;
     const latest = session.notifySourceChange(2);
     expect(await stale).toBe(false);
     expect(await latest).toBe(true);
@@ -151,6 +151,7 @@ test("shutdown cleans the active backend, inspector child, and generation direct
       },
     });
     const backend = session.active;
+    await waitFor(() => session?.inspectorChild !== undefined, "owned Inspector child");
     const inspector = session.inspectorChild;
     await session.stop(new Error("test shutdown"));
     await session.waitForShutdown();

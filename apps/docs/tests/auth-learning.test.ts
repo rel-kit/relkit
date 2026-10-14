@@ -1,3 +1,4 @@
+/** Checks authored auth guidance against repository-owned source facts using finite synchronous read-only test adapters. */
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -6,6 +7,10 @@ import { apiPackages } from "../scripts/documentation-catalog.js";
 import { features } from "../scripts/feature-catalog.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
+/** Reads one owned auth guide at the native synchronous test boundary.
+ * @param page - Auth guide path selected by this suite.
+ * @returns Original guide text; missing input fails the native test.
+ */
 const read = (page: string) => readFileSync(resolve(content, `auth/${page}.mdx`), "utf8");
 test("connects Auth after Database with source-backed guides and API reference", () => {
   const groups = guideGroups.map(({ directory }) => directory);
@@ -56,11 +61,11 @@ test("teaches a migrated existing-app flow without hard-coded server secrets", (
   for (const path of [
     "relkit.config.ts",
     "drizzle.config.ts",
-    "src/database/schema/index.ts",
-    "src/database/service.ts",
-    "src/auth/service.ts",
-    "src/account/service.ts",
-    "src/account/functions/session.function.ts",
+    "src/services/database/schema/index.ts",
+    "src/services/database/service.ts",
+    "src/services/auth/service.ts",
+    "src/services/account/service.ts",
+    "src/services/account/functions/session.function.ts",
     "src/routes/session/route.ts",
     "src/routes/account/profile/route.ts",
     "src/routes/api/auth/[[...auth]]/route.ts",
@@ -72,10 +77,12 @@ test("teaches a migrated existing-app flow without hard-coded server secrets", (
   expect(tutorial).toContain("drizzle-kit generate");
   expect(tutorial).toContain("drizzle-kit migrate");
   const example = resolve(content, "../../../../examples/auth-drizzle");
-  expect(readFileSync(resolve(example, "src/database/service.ts"), "utf8")).not.toMatch(
+  expect(readFileSync(resolve(example, "src/services/database/service.ts"), "utf8")).not.toMatch(
     /\.exec\(|create table/i,
   );
-  expect(readFileSync(resolve(example, "src/auth/service.ts"), "utf8")).not.toContain("secret:");
+  expect(readFileSync(resolve(example, "src/services/auth/service.ts"), "utf8")).not.toContain(
+    "secret:",
+  );
   expect(readFileSync(resolve(example, "relkit.config.ts"), "utf8")).toContain(
     "BETTER_AUTH_SECRET: env.secret()",
   );

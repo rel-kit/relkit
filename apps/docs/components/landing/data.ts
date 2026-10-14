@@ -1,21 +1,13 @@
-export interface LandingExample {
-  readonly id: string;
-  readonly title: string;
-  readonly description: string;
-  readonly source: string;
-  readonly guide: string;
-}
-
-export interface RenderedLandingExample extends LandingExample {
-  readonly highlightedCode: string;
-}
+/** Pure landing metadata backed by maintained grouped application sources. */
+import type { LandingExample } from "./data.types";
+export type { LandingExample, RenderedLandingExample } from "./data.types";
 
 export const exampleDefinitions = [
   {
     id: "service",
     title: "Service",
     description: "Organize a domain around one focused public boundary.",
-    source: "examples/commerce/src/orders/service.ts",
+    source: "examples/commerce/src/services/orders/service.ts",
     guide: "/docs/service",
   },
   {
@@ -29,7 +21,7 @@ export const exampleDefinitions = [
     id: "function",
     title: "Functions",
     description: "Run schema-checked business logic with explicit dependencies.",
-    source: "examples/commerce/src/orders/functions/create-order.function.ts",
+    source: "examples/commerce/src/services/orders/functions/create-order.function.ts",
     guide: "/docs/fundamentals/functions",
   },
   {

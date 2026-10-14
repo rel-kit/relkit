@@ -1,3 +1,4 @@
+/** Synchronous admission facade and joined lifetime for the development source watcher. */
 import type { Effect } from "effect";
 
 /** Existing synchronous watcher admission boundary. */

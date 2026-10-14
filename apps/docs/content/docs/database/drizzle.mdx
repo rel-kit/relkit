@@ -10,10 +10,10 @@ adapter-neutral architecture.
 
 ## Define once and reuse throughout the app
 
-Export `defineDrizzleService(...)` from `src/database/service.ts`:
+Export `defineDrizzleService(...)` from `src/services/database/service.ts`:
 
-<include cwd lang="ts" meta='title="src/database/service.ts"'>
-  ../../examples/data-model/src/database/service.ts
+<include cwd lang="ts" meta='title="src/services/database/service.ts"'>
+  ../../examples/data-model/src/services/database/service.ts
 </include>
 
 The factory connects to the database. It does not require handwritten table-creation statements.

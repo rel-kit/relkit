@@ -43,7 +43,32 @@ async function invokeHttp(request) {
   const task = request.auth === undefined
     ? execute()
     : authRequestStorage.run(request.auth, execute);
-  return await runtimeOwner.track(task);
+  const result = await runtimeOwner.track(task);
+  return request.auth === undefined ? result : retainStreamAuth(result, request.auth);
+}
+
+/** Preserves admitted request authority on lazy native iterator operations.
+ * @param result - Original scalar or single-consumer iterable returned by invocation.
+ * @param auth - Native request authentication captured before HTTP invocation returns.
+ * @returns The unchanged scalar or a protocol adapter retaining original pulls and cleanup.
+ */
+function retainStreamAuth(result, auth) {
+  if (result === null || typeof result !== "object" || typeof result[Symbol.asyncIterator] !== "function") return result;
+  return {
+    [Symbol.asyncIterator]() {
+      const iterator = authRequestStorage.run(auth, () => result[Symbol.asyncIterator]());
+      return {
+        next: (...args) => authRequestStorage.run(auth, () => iterator.next(...args)),
+        ...(iterator.return === undefined ? {} : {
+          return: (...args) => authRequestStorage.run(auth, () => iterator.return(...args)),
+        }),
+        ...(iterator.throw === undefined ? {} : {
+          throw: (...args) => authRequestStorage.run(auth, () => iterator.throw(...args)),
+        }),
+        [Symbol.asyncIterator]() { return this; },
+      };
+    },
+  };
 }
 
 async function invocationContext({ invocation, signal, env, time }, spanId) {

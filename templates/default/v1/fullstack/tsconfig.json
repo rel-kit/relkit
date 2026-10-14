@@ -8,6 +8,7 @@
     "paths": { "@app/*": ["src/*"] },
     "lib": ["ES2022"],
     "types": ["bun"],
+    "typeRoots": ["./node_modules/@types"],
     "plugins": [{ "name": "@relkit/cli/editor" }],
     "strict": true,
     "noUncheckedIndexedAccess": true,

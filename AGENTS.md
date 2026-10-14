@@ -30,6 +30,23 @@ port `3210` by default. `.relkit/generated` contains graph and manifest outputs;
 `.relkit/observability` contain local runtime data. Preserve user-owned output
 and dirty worktree changes.
 
+New applications group generic, database, and auth boundaries at
+`src/services/<name>/service.ts`, with their descriptors, schemas, helpers, and
+assets colocated beneath that service. Routes remain in `src/routes`; environment
+contracts and explicitly imported configuration/provider fragments live in
+`src/platform`. Application descriptors use plain TypeScript and public RELKIT
+APIs, without requiring Effect imports.
+
+Existing flat `src/<name>/service.ts` applications remain supported; add preserves
+their detected layout and empty projects default to grouped. Never mix service
+roots, nest boundaries, or create an aggregate `src/services/service.ts`.
+Cross-service and route imports use the destination's public `service.ts`;
+Platform cannot import services or Routes. Helpers do not independently create
+domains. Preserve logical IDs, exposure, policies, and durable versions during
+source-only moves. Optional `relkit migrate layout` previews before `--write`;
+`--rollback <receipt>` restores only matching owned bytes. Check, typecheck, and
+fresh `relkit dev --prepare` are required after either operation.
+
 ## Commands
 
 From the repository root:

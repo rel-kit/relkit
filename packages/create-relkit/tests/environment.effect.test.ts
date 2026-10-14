@@ -34,8 +34,9 @@ it.live(
               typeof language === "number" ? language : language.languageVersion,
               true,
             )
-          : original(file, language, onError, createNew);
-      const mutation = ts.createProgram([fixture], parsed.options, host);
+          : (actual.getSourceFile(file) ?? original(file, language, onError, createNew));
+      // Only the fixture changes; reuse its already-parsed dependencies in the mutation check.
+      const mutation = ts.createProgram([fixture], parsed.options, host, actual);
       const diagnostics = ts.getPreEmitDiagnostics(mutation);
       expect(diagnostics.filter((error) => error.code === 2578)).toHaveLength(7);
     }),

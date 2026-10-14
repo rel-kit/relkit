@@ -30,23 +30,9 @@ export function snapshotTypecheckObservations(witnesses: readonly TypecheckInput
       .filter((witness) => witness.kind === "directoryExists" && !witness.exists)
       .map((query) => query.path),
   );
-  const dependencyRoots = new Set(
-    witnesses
-      .filter(
-        (witness) => witness.kind === "read" || (witness.kind !== "directories" && witness.exists),
-      )
-      .map((witness) => dependencyRoot(witness.path))
-      .filter((path): path is string => path !== undefined),
-  );
   return witnesses
     .filter((witness) => witness.kind !== "read")
     .filter((query) => {
-      if (
-        [...dependencyRoots].some(
-          (root) => query.path === root || query.path.startsWith(`${root}/`),
-        )
-      )
-        return false;
       if (query.kind === "directories") return true;
       if (query.exists)
         return !(query.kind === "fileExists" ? reads.has(query.path) : directories.has(query.path));
@@ -57,13 +43,4 @@ export function snapshotTypecheckObservations(witnesses: readonly TypecheckInput
       }
       return true;
     });
-}
-
-/** Returns one installed package root while preserving root-level shadow probes. */
-function dependencyRoot(path: string): string | undefined {
-  const segments = path.split("/");
-  if (segments[0] !== "node_modules" || segments.length < 2) return undefined;
-  if (segments[1]?.startsWith("@"))
-    return segments.length < 3 ? undefined : segments.slice(0, 3).join("/");
-  return segments.slice(0, 2).join("/");
 }

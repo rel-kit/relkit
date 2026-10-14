@@ -36,7 +36,7 @@ export async function verifyCreationTuple(root: string, selection: CreationTuple
   expect(result.gitInitialized).toBe(git);
   verifyGeneratedManifest(manifest, template);
   expect(tsconfig.compilerOptions).toMatchObject({ baseUrl: ".", paths: { "@app/*": ["src/*"] } });
-  expect(result.files.some((path) => path.startsWith("src/hello/functions/"))).toBe(true);
+  expect(result.files.some((path) => path.startsWith("src/services/hello/functions/"))).toBe(true);
   expect(result.files.some((path) => path.startsWith("tests/"))).toBe(examples);
   for (const path of [
     ".agents/skills/relkit/SKILL.md",

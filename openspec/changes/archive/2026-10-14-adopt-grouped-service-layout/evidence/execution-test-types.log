@@ -1,0 +1,1 @@
+$ bun x tsc -p packages/runtime-effect/tsconfig.tests.json --pretty false && bun x tsc -p packages/providers-local/tsconfig.tests.json --pretty false && bun x tsc -p packages/engine/tsconfig.tests.json --pretty false && bun x tsc -p packages/runtime-hono/tsconfig.tests.json --pretty false

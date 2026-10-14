@@ -1,3 +1,4 @@
+/** Checks service placement, native public authoring examples and linked capability guides through finite read-only source assertions. */
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -5,6 +6,10 @@ import { features } from "../scripts/feature-catalog.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 import { serviceGuideGroup } from "../scripts/service-guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
+/** Reads one owned service guide at the native synchronous test boundary.
+ * @param page - Service guide path selected by this suite.
+ * @returns Original guide text; missing input fails the native test.
+ */
 const read = (page: string) => readFileSync(resolve(content, `service/${page}.mdx`), "utf8");
 test("introduces Service after Core concepts with source-backed, connected guides", () => {
   expect(guideGroups.map(({ directory }) => directory).slice(0, 5)).toEqual([
@@ -61,8 +66,8 @@ test("routes code-placement questions into existing capability and HTTP guides",
 test("walks through the Orders service using the executable API starter", () => {
   const tutorial = read("first-service");
   for (const path of [
-    "src/orders/functions/create-order.function.ts",
-    "src/orders/service.ts",
+    "src/services/orders/functions/create-order.function.ts",
+    "src/services/orders/service.ts",
     "src/routes/orders/route.ts",
     "tests/unit/orders.function.test.ts",
   ]) {

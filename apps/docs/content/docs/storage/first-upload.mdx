@@ -29,16 +29,16 @@ choices are described in [Define a bucket](/docs/storage/define).
 
 ## Define the bucket
 
-<include cwd lang="ts" meta='title="src/assets/buckets/assets.bucket.ts"'>
-  ../../examples/commerce/src/assets/buckets/assets.bucket.ts
+<include cwd lang="ts" meta='title="src/services/assets/buckets/assets.bucket.ts"'>
+  ../../examples/commerce/src/services/assets/buckets/assets.bucket.ts
 </include>
 
 ## Add the upload function
 
 The function validates the upload, saves each image, and returns the stored keys:
 
-<include cwd lang="ts" meta='title="src/assets/functions/upload-assets.function.ts"'>
-  ../../examples/commerce/src/assets/functions/upload-assets.function.ts
+<include cwd lang="ts" meta='title="src/services/assets/functions/upload-assets.function.ts"'>
+  ../../examples/commerce/src/services/assets/functions/upload-assets.function.ts
 </include>
 
 For this local example, filenames are the keys. Reusing a filename replaces that object. Use server-generated keys and authorize requests before accepting real users' uploads.
@@ -47,8 +47,8 @@ For this local example, filenames are the keys. Reusing a filename replaces that
 
 Add the function to your Assets service:
 
-<include cwd lang="ts" meta='title="src/assets/service.ts"'>
-  ../../examples/commerce/src/assets/service.ts
+<include cwd lang="ts" meta='title="src/services/assets/service.ts"'>
+  ../../examples/commerce/src/services/assets/service.ts
 </include>
 
 Connect it to `POST /uploads`:

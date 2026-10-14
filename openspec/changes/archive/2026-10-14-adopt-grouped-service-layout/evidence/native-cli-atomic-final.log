@@ -1,0 +1,1697 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/commands-protocol.test.ts:
+(pass) graph print/check/diff success and failure use structured exits [664.58ms]
+(pass) graph commands accept current services and reject stale or unbound identities [331.59ms]
+(pass) env and doctor cover safe success, failure, and usage paths [33.74ms]
+(pass) local up is Docker-free without declarations and reset requires confirmation [345.77ms]
+
+packages/cli/scaffold-local.test.ts:
+(pass) removes descriptor duplication and defers the Docker reminder in the preview [0.13ms]
+(pass) offers detached local startup after success, approval=%s [0.74ms]
+(pass) offers detached local startup after success, approval=%s [0.16ms]
+(pass) keeps saved files and a retry reminder when local startup fails [0.21ms]
+(pass) never starts Docker in headless, JSON, CI or unverified runs [0.50ms]
+(pass) cancelling the post-scaffold prompt does not claim the scaffold was rolled back [0.29ms]
+
+packages/cli/dev-presentation.test.ts:
+(pass) redacts candidate output before callbacks and human sinks [3.85ms]
+(pass) hides internal child operations while retaining request logs, evidence and verbose diagnostics [1.48ms]
+(pass) uses the production inspector and configured port by default [0.52ms]
+(pass) keeps inspector disconnect output out of normal shutdown while retaining cleanup failures [0.64ms]
+
+packages/cli/dev-telemetry-error.test.ts:
+(pass) telemetry lock errors name the owner and recovery without DuckDB noise [1.95ms]
+(pass) other telemetry open failures retain their diagnostic [0.29ms]
+
+packages/cli/local.test.ts:
+(pass) manages detached project services and protects live attached leases [2480.67ms]
+
+packages/cli/commands-core-start.test.ts:
+[23:27:36.664] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.185333,
+}
+[23:27:36.666] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.604417,
+}
+[23:27:36.668] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 2.08025,
+}
+[23:27:36.668] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.113334,
+}
+[23:27:36.674] INFO (#4030): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 5.884542,
+}
+[23:27:37.467] INFO (#4371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.health.body",
+  outcome: "success",
+  duration_ms: 0.088083,
+}
+[23:27:37.467] INFO (#4371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.graph.body",
+  outcome: "success",
+  duration_ms: 0.053542,
+}
+[23:27:37.487] INFO (#4371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.routes.body",
+  outcome: "success",
+  duration_ms: 0.108083,
+}
+[23:27:37.487] INFO (#4371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.functions.body",
+  outcome: "success",
+  duration_ms: 0.028166,
+}
+[23:27:37.537] INFO (#4371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.route.body",
+  outcome: "success",
+  duration_ms: 0.084,
+}
+[23:27:37.564] INFO (#4371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.action.body",
+  outcome: "success",
+  duration_ms: 0.082667,
+}
+[23:27:37.661] INFO (#4371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.logs.body",
+  outcome: "success",
+  duration_ms: 0.074541,
+}
+[23:27:37.667] INFO (#4371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.logs.next",
+  outcome: "success",
+  duration_ms: 0.0465,
+}
+[23:27:37.698] INFO (#4411): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 4.686125,
+}
+(pass) start serves health, graph, inspector collections, and rejects an invalid build [1035.57ms]
+[23:27:37.701] INFO (#4412): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 2.062,
+}
+[23:27:37.701] INFO (#4412): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.561833,
+}
+[23:27:37.701] INFO (#4412): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.13075,
+}
+[23:27:37.701] INFO (#4412): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.031209,
+}
+[23:27:37.707] INFO (#4412): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 5.538541,
+}
+[23:27:38.426] INFO (#4769): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 4.26625,
+}
+(pass) start cleanup follows an external abort signal [727.79ms]
+[23:27:38.426] INFO (#4770): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.088416,
+}
+[23:27:38.427] INFO (#4770): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.518834,
+}
+[23:27:38.427] INFO (#4770): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.125083,
+}
+[23:27:38.427] INFO (#4770): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.0315,
+}
+[23:27:38.434] INFO (#4770): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 7.227417,
+}
+[23:27:39.157] INFO (#5127): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 4.368541,
+}
+(pass) production start keeps internal endpoints private [730.50ms]
+
+packages/cli/dev-candidates.test.ts:
+[23:27:39.165] INFO (#5128): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 1.854625,
+}
+[23:27:39.241] INFO (#5454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 5.660417,
+}
+[23:27:39.241] INFO (#5454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.321625,
+}
+(pass) keeps the active backend when a later candidate fails [79.26ms]
+[23:27:39.241] INFO (#5531): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.133334,
+}
+[23:27:39.466] INFO (#7226): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.010917,
+}
+[23:27:39.467] INFO (#7226): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.35875,
+}
+(pass) retains fingerprints only for active or draining generations across failed verifications [225.70ms]
+[23:27:39.467] INFO (#7227): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.158875,
+}
+[23:27:39.480] INFO (#7363): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.371208,
+}
+(pass) preserves the initial candidate failure [13.06ms]
+
+packages/cli/env.test.ts:
+(pass) relkit env commands > checks environment-specific requirements and keeps values out of output [0.81ms]
+(pass) relkit env commands > generates deterministic redacted examples without overwriting edits [1.93ms]
+
+packages/cli/dev-scaffold.test.ts:
+[23:27:39.497] INFO (#7423): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.216833,
+}
+[23:27:41.604] INFO (#9354): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 3.266666,
+}
+[23:27:41.605] INFO (#9354): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.549875,
+}
+(pass) holds reload until a real scaffold transaction finishes installation or rollback [2108.16ms]
+
+packages/cli/dev-check.test.ts:
+[23:27:41.611] INFO (#9428): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.212209,
+}
+[23:27:41.881] INFO (#9428): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 270.3695,
+}
+[23:27:41.882] INFO (#9428): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.426292,
+}
+[23:27:41.882] INFO (#9428): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 271.449292,
+}
+(pass) isolated development checks retain ordinary diagnostics [271.95ms]
+[23:27:41.882] INFO (#9441): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.142375,
+}
+[23:27:42.150] INFO (#9441): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 268.269083,
+}
+[23:27:42.151] INFO (#9441): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.286667,
+}
+[23:27:42.151] INFO (#9441): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 268.914417,
+}
+(pass) an abruptly exited compiler reports its bounded stderr instead of hanging [269.07ms]
+[23:27:42.151] INFO (#9454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.154916,
+}
+[23:27:42.411] INFO (#9467): Execution operation completed {
+  domain: "testing",
+  operation: "dev-check.pids",
+  outcome: "success",
+  duration_ms: 0.432375,
+}
+[23:27:42.411] INFO (#9468): Execution operation completed {
+  domain: "testing",
+  operation: "dev-check.reap",
+  outcome: "success",
+  duration_ms: 0.164791,
+}
+[23:27:42.411] INFO (#9454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 260.103708,
+}
+[23:27:42.412] INFO (#9454): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.411541,
+}
+[23:27:42.412] INFO (#9454): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 260.838,
+}
+(pass) a completed check releases imported timers and owned descendants [261.03ms]
+[23:27:42.412] INFO (#9469): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.129167,
+}
+[23:27:42.662] INFO (#9475): Execution operation completed {
+  domain: "testing",
+  operation: "dev-check.pids",
+  outcome: "success",
+  duration_ms: 249.65125,
+}
+[23:27:42.666] INFO (#9484): Execution operation completed {
+  domain: "testing",
+  operation: "dev-check.reap",
+  outcome: "success",
+  duration_ms: 0.0455,
+}
+[23:27:42.666] INFO (#9469): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 253.936333,
+}
+[23:27:42.667] INFO (#9469): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.26925,
+}
+[23:27:42.667] INFO (#9469): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 254.45925,
+}
+(pass) cancellation joins a CPU-bound compiler and terminates its evaluator process group [254.52ms]
+
+packages/cli/port-availability.test.ts:
+(pass) identifies occupied ports and their CLI override [51.28ms]
+
+packages/cli/commands-core-build.test.ts:
+[23:27:42.724] INFO (#9501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.162375,
+}
+[23:27:42.724] INFO (#9501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.51875,
+}
+[23:27:42.725] INFO (#9501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.135042,
+}
+[23:27:42.726] INFO (#9501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.053834,
+}
+[23:27:42.732] INFO (#9501): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 5.342583,
+}
+[23:27:44.823] INFO (#9715): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 3.002,
+}
+(pass) check refreshes generated event types before project typechecking [2099.51ms]
+[23:27:44.824] INFO (#9716): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.15325,
+}
+[23:27:44.824] INFO (#9716): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.664791,
+}
+[23:27:44.825] INFO (#9716): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.153458,
+}
+[23:27:44.825] INFO (#9716): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.039166,
+}
+[23:27:44.831] INFO (#9716): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 6.622458,
+}
+[23:27:45.330] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.081542,
+}
+[23:27:45.331] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.044667,
+}
+[23:27:45.331] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.055083,
+}
+[23:27:45.331] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.034458,
+}
+[23:27:45.331] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.041625,
+}
+[23:27:45.332] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.815875,
+}
+[23:27:45.332] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.111834,
+}
+[23:27:45.332] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.05,
+}
+[23:27:45.332] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.036958,
+}
+[23:27:45.332] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.044667,
+}
+[23:27:45.332] INFO (#9975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.042334,
+}
+[23:27:45.773] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.09375,
+}
+[23:27:45.773] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.0455,
+}
+[23:27:45.773] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.038875,
+}
+[23:27:45.773] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.038334,
+}
+[23:27:45.773] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.044125,
+}
+[23:27:45.774] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 1.133458,
+}
+[23:27:45.774] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.123125,
+}
+[23:27:45.774] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.047167,
+}
+[23:27:45.775] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.036875,
+}
+[23:27:45.775] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.04375,
+}
+[23:27:45.775] INFO (#10225): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.artifact.read",
+  outcome: "success",
+  duration_ms: 0.03675,
+}
+[23:27:45.779] INFO (#10300): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.110792,
+}
+[23:27:45.780] INFO (#10300): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.614584,
+}
+[23:27:45.780] INFO (#10300): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.129,
+}
+[23:27:45.780] INFO (#10300): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.029958,
+}
+[23:27:45.790] INFO (#10300): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 9.303917,
+}
+[23:27:46.102] INFO (#10495): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 2.349625,
+}
+[23:27:46.106] INFO (#10495): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 3.84125,
+}
+(pass) build succeeds from a checked graph and reports failed checks [1283.17ms]
+[23:27:46.107] INFO (#10496): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.11175,
+}
+[23:27:46.107] INFO (#10496): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.517416,
+}
+[23:27:46.107] INFO (#10496): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.134625,
+}
+[23:27:46.107] INFO (#10496): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.026083,
+}
+[23:27:46.115] INFO (#10496): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 7.862292,
+}
+[23:27:46.419] INFO (#10756): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 3.45725,
+}
+(pass) rejects malformed jobs manifests before activation [312.94ms]
+[23:27:46.420] INFO (#10757): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.099291,
+}
+[23:27:46.420] INFO (#10757): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.567125,
+}
+[23:27:46.420] INFO (#10757): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.150333,
+}
+[23:27:46.420] INFO (#10757): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.025875,
+}
+[23:27:46.429] INFO (#10757): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 8.139375,
+}
+[23:27:46.878] INFO (#11006): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 4.242208,
+}
+(pass) build carries server port, body limit, and API docs settings into runtime artifacts [458.66ms]
+
+packages/cli/commands-core.test.ts:
+[23:27:47.468] INFO (#11009): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.248625,
+}
+[23:27:47.469] INFO (#11009): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.853583,
+}
+[23:27:47.470] INFO (#11009): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.2235,
+}
+[23:27:47.470] INFO (#11009): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.065458,
+}
+[23:27:47.505] INFO (#11009): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 34.737583,
+}
+[23:27:48.181] INFO (#11403): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 5.528042,
+}
+[23:27:48.182] INFO (#11403): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 1.354,
+}
+[23:27:48.182] INFO (#11403): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.1445,
+}
+[23:27:48.182] INFO (#11403): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.041584,
+}
+[23:27:48.187] INFO (#11403): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 5.195,
+}
+[23:27:48.482] INFO (#11550): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 2.296292,
+}
+[23:27:48.485] INFO (#11550): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 3.173625,
+}
+(pass) check emits activatable success and portable structured diagnostics on failure [1018.46ms]
+[23:27:48.486] INFO (#11551): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.102792,
+}
+[23:27:48.486] INFO (#11551): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.470292,
+}
+[23:27:48.486] INFO (#11551): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.133292,
+}
+[23:27:48.486] INFO (#11551): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.029,
+}
+[23:27:48.494] INFO (#11551): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 7.876,
+}
+[23:27:49.067] INFO (#11779): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 3.079333,
+}
+(pass) failed checks preserve the last valid graph and update diagnostics [581.91ms]
+[23:27:49.068] INFO (#11780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.126875,
+}
+[23:27:49.069] INFO (#11780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 0.605084,
+}
+[23:27:49.069] INFO (#11780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.168458,
+}
+[23:27:49.069] INFO (#11780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.051,
+}
+[23:27:49.074] INFO (#11780): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 5.524917,
+}
+[23:27:49.805] INFO (#11878): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 2.217042,
+}
+(pass) dev compile failures identify the source and suggested fix [737.82ms]
+[23:27:49.806] INFO (#11879): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture",
+  outcome: "success",
+  duration_ms: 0.10575,
+}
+[23:27:49.808] INFO (#11879): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.copy",
+  outcome: "success",
+  duration_ms: 2.818083,
+}
+[23:27:49.809] INFO (#11879): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.manifest",
+  outcome: "success",
+  duration_ms: 0.225333,
+}
+[23:27:49.809] INFO (#11879): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.modules",
+  outcome: "success",
+  duration_ms: 0.04025,
+}
+[23:27:49.815] INFO (#11879): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.links",
+  outcome: "success",
+  duration_ms: 6.1415,
+}
+[23:27:49.821] INFO (#11907): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command.fixture.release",
+  outcome: "success",
+  duration_ms: 2.266125,
+}
+(pass) check locates removed config keys and shows the fixed replacement [15.75ms]
+
+packages/cli/editor.test.ts:
+(pass) the packaged editor plugin reports unsaved route mistakes and offers a working code fix [3229.83ms]
+(pass) the editor entry point loads through Node and TypeScript's plugin resolver [184.45ms]
+(pass) the packaged editor excludes test and fixture routes but diagnoses application routes [2.36ms]
+
+packages/cli/dev.test.ts:
+[23:27:53.246] INFO (#11908): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.400542,
+}
+[23:27:55.134] INFO (#13350): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 6.749208,
+}
+[23:27:55.134] INFO (#13350): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.392375,
+}
+(pass) serves the active generation throughout a CPU-heavy failed check and recovers [1890.72ms]
+[23:27:55.135] INFO (#13424): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.132084,
+}
+[23:27:55.179] INFO (#13747): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.041083,
+}
+(pass) owns a stable proxy, dynamic backend, candidate, and clean stop [44.53ms]
+
+packages/cli/route-review-regressions.test.ts:
+[23:27:55.179] INFO (#13747): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.3315,
+}
+[23:27:55.188] INFO (#13749): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.228125,
+}
+[23:27:55.189] INFO (#13749): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.909542,
+}
+[23:27:55.193] INFO (#13749): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 4.252084,
+}
+[23:27:55.193] INFO (#13748): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.route.fixture.canonical",
+  outcome: "success",
+  duration_ms: 6.03075,
+}
+[23:27:55.194] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.298583,
+}
+[23:27:55.194] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.0965,
+}
+[23:27:55.194] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.091708,
+}
+[23:27:55.194] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090958,
+}
+[23:27:55.194] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.093583,
+}
+[23:27:55.194] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.133834,
+}
+[23:27:55.197] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 2.737833,
+}
+[23:27:55.197] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.18825,
+}
+[23:27:55.198] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.14975,
+}
+[23:27:55.198] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.15975,
+}
+[23:27:55.198] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.107708,
+}
+[23:27:55.198] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.096042,
+}
+[23:27:55.198] INFO (#13752): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.146292,
+}
+[23:27:58.155] INFO (#13756): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.route.graph.read",
+  outcome: "success",
+  duration_ms: 0.213375,
+}
+[23:28:00.680] INFO (#13829): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 8.460041,
+}
+(pass) the real CLI accepts annotated explicit path mappings and still rejects missing inferred inputs [5493.75ms]
+[23:28:00.681] INFO (#13831): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.216417,
+}
+[23:28:00.682] INFO (#13831): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.665708,
+}
+[23:28:00.685] INFO (#13831): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.96825,
+}
+[23:28:00.685] INFO (#13830): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.route.fixture.canonical",
+  outcome: "success",
+  duration_ms: 4.185666,
+}
+[23:28:00.685] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.294583,
+}
+[23:28:00.685] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.138583,
+}
+[23:28:00.686] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.110709,
+}
+[23:28:00.686] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.102458,
+}
+[23:28:00.686] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.106375,
+}
+[23:28:00.686] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1155,
+}
+[23:28:00.686] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095375,
+}
+[23:28:00.686] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.091167,
+}
+[23:28:00.686] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1025,
+}
+[23:28:00.687] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.138541,
+}
+[23:28:00.687] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.093792,
+}
+[23:28:00.687] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090334,
+}
+[23:28:00.687] INFO (#13834): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.141125,
+}
+[23:28:22.090] INFO (#13844): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.576083,
+}
+(pass) the real CLI ignores excluded route fixtures without suppressing invalid application routes [21409.13ms]
+
+packages/cli/dev-persistence.test.ts:
+(pass) generated backend reloads preserve committed telemetry without bundling the native driver [10288.96ms]
+(pass) remote capture redacts before transport and reports dropped records without failing application work [277.23ms]
+
+packages/cli/product-runtime.test.ts:
+(pass) the emitted full-graph server runs agents and correlated observability [2243.40ms]
+
+packages/cli/api-docs-source.test.ts:
+(pass) passes configured domain exclusions to the runtime API reference
+
+packages/cli/route-module-check.test.ts:
+[23:28:34.919] INFO (#19571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.251708,
+}
+[23:28:34.920] INFO (#19571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.728625,
+}
+[23:28:34.923] INFO (#19571): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.178917,
+}
+[23:28:34.923] INFO (#19570): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.route.fixture.canonical",
+  outcome: "success",
+  duration_ms: 4.756333,
+}
+[23:28:34.923] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.232959,
+}
+[23:28:34.924] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.137,
+}
+[23:28:34.924] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.114084,
+}
+[23:28:34.924] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.106083,
+}
+[23:28:34.924] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.086625,
+}
+[23:28:34.924] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.094042,
+}
+[23:28:34.924] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.091958,
+}
+[23:28:34.924] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.107125,
+}
+[23:28:34.924] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095792,
+}
+[23:28:34.925] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.140958,
+}
+[23:28:34.925] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.088375,
+}
+[23:28:34.925] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.088667,
+}
+[23:28:34.925] INFO (#19574): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.143167,
+}
+[23:28:39.787] INFO (#20155): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 4.710416,
+}
+(pass) route type failures retain the last valid manifest and recover after the export is fixed [4870.68ms]
+
+packages/cli/scaffolding.test.ts:
+(pass) parses every add value through the Effect command tree [4.45ms]
+(pass) keeps add JSON isolated to one result object [4.34ms]
+(pass) shows and confirms an interactively resolved add plan [6.41ms]
+(pass) opens the context menu only for an empty TTY invocation [4.37ms]
+(pass) maps the project local-services action to a useful status command [0.73ms]
+
+packages/cli/specialized-logging.test.ts:
+(pass) generated specialized debug logs reach the configured dev sink with retained annotations [2.38ms]
+
+packages/cli/environment-runtime.test.ts:
+(pass) the emitted server rejects missing production environment before provider startup [2139.13ms]
+
+packages/cli/editor-compatibility.test.ts:
+(pass) the packaged plugin uses the editor's TypeScript for dynamic route inputs and recovery [3916.24ms]
+
+packages/cli/local-service-options.test.ts:
+(pass) keeps the initial Inngest endpoint on the host until workers are active [0.21ms]
+(pass) uses stable compiled job generations for local bindings [0.28ms]
+(pass) rewrites only loopback provider endpoints for worker containers [7.89ms]
+
+packages/cli/build-support.test.ts:
+[23:28:46.058] INFO (#21650): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.437209,
+}
+[23:28:46.058] INFO (#21650): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 151.434541,
+}
+[23:28:46.071] INFO (#21650): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.133375,
+}
+[23:28:46.071] INFO (#21650): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 12.598458,
+}
+[23:28:46.098] INFO (#21650): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.165584,
+}
+[23:28:46.098] INFO (#21650): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 27.023417,
+}
+(pass) bundles without optional DeepAgents in development [200.03ms]
+[23:28:46.255] INFO (#21666): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.194667,
+}
+[23:28:46.255] INFO (#21666): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 147.507209,
+}
+[23:28:46.269] INFO (#21666): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.170333,
+}
+[23:28:46.270] INFO (#21666): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 14.474958,
+}
+[23:28:46.291] INFO (#21666): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.181792,
+}
+[23:28:46.291] INFO (#21666): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 21.038042,
+}
+(pass) bundles without optional DeepAgents in production [192.39ms]
+[23:28:46.441] INFO (#21682): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.201583,
+}
+[23:28:46.441] INFO (#21682): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 139.198416,
+}
+[23:28:46.455] INFO (#21682): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.148666,
+}
+[23:28:46.455] INFO (#21682): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 13.432209,
+}
+(pass) bundles hoisted DeepAgents into a standalone production server [174.43ms]
+[23:28:46.613] INFO (#21693): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.227083,
+}
+[23:28:46.613] INFO (#21693): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 140.609833,
+}
+[23:28:46.628] INFO (#21693): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.132833,
+}
+[23:28:46.628] INFO (#21693): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 13.849083,
+}
+(pass) bundles nested DeepAgents into a standalone production server [170.86ms]
+[23:28:46.785] INFO (#21704): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.23175,
+}
+[23:28:46.785] INFO (#21704): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 139.685625,
+}
+(pass) missing required imports still fail bundling and remove the temporary module link [149.38ms]
+[23:28:46.950] INFO (#21710): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.246958,
+}
+[23:28:46.950] INFO (#21710): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 157.15225,
+}
+[23:28:46.974] INFO (#21710): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.194583,
+}
+[23:28:46.974] INFO (#21710): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 18.819,
+}
+(pass) preparation seals lazy chunks that run after relocation without installed modules [188.62ms]
+
+packages/cli/dev-shutdown.test.ts:
+(pass) shutdown stops the inspector while the proxy waits for its requests to close [2.13ms]
+
+packages/cli/ports.test.ts:
+(pass) framework port precedence > resolves application flag, environment, config, and default in order [0.52ms]
+(pass) framework port precedence > resolves inspector precedence and rejects invalid environment values [0.11ms]
+
+packages/cli/deepagent-bucket-registration.test.ts:
+(pass) generated agents receive only their declared bucket dependency [3.85ms]
+
+packages/cli/build-activation.test.ts:
+(pass) keeps the last-known-good build when staged activation fails [3.81ms]
+(pass) activates a complete staged build and replaces the old cohort [2.10ms]
+
+packages/cli/jobs-commands.test.ts:
+(pass) jobs CLI > pins jobs requests to the local loopback server [0.20ms]
+(pass) jobs CLI > rejects an unsafe local server port before building a request URL [0.10ms]
+[23:28:47.022] INFO (#21787): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 3.10675,
+}
+(pass) jobs CLI > resolves a durable job ID and submits through the jobs RPC [15.84ms]
+[23:28:47.027] ERROR (#21810): Execution operation failed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "failure",
+  duration_ms: 0.94875,
+}
+(pass) jobs CLI > reports an unknown trigger outcome with its recovery identifiers [9.16ms]
+(pass) jobs CLI > sends schedule definitions as JSON and queries runtime capabilities [5.09ms]
+[23:28:47.043] INFO (#21871): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 2.057875,
+}
+(pass) jobs CLI > streams projected watch frames and forwards the resume cursor [10.11ms]
+
+packages/cli/regression-13-13.test.ts:
+(pass) preserves active traffic across compile, start, hash, API, and readiness failures [2412.28ms]
+(pass) rapid saves obsolete stale candidates and activate only the latest generation [87.11ms]
+(pass) atomically switches traffic and drains the old request before cleanup [130.75ms]
+(pass) shutdown cleans the active backend, inspector child, and generation directory [69.59ms]
+
+packages/cli/jobs-identity.test.ts:
+(pass) Jobs CLI forwards the backend identity and visitor cookies to RPC [1.55ms]
+(pass) Jobs run flags reach the handler with kebab-case names [3.42ms]
+
+packages/cli/deployment-integrations.test.ts:
+(pass) loads only selected verified deployment role exports [9.95ms]
+(pass) rejects a selected export that reports another role [4.04ms]
+
+packages/cli/start-built.test.ts:
+(pass) accepts only the current complete built artifact cohort [10.66ms]
+
+packages/cli/dev-ownership.test.ts:
+[23:28:49.801] INFO (#26644): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.278458,
+}
+[23:28:49.873] INFO (#26966): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.144334,
+}
+[23:28:49.874] INFO (#26966): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.355791,
+}
+(pass) stops an inspector child through the external shutdown signal [73.20ms]
+[23:28:49.874] INFO (#26983): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.140209,
+}
+[23:28:49.924] INFO (#27287): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.237208,
+}
+[23:28:49.925] INFO (#27287): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.402667,
+}
+(pass) releases the backend port when its terminal closes [51.12ms]
+[23:28:49.926] INFO (#27304): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.162042,
+}
+[23:28:50.888] INFO (#29519): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 3.531666,
+}
+[23:28:50.889] INFO (#29519): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.990709,
+}
+(pass) forwards source, directory, and root configuration changes through the watcher [963.73ms]
+[23:28:50.889] INFO (#29593): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.147209,
+}
+[23:28:50.963] INFO (#29840): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 3.4355,
+}
+[23:28:50.963] INFO (#29840): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.263333,
+}
+(pass) forwards backend console output through dev logs [74.45ms]
+
+packages/cli/doctor.test.ts:
+(pass) doctor validates the fixture without deployment prerequisites [35.26ms]
+(pass) doctor can skip transient port availability during project generation [3.57ms]
+(pass) doctor reports deployment failures without credential values [3.30ms]
+
+packages/cli/build-prepared-manifest.test.ts:
+(pass) preparedRuntimeManifest > rebases escaped deferred imports alongside ordinary imports for a deeper build [2.00ms]
+(pass) preparedRuntimeManifest > partitions HTTP-only executable modules behind one single-flight loader [0.61ms]
+(pass) preparedRuntimeManifest > does not confuse overlapping generated aliases [0.50ms]
+(pass) preparedRuntimeManifest > preserves distinct targets exported by the same deferred module [0.40ms]
+(pass) preparedRuntimeManifest > keeps a function eager when a non-HTTP trigger also owns it [0.32ms]
+(pass) preparedRuntimeManifest > escapes HTML-significant characters in generated import expressions [0.38ms]
+(pass) preparedRuntimeManifest > shares one real module initialization across simultaneous requests [28.43ms]
+(pass) preparedRuntimeManifest > shares a failed import without manufacturing a successful response [2.26ms]
+
+packages/cli/deploy.test.ts:
+(pass) preview plans through Automation API without calling up and redacts config values [11.93ms]
+(pass) up declines destructive changes before mutation [10.96ms]
+(pass) destroy uses explicit non-interactive confirmation and outputs stay secret-safe [16.06ms]
+
+packages/cli/client.test.ts:
+(pass) client pull rejects invalid agent metadata before creating output [8.37ms]
+(pass) client pull writes a validated contract and registry [12.33ms]
+
+packages/cli/dev-logging.test.ts:
+(pass) scaffold rebuild output is concise while verbose and JSON retain diagnostic details [2.10ms]
+(pass) dev JSON uses only the supplied stderr sink after redaction [0.04ms]
+(pass) normal reload failures show every compiler diagnostic and preserve the serving status [0.18ms]
+(pass) dev severity is presentation only; raw and structured child logs are distinct [0.56ms]
+(pass) routine Inspector output is verbose-only and never persisted [1.23ms]
+(pass) verbose lease failures stay actionable without duplicated internals [0.28ms]
+(pass) truncated runtime presentation copies are never persisted a second time [4.54ms]
+(pass) UTF-8, split secrets, final output, and oversized diagnostics remain continuously visible [17.82ms]
+(pass) narrow formatting preserves complete URLs, errors, local milliseconds, and flags [0.84ms]
+
+packages/cli/dev-inspector-installation.test.ts:
+[23:28:51.152] INFO (#31026): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.28375,
+}
+[23:28:51.154] INFO (#31028): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.592083,
+}
+(pass) prefers production when a compiled CLI also contains inspector source [4.84ms]
+[23:28:51.154] INFO (#31029): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.122958,
+}
+[23:28:51.156] INFO (#31067): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.242833,
+}
+(pass) reads the inspector port from relkit.config.ts unless the CLI overrides it [2.36ms]
+
+packages/cli/main.test.ts:
+(pass) covers human and JSON help/version/usage exits [27.21ms]
+(pass) keeps command and create failures structured in JSON [22.01ms]
+(pass) renders focused help for every command and nested subcommand [130.70ms]
+(pass) parses local lifecycle commands and disables dev reconciliation explicitly [8.31ms]
+(pass) forwards tool function creation through the CLI parser [3.26ms]
+(pass) generates completions, suggestions, help metadata, and command status [34.75ms]
+(pass) removes signal handlers and reports interruption without corrupting JSON [9.02ms]
+
+packages/cli/route-path-input.test.ts:
+(pass) the real check pipeline rejects an inferred users path without id input [3472.54ms]
+
+packages/cli/build-server.test.ts:
+(pass) generated runtime carries and verifies its activation fingerprint [5.59ms]
+(pass) generated runtime validates activation-bound provider overrides [0.71ms]
+(pass) generated runtime verifies an optional local-service plan [0.10ms]
+
+ 131 pass
+ 0 fail
+ 1518 expect() calls
+Ran 131 tests across 45 files. [82.79s]

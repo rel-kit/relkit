@@ -1,3 +1,4 @@
+/** Describes the realtime documentation feature using its native channel API and grouped commerce source example. */
 import { feature } from "./documentation-catalog.js";
 
 export const realtimeFeature = feature(
@@ -7,5 +8,5 @@ export const realtimeFeature = feature(
   "realtime/index",
   "realtime",
   [["packages/realtime/src/channel.ts", "defineChannel"]],
-  ["examples/commerce/src/announcements/channels/announcements.channel.ts"],
+  ["examples/commerce/src/services/announcements/channels/announcements.channel.ts"],
 );

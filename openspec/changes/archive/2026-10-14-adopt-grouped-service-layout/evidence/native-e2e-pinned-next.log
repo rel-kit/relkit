@@ -1,0 +1,137 @@
+$ bun run scripts/test-e2e.ts
+[WebServer] $ bun --cwd ../commerce check && next dev --hostname 127.0.0.1
+[WebServer] $ bun ../../packages/cli/dist/bin.js check
+[WebServer] $ next dev --hostname 127.0.0.1 --port "3211"
+[WebServer] (node:91156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91157) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer]       at emitWarning (unknown:1:1)
+[WebServer]       at warnOnDeactivatedColors (internal:tty:33:24)
+[WebServer]       at getColorDepth (internal:tty:42:39)
+[WebServer]       at shouldColorize (internal:util/colors:14:109)
+[WebServer]       at refresh (internal:util/colors:18:31)
+[WebServer]       at internal:util/colors (internal:util/colors:24:16)
+[WebServer]       at anonymous (unknown:1:1)
+[WebServer]       at internal:assert/assertion_error (internal:assert/assertion_error:2:187)
+[WebServer]       at anonymous (unknown:1:1)
+[WebServer]       at loadAssertionError (node:assert:28:96)
+[WebServer] 
+[WebServer] (node:91211) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 31 tests using 1 worker
+
+(node:91283) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91323) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/e2e/inspector-redesign.spec.ts:10:1 › centers select labels before and after changing selection (5.0s)
+  ✓   2 tests/e2e/inspector-redesign.spec.ts:39:1 › supports keyboard search and accessible route table quick views (1.2s)
+
+Running 3 tests using 1 worker
+
+(node:91348) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/e2e-commerce/commerce-example.spec.ts:3:1 › announcements synchronize connected tabs and restore a late tab (1.6s)
+  ✓  2 tests/e2e-commerce/commerce-example.spec.ts:35:1 › commerce support agent negotiates capabilities and settles its streamed run (1.3s)
+  -  3 tests/e2e-commerce/generated-ai-regressions.spec.ts:4:1 › generated dev host admits its browser origin and classifies malformed AI input
+[WebServer] [browser] React Flow: It seems like you are hiding the attribution. Please only do this when you are subscribed to React Flow Pro: https://reactflow.dev/remove-attr
+[WebServer] You can ignore this warning if you are subscribed.
+
+  1 skipped
+  2 passed (17.3s)
+commerce browser suite: 17.7s
+[WebServer] (node:91378) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   3 tests/e2e/inspector-redesign.spec.ts:64:1 › renders the interactive graph, trace waterfall, and Scalar reference (6.3s)
+  ✓   4 tests/e2e/inspector-redesign.spec.ts:100:1 › keeps the shell usable in dark mode and on mobile (952ms)
+[WebServer] (node:91390) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   5 tests/e2e/inspector.spec.ts:14:1 › loads the active graph and follows route/detail/composer flows (1.5s)
+[WebServer] (node:91395) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91399) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91401) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91403) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91404) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   6 tests/e2e/inspector.spec.ts:34:1 › keeps contracts available when observability is unavailable (4.3s)
+[WebServer] (node:91414) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91415) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   7 tests/e2e/inspector.spec.ts:52:1 › runs, resumes, restores, and visualizes a graph without leaking private state (3.8s)
+[WebServer] (node:91420) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   8 tests/e2e/inspector.spec.ts:113:1 › opens raw route details without looking up a nonexistent function (535ms)
+[WebServer] (node:91426) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91443) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 tests/e2e/inspector.spec.ts:147:1 › shows a new request live and renders its correlated timeline and edges (5.9s)
+[WebServer] (node:91490) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91491) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 tests/e2e/inspector.spec.ts:186:1 › follows a paused request through completion and linked work (2.4s)
+[WebServer] (node:91494) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91495) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91496) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  11 tests/e2e/inspector.spec.ts:216:1 › pinpoints failed, timed out, cancelled, and incomplete requests (2.5s)
+[WebServer] (node:91531) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 tests/e2e/inspector.spec.ts:232:1 › renders every required inspector page (8.5s)
+[WebServer] (node:91536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91542) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91543) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 tests/e2e/inspector.spec.ts:273:1 › uses event terminology, local job actions, diagnostics, agent tools, and source links (4.3s)
+[WebServer] (node:91561) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  14 tests/e2e/inspector.spec.ts:313:1 › keeps critical controls usable on a narrow viewport (579ms)
+  ✓  15 tests/e2e/inspector.spec.ts:325:1 › scans inspector bundles and network payloads for boundary leaks (886ms)
+  ✓  16 tests/e2e/log-stability.spec.ts:10:1 › coalesces bursts and only announces matching new logs while inspection is paused (5.9s)
+  ✓  17 tests/e2e/log-stability.spec.ts:49:5 › request lifecycle workspace at 1600px in dark (1.7s)
+  ✓  18 tests/e2e/log-stability.spec.ts:49:5 › request lifecycle workspace at 1600px in light (1.4s)
+  ✓  19 tests/e2e/log-stability.spec.ts:49:5 › request lifecycle workspace at 1024px in dark (1.3s)
+  ✓  20 tests/e2e/log-stability.spec.ts:49:5 › request lifecycle workspace at 1024px in light (1.3s)
+  ✓  21 tests/e2e/log-stability.spec.ts:49:5 › request lifecycle workspace at 390px in dark (1.0s)
+  ✓  22 tests/e2e/log-stability.spec.ts:49:5 › request lifecycle workspace at 390px in light (1.1s)
+  ✓  23 tests/e2e/logs.spec.ts:10:1 › keeps selected rows stable, navigates with keys, searches, and resumes live updates (1.9s)
+  ✓  24 tests/e2e/logs.spec.ts:50:5 › selected log and trace at 1600px in light (1.2s)
+  ✓  25 tests/e2e/logs.spec.ts:50:5 › selected log and trace at 1600px in dark (990ms)
+  ✓  26 tests/e2e/logs.spec.ts:50:5 › selected log and trace at 1024px in light (1.2s)
+  ✓  27 tests/e2e/logs.spec.ts:50:5 › selected log and trace at 1024px in dark (1.2s)
+  ✓  28 tests/e2e/logs.spec.ts:50:5 › selected log and trace at 390px in light (982ms)
+  ✓  29 tests/e2e/logs.spec.ts:50:5 › selected log and trace at 390px in dark (952ms)
+  ✓  30 tests/e2e/logs.spec.ts:73:1 › reports expired logs and unavailable traces without inventing relationships (1.3s)
+[WebServer] (node:91773) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  31 tests/e2e/logs.spec.ts:93:1 › loads additional trace pages in the log pane and full trace view (1.6s)
+
+  31 passed (1.3m)
+inspector browser suite: 80.9s

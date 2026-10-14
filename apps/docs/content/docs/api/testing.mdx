@@ -1237,7 +1237,103 @@ type TestRoute = TestFunctionRoute | TestRawRoute;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L35)
 
+## `application-service-auth.ts`
+
+Composes auth over a borrowed database without taking a second disposal authority.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [acquireApplicationAuth](#acquireapplicationauth)
+  - [nativeServiceError](#nativeserviceerror)
+
+---
+
+# utils
+
+## acquireApplicationAuth
+
+Acquires the optional native auth handler and its protection runtime.
+
+**Signature**
+
+```ts
+declare const acquireApplicationAuth: (
+  platform: ApplicationServicesPlatform,
+  declaration: BetterAuthServiceDescriptor<BetterAuthServiceOptions> | undefined,
+  database: DrizzleActivation<DrizzleServiceDescriptor<any, any, any, any>> | undefined,
+  routes: ReadonlyArray<TestRoute>,
+) => Effect.Effect<Pick<TestApplicationServices, "auth" | "authHandler">, Error, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-auth.ts#L21)
+
+## nativeServiceError
+
+Converts foreign rejections once while retaining native Error identity.
+
+**Signature**
+
+```ts
+declare const nativeServiceError: <Failure>(cause: Failure) => Error;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-auth.ts#L58)
+
+## `application-service-discovery.ts`
+
+Finds native service declarations through the shared, syntax-only layout model.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [loadApplicationServices](#loadapplicationservices)
+  - [soleNativeService](#solenativeservice)
+
+---
+
+# utils
+
+## loadApplicationServices
+
+Loads only evidenced boundaries, in deterministic order, without activating clients.
+
+**Signature**
+
+```ts
+declare const loadApplicationServices: (
+  root: string,
+) => Effect.Effect<Array<DescriptorAny>, Error, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-discovery.ts#L21)
+
+## soleNativeService
+
+Selects the sole native declaration by its capability discriminator.
+
+**Throws**
+
+Error When more than one declaration owns the capability.
+
+**Signature**
+
+```ts
+declare const soleNativeService: <Kind extends "drizzle" | "better-auth">(
+  services: readonly DescriptorAny[],
+  kind: Kind,
+) => (Kind extends "drizzle" ? DatabaseDeclaration : AuthDeclaration) | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-discovery.ts#L79)
+
 ## `application-services.ts`
+
+Owns scoped database/auth activation for a test application in either service layout.
 
 ---
 
@@ -1264,7 +1360,7 @@ type TestRoute = TestFunctionRoute | TestRawRoute;
 declare const ApplicationServicesPlatform: ApplicationServicesPlatform;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L17)
 
 ## TestApplicationServices
 
@@ -1274,11 +1370,11 @@ declare const ApplicationServicesPlatform: ApplicationServicesPlatform;
 declare const TestApplicationServices: TestApplicationServices;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L18)
 
 ## TestServices (class)
 
-Database and authentication context whose lifetime follows its Layer.
+Database and authentication authorities whose lifetime follows their Layer.
 
 **Signature**
 
@@ -1286,11 +1382,11 @@ Database and authentication context whose lifetime follows its Layer.
 declare class TestServices
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L40)
 
 ## TestServicesPlatform (class)
 
-Native service activation dependencies, acquired once per application owner.
+Native activation dependencies acquired once per application owner.
 
 **Signature**
 
@@ -1298,9 +1394,11 @@ Native service activation dependencies, acquired once per application owner.
 declare class TestServicesPlatform
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L22)
 
 ## TestServicesPlatformLive
+
+Live native adapters; no database or auth client is acquired by this Layer.
 
 **Signature**
 
@@ -1308,41 +1406,43 @@ declare class TestServicesPlatform
 declare const TestServicesPlatformLive: Layer.Layer<TestServicesPlatform, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L82)
 
 ## activateTestServices
 
-Acquires database/auth services with reverse-order release on startup failure.
+Acquires services with an idempotent native shutdown hook.
 
 **Signature**
 
 ```ts
 declare const activateTestServices: (
   root: string,
-  env: Readonly<Record<string, unknown>>,
+  env: ServiceEnvironment,
   routes: readonly TestRoute[],
 ) => Promise<TestApplicationServices>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L109)
 
 ## testServicesLayer
 
-Defines the service workflow independently of native activation implementations.
+Builds an owner-scoped Layer over replaceable native dependencies.
 
 **Signature**
 
 ```ts
 declare const testServicesLayer: (
   root: string,
-  env: Readonly<Record<string, unknown>>,
+  env: ServiceEnvironment,
   routes: readonly TestRoute[],
-) => Layer.Layer<TestServices, unknown, TestServicesPlatform>;
+) => Layer.Layer<TestServices, Error, TestServicesPlatform>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L94)
 
 ## `application-services.types.ts`
+
+Native application service ownership and replaceable activation dependencies.
 
 ---
 
@@ -1350,6 +1450,11 @@ declare const testServicesLayer: (
 
 - [utils](#utils)
   - [ApplicationServicesPlatform (interface)](#applicationservicesplatform-interface)
+  - [AuthDeclaration (type alias)](#authdeclaration-type-alias)
+  - [DatabaseDeclaration (type alias)](#databasedeclaration-type-alias)
+  - [NativeAuth (type alias)](#nativeauth-type-alias)
+  - [NativeDatabase (type alias)](#nativedatabase-type-alias)
+  - [ServiceEnvironment (type alias)](#serviceenvironment-type-alias)
   - [TestApplicationServices (interface)](#testapplicationservices-interface)
 
 ---
@@ -1358,36 +1463,88 @@ declare const testServicesLayer: (
 
 ## ApplicationServicesPlatform (interface)
 
-Native activation boundaries replaced by test Layers for partial-acquisition checks.
+Native dependencies substituted by test Layers without replacing ownership.
 
 **Signature**
 
 ```ts
 export interface ApplicationServicesPlatform {
-  readonly load: (root: string) => Promise<readonly Record<string, unknown>[]>;
+  readonly load: (
+    root: string,
+  ) => Effect.Effect<readonly DescriptorAny[], Error | SourceLocationError>;
   readonly database: typeof activateDrizzleService;
   readonly auth: typeof activateBetterAuthService;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L23)
+
+## AuthDeclaration (type alias)
+
+**Signature**
+
+```ts
+type AuthDeclaration = Parameters<typeof activateBetterAuthService>[0];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L11)
+
+## DatabaseDeclaration (type alias)
+
+**Signature**
+
+```ts
+type DatabaseDeclaration = Parameters<typeof activateDrizzleService>[0];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L10)
+
+## NativeAuth (type alias)
+
+**Signature**
+
+```ts
+type NativeAuth = Awaited<ReturnType<typeof activateBetterAuthService>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L9)
+
+## NativeDatabase (type alias)
+
+**Signature**
+
+```ts
+type NativeDatabase = Awaited<ReturnType<typeof activateDrizzleService>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L8)
+
+## ServiceEnvironment (type alias)
+
+**Signature**
+
+```ts
+type ServiceEnvironment = Parameters<typeof activateDrizzleService>[1];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L12)
 
 ## TestApplicationServices (interface)
 
-Acquired owner-specific database and auth authorities with complete cleanup.
+Acquired owner-specific authorities; auth borrows the sole database.
 
 **Signature**
 
 ```ts
 export interface TestApplicationServices {
-  readonly context: Readonly<Record<string, unknown>>;
+  readonly context: { readonly database?: NativeDatabase["context"] };
   readonly auth?: HttpAuthRuntime;
   readonly authHandler?: (request: Request) => Promise<Response>;
   readonly close: () => Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L15)
 
 ## `application.ts`
 

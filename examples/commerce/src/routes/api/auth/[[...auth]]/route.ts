@@ -1,5 +1,6 @@
+/** Mounts the native Better Auth handler once for all methods and protects account/MCP application paths. */
 import { defineRoute } from "@relkit/app/routes";
-import auth from "@app/auth/service.js";
+import auth from "../../../../services/auth/service.js";
 
 export const ALL = defineRoute({
   // Forward every Better Auth method through one filesystem route.

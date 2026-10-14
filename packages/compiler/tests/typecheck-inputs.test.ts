@@ -65,7 +65,7 @@ it.effect("records consumed declaration bytes and missing shadow resolution path
       );
       expect(diagnostics.some((diagnostic) => diagnostic.code === "TS2322")).toBe(true);
       const witnesses = yield* journal.evidence;
-      expect(witnesses).not.toContainEqual(
+      expect(witnesses).toContainEqual(
         expect.objectContaining({ kind: "read", path: "node_modules/fixture/index.d.ts" }),
       );
       expect(witnesses).toContainEqual({
@@ -123,40 +123,45 @@ it.effect("isolates ancestor dependencies while ordinary checks retain native re
         Effect.provideService(TypecheckInputs, journal),
       );
       expect(isolated.some((diagnostic) => diagnostic.code === "TS2307")).toBe(true);
-      expect(JSON.stringify(yield* journal.evidence)).not.toContain(parent);
+      const evidence = yield* journal.evidence;
+      expect(
+        evidence.some((witness) => witness.kind === "read" && witness.path.includes("ancestor")),
+      ).toBe(false);
+      expect(evidence.some((witness) => witness.path.startsWith(".."))).toBe(false);
     }),
   ),
 );
 
-it.effect("keeps linked dependency evidence under dependency capture ownership", () =>
-  Effect.scoped(
-    Effect.gen(function* () {
-      const parent = yield* directory;
-      const root = join(parent, "project");
-      const dependency = join(parent, "linked-dependency");
-      yield* project(root);
-      yield* Effect.promise(async () => {
-        await mkdir(dependency, { recursive: true });
-        await writeFile(join(dependency, "package.json"), '{"types":"index.d.ts"}');
-        await writeFile(join(dependency, "index.d.ts"), "export declare const linked: string;");
-        await symlink(dependency, join(root, "node_modules/linked"));
-        await writeFile(
-          join(root, "src/app.ts"),
-          'import { linked } from "linked"; const result: string = linked;',
+it.effect(
+  "refuses prepared reuse of external linked declarations while resolving the native check",
+  () =>
+    Effect.scoped(
+      Effect.gen(function* () {
+        const parent = yield* directory;
+        const root = join(parent, "project");
+        const dependency = join(parent, "linked-dependency");
+        yield* project(root);
+        yield* Effect.promise(async () => {
+          await mkdir(dependency, { recursive: true });
+          await writeFile(join(dependency, "package.json"), '{"types":"index.d.ts"}');
+          await writeFile(join(dependency, "index.d.ts"), "export declare const linked: string;");
+          await symlink(dependency, join(root, "node_modules/linked"));
+          await writeFile(
+            join(root, "src/app.ts"),
+            'import { linked } from "linked"; const result: string = linked;',
+          );
+        });
+        const journal = yield* TypecheckInputs.make(root);
+        const diagnostics = yield* typecheckProjectEffect(root).pipe(
+          Effect.provideService(TypecheckInputs, journal),
         );
-      });
-      const journal = yield* TypecheckInputs.make(root);
-      const diagnostics = yield* typecheckProjectEffect(root).pipe(
-        Effect.provideService(TypecheckInputs, journal),
-      );
-      expect(diagnostics.some((diagnostic) => diagnostic.code === "TS2307")).toBe(false);
-      const witnesses = yield* journal.evidence;
-      expect(witnesses).not.toContainEqual(
-        expect.objectContaining({ kind: "read", path: "node_modules/linked/index.d.ts" }),
-      );
-      expect(JSON.stringify(witnesses)).not.toContain(dependency);
-    }),
-  ),
+        expect(diagnostics.some((diagnostic) => diagnostic.code === "TS2307")).toBe(false);
+        const exit = yield* Effect.exit(journal.evidence);
+        expect(Exit.isFailure(exit)).toBe(true);
+        if (Exit.isFailure(exit))
+          expect(Cause.squash(exit.cause)).toMatchObject({ reason: "escaped" });
+      }),
+    ),
 );
 
 it.effect("resolves the standard library from the relocatable project installation", () =>

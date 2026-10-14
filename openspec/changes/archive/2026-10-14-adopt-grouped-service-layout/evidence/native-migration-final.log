@@ -1,0 +1,148 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/migration/active-dev.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+11 | import * as Schedule from "effect/Schedule";
+12 | import * as Scope from "effect/Scope";
+13 | import * as TestClock from "effect/testing/TestClock";
+14 | import * as TestConsole from "effect/testing/TestConsole";
+15 | import * as V from "vitest";
+16 | const getCurrentSuite = V.TestRunner.getCurrentSuite;
+                               ^
+TypeError: undefined is not an object (evaluating 'V.TestRunner.getCurrentSuite')
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@effect+vitest@4.0.1+0bf438fc418a04a6/node_modules/@effect/vitest/dist/internal/internal.js:16:27
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+packages/cli/tests/migration/parser.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+2 | import { it, expect } from "@effect/vitest";
+3 | import { Effect } from "effect";
+4 | import { parseEffectCli } from "../../src/cli-effect-runtime.js";
+5 | import { runCli } from "../../src/main.js";
+6 | 
+7 | it.live("parses preview/write/rollback and exposes shared help/completions", () =>
+    ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/parser.test.ts:7:1
+-------------------------------
+
+
+packages/cli/tests/migration/crash.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+2 | import { it, expect } from "@effect/vitest";
+3 | import { Effect } from "effect";
+4 | import { nativeMigrationProbe } from "./native-probe.js";
+5 | import { processLayer } from "../../src/services/process.service.js";
+6 | 
+7 | it.live(
+    ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/crash.test.ts:7:1
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+packages/cli/tests/migration/recovery.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+2 | import { it, expect } from "@effect/vitest";
+3 | import { Effect } from "effect";
+4 | import { nativeMigrationProbe } from "./native-probe.js";
+5 | import { processLayer } from "../../src/services/process.service.js";
+6 | 
+7 | it.live(
+    ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/recovery.test.ts:7:1
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+packages/cli/tests/migration/failure-presentation.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+24 |       error: () => undefined,
+25 |     },
+26 |   };
+27 | }
+28 | 
+29 | it.effect("does not recover a recognized failure mixed with a defect or interruption", () =>
+     ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/failure-presentation.test.ts:29:1
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+packages/cli/tests/migration/rewrite-tooling.test.ts:
+(pass) rewrites actual shell script operands while preserving comments and output payloads [0.71ms]
+(pass) preserves unsupported shell commands and blocks ambiguous or interpolated operands [0.05ms]
+(pass) rewrites package scripts by command syntax while preserving unrelated shell payloads [16.79ms]
+(pass) keeps prose ambiguous but supports explicit Markdown paths and JSON config positions [0.31ms]
+(pass) rewrites complete root literals without matching similarly named unrelated directories [0.35ms]
+
+packages/cli/tests/migration/git.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+2 | import { it, expect } from "@effect/vitest";
+3 | import { Effect } from "effect";
+4 | import { nativeMigrationProbe } from "./native-probe.js";
+5 | import { processLayer } from "../../src/services/process.service.js";
+6 | 
+7 | it.live(
+    ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/git.test.ts:7:1
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+packages/cli/tests/migration/layout.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+2 | import { it, expect } from "@effect/vitest";
+3 | import { Effect } from "effect";
+4 | import { nativeMigrationProbe } from "./native-probe.js";
+5 | import { processLayer } from "../../src/services/process.service.js";
+6 | 
+7 | it.live(
+    ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/layout.test.ts:7:1
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+packages/cli/tests/migration/cancellation.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+2 | import { expect, it } from "@effect/vitest";
+3 | import { Effect } from "effect";
+4 | import { runCli } from "../../src/main.js";
+5 | import { failSignal } from "../../src/main-support.js";
+6 | 
+7 | it.live("reports one secret-safe migration object and status 130 for either native signal", () =>
+    ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/cancellation.test.ts:7:1
+-------------------------------
+
+
+ 5 pass
+ 8 fail
+ 8 errors
+ 13 expect() calls
+Ran 13 tests across 9 files. [948.00ms]

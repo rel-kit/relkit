@@ -1,19 +1,19 @@
 /**
- * Captures a fresh packed default-project candidate after runtime edits.
+ * Captures packed default-project starts, optionally reusing one exact release closure across sets.
  * Packages and the generated application install outside the workspace; a finite
  * registry scope owns setup, and measured starts own separate process groups.
  * Evidence retains fixture identities and every attempt; historical baseline
- * evidence is preserved separately and restart sets remain explicitly diagnostic.
+ * evidence and restart preparation remain separate from each certification set.
  */
 import { resolve } from "node:path";
 import { Effect, Layer } from "effect";
-import { createPackedProject, preparePackedFixture } from "./dev-readiness/packed-fixture.js";
+import { preparePackedFixture } from "./dev-readiness/packed-fixture.js";
+import { packedStartRequest, measurePackedSet } from "./dev-readiness/benchmark-packed-measure.js";
 import { benchmarkNativeLive, BenchmarkNative } from "./dev-readiness/benchmark-native.service.js";
-import { readinessBenchmarkLive, ReadinessBenchmark } from "./dev-readiness/benchmark.service.js";
+import { readinessBenchmarkLive } from "./dev-readiness/benchmark.service.js";
 import { benchmarkReportEffect } from "./dev-readiness/benchmark-report.js";
 import { packedReadinessIdentity } from "./dev-readiness/benchmark-identity.js";
 import { benchmarkHostIdentity } from "./dev-readiness/benchmark-host.js";
-import { packedProbeContract } from "./dev-readiness/packed-probe-contract.js";
 import { runBenchmarkMain } from "./dev-readiness/benchmark-main.js";
 import { candidateSummary } from "./dev-readiness/benchmark-packed-summary.js";
 import type { StartRequest } from "./dev-readiness/benchmark.types.js";
@@ -50,50 +50,24 @@ const main = Effect.fn("ReadinessBenchmark.packedCandidate")(function* () {
   const set = option("--set", "diagnostic");
   if (set !== "diagnostic" && set !== "fresh" && set !== "restart")
     return yield* Effect.die(new Error("--set must be diagnostic, fresh, or restart"));
+  const artifactDirectory = option("--artifacts", "");
+  if (process.argv.includes("--artifacts") && artifactDirectory === "")
+    return yield* Effect.die(new Error("--artifacts requires a directory"));
   const backendPort = yield* allocatePort();
   const inspectorPort = yield* allocatePort();
-  yield* Effect.logInfo("Packing and installing the candidate fixture");
+  yield* Effect.logInfo("Preparing and installing the packed candidate fixture");
   const fixture = yield* preparePackedFixture(
     repository,
     process.argv.includes("--no-examples") ? "no-examples" : "examples",
+    artifactDirectory === "" ? undefined : artifactDirectory,
   );
-  const benchmark = yield* ReadinessBenchmark;
-  const requestFor = Effect.fn("ReadinessBenchmark.requestFor")(function* (projectRoot: string) {
-    return {
-      projectRoot,
-      environment: {
-        ...process.env,
-        PORT: String(backendPort),
-        RELKIT_INSPECTOR_PORT: String(inspectorPort),
-      },
-      ...(yield* packedProbeContract(projectRoot, backendPort)),
-      deadlineMs: 30_000,
-    } satisfies StartRequest;
-  });
-  const request = yield* requestFor(fixture.projectRoot);
-  const preparationAttempt =
-    set === "restart" ? yield* benchmarkReportEffect(benchmark, request, 0) : undefined;
-  const attempts = yield* Effect.forEach(
-    Array.from({ length: count }, (_, index) => index + 1),
-    (run) =>
-      Effect.gen(function* () {
-        const projectRoot =
-          set !== "fresh" || run === 1
-            ? fixture.projectRoot
-            : yield* createPackedProject(
-                fixture.temporary,
-                fixture.registry,
-                `readiness-fresh-${run}`,
-                fixture.examples,
-              );
-        const attempt = yield* benchmarkReportEffect(
-          benchmark,
-          yield* requestFor(projectRoot),
-          run,
-        );
-        return { ...attempt, projectRoot };
-      }),
-    { concurrency: 1 },
+  const request = yield* packedStartRequest(fixture.projectRoot, backendPort, inspectorPort);
+  const { attempts, preparationAttempt } = yield* measurePackedSet(
+    fixture,
+    set,
+    count,
+    backendPort,
+    inspectorPort,
   );
   const report = packedReport(
     fixture,
@@ -126,7 +100,7 @@ function option(name: string, fallback: string): string {
 }
 
 /**
- * Builds diagnostic evidence without changing or omitting any measured attempt.
+ * Builds explicitly diagnostic or certification evidence without changing or omitting any measured attempt.
  * @param fixture - Actual outside-workspace packed installation identity.
  * @param request - Complete response contract used by every measured launch.
  * @param attempts - All launched attempts, including failed acquisition or cleanup.

@@ -1,6 +1,7 @@
+/** Verifies regular and ten-item bulk totals through the tutorial's original checked pricing function. */
 import { expect, test } from "bun:test";
 import { invokeFunction } from "@relkit/testing";
-import priceOrder from "../../src/orders/functions/price-order.function.js";
+import priceOrder from "../../src/services/orders/functions/price-order.function.js";
 
 test("bulk pricing preserves the regular price below ten", async () => {
   expect(await invokeFunction(priceOrder, { quantity: 3 })).toEqual({ totalCents: 300 });

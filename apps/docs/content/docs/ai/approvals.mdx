@@ -26,15 +26,15 @@ Declare `sideEffect` accurately. A write incorrectly marked as a read can skip a
 
 Use `never` when the operation may run without a separate confirmation:
 
-<include cwd lang="ts" meta='title="src/hello/tools/lookup.tool.ts"'>
-  ../../templates/default/v1/agent/src/hello/tools/lookup.tool.ts
+<include cwd lang="ts" meta='title="src/services/hello/tools/lookup.tool.ts"'>
+  ../../templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts
 </include>
 
 ### Approval for writes
 
 This `defineTool` example requires confirmation because its side effect is `write`:
 
-<include cwd lang="ts" meta='title="src/orders/tools/cancel-order.tool.ts"'>
+<include cwd lang="ts" meta='title="src/services/orders/tools/cancel-order.tool.ts"'>
   ../../examples/commerce/tests/fixtures/cancel-order-with-approval.ts#approval-tool
 </include>
 
@@ -44,8 +44,8 @@ It uses the existing order-deletion function. `mcp: false` keeps this approval-r
 
 This order-cancellation tool requires approval on every call:
 
-<include cwd lang="ts" meta='title="src/orders/tools/cancel-order.tool.ts"'>
-  ../../examples/commerce/src/orders/tools/cancel-order.tool.ts
+<include cwd lang="ts" meta='title="src/services/orders/tools/cancel-order.tool.ts"'>
+  ../../examples/commerce/src/services/orders/tools/cancel-order.tool.ts
 </include>
 
 The function must still check whether the caller may cancel that order. Approval does not replace authorization.

@@ -1,0 +1,139 @@
+{
+  "protocol": "relkit.synthetic-secret-scan",
+  "filesScanned": 17772,
+  "bytesScanned": 261481967,
+  "categories": {
+    "snapshots": 31,
+    "graph": 644,
+    "manifest": 407,
+    "generated-source": 13435,
+    "build-image": 0,
+    "plan": 126,
+    "pulumi-reports": 80,
+    "cloud-evidence": 2,
+    "browser": 3047
+  },
+  "matches": [],
+  "image": {
+    "scanned": false
+  }
+}
+$ bun test ./tests/security
+bun test v1.3.10 (30e609e0)
+
+tests/security/evidence-origin-probe.test.ts:
+[21:07:22.096] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 46.473709,
+}
+[21:07:22.146] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 43.847625,
+}
+[21:07:22.189] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 41.737167,
+}
+[21:07:22.243] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 49.930083,
+}
+[21:07:22.285] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 42.053959,
+}
+[21:07:22.358] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 71.814416,
+}
+[21:07:22.416] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 57.807875,
+}
+[21:07:22.450] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 33.16175,
+}
+[21:07:22.489] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 39.20675,
+}
+(pass) origin evidence probe rejects unapproved destinations before making requests [461.93ms]
+[21:07:24.067] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 1565.677375,
+}
+[21:07:25.652] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 1577.400125,
+}
+(pass) origin evidence probe preserves both recorded branches at owned HTTP and WebSocket origins [3166.55ms]
+[21:07:25.736] INFO (#3): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 63.778458,
+}
+[21:07:25.793] INFO (#3): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 50.834625,
+}
+[21:07:27.378] INFO (#3): Execution operation completed {
+  domain: "testing",
+  operation: "security.origin-probe",
+  outcome: "success",
+  duration_ms: 1559.399583,
+}
+(pass) origin evidence probe never follows HTTP or WebSocket redirects [1725.34ms]
+
+tests/security/secret-scan.test.ts:
+(pass) recursively scans values and release artifacts without exposing raw matches [66.43ms]
+
+tests/security/source-scan-paths.test.ts:
+(pass) source scans reject symlinks outside their owned roots [5.94ms]
+
+tests/security/redaction/redaction.test.ts:
+(pass) recursively finds no synthetic secret in observable flows or sinks [2419.63ms]
+
+ 6 pass
+ 0 fail
+ 56 expect() calls
+Ran 6 tests across 4 files. [10.08s]
+Public declaration scan passed (16 packages).
+bun test v1.3.10 (30e609e0)
+
+tests/agents/source-boundaries.test.ts:
+(pass) agent declaration/source boundaries > the real public authoring sources contain no vendor agent details [180.46ms]
+(pass) agent declaration/source boundaries > the shared authoring scan rejects vendor models and credentials on agents [24.45ms]
+
+tests/compiler/commerce-example.test.ts:
+(pass) commerce-example compiler acceptance > compiles the canonical mixed integration topology [3588.52ms]
+
+ 3 pass
+ 0 fail
+ 98 expect() calls
+Ran 3 tests across 2 files. [4.94s]

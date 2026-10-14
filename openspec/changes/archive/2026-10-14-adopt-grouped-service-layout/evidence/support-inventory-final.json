@@ -1,0 +1,57 @@
+{
+  "protocol": "relkit.grouped-layout.support-inventory",
+  "files": 7152,
+  "ignoredSupportingAuthoredFiles": [],
+  "positivePatterns": [
+    "*.ts",
+    "*.tsx",
+    "*.mts",
+    "*.cts",
+    "*.md",
+    "*.mdx",
+    "*.json",
+    "*.yml",
+    "*.yaml",
+    "*.sh",
+    "AGENTS.md"
+  ],
+  "exclusions": [
+    "**/node_modules/**",
+    "node_modules/**",
+    "**/dist/**",
+    "**/.relkit/**",
+    "**/.relkit-*/**",
+    "**/.next*/**",
+    "**/.turbo/**",
+    ".git/**",
+    ".codegraph/**",
+    "repos/**",
+    "**/coverage/**",
+    "test-results/**",
+    "playwright-report/**",
+    "**/build/**",
+    "**/out/**",
+    "**/.source/**",
+    "reports/**"
+  ],
+  "command": "rg --files --hidden --no-ignore (positive patterns before exclusions); git check-ignore --stdin",
+  "includesHiddenGuidance": true,
+  "ignoredGeneratedCandidates": [
+    {
+      "path": "apps/docs/.source/browser.ts",
+      "disposition": "Fumadocs generated collection; native docs generation and workspace build pass"
+    },
+    {
+      "path": "apps/docs/.source/dynamic.ts",
+      "disposition": "Fumadocs generated collection; native docs generation and workspace build pass"
+    },
+    {
+      "path": "apps/docs/.source/server.ts",
+      "disposition": "Fumadocs generated collection; native docs generation and workspace build pass"
+    },
+    {
+      "path": "reports/mutation/mutation.json",
+      "disposition": "Stryker generated mutation report; native full10 quality gate passes"
+    }
+  ]
+}
