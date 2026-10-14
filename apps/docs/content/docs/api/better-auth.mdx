@@ -498,6 +498,7 @@ Lazy authoring and Effect-native authentication borrowing the application's DB. 
   - [authFactoryLiveLayer](#authfactorylivelayer)
   - [authLiveLayer](#authlivelayer)
   - [authServiceLayer](#authservicelayer)
+  - [generateBetterAuthOpenApi](#generatebetterauthopenapi)
 
 ---
 
@@ -530,7 +531,7 @@ declare const defineBetterAuthService: <const Options extends BetterAuthServiceO
 ) => BetterAuthServiceDescriptor<Options>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L55)
 
 Since v0.0.5
 
@@ -544,7 +545,7 @@ Since v0.0.5
 declare const AuthConfiguration: AuthConfiguration;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L29)
 
 ## AuthFactory
 
@@ -554,7 +555,7 @@ declare const AuthConfiguration: AuthConfiguration;
 declare const AuthFactory: typeof AuthFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L20)
 
 ## AuthFactoryInterface
 
@@ -564,7 +565,7 @@ declare const AuthFactory: typeof AuthFactory;
 declare const AuthFactoryInterface: AuthFactoryInterface;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L31)
 
 ## AuthFailure
 
@@ -574,7 +575,7 @@ declare const AuthFactoryInterface: AuthFactoryInterface;
 declare const AuthFailure: typeof AuthFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L19)
 
 ## AuthService
 
@@ -584,7 +585,7 @@ declare const AuthFailure: typeof AuthFailure;
 declare const AuthService: typeof AuthService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L21)
 
 ## AuthServiceInterface
 
@@ -594,7 +595,7 @@ declare const AuthService: typeof AuthService;
 declare const AuthServiceInterface: AuthServiceInterface;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L30)
 
 ## BETTER_AUTH_HANDLER
 
@@ -614,7 +615,7 @@ declare const BETTER_AUTH_HANDLER: unique symbol;
 declare const BetterAuthActivationOptions: BetterAuthActivationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L22)
 
 ## BetterAuthHandler
 
@@ -624,7 +625,7 @@ declare const BetterAuthActivationOptions: BetterAuthActivationOptions;
 declare const BetterAuthHandler: BetterAuthHandler<Session>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L26)
 
 ## BetterAuthRegistration
 
@@ -634,7 +635,7 @@ declare const BetterAuthHandler: BetterAuthHandler<Session>;
 declare const BetterAuthRegistration: BetterAuthRegistration;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L25)
 
 ## BetterAuthServiceDescriptor
 
@@ -644,7 +645,7 @@ declare const BetterAuthRegistration: BetterAuthRegistration;
 declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L28)
 
 ## BetterAuthServiceOptions
 
@@ -654,7 +655,7 @@ declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options>;
 declare const BetterAuthServiceOptions: BetterAuthServiceOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L24)
 
 ## InferBetterAuthSession
 
@@ -664,7 +665,7 @@ declare const BetterAuthServiceOptions: BetterAuthServiceOptions;
 declare const InferBetterAuthSession: InferBetterAuthSession<Handler>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L27)
 
 ## activateBetterAuthService
 
@@ -689,7 +690,7 @@ declare const activateBetterAuthService: <Options extends BetterAuthServiceOptio
 declare const authFactoryLiveLayer: Layer<AuthFactory, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L20)
 
 ## authLiveLayer
 
@@ -701,7 +702,7 @@ declare const authLiveLayer: (
 ) => Layer<AuthService, AuthFailure | DrizzleFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L21)
 
 ## authServiceLayer
 
@@ -713,7 +714,105 @@ declare const authServiceLayer: (
 ) => Layer<AuthService, AuthFailure | DrizzleFailure, AuthFactory>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L21)
+
+## generateBetterAuthOpenApi
+
+**Signature**
+
+```ts
+declare const generateBetterAuthOpenApi: (
+  auth: Pick<Auth, "$context">,
+  instrumentation?: Context<never>,
+) => Promise<JsonValue>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L18)
+
+## `openapi-projection.ts`
+
+Validates native schema JSON, prefixes mounted paths and component identities,
+and removes token requirements from browser-session documentation. This pure
+projection is called by AuthOpenApi; malformed metadata throws at that adapter.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [projectAuthOpenApi](#projectauthopenapi)
+
+---
+
+# utils
+
+## projectAuthOpenApi
+
+Detaches and projects one native OpenAPI document without changing SDK metadata.
+
+**Throws**
+
+TypeError When the metadata is not JSON or lacks paths.
+
+**Signature**
+
+```ts
+declare const projectAuthOpenApi: <Input>(document: Input, basePath?: string) => JsonValue;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-projection.ts#L16)
+
+## `openapi.ts`
+
+Generates native authentication documentation through a typed, observable
+service. The activated SDK supplies endpoint metadata; projection does not
+acquire a database or install the plugin's public schema/reference routes.
+The exported Promise function is the server compatibility boundary.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [AuthOpenApi (class)](#authopenapi-class)
+  - [generateBetterAuthOpenApi](#generatebetterauthopenapi)
+
+---
+
+# utils
+
+## AuthOpenApi (class)
+
+Native metadata projection with no request identity or database ownership.
+
+**Signature**
+
+```ts
+declare class AuthOpenApi
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L19)
+
+## generateBetterAuthOpenApi
+
+Projects native core and plugin endpoints for RELKIT's shared API reference.
+
+**Example**
+
+```ts
+const schema = await generateBetterAuthOpenApi(auth);
+```
+
+**Signature**
+
+```ts
+declare const generateBetterAuthOpenApi: (
+  auth: Pick<Auth, "$context">,
+  instrumentation?: Context.Context<never>,
+) => Promise<JsonValue>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L65)
 
 ## `react.ts`
 

@@ -1,19 +1,19 @@
 ---
 title: Your first HTTP route
-description: Read the Orders route in the API starter and verify its request and response boundary.
+description: Read the Orders endpoint extension and verify its request and response boundary.
 ---
 
-Use the `relkit-orders` API starter from [Create and run an application](/docs/start/create-an-app).
-The route already exists; you will follow one `POST /orders` request from JSON to a validated
+Use `relkit-orders` after [adding the Orders endpoint](/docs/start/first-route) to the certified minimal app.
+That chapter creates this route from maintained API-candidate sources. Follow one `POST /orders` request from JSON to a validated
 function result and verify both accepted and rejected input. Run commands from the app root.
 
 ## Select the public operation
 
 The Orders domain calculates a price in `createOrder`. Its service exposes that operation to
-the route. Read the **existing** `src/orders/service.ts`:
+the route. Read the **existing** `src/services/orders/service.ts`:
 
-<include cwd lang="ts" meta='title="src/orders/service.ts"'>
-  ../../templates/default/v1/api/src/orders/service.ts
+<include cwd lang="ts" meta='title="src/services/orders/service.ts"'>
+  ../../templates/default/v1/api/src/services/orders/service.ts
 </include>
 
 The service is the public boundary. A route imports the service, not a private function file.
@@ -38,7 +38,7 @@ curl -i -X POST http://localhost:3000/orders \
 ```
 
 Expect HTTP `201` and `totalCents: 300`. The starter's HTTP test checks the same status and
-body in process:
+body in process. Create `tests/integration/orders.route.test.ts` from this source:
 
 <include cwd lang="ts" meta='title="tests/integration/orders.route.test.ts"'>
   ../../templates/default/v1/api/tests/integration/orders.route.test.ts
