@@ -1,6 +1,7 @@
+/** Checks orders.function through the supported public RELKIT APIs. */
 import { expect, test } from "bun:test";
 import { invokeFunction } from "@relkit/testing";
-import orders from "@app/orders/service.js";
+import orders from "@app/services/orders/service.js";
 
 test("createOrder invokes pricing", async () => {
   const result = await invokeFunction(orders.createOrder, {

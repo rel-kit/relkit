@@ -1,6 +1,7 @@
+/** Validates order input, invokes the service-local pricing function, and returns the calculated order. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
-import priceOrder from "@app/orders/functions/price-order.function.js";
+import priceOrder from "@app/services/orders/functions/price-order.function.js";
 
 const orderInput = z.object({
   orderId: z.string().min(1),
