@@ -8,7 +8,7 @@ In `src/routes/hello/route.ts`, this exposes the service's public `hello` functi
 
 ```ts
 import { defineRoute } from "@relkit/app/routes";
-import hello from "@app/hello/service.js";
+import hello from "@app/services/hello/service.js";
 
 export const GET = defineRoute({ target: hello.hello });
 ```
@@ -31,7 +31,7 @@ A raw handler has a generic OpenAPI response. The recognized Better Auth mount a
 
 ```ts
 import { defineRoute } from "@relkit/app/routes";
-import auth from "@app/auth/service.js";
+import auth from "@app/services/auth/service.js";
 
 export const ALL = defineRoute({ handler: auth.handler });
 ```
@@ -40,7 +40,7 @@ export const ALL = defineRoute({ handler: auth.handler });
 
 ```ts
 import { defineServiceRoutes } from "@relkit/app/routes";
-import orders from "@app/orders/service.js";
+import orders from "@app/services/orders/service.js";
 
 export const { GET, POST } = defineServiceRoutes(orders, {
   GET: "listOrders",

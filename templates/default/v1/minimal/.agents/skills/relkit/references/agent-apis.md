@@ -15,7 +15,7 @@ Use `defineAgent` when a model should choose among tools. The agent template pro
 import { defineAgent } from "@relkit/app/agents";
 import { z } from "@relkit/app/schema";
 import { FakeToolCallingModel } from "langchain";
-import lookup from "@app/hello/tools/lookup.tool.js";
+import lookup from "@app/services/hello/tools/lookup.tool.js";
 export default defineAgent({
   id: "hello.assistant",
   input: z.object({ message: z.string().min(1) }),
@@ -37,7 +37,7 @@ A RELKIT tool wraps a callable function without duplicating its schemas:
 
 ```ts
 import { defineTool } from "@relkit/app/tools";
-import lookup from "@app/orders/functions/lookup.function.js";
+import lookup from "@app/services/orders/functions/lookup.function.js";
 export default defineTool({
   id: "orders.lookup",
   target: lookup,
