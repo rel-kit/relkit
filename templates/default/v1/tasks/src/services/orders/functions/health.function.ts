@@ -1,3 +1,4 @@
+/** Supplies the orders service with a validated health result independent of job execution. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
 
