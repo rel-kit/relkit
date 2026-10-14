@@ -7,6 +7,7 @@ import { clientHelp } from "./cli-help-client.js";
 import { deploy, env, graph, local } from "./cli-help-system.js";
 import { jobs } from "./cli-help-jobs.js";
 import { projectRoot } from "./cli-help-options.js";
+import { migrateHelp } from "./cli-help-migrate.js";
 
 export type * from "./cli-help-model.types.js";
 
@@ -56,6 +57,7 @@ const root = command(
         ],
       }),
       addHelp,
+      migrateHelp,
       command("dev", "Run app, inspector, OpenAPI, and Scalar", "relkit dev", {
         options: [
           projectRoot,

@@ -1,4 +1,6 @@
+/** Constructs the pure CLI command tree with shared help and completion metadata. */
 import { Command } from "effect/cli";
+import { migrateCommand } from "./cli-command-migrate.js";
 import { basicCommands } from "./cli-command-basic.js";
 import { addCommand } from "./cli-command-add.js";
 import { groupCommands } from "./cli-command-groups.js";
@@ -18,6 +20,7 @@ export function createCliCommand(select: SelectInvocation) {
       Command.withSubcommands([
         create,
         add,
+        migrateCommand(select),
         dev,
         check,
         build,
