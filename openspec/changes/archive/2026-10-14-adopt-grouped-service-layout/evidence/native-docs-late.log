@@ -1,0 +1,38 @@
+bun test v1.3.10 (30e609e0)
+
+apps/docs/tests/service-learning.test.ts:
+(pass) introduces Service after Core concepts with source-backed, connected guides [27.41ms]
+(pass) routes code-placement questions into existing capability and HTTP guides [0.47ms]
+(pass) walks through the Orders service using the executable API starter [0.08ms]
+
+apps/docs/tests/auth-learning.test.ts:
+(pass) connects Auth after Database with source-backed guides and API reference [3.28ms]
+(pass) separates identity, integration, transport protection, and business authorization [0.40ms]
+(pass) teaches a migrated existing-app flow without hard-coded server secrets [0.93ms]
+
+apps/docs/tests/database-learning.test.ts:
+(pass) connects Database guides and the generated Drizzle reference [3.26ms]
+(pass) uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets [1.82ms]
+(pass) states validation, override, transaction, and lifecycle boundaries [0.29ms]
+(pass) explains generated data shapes and Better Auth's native-client boundary [0.28ms]
+
+apps/docs/tests/start-learning.test.ts:
+(pass) keeps a single ordered Orders journey with optional scaffolding last [1.01ms]
+(pass) extends the certified minimal app into the same Orders journey [1.44ms]
+(pass) redirects retired Start URLs directly to current guidance [2.05ms]
+
+apps/docs/tests/http-learning.test.ts:
+(pass) connects Service to HTTP Routes without changing existing HTTP guide URLs [27.12ms]
+(pass) teaches the Orders HTTP boundary with executable starter source and tests [0.30ms]
+(pass) documents raw and RPC boundaries without promising REST-only policies on RPC [0.17ms]
+
+apps/docs/tests/jobs-learning.test.ts:
+(pass) connects Jobs between Events and Database with source-backed guides [16.48ms]
+(pass) teaches task admission and completion using executable documentation sources [0.56ms]
+(pass) states current retry, overlap, and provider limits without exactly-once promises [0.60ms]
+(pass) provider guides show configuration, real input, registration, and native run evidence [9.26ms]
+
+ 20 pass
+ 0 fail
+ 400 expect() calls
+Ran 20 tests across 6 files. [799.00ms]
