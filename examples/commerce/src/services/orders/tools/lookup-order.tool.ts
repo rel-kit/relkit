@@ -1,4 +1,5 @@
-import getOrder from "@app/orders/functions/get-order.function.js";
+/** Exposes the checked order lookup as a read-only tool requiring no approval and retaining its two-second timeout. */
+import getOrder from "../functions/get-order.function.js";
 
 const lookupOrder = getOrder.asTool({
   // The tool keeps the function's checked input and output schemas.

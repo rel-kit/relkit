@@ -1,5 +1,6 @@
+/** Schedules the cleanup task daily at midnight UTC with the established input and skip-misfire policy. */
 import { defineJob } from "@relkit/app/jobs";
-import cleanupOrders from "@app/orders/tasks/cleanup-orders.task.js";
+import cleanupOrders from "../tasks/cleanup-orders.task.js";
 
 const cleanupOrdersJob = defineJob({
   name: "cleanupOrders",

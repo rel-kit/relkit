@@ -1,4 +1,5 @@
-import deleteOrder from "@app/orders/functions/delete-order.function.js";
+/** Exposes the order deletion function as a write tool requiring explicit approval before invocation. */
+import deleteOrder from "../functions/delete-order.function.js";
 
 const cancelOrder = deleteOrder.asTool({
   id: "orders.cancel-order",
