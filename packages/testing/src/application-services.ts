@@ -1,14 +1,16 @@
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
-import { activateBetterAuthService, generateBetterAuthOpenApi } from "@relkit/better-auth";
+/** Owns scoped database/auth activation for a test application in either service layout. */
+import { activateBetterAuthService } from "@relkit/better-auth";
 import { activateDrizzleService } from "@relkit/drizzle";
-import { createHttpAuthRuntime } from "@relkit/runtime-hono";
-import type { TestRawRoute, TestRoute } from "./application-routes.js";
-import { Context, Effect, Layer, ManagedRuntime } from "effect";
 import { observeExecution, runExecutionPromise } from "@relkit/contracts/operation";
+import { Context, Effect, Layer, ManagedRuntime } from "effect";
+import type { TestRoute } from "./application-routes.js";
+import { acquireApplicationAuth, nativeServiceError } from "./application-service-auth.js";
+import { loadApplicationServices, soleNativeService } from "./application-service-discovery.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
 import type {
   ApplicationServicesPlatform,
+  NativeDatabase,
+  ServiceEnvironment,
   TestApplicationServices,
 } from "./application-services.types.js";
 export type {
@@ -16,39 +18,97 @@ export type {
   TestApplicationServices,
 } from "./application-services.types.js";
 
-/** Native service activation dependencies, acquired once per application owner. */
+/** Native activation dependencies acquired once per application owner. */
 export class TestServicesPlatform extends Context.Service<
   TestServicesPlatform,
   ApplicationServicesPlatform
->()("relkit/testing/ServicesPlatform") {}
+>()("relkit/testing/ServicesPlatform", {
+  /** Provides the native adapters; construction itself acquires no resources. */
+  make: Effect.sync(
+    () =>
+      ({
+        load: loadApplicationServices,
+        database: (service, env, options) =>
+          activateDrizzleService(service, env, { ...options, isolated: true }),
+        auth: (service, database, basePath) =>
+          activateBetterAuthService(service, database, basePath, { isolated: true }),
+      }) satisfies ApplicationServicesPlatform,
+  ),
+}) {}
 
-/** Database and authentication context whose lifetime follows its Layer. */
+/** Database and authentication authorities whose lifetime follows their Layer. */
 export class TestServices extends Context.Service<
   TestServices,
   Omit<TestApplicationServices, "close">
->()("relkit/testing/Services") {}
+>()("relkit/testing/Services", {
+  /**
+   * Acquires services with reverse-order release, including partial-startup failure.
+   * @param root - Authored project root.
+   * @param env - Already validated environment values.
+   * @param routes - Authored HTTP routes.
+   * @returns Scoped authorities requiring the replaceable native platform.
+   */
+  make: Effect.fn("Testing.services.acquire")(
+    function* (root: string, env: ServiceEnvironment, routes: readonly TestRoute[]) {
+      const platform = yield* TestServicesPlatform;
+      const instrumentation = yield* Effect.context<never>();
+      const services = yield* platform.load(root);
+      const declaration = soleNativeService(services, "drizzle");
+      let database: NativeDatabase | undefined;
+      if (declaration !== undefined)
+        database = yield* Effect.acquireRelease(
+          Effect.tryPromise({
+            try: () => platform.database(declaration, env, { instrumentation }),
+            catch: nativeServiceError,
+          }),
+          (active) => Effect.promise(() => active.close()),
+        );
+      const auth = yield* acquireApplicationAuth(
+        platform,
+        soleNativeService(services, "better-auth"),
+        database,
+        routes,
+      );
+      return Object.freeze({
+        context: Object.freeze(database === undefined ? {} : { database: database.context }),
+        ...auth,
+      });
+    },
+    (effect) => observeExecution("testing", "services.acquire", effect),
+  ),
+}) {}
 
-export const TestServicesPlatformLive = Layer.succeed(
+/** Live native adapters; no database or auth client is acquired by this Layer. */
+export const TestServicesPlatformLive = Layer.effect(
   TestServicesPlatform,
-  TestServicesPlatform.of({
-    load: loadServices,
-    database: (service, env, options) =>
-      activateDrizzleService(service, env, { ...options, isolated: true }),
-    auth: (service, database, basePath) =>
-      activateBetterAuthService(service, database, basePath, { isolated: true }),
-  }),
+  TestServicesPlatform.make,
 );
 
 /**
- * Acquires database/auth services with reverse-order release on startup failure.
- * @param root Source project root.
- * @param env Already validated environment values.
- * @param routes Routes containing the optional auth mount.
- * @returns Context and an idempotent shutdown hook.
+ * Builds an owner-scoped Layer over replaceable native dependencies.
+ * @param root - Authored project root.
+ * @param env - Validated environment.
+ * @param routes - Routes including the optional auth mount.
+ * @returns A Layer requiring TestServicesPlatform.
+ */
+export function testServicesLayer(
+  root: string,
+  env: ServiceEnvironment,
+  routes: readonly TestRoute[],
+) {
+  return Layer.effect(TestServices, TestServices.make(root, env, routes));
+}
+
+/**
+ * Acquires services with an idempotent native shutdown hook.
+ * @param root - Source project root.
+ * @param env - Validated environment.
+ * @param routes - Authored HTTP routes.
+ * @returns Context and a hook that waits for every finalizer.
  */
 export async function activateTestServices(
   root: string,
-  env: Readonly<Record<string, unknown>>,
+  env: ServiceEnvironment,
   routes: readonly TestRoute[],
 ): Promise<TestApplicationServices> {
   const owner = ManagedRuntime.make(
@@ -65,156 +125,4 @@ export async function activateTestServices(
     await disposeTestingOwner(owner);
     throw error;
   }
-}
-
-/**
- * Defines the service workflow independently of native activation implementations.
- * @param root Source project root to load.
- * @param env Resolved environment shared with the database.
- * @param routes Declared HTTP routes used to identify auth's base path.
- * @returns A scoped service Layer requiring TestServicesPlatform.
- */
-export function testServicesLayer(
-  root: string,
-  env: Readonly<Record<string, unknown>>,
-  routes: readonly TestRoute[],
-) {
-  return Layer.effect(
-    TestServices,
-    observeExecution(
-      "testing",
-      "services.acquire",
-      Effect.fn("Testing.services.acquire")(function* () {
-        const platform = yield* TestServicesPlatform;
-        const instrumentation = yield* Effect.context<never>();
-        const services = yield* Effect.tryPromise({
-          try: () => platform.load(root),
-          catch: (cause) => cause,
-        });
-        const databaseService = soleCapability(services, "drizzle");
-        const authService = soleCapability(services, "better-auth");
-        const database =
-          databaseService === undefined
-            ? undefined
-            : yield* Effect.acquireRelease(
-                Effect.tryPromise({
-                  try: () =>
-                    platform.database(
-                      databaseService as unknown as Parameters<
-                        ApplicationServicesPlatform["database"]
-                      >[0],
-                      env,
-                      { instrumentation },
-                    ),
-                  catch: (cause) => cause,
-                }),
-                (value) => Effect.promise(() => value.close()),
-              );
-        const mount = routes.find(isAuthMount);
-        if (authService !== undefined && (database === undefined || mount === undefined)) {
-          return yield* Effect.fail(
-            new Error("Better Auth tests require one Drizzle service and one auth ALL route"),
-          );
-        }
-        const activeAuth =
-          authService === undefined
-            ? undefined
-            : yield* Effect.tryPromise({
-                try: () =>
-                  platform.auth(
-                    authService as unknown as Parameters<ApplicationServicesPlatform["auth"]>[0],
-                    database!,
-                    basePath(mount!),
-                  ),
-                catch: (cause) => cause,
-              });
-        const auth =
-          activeAuth === undefined || mount === undefined
-            ? undefined
-            : createHttpAuthRuntime({
-                protected: mount.auth?.protected ?? [],
-                publicPaths: [basePath(mount), mount.path],
-                getOpenApiDocument: () => generateBetterAuthOpenApi(activeAuth, instrumentation),
-                getSession: async (headers) =>
-                  (await activeAuth.api.getSession({ headers })) ?? null,
-              });
-        return TestServices.of(
-          Object.freeze({
-            context: Object.freeze({
-              ...(database === undefined ? {} : { database: database.context }),
-            }),
-            ...(auth === undefined ? {} : { auth }),
-            ...(activeAuth === undefined
-              ? {}
-              : { authHandler: (request: Request) => activeAuth.handler(request) }),
-          }),
-        );
-      })(),
-    ),
-  );
-}
-
-/**
- * Loads declared source services in deterministic file order.
- * @param root - Explicit source project or persistence root.
- * @returns Service descriptors without activating their native resources.
- */
-async function loadServices(root: string): Promise<readonly Record<string, unknown>[]> {
-  const source = join(root, "src");
-  const files = [...new Bun.Glob("*/service.ts").scanSync({ cwd: source, onlyFiles: true })];
-  const services: Record<string, unknown>[] = [];
-  for (const file of files.sort()) {
-    const module = (await import(pathToFileURL(join(source, file)).href)) as Record<
-      string,
-      unknown
-    >;
-    for (const value of Object.values(module)) {
-      if (isRecord(value) && value.kind === "service") services.push(value);
-    }
-  }
-  return services;
-}
-
-/**
- * Selects the sole declared service for a native capability.
- * @param services - Loaded service descriptors before native activation.
- * @param kind - Required native service capability.
- * @returns The matching descriptor or undefined; ambiguity throws.
- */
-function soleCapability(
-  services: readonly Record<string, unknown>[],
-  kind: "drizzle" | "better-auth",
-): Record<string, unknown> | undefined {
-  const matches = services.filter(
-    (service) => isRecord(service.capability) && service.capability.kind === kind,
-  );
-  if (matches.length > 1) throw new Error(`Test application has multiple ${kind} services`);
-  return matches[0];
-}
-
-/**
- * Checks the ALL route authority used for native authentication.
- * @param route - Authored route descriptor with parsed native metadata.
- * @returns True for a raw ALL route with authentication registration.
- */
-function isAuthMount(route: TestRoute): route is TestRawRoute {
-  return route.method === "ALL" && "handler" in route && route.auth !== undefined;
-}
-
-/**
- * Derives the native authentication base from its filesystem catch-all mount.
- * @param route - Authored route descriptor with parsed native metadata.
- * @returns The mount path without its terminal wildcard segment.
- */
-function basePath(route: TestRawRoute): string {
-  return route.path.replace(/\/\*[^/]+\??$/, "");
-}
-
-/**
- * Checks the shallow non-array object shape before selective property access.
- * @param value - Candidate native value checked or detached by this helper.
- * @returns True for a non-null non-array object.
- */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
