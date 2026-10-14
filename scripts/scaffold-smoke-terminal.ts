@@ -1,54 +1,36 @@
+/** Exercises packed CLI cancellation and Docker consent through scope-owned native terminal invocations. */
 import { strict as assert } from "node:assert";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
-import type { PromptDriver } from "create-relkit";
+import { Context, Effect, Layer } from "effect";
+import { scaffoldTerminal } from "./scaffold-terminal-owner.js";
+import { interactiveResolver } from "./scaffold-resolver.js";
 import type { ScaffoldTerminalResult } from "./scaffold-smoke-terminal.types.js";
 
-const SCAFFOLD_TERMINAL_TIMEOUT_MS = 600_000;
+/** Native terminal authority is constructed per script invocation; input belongs to each child. */
+class ScaffoldTerminal extends Context.Service<ScaffoldTerminal>()(
+  "relkit.scripts.ScaffoldTerminal",
+  {
+    make: Effect.sync(() => ({ run: terminal, verify: verifyTerminal })),
+  },
+) {}
+const terminalLayer = Layer.effect(ScaffoldTerminal, ScaffoldTerminal.make);
 
-/** Runs a real packed CLI in a bounded native terminal and answers prompts in order.
- * @param command - Script executable and its literal argument vector.
- * @param cwd - Standalone application directory.
- * @param answers - Expected prompt fragments and terminal input, in display order.
- * @param env - Explicit overrides for this child only.
- * @returns The physical child exit and captured terminal display after every answer was sent.
- * @remarks Native Bun.Terminal behavior is the acceptance boundary, including Ctrl-C.
+/**
+ * Supplies exact native terminal arguments without changing child ownership.
+ * @param command - Installed executable and literal arguments.
+ * @param cwd - Standalone application root.
+ * @param answers - Ordered prompt fragments and terminal input.
+ * @param env - Child-only environment overrides.
+ * @returns Scoped exit and display output after terminal release.
  */
-export async function runScaffoldTerminal(
+function terminal(
   command: string[],
   cwd: string,
   answers: readonly (readonly [string, string])[],
   env: Record<string, string> = {},
-): Promise<ScaffoldTerminalResult> {
-  let output = "";
-  let answered = 0;
-  const terminal = new Bun.Terminal({
-    cols: 120,
-    rows: 40,
-    data(term, bytes) {
-      output += new TextDecoder().decode(bytes);
-      const next = answers[answered];
-      if (next && output.includes(next[0])) {
-        answered++;
-        term.write(next[1]);
-      }
-    },
-  });
-  const child = Bun.spawn([process.execPath, ...command], {
-    cwd,
-    terminal,
-    env: { ...process.env, CI: "", NO_COLOR: "1", TERM: "xterm-256color", ...env },
-    signal: AbortSignal.timeout(SCAFFOLD_TERMINAL_TIMEOUT_MS),
-  });
-  try {
-    const code = await child.exited;
-    assert.equal(answered, answers.length, `Missing terminal prompt:\n${output}`);
-    return { code, output };
-  } finally {
-    if (child.exitCode === null) child.kill();
-    terminal.close();
-  }
+) {
+  return scaffoldTerminal({ command, cwd, answers, env });
 }
 
 /** Verifies packed artifact cancellation and the separate Docker startup consent.
@@ -56,107 +38,76 @@ export async function runScaffoldTerminal(
  * @param cli - Actual packed CLI executable.
  * @returns After cancellation, declined consent, failed startup, and successful startup assertions.
  */
-export async function verifyScaffoldTerminal(root: string, cli: string): Promise<void> {
-  const cancelled = await runScaffoldTerminal([cli, "add", "service"], root, [
-    ["service name", "\x03"],
-  ]);
+const verifyTerminal = Effect.fn("ScaffoldTerminal.verify")(function* (root: string, cli: string) {
+  const cancelled = yield* terminal([cli, "add", "service"], root, [["service name", "\x03"]]);
   assert.equal(cancelled.code, 130, cancelled.output);
-  const declined = await runScaffoldTerminal(
+  const declined = yield* terminal(
     [cli, "add", "cache", "terminal-cache", "--service", "billing", "--profile", "local"],
     root,
     [["Start local Docker services now?", "n\r"]],
   );
   assert.equal(declined.code, 0, declined.output);
-  assert.ok(existsSync(join(root, "src/billing/cache/terminal-cache.cache.ts")));
+  assert.ok(existsSync(join(root, "src/services/billing/cache/terminal-cache.cache.ts")));
   assert.ok(declined.output.includes("Run `relkit local up`"));
   assert.ok(!declined.output.includes("Descriptors"));
   for (const unavailable of [true, false]) {
     const name = unavailable ? "docker-unavailable" : "docker-approved";
-    const result = await runScaffoldTerminal(
+    const result = yield* terminal(
       [cli, "add", "cache", name, "--service", "billing", "--profile", "local"],
       root,
       [["Start local Docker services now?", "y\r"]],
       unavailable ? { DOCKER_HOST: `unix://${join(root, "missing-docker.sock")}` } : {},
     );
     assert.equal(result.code, unavailable ? 1 : 0, result.output);
-    assert.ok(existsSync(join(root, `src/billing/cache/${name}.cache.ts`)));
+    assert.ok(existsSync(join(root, `src/services/billing/cache/${name}.cache.ts`)));
     assert.equal(
       result.output.includes("Scaffold saved, but local services could not start"),
       unavailable,
     );
     if (!unavailable) assert.ok(!result.output.includes("Run `relkit local up`"), result.output);
   }
+});
+
+/**
+ * Runs the finite native terminal boundary from ordinary packed script callers.
+ * @param command - Installed executable and arguments.
+ * @param cwd - Standalone application root.
+ * @param answers - Expected prompts and input, in display order.
+ * @param env - Child-only environment overrides.
+ * @returns Actual packed exit and bounded terminal output after cleanup.
+ */
+export function runScaffoldTerminal(
+  command: string[],
+  cwd: string,
+  answers: readonly (readonly [string, string])[],
+  env: Record<string, string> = {},
+): Promise<ScaffoldTerminalResult> {
+  return Effect.runPromise(
+    Effect.flatMap(ScaffoldTerminal, (service) => service.run(command, cwd, answers, env)).pipe(
+      Effect.provide(terminalLayer),
+    ),
+  );
 }
 
-/** Verifies the packed public resolver's creation choices and explicit advanced flags.
- * @param root - Registry consumer containing the actual packed generator.
- * @returns After asserting omitted choices are prompted and explicit flags bypass their questions.
+/**
+ * Verifies cancellation, declined consent and unavailable/available local Docker.
+ * @param root - Installed application with a grouped Billing service.
+ * @param cli - Packed CLI executable.
+ * @returns Completion after all native terminal children have closed.
  */
-export async function verifyInteractiveResolver(root: string): Promise<void> {
-  // Release staging verifies this package/version before installation; assert the
-  // packed public contract against the same authored API used by scaffold callers.
-  const api = (await import(
-    pathToFileURL(join(root, "node_modules/create-relkit/dist/index.js")).href
-  )) as typeof import("create-relkit");
-  const requested: string[] = [];
-  const answers: PromptDriver = {
-    text: async ({ message }) => {
-      requested.push(message);
-      if (message === "Project name") return "interactive-app";
-      assert.equal(message, "Destination");
-      return "interactive-project";
-    },
-    select: async ({ message, options }) => {
-      requested.push(message);
-      assert.ok(message === "Starter template" || message === "Jobs service");
-      const selected = options.find(
-        (option) => option.value === (message === "Starter template" ? "minimal" : "none"),
-      );
-      assert.ok(selected);
-      return selected.value;
-    },
-    multiselect: async () => {
-      throw new Error("Creation requested an unexpected multiselect.");
-    },
-    confirm: async () => {
-      throw new Error("Confirmation belongs to generation, after option resolution.");
-    },
-    note: () => undefined,
-    intro: () => undefined,
-    outro: () => undefined,
-  };
-  const resolved = await api.resolveCreateOptionsDetails([], {
-    interactive: true,
-    promptDriver: answers,
-  });
-  assert.equal(resolved.options.name, "interactive-app");
-  assert.equal(resolved.options.template, "minimal");
-  assert.equal(resolved.options.directory, "interactive-project");
-  assert.equal(resolved.options.cloud, "none");
-  assert.equal(resolved.options.deploy, "none");
-  assert.equal(resolved.options.jobs, undefined);
-  assert.equal(resolved.options.install, true);
-  assert.equal(resolved.options.git, true);
-  assert.equal(resolved.options.examples, true);
-  assert.deepEqual(requested, ["Project name", "Starter template", "Jobs service", "Destination"]);
-  requested.length = 0;
-  const explicit = await api.resolveCreateOptionsDetails(
-    [
-      "named-app",
-      "--template",
-      "api",
-      "--jobs",
-      "effect-mq-docker",
-      "--directory",
-      "explicit-project",
-      "--no-install",
-    ],
-    { interactive: true, promptDriver: answers },
+export function verifyScaffoldTerminal(root: string, cli: string): Promise<void> {
+  return Effect.runPromise(
+    Effect.flatMap(ScaffoldTerminal, (service) => service.verify(root, cli)).pipe(
+      Effect.provide(terminalLayer),
+    ),
   );
-  assert.equal(explicit.options.name, "named-app");
-  assert.equal(explicit.options.template, "api");
-  assert.equal(explicit.options.jobs, "effect-mq-docker");
-  assert.equal(explicit.options.directory, "explicit-project");
-  assert.equal(explicit.options.install, false);
-  assert.deepEqual(requested, []);
+}
+
+/**
+ * Verifies the real packed option resolver with a native deterministic prompt driver.
+ * @param root - Registry consumer with the installed generator.
+ * @returns Completion after default and explicit option-resolution assertions.
+ */
+export function verifyInteractiveResolver(root: string): Promise<void> {
+  return Effect.runPromise(interactiveResolver(root));
 }
