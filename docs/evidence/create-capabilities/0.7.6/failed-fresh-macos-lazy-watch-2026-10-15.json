@@ -1,0 +1,606 @@
+{
+  "protocol": "relkit.dev-readiness",
+  "version": 1,
+  "mode": "candidate-certification",
+  "set": "fresh",
+  "command": "bun dev",
+  "thresholdMs": 1000,
+  "environment": {
+    "bun": "1.3.10",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M1 (Virtual)",
+    "load": [
+      9.88134765625,
+      13.4482421875,
+      11.40185546875
+    ]
+  },
+  "fixture": {
+    "temporary": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12",
+    "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-baseline",
+    "version": "0.7.6",
+    "registry": "http://127.0.0.1:49705",
+    "examples": "examples",
+    "artifacts": [
+      {
+        "name": "@relkit/contracts",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-contracts-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/schema",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-schema-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/buckets",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-buckets-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/cache",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-cache-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/diagnostics",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-diagnostics-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/graph",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-graph-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/invocation",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-invocation-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/observability",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-observability-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/provider",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-provider-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/realtime",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-realtime-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/client",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-client-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/client-generator",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-client-generator-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/config",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-config-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/deploy",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-deploy-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/drizzle",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-drizzle-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/functions",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-functions-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/local-service",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-local-service-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/openapi",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-openapi-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/compiler",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-compiler-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/docker",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-docker-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/jobs",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-jobs-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/runtime-effect",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-runtime-effect-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/s3",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-s3-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/tools",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-tools-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/agents",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-agents-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/deploy-pulumi",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-deploy-pulumi-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/effect-mq",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-effect-mq-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/events",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-events-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/inngest",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-inngest-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/inspector-api",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-inspector-api-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/supervisor",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-supervisor-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/trigger",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-trigger-0.7.6.tgz"
+      },
+      {
+        "name": "create-relkit",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/create-relkit-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/providers-local",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-providers-local-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/services",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-services-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/local",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-local-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/redis",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-redis-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/routes",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-routes-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/app",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-app-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/better-auth",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-better-auth-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/engine",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-engine-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/runtime-hono",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-runtime-hono-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/cli",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-cli-0.7.6.tgz"
+      },
+      {
+        "name": "@relkit/testing",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-testing-0.7.6.tgz"
+      },
+      {
+        "name": "relkit",
+        "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/release-artifacts/relkit-0.7.6.tgz"
+      }
+    ]
+  },
+  "identity": {
+    "bun": {
+      "path": "/Users/runner/.bun/bin/bun",
+      "realpath": "/Users/runner/.bun/bin/bun",
+      "version": "1.3.10"
+    },
+    "cli": {
+      "name": "@relkit/cli",
+      "version": "0.7.6",
+      "path": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-baseline/node_modules/.bin/relkit",
+      "realpath": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-baseline/node_modules/@relkit/cli/dist/bin.js"
+    },
+    "typescript": {
+      "name": "typescript",
+      "version": "5.9.3"
+    },
+    "lockHash": "sha256:3dd9cd6e0dfed823d264c314182cc46899a76dfa6ca9f8db1971ce093b133409",
+    "artifacts": [
+      {
+        "name": "@relkit/contracts",
+        "hash": "sha256:e57eb294db6b2bafbe46ab4b5231a95c0fb5f96d7d5d6fd5ef4fafb471116312"
+      },
+      {
+        "name": "@relkit/schema",
+        "hash": "sha256:67e689874c74385ad1c7b0a71fbe7f9f19b0f608e6d6b5355e782d93b8f9f93d"
+      },
+      {
+        "name": "@relkit/buckets",
+        "hash": "sha256:1093ee5b3455662d6c6f3c93474935d9cacc8e5c9750b14997f4fde6d8a16be6"
+      },
+      {
+        "name": "@relkit/cache",
+        "hash": "sha256:8300d7f4634143763c5fca4c3f11996e2bb4d33e7b8c00d0da5fced37020bd29"
+      },
+      {
+        "name": "@relkit/diagnostics",
+        "hash": "sha256:15847f5c43bed27405a4f2e5ac33fe6bdc5ab61f1aa0dd702fabc930554f3a75"
+      },
+      {
+        "name": "@relkit/graph",
+        "hash": "sha256:cd23be961fd5c7af17b0bfd7b136bbdf948dd277b71283adc6d54a58644d5463"
+      },
+      {
+        "name": "@relkit/invocation",
+        "hash": "sha256:eb28c4a7b3994a0db8e8397187141472bb1e4ac4dc4fa5bb30d34e1d48ae74b2"
+      },
+      {
+        "name": "@relkit/observability",
+        "hash": "sha256:4f92024c11b8e35cf02079cd3daa8f940c3a1a7bdc1977226a9f01132e9ee416"
+      },
+      {
+        "name": "@relkit/provider",
+        "hash": "sha256:a50034b607596ad99799a1b8b4fe74632689da045cfd1e1ab7175f769c9fa085"
+      },
+      {
+        "name": "@relkit/realtime",
+        "hash": "sha256:39b20329bb90d6cb2f0f5273725d55fb938aaeaca6c6792c84ebd0fa9aa148fc"
+      },
+      {
+        "name": "@relkit/client",
+        "hash": "sha256:eebc18ac7a4215e3fc19e943dc0b635e5c1f707c5e987a4aa68ea85236fdb9aa"
+      },
+      {
+        "name": "@relkit/client-generator",
+        "hash": "sha256:c48c707844cbbf8100b3c080c91e9bc95efeaec7e936410ef9a5b75e166089f6"
+      },
+      {
+        "name": "@relkit/config",
+        "hash": "sha256:1662e6d93b8f40c300ce78c9e1e6a919087dd7c704984d5c35d9d61cc91512fb"
+      },
+      {
+        "name": "@relkit/deploy",
+        "hash": "sha256:05940979f4d3b6f801efbaf1dacb3c0bc887f144ef77e31c458863b5e2c0a0e5"
+      },
+      {
+        "name": "@relkit/drizzle",
+        "hash": "sha256:1d7c1c227f28731034014c63a0179f967eb3d400b12eb5554a450e73b1d2e2e9"
+      },
+      {
+        "name": "@relkit/functions",
+        "hash": "sha256:496f54a38dceec44276cbb6491963961b6a90c14401f301498737d7296a7bf49"
+      },
+      {
+        "name": "@relkit/local-service",
+        "hash": "sha256:adab2fb78c0c8dac903785dcade2181b93d8113ca257aabb7039aee548990546"
+      },
+      {
+        "name": "@relkit/openapi",
+        "hash": "sha256:cb25cc157f960257ae58f00b9f03da3c62e8bfead21989cad927bc276c77216c"
+      },
+      {
+        "name": "@relkit/compiler",
+        "hash": "sha256:418ac6a7b1b22c06882dcf7bf0865899149845281fab5be21c048b553b87b1cc"
+      },
+      {
+        "name": "@relkit/docker",
+        "hash": "sha256:eec94050ebd7baf9c863491f2f073e011796460383530711fcdf26069c22854b"
+      },
+      {
+        "name": "@relkit/jobs",
+        "hash": "sha256:59946ad4527a6d6753e41bc22824607001c0fda66f439794ec0902e4a0a9cbf2"
+      },
+      {
+        "name": "@relkit/runtime-effect",
+        "hash": "sha256:f4923cf5638be04de3018062f1aa44ad2189c4927e02c15bb63b1196a2b283e0"
+      },
+      {
+        "name": "@relkit/s3",
+        "hash": "sha256:c55cb54018d806725357a4aee84e4822633a008169d56e02bee10433bb4bd2fc"
+      },
+      {
+        "name": "@relkit/tools",
+        "hash": "sha256:0b40788287c9be0519d44aff151ca0421834f0d0a8b3bc1b80235d320251645e"
+      },
+      {
+        "name": "@relkit/agents",
+        "hash": "sha256:fc95b9c8a07cdd0c60e79d5d84d15723deeceebefc2422cec684e99d4c479c17"
+      },
+      {
+        "name": "@relkit/deploy-pulumi",
+        "hash": "sha256:d6db3372d96a42bbf58ac49dc7b1042ee50ce6b01bc22b00d754701a9e2f8054"
+      },
+      {
+        "name": "@relkit/effect-mq",
+        "hash": "sha256:f51d647f983f5ba2e9836ffa9e6b8d4aaf9736229427698486125ed6e9838419"
+      },
+      {
+        "name": "@relkit/events",
+        "hash": "sha256:dfa294be61343569e63f0f1297ab0d0ed3ccb4c95e53983ececc80d4a631421f"
+      },
+      {
+        "name": "@relkit/inngest",
+        "hash": "sha256:f50fb7d0dabd0a0b982a14111de8bbf33c7bf51ed198a615cc15a6fa83da1965"
+      },
+      {
+        "name": "@relkit/inspector-api",
+        "hash": "sha256:16d44b0384b364d0ef897d9c2c5dee378dbb9ae167508baf47033870231e5002"
+      },
+      {
+        "name": "@relkit/supervisor",
+        "hash": "sha256:4f041aad65858f5895b8bc59451eb0172950e5635e888c007ff1427a62c60cc3"
+      },
+      {
+        "name": "@relkit/trigger",
+        "hash": "sha256:12c49ffdcfe60e35ef72f5cecae4449cb7ea8a1523d7253be59ac4db87d87771"
+      },
+      {
+        "name": "create-relkit",
+        "hash": "sha256:cb04ac9b4f51a7583f168e2504a2e78ec9b675e3f83cfce4f42cfa198b376071"
+      },
+      {
+        "name": "@relkit/providers-local",
+        "hash": "sha256:c79ba3edfe8e578280bbe0e085ffc9d6732491e626922ad674de13779b77bef1"
+      },
+      {
+        "name": "@relkit/services",
+        "hash": "sha256:f445428bbdf926e05e761d53078f99130bb12c76645825f22ce632d1150a5ec8"
+      },
+      {
+        "name": "@relkit/local",
+        "hash": "sha256:efdc9d916e9b59f9b6d62522a5821221653f4985601f9d3f413432bf6b9ed407"
+      },
+      {
+        "name": "@relkit/redis",
+        "hash": "sha256:7f23a5df87e752da3e8b2dec9dd07d421466bd09f8e3849549c5835a2e0eb0e7"
+      },
+      {
+        "name": "@relkit/routes",
+        "hash": "sha256:3bff1f8de45d8fa56c4c5778d0cca56f74ef9d59b78ea8c3faa670bb7d959a4f"
+      },
+      {
+        "name": "@relkit/app",
+        "hash": "sha256:818329cfaef0c1985664453ac25bff8ee1dd7f55d1fdbcfbfcb413c927fd62fb"
+      },
+      {
+        "name": "@relkit/better-auth",
+        "hash": "sha256:8490dec5540d8336e1ebe2c7accc20f15c0e19e6e88c336a0a5b0b90fbb698dd"
+      },
+      {
+        "name": "@relkit/engine",
+        "hash": "sha256:85f9bb921c70459fecc829523c5749b7a5d695e6a9d80757dff15be0f26d4c03"
+      },
+      {
+        "name": "@relkit/runtime-hono",
+        "hash": "sha256:bae9213f0725fdc807da819feaf01be66f5f6095718f8c4bd0458610ab75a71b"
+      },
+      {
+        "name": "@relkit/cli",
+        "hash": "sha256:4ef4bdb01794c1c7de621b63ed1891919692ff2b4ff3ebd85cce0d86625793fb"
+      },
+      {
+        "name": "@relkit/testing",
+        "hash": "sha256:eab18a4994c78624f3fbc3d20d5e239fb9b546b3bae1f97722dd5e1673509a42"
+      },
+      {
+        "name": "relkit",
+        "hash": "sha256:a8d02031898f98c53d3146e8c1911468e77c88caa5401da7ec706080d33e8204"
+      }
+    ],
+    "inspectorOverride": "absent"
+  },
+  "request": {
+    "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-baseline",
+    "url": "http://127.0.0.1:49443/hello?name=RelKit",
+    "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
+  },
+  "attempts": [
+    {
+      "run": 1,
+      "sample": {
+        "durationMs": 830.719041,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:05:47.263 INFO  relkit            Starting development server\n11:05:47.300 INFO  build             Compiling application\n11:05:47.695 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:05:47.751 INFO  build             Compiled in 450ms\n11:05:47.753 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:05:47.737 INFO  http              GET /hello → 200 in 129ms\n11:05:47.789 INFO  relkit            Stopping development server\n11:05:47.809 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-baseline"
+    },
+    {
+      "run": 2,
+      "sample": {
+        "durationMs": 1413.773917,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:06:03.095 INFO  relkit            Starting development server\n11:06:03.120 INFO  build             Compiling application\n11:06:03.682 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:06:03.775 INFO  build             Compiled in 653ms\n11:06:03.777 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:06:03.743 INFO  http              GET /hello → 200 in 291ms\n11:06:03.828 INFO  relkit            Stopping development server\n11:06:03.861 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-2"
+    },
+    {
+      "run": 3,
+      "sample": {
+        "durationMs": 2095.024291,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:06:24.512 INFO  relkit            Starting development server\n11:06:24.558 INFO  build             Compiling application\n11:06:25.759 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:06:25.902 INFO  build             Compiled in 1341ms\n11:06:25.906 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:06:25.924 INFO  relkit            Stopping development server\n11:06:25.847 INFO  http              GET /hello → 200 in 330ms\n11:06:25.972 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-3"
+    },
+    {
+      "run": 4,
+      "sample": {
+        "durationMs": 771.089458,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:06:47.801 INFO  relkit            Starting development server\n11:06:47.818 INFO  build             Compiling application\n11:06:48.138 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:06:48.200 INFO  build             Compiled in 381ms\n11:06:48.204 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:06:48.215 INFO  relkit            Stopping development server\n11:06:48.177 INFO  http              GET /hello → 200 in 157ms\n11:06:48.254 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-4"
+    },
+    {
+      "run": 5,
+      "sample": {
+        "durationMs": 727.885083,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:07:03.131 INFO  relkit            Starting development server\n11:07:03.157 INFO  build             Compiling application\n11:07:03.463 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:07:03.501 INFO  build             Compiled in 340ms\n11:07:03.504 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:07:03.485 INFO  http              GET /hello → 200 in 95ms\n11:07:03.521 INFO  relkit            Stopping development server\n11:07:03.550 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-5"
+    },
+    {
+      "run": 6,
+      "sample": {
+        "durationMs": 708.152875,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:07:17.685 INFO  relkit            Starting development server\n11:07:17.705 INFO  build             Compiling application\n11:07:18.024 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:07:18.087 INFO  build             Compiled in 381ms\n11:07:18.088 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:07:18.067 INFO  http              GET /hello → 200 in 166ms\n11:07:18.118 INFO  relkit            Stopping development server\n11:07:18.141 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-6"
+    },
+    {
+      "run": 7,
+      "sample": {
+        "durationMs": 659.316292,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:07:30.560 INFO  relkit            Starting development server\n11:07:30.593 INFO  build             Compiling application\n11:07:30.883 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:07:30.914 INFO  build             Compiled in 318ms\n11:07:30.915 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:07:30.903 INFO  http              GET /hello → 200 in 107ms\n11:07:30.941 INFO  relkit            Stopping development server\n11:07:30.959 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-7"
+    },
+    {
+      "run": 8,
+      "sample": {
+        "durationMs": 634.531833,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:07:43.399 INFO  relkit            Starting development server\n11:07:43.437 INFO  build             Compiling application\n11:07:43.674 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:07:43.704 INFO  build             Compiled in 266ms\n11:07:43.705 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:07:43.692 INFO  http              GET /hello → 200 in 73ms\n11:07:43.733 INFO  relkit            Stopping development server\n11:07:43.776 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-8"
+    },
+    {
+      "run": 9,
+      "sample": {
+        "durationMs": 584.1255,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:07:56.139 INFO  relkit            Starting development server\n11:07:56.155 INFO  build             Compiling application\n11:07:56.395 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:07:56.430 INFO  build             Compiled in 274ms\n11:07:56.431 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:07:56.441 INFO  relkit            Stopping development server\n11:07:56.419 INFO  http              GET /hello → 200 in 95ms\n11:07:56.475 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-9"
+    },
+    {
+      "run": 10,
+      "sample": {
+        "durationMs": 900.193458,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:08:14.088 INFO  relkit            Starting development server\n11:08:14.107 INFO  build             Compiling application\n11:08:14.517 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:08:14.563 INFO  build             Compiled in 454ms\n11:08:14.564 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:08:14.548 INFO  http              GET /hello → 200 in 140ms\n11:08:14.589 INFO  relkit            Stopping development server\n11:08:14.626 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-10"
+    },
+    {
+      "run": 11,
+      "sample": {
+        "durationMs": 1023.996083,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:08:34.084 INFO  relkit            Starting development server\n11:08:34.108 INFO  build             Compiling application\n11:08:34.570 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:08:34.641 INFO  build             Compiled in 531ms\n11:08:34.643 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:08:34.611 INFO  http              GET /hello → 200 in 177ms\n11:08:34.665 INFO  relkit            Stopping development server\n11:08:34.694 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-11"
+    },
+    {
+      "run": 12,
+      "sample": {
+        "durationMs": 815.007709,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:08:52.582 INFO  relkit            Starting development server\n11:08:52.619 INFO  build             Compiling application\n11:08:52.955 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:08:53.008 INFO  build             Compiled in 386ms\n11:08:53.011 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:08:52.992 INFO  http              GET /hello → 200 in 139ms\n11:08:53.036 INFO  relkit            Stopping development server\n11:08:53.078 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-12"
+    },
+    {
+      "run": 13,
+      "sample": {
+        "durationMs": 897.376875,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:09:11.543 INFO  relkit            Starting development server\n11:09:11.565 INFO  build             Compiling application\n11:09:11.905 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:09:11.969 INFO  build             Compiled in 403ms\n11:09:11.970 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:09:11.985 INFO  relkit            Stopping development server\n11:09:11.946 INFO  http              GET /hello → 200 in 140ms\n11:09:12.034 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-13"
+    },
+    {
+      "run": 14,
+      "sample": {
+        "durationMs": 972.436375,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:09:30.370 INFO  relkit            Starting development server\n11:09:30.393 INFO  build             Compiling application\n11:09:30.834 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:09:30.905 INFO  build             Compiled in 509ms\n11:09:30.906 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:09:30.882 INFO  http              GET /hello → 200 in 180ms\n11:09:30.946 INFO  relkit            Stopping development server\n11:09:30.974 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-14"
+    },
+    {
+      "run": 15,
+      "sample": {
+        "durationMs": 867.665333,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:09:49.556 INFO  relkit            Starting development server\n11:09:49.584 INFO  build             Compiling application\n11:09:49.951 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:09:49.991 INFO  build             Compiled in 404ms\n11:09:49.992 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:09:49.977 INFO  http              GET /hello → 200 in 125ms\n11:09:50.025 INFO  relkit            Stopping development server\n11:09:50.049 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-15"
+    },
+    {
+      "run": 16,
+      "sample": {
+        "durationMs": 694.830708,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:10:10.451 INFO  relkit            Starting development server\n11:10:10.487 INFO  build             Compiling application\n11:10:10.770 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:10:10.807 INFO  build             Compiled in 317ms\n11:10:10.808 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:10:10.820 INFO  relkit            Stopping development server\n11:10:10.795 INFO  http              GET /hello → 200 in 109ms\n11:10:10.844 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-16"
+    },
+    {
+      "run": 17,
+      "sample": {
+        "durationMs": 1301.912042,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:10:28.286 INFO  relkit            Starting development server\n11:10:28.342 INFO  build             Compiling application\n11:10:28.881 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:10:28.969 INFO  build             Compiled in 625ms\n11:10:28.971 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:10:28.925 INFO  http              GET /hello → 200 in 189ms\n11:10:29.004 INFO  relkit            Stopping development server\n11:10:29.037 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-17"
+    },
+    {
+      "run": 18,
+      "sample": {
+        "durationMs": 1207.699667,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:10:54.493 INFO  relkit            Starting development server\n11:10:54.537 INFO  build             Compiling application\n11:10:55.023 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:10:55.107 INFO  build             Compiled in 566ms\n11:10:55.108 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:10:55.090 INFO  http              GET /hello → 200 in 236ms\n11:10:55.138 INFO  relkit            Stopping development server\n11:10:55.195 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-18"
+    },
+    {
+      "run": 19,
+      "sample": {
+        "durationMs": 923.715583,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:11:14.187 INFO  relkit            Starting development server\n11:11:14.205 INFO  build             Compiling application\n11:11:14.540 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:11:14.612 INFO  build             Compiled in 405ms\n11:11:14.614 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:11:14.591 INFO  http              GET /hello → 200 in 166ms\n11:11:14.644 INFO  relkit            Stopping development server\n11:11:14.670 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-19"
+    },
+    {
+      "run": 20,
+      "sample": {
+        "durationMs": 822.484541,
+        "outcome": "response",
+        "output": "$ relkit dev\n11:11:31.918 INFO  relkit            Starting development server\n11:11:31.941 INFO  build             Compiling application\n11:11:32.313 INFO  hello.greet       hello invoked\n                                     {\"name\":\"RelKit\"}\n11:11:32.372 INFO  build             Compiled in 430ms\n11:11:32.374 INFO  server            Ready\n                                     API        http://127.0.0.1:49443\n                                     Reference  http://127.0.0.1:49443/_relkit/v1/api-reference\n                                     OpenAPI    http://127.0.0.1:49443/_relkit/v1/openapi.json\n11:11:32.355 INFO  http              GET /hello → 200 in 170ms\n11:11:32.396 INFO  relkit            Stopping development server\n11:11:32.430 INFO  relkit            Development server stopped\nerror: script \"dev\" exited with code 143\n"
+      },
+      "projectRoot": "/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/relkit-readiness-ViSS12/readiness-fresh-20"
+    }
+  ],
+  "expectedRuns": 20,
+  "summary": {
+    "runs": 20,
+    "medianMs": 849.192187,
+    "p95Ms": 1413.773917,
+    "maximumMs": 2095.024291,
+    "passed": false,
+    "preparationPassed": true
+  }
+}

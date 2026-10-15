@@ -34,9 +34,14 @@ For a release-branch repair, dispatch the existing CI workflow on
 `changeset-release/main` with `certify_create=true`. Its optional certification
 job uploads passing candidate source and reports as a commit-specific artifact
 for review; it has read-only repository access. Regular CI checks remain required.
-Timing certification runs on the standard `macos-15` Apple silicon runner, while
-regular CI remains on Ubuntu. Each completed measurement is checkpointed so a
-later project-creation failure cannot discard earlier attempts.
+Timing certification runs on the standard `ubuntu-24.04-arm` runner with four
+cores and 16 GB RAM, while regular CI remains on x64 Ubuntu. Each completed
+measurement is checkpointed so a later project-creation failure cannot discard
+earlier attempts. Timing evidence identifies the actual host; passing one
+reference host does not establish a latency bound for every machine.
+Regular CI and `bun run prepush` also build and trace the packaged startup graph.
+Its eager size budget keeps the ordinary TypeScript watcher behind a lazy import;
+prepared sessions continue to use their existing integrity epoch watcher.
 
 Pull requests from this repository automatically receive a patch Changeset when
 they touch a publishable package, the bundled templates, or the bundled
