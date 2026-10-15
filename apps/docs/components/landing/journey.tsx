@@ -17,7 +17,7 @@ export function DeveloperWorkflows() {
           title="Change the environment. Keep the model."
           description="Local recipes, connected services, and infrastructure-owned resources share one checked topology, with explicit lifecycle ownership."
         />
-        <MotionRegion name="workflow" className={`${styles.workflows} ${motion.workflows}`}>
+        <MotionRegion name="connections" className={`${styles.workflows} ${motion.workflows}`}>
           <article className={styles.workflow}>
             <div className={`${styles.recipe} ${motion.diagram}`} aria-hidden="true">
               <span className={styles.diagramLabel} data-flow="source" data-flow-motion="">

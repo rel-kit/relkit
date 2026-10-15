@@ -12,7 +12,7 @@ export function MotionRegion({
 }: {
   readonly children: ReactNode;
   readonly className: string | undefined;
-  readonly name: "workflow" | "technology";
+  readonly name: "connections" | "technology";
 }) {
   const host = useRef<HTMLDivElement>(null);
   const controller = useRef<ReturnType<typeof connectLandingMotion>>(null);
