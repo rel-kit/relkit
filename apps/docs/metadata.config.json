@@ -1,0 +1,14 @@
+{
+  "title": "RELKIT",
+  "tagline": "One application model for TypeScript backends",
+  "url": "https://relkit.up.railway.app",
+  "colors": {
+    "background": "#ffffff",
+    "foreground": "#171717",
+    "accent": "#171717"
+  },
+  "logo": "./public/metadata/mark.svg",
+  "faviconSrc": "./public/metadata/mark.svg",
+  "outputDir": "public/metadata",
+  "font": "Inter"
+}
