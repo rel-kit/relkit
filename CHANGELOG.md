@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.7.6
+
+### Changes
+
+- feat(generator): bundle RELKIT application skills in every starter
+- feat: adopt grouped service layout and guarded migrations
+
 ## 0.7.5
 
 ### Changes

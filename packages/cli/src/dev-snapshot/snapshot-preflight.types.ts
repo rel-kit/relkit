@@ -1,9 +1,6 @@
-import type { FSWatcher } from "node:fs";
-
 /** Native watch established before the prepared Effect graph is imported. */
 export interface SnapshotEpochPreflight {
   readonly root: string;
-  watcher: FSWatcher;
   revision: number;
   failure: unknown;
   notify: (() => void) | undefined;

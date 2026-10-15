@@ -6,6 +6,8 @@
  * evidence and restart preparation remain separate from each certification set.
  */
 import { resolve } from "node:path";
+import { rm } from "node:fs/promises";
+import { ownedNativePromise } from "@relkit/cli/internal/tooling";
 import { Effect, Layer } from "effect";
 import { preparePackedFixture } from "./dev-readiness/packed-fixture.js";
 import { packedStartRequest, measurePackedSet } from "./dev-readiness/benchmark-packed-measure.js";
@@ -62,21 +64,7 @@ const main = Effect.fn("ReadinessBenchmark.packedCandidate")(function* () {
     artifactDirectory === "" ? undefined : artifactDirectory,
   );
   const request = yield* packedStartRequest(fixture.projectRoot, backendPort, inspectorPort);
-  const { attempts, preparationAttempt } = yield* measurePackedSet(
-    fixture,
-    set,
-    count,
-    backendPort,
-    inspectorPort,
-  );
-  const report = packedReport(
-    fixture,
-    request,
-    attempts,
-    yield* packedReadinessIdentity(fixture.projectRoot, fixture.artifacts),
-    set,
-    preparationAttempt,
-  );
+  const identity = yield* packedReadinessIdentity(fixture.projectRoot, fixture.artifacts);
   const path = resolve(
     repository,
     option(
@@ -84,8 +72,31 @@ const main = Effect.fn("ReadinessBenchmark.packedCandidate")(function* () {
       `openspec/changes/fast-generated-dev-readiness/evidence/candidate-packed${fixture.examples === "no-examples" ? "-no-examples" : ""}.json`,
     ),
   );
+  const native = yield* BenchmarkNative;
+  const { attempts, preparationAttempt } = yield* measurePackedSet(
+    fixture,
+    set,
+    count,
+    backendPort,
+    inspectorPort,
+    process.argv.includes("--cleanup"),
+    (attempts, preparation) =>
+      native.report(
+        path,
+        JSON.stringify(
+          packedReport(fixture, request, attempts, identity, set, preparation, count),
+          null,
+          2,
+        ) + "\n",
+      ),
+  );
+  const report = packedReport(fixture, request, attempts, identity, set, preparationAttempt, count);
   yield* (yield* BenchmarkNative).report(path, JSON.stringify(report, null, 2) + "\n");
   yield* Effect.logInfo("Packed candidate recorded", { path, summary: report.summary });
+  if (process.argv.includes("--cleanup"))
+    yield* ownedNativePromise("benchmark.cleanupFixture", () =>
+      rm(fixture.temporary, { recursive: true, force: true }),
+    );
 });
 
 /**
@@ -116,7 +127,9 @@ function packedReport(
   identity: Effect.Success<ReturnType<typeof packedReadinessIdentity>>,
   set: "diagnostic" | "fresh" | "restart",
   preparationAttempt?: Effect.Success<ReturnType<typeof benchmarkReportEffect>>,
+  expectedRuns = attempts.length,
 ) {
+  const summary = candidateSummary(attempts, preparationAttempt);
   return {
     protocol: "relkit.dev-readiness",
     version: 1,
@@ -134,7 +147,8 @@ function packedReport(
     },
     attempts,
     ...(preparationAttempt === undefined ? {} : { preparationAttempt }),
-    summary: candidateSummary(attempts, preparationAttempt),
+    expectedRuns,
+    summary: { ...summary, passed: attempts.length === expectedRuns && summary.passed },
   };
 }
 

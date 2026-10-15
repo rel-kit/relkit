@@ -112,6 +112,7 @@ async function main(): Promise<void> {
   await run(process.execPath, [changesetCli, "version"]);
   await run("bun", ["run", "scripts/sync-release.ts", "--write"]);
   await run("bun", ["install", "--lockfile-only"]);
+  await run("bun", ["run", "scripts/certify-create.ts"]);
   await writeFile(changelogPath, changelog);
   await run("bun", [
     "run",

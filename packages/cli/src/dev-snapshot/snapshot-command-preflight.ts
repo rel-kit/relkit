@@ -7,6 +7,7 @@ import { readFileSync, statSync, watch } from "node:fs";
 import { resolve } from "node:path";
 import { findSnapshotMismatch } from "./snapshot-integrity-process.js";
 import { isSnapshotEpochPathRelevant } from "./snapshot-epoch-path.js";
+import { watchSnapshotInputs } from "./snapshot-input-watch.js";
 import type { SnapshotMember } from "./snapshot.types.js";
 import type {
   SnapshotCommandPreflight,
@@ -23,7 +24,6 @@ export function startSnapshotCommandPreflight(
   let epoch: SnapshotEpochPreflight | undefined;
   try {
     const root = projectRoot(args);
-    epoch = startEpoch(root);
     const pointer = readJson(root, ".relkit/dev/current.json", 1_024);
     const generation = recordString(pointer, "generation");
     if (!GENERATION.test(generation)) throw new Error("Invalid generation");
@@ -31,14 +31,21 @@ export function startSnapshotCommandPreflight(
       root,
       `.relkit/dev/generations/${generation.slice(7)}/receipt.json`,
       2_097_152,
+      generation,
     );
     const members = currentMembers(receipt);
+    epoch = startEpoch(root, members, receipt);
+    const startRevision = epoch.revision;
+    const mismatch = findSnapshotMismatch(root, members, 67_108_864, signal);
+    // The command graph may still be importing when a speculative worker fails.
+    // Keep its original rejection for validation while admitting that early failure.
+    void mismatch.catch(() => undefined);
     return {
       root,
       generation,
-      startRevision: epoch.revision,
+      startRevision,
       epoch,
-      mismatch: findSnapshotMismatch(root, members, 67_108_864, signal),
+      mismatch,
     };
   } catch {
     epoch?.close();
@@ -54,40 +61,61 @@ function projectRoot(args: readonly string[]): string {
   return resolve(value ?? process.cwd());
 }
 
-/** Opens one recursive witness before reading any member identity. */
-function startEpoch(root: string): SnapshotEpochPreflight {
-  const epoch = {
+/** Opens complete input observation before hashing or authoritative inventory validation. */
+function startEpoch(
+  root: string,
+  members: readonly SnapshotMember[],
+  receipt: unknown,
+): SnapshotEpochPreflight {
+  const epoch: SnapshotEpochPreflight = {
     root,
     revision: 0,
     failure: undefined,
     notify: undefined,
-    watcher: undefined,
     close: () => undefined,
-  } as unknown as SnapshotEpochPreflight;
-  const watcher = watch(root, { recursive: true }, (_event, filename) => {
-    if (filename !== null && !isSnapshotEpochPathRelevant(filename.toString())) return;
+  };
+  const changed = () => {
     epoch.revision += 1;
     epoch.notify?.();
-  });
-  watcher.on("error", (failure) => {
+  };
+  const failed = (failure: unknown) => {
     epoch.failure = failure;
     epoch.notify?.();
-  });
+  };
+  let close: () => void;
+  if (process.platform === "linux" && isRecord(receipt) && isRecord(receipt.typecheckInputs)) {
+    close = watchSnapshotInputs(
+      root,
+      members,
+      receipt.typecheckInputs.observations,
+      changed,
+      failed,
+    );
+  } else {
+    const watcher = watch(root, { recursive: true }, (_event, filename) => {
+      if (filename !== null && !isSnapshotEpochPathRelevant(filename.toString())) return;
+      changed();
+    });
+    watcher.on("error", failed);
+    close = () => watcher.close();
+  }
   let closed = false;
-  epoch.watcher = watcher;
   epoch.close = () => {
     if (closed) return;
     closed = true;
-    watcher.close();
+    close();
   };
   return epoch;
 }
 
 /** Reads one bounded speculative JSON document; authoritative decoding happens later. */
-function readJson(root: string, path: string, limit: number): unknown {
+function readJson(root: string, path: string, limit: number, generation?: string): unknown {
   const absolute = resolve(root, path);
   if (statSync(absolute).size > limit) throw new Error();
-  return JSON.parse(readFileSync(absolute, "utf8"));
+  const bytes = readFileSync(absolute);
+  if (generation !== undefined && `sha256:${Bun.SHA256.hash(bytes, "hex")}` !== generation)
+    throw new Error("Invalid preflight receipt address");
+  return JSON.parse(bytes.toString("utf8"));
 }
 
 /** Extracts and deduplicates mutable source and checker members. */

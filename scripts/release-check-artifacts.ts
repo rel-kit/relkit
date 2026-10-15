@@ -16,7 +16,7 @@ import { stageReleaseRoot } from "./release-stage.js";
 import { assertListing } from "./release-check-listing.js";
 export { templateInputs } from "./release-check-templates.js";
 async function readJsonFromTar(artifact: string): Promise<RecordValue> {
-  return JSON.parse(await command("tar", ["-xOf", artifact, "package/package.json"]));
+  return JSON.parse(await command("tar", ["-xOf", artifact, "package/package.json"], root, 60_000));
 }
 export function publicationOrder(items: PackageInfo[]): PackageInfo[] {
   const byName = new Map(items.map((item) => [item.name, item]));
@@ -47,6 +47,7 @@ async function stagePackages(items: PackageInfo[]): Promise<string> {
     await mkdir(join(staging, "packages"));
     await stageReleaseRoot(root, staging, await readJson(join(root, "package.json")));
     for (const item of items) {
+      console.error(`Staging release package: ${item.name}`);
       const target = join(staging, "packages", basename(item.directory));
       await mkdir(target);
       for (const file of item.manifest.files as string[])
@@ -65,7 +66,7 @@ async function stagePackages(items: PackageInfo[]): Promise<string> {
         );
       }
     }
-    await command(bun, ["install", "--lockfile-only", "--ignore-scripts"], staging);
+    await command(bun, ["install", "--lockfile-only", "--ignore-scripts"], staging, 120_000);
     return staging;
   } catch (error) {
     await rm(staging, { recursive: true, force: true });
@@ -90,16 +91,19 @@ export async function packAll(
         bun,
         ["pm", "pack", "--ignore-scripts", "--destination", destination, "--quiet"],
         join(staging, "packages", basename(item.directory)),
+        120_000,
       );
       const file = (await readdir(destination)).find(
         (candidate) => candidate.endsWith(".tgz") && !before.has(candidate),
       );
       if (file === undefined) throw new Error(`No packed artifact found for ${item.name}`);
       const artifact = join(destination, file);
-      const listing = (await command("tar", ["-tzf", artifact])).trim().split(/\r?\n/);
+      const listing = (await command("tar", ["-tzf", artifact], root, 60_000))
+        .trim()
+        .split(/\r?\n/);
       const packed = await readJsonFromTar(artifact);
       if (
-        (await command("tar", ["-xOf", artifact, "package/LICENSE"])) !==
+        (await command("tar", ["-xOf", artifact, "package/LICENSE"], root, 60_000)) !==
         (await readFile(join(root, "LICENSE"), "utf8"))
       )
         throw new Error(`Packed license mismatch: ${item.name}`);

@@ -19,6 +19,38 @@ provides an isolated environment.
 
 ## Changesets
 
+`bun run version:packages` certifies the new release after synchronizing package
+and template versions. It records 20 fresh starts and 20 restarts from packed
+packages, including restart preparation, and validates every start against the
+one-second limit before updating the creation allow-list. Failed certification
+restores the previous allow-list and evidence and stops release PR generation.
+To repair a versioned candidate, run `bun scripts/certify-create.ts`; never copy
+an older release's reports or change their recorded version numbers.
+Failed reports remain at the path printed by the driver and are uploaded as
+workflow artifacts when automated versioning fails.
+The driver disposes of temporary measured projects after recording their results
+so certification does not accumulate twenty separate dependency installations.
+For a release-branch repair, dispatch the existing CI workflow on
+`changeset-release/main` with `certify_create=true`. Its optional certification
+job uploads passing candidate source and reports as a commit-specific artifact
+for review; it has read-only repository access. Regular CI checks remain required.
+Timing certification runs on the standard `ubuntu-24.04-arm` runner with four
+cores and 16 GB RAM, while regular CI remains on x64 Ubuntu. Each completed
+measurement is checkpointed so a later project-creation failure cannot discard
+earlier attempts. Timing evidence identifies the actual host; passing one
+reference host does not establish a latency bound for every machine.
+Regular CI and `bun run prepush` also build and trace the packaged startup graph.
+Its eager size budget keeps the ordinary TypeScript watcher behind a lazy import;
+prepared sessions continue to use their existing integrity epoch watcher.
+On Linux, that watcher observes authored trees and the installed directories
+needed by the authenticated receipt, including ancestors of absent resolution
+paths. It avoids recursively traversing unrelated installed dependencies. A
+different receipt generation cannot reuse the earlier watch plan.
+`bun run test:certification` runs the packing, registry, startup graph, watch,
+checkpoint, and fixture cleanup regression checks shared by CI and pre-push.
+The certification step has a shorter deadline than its job so failure artifacts
+can still upload when a native setup operation stalls.
+
 Pull requests from this repository automatically receive a patch Changeset when
 they touch a publishable package, the bundled templates, or the bundled
 inspector. Documentation and internal chores outside those release paths do not

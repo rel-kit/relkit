@@ -3,7 +3,6 @@ import { expect, it } from "@effect/vitest";
 import { Deferred, Effect } from "effect";
 import { CliCleanup } from "../../src/services/cleanup.service.js";
 import { makeDevSessionEngineEffect } from "../../src/commands/dev-session-engine.js";
-import { makeDevSourceWatcherEffect } from "../../src/commands/dev-watch.js";
 import { DevSession } from "../../src/commands/dev-session.js";
 import { sourceWatchFixture } from "./source-watch-fixture.js";
 
@@ -23,7 +22,7 @@ it.live(
       yield* Effect.scoped(
         Effect.gen(function* () {
           const engine = yield* makeDevSessionEngineEffect(session);
-          const watcher = yield* makeDevSourceWatcherEffect(session);
+          const watcher = yield* engine.watch;
           const reason = new Error("Native watcher failed.");
           fixture.fail(reason);
           for (let index = 0; index < 400; index += 1) fixture.change("change-" + index + ".ts");
@@ -68,7 +67,7 @@ it.live(
       yield* Effect.scoped(
         Effect.gen(function* () {
           const engine = yield* makeDevSessionEngineEffect(session);
-          yield* makeDevSourceWatcherEffect(session);
+          yield* engine.watch;
           fixture.change("edited.ts");
           yield* Deferred.await(fixture.stopped);
           yield* engine.wait;

@@ -2,6 +2,7 @@
  * Acquires the development session's native engine and shared release receipt.
  * Candidate admission, backend startup and independent support have explicit
  * owners; callbacks submit lazy stop work without nesting an Effect runtime.
+ * The ordinary watcher and its TypeScript parser load only when watch is requested.
  */
 import { Deferred, Effect, Layer, Scope } from "effect";
 import { observeCli } from "../cli-runtime.js";
@@ -11,7 +12,7 @@ import { devSupervisorLayer } from "../services/dev-supervisor.service.js";
 import { portProbeLayer } from "./port-availability.service.js";
 import { sourceWatchLayer } from "../services/source-watch.service.js";
 import { drainCandidateEffect } from "./dev-activation.js";
-import { makeDevSourceWatcherEffect } from "./dev-watch.js";
+import { ownedNativePromise } from "../services/owned-promise.js";
 import { inspectorSupportLayer } from "./dev-inspector-support.service.js";
 import { acquireDevEngineState, provideDevEngine } from "./dev-engine-state.js";
 import { admitDevActivation, devActivationWorker } from "./dev-engine-activation.js";
@@ -59,9 +60,16 @@ export const makeDevSessionEngineEffect = Effect.fn("Dev.acquireSession")(
       stop,
       requestStop,
       wait: observeCli("dev.session.wait", Deferred.await(owner.closed)),
-      watch: provideDevEngine(owner, makeDevSourceWatcherEffect(session)).pipe(
-        Effect.provideService(Scope.Scope, owner.scope),
-      ),
+      watch: provideDevEngine(
+        owner,
+        Effect.gen(function* () {
+          const watcher = yield* ownedNativePromise(
+            "dev.watch.import",
+            () => import("./dev-watch.js"),
+          );
+          return yield* watcher.makeDevSourceWatcherEffect(session);
+        }),
+      ).pipe(Effect.provideService(Scope.Scope, owner.scope)),
       finish: () => {
         Deferred.doneUnsafe(owner.closed, Effect.void);
       },

@@ -1,10 +1,19 @@
 /** Captures original packed response contracts and retains every sequential native measurement and separate restart preparation. */
 import { Effect } from "effect";
+import { rm } from "node:fs/promises";
+import { ownedNativePromise } from "@relkit/cli/internal/tooling";
 import { createPackedProject, type preparePackedFixture } from "./packed-fixture.js";
 import { ReadinessBenchmark } from "./benchmark.service.js";
 import { benchmarkReportEffect } from "./benchmark-report.js";
 import { packedProbeContract } from "./packed-probe-contract.js";
 import type { StartRequest } from "./benchmark.types.js";
+import type { PackedAttempt } from "./benchmark-packed-summary.js";
+import type { ReadinessBenchmarkError } from "./benchmark-error.js";
+
+type Progress = (
+  attempts: readonly PackedAttempt[],
+  preparation?: Effect.Success<ReturnType<typeof benchmarkReportEffect>>,
+) => Effect.Effect<void, ReadinessBenchmarkError>;
 
 /** Captures the same actual response contract and ports before each measured native launch.
  * @param projectRoot - Actual outside-workspace packed project.
@@ -35,6 +44,8 @@ export const packedStartRequest = Effect.fn("ReadinessBenchmark.requestFor")(fun
  * @param count - Validated number of retained measured attempts.
  * @param backendPort - Original freed loopback backend port.
  * @param inspectorPort - Original freed loopback inspector port.
+ * @param cleanup - Release completed fresh fixtures after retaining their measured result.
+ * @param progress - Persist completed attempts before another acquisition or disposal can fail.
  * @returns All measured attempts and the separate original restart preparation.
  */
 export const measurePackedSet = Effect.fn("ReadinessBenchmark.measurePackedSet")(function* (
@@ -43,11 +54,17 @@ export const measurePackedSet = Effect.fn("ReadinessBenchmark.measurePackedSet")
   count: number,
   backendPort: number,
   inspectorPort: number,
+  cleanup = false,
+  progress?: Progress,
 ) {
   const benchmark = yield* ReadinessBenchmark;
   const request = yield* packedStartRequest(fixture.projectRoot, backendPort, inspectorPort);
   let preparationAttempt: Effect.Success<ReturnType<typeof benchmarkReportEffect>> | undefined;
-  if (set === "restart") preparationAttempt = yield* benchmarkReportEffect(benchmark, request, 0);
+  const recorded: PackedAttempt[] = [];
+  if (set === "restart") {
+    preparationAttempt = yield* benchmarkReportEffect(benchmark, request, 0);
+    if (progress) yield* progress(recorded, preparationAttempt);
+  }
   const attempts = yield* Effect.forEach(
     Array.from({ length: count }, (_, index) => index + 1),
     (run) =>
@@ -65,6 +82,12 @@ export const measurePackedSet = Effect.fn("ReadinessBenchmark.measurePackedSet")
           yield* packedStartRequest(projectRoot, backendPort, inspectorPort),
           run,
         );
+        recorded.push({ ...attempt, projectRoot });
+        if (progress) yield* progress(recorded, preparationAttempt);
+        if (cleanup && set === "fresh" && run !== 1)
+          yield* ownedNativePromise("benchmark.cleanupFreshProject", () =>
+            rm(projectRoot, { recursive: true, force: true }),
+          );
         return { ...attempt, projectRoot };
       }),
     { concurrency: 1 },

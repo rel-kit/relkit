@@ -21,20 +21,68 @@ export type PackageInfo = {
   manifest: RecordValue;
 };
 
-export async function command(executable: string, args: string[], cwd = root): Promise<string> {
+export async function command(
+  executable: string,
+  args: string[],
+  cwd = root,
+  timeoutMs = 600_000,
+): Promise<string> {
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1)
+    throw new Error("Release command timeout must be a positive integer");
+  const label = `${executable} ${args.join(" ")} in ${cwd}`;
+  console.error(`Release command: ${label}`);
   const child = Bun.spawn([executable, ...args], {
     cwd,
+    detached: true,
     stdout: "pipe",
     stderr: "pipe",
   });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-    child.exited,
-  ]);
-  if (code !== 0)
-    throw new Error(`${executable} ${args.join(" ")} failed (${code})\n${stdout}${stderr}`);
-  return stdout;
+  let timedOut = false;
+  let escalation: ReturnType<typeof setTimeout> | undefined;
+  const signal = (signal: NodeJS.Signals) => {
+    try {
+      process.kill(-child.pid, signal);
+    } catch (cause) {
+      if (!(cause instanceof Error) || !("code" in cause) || cause.code !== "ESRCH") throw cause;
+    }
+  };
+  const stop = () => {
+    if (escalation !== undefined) return;
+    signal("SIGTERM");
+    escalation = setTimeout(() => signal("SIGKILL"), 2_000);
+  };
+  const observe = <T>(pending: Promise<T>): Promise<T> =>
+    pending.catch((cause) => {
+      stop();
+      throw cause;
+    });
+  const deadline = setTimeout(() => {
+    timedOut = true;
+    stop();
+  }, timeoutMs);
+  try {
+    const [stdout, stderr, exit] = await Promise.allSettled([
+      observe(new Response(child.stdout).text()),
+      observe(new Response(child.stderr).text()),
+      observe(child.exited),
+    ]);
+    const output = [stdout, stderr]
+      .map((result) => (result.status === "fulfilled" ? result.value : String(result.reason)))
+      .join("");
+    if (timedOut)
+      throw new Error(`Release command timed out after ${timeoutMs}ms: ${label}\n${output}`);
+    if (
+      stdout.status !== "fulfilled" ||
+      stderr.status !== "fulfilled" ||
+      exit.status !== "fulfilled"
+    )
+      throw new Error(`Release command settlement failed: ${label}\n${output}`);
+    if (exit.value !== 0) throw new Error(`${label} failed (${exit.value})\n${output}`);
+    return stdout.value;
+  } finally {
+    clearTimeout(deadline);
+    clearTimeout(escalation);
+  }
 }
 
 export async function readJson(path: string): Promise<RecordValue> {

@@ -8,6 +8,7 @@ export async function runPreparedDev(args: readonly string[], signal: AbortSigna
     const command = await import("./snapshot-command.js");
     return await command.runPreparedDev(args, signal, preflight);
   } finally {
+    await preflight?.mismatch.catch(() => undefined);
     preflight?.epoch.close();
   }
 }

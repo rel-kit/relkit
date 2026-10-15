@@ -5,6 +5,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      certify_create:
+        description: Generate reviewed creation evidence for the release branch
+        type: boolean
+        default: false
 
 permissions: {}
 
@@ -13,6 +18,53 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  certify-create:
+    name: Certify packed creation
+    if: >-
+      github.event_name == 'workflow_dispatch' && inputs.certify_create &&
+      github.ref == 'refs/heads/changeset-release/main'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - id: identity
+        name: Read the candidate version
+        run: |
+          version="$(bun -p 'require("./packages/create-relkit/package.json").version')"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Certify the exact packed candidate
+        timeout-minutes: 20
+        run: bun scripts/certify-create.ts
+      - name: Upload passing candidate evidence for review
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: create-certification-${{ github.sha }}
+          path: |
+            packages/create-relkit/src/create-capabilities.ts
+            docs/evidence/create-capabilities/${{ steps.identity.outputs.version }}/fresh.json
+            docs/evidence/create-capabilities/${{ steps.identity.outputs.version }}/restart.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Preserve failed certification reports
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: failed-create-certification-${{ github.run_id }}
+          path: ${{ runner.temp }}/relkit-create-certification-*/*.json
+          if-no-files-found: ignore
+          retention-days: 7
+
   auto-changeset:
     name: Automatic Changeset
     if: >-
@@ -112,6 +164,7 @@ jobs:
       - name: Run focused tests
         run: |
           bun run test:types
+          bun run test:certification
           bun run test:unit
           bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts
           bun run test:graph
