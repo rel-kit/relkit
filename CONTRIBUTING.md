@@ -34,6 +34,9 @@ For a release-branch repair, dispatch the existing CI workflow on
 `changeset-release/main` with `certify_create=true`. Its optional certification
 job uploads passing candidate source and reports as a commit-specific artifact
 for review; it has read-only repository access. Regular CI checks remain required.
+Timing certification runs on the standard `macos-15` Apple silicon runner, while
+regular CI remains on Ubuntu. Each completed measurement is checkpointed so a
+later project-creation failure cannot discard earlier attempts.
 
 Pull requests from this repository automatically receive a patch Changeset when
 they touch a publishable package, the bundled templates, or the bundled
