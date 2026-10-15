@@ -1,0 +1,133 @@
+.icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  overflow: visible;
+}
+
+/* Productive gestures from Hugeicons Animated, repeated once per connection beat. */
+.scan {
+  opacity: 0;
+  stroke-width: 2.4;
+  stroke-dasharray: 18 82;
+  animation: scan 3.2s linear 1.66s infinite;
+}
+
+.records {
+  opacity: 0;
+  animation: records 3.2s linear 1.8s infinite;
+}
+
+.folder,
+.link,
+.cloud,
+.upload {
+  animation: folder 3.2s cubic-bezier(0.23, 1, 0.32, 1) 1.96s infinite;
+}
+
+.folder {
+  transform-origin: 12px 18px;
+}
+.link {
+  animation-name: link;
+  transform-origin: 12px 12px;
+  animation-delay: 1.66s;
+}
+.cloud {
+  animation-name: cloud;
+  transform-origin: 12px 12px;
+}
+.upload {
+  animation-name: upload;
+}
+
+@keyframes scan {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 95;
+  }
+  2% {
+    opacity: 1;
+    stroke-dashoffset: 95;
+  }
+  12% {
+    opacity: 1;
+    stroke-dashoffset: -12;
+  }
+  14%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -12;
+  }
+}
+
+@keyframes records {
+  0%,
+  5%,
+  26%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  20% {
+    opacity: 1;
+  }
+}
+
+@keyframes folder {
+  0%,
+  18%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  6% {
+    transform: translateY(-1.7px) rotate(-2deg);
+  }
+  12% {
+    transform: translateY(0.4px) rotate(0.7deg);
+  }
+}
+
+@keyframes link {
+  0%,
+  16%,
+  100% {
+    transform: rotate(0) scale(1);
+  }
+  5% {
+    transform: rotate(-3deg) scale(0.97);
+  }
+  10% {
+    transform: rotate(2deg) scale(1.02);
+  }
+}
+
+@keyframes cloud {
+  0%,
+  18%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  4% {
+    transform: translateY(0.45px) scaleY(0.98);
+  }
+  10% {
+    transform: translateY(-1px) scaleY(1.03);
+  }
+}
+
+@keyframes upload {
+  0% {
+    transform: translateY(2.4px);
+  }
+  9% {
+    transform: translateY(-2.2px);
+  }
+  14% {
+    transform: translateY(0.35px);
+  }
+  18%,
+  100% {
+    transform: translateY(0);
+  }
+}

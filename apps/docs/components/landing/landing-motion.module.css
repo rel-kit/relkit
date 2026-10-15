@@ -1,0 +1,141 @@
+.region {
+  position: relative;
+}
+
+.control {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--page);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background 160ms,
+    transform 120ms;
+}
+
+.control:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.control:active {
+  transform: scale(0.94);
+}
+
+.control:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.technology {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px 24px 0;
+  border-top: 1px solid var(--line);
+}
+
+.technology > .control {
+  position: static;
+  flex: none;
+}
+
+.window {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 32px,
+    #000 calc(100% - 32px),
+    transparent
+  );
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: travel 34s linear infinite;
+}
+
+.stack {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 40px;
+  margin: 0;
+  padding: 8px 40px 8px 0;
+  list-style: none;
+}
+
+.stack li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.stack svg {
+  width: 20px;
+  height: 20px;
+}
+
+.region[data-motion="paused"] .track,
+.region[data-motion="paused"] [data-flow-motion],
+.region[data-motion="paused"] [data-flow="resources"] > span::after {
+  animation-play-state: paused;
+}
+
+@keyframes travel {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (hover: hover) {
+  .control:hover:not(:disabled) {
+    background: #eee;
+  }
+  .technology:hover .track {
+    animation-play-state: paused;
+  }
+}
+
+@media (pointer: coarse) {
+  .control {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .region *,
+  .region *::after {
+    animation: none !important;
+    transition: none;
+  }
+  .track {
+    width: auto;
+    display: block;
+  }
+  .stack {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-left: 24px;
+  }
+  .stack[aria-hidden="true"] {
+    display: none;
+  }
+}

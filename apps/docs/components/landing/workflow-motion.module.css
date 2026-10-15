@@ -1,0 +1,166 @@
+.workflows .diagram {
+  min-height: 320px;
+  gap: 0;
+  padding-block: 40px;
+}
+
+.diagram [data-flow="source"] {
+  position: relative;
+  z-index: 1;
+  animation: source 3.2s ease infinite;
+}
+
+.diagram [data-flow="resources"] {
+  display: grid;
+  width: 100%;
+  max-width: 320px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.diagram [data-flow="resources"] > span {
+  position: relative;
+  min-width: 0;
+  gap: 8px;
+  padding-inline: 10px;
+  font-size: 11px;
+}
+
+.diagram [data-flow="resources"] > span::after {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--ink);
+  border-radius: inherit;
+  content: "";
+  opacity: 0;
+  animation: received 3.2s ease infinite;
+  pointer-events: none;
+}
+
+.diagram [data-flow="resources"] > span + span::after {
+  animation-delay: 0.3s;
+}
+.diagram > span:last-child {
+  margin-top: 24px;
+}
+
+.connector {
+  width: min(320px, 100%);
+  height: 72px;
+  overflow: visible;
+  color: var(--ink);
+}
+
+.trail {
+  opacity: 0;
+  stroke-width: 2.5;
+  stroke-dasharray: 18 100;
+  animation: trail 3.2s linear infinite;
+}
+
+.trailRight {
+  animation-delay: 0.3s;
+}
+
+.packetLeft,
+.packetRight {
+  --target-x: 80px;
+  opacity: 0;
+  animation: packet 3.2s linear infinite;
+}
+
+.packetRight {
+  --target-x: 240px;
+  animation-delay: 0.3s;
+}
+
+@keyframes packet {
+  0% {
+    opacity: 0;
+    transform: translate(160px, 0);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(160px, 0);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(160px, 28px);
+  }
+  38% {
+    opacity: 1;
+    transform: translate(var(--target-x), 28px);
+  }
+  52% {
+    opacity: 1;
+    transform: translate(var(--target-x), 72px);
+  }
+  58%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--target-x), 72px);
+  }
+}
+
+/* A small SVG stroke is painted to show direction along the exact connector path. */
+@keyframes trail {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 18;
+  }
+  4% {
+    opacity: 0.85;
+    stroke-dashoffset: 18;
+  }
+  18% {
+    opacity: 0.85;
+    stroke-dashoffset: -0.42;
+  }
+  38% {
+    opacity: 0.85;
+    stroke-dashoffset: -53.05;
+  }
+  52% {
+    opacity: 0.85;
+    stroke-dashoffset: -82;
+  }
+  58%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -100;
+  }
+}
+
+@keyframes source {
+  0%,
+  30%,
+  100% {
+    transform: scale(1);
+  }
+  8% {
+    transform: scale(1.035);
+  }
+}
+
+@keyframes received {
+  0%,
+  48%,
+  82%,
+  100% {
+    opacity: 0;
+  }
+  56%,
+  66% {
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 700px) {
+  .workflows[data-motion] {
+    grid-template-columns: 1fr;
+  }
+  .workflows[data-motion] > article + article {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}

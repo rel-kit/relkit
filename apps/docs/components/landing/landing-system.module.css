@@ -1,0 +1,181 @@
+.page {
+  --page: #fff;
+  --ink: #171717;
+  --muted: #686868;
+  --line: #e5e5e5;
+  --soft: #fafafa;
+  position: relative;
+  isolation: isolate;
+  color-scheme: light;
+  color: var(--ink);
+  background: var(--page);
+  font-family: var(--hero-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A single pair of rails owns every lower section, including its whitespace. */
+.page::before {
+  position: absolute;
+  z-index: 2;
+  inset: 0 auto 0 50%;
+  width: min(calc(100% - 48px), 1120px);
+  border-inline: 1px solid var(--line);
+  content: "";
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.page ::selection {
+  color: var(--page);
+  background: var(--ink);
+}
+
+.page h2,
+.page h3,
+.page p,
+.page dl,
+.page dd {
+  margin: 0;
+}
+
+.page h3 {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+}
+
+.page p {
+  text-wrap: pretty;
+}
+
+.page a,
+.page button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page a:focus-visible,
+.page button:focus-visible {
+  outline: 2px solid var(--muted);
+  outline-offset: -5px;
+}
+
+.row {
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 24px;
+}
+
+.frame {
+  width: min(calc(100% - 48px), 1120px);
+  margin-inline: auto;
+}
+
+.heading {
+  display: grid;
+  gap: 24px;
+  padding: 80px 48px 48px;
+}
+
+.page .label {
+  color: var(--muted);
+  font-family: var(--hero-mono), monospace;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.page .title {
+  max-width: 760px;
+  font-size: clamp(32px, 3.5vw, 48px);
+  font-weight: 450;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.page .description {
+  max-width: 600px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.textLink {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 450;
+  line-height: 1.5;
+}
+
+.textLink svg {
+  flex: none;
+}
+
+.page .button {
+  display: inline-flex;
+  min-height: 49px;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 12px 20px;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  color: var(--page);
+  background: var(--ink);
+  font-size: 14px;
+  transition: transform 160ms ease-out;
+}
+
+.page .button:focus-visible {
+  outline-offset: 4px;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .textLink:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .page .button:hover {
+    background: #303030;
+  }
+}
+
+@media (max-width: 800px) {
+  .heading {
+    padding: 64px 32px 40px;
+  }
+}
+
+@media (max-width: 560px) {
+  .frame,
+  .page::before {
+    width: calc(100% - 32px);
+  }
+  .heading {
+    gap: 20px;
+    padding: 48px 24px 32px;
+  }
+  .page .description {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page *,
+  .page *::before,
+  .page *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

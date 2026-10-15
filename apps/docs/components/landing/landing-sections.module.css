@@ -1,0 +1,250 @@
+.capabilities {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.capabilities > * {
+  min-width: 0;
+  padding: 40px 32px;
+}
+
+.capabilities > :not(:nth-child(3n + 1)) {
+  border-left: 1px solid var(--line);
+}
+
+.capabilities > :nth-child(n + 4) {
+  border-top: 1px solid var(--line);
+}
+
+.capabilityIntro {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--soft);
+}
+
+.capabilityIntro h2 {
+  font-size: clamp(28px, 2.8vw, 36px);
+  font-weight: 450;
+  line-height: 1.12;
+  letter-spacing: -1.4px;
+}
+
+.capabilityIntro > p:last-child,
+.capability > p,
+.workflowCopy > p:not(:first-child) {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.capability {
+  display: flex;
+  min-height: 300px;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.capabilityTop {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.capability > span:last-child {
+  margin-top: auto;
+}
+
+.capability:active {
+  background: #f2f2f2;
+}
+
+.model {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+}
+
+.modelCopy {
+  display: grid;
+  align-content: center;
+  gap: 24px;
+  padding: 64px 48px;
+}
+
+.modelCopy > div {
+  padding: 0;
+}
+
+.statistics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+
+.statistics > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 32px;
+}
+
+.statistics > div + div {
+  border-left: 1px solid var(--line);
+}
+
+.statistics dt {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.statistics dd {
+  font-size: 56px;
+  font-weight: 350;
+  line-height: 1;
+  letter-spacing: -3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.workflows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+
+.workflow {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.workflow + .workflow {
+  border-left: 1px solid var(--line);
+}
+
+.recipe {
+  display: grid;
+  min-height: 280px;
+  align-content: center;
+  justify-items: center;
+  gap: 16px;
+  padding: 32px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--soft);
+  color: var(--muted);
+}
+
+.diagramLabel,
+.resourcePair > span {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  color: var(--ink);
+  background: var(--page);
+  font-family: var(--hero-mono), monospace;
+  font-size: 12px;
+}
+
+.resourcePair {
+  display: flex;
+  gap: 16px;
+}
+
+.diagramCaption {
+  font-family: var(--hero-mono), monospace;
+  font-size: 10px;
+}
+
+.workflowCopy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  padding: 40px 48px;
+}
+
+.workflowCopy > a {
+  margin-top: auto;
+}
+
+@media (hover: hover) {
+  .capability:hover {
+    background: var(--soft);
+  }
+}
+
+@media (max-width: 800px) {
+  .capabilities {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .capabilities > :nth-child(n) {
+    border: 0;
+  }
+  .capabilities > :nth-child(even) {
+    border-left: 1px solid var(--line);
+  }
+  .capabilities > :nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+  .model {
+    grid-template-columns: 1fr;
+  }
+  .modelCopy,
+  .workflowCopy {
+    padding: 40px 32px;
+  }
+  .resourcePair {
+    gap: 8px;
+  }
+  .resourcePair > span {
+    gap: 8px;
+    padding: 12px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 560px) {
+  .capabilities,
+  .workflows,
+  .statistics {
+    grid-template-columns: 1fr;
+  }
+  .capabilities > :nth-child(n) {
+    min-height: auto;
+    padding: 32px 24px;
+    border-left: 0;
+  }
+  .capabilities > :nth-child(n + 2),
+  .workflow + .workflow {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .modelCopy,
+  .workflowCopy {
+    padding: 40px 24px;
+  }
+  .statistics > div {
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 24px;
+    padding: 24px;
+  }
+  .statistics > div + div {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .statistics dt {
+    font-size: 13px;
+  }
+  .statistics dd {
+    width: 32px;
+    flex: none;
+    font-size: 40px;
+  }
+}
