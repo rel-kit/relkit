@@ -1,0 +1,219 @@
+.inspectorStage {
+  display: grid;
+  gap: 24px;
+  padding: 16px 48px 40px;
+}
+
+.inspector {
+  display: block;
+  overflow: hidden;
+  border: 1px solid #d4d4d4;
+  border-radius: 6px;
+  background: var(--page);
+  box-shadow: 0 12px 32px -20px #0003;
+}
+
+.inspectorBar,
+.inspectorBar > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inspectorBar {
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  background: var(--soft);
+  font-family: var(--hero-mono), monospace;
+  font-size: 11px;
+}
+
+.inspectorBar i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #737373;
+}
+
+.inspector img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.observability,
+.guides {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+
+.observability article,
+.guides > a {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px;
+}
+
+.observability article + article,
+.guides > a + a {
+  border-left: 1px solid var(--line);
+}
+
+.observability article > p:not(:first-child),
+.guides > a > p:not(:first-of-type),
+.community > div + div > p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.observability article > a,
+.guides > a > span:last-child {
+  margin-top: auto;
+}
+
+.community {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: end;
+  gap: 64px;
+  padding: 64px 48px 48px;
+}
+
+.community > div {
+  display: grid;
+  gap: 24px;
+}
+
+.community h2 {
+  max-width: 400px;
+  font-size: 36px;
+  font-weight: 450;
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+}
+
+.guideVisual {
+  display: grid;
+  min-height: 144px;
+  align-content: center;
+  justify-items: start;
+  gap: 24px;
+  margin-bottom: 16px;
+  color: var(--muted);
+}
+
+.guideVisual code {
+  font-family: var(--hero-mono), monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.guides > a:active {
+  background: #f2f2f2;
+}
+
+.cta {
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+  padding: 96px 32px;
+  text-align: center;
+}
+
+.cta h2 {
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 450;
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
+
+.cta > p:not(:first-child),
+.cta code {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.cta code {
+  font-family: var(--hero-mono), monospace;
+  font-size: 11px;
+}
+
+@media (hover: hover) {
+  .guides > a:hover {
+    background: var(--soft);
+  }
+  .inspector:hover {
+    border-color: #a3a3a3;
+  }
+}
+
+@media (max-width: 800px) {
+  .inspectorStage {
+    padding-inline: 32px;
+  }
+  .observability,
+  .guides {
+    grid-template-columns: 1fr;
+  }
+  .observability article,
+  .guides > a {
+    padding: 32px;
+  }
+  .observability article + article,
+  .guides > a + a {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .guides > a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    column-gap: 32px;
+  }
+  .guideVisual {
+    grid-row: 1 / span 4;
+    min-height: 0;
+    margin-bottom: 0;
+  }
+  .community {
+    gap: 32px;
+    padding-inline: 32px;
+  }
+}
+
+@media (max-width: 560px) {
+  .inspectorStage {
+    padding: 0 24px 32px;
+  }
+  .inspectorBar {
+    padding: 12px;
+    font-size: 9px;
+  }
+  .community {
+    grid-template-columns: 1fr;
+  }
+  .observability article,
+  .guides > a {
+    padding-inline: 24px;
+  }
+  .guides > a {
+    display: flex;
+  }
+  .community {
+    padding: 48px 24px 32px;
+  }
+  .community h2 {
+    font-size: 32px;
+  }
+  .guideVisual {
+    min-height: 100px;
+  }
+  .cta {
+    padding: 64px 24px;
+  }
+}

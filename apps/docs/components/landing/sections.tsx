@@ -1,5 +1,8 @@
-import { Activity, Boxes, Braces, RadioTower, Route } from "lucide-react";
+import { Activity, ArrowUpRight, Boxes, Braces, RadioTower, Route } from "lucide-react";
 import Link from "next/link";
+import { Topology } from "./topology";
+import system from "./landing-system.module.css";
+import styles from "./landing-sections.module.css";
 
 interface Capability {
   readonly id: string;
@@ -16,37 +19,44 @@ export function SectionHeading({
   description,
 }: {
   readonly eyebrow: string;
-  readonly title?: string;
+  readonly title: string;
   readonly description?: string;
 }) {
   return (
-    <div className="landing-section-heading">
-      <p>{eyebrow}</p>
-      {title === undefined ? null : <h2>{title}</h2>}
-      {description === undefined ? null : <span>{description}</span>}
+    <div className={system.heading}>
+      <p className={system.label}>{eyebrow}</p>
+      <h2 className={system.title}>{title}</h2>
+      {description === undefined ? null : <p className={system.description}>{description}</p>}
     </div>
   );
 }
 
 export function Capabilities({ features }: { readonly features: readonly Capability[] }) {
   return (
-    <section className="landing-container landing-section">
-      <SectionHeading
-        eyebrow="Features"
-        title="The five parts of a Relkit application."
-        description="Organize a service, implement functions, expose routes, publish events, and observe the complete execution path."
-      />
-      <div className="landing-capability-grid">
+    <section className={system.row} aria-label="Application capabilities">
+      <div className={`${system.frame} ${styles.capabilities}`}>
+        <div className={styles.capabilityIntro}>
+          <p className={system.label}>01 / The building blocks</p>
+          <h2>
+            Five parts.
+            <br />
+            One application.
+          </h2>
+          <p>From a focused service to a complete execution path. The pieces fit together.</p>
+        </div>
         {features.map((feature, index) => {
           const Icon = capabilityIcons[index]!;
           return (
-            <Link key={feature.id} href={`/docs/${feature.guide}`}>
-              <span className="landing-feature-mark">
-                <Icon aria-hidden="true" />
-              </span>
+            <Link className={styles.capability} key={feature.id} href={`/docs/${feature.guide}`}>
+              <div className={styles.capabilityTop}>
+                <Icon size={22} strokeWidth={1.5} aria-hidden="true" />
+                <span className={system.label}>0{index + 1}</span>
+              </div>
               <h3>{feature.title}</h3>
               <p>{feature.summary}</p>
-              <small>Learn more &gt;</small>
+              <span className={system.textLink}>
+                Explore {feature.title.toLowerCase()} <ArrowUpRight size={14} aria-hidden="true" />
+              </span>
             </Link>
           );
         })}
@@ -57,19 +67,36 @@ export function Capabilities({ features }: { readonly features: readonly Capabil
 
 export function Statistics() {
   return (
-    <section className="landing-container landing-section">
-      <SectionHeading eyebrow="One source of truth" />
-      <div className="landing-stat-grid">
-        {[
-          ["1", "checked application graph"],
-          ["3", "project templates: minimal, API, agent"],
-          ["0", "cloud credentials for the local journey"],
-        ].map(([value, label]) => (
-          <article key={label}>
-            <strong>{value}</strong>
-            <span>{label}</span>
-          </article>
-        ))}
+    <section className={system.row} aria-label="One application model">
+      <div className={system.frame}>
+        <div className={styles.model}>
+          <div className={styles.modelCopy}>
+            <SectionHeading
+              eyebrow="02 / One source of truth"
+              title="Your code is the blueprint."
+              description="Describe your application in TypeScript. Relkit checks the graph that connects your services, routes, resources, and async work."
+            />
+            <p className={system.description}>
+              Development, tests, inspection, and deployment all start from that same model.
+            </p>
+            <Link className={system.textLink} href="/docs/service/organization">
+              Explore the application model <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
+          </div>
+          <Topology />
+        </div>
+        <dl className={styles.statistics}>
+          {[
+            ["1", "Checked application graph"],
+            ["3", "Templates: minimal, API, agent"],
+            ["0", "Cloud credentials to start locally"],
+          ].map(([value, label]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
   );
