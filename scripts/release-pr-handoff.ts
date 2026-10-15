@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 type WorkflowRun = {
   head_branch: string;
@@ -78,30 +79,22 @@ export async function handoffRelease(
 
 if (import.meta.main) {
   const repository = process.env.GITHUB_REPOSITORY;
-  const token = process.env.GH_TOKEN;
   assert.ok(repository && /^[\w.-]+\/[\w.-]+$/.test(repository));
-  assert.ok(token);
-  assert.ok(process.env.GITHUB_EVENT_PATH);
-  const event = JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH, "utf8")) as {
-    workflow_run: WorkflowRun;
-  };
+  assert.ok(process.env.RELEASE_WORKFLOW_RUN);
+  const run = JSON.parse(process.env.RELEASE_WORKFLOW_RUN) as WorkflowRun;
+  const execute = promisify(execFile);
   const api: Api = async (path, body) => {
-    const response = await fetch(
-      `${process.env.GITHUB_API_URL ?? "https://api.github.com"}${path}`,
-      {
-        method: body === undefined ? "GET" : "POST",
-        headers: {
-          authorization: `Bearer ${token}`,
-          accept: "application/vnd.github+json",
-          "content-type": "application/json",
-          "x-github-api-version": "2022-11-28",
-        },
-        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-        signal: AbortSignal.timeout(30_000),
-      },
-    );
-    if (!response.ok) throw new Error(`GitHub ${response.status}: ${path}`);
-    return response.status === 204 ? undefined : response.json();
+    const args = ["api", "--hostname", "github.com", path];
+    if (body !== undefined) {
+      args.push("--method", "POST");
+      for (const [key, value] of Object.entries(body)) args.push("--raw-field", `${key}=${value}`);
+    }
+    const { stdout } = await execute("gh", args, {
+      timeout: 30_000,
+      maxBuffer: 4 * 1024 * 1024,
+      encoding: "utf8",
+    });
+    return stdout.trim() === "" ? undefined : JSON.parse(stdout);
   };
-  console.log(await handoffRelease(repository, event.workflow_run, api));
+  console.log(await handoffRelease(repository, run, api));
 }

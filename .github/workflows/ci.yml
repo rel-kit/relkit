@@ -54,6 +54,7 @@ jobs:
       - name: Recover the handoff after a bot merge
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_WORKFLOW_RUN: ${{ toJSON(github.event.workflow_run) }}
         run: bun scripts/release-pr-handoff.ts
 
   select-release-mode:
