@@ -33,11 +33,13 @@ test("fast CI gates merges and only green main runs start releases", async () =>
   expect(release).toContain(".head_sha == $sha");
   expect(release).toContain("ref: ${{ github.sha }}");
   expect(release).not.toContain("needs.select-release-mode.outputs.sha");
-  expect(release).toContain("return_run_details=true");
-  expect(release).toContain('gh run watch "$run_id" --exit-status');
-  expect(release).toContain(
-    'gh workflow run ci.yml --ref main -f verified_sha="$sha" -f ci_run_id="$run_id"',
-  );
+  expect(release).toContain("github.event.workflow_run.event == 'workflow_dispatch'");
+  expect(release).toContain("branches: [main, changeset-release/main]");
+  expect(release).toContain("bun scripts/release-pr-handoff.ts");
+  expect(release).toContain("name: Dispatch CI for the merged release");
+  expect(release).not.toContain("for attempt in {1..120}");
+  expect(release).toContain("steps.published.outputs.complete == 'true' && 'none'");
+  expect(release).toContain("release(tagName: $tag) { isDraft }");
   expect(release).toContain("--ci-pack --output");
   expect(release).toContain("needs.pack.result == 'success'");
   expect(release).not.toContain("aws-cloud");
