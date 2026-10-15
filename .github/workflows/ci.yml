@@ -118,6 +118,14 @@ jobs:
           commit-message: "chore: version RELKIT packages"
           pr-title: "chore: release RELKIT"
           pr-base-branch: main
+      - name: Preserve failed creation certification reports
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: failed-create-certification-${{ github.run_id }}
+          path: ${{ runner.temp }}/relkit-create-certification-*/*.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Verify and auto-merge the release pull request
         env:
           GH_TOKEN: ${{ github.token }}

@@ -19,6 +19,22 @@ provides an isolated environment.
 
 ## Changesets
 
+`bun run version:packages` certifies the new release after synchronizing package
+and template versions. It records 20 fresh starts and 20 restarts from packed
+packages, including restart preparation, and validates every start against the
+one-second limit before updating the creation allow-list. Failed certification
+restores the previous allow-list and evidence and stops release PR generation.
+To repair a versioned candidate, run `bun scripts/certify-create.ts`; never copy
+an older release's reports or change their recorded version numbers.
+Failed reports remain at the path printed by the driver and are uploaded as
+workflow artifacts when automated versioning fails.
+The driver disposes of temporary measured projects after recording their results
+so certification does not accumulate twenty separate dependency installations.
+For a release-branch repair, dispatch the existing CI workflow on
+`changeset-release/main` with `certify_create=true`. Its optional certification
+job uploads passing candidate source and reports as a commit-specific artifact
+for review; it has read-only repository access. Regular CI checks remain required.
+
 Pull requests from this repository automatically receive a patch Changeset when
 they touch a publishable package, the bundled templates, or the bundled
 inspector. Documentation and internal chores outside those release paths do not
