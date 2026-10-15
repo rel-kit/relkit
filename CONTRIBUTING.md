@@ -46,6 +46,10 @@ On Linux, that watcher observes authored trees and the installed directories
 needed by the authenticated receipt, including ancestors of absent resolution
 paths. It avoids recursively traversing unrelated installed dependencies. A
 different receipt generation cannot reuse the earlier watch plan.
+`bun run test:certification` runs the packing, registry, startup graph, watch,
+checkpoint, and fixture cleanup regression checks shared by CI and pre-push.
+The certification step has a shorter deadline than its job so failure artifacts
+can still upload when a native setup operation stalls.
 
 Pull requests from this repository automatically receive a patch Changeset when
 they touch a publishable package, the bundled templates, or the bundled

@@ -11,17 +11,10 @@ import { assertPackedDependencies } from "./catalog-manifest.js";
  * @throws When extraction fails or the manifest is malformed JSON.
  */
 export async function readPackedManifest(path: string): Promise<Manifest> {
-  const child = Bun.spawn(["tar", "-xOf", path, "package/package.json"], {
-    stdout: "pipe",
-    stderr: "pipe",
-  });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-    child.exited,
-  ]);
-  if (code !== 0) throw new Error(`Cannot read packed manifest ${path}\n${stderr}`);
-  return JSON.parse(stdout) as Manifest;
+  const files = await new Bun.Archive(await Bun.file(path).bytes()).files("package/package.json");
+  const manifest = files.get("package/package.json");
+  if (manifest === undefined) throw new Error(`Packed manifest is absent: ${path}`);
+  return JSON.parse(await manifest.text()) as Manifest;
 }
 
 export async function readManifests(
@@ -112,7 +105,9 @@ export async function startRegistry(
   >();
   const proxyUpstream = async (url: URL): Promise<Response> => {
     const load = async () => {
-      const response = await fetch(`https://registry.npmjs.org${url.pathname}${url.search}`);
+      const response = await fetch(`https://registry.npmjs.org${url.pathname}${url.search}`, {
+        signal: AbortSignal.timeout(60_000),
+      });
       return {
         body: new Uint8Array(await response.arrayBuffer()),
         contentType: response.headers.get("content-type") ?? "application/json",
@@ -120,12 +115,19 @@ export async function startRegistry(
       };
     };
     const key = `${url.pathname}${url.search}`;
-    const result = await (upstreamResponses.get(key) ??
+    const pending =
+      upstreamResponses.get(key) ??
       (() => {
         const pending = load();
         upstreamResponses.set(key, pending);
+        void pending.catch(() => {
+          if (upstreamResponses.get(key) === pending) upstreamResponses.delete(key);
+        });
         return pending;
-      })());
+      })();
+    const result = await pending;
+    if (result.status >= 500 && upstreamResponses.get(key) === pending)
+      upstreamResponses.delete(key);
     return new Response(result.body.slice(), {
       status: result.status,
       headers: { "content-type": result.contentType },
@@ -146,7 +148,10 @@ export async function startRegistry(
       const manifest = packedManifests.get(name);
       if (manifests.has(name) && manifest === undefined)
         return new Response(`Workspace package was not packed: ${name}`, { status: 404 });
-      if (manifest === undefined) return proxyUpstream(url);
+      if (manifest === undefined)
+        return proxyUpstream(url).catch(
+          () => new Response("Upstream npm registry unavailable", { status: 502 }),
+        );
       return Response.json({
         name,
         "dist-tags": { latest: manifest.version },

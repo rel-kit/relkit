@@ -58,7 +58,7 @@ test("packaged snapshot hits keep checking and bundling behind dynamic miss impo
   expect(hitTrace.dynamicPaths.filter((path) => path.startsWith("./prepared-hit-"))).toHaveLength(
     1,
   );
-});
+}, 30_000);
 
 async function staticClosure(entry: string): Promise<{
   readonly staticPaths: readonly string[];

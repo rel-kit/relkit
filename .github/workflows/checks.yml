@@ -44,6 +44,7 @@ jobs:
           version="$(bun -p 'require("./packages/create-relkit/package.json").version')"
           echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Certify the exact packed candidate
+        timeout-minutes: 20
         run: bun scripts/certify-create.ts
       - name: Upload passing candidate evidence for review
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -163,7 +164,7 @@ jobs:
       - name: Run focused tests
         run: |
           bun run test:types
-          bun test scripts/tests/dev-readiness/bootstrap-imports.test.ts packages/cli/tests/dev-snapshot/input-watch.test.ts
+          bun run test:certification
           bun run test:unit
           bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts
           bun run test:graph
