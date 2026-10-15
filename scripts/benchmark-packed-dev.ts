@@ -6,6 +6,8 @@
  * evidence and restart preparation remain separate from each certification set.
  */
 import { resolve } from "node:path";
+import { rm } from "node:fs/promises";
+import { ownedNativePromise } from "@relkit/cli/internal/tooling";
 import { Effect, Layer } from "effect";
 import { preparePackedFixture } from "./dev-readiness/packed-fixture.js";
 import { packedStartRequest, measurePackedSet } from "./dev-readiness/benchmark-packed-measure.js";
@@ -68,6 +70,7 @@ const main = Effect.fn("ReadinessBenchmark.packedCandidate")(function* () {
     count,
     backendPort,
     inspectorPort,
+    process.argv.includes("--cleanup"),
   );
   const report = packedReport(
     fixture,
@@ -86,6 +89,10 @@ const main = Effect.fn("ReadinessBenchmark.packedCandidate")(function* () {
   );
   yield* (yield* BenchmarkNative).report(path, JSON.stringify(report, null, 2) + "\n");
   yield* Effect.logInfo("Packed candidate recorded", { path, summary: report.summary });
+  if (process.argv.includes("--cleanup"))
+    yield* ownedNativePromise("benchmark.cleanupFixture", () =>
+      rm(fixture.temporary, { recursive: true, force: true }),
+    );
 });
 
 /**
