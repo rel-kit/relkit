@@ -42,6 +42,10 @@ reference host does not establish a latency bound for every machine.
 Regular CI and `bun run prepush` also build and trace the packaged startup graph.
 Its eager size budget keeps the ordinary TypeScript watcher behind a lazy import;
 prepared sessions continue to use their existing integrity epoch watcher.
+On Linux, that watcher observes authored trees and the installed directories
+needed by the authenticated receipt, including ancestors of absent resolution
+paths. It avoids recursively traversing unrelated installed dependencies. A
+different receipt generation cannot reuse the earlier watch plan.
 
 Pull requests from this repository automatically receive a patch Changeset when
 they touch a publishable package, the bundled templates, or the bundled

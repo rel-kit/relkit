@@ -97,6 +97,8 @@ const selectPreparedDev = Effect.fn("DevSnapshot.select")(function* (
         }
       : undefined;
   const staged = yield* snapshots.stage(projectRoot, tools, currentMembers);
+  if (matching !== undefined && staged.snapshot.generation !== matching.generation)
+    return yield* new DevSnapshotRejected({ reason: "stale", operation: "epoch.generation" });
   yield* staged.verification;
   yield* epoch.verify(token);
   if (staged.snapshot.receipt.ports === undefined) return undefined;
