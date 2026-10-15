@@ -64,9 +64,18 @@ function readManifest(directory: string): Manifest {
   return manifest;
 }
 
-function publishedIntegrity(artifact: Artifact): string | undefined {
+type PublishedPackage = Pick<Artifact, "name" | "version" | "integrity">;
+
+function publishedIntegrity(artifact: PublishedPackage): string | undefined {
   const output = run(
-    ["view", `${artifact.name}@${artifact.version}`, "dist.integrity", "--json"],
+    [
+      "view",
+      `${artifact.name}@${artifact.version}`,
+      "dist.integrity",
+      "--json",
+      "--prefer-online",
+      "--registry=https://registry.npmjs.org",
+    ],
     true,
   );
   if (output === undefined || output === "") return undefined;
@@ -74,6 +83,26 @@ function publishedIntegrity(artifact: Artifact): string | undefined {
   if (typeof parsed !== "string")
     throw new Error(`Invalid registry integrity for ${artifact.name}`);
   return parsed;
+}
+
+/** Confirms the complete release is publicly visible before creating its GitHub release. */
+export async function verifyPublishedPackages(
+  packages: readonly PublishedPackage[],
+  lookup: (artifact: PublishedPackage) => string | undefined | Promise<string | undefined>,
+  pause: () => Promise<void> = () => new Promise((resolve) => setTimeout(resolve, 5_000)),
+): Promise<void> {
+  for (const artifact of packages) {
+    let integrity: string | undefined;
+    for (let attempt = 0; attempt < 60; attempt++) {
+      integrity = await lookup(artifact);
+      if (integrity !== undefined) break;
+      if (attempt < 59) await pause();
+    }
+    if (integrity !== artifact.integrity)
+      throw new Error(
+        `Published package unavailable or integrity mismatch: ${artifact.name}@${artifact.version}`,
+      );
+  }
 }
 
 function requirePublishingContext(manifest: Manifest): void {
@@ -88,31 +117,39 @@ function requirePublishingContext(manifest: Manifest): void {
   if (run(["--version"]) !== "11.19.0") throw new Error("npm 11.19.0 is required");
 }
 
-const directoryOption = argument("--directory");
-if (directoryOption === undefined) throw new Error("--directory is required");
-const directory = resolve(directoryOption);
-const manifest = readManifest(directory);
-if (process.argv.includes("--publish")) {
-  requirePublishingContext(manifest);
-  for (const artifact of manifest.packages) {
-    const existing = publishedIntegrity(artifact);
-    if (existing !== undefined) {
-      if (existing !== artifact.integrity)
-        throw new Error(`Registry integrity mismatch for ${artifact.name}@${artifact.version}`);
-      console.log(`verified ${artifact.name}@${artifact.version}`);
-      continue;
+async function main(): Promise<void> {
+  const directoryOption = argument("--directory");
+  if (directoryOption === undefined) throw new Error("--directory is required");
+  const directory = resolve(directoryOption);
+  const manifest = readManifest(directory);
+  if (process.argv.includes("--publish")) {
+    requirePublishingContext(manifest);
+    for (const artifact of manifest.packages) {
+      const existing = publishedIntegrity(artifact);
+      if (existing !== undefined) {
+        if (existing !== artifact.integrity)
+          throw new Error(`Registry integrity mismatch for ${artifact.name}@${artifact.version}`);
+        console.log(`verified ${artifact.name}@${artifact.version}`);
+        continue;
+      }
+      run([
+        "publish",
+        join(directory, artifact.file),
+        "--access",
+        "public",
+        "--tag",
+        "latest",
+        "--provenance",
+      ]);
+      console.log(`published ${artifact.name}@${artifact.version}`);
     }
-    run([
-      "publish",
-      join(directory, artifact.file),
-      "--access",
-      "public",
-      "--tag",
-      "latest",
-      "--provenance",
-    ]);
-    console.log(`published ${artifact.name}@${artifact.version}`);
+    await verifyPublishedPackages(manifest.packages, publishedIntegrity);
+    console.log(
+      `verified all ${manifest.packages.length} published packages for ${manifest.version}`,
+    );
+  } else {
+    console.log(`verified ${manifest.packages.length} release artifacts for ${manifest.version}`);
   }
-} else {
-  console.log(`verified ${manifest.packages.length} release artifacts for ${manifest.version}`);
 }
+
+if (import.meta.main) await main();

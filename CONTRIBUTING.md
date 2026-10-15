@@ -51,6 +51,16 @@ checkpoint, and fixture cleanup regression checks shared by CI and pre-push.
 The certification step has a shorter deadline than its job so failure artifacts
 can still upload when a native setup operation stalls.
 
+Successful release-PR CI owns the publication handoff independently of the
+versioning job. It waits briefly for the reviewed PR to merge, then dispatches
+CI for its exact merge commit when no main CI run exists. Successful push or
+manually dispatched CI on the current `main` commit starts the release workflow.
+This explicit dispatch handles bot merges whose token suppresses push workflows.
+For recovery, dispatch CI on `main`; its successful completion resumes release
+selection. Publishing verifies every package's registry integrity before the
+GitHub release is declared complete. Later CI-only or documentation changes skip
+an already completed release instead of rebuilding and republishing its version.
+
 Pull requests from this repository automatically receive a patch Changeset when
 they touch a publishable package, the bundled templates, or the bundled
 inspector. Documentation and internal chores outside those release paths do not
