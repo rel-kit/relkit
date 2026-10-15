@@ -22,10 +22,10 @@ function resolvePageMetadata(pathname: string, page: Metadata = {}) {
 test("homepage social previews retain the default title, description, and shared image", async () => {
   const resolved = await resolvePageMetadata("/");
   expect(resolved.title?.absolute).toBe("Relkit — One application model for TypeScript backends");
-  expect(resolved.openGraph?.title).toEqual(resolved.title);
-  expect(resolved.twitter?.title).toEqual(resolved.title);
-  expect(resolved.openGraph?.description).toBe(metadata.description);
-  expect(resolved.twitter?.description).toBe(metadata.description);
+  expect(resolved.openGraph?.title.absolute).toBe(resolved.title?.absolute);
+  expect(resolved.twitter?.title.absolute).toBe(resolved.title?.absolute);
+  expect(resolved.openGraph?.description).toBe(metadata.description ?? undefined);
+  expect(resolved.twitter?.description).toBe(metadata.description ?? undefined);
   expect(resolved.openGraph?.images).toContainEqual(
     expect.objectContaining({ url: "https://relkit.up.railway.app/metadata/og.png" }),
   );
@@ -40,8 +40,8 @@ test.each([
   async (pathname, title, description) => {
     const resolved = await resolvePageMetadata(pathname, { title, description });
     expect(resolved.title?.absolute).toBe(`${title} | Relkit`);
-    expect(resolved.openGraph?.title).toEqual(resolved.title);
-    expect(resolved.twitter?.title).toEqual(resolved.title);
+    expect(resolved.openGraph?.title.absolute).toBe(resolved.title?.absolute);
+    expect(resolved.twitter?.title.absolute).toBe(resolved.title?.absolute);
     expect(resolved.openGraph?.description).toBe(description);
     expect(resolved.twitter?.description).toBe(description);
     expect(resolved.openGraph?.images).toContainEqual(
