@@ -28,6 +28,32 @@
       "attempt": 1,
       "updated_at": "2026-10-10T16:14:52+00:00",
       "report": "bug-fix-reports/issues/bf-379960edd4d6f5dd49beed02/report.md"
+    },
+    "bf-d830c3c555dba675790aa029": {
+      "id": "bf-d830c3c555dba675790aa029",
+      "status": "verified",
+      "what": "The commerce application cannot prepare a development snapshot despite using declarative Better Auth and SQLite descriptors.",
+      "root_cause": "snapshot-eligibility.ts lacked audited commerce constructors and inert helper declarations while snapshot-preparation-guards.ts audited unrelated tooling. The app also read an ambient auth origin and used unaudited schema spreads. Its root SQLite shared-memory file changed on activation, correctly invalidating complete",
+      "fixed_by": "Verified explicit commerce preparation and actual capsule activation, all16 identical recovery scenarios with unchanged CLI55765, and final current snapshot317e000a... after all source fixes. Full30 local framework stages plus supplemental native/Bun checks pass. SQLite runtime data was copied without loss to .relkit/s",
+      "files": [
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts",
+        "packages/cli/src/dev-snapshot/snapshot-default-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts",
+        "packages/cli/src/dev-snapshot/snapshot-commerce-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-sqlite-eligibility.ts",
+        "packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts",
+        "packages/cli/tests/dev-snapshot/commerce-project-eligibility.test.ts",
+        "packages/create-relkit/src/render-database.ts",
+        "packages/create-relkit/src/render-database-sources.ts",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        "tests/generator/sqlite-state-path.test.ts",
+        ".changeset/prepared-commerce-eligibility.md",
+        "tests/generator/sqlite-path-typing.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T23:45:31+00:00",
+      "report": "bug-fix-reports/issues/bf-d830c3c555dba675790aa029/report.md"
     }
   }
 }
