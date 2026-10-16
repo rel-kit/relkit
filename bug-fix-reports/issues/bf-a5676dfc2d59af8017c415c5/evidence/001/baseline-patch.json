@@ -1,0 +1,31 @@
+{
+  "status": "in-progress",
+  "what": "PR #120 CodeQL path injection findings in recovery/evidence probes",
+  "expected": "Caller-selected paths cannot redirect evidence writes and archived log phases are closed literals.",
+  "observed": "Native recovery process creates a caller-selected evidence directory and archived phase accepts traversal components.",
+  "root_cause": "recovery.probe.ts accepts argv[3] as an unrestricted mkdir/write target and resolves argv[2] before checking its boundary; the archived runtime probe interpolates unrestricted argv[2] into log filenames.",
+  "reproduction": [
+    "Run paths.test.ts against original b8242805e: both path-safety assertions fail.",
+    "Replay native recovery probe with a minimal owned temporary app and a caller-selected evidence child: directory is created before probe failure."
+  ],
+  "files": [
+    "packages/cli/tests/dev-environment/recovery.probe.ts",
+    "packages/cli/tests/dev-environment/paths.test.ts",
+    "bug-fix-reports/issues/bf-6c1f59bebfd1c8865038fc52/evidence/001/runtime.probe.ts"
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.log",
+        "note": "Real subprocess created unowned output target before rejection."
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.log",
+        "note": "Both regressions failed against original implementation."
+      }
+    ],
+    "after": []
+  }
+}
