@@ -1,0 +1,18 @@
+ordinary: syntax, descriptor, import, deletion, config and in-flight multi-file burst recovery passed
+shutdown: 5 owned descendants exited; listener unavailable
+ordinary: shutdown released the public listener
+[22:36:26.633] INFO (#2): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 1.271166,
+}
+[22:36:26.634] INFO (#2): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 4684.401208,
+}
+prepared: syntax, descriptor, import, deletion, config and in-flight multi-file burst recovery passed
+shutdown: 5 owned descendants exited; listener unavailable
+prepared: shutdown released the public listener

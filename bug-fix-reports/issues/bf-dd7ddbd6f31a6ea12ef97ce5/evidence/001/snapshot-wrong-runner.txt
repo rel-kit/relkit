@@ -1,0 +1,97 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/dev-snapshot/input-watch.test.ts:
+(pass) installed-input registration never recursively walks unrelated dependencies or runtime state [8.00ms]
+(skip) native input observation invalidates after changing src/deep/helper.ts
+(skip) native input observation invalidates after changing src/new/deeper/helper.ts
+(skip) native input observation invalidates after changing new-source/helper.ts
+(skip) native input observation invalidates after changing node_modules/library/types/index.d.ts
+(skip) native input observation invalidates after changing node_modules/library/absent/nested.d.ts
+(pass) partial registration failures close every previously acquired native watcher [3.99ms]
+(pass) escaped member/query paths and external installed links reject registration [8.21ms]
+(pass) preflight refuses unauthenticated receipt bytes before trusting their watch inventory [4.76ms]
+
+packages/cli/tests/dev-snapshot/integrity-process.test.ts:
+(pass) uses the inherited working directory as its only root authority [24.30ms]
+
+packages/cli/tests/dev-snapshot/stale-command.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+11 | import * as Schedule from "effect/Schedule";
+12 | import * as Scope from "effect/Scope";
+13 | import * as TestClock from "effect/testing/TestClock";
+14 | import * as TestConsole from "effect/testing/TestConsole";
+15 | import * as V from "vitest";
+16 | const getCurrentSuite = V.TestRunner.getCurrentSuite;
+                               ^
+TypeError: undefined is not an object (evaluating 'V.TestRunner.getCurrentSuite')
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@effect+vitest@4.0.1+0bf438fc418a04a6/node_modules/@effect/vitest/dist/internal/internal.js:16:27
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+packages/cli/tests/dev-snapshot/files.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+17 | const directory = Effect.acquireRelease(
+18 |   Effect.promise(() => mkdtemp(join(tmpdir(), "relkit-snapshot-files-"))),
+19 |   (root) => Effect.promise(() => rm(root, { recursive: true, force: true })),
+20 | );
+21 | 
+22 | it.effect("rejects replacement of an acquired project root even when its bytes match", () =>
+     ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/files.test.ts:22:1
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+packages/cli/tests/dev-snapshot/readiness-requests.test.ts:
+(pass) SnapshotReadinessRequests > releases the verified public response only after publication [1.00ms]
+(pass) SnapshotReadinessRequests > rejects a retained caller when publication is refused
+(pass) SnapshotReadinessRequests > does not intercept unrelated or later requests
+(pass) SnapshotReadinessRequests > claims the next polling request when verification reaches the gap
+(pass) SnapshotReadinessRequests > stops intercepting when direct verification wins the bounded claim window [11.01ms]
+
+packages/cli/tests/dev-snapshot/validation.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+19 |       Effect.provide(devSnapshotsLive.pipe(Layer.provide(fixture.layer))),
+20 |     ),
+21 |   );
+22 | }
+23 | 
+24 | it.effect("validates the complete cohort after relocation and freezes all metadata", () =>
+     ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/validation.test.ts:24:1
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+packages/cli/tests/dev-snapshot/prepared-plan.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+23 |   mcp: true,
+24 |   maxPreviewBytes: 1_048_576,
+25 |   httpApplication: "prepared" as const,
+26 | };
+27 | 
+28 | it.effect("executes the exact canonical frozen projection without a runtime planner import", () =>
+     ^
+ReferenceError: Cannot access 'it' before initialization.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/prepared-plan.test.ts:28:1
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+ 10 pass
+ 5 skip
+ 4 fail
+ 4 errors
+ 24 expect() calls
+Ran 19 tests across 7 files. [229.00ms]

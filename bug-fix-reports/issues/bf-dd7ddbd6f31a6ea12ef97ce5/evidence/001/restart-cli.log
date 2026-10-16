@@ -1,0 +1,85 @@
+$ bun /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts dev --port 15762 --inspector-port 15763 --local off --no-color --verbose
+21:23:58.267 INFO  relkit            Starting development server
+21:23:58.281 DEBUG relkit            supervisor.transition
+                                     {"phase":"idle","state":"compiling-candidate"}
+21:23:58.282 INFO  build             Compiling application
+21:23:58.287 DEBUG relkit            candidate.compile.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-5CgTm3/generation-1"}
+21:23:58.581 DEBUG relkit            candidate.compile.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-5CgTm3/generation-1","entrypoint":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-5CgTm3/generation-1/server/index.js"}
+21:23:58.587 DEBUG relkit            candidate.start.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-5CgTm3/generation-1","port":59021}
+21:23:58.589 DEBUG relkit            candidate.start.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-5CgTm3/generation-1","pid":44667,"port":59021}
+21:23:58.593 DEBUG relkit            supervisor.transition
+                                     {"phase":"compiling-candidate","state":"starting-candidate"}
+21:23:58.595 DEBUG relkit            supervisor.transition
+                                     {"phase":"starting-candidate","state":"verifying-hash-and-readiness"}
+21:23:59.072 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.256042,"operation":"server.readiness","outcome":"success"}
+21:23:59.100 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":4.841875,"operation":"server.provider-delay","outcome":"success"}
+21:23:59.101 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.066,"operation":"server.readiness","outcome":"success"}
+21:23:59.106 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":11.146875,"operation":"server.invocation","outcome":"success"}
+21:23:59.130 DEBUG relkit            supervisor.outcome
+                                     {"phase":"verification","state":"verification-succeeded"}
+21:23:59.131 DEBUG relkit            supervisor.transition
+                                     {"phase":"verifying-hash-and-readiness","state":"switching"}
+21:23:59.133 DEBUG relkit            supervisor.outcome
+                                     {"phase":"switch","state":"switch-succeeded"}
+21:23:59.134 DEBUG relkit            supervisor.transition
+                                     {"phase":"switching","state":"active"}
+21:23:59.135 INFO  build             Compiled in 852ms
+21:23:59.135 INFO  server            Ready
+                                     API        http://127.0.0.1:15762
+                                     Reference  http://127.0.0.1:15762/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:15762/_relkit/v1/openapi.json
+21:23:59.108 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":15.760458,"operation":"server.resource","outcome":"success"}
+21:23:59.254 INFO  hello.greet       hello invoked
+                                     request: request-f354e03c-2f0e-4338-945d-34ca3996fc2e
+                                     trace: 7239eb041e89467f9770a8e36252e648
+                                     {"name":"Probe","requestId":"request-f354e03c-2f0e-4338-945d-34ca3996fc2e","traceId":"7239eb041e89467f9770a8e36252e648","spanId":"c8a23287c1abfa72","functionId":"hello.greet","serviceId":"hello"}
+21:23:59.269 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":62.091583,"operation":"server.invocation","outcome":"success"}
+21:23:59.281 INFO  http              GET /hello → 200 in 105ms
+                                     request: request-f354e03c-2f0e-4338-945d-34ca3996fc2e
+                                     trace: 7239eb041e89467f9770a8e36252e648
+21:23:59.318 INFO  hello.greet       hello invoked
+                                     request: request-40d9c255-8049-47dd-934f-3513686f52cf
+                                     trace: bd8420cc2c6381439992b7f3b30548cf
+                                     {"name":"Probe","requestId":"request-40d9c255-8049-47dd-934f-3513686f52cf","traceId":"bd8420cc2c6381439992b7f3b30548cf","spanId":"a683c491434743f8","functionId":"hello.greet","serviceId":"hello"}
+21:23:59.338 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":36.704916,"operation":"server.invocation","outcome":"success"}
+21:23:59.345 INFO  http              GET /hello → 200 in 55ms
+                                     request: request-40d9c255-8049-47dd-934f-3513686f52cf
+                                     trace: bd8420cc2c6381439992b7f3b30548cf
+21:23:59.377 INFO  hello.greet       hello invoked
+                                     request: request-3286bdf3-d946-41ac-af0f-ced0fbe6b071
+                                     trace: 173130677b16373a364ff2255c622c93
+                                     {"name":"Probe","requestId":"request-3286bdf3-d946-41ac-af0f-ced0fbe6b071","traceId":"173130677b16373a364ff2255c622c93","spanId":"e0f77cc0f9bf591c","functionId":"hello.greet","serviceId":"hello"}
+21:23:59.384 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":20.70125,"operation":"server.invocation","outcome":"success"}
+21:23:59.411 INFO  relkit            Stopping development server
+21:23:59.389 INFO  http              GET /hello → 200 in 37ms
+                                     request: request-3286bdf3-d946-41ac-af0f-ced0fbe6b071
+                                     trace: 173130677b16373a364ff2255c622c93
+21:23:59.417 INFO  lifecycle         Execution operation completed
+                                     {"domain":"engine","duration_ms":0.214042,"operation":"providers.release","outcome":"success"}
+21:23:59.418 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.287708,"operation":"server.cleanup","outcome":"success"}
+21:23:59.482 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":63.354834,"operation":"server.cleanup","outcome":"success"}
+21:23:59.496 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":12.704333,"operation":"server.cleanup","outcome":"success"}
+21:23:59.498 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.201291,"operation":"server.cleanup","outcome":"success"}
+21:23:59.499 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":84.445292,"operation":"server.shutdown","outcome":"success"}
+21:23:59.512 DEBUG relkit            candidate.process-exited
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-5CgTm3/generation-1","exitCode":0}
+21:23:59.517 INFO  relkit            Development server stopped
+RELKIT_INTERRUPTED: Received SIGTERM.
+error: script "dev" exited with code 143

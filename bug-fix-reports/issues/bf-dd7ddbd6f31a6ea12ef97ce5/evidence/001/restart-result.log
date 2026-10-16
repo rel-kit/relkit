@@ -1,0 +1,3 @@
+{"phase":"initial","pid":44598,"response":{"status":200,"text":"{\"message\":\"Hello, Probe!\"}"}}
+{"phase":"restart-with-repaired-env","response":{"status":200,"text":"{\"message\":\"Hello, Probe!\"}"}}
+{"phase":"cleanup","exit":143}
