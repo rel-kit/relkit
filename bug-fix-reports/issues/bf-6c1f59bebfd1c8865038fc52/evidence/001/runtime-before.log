@@ -1,0 +1,22 @@
+{"scenario":"context","exitCode":1,"expected":0}
+{"scenario":"routes","exitCode":1,"expected":0}
+34 |     else assert(await Bun.file(join(app, ".relkit/dev/current.json")).exists(), "successful prepare publishes its receipt");
+35 |   }
+36 | } finally {
+37 |   await rm(root, { recursive: true, force: true });
+38 | }
+39 | assert.equal(failures, 0, "both supported preparation scenarios must succeed");
+            ^
+AssertionError: both supported preparation scenarios must succeed
+
+2 !== 0
+
+ generatedMessage: false,
+     actual: 2,
+   expected: 0,
+   operator: "strictEqual",
+       code: "ERR_ASSERTION"
+
+      at /Users/mustafaelsayed/Workspace/relkit/test-results/full-suite-20261016/snapshot-compatibility.probe.ts:39:8
+
+Bun v1.3.10 (macOS arm64)

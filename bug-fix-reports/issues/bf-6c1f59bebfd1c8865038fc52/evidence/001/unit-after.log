@@ -1,0 +1,13 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/dev-snapshot/template-compatibility.test.ts:
+(pass) snapshot discovery accepts the current generated context declaration with supported root discovery [3.82ms]
+(pass) snapshot paths admit authored parameter and catch-all route folders [0.33ms]
+(pass) native integrity workers hash parameter route source paths [20.77ms]
+(pass) native input watches accept bracketed source resolution witnesses [3.84ms]
+(pass) route bracket support preserves containment and exact generated root restrictions [0.56ms]
+
+ 5 pass
+ 0 fail
+ 24 expect() calls
+Ran 5 tests across 1 file. [179.00ms]

@@ -1,0 +1,24 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/dev-snapshot/template-compatibility.test.ts:
+12 |       "../../../../templates/default/v1",
+13 |       starter,
+14 |       "tsconfig.json",
+15 |     );
+16 |     const config = JSON.parse(await readFile(path, "utf8"));
+17 |     expect(Schema.is(SnapshotEligibleTsConfig)(config), starter).toBe(true);
+                                                                      ^
+error: tasks
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/template-compatibility.test.ts:17:66)
+(fail) snapshot discovery accepts the current generated context declaration in every starter [98.34ms]
+(pass) snapshot paths admit authored parameter and catch-all route folders [0.49ms]
+(pass) route bracket support preserves containment and exact generated root restrictions [0.65ms]
+
+ 2 pass
+ 1 fail
+ 22 expect() calls
+Ran 3 tests across 1 file. [359.00ms]
