@@ -1,0 +1,9 @@
+{
+  "ownedTimedOutProcess": 11658,
+  "originalPath": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-export-smoke-gMkdw6",
+  "retainedAt": "/Users/mustafaelsayed/Workspace/relkit/test-results/full-suite-integrity-fixes-20261016/guardrail-timeout-fixture",
+  "ownershipEvidence": "Exact native packed-export test creation window and matching controlled fixture verifier",
+  "atomicSameFilesystemMove": true,
+  "temporaryRootRemoved": true,
+  "preservedAsDiagnosticEvidence": true
+}

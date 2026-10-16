@@ -1,0 +1,49 @@
+APPLICATION_PRELOAD
+18:41:13.578 INFO  relkit            Starting development server
+18:41:13.593 INFO  build             Compiling application
+18:41:13.956 INFO  app               APPLICATION_PRELOAD
+18:41:14.376 INFO  build             Compiled in 782ms
+18:41:14.376 INFO  server            Ready
+                                     API        http://127.0.0.1:63083
+                                     Reference  http://127.0.0.1:63083/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:63083/_relkit/v1/openapi.json
+18:41:14.490 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:14.509 INFO  http              GET /hello → 200 in 68ms
+18:41:14.577 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:14.587 INFO  http              GET /hello → 200 in 30ms
+18:41:14.686 INFO  build             Rebuilding application (1 changed file)
+18:41:14.850 INFO  relkit            dev.inspector.ready
+18:41:14.865 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:14.876 INFO  http              GET /hello → 200 in 32ms
+18:41:15.155 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:15.166 INFO  http              GET /hello → 200 in 31ms
+18:41:15.447 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:15.458 INFO  http              GET /hello → 200 in 33ms
+18:41:15.737 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:15.746 INFO  http              GET /hello → 200 in 29ms
+18:41:16.029 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:16.045 INFO  http              GET /hello → 200 in 39ms
+18:41:16.333 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:16.344 INFO  http              GET /hello → 200 in 30ms
+18:41:16.588 INFO  app               APPLICATION_PRELOAD
+18:41:16.622 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:16.632 INFO  http              GET /hello → 200 in 29ms
+18:41:16.909 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:16.918 INFO  http              GET /hello → 200 in 31ms
+18:41:17.291 INFO  build             Reloaded in 2605ms
+18:41:17.278 INFO  hello.greet       hello invoked
+                                     {"name":"preload"}
+18:41:17.297 INFO  http              GET /hello → 200 in 112ms
+18:41:17.350 INFO  relkit            Stopping development server
+18:41:17.395 INFO  relkit            Development server stopped
+RELKIT_INTERRUPTED: Received SIGTERM.
