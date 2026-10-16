@@ -1,0 +1,20 @@
+{
+  "key": "66e347f46c30cffca371d5893be90dee9a59f1c0c6fd8e529e438577b330350b",
+  "matches": {
+    "bf-66e347f46c30cffca371d589": {
+      "id": "bf-66e347f46c30cffca371d589",
+      "status": "verified",
+      "what": "Application preloads prevent fresh dotenv resolution",
+      "root_cause": "dev-environment.service.ts runs its Bun JSON helper in the application cwd with default configuration and inherited runtime options",
+      "fixed_by": "Verified explicit empty Bun helper configuration and removal of inherited runtime startup flags only from private helper execution, with application values preserved. Native service tests and actual CLI startup plus same-PID HTTP dotenv recovery pass with the logging application preload retained. All32 local framework ",
+      "files": [
+        "packages/cli/src/services/dev-environment.service.ts",
+        "packages/cli/tests/services/dev-environment-preload.test.ts",
+        "packages/cli/tests/services/dev-environment-native.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-16T15:48:06+00:00",
+      "report": "bug-fix-reports/issues/bf-66e347f46c30cffca371d589/report.md"
+    }
+  }
+}
