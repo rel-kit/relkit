@@ -1,0 +1,6 @@
+{
+  "remainingOwnedProcesses": [],
+  "suiteListeners": "",
+  "listenerProbeExit": 1,
+  "interpretation": "lsof exit 1 with empty output means no matching listener"
+}

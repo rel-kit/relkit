@@ -1,0 +1,376 @@
+{
+  "status": "passed",
+  "scope": "Every distinct local layer from scripts/test-all.ts, executed serially with bounded nested workers; final build, unit, certification and guardrail checks also pass.",
+  "revision": "ebc3a2544 plus uncommitted dev-recovery and full-suite fixes",
+  "initialBuild": {
+    "exitCode": 0,
+    "log": "01-build.log"
+  },
+  "stages": [
+    {
+      "stage": "02-docs",
+      "command": [
+        "bun",
+        "x",
+        "turbo",
+        "run",
+        "check",
+        "test",
+        "--filter=@relkit/docs",
+        "--concurrency=1"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 132.7
+    },
+    {
+      "stage": "03-restart",
+      "command": [
+        "bun",
+        "run",
+        "test:restart"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 24.5
+    },
+    {
+      "stage": "04-jobs-coverage",
+      "command": [
+        "bun",
+        "run",
+        "test:jobs:coverage"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 21.4
+    },
+    {
+      "stage": "05-jobs-mutation",
+      "command": [
+        "bun",
+        "x",
+        "stryker",
+        "run",
+        "scripts/jobs-coverage/stryker.config.mjs",
+        "--concurrency",
+        "1"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 757.5
+    },
+    {
+      "stage": "06-mutation-verification",
+      "command": [
+        "bun",
+        "scripts/jobs-coverage/verify-mutation.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.1
+    },
+    {
+      "stage": "07-e2e-inspector",
+      "command": [
+        "bun",
+        "x",
+        "playwright",
+        "test",
+        "--workers=1",
+        "--output=test-results/inspector"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 66.1
+    },
+    {
+      "stage": "08-e2e-commerce",
+      "command": [
+        "bun",
+        "x",
+        "playwright",
+        "test",
+        "--config=playwright.commerce.config.ts",
+        "--workers=1",
+        "--output=test-results/commerce"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 11.5
+    },
+    {
+      "stage": "09-jobs-matrix",
+      "command": [
+        "bun",
+        "run",
+        "test:jobs:matrix"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "stage": "10-types",
+      "command": [
+        "bun",
+        "run",
+        "test:types"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.8
+    },
+    {
+      "stage": "11-unit",
+      "command": [
+        "bun",
+        "run",
+        "test:unit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.6
+    },
+    {
+      "stage": "12-compiler",
+      "command": [
+        "bun",
+        "test",
+        "--timeout",
+        "15000",
+        "./tests/compiler"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 38.1
+    },
+    {
+      "stage": "13-graph",
+      "command": [
+        "bun",
+        "x",
+        "vitest",
+        "run",
+        "--config",
+        "packages/graph/vitest.config.ts",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.0
+    },
+    {
+      "stage": "14-contracts",
+      "command": [
+        "bun",
+        "run",
+        "test:contracts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.7
+    },
+    {
+      "stage": "15-integration",
+      "command": [
+        "bun",
+        "run",
+        "test:integration"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 105.2
+    },
+    {
+      "stage": "16-inspector",
+      "command": [
+        "bun",
+        "run",
+        "test:inspector"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.0
+    },
+    {
+      "stage": "17-container",
+      "command": [
+        "bun",
+        "run",
+        "test:container"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.3
+    },
+    {
+      "stage": "18-security",
+      "command": [
+        "bun",
+        "run",
+        "test:security"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 6.0
+    },
+    {
+      "stage": "19-deployment",
+      "command": [
+        "bun",
+        "run",
+        "test:deployment"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.4
+    },
+    {
+      "stage": "20-examples",
+      "command": [
+        "bun",
+        "run",
+        "test:examples"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 61.9
+    },
+    {
+      "stage": "21-packages",
+      "command": [
+        "bun",
+        "run",
+        "test:packages"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 494.9
+    },
+    {
+      "stage": "22-generator",
+      "command": [
+        "bun",
+        "run",
+        "test:generator"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 256.6
+    },
+    {
+      "stage": "23-final-build",
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 194.4
+    },
+    {
+      "stage": "24-final-unit",
+      "command": [
+        "bun",
+        "run",
+        "test:unit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.7
+    },
+    {
+      "stage": "25-certification-bun",
+      "command": [
+        "bun",
+        "test",
+        "scripts/tests/dev-readiness/bootstrap-imports.test.ts",
+        "scripts/tests/packed-manifest.test.ts",
+        "scripts/tests/registry-cache.test.ts",
+        "scripts/tests/release-command.test.ts",
+        "packages/cli/tests/dev-snapshot/input-watch.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.2
+    },
+    {
+      "stage": "26-certification-vitest",
+      "command": [
+        "bun",
+        "x",
+        "vitest",
+        "run",
+        "--maxWorkers=1",
+        "scripts/tests/benchmark-packed-cleanup.test.ts",
+        "scripts/tests/benchmark-packed-dev.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.5
+    },
+    {
+      "stage": "27-guardrails",
+      "command": [
+        "bun",
+        "test",
+        "tests/phase0.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 72.5
+    },
+    {
+      "stage": "28-lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.2
+    },
+    {
+      "stage": "29-boundaries",
+      "command": [
+        "bun",
+        "run",
+        "check"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.8
+    },
+    {
+      "stage": "30-konsistent",
+      "command": [
+        "bun",
+        "run",
+        "konsistent",
+        "--",
+        "validate"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.3
+    },
+    {
+      "stage": "31-format",
+      "command": [
+        "bun",
+        "x",
+        "prettier",
+        "--check",
+        "tests/integration/fixtures/paired-commerce-project.ts",
+        "tests/unit/paired-commerce-project.test.ts",
+        "packages/cli/src/commands/dev-session-engine.ts",
+        "packages/cli/src/commands/dev-session.types.ts",
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/tests/services/dev-support-fixture.ts",
+        "packages/cli/tests/services/source-watch-synchronous.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.2
+    },
+    {
+      "stage": "32-observability",
+      "command": [
+        "bun",
+        "scripts/check-observability-sinks.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.4
+    }
+  ],
+  "cloudAcceptance": "disabled under repository default policy",
+  "limitations": [
+    "Existing opt-in Docker, AWS/cloud, external-provider and platform-specific tests retain their declared skips.",
+    "macOS and Bun 1.3.10; hosted CI not run."
+  ],
+  "fixes": [
+    "bf-6c16eaa4c0d654629db8b963",
+    "bf-a561f569dacbef352f9ffb95"
+  ],
+  "mutation": {
+    "killed": 501,
+    "timedOut": 7,
+    "survived": 268,
+    "noCoverage": 17,
+    "semanticGate": "passed"
+  },
+  "cleanup": "Both ordinary/prepared CLI probes confirmed five owned descendants exited and the public listener closed; final process audit retained separately."
+}
