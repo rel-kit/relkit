@@ -1,0 +1,8 @@
+{
+  "reason": "Packed export Bun subprocess idle with no descendants and no sockets until existing 540000ms deadline; imports and inventory succeed in independent bounded probes",
+  "adjustment": "BUN_RUNTIME_TRANSPILER_CACHE_PATH=0 scoped to remaining runner invocation",
+  "checksUnchanged": true,
+  "testDeadlinesUnchanged": true,
+  "sourceUnchangedExceptGeneratedEditorDeclaration": true,
+  "documentation": "https://bun.sh/docs/runtime/environment-variables#runtime-transpiler-caching"
+}
