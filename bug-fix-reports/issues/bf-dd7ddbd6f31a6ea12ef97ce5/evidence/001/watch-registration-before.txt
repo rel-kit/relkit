@@ -1,0 +1,164 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+stdout | packages/cli/tests/services/source-watch.test.ts > native watch failure is supervised and every stop joins despite another stop throwing
+[22:34:09.025] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.acquire',
+  outcome: 'success',
+  duration_ms: 0.815583
+}
+
+stdout | packages/cli/tests/services/source-watch.test.ts > native watch failure is supervised and every stop joins despite another stop throwing
+[22:34:09.053] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.config-inputs',
+  outcome: 'success',
+  duration_ms: 6.092917
+}
+[22:34:09.054] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.start',
+  outcome: 'success',
+  duration_ms: 7.199625
+}
+[22:34:09.056] INFO (#74): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.stopping.callback',
+  outcome: 'success',
+  duration_ms: 0.047292
+}
+[22:34:09.057] INFO (#79): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.proxy.release',
+  outcome: 'success',
+  duration_ms: 0.031917
+}
+
+stdout | packages/cli/tests/services/source-watch.test.ts > native watch failure is supervised and every stop joins despite another stop throwing
+[22:34:09.061] INFO (#74): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.observability.release',
+  outcome: 'success',
+  duration_ms: 3.674166
+}
+[22:34:09.062] INFO (#74): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.shutdown',
+  outcome: 'success',
+  duration_ms: 7.567875
+}
+[22:34:09.062] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.wait',
+  outcome: 'success',
+  duration_ms: 0.752416
+}
+[22:34:09.062] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.worker.release',
+  outcome: 'success',
+  duration_ms: 0.107
+}
+[22:34:09.062] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'cleanup.record',
+  outcome: 'success',
+  duration_ms: 0.02675
+}
+[22:34:09.062] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'cleanup.record',
+  outcome: 'success',
+  duration_ms: 0.013625
+}
+[22:34:09.062] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.close',
+  outcome: 'success',
+  duration_ms: 0.517458
+}
+[22:34:09.062] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.worker.release',
+  outcome: 'success',
+  duration_ms: 0.010375
+}
+[22:34:09.063] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.close',
+  outcome: 'success',
+  duration_ms: 0.0965
+}
+[22:34:09.064] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.worker.release',
+  outcome: 'success',
+  duration_ms: 0.012916
+}
+[22:34:09.064] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.watch.close',
+  outcome: 'success',
+  duration_ms: 0.134583
+}
+[22:34:09.064] INFO (#53): Execution operation completed {
+  domain: 'cli',
+  operation: 'dev.session.stop',
+  outcome: 'success',
+  duration_ms: 0.020875
+}
+[22:34:09.064] ERROR (#53): Error [AssertionError]: expected [ 'watch', 'env', 'env' ] to deeply equal [ 'watch', 'env', 'env.local' ]
+    at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/source-watch.test.ts:34:36 {
+  actual: [ 'watch', 'env', 'env' ],
+  expected: [ 'watch', 'env', 'env.local' ],
+  showDiff: true,
+  operator: 'deepStrictEqual',
+  [cause]: undefined
+}
+
+ ❯ packages/cli/tests/services/source-watch.test.ts (2 tests | 1 failed) 134ms
+   × native watch failure is supervised and every stop joins despite another stop throwing 48ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/cli/tests/services/source-watch.test.ts > native watch failure is supervised and every stop joins despite another stop throwing
+AssertionError: expected [ 'watch', 'env', 'env' ] to deeply equal [ 'watch', 'env', 'env.local' ]
+
+- Expected
++ Received
+
+  [
+    "watch",
+    "env",
+-   "env.local",
++   "env",
+  ]
+
+ ❯ packages/cli/tests/services/source-watch.test.ts:34:36
+     32|           yield* watcher.closeEffect;
+     33|           yield* watcher.closeEffect;
+     34|           expect(fixture.released).toEqual(["watch", "env", "env.local…
+       |                                    ^
+     35|           const evidence = yield* CliCleanup.use((cleanup) => cleanup.…
+     36|           expect(evidence.map((issue) => issue.operation)).toEqual([
+ ❯ IteratorImpl.~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1417:28
+ ❯ ExitPrimitive.~effect/Effect/evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/core.ts:565:30
+ ❯ FiberImpl.runLoop node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:650:39
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:592:23
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:586:27
+ ❯ Array.<anonymous> node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1154:17
+ ❯ doneUnsafe node_modules/.bun/effect@4.0.1/node_modules/effect/src/Deferred.ts:1659:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  1 failed | 15 passed (16)
+   Start at  22:34:06
+   Duration  6.19s (import 59%, transform 35%, tests 6%)
+
+     Import  751 modules were evaluated 1484 times · 3.35s total, 59% of tracked time
+             ~1.65s faster with isolate: false — shared modules are evaluated once per worker instead of once per file
+             learn more: https://vitest.dev/guide/improving-performance#test-isolation
+
