@@ -1,0 +1,31 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/paired-commerce-project.test.ts:
+(pass) commerce flattening creates an absent destination and preserves service bytes [8.60ms]
+(pass) commerce flattening accepts an existing empty destination [2.58ms]
+(pass) commerce flattening rejects and preserves existing destination content: keep.txt [1.96ms]
+(pass) commerce flattening rejects and preserves existing destination content: .keep [1.62ms]
+49 |     const destination = join(root, "examples/commerce/src/database");
+50 |     const text = 'export { value } from "../services/other/service.js";\n';
+51 |     await mkdir(destination);
+52 |     await writeFile(join(destination, "keep.ts"), text);
+53 |     await expect(flattenCommerce(root)).rejects.toThrow("contains authored content");
+54 |     expect(await readFile(join(destination, "keep.ts"), "utf8")).toBe(text);
+                                                                      ^
+error: expect(received).toBe(expected)
+
+- "export { value } from "../services/other/service.js";
++ "export { value } from "../other/service.js";
+  "
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/unit/paired-commerce-project.test.ts:54:66)
+      at async withProject (/Users/mustafaelsayed/Workspace/relkit/tests/unit/paired-commerce-project.test.ts:13:11)
+(fail) commerce flattening rejects collisions before rewriting authored imports [3.58ms]
+
+ 4 pass
+ 1 fail
+ 10 expect() calls
+Ran 5 tests across 1 file. [186.00ms]
