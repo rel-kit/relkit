@@ -1,0 +1,20 @@
+ordinary: environment creation, edits, expansion, removal and fallback passed (PID 14720)
+ordinary: syntax, descriptor, import, deletion, config and in-flight multi-file burst recovery passed
+shutdown: 5 owned descendants exited; listener unavailable
+ordinary: shutdown released the public listener
+[23:46:00.035] INFO (#2): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 1.206625,
+}
+[23:46:00.036] INFO (#2): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 5430.599625,
+}
+prepared: environment creation, edits, expansion, removal and fallback passed (PID 16945)
+prepared: syntax, descriptor, import, deletion, config and in-flight multi-file burst recovery passed
+shutdown: 5 owned descendants exited; listener unavailable
+prepared: shutdown released the public listener
