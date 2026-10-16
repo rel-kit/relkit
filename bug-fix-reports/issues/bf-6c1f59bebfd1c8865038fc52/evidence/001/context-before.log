@@ -1,0 +1,19 @@
+[01:03:20.048] INFO (#53): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 2.783458,
+}
+[01:03:20.053] INFO (#53): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inputs",
+  outcome: "success",
+  duration_ms: 7.817625,
+}
+[01:03:20.055] ERROR (#53): Execution operation failed {
+  domain: "cli",
+  operation: "dev.snapshot.prepare",
+  outcome: "failure",
+  duration_ms: 18.809292,
+}
+Development snapshot ineligible during compilation.aliases.

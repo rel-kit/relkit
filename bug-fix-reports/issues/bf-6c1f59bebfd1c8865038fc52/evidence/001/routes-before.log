@@ -1,0 +1,19 @@
+[01:03:20.418] ERROR (#53): Execution operation failed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "failure",
+  duration_ms: 3.176875,
+}
+[01:03:20.419] ERROR (#53): Execution operation failed {
+  domain: "cli",
+  operation: "dev.snapshot.inputs",
+  outcome: "failure",
+  duration_ms: 4.809209,
+}
+[01:03:20.420] ERROR (#53): Execution operation failed {
+  domain: "cli",
+  operation: "dev.snapshot.prepare",
+  outcome: "failure",
+  duration_ms: 17.307791,
+}
+Development snapshot ineligible during inventory.link-or-path.

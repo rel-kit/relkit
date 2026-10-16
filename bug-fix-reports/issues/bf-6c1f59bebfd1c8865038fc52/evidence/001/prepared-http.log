@@ -1,0 +1,32 @@
+02:39:26.460 INFO  relkit            Starting development server
+02:39:26.474 INFO  build             Compiling application
+02:39:26.663 INFO  hello.greet       hello invoked
+                                     {"name":"RelKit"}
+02:39:26.691 INFO  build             Compiled in 215ms
+02:39:26.692 INFO  server            Ready
+                                     API        http://127.0.0.1:52930
+                                     Reference  http://127.0.0.1:52930/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:52930/_relkit/v1/openapi.json
+02:39:26.682 INFO  http              GET /hello → 200 in 68ms
+02:39:26.776 INFO  hello.greet       hello invoked
+                                     {"name":"prepared"}
+02:39:26.791 INFO  http              GET /hello → 200 in 33ms
+02:39:26.812 INFO  hello.greet       hello invoked
+                                     {"name":"route-proof"}
+02:39:26.825 INFO  http              GET /route-proof → 200 in 29ms
+02:39:26.871 INFO  relkit            Stopping development server
+02:39:26.936 INFO  relkit            Development server stopped
+
+Owned process proof:
+[
+  {
+    "pid": 26429,
+    "parent": 26105,
+    "command": "/Users/mustafaelsayed/.bun/bin/bun /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts dev --project-root /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-prepared-compatibility-03RFTB/context-routes --port 52930 --inspector-port 52931 --local off --no-color"
+  },
+  {
+    "pid": 26433,
+    "parent": 26429,
+    "command": "/Users/mustafaelsayed/.bun/bin/bun --no-env-file /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-prepared-compatibility-03RFTB/context-routes/.relkit/dev/sessions/dev-session-Bt5mRL/generation-1/server/index.js"
+  }
+]
