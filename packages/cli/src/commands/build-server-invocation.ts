@@ -15,6 +15,7 @@ async function invokeHttp(request) {
       input: request.input,
       source: request.source ?? "http",
       registry,
+      env: values,
       functionId: request.functionId,
       ...(target === undefined ? {} : { target }),
       ...(request.signal === undefined

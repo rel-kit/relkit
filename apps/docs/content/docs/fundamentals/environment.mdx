@@ -45,9 +45,21 @@ describes one declaration, and `example` renders a safe template. Run `bun run c
 so generated types and graph metadata stay current.
 
 Generated commands run under Bun, which loads its normal dotenv files for the process.
-An existing process environment value takes precedence. `.env.example` is an informational
+For one-shot and production commands, an existing process environment value takes precedence. `.env.example` is an informational
 template; RELKIT does not load it as runtime configuration. Keep its placeholder values
 separate from real credentials. Moving services leaves the root dotenv files in place.
+
+During `bun dev`, RELKIT reloads active dotenv files for each candidate, including after a
+failed reload. Keys declared in those files are managed by the files: additions and edits
+replace startup values, and deleting a key removes its previous file-managed value. Other
+inherited environment values and explicit RELKIT runtime settings remain in effect.
+
+The startup `NODE_ENV` selects `.env.development`, `.env.production`, or `.env.test`, with
+development as the fallback for an absent or custom value. `.env.local` has higher precedence
+and is excluded in test mode. `.env.<mode>.local` has the highest file precedence.
+Creating, deleting, or atomically replacing an active dotenv file also triggers a reload.
+A rejected candidate leaves the previous valid version serving until the repair succeeds;
+neither ordinary nor prepared startup requires restarting the CLI after a dotenv repair.
 
 The CLI's `--environment` selects the command's provider environment. It does not turn a
 custom application field named `RELKIT_ENV` into business configuration. RELKIT owns that
