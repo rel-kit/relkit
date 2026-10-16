@@ -1,0 +1,10 @@
+$ bun tests/jobs/compatibility/capability-matrix.ts
+{
+  "status": "ready",
+  "requiredNativeEngines": 2,
+  "provenNativeEngines": [
+    "inngest",
+    "effect-mq"
+  ],
+  "providerSuite": "skipped; Docker gate not enabled"
+}

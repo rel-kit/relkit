@@ -1,0 +1,2202 @@
+$ vitest run --config scripts/jobs-coverage/vitest.config.ts --coverage
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+      Coverage enabled with v8
+
+[23:11:10.166] INFO (#29): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.watch.frames',
+  outcome: 'success',
+  duration_ms: 0.452291
+}
+[23:11:10.169] INFO (#30): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.watch.frames',
+  outcome: 'success',
+  duration_ms: 0.219
+}
+[23:11:10.169] INFO (#28): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.observe',
+  outcome: 'success',
+  duration_ms: 5.64375
+}
+[23:11:10.172] INFO (#38): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.watch.frames',
+  outcome: 'success',
+  duration_ms: 0.175791
+}
+[23:11:10.172] INFO (#37): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.observe',
+  outcome: 'success',
+  duration_ms: 0.831583
+}
+[23:11:10.177] INFO (#50): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.feed.borrow',
+  outcome: 'success',
+  duration_ms: 0.086375
+}
+[23:11:10.177] INFO (#50): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.refetch',
+  outcome: 'success',
+  duration_ms: 0.866375
+}
+[23:11:10.180] INFO (#74): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.observe',
+  outcome: 'success',
+  duration_ms: 0.742791
+}
+[23:11:10.182] ERROR (#83): Execution operation failed {
+  domain: 'client',
+  operation: 'jobs.watch.frames',
+  outcome: 'failure',
+  duration_ms: 1.4415
+}
+[23:11:10.183] ERROR (#82): Execution operation failed {
+  domain: 'client',
+  operation: 'jobs.observe',
+  outcome: 'failure',
+  duration_ms: 2.194708
+}
+[23:11:10.184] INFO (#90): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.observe',
+  outcome: 'success',
+  duration_ms: 0.5175
+}
+[23:11:10.184] ERROR (#97): Execution operation failed {
+  domain: 'client',
+  operation: 'jobs.observe',
+  outcome: 'failure',
+  duration_ms: 0.237459
+}
+[23:11:10.192] INFO (#112): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.observe',
+  outcome: 'success',
+  duration_ms: 0.476583
+}
+[23:11:10.193] INFO (#120): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.observe',
+  outcome: 'success',
+  duration_ms: 0.444458
+}
+[23:11:10.193] INFO (#126): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.observe',
+  outcome: 'success',
+  duration_ms: 0.397292
+}
+[23:11:10.195] ERROR (#133): Execution operation failed {
+  domain: 'client',
+  operation: 'jobs.content.open',
+  outcome: 'failure',
+  duration_ms: 1.5145
+}
+[23:11:10.196] INFO (#134): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.content.open',
+  outcome: 'success',
+  duration_ms: 0.41325
+}
+[23:11:10.198] INFO (#149): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.content.open',
+  outcome: 'success',
+  duration_ms: 0.094083
+}
+[23:11:10.199] ERROR (#152): Execution operation failed {
+  domain: 'client',
+  operation: 'jobs.content.frames',
+  outcome: 'failure',
+  duration_ms: 0.295875
+}
+[23:11:10.199] INFO (#160): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.content.open',
+  outcome: 'success',
+  duration_ms: 0.087042
+}
+[23:11:10.199] ERROR (#163): Execution operation failed {
+  domain: 'client',
+  operation: 'jobs.content.frames',
+  outcome: 'failure',
+  duration_ms: 0.1995
+}
+[23:11:10.199] INFO (#169): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.content.open',
+  outcome: 'success',
+  duration_ms: 0.079084
+}
+[23:11:10.200] ERROR (#172): Execution operation failed {
+  domain: 'client',
+  operation: 'jobs.content.frames',
+  outcome: 'failure',
+  duration_ms: 0.193375
+}
+[23:11:10.653] INFO (#3): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.215458
+}
+[23:11:10.657] INFO (#3): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 1.818792
+}
+[23:11:10.657] INFO (#3): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 5.316833
+}
+[23:11:10.659] INFO (#5): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 1.116083
+}
+[23:11:10.659] INFO (#7): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.request',
+  outcome: 'success',
+  duration_ms: 0.051042
+}
+[23:11:10.659] INFO (#8): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.035208
+}
+[23:11:10.659] INFO (#8): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.176
+}
+[23:11:10.660] INFO (#8): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.matches',
+  outcome: 'success',
+  duration_ms: 0.495583
+}
+[23:11:10.660] INFO (#10): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.019709
+}
+[23:11:10.660] INFO (#10): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.132167
+}
+[23:11:10.660] INFO (#10): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.matches',
+  outcome: 'success',
+  duration_ms: 0.356833
+}
+[23:11:10.660] INFO (#12): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.update',
+  outcome: 'success',
+  duration_ms: 0.044875
+}
+[23:11:10.661] INFO (#13): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.021708
+}
+[23:11:10.661] INFO (#14): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.clear',
+  outcome: 'success',
+  duration_ms: 0.062209
+}
+[23:11:10.661] INFO (#15): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.016708
+}
+[23:11:10.661] INFO (#15): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.146584
+}
+[23:11:10.662] INFO (#15): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.372292
+}
+[23:11:10.662] INFO (#17): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.024541
+}
+[23:11:10.662] INFO (#17): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.14125
+}
+[23:11:10.662] INFO (#17): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.456333
+}
+[23:11:10.662] INFO (#19): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02
+}
+[23:11:10.663] INFO (#19): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.201958
+}
+[23:11:10.663] INFO (#19): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.52525
+}
+[23:11:10.663] INFO (#21): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.018958
+}
+[23:11:10.663] INFO (#21): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.149208
+}
+[23:11:10.663] INFO (#21): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.362167
+}
+[23:11:10.663] INFO (#23): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.0255
+}
+[23:11:10.664] INFO (#23): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.123125
+}
+[23:11:10.664] INFO (#23): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.331
+}
+[23:11:10.664] INFO (#25): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.025416
+}
+[23:11:10.664] INFO (#25): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.153542
+}
+[23:11:10.664] INFO (#25): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.453834
+}
+[23:11:10.664] INFO (#27): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.017792
+}
+[23:11:10.664] INFO (#27): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.126292
+}
+[23:11:10.665] INFO (#27): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.325666
+}
+[23:11:10.665] INFO (#29): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.01825
+}
+[23:11:10.665] INFO (#29): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.10925
+}
+[23:11:10.665] INFO (#29): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.29625
+}
+[23:11:10.665] INFO (#31): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.016834
+}
+[23:11:10.665] INFO (#31): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.1005
+}
+[23:11:10.665] INFO (#31): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.271875
+}
+[23:11:10.665] INFO (#33): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.016875
+}
+[23:11:10.666] INFO (#33): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.108125
+}
+[23:11:10.666] INFO (#33): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.276167
+}
+[23:11:10.666] INFO (#35): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.016625
+}
+[23:11:10.666] INFO (#35): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.094333
+}
+[23:11:10.666] INFO (#35): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.269541
+}
+[23:11:10.666] INFO (#37): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.017125
+}
+[23:11:10.666] INFO (#37): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.09225
+}
+[23:11:10.666] INFO (#37): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.256
+}
+[23:11:10.666] INFO (#39): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.019875
+}
+[23:11:10.667] INFO (#39): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.099083
+}
+[23:11:10.667] INFO (#39): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.281208
+}
+[23:11:10.667] INFO (#41): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.019292
+}
+[23:11:10.667] INFO (#41): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.094541
+}
+[23:11:10.667] INFO (#41): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.287583
+}
+[23:11:10.667] INFO (#43): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.019292
+}
+[23:11:10.667] INFO (#43): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.085958
+}
+[23:11:10.667] INFO (#43): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.285209
+}
+[23:11:10.667] INFO (#45): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.018417
+}
+[23:11:10.668] INFO (#45): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.098375
+}
+[23:11:10.668] INFO (#45): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.264875
+}
+[23:11:10.668] INFO (#47): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.020083
+}
+[23:11:10.668] INFO (#47): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.096041
+}
+[23:11:10.668] INFO (#47): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.288542
+}
+[23:11:10.668] INFO (#49): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.021667
+}
+[23:11:10.668] INFO (#49): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.1035
+}
+[23:11:10.668] INFO (#49): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.30025
+}
+[23:11:10.668] INFO (#51): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02125
+}
+[23:11:10.669] INFO (#51): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.088459
+}
+[23:11:10.669] INFO (#51): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.262792
+}
+[23:11:10.669] INFO (#53): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.021708
+}
+[23:11:10.669] INFO (#53): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.106333
+}
+[23:11:10.669] INFO (#53): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.288958
+}
+[23:11:10.669] INFO (#55): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.022
+}
+[23:11:10.669] INFO (#55): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.090209
+}
+[23:11:10.669] INFO (#55): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.279791
+}
+[23:11:10.670] INFO (#57): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.038833
+}
+[23:11:10.670] INFO (#57): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.095083
+}
+[23:11:10.670] INFO (#57): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.298583
+}
+[23:11:10.670] INFO (#59): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.024041
+}
+[23:11:10.670] INFO (#59): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.10025
+}
+[23:11:10.670] INFO (#59): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.352417
+}
+[23:11:10.670] INFO (#61): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.024875
+}
+[23:11:10.671] INFO (#61): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.104
+}
+[23:11:10.671] INFO (#61): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.297084
+}
+[23:11:10.671] INFO (#63): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.024042
+}
+[23:11:10.671] INFO (#63): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.088792
+}
+[23:11:10.671] INFO (#63): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.2885
+}
+[23:11:10.671] INFO (#65): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.026375
+}
+[23:11:10.671] INFO (#65): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.113875
+}
+[23:11:10.671] INFO (#65): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.357792
+}
+[23:11:10.672] INFO (#67): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.031459
+}
+[23:11:10.672] INFO (#67): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.096292
+}
+[23:11:10.672] INFO (#67): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.297416
+}
+[23:11:10.672] INFO (#69): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.025875
+}
+[23:11:10.672] INFO (#69): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.098292
+}
+[23:11:10.672] INFO (#69): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.326667
+}
+[23:11:10.672] INFO (#71): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.026833
+}
+[23:11:10.672] INFO (#71): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.094042
+}
+[23:11:10.672] INFO (#71): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.279375
+}
+[23:11:10.673] INFO (#73): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.036917
+}
+[23:11:10.673] INFO (#73): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.106041
+}
+[23:11:10.673] INFO (#73): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.328625
+}
+[23:11:10.673] INFO (#75): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.026125
+}
+[23:11:10.673] INFO (#75): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.088
+}
+[23:11:10.673] INFO (#75): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.270625
+}
+[23:11:10.673] INFO (#77): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02275
+}
+[23:11:10.673] INFO (#77): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.085291
+}
+[23:11:10.674] INFO (#77): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.256875
+}
+[23:11:10.674] INFO (#79): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.025625
+}
+[23:11:10.674] INFO (#79): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.131125
+}
+[23:11:10.674] INFO (#79): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.3995
+}
+[23:11:10.674] INFO (#81): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.031792
+}
+[23:11:10.674] INFO (#81): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.098125
+}
+[23:11:10.674] INFO (#81): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.305459
+}
+[23:11:10.675] INFO (#83): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.040625
+}
+[23:11:10.675] INFO (#83): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.094208
+}
+[23:11:10.675] INFO (#83): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.29925
+}
+[23:11:10.675] INFO (#85): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02675
+}
+[23:11:10.675] INFO (#85): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.107291
+}
+[23:11:10.675] INFO (#85): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.289166
+}
+[23:11:10.675] INFO (#87): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02275
+}
+[23:11:10.675] INFO (#87): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.093791
+}
+[23:11:10.675] INFO (#87): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.275042
+}
+[23:11:10.676] INFO (#89): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.022958
+}
+[23:11:10.676] INFO (#89): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.082875
+}
+[23:11:10.676] INFO (#89): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.260458
+}
+[23:11:10.676] INFO (#91): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.023625
+}
+[23:11:10.676] INFO (#91): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.082417
+}
+[23:11:10.676] INFO (#91): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.255625
+}
+[23:11:10.676] INFO (#93): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.023292
+}
+[23:11:10.676] INFO (#93): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.083834
+}
+[23:11:10.676] INFO (#93): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.261209
+}
+[23:11:10.676] INFO (#95): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.021625
+}
+[23:11:10.677] INFO (#95): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.10775
+}
+[23:11:10.677] INFO (#95): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.37075
+}
+[23:11:10.677] INFO (#97): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02675
+}
+[23:11:10.677] INFO (#97): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.123208
+}
+[23:11:10.677] INFO (#97): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.348792
+}
+[23:11:10.677] INFO (#99): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.024542
+}
+[23:11:10.678] INFO (#99): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.179459
+}
+[23:11:10.678] INFO (#99): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.489792
+}
+[23:11:10.678] INFO (#101): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.027917
+}
+[23:11:10.678] INFO (#101): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.1405
+}
+[23:11:10.678] INFO (#101): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.338625
+}
+[23:11:10.678] INFO (#103): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.023083
+}
+[23:11:10.679] INFO (#103): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.095667
+}
+[23:11:10.679] INFO (#103): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.293875
+}
+[23:11:10.679] INFO (#105): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02225
+}
+[23:11:10.679] INFO (#105): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.085792
+}
+[23:11:10.679] INFO (#105): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.269584
+}
+[23:11:10.679] INFO (#107): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.035917
+}
+[23:11:10.681] INFO (#107): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 1.582375
+}
+[23:11:10.681] INFO (#107): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 1.964834
+}
+[23:11:10.681] INFO (#109): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.024667
+}
+[23:11:10.681] INFO (#109): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.198625
+}
+[23:11:10.682] INFO (#109): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.473166
+}
+[23:11:10.682] INFO (#111): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.026292
+}
+[23:11:10.682] INFO (#111): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.136292
+}
+[23:11:10.682] INFO (#111): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.3955
+}
+[23:11:10.682] INFO (#113): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02375
+}
+[23:11:10.682] INFO (#113): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.0905
+}
+[23:11:10.682] INFO (#113): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.2655
+}
+[23:11:10.683] INFO (#115): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.022458
+}
+[23:11:10.683] INFO (#115): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.094959
+}
+[23:11:10.683] INFO (#115): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.272583
+}
+[23:11:10.683] INFO (#117): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.0225
+}
+[23:11:10.683] INFO (#117): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.080083
+}
+[23:11:10.683] INFO (#117): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.245166
+}
+[23:11:10.683] INFO (#119): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.022416
+}
+[23:11:10.683] INFO (#119): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.105083
+}
+[23:11:10.683] INFO (#119): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.328375
+}
+[23:11:10.684] INFO (#121): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.026459
+}
+[23:11:10.684] INFO (#121): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.116083
+}
+[23:11:10.684] INFO (#121): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.305333
+}
+[23:11:10.684] INFO (#123): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.027958
+}
+[23:11:10.684] INFO (#123): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.095417
+}
+[23:11:10.684] INFO (#123): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.290709
+}
+[23:11:10.684] INFO (#125): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.021875
+}
+[23:11:10.684] INFO (#125): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.08875
+}
+[23:11:10.684] INFO (#125): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.255375
+}
+[23:11:10.685] INFO (#127): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.023833
+}
+[23:11:10.685] INFO (#127): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.079584
+}
+[23:11:10.685] INFO (#127): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.247416
+}
+[23:11:10.685] INFO (#129): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02375
+}
+[23:11:10.685] INFO (#129): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.07975
+}
+[23:11:10.685] INFO (#129): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.247834
+}
+[23:11:10.685] INFO (#131): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.024458
+}
+[23:11:10.685] INFO (#131): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.098708
+}
+[23:11:10.685] INFO (#131): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.282958
+}
+[23:11:10.686] INFO (#133): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.023416
+}
+[23:11:10.686] INFO (#133): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.118208
+}
+[23:11:10.686] INFO (#133): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.309875
+}
+[23:11:10.686] INFO (#135): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02475
+}
+[23:11:10.686] INFO (#135): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.106459
+}
+[23:11:10.686] INFO (#135): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.283
+}
+[23:11:10.686] INFO (#137): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.024958
+}
+[23:11:10.686] INFO (#137): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.079375
+}
+[23:11:10.686] INFO (#137): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.249458
+}
+[23:11:10.687] INFO (#139): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.0325
+}
+[23:11:10.687] INFO (#139): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.1055
+}
+[23:11:10.687] INFO (#139): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.313958
+}
+[23:11:10.687] INFO (#141): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.035542
+}
+[23:11:10.687] INFO (#141): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.114875
+}
+[23:11:10.687] INFO (#141): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.3575
+}
+[23:11:10.688] INFO (#143): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.141084
+}
+[23:11:10.688] INFO (#143): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.131875
+}
+[23:11:10.688] INFO (#143): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.608458
+}
+[23:11:10.688] INFO (#145): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.028167
+}
+[23:11:10.688] INFO (#145): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.1365
+}
+[23:11:10.688] INFO (#145): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.374917
+}
+[23:11:10.689] INFO (#147): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.026833
+}
+[23:11:10.689] INFO (#147): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.102292
+}
+[23:11:10.689] INFO (#147): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.282375
+}
+[23:11:10.689] INFO (#149): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.025666
+}
+[23:11:10.689] INFO (#149): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.081459
+}
+[23:11:10.689] INFO (#149): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.254292
+}
+[23:11:10.689] INFO (#151): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.024625
+}
+[23:11:10.689] INFO (#151): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.114291
+}
+[23:11:10.689] INFO (#151): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.324417
+}
+[23:11:10.690] INFO (#153): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.027542
+}
+[23:11:10.690] INFO (#153): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.110042
+}
+[23:11:10.690] INFO (#153): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.317917
+}
+[23:11:10.690] INFO (#155): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.028
+}
+[23:11:10.690] INFO (#155): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.086875
+}
+[23:11:10.690] INFO (#155): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.270208
+}
+[23:11:10.690] INFO (#157): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.026708
+}
+[23:11:10.690] INFO (#157): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.079708
+}
+[23:11:10.690] INFO (#157): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.258084
+}
+[23:11:10.691] INFO (#159): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.026666
+}
+[23:11:10.691] INFO (#159): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.088709
+}
+[23:11:10.691] INFO (#159): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.287792
+}
+[23:11:10.691] INFO (#161): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.032125
+}
+[23:11:10.691] INFO (#161): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.078
+}
+[23:11:10.691] INFO (#161): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.271125
+}
+[23:11:10.691] INFO (#163): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.026792
+}
+[23:11:10.691] INFO (#163): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.077958
+}
+[23:11:10.691] INFO (#163): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.256291
+}
+[23:11:10.692] INFO (#165): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.028459
+}
+[23:11:10.692] INFO (#165): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.08275
+}
+[23:11:10.692] INFO (#165): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.279292
+}
+[23:11:10.692] INFO (#167): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.028333
+}
+[23:11:10.692] INFO (#167): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.090375
+}
+[23:11:10.692] INFO (#167): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.286583
+}
+[23:11:10.692] INFO (#169): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.032959
+}
+[23:11:10.692] INFO (#169): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.084709
+}
+[23:11:10.692] INFO (#169): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.294166
+}
+[23:11:10.693] INFO (#171): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.028208
+}
+[23:11:10.693] INFO (#171): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.093583
+}
+[23:11:10.693] INFO (#171): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.270417
+}
+[23:11:10.693] INFO (#173): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.027958
+}
+[23:11:10.693] INFO (#173): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.078459
+}
+[23:11:10.693] INFO (#173): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.254416
+}
+[23:11:10.693] INFO (#175): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.029084
+}
+[23:11:10.693] INFO (#175): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.084042
+}
+[23:11:10.693] INFO (#175): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.263
+}
+[23:11:10.694] INFO (#177): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.028
+}
+[23:11:10.694] INFO (#177): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.0825
+}
+[23:11:10.694] INFO (#177): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.261208
+}
+[23:11:10.694] INFO (#179): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.028208
+}
+[23:11:10.694] INFO (#179): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.085292
+}
+[23:11:10.694] INFO (#179): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.281667
+}
+[23:11:10.694] INFO (#181): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.029958
+}
+[23:11:10.694] INFO (#181): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.117958
+}
+[23:11:10.694] INFO (#181): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.323417
+}
+[23:11:10.695] INFO (#183): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.032125
+}
+[23:11:10.695] INFO (#183): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.08
+}
+[23:11:10.695] INFO (#183): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.267584
+}
+[23:11:10.695] INFO (#185): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.0285
+}
+[23:11:10.695] INFO (#185): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.128666
+}
+[23:11:10.695] INFO (#185): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.351917
+}
+[23:11:10.695] INFO (#187): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.032291
+}
+[23:11:10.696] INFO (#187): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.15475
+}
+[23:11:10.696] INFO (#187): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.438916
+}
+[23:11:10.696] INFO (#189): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.038417
+}
+[23:11:10.696] INFO (#189): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.096083
+}
+[23:11:10.696] INFO (#189): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.314209
+}
+[23:11:10.696] INFO (#191): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.04425
+}
+[23:11:10.696] INFO (#191): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.092083
+}
+[23:11:10.697] INFO (#191): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.318209
+}
+[23:11:10.697] INFO (#193): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.029417
+}
+[23:11:10.697] INFO (#193): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.100541
+}
+[23:11:10.697] INFO (#193): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.30325
+}
+[23:11:10.697] INFO (#195): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.029542
+}
+[23:11:10.697] INFO (#195): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.084833
+}
+[23:11:10.697] INFO (#195): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.271166
+}
+[23:11:10.697] INFO (#197): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.030583
+}
+[23:11:10.697] INFO (#197): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.0795
+}
+[23:11:10.698] INFO (#197): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.255167
+}
+[23:11:10.698] INFO (#199): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.030708
+}
+[23:11:10.698] INFO (#199): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.074042
+}
+[23:11:10.698] INFO (#199): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.24675
+}
+[23:11:10.698] INFO (#201): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.030083
+}
+[23:11:10.698] INFO (#201): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.086125
+}
+[23:11:10.698] INFO (#201): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.260125
+}
+[23:11:10.698] INFO (#203): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.02975
+}
+[23:11:10.698] INFO (#203): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.076667
+}
+[23:11:10.698] INFO (#203): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.246541
+}
+[23:11:10.699] INFO (#205): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.034209
+}
+[23:11:10.699] INFO (#205): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.074333
+}
+[23:11:10.699] INFO (#205): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.254834
+}
+[23:11:10.699] INFO (#207): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.028875
+}
+[23:11:10.699] INFO (#207): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.068625
+}
+[23:11:10.699] INFO (#207): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.230375
+}
+[23:11:10.699] INFO (#209): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.030958
+}
+[23:11:10.699] INFO (#209): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.094334
+}
+[23:11:10.699] INFO (#209): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.294709
+}
+[23:11:10.700] INFO (#211): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.031
+}
+[23:11:10.700] INFO (#211): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.076375
+}
+[23:11:10.700] INFO (#211): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.297709
+}
+[23:11:10.700] INFO (#213): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.040042
+}
+[23:11:10.700] INFO (#213): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.082417
+}
+[23:11:10.700] INFO (#213): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.270833
+}
+[23:11:10.700] INFO (#215): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.032875
+}
+[23:11:10.701] ERROR (#215): Execution operation failed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'failure',
+  duration_ms: 0.460083
+}
+[23:11:10.702] INFO (#216): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.037209
+}
+[23:11:10.702] INFO (#217): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.clear',
+  outcome: 'success',
+  duration_ms: 0.04075
+}
+[23:11:10.703] INFO (#218): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.0105
+}
+[23:11:10.703] INFO (#218): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.105458
+}
+[23:11:10.703] INFO (#218): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.278417
+}
+[23:11:10.703] INFO (#220): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.update',
+  outcome: 'success',
+  duration_ms: 0.015709
+}
+[23:11:10.703] INFO (#221): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.011
+}
+[23:11:10.703] INFO (#221): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.114459
+}
+[23:11:10.703] ERROR (#221): Execution operation failed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'failure',
+  duration_ms: 0.307375
+}
+[23:11:10.703] INFO (#223): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.update',
+  outcome: 'success',
+  duration_ms: 0.013958
+}
+[23:11:10.703] INFO (#224): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.011209
+}
+[23:11:10.704] INFO (#224): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.208292
+}
+[23:11:10.704] INFO (#224): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'success',
+  duration_ms: 0.344166
+}
+[23:11:10.704] INFO (#226): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.update',
+  outcome: 'success',
+  duration_ms: 0.013834
+}
+[23:11:10.704] INFO (#227): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.list',
+  outcome: 'success',
+  duration_ms: 0.011083
+}
+[23:11:10.704] INFO (#227): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.digest',
+  outcome: 'success',
+  duration_ms: 0.132458
+}
+[23:11:10.704] ERROR (#227): Execution operation failed {
+  domain: 'client',
+  operation: 'pending.remember',
+  outcome: 'failure',
+  duration_ms: 0.363875
+}
+[23:11:10.704] INFO (#229): Execution operation completed {
+  domain: 'client',
+  operation: 'pending.clear',
+  outcome: 'success',
+  duration_ms: 0.01525
+}
+[23:11:15.316] INFO (#52): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.feed.borrow',
+  outcome: 'success',
+  duration_ms: 0.105958
+}
+[23:11:19.449] INFO (#6): Execution operation completed {
+  domain: 'client',
+  operation: 'jobs.content.open',
+  outcome: 'success',
+  duration_ms: 1.687959
+}
+[23:11:19.452] ERROR (#9): Execution operation failed {
+  domain: 'client',
+  operation: 'jobs.content.frames',
+  outcome: 'failure',
+  duration_ms: 0.732125
+}
+
+ Test Files  69 passed (69)
+      Tests  242 passed (242)
+   Start at  23:11:09
+   Duration  20.99s (import 81%, tests 8%, transform 7%, worker 4%)
+
+     Import  378 modules were evaluated 568 times · 11.53s total, 81% of tracked time
+             ~3.86s faster with isolate: false — shared modules are evaluated once per worker instead of once per file
+             learn more: https://vitest.dev/guide/improving-performance#test-isolation
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   96.06 |     91.2 |   97.67 |   97.22 |                   
+ client/src/jobs   |   94.55 |    85.03 |   96.42 |   96.63 |                   
+  ...er.service.ts |   91.07 |    73.13 |    93.1 |   94.23 | ...09,213,215-216 
+  controller.ts    |   93.54 |    78.57 |     100 |     100 | 71-75             
+  ...ry.service.ts |   97.77 |      100 |   93.75 |   97.29 | 83                
+  ...-feed-loop.ts |   98.41 |    87.09 |     100 |     100 | 27,70,91-92       
+  ...ed-polling.ts |    91.3 |    57.14 |     100 |   95.12 | 40,68             
+  ...d-recovery.ts |   91.66 |    83.33 |     100 |     100 | 20-23             
+  ...ed-support.ts |      96 |      100 |   94.73 |   95.34 | 71-72             
+  watch-key.ts     |   93.75 |    95.34 |     100 |   93.75 | 72                
+ jobs/src          |   98.23 |    97.17 |     100 |   98.04 |                   
+  ...ng-support.ts |   95.83 |    96.15 |     100 |   95.65 | 29                
+  ...ve-binding.ts |   97.05 |     92.3 |     100 |   96.72 | 43,170            
+  ...value-copy.ts |   98.14 |    98.55 |     100 |   97.87 | 94                
+  ...validation.ts |   98.27 |    98.48 |     100 |   98.03 | 114               
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 96.06% ( 660/687 )
+Branches     : 91.2% ( 508/557 )
+Functions    : 97.67% ( 168/172 )
+Lines        : 97.22% ( 596/613 )
+================================================================================

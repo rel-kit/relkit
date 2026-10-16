@@ -1,0 +1,2 @@
+$ bun run scripts/test-types.ts
+Type fixtures passed (public descriptor inference and boundary rejection).
