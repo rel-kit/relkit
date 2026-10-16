@@ -1,0 +1,36 @@
+bun test v1.3.10 (30e609e0)
+
+scripts/tests/packed-manifest.test.ts:
+(pass) reads the exact packed package manifest from a gzipped archive [6.38ms]
+(pass) rejects archives without a packed package manifest [0.74ms]
+
+scripts/tests/registry-cache.test.ts:
+(pass) evicts an upstream network failure and retains its native deadline [4.49ms]
+(pass) evicts an upstream HTTP 503 failure and retains its native deadline [2.65ms]
+
+scripts/tests/release-command.test.ts:
+Release command: /Users/mustafaelsayed/.bun/bin/bun -e console.log("complete") in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun -e console.error("packing failed");process.exit(7) in /Users/mustafaelsayed/Workspace/relkit
+(pass) release commands return stdout and preserve nonzero-exit diagnostics [22.29ms]
+Release command: /Users/mustafaelsayed/.bun/bin/bun -e console.log(process.pid);console.error("stalled install");setInterval(()=>{},100) in /Users/mustafaelsayed/Workspace/relkit
+(pass) release command deadlines terminate and join the owned process group [1002.68ms]
+
+scripts/tests/dev-readiness/bootstrap-imports.test.ts:
+(pass) packaged snapshot hits keep checking and bundling behind dynamic miss imports [1020.28ms]
+
+packages/cli/tests/dev-snapshot/input-watch.test.ts:
+(pass) installed-input registration never recursively walks unrelated dependencies or runtime state [7.11ms]
+(skip) native input observation invalidates after changing src/deep/helper.ts
+(skip) native input observation invalidates after changing src/new/deeper/helper.ts
+(skip) native input observation invalidates after changing new-source/helper.ts
+(skip) native input observation invalidates after changing node_modules/library/types/index.d.ts
+(skip) native input observation invalidates after changing node_modules/library/absent/nested.d.ts
+(pass) partial registration failures close every previously acquired native watcher [2.95ms]
+(pass) escaped member/query paths and external installed links reject registration [5.29ms]
+(pass) preflight refuses unauthenticated receipt bytes before trusting their watch inventory [3.99ms]
+
+ 11 pass
+ 5 skip
+ 0 fail
+ 38 expect() calls
+Ran 16 tests across 5 files. [2.21s]
