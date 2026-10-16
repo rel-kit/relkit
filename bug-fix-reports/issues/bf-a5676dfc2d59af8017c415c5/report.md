@@ -1,7 +1,7 @@
 # bf-a5676dfc2d59af8017c415c5: PR #120 CodeQL path injection findings in recovery/evidence probes
 
 Status: **verified**
-Attempt: 1 · Updated: 2026-10-16T18:59:43+00:00
+Attempt: 1 · Updated: 2026-10-16T19:12:10+00:00
 
 ## What
 
@@ -21,7 +21,7 @@ The recovery probe passed argv[3] through resolve into mkdir and multiple writeF
 
 ## Fixed by
 
-Allocate evidence with mkdtemp instead of accepting an output path; normalize/check the temporary app boundary before realpath and validate the canonical result; select archived phases from literal before/after/smoke returns. Run regressions in the CI security suite. Native ordinary/prepared recovery matrices and prepush passed.
+Allocate evidence with mkdtemp instead of accepting an output path; normalize/check the temporary app boundary before realpath and validate the canonical result; select archived phases from literal before/after/smoke returns. Run regressions in the CI security suite. Native ordinary/prepared recovery matrices and prepush passed. A subsequent CodeQL run cleared alerts 80-84 and reported alert 85 at the normalized lookup. Select the lexical/canonical temporary alias first, then use one dominating containment check before realpath. Both aliases, all rejected path cases, ordinary/prepared source recovery and the required prepush gate pass again. No finding was dismissed or rule disabled.
 
 ## Changed files
 
@@ -40,10 +40,15 @@ Allocate evidence with mkdtemp instead of accepting an output path; normalize/ch
 
 - before: [unit](evidence/001/unit-before.log) — Both original path regressions fail
 - before: [integration](evidence/001/runtime-before.log) — Actual native probe creates caller-selected output
+- before: [check](evidence/001/codeql-followup-before.json) — Actual new CodeQL alert 85 after original five were cleared
+- before: [check](evidence/001/codeql-followup-check-before.json) — Failing hosted security check on 45f69537f
 - after: [unit](evidence/001/unit-after.log) — All three security regressions pass, including boundary cases
 - after: [integration](evidence/001/runtime-after.log) — Same native scenario rejects output selection without creating it
 - after: [e2e](evidence/001/recovery-after.log) — Real CLI, HTTP, both startup paths, environment/source cycles and joined cleanup
 - after: [check](evidence/001/prepush-result.json) — Required prepush gate command and native exit status
+- after: [integration](evidence/001/followup-security.log) — Four passing tests; lexical and canonical aliases, output ownership, phases, external/sibling/symlink rejection
+- after: [e2e](evidence/001/followup-recovery-after.log) — Native ordinary/prepared source recovery and joined cleanup with canonical temporary app input
+- after: [check](evidence/001/followup-prepush-result.json) — Required prepush rerun after the follow-up
 
 ## Scope
 
@@ -70,7 +75,7 @@ Allocate evidence with mkdtemp instead of accepting an output path; normalize/ch
 ```json
 {
   "package": "packages/cli tests and tests/security",
-  "revision": "b8242805edd3e4033e4a773a587533918c55ef20 plus PR review fixes",
+  "revision": "45f69537fddb192f0755117b5e0d7658fb56d6c5 plus single-guard follow-up",
   "target": "Owned temporary fixtures, Bun 1.3.10 on macOS",
   "api_exposed": false,
   "e2e_available": true,
@@ -96,8 +101,8 @@ Allocate evidence with mkdtemp instead of accepting an output path; normalize/ch
       "command": "bun test tests/security/dev-recovery-probe-paths.test.ts",
       "cwd": ".",
       "exit_code": 0,
-      "assertion": "Path boundaries reject unsafe arguments before filesystem writes",
-      "output": "evidence/001/unit-after.log"
+      "assertion": "Both temporary path aliases remain supported; unsafe paths, evidence output selection and traversal phases remain rejected",
+      "output": "evidence/001/followup-security.log"
     }
   },
   "runtime": {
@@ -122,20 +127,20 @@ Allocate evidence with mkdtemp instead of accepting an output path; normalize/ch
     },
     "after": {
       "status": "passed",
-      "command": "bun test tests/security/dev-recovery-probe-paths.test.ts -t 'evidence directories'",
+      "command": "bun test tests/security/dev-recovery-probe-paths.test.ts",
       "cwd": ".",
       "exit_code": 0,
-      "assertion": "Path boundaries reject unsafe arguments before filesystem writes",
-      "output": "evidence/001/runtime-after.log"
+      "assertion": "Both temporary path aliases remain supported; unsafe paths, evidence output selection and traversal phases remain rejected",
+      "output": "evidence/001/followup-security.log"
     }
   },
   "e2e": {
     "status": "passed",
-    "command": "bun packages/cli/tests/dev-environment/recovery.probe.ts <owned cloned installed app>",
+    "command": "bun packages/cli/tests/dev-environment/recovery.probe.ts <owned canonical cloned installed app> --source-only",
     "cwd": ".",
     "exit_code": 0,
-    "assertion": "Both startup paths preserve previous-generation HTTP during rejections, activate repaired environment/source markers without restart, and join children/listeners on shutdown",
-    "output": "evidence/001/recovery-after.log"
+    "assertion": "Both startup paths activate repaired source markers, retain last-valid HTTP during rejections and join owned descendants/listeners on shutdown using a canonical temporary path",
+    "output": "evidence/001/followup-recovery-after.log"
   },
   "checks": [
     {
@@ -144,8 +149,8 @@ Allocate evidence with mkdtemp instead of accepting an output path; normalize/ch
       "command": "TURBO_CONCURRENCY=1 VITEST_MAX_WORKERS=1 RAYON_NUM_THREADS=1 UV_THREADPOOL_SIZE=1 NODE_OPTIONS=--max-old-space-size=2048 RELKIT_DOCGEN_CONCURRENCY=1 CIRCLE_NODE_TOTAL=2 nice -n 15 bun run prepush",
       "cwd": ".",
       "exit_code": 0,
-      "assertion": "Required local PR publication gate passes with constrained concurrency",
-      "output": "evidence/001/prepush.log"
+      "assertion": "Required local publication gate passes again after follow-up",
+      "output": "evidence/001/followup-prepush.log"
     }
   ],
   "regressions": [
@@ -168,12 +173,34 @@ Allocate evidence with mkdtemp instead of accepting an output path; normalize/ch
       "exit_code": 0,
       "assertion": "All ordinary and prepared environment/source recovery and shutdown assertions pass",
       "output": "evidence/001/recovery-after.log"
+    },
+    {
+      "kind": "integration",
+      "boundary": "Native Bun probe -> normalized lexical/canonical path validation -> owned filesystem",
+      "status": "passed",
+      "command": "bun test tests/security/dev-recovery-probe-paths.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Both temporary path aliases remain supported; unsafe paths, evidence output selection and traversal phases remain rejected",
+      "output": "evidence/001/followup-security.log"
+    },
+    {
+      "kind": "e2e",
+      "boundary": "Canonical temporary app -> native ordinary/prepared CLI -> HTTP recovery -> joined shutdown",
+      "status": "passed",
+      "command": "bun packages/cli/tests/dev-environment/recovery.probe.ts <owned canonical cloned installed app> --source-only",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Both startup paths activate repaired source markers, retain last-valid HTTP during rejections and join owned descendants/listeners on shutdown using a canonical temporary path",
+      "output": "evidence/001/followup-recovery-after.log"
     }
   ],
   "limitations": [
     "The archived probe contains historical machine-specific setup and moved imports. Its actual phase declaration is extracted with the TypeScript parser and evaluated directly for all accepted phases and traversal inputs; the entire historical app experiment is not rerun.",
     "Native runtime replay uses a disposable cloned installed minimal app. The existing e-commerce preview is left running and is not edited.",
-    "GitHub CodeQL/CI results are checked separately on the published final commit; no alerts are dismissed or scanning rules disabled."
+    "GitHub CodeQL/CI results are checked separately on the published final commit; no alerts are dismissed or scanning rules disabled.",
+    "Alert 85 was reproduced as an actual failing CodeQL analysis. No additional runtime path escape was observed: all original rejection cases already passed on 45f69537f. The follow-up expresses the same dual-alias policy as one dominating containment guard.",
+    "The full dotenv/source matrix in recovery-after.log was run for the first repair. After the guard-only follow-up, both temporary aliases are checked natively and the canonical-path ordinary/prepared source matrix is rerun with --source-only. Dotenv/compiler/runtime implementation is unchanged by either PR review repair."
   ]
 }
 ```
@@ -189,6 +216,7 @@ Allocate evidence with mkdtemp instead of accepting an output path; normalize/ch
 ```json
 [
   "Historical before/after application logs remain unchanged; only the executable archived probe phase selection is hardened.",
-  "Regression tests were initially authored under packages/cli/tests/dev-environment/paths.test.ts, then moved to tests/security/dev-recovery-probe-paths.test.ts so the standard CI security gate executes them."
+  "Regression tests were initially authored under packages/cli/tests/dev-environment/paths.test.ts, then moved to tests/security/dev-recovery-probe-paths.test.ts so the standard CI security gate executes them.",
+  "The actual hosted CodeQL failure is retained before the follow-up. The query's primary-source StartsWithDirSanitizer and RelativePathStartsWithSanitizer were inspected; no suppression, dismissal, query exclusion, or output waiver was added."
 ]
 ```
