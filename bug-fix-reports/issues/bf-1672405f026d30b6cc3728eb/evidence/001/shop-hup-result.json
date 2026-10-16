@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "actualCommercePreparedFastPath": true,
+  "cliPid": 68910,
+  "signal": "SIGHUP",
+  "exitCode": 129,
+  "ownedProcessesJoined": 4,
+  "ownerExited": true,
+  "bothListenersClosed": true,
+  "shutdownDiagnostics": true,
+  "nativeExitReceiptRetained": true
+}

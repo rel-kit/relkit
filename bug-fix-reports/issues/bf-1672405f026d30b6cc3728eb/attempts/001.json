@@ -1,0 +1,404 @@
+{
+  "schema_version": 1,
+  "id": "bf-1672405f026d30b6cc3728eb",
+  "fingerprint": "1672405f026d30b6cc3728ebdd961ba379fff53a6546d70432bb40ba1ee2b3fb",
+  "identity": {
+    "entrypoint": "relkit dev (prepared)",
+    "module": "invocation-signals",
+    "symptom": "sighup terminates prepared cli without shutdown diagnostics and leaves owned descendants",
+    "scenario": "prepared-terminal-hangup",
+    "error": "unhandled sighup"
+  },
+  "attempt": 1,
+  "created_at": "2026-10-16T11:53:45+00:00",
+  "updated_at": "2026-10-16T13:11:50+00:00",
+  "status": "verified",
+  "what": "Prepared dev exits abruptly on terminal hangup and leaves its owned backend, inspector, and storage worker running.",
+  "expected": "Native SIGHUP enters invocation cancellation, records shutdown diagnostics, joins all owned resources, and returns signal exit status 129.",
+  "observed": "Actual prepared HTTP and inspector readiness passed; SIGHUP then returned native signal exit -1 without shutdown diagnostics, leaving three owned descendants. The unit test found no invocation SIGHUP listener.",
+  "root_cause": "invocation-signals.ts:13 installed INT/TERM but no HUP owner; snapshot-session-options.ts:42 disables manual-session handlers in favor of that invocation owner. A prepared SIGHUP therefore bypassed Scope release, killed the proxy CLI, and orphaned its backend, inspector and storage worker. During initial/ordinary startup, main-support.ts:isFailure and the CliFailure/CliFailureError contracts also rejected HUP metadata, replacing the original reason/status129 with generic status130.",
+  "fixed_by": "Verified native HUP invocation cancellation and its typed public failure contract. Both owners now preserve SIGHUP/status129, join resource cleanup and remove their own listeners. The prepared native replay and actual e-commerce HUP test close all owned processes/listeners; the final detached preview retains its eventual native exit code via a lightweight owner receipt.",
+  "files": [
+    "packages/cli/src/invocation-signals.ts",
+    "packages/cli/src/cli-errors.ts",
+    "packages/cli/src/main-support.ts",
+    "packages/cli/src/main-support-types.ts",
+    "packages/cli/tests/invocation/signals.test.ts",
+    "packages/cli/tests/services/dev-initial-native.test.ts",
+    ".changeset/prepared-dev-hangup-cleanup.md"
+  ],
+  "tags": [
+    "dev",
+    "prepared-startup",
+    "signals",
+    "shutdown",
+    "owned-process-cleanup"
+  ],
+  "related": [
+    "bf-625fd985faaf71cd148396fc"
+  ],
+  "scope": {
+    "modules": [
+      "Native invocation signal ownership",
+      "Prepared dev session",
+      "Supervisor process cleanup"
+    ],
+    "entrypoints": [
+      "relkit dev (prepared)",
+      "relkit dev (ordinary)"
+    ],
+    "invariants": [
+      "Catchable native shutdown signals join owned children",
+      "Release removes only invocation-owned listeners",
+      "Original cancellation reason is retained"
+    ]
+  },
+  "environment": {
+    "package": "@relkit/cli",
+    "revision": "ebc3a2544ad5521016fd9efc8db3ff1930a3fb75 plus uncommitted signal fix",
+    "target": "Actual source CLI, physically contained local fixture and prepared e-commerce app at http://127.0.0.1:3400",
+    "api_exposed": false,
+    "e2e_available": true,
+    "monitoring": "Existing native CLI lifecycle, candidate, cleanup and HTTP logs plus owned process-table snapshots. No external crash-tracker evidence establishes the original stop signal. Bun1.3.10 and Effect4.0.1; all workload serialized, worker1 and nice15."
+  },
+  "reproduction": [
+    "Prepare a physically contained minimal app with the actual source CLI",
+    "Start the prepared CLI and assert exact HTTP handler output plus real inspector readiness",
+    "Confirm the backend command executes from the prepared session directory",
+    "Send SIGHUP only to the owned CLI and assert joined exit 129, diagnostics, and no remaining descendants"
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.log",
+        "note": "Assertion-bearing actual CLI reproduction exits 1; prepared CLI died on SIGHUP and left all three descendants."
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.log",
+        "note": "2 existing signal cases pass; missing HUP listener assertion fails."
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/classification-unit-before.log",
+        "note": "After listener repair, original HUP reason still failed presentation classification."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/native-regressions.log",
+        "note": "Actual native initial compilation HUP returned130 instead of129 before typed contract repair."
+      }
+    ],
+    "after": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-after-final-final.log",
+        "note": "Same actual prepared HUP scenario now exits129 with diagnostics and no children."
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/check-native-regressions.log",
+        "note": "14 Bun tests pass, including tracked native initial-compilation TERM/HUP E2E cases and unit contract boundaries."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/matrix-results-final.json",
+        "note": "Six sequential ordinary/prepared signal and idle cases all pass."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/shop-hup-result.json",
+        "note": "Actual prepared commerce HUP exits129, joins four owned processes and closes both listeners."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/shop-hup-exit-receipt.json",
+        "note": "Detached owner retained the actual129 native exit result."
+      },
+      {
+        "kind": "api",
+        "path": "evidence/001/shop-final-live.json",
+        "note": "Auth, catalog3, cart7200, order4900, SQLite read-back and three links pass after restart."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/final-integrity.json",
+        "note": "Full current source/dependency/artifact/graph validation passes before and after live requests on unchanged final CLI69188."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/final-audit.json",
+        "note": "All fixture roots/processes cleaned, current preview ownership/nice15, source identities and empty staging verified."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/final-secret-and-git-audit.json",
+        "note": "Final owner running, no private values in new evidence, unchangedHEAD and empty staging."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/full-monorepo-after-fix.json",
+        "note": "Fresh full local monorepo rerun30/30, no failures or further product fixes; all7213 initial source identities preserved; unchanged live CLI69188, business data and full capsule integrity pass."
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "rtk sh -c 'bun test --max-concurrency 1 packages/cli/tests/invocation/signals.test.ts'",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Each native signal has exactly one invocation-owned cancellation handler",
+        "output": "evidence/001/unit-before.log"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk sh -c 'RAYON_NUM_THREADS=1 UV_THREADPOOL_SIZE=1 CIRCLE_NODE_TOTAL=2 nice -n 15 python3 test-results/dev-process-lifetime-20261016/checks.py'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Native signal cancellation, exact listener release, first-reason retention, HUP classification and unsupported metadata boundaries all pass",
+        "output": "evidence/001/check-native-regressions.log"
+      }
+    },
+    "runtime": {
+      "kind": "integration",
+      "reason": "Failure is native CLI process ownership and signal cancellation, not an API operation; actual HTTP and inspector traffic establish serving readiness before native signal delivery.",
+      "boundary": "Source CLI bin -> prepared validation/activation -> public HTTP proxy + real backend/inspector/storage -> native HUP -> joined supervisor cleanup",
+      "dependencies": [
+        "Actual native Bun CLI and OS signals/process table",
+        "Physically contained generated application and installed package tree",
+        "Actual Next inspector and local storage worker; no mocked failing adapter"
+      ],
+      "steps": [
+        "Prepare a physically contained minimal app with the actual source CLI",
+        "Start the prepared CLI and assert exact HTTP handler output plus real inspector readiness",
+        "Confirm the backend command executes from the prepared session directory",
+        "Send SIGHUP only to the owned CLI and assert joined exit 129, diagnostics, and no remaining descendants"
+      ],
+      "before": {
+        "status": "failed",
+        "command": "rtk sh -c 'RELKIT_LIFETIME_EVIDENCE=/Users/mustafaelsayed/Workspace/relkit/bug-fix-reports/issues/bf-1672405f026d30b6cc3728eb/evidence/001 RELKIT_LIFETIME_LABEL=runtime-before python3 test-results/dev-process-lifetime-20261016/probe.py hup --prepared --expect-graceful'",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Prepared HUP returns129 with diagnostics and no remaining owned descendants",
+        "output": "evidence/001/runtime-before.log"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk sh -c 'RELKIT_LIFETIME_MATRIX_SUFFIX=-final nice -n 15 python3 test-results/dev-process-lifetime-20261016/matrix.py'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Same prepared HUP returns129 with diagnostics and no remaining owned descendants",
+        "output": "evidence/001/runtime-after-final-final.log"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "rtk sh -c 'RAYON_NUM_THREADS=1 UV_THREADPOOL_SIZE=1 CIRCLE_NODE_TOTAL=2 nice -n 15 python3 test-results/dev-process-lifetime-20261016/checks.py'",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Tracked real CLI E2E joins the CPU-bound initial compiler and its descendant under HUP/TERM; protocol/bootstrap tests also pass",
+      "output": "evidence/001/check-native-regressions.log"
+    },
+    "regressions": [
+      {
+        "status": "passed",
+        "command": "rtk sh -c 'RELKIT_LIFETIME_MATRIX_SUFFIX=-final nice -n 15 python3 test-results/dev-process-lifetime-20261016/matrix.py'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Native runtime-after-final-final retains expected HTTP output, correct signal exit, owned cleanup or unchanged idle CLI",
+        "output": "evidence/001/runtime-after-final-final.log",
+        "kind": "integration",
+        "boundary": "Native CLI + actual HTTP handler + inspector + OS process ownership"
+      },
+      {
+        "status": "passed",
+        "command": "rtk sh -c 'RELKIT_LIFETIME_MATRIX_SUFFIX=-final nice -n 15 python3 test-results/dev-process-lifetime-20261016/matrix.py'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Native ordinary-hup-after-final retains expected HTTP output, correct signal exit, owned cleanup or unchanged idle CLI",
+        "output": "evidence/001/ordinary-hup-after-final.log",
+        "kind": "integration",
+        "boundary": "Native CLI + actual HTTP handler + inspector + OS process ownership"
+      },
+      {
+        "status": "passed",
+        "command": "rtk sh -c 'RELKIT_LIFETIME_MATRIX_SUFFIX=-final nice -n 15 python3 test-results/dev-process-lifetime-20261016/matrix.py'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Native ordinary-int-after-final retains expected HTTP output, correct signal exit, owned cleanup or unchanged idle CLI",
+        "output": "evidence/001/ordinary-int-after-final.log",
+        "kind": "integration",
+        "boundary": "Native CLI + actual HTTP handler + inspector + OS process ownership"
+      },
+      {
+        "status": "passed",
+        "command": "rtk sh -c 'RELKIT_LIFETIME_MATRIX_SUFFIX=-final nice -n 15 python3 test-results/dev-process-lifetime-20261016/matrix.py'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Native prepared-term-after-final retains expected HTTP output, correct signal exit, owned cleanup or unchanged idle CLI",
+        "output": "evidence/001/prepared-term-after-final.log",
+        "kind": "integration",
+        "boundary": "Native CLI + actual HTTP handler + inspector + OS process ownership"
+      },
+      {
+        "status": "passed",
+        "command": "rtk sh -c 'RELKIT_LIFETIME_MATRIX_SUFFIX=-final nice -n 15 python3 test-results/dev-process-lifetime-20261016/matrix.py'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Native prepared-int-after-final retains expected HTTP output, correct signal exit, owned cleanup or unchanged idle CLI",
+        "output": "evidence/001/prepared-int-after-final.log",
+        "kind": "integration",
+        "boundary": "Native CLI + actual HTTP handler + inspector + OS process ownership"
+      },
+      {
+        "status": "passed",
+        "command": "rtk sh -c 'RELKIT_LIFETIME_MATRIX_SUFFIX=-final nice -n 15 python3 test-results/dev-process-lifetime-20261016/matrix.py'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Native prepared-idle-after-final retains expected HTTP output, correct signal exit, owned cleanup or unchanged idle CLI",
+        "output": "evidence/001/prepared-idle-after-final.log",
+        "kind": "integration",
+        "boundary": "Native CLI + actual HTTP handler + inspector + OS process ownership"
+      },
+      {
+        "status": "passed",
+        "command": "rtk python3 test-results/dev-process-lifetime-20261016/shop-proof.py bug-fix-reports/issues/bf-1672405f026d30b6cc3728eb/evidence/001/shop-final-live.json",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Final commerce auth/catalog/cart/order and independent SQLite read-back match persisted state; all three links respond",
+        "output": "evidence/001/shop-final-live.json",
+        "kind": "api",
+        "boundary": "Real commerce HTTP/auth/services/SQLite"
+      },
+      {
+        "status": "passed",
+        "command": "rtk sh -c 'RAYON_NUM_THREADS=1 UV_THREADPOOL_SIZE=1 CIRCLE_NODE_TOTAL=2 nice -n 15 bun test-results/dev-process-lifetime-20261016/final-integrity.probe.ts bug-fix-reports/issues/bf-1672405f026d30b6cc3728eb/evidence/001/final-integrity.json'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Complete snapshot integrity validates before and after live requests with unchanged CLI",
+        "output": "evidence/001/final-integrity.log",
+        "kind": "integration",
+        "boundary": "Actual DevSnapshots validation + current source/dependency/artifact/graph cohort + real HTTP"
+      }
+    ],
+    "checks": [
+      {
+        "status": "passed",
+        "command": "nice -n 15 bun x prettier --write packages/cli/src/invocation-signals.ts packages/cli/src/cli-errors.ts packages/cli/src/main-support.ts packages/cli/src/main-support-types.ts packages/cli/tests/invocation/signals.test.ts packages/cli/tests/services/dev-initial-native.test.ts .changeset/prepared-dev-hangup-cleanup.md",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "format passes",
+        "output": "evidence/001/check-format.log",
+        "name": "format"
+      },
+      {
+        "status": "passed",
+        "command": "nice -n 15 bun test --max-concurrency 1 packages/cli/tests/invocation/signals.test.ts packages/cli/tests/services/dev-initial-native.test.ts packages/cli/commands-protocol.test.ts scripts/tests/dev-readiness/bootstrap-imports.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "native-regressions passes",
+        "output": "evidence/001/check-native-regressions.log",
+        "name": "native-regressions"
+      },
+      {
+        "status": "passed",
+        "command": "nice -n 15 bun x vitest run --maxWorkers=1 --no-file-parallelism packages/cli/main.test.ts packages/cli/tests/invocation/logging.test.ts packages/cli/tests/services/process.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "main-regressions passes",
+        "output": "evidence/001/check-main-regressions.log",
+        "name": "main-regressions"
+      },
+      {
+        "status": "passed",
+        "command": "nice -n 15 bun x tsc -b packages/cli --pretty false",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "typecheck passes",
+        "output": "evidence/001/check-typecheck-result.json",
+        "name": "typecheck"
+      },
+      {
+        "status": "passed",
+        "command": "nice -n 15 bun run scripts/package-dev-bootstrap.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "bootstrap-build passes",
+        "output": "evidence/001/check-bootstrap-build-result.json",
+        "name": "bootstrap-build"
+      },
+      {
+        "status": "passed",
+        "command": "nice -n 15 bun run lint",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "lint passes",
+        "output": "evidence/001/check-lint.log",
+        "name": "lint"
+      },
+      {
+        "status": "passed",
+        "command": "nice -n 15 bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "boundaries passes",
+        "output": "evidence/001/check-boundaries.log",
+        "name": "boundaries"
+      },
+      {
+        "status": "passed",
+        "command": "nice -n 15 bun run konsistent -- validate",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "konsistent passes",
+        "output": "evidence/001/check-konsistent.log",
+        "name": "konsistent"
+      },
+      {
+        "status": "passed",
+        "command": "nice -n 15 git diff --check",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "diff-check passes",
+        "output": "evidence/001/check-diff-check-result.json",
+        "name": "diff-check"
+      },
+      {
+        "status": "passed",
+        "command": "rtk bun x prettier --check packages/cli/src/invocation-signals.ts packages/cli/src/cli-errors.ts packages/cli/src/main-support.ts packages/cli/src/main-support-types.ts packages/cli/tests/invocation/signals.test.ts packages/cli/tests/services/dev-initial-native.test.ts .changeset/prepared-dev-hangup-cleanup.md",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Changed source/tests/changeset conform to formatter",
+        "output": "evidence/001/format-check.log",
+        "name": "format-check"
+      },
+      {
+        "name": "fresh-full-monorepo-suite",
+        "status": "passed",
+        "command": "rtk python3 test-results/full-suite-after-sighup-20261016/run.py",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "All30 default local validation stages pass on the unchanged latest signal-fix source; final app and integrity checks pass through unchanged CLI69188",
+        "output": "evidence/001/full-monorepo-after-fix.json"
+      }
+    ],
+    "limitations": [
+      "The exact historical stop cause remains not reproduced; SIGHUP is a separately proven defect, not proven attribution.",
+      "An intentional HUP still requests shutdown; the fix joins cleanup, preserves reason/status and avoids orphaned children. It does not ignore shutdown signals or auto-restart after arbitrary external termination.",
+      "Final startup briefly overlapped the final preparation tail. Both completed, actual prepared backend execution was confirmed and complete current cohort validation passed before and after real business requests.",
+      "The read-only upstream Effect checkout lacks the Schema implementation/examples; compatibility was checked against installed Effect4.0.1 source and available upstream schema tests."
+    ]
+  },
+  "notes": [
+    "This is a reproduced shutdown-path defect. No retained signal or exit status establishes that HUP caused the historical CLI55765 disappearance. That incident is tracked separately as bf-625fd985faaf71cd148396fc.",
+    "First after-replay's diagnostic assertion missed human-formatted 'Stopping development server'; retained runtime-after.log records this harness error. Corrected predicate and full native replay pass; no failure was hidden or relabeled.",
+    "The classification regression was reproduced as both a failing unit and real initial native CLI exit130 before extending the failure schema, public signal union, constructors and narrowing predicate.",
+    "Final preview CLI69188 / receipt-owner69187 are detached at nice15, with actual prepared backend69206, inspector69212 and storage69213. Stop gracefully with kill -TERM 69188; the owner records the exit and exits itself.",
+    "User explicitly authorized leaving the app running. All temporary fixture processes/roots were joined/removed; no unrelated process was killed, no app-root input was edited, and staging/HEAD are unchanged.",
+    "Final secret-value scan across both issue evidence directories and new runtime logs found no retained auth-cookie or dotenv secret values.",
+    "Follow-up full monorepo validation completed after the signal fix:30/30 stages passed fresh, including all793 mutation cases and browser acceptance. No additional product source edits were needed. Current app remained running throughout with CLI69188 unchanged."
+  ]
+}

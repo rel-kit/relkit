@@ -1,0 +1,21 @@
+15:04:40.952 INFO  relkit            Starting development server
+15:04:40.969 INFO  build             Compiling application
+15:04:41.337 INFO  build             Compiled in 367ms
+15:04:41.338 INFO  server            Ready
+                                     API        http://127.0.0.1:3400
+                                     Reference  http://127.0.0.1:3400/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:3400/_relkit/v1/openapi.json
+15:04:41.552 INFO  http              GET / → 200 in 16ms
+15:04:41.820 INFO  http              GET / → 200 in 8ms
+15:04:42.089 INFO  http              GET / → 200 in 5ms
+15:04:42.353 INFO  http              GET / → 200 in 6ms
+15:04:42.619 INFO  http              GET / → 200 in 5ms
+15:04:42.725 INFO  relkit            dev.storage.ready
+15:04:42.920 INFO  relkit            dev.inspector.ready
+15:04:47.120 INFO  http              GET /products → 200 in 99ms
+15:04:47.235 INFO  http              GET /api/auth/get-session → 200 in 71ms
+15:04:47.302 INFO  http              GET /cart → 200 in 57ms
+15:04:47.397 INFO  http              GET /orders/28fab114-36c2-4af6-8965-a69c73004fad → 200 in 65ms
+15:04:47.436 INFO  http              GET / → 200 in 5ms
+15:05:11.880 INFO  relkit            Stopping development server
+15:05:11.982 INFO  relkit            Development server stopped
