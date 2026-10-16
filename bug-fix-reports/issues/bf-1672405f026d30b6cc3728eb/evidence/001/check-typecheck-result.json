@@ -1,0 +1,16 @@
+{
+  "name": "typecheck",
+  "command": [
+    "bun",
+    "x",
+    "tsc",
+    "-b",
+    "packages/cli",
+    "--pretty",
+    "false"
+  ],
+  "exitCode": 0,
+  "seconds": 6.51,
+  "rawLog": "check-typecheck.log",
+  "stdoutAndStderrBytes": 0
+}

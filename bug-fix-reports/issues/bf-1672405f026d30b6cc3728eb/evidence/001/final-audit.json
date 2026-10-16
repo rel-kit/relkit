@@ -1,0 +1,58 @@
+{
+  "head": "ebc3a2544ad5521016fd9efc8db3ff1930a3fb75",
+  "stagedPaths": 0,
+  "uncommitted": true,
+  "allSixFixtureRootsRemoved": true,
+  "allFixtureOwnedProcessesJoined": true,
+  "finalPreview": {
+    "status": "passed",
+    "cliPid": 69188,
+    "ownerPid": 69187,
+    "actualPreparedFastPath": true,
+    "processes": [
+      {
+        "pid": 69187,
+        "parent": 1,
+        "nice": 15,
+        "kind": "owner"
+      },
+      {
+        "pid": 69188,
+        "parent": 69187,
+        "nice": 15,
+        "kind": "cli"
+      },
+      {
+        "pid": 69206,
+        "parent": 69188,
+        "nice": 15,
+        "kind": "prepared-backend"
+      },
+      {
+        "pid": 69212,
+        "parent": 69188,
+        "nice": 15,
+        "kind": "inspector"
+      },
+      {
+        "pid": 69213,
+        "parent": 69188,
+        "nice": 15,
+        "kind": "storage-worker"
+      }
+    ],
+    "stop": "kill -TERM 69188",
+    "app": "http://127.0.0.1:3400",
+    "inspector": "http://127.0.0.1:3410",
+    "exitReceipt": "/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/evidence/dev-process-lifetime-20261016/final-preview/preview-session.json"
+  },
+  "files": {
+    "packages/cli/src/invocation-signals.ts": "62708d9709db7d6e1f6d5da87a6c6bac0457b96baaf8b64e6205e93ea5e3f6ab",
+    "packages/cli/src/cli-errors.ts": "69a3ed8f2affbcbabc72f20ac5195514313ccbffe2b2fe025ab56db4ac455748",
+    "packages/cli/src/main-support.ts": "aa2b9955e9943b28d5479560cfca19b4546827406d256645916b96d7c1c617c8",
+    "packages/cli/src/main-support-types.ts": "4f6fd9b884afe054e5f0ed327d43ae3378e90e6fded15c9fade0ad40dda61c94",
+    "packages/cli/tests/invocation/signals.test.ts": "da68585af01a5e0fe1408e2492c9780dd57e13d5ce0e7654483cb6e6d8e7d04b",
+    "packages/cli/tests/services/dev-initial-native.test.ts": "5c649da5f122a1dbc96eb3399164bdb42a2162512ee7be05456503b3b0fde78d",
+    ".changeset/prepared-dev-hangup-cleanup.md": "4e511e63bf67c9b65c133c9f3d2175fb5ee058d2519d02e7977b2e3ed7f45d81"
+  }
+}

@@ -1,0 +1,61 @@
+[15:06:59.657] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.seal-artifacts",
+  outcome: "success",
+  duration_ms: 14.90475,
+}
+[15:06:59.796] INFO (#431): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.typecheckQueries",
+  outcome: "success",
+  duration_ms: 102.553125,
+}
+[15:06:59.804] INFO (#429): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 118.418041,
+}
+[15:06:59.942] INFO (#430): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.current-members",
+  outcome: "success",
+  duration_ms: 256.175334,
+}
+[15:06:59.942] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.validate",
+  outcome: "success",
+  duration_ms: 341.070708,
+}
+[15:07:00.172] INFO (#432): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.seal-artifacts",
+  outcome: "success",
+  duration_ms: 12.7625,
+}
+[15:07:00.239] INFO (#862): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.typecheckQueries",
+  outcome: "success",
+  duration_ms: 44.09775,
+}
+[15:07:00.243] INFO (#860): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 51.655167,
+}
+[15:07:00.309] INFO (#861): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.current-members",
+  outcome: "success",
+  duration_ms: 117.51175,
+}
+[15:07:00.309] INFO (#432): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.validate",
+  outcome: "success",
+  duration_ms: 177.736709,
+}
+{"status":"passed","generation":"sha256:317e000a51693740fbd1bb26620f92ffa2a53d7723d689c07028cbe2e331a7e5","snapshotCurrentBeforeAndAfterLiveRequests":true,"sourceDependencyArtifactAndGraphValidation":true,"cliPid":69188,"ownerPid":69187,"catalogProducts":3,"authenticated":true,"cartTotalCents":7200,"historicalOrderTotalCents":4900,"liveLinks":3}
