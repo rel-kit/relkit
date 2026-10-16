@@ -1,0 +1,48 @@
+{
+  "scenario": "runtime-before",
+  "fixture": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-q49h2e5b",
+  "appPort": 58490,
+  "inspectorPort": 58491,
+  "cliPid": 59808,
+  "initialHandler": "Hello, lifetime!",
+  "inspectorReady": true,
+  "preparedFastPath": true,
+  "ownedProcesses": [
+    {
+      "pid": 59808,
+      "parent": 59206,
+      "command": "bun /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts dev --port 58490 --inspector-port 58491 --local off --no-color --verbose"
+    },
+    {
+      "pid": 59811,
+      "parent": 59808,
+      "command": "/Users/mustafaelsayed/.bun/bin/bun --no-env-file /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-q49h2e5b/.relkit/dev/sessions/dev-session-ZUwcT1/generation-1/server/index.js"
+    },
+    {
+      "pid": 59844,
+      "parent": 59808,
+      "command": "next-server (v RELKIT_LIFETIME_LABEL=runtime-before"
+    },
+    {
+      "pid": 59845,
+      "parent": 59808,
+      "command": "node /Users/mustafaelsayed/Workspace/relkit/packages/observability/dist/local/duckdb-worker.js"
+    }
+  ],
+  "exitCode": -1,
+  "signalSent": "SIGHUP",
+  "shutdownDiagnostic": false,
+  "survivingDescendantsAtExit": [
+    59811,
+    59844,
+    59845
+  ]
+}
+Traceback (most recent call last):
+  File "/Users/mustafaelsayed/Workspace/relkit/test-results/dev-process-lifetime-20261016/probe.py", line 163, in <module>
+    main()
+    ~~~~^^
+  File "/Users/mustafaelsayed/Workspace/relkit/test-results/dev-process-lifetime-20261016/probe.py", line 149, in main
+    assert result["exitCode"] == expected, f"Expected joined signal exit {expected}, observed {result['exitCode']}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Expected joined signal exit 129, observed -1
