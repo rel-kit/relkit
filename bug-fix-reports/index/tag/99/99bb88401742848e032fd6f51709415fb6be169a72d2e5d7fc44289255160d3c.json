@@ -49,6 +49,21 @@
       "attempt": 1,
       "updated_at": "2026-10-02T11:59:25+00:00",
       "report": "bug-fix-reports/issues/bf-b7ee23d5a794f98a368839bd/report.md"
+    },
+    "bf-a5676dfc2d59af8017c415c5": {
+      "id": "bf-a5676dfc2d59af8017c415c5",
+      "status": "verified",
+      "what": "PR #120 CodeQL path injection findings in recovery/evidence probes",
+      "root_cause": "The recovery probe passed argv[3] through resolve into mkdir and multiple writeFile calls, and called realpath(argv[2]) before establishing its temporary-root boundary. The archived probe interpolated argv[2] without restricting phases.",
+      "fixed_by": "Allocate evidence with mkdtemp instead of accepting an output path; normalize/check the temporary app boundary before realpath and validate the canonical result; select archived phases from literal before/after/smoke returns. Run regressions in the CI security suite. Native ordinary/prepared recovery matrices and prepu",
+      "files": [
+        "packages/cli/tests/dev-environment/recovery.probe.ts",
+        "tests/security/dev-recovery-probe-paths.test.ts",
+        "bug-fix-reports/issues/bf-6c1f59bebfd1c8865038fc52/evidence/001/runtime.probe.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-16T18:59:43+00:00",
+      "report": "bug-fix-reports/issues/bf-a5676dfc2d59af8017c415c5/report.md"
     }
   }
 }
