@@ -1,0 +1,20 @@
+{
+  "key": "c7e0a9416b68b0c54a9942e6b2b5248033363ce10e9075dc2484160e374c4b09",
+  "matches": {
+    "bf-c7e0a9416b68b0c54a9942e6": {
+      "id": "bf-c7e0a9416b68b0c54a9942e6",
+      "status": "verified",
+      "what": "minimal template certificate digest is stale",
+      "root_cause": "templates/default/v1/minimal/tsconfig.json gained the required context registry declaration; packages/create-relkit/src/create-capabilities.ts retains the certificate for the previous complete template digest.",
+      "fixed_by": "Regenerated the certificate table and fresh/restart JSON through certifyCreation with concurrency 1, unchanged 20 runs per set and a 1,000 ms threshold. Fresh maximum 587.18 ms and restart maximum 527.16 ms; the previously failing package stage and all 30 local validation stages pass.",
+      "files": [
+        "packages/create-relkit/src/create-capabilities.ts",
+        "docs/evidence/create-capabilities/0.7.6/fresh.json",
+        "docs/evidence/create-capabilities/0.7.6/restart.json"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T23:42:49+00:00",
+      "report": "bug-fix-reports/issues/bf-c7e0a9416b68b0c54a9942e6/report.md"
+    }
+  }
+}

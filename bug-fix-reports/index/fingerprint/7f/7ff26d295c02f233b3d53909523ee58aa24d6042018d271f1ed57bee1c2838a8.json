@@ -1,0 +1,19 @@
+{
+  "key": "6c16eaa4c0d654629db8b963d2d62226f9f7b2641ec645af55a47996022698ca",
+  "matches": {
+    "bf-6c16eaa4c0d654629db8b963": {
+      "id": "bf-6c16eaa4c0d654629db8b963",
+      "status": "verified",
+      "what": "The full integration suite could not compare flat and grouped commerce layouts because flat fixture preparation rejected absent destination directories.",
+      "root_cause": "flattenCommerce in tests/integration/fixtures/paired-commerce-project.ts scanned destinations before creating them, used Bun.Glob's default dotfile exclusion, and performed that validation after the source rewrite pass.",
+      "fixed_by": "Preflight every service destination before rewriting: create absent directories, include dotfiles in residue detection, and reject authored collisions. Five filesystem regressions and both maintained native commerce acceptance layouts pass.",
+      "files": [
+        "tests/integration/fixtures/paired-commerce-project.ts",
+        "tests/unit/paired-commerce-project.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:07:51+00:00",
+      "report": "bug-fix-reports/issues/bf-6c16eaa4c0d654629db8b963/report.md"
+    }
+  }
+}
