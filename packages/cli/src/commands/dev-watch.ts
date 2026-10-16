@@ -9,6 +9,7 @@ import { makeDevWatchOwner } from "./dev-watch-owner.js";
 import { syncWatchConfigurations } from "./dev-watch-config.js";
 import { startWatchWorker } from "./dev-watch-worker.js";
 import { ignoredWatchPath } from "./dev-watch-paths.js";
+import { developmentEnvironmentFiles } from "./dev-environment-files.js";
 import type { DevSession } from "./dev-session.js";
 import type { EffectDevSourceWatcher, DevSourceWatcher } from "./dev-watch.types.js";
 export type { DevSourceWatcher } from "./dev-watch.types.js";
@@ -55,7 +56,7 @@ export const makeDevSourceWatcherEffect = Effect.fn("Dev.watch")(
           owner.failure,
         ),
       );
-    for (const file of [".env", ".env.local"])
+    for (const file of developmentEnvironmentFiles(process.env.NODE_ENV))
       yield* owner.register(native.poll(join(root, file), () => owner.notify([file])));
     yield* startWatchWorker(session, native, owner);
     return { close: owner.close, closeEffect: owner.closeEffect } satisfies EffectDevSourceWatcher;
@@ -69,5 +70,7 @@ export const makeDevSourceWatcherEffect = Effect.fn("Dev.watch")(
  * @returns Existing synchronous admission-close facade.
  */
 export function startDevSourceWatcher(session: DevSession): DevSourceWatcher {
-  return session.runSynchronous(session.nativeEngine.watch);
+  return session.runSynchronous(
+    session.nativeEngine.watchWith(makeDevSourceWatcherEffect(session)),
+  );
 }

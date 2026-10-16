@@ -11,6 +11,7 @@ import type { EffectDevInspector } from "./dev-process.types.js";
 import type { EffectDevSourceWatcher } from "./dev-watch.types.js";
 import type { CleanupCapabilities } from "../services/cleanup.types.js";
 import type { SupervisorCandidateToken } from "@relkit/supervisor";
+import type { DevEngineAuthorities } from "./dev-engine-state.types.js";
 
 /** One caller waiting for an admitted source version. */
 export interface DevActivationRequest {
@@ -60,6 +61,14 @@ export interface DevSessionEngine {
   readonly wait: Effect.Effect<void>;
   /** Acquires source watchers and their debounced worker in the session Scope. */
   readonly watch: Effect.Effect<EffectDevSourceWatcher, CliAdapterError>;
+  /** Captures an already-loaded watcher operation in the existing native scope. */
+  readonly watchWith: (
+    effect: Effect.Effect<
+      EffectDevSourceWatcher,
+      CliAdapterError,
+      DevEngineAuthorities | Scope.Scope
+    >,
+  ) => Effect.Effect<EffectDevSourceWatcher, CliAdapterError>;
   /**
    * Native callbacks request shutdown without executing a nested runtime.
    * @param reason - Native signal, watcher or child-exit failure.

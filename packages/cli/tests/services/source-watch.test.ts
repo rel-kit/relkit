@@ -31,7 +31,7 @@ it.live(
           watcher.close();
           yield* watcher.closeEffect;
           yield* watcher.closeEffect;
-          expect(fixture.released).toEqual(["watch", "env", "env.local"]);
+          expect(fixture.released).toEqual(["watch", ".env", ".env.test", ".env.test.local"]);
           const evidence = yield* CliCleanup.use((cleanup) => cleanup.snapshot());
           expect(evidence.map((issue) => issue.operation)).toEqual([
             "dev.watch.native",
