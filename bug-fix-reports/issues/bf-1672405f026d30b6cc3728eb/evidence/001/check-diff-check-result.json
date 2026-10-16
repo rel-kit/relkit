@@ -1,0 +1,12 @@
+{
+  "name": "diff-check",
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "exitCode": 0,
+  "seconds": 0.08,
+  "rawLog": "check-diff-check.log",
+  "stdoutAndStderrBytes": 0
+}

@@ -1,0 +1,12 @@
+{
+  "name": "bootstrap-build",
+  "command": [
+    "bun",
+    "run",
+    "scripts/package-dev-bootstrap.ts"
+  ],
+  "exitCode": 0,
+  "seconds": 1.68,
+  "rawLog": "check-bootstrap-build.log",
+  "stdoutAndStderrBytes": 0
+}
