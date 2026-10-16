@@ -1,0 +1,13 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  7 passed (7)
+      Tests  16 passed (16)
+   Start at  22:48:12
+   Duration  6.27s (import 58%, transform 36%, tests 6%)
+
+     Import  751 modules were evaluated 1360 times · 3.35s total, 58% of tracked time
+             ~1.50s faster with isolate: false — shared modules are evaluated once per worker instead of once per file
+             learn more: https://vitest.dev/guide/improving-performance#test-isolation
+

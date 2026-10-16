@@ -1,0 +1,1857 @@
+{"root":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq","pid":34879}
+[21:13:43.238] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.recipe.acquire",
+  outcome: "success",
+  duration_ms: 0.683875,
+}
+[21:13:43.240] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.bridge",
+  outcome: "success",
+  duration_ms: 0.502042,
+}
+[21:13:43.240] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.acquire",
+  outcome: "success",
+  duration_ms: 4.333042,
+}
+[21:13:43.245] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.acquire",
+  outcome: "success",
+  duration_ms: 0.703417,
+}
+{"component":"cli.dev","fields":{},"level":"info","message":"dev.starting","signal":"log","timestamp":"2026-10-15T18:13:43.246Z","version":2}
+[21:13:43.249] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "port.check",
+  outcome: "success",
+  duration_ms: 0.107042,
+}
+[21:13:43.255] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.proxy.listen",
+  outcome: "success",
+  duration_ms: 6.412125,
+}
+{"component":"cli.dev","fields":{"phase":"idle","state":"compiling-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:13:43.264Z","version":2}
+{"component":"cli.dev","fields":{"files":[],"initial":true},"level":"info","message":"dev.build.started","signal":"log","timestamp":"2026-10-15T18:13:43.266Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-1"},"level":"debug","message":"candidate.compile.started","signal":"log","timestamp":"2026-10-15T18:13:43.273Z","version":2}
+[21:13:46.764] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.release",
+  outcome: "success",
+  duration_ms: 0.515125,
+}
+[21:13:46.764] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.check",
+  outcome: "success",
+  duration_ms: 3487.892292,
+}
+[21:13:46.766] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stage",
+  outcome: "success",
+  duration_ms: 0.360042,
+}
+[21:13:46.775] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.287625,
+}
+[21:13:46.781] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 2.50275,
+}
+[21:13:46.782] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.375166,
+}
+[21:13:46.783] ERROR (#134): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.877875,
+}
+[21:13:46.783] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "build.stageJobs",
+  outcome: "success",
+  duration_ms: 1.332667,
+}
+[21:13:46.783] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.264709,
+}
+[21:13:46.784] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.187417,
+}
+[21:13:46.784] ERROR (#134): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.132,
+}
+[21:13:46.787] INFO (#186): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.711459,
+}
+[21:13:46.787] INFO (#187): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.949958,
+}
+[21:13:46.787] INFO (#189): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.936834,
+}
+[21:13:46.788] INFO (#188): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 2.028334,
+}
+[21:13:46.788] INFO (#190): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.297875,
+}
+[21:13:46.788] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.symlink",
+  outcome: "success",
+  duration_ms: 0.245875,
+}
+[21:13:47.046] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 1.310333,
+}
+[21:13:47.046] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 248.402458,
+}
+[21:13:47.046] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.unlink",
+  outcome: "success",
+  duration_ms: 0.220917,
+}
+[21:13:47.047] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "build.moduleLink.remove",
+  outcome: "success",
+  duration_ms: 0.426833,
+}
+[21:13:47.047] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "build.bundleServer",
+  outcome: "success",
+  duration_ms: 258.824833,
+}
+[21:13:47.047] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.283792,
+}
+[21:13:47.048] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.166834,
+}
+[21:13:47.048] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.276,
+}
+[21:13:47.049] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.271417,
+}
+[21:13:47.050] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.254167,
+}
+[21:13:47.050] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.203542,
+}
+[21:13:47.050] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "build.previous.remove",
+  outcome: "success",
+  duration_ms: 0.358334,
+}
+[21:13:47.050] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "build.activate",
+  outcome: "success",
+  duration_ms: 1.838208,
+}
+[21:13:47.051] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage",
+  outcome: "success",
+  duration_ms: 284.777709,
+}
+[21:13:47.051] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.060416,
+}
+[21:13:47.051] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage.remove",
+  outcome: "success",
+  duration_ms: 0.118583,
+}
+[21:13:47.051] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "project.build",
+  outcome: "success",
+  duration_ms: 286.370167,
+}
+[21:13:47.051] INFO (#134): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.generation",
+  outcome: "success",
+  duration_ms: 3775.809458,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-1","entrypoint":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-1/server/index.js"},"level":"debug","message":"candidate.compile.succeeded","signal":"log","timestamp":"2026-10-15T18:13:47.052Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-1","port":56054},"level":"debug","message":"candidate.start.started","signal":"log","timestamp":"2026-10-15T18:13:47.059Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-1","pid":34943,"port":56054},"level":"debug","message":"candidate.start.succeeded","signal":"log","timestamp":"2026-10-15T18:13:47.061Z","version":2}
+[21:13:47.062] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "success",
+  duration_ms: 3793.495416,
+}
+{"component":"cli.dev","fields":{"phase":"compiling-candidate","state":"starting-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:13:47.064Z","version":2}
+{"component":"cli.dev","fields":{"phase":"starting-candidate","state":"verifying-hash-and-readiness"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:13:47.065Z","version":2}
+[21:13:47.066] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.193541,
+}
+[21:13:47.067] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation.fingerprint",
+  outcome: "success",
+  duration_ms: 0.880292,
+}
+[21:13:47.484] INFO (#255): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.verify",
+  outcome: "success",
+  duration_ms: 416.933875,
+}
+{"component":"cli.dev","fields":{"phase":"verification","state":"verification-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:13:47.485Z","version":2}
+{"component":"cli.dev","fields":{"phase":"verifying-hash-and-readiness","state":"switching"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:13:47.486Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switch","state":"switch-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:13:47.488Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switching","state":"active"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:13:47.489Z","version":2}
+{"component":"cli.dev","fields":{"changedFiles":0,"durationMs":4221.848083999999,"initial":true,"version":0},"level":"info","message":"dev.generation.active","signal":"log","timestamp":"2026-10-15T18:13:47.490Z","version":2}
+[21:13:47.490] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation",
+  outcome: "success",
+  duration_ms: 4231.83925,
+}
+[21:13:47.490] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.activate",
+  outcome: "success",
+  duration_ms: 4234.639834,
+}
+{"component":"cli.dev","fields":{"apiReference":"http://127.0.0.1:56020/_relkit/v1/api-reference","backend":"http://127.0.0.1:56020","openapi":"http://127.0.0.1:56020/_relkit/v1/openapi.json"},"level":"info","message":"dev.ready","signal":"log","timestamp":"2026-10-15T18:13:47.490Z","version":2}
+[21:13:47.491] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.start",
+  outcome: "success",
+  duration_ms: 4245.248833,
+}
+[21:13:47.491] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.acquire",
+  outcome: "success",
+  duration_ms: 4250.307875,
+}
+[21:13:47.506] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.config-inputs",
+  outcome: "success",
+  duration_ms: 11.847291,
+}
+[21:13:47.509] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.subscribe",
+  outcome: "success",
+  duration_ms: 2.309334,
+}
+[21:13:47.509] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.subscribe",
+  outcome: "success",
+  duration_ms: 0.502834,
+}
+[21:13:47.510] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.poll",
+  outcome: "success",
+  duration_ms: 0.155125,
+}
+[21:13:47.510] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.poll",
+  outcome: "success",
+  duration_ms: 0.025375,
+}
+[21:13:47.510] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.start",
+  outcome: "success",
+  duration_ms: 16.756292,
+}
+{"initial":{"status":200,"text":"\"hello\""},"port":56020,"active":34943}
+{"case":"syntax error","phase":"bad-edit"}
+[21:13:47.662] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.config-inputs",
+  outcome: "success",
+  duration_ms: 5.787458,
+}
+[21:13:47.662] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "modules.invalidate",
+  outcome: "success",
+  duration_ms: 0.009875,
+}
+[21:13:47.663] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.recipe.invalidate",
+  outcome: "success",
+  duration_ms: 0.126417,
+}
+{"component":"cli.dev","fields":{"phase":"active","state":"compiling-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:13:47.663Z","version":2}
+{"component":"cli.dev","fields":{"files":["src/hello/functions/hello.function.ts"],"initial":false},"level":"info","message":"dev.build.started","signal":"log","timestamp":"2026-10-15T18:13:47.664Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-2"},"level":"debug","message":"candidate.compile.started","signal":"log","timestamp":"2026-10-15T18:13:47.664Z","version":2}
+[21:14:02.397] INFO (#463): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.release",
+  outcome: "success",
+  duration_ms: 1.02575,
+}
+[21:14:02.398] INFO (#463): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.check",
+  outcome: "success",
+  duration_ms: 14733.052417,
+}
+[21:14:02.404] ERROR (#463): Execution operation failed {
+  domain: "cli",
+  operation: "dev.compiler.generation",
+  outcome: "failure",
+  duration_ms: 14739.205333,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-2","message":"src/hello/functions/hello.function.ts:1:17 - error TS1109: Expression expected.\n > 1 | export default (\n     |                 ^\nerror RELKIT_EVALUATOR_TIMEOUT: Evaluator exceeded 10000ms and was killed."},"level":"debug","message":"candidate.compile.failed","signal":"log","timestamp":"2026-10-15T18:14:02.406Z","version":2}
+[21:14:02.412] ERROR (#102): Execution operation failed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "failure",
+  duration_ms: 14748.034834,
+}
+{"component":"cli.dev","fields":{"phase":"compile","state":"compile-failed"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:02.414Z","version":2}
+{"component":"cli.dev","fields":{"phase":"compiling-candidate","state":"active"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:02.414Z","version":2}
+{"component":"cli.dev","fields":{"error":{"message":"src/hello/functions/hello.function.ts:1:17 - error TS1109: Expression expected.\n > 1 | export default (\n     |                 ^\nerror RELKIT_EVALUATOR_TIMEOUT: Evaluator exceeded 10000ms and was killed.","name":"Error","stack":"Error: src/hello/functions/hello.function.ts:1:17 - error TS1109: Expression expected.\n > 1 | export default (\n     |                 ^\nerror RELKIT_EVALUATOR_TIMEOUT: Evaluator exceeded 10000ms and was killed.\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/commands/dev-local-generation.ts:80:17)\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:753:22)\n    at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)\n    at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)\n    at runInAsyncScope (node:async_hooks:137:23)\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)\n    at doneUnsafe (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/Deferred.js:685:15)\n    at emit (node:events:98:22)\n    at #handleOnExit (node:child_process:520:14)\n    at processTicksAndRejections (native:7:39)"},"message":"src/hello/functions/hello.function.ts:1:17 - error TS1109: Expression expected.\n > 1 | export default (\n     |                 ^\nerror RELKIT_EVALUATOR_TIMEOUT: Evaluator exceeded 10000ms and was killed.","previousActive":true},"level":"error","message":"dev.generation.failed","signal":"log","timestamp":"2026-10-15T18:14:02.415Z","version":2}
+[21:14:02.416] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation",
+  outcome: "success",
+  duration_ms: 14753.160584,
+}
+[21:14:02.416] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.activate",
+  outcome: "success",
+  duration_ms: 14753.460791,
+}
+{"case":"syntax error","phase":"rejected","stopping":false,"state":"active","response":{"status":200,"text":"\"hello\""}}
+[21:14:02.624] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.config-inputs",
+  outcome: "success",
+  duration_ms: 7.718208,
+}
+[21:14:02.624] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "modules.invalidate",
+  outcome: "success",
+  duration_ms: 0.010167,
+}
+[21:14:02.624] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.recipe.invalidate",
+  outcome: "success",
+  duration_ms: 0.082208,
+}
+{"component":"cli.dev","fields":{"phase":"active","state":"compiling-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:02.625Z","version":2}
+{"component":"cli.dev","fields":{"files":["src/hello/functions/hello.function.ts"],"initial":false},"level":"info","message":"dev.build.started","signal":"log","timestamp":"2026-10-15T18:14:02.625Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-3"},"level":"debug","message":"candidate.compile.started","signal":"log","timestamp":"2026-10-15T18:14:02.629Z","version":2}
+[21:14:06.528] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.release",
+  outcome: "success",
+  duration_ms: 0.158042,
+}
+[21:14:06.528] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.check",
+  outcome: "success",
+  duration_ms: 3898.553542,
+}
+[21:14:06.529] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stage",
+  outcome: "success",
+  duration_ms: 0.221125,
+}
+[21:14:06.533] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.194708,
+}
+[21:14:06.534] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.215958,
+}
+[21:14:06.534] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.211042,
+}
+[21:14:06.535] ERROR (#571): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.248333,
+}
+[21:14:06.535] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "build.stageJobs",
+  outcome: "success",
+  duration_ms: 0.459666,
+}
+[21:14:06.535] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.237542,
+}
+[21:14:06.536] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.507708,
+}
+[21:14:06.536] ERROR (#571): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.1195,
+}
+[21:14:06.538] INFO (#1038): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.502209,
+}
+[21:14:06.538] INFO (#1037): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.076209,
+}
+[21:14:06.538] INFO (#1040): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.060042,
+}
+[21:14:06.538] INFO (#1039): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.111875,
+}
+[21:14:06.538] INFO (#1041): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.281042,
+}
+[21:14:06.539] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.symlink",
+  outcome: "success",
+  duration_ms: 0.146083,
+}
+[21:14:06.832] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 1.492625,
+}
+[21:14:06.832] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 291.929417,
+}
+[21:14:06.832] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.unlink",
+  outcome: "success",
+  duration_ms: 0.226167,
+}
+[21:14:06.833] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "build.moduleLink.remove",
+  outcome: "success",
+  duration_ms: 0.455875,
+}
+[21:14:06.833] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "build.bundleServer",
+  outcome: "success",
+  duration_ms: 294.133375,
+}
+[21:14:06.834] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.339125,
+}
+[21:14:06.834] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.247291,
+}
+[21:14:06.834] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.203416,
+}
+[21:14:06.835] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.303458,
+}
+[21:14:06.835] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.214917,
+}
+[21:14:06.835] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.237208,
+}
+[21:14:06.836] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "build.previous.remove",
+  outcome: "success",
+  duration_ms: 0.347583,
+}
+[21:14:06.836] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "build.activate",
+  outcome: "success",
+  duration_ms: 1.20325,
+}
+[21:14:06.836] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage",
+  outcome: "success",
+  duration_ms: 307.006875,
+}
+[21:14:06.836] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.060834,
+}
+[21:14:06.836] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage.remove",
+  outcome: "success",
+  duration_ms: 0.133792,
+}
+[21:14:06.836] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "project.build",
+  outcome: "success",
+  duration_ms: 307.669334,
+}
+[21:14:06.836] INFO (#571): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.generation",
+  outcome: "success",
+  duration_ms: 4206.545,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-3","entrypoint":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-3/server/index.js"},"level":"debug","message":"candidate.compile.succeeded","signal":"log","timestamp":"2026-10-15T18:14:06.836Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-3","port":56155},"level":"debug","message":"candidate.start.started","signal":"log","timestamp":"2026-10-15T18:14:06.842Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-3","pid":35140,"port":56155},"level":"debug","message":"candidate.start.succeeded","signal":"log","timestamp":"2026-10-15T18:14:06.843Z","version":2}
+[21:14:06.843] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "success",
+  duration_ms: 4217.850292,
+}
+{"component":"cli.dev","fields":{"phase":"compile","state":"compile-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:06.847Z","version":2}
+{"component":"cli.dev","fields":{"phase":"compiling-candidate","state":"starting-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:06.847Z","version":2}
+{"component":"cli.dev","fields":{"phase":"start","state":"start-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:06.850Z","version":2}
+{"component":"cli.dev","fields":{"phase":"starting-candidate","state":"verifying-hash-and-readiness"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:06.851Z","version":2}
+[21:14:06.856] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 4.351542,
+}
+[21:14:06.856] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation.fingerprint",
+  outcome: "success",
+  duration_ms: 4.828167,
+}
+[21:14:07.987] INFO (#1157): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.verify",
+  outcome: "success",
+  duration_ms: 1130.705833,
+}
+{"component":"cli.dev","fields":{"phase":"verification","state":"verification-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:07.988Z","version":2}
+{"component":"cli.dev","fields":{"phase":"verifying-hash-and-readiness","state":"switching"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:07.989Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switch","state":"switch-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:07.998Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switching","state":"draining-previous"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:08.000Z","version":2}
+{"case":"syntax error","phase":"recovered","stopping":false,"state":"draining-previous","response":{"status":200,"text":"\"recovered-syntax\""}}
+{"case":"invalid service descriptor","phase":"bad-edit"}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-1","exitCode":137},"level":"debug","message":"candidate.process-exited","signal":"log","timestamp":"2026-10-15T18:14:09.051Z","version":2}
+[21:14:09.063] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.generation.drain",
+  outcome: "success",
+  duration_ms: 1061.33525,
+}
+{"component":"cli.dev","fields":{"phase":"drain","state":"drain-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:09.068Z","version":2}
+{"component":"cli.dev","fields":{"phase":"draining-previous","state":"active"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:09.077Z","version":2}
+[21:14:09.078] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.drain",
+  outcome: "success",
+  duration_ms: 1077.353792,
+}
+{"component":"cli.dev","fields":{"changedFiles":1,"durationMs":6452.976875,"initial":false,"version":2},"level":"info","message":"dev.generation.active","signal":"log","timestamp":"2026-10-15T18:14:09.078Z","version":2}
+[21:14:09.079] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation",
+  outcome: "success",
+  duration_ms: 6454.553125,
+}
+[21:14:09.079] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.activate",
+  outcome: "success",
+  duration_ms: 6454.797666,
+}
+[21:14:09.162] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.config-inputs",
+  outcome: "success",
+  duration_ms: 7.193375,
+}
+[21:14:09.162] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "modules.invalidate",
+  outcome: "success",
+  duration_ms: 0.008333,
+}
+[21:14:09.162] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.recipe.invalidate",
+  outcome: "success",
+  duration_ms: 0.070042,
+}
+{"component":"cli.dev","fields":{"phase":"active","state":"compiling-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:09.163Z","version":2}
+{"component":"cli.dev","fields":{"files":["src/hello/service.ts"],"initial":false},"level":"info","message":"dev.build.started","signal":"log","timestamp":"2026-10-15T18:14:09.163Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-4"},"level":"debug","message":"candidate.compile.started","signal":"log","timestamp":"2026-10-15T18:14:09.164Z","version":2}
+[21:14:13.786] INFO (#1642): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.release",
+  outcome: "success",
+  duration_ms: 0.83875,
+}
+[21:14:13.787] INFO (#1642): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.check",
+  outcome: "success",
+  duration_ms: 4622.196917,
+}
+[21:14:13.790] ERROR (#1642): Execution operation failed {
+  domain: "cli",
+  operation: "dev.compiler.generation",
+  outcome: "failure",
+  duration_ms: 4625.947125,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-4","message":"src/routes/route.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: Route target must be a function reference\n > 1 | import { defineRoute } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"../hello/service.js\";\nsrc/routes/route.ts:3:48 - error TS2339: Property 'hello' does not exist on type '{ invalid: boolean; }'.\n   2 | import hello from \"../hello/service.js\";\n > 3 | export const GET = defineRoute({ target: hello.hello });\n     |                                                ^\n   4 | "},"level":"debug","message":"candidate.compile.failed","signal":"log","timestamp":"2026-10-15T18:14:13.792Z","version":2}
+[21:14:13.799] ERROR (#102): Execution operation failed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "failure",
+  duration_ms: 4635.815958,
+}
+{"component":"cli.dev","fields":{"phase":"compile","state":"compile-failed"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:13.810Z","version":2}
+{"component":"cli.dev","fields":{"phase":"compiling-candidate","state":"active"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:13.811Z","version":2}
+{"component":"cli.dev","fields":{"error":{"message":"src/routes/route.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: Route target must be a function reference\n > 1 | import { defineRoute } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"../hello/service.js\";\nsrc/routes/route.ts:3:48 - error TS2339: Property 'hello' does not exist on type '{ invalid: boolean; }'.\n   2 | import hello from \"../hello/service.js\";\n > 3 | export const GET = defineRoute({ target: hello.hello });\n     |                                                ^\n   4 | ","name":"Error","stack":"Error: src/routes/route.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: Route target must be a function reference\n > 1 | import { defineRoute } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"../hello/service.js\";\nsrc/routes/route.ts:3:48 - error TS2339: Property 'hello' does not exist on type '{ invalid: boolean; }'.\n   2 | import hello from \"../hello/service.js\";\n > 3 | export const GET = defineRoute({ target: hello.hello });\n     |                                                ^\n   4 | \n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/commands/dev-local-generation.ts:80:17)\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:753:22)\n    at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)\n    at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)\n    at runInAsyncScope (node:async_hooks:137:23)\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)\n    at doneUnsafe (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/Deferred.js:685:15)\n    at emit (node:events:98:22)\n    at #handleOnExit (node:child_process:520:14)\n    at processTicksAndRejections (native:7:39)"},"message":"src/routes/route.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: Route target must be a function reference\n > 1 | import { defineRoute } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"../hello/service.js\";\nsrc/routes/route.ts:3:48 - error TS2339: Property 'hello' does not exist on type '{ invalid: boolean; }'.\n   2 | import hello from \"../hello/service.js\";\n > 3 | export const GET = defineRoute({ target: hello.hello });\n     |                                                ^\n   4 | ","previousActive":true},"level":"error","message":"dev.generation.failed","signal":"log","timestamp":"2026-10-15T18:14:13.811Z","version":2}
+[21:14:13.811] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation",
+  outcome: "success",
+  duration_ms: 4649.168625,
+}
+[21:14:13.811] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.activate",
+  outcome: "success",
+  duration_ms: 4649.35475,
+}
+{"case":"invalid service descriptor","phase":"rejected","stopping":false,"state":"active","response":{"status":200,"text":"\"recovered-syntax\""}}
+[21:14:14.003] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.config-inputs",
+  outcome: "success",
+  duration_ms: 7.043958,
+}
+[21:14:14.003] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "modules.invalidate",
+  outcome: "success",
+  duration_ms: 0.011041,
+}
+[21:14:14.003] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.recipe.invalidate",
+  outcome: "success",
+  duration_ms: 0.078375,
+}
+{"component":"cli.dev","fields":{"phase":"active","state":"compiling-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:14.004Z","version":2}
+{"component":"cli.dev","fields":{"files":["src/hello/service.ts"],"initial":false},"level":"info","message":"dev.build.started","signal":"log","timestamp":"2026-10-15T18:14:14.004Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-5"},"level":"debug","message":"candidate.compile.started","signal":"log","timestamp":"2026-10-15T18:14:14.005Z","version":2}
+[21:14:18.034] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.release",
+  outcome: "success",
+  duration_ms: 0.241542,
+}
+[21:14:18.035] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.check",
+  outcome: "success",
+  duration_ms: 4029.015833,
+}
+[21:14:18.036] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stage",
+  outcome: "success",
+  duration_ms: 0.586291,
+}
+[21:14:18.042] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 1.195708,
+}
+[21:14:18.051] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.333083,
+}
+[21:14:18.052] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.361208,
+}
+[21:14:18.053] ERROR (#1751): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.327,
+}
+[21:14:18.053] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "build.stageJobs",
+  outcome: "success",
+  duration_ms: 0.536709,
+}
+[21:14:18.054] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.335833,
+}
+[21:14:18.054] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.520125,
+}
+[21:14:18.055] ERROR (#1751): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.549625,
+}
+[21:14:18.060] INFO (#2233): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.419458,
+}
+[21:14:18.060] INFO (#2235): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.542375,
+}
+[21:14:18.060] INFO (#2232): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.972,
+}
+[21:14:18.060] INFO (#2234): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 1.999792,
+}
+[21:14:18.061] INFO (#2236): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.801584,
+}
+[21:14:18.067] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.symlink",
+  outcome: "success",
+  duration_ms: 5.691458,
+}
+[21:14:18.492] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.306791,
+}
+[21:14:18.493] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 414.793333,
+}
+[21:14:18.493] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.unlink",
+  outcome: "success",
+  duration_ms: 0.186125,
+}
+[21:14:18.493] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "build.moduleLink.remove",
+  outcome: "success",
+  duration_ms: 0.270208,
+}
+[21:14:18.493] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "build.bundleServer",
+  outcome: "success",
+  duration_ms: 432.228625,
+}
+[21:14:18.494] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.262041,
+}
+[21:14:18.494] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.237291,
+}
+[21:14:18.494] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.167666,
+}
+[21:14:18.496] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 2.18,
+}
+[21:14:18.497] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.221792,
+}
+[21:14:18.497] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.21575,
+}
+[21:14:18.497] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "build.previous.remove",
+  outcome: "success",
+  duration_ms: 0.26575,
+}
+[21:14:18.497] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "build.activate",
+  outcome: "success",
+  duration_ms: 3.022875,
+}
+[21:14:18.497] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage",
+  outcome: "success",
+  duration_ms: 460.862125,
+}
+[21:14:18.497] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.070917,
+}
+[21:14:18.497] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage.remove",
+  outcome: "success",
+  duration_ms: 0.17775,
+}
+[21:14:18.498] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "project.build",
+  outcome: "success",
+  duration_ms: 462.236791,
+}
+[21:14:18.498] INFO (#1751): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.generation",
+  outcome: "success",
+  duration_ms: 4491.937208,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-5","entrypoint":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-5/server/index.js"},"level":"debug","message":"candidate.compile.succeeded","signal":"log","timestamp":"2026-10-15T18:14:18.498Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-5","port":56279},"level":"debug","message":"candidate.start.started","signal":"log","timestamp":"2026-10-15T18:14:18.502Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-5","pid":35320,"port":56279},"level":"debug","message":"candidate.start.succeeded","signal":"log","timestamp":"2026-10-15T18:14:18.503Z","version":2}
+[21:14:18.504] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "success",
+  duration_ms: 4499.89375,
+}
+{"component":"cli.dev","fields":{"phase":"compile","state":"compile-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:18.505Z","version":2}
+{"component":"cli.dev","fields":{"phase":"compiling-candidate","state":"starting-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:18.505Z","version":2}
+{"component":"cli.dev","fields":{"phase":"start","state":"start-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:18.506Z","version":2}
+{"component":"cli.dev","fields":{"phase":"starting-candidate","state":"verifying-hash-and-readiness"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:18.507Z","version":2}
+[21:14:18.508] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.192875,
+}
+[21:14:18.508] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation.fingerprint",
+  outcome: "success",
+  duration_ms: 0.389416,
+}
+[21:14:19.786] INFO (#2359): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.verify",
+  outcome: "success",
+  duration_ms: 1277.370209,
+}
+{"component":"cli.dev","fields":{"phase":"verification","state":"verification-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:19.788Z","version":2}
+{"component":"cli.dev","fields":{"phase":"verifying-hash-and-readiness","state":"switching"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:19.788Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switch","state":"switch-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:19.792Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switching","state":"draining-previous"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:19.793Z","version":2}
+{"case":"invalid service descriptor","phase":"recovered","stopping":false,"state":"draining-previous","response":{"status":200,"text":"\"recovered-descriptor\""}}
+{"case":"missing import","phase":"bad-edit"}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-3","exitCode":137},"level":"debug","message":"candidate.process-exited","signal":"log","timestamp":"2026-10-15T18:14:20.835Z","version":2}
+[21:14:20.838] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.generation.drain",
+  outcome: "success",
+  duration_ms: 1043.739375,
+}
+{"component":"cli.dev","fields":{"phase":"drain","state":"drain-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:20.839Z","version":2}
+{"component":"cli.dev","fields":{"phase":"draining-previous","state":"active"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:20.839Z","version":2}
+[21:14:20.839] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.drain",
+  outcome: "success",
+  duration_ms: 1045.356,
+}
+{"component":"cli.dev","fields":{"changedFiles":1,"durationMs":6835.026499999996,"initial":false,"version":4},"level":"info","message":"dev.generation.active","signal":"log","timestamp":"2026-10-15T18:14:20.839Z","version":2}
+[21:14:20.839] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation",
+  outcome: "success",
+  duration_ms: 6836.213541,
+}
+[21:14:20.839] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.activate",
+  outcome: "success",
+  duration_ms: 6836.357167,
+}
+[21:14:20.923] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.config-inputs",
+  outcome: "success",
+  duration_ms: 5.832333,
+}
+[21:14:20.923] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "modules.invalidate",
+  outcome: "success",
+  duration_ms: 0.039292,
+}
+[21:14:20.923] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.recipe.invalidate",
+  outcome: "success",
+  duration_ms: 0.188541,
+}
+{"component":"cli.dev","fields":{"phase":"active","state":"compiling-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:20.924Z","version":2}
+{"component":"cli.dev","fields":{"files":["src/hello/functions/hello.function.ts"],"initial":false},"level":"info","message":"dev.build.started","signal":"log","timestamp":"2026-10-15T18:14:20.924Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-6"},"level":"debug","message":"candidate.compile.started","signal":"log","timestamp":"2026-10-15T18:14:20.925Z","version":2}
+[21:14:23.845] INFO (#2919): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.release",
+  outcome: "success",
+  duration_ms: 0.448916,
+}
+[21:14:23.846] INFO (#2919): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.check",
+  outcome: "success",
+  duration_ms: 2920.005,
+}
+[21:14:23.847] ERROR (#2919): Execution operation failed {
+  domain: "cli",
+  operation: "dev.compiler.generation",
+  outcome: "failure",
+  duration_ms: 2921.817375,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-6","message":"src/hello/service.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: ResolveMessage: Cannot find module './functions/missing.function.js' from '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/src/hello/service.ts'\n > 1 | import { defineService } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"./functions/missing.function.js\";\nsrc/hello/service.ts:2:19 - error TS2307: Cannot find module './functions/missing.function.js' or its corresponding type declarations.\n "},"level":"debug","message":"candidate.compile.failed","signal":"log","timestamp":"2026-10-15T18:14:23.848Z","version":2}
+[21:14:23.851] ERROR (#102): Execution operation failed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "failure",
+  duration_ms: 2926.241125,
+}
+{"component":"cli.dev","fields":{"phase":"compile","state":"compile-failed"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:23.852Z","version":2}
+{"component":"cli.dev","fields":{"phase":"compiling-candidate","state":"active"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:23.853Z","version":2}
+{"component":"cli.dev","fields":{"error":{"message":"src/hello/service.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: ResolveMessage: Cannot find module './functions/missing.function.js' from '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/src/hello/service.ts'\n > 1 | import { defineService } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"./functions/missing.function.js\";\nsrc/hello/service.ts:2:19 - error TS2307: Cannot find module './functions/missing.function.js' or its corresponding type declarations.\n   1 | import { defineService } from \"@relkit/app\";\n > 2 | import hello from \"./functions/missing.function.js\";\n     |                   ^\n   3 | export default defineService({ functions: { hello } });\nsrc/routes/route.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: ResolveMessage: Cannot find module './functions/missing.function.js' from '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/src/hello/service.ts'\n > 1 | import { defineRoute } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"../hello/service.js\";","name":"Error","stack":"Error: src/hello/service.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: ResolveMessage: Cannot find module './functions/missing.function.js' from '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/src/hello/service.ts'\n > 1 | import { defineService } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"./functions/missing.function.js\";\nsrc/hello/service.ts:2:19 - error TS2307: Cannot find module './functions/missing.function.js' or its corresponding type declarations.\n   1 | import { defineService } from \"@relkit/app\";\n > 2 | import hello from \"./functions/missing.function.js\";\n     |                   ^\n   3 | export default defineService({ functions: { hello } });\nsrc/routes/route.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: ResolveMessage: Cannot find module './functions/missing.function.js' from '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/src/hello/service.ts'\n > 1 | import { defineRoute } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"../hello/service.js\";\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/commands/dev-local-generation.ts:80:17)\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:753:22)\n    at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)\n    at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)\n    at runInAsyncScope (node:async_hooks:137:23)\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)\n    at doneUnsafe (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/Deferred.js:685:15)\n    at emit (node:events:98:22)\n    at #handleOnExit (node:child_process:520:14)\n    at processTicksAndRejections (native:7:39)"},"message":"src/hello/service.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: ResolveMessage: Cannot find module './functions/missing.function.js' from '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/src/hello/service.ts'\n > 1 | import { defineService } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"./functions/missing.function.js\";\nsrc/hello/service.ts:2:19 - error TS2307: Cannot find module './functions/missing.function.js' or its corresponding type declarations.\n   1 | import { defineService } from \"@relkit/app\";\n > 2 | import hello from \"./functions/missing.function.js\";\n     |                   ^\n   3 | export default defineService({ functions: { hello } });\nsrc/routes/route.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: ResolveMessage: Cannot find module './functions/missing.function.js' from '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/src/hello/service.ts'\n > 1 | import { defineRoute } from \"@relkit/app\";\n     | ^\n   2 | import hello from \"../hello/service.js\";","previousActive":true},"level":"error","message":"dev.generation.failed","signal":"log","timestamp":"2026-10-15T18:14:23.853Z","version":2}
+[21:14:23.853] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation",
+  outcome: "success",
+  duration_ms: 2929.867291,
+}
+[21:14:23.854] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.activate",
+  outcome: "success",
+  duration_ms: 2930.072959,
+}
+{"case":"missing import","phase":"rejected","stopping":false,"state":"active","response":{"status":200,"text":"\"recovered-descriptor\""}}
+[21:14:23.937] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.config-inputs",
+  outcome: "success",
+  duration_ms: 6.530958,
+}
+[21:14:23.937] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "modules.invalidate",
+  outcome: "success",
+  duration_ms: 0.006625,
+}
+[21:14:23.937] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.recipe.invalidate",
+  outcome: "success",
+  duration_ms: 0.062541,
+}
+{"component":"cli.dev","fields":{"phase":"active","state":"compiling-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:23.938Z","version":2}
+{"component":"cli.dev","fields":{"files":["src/hello/service.ts"],"initial":false},"level":"info","message":"dev.build.started","signal":"log","timestamp":"2026-10-15T18:14:23.938Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-7"},"level":"debug","message":"candidate.compile.started","signal":"log","timestamp":"2026-10-15T18:14:23.939Z","version":2}
+[21:14:26.948] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.release",
+  outcome: "success",
+  duration_ms: 0.096292,
+}
+[21:14:26.948] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.check",
+  outcome: "success",
+  duration_ms: 3008.263833,
+}
+[21:14:26.949] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stage",
+  outcome: "success",
+  duration_ms: 0.273417,
+}
+[21:14:26.951] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.160333,
+}
+[21:14:26.952] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.179375,
+}
+[21:14:26.952] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.313291,
+}
+[21:14:26.953] ERROR (#3018): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.154166,
+}
+[21:14:26.953] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "build.stageJobs",
+  outcome: "success",
+  duration_ms: 0.252,
+}
+[21:14:26.956] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 2.851166,
+}
+[21:14:26.959] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 3.115417,
+}
+[21:14:26.959] ERROR (#3018): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.181542,
+}
+[21:14:26.961] INFO (#3412): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.595125,
+}
+[21:14:26.961] INFO (#3411): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.800084,
+}
+[21:14:26.961] INFO (#3413): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.783334,
+}
+[21:14:26.961] INFO (#3414): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.792791,
+}
+[21:14:26.961] INFO (#3415): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.184459,
+}
+[21:14:26.961] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.symlink",
+  outcome: "success",
+  duration_ms: 0.153667,
+}
+[21:14:27.226] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.173333,
+}
+[21:14:27.226] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 264.182084,
+}
+[21:14:27.227] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.unlink",
+  outcome: "success",
+  duration_ms: 0.144583,
+}
+[21:14:27.227] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "build.moduleLink.remove",
+  outcome: "success",
+  duration_ms: 0.202875,
+}
+[21:14:27.227] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "build.bundleServer",
+  outcome: "success",
+  duration_ms: 265.650208,
+}
+[21:14:27.227] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.274417,
+}
+[21:14:27.228] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.280083,
+}
+[21:14:27.228] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.491083,
+}
+[21:14:27.229] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.269625,
+}
+[21:14:27.229] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.19775,
+}
+[21:14:27.229] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.142875,
+}
+[21:14:27.229] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "build.previous.remove",
+  outcome: "success",
+  duration_ms: 0.192,
+}
+[21:14:27.229] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "build.activate",
+  outcome: "success",
+  duration_ms: 0.898292,
+}
+[21:14:27.229] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage",
+  outcome: "success",
+  duration_ms: 280.40775,
+}
+[21:14:27.230] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.290292,
+}
+[21:14:27.230] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage.remove",
+  outcome: "success",
+  duration_ms: 0.330042,
+}
+[21:14:27.230] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "project.build",
+  outcome: "success",
+  duration_ms: 281.297875,
+}
+[21:14:27.230] INFO (#3018): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.generation",
+  outcome: "success",
+  duration_ms: 3290.18475,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-7","entrypoint":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-7/server/index.js"},"level":"debug","message":"candidate.compile.succeeded","signal":"log","timestamp":"2026-10-15T18:14:27.230Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-7","port":56380},"level":"debug","message":"candidate.start.started","signal":"log","timestamp":"2026-10-15T18:14:27.234Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-7","pid":35362,"port":56380},"level":"debug","message":"candidate.start.succeeded","signal":"log","timestamp":"2026-10-15T18:14:27.235Z","version":2}
+[21:14:27.236] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "success",
+  duration_ms: 3297.251417,
+}
+{"component":"cli.dev","fields":{"phase":"compile","state":"compile-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:27.236Z","version":2}
+{"component":"cli.dev","fields":{"phase":"compiling-candidate","state":"starting-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:27.237Z","version":2}
+{"component":"cli.dev","fields":{"phase":"start","state":"start-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:27.237Z","version":2}
+{"component":"cli.dev","fields":{"phase":"starting-candidate","state":"verifying-hash-and-readiness"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:27.238Z","version":2}
+[21:14:27.240] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.950833,
+}
+[21:14:27.240] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation.fingerprint",
+  outcome: "success",
+  duration_ms: 1.241125,
+}
+[21:14:28.542] INFO (#3538): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.verify",
+  outcome: "success",
+  duration_ms: 1302.179792,
+}
+{"component":"cli.dev","fields":{"phase":"verification","state":"verification-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:28.543Z","version":2}
+{"component":"cli.dev","fields":{"phase":"verifying-hash-and-readiness","state":"switching"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:28.543Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switch","state":"switch-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:28.545Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switching","state":"draining-previous"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:28.547Z","version":2}
+{"case":"missing import","phase":"recovered","stopping":false,"state":"draining-previous","response":{"status":200,"text":"\"recovered-import\""}}
+{"case":"invalid app config","phase":"bad-edit"}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-5","exitCode":137},"level":"debug","message":"candidate.process-exited","signal":"log","timestamp":"2026-10-15T18:14:29.863Z","version":2}
+[21:14:29.868] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.generation.drain",
+  outcome: "success",
+  duration_ms: 1319.8905,
+}
+{"component":"cli.dev","fields":{"phase":"drain","state":"drain-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:29.872Z","version":2}
+{"component":"cli.dev","fields":{"phase":"draining-previous","state":"active"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:29.874Z","version":2}
+[21:14:29.874] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.drain",
+  outcome: "success",
+  duration_ms: 1326.5325,
+}
+{"component":"cli.dev","fields":{"changedFiles":1,"durationMs":5936.134875000003,"initial":false,"version":6},"level":"info","message":"dev.generation.active","signal":"log","timestamp":"2026-10-15T18:14:29.875Z","version":2}
+[21:14:29.875] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation",
+  outcome: "success",
+  duration_ms: 5937.956417,
+}
+[21:14:29.875] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.activate",
+  outcome: "success",
+  duration_ms: 5938.548708,
+}
+[21:14:29.979] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.config-inputs",
+  outcome: "success",
+  duration_ms: 14.637292,
+}
+[21:14:29.980] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "modules.invalidate",
+  outcome: "success",
+  duration_ms: 0.007834,
+}
+[21:14:29.980] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.recipe.invalidate",
+  outcome: "success",
+  duration_ms: 0.081834,
+}
+{"component":"cli.dev","fields":{"phase":"active","state":"compiling-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:29.980Z","version":2}
+{"component":"cli.dev","fields":{"files":["src/hello/service.ts"],"initial":false},"level":"info","message":"dev.build.started","signal":"log","timestamp":"2026-10-15T18:14:29.981Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-8"},"level":"debug","message":"candidate.compile.started","signal":"log","timestamp":"2026-10-15T18:14:29.982Z","version":2}
+[21:14:30.477] INFO (#4110): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.release",
+  outcome: "success",
+  duration_ms: 0.099458,
+}
+[21:14:30.477] INFO (#4110): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.check",
+  outcome: "success",
+  duration_ms: 491.799334,
+}
+[21:14:30.477] ERROR (#4110): Execution operation failed {
+  domain: "cli",
+  operation: "dev.compiler.generation",
+  outcome: "failure",
+  duration_ms: 492.760916,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-8","message":"relkit.config.ts:1:18 - error RELKIT_CONFIG_KEY_NOT_ALLOWED: Unknown tooling config key \"invalid\". Example: export default defineApp({ env: defineEnv({}), server: { port: 3000 }, inspector: { port: 3210 } });\n > 1 | export default { invalid: true };\n     |                  ^"},"level":"debug","message":"candidate.compile.failed","signal":"log","timestamp":"2026-10-15T18:14:30.478Z","version":2}
+[21:14:30.479] ERROR (#102): Execution operation failed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "failure",
+  duration_ms: 497.820375,
+}
+{"component":"cli.dev","fields":{"phase":"compile","state":"compile-failed"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:30.479Z","version":2}
+{"component":"cli.dev","fields":{"phase":"compiling-candidate","state":"active"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:30.480Z","version":2}
+{"component":"cli.dev","fields":{"error":{"message":"relkit.config.ts:1:18 - error RELKIT_CONFIG_KEY_NOT_ALLOWED: Unknown tooling config key \"invalid\". Example: export default defineApp({ env: defineEnv({}), server: { port: 3000 }, inspector: { port: 3210 } });\n > 1 | export default { invalid: true };\n     |                  ^","name":"Error","stack":"Error: relkit.config.ts:1:18 - error RELKIT_CONFIG_KEY_NOT_ALLOWED: Unknown tooling config key \"invalid\". Example: export default defineApp({ env: defineEnv({}), server: { port: 3000 }, inspector: { port: 3210 } });\n > 1 | export default { invalid: true };\n     |                  ^\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/commands/dev-local-generation.ts:80:17)\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:753:22)\n    at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)\n    at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)\n    at runInAsyncScope (node:async_hooks:137:23)\n    at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)\n    at doneUnsafe (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/Deferred.js:685:15)\n    at emit (node:events:98:22)\n    at #handleOnExit (node:child_process:520:14)\n    at processTicksAndRejections (native:7:39)"},"message":"relkit.config.ts:1:18 - error RELKIT_CONFIG_KEY_NOT_ALLOWED: Unknown tooling config key \"invalid\". Example: export default defineApp({ env: defineEnv({}), server: { port: 3000 }, inspector: { port: 3210 } });\n > 1 | export default { invalid: true };\n     |                  ^","previousActive":true},"level":"error","message":"dev.generation.failed","signal":"log","timestamp":"2026-10-15T18:14:30.480Z","version":2}
+[21:14:30.480] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation",
+  outcome: "success",
+  duration_ms: 500.392042,
+}
+[21:14:30.480] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.activate",
+  outcome: "success",
+  duration_ms: 500.604459,
+}
+{"case":"invalid app config","phase":"rejected","stopping":false,"state":"active","response":{"status":200,"text":"\"recovered-import\""}}
+[21:14:30.563] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.config-inputs",
+  outcome: "success",
+  duration_ms: 5.686334,
+}
+[21:14:30.563] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "modules.invalidate",
+  outcome: "success",
+  duration_ms: 0.015,
+}
+[21:14:30.563] INFO (#424): Execution operation completed {
+  domain: "cli",
+  operation: "dev.recipe.invalidate",
+  outcome: "success",
+  duration_ms: 0.064083,
+}
+{"component":"cli.dev","fields":{"phase":"active","state":"compiling-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:30.563Z","version":2}
+{"component":"cli.dev","fields":{"files":["src/hello/functions/hello.function.ts"],"initial":false},"level":"info","message":"dev.build.started","signal":"log","timestamp":"2026-10-15T18:14:30.564Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-9"},"level":"debug","message":"candidate.compile.started","signal":"log","timestamp":"2026-10-15T18:14:30.567Z","version":2}
+[21:14:33.511] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.release",
+  outcome: "success",
+  duration_ms: 0.123458,
+}
+[21:14:33.511] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.check",
+  outcome: "success",
+  duration_ms: 2943.636375,
+}
+[21:14:33.514] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stage",
+  outcome: "success",
+  duration_ms: 2.208667,
+}
+[21:14:33.522] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 2.795916,
+}
+[21:14:33.523] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.616958,
+}
+[21:14:33.524] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.53,
+}
+[21:14:33.525] ERROR (#4214): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.141583,
+}
+[21:14:33.525] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "build.stageJobs",
+  outcome: "success",
+  duration_ms: 0.230333,
+}
+[21:14:33.525] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.185875,
+}
+[21:14:33.525] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.149666,
+}
+[21:14:33.525] ERROR (#4214): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.081292,
+}
+[21:14:33.526] INFO (#4610): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.450333,
+}
+[21:14:33.526] INFO (#4607): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.615167,
+}
+[21:14:33.526] INFO (#4608): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.655834,
+}
+[21:14:33.526] INFO (#4609): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.670792,
+}
+[21:14:33.527] INFO (#4611): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.203875,
+}
+[21:14:33.527] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.symlink",
+  outcome: "success",
+  duration_ms: 0.144667,
+}
+[21:14:33.823] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.155375,
+}
+[21:14:33.823] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 295.163291,
+}
+[21:14:33.823] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.unlink",
+  outcome: "success",
+  duration_ms: 0.209333,
+}
+[21:14:33.823] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "build.moduleLink.remove",
+  outcome: "success",
+  duration_ms: 0.270625,
+}
+[21:14:33.823] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "build.bundleServer",
+  outcome: "success",
+  duration_ms: 296.711167,
+}
+[21:14:33.824] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.217291,
+}
+[21:14:33.824] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.1315,
+}
+[21:14:33.824] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.118,
+}
+[21:14:33.824] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.180083,
+}
+[21:14:33.824] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.14525,
+}
+[21:14:33.825] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.129583,
+}
+[21:14:33.825] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "build.previous.remove",
+  outcome: "success",
+  duration_ms: 0.163458,
+}
+[21:14:33.825] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "build.activate",
+  outcome: "success",
+  duration_ms: 0.631208,
+}
+[21:14:33.825] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage",
+  outcome: "success",
+  duration_ms: 311.014166,
+}
+[21:14:33.825] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.034917,
+}
+[21:14:33.825] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage.remove",
+  outcome: "success",
+  duration_ms: 0.062417,
+}
+[21:14:33.825] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "project.build",
+  outcome: "success",
+  duration_ms: 313.636875,
+}
+[21:14:33.825] INFO (#4214): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.generation",
+  outcome: "success",
+  duration_ms: 3257.548875,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-9","entrypoint":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-9/server/index.js"},"level":"debug","message":"candidate.compile.succeeded","signal":"log","timestamp":"2026-10-15T18:14:33.825Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-9","port":56489},"level":"debug","message":"candidate.start.started","signal":"log","timestamp":"2026-10-15T18:14:33.830Z","version":2}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-9","pid":35410,"port":56489},"level":"debug","message":"candidate.start.succeeded","signal":"log","timestamp":"2026-10-15T18:14:33.831Z","version":2}
+[21:14:33.831] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "success",
+  duration_ms: 3267.493625,
+}
+{"component":"cli.dev","fields":{"phase":"compile","state":"compile-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:33.833Z","version":2}
+{"component":"cli.dev","fields":{"phase":"compiling-candidate","state":"starting-candidate"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:33.833Z","version":2}
+{"component":"cli.dev","fields":{"phase":"start","state":"start-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:33.834Z","version":2}
+{"component":"cli.dev","fields":{"phase":"starting-candidate","state":"verifying-hash-and-readiness"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:33.835Z","version":2}
+[21:14:33.836] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.54575,
+}
+[21:14:33.836] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.activation.fingerprint",
+  outcome: "success",
+  duration_ms: 0.689042,
+}
+[21:14:35.592] INFO (#4727): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.verify",
+  outcome: "success",
+  duration_ms: 1756.178625,
+}
+{"component":"cli.dev","fields":{"phase":"verification","state":"verification-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:35.594Z","version":2}
+{"component":"cli.dev","fields":{"phase":"verifying-hash-and-readiness","state":"switching"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:35.595Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switch","state":"switch-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-15T18:14:35.599Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switching","state":"draining-previous"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-15T18:14:35.599Z","version":2}
+{"case":"invalid app config","phase":"recovered","stopping":false,"state":"draining-previous","response":{"status":200,"text":"\"recovered-config\""}}
+[21:14:35.784] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.worker.release",
+  outcome: "success",
+  duration_ms: 0.253083,
+}
+[21:14:35.784] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.watch.close",
+  outcome: "success",
+  duration_ms: 2.862208,
+}
+{"component":"cli.dev","fields":{"message":"Development session stopped."},"level":"info","message":"dev.shutdown.started","signal":"log","timestamp":"2026-10-15T18:14:35.786Z","version":2}
+[21:14:35.786] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.stopping.callback",
+  outcome: "success",
+  duration_ms: 0.0365,
+}
+[21:14:35.788] INFO (#5312): Execution operation completed {
+  domain: "cli",
+  operation: "dev.proxy.stop",
+  outcome: "success",
+  duration_ms: 1.430375,
+}
+[21:14:35.788] INFO (#5312): Execution operation completed {
+  domain: "cli",
+  operation: "dev.proxy.release",
+  outcome: "success",
+  duration_ms: 1.517416,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-7","exitCode":137},"level":"debug","message":"candidate.process-exited","signal":"log","timestamp":"2026-10-15T18:14:36.630Z","version":2}
+[21:14:36.633] INFO (#102): Execution operation completed {
+  domain: "cli",
+  operation: "dev.generation.drain",
+  outcome: "success",
+  duration_ms: 1031.486542,
+}
+[21:14:36.633] INFO (#5316): Execution operation completed {
+  domain: "cli",
+  operation: "dev.generation.drain",
+  outcome: "success",
+  duration_ms: 846.422917,
+}
+[21:14:36.633] INFO (#5316): Execution operation completed {
+  domain: "cli",
+  operation: "dev.drain.release",
+  outcome: "success",
+  duration_ms: 846.511917,
+}
+{"component":"cli.dev","fields":{"directory":"/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-layout-migration-test-LgvRsq/.relkit/generated/generation-9","exitCode":137},"level":"debug","message":"candidate.process-exited","signal":"log","timestamp":"2026-10-15T18:14:36.802Z","version":2}
+[21:14:36.805] INFO (#5317): Execution operation completed {
+  domain: "cli",
+  operation: "dev.generation.drain",
+  outcome: "success",
+  duration_ms: 1017.935833,
+}
+[21:14:36.805] INFO (#5317): Execution operation completed {
+  domain: "cli",
+  operation: "dev.drain.release",
+  outcome: "success",
+  duration_ms: 1017.99275,
+}
+[21:14:36.806] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.local.owner.release",
+  outcome: "success",
+  duration_ms: 0.009583,
+}
+[21:14:36.806] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.close",
+  outcome: "success",
+  duration_ms: 0.38275,
+}
+[21:14:36.806] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.local-services.release",
+  outcome: "success",
+  duration_ms: 0.418167,
+}
+[21:14:36.806] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.observability.release",
+  outcome: "success",
+  duration_ms: 0.294584,
+}
+{"component":"cli.dev","fields":{},"level":"info","message":"dev.stopped","signal":"log","timestamp":"2026-10-15T18:14:36.806Z","version":2}
+[21:14:36.806] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.shutdown",
+  outcome: "success",
+  duration_ms: 1021.095125,
+}
+[21:14:36.806] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.session.stop",
+  outcome: "success",
+  duration_ms: 1021.583584,
+}
+[21:14:36.806] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "dev.compiler.close",
+  outcome: "success",
+  duration_ms: 0.012834,
+}
