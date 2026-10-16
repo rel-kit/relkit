@@ -1,0 +1,24 @@
+{
+  "key": "signals",
+  "matches": {
+    "bf-1672405f026d30b6cc3728eb": {
+      "id": "bf-1672405f026d30b6cc3728eb",
+      "status": "verified",
+      "what": "Prepared dev exits abruptly on terminal hangup and leaves its owned backend, inspector, and storage worker running.",
+      "root_cause": "invocation-signals.ts:13 installed INT/TERM but no HUP owner; snapshot-session-options.ts:42 disables manual-session handlers in favor of that invocation owner. A prepared SIGHUP therefore bypassed Scope release, killed the proxy CLI, and orphaned its backend, inspector and storage worker. During initial/ordinary start",
+      "fixed_by": "Verified native HUP invocation cancellation and its typed public failure contract. Both owners now preserve SIGHUP/status129, join resource cleanup and remove their own listeners. The prepared native replay and actual e-commerce HUP test close all owned processes/listeners; the final detached preview retains its eventu",
+      "files": [
+        "packages/cli/src/invocation-signals.ts",
+        "packages/cli/src/cli-errors.ts",
+        "packages/cli/src/main-support.ts",
+        "packages/cli/src/main-support-types.ts",
+        "packages/cli/tests/invocation/signals.test.ts",
+        "packages/cli/tests/services/dev-initial-native.test.ts",
+        ".changeset/prepared-dev-hangup-cleanup.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-16T13:11:50+00:00",
+      "report": "bug-fix-reports/issues/bf-1672405f026d30b6cc3728eb/report.md"
+    }
+  }
+}
