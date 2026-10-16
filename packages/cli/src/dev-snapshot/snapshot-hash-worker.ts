@@ -26,7 +26,7 @@ interface Member {
 type ExpectedMember = readonly [path: string, bytes: number, hash: string];
 
 const PATH =
-  /^(?!\/)(?!.*(?:^|\/)\.{1,2}(?:\/|$))[A-Za-z0-9_@+.,()=-]+(?:\/[A-Za-z0-9_@+.,()=-]+)*$/;
+  /^(?!\/)(?!.*(?:^|\/)\.{1,2}(?:\/|$))[A-Za-z0-9_@+.,()=\[\]-]+(?:\/[A-Za-z0-9_@+.,()=\[\]-]+)*$/;
 
 /** Executes the fixed stdin/stdout worker protocol without printing native details. */
 function main(): void {

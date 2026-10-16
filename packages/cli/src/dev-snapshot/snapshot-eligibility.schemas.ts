@@ -12,7 +12,13 @@ export const SnapshotEligibleTsConfig = Schema.Struct({
     baseUrl: Schema.Literal("."),
     paths: Schema.Struct({ "@app/*": Schema.Tuple([Schema.Literal("src/*")]) }),
   }),
-  files: Schema.Tuple([Schema.Literal(".relkit/generated/route-module-checks.ts")]),
+  files: Schema.Union([
+    Schema.Tuple([Schema.Literal(".relkit/generated/route-module-checks.ts")]),
+    Schema.Tuple([
+      Schema.Literal(".relkit/generated/route-module-checks.ts"),
+      Schema.Literal(".relkit/generated/context-registry.d.ts"),
+    ]),
+  ]),
   include: Schema.Tuple([
     Schema.Literal("src/**/*.ts"),
     Schema.Literal("tests/**/*.ts"),

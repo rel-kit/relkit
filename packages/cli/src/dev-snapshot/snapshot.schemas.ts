@@ -11,7 +11,7 @@ import { APPLICATION_LAYOUT_VERSION } from "@relkit/contracts";
 export const SnapshotPath = Schema.String.check(
   Schema.isMaxLength(1024),
   Schema.isPattern(
-    /^(?!\/)(?!.*(?:^|\/)\.{1,2}(?:\/|$))[A-Za-z0-9_@+.,()=-]+(?:\/[A-Za-z0-9_@+.,()=-]+)*$/,
+    /^(?!\/)(?!.*(?:^|\/)\.{1,2}(?:\/|$))[A-Za-z0-9_@+.,()=\[\]-]+(?:\/[A-Za-z0-9_@+.,()=\[\]-]+)*$/,
   ),
 );
 
@@ -29,7 +29,7 @@ export const SnapshotMember = Schema.Struct({
 export const SnapshotResolutionPath = Schema.String.check(
   Schema.isMaxLength(1024),
   Schema.isPattern(
-    /^(?!\/)(?![A-Za-z]:)(?!.*(?:^|\/)\.{1,2}(?:\/|$))[A-Za-z0-9_@+.,():=-]+(?:\/[A-Za-z0-9_@+.,():=-]+)*$/,
+    /^(?!\/)(?![A-Za-z]:)(?!.*(?:^|\/)\.{1,2}(?:\/|$))[A-Za-z0-9_@+.,():=\[\]-]+(?:\/[A-Za-z0-9_@+.,():=\[\]-]+)*$/,
   ),
 );
 
