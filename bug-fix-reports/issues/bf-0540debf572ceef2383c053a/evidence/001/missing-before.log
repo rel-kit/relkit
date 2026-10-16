@@ -1,0 +1,192 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/sqlite-state-path.test.ts:
+[23:28:50.028] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.074792,
+}
+[23:28:50.030] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.206167,
+}
+[23:28:50.041] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 10.426375,
+}
+[23:28:50.093] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 51.866458,
+}
+[23:28:50.097] INFO (#89): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.147708,
+}
+(pass) generated SQLite defaults place mutable state below .relkit/state [76.99ms]
+[23:28:50.097] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.146334,
+}
+[23:28:50.098] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.676916,
+}
+[23:28:50.101] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.531917,
+}
+[23:28:50.126] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 25.195209,
+}
+[23:28:50.127] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.471,
+}
+[23:28:50.127] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.112375,
+}
+[23:28:50.127] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.136792,
+}
+[23:28:50.127] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122959,
+}
+[23:28:50.128] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1055,
+}
+[23:28:50.128] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.098917,
+}
+[23:28:50.128] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.089291,
+}
+[23:28:50.128] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.096625,
+}
+[23:28:50.128] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.116709,
+}
+[23:28:50.128] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.173791,
+}
+[23:28:50.129] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122791,
+}
+[23:28:50.129] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.118292,
+}
+[23:28:50.129] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.150833,
+}
+43 |     stdout: "pipe",
+44 |     stderr: "pipe",
+45 |   });
+46 |   const output =
+47 |     (await new Response(child.stdout).text()) + (await new Response(child.stderr).text());
+48 |   expect(await child.exited, output).toBe(0);
+                                          ^
+error: AssertionError: The input did not match the regular expression /DATABASE_PATH is required/. Input:
+
+'TypeError [ERR_INVALID_ARG_TYPE]: The "path" property must be of type string, got undefined'
+
+ generatedMessage: true,
+   expected: /DATABASE_PATH is required/,
+   operator: "rejects",
+       code: "ERR_ASSERTION"
+
+      at expectedException (node:assert:381:33)
+      at expectsError (node:assert:449:20)
+      at rejects (node:assert:487:15)
+      at processTicksAndRejections (native:7:39)
+
+ 6 | import * as schema from "./schema/index.js";
+ 7 | 
+ 8 | export default defineDrizzleService({
+ 9 |   schema,
+10 |   client: ({ env }) => {
+11 |     mkdirSync(dirname(env.DATABASE_PATH), { recursive: true });
+                   ^
+TypeError: The "path" property must be of type string, got undefined
+ code: "ERR_INVALID_ARG_TYPE"
+
+      at client (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-add-acceptance-QQ0m7X/app/src/services/database/service.ts:11:15)
+      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-add-acceptance-QQ0m7X/app/runtime-proof.ts:8:48)
+      at waitForActual (node:assert:406:34)
+      at rejects (node:assert:487:44)
+      at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-add-acceptance-QQ0m7X/app/runtime-proof.ts:8:20
+
+Bun v1.3.10 (macOS arm64)
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/sqlite-state-path.test.ts:48:38)
+[23:28:50.280] INFO (#120): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 4.03925,
+}
+(fail) generated SQLite activation creates missing parent directories lazily [183.33ms]
+
+ 1 pass
+ 1 fail
+ 3 expect() calls
+Ran 2 tests across 1 file. [532.00ms]

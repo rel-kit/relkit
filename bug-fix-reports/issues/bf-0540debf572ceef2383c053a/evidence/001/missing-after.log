@@ -1,0 +1,148 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/sqlite-state-path.test.ts:
+[23:30:18.941] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 6.376291,
+}
+[23:30:18.943] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.92675,
+}
+[23:30:18.952] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 9.317292,
+}
+[23:30:19.000] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 47.3305,
+}
+[23:30:19.003] INFO (#89): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.12125,
+}
+(pass) generated SQLite defaults place mutable state below .relkit/state [71.62ms]
+[23:30:19.004] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.290875,
+}
+[23:30:19.005] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.640584,
+}
+[23:30:19.007] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.334834,
+}
+[23:30:19.030] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 22.700167,
+}
+[23:30:19.031] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.433208,
+}
+[23:30:19.031] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.150208,
+}
+[23:30:19.031] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.104625,
+}
+[23:30:19.031] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1045,
+}
+[23:30:19.031] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.107334,
+}
+[23:30:19.032] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105125,
+}
+[23:30:19.032] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105459,
+}
+[23:30:19.032] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092667,
+}
+[23:30:19.032] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.114917,
+}
+[23:30:19.032] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.179333,
+}
+[23:30:19.032] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.113417,
+}
+[23:30:19.032] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.093709,
+}
+[23:30:19.033] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.14625,
+}
+[23:30:19.173] INFO (#120): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 4.060875,
+}
+(pass) generated SQLite activation creates missing parent directories lazily [169.80ms]
+
+ 2 pass
+ 0 fail
+ 3 expect() calls
+Ran 2 tests across 1 file. [505.00ms]
