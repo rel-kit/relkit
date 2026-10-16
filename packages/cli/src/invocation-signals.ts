@@ -5,7 +5,7 @@
  */
 
 /**
- * Owns INT/TERM listeners for one invocation controller.
+ * Owns INT/TERM/HUP listeners for one invocation controller.
  * @param controller - Executable-owned cancellation authority.
  * @returns Exact release callback; native listeners never execute an Effect.
  */
@@ -30,6 +30,17 @@ export function installInvocationSignals(controller: AbortController): () => voi
             code: "RELKIT_INTERRUPTED",
             exitCode: 143,
             signal: "SIGTERM",
+          }),
+        ),
+    ],
+    [
+      "SIGHUP",
+      () =>
+        controller.abort(
+          Object.assign(new Error("Received SIGHUP."), {
+            code: "RELKIT_INTERRUPTED",
+            exitCode: 129,
+            signal: "SIGHUP",
           }),
         ),
     ],
