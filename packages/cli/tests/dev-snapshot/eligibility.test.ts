@@ -25,7 +25,20 @@ it.effect("accepts generated symbolic environment, aliases and deferred runtime 
     ];
     for (const source of sources)
       expect(
-        Exit.isSuccess(yield* Effect.exit(verifyStaticSnapshotSource(source, "src/route.ts"))),
+        Exit.isSuccess(
+          yield* Effect.exit(
+            verifyStaticSnapshotSource(
+              source,
+              "src/route.ts",
+              new Map([
+                [
+                  "src/hello/function.ts",
+                  'import {defineFunction} from "@relkit/app/functions"; export default defineFunction({handler:async () => "hello"});',
+                ],
+              ]),
+            ),
+          ),
+        ),
         source,
       ).toBe(true);
   }),

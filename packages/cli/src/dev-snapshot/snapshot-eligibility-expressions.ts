@@ -4,7 +4,13 @@
  * dynamic properties and construction callbacks reject snapshot eligibility.
  */
 import ts from "typescript";
-import { isLiteralSnapshotDefault } from "./snapshot-default-eligibility.js";
+import {
+  isLiteralSnapshotDefault,
+  isStaticSnapshotUrl,
+  isStaticSnapshotText,
+} from "./snapshot-default-eligibility.js";
+import { assertSqliteExpression } from "./snapshot-sqlite-eligibility.js";
+import { assertCommerceCall } from "./snapshot-commerce-eligibility.js";
 
 const schemaMethods = new Set([
   "string",
@@ -30,6 +36,7 @@ const schemaMethods = new Set([
   "uuid",
   "datetime",
   "strict",
+  "secret",
 ]);
 
 const descriptorFactories = new Set([
@@ -45,7 +52,6 @@ const descriptorFactories = new Set([
   "defineServiceRoutes",
   "defineTask",
 ]);
-
 const providerFactories = new Set(["localAgentState", "localRealtime"]);
 const constructors = new Set(["FakeToolCallingModel", "MemorySaver", "StateSchema"]);
 const deferredProperties = new Set(["edges", "handler"]);
@@ -61,6 +67,8 @@ export function assertPureExpression(
   expression: ts.Expression,
   bindings: ReadonlyMap<string, string>,
 ): void {
+  if (assertSqliteExpression(expression, bindings)) return;
+  if (isStaticSnapshotText(expression, bindings)) return;
   if (
     ts.isStringLiteral(expression) ||
     ts.isNumericLiteral(expression) ||
@@ -70,7 +78,11 @@ export function assertPureExpression(
   )
     return;
   if (ts.isIdentifier(expression)) {
-    if (expression.text === "undefined" || bindings.has(expression.text)) return;
+    if (
+      expression.text === "undefined" ||
+      (bindings.has(expression.text) && bindings.get(expression.text) !== "runtime-only")
+    )
+      return;
     throw new Error("Ambient compilation input");
   }
   if (
@@ -94,6 +106,7 @@ export function assertPureExpression(
     return;
   }
   if (ts.isNewExpression(expression)) {
+    if (isStaticSnapshotUrl(expression, bindings)) return;
     if (
       !ts.isIdentifier(expression.expression) ||
       !constructors.has(bindings.get(expression.expression.text) ?? "")
@@ -145,6 +158,7 @@ function assertPureCall(
   expression: ts.CallExpression,
   bindings: ReadonlyMap<string, string>,
 ): void {
+  if (assertCommerceCall(expression, bindings, assertPureExpression)) return;
   const target = expression.expression;
   if (ts.isIdentifier(target)) {
     const binding = bindings.get(target.text) ?? "";
@@ -180,7 +194,7 @@ function assertPureCall(
     ts.isPropertyAccessExpression(target) &&
     target.name.text === "asTool" &&
     ts.isIdentifier(target.expression) &&
-    bindings.get(target.expression.text) === "local" &&
+    bindings.get(target.expression.text) === "function-descriptor" &&
     expression.arguments.length === 1
   ) {
     assertPureExpression(expression.arguments[0]!, bindings);
@@ -188,7 +202,12 @@ function assertPureCall(
   }
   if (!ts.isPropertyAccessExpression(target) || !schemaMethods.has(target.name.text))
     throw new Error("Unaudited call");
-  if (target.name.text === "default" && !expression.arguments.every(isLiteralSnapshotDefault))
+  if (
+    target.name.text === "default" &&
+    !expression.arguments.every(
+      (argument) => isLiteralSnapshotDefault(argument) || isStaticSnapshotUrl(argument, bindings),
+    )
+  )
     throw new Error("Dynamic schema default");
   let receiver = target.expression;
   while (ts.isCallExpression(receiver) && ts.isPropertyAccessExpression(receiver.expression))
