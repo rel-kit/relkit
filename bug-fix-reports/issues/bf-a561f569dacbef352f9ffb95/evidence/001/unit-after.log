@@ -1,0 +1,27 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/services/source-watch-synchronous.test.ts:
+[20:42:31.896] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 2.278709,
+}
+[20:42:32.005] INFO (#332): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.025791,
+}
+[20:42:32.006] INFO (#332): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.423125,
+}
+(pass) manual watcher admission returns synchronously in the acquired session scope [117.77ms]
+
+ 1 pass
+ 0 fail
+ 3 expect() calls
+Ran 1 test across 1 file. [496.00ms]
