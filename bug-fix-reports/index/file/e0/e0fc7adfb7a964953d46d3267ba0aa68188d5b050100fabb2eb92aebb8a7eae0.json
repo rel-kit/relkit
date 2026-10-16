@@ -1,0 +1,55 @@
+{
+  "key": ".changeset/dev-environment-recovery.md",
+  "matches": {
+    "bf-a561f569dacbef352f9ffb95": {
+      "id": "bf-a561f569dacbef352f9ffb95",
+      "status": "verified",
+      "what": "Manual source-watcher startup threw AsyncFiberError, blocking source and scaffold reload admission.",
+      "root_cause": "startDevSourceWatcher in dev-watch.ts ran session.nativeEngine.watch synchronously. That effect in dev-session-engine.ts begins with ownedNativePromise importing dev-watch.js, which must suspend even when the module is cached. Effect.runSync correctly rejects suspended work.",
+      "fixed_by": "Add a narrow internal watchWith operation that supplies the existing engine authorities and Scope to an already-loaded watcher effect. The synchronous facade uses it directly; the normal CLI watch effect continues importing lazily and then uses the same owner. Preserve the public watcher return type and supervisor API.",
+      "files": [
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/src/commands/dev-session-engine.ts",
+        "packages/cli/src/commands/dev-session.types.ts",
+        "packages/cli/tests/services/dev-support-fixture.ts",
+        "packages/cli/tests/services/source-watch-synchronous.test.ts",
+        ".changeset/dev-environment-recovery.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:08:23+00:00",
+      "report": "bug-fix-reports/issues/bf-a561f569dacbef352f9ffb95/report.md"
+    },
+    "bf-dd7ddbd6f31a6ea12ef97ce5": {
+      "id": "bf-dd7ddbd6f31a6ea12ef97ce5",
+      "status": "verified",
+      "what": "Development reloads remain rejected after repairing dotenv until the CLI restarts.",
+      "root_cause": "CliDevSupervisor previously forwarded only startup/options environment into a --no-env-file candidate. Deleted values could return through inherited process.env in packages/supervisor/src/candidate-process.ts:55. The prepared epoch filter excluded all dotenv events in packages/cli/src/dev-snapshot/snapshot-epoch-path.t",
+      "fixed_by": "Resolve each generation with bounded, joined Bun dotenv helpers and retained file-key ownership; explicitly unset removed inherited keys; preserve SDK/runtime overrides; observe every active standard dotenv file in both paths. Include Bun custom-mode fallback and mode-local precedence. Both complete real CLI/HTTP matri",
+      "files": [
+        ".changeset/dev-environment-recovery.md",
+        "apps/docs/content/docs/fundamentals/environment.mdx",
+        "packages/cli/src/commands/dev-environment-files.ts",
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/src/dev-snapshot/snapshot-epoch-path.ts",
+        "packages/cli/src/services/dev-environment.schemas.ts",
+        "packages/cli/src/services/dev-environment.service.ts",
+        "packages/cli/src/services/dev-environment.types.ts",
+        "packages/cli/src/services/dev-supervisor.service.ts",
+        "packages/cli/tests/dev-environment/recovery-cycles.ts",
+        "packages/cli/tests/dev-environment/recovery-process.ts",
+        "packages/cli/tests/dev-environment/recovery.probe.ts",
+        "packages/cli/tests/dev-environment/recovery.types.ts",
+        "packages/cli/tests/services/dev-environment-errors.test.ts",
+        "packages/cli/tests/services/dev-environment-native.test.ts",
+        "packages/cli/tests/services/dev-environment-values.test.ts",
+        "packages/cli/tests/services/source-watch-fixture.ts",
+        "packages/cli/tests/services/source-watch.test.ts",
+        "packages/supervisor/src/candidate-process.ts",
+        "packages/supervisor/tests/compatibility/environment.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:08:47+00:00",
+      "report": "bug-fix-reports/issues/bf-dd7ddbd6f31a6ea12ef97ce5/report.md"
+    }
+  }
+}
