@@ -1,0 +1,31 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/invocation/signals.test.ts:
+(pass) invocation owns SIGINT cancellation and releases its listener [1.79ms]
+(pass) invocation owns SIGTERM cancellation and releases its listener
+(pass) invocation owns SIGHUP cancellation and releases its listener [0.15ms]
+(pass) the first shutdown signal wins and unrelated listeners survive release [0.43ms]
+
+packages/cli/tests/services/dev-initial-native.test.ts:
+(pass) initial development SIGTERM joins the CPU-bound compiler group within the strict shutdown limit [1387.28ms]
+127 |         child.kill(signal);
+128 |         const exitCode = await Promise.race([child.exited, Bun.sleep(2_000).then(() => undefined)]);
+129 |         // Assert the finite deadline before awaiting readers so a hung child
+130 |         // reaches finally and its physical cleanup can finish.
+131 |         expect(exitCode).toBeDefined();
+132 |         expect(exitCode, (await output).join("\n")).toBe(expectedCode);
+                                                          ^
+error: 
+RELKIT_INTERRUPTED: Operation interrupted.
+
+
+Expected: 129
+Received: 130
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/dev-initial-native.test.ts:132:53)
+(fail) initial development SIGHUP joins the CPU-bound compiler group within the strict shutdown limit [1074.08ms]
+
+ 5 pass
+ 1 fail
+ 32 expect() calls
+Ran 6 tests across 2 files. [2.63s]

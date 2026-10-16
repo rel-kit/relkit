@@ -1,0 +1,71 @@
+[
+  {
+    "label": "runtime-after-final-final",
+    "command": [
+      "python3",
+      "test-results/dev-process-lifetime-20261016/probe.py",
+      "hup",
+      "--prepared",
+      "--expect-graceful"
+    ],
+    "exitCode": 0,
+    "seconds": 26.98
+  },
+  {
+    "label": "ordinary-hup-after-final",
+    "command": [
+      "python3",
+      "test-results/dev-process-lifetime-20261016/probe.py",
+      "hup",
+      "--expect-graceful"
+    ],
+    "exitCode": 0,
+    "seconds": 25.35
+  },
+  {
+    "label": "ordinary-int-after-final",
+    "command": [
+      "python3",
+      "test-results/dev-process-lifetime-20261016/probe.py",
+      "int",
+      "--expect-graceful"
+    ],
+    "exitCode": 0,
+    "seconds": 23.55
+  },
+  {
+    "label": "prepared-term-after-final",
+    "command": [
+      "python3",
+      "test-results/dev-process-lifetime-20261016/probe.py",
+      "term",
+      "--prepared",
+      "--expect-graceful"
+    ],
+    "exitCode": 0,
+    "seconds": 20.9
+  },
+  {
+    "label": "prepared-int-after-final",
+    "command": [
+      "python3",
+      "test-results/dev-process-lifetime-20261016/probe.py",
+      "int",
+      "--prepared",
+      "--expect-graceful"
+    ],
+    "exitCode": 0,
+    "seconds": 22.37
+  },
+  {
+    "label": "prepared-idle-after-final",
+    "command": [
+      "python3",
+      "test-results/dev-process-lifetime-20261016/probe.py",
+      "idle",
+      "--prepared"
+    ],
+    "exitCode": 0,
+    "seconds": 32.04
+  }
+]
