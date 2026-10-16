@@ -1,0 +1,13 @@
+bun test v1.3.10 (30e609e0)
+
+packages/create-relkit/tests/create-capabilities.effect.test.ts:
+(pass) creation capability evidence > certifies the default tuple for the actual packaged release identity [0.52ms]
+(pass) creation capability evidence > accepts only the current fully evidenced tuple
+(pass) creation capability evidence > filters partial interactive choices with the same table
+(pass) creation capability evidence > pins the certified source template bytes [1.50ms]
+(pass) creation capability evidence > gates every table entry on complete passing evidence [0.62ms]
+
+ 5 pass
+ 0 fail
+ 22 expect() calls
+Ran 5 tests across 1 file. [55.00ms]
