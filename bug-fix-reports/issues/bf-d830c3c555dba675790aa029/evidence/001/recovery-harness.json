@@ -1,0 +1,10 @@
+{
+  "application": "/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab",
+  "matrixScenarios": 16,
+  "matrixAlgorithmEditedThisTurn": false,
+  "sha256": {
+    "scripts/recovery-proof.ts": "02f185439dfa79803f0a5f6a986234a42f4d9c3fd811183c3c7af4e484ac1727",
+    "scripts/recovery-session.ts": "efdbb408b4ced494da398c275cfdd69aa940774333a38b98ae978349424e8006",
+    "scripts/wait-idle.ts": "a55c30c3d4ae4aa3ccf34109e07fdfae06207a43d0f589a81530484420f95ac7"
+  }
+}
