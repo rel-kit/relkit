@@ -1,12 +1,47 @@
 import { expect, test } from "bun:test";
 import { existsSync } from "node:fs";
-import { mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import ts from "typescript";
 
 const repository = resolve(import.meta.dirname, "../..");
 const probe = join(repository, "packages/cli/tests/dev-environment/recovery.probe.ts");
+
+test("recovery probe accepts lexical and canonical temporary app paths", async () => {
+  const app = await mkdtemp(join(tmpdir(), "relkit-recovery-path-test-"));
+  const manifest = JSON.stringify({ scripts: {} });
+  await mkdir(join(app, "src/platform"), { recursive: true });
+  await mkdir(join(app, "src/services/hello/functions"), { recursive: true });
+  await writeFile(join(app, "package.json"), manifest);
+  try {
+    for (const input of new Set([app, await realpath(app)])) {
+      const child = Bun.spawn([process.execPath, probe, input, "--source-only"], {
+        stdout: "pipe",
+        stderr: "pipe",
+      });
+      const [code, stdout, stderr] = await Promise.all([
+        child.exited,
+        new Response(child.stdout).text(),
+        new Response(child.stderr).text(),
+      ]);
+      // The deliberately incomplete fixture stops before it can launch a server.
+      expect(code).not.toBe(0);
+      expect(stderr).toContain("Missing fixture route");
+      const evidence = stdout.match(/^Evidence directory: (.+)$/m)?.[1];
+      expect(evidence).toBeDefined();
+      if (evidence !== undefined) {
+        expect((await realpath(evidence)).startsWith((await realpath(tmpdir())) + "/")).toBe(true);
+        expect(evidence).toContain("/relkit-dev-recovery-evidence-");
+        await rm(evidence, { recursive: true });
+      }
+      expect(await readFile(join(app, "package.json"), "utf8")).toBe(manifest);
+      expect(existsSync(join(app, "src/platform/env.ts"))).toBe(false);
+    }
+  } finally {
+    await rm(app, { recursive: true, force: true });
+  }
+});
 
 test("recovery probe rejects caller-selected evidence directories before writing", async () => {
   const app = await mkdtemp(join(tmpdir(), "relkit-recovery-path-test-"));

@@ -29,7 +29,8 @@ if (
   throw new Error("Probe owns its evidence directory; only --source-only is accepted");
 const temporary = await realpath(tmpdir());
 const candidate = resolve(appPath);
-if (!candidate.startsWith(resolve(tmpdir()) + "/") && !candidate.startsWith(temporary + "/"))
+const temporaryBase = candidate.startsWith(temporary + "/") ? temporary : resolve(tmpdir());
+if (!candidate.startsWith(temporaryBase + "/"))
   throw new Error("Probe requires a disposable temporary app");
 const root = await realpath(candidate);
 const cliRoot = resolve(import.meta.dirname, "../..");
