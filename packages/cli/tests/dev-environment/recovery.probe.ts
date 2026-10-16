@@ -2,10 +2,11 @@
  * Runs opt-in installed-app acceptance against a disposable minimal app directory.
  * It backs up authored inputs, invokes the source CLI through literal `bun dev`,
  * proves both startup paths, and joins all processes before restoring inputs.
- * Usage: bun recovery.probe.ts <temporary-installed-minimal-app> <evidence-dir>.
+ * Usage: bun recovery.probe.ts <temporary-installed-minimal-app> [--source-only].
+ * Evidence is written to a fresh owned temporary directory printed at startup.
  */
 import { expect } from "bun:test";
-import { readFile, realpath, rm, writeFile, mkdir } from "node:fs/promises";
+import { readFile, realpath, rm, writeFile, mkdir, mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Effect } from "effect";
@@ -19,16 +20,22 @@ import {
   sourceCycle,
 } from "./recovery-cycles.js";
 
-const appPath = process.argv[2],
-  evidencePath = process.argv[3];
-if (appPath === undefined || evidencePath === undefined)
-  throw new Error("Expected temporary app and evidence directory");
-const root = await realpath(appPath);
-const evidence = resolve(evidencePath);
-const cliRoot = resolve(import.meta.dirname, "../..");
-if (!root.startsWith((await realpath(tmpdir())) + "/"))
+const appPath = process.argv[2];
+if (appPath === undefined) throw new Error("Expected temporary app directory");
+if (
+  process.argv.length > 4 ||
+  (process.argv[3] !== undefined && process.argv[3] !== "--source-only")
+)
+  throw new Error("Probe owns its evidence directory; only --source-only is accepted");
+const temporary = await realpath(tmpdir());
+const candidate = resolve(appPath);
+if (!candidate.startsWith(resolve(tmpdir()) + "/") && !candidate.startsWith(temporary + "/"))
   throw new Error("Probe requires a disposable temporary app");
-await mkdir(evidence, { recursive: true });
+const root = await realpath(candidate);
+const cliRoot = resolve(import.meta.dirname, "../..");
+if (!root.startsWith(temporary + "/")) throw new Error("Probe requires a disposable temporary app");
+const evidence = await mkdtemp(join(tmpdir(), "relkit-dev-recovery-evidence-"));
+console.log(`Evidence directory: ${evidence}`);
 const names = [
   "package.json",
   "src/platform/env.ts",

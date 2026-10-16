@@ -8,7 +8,15 @@ import { prepareSnapshotCommand } from "../../packages/cli/src/dev-snapshot/snap
 
 const source = "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dev-recovery-7uwlmdbu/app";
 const repository = resolve(import.meta.dir, "../..");
-const phase = process.argv[2] ?? "before";
+const phase = (() => {
+  switch (process.argv[2]) {
+    case undefined:
+    case "before": return "before";
+    case "after": return "after";
+    case "smoke": return "smoke";
+    default: throw new Error("Invalid probe phase");
+  }
+})();
 const root = await mkdtemp(join(tmpdir(), "relkit-prepared-compatibility-"));
 let failures = 0;
 
