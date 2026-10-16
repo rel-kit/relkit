@@ -1,0 +1,18 @@
+[FAIL] FAILURES:
+  (fail) custom NODE_ENV follows Bun's development dotenv fallback [16.49ms]
+  error: expect(received).toBe(expected)
+  Expected: "development"
+  Received: undefined
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/dev-environment-values.test.ts:123:54)
+  at ~effect/Effect/successCont (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+  at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+  at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+  at runInAsyncScope (node:async_hooks:137:23)
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [212.00ms]
+
+[full output: rtk recall c6a0876159f5]

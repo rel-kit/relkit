@@ -1,0 +1,202 @@
+$ bun /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts dev --port 15762 --inspector-port 15763 --local off --no-color --verbose
+21:22:45.098 INFO  relkit            Starting development server
+21:22:45.115 DEBUG relkit            supervisor.transition
+                                     {"phase":"idle","state":"compiling-candidate"}
+21:22:45.117 INFO  build             Compiling application
+21:22:45.125 DEBUG relkit            candidate.compile.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-1"}
+21:22:45.402 DEBUG relkit            candidate.compile.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-1","entrypoint":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-1/server/index.js"}
+21:22:45.408 DEBUG relkit            candidate.start.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-1","port":58519}
+21:22:45.410 DEBUG relkit            candidate.start.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-1","pid":42742,"port":58519}
+21:22:45.413 DEBUG relkit            supervisor.transition
+                                     {"phase":"compiling-candidate","state":"starting-candidate"}
+21:22:45.415 DEBUG relkit            supervisor.transition
+                                     {"phase":"starting-candidate","state":"verifying-hash-and-readiness"}
+21:22:45.859 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.24625,"operation":"server.readiness","outcome":"success"}
+21:22:45.875 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.222625,"operation":"server.provider-delay","outcome":"success"}
+21:22:45.876 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.038167,"operation":"server.readiness","outcome":"success"}
+21:22:45.877 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":2.991125,"operation":"server.invocation","outcome":"success"}
+21:22:45.892 DEBUG relkit            supervisor.outcome
+                                     {"phase":"verification","state":"verification-succeeded"}
+21:22:45.893 DEBUG relkit            supervisor.transition
+                                     {"phase":"verifying-hash-and-readiness","state":"switching"}
+21:22:45.896 DEBUG relkit            supervisor.outcome
+                                     {"phase":"switch","state":"switch-succeeded"}
+21:22:45.896 DEBUG relkit            supervisor.transition
+                                     {"phase":"switching","state":"active"}
+21:22:45.897 INFO  build             Compiled in 780ms
+21:22:45.898 INFO  server            Ready
+                                     API        http://127.0.0.1:15762
+                                     Reference  http://127.0.0.1:15762/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:15762/_relkit/v1/openapi.json
+21:22:45.878 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":5.098333,"operation":"server.resource","outcome":"success"}
+21:22:45.988 INFO  hello.greet       hello invoked
+                                     request: request-40827291-3b04-4f6a-aca2-29a3c6d44539
+                                     trace: 80b5fa6342044dc7792e72a88a86cda3
+                                     {"name":"Probe","requestId":"request-40827291-3b04-4f6a-aca2-29a3c6d44539","traceId":"80b5fa6342044dc7792e72a88a86cda3","spanId":"55ee1cada9d59977","functionId":"hello.greet","serviceId":"hello"}
+21:22:45.998 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":37.617,"operation":"server.invocation","outcome":"success"}
+21:22:46.010 INFO  http              GET /hello → 200 in 74ms
+                                     request: request-40827291-3b04-4f6a-aca2-29a3c6d44539
+                                     trace: 80b5fa6342044dc7792e72a88a86cda3
+21:22:46.040 INFO  hello.greet       hello invoked
+                                     request: request-0af6d05b-6bdc-4ea1-a731-0a4259b4008a
+                                     trace: 667442fb5c5b351b88bfbaa77a35d746
+                                     {"name":"Probe","requestId":"request-0af6d05b-6bdc-4ea1-a731-0a4259b4008a","traceId":"667442fb5c5b351b88bfbaa77a35d746","spanId":"69611c85f1b673f6","functionId":"hello.greet","serviceId":"hello"}
+21:22:46.058 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":32.641625,"operation":"server.invocation","outcome":"success"}
+21:22:46.066 INFO  http              GET /hello → 200 in 50ms
+                                     request: request-0af6d05b-6bdc-4ea1-a731-0a4259b4008a
+                                     trace: 667442fb5c5b351b88bfbaa77a35d746
+21:22:46.170 DEBUG relkit            supervisor.transition
+                                     {"phase":"active","state":"compiling-candidate"}
+21:22:46.170 INFO  build             Rebuilding application
+                                     src/platform/env.ts
+21:22:46.172 DEBUG relkit            candidate.compile.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2"}
+21:22:46.216 DEBUG inspector         ▲ Next.js 16.3.8
+21:22:46.218 DEBUG inspector         - Local:         http://127.0.0.1:15763
+21:22:46.219 DEBUG inspector         - Network:       http://127.0.0.1:15763
+21:22:46.226 DEBUG inspector         ✓ Ready in 0ms
+21:22:46.254 DEBUG inspector         ✓ Running next.config took 7ms
+21:22:46.422 INFO  relkit            dev.inspector.ready
+                                     {"inspector":"http://127.0.0.1:15763"}
+21:22:49.978 DEBUG relkit            candidate.compile.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2","entrypoint":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2/server/index.js"}
+21:22:49.988 DEBUG relkit            candidate.start.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2","port":58574}
+21:22:49.990 DEBUG relkit            candidate.start.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2","pid":42782,"port":58574}
+21:22:49.992 DEBUG relkit            supervisor.outcome
+                                     {"phase":"compile","state":"compile-succeeded"}
+21:22:49.993 DEBUG relkit            supervisor.transition
+                                     {"phase":"compiling-candidate","state":"starting-candidate"}
+21:22:49.995 DEBUG relkit            supervisor.outcome
+                                     {"phase":"start","state":"start-succeeded"}
+21:22:49.998 DEBUG relkit            supervisor.transition
+                                     {"phase":"starting-candidate","state":"verifying-hash-and-readiness"}
+21:22:50.677 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.464875,"operation":"server.readiness","outcome":"success"}
+21:22:50.705 ERROR lifecycle         Execution operation failed
+                                     {"domain":"runtime","duration_ms":1.194042,"operation":"server.invocation","outcome":"failure"}
+21:22:50.707 ERROR provider          Provider startup failed
+                                     EnvResolutionError [RELKIT_ENVIRONMENT_INVALID]: RECOVERY_REQUIRED: Required value is missing
+                                     at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/packages/config/dist/resolve.js:27:43)
+                                     at ~effect/Effect/successCont (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+                                     at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+                                     at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+                                     at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2460:9)
+                                     at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2538:19)
+                                     at runConfigSync2 (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/packages/config/dist/config-observability.js:47:25)
+                                     at resolveRuntimeEnvironment (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2/server/.relkit/generated/.dev-K4CHQr/.relkit-build-tBlYYp/server/index.ts:947:22)
+                                     at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2/server/.relkit/generated/.dev-K4CHQr/.relkit-build-tBlYYp/server/index.ts:116:31
+                                     at asyncModuleEvaluation (unknown:2)
+                                     {"code":"RELKIT_ENVIRONMENT_INVALID","detail":"RECOVERY_REQUIRED: Required value is missing","error":{"message":"RECOVERY_REQUIRED: Required value is missing","name":"EnvResolutionError","stack":"Error\n    at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/packages/config/dist/resolve.js:27:43)\n    at ~effect/Effect/successCont (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)\n    at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)\n    at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)\n    at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2460:9)\n    at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2538:19)\n    at runConfigSync2 (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/packages/config/dist/config-observability.js:47:25)\n    at resolveRuntimeEnvironment (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2/server/.relkit/generated/.dev-K4CHQr/.relkit-build-tBlYYp/server/index.ts:947:22)\n    at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2/server/.relkit/generated/.dev-K4CHQr/.relkit-build-tBlYYp/server/index.ts:116:31\n    at asyncModuleEvaluation (unknown:2)"}}
+21:22:50.708 ERROR lifecycle         Execution operation failed
+                                     {"domain":"runtime","duration_ms":4.500292,"operation":"server.resource","outcome":"failure"}
+21:23:00.015 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.212958,"operation":"server.cleanup","outcome":"success"}
+21:23:00.042 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":24.761208,"operation":"server.cleanup","outcome":"success"}
+21:23:00.045 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.355959,"operation":"server.cleanup","outcome":"success"}
+21:23:00.046 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":35.865375,"operation":"server.shutdown","outcome":"success"}
+21:23:00.065 DEBUG relkit            candidate.process-exited
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-2","exitCode":0}
+21:23:00.072 DEBUG relkit            supervisor.outcome
+                                     {"phase":"verification","state":"verification-failed"}
+21:23:00.073 DEBUG relkit            supervisor.transition
+                                     {"phase":"verifying-hash-and-readiness","state":"active"}
+21:23:00.073 ERROR build             Reload failed; previous version is still serving
+                                     RELKIT_CANDIDATE_PROVIDER_NOT_READY: Candidate providers are not ready.
+                                     at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/supervisor/dist/verification-probe.js:50:54)
+                                     at ~effect/Effect/successCont (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+                                     at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+                                     at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+                                     at runInAsyncScope (node:async_hooks:137:23)
+                                     at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
+21:23:00.154 INFO  hello.greet       hello invoked
+                                     request: request-c70177f4-2421-4408-84f1-89ae0eae93d2
+                                     trace: 644fbe2602be57752a5adfe15e2ffc3f
+                                     {"name":"Probe","requestId":"request-c70177f4-2421-4408-84f1-89ae0eae93d2","traceId":"644fbe2602be57752a5adfe15e2ffc3f","spanId":"3c0c5aac04c3f052","functionId":"hello.greet","serviceId":"hello"}
+21:23:00.161 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":24.198208,"operation":"server.invocation","outcome":"success"}
+21:23:00.168 INFO  http              GET /hello → 200 in 51ms
+                                     request: request-c70177f4-2421-4408-84f1-89ae0eae93d2
+                                     trace: 644fbe2602be57752a5adfe15e2ffc3f
+21:23:00.264 DEBUG relkit            supervisor.transition
+                                     {"phase":"active","state":"compiling-candidate"}
+21:23:00.265 INFO  build             Rebuilding application
+                                     .env.local
+21:23:00.267 DEBUG relkit            candidate.compile.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3"}
+21:23:06.310 DEBUG relkit            candidate.compile.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3","entrypoint":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3/server/index.js"}
+21:23:06.318 DEBUG relkit            candidate.start.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3","port":58661}
+21:23:06.320 DEBUG relkit            candidate.start.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3","pid":42946,"port":58661}
+21:23:06.323 DEBUG relkit            supervisor.outcome
+                                     {"phase":"compile","state":"compile-succeeded"}
+21:23:06.324 DEBUG relkit            supervisor.transition
+                                     {"phase":"compiling-candidate","state":"starting-candidate"}
+21:23:06.326 DEBUG relkit            supervisor.outcome
+                                     {"phase":"start","state":"start-succeeded"}
+21:23:06.327 DEBUG relkit            supervisor.transition
+                                     {"phase":"starting-candidate","state":"verifying-hash-and-readiness"}
+21:23:06.839 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.246417,"operation":"server.readiness","outcome":"success"}
+21:23:06.858 ERROR lifecycle         Execution operation failed
+                                     {"domain":"runtime","duration_ms":0.966334,"operation":"server.invocation","outcome":"failure"}
+21:23:06.860 ERROR provider          Provider startup failed
+                                     EnvResolutionError [RELKIT_ENVIRONMENT_INVALID]: RECOVERY_REQUIRED: Required value is missing
+                                     at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/packages/config/dist/resolve.js:27:43)
+                                     at ~effect/Effect/successCont (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+                                     at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+                                     at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+                                     at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2460:9)
+                                     at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2538:19)
+                                     at runConfigSync2 (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/packages/config/dist/config-observability.js:47:25)
+                                     at resolveRuntimeEnvironment (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3/server/.relkit/generated/.dev-K4CHQr/.relkit-build-HuoDRj/server/index.ts:947:22)
+                                     at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3/server/.relkit/generated/.dev-K4CHQr/.relkit-build-HuoDRj/server/index.ts:116:31
+                                     at asyncModuleEvaluation (unknown:2)
+                                     {"code":"RELKIT_ENVIRONMENT_INVALID","detail":"RECOVERY_REQUIRED: Required value is missing","error":{"message":"RECOVERY_REQUIRED: Required value is missing","name":"EnvResolutionError","stack":"Error\n    at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/packages/config/dist/resolve.js:27:43)\n    at ~effect/Effect/successCont (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)\n    at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)\n    at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)\n    at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2460:9)\n    at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2538:19)\n    at runConfigSync2 (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/Workspace/relkit/packages/config/dist/config-observability.js:47:25)\n    at resolveRuntimeEnvironment (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3/server/.relkit/generated/.dev-K4CHQr/.relkit-build-HuoDRj/server/index.ts:947:22)\n    at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3/server/.relkit/generated/.dev-K4CHQr/.relkit-build-HuoDRj/server/index.ts:116:31\n    at asyncModuleEvaluation (unknown:2)"}}
+21:23:06.860 ERROR lifecycle         Execution operation failed
+                                     {"domain":"runtime","duration_ms":3.491541,"operation":"server.resource","outcome":"failure"}
+21:23:12.214 INFO  relkit            Stopping development server
+21:23:12.206 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.859125,"operation":"server.cleanup","outcome":"success"}
+21:23:12.248 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":39.57575,"operation":"server.cleanup","outcome":"success"}
+21:23:12.256 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.419458,"operation":"server.cleanup","outcome":"success"}
+21:23:12.258 INFO  lifecycle         Execution operation completed
+                                     {"domain":"engine","duration_ms":0.939375,"operation":"providers.release","outcome":"success"}
+21:23:12.262 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":11.592042,"operation":"server.cleanup","outcome":"success"}
+21:23:12.258 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":62.616041,"operation":"server.shutdown","outcome":"success"}
+21:23:12.284 DEBUG relkit            candidate.process-exited
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-3","exitCode":0}
+21:23:12.281 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":17.176,"operation":"server.cleanup","outcome":"success"}
+21:23:12.299 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":16.560083,"operation":"server.cleanup","outcome":"success"}
+21:23:12.302 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.303083,"operation":"server.cleanup","outcome":"success"}
+21:23:12.303 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":78.255166,"operation":"server.shutdown","outcome":"success"}
+21:23:12.325 DEBUG relkit            candidate.process-exited
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/installed-app/.relkit/generated/.dev-K4CHQr/generation-1","exitCode":0}
+21:23:12.333 INFO  relkit            Development server stopped
+RELKIT_INTERRUPTED: Received SIGTERM.
+error: script "dev" exited with code 143
