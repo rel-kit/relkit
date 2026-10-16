@@ -13,9 +13,9 @@ import type { DatabaseDialect } from "./add-types.js";
 export function databaseServiceSource(dialect: DatabaseDialect): string {
   const sqlite = dialect === "sqlite";
   const client = sqlite
-    ? `const sqlite = new Database(env.DATABASE_PATH);\n    return drizzle({ client: sqlite });`
+    ? `const path = env.DATABASE_PATH;\n    if (!path) throw new Error("DATABASE_PATH is required");\n    mkdirSync(dirname(path), { recursive: true });\n    const sqlite = new Database(path);\n    return drizzle({ client: sqlite });`
     : `const url = env.DATABASE_URL;\n    if (!url) throw new Error("DATABASE_URL is required");\n    return drizzle.${dialect === "postgresql" ? "postgres" : "mysql"}(url);`;
-  return `${sqlite ? `import { Database } from "bun:sqlite";\n` : ""}import { defineDrizzleService } from "@relkit/drizzle";
+  return `${sqlite ? `import { Database } from "bun:sqlite";\nimport { mkdirSync } from "node:fs";\nimport { dirname } from "node:path";\n` : ""}import { defineDrizzleService } from "@relkit/drizzle";
 import { drizzle } from "drizzle-orm/${sqlite ? "bun-sqlite" : "bun-sql"}";
 import * as schema from "./schema/index.js";
 
@@ -85,5 +85,31 @@ export default defineConfig({
   out: "./drizzle",
   dbCredentials: { url: ${value} },
 });
+`;
+}
+
+/** Renders the native Bun SQLite migration runner without loading a Node-only driver.
+ * @returns Standalone, finite migration script using the installed Drizzle migrator.
+ */
+export function sqliteMigrationSource(): string {
+  return `import { Database } from "bun:sqlite";
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+
+const path = process.env.DATABASE_PATH;
+if (!path?.trim() || path === ":memory:") {
+  throw new Error("Set DATABASE_PATH to a persistent SQLite file");
+}
+mkdirSync(dirname(path), { recursive: true });
+const client = new Database(path, { create: true });
+try {
+  client.exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
+  migrate(drizzle({ client }), { migrationsFolder: "./drizzle" });
+  console.log("SQLite migrations applied");
+} finally {
+  client.close();
+}
 `;
 }
