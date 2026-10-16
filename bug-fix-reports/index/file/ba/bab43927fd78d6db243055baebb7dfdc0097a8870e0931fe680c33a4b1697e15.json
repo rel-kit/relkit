@@ -1,0 +1,23 @@
+{
+  "key": "packages/cli/tests/dev-snapshot/as-tool-integrity.test.ts",
+  "matches": {
+    "bf-6968f4b18d7d446004cc39f5": {
+      "id": "bf-6968f4b18d7d446004cc39f5",
+      "status": "verified",
+      "what": "Prepared eligibility admits eager ambient code disguised as asTool",
+      "root_cause": "snapshot-eligibility.ts:108 marks arbitrary function declarations local; snapshot-eligibility-expressions.ts treated all local asTool methods as audited constructors",
+      "fixed_by": "Verified explicit function-descriptor provenance through captured backend imports, fail-closed ambiguous/cyclic imports, and static destructuring keys. Same native CLI regression changes from wrongful publication to eligibility rejection; genuine imported tools still prepare. Final recovery32/32, six lifetime cases, an",
+      "files": [
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts",
+        "packages/cli/src/dev-snapshot/snapshot-function-bindings.ts",
+        "packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts",
+        "packages/cli/tests/dev-snapshot/as-tool-integrity.test.ts",
+        "packages/cli/tests/dev-snapshot/eligibility.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-16T15:48:06+00:00",
+      "report": "bug-fix-reports/issues/bf-6968f4b18d7d446004cc39f5/report.md"
+    }
+  }
+}
