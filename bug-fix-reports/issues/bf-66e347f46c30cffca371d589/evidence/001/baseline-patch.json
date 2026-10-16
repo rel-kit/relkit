@@ -1,0 +1,19 @@
+{
+  "what": "Application preloads prevent fresh dotenv resolution",
+  "expected": "The private dotenv helper never executes application preloads",
+  "observed": "Actual resolver with native adapters failed dev.environment.decode after a logging preload contaminated stdout",
+  "root_cause": "dev-environment.service.ts runs its Bun JSON helper in the application cwd with default configuration and inherited runtime options",
+  "files": [
+    "packages/cli/src/services/dev-environment.service.ts"
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Real filesystem/process layers reproduce preload contamination"
+      }
+    ],
+    "after": []
+  }
+}

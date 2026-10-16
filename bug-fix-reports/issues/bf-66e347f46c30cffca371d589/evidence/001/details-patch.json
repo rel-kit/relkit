@@ -1,0 +1,63 @@
+{
+  "files": [
+    "packages/cli/src/services/dev-environment.service.ts",
+    "packages/cli/tests/services/dev-environment-preload.test.ts",
+    "packages/cli/tests/services/dev-environment-native.test.ts"
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Real filesystem/process layers reproduce preload contamination"
+      }
+    ],
+    "after": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-after.txt",
+        "note": "Private helper excludes logging preloads and retains runtime option values"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/http-preload-after.txt",
+        "note": "Real candidate HTTP sees dotenv and application preload runs exactly once"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/native-adjacent.txt",
+        "note": "Creation, deletion, precedence, isolation and signal metadata regressions pass"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/adjacent-vitest.txt",
+        "note": "Permit release, malformed output and timeout behavior pass"
+      }
+    ]
+  },
+  "scope": {
+    "modules": [
+      "SnapshotEligibility",
+      "CliDevEnvironment",
+      "CliDevSupervisor"
+    ],
+    "entrypoints": [
+      "relkit dev --prepare",
+      "relkit dev"
+    ],
+    "invariants": [
+      "No eager ambient evaluation is accepted for prepared snapshots",
+      "Private helper execution cannot run application preload code",
+      "Application preload behavior and runtime options remain available to native candidates",
+      "Rejected reloads preserve previous traffic and repairs activate in the same CLI process"
+    ]
+  },
+  "environment": {
+    "package": "packages/cli",
+    "revision": "ebc3a2544ad5521016fd9efc8db3ff1930a3fb75 plus uncommitted fix; exact hashes in test-results/integrity-fixes-20261016/final/fix-source-sha256.json",
+    "target": "Owned native fixtures and isolated commerce copies; approved commerce preview unchanged",
+    "api_exposed": false,
+    "e2e_available": false,
+    "monitoring": "Existing CLI observeCli structured operation logs retained. No new monitoring installed. Native subprocess and HTTP readback provide behavioral evidence."
+  }
+}
