@@ -1,0 +1,35 @@
+{
+  "scenario": "term",
+  "fixture": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-lfcpfyci",
+  "appPort": 58006,
+  "inspectorPort": 58007,
+  "cliPid": 55991,
+  "initialHandler": "Hello, lifetime!",
+  "ownedProcesses": [
+    {
+      "pid": 55991,
+      "parent": 55934,
+      "command": "bun /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts dev --port 58006 --inspector-port 58007 --local off --no-color --verbose"
+    },
+    {
+      "pid": 56003,
+      "parent": 55991,
+      "command": "node /Users/mustafaelsayed/Workspace/relkit/packages/observability/dist/local/duckdb-worker.js"
+    },
+    {
+      "pid": 56007,
+      "parent": 55991,
+      "command": "/Users/mustafaelsayed/.bun/bin/bun --no-env-file /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-lfcpfyci/.relkit/generated/.dev-qpfBES/generation-1/server/index.js"
+    },
+    {
+      "pid": 56008,
+      "parent": 55991,
+      "command": "next-server (v NVM_INC=/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/include/node"
+    }
+  ],
+  "exitCode": 143,
+  "signalSent": "SIGTERM",
+  "shutdownDiagnostic": true,
+  "survivingDescendantsAtExit": [],
+  "cleanupVerified": true
+}
