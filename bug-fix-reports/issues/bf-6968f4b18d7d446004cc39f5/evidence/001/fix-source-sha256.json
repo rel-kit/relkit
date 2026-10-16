@@ -1,0 +1,11 @@
+{
+  "packages/cli/src/dev-snapshot/snapshot-function-bindings.ts": "8fe0d7946864bca57e9c84a74eee0606dbb18ebdf46c6a0614fed549a9694da0",
+  "packages/cli/src/dev-snapshot/snapshot-eligibility.ts": "da6206b94c4afa3489db7e4a9fe55ceb2dbb5fd75e9440f0ec8e36e5b9df3667",
+  "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts": "21237ae8a6467cfbe16634b7bdebc743594b327558cb36772426b9fd0ce55241",
+  "packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts": "1ca928283e9a21a3ab72e9c58d1dafb5b9cbfb5fce501508b866ad45bce8607c",
+  "packages/cli/src/services/dev-environment.service.ts": "b16b3784315afca67b4b1f5153936acfbd5f9e8f7732248b85e9d329d88297ce",
+  "packages/cli/tests/dev-snapshot/as-tool-integrity.test.ts": "c5f44542d1c6f943ad65bba8e2d46dd7d462578e369be1e5902baf86590f76c5",
+  "packages/cli/tests/services/dev-environment-preload.test.ts": "2c8eb85cfce025e1f9ccb6b7abbb50f33dba61ae108ef4820023d818515ac702",
+  "packages/cli/tests/services/dev-environment-native.test.ts": "f859d1f0bb797bcc63b4b4b67f862a98212113a2f9cd75e477644af06e95eeb8",
+  "packages/cli/tests/dev-snapshot/eligibility.test.ts": "66613208727bdb8e0dc60026a4e63f8eac08ebf9f2ec22d99564f80115a55967"
+}

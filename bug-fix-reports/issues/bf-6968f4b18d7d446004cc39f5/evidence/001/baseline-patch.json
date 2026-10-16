@@ -1,0 +1,25 @@
+{
+  "what": "Prepared eligibility admits eager ambient code disguised as asTool",
+  "expected": "Preparation rejects ambient descriptor construction and publishes no pointer",
+  "observed": "Native dev --prepare published a snapshot from an untracked environment-dependent application id",
+  "root_cause": "snapshot-eligibility.ts:108 marks arbitrary function declarations local; snapshot-eligibility-expressions.ts treated all local asTool methods as audited constructors",
+  "files": [
+    "packages/cli/src/dev-snapshot/snapshot-eligibility.ts",
+    "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts"
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.txt",
+        "note": "Native CLI wrongly publishes ambient-dependent topology"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Focused regression fails"
+      }
+    ],
+    "after": []
+  }
+}
