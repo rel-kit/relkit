@@ -1,0 +1,2 @@
+Bun 1.3.10, NODE_ENV=development, only .env.development.local defines synthetic key. Native result:
+{"modeLocal":"mode-local"}

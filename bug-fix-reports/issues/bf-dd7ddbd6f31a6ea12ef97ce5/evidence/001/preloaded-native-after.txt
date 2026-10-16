@@ -1,0 +1,202 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/services/dev-environment-native.test.ts:
+[19:53:42.536] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.327875,
+}
+[19:53:42.537] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.080417,
+}
+[19:53:42.537] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.052625,
+}
+[19:53:42.537] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.environment.resolve",
+  outcome: "success",
+  duration_ms: 3.260125,
+}
+[19:53:42.558] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "success",
+  duration_ms: 23.906833,
+}
+[19:53:42.575] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.049083,
+}
+[19:53:42.575] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stat",
+  outcome: "success",
+  duration_ms: 0.142333,
+}
+[19:53:42.576] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.182958,
+}
+[19:53:42.576] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.037709,
+}
+[19:53:42.576] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.022625,
+}
+[19:53:42.592] INFO (#22): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 1.074375,
+}
+[19:53:42.592] INFO (#22): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 15.143667,
+}
+[19:53:42.593] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.environment.resolve",
+  outcome: "success",
+  duration_ms: 18.13125,
+}
+[19:53:42.599] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "success",
+  duration_ms: 23.817542,
+}
+[19:53:42.612] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.02875,
+}
+[19:53:42.612] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stat",
+  outcome: "success",
+  duration_ms: 0.072083,
+}
+[19:53:42.612] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.10275,
+}
+[19:53:42.612] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.040208,
+}
+[19:53:42.613] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.015458,
+}
+[19:53:42.624] INFO (#47): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.26825,
+}
+[19:53:42.624] INFO (#47): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 11.726833,
+}
+[19:53:42.625] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.environment.resolve",
+  outcome: "success",
+  duration_ms: 12.659209,
+}
+[19:53:42.630] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "success",
+  duration_ms: 18.529666,
+}
+[19:53:42.644] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.032792,
+}
+[19:53:42.644] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.0315,
+}
+[19:53:42.644] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.019792,
+}
+[19:53:42.644] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.environment.resolve",
+  outcome: "success",
+  duration_ms: 0.481,
+}
+[19:53:42.650] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.start",
+  outcome: "success",
+  duration_ms: 5.898833,
+}
+[19:53:42.667] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.dispose",
+  outcome: "success",
+  duration_ms: 4.010792,
+}
+[19:53:42.670] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.dispose",
+  outcome: "success",
+  duration_ms: 2.484333,
+}
+[19:53:42.672] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.dispose",
+  outcome: "success",
+  duration_ms: 2.142292,
+}
+[19:53:42.675] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.candidate.dispose",
+  outcome: "success",
+  duration_ms: 3.363375,
+}
+(pass) candidate generations read dotenv creation, changes and removal without a CLI restart [149.60ms]
+(pass) prepared epochs observe runtime dotenv repairs but ignore examples and generated state [0.23ms]
+
+ 2 pass
+ 0 fail
+ 17 expect() calls
+Ran 2 tests across 1 file. [481.00ms]

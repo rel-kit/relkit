@@ -1,0 +1,28 @@
+[FAIL] FAILURES:
+  (fail) mode-local files override local values and refresh after removal [29.76ms]
+  error: expect(received).toBe(expected)
+  Expected: "mode-local"
+  Received: "local"
+  at toBe (unknown:1:1)
+  at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/dev-environment-values.test.ts:155:54
+  at ~effect/Effect/successCont (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:985:26)
+  at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:383:16)
+  at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:327:10)
+  at runInAsyncScope (node:async_hooks:137:23)
+  at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+  at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:1180:3
+  at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:347:14)
+  at runInAsyncScope (node:async_hooks:137:23)
+  at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+  at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:1180:3
+  at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:347:14)
+  at runInAsyncScope (node:async_hooks:137:23)
+  at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+  at processTicksAndRejections (unknown:7:39)
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [163.00ms]
+
+[full output: rtk recall ef9470a5c54d]
