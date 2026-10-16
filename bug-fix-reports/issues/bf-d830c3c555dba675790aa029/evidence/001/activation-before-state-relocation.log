@@ -1,0 +1,175 @@
+$ bun /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts dev --port 3400 --inspector-port 3410 --local off --no-color --verbose
+01:34:22.094 INFO  relkit            Starting development server
+01:34:22.107 DEBUG relkit            supervisor.transition
+                                     {"phase":"idle","state":"compiling-candidate"}
+01:34:22.108 INFO  build             Compiling application
+01:34:22.128 DEBUG relkit            candidate.compile.started
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/dev/sessions/dev-session-uz6jyX/generation-1"}
+01:34:22.141 DEBUG relkit            candidate.compile.succeeded
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/dev/sessions/dev-session-uz6jyX/generation-1","entrypoint":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/dev/sessions/dev-session-uz6jyX/generation-1/server/index.js"}
+01:34:22.146 DEBUG relkit            candidate.start.started
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/dev/sessions/dev-session-uz6jyX/generation-1","port":64699}
+01:34:22.148 DEBUG relkit            candidate.start.succeeded
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/dev/sessions/dev-session-uz6jyX/generation-1","pid":54034,"port":64699}
+01:34:22.150 DEBUG relkit            supervisor.transition
+                                     {"phase":"compiling-candidate","state":"starting-candidate"}
+01:34:22.152 DEBUG relkit            supervisor.transition
+                                     {"phase":"starting-candidate","state":"verifying-hash-and-readiness"}
+01:34:22.346 INFO  specialized       Execution operation completed
+                                     {"domain":"runtime","duration_ms":3.785792,"operation":"database.acquire","outcome":"success"}
+01:34:22.350 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":7.662875,"operation":"server.invocation","outcome":"success"}
+01:34:22.351 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.137833,"operation":"server.readiness","outcome":"success"}
+01:34:22.351 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.074083,"operation":"server.invocation","outcome":"success"}
+01:34:22.352 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":10.411292,"operation":"server.resource","outcome":"success"}
+01:34:22.357 INFO  specialized       Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.757625,"operation":"auth.factory","outcome":"success"}
+01:34:22.359 INFO  specialized       Execution operation completed
+                                     {"domain":"runtime","duration_ms":5.52675,"operation":"auth.acquire","outcome":"success"}
+01:34:22.360 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":7.40825,"operation":"server.invocation","outcome":"success"}
+01:34:22.361 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.041291,"operation":"server.readiness","outcome":"success"}
+01:34:22.361 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.056375,"operation":"server.invocation","outcome":"success"}
+01:34:22.362 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":8.989584,"operation":"server.resource","outcome":"success"}
+01:34:22.366 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.085042,"operation":"server.invocation","outcome":"success"}
+01:34:22.367 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.05675,"operation":"server.invocation","outcome":"success"}
+01:34:22.367 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":3.763541,"operation":"server.resource","outcome":"success"}
+01:34:22.371 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.060458,"operation":"server.readiness","outcome":"success"}
+01:34:22.381 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":18.026375,"operation":"server.provider-delay","outcome":"success"}
+01:34:22.382 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.029583,"operation":"server.readiness","outcome":"success"}
+01:34:22.382 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":19.325208,"operation":"server.invocation","outcome":"success"}
+01:34:22.383 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":20.836,"operation":"server.resource","outcome":"success"}
+01:34:22.396 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.252542,"operation":"server.cleanup","outcome":"success"}
+01:34:22.397 INFO  lifecycle         Execution operation completed
+                                     {"domain":"engine","duration_ms":0.177084,"operation":"providers.release","outcome":"success"}
+01:34:22.397 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.780916,"operation":"server.cleanup","outcome":"success"}
+01:34:22.398 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.104792,"operation":"server.cleanup","outcome":"success"}
+01:34:22.399 INFO  specialized       Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.422291,"operation":"database.close","outcome":"success"}
+01:34:22.400 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.574708,"operation":"server.cleanup","outcome":"success"}
+01:34:22.422 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":22.201833,"operation":"server.cleanup","outcome":"success"}
+01:34:22.427 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":3.543333,"operation":"server.cleanup","outcome":"success"}
+01:34:22.428 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.160792,"operation":"server.cleanup","outcome":"success"}
+01:34:22.429 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":35.407792,"operation":"server.shutdown","outcome":"success"}
+01:34:22.433 DEBUG relkit            candidate.process-exited
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/dev/sessions/dev-session-uz6jyX/generation-1","exitCode":0}
+01:34:22.440 DEBUG relkit            supervisor.outcome
+                                     {"phase":"verification","state":"verification-failed"}
+01:34:22.441 DEBUG relkit            supervisor.transition
+                                     {"phase":"verifying-hash-and-readiness","state":"idle"}
+01:34:22.443 INFO  relkit            Stopping development server
+01:34:22.446 INFO  relkit            Development server stopped
+01:34:26.419 INFO  relkit            Starting development server
+01:34:26.427 DEBUG relkit            supervisor.transition
+                                     {"phase":"idle","state":"compiling-candidate"}
+01:34:26.428 INFO  build             Compiling application
+01:34:26.445 DEBUG relkit            candidate.compile.started
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/generated/.dev-RNa5Fw/generation-1"}
+01:34:26.761 DEBUG relkit            candidate.compile.succeeded
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/generated/.dev-RNa5Fw/generation-1","entrypoint":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/generated/.dev-RNa5Fw/generation-1/server/index.js"}
+01:34:26.765 DEBUG relkit            candidate.start.started
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/generated/.dev-RNa5Fw/generation-1","port":64796}
+01:34:26.767 DEBUG relkit            candidate.start.succeeded
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/generated/.dev-RNa5Fw/generation-1","pid":54136,"port":64796}
+01:34:26.768 DEBUG relkit            supervisor.transition
+                                     {"phase":"compiling-candidate","state":"starting-candidate"}
+01:34:26.769 DEBUG relkit            supervisor.transition
+                                     {"phase":"starting-candidate","state":"verifying-hash-and-readiness"}
+01:34:27.358 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.244333,"operation":"server.readiness","outcome":"success"}
+01:34:27.386 INFO  specialized       Execution operation completed
+                                     {"domain":"runtime","duration_ms":3.186292,"operation":"database.acquire","outcome":"success"}
+01:34:27.388 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":5.028,"operation":"server.invocation","outcome":"success"}
+01:34:27.389 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.05275,"operation":"server.readiness","outcome":"success"}
+01:34:27.389 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.068959,"operation":"server.invocation","outcome":"success"}
+01:34:27.390 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":7.992917,"operation":"server.resource","outcome":"success"}
+01:34:27.396 INFO  specialized       Execution operation completed
+                                     {"domain":"runtime","duration_ms":2.135542,"operation":"auth.factory","outcome":"success"}
+01:34:27.399 INFO  specialized       Execution operation completed
+                                     {"domain":"runtime","duration_ms":7.071125,"operation":"auth.acquire","outcome":"success"}
+01:34:27.399 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":8.982125,"operation":"server.invocation","outcome":"success"}
+01:34:27.400 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.030042,"operation":"server.readiness","outcome":"success"}
+01:34:27.401 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.07725,"operation":"server.invocation","outcome":"success"}
+01:34:27.401 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":10.68375,"operation":"server.resource","outcome":"success"}
+01:34:27.407 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":3.603541,"operation":"server.provider-delay","outcome":"success"}
+01:34:27.407 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.029792,"operation":"server.readiness","outcome":"success"}
+01:34:27.408 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":4.958708,"operation":"server.invocation","outcome":"success"}
+01:34:27.420 DEBUG relkit            supervisor.outcome
+                                     {"phase":"verification","state":"verification-succeeded"}
+01:34:27.421 DEBUG relkit            supervisor.transition
+                                     {"phase":"verifying-hash-and-readiness","state":"switching"}
+01:34:27.424 DEBUG relkit            supervisor.outcome
+                                     {"phase":"switch","state":"switch-succeeded"}
+01:34:27.424 DEBUG relkit            supervisor.transition
+                                     {"phase":"switching","state":"active"}
+01:34:27.425 INFO  build             Compiled in 997ms
+01:34:27.426 INFO  server            Ready
+                                     API        http://127.0.0.1:3400
+                                     Reference  http://127.0.0.1:3400/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:3400/_relkit/v1/openapi.json
+01:34:27.408 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":6.85625,"operation":"server.resource","outcome":"success"}
+01:34:27.723 DEBUG inspector         ▲ Next.js 16.3.8
+01:34:27.724 DEBUG inspector         - Local:         http://127.0.0.1:3410
+01:34:27.724 DEBUG inspector         - Network:       http://127.0.0.1:3410
+01:34:27.728 DEBUG inspector         ✓ Ready in 0ms
+01:34:27.757 DEBUG inspector         ✓ Running next.config took 4ms
+01:34:27.908 INFO  relkit            dev.inspector.ready
+                                     {"inspector":"http://127.0.0.1:3410"}
+01:35:08.164 INFO  relkit            Stopping development server
+01:35:08.173 INFO  lifecycle         Execution operation completed
+                                     {"domain":"engine","duration_ms":0.234709,"operation":"providers.release","outcome":"success"}
+01:35:08.174 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.743292,"operation":"server.cleanup","outcome":"success"}
+01:35:08.175 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.1235,"operation":"server.cleanup","outcome":"success"}
+01:35:08.176 INFO  specialized       Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.285917,"operation":"database.close","outcome":"success"}
+01:35:08.177 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.718375,"operation":"server.cleanup","outcome":"success"}
+01:35:08.208 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":29.991083,"operation":"server.cleanup","outcome":"success"}
+01:35:08.224 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":15.921,"operation":"server.cleanup","outcome":"success"}
+01:35:08.227 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.183958,"operation":"server.cleanup","outcome":"success"}
+01:35:08.227 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":58.117042,"operation":"server.shutdown","outcome":"success"}
+01:35:08.244 DEBUG relkit            candidate.process-exited
+                                     {"directory":"/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/generated/.dev-RNa5Fw/generation-1","exitCode":0}
+01:35:08.259 INFO  relkit            Development server stopped
+RELKIT_INTERRUPTED: Received SIGTERM.
+error: script "dev" exited with code 143

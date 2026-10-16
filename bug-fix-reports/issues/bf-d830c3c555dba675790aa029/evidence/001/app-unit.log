@@ -1,0 +1,12 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/commerce.test.ts:
+(pass) cart quantity accepts integer boundaries and rejects out-of-range values [3.06ms]
+(pass) cart operations require a session before touching persistence [57.34ms]
+(pass) order operations require a session before touching persistence [29.74ms]
+(pass) order pagination and identifier boundaries are validated [1.04ms]
+
+ 4 pass
+ 0 fail
+ 18 expect() calls
+Ran 4 tests across 1 file. [679.00ms]
