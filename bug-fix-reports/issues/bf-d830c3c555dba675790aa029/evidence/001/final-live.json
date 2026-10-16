@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "generation": "sha256:317e000a51693740fbd1bb26620f92ffa2a53d7723d689c07028cbe2e331a7e5",
+  "snapshotCurrentBeforeAndAfterLiveRequests": true,
+  "sourceDependencyArtifactAndGraphValidation": true,
+  "cliPid": 55765,
+  "inspectorPid": 55817,
+  "catalogProducts": 3,
+  "cartTotalCents": 7200,
+  "historicalOrderTotalCents": 4900,
+  "independentDatabaseReadBack": true,
+  "liveLinks": 3,
+  "privateValuesLogged": false
+}

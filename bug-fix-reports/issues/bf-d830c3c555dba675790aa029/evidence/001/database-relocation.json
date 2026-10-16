@@ -1,0 +1,18 @@
+{
+  "source": "app.sqlite",
+  "destination": ".relkit/state/commerce.sqlite",
+  "sourcePreserved": true,
+  "sameBytesBeforeOpen": true,
+  "integrityCheck": "ok",
+  "counts": {
+    "user": 5,
+    "products": 4,
+    "carts": 1,
+    "orders": 10,
+    "order_items": 14
+  },
+  "activationRejectionBeforeRelocation": {
+    "mismatchedInput": "app.sqlite-shm",
+    "preparedCandidatePublished": false
+  }
+}

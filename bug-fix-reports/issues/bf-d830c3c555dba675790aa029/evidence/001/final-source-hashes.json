@@ -1,0 +1,21 @@
+{
+  "head": "ebc3a2544ad5521016fd9efc8db3ff1930a3fb75",
+  "files": {
+    "packages/cli/src/dev-snapshot/snapshot-eligibility.ts": "643b3dac411658aeec21058ef382fccc3f71ffae51556ef49aca8ec3b1822130",
+    "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts": "1501e9512cab9efa183a6791993efe4d03a80c33ba1423a4c01284add40d374f",
+    "packages/cli/src/dev-snapshot/snapshot-default-eligibility.ts": "61cefdb39e6777d1391752eddac612b75f77419e3dff001f9110ba6fc9c2ca39",
+    "packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts": "fb775c135fdf3c042309f8437626de5cab1ffddb01b99c11837895a313fb696c",
+    "packages/cli/src/dev-snapshot/snapshot-commerce-eligibility.ts": "69f06f529f34fae5ef71fc96e34b424c0409205062d74094ef65097a9d4a3cf9",
+    "packages/cli/src/dev-snapshot/snapshot-sqlite-eligibility.ts": "fc30336679dcf579d26d662efa033ced5fba49f9906c3dc70e9b462f60353849",
+    "packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts": "3beaec45705545e853240ff351be578edb727c63c1126d17894f346bac1cce12",
+    "packages/cli/tests/dev-snapshot/commerce-project-eligibility.test.ts": "744f57b2b1b8c8587afc885669194c2a3e8beab714fc9be1212ba59d6d560a25",
+    "packages/create-relkit/src/render-database.ts": "2cb03895ce0e77ba6940d4afc0324fc5a235fff5de8264c461752dfe7a7a55c4",
+    "packages/create-relkit/src/render-database-sources.ts": "6ab52e2559246d14452dd8d89861cd3d4bc94d6ca138220fda0c3b9fec43cbb8",
+    "tests/generator/sqlite-app-tooling.test.ts": "4dbe4ddf77d8f0c761520f642805469444c52fa7789841697f5a2230a92117d0",
+    "tests/generator/sqlite-state-path.test.ts": "4d182149796ca9541e4a6d9f0850d03d89b986c54f7a9fb80662dc27d1435476",
+    ".changeset/prepared-commerce-eligibility.md": "b3cb50f0c26d5aefbb90a35369115a1b1985f0701081bfdc8f2c2b54e2ffbe7a",
+    "tests/generator/sqlite-path-typing.test.ts": "6cef36b05f07d1a2eb5cda4c508c7d9a2e6bbdd69af6d38e7acdfd03af895a1f"
+  },
+  "implementationFrozen": true,
+  "finalSnapshot": "sha256:317e000a51693740fbd1bb26620f92ffa2a53d7723d689c07028cbe2e331a7e5"
+}
