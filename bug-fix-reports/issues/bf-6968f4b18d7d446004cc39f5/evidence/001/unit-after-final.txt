@@ -1,0 +1,12 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/dev-snapshot/as-tool-integrity.test.ts:
+(pass) rejects an ambient function disguised as a local asTool constructor [10.75ms]
+(pass) rejects eager computed destructuring keys while preserving static route bindings [1.56ms]
+(pass) accepts proven local and imported descriptors, including aliases [2.96ms]
+(pass) rejects forged imported descriptors, namespaces, ambiguous resolution and cycles [1.09ms]
+
+ 4 pass
+ 0 fail
+ 12 expect() calls
+Ran 4 tests across 1 file. [245.00ms]
