@@ -1,0 +1,30 @@
+31 |     .wait(
+32 |       `Expected HTTP marker ${marker}`,
+33 |       async () => (await session.read()) === JSON.stringify({ message: marker }),
+34 |     )
+35 |     .catch(async (cause: Error) => {
+36 |       throw new Error(`Expected ${marker}; received ${await session.read()}`, { cause });
+                     ^
+error: Expected repaired; received {"message":"initial"}
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-environment/recovery-cycles.ts:36:17
+
+65 |       if (child.exitCode !== null)
+66 |         throw new Error(`Dev exited (${child.exitCode}): ${text.slice(-4000)}`);
+67 |       if (await check()) return;
+68 |       await Bun.sleep(50);
+69 |     }
+70 |     throw new Error(`${label}: ${text.slice(-4000)}`);
+                   ^
+error: Expected HTTP marker repaired: ation.runtime","graphHash":"sha256:cfa20396f7f41b5ee956c05f3eac118a04759715e3f1b9d4ee0c1168877d9867","level":"info","message":"request.completed","originRequestId":"request-b0973d33-f01a-4b01-9b0e-64440ecd41dd","requestId":"request-b0973d33-f01a-4b01-9b0e-64440ecd41dd","signal":"log","timestamp":"2026-10-15T19:24:24.619Z","traceId":"8abc86bab02e4daa0a5e23f93c6d5ff5","version":2}
+{"component":"runtime.lifecycle","fields":{"domain":"runtime","duration_ms":15.418791,"operation":"server.invocation","outcome":"success"},"generationId":"generation.runtime","graphHash":"sha256:cfa20396f7f41b5ee956c05f3eac118a04759715e3f1b9d4ee0c1168877d9867","level":"info","message":"Execution operation completed","signal":"log","source":"direct","timestamp":"2026-10-15T19:24:24.697Z","version":2}
+{"component":"runtime.http","fields":{"durationMs":28,"method":"GET","path":"/hello","status":200},"generationId":"generation.runtime","graphHash":"sha256:cfa20396f7f41b5ee956c05f3eac118a04759715e3f1b9d4ee0c1168877d9867","level":"info","message":"request.completed","originRequestId":"request-db02952f-a48e-494d-8aa7-510f46c19483","requestId":"request-db02952f-a48e-494d-8aa7-510f46c19483","signal":"log","timestamp":"2026-10-15T19:24:24.701Z","traceId":"8b28917d8ff52e6a51d4ac1ed2b8588b","version":2}
+{"component":"runtime.lifecycle","fields":{"domain":"runtime","duration_ms":15.143792,"operation":"server.invocation","outcome":"success"},"generationId":"generation.runtime","graphHash":"sha256:cfa20396f7f41b5ee956c05f3eac118a04759715e3f1b9d4ee0c1168877d9867","level":"info","message":"Execution operation completed","signal":"log","source":"direct","timestamp":"2026-10-15T19:24:24.779Z","version":2}
+{"component":"runtime.http","fields":{"durationMs":28,"method":"GET","path":"/hello","status":200},"generationId":"generation.runtime","graphHash":"sha256:cfa20396f7f41b5ee956c05f3eac118a04759715e3f1b9d4ee0c1168877d9867","level":"info","message":"request.completed","originRequestId":"request-a6b0f684-9edb-4c6d-9fd2-d9054f111240","requestId":"request-a6b0f684-9edb-4c6d-9fd2-d9054f111240","signal":"log","timestamp":"2026-10-15T19:24:24.783Z","traceId":"e02be71afe0830c195442f9be0147965","version":2}
+{"component":"runtime.lifecycle","fields":{"domain":"runtime","duration_ms":16.024375,"operation":"server.invocation","outcome":"success"},"generationId":"generation.runtime","graphHash":"sha256:cfa20396f7f41b5ee956c05f3eac118a04759715e3f1b9d4ee0c1168877d9867","level":"info","message":"Execution operation completed","signal":"log","source":"direct","timestamp":"2026-10-15T19:24:24.862Z","version":2}
+{"component":"runtime.http","fields":{"durationMs":30,"method":"GET","path":"/hello","status":200},"generationId":"generation.runtime","graphHash":"sha256:cfa20396f7f41b5ee956c05f3eac118a04759715e3f1b9d4ee0c1168877d9867","level":"info","message":"request.completed","originRequestId":"request-2a48249d-c00d-4048-be42-e77dbf2025b2","requestId":"request-2a48249d-c00d-4048-be42-e77dbf2025b2","signal":"log","timestamp":"2026-10-15T19:24:24.867Z","traceId":"ed507054fb3909acaa0115960f98b2d8","version":2}
+{"component":"runtime.lifecycle","fields":{"domain":"runtime","duration_ms":16.0745,"operation":"server.invocation","outcome":"success"},"generationId":"generation.runtime","graphHash":"sha256:cfa20396f7f41b5ee956c05f3eac118a04759715e3f1b9d4ee0c1168877d9867","level":"info","message":"Execution operation completed","signal":"log","source":"direct","timestamp":"2026-10-15T19:24:24.945Z","version":2}
+{"component":"runtime.http","fields":{"durationMs":28,"method":"GET","path":"/hello","status":200},"generationId":"generation.runtime","graphHash":"sha256:cfa20396f7f41b5ee956c05f3eac118a04759715e3f1b9d4ee0c1168877d9867","level":"info","message":"request.completed","originRequestId":"request-235bf683-58c8-4454-a740-7c399455297b","requestId":"request-235bf683-58c8-4454-a740-7c399455297b","signal":"log","timestamp":"2026-10-15T19:24:24.949Z","traceId":"32e7e32388c7fcc839c594d00057bc7c","version":2}
+
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-environment/recovery-process.ts:70:15
+
+Bun v1.3.10 (macOS arm64)
