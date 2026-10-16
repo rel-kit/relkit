@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "id": "bf-e0fab09ce6cdf84aad5d1d9c",
+  "fingerprint": "e0fab09ce6cdf84aad5d1d9c5b188d4b63ec9d95cc3cc186ec0f5ebc33e21197",
+  "identity": {
+    "entrypoint": "relkit add auth/database then check",
+    "module": "create-relkit tsconfig",
+    "symptom": "generated context registry excluded from application typechecking",
+    "scenario": "minimal scaffold with database and auth",
+    "error": ""
+  },
+  "attempt": 1,
+  "created_at": "2026-10-15T21:21:35+00:00",
+  "updated_at": "2026-10-15T21:40:00+00:00",
+  "status": "verified",
+  "what": "Starter applications exclude generated database/auth context declarations from TypeScript checking.",
+  "expected": "All starter TypeScript programs admit generated context declarations so authored functions receive their database and auth types.",
+  "observed": "Actual app typecheck loses database/auth properties; a focused template TypeScript program cannot find namespace Relkit.",
+  "root_cause": "All five templates/default/v1/*/tsconfig.json files admitted generated route checks but omitted .relkit/generated/context-registry.d.ts, while excluding .relkit from includes. The registry existed on disk but was not a TypeScript program root.",
+  "fixed_by": "Include the existing generated context registry alongside route-module-checks in every starter's authored tsconfig. The app recovered through the unchanged live CLI after the same authored config correction. All five isolated TypeScript template probes, fresh real CLI scaffold/check, final app typecheck and adjacent scaffolds pass.",
+  "files": [
+    "templates/default/v1/minimal/tsconfig.json",
+    "templates/default/v1/api/tsconfig.json",
+    "templates/default/v1/agent/tsconfig.json",
+    "templates/default/v1/fullstack/tsconfig.json",
+    "templates/default/v1/tasks/tsconfig.json",
+    "tests/generator/sqlite-app-tooling.test.ts",
+    ".changeset/sqlite-app-tooling.md"
+  ],
+  "tags": [
+    "generator",
+    "sqlite",
+    "auth",
+    "commerce-lab"
+  ],
+  "related": [
+    "bf-2e683644ffd7da2a89349aa4"
+  ],
+  "scope": {
+    "modules": [
+      "create-relkit scaffolding",
+      "generated app tooling",
+      "Drizzle and Better Auth application"
+    ],
+    "entrypoints": [
+      "relkit add auth/database then check",
+      "create-relkit minimal",
+      "relkit add auth"
+    ],
+    "invariants": [
+      "Generated context declarations are part of every starter TypeScript program",
+      "App database/auth context remains typed",
+      "The live CLI recovers after valid authored config repairs"
+    ]
+  },
+  "environment": {
+    "package": "packages/create-relkit and templates/default/v1",
+    "revision": "ebc3a2544 plus preserved pre-existing uncommitted recovery fixes and these local tooling fixes",
+    "target": "macOS Bun 1.3.10; local commerce lab and disposable generated CLI fixtures",
+    "api_exposed": false,
+    "e2e_available": true,
+    "monitoring": "Real source CLI diagnostics, native migration command exits, SQLite catalog/journal queries and TypeScript diagnostics; existing local runtime HTTP logs. No remote telemetry configured in this local app."
+  },
+  "reproduction": [
+    "Generate minimal starter and add auth/SQLite.",
+    "Use context.database and context.auth in application functions and run typecheck.",
+    "Observe missing context properties despite the generated declaration file existing.",
+    "Run the focused TypeScript program root regression against original template config; it fails with missing Relkit namespace.",
+    "Include the generated declaration in authored app/templates; replay typecheck, source CLI scaffolding and all five template probes."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.txt",
+        "note": "Original app command fails its actual expected contract"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Focused regression fails on original generator/template"
+      }
+    ],
+    "after": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/cli-after.txt",
+        "note": "Fresh real source create/add auth; native migrations twice; four tables, one journal row; app check"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/final-tests.txt",
+        "note": "33 tests, 186 assertions and three snapshots pass including both new regressions and Phase 0 guardrails"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/commerce-after.txt",
+        "note": "Main live application proves real auth cookies, ownership, totals, persistence and concurrent checkout"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/app-typecheck-after.txt",
+        "note": "Final authored application context typecheck exits zero"
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "rtk nice -n 15 bun test --max-concurrency 1 tests/generator/sqlite-app-tooling.test.ts --test-name-pattern 'each template'",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "TypeScript program admits generated global context",
+        "output": "evidence/001/unit-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk nice -n 15 bun --smol test --max-concurrency 1 tests/generator/sqlite-app-tooling.test.ts tests/generator/add-acceptance.test.ts tests/phase0.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "All five starter TypeScript programs admit generated context",
+        "output": "evidence/001/final-tests.txt"
+      }
+    },
+    "runtime": {
+      "kind": "integration",
+      "reason": "The defect belongs to code-generation and local CLI/TypeScript/migration workflows, rather than an HTTP endpoint. Main application HTTP behavior is additional affected-consumer proof.",
+      "boundary": "starter config -> generated context registry -> TypeScript program roots -> authored database/auth functions",
+      "dependencies": [
+        "Actual local generator and source CLI with pinned installed SDKs",
+        "Actual Bun SQLite, Drizzle Kit and Drizzle migrator",
+        "Actual TypeScript compiler; no mocked migration or auth database"
+      ],
+      "steps": [
+        "Preserve original failed command and focused regression",
+        "Apply scoped generator/template repair",
+        "Repeat real CLI scaffolding and typecheck",
+        "Assert persisted auth schema and idempotency",
+        "Assert adjacent commerce behavior with real cookies and SQLite"
+      ],
+      "before": {
+        "status": "failed",
+        "command": "rtk sh -c 'cd /Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab && rtk bun run typecheck'",
+        "cwd": ".",
+        "exit_code": 2,
+        "assertion": "Application functions receive generated database/auth context types",
+        "output": "evidence/001/runtime-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk sh -c 'cd /Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab && rtk env NODE_OPTIONS=--max-old-space-size=512 bun run typecheck'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Application database/auth functions typecheck using the generated context registry",
+        "output": "evidence/001/app-typecheck-after.txt"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "rtk nice -n 15 bun --smol test --max-concurrency 1 tests/generator/sqlite-app-tooling.test.ts tests/generator/add-acceptance.test.ts tests/phase0.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Existing generator acceptance harness and Phase 0 guardrails pass",
+      "output": "evidence/001/final-tests.txt"
+    },
+    "checks": [
+      {
+        "name": "generator targeted TypeScript build",
+        "status": "passed",
+        "command": "rtk nice -n 15 node --max-old-space-size=512 node_modules/typescript/bin/tsc -b packages/create-relkit/tsconfig.json --pretty false",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/build-summary.txt"
+      },
+      {
+        "name": "repository boundaries",
+        "status": "passed",
+        "command": "rtk nice -n 15 bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "62 roots pass package boundaries",
+        "output": "evidence/001/boundaries.txt"
+      }
+    ],
+    "regressions": [
+      {
+        "kind": "integration",
+        "boundary": "database/auth scaffold across supported starters and SQLite/PostgreSQL/MySQL",
+        "status": "passed",
+        "command": "rtk nice -n 15 bun --smol test --max-concurrency 1 tests/generator/add-platform-acceptance.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "26 adjacent scaffold assertions pass",
+        "output": "evidence/001/platform-tests.txt"
+      },
+      {
+        "kind": "api",
+        "boundary": "main app auth -> public functions -> SQLite -> cart/order read-back",
+        "status": "passed",
+        "command": "rtk sh -c 'cd /Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab && rtk nice -n 15 bun scripts/commerce-proof.ts'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Real cookies, ownership, exact persisted totals and one concurrent checkout success",
+        "output": "evidence/001/commerce-after.txt"
+      }
+    ],
+    "limitations": [
+      "Local macOS/Bun verification; no hosted CI, public deployment or registry publication.",
+      "Full monorepo build/test/prepush was not rerun; focused generator build, boundary checks, adjacent platform suites and Phase 0 guardrails were completed.",
+      "Application dependencies borrow the current local framework rather than certifying an independently installed registry release.",
+      "Read-only repos/effect lacks core Effect implementation/tests; existing planning effects were retained and checked against installed 4.0.1 source."
+    ]
+  },
+  "notes": [
+    "No Git mutations; all pre-existing dirty framework work and indexed reports preserved.",
+    "The commerce app CLI PID 56536 remained unchanged through all recovery scenarios; no manual restart was required.",
+    "Before app typecheck contained additional ordinary authoring errors; the isolated TypeScript root regression establishes the missing registry cause separately.",
+    "The final app/inspector remain running at user request; all disposable proof fixtures and browser sessions are closed.",
+    "External app commands are normalized to repository cwd using an explicit cd; original executions used the app as tool working directory."
+  ]
+}
