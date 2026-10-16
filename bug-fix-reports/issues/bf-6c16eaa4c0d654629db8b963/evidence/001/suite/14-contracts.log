@@ -1,0 +1,114 @@
+$ bun test ./tests/contracts
+bun test v1.3.10 (30e609e0)
+
+tests/contracts/descriptor-cohort.test.ts:
+(pass) Phase 2 descriptor cohort > brands, freezes, and keeps explicit stable refs immutable [2.10ms]
+(pass) Phase 2 descriptor cohort > narrows declared dependencies and creates typed declared errors [23.01ms]
+(pass) Phase 2 descriptor cohort > serializes route ASTs and named transform projections without closures [7.93ms]
+(pass) Phase 2 descriptor cohort > keeps application environment and binding references value-free [5.77ms]
+(pass) Phase 2 descriptor cohort > validates job policies and omits executable handlers [1.41ms]
+(pass) Phase 2 descriptor cohort > keeps bucket/cache contracts logical and tools/agents handler-free [6.73ms]
+(pass) Phase 2 descriptor cohort > keeps service members identity-preserving and cohesive [36.09ms]
+(pass) Phase 2 descriptor cohort > rejects invalid declarations and keeps the public cohort immutable [3.05ms]
+(pass) Phase 2 descriptor cohort > emits every convention warning without excluding a descriptor [4.61ms]
+
+tests/contracts/events.test.ts:
+(pass) event contract: deterministic testing event harness > publishes a validated payload as one correlated envelope [96.08ms]
+(pass) event contract: deterministic testing event harness > rejects invalid payload before acceptance or delivery [14.26ms]
+(pass) event contract: deterministic testing event harness > exposes honest ephemeral and durable delivery capabilities [0.05ms]
+(pass) event contract: deterministic testing event harness > fans out independently and invokes the selected target [119.16ms]
+(pass) event contract: deterministic testing event harness > recovers durable work, exposes duplicates, retries, and dead-letters safely [154.38ms]
+(pass) event contract: deterministic testing event harness > does not claim recovery for in-flight ephemeral delivery [31.97ms]
+
+tests/contracts/cache.test.ts:
+(pass) cache contract: local provider > covers get, set, delete, has, getOrSet, and increment [15.10ms]
+(pass) cache contract: local provider > uses canonical object keys and deterministic TTL expiry [1.54ms]
+(pass) cache contract: local provider > rejects invalid keys, values, and TTLs without replacing a value [1.51ms]
+(pass) cache contract: local provider > runs one producer per key for concurrent misses [1.76ms]
+(pass) cache contract: local provider > keeps cache observations free of raw keys and values [1.30ms]
+(pass) cache contract: local provider > rejects an unavailable increment capability explicitly [1.83ms]
+(pass) cache contract: local provider > rejects reads after the provider goes out of service [2.08ms]
+(pass) cache contract: local provider > evicts the least recently used entry within the configured bound [9.79ms]
+(pass) cache contract: test fake > covers get, set, delete, has, getOrSet, and increment [8.49ms]
+(pass) cache contract: test fake > uses canonical object keys and deterministic TTL expiry [3.80ms]
+(pass) cache contract: test fake > rejects invalid keys, values, and TTLs without replacing a value [6.86ms]
+(pass) cache contract: test fake > runs one producer per key for concurrent misses [2.23ms]
+(pass) cache contract: test fake > keeps cache observations free of raw keys and values [1.64ms]
+(pass) cache contract: test fake > rejects an unavailable increment capability explicitly [1.96ms]
+(pass) cache contract: test fake > rejects reads after the provider goes out of service [1.98ms]
+(pass) cache contract: test fake > preserves the prior entry when a write outage is injected [2.51ms]
+
+tests/contracts/optional-ids.test.ts:
+(pass) optional authoring IDs > uses process-local unbound identities for eligible factories [5.74ms]
+(pass) optional authoring IDs > keeps durable identities mandatory at runtime [2.11ms]
+
+tests/contracts/declared-errors.test.ts:
+(pass) declared error retry metadata > normalizes omission and legacy strings while retaining delay hints [1.18ms]
+(pass) declared error retry metadata > rejects invalid delay hints [1.16ms]
+(pass) declared error retry metadata > binds inferred IDs into instances and safe envelopes [1.21ms]
+
+tests/contracts/buckets.test.ts:
+(pass) bucket contract: local provider > round-trips every operation and metadata [22.23ms]
+(pass) bucket contract: local provider > rejects traversal, absolute keys, and policy violations [5.71ms]
+(pass) bucket contract: local provider > reports signed URL support through capabilities [1.82ms]
+(pass) bucket contract: local provider > rejects operations after the provider goes out of service [2.55ms]
+(pass) bucket contract: local provider > returns sorted, cursor-based pages without duplicates [10.49ms]
+(pass) bucket contract: test fake > round-trips every operation and metadata [5.56ms]
+(pass) bucket contract: test fake > rejects traversal, absolute keys, and policy violations [3.58ms]
+(pass) bucket contract: test fake > reports signed URL support through capabilities [2.21ms]
+(pass) bucket contract: test fake > rejects operations after the provider goes out of service [1.78ms]
+(pass) bucket contract: test fake > keeps the prior object visible across injected write failures [2.39ms]
+
+tests/contracts/jobs.test.ts:
+(pass) job contract: deterministic testing job harness > publishes durable at-least-once capabilities without exactly-once claims
+(pass) job contract: deterministic testing job harness > rejects invalid input before durable acceptance or target invocation [8.58ms]
+(pass) job contract: deterministic testing job harness > enqueues, consumes through the engine, and acknowledges completion [29.61ms]
+(pass) job contract: deterministic testing job harness > uses deterministic retry delay and succeeds on the next attempt [32.68ms]
+(pass) job contract: deterministic testing job harness > dead-letters an exhausted retry with safe failure metadata [19.57ms]
+(pass) job contract: deterministic testing job harness > returns an expired lease to available without inventing a state [24.71ms]
+(pass) job contract: deterministic testing job harness > makes acknowledgement-gap duplicates visible after lease recovery [38.59ms]
+(pass) job contract: deterministic testing job harness > retains idempotency keys, returns duplicates, and accepts after expiry [10.27ms]
+(pass) job contract: deterministic testing job harness > enforces the stricter function and consumer concurrency limit [38.33ms]
+(pass) job contract: deterministic testing job harness > fires schedules through enqueue and applies skip/allow overlap policies [37.44ms]
+(pass) job contract: deterministic testing job harness > recovers delayed state and completed state across a restart [33.99ms]
+(pass) job contract: deterministic testing job harness > quarantines malformed durable records while preserving valid work [23.74ms]
+(pass) job contract: deterministic testing job harness > cancels an in-flight enqueue before the provider accepts work [4.80ms]
+
+tests/contracts/canonical-contracts.test.ts:
+(pass) canonical contracts > sorts object keys recursively while preserving array order [0.69ms]
+(pass) canonical contracts > rejects invalid JSON values with stable paths [2.05ms]
+(pass) canonical contracts > normalizes explicit IDs and protocol IDs without source paths [1.60ms]
+(pass) canonical contracts > normalizes source locations across roots and separators [0.63ms]
+(pass) canonical contracts > validates one-based source positions with stable errors [1.16ms]
+(pass) canonical contracts > versions graph and manifest shapes independently from v1 protocols
+
+tests/contracts/redis.test.ts:
+(pass) cache contract: Redis integration > covers get, set, delete, has, getOrSet, and increment [3.12ms]
+(pass) cache contract: Redis integration > uses canonical object keys and deterministic TTL expiry [0.83ms]
+(pass) cache contract: Redis integration > rejects invalid keys, values, and TTLs without replacing a value [0.46ms]
+(pass) cache contract: Redis integration > runs one producer per key for concurrent misses [0.97ms]
+(pass) cache contract: Redis integration > keeps cache observations free of raw keys and values
+(pass) cache contract: Redis integration > rejects an unavailable increment capability explicitly [0.75ms]
+(pass) cache contract: Redis integration > rejects reads after the provider goes out of service [0.33ms]
+
+tests/contracts/descriptor.test.ts:
+(pass) descriptor contracts > uses the global brand and normalized immutable refs [0.71ms]
+(pass) descriptor contracts > rejects forged or mismatched values and freezes nested cycles [0.33ms]
+(pass) descriptor contracts > flattens task and job members while retaining descriptor identity [7.75ms]
+
+tests/contracts/s3.test.ts:
+(pass) bucket contract: S3 integration > round-trips every operation and metadata [6.81ms]
+(pass) bucket contract: S3 integration > rejects traversal, absolute keys, and policy violations [2.03ms]
+(pass) bucket contract: S3 integration > reports signed URL support through capabilities [1.03ms]
+(pass) bucket contract: S3 integration > rejects operations after the provider goes out of service [0.75ms]
+
+tests/contracts/version-cohort.test.ts:
+(pass) exposes the provider-architecture contract cohort
+(pass) publishes the native agent stream capability cohort
+(pass) keeps runtime integration and provider override contracts JSON-safe
+(pass) rejects a previous runtime-integration plan without a compatibility reader [1.58ms]
+
+ 83 pass
+ 0 fail
+ 579 expect() calls
+Ran 83 tests across 12 files. [1.69s]
