@@ -336,6 +336,246 @@
       "attempt": 1,
       "updated_at": "2026-10-11T13:47:52+00:00",
       "report": "bug-fix-reports/issues/bf-64e1972ee751d5a45e3ef3b8/report.md"
+    },
+    "bf-6c16eaa4c0d654629db8b963": {
+      "id": "bf-6c16eaa4c0d654629db8b963",
+      "status": "verified",
+      "what": "The full integration suite could not compare flat and grouped commerce layouts because flat fixture preparation rejected absent destination directories.",
+      "root_cause": "flattenCommerce in tests/integration/fixtures/paired-commerce-project.ts scanned destinations before creating them, used Bun.Glob's default dotfile exclusion, and performed that validation after the source rewrite pass.",
+      "fixed_by": "Preflight every service destination before rewriting: create absent directories, include dotfiles in residue detection, and reject authored collisions. Five filesystem regressions and both maintained native commerce acceptance layouts pass.",
+      "files": [
+        "tests/integration/fixtures/paired-commerce-project.ts",
+        "tests/unit/paired-commerce-project.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:07:51+00:00",
+      "report": "bug-fix-reports/issues/bf-6c16eaa4c0d654629db8b963/report.md"
+    },
+    "bf-a561f569dacbef352f9ffb95": {
+      "id": "bf-a561f569dacbef352f9ffb95",
+      "status": "verified",
+      "what": "Manual source-watcher startup threw AsyncFiberError, blocking source and scaffold reload admission.",
+      "root_cause": "startDevSourceWatcher in dev-watch.ts ran session.nativeEngine.watch synchronously. That effect in dev-session-engine.ts begins with ownedNativePromise importing dev-watch.js, which must suspend even when the module is cached. Effect.runSync correctly rejects suspended work.",
+      "fixed_by": "Add a narrow internal watchWith operation that supplies the existing engine authorities and Scope to an already-loaded watcher effect. The synchronous facade uses it directly; the normal CLI watch effect continues importing lazily and then uses the same owner. Preserve the public watcher return type and supervisor API.",
+      "files": [
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/src/commands/dev-session-engine.ts",
+        "packages/cli/src/commands/dev-session.types.ts",
+        "packages/cli/tests/services/dev-support-fixture.ts",
+        "packages/cli/tests/services/source-watch-synchronous.test.ts",
+        ".changeset/dev-environment-recovery.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:08:23+00:00",
+      "report": "bug-fix-reports/issues/bf-a561f569dacbef352f9ffb95/report.md"
+    },
+    "bf-dd7ddbd6f31a6ea12ef97ce5": {
+      "id": "bf-dd7ddbd6f31a6ea12ef97ce5",
+      "status": "verified",
+      "what": "Development reloads remain rejected after repairing dotenv until the CLI restarts.",
+      "root_cause": "CliDevSupervisor previously forwarded only startup/options environment into a --no-env-file candidate. Deleted values could return through inherited process.env in packages/supervisor/src/candidate-process.ts:55. The prepared epoch filter excluded all dotenv events in packages/cli/src/dev-snapshot/snapshot-epoch-path.t",
+      "fixed_by": "Resolve each generation with bounded, joined Bun dotenv helpers and retained file-key ownership; explicitly unset removed inherited keys; preserve SDK/runtime overrides; observe every active standard dotenv file in both paths. Include Bun custom-mode fallback and mode-local precedence. Both complete real CLI/HTTP matri",
+      "files": [
+        ".changeset/dev-environment-recovery.md",
+        "apps/docs/content/docs/fundamentals/environment.mdx",
+        "packages/cli/src/commands/dev-environment-files.ts",
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/src/dev-snapshot/snapshot-epoch-path.ts",
+        "packages/cli/src/services/dev-environment.schemas.ts",
+        "packages/cli/src/services/dev-environment.service.ts",
+        "packages/cli/src/services/dev-environment.types.ts",
+        "packages/cli/src/services/dev-supervisor.service.ts",
+        "packages/cli/tests/dev-environment/recovery-cycles.ts",
+        "packages/cli/tests/dev-environment/recovery-process.ts",
+        "packages/cli/tests/dev-environment/recovery.probe.ts",
+        "packages/cli/tests/dev-environment/recovery.types.ts",
+        "packages/cli/tests/services/dev-environment-errors.test.ts",
+        "packages/cli/tests/services/dev-environment-native.test.ts",
+        "packages/cli/tests/services/dev-environment-values.test.ts",
+        "packages/cli/tests/services/source-watch-fixture.ts",
+        "packages/cli/tests/services/source-watch.test.ts",
+        "packages/supervisor/src/candidate-process.ts",
+        "packages/supervisor/tests/compatibility/environment.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:08:47+00:00",
+      "report": "bug-fix-reports/issues/bf-dd7ddbd6f31a6ea12ef97ce5/report.md"
+    },
+    "bf-a2da0ca60e9c828fc35b84bd": {
+      "id": "bf-a2da0ca60e9c828fc35b84bd",
+      "status": "verified",
+      "what": "Generated HTTP functions received an empty environment despite successful candidate environment resolution.",
+      "root_cause": "packages/cli/src/commands/build-server-invocation.ts invokeHttp omitted env from engine invoke options. packages/cli/src/commands/build-server-invocation.ts:18 now forwards the resolved values.",
+      "fixed_by": "Forward env: values into the generated HTTP invocation. The capturing generated-wiring regression failed before this edit and passes after it; both real CLI/HTTP matrices now return the resolved defaults and repaired values.",
+      "files": [
+        "packages/cli/src/commands/build-server-invocation.ts",
+        "packages/cli/tests/services/dev-invocation-environment.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:08:47+00:00",
+      "report": "bug-fix-reports/issues/bf-a2da0ca60e9c828fc35b84bd/report.md"
+    },
+    "bf-2e683644ffd7da2a89349aa4": {
+      "id": "bf-2e683644ffd7da2a89349aa4",
+      "status": "verified",
+      "what": "New SQLite database/auth applications cannot apply their generated migrations under Bun.",
+      "root_cause": "packages/create-relkit/src/render-database.ts unconditionally generated bun --bun drizzle-kit migrate for SQLite; pinned Kit chooses the installed Node-only better-sqlite3 driver. The app already uses bun:sqlite, whose supported Drizzle migrator avoids that driver. A Node control also failed due this machine's native A",
+      "fixed_by": "For SQLite, emit scripts/migrate.ts using drizzle-orm/bun-sqlite/migrator, guard persistent DATABASE_PATH, close the client in finally and point db:migrate to it. Retain existing non-SQLite commands. Original failing regressions, fresh real CLI creation/addition/migration replay, main app auth/commerce HTTP, adjacent d",
+      "files": [
+        "packages/create-relkit/src/render-database.ts",
+        "packages/create-relkit/src/render-database-sources.ts",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        ".changeset/sqlite-app-tooling.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:39:54+00:00",
+      "report": "bug-fix-reports/issues/bf-2e683644ffd7da2a89349aa4/report.md"
+    },
+    "bf-e0fab09ce6cdf84aad5d1d9c": {
+      "id": "bf-e0fab09ce6cdf84aad5d1d9c",
+      "status": "verified",
+      "what": "Starter applications exclude generated database/auth context declarations from TypeScript checking.",
+      "root_cause": "All five templates/default/v1/*/tsconfig.json files admitted generated route checks but omitted .relkit/generated/context-registry.d.ts, while excluding .relkit from includes. The registry existed on disk but was not a TypeScript program root.",
+      "fixed_by": "Include the existing generated context registry alongside route-module-checks in every starter's authored tsconfig. The app recovered through the unchanged live CLI after the same authored config correction. All five isolated TypeScript template probes, fresh real CLI scaffold/check, final app typecheck and adjacent sc",
+      "files": [
+        "templates/default/v1/minimal/tsconfig.json",
+        "templates/default/v1/api/tsconfig.json",
+        "templates/default/v1/agent/tsconfig.json",
+        "templates/default/v1/fullstack/tsconfig.json",
+        "templates/default/v1/tasks/tsconfig.json",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        ".changeset/sqlite-app-tooling.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:40:00+00:00",
+      "report": "bug-fix-reports/issues/bf-e0fab09ce6cdf84aad5d1d9c/report.md"
+    },
+    "bf-6c1f59bebfd1c8865038fc52": {
+      "id": "bf-6c1f59bebfd1c8865038fc52",
+      "status": "verified",
+      "what": "current generated tsconfig and parameter routes rejected by snapshot discovery",
+      "root_cause": "SnapshotEligibleTsConfig.files only allowed the older route-module-checks root. SnapshotPath, SnapshotResolutionPath, native hash worker PATH and native watcher RESOLUTION_PATH separately excluded square brackets used by authored parameter/catch-all routes.",
+      "fixed_by": "Accepted only the canonical generated root pair and literal route brackets across schema, native worker and input-watch guards. Focused before/after tests, actual CLI preparation, final prepared HTTP/negative-root/cleanup smoke and all 30 local validation stages pass.",
+      "files": [
+        "packages/cli/src/dev-snapshot/snapshot.schemas.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.schemas.ts",
+        "packages/cli/tests/dev-snapshot/template-compatibility.test.ts",
+        "packages/cli/src/dev-snapshot/snapshot-hash-worker.ts",
+        "packages/cli/src/dev-snapshot/snapshot-input-watch.ts",
+        ".changeset/prepared-template-compatibility.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T23:41:32+00:00",
+      "report": "bug-fix-reports/issues/bf-6c1f59bebfd1c8865038fc52/report.md"
+    },
+    "bf-c7e0a9416b68b0c54a9942e6": {
+      "id": "bf-c7e0a9416b68b0c54a9942e6",
+      "status": "verified",
+      "what": "minimal template certificate digest is stale",
+      "root_cause": "templates/default/v1/minimal/tsconfig.json gained the required context registry declaration; packages/create-relkit/src/create-capabilities.ts retains the certificate for the previous complete template digest.",
+      "fixed_by": "Regenerated the certificate table and fresh/restart JSON through certifyCreation with concurrency 1, unchanged 20 runs per set and a 1,000 ms threshold. Fresh maximum 587.18 ms and restart maximum 527.16 ms; the previously failing package stage and all 30 local validation stages pass.",
+      "files": [
+        "packages/create-relkit/src/create-capabilities.ts",
+        "docs/evidence/create-capabilities/0.7.6/fresh.json",
+        "docs/evidence/create-capabilities/0.7.6/restart.json"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T23:42:49+00:00",
+      "report": "bug-fix-reports/issues/bf-c7e0a9416b68b0c54a9942e6/report.md"
+    },
+    "bf-0540debf572ceef2383c053a": {
+      "id": "bf-0540debf572ceef2383c053a",
+      "status": "verified",
+      "what": "generated sqlite service fails strict project compilation",
+      "root_cause": "databaseServiceSource adds mkdirSync(dirname(env.DATABASE_PATH)) before narrowing the generic string|undefined environment entry; Bun Database previously accepted an optional path but node:path.dirname requires a string.",
+      "fixed_by": "Validate and narrow DATABASE_PATH before directory creation and database acquisition. All four starters, the same native CLI check, missing and empty path controls, a real nested SQLite query, the complete generator suite, and final repository gates pass.",
+      "files": [
+        "packages/create-relkit/src/render-database-sources.ts",
+        "tests/generator/sqlite-path-typing.test.ts",
+        "tests/generator/sqlite-state-path.test.ts",
+        ".changeset/prepared-commerce-eligibility.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T23:42:50+00:00",
+      "report": "bug-fix-reports/issues/bf-0540debf572ceef2383c053a/report.md"
+    },
+    "bf-d830c3c555dba675790aa029": {
+      "id": "bf-d830c3c555dba675790aa029",
+      "status": "verified",
+      "what": "The commerce application cannot prepare a development snapshot despite using declarative Better Auth and SQLite descriptors.",
+      "root_cause": "snapshot-eligibility.ts lacked audited commerce constructors and inert helper declarations while snapshot-preparation-guards.ts audited unrelated tooling. The app also read an ambient auth origin and used unaudited schema spreads. Its root SQLite shared-memory file changed on activation, correctly invalidating complete",
+      "fixed_by": "Verified explicit commerce preparation and actual capsule activation, all16 identical recovery scenarios with unchanged CLI55765, and final current snapshot317e000a... after all source fixes. Full30 local framework stages plus supplemental native/Bun checks pass. SQLite runtime data was copied without loss to .relkit/s",
+      "files": [
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts",
+        "packages/cli/src/dev-snapshot/snapshot-default-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts",
+        "packages/cli/src/dev-snapshot/snapshot-commerce-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-sqlite-eligibility.ts",
+        "packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts",
+        "packages/cli/tests/dev-snapshot/commerce-project-eligibility.test.ts",
+        "packages/create-relkit/src/render-database.ts",
+        "packages/create-relkit/src/render-database-sources.ts",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        "tests/generator/sqlite-state-path.test.ts",
+        ".changeset/prepared-commerce-eligibility.md",
+        "tests/generator/sqlite-path-typing.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T23:45:31+00:00",
+      "report": "bug-fix-reports/issues/bf-d830c3c555dba675790aa029/report.md"
+    },
+    "bf-1672405f026d30b6cc3728eb": {
+      "id": "bf-1672405f026d30b6cc3728eb",
+      "status": "verified",
+      "what": "Prepared dev exits abruptly on terminal hangup and leaves its owned backend, inspector, and storage worker running.",
+      "root_cause": "invocation-signals.ts:13 installed INT/TERM but no HUP owner; snapshot-session-options.ts:42 disables manual-session handlers in favor of that invocation owner. A prepared SIGHUP therefore bypassed Scope release, killed the proxy CLI, and orphaned its backend, inspector and storage worker. During initial/ordinary start",
+      "fixed_by": "Verified native HUP invocation cancellation and its typed public failure contract. Both owners now preserve SIGHUP/status129, join resource cleanup and remove their own listeners. The prepared native replay and actual e-commerce HUP test close all owned processes/listeners; the final detached preview retains its eventu",
+      "files": [
+        "packages/cli/src/invocation-signals.ts",
+        "packages/cli/src/cli-errors.ts",
+        "packages/cli/src/main-support.ts",
+        "packages/cli/src/main-support-types.ts",
+        "packages/cli/tests/invocation/signals.test.ts",
+        "packages/cli/tests/services/dev-initial-native.test.ts",
+        ".changeset/prepared-dev-hangup-cleanup.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-16T13:11:50+00:00",
+      "report": "bug-fix-reports/issues/bf-1672405f026d30b6cc3728eb/report.md"
+    },
+    "bf-6968f4b18d7d446004cc39f5": {
+      "id": "bf-6968f4b18d7d446004cc39f5",
+      "status": "verified",
+      "what": "Prepared eligibility admits eager ambient code disguised as asTool",
+      "root_cause": "snapshot-eligibility.ts:108 marks arbitrary function declarations local; snapshot-eligibility-expressions.ts treated all local asTool methods as audited constructors",
+      "fixed_by": "Verified explicit function-descriptor provenance through captured backend imports, fail-closed ambiguous/cyclic imports, and static destructuring keys. Same native CLI regression changes from wrongful publication to eligibility rejection; genuine imported tools still prepare. Final recovery32/32, six lifetime cases, an",
+      "files": [
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts",
+        "packages/cli/src/dev-snapshot/snapshot-function-bindings.ts",
+        "packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts",
+        "packages/cli/tests/dev-snapshot/as-tool-integrity.test.ts",
+        "packages/cli/tests/dev-snapshot/eligibility.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-16T15:48:06+00:00",
+      "report": "bug-fix-reports/issues/bf-6968f4b18d7d446004cc39f5/report.md"
+    },
+    "bf-66e347f46c30cffca371d589": {
+      "id": "bf-66e347f46c30cffca371d589",
+      "status": "verified",
+      "what": "Application preloads prevent fresh dotenv resolution",
+      "root_cause": "dev-environment.service.ts runs its Bun JSON helper in the application cwd with default configuration and inherited runtime options",
+      "fixed_by": "Verified explicit empty Bun helper configuration and removal of inherited runtime startup flags only from private helper execution, with application values preserved. Native service tests and actual CLI startup plus same-PID HTTP dotenv recovery pass with the logging application preload retained. All32 local framework ",
+      "files": [
+        "packages/cli/src/services/dev-environment.service.ts",
+        "packages/cli/tests/services/dev-environment-preload.test.ts",
+        "packages/cli/tests/services/dev-environment-native.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-16T15:48:06+00:00",
+      "report": "bug-fix-reports/issues/bf-66e347f46c30cffca371d589/report.md"
     }
   }
 }

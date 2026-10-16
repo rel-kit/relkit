@@ -1,0 +1,16 @@
+{
+  "key": "not-reproduced",
+  "matches": {
+    "bf-625fd985faaf71cd148396fc": {
+      "id": "bf-625fd985faaf71cd148396fc",
+      "status": "not-reproduced",
+      "what": "Investigate the silent disappearance of previously healthy e-commerce dev CLI55765.",
+      "root_cause": "Not established. No retained exit status, native signal, sender, exact stop time, matching Bun crash report, or host kill event ties the historical disappearance to a specific cause. A separate prepared SIGHUP cleanup defect was reproduced and is tracked as bf-1672405f026d30b6cc3728eb; it is not proof that HUP caused t",
+      "fixed_by": "Not reproduced: the original stop cannot be attributed to a specific signal or sender. The app is now running on verified fixed code in a detached owner with a retained native exit receipt; exact current metadata and business/integrity checks are in evidence/001/current-preview.json.",
+      "files": [],
+      "attempt": 1,
+      "updated_at": "2026-10-16T12:10:35+00:00",
+      "report": "bug-fix-reports/issues/bf-625fd985faaf71cd148396fc/report.md"
+    }
+  }
+}
