@@ -86,6 +86,19 @@ async function copyCapabilities(root: string): Promise<void> {
  * @returns Completion after native relative imports, aliases and whole-service moves settle.
  */
 export async function flattenCommerce(root: string): Promise<void> {
+  const services = join(root, "examples/commerce/src/services");
+  const entries = await readdir(services, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isDirectory())
+      throw new Error("Unexpected grouping entry in controlled commerce fixture");
+    const destination = join(root, "examples/commerce/src", entry.name);
+    await mkdir(destination, { recursive: true });
+    const residue = [
+      ...new Bun.Glob("**/*").scanSync({ cwd: destination, onlyFiles: true, dot: true }),
+    ];
+    if (residue.length > 0)
+      throw new Error("Controlled flat destination contains authored content");
+  }
   for (const path of new Bun.Glob("{examples,tests}/**/*.ts").scanSync({
     cwd: root,
     onlyFiles: true,
@@ -94,14 +107,8 @@ export async function flattenCommerce(root: string): Promise<void> {
     const text = await readFile(join(root, path), "utf8");
     await writeFile(join(root, path), flatCommerceImports(text, path));
   }
-  const services = join(root, "examples/commerce/src/services");
-  for (const entry of await readdir(services, { withFileTypes: true })) {
-    if (!entry.isDirectory())
-      throw new Error("Unexpected grouping entry in controlled commerce fixture");
+  for (const entry of entries) {
     const destination = join(root, "examples/commerce/src", entry.name);
-    const residue = [...new Bun.Glob("**/*").scanSync({ cwd: destination, onlyFiles: true })];
-    if (residue.length > 0)
-      throw new Error("Controlled flat destination contains authored content");
     await rm(destination, { recursive: true, force: true });
     await rename(join(services, entry.name), destination);
   }
