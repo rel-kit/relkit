@@ -1,0 +1,6 @@
+{
+  ".env": "0o600",
+  "credentials.txt": "0o600",
+  ".auth-state.json": "0o600",
+  ".relkit/state/commerce.sqlite": "0o600"
+}

@@ -1,0 +1,12 @@
+bun test v1.3.10 (30e609e0)
+
+tests/security/dev-recovery-probe-paths.test.ts:
+(pass) recovery probe accepts lexical and canonical temporary app paths [214.25ms]
+(pass) recovery probe rejects caller-selected evidence directories before writing [99.27ms]
+(pass) archived probe only uses literal phases in log filenames [30.25ms]
+(pass) recovery probe rejects external, sibling-prefix and escaping symlink apps [393.20ms]
+
+ 4 pass
+ 0 fail
+ 38 expect() calls
+Ran 4 tests across 1 file. [888.00ms]

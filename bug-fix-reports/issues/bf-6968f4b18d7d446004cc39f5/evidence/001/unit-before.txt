@@ -1,0 +1,22 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/dev-snapshot/as-tool-integrity.test.ts:
+ 7 |   const source = `import {defineApp, defineEnv} from "@relkit/app/config";
+ 8 | function readAmbient(_options: {}) { return process.env.REVIEW_VALUE ?? "fallback"; }
+ 9 | const builder = {asTool: readAmbient};
+10 | export default defineApp({id: builder.asTool({}), env: defineEnv({})});`;
+11 |   const result = await Effect.runPromiseExit(verifyStaticSnapshotSource(source, "relkit.config.ts"));
+12 |   expect(Exit.isFailure(result)).toBe(true);
+                                      ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/as-tool-integrity.test.ts:12:34)
+(fail) rejects an ambient function disguised as a local asTool constructor [10.24ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [275.00ms]

@@ -1,0 +1,8 @@
+{
+  "status": "unverified",
+  "fixed_by": "Implemented explicit empty Bun helper configuration and removed inherited runtime options only from helper execution, retaining application values. Native helper and candidate HTTP regressions pass; full framework checks remain pending resource headroom.",
+  "notes": [
+    "Mac entered warning memory pressure (level 2); all owned heavy workloads stopped. Existing approved commerce preview retained. No unrelated processes changed.",
+    "Initial ordinary/prepared matrices passed 16 each and six signal/lifetime cases passed. Final ordinary matrix passed 16; repeated prepared run stopped for resources. Interrupted build attempt retained and its 74 observed processes joined."
+  ]
+}

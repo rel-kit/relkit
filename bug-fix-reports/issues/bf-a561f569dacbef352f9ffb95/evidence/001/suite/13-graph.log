@@ -1,0 +1,12 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  20 passed (20)
+      Tests  175 passed (175)
+   Start at  23:26:10
+   Duration  4.75s (import 83%, tests 8%, transform 8%, worker 1%)
+
+    Isolate  20 workers spawned · ~65ms startup each (spawn + environment, per file)
+             at least ~1.23s faster with isolate: false — reuses workers across files instead of one per file
+

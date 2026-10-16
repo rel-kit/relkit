@@ -1,0 +1,5 @@
+{
+  "command": "rtk nice -n 10 bun node_modules/typescript/bin/tsc -p packages/supervisor/tsconfig.json --noEmit --composite false --incremental false",
+  "exit_code": 0,
+  "diagnostics": []
+}

@@ -1,0 +1,51 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+stdout | packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts > accepts audited SQLite metadata, native deferred clients, errors and literal auth
+[01:38:53.740] ERROR (#1): Error [AssertionError]: import {mkdirSync} from "node:fs"; import {dirname} from "node:path"; export async function client(env: {path:string}) { mkdirSync(dirname(env.path), {recursive:true}); }: expected false to be true // Object.is equality
+    at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts:31:9 {
+  actual: false,
+  expected: true,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+
+ ❯ packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts (2 tests | 1 failed) 22ms
+   × accepts audited SQLite metadata, native deferred clients, errors and literal auth 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts > accepts audited SQLite metadata, native deferred clients, errors and literal auth
+AssertionError: import {mkdirSync} from "node:fs"; import {dirname} from "node:path"; export async function client(env: {path:string}) { mkdirSync(dirname(env.path), {recursive:true}); }: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts:31:9
+     29|         Exit.isSuccess(yield* Effect.exit(verifyStaticSnapshotSource(s…
+     30|         source,
+     31|       ).toBe(true);
+       |         ^
+     32|   }),
+     33| );
+ ❯ IteratorImpl.~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1417:28
+ ❯ FiberImpl.succeedWith node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:706:30
+ ❯ PrimitiveImpl.~effect/Effect/failureCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:3783:20
+ ❯ ExitPrimitive.~effect/Effect/evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/core.ts:607:20
+ ❯ FiberImpl.runLoop node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:650:39
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:592:23
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:5679:9
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:5757:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  01:38:53
+   Duration  568ms (import 76%, transform 19%, tests 5%, worker 1%)
+

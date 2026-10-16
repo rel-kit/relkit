@@ -1,0 +1,23 @@
+{
+  "key": "DevSessionEngine",
+  "matches": {
+    "bf-a561f569dacbef352f9ffb95": {
+      "id": "bf-a561f569dacbef352f9ffb95",
+      "status": "verified",
+      "what": "Manual source-watcher startup threw AsyncFiberError, blocking source and scaffold reload admission.",
+      "root_cause": "startDevSourceWatcher in dev-watch.ts ran session.nativeEngine.watch synchronously. That effect in dev-session-engine.ts begins with ownedNativePromise importing dev-watch.js, which must suspend even when the module is cached. Effect.runSync correctly rejects suspended work.",
+      "fixed_by": "Add a narrow internal watchWith operation that supplies the existing engine authorities and Scope to an already-loaded watcher effect. The synchronous facade uses it directly; the normal CLI watch effect continues importing lazily and then uses the same owner. Preserve the public watcher return type and supervisor API.",
+      "files": [
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/src/commands/dev-session-engine.ts",
+        "packages/cli/src/commands/dev-session.types.ts",
+        "packages/cli/tests/services/dev-support-fixture.ts",
+        "packages/cli/tests/services/source-watch-synchronous.test.ts",
+        ".changeset/dev-environment-recovery.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:08:23+00:00",
+      "report": "bug-fix-reports/issues/bf-a561f569dacbef352f9ffb95/report.md"
+    }
+  }
+}

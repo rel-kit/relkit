@@ -1,0 +1,7 @@
+{
+  "previousCliPid": 47312,
+  "intentionalStopForFixedCodeVerification": true,
+  "signal": "SIGTERM",
+  "ownedProcessCount": 4,
+  "allExited": true
+}

@@ -1,0 +1,123 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/sqlite-path-typing.test.ts:
+[23:30:09.952] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 6.689583,
+}
+[23:30:09.954] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.952667,
+}
+[23:30:09.966] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 12.424208,
+}
+[23:30:10.025] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 58.988708,
+}
+[23:30:10.057] INFO (#89): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.522209,
+}
+[23:30:10.058] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.402917,
+}
+[23:30:10.058] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.120917,
+}
+[23:30:10.058] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.100125,
+}
+[23:30:10.058] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.113833,
+}
+[23:30:10.058] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099166,
+}
+[23:30:10.059] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122791,
+}
+[23:30:10.059] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09425,
+}
+[23:30:10.059] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1005,
+}
+[23:30:10.059] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.139833,
+}
+[23:30:10.059] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.166791,
+}
+[23:30:10.059] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.098875,
+}
+[23:30:10.059] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099125,
+}
+[23:30:10.062] INFO (#118): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 2.198333,
+}
+[23:30:18.564] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.705542,
+}
+(pass) SQLite database and auth additions pass the native project check [8622.84ms]
+
+ 1 pass
+ 0 fail
+ 4 expect() calls
+Ran 1 test across 1 file. [8.91s]

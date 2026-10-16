@@ -1,0 +1,24 @@
+{
+  "key": "templates/default/v1/fullstack/tsconfig.json",
+  "matches": {
+    "bf-e0fab09ce6cdf84aad5d1d9c": {
+      "id": "bf-e0fab09ce6cdf84aad5d1d9c",
+      "status": "verified",
+      "what": "Starter applications exclude generated database/auth context declarations from TypeScript checking.",
+      "root_cause": "All five templates/default/v1/*/tsconfig.json files admitted generated route checks but omitted .relkit/generated/context-registry.d.ts, while excluding .relkit from includes. The registry existed on disk but was not a TypeScript program root.",
+      "fixed_by": "Include the existing generated context registry alongside route-module-checks in every starter's authored tsconfig. The app recovered through the unchanged live CLI after the same authored config correction. All five isolated TypeScript template probes, fresh real CLI scaffold/check, final app typecheck and adjacent sc",
+      "files": [
+        "templates/default/v1/minimal/tsconfig.json",
+        "templates/default/v1/api/tsconfig.json",
+        "templates/default/v1/agent/tsconfig.json",
+        "templates/default/v1/fullstack/tsconfig.json",
+        "templates/default/v1/tasks/tsconfig.json",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        ".changeset/sqlite-app-tooling.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:40:00+00:00",
+      "report": "bug-fix-reports/issues/bf-e0fab09ce6cdf84aad5d1d9c/report.md"
+    }
+  }
+}

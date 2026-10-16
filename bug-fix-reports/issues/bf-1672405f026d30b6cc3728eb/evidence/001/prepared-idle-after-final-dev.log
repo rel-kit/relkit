@@ -1,0 +1,226 @@
+15:01:36.728 INFO  relkit            Starting development server
+15:01:36.741 DEBUG relkit            supervisor.transition
+                                     {"phase":"idle","state":"compiling-candidate"}
+15:01:36.743 INFO  build             Compiling application
+15:01:36.748 DEBUG relkit            candidate.compile.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-voqt01ae/.relkit/dev/sessions/dev-session-9n4AOL/generation-1"}
+15:01:36.756 DEBUG relkit            candidate.compile.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-voqt01ae/.relkit/dev/sessions/dev-session-9n4AOL/generation-1","entrypoint":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-voqt01ae/.relkit/dev/sessions/dev-session-9n4AOL/generation-1/server/index.js"}
+15:01:36.760 DEBUG relkit            candidate.start.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-voqt01ae/.relkit/dev/sessions/dev-session-9n4AOL/generation-1","port":60338}
+15:01:36.762 DEBUG relkit            candidate.start.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-voqt01ae/.relkit/dev/sessions/dev-session-9n4AOL/generation-1","pid":67137,"port":60338}
+15:01:36.765 DEBUG relkit            supervisor.transition
+                                     {"phase":"compiling-candidate","state":"starting-candidate"}
+15:01:36.766 DEBUG relkit            supervisor.transition
+                                     {"phase":"starting-candidate","state":"verifying-hash-and-readiness"}
+15:01:36.870 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.062459,"operation":"server.invocation","outcome":"success"}
+15:01:36.875 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.093583,"operation":"server.invocation","outcome":"success"}
+15:01:36.876 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":8.306334,"operation":"server.resource","outcome":"success"}
+15:01:36.880 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.227208,"operation":"server.readiness","outcome":"success"}
+15:01:36.886 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":17.866292,"operation":"server.provider-delay","outcome":"success"}
+15:01:36.886 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.037542,"operation":"server.readiness","outcome":"success"}
+15:01:36.887 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":19.350541,"operation":"server.invocation","outcome":"success"}
+15:01:36.887 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":20.984958,"operation":"server.resource","outcome":"success"}
+15:01:36.941 INFO  hello.greet       hello invoked
+                                     request: request-cb4d11d2-5643-4b52-a643-9c7c895fdb92
+                                     trace: 0e3ac574d583cbeed7c799c01c4956c1
+                                     {"name":"RelKit","requestId":"request-cb4d11d2-5643-4b52-a643-9c7c895fdb92","traceId":"0e3ac574d583cbeed7c799c01c4956c1","spanId":"2f2f4c9b3bd0c5aa","functionId":"hello.greet","serviceId":"hello"}
+15:01:36.951 INFO  lifecycle         Execution operation completed
+                                     request: request-cb4d11d2-5643-4b52-a643-9c7c895fdb92
+                                     trace: 0e3ac574d583cbeed7c799c01c4956c1
+                                     {"domain":"runtime","duration_ms":32.041792,"operation":"server.invocation","outcome":"success","requestId":"request-cb4d11d2-5643-4b52-a643-9c7c895fdb92","traceId":"0e3ac574d583cbeed7c799c01c4956c1","spanId":"2b3ab67826fa009e"}
+15:01:36.963 DEBUG relkit            supervisor.outcome
+                                     {"phase":"verification","state":"verification-succeeded"}
+15:01:36.964 DEBUG relkit            supervisor.transition
+                                     {"phase":"verifying-hash-and-readiness","state":"switching"}
+15:01:36.966 DEBUG relkit            supervisor.outcome
+                                     {"phase":"switch","state":"switch-succeeded"}
+15:01:36.967 DEBUG relkit            supervisor.transition
+                                     {"phase":"switching","state":"active"}
+15:01:36.967 INFO  build             Compiled in 224ms
+15:01:36.968 INFO  server            Ready
+                                     API        http://127.0.0.1:60303
+                                     Reference  http://127.0.0.1:60303/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:60303/_relkit/v1/openapi.json
+15:01:36.960 INFO  http              GET /hello → 200 in 69ms
+                                     request: request-cb4d11d2-5643-4b52-a643-9c7c895fdb92
+                                     trace: 0e3ac574d583cbeed7c799c01c4956c1
+15:01:37.043 INFO  hello.greet       hello invoked
+                                     request: request-6df4a9db-dce6-4a02-a08d-445ad21522d5
+                                     trace: 6e749d97fcc388614135d9294f7c5a01
+                                     {"name":"lifetime","requestId":"request-6df4a9db-dce6-4a02-a08d-445ad21522d5","traceId":"6e749d97fcc388614135d9294f7c5a01","spanId":"0d7a7cff08f45548","functionId":"hello.greet","serviceId":"hello"}
+15:01:37.054 INFO  lifecycle         Execution operation completed
+                                     request: request-6df4a9db-dce6-4a02-a08d-445ad21522d5
+                                     trace: 6e749d97fcc388614135d9294f7c5a01
+                                     {"domain":"runtime","duration_ms":20.716792,"operation":"server.invocation","outcome":"success","requestId":"request-6df4a9db-dce6-4a02-a08d-445ad21522d5","traceId":"6e749d97fcc388614135d9294f7c5a01","spanId":"d1066b00be77d4b9"}
+15:01:37.060 INFO  http              GET /hello → 200 in 34ms
+                                     request: request-6df4a9db-dce6-4a02-a08d-445ad21522d5
+                                     trace: 6e749d97fcc388614135d9294f7c5a01
+15:01:37.706 DEBUG inspector         ▲ Next.js 16.3.8
+15:01:37.706 DEBUG inspector         - Local:         http://127.0.0.1:60304
+15:01:37.707 DEBUG inspector         - Network:       http://127.0.0.1:60304
+15:01:37.708 DEBUG inspector         ✓ Ready in 0ms
+15:01:37.735 DEBUG inspector         ✓ Running next.config took 1.6ms
+15:01:37.750 INFO  relkit            dev.storage.ready
+                                     {"malformed":0,"records":0}
+15:01:37.885 INFO  relkit            dev.inspector.ready
+                                     {"inspector":"http://127.0.0.1:60304"}
+15:01:38.963 INFO  hello.greet       hello invoked
+                                     request: request-fdffe5f8-fbad-4eb8-8be1-0ba5ee88f5c3
+                                     trace: 287c468c857570bc23bba945727087ed
+                                     {"name":"lifetime","requestId":"request-fdffe5f8-fbad-4eb8-8be1-0ba5ee88f5c3","traceId":"287c468c857570bc23bba945727087ed","spanId":"b56c721381cff593","functionId":"hello.greet","serviceId":"hello"}
+15:01:38.970 INFO  lifecycle         Execution operation completed
+                                     request: request-fdffe5f8-fbad-4eb8-8be1-0ba5ee88f5c3
+                                     trace: 287c468c857570bc23bba945727087ed
+                                     {"domain":"runtime","duration_ms":22.4315,"operation":"server.invocation","outcome":"success","requestId":"request-fdffe5f8-fbad-4eb8-8be1-0ba5ee88f5c3","traceId":"287c468c857570bc23bba945727087ed","spanId":"831a76cd50cdf247"}
+15:01:38.978 INFO  http              GET /hello → 200 in 46ms
+                                     request: request-fdffe5f8-fbad-4eb8-8be1-0ba5ee88f5c3
+                                     trace: 287c468c857570bc23bba945727087ed
+15:01:40.006 INFO  hello.greet       hello invoked
+                                     request: request-e17bfd60-895e-4218-a7db-c3d2c067b2a9
+                                     trace: fbbc24c0fa83667831603902340a143a
+                                     {"name":"lifetime","requestId":"request-e17bfd60-895e-4218-a7db-c3d2c067b2a9","traceId":"fbbc24c0fa83667831603902340a143a","spanId":"2930cbf3334082a7","functionId":"hello.greet","serviceId":"hello"}
+15:01:40.012 INFO  lifecycle         Execution operation completed
+                                     request: request-e17bfd60-895e-4218-a7db-c3d2c067b2a9
+                                     trace: fbbc24c0fa83667831603902340a143a
+                                     {"domain":"runtime","duration_ms":15.708458,"operation":"server.invocation","outcome":"success","requestId":"request-e17bfd60-895e-4218-a7db-c3d2c067b2a9","traceId":"fbbc24c0fa83667831603902340a143a","spanId":"df19e319a83c33ff"}
+15:01:40.019 INFO  http              GET /hello → 200 in 31ms
+                                     request: request-e17bfd60-895e-4218-a7db-c3d2c067b2a9
+                                     trace: fbbc24c0fa83667831603902340a143a
+15:01:41.052 INFO  hello.greet       hello invoked
+                                     request: request-05f6545f-70f5-4676-a881-b5e6a1826c77
+                                     trace: 084f74a0ad47d4e32531bd81c395b1b3
+                                     {"name":"lifetime","requestId":"request-05f6545f-70f5-4676-a881-b5e6a1826c77","traceId":"084f74a0ad47d4e32531bd81c395b1b3","spanId":"9598d6cda254f178","functionId":"hello.greet","serviceId":"hello"}
+15:01:41.060 INFO  lifecycle         Execution operation completed
+                                     request: request-05f6545f-70f5-4676-a881-b5e6a1826c77
+                                     trace: 084f74a0ad47d4e32531bd81c395b1b3
+                                     {"domain":"runtime","duration_ms":19.588166,"operation":"server.invocation","outcome":"success","requestId":"request-05f6545f-70f5-4676-a881-b5e6a1826c77","traceId":"084f74a0ad47d4e32531bd81c395b1b3","spanId":"5887d9bb6b50fab3"}
+15:01:41.068 INFO  http              GET /hello → 200 in 39ms
+                                     request: request-05f6545f-70f5-4676-a881-b5e6a1826c77
+                                     trace: 084f74a0ad47d4e32531bd81c395b1b3
+15:01:42.100 INFO  hello.greet       hello invoked
+                                     request: request-48a67de2-f379-4fb5-9532-aa5a23d09ad6
+                                     trace: 05a26c74a3be9834a335dfe0d1354ed9
+                                     {"name":"lifetime","requestId":"request-48a67de2-f379-4fb5-9532-aa5a23d09ad6","traceId":"05a26c74a3be9834a335dfe0d1354ed9","spanId":"fc4b69aaa1a444eb","functionId":"hello.greet","serviceId":"hello"}
+15:01:42.106 INFO  lifecycle         Execution operation completed
+                                     request: request-48a67de2-f379-4fb5-9532-aa5a23d09ad6
+                                     trace: 05a26c74a3be9834a335dfe0d1354ed9
+                                     {"domain":"runtime","duration_ms":18.059875,"operation":"server.invocation","outcome":"success","requestId":"request-48a67de2-f379-4fb5-9532-aa5a23d09ad6","traceId":"05a26c74a3be9834a335dfe0d1354ed9","spanId":"f837841c8c5b40a5"}
+15:01:42.114 INFO  http              GET /hello → 200 in 37ms
+                                     request: request-48a67de2-f379-4fb5-9532-aa5a23d09ad6
+                                     trace: 05a26c74a3be9834a335dfe0d1354ed9
+15:01:43.141 INFO  hello.greet       hello invoked
+                                     request: request-b9e5a4fa-e5ac-4a66-92b4-79b23eee6e30
+                                     trace: b6a6ca55df5b6b75368d1096ae43aac3
+                                     {"name":"lifetime","requestId":"request-b9e5a4fa-e5ac-4a66-92b4-79b23eee6e30","traceId":"b6a6ca55df5b6b75368d1096ae43aac3","spanId":"ba8af3e128e0da72","functionId":"hello.greet","serviceId":"hello"}
+15:01:43.146 INFO  lifecycle         Execution operation completed
+                                     request: request-b9e5a4fa-e5ac-4a66-92b4-79b23eee6e30
+                                     trace: b6a6ca55df5b6b75368d1096ae43aac3
+                                     {"domain":"runtime","duration_ms":15.351625,"operation":"server.invocation","outcome":"success","requestId":"request-b9e5a4fa-e5ac-4a66-92b4-79b23eee6e30","traceId":"b6a6ca55df5b6b75368d1096ae43aac3","spanId":"2db05b133ea2a039"}
+15:01:43.154 INFO  http              GET /hello → 200 in 30ms
+                                     request: request-b9e5a4fa-e5ac-4a66-92b4-79b23eee6e30
+                                     trace: b6a6ca55df5b6b75368d1096ae43aac3
+15:01:44.182 INFO  hello.greet       hello invoked
+                                     request: request-cad3222d-b1ed-49d2-bf18-57ad4ecbf4ad
+                                     trace: 11d2577933e1d26578b9d22f03a3c1d5
+                                     {"name":"lifetime","requestId":"request-cad3222d-b1ed-49d2-bf18-57ad4ecbf4ad","traceId":"11d2577933e1d26578b9d22f03a3c1d5","spanId":"a040d1b01cfbf74e","functionId":"hello.greet","serviceId":"hello"}
+15:01:44.188 INFO  lifecycle         Execution operation completed
+                                     request: request-cad3222d-b1ed-49d2-bf18-57ad4ecbf4ad
+                                     trace: 11d2577933e1d26578b9d22f03a3c1d5
+                                     {"domain":"runtime","duration_ms":15.978625,"operation":"server.invocation","outcome":"success","requestId":"request-cad3222d-b1ed-49d2-bf18-57ad4ecbf4ad","traceId":"11d2577933e1d26578b9d22f03a3c1d5","spanId":"5588d7bba5759eae"}
+15:01:44.197 INFO  http              GET /hello → 200 in 33ms
+                                     request: request-cad3222d-b1ed-49d2-bf18-57ad4ecbf4ad
+                                     trace: 11d2577933e1d26578b9d22f03a3c1d5
+15:01:45.228 INFO  hello.greet       hello invoked
+                                     request: request-8625c277-7b3f-409b-836a-456096aeae4d
+                                     trace: b041f4799f833454bae7a0cc0f6f0fbd
+                                     {"name":"lifetime","requestId":"request-8625c277-7b3f-409b-836a-456096aeae4d","traceId":"b041f4799f833454bae7a0cc0f6f0fbd","spanId":"7274413c398c41ec","functionId":"hello.greet","serviceId":"hello"}
+15:01:45.234 INFO  lifecycle         Execution operation completed
+                                     request: request-8625c277-7b3f-409b-836a-456096aeae4d
+                                     trace: b041f4799f833454bae7a0cc0f6f0fbd
+                                     {"domain":"runtime","duration_ms":17.093958,"operation":"server.invocation","outcome":"success","requestId":"request-8625c277-7b3f-409b-836a-456096aeae4d","traceId":"b041f4799f833454bae7a0cc0f6f0fbd","spanId":"739fe617dc032db9"}
+15:01:45.242 INFO  http              GET /hello → 200 in 36ms
+                                     request: request-8625c277-7b3f-409b-836a-456096aeae4d
+                                     trace: b041f4799f833454bae7a0cc0f6f0fbd
+15:01:46.269 INFO  hello.greet       hello invoked
+                                     request: request-76b67d90-8179-4188-94c6-ecd6970d979b
+                                     trace: 8abf42fbc862f1e9084ee784fed43a54
+                                     {"name":"lifetime","requestId":"request-76b67d90-8179-4188-94c6-ecd6970d979b","traceId":"8abf42fbc862f1e9084ee784fed43a54","spanId":"2399ec92e705624a","functionId":"hello.greet","serviceId":"hello"}
+15:01:46.274 INFO  lifecycle         Execution operation completed
+                                     request: request-76b67d90-8179-4188-94c6-ecd6970d979b
+                                     trace: 8abf42fbc862f1e9084ee784fed43a54
+                                     {"domain":"runtime","duration_ms":15.917208,"operation":"server.invocation","outcome":"success","requestId":"request-76b67d90-8179-4188-94c6-ecd6970d979b","traceId":"8abf42fbc862f1e9084ee784fed43a54","spanId":"1ac6ea5b00ce2677"}
+15:01:46.282 INFO  http              GET /hello → 200 in 32ms
+                                     request: request-76b67d90-8179-4188-94c6-ecd6970d979b
+                                     trace: 8abf42fbc862f1e9084ee784fed43a54
+15:01:47.322 INFO  hello.greet       hello invoked
+                                     request: request-6cc561b4-3d1d-48c8-887d-57f72ebec602
+                                     trace: 1404c8d37c41903f846fb5a956b5efb8
+                                     {"name":"lifetime","requestId":"request-6cc561b4-3d1d-48c8-887d-57f72ebec602","traceId":"1404c8d37c41903f846fb5a956b5efb8","spanId":"6f83a7d725de60ce","functionId":"hello.greet","serviceId":"hello"}
+15:01:47.328 INFO  lifecycle         Execution operation completed
+                                     request: request-6cc561b4-3d1d-48c8-887d-57f72ebec602
+                                     trace: 1404c8d37c41903f846fb5a956b5efb8
+                                     {"domain":"runtime","duration_ms":20.629917,"operation":"server.invocation","outcome":"success","requestId":"request-6cc561b4-3d1d-48c8-887d-57f72ebec602","traceId":"1404c8d37c41903f846fb5a956b5efb8","spanId":"3351475b49efa996"}
+15:01:47.337 INFO  http              GET /hello → 200 in 46ms
+                                     request: request-6cc561b4-3d1d-48c8-887d-57f72ebec602
+                                     trace: 1404c8d37c41903f846fb5a956b5efb8
+15:01:48.379 INFO  hello.greet       hello invoked
+                                     request: request-949aa86e-eae3-47cd-8554-94e250f5232e
+                                     trace: 9559ec2097eb568e03028f2fb9c15999
+                                     {"name":"lifetime","requestId":"request-949aa86e-eae3-47cd-8554-94e250f5232e","traceId":"9559ec2097eb568e03028f2fb9c15999","spanId":"8f3618ed0a2628db","functionId":"hello.greet","serviceId":"hello"}
+15:01:48.385 INFO  lifecycle         Execution operation completed
+                                     request: request-949aa86e-eae3-47cd-8554-94e250f5232e
+                                     trace: 9559ec2097eb568e03028f2fb9c15999
+                                     {"domain":"runtime","duration_ms":19.455167,"operation":"server.invocation","outcome":"success","requestId":"request-949aa86e-eae3-47cd-8554-94e250f5232e","traceId":"9559ec2097eb568e03028f2fb9c15999","spanId":"3d8061e3d34af8c9"}
+15:01:48.393 INFO  http              GET /hello → 200 in 43ms
+                                     request: request-949aa86e-eae3-47cd-8554-94e250f5232e
+                                     trace: 9559ec2097eb568e03028f2fb9c15999
+15:01:49.415 INFO  hello.greet       hello invoked
+                                     request: request-448d6593-9201-4bd9-ae12-ab45289a0661
+                                     trace: bba77f24863fd5a20f7f761640f56769
+                                     {"name":"lifetime","requestId":"request-448d6593-9201-4bd9-ae12-ab45289a0661","traceId":"bba77f24863fd5a20f7f761640f56769","spanId":"7b57d9fee217947c","functionId":"hello.greet","serviceId":"hello"}
+15:01:49.420 INFO  lifecycle         Execution operation completed
+                                     request: request-448d6593-9201-4bd9-ae12-ab45289a0661
+                                     trace: bba77f24863fd5a20f7f761640f56769
+                                     {"domain":"runtime","duration_ms":13.641083,"operation":"server.invocation","outcome":"success","requestId":"request-448d6593-9201-4bd9-ae12-ab45289a0661","traceId":"bba77f24863fd5a20f7f761640f56769","spanId":"a542e8e41c22450a"}
+15:01:49.428 INFO  http              GET /hello → 200 in 30ms
+                                     request: request-448d6593-9201-4bd9-ae12-ab45289a0661
+                                     trace: bba77f24863fd5a20f7f761640f56769
+15:01:50.456 INFO  hello.greet       hello invoked
+                                     request: request-db0ff89e-7131-4ae1-83f1-1525a2d48edb
+                                     trace: dc69f1f04529aebb0e085eea8e46d6eb
+                                     {"name":"lifetime","requestId":"request-db0ff89e-7131-4ae1-83f1-1525a2d48edb","traceId":"dc69f1f04529aebb0e085eea8e46d6eb","spanId":"2e86a86e6036f3af","functionId":"hello.greet","serviceId":"hello"}
+15:01:50.461 INFO  lifecycle         Execution operation completed
+                                     request: request-db0ff89e-7131-4ae1-83f1-1525a2d48edb
+                                     trace: dc69f1f04529aebb0e085eea8e46d6eb
+                                     {"domain":"runtime","duration_ms":15.806166,"operation":"server.invocation","outcome":"success","requestId":"request-db0ff89e-7131-4ae1-83f1-1525a2d48edb","traceId":"dc69f1f04529aebb0e085eea8e46d6eb","spanId":"97256e9c0eacae14"}
+15:01:50.469 INFO  http              GET /hello → 200 in 33ms
+                                     request: request-db0ff89e-7131-4ae1-83f1-1525a2d48edb
+                                     trace: dc69f1f04529aebb0e085eea8e46d6eb
+15:01:50.523 INFO  relkit            Stopping development server
+15:01:50.528 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.266541,"operation":"server.cleanup","outcome":"success"}
+15:01:50.529 INFO  lifecycle         Execution operation completed
+                                     {"domain":"engine","duration_ms":0.150167,"operation":"providers.release","outcome":"success"}
+15:01:50.529 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.624416,"operation":"server.cleanup","outcome":"success"}
+15:01:50.562 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":32.030833,"operation":"server.cleanup","outcome":"success"}
+15:01:50.566 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":3.844459,"operation":"server.cleanup","outcome":"success"}
+15:01:50.568 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.176834,"operation":"server.cleanup","outcome":"success"}
+15:01:50.568 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":42.066708,"operation":"server.shutdown","outcome":"success"}
+15:01:50.573 DEBUG relkit            candidate.process-exited
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-voqt01ae/.relkit/dev/sessions/dev-session-9n4AOL/generation-1","exitCode":0}
+15:01:50.578 INFO  relkit            Development server stopped

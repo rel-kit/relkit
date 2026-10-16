@@ -23,6 +23,7 @@ export const CLI_EXIT_CODES = Object.freeze({
   usage: 2,
   sigint: 130,
   sigterm: 143,
+  sighup: 129,
 });
 /**
  * Imports the optional generator using the existing public Promise contract.
@@ -132,6 +133,7 @@ export function installSignals(controller: AbortController): () => void {
   const handlers = [
     ["SIGINT", () => controller.abort(failSignal("SIGINT"))],
     ["SIGTERM", () => controller.abort(failSignal("SIGTERM"))],
+    ["SIGHUP", () => controller.abort(failSignal("SIGHUP"))],
   ] as const;
   for (const [signal, handler] of handlers) process.on(signal, handler);
   return () => {
@@ -143,8 +145,9 @@ export function installSignals(controller: AbortController): () => void {
  * @param signal - Received native signal.
  * @returns The established interruption failure.
  */
-export function failSignal(signal: "SIGINT" | "SIGTERM"): CliFailure {
-  return fail("RELKIT_INTERRUPTED", `Received ${signal}.`, signal === "SIGINT" ? 130 : 143, signal);
+export function failSignal(signal: "SIGINT" | "SIGTERM" | "SIGHUP"): CliFailure {
+  const exitCode = { SIGINT: 130, SIGTERM: 143, SIGHUP: 129 }[signal];
+  return fail("RELKIT_INTERRUPTED", `Received ${signal}.`, exitCode, signal);
 }
 /**
  * Constructs the typed product failure while retaining public code/exit fields.
@@ -158,7 +161,7 @@ export function fail(
   code: string,
   message: string,
   exitCode = 1,
-  signal?: "SIGINT" | "SIGTERM",
+  signal?: "SIGINT" | "SIGTERM" | "SIGHUP",
 ): CliFailureError {
   return new CliFailureError({
     code,
@@ -222,6 +225,7 @@ function isFailure(value: unknown): value is CliFailure {
     (!("signal" in value) ||
       value.signal === undefined ||
       value.signal === "SIGINT" ||
-      value.signal === "SIGTERM")
+      value.signal === "SIGTERM" ||
+      value.signal === "SIGHUP")
   );
 }

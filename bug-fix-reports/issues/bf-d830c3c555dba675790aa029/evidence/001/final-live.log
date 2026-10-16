@@ -1,0 +1,61 @@
+[02:43:29.311] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.seal-artifacts",
+  outcome: "success",
+  duration_ms: 24.377,
+}
+[02:43:29.398] INFO (#431): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.typecheckQueries",
+  outcome: "success",
+  duration_ms: 49.674084,
+}
+[02:43:29.405] INFO (#429): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 65.914458,
+}
+[02:43:29.833] INFO (#430): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.current-members",
+  outcome: "success",
+  duration_ms: 493.0335,
+}
+[02:43:29.833] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.validate",
+  outcome: "success",
+  duration_ms: 602.965083,
+}
+[02:43:30.107] INFO (#432): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.seal-artifacts",
+  outcome: "success",
+  duration_ms: 10.60925,
+}
+[02:43:30.181] INFO (#862): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.typecheckQueries",
+  outcome: "success",
+  duration_ms: 45.3545,
+}
+[02:43:30.185] INFO (#860): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 54.106667,
+}
+[02:43:30.269] INFO (#861): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.current-members",
+  outcome: "success",
+  duration_ms: 137.671917,
+}
+[02:43:30.269] INFO (#432): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.validate",
+  outcome: "success",
+  duration_ms: 202.618416,
+}
+PASS final current capsule, authenticated session/cart/order, independent SQLite read-back and all3 links; CLI55765 unchanged

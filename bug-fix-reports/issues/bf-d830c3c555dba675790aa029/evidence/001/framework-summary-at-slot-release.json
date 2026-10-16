@@ -1,0 +1,436 @@
+{
+  "status": "all-local-framework-checks-passed",
+  "stages": {
+    "01-build": {
+      "stage": "01-build",
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 198.0
+    },
+    "02-docs": {
+      "stage": "02-docs",
+      "command": [
+        "bun",
+        "x",
+        "turbo",
+        "run",
+        "check",
+        "test",
+        "--filter=@relkit/docs",
+        "--concurrency=1"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 147.1
+    },
+    "03-restart": {
+      "stage": "03-restart",
+      "command": [
+        "bun",
+        "run",
+        "test:restart"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 24.1
+    },
+    "04-jobs-coverage": {
+      "stage": "04-jobs-coverage",
+      "command": [
+        "bun",
+        "run",
+        "test:jobs:coverage"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 20.1
+    },
+    "05-jobs-mutation": {
+      "stage": "05-jobs-mutation",
+      "command": [
+        "bun",
+        "x",
+        "stryker",
+        "run",
+        "scripts/jobs-coverage/stryker.config.mjs",
+        "--concurrency",
+        "1"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 759.2
+    },
+    "06-mutation-verification": {
+      "stage": "06-mutation-verification",
+      "command": [
+        "bun",
+        "scripts/jobs-coverage/verify-mutation.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.0
+    },
+    "07-e2e-inspector": {
+      "stage": "07-e2e-inspector",
+      "command": [
+        "bun",
+        "x",
+        "playwright",
+        "test",
+        "--workers=1",
+        "--output=test-results/inspector"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 65.9
+    },
+    "08-e2e-commerce": {
+      "stage": "08-e2e-commerce",
+      "command": [
+        "bun",
+        "x",
+        "playwright",
+        "test",
+        "--config=playwright.commerce.config.ts",
+        "--workers=1",
+        "--output=test-results/commerce"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 17.5
+    },
+    "09-jobs-matrix": {
+      "stage": "09-jobs-matrix",
+      "command": [
+        "bun",
+        "run",
+        "test:jobs:matrix"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.0
+    },
+    "10-types": {
+      "stage": "10-types",
+      "command": [
+        "bun",
+        "run",
+        "test:types"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.0
+    },
+    "11-unit": {
+      "stage": "11-unit",
+      "command": [
+        "bun",
+        "run",
+        "test:unit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.5
+    },
+    "12-compiler": {
+      "stage": "12-compiler",
+      "command": [
+        "bun",
+        "test",
+        "--timeout",
+        "15000",
+        "./tests/compiler"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 36.9
+    },
+    "13-graph": {
+      "stage": "13-graph",
+      "command": [
+        "bun",
+        "x",
+        "vitest",
+        "run",
+        "--config",
+        "packages/graph/vitest.config.ts",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.6
+    },
+    "14-contracts": {
+      "stage": "14-contracts",
+      "command": [
+        "bun",
+        "run",
+        "test:contracts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.5
+    },
+    "15-integration": {
+      "stage": "15-integration",
+      "command": [
+        "bun",
+        "run",
+        "test:integration"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 112.0
+    },
+    "16-inspector": {
+      "stage": "16-inspector",
+      "command": [
+        "bun",
+        "run",
+        "test:inspector"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.0
+    },
+    "17-container": {
+      "stage": "17-container",
+      "command": [
+        "bun",
+        "run",
+        "test:container"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.1
+    },
+    "18-security": {
+      "stage": "18-security",
+      "command": [
+        "bun",
+        "run",
+        "test:security"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.9
+    },
+    "19-deployment": {
+      "stage": "19-deployment",
+      "command": [
+        "bun",
+        "run",
+        "test:deployment"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.1
+    },
+    "20-examples": {
+      "stage": "20-examples",
+      "command": [
+        "bun",
+        "run",
+        "test:examples"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 130.9
+    },
+    "21-packages": {
+      "stage": "21-packages",
+      "command": [
+        "bun",
+        "run",
+        "test:packages"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 451.8
+    },
+    "22-generator": {
+      "stage": "22-generator",
+      "command": [
+        "bun",
+        "run",
+        "test:generator"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 239.5
+    },
+    "25-certification-bun": {
+      "stage": "25-certification-bun",
+      "command": [
+        "bun",
+        "test",
+        "scripts/tests/dev-readiness/bootstrap-imports.test.ts",
+        "scripts/tests/packed-manifest.test.ts",
+        "scripts/tests/registry-cache.test.ts",
+        "scripts/tests/release-command.test.ts",
+        "packages/cli/tests/dev-snapshot/input-watch.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.2
+    },
+    "26-certification-vitest": {
+      "stage": "26-certification-vitest",
+      "command": [
+        "bun",
+        "x",
+        "vitest",
+        "run",
+        "--maxWorkers=1",
+        "scripts/tests/benchmark-packed-cleanup.test.ts",
+        "scripts/tests/benchmark-packed-dev.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.5
+    },
+    "27-guardrails": {
+      "stage": "27-guardrails",
+      "command": [
+        "bun",
+        "test",
+        "tests/phase0.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 78.0
+    },
+    "28-lint": {
+      "stage": "28-lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.2
+    },
+    "29-boundaries": {
+      "stage": "29-boundaries",
+      "command": [
+        "bun",
+        "run",
+        "check"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.8
+    },
+    "30-konsistent": {
+      "stage": "30-konsistent",
+      "command": [
+        "bun",
+        "run",
+        "konsistent",
+        "--",
+        "validate"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.3
+    },
+    "31-format": {
+      "stage": "31-format",
+      "command": [
+        "bun",
+        "x",
+        "prettier",
+        "--check",
+        ".changeset/dev-environment-recovery.md",
+        ".changeset/prepared-commerce-eligibility.md",
+        ".changeset/prepared-template-compatibility.md",
+        ".changeset/sqlite-app-tooling.md",
+        "apps/docs/content/docs/fundamentals/environment.mdx",
+        "docs/evidence/create-capabilities/0.7.6/fresh.json",
+        "docs/evidence/create-capabilities/0.7.6/restart.json",
+        "packages/cli/src/commands/build-server-invocation.ts",
+        "packages/cli/src/commands/dev-environment-files.ts",
+        "packages/cli/src/commands/dev-session-engine.ts",
+        "packages/cli/src/commands/dev-session.types.ts",
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/src/dev-snapshot/snapshot-commerce-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-default-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.schemas.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-epoch-path.ts",
+        "packages/cli/src/dev-snapshot/snapshot-hash-worker.ts",
+        "packages/cli/src/dev-snapshot/snapshot-input-watch.ts",
+        "packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts",
+        "packages/cli/src/dev-snapshot/snapshot-sqlite-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot.schemas.ts",
+        "packages/cli/src/services/dev-environment.schemas.ts",
+        "packages/cli/src/services/dev-environment.service.ts",
+        "packages/cli/src/services/dev-environment.types.ts",
+        "packages/cli/src/services/dev-supervisor.service.ts",
+        "packages/cli/tests/dev-environment/recovery-cycles.ts",
+        "packages/cli/tests/dev-environment/recovery-process.ts",
+        "packages/cli/tests/dev-environment/recovery.probe.ts",
+        "packages/cli/tests/dev-environment/recovery.types.ts",
+        "packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts",
+        "packages/cli/tests/dev-snapshot/commerce-project-eligibility.test.ts",
+        "packages/cli/tests/dev-snapshot/template-compatibility.test.ts",
+        "packages/cli/tests/services/dev-environment-errors.test.ts",
+        "packages/cli/tests/services/dev-environment-native.test.ts",
+        "packages/cli/tests/services/dev-environment-values.test.ts",
+        "packages/cli/tests/services/dev-invocation-environment.test.ts",
+        "packages/cli/tests/services/dev-support-fixture.ts",
+        "packages/cli/tests/services/source-watch-fixture.ts",
+        "packages/cli/tests/services/source-watch-synchronous.test.ts",
+        "packages/cli/tests/services/source-watch.test.ts",
+        "packages/create-relkit/src/create-capabilities.ts",
+        "packages/create-relkit/src/render-database-sources.ts",
+        "packages/create-relkit/src/render-database.ts",
+        "packages/supervisor/src/candidate-process.ts",
+        "packages/supervisor/tests/compatibility/environment.test.ts",
+        "templates/default/v1/agent/tsconfig.json",
+        "templates/default/v1/api/tsconfig.json",
+        "templates/default/v1/fullstack/tsconfig.json",
+        "templates/default/v1/minimal/tsconfig.json",
+        "templates/default/v1/tasks/tsconfig.json",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        "tests/generator/sqlite-path-typing.test.ts",
+        "tests/generator/sqlite-state-path.test.ts",
+        "tests/integration/fixtures/paired-commerce-project.ts",
+        "tests/unit/paired-commerce-project.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.5
+    },
+    "32-observability": {
+      "stage": "32-observability",
+      "command": [
+        "bun",
+        "scripts/check-observability-sinks.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.4
+    }
+  },
+  "mutationRetainedInputsMatched": 80,
+  "supplemental": {
+    "affectedCreatePackage": {
+      "command": "bun x --bun vitest run --config packages/create-relkit/vitest.config.ts --maxWorkers=1",
+      "exitCode": 0,
+      "files": 10,
+      "tests": 28
+    },
+    "nativePreparedSmoke": {
+      "exitCode": 0,
+      "assertions": [
+        "prepared backend executes under owned snapshot session",
+        "exact HTTP handler and parameter route outputs",
+        "extra root rejects without receipt replacement",
+        "joined shutdown closes listener"
+      ]
+    },
+    "certificate": {
+      "freshRuns": 20,
+      "restartRuns": 20,
+      "thresholdMs": 1000,
+      "freshMaximumMs": 587.179375,
+      "restartMaximumMs": 527.162584
+    }
+  },
+  "repairReports": [
+    "bf-6c1f59bebfd1c8865038fc52",
+    "bf-c7e0a9416b68b0c54a9942e6",
+    "bf-0540debf572ceef2383c053a"
+  ],
+  "commerce": {
+    "cliPid": 55765,
+    "recoveryScenariosPassed": 16,
+    "finalPreparationRefresh": "pending in coordinated app chat",
+    "url": "http://localhost:3400",
+    "inspector": "http://localhost:3410"
+  },
+  "limitations": [
+    "Local execution only; cloud acceptance disabled and declared opt-in/platform skips retained",
+    "Supplemental Node runtime attempt failed because Bun globals were unavailable; same package passed with documented Bun runtime",
+    "Initial partial certification stopped administratively for reproduced Mac integrity hardening, with rollback and cleanup before complete replay"
+  ],
+  "uncommitted": true
+}

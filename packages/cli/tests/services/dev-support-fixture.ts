@@ -67,6 +67,7 @@ export const devSupportFixture = Effect.fn("Test.devSupportFixture")(function* (
     start: startDevEngine(owner, session, { activate, stop, requestStop }),
     wait: Deferred.await(owner.closed),
     watch: Effect.never,
+    watchWith: () => Effect.never,
     drain: () => Effect.void,
     finish: () => {
       Deferred.doneUnsafe(owner.closed, Effect.void);

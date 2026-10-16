@@ -1,0 +1,11 @@
+{
+  "preparedFastPath": true,
+  "generation": "sha256:db6ea2b36fb42d14c8562b9e0ff32290569ab9ee80f7834e0b6b4c53c8830781",
+  "cliPid": 55765,
+  "initialCandidatePid": 55798,
+  "inspectorPid": 55817,
+  "preparedSession": ".relkit/dev/sessions/dev-session-FAZige",
+  "verifiedAndPublished": true,
+  "ordinaryFallbackBeforeMatrix": false,
+  "catalogProducts": 3
+}

@@ -1,0 +1,103 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+stdout | packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts > accepts audited SQLite metadata, native deferred clients, errors and literal auth
+[01:28:55.897] ERROR (#1): Error [AssertionError]: import { integer, text, sqliteTable, uniqueIndex, check, primaryKey } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
+export const user = sqliteTable("user", { id: text().primaryKey() });
+export const item = sqliteTable("item", {
+  id: text().primaryKey(),
+  userId: text().notNull().references(() => user.id, { onDelete: "cascade" }),
+  count: integer().notNull().default(1),
+}, (t) => [uniqueIndex("owner").on(t.userId), primaryKey({columns: [t.id]}), check("positive", sql`${t.count} > 0`)]);: expected false to be true // Object.is equality
+    at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts:27:112 {
+  actual: false,
+  expected: true,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+
+stdout | packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts > rejects ambient metadata, eager callbacks, imported tooling and runtime construction
+[01:28:55.905] ERROR (#6): Error [AssertionError]: import value from "../scripts/seed.js"; export default value;: expected false to be true // Object.is equality
+    at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts:52:112 {
+  actual: false,
+  expected: true,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+
+ ❯ packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts (2 tests | 2 failed) 19ms
+   × accepts audited SQLite metadata, native deferred clients, errors and literal auth 13ms
+   × rejects ambient metadata, eager callbacks, imported tooling and runtime construction 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts > accepts audited SQLite metadata, native deferred clients, errors and literal auth
+AssertionError: import { integer, text, sqliteTable, uniqueIndex, check, primaryKey } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
+export const user = sqliteTable("user", { id: text().primaryKey() });
+export const item = sqliteTable("item", {
+  id: text().primaryKey(),
+  userId: text().notNull().references(() => user.id, { onDelete: "cascade" }),
+  count: integer().notNull().default(1),
+}, (t) => [uniqueIndex("owner").on(t.userId), primaryKey({columns: [t.id]}), check("positive", sql`${t.count} > 0`)]);: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts:27:112
+     25|       'export * from "./schema/commerce.js";',
+     26|     ])
+     27|       expect(Exit.isSuccess(yield* Effect.exit(verifyStaticSnapshotSou…
+       |                                                                                                                ^
+     28|   }),
+     29| );
+ ❯ IteratorImpl.~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1417:28
+ ❯ FiberImpl.succeedWith node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:706:30
+ ❯ PrimitiveImpl.~effect/Effect/failureCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:3783:20
+ ❯ ExitPrimitive.~effect/Effect/evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/core.ts:607:20
+ ❯ FiberImpl.runLoop node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:650:39
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:592:23
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:5679:9
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:5757:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts > rejects ambient metadata, eager callbacks, imported tooling and runtime construction
+AssertionError: import value from "../scripts/seed.js"; export default value;: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts:52:112
+     50|     ];
+     51|     for (const source of unsafe)
+     52|       expect(Exit.isFailure(yield* Effect.exit(verifyStaticSnapshotSou…
+       |                                                                                                                ^
+     53|   }),
+     54| );
+ ❯ IteratorImpl.~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1417:28
+ ❯ FiberImpl.succeedWith node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:706:30
+ ❯ PrimitiveImpl.~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:3780:20
+ ❯ ExitPrimitive.~effect/Effect/evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/core.ts:565:30
+ ❯ FiberImpl.runLoop node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:650:39
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:592:23
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:5679:9
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:5757:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  01:28:55
+   Duration  556ms (import 77%, transform 18%, tests 4%, worker 1%)
+

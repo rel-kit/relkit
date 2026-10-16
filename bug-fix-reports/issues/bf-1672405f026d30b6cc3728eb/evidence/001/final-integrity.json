@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "generation": "sha256:317e000a51693740fbd1bb26620f92ffa2a53d7723d689c07028cbe2e331a7e5",
+  "snapshotCurrentBeforeAndAfterLiveRequests": true,
+  "sourceDependencyArtifactAndGraphValidation": true,
+  "cliPid": 69188,
+  "ownerPid": 69187,
+  "catalogProducts": 3,
+  "authenticated": true,
+  "cartTotalCents": 7200,
+  "historicalOrderTotalCents": 4900,
+  "liveLinks": 3
+}

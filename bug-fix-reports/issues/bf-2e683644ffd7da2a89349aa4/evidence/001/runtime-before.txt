@@ -1,0 +1,9 @@
+$ bun --bun drizzle-kit migrate
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/drizzle.config.ts'
+Using 'better-sqlite3' driver for database querying
+Error  'better-sqlite3' is not yet supported in Bun.
+Track the status in https://github.com/oven-sh/bun/issues/4290
+In the meantime, you could try bun:sqlite which has a similar API.
+error: "drizzle-kit" exited with code 1
+error: script "db:migrate" exited with code 1

@@ -50,6 +50,8 @@ export const makeDevSessionEngineEffect = Effect.fn("Dev.acquireSession")(
     const requestStop = <Reason>(reason: Reason): void => {
       Deferred.doneUnsafe(owner.requested, stop(reason));
     };
+    const watchWith: DevSessionEngine["watchWith"] = (effect) =>
+      provideDevEngine(owner, effect).pipe(Effect.provideService(Scope.Scope, owner.scope));
     const engine: DevSessionEngine = {
       scope: owner.scope,
       cleanup: owner.cleanup,
@@ -60,16 +62,14 @@ export const makeDevSessionEngineEffect = Effect.fn("Dev.acquireSession")(
       stop,
       requestStop,
       wait: observeCli("dev.session.wait", Deferred.await(owner.closed)),
-      watch: provideDevEngine(
-        owner,
-        Effect.gen(function* () {
-          const watcher = yield* ownedNativePromise(
-            "dev.watch.import",
-            () => import("./dev-watch.js"),
-          );
-          return yield* watcher.makeDevSourceWatcherEffect(session);
-        }),
-      ).pipe(Effect.provideService(Scope.Scope, owner.scope)),
+      watchWith,
+      watch: Effect.gen(function* () {
+        const watcher = yield* ownedNativePromise(
+          "dev.watch.import",
+          () => import("./dev-watch.js"),
+        );
+        return yield* watchWith(watcher.makeDevSourceWatcherEffect(session));
+      }),
       finish: () => {
         Deferred.doneUnsafe(owner.closed, Effect.void);
       },

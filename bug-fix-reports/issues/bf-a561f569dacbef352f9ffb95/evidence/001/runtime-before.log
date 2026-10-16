@@ -1,0 +1,75 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/dev-scaffold.test.ts:
+[20:41:03.947] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 1.922666,
+}
+2537 |     const scheduler = new Scheduler.MixedScheduler("sync");
+2538 |     const fiber = runFork(effect, {
+2539 |       scheduler
+2540 |     });
+2541 |     fiber._dispatcher?.flush();
+2542 |     return fiber._exit ?? exitDie(new AsyncFiberError(fiber));
+                                         ^
+error: An asynchronous Effect was executed with Effect.runSync
+      fiber: FiberImpl {
+  context: [Object ...],
+  _dispatcher: undefined,
+  cache: [Object ...],
+  id: 290,
+  currentOpCount: 21,
+  interruptible: true,
+  _stack: [
+    [Object ...], [Object ...], [Object ...], [Object ...], [Object ...], [Object ...]
+  ],
+  _observers: undefined,
+  _exit: undefined,
+  _children: undefined,
+  _interruptedCause: undefined,
+  _yielded: [Function],
+  _running: false,
+  _deferredInterrupt: false,
+  _parent: undefined,
+  _asyncContext: [Object ...],
+  "~effect/Fiber": [Getter],
+  currentDispatcher: [Getter],
+  getRef: [Function: getRef],
+  addObserver: [Function: addObserver],
+  removeObserver: [Function: removeObserver],
+  interruptUnsafe: [Function: interruptUnsafe],
+  pollUnsafe: [Function: pollUnsafe],
+  evaluate: [Function: evaluate],
+  runLoop: [Function: runLoop],
+  getCont: [Function: getCont],
+  succeedWith: [Function: succeedWith],
+  yieldWith: [Function: yieldWith],
+  children: [Function: children],
+  pipe: [Function: pipe],
+  setContext: [Function: setContext],
+  currentSpanLocal: [Getter],
+},
+       _tag: "AsyncFiberError",
+ ~effect/Cause/AsyncFiberError: "~effect/Cause/AsyncFiberError",
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2542:35)
+      at runExecutionSync (/Users/mustafaelsayed/Workspace/relkit/packages/contracts/dist/operation-runtime.js:25:26)
+[20:41:04.036] INFO (#292): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 10.482625,
+}
+[20:41:04.037] INFO (#292): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.477709,
+}
+(fail) holds reload until a real scaffold transaction finishes installation or rollback [99.06ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [460.00ms]

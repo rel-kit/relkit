@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "cliPid": 37497,
+  "actualCliStartup": true,
+  "loggingPreloadRetained": true,
+  "dotenvReloadReachedHttp": true,
+  "samePidDuringRecovery": true,
+  "privateValuesLogged": false,
+  "joinedCleanup": true
+}

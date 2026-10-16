@@ -1,0 +1,112 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/services/dev-environment-preload.test.ts:
+[14:07:04.664] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.346,
+}
+[14:07:04.666] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stat",
+  outcome: "success",
+  duration_ms: 0.297125,
+}
+[14:07:04.666] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.191208,
+}
+[14:07:04.666] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.049958,
+}
+[14:07:04.667] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.042209,
+}
+[14:07:04.667] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.028792,
+}
+[14:07:04.692] INFO (#4): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 1.022875,
+}
+[14:07:04.692] INFO (#4): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 25.233375,
+}
+[14:07:04.693] ERROR (#1): Execution operation failed {
+  domain: "cli",
+  operation: "dev.environment.resolve",
+  outcome: "failure",
+  duration_ms: 31.174584,
+}
+46 |  * @param operation - Declaration-owned boundary label.
+47 |  * @param cause - Original native rejection or thrown value.
+48 |  * @returns The typed adapter failure.
+49 |  */
+50 | export function cliAdapterError(operation: string, cause: unknown): CliAdapterError {
+51 |   return new CliAdapterError({
+                  ^
+error: Invalid development environment response.
+      _tag: "CliAdapterError",
+ operation: "dev.environment.decode",
+
+      at cliAdapterError (/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/cli-errors.ts:51:14)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:728:2
+      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:383:16)
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:327:10)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:1180:3
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:347:14)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:1180:3
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:347:14)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+      at processTicksAndRejections (unknown:7:39)
+
+161 |   return Effect.try({
+162 |     try: () => Schema.decodeUnknownSync(developmentEnvironmentSchema)(JSON.parse(text)),
+163 |     catch: () =>
+164 |       cliAdapterError(
+165 |         "dev.environment.decode",
+166 |         new Error("Invalid development environment response."),
+                  ^
+error: Invalid development environment response.
+      at catch (/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/services/dev-environment.service.ts:166:13)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:728:2
+      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:383:16)
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:327:10)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:1180:3
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:347:14)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:1180:3
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:347:14)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+      at processTicksAndRejections (unknown:7:39)
+(fail) loads dotenv values without executing a logging application preload [39.86ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [177.00ms]

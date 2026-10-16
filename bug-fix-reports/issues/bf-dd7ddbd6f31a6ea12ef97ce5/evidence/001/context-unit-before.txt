@@ -1,0 +1,15 @@
+[FAIL] FAILURES:
+  (fail) generated HTTP invocation forwards resolved environment into the engine [32.97ms]
+  error: expect(received).toBe(expected)
+  Expected: {
+  RECOVERY_VALUE: "resolved",
+  }
+  Received: undefined
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/dev-invocation-environment.test.ts:26:20)
+
+SUMMARY:
+   0 pass
+   1 fail
+  Ran 1 test across 1 file. [434.00ms]
+
+[full output: rtk recall 15715940bb2a]

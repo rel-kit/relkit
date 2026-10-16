@@ -1,0 +1,19 @@
+Evidence directory: /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dev-recovery-evidence-TCsGiL
+ordinary: syntax, descriptor, import, deletion, config and in-flight multi-file burst recovery passed
+shutdown: 5 owned descendants exited; listener unavailable
+ordinary: shutdown released the public listener
+[22:09:11.711] INFO (#2): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 1.249041,
+}
+[22:09:11.712] INFO (#2): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 4161.0505,
+}
+prepared: syntax, descriptor, import, deletion, config and in-flight multi-file burst recovery passed
+shutdown: 5 owned descendants exited; listener unavailable
+prepared: shutdown released the public listener

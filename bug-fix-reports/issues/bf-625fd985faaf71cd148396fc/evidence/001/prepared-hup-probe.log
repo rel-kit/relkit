@@ -1,0 +1,27 @@
+{
+  "scenario": "prepared-hup",
+  "fixture": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-7yf2dur2",
+  "appPort": 58253,
+  "inspectorPort": 58254,
+  "cliPid": 56895,
+  "initialHandler": "Hello, lifetime!",
+  "preparedFastPath": true,
+  "ownedProcesses": [
+    {
+      "pid": 56895,
+      "parent": 56748,
+      "command": "bun /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts dev --port 58253 --inspector-port 58254 --local off --no-color --verbose"
+    },
+    {
+      "pid": 56898,
+      "parent": 56895,
+      "command": "/Users/mustafaelsayed/.bun/bin/bun --no-env-file /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-7yf2dur2/.relkit/dev/sessions/dev-session-zX0hQW/generation-1/server/index.js"
+    }
+  ],
+  "exitCode": -1,
+  "signalSent": "SIGHUP",
+  "shutdownDiagnostic": false,
+  "survivingDescendantsAtExit": [
+    56898
+  ]
+}

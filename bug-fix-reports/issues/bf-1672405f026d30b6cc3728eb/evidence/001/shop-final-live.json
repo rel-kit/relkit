@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "products": 3,
+  "revision": "v1:base",
+  "authenticated": true,
+  "cartTotalCents": 7200,
+  "historicalOrderTotalCents": 4900,
+  "independentSqliteReadBack": true,
+  "links": 3
+}

@@ -1,0 +1,21 @@
+{
+  "key": "2e683644ffd7da2a89349aa423a004a3574c02325dbafca00aa4036b992873e7",
+  "matches": {
+    "bf-2e683644ffd7da2a89349aa4": {
+      "id": "bf-2e683644ffd7da2a89349aa4",
+      "status": "verified",
+      "what": "New SQLite database/auth applications cannot apply their generated migrations under Bun.",
+      "root_cause": "packages/create-relkit/src/render-database.ts unconditionally generated bun --bun drizzle-kit migrate for SQLite; pinned Kit chooses the installed Node-only better-sqlite3 driver. The app already uses bun:sqlite, whose supported Drizzle migrator avoids that driver. A Node control also failed due this machine's native A",
+      "fixed_by": "For SQLite, emit scripts/migrate.ts using drizzle-orm/bun-sqlite/migrator, guard persistent DATABASE_PATH, close the client in finally and point db:migrate to it. Retain existing non-SQLite commands. Original failing regressions, fresh real CLI creation/addition/migration replay, main app auth/commerce HTTP, adjacent d",
+      "files": [
+        "packages/create-relkit/src/render-database.ts",
+        "packages/create-relkit/src/render-database-sources.ts",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        ".changeset/sqlite-app-tooling.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:39:54+00:00",
+      "report": "bug-fix-reports/issues/bf-2e683644ffd7da2a89349aa4/report.md"
+    }
+  }
+}

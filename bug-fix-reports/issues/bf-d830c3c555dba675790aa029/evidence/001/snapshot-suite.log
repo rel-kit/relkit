@@ -1,0 +1,39 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+ ❯ packages/cli/tests/dev-snapshot/input-watch.test.ts (0 test)
+ ❯ packages/cli/tests/dev-snapshot/template-compatibility.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/cli/tests/dev-snapshot/input-watch.test.ts [ packages/cli/tests/dev-snapshot/input-watch.test.ts ]
+Error: Cannot find package 'bun:test' imported from /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/input-watch.test.ts
+ ❯ packages/cli/tests/dev-snapshot/input-watch.test.ts:2:1
+      1| /** Exercises real installed-input watches, bounded native registratio…
+      2| import { expect, test } from "bun:test";
+       | ^
+      3| import { watch } from "node:fs";
+      4| import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promis…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  packages/cli/tests/dev-snapshot/template-compatibility.test.ts [ packages/cli/tests/dev-snapshot/template-compatibility.test.ts ]
+Error: Cannot find package 'bun:test' imported from /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/template-compatibility.test.ts
+ ❯ packages/cli/tests/dev-snapshot/template-compatibility.test.ts:1:1
+      1| import { expect, test } from "bun:test";
+       | ^
+      2| import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promi…
+      3| import { join, resolve } from "node:path";
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 29 passed (31)
+      Tests  76 passed (76)
+   Start at  01:39:33
+   Duration  9.97s (import 66%, transform 19%, tests 14%, worker 1%)
+
+     Import  618 modules were evaluated 1011 times · 5.23s total, 66% of tracked time
+             ~2.03s faster with isolate: false — shared modules are evaluated once per worker instead of once per file
+             learn more: https://vitest.dev/guide/improving-performance#test-isolation
+

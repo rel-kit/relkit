@@ -13,6 +13,6 @@
     "baseUrl": ".",
     "paths": { "@app/*": ["src/*"] }
   },
-  "files": [".relkit/generated/route-module-checks.ts"],
+  "files": [".relkit/generated/route-module-checks.ts", ".relkit/generated/context-registry.d.ts"],
   "include": ["src", "tests", "examples"]
 }

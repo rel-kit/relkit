@@ -25,6 +25,7 @@ import {
   databaseServiceSource,
   drizzleConfigSource,
   itemsSchemaSource,
+  sqliteMigrationSource,
 } from "./render-database-sources.js";
 
 /**
@@ -64,14 +65,19 @@ export const renderDatabaseEffect = Effect.fn("Scaffold.renderDatabase")(
       yield* builder.dependencyEffect(dependency);
     }
     yield* builder.scriptEffect("db:generate", "bun --bun drizzle-kit generate");
-    yield* builder.scriptEffect("db:migrate", "bun --bun drizzle-kit migrate");
+    if (request.dialect === "sqlite")
+      yield* builder.createEffect("scripts/migrate.ts", sqliteMigrationSource());
+    yield* builder.scriptEffect(
+      "db:migrate",
+      request.dialect === "sqlite" ? "bun scripts/migrate.ts" : "bun --bun drizzle-kit migrate",
+    );
     yield* builder.gitignoreEffect("/drizzle/");
     if (request.dialect === "sqlite") {
       yield* ensureEnvironmentEffect(
         builder,
         "DATABASE_PATH",
-        `env.string().default("./app.sqlite")`,
-        "./app.sqlite",
+        `env.string().default("./.relkit/state/app.sqlite")`,
+        "./.relkit/state/app.sqlite",
       );
       yield* builder.gitignoreEffect("*.sqlite");
       yield* builder.gitignoreEffect("*.sqlite-*");

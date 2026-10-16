@@ -1,0 +1,1022 @@
+bun test v1.3.10 (30e609e0)
+
+tests/compiler/identity-binding.test.ts:
+(pass) manifest binds exported service facades and nested errors to canonical IDs [10.52ms]
+
+tests/compiler/fixtures.test.ts:
+(pass) compiler fixture goldens > valid-minimal [837.48ms]
+(pass) compiler fixture goldens > valid-full [838.71ms]
+(pass) compiler fixture goldens > valid-inferred-identities [821.46ms]
+(pass) compiler fixture goldens > warning-wrong-directory [590.54ms]
+(pass) compiler fixture goldens > warning-wrong-suffix [594.22ms]
+(pass) compiler fixture goldens > error-duplicate-id [613.06ms]
+(pass) compiler fixture goldens > error-ambiguous-id [589.47ms]
+(pass) compiler fixture goldens > error-inferred-collision [736.79ms]
+(pass) compiler fixture goldens > error-route-collision [625.42ms]
+(pass) compiler fixture goldens > error-missing-target [581.13ms]
+(pass) compiler fixture goldens > error-event-target [614.58ms]
+(pass) compiler fixture goldens > error-provider-profile [603.28ms]
+
+tests/compiler/evaluator.test.ts:
+(pass) isolated evaluator > returns snapshots and manifest references without corrupting output [131.35ms]
+(pass) isolated evaluator > reports supported side effects and keeps generated writes allowed [245.48ms]
+(pass) isolated evaluator > returns source-mapped structured import failures [111.25ms]
+(pass) isolated evaluator > kills a candidate that exceeds the compilation timeout [207.32ms]
+(pass) isolated evaluator > rejects candidates outside the fixed project root [1.11ms]
+(pass) isolated evaluator > retains executable source hashes in task descriptor snapshots [1.74ms]
+
+tests/compiler/route-file.test.ts:
+(pass) route-file paths > parses root, static, and dynamic routes [0.09ms]
+(pass) route-file paths > parses required and optional catch-all variants [0.43ms]
+(pass) route-file paths > converts canonical route paths back to source files [0.38ms]
+(pass) route-file paths > sorts route kinds by documented precedence [0.73ms]
+(pass) route-file paths > rejects unsupported and ambiguous route files [1.13ms]
+
+tests/compiler/manifest.test.ts:
+(pass) runtime manifest generation > sorts imports and emits handlers plus the runtime-integration plan reference [0.84ms]
+(pass) runtime manifest generation > keeps provider topology in graph data and factories out of executable manifest [5.30ms]
+(pass) runtime manifest generation > imports event target binding from the events authoring facade
+(pass) runtime manifest generation > does not activate without executable references or with a hash mismatch [0.76ms]
+
+tests/compiler/runtime-integration-plan.test.ts:
+(pass) runtime integration plan > emits only graph-required runtimes in stable registration order [0.35ms]
+(pass) runtime integration plan > resolves standalone provenance through catalog metadata [5.54ms]
+(pass) runtime integration plan > rejects mismatched identities and duplicate runtime registrations [0.97ms]
+(pass) runtime integration plan > generates one deterministic static import per selected package export [0.15ms]
+(pass) runtime integration plan > rejects authored runtime paths and package-root escapes [5.42ms]
+
+tests/compiler/effect-import-bundling.test.ts:
+(pass) keeps unsupported imports and narrows aliases plus type-only named imports [0.71ms]
+(pass) packaged namespace imports preserve pinned service identity and executable behavior [117.39ms]
+
+tests/compiler/event-functions.test.ts:
+(pass) lowers an authored event function to one exact-event trigger [5.12ms]
+(pass) preserves explicit event delivery limits in the graph [5.83ms]
+(pass) diagnoses unknown publications and duplicate publication IDs [4.23ms]
+(pass) reserves generated trigger identities and rejects unknown consumer events [3.70ms]
+(pass) rejects executable fields on forged event contracts [2.70ms]
+
+tests/compiler/ast-prefilter.test.ts:
+(pass) AST discovery prefilter > finds syntax candidates without evaluating ordinary source [2.73ms]
+(pass) AST discovery prefilter > ignores type-only RelKit references and uses default exclusions [0.53ms]
+
+tests/compiler/graph-construction.test.ts:
+(pass) compiler graph construction > projects triggers, ordered middleware/transforms, and declared edges [33.40ms]
+(pass) compiler graph construction > keeps direct descriptor normalization independent of source-domain validation [4.22ms]
+
+tests/compiler/inferred-identities.test.ts:
+(pass) compiler source identity normalization > derives IDs and rewrites target references before validation [12.40ms]
+(pass) compiler source identity normalization > normalizes service member identities used by route targets [7.42ms]
+(pass) compiler source identity normalization > reports ambiguous omitted IDs with an explicit-ID suggestion [3.34ms]
+(pass) compiler source identity normalization > reports mixed explicit/inferred collisions at both source locations [3.49ms]
+(pass) compiler source identity normalization > treats inferred source moves as identity changes and explicit moves as metadata-only [13.32ms]
+
+tests/compiler/route-module-exclusions.test.ts:
+(pass) generated route contracts omit discovery's excluded test and fixture modules [0.89ms]
+(pass) shared route findings skip excluded files while preserving errors in application routes [35.82ms]
+(pass) route eligibility ignores excluded folders only beneath the source route directory
+
+tests/compiler/local-service-plan.test.ts:
+(pass) local-service plan preserves declarations and graph requirements without values [0.18ms]
+(pass) local-service plan bytes are independent of graph insertion order [0.34ms]
+
+tests/compiler/route-module-types.test.ts:
+(pass) installed public declarations validate individual routes and service-route destructuring [2833.68ms]
+(pass) tsc rejects bad route exports even with skipLibCheck and generated files excluded [4423.85ms]
+(pass) module checking follows reexports instead of relying on initializer syntax [693.43ms]
+(pass) module findings locate invalid star reexports in the route module [620.86ms]
+(pass) source rules recognize import aliases, namespaces and wrapped expressions with a precise fix [0.76ms]
+(pass) route validators sort, deduplicate and support custom output directories [0.12ms]
+(pass) service route destructuring rejects renamed methods, rest bindings and ALL [0.24ms]
+(pass) aliased service-route factories retain static route identity evidence [1.12ms]
+
+tests/compiler/commerce-example.test.ts:
+(pass) commerce-example compiler acceptance > compiles the canonical mixed integration topology [1111.13ms]
+
+tests/compiler/semantic-validation.test.ts:
+(pass) compiler semantic validation > resolves agent model profiles without a legacy model registry [25.88ms]
+(pass) compiler semantic validation > indexes middleware and transforms without duplicating exported references [7.00ms]
+(pass) compiler semantic validation > reports missing references, response incompatibility, and transform collisions [10.98ms]
+(pass) compiler semantic validation > validates provider capabilities without static function cycles [5.27ms]
+(pass) compiler semantic validation > rejects multiple bucket descriptors owning one profile [4.46ms]
+(pass) compiler semantic validation > projects provider sources, integrations, named values, recipes, and deployment roles [5.60ms]
+(pass) compiler semantic validation > rejects local-only provider bindings in production [6.35ms]
+
+tests/compiler/inferred-fixtures.test.ts:
+(pass) compiles every inferred declaration kind and binds canonical identities [441.16ms]
+(pass) keeps inferred fixture artifacts stable across roots and candidate order [1258.10ms]
+
+tests/compiler/source-facts.test.ts:
+(pass) TypeScript discovery facts > finds bindings, exports, route operations, service members, and local errors syntactically [2.13ms]
+(pass) TypeScript discovery facts > carries facts through source mapping without importing the source [1.45ms]
+
+tests/compiler/activation-fingerprint.test.ts:
+(pass) activation fingerprints bind every selected cohort artifact deterministically
+
+tests/compiler/evaluator-error-export.test.ts:
+(pass) exported error constructors survive evaluator discovery [2.80ms]
+
+tests/compiler/extract.test.ts:
+(pass) descriptor extraction > preserves named/default exports, source positions, and data-only references [1.26ms]
+
+tests/compiler/generated-artifacts.test.ts:
+(pass) compiler generated artifacts > writes core bytes once and preserves unchanged modification state [8.13ms]
+(pass) compiler generated artifacts > accepts only versioned future artifact extensions [4.81ms]
+(pass) compiler generated artifacts > invalidates changed descriptors and transitive dependants deterministically [0.66ms]
+
+tests/compiler/rate-limit.test.ts:
+(pass) rate-limit compilation > projects the policy, shared store, edge, and inferred 429 [9.02ms]
+(pass) rate-limit compilation > allows generation-local memory only outside production [9.88ms]
+
+tests/compiler/normalize.test.ts:
+(pass) compiler normalization > runs all v3 passes in their exact order [10.47ms]
+(pass) compiler normalization > keeps diagnostic codes stable for duplicate IDs and route collisions [6.91ms]
+(pass) compiler normalization > requires an explicit compatibility opt-in for legacy jobs [11.35ms]
+(pass) compiler normalization > treats the task-first profile spelling as a warning, not legacy execution [8.41ms]
+(pass) compiler normalization > sorts canonical graph bytes independently of descriptor enumeration [17.81ms]
+(pass) compiler normalization > normalizes raw IDs and paths without losing mapped source locations [2.83ms]
+(pass) compiler normalization > keeps invalid raw IDs as stable diagnostics [2.51ms]
+
+tests/compiler/project-typecheck.test.ts:
+(pass) generated checks do not reject rootDir src projects without routes [1028.82ms]
+(pass) route assertions outside rootDir still reject invalid exports [2672.16ms]
+(pass) validation retains a broader rootDir and ordinary source type errors [579.37ms]
+(pass) fixture release joins native work after interruption and body failure [5.65ms]
+
+tests/compiler/route-inference.test.ts:
+(pass) route contract inference > rejects framework-reserved route paths [6.89ms]
+(pass) route contract inference > maps path and remaining GET fields and infers success, errors, and validation [10.65ms]
+(pass) route contract inference > maps matching path fields and rejects unmatched parameters during inference [5.91ms]
+(pass) route contract inference > rejects unmatched catch-all parameters during inference [5.62ms]
+(pass) route contract inference > keeps explicit request mappings as complete overrides [8.26ms]
+(pass) route contract inference > includes declared errors without explicit HTTP status mappings [20.12ms]
+(pass) route contract inference > maps write fields to JSON and infers void as 204 [6.45ms]
+(pass) route contract inference > maps write fields to multipart when the route accepts form data [8.39ms]
+(pass) route contract inference > preserves schema defaults in inferred request mappings [7.08ms]
+(pass) route contract inference > infers catch-all arrays and reports unusable input projections [13.27ms]
+
+tests/compiler/job-names.test.ts:
+(pass) task/job compiler discovery > creates one private implicit job with the task durable ID [9.90ms]
+(pass) task/job compiler discovery > requires an explicit job for ambiguous task aliases [3.56ms]
+(pass) task/job compiler discovery > does not invent an implicit job from a service facade alone [3.52ms]
+(pass) task/job compiler discovery > deduplicates a service facade alias against the canonical task export [7.34ms]
+(pass) task/job compiler discovery > keeps task and task-backed job graph identities distinct [6.67ms]
+(pass) task/job compiler discovery > emits stable task hook nodes without changing legacy hook phases [7.78ms]
+(pass) task/job compiler discovery > emits one deterministic versioned jobs manifest and runtime task/job maps [11.06ms]
+(pass) task/job compiler discovery > keeps schedule inputs out of the data-only jobs manifest [7.31ms]
+(pass) task/job compiler discovery > keeps manifest identity stable when discovery order changes [19.86ms]
+(pass) task/job compiler discovery > changes public identity without replacing a pinned job durable ID [12.52ms]
+(pass) task/job compiler discovery > keeps executable build identity separate from task semantic version [13.37ms]
+(pass) task/job compiler discovery > keeps executable identity stable when an implicit export is renamed [11.21ms]
+(pass) task/job compiler discovery > keeps task-scoped directional schema hashes across equal durable IDs [5.99ms]
+(pass) task/job compiler discovery > uses inputWire for a transformed task's canonical projection [9.00ms]
+(pass) task/job compiler discovery > diagnoses a graph-only synthetic identity collision [4.07ms]
+(pass) task/job compiler discovery > rejects duplicate IDs within one durable namespace [8.02ms]
+(pass) task/job compiler discovery > reserves the root jobs namespace for exposed task-backed jobs [10.30ms]
+
+tests/compiler/source-id.test.ts:
+(pass) source-scoped ID encoders > strips conventional source structure and normalizes hierarchy [1.03ms]
+(pass) source-scoped ID encoders > uses named bindings, default file stems, and explicit IDs [0.57ms]
+(pass) source-scoped ID encoders > encodes errors and service members with explicit precedence [0.40ms]
+(pass) source-scoped ID encoders > encodes route method and path variants without transport punctuation [0.36ms]
+
+tests/compiler/worker-entries.test.ts:
+(pass) immutable job worker entries > writes deterministic worker and routing files without rewriting unchanged bytes [8.64ms]
+[20:25:57.935] WARN (#22726): Compiler jobs operation failed {
+  "compiler.stage": "jobs",
+  operation: "routingMerge",
+  outcome: "failure",
+  duration_ms: 0.15925,
+}
+[20:25:57.936] WARN (#22725): Compiler jobs operation failed {
+  "compiler.stage": "jobs",
+  operation: "writeWorkers",
+  outcome: "failure",
+  duration_ms: 1.749458,
+}
+(pass) immutable job worker entries > preflights every path so an immutable conflict cannot partially activate a build [4.46ms]
+(pass) immutable job worker entries > keeps implicit routing when a second binding uses the same worker [3.45ms]
+
+tests/compiler/grouped-runtime-execution.test.ts:
+[20:25:59.294] INFO (#22736): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.grouped.runtime.check.flat",
+  outcome: "success",
+  duration_ms: 1282.713875,
+}
+[20:25:59.321] INFO (#22736): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.grouped.manifest.invoke",
+  outcome: "success",
+  duration_ms: 27.350958,
+}
+[20:25:59.322] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.048209,
+}
+[20:25:59.322] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.0205,
+}
+[20:25:59.329] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.inventory",
+  outcome: "success",
+  duration_ms: 7.011542,
+}
+[20:25:59.339] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.rewrite.source",
+  outcome: "success",
+  duration_ms: 0.888916,
+}
+[20:25:59.339] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.rewrite.source",
+  outcome: "success",
+  duration_ms: 0.522875,
+}
+[20:25:59.340] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.rewrite.source",
+  outcome: "success",
+  duration_ms: 0.389292,
+}
+[20:25:59.340] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.rewrite.source",
+  outcome: "success",
+  duration_ms: 0.305667,
+}
+[20:25:59.340] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.plan",
+  outcome: "success",
+  duration_ms: 18.684916,
+}
+[20:25:59.379] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.409792,
+}
+[20:25:59.380] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 34.659,
+}
+[20:25:59.380] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.058917,
+}
+[20:25:59.386] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.175916,
+}
+[20:25:59.386] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 5.849,
+}
+[20:25:59.387] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stage",
+  outcome: "success",
+  duration_ms: 0.208875,
+}
+[20:25:59.387] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stage",
+  outcome: "success",
+  duration_ms: 0.100584,
+}
+[20:25:59.387] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.chmod",
+  outcome: "success",
+  duration_ms: 0.058417,
+}
+[20:25:59.387] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.chmod",
+  outcome: "success",
+  duration_ms: 0.053667,
+}
+[20:25:59.388] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.336167,
+}
+[20:25:59.388] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.196792,
+}
+[20:25:59.388] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.277209,
+}
+[20:25:59.389] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.220333,
+}
+[20:25:59.389] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.155833,
+}
+[20:25:59.389] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.148042,
+}
+[20:25:59.389] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.202375,
+}
+[20:25:59.390] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.195417,
+}
+[20:25:59.390] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.36725,
+}
+[20:25:59.390] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.424,
+}
+[20:25:59.391] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.283666,
+}
+[20:25:59.391] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.2285,
+}
+[20:25:59.391] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.15625,
+}
+[20:25:59.391] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.16575,
+}
+[20:25:59.392] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.196042,
+}
+[20:25:59.392] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.228041,
+}
+[20:25:59.392] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.151916,
+}
+[20:25:59.392] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.154084,
+}
+[20:25:59.392] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.027917,
+}
+[20:25:59.393] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.symlink",
+  outcome: "success",
+  duration_ms: 0.090709,
+}
+[20:25:59.393] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.symlink",
+  outcome: "success",
+  duration_ms: 0.068666,
+}
+[20:25:59.393] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.012458,
+}
+[20:25:59.394] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "modules.load",
+  outcome: "success",
+  duration_ms: 1.053459,
+}
+[20:25:59.394] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.readConfig",
+  outcome: "success",
+  duration_ms: 1.1695,
+}
+[20:25:59.395] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.loadConfig",
+  outcome: "success",
+  duration_ms: 0.212334,
+}
+[20:25:59.395] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.files",
+  outcome: "success",
+  duration_ms: 0.176625,
+}
+[20:25:59.395] INFO (#23852): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.116916,
+}
+[20:25:59.395] INFO (#23854): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.125208,
+}
+[20:25:59.395] INFO (#23853): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.18075,
+}
+[20:25:59.395] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.readSources",
+  outcome: "success",
+  duration_ms: 0.484542,
+}
+[20:25:59.396] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeChanged",
+  outcome: "success",
+  duration_ms: 0.789333,
+}
+[20:25:59.396] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.writeRouteModuleChecks",
+  outcome: "success",
+  duration_ms: 0.909834,
+}
+[20:25:59.396] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.049458,
+}
+[20:25:59.396] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.discoverySources",
+  outcome: "success",
+  duration_ms: 0.115167,
+}
+[20:25:59.676] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.evaluate",
+  outcome: "success",
+  duration_ms: 277.703792,
+}
+[20:25:59.681] INFO (#23866): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeChanged",
+  outcome: "success",
+  duration_ms: 0.952917,
+}
+[20:25:59.681] INFO (#23866): Execution operation completed {
+  domain: "cli",
+  operation: "project.writeContextRegistry",
+  outcome: "success",
+  duration_ms: 1.176125,
+}
+[20:25:59.681] INFO (#23864): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeChanged",
+  outcome: "success",
+  duration_ms: 1.374416,
+}
+[20:25:59.681] INFO (#23864): Execution operation completed {
+  domain: "cli",
+  operation: "project.writeEventRegistry",
+  outcome: "success",
+  duration_ms: 1.521666,
+}
+[20:26:00.532] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.typecheck",
+  outcome: "success",
+  duration_ms: 851.002416,
+}
+[20:26:00.533] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.integrationPackages",
+  outcome: "success",
+  duration_ms: 1.296125,
+}
+[20:26:00.544] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 10.148083,
+}
+[20:26:00.545] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.applicationId",
+  outcome: "success",
+  duration_ms: 11.26275,
+}
+[20:26:00.568] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeArtifacts",
+  outcome: "success",
+  duration_ms: 2.804125,
+}
+[20:26:00.568] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.emitCheckResult",
+  outcome: "success",
+  duration_ms: 2.983875,
+}
+[20:26:00.569] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.check",
+  outcome: "success",
+  duration_ms: 1175.540917,
+}
+[20:26:01.752] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.237625,
+}
+[20:26:01.753] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 1183.955292,
+}
+[20:26:01.756] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.047791,
+}
+[20:26:01.757] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "modules.load",
+  outcome: "success",
+  duration_ms: 1.07175,
+}
+[20:26:01.757] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.readConfig",
+  outcome: "success",
+  duration_ms: 1.282625,
+}
+[20:26:01.757] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.loadConfig",
+  outcome: "success",
+  duration_ms: 0.173834,
+}
+[20:26:01.757] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.files",
+  outcome: "success",
+  duration_ms: 0.188625,
+}
+[20:26:01.758] INFO (#24056): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.116542,
+}
+[20:26:01.758] INFO (#24057): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.136,
+}
+[20:26:01.758] INFO (#24058): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.141875,
+}
+[20:26:01.758] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.readSources",
+  outcome: "success",
+  duration_ms: 0.480833,
+}
+[20:26:01.759] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeChanged",
+  outcome: "success",
+  duration_ms: 0.772458,
+}
+[20:26:01.759] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.writeRouteModuleChecks",
+  outcome: "success",
+  duration_ms: 0.868916,
+}
+[20:26:01.759] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.044791,
+}
+[20:26:01.759] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.discoverySources",
+  outcome: "success",
+  duration_ms: 0.090417,
+}
+[20:26:02.033] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.evaluate",
+  outcome: "success",
+  duration_ms: 272.011584,
+}
+[20:26:02.038] INFO (#24070): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeChanged",
+  outcome: "success",
+  duration_ms: 0.878417,
+}
+[20:26:02.038] INFO (#24070): Execution operation completed {
+  domain: "cli",
+  operation: "project.writeContextRegistry",
+  outcome: "success",
+  duration_ms: 1.092,
+}
+[20:26:02.038] INFO (#24068): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeChanged",
+  outcome: "success",
+  duration_ms: 1.238708,
+}
+[20:26:02.038] INFO (#24068): Execution operation completed {
+  domain: "cli",
+  operation: "project.writeEventRegistry",
+  outcome: "success",
+  duration_ms: 1.374875,
+}
+[20:26:02.853] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.typecheck",
+  outcome: "success",
+  duration_ms: 815.555333,
+}
+[20:26:02.855] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.integrationPackages",
+  outcome: "success",
+  duration_ms: 1.294791,
+}
+[20:26:02.856] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.784833,
+}
+[20:26:02.856] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.applicationId",
+  outcome: "success",
+  duration_ms: 1.077917,
+}
+[20:26:02.901] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeArtifacts",
+  outcome: "success",
+  duration_ms: 3.058708,
+}
+[20:26:02.901] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.emitCheckResult",
+  outcome: "success",
+  duration_ms: 3.207708,
+}
+[20:26:02.901] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "project.check",
+  outcome: "success",
+  duration_ms: 1145.478292,
+}
+[20:26:04.036] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.214666,
+}
+[20:26:04.037] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 1135.455833,
+}
+[20:26:04.041] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 2.243416,
+}
+[20:26:04.043] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 2.017167,
+}
+[20:26:04.044] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.inventory",
+  outcome: "success",
+  duration_ms: 1.043541,
+}
+[20:26:04.074] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.206792,
+}
+[20:26:04.074] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 29.085083,
+}
+[20:26:04.074] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.033417,
+}
+[20:26:04.081] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.193042,
+}
+[20:26:04.081] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 6.748666,
+}
+[20:26:04.084] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.255042,
+}
+[20:26:04.085] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.chmod",
+  outcome: "success",
+  duration_ms: 0.061083,
+}
+[20:26:04.086] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exclusive",
+  outcome: "success",
+  duration_ms: 0.596458,
+}
+[20:26:04.086] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeExclusive",
+  outcome: "success",
+  duration_ms: 0.697583,
+}
+[20:26:04.087] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exclusive",
+  outcome: "success",
+  duration_ms: 0.322,
+}
+[20:26:04.088] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeExclusive",
+  outcome: "success",
+  duration_ms: 0.47975,
+}
+[20:26:04.088] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.268125,
+}
+[20:26:04.088] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.read",
+  outcome: "success",
+  duration_ms: 0.185,
+}
+[20:26:04.089] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.read",
+  outcome: "success",
+  duration_ms: 0.179792,
+}
+[20:26:04.089] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.4795,
+}
+[20:26:04.089] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.remove",
+  outcome: "success",
+  duration_ms: 0.220292,
+}
+[20:26:04.090] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.read",
+  outcome: "success",
+  duration_ms: 0.111125,
+}
+[20:26:04.090] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.read",
+  outcome: "success",
+  duration_ms: 0.094042,
+}
+[20:26:04.090] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.282167,
+}
+[20:26:04.090] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.remove",
+  outcome: "success",
+  duration_ms: 0.112417,
+}
+[20:26:04.090] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.read",
+  outcome: "success",
+  duration_ms: 0.079041,
+}
+[20:26:04.090] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.read",
+  outcome: "success",
+  duration_ms: 0.06925,
+}
+[20:26:04.091] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.257292,
+}
+[20:26:04.091] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.remove",
+  outcome: "success",
+  duration_ms: 0.160417,
+}
+[20:26:04.091] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.read",
+  outcome: "success",
+  duration_ms: 0.138084,
+}
+[20:26:04.091] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.files.put",
+  outcome: "success",
+  duration_ms: 0.15525,
+}
+[20:26:04.092] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exclusive",
+  outcome: "success",
+  duration_ms: 0.189792,
+}
+[20:26:04.092] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeExclusive",
+  outcome: "success",
+  duration_ms: 0.23175,
+}
+[20:26:04.092] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.202792,
+}
+[20:26:04.092] INFO (#22736): Execution operation completed {
+  domain: "cli",
+  operation: "migration.write",
+  outcome: "success",
+  duration_ms: 4770.427125,
+}
+[20:26:05.422] INFO (#22736): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.grouped.runtime.check.grouped",
+  outcome: "success",
+  duration_ms: 1329.962625,
+}
+[20:26:05.437] INFO (#22736): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.grouped.manifest.invoke",
+  outcome: "success",
+  duration_ms: 14.934625,
+}
+(pass) generated manifests keep and execute the original descriptor through the same inferred ID after source movement [7450.84ms]
+
+tests/compiler/event-source-diagnostics.test.ts:
+(pass) reports source-located event function option, result, capability, and target errors [942.06ms]
+
+tests/compiler/middleware-coverage.test.ts:
+(pass) middleware route coverage > classifies exact, parameter, wildcard, global, unmatched, and partial catch-all paths
+
+tests/compiler/job-replay.test.ts:
+(pass) durable task replay advisories > warns about unstable wait identity and work before a wait without blocking activation [49.34ms]
+(pass) durable task replay advisories > does not warn for a stable accepted-input-derived wait key [12.94ms]
+
+tests/compiler/route-path-types.test.ts:
+(pass) built declarations and editor findings reject missing inferred input while accepting explicit mappings [2543.66ms]
+
+tests/compiler/langgraph-authoring.test.ts:
+(pass) LangGraph compiler metadata > discovers defineGraph as an optional-id agent factory [0.84ms]
+(pass) LangGraph compiler metadata > keeps the inspectable workflow on the agent node [10.25ms]
+(pass) LangGraph compiler metadata > derives Inspector topology without evaluating graph routes [6.84ms]
+(pass) LangGraph compiler metadata > emits exact native client metadata without runtime instances [20.31ms]
+(pass) LangGraph compiler metadata > projects only safe subagent and resource dependency metadata [9.30ms]
+(pass) LangGraph compiler metadata > projects native agent function dependencies as refs only [25.74ms]
+
+tests/compiler/telemetry-configuration.test.ts:
+(pass) projects typed telemetry and plans all configured exporter integrations [8.30ms]
+
+tests/compiler/determinism.test.ts:
+(pass) compiler determinism > keeps compiler and Phase 6 artifact bytes stable across roots, orders, identities, and insertion order [1307.00ms]
+(pass) compiler determinism > normalizes Windows roots and excludes PID, clock, generation, and random metadata [1.06ms]
+(pass) compiler determinism > matches clean compilation for watch add/change/remove cycles and preserves unaffected writes [56.31ms]
+
+tests/compiler/route-file-discovery.test.ts:
+(pass) route-file discovery > binds every named method export to one file-derived path [8.77ms]
+(pass) route-file discovery > reports legacy files, default exports, and transport fields at the route source [4.62ms]
+(pass) route-file discovery > checks collisions across optional catch-all runtime variants [6.96ms]
+(pass) route-file discovery > allows method-scoped raw routes and reserves ALL for Better Auth [5.33ms]
+
+tests/compiler/deepagent-bucket.test.ts:
+(pass) DeepAgents bucket compilation > declares the bucket on the agent and its generated function [5.59ms]
+(pass) DeepAgents bucket compilation > rejects a RELKIT cache descriptor as a filesystem backend [4.26ms]
+
+tests/compiler/route-path-input.test.ts:
+(pass) inferred routes reject path parameters absent from the target input schema [6.35ms]
+
+ 150 pass
+ 0 fail
+ 758 expect() calls
+Ran 150 tests across 40 files. [38.08s]

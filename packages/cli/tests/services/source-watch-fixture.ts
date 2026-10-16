@@ -1,5 +1,6 @@
 /** Supplies precise native watch/supervisor doubles whose callbacks retain original failures and joined cleanup observations. */
 import { Deferred, Effect, Layer } from "effect";
+import { basename } from "node:path";
 import { CliSourceWatch } from "../../src/services/source-watch.service.js";
 import { CliDevSupervisor } from "../../src/services/dev-supervisor.service.js";
 import { CliPortProbe } from "../../src/commands/port-availability.service.js";
@@ -34,7 +35,7 @@ export const sourceWatchFixture = Effect.fn("SourceWatchTest.fixture")(function*
         }),
       poll: (path) =>
         Effect.succeed(() => {
-          if (stopThrows) released.push(path.endsWith(".env.local") ? "env.local" : "env");
+          if (stopThrows) released.push(basename(path));
         }),
     }),
   );

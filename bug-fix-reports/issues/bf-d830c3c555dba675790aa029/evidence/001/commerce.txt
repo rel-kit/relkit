@@ -1,0 +1,32 @@
+PASS persistent seeded catalog contains three active products
+PASS anonymous GET /cart denied
+PASS anonymous PUT /cart denied
+PASS anonymous DELETE /cart denied
+PASS anonymous POST /orders denied
+PASS anonymous GET /orders denied
+PASS anonymous GET /orders/absent denied
+PASS empty checkout rejected
+PASS invalid quantity 0 rejected
+PASS invalid quantity -1 rejected
+PASS invalid quantity 100 rejected
+PASS invalid quantity 1.5 rejected
+PASS invalid quantity "two" rejected
+PASS invalid quantity null rejected
+PASS unavailable product rejected
+PASS unavailable product rejected
+PASS invalid writes leave empty cart unchanged
+PASS upper quantity boundary uses exact integer cents
+PASS quantity replaces rather than adds; forged price/owner ignored
+PASS second user has an isolated empty cart
+PASS checkout persists correct total and both item snapshots
+PASS checkout clears cart
+PASS order detail reads persisted total
+PASS order list includes new order
+PASS foreign order detail is concealed
+PASS foreign order excluded from list
+PASS missing order returns declared 404
+PASS independent SQLite connection confirms committed order
+PASS concurrent checkout creates exactly one order
+PASS repeat checkout cannot duplicate empty cart
+PASS signout invalidates the real session
+Commerce HTTP proof complete; no secret values retained

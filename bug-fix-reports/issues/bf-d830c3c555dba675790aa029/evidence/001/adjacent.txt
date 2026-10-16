@@ -1,0 +1,3 @@
+PASS cart and checkout use current price; historical order snapshot remains unchanged
+PASS unavailable checkout writes no order and leaves item removable
+PASS saved cart fixture prepared for generation/restart persistence verification

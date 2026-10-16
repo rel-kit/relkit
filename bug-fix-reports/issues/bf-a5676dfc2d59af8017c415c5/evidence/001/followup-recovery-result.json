@@ -1,0 +1,8 @@
+{
+  "command": "bun packages/cli/tests/dev-environment/recovery.probe.ts <owned canonical cloned installed app> --source-only",
+  "cwd": ".",
+  "exit_code": 0,
+  "elapsed_seconds": 135.02,
+  "fixture": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-pr120-recovery-eyg8_hsp",
+  "cleanup": "probe asserts joined descendants and closed listeners; cloned fixture removed in finally"
+}

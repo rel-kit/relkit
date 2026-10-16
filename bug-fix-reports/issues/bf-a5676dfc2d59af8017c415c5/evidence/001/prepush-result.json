@@ -1,0 +1,7 @@
+{
+  "command": "TURBO_CONCURRENCY=1 VITEST_MAX_WORKERS=1 RAYON_NUM_THREADS=1 UV_THREADPOOL_SIZE=1 NODE_OPTIONS=--max-old-space-size=2048 RELKIT_DOCGEN_CONCURRENCY=1 CIRCLE_NODE_TOTAL=2 nice -n 15 bun run prepush",
+  "cwd": ".",
+  "exit_code": 0,
+  "elapsed_seconds": 62.89,
+  "pid": 32093
+}

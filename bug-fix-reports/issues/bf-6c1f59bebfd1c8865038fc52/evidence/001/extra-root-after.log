@@ -1,0 +1,19 @@
+[02:39:27.200] INFO (#53): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 8.467083,
+}
+[02:39:27.203] INFO (#53): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inputs",
+  outcome: "success",
+  duration_ms: 12.237125,
+}
+[02:39:27.206] ERROR (#53): Execution operation failed {
+  domain: "cli",
+  operation: "dev.snapshot.prepare",
+  outcome: "failure",
+  duration_ms: 17.645583,
+}
+{"code":"RELKIT_INTERNAL_ERROR","message":"Development snapshot ineligible during compilation.aliases."}

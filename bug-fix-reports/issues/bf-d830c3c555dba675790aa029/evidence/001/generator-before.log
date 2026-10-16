@@ -1,0 +1,455 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/sqlite-state-path.test.ts:
+[22:38:24.250] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 5.328084,
+}
+[22:38:24.253] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.889833,
+}
+[22:38:24.265] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 11.391917,
+}
+[22:38:24.317] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 51.941541,
+}
+ 6 | registerAddCleanup();
+ 7 | 
+ 8 | test("generated SQLite defaults place mutable state below .relkit/state", async () => {
+ 9 |   const root = await project("minimal");
+10 |   await add(root, ["database", "--dialect", "sqlite", "--no-install"]);
+11 |   expect(await Bun.file(join(root, "src/platform/env.ts")).text()).toContain(
+                                                                        ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "env.string().default(\"./.relkit/state/app.sqlite\")"
+Received: "import { defineEnv, env } from \"@relkit/app/config\";\n\nexport default defineEnv({\n  LOG_LEVEL: env.literal(\"trace\", \"debug\", \"info\", \"warn\", \"error\").default(\"info\"),\n  DATABASE_PATH: env.string().default(\"./app.sqlite\"),\n});\n"
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/sqlite-state-path.test.ts:11:68)
+[22:38:24.322] INFO (#89): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.215,
+}
+(fail) generated SQLite defaults place mutable state below .relkit/state [79.62ms]
+[22:38:24.323] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.184083,
+}
+[22:38:24.323] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.68775,
+}
+[22:38:24.326] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.386792,
+}
+[22:38:24.348] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.945208,
+}
+[22:38:24.349] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.379083,
+}
+[22:38:24.349] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.113709,
+}
+[22:38:24.349] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.104875,
+}
+[22:38:24.349] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.118292,
+}
+[22:38:24.349] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.101458,
+}
+[22:38:24.349] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095625,
+}
+[22:38:24.350] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.089375,
+}
+[22:38:24.350] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09,
+}
+[22:38:24.350] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.107917,
+}
+[22:38:24.350] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.146542,
+}
+[22:38:24.350] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.094458,
+}
+[22:38:24.350] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090833,
+}
+[22:38:24.350] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.149791,
+}
+40 |     stdout: "pipe",
+41 |     stderr: "pipe",
+42 |   });
+43 |   const output =
+44 |     (await new Response(child.stdout).text()) + (await new Response(child.stderr).text());
+45 |   expect(await child.exited, output).toBe(0);
+                                          ^
+error: 4 | import * as schema from "./schema/index.js";
+5 | 
+6 | export default defineDrizzleService({
+7 |   schema,
+8 |   client: ({ env }) => {
+9 |     const sqlite = new Database(env.DATABASE_PATH);
+                       ^
+SQLiteError: unable to open database file
+      errno: 14,
+ byteOffset: -1,
+       code: "SQLITE_CANTOPEN"
+
+      at new Database (bun:sqlite:260:28)
+      at client (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-add-acceptance-2ok29i/app/src/services/database/service.ts:9:20)
+      at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-add-acceptance-2ok29i/app/runtime-proof.ts:7:30
+
+Bun v1.3.10 (macOS arm64)
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/sqlite-state-path.test.ts:45:38)
+[22:38:24.508] INFO (#120): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 4.051625,
+}
+(fail) generated SQLite activation creates missing parent directories lazily [186.17ms]
+
+tests/generator/sqlite-app-tooling.test.ts:
+[22:38:24.512] INFO (#121): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.201625,
+}
+[22:38:24.512] INFO (#121): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.700792,
+}
+[22:38:24.515] INFO (#121): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.829834,
+}
+[22:38:24.554] INFO (#124): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.088584,
+}
+[22:38:24.560] INFO (#124): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 5.880167,
+}
+[22:38:24.568] INFO (#124): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 7.527917,
+}
+[22:38:24.582] INFO (#126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 2.557584,
+}
+[22:38:24.583] INFO (#126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.918292,
+}
+[22:38:24.586] INFO (#126): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.698083,
+}
+[22:38:24.609] INFO (#128): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 3.117083,
+}
+[22:38:24.614] INFO (#128): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.599417,
+}
+[22:38:24.622] INFO (#128): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 8.049959,
+}
+[22:38:24.632] INFO (#130): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 2.6455,
+}
+[22:38:24.633] INFO (#130): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.870208,
+}
+[22:38:24.636] INFO (#130): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.958083,
+}
+[22:38:24.646] INFO (#132): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.047875,
+}
+[22:38:24.650] INFO (#132): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.914834,
+}
+[22:38:24.654] INFO (#132): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.940875,
+}
+[22:38:24.658] INFO (#132): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.341542,
+}
+[22:38:24.660] INFO (#132): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 2.844209,
+}
+(pass) each template admits generated context declarations to the TypeScript program [149.65ms]
+[22:38:24.661] INFO (#133): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.171042,
+}
+[22:38:24.662] INFO (#133): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.698833,
+}
+[22:38:24.664] INFO (#133): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.443666,
+}
+[22:38:24.690] INFO (#136): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 25.536333,
+}
+[22:38:24.690] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.235458,
+}
+[22:38:24.690] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.10175,
+}
+[22:38:24.691] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095917,
+}
+[22:38:24.691] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1265,
+}
+[22:38:24.691] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090708,
+}
+[22:38:24.691] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.089875,
+}
+[22:38:24.691] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092375,
+}
+[22:38:24.691] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.108958,
+}
+[22:38:24.691] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.111917,
+}
+[22:38:24.691] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.146041,
+}
+[22:38:24.692] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092459,
+}
+[22:38:24.692] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090292,
+}
+[22:38:24.692] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.144042,
+}
+62 |       stdout: "pipe",
+63 |       stderr: "pipe",
+64 |     });
+65 |     const output =
+66 |       (await new Response(child.stdout).text()) + (await new Response(child.stderr).text());
+67 |     expect(await child.exited, output).toBe(0);
+                                            ^
+error: $ bun scripts/migrate.ts
+4 | 
+5 | const path = process.env.DATABASE_PATH;
+6 | if (!path?.trim() || path === ":memory:") {
+7 |   throw new Error("Set DATABASE_PATH to a persistent SQLite file");
+8 | }
+9 | const client = new Database(path, { create: true });
+                   ^
+SQLiteError: unable to open database file
+      errno: 14,
+ byteOffset: -1,
+       code: "SQLITE_CANTOPEN"
+
+      at new Database (bun:sqlite:260:28)
+      at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-add-acceptance-B2sdqT/app/scripts/migrate.ts:9:16
+      at loadAndEvaluateModule (2:1)
+
+Bun v1.3.10 (macOS arm64)
+error: script "db:migrate" exited with code 1
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/sqlite-app-tooling.test.ts:67:40)
+[22:38:25.051] INFO (#168): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 4.698958,
+}
+(fail) generated SQLite migration command creates auth tables and is repeatable under Bun [390.45ms]
+
+ 1 pass
+ 3 fail
+ 9 expect() calls
+Ran 4 tests across 2 files. [1104.00ms]

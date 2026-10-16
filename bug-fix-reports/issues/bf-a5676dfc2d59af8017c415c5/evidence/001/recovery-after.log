@@ -1,0 +1,21 @@
+Evidence directory: /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dev-recovery-evidence-TstdOo
+ordinary: environment creation, edits, expansion, removal and fallback passed (PID 29602)
+ordinary: syntax, descriptor, import, deletion, config and in-flight multi-file burst recovery passed
+shutdown: 5 owned descendants exited; listener unavailable
+ordinary: shutdown released the public listener
+[21:55:32.065] INFO (#2): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 1.23375,
+}
+[21:55:32.066] INFO (#2): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 4323.839708,
+}
+prepared: environment creation, edits, expansion, removal and fallback passed (PID 30773)
+prepared: syntax, descriptor, import, deletion, config and in-flight multi-file burst recovery passed
+shutdown: 5 owned descendants exited; listener unavailable
+prepared: shutdown released the public listener

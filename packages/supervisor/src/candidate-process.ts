@@ -51,13 +51,13 @@ export function childEnvironment(
       (entry): entry is [string, string] => entry[1] !== undefined,
     ),
   );
+  // Explicit undefined removes a stale inherited key, including deleted dotenv values.
+  for (const [key, value] of Object.entries(values ?? {})) {
+    if (value === undefined) delete inherited[key];
+    else inherited[key] = value;
+  }
   return {
     ...inherited,
-    ...Object.fromEntries(
-      Object.entries(values ?? {}).filter(
-        (entry): entry is [string, string] => entry[1] !== undefined,
-      ),
-    ),
     PORT: String(port),
     RELKIT_SOURCE_TOKEN: String(token.sourceToken),
     RELKIT_GENERATION_TOKEN: String(token.generationToken),

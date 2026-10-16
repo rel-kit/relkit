@@ -1,0 +1,46 @@
+Release command: /Users/mustafaelsayed/.bun/bin/bun run scripts/sync-release.ts in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun x --bun vitest run --config packages/create-relkit/vitest.config.ts packages/create-relkit/tests/create-capabilities.effect.test.ts in /Users/mustafaelsayed/Workspace/relkit
+75 |       stdout.status !== "fulfilled" ||
+76 |       stderr.status !== "fulfilled" ||
+77 |       exit.status !== "fulfilled"
+78 |     )
+79 |       throw new Error(`Release command settlement failed: ${label}\n${output}`);
+80 |     if (exit.value !== 0) throw new Error(`${label} failed (${exit.value})\n${output}`);
+                                         ^
+error: /Users/mustafaelsayed/.bun/bin/bun x --bun vitest run --config packages/create-relkit/vitest.config.ts packages/create-relkit/tests/create-capabilities.effect.test.ts in /Users/mustafaelsayed/Workspace/relkit failed (1)
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+ ❯ packages/create-relkit/tests/create-capabilities.effect.test.ts (5 tests | 1 failed) 12ms
+   ❯ creation capability evidence (5)
+     × pins the certified source template bytes 6ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  02:06:36
+   Duration  121ms (transform 58%, tests 20%, import 16%, worker 5%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/create-relkit/tests/create-capabilities.effect.test.ts > creation capability evidence > pins the certified source template bytes
+AssertionError: expected '509f430ed6807c4cb54923a581ce1df2ab5f1…' to be 'f72fded9c0ceccefc8140e3104ab4a0eabb8f…' // Object.is equality
+
+Expected: "f72fded9c0ceccefc8140e3104ab4a0eabb8f7f92283ec0ff5237f0a772dd0ef"
+Received: "509f430ed6807c4cb54923a581ce1df2ab5f1b3d5b8abf5519e04a76ee0db721"
+
+ ❯ packages/create-relkit/tests/create-capabilities.test.ts:59:34
+     57|   it("pins the certified source template bytes", () => {
+     58|     const root = join(import.meta.dirname, "../../../templates/default…
+     59|     expect(templateDigest(root)).toBe(CREATE_CAPABILITY_TABLE.entries[…
+       |                                  ^
+     60|   });
+     61|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+      at command (/Users/mustafaelsayed/Workspace/relkit/scripts/release-check-support.ts:80:37)
+      at async main (/Users/mustafaelsayed/Workspace/relkit/scripts/release-check.ts:114:9)
+
+Bun v1.3.10 (macOS arm64)

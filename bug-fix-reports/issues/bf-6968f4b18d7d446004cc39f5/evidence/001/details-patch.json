@@ -1,0 +1,71 @@
+{
+  "files": [
+    "packages/cli/src/dev-snapshot/snapshot-eligibility.ts",
+    "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts",
+    "packages/cli/src/dev-snapshot/snapshot-function-bindings.ts",
+    "packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts",
+    "packages/cli/tests/dev-snapshot/as-tool-integrity.test.ts",
+    "packages/cli/tests/dev-snapshot/eligibility.test.ts"
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.txt",
+        "note": "Native CLI wrongly publishes ambient-dependent topology"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Focused regression fails"
+      }
+    ],
+    "after": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-after-final.txt",
+        "note": "Four regressions include real and forged descriptors, cycles, ambiguous resolution, and computed bindings"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-after.txt",
+        "note": "Actual CLI rejects the ambient asTool source before publication"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-valid-tool.txt",
+        "note": "Actual CLI prepares an imported genuine function descriptor"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/adjacent-vitest.txt",
+        "note": "Nine adjacent guard and typed environment-error checks pass"
+      }
+    ]
+  },
+  "scope": {
+    "modules": [
+      "SnapshotEligibility",
+      "CliDevEnvironment",
+      "CliDevSupervisor"
+    ],
+    "entrypoints": [
+      "relkit dev --prepare",
+      "relkit dev"
+    ],
+    "invariants": [
+      "No eager ambient evaluation is accepted for prepared snapshots",
+      "Private helper execution cannot run application preload code",
+      "Application preload behavior and runtime options remain available to native candidates",
+      "Rejected reloads preserve previous traffic and repairs activate in the same CLI process"
+    ]
+  },
+  "environment": {
+    "package": "packages/cli",
+    "revision": "ebc3a2544ad5521016fd9efc8db3ff1930a3fb75 plus uncommitted fix; exact hashes in test-results/integrity-fixes-20261016/final/fix-source-sha256.json",
+    "target": "Owned native fixtures and isolated commerce copies; approved commerce preview unchanged",
+    "api_exposed": false,
+    "e2e_available": false,
+    "monitoring": "Existing CLI observeCli structured operation logs retained. No new monitoring installed. Native subprocess and HTTP readback provide behavioral evidence."
+  }
+}

@@ -1,0 +1,186 @@
+$ bun test ./tests/unit
+bun test v1.3.10 (30e609e0)
+
+tests/unit/release-check.test.ts:
+(pass) the release certifies default creation using its actual tool identity [2.38ms]
+(pass) the release retains complete fresh certification for its actual tool identity [1.86ms]
+(pass) the release retains complete restart certification for its actual tool identity [0.31ms]
+(pass) accepts the unscoped CLI package and publishes its dependency first [6.87ms]
+(pass) tracked release notes exclude rebuild-dependent tarball hashes [0.34ms]
+
+tests/unit/publish-release.test.ts:
+(pass) every package must be present with the actual release artifact integrity [0.23ms]
+(pass) registry propagation is retried within a finite bound
+(pass) a partially published train fails instead of reporting a complete release [0.31ms]
+(pass) an immutable registry integrity mismatch fails immediately
+
+tests/unit/build-catalog.test.ts:
+(pass) catalog metadata derives exact patch identity, bytes, and native literal types [1.91ms]
+(pass) release staging provides catalogs, overrides, and patch bytes before installation [2.18ms]
+
+tests/unit/root-scripts.test.ts:
+(pass) test:all points to a checked-in orchestration script [1.36ms]
+
+tests/unit/job-name.test.ts:
+(pass) accepts safe camelCase job names [5.34ms]
+(pass) rejects unsafe and reserved job names [3.84ms]
+
+tests/unit/jobs-mutation-gate.test.ts:
+(pass) requires killed mutants in all retained semantic responsibilities [0.56ms]
+(pass) old facade line numbers cannot satisfy migrated stale-epoch ownership [0.02ms]
+(pass) mutation execution errors fail even when every semantic requirement has a kill [0.06ms]
+
+tests/unit/auto-changeset.test.ts:
+(pass) release paths map to their published packages [0.12ms]
+(pass) shared packaged inputs release the fixed train
+(pass) Changesets are detected and rendered deterministically [0.09ms]
+(pass) release diffs retain deletions and both sides of renames
+(pass) a deleted Changeset does not satisfy release policy [0.12ms]
+
+tests/unit/version-packages.test.ts:
+(pass) the release train promotes Unreleased into one root changelog entry [0.46ms]
+(pass) the Changesets action receives an untracked package changelog
+(pass) versioning stops before release notes when new-version certification fails [82.84ms]
+
+tests/unit/catalog-manifest.test.ts:
+(pass) catalog resolution preserves concrete declarations and named peer ranges
+(pass) missing or recursive catalogs fail without inventing a dependency version
+(pass) packed dependency validation requires concrete pins in every dependency field [0.87ms]
+
+tests/unit/release-pr-handoff.test.ts:
+(pass) a repaired release PR hands off after merge without its original version job [0.54ms]
+(pass) successful manually dispatched release-branch CI also recovers publication [0.07ms]
+(pass) closed unmerged and unrelated PRs cannot dispatch main CI [0.13ms]
+(pass) does not dispatch redundant or stale main CI: {"changed":true}
+(pass) does not dispatch redundant or stale main CI: {"advanced":true} [0.07ms]
+(pass) does not dispatch redundant or stale main CI: {"existing":true} [0.04ms]
+(pass) rejects untrusted handoff input: {"head_branch":"changeset-release/main","head_sha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","head_repository":{"full_name":"rel-kit/relkit"},"event":"pull_request","conclusion":"failure"} [0.13ms]
+(pass) rejects untrusted handoff input: {"head_branch":"changeset-release/main","head_sha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","head_repository":{"full_name":"fork/relkit"},"event":"pull_request","conclusion":"success"}
+(pass) rejects untrusted handoff input: {"head_branch":"feature","head_sha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","head_repository":{"full_name":"rel-kit/relkit"},"event":"pull_request","conclusion":"success"}
+(pass) rejects untrusted handoff input: {"head_branch":"changeset-release/main","head_sha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","head_repository":{"full_name":"rel-kit/relkit"},"event":"push","conclusion":"success"}
+(pass) unmerged release PRs have a finite handoff deadline and never dispatch publication [0.77ms]
+
+tests/unit/package-tests.test.ts:
+(pass) package test discovery includes standalone integrations without build output [40.51ms]
+
+tests/unit/paired-commerce-project.test.ts:
+(pass) commerce flattening creates an absent destination and preserves service bytes [8.36ms]
+(pass) commerce flattening accepts an existing empty destination [2.04ms]
+(pass) commerce flattening rejects and preserves existing destination content: keep.txt [1.82ms]
+(pass) commerce flattening rejects and preserves existing destination content: .keep [1.25ms]
+(pass) commerce flattening rejects collisions before rewriting authored imports [1.33ms]
+
+tests/unit/ci-workflow.test.ts:
+(pass) fast CI gates merges and only green main runs start releases [0.55ms]
+
+tests/unit/phase0-harness-ownership.test.ts:
+[21:04:28.602] INFO (#47): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.533583,
+}
+[21:04:28.604] INFO (#47): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.manifest",
+  outcome: "success",
+  duration_ms: 0.2515,
+}
+[21:04:28.604] INFO (#47): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.21225,
+}
+[21:04:28.605] ERROR (#47): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "failure",
+  duration_ms: 0.26275,
+}
+[21:04:28.605] INFO (#47): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.222125,
+}
+[21:04:28.605] ERROR (#47): Execution operation failed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "failure",
+  duration_ms: 3.888292,
+}
+(pass) guardrail fixtures release after native assertion failure [4.97ms]
+[21:04:28.606] INFO (#48): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.115541,
+}
+[21:04:29.110] ERROR (#49): Execution operation failed {
+  domain: "testing",
+  operation: "guardrail.command",
+  outcome: "failure",
+  duration_ms: 504.375958,
+}
+[21:04:29.111] INFO (#48): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 504.981958,
+}
+[21:04:29.111] INFO (#48): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.246417,
+}
+[21:04:29.111] INFO (#48): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 505.714625,
+}
+(pass) guardrail command timeout joins the actual child before root release [506.04ms]
+
+tests/unit/release-check-listing.test.ts:
+(pass) accepts the complete generator's exact portable catalog source pair [0.30ms]
+(pass) requires the relkit skill in the minimal template [0.20ms]
+(pass) requires the relkit skill in the api template [0.03ms]
+(pass) requires the relkit skill in the agent template [0.02ms]
+(pass) requires the relkit skill in the fullstack template [0.03ms]
+(pass) requires the relkit skill in the tasks template [0.02ms]
+(pass) retains development-file rejection beside approved catalog assets [0.09ms]
+(pass) requires the portable catalog asset package/src/catalog-resolution.ts even without an export target [0.04ms]
+(pass) requires the portable catalog asset package/src/catalog-resolution.types.ts even without an export target [0.02ms]
+(pass) forbids the same catalog source pair in every unrelated package [0.04ms]
+
+tests/unit/catalog-bootstrap.test.ts:
+(pass) pure catalog subpath boots before any generator or framework dist exists [14.14ms]
+(pass) actual generator tarball carries the same source resolver and works without dist [359.64ms]
+
+tests/unit/create-certification.test.ts:
+(pass) certification requires all original packed attempts and exact identities [1.21ms]
+(pass) certification preserves owned bytes when failure is none [110.15ms]
+Failed certification reports retained at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-XD1JTk
+(pass) certification preserves owned bytes when failure is measurement [19.57ms]
+Failed certification reports retained at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-SXKVML
+(pass) certification preserves owned bytes when failure is report [19.50ms]
+Failed certification reports retained at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-HIjj5R
+(pass) certification preserves owned bytes when failure is final-check [21.36ms]
+
+tests/unit/packed-registry.test.ts:
+(pass) smoke registry serves verified tarball metadata instead of workspace metadata [23.13ms]
+
+tests/unit/sync-release.test.ts:
+(pass) release sync retains the CLI editor assets and remains idempotent [78.01ms]
+
+tests/unit/public-declarations.test.ts:
+(pass) allows the documented native Effect constructors and injectable services [17.06ms]
+(pass) follows split Next middleware types within the existing middleware exception [13.23ms]
+(pass) still rejects unrelated framework, cloud, and internal provider declarations [13.43ms]
+
+ 70 pass
+ 0 fail
+ 389 expect() calls
+Ran 70 tests across 20 files. [1.65s]

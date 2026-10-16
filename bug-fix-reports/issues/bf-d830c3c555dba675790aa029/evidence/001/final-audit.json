@@ -1,0 +1,35 @@
+{
+  "status": "passed",
+  "evidenceFilesScanned": 61,
+  "privateValuesRetained": false,
+  "processes": [
+    {
+      "pid": 29401,
+      "ppid": 55765,
+      "nice": 15,
+      "command": "/Users/mustafael"
+    },
+    {
+      "pid": 55765,
+      "ppid": 55764,
+      "nice": 15,
+      "command": "bun"
+    },
+    {
+      "pid": 55817,
+      "ppid": 55765,
+      "nice": 15,
+      "command": "next-server"
+    },
+    {
+      "pid": 55819,
+      "ppid": 55765,
+      "nice": 15,
+      "command": "node"
+    }
+  ],
+  "onlyApprovedLiveAppTreeRemains": true,
+  "formerDevSessionsStopped": true,
+  "stagedPathCount": 0,
+  "gitMutationsByThisChat": false
+}

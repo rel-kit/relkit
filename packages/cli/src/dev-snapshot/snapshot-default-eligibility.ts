@@ -34,3 +34,35 @@ export function isLiteralSnapshotDefault(expression: ts.Expression): boolean {
     return property.name.text !== "__proto__" && isLiteralSnapshotDefault(property.initializer);
   });
 }
+
+/** Only the unshadowed native URL constructor with one literal is deterministic. */
+export function isStaticSnapshotUrl(
+  expression: ts.Expression,
+  bindings: ReadonlyMap<string, string>,
+): boolean {
+  return (
+    ts.isNewExpression(expression) &&
+    ts.isIdentifier(expression.expression) &&
+    expression.expression.text === "URL" &&
+    !bindings.has("URL") &&
+    expression.arguments?.length === 1 &&
+    ts.isStringLiteral(expression.arguments[0]!)
+  );
+}
+
+/** Static raw text has no interpolation, tag replacement or ambient evaluation. */
+export function isStaticSnapshotText(
+  expression: ts.Expression,
+  bindings: ReadonlyMap<string, string>,
+): boolean {
+  return (
+    ts.isNoSubstitutionTemplateLiteral(expression) ||
+    (ts.isTaggedTemplateExpression(expression) &&
+      ts.isPropertyAccessExpression(expression.tag) &&
+      ts.isIdentifier(expression.tag.expression) &&
+      expression.tag.expression.text === "String" &&
+      !bindings.has("String") &&
+      expression.tag.name.text === "raw" &&
+      ts.isNoSubstitutionTemplateLiteral(expression.template))
+  );
+}

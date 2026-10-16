@@ -1,0 +1,21 @@
+$ bun /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts dev --prepare --port "3400" --inspector-port "3410" --local off --no-color --verbose
+[01:04:47.313] INFO (#53): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 9.973333,
+}
+[01:04:47.383] INFO (#53): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inputs",
+  outcome: "success",
+  duration_ms: 80.668708,
+}
+[01:04:47.394] ERROR (#53): Execution operation failed {
+  domain: "cli",
+  operation: "dev.snapshot.prepare",
+  outcome: "failure",
+  duration_ms: 102.559292,
+}
+Development snapshot ineligible during compilation.dynamic.
+error: script "relkit" exited with code 1

@@ -1,0 +1,51 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+stdout | packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts > rejects ambient metadata, eager callbacks, imported tooling and runtime construction
+[01:48:18.072] ERROR (#6): Error [AssertionError]: import {mkdirSync} from "node:fs" with {type:"macro"}; import {defineDrizzleService} from "@relkit/drizzle"; export default defineDrizzleService({schema:{}, client:()=>mkdirSync("./private")});: expected false to be true // Object.is equality
+    at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts:71:11 {
+  actual: false,
+  expected: true,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+
+ ❯ packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts (2 tests | 1 failed) 22ms
+   × rejects ambient metadata, eager callbacks, imported tooling and runtime construction 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts > rejects ambient metadata, eager callbacks, imported tooling and runtime construction
+AssertionError: import {mkdirSync} from "node:fs" with {type:"macro"}; import {defineDrizzleService} from "@relkit/drizzle"; export default defineDrizzleService({schema:{}, client:()=>mkdirSync("./private")});: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts:71:11
+     69|           Exit.isFailure(yield* Effect.exit(verifyStaticSnapshotSource…
+     70|           source,
+     71|         ).toBe(true);
+       |           ^
+     72|     }),
+     73| );
+ ❯ IteratorImpl.~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1417:28
+ ❯ FiberImpl.succeedWith node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:706:30
+ ❯ PrimitiveImpl.~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:3780:20
+ ❯ ExitPrimitive.~effect/Effect/evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/core.ts:565:30
+ ❯ FiberImpl.runLoop node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:650:39
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:592:23
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:5679:9
+ ❯ node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:5757:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  01:48:17
+   Duration  607ms (import 74%, transform 21%, tests 4%, worker 1%)
+

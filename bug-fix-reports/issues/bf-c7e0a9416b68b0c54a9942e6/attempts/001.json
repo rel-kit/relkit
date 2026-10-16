@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "id": "bf-c7e0a9416b68b0c54a9942e6",
+  "fingerprint": "c7e0a9416b68b0c54a9942e6b2b5248033363ce10e9075dc2484160e374c4b09",
+  "identity": {
+    "entrypoint": "create certification",
+    "module": "CreateCapabilityEvidence",
+    "symptom": "minimal template certificate digest is stale",
+    "scenario": "generated-context-root",
+    "error": "templatedigest mismatch"
+  },
+  "attempt": 1,
+  "created_at": "2026-10-15T23:06:16+00:00",
+  "updated_at": "2026-10-15T23:42:49+00:00",
+  "status": "verified",
+  "what": "minimal template certificate digest is stale",
+  "expected": "The certified capability digest and fresh/restart evidence refer to the current generated minimal template bytes.",
+  "observed": "The narrow package certificate guard rejects expected f72fd... versus actual509f... after generated context-root changes.",
+  "root_cause": "templates/default/v1/minimal/tsconfig.json gained the required context registry declaration; packages/create-relkit/src/create-capabilities.ts retains the certificate for the previous complete template digest.",
+  "fixed_by": "Regenerated the certificate table and fresh/restart JSON through certifyCreation with concurrency 1, unchanged 20 runs per set and a 1,000 ms threshold. Fresh maximum 587.18 ms and restart maximum 527.16 ms; the previously failing package stage and all 30 local validation stages pass.",
+  "files": [
+    "packages/create-relkit/src/create-capabilities.ts",
+    "docs/evidence/create-capabilities/0.7.6/fresh.json",
+    "docs/evidence/create-capabilities/0.7.6/restart.json"
+  ],
+  "tags": [],
+  "related": [],
+  "scope": {
+    "modules": [
+      "CreateCapabilityEvidence",
+      "CreationCertification",
+      "PackedDevReadiness"
+    ],
+    "entrypoints": [
+      "Creation certificate gate",
+      "relkit create",
+      "bun dev"
+    ],
+    "invariants": [
+      "Certificate matches complete current template bytes",
+      "Only fully validated20 fresh/20 restart reports publish",
+      "Startup threshold and cleanup guarantees remain unchanged"
+    ]
+  },
+  "environment": {
+    "package": "create-relkit",
+    "revision": "ebc3a2544ad5521016fd9efc8db3ff1930a3fb75 plus uncommitted recovery, prepared-commerce and certificate fixes",
+    "target": "Local macOS Bun 1.3.10 / Effect 4.0.1; real CLI and HTTP fixtures",
+    "api_exposed": false,
+    "e2e_available": true,
+    "monitoring": "Existing CLI lifecycle/HTTP logs, owned process inventory, native benchmark metrics and physical file hashes; no remote monitoring used."
+  },
+  "reproduction": [
+    "Run bun test packages/create-relkit/tests/create-capabilities.effect.test.ts against the current template and certificate.",
+    "Run the native release-check CLI with --allow-dirty --skip-build --ci-pack and observe the same certificate gate."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.log",
+        "note": "Exact template certificate assertion fails before regeneration."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/packages-before.log",
+        "note": "Full native package cohort fails only at stale creation certificate."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.log",
+        "note": "Native release-check CLI stops at the exact certificate digest assertion before packing."
+      }
+    ],
+    "after": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-after.log",
+        "note": "Previously failing digest gate and complete-evidence assertions pass."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/certification-after.log",
+        "note": "Supported certification rebuilds final artifacts and validates20fresh/20restart plus preparation and the exact certificate gate."
+      },
+      {
+        "kind": "api",
+        "path": "evidence/001/fresh-after.json",
+        "note": "20real packed fresh apps serve the expected HTTP response below1,000ms, cleanup enforced."
+      },
+      {
+        "kind": "api",
+        "path": "evidence/001/restart-after.json",
+        "note": "20real packed restarts plus preparation pass the unchanged startup/cleanup protocol."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/full-suite-results.jsonl",
+        "note": "Actual latest serial results for every local validation stage."
+      }
+    ]
+  },
+  "verification": {
+    "checks": [
+      {
+        "name": "01-build",
+        "status": "passed",
+        "command": "bun run build",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "02-docs",
+        "status": "passed",
+        "command": "bun x turbo run check test --filter=@relkit/docs --concurrency=1",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "03-restart",
+        "status": "passed",
+        "command": "bun run test:restart",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "04-jobs-coverage",
+        "status": "passed",
+        "command": "bun run test:jobs:coverage",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "05-jobs-mutation",
+        "status": "passed",
+        "command": "bun x stryker run scripts/jobs-coverage/stryker.config.mjs --concurrency 1",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "06-mutation-verification",
+        "status": "passed",
+        "command": "bun scripts/jobs-coverage/verify-mutation.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "07-e2e-inspector",
+        "status": "passed",
+        "command": "bun x playwright test --workers=1 --output=test-results/inspector",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "08-e2e-commerce",
+        "status": "passed",
+        "command": "bun x playwright test --config=playwright.commerce.config.ts --workers=1 --output=test-results/commerce",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "09-jobs-matrix",
+        "status": "passed",
+        "command": "bun run test:jobs:matrix",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "10-types",
+        "status": "passed",
+        "command": "bun run test:types",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "11-unit",
+        "status": "passed",
+        "command": "bun run test:unit",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "12-compiler",
+        "status": "passed",
+        "command": "bun test --timeout 15000 ./tests/compiler",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "13-graph",
+        "status": "passed",
+        "command": "bun x vitest run --config packages/graph/vitest.config.ts --maxWorkers=1",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "14-contracts",
+        "status": "passed",
+        "command": "bun run test:contracts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "15-integration",
+        "status": "passed",
+        "command": "bun run test:integration",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "16-inspector",
+        "status": "passed",
+        "command": "bun run test:inspector",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "17-container",
+        "status": "passed",
+        "command": "bun run test:container",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "18-security",
+        "status": "passed",
+        "command": "bun run test:security",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "19-deployment",
+        "status": "passed",
+        "command": "bun run test:deployment",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "20-examples",
+        "status": "passed",
+        "command": "bun run test:examples",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "21-packages",
+        "status": "passed",
+        "command": "bun run test:packages",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "22-generator",
+        "status": "passed",
+        "command": "bun run test:generator",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "25-certification-bun",
+        "status": "passed",
+        "command": "bun test scripts/tests/dev-readiness/bootstrap-imports.test.ts scripts/tests/packed-manifest.test.ts scripts/tests/registry-cache.test.ts scripts/tests/release-command.test.ts packages/cli/tests/dev-snapshot/input-watch.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "26-certification-vitest",
+        "status": "passed",
+        "command": "bun x vitest run --maxWorkers=1 scripts/tests/benchmark-packed-cleanup.test.ts scripts/tests/benchmark-packed-dev.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "27-guardrails",
+        "status": "passed",
+        "command": "bun test tests/phase0.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "28-lint",
+        "status": "passed",
+        "command": "bun run lint",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "29-boundaries",
+        "status": "passed",
+        "command": "bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "30-konsistent",
+        "status": "passed",
+        "command": "bun run konsistent -- validate",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "31-format",
+        "status": "passed",
+        "command": "bun x prettier --check .changeset/dev-environment-recovery.md .changeset/prepared-commerce-eligibility.md .changeset/prepared-template-compatibility.md .changeset/sqlite-app-tooling.md apps/docs/content/docs/fundamentals/environment.mdx docs/evidence/create-capabilities/0.7.6/fresh.json docs/evidence/create-capabilities/0.7.6/restart.json packages/cli/src/commands/build-server-invocation.ts packages/cli/src/commands/dev-environment-files.ts packages/cli/src/commands/dev-session-engine.ts packages/cli/src/commands/dev-session.types.ts packages/cli/src/commands/dev-watch.ts packages/cli/src/dev-snapshot/snapshot-commerce-eligibility.ts packages/cli/src/dev-snapshot/snapshot-default-eligibility.ts packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts packages/cli/src/dev-snapshot/snapshot-eligibility.schemas.ts packages/cli/src/dev-snapshot/snapshot-eligibility.ts packages/cli/src/dev-snapshot/snapshot-epoch-path.ts packages/cli/src/dev-snapshot/snapshot-hash-worker.ts packages/cli/src/dev-snapshot/snapshot-input-watch.ts packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts packages/cli/src/dev-snapshot/snapshot-sqlite-eligibility.ts packages/cli/src/dev-snapshot/snapshot.schemas.ts packages/cli/src/services/dev-environment.schemas.ts packages/cli/src/services/dev-environment.service.ts packages/cli/src/services/dev-environment.types.ts packages/cli/src/services/dev-supervisor.service.ts packages/cli/tests/dev-environment/recovery-cycles.ts packages/cli/tests/dev-environment/recovery-process.ts packages/cli/tests/dev-environment/recovery.probe.ts packages/cli/tests/dev-environment/recovery.types.ts packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts packages/cli/tests/dev-snapshot/commerce-project-eligibility.test.ts packages/cli/tests/dev-snapshot/template-compatibility.test.ts packages/cli/tests/services/dev-environment-errors.test.ts packages/cli/tests/services/dev-environment-native.test.ts packages/cli/tests/services/dev-environment-values.test.ts packages/cli/tests/services/dev-invocation-environment.test.ts packages/cli/tests/services/dev-support-fixture.ts packages/cli/tests/services/source-watch-fixture.ts packages/cli/tests/services/source-watch-synchronous.test.ts packages/cli/tests/services/source-watch.test.ts packages/create-relkit/src/create-capabilities.ts packages/create-relkit/src/render-database-sources.ts packages/create-relkit/src/render-database.ts packages/supervisor/src/candidate-process.ts packages/supervisor/tests/compatibility/environment.test.ts templates/default/v1/agent/tsconfig.json templates/default/v1/api/tsconfig.json templates/default/v1/fullstack/tsconfig.json templates/default/v1/minimal/tsconfig.json templates/default/v1/tasks/tsconfig.json tests/generator/sqlite-app-tooling.test.ts tests/generator/sqlite-path-typing.test.ts tests/generator/sqlite-state-path.test.ts tests/integration/fixtures/paired-commerce-project.ts tests/unit/paired-commerce-project.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "32-observability",
+        "status": "passed",
+        "command": "bun scripts/check-observability-sinks.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "affected-create-package-after-path-fix",
+        "status": "passed",
+        "command": "bun x --bun vitest run --config packages/create-relkit/vitest.config.ts --maxWorkers=1",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/affected-create-package.log"
+      }
+    ],
+    "limitations": [
+      "Local verification only; cloud acceptance and declared opt-in environment/platform tests remain skipped.",
+      "Stryker793 result retained only after all 80 recorded source/test contents matched current bytes; every other suite stage reran.",
+      "Performance samples refer to the exact packed artifact hashes recorded in the local certificate, not hosted CI or a published release."
+    ],
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "bun test packages/create-relkit/tests/create-capabilities.effect.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Template digest matches certified source bytes",
+        "output": "evidence/001/unit-before.log"
+      },
+      "after": {
+        "status": "passed",
+        "command": "bun test packages/create-relkit/tests/create-capabilities.effect.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Digest and all complete-evidence assertions pass",
+        "output": "evidence/001/unit-after.log"
+      }
+    },
+    "runtime": {
+      "kind": "integration",
+      "reason": "Creation certification is a local tool/release gate with no HTTP endpoint of its own; packed generated-app HTTP startup is the downstream proof.",
+      "boundary": "Native package orchestrator -> physical template and capability source -> real certificate gate",
+      "dependencies": [
+        "Actual repository package runner",
+        "Physical template bytes",
+        "Supported native certification workflow and packed CLI artifacts"
+      ],
+      "steps": [
+        "Run complete package runner and retain stale-digest failure",
+        "Regenerate certificate through supported40-sample workflow",
+        "Rerun identical complete package command"
+      ],
+      "before": {
+        "status": "failed",
+        "command": "bun run test:packages",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Source certificate pins current template bytes",
+        "output": "evidence/001/packages-before.log"
+      },
+      "after": {
+        "status": "passed",
+        "command": "bun run test:packages",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Same complete package runner and certificate guard pass",
+        "output": "evidence/001/full-suite-results.jsonl"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "bun test-results/full-suite-20261016/certify-current-template.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "20 fresh and20 restart measurements plus preparation and cleanup pass below unchanged1,000 ms threshold",
+      "output": "evidence/001/certification-after.log"
+    },
+    "regressions": [
+      {
+        "status": "passed",
+        "command": "bun test-results/full-suite-20261016/certify-current-template.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "20 fresh and20 restart measurements plus preparation and cleanup pass below unchanged1,000 ms threshold",
+        "output": "evidence/001/certification-after.log",
+        "kind": "api",
+        "boundary": "Packed public create -> fresh bun dev -> expected HTTP readiness"
+      },
+      {
+        "status": "passed",
+        "command": "bun test-results/full-suite-20261016/certify-current-template.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "20 fresh and20 restart measurements plus preparation and cleanup pass below unchanged1,000 ms threshold",
+        "output": "evidence/001/certification-after.log",
+        "kind": "api",
+        "boundary": "Same packed app -> repeated bun dev restart -> expected HTTP readiness and cleanup"
+      }
+    ]
+  },
+  "notes": [
+    "An initial partial certification was administratively interrupted through owned benchmark SIGINT when a separately reproduced Mac case-policy hardening landed. Scope cleanup completed and prior certificate bytes were restored before the final clean40-sample run.",
+    "No template digest or certificate assertion was bypassed or manually relabeled. The supported generator writes and rolls back its owned table/reports."
+  ]
+}

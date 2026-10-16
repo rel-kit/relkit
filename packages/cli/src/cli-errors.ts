@@ -12,7 +12,7 @@ export class CliFailureError extends Schema.TaggedError<CliFailureError>()("CliF
   code: Schema.String,
   message: Schema.String,
   exitCode: Schema.Number,
-  signal: Schema.optionalKey(Schema.Literals(["SIGINT", "SIGTERM"])),
+  signal: Schema.optionalKey(Schema.Literals(["SIGINT", "SIGTERM", "SIGHUP"])),
 }) {}
 
 /**

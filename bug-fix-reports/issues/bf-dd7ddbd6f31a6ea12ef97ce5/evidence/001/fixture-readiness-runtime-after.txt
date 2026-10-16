@@ -1,0 +1,70 @@
+ordinary: environment creation, edits, expansion, removal and fallback passed (PID 28235)
+ordinary: syntax, descriptor, import, deletion and in-flight burst recovery passed
+ordinary: shutdown released the public listener
+31 |     .wait(
+32 |       `Expected HTTP marker ${marker}`,
+33 |       async () => (await session.read()) === JSON.stringify({ message: marker }),
+34 |     )
+35 |     .catch(async (cause: Error) => {
+36 |       throw new Error(`Expected ${marker}; received ${await session.read()}`, { cause });
+                     ^
+error: Expected initial; received unavailable
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-environment/recovery-cycles.ts:36:17)
+
+61 |   };
+62 |   const wait = async (label: string, check: () => boolean | Promise<boolean>, timeout = 25_000) => {
+63 |     const end = performance.now() + timeout;
+64 |     while (performance.now() < end) {
+65 |       if (child.exitCode !== null)
+66 |         throw new Error(`Dev exited (${child.exitCode}): ${text.slice(-4000)}`);
+                       ^
+error: Dev exited (1): d0-b517-17d90fb1a183
+                                     trace: 97f64cdd5653e4bdc01cd100a3a7dc78
+                                     {"domain":"runtime","duration_ms":30.160375,"operation":"server.invocation","outcome":"success","requestId":"request-9c4621de-fa44-43d0-b517-17d90fb1a183","traceId":"97f64cdd5653e4bdc01cd100a3a7dc78","spanId":"6ba8d15cfa92aec4"}
+22:27:50.652 DEBUG relkit            supervisor.outcome
+                                     {"phase":"verification","state":"verification-failed"}
+22:27:50.653 DEBUG relkit            supervisor.transition
+                                     {"phase":"verifying-hash-and-readiness","state":"idle"}
+22:27:50.647 INFO  http              GET /hello → 200 in 65ms
+                                     request: request-9c4621de-fa44-43d0-b517-17d90fb1a183
+                                     trace: 97f64cdd5653e4bdc01cd100a3a7dc78
+22:27:50.656 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.257125,"operation":"server.cleanup","outcome":"success"}
+22:27:50.657 INFO  lifecycle         Execution operation completed
+                                     {"domain":"engine","duration_ms":0.168834,"operation":"providers.release","outcome":"success"}
+22:27:50.658 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.726875,"operation":"server.cleanup","outcome":"success"}
+22:27:50.703 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":44.966875,"operation":"server.cleanup","outcome":"success"}
+22:27:50.708 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":3.620375,"operation":"server.cleanup","outcome":"success"}
+22:27:50.710 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.169792,"operation":"server.cleanup","outcome":"success"}
+22:27:50.710 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":55.36,"operation":"server.shutdown","outcome":"success"}
+22:27:50.714 DEBUG relkit            candidate.process-exited
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dev-recovery-7uwlmdbu/app/.relkit/dev/sessions/dev-session-nwCSjO/generation-1","exitCode":0}
+22:27:50.718 INFO  relkit            Stopping development server
+22:27:50.720 INFO  relkit            Development server stopped
+107 |   if (readiness.kind === "graph")
+108 |     yield* verifySnapshotGraphResponse(response, request.snapshot.receipt, child.token);
+109 |   else if (response.status !== readiness.status || response.body !== readiness.body)
+110 |     return yield* cliAdapterError(
+111 |       "dev.snapshot.probe",
+112 |       new Error("Prepared backend route did not return its expected response."),
+                ^
+error: Prepared backend route did not return its expected response.
+      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/dev-snapshot/snapshot-candidate.service.ts:112:11
+      at ~effect/Effect/successCont (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:985:26)
+      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:383:16)
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:327:10)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+      at processTicksAndRejections (unknown:7:39)
+
+Bun v1.3.10 (macOS arm64)
+error: script "dev" exited with code 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-environment/recovery-process.ts:66:19)
+
+Bun v1.3.10 (macOS arm64)

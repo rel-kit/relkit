@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "id": "bf-2e683644ffd7da2a89349aa4",
+  "fingerprint": "2e683644ffd7da2a89349aa423a004a3574c02325dbafca00aa4036b992873e7",
+  "identity": {
+    "entrypoint": "bun run db:migrate",
+    "module": "create-relkit database scaffold",
+    "symptom": "sqlite migration command selects unsupported better-sqlite3 on bun",
+    "scenario": "generated sqlite auth app",
+    "error": ""
+  },
+  "attempt": 1,
+  "created_at": "2026-10-15T21:17:02+00:00",
+  "updated_at": "2026-10-15T21:39:54+00:00",
+  "status": "verified",
+  "what": "New SQLite database/auth applications cannot apply their generated migrations under Bun.",
+  "expected": "Supported generated db:migrate applies SQLite migrations under Bun and safely repeats.",
+  "observed": "bun --bun drizzle-kit migrate selects better-sqlite3 and exits 1 with its explicit Bun unsupported-driver error.",
+  "root_cause": "packages/create-relkit/src/render-database.ts unconditionally generated bun --bun drizzle-kit migrate for SQLite; pinned Kit chooses the installed Node-only better-sqlite3 driver. The app already uses bun:sqlite, whose supported Drizzle migrator avoids that driver. A Node control also failed due this machine's native ABI mismatch.",
+  "fixed_by": "For SQLite, emit scripts/migrate.ts using drizzle-orm/bun-sqlite/migrator, guard persistent DATABASE_PATH, close the client in finally and point db:migrate to it. Retain existing non-SQLite commands. Original failing regressions, fresh real CLI creation/addition/migration replay, main app auth/commerce HTTP, adjacent dialects and guardrails pass.",
+  "files": [
+    "packages/create-relkit/src/render-database.ts",
+    "packages/create-relkit/src/render-database-sources.ts",
+    "tests/generator/sqlite-app-tooling.test.ts",
+    ".changeset/sqlite-app-tooling.md"
+  ],
+  "tags": [
+    "generator",
+    "sqlite",
+    "auth",
+    "commerce-lab"
+  ],
+  "related": [
+    "bf-e0fab09ce6cdf84aad5d1d9c"
+  ],
+  "scope": {
+    "modules": [
+      "create-relkit scaffolding",
+      "generated app tooling",
+      "Drizzle and Better Auth application"
+    ],
+    "entrypoints": [
+      "bun run db:migrate",
+      "create-relkit minimal",
+      "relkit add auth"
+    ],
+    "invariants": [
+      "SQLite migrations work under Bun without Node-only drivers",
+      "Repeated migration does not duplicate journal entries",
+      "Database/auth scaffold and other dialects remain valid"
+    ]
+  },
+  "environment": {
+    "package": "packages/create-relkit and templates/default/v1",
+    "revision": "ebc3a2544 plus preserved pre-existing uncommitted recovery fixes and these local tooling fixes",
+    "target": "macOS Bun 1.3.10; local commerce lab and disposable generated CLI fixtures",
+    "api_exposed": false,
+    "e2e_available": true,
+    "monitoring": "Real source CLI diagnostics, native migration command exits, SQLite catalog/journal queries and TypeScript diagnostics; existing local runtime HTTP logs. No remote telemetry configured in this local app."
+  },
+  "reproduction": [
+    "Create a fresh supported minimal app, add auth with SQLite using the actual CLI.",
+    "Use the pinned installed Drizzle Kit and generated db:generate script.",
+    "Run generated db:migrate under Bun; require zero exit and four auth tables.",
+    "The original command exits 1 before migration. Preserve unit and real CLI logs before editing.",
+    "After fix rebuild the generator, repackage templates, create another disposable app through real CLI and repeat migrations twice."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.txt",
+        "note": "Original app command fails its actual expected contract"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Focused regression fails on original generator/template"
+      }
+    ],
+    "after": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/cli-after.txt",
+        "note": "Fresh real source create/add auth; native migrations twice; four tables, one journal row; app check"
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/final-tests.txt",
+        "note": "33 tests, 186 assertions and three snapshots pass including both new regressions and Phase 0 guardrails"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/commerce-after.txt",
+        "note": "Main live application proves real auth cookies, ownership, totals, persistence and concurrent checkout"
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "rtk nice -n 15 bun test --max-concurrency 1 tests/generator/sqlite-app-tooling.test.ts --test-name-pattern 'generated SQLite'",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Generated migration command works under Bun",
+        "output": "evidence/001/unit-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk nice -n 15 bun --smol test --max-concurrency 1 tests/generator/sqlite-app-tooling.test.ts tests/generator/add-acceptance.test.ts tests/phase0.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Generated migration applies and repeats using native SQLite",
+        "output": "evidence/001/final-tests.txt"
+      }
+    },
+    "runtime": {
+      "kind": "integration",
+      "reason": "The defect belongs to code-generation and local CLI/TypeScript/migration workflows, rather than an HTTP endpoint. Main application HTTP behavior is additional affected-consumer proof.",
+      "boundary": "real create CLI -> real add auth CLI -> generated db:generate/db:migrate -> native Bun SQLite -> catalog and journal assertions",
+      "dependencies": [
+        "Actual local generator and source CLI with pinned installed SDKs",
+        "Actual Bun SQLite, Drizzle Kit and Drizzle migrator",
+        "Actual TypeScript compiler; no mocked migration or auth database"
+      ],
+      "steps": [
+        "Preserve original failed command and focused regression",
+        "Apply scoped generator/template repair",
+        "Repeat real CLI scaffolding and typecheck",
+        "Assert persisted auth schema and idempotency",
+        "Assert adjacent commerce behavior with real cookies and SQLite"
+      ],
+      "before": {
+        "status": "failed",
+        "command": "rtk sh -c 'cd /Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab && rtk bun run db:migrate'",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Native SQLite migrations create auth tables",
+        "output": "evidence/001/runtime-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "rtk sh -c 'cd /Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab && rtk nice -n 15 bun scripts/framework-tooling-proof.ts'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Real generated migration command creates four auth tables and repeats with exactly one journal row",
+        "output": "evidence/001/cli-after.txt"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "rtk nice -n 15 bun --smol test --max-concurrency 1 tests/generator/sqlite-app-tooling.test.ts tests/generator/add-acceptance.test.ts tests/phase0.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Existing generator acceptance harness and Phase 0 guardrails pass",
+      "output": "evidence/001/final-tests.txt"
+    },
+    "checks": [
+      {
+        "name": "generator targeted TypeScript build",
+        "status": "passed",
+        "command": "rtk nice -n 15 node --max-old-space-size=512 node_modules/typescript/bin/tsc -b packages/create-relkit/tsconfig.json --pretty false",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/build-summary.txt"
+      },
+      {
+        "name": "repository boundaries",
+        "status": "passed",
+        "command": "rtk nice -n 15 bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "62 roots pass package boundaries",
+        "output": "evidence/001/boundaries.txt"
+      }
+    ],
+    "regressions": [
+      {
+        "kind": "integration",
+        "boundary": "database/auth scaffold across supported starters and SQLite/PostgreSQL/MySQL",
+        "status": "passed",
+        "command": "rtk nice -n 15 bun --smol test --max-concurrency 1 tests/generator/add-platform-acceptance.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "26 adjacent scaffold assertions pass",
+        "output": "evidence/001/platform-tests.txt"
+      },
+      {
+        "kind": "api",
+        "boundary": "main app auth -> public functions -> SQLite -> cart/order read-back",
+        "status": "passed",
+        "command": "rtk sh -c 'cd /Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab && rtk nice -n 15 bun scripts/commerce-proof.ts'",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Real cookies, ownership, exact persisted totals and one concurrent checkout success",
+        "output": "evidence/001/commerce-after.txt"
+      }
+    ],
+    "limitations": [
+      "Local macOS/Bun verification; no hosted CI, public deployment or registry publication.",
+      "Full monorepo build/test/prepush was not rerun; focused generator build, boundary checks, adjacent platform suites and Phase 0 guardrails were completed.",
+      "Application dependencies borrow the current local framework rather than certifying an independently installed registry release.",
+      "Read-only repos/effect lacks core Effect implementation/tests; existing planning effects were retained and checked against installed 4.0.1 source."
+    ]
+  },
+  "notes": [
+    "No Git mutations; all pre-existing dirty framework work and indexed reports preserved.",
+    "The commerce app CLI PID 56536 remained unchanged through all recovery scenarios; no manual restart was required.",
+    "Before app typecheck contained additional ordinary authoring errors; the isolated TypeScript root regression establishes the missing registry cause separately.",
+    "The final app/inspector remain running at user request; all disposable proof fixtures and browser sessions are closed.",
+    "External app commands are normalized to repository cwd using an explicit cd; original executions used the app as tool working directory."
+  ]
+}

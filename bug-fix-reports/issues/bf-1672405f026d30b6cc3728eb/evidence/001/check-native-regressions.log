@@ -1,0 +1,28 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/commands-protocol.test.ts:
+(pass) graph print/check/diff success and failure use structured exits [1111.80ms]
+(pass) graph commands accept current services and reject stale or unbound identities [448.91ms]
+(pass) env and doctor cover safe success, failure, and usage paths [76.67ms]
+(pass) local up is Docker-free without declarations and reset requires confirmation [1978.49ms]
+
+scripts/tests/dev-readiness/bootstrap-imports.test.ts:
+(pass) packaged snapshot hits keep checking and bundling behind dynamic miss imports [3786.08ms]
+
+packages/cli/tests/invocation/signals.test.ts:
+(pass) invocation owns SIGINT cancellation and releases its listener [14.63ms]
+(pass) invocation owns SIGTERM cancellation and releases its listener [1.47ms]
+(pass) invocation owns SIGHUP cancellation and releases its listener [1.27ms]
+(pass) the first shutdown signal wins and unrelated listeners survive release [2.49ms]
+(pass) ordinary invocation presentation retains the hangup reason and status [3.44ms]
+(pass) the public CLI owner joins the same typed hangup contract [17.75ms]
+(pass) unsupported signal metadata does not acquire a trusted failure contract [0.37ms]
+
+packages/cli/tests/services/dev-initial-native.test.ts:
+(pass) initial development SIGTERM joins the CPU-bound compiler group within the strict shutdown limit [6111.82ms]
+(pass) initial development SIGHUP joins the CPU-bound compiler group within the strict shutdown limit [1119.73ms]
+
+ 14 pass
+ 0 fail
+ 88 expect() calls
+Ran 14 tests across 4 files. [15.45s]

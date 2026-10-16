@@ -15,6 +15,20 @@
       "attempt": 1,
       "updated_at": "2026-10-06T20:24:07+00:00",
       "report": "bug-fix-reports/issues/bf-1c471c67a9bc9b72de77cc3d/report.md"
+    },
+    "bf-a2da0ca60e9c828fc35b84bd": {
+      "id": "bf-a2da0ca60e9c828fc35b84bd",
+      "status": "verified",
+      "what": "Generated HTTP functions received an empty environment despite successful candidate environment resolution.",
+      "root_cause": "packages/cli/src/commands/build-server-invocation.ts invokeHttp omitted env from engine invoke options. packages/cli/src/commands/build-server-invocation.ts:18 now forwards the resolved values.",
+      "fixed_by": "Forward env: values into the generated HTTP invocation. The capturing generated-wiring regression failed before this edit and passes after it; both real CLI/HTTP matrices now return the resolved defaults and repaired values.",
+      "files": [
+        "packages/cli/src/commands/build-server-invocation.ts",
+        "packages/cli/tests/services/dev-invocation-environment.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:08:47+00:00",
+      "report": "bug-fix-reports/issues/bf-a2da0ca60e9c828fc35b84bd/report.md"
     }
   }
 }

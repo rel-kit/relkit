@@ -1,0 +1,39 @@
+bun test v1.3.10 (30e609e0)
+
+scripts/tests/packed-manifest.test.ts:
+(pass) reads the exact packed package manifest from a gzipped archive [6.46ms]
+(pass) rejects archives without a packed package manifest [0.69ms]
+
+scripts/tests/registry-cache.test.ts:
+(pass) evicts an upstream network failure and retains its native deadline [4.65ms]
+(pass) evicts an upstream HTTP 503 failure and retains its native deadline [2.86ms]
+
+scripts/tests/release-command.test.ts:
+Release command: /Users/mustafaelsayed/.bun/bin/bun -e console.log("complete") in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun -e console.error("packing failed");process.exit(7) in /Users/mustafaelsayed/Workspace/relkit
+(pass) release commands return stdout and preserve nonzero-exit diagnostics [26.27ms]
+Release command: /Users/mustafaelsayed/.bun/bin/bun -e console.log(process.pid);console.error("stalled install");setInterval(()=>{},100) in /Users/mustafaelsayed/Workspace/relkit
+(pass) release command deadlines terminate and join the owned process group [1003.04ms]
+
+scripts/tests/dev-readiness/bootstrap-imports.test.ts:
+(pass) packaged snapshot hits keep checking and bundling behind dynamic miss imports [1083.33ms]
+
+packages/cli/tests/dev-snapshot/input-watch.test.ts:
+(pass) installed-input registration never recursively walks unrelated dependencies or runtime state [19.59ms]
+(skip) native input observation invalidates after changing src/deep/helper.ts
+(skip) native input observation invalidates after changing src/new/deeper/helper.ts
+(skip) native input observation invalidates after changing new-source/helper.ts
+(skip) native input observation invalidates after changing node_modules/library/types/index.d.ts
+(skip) native input observation invalidates after changing node_modules/library/absent/nested.d.ts
+(pass) partial registration failures close every previously acquired native watcher [3.80ms]
+(pass) escaped member/query paths and external installed links reject registration [6.96ms]
+(pass) preflight refuses unauthenticated receipt bytes before trusting their watch inventory [4.54ms]
+
+packages/cli/tests/dev-snapshot/integrity-process.test.ts:
+(pass) uses the inherited working directory as its only root authority [24.05ms]
+
+ 12 pass
+ 5 skip
+ 0 fail
+ 41 expect() calls
+Ran 17 tests across 6 files. [2.33s]

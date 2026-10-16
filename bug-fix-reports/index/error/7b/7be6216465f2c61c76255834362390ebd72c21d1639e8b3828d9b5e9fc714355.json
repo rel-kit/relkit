@@ -1,0 +1,23 @@
+{
+  "key": "inventory.link-or-path compilation.aliases",
+  "matches": {
+    "bf-6c1f59bebfd1c8865038fc52": {
+      "id": "bf-6c1f59bebfd1c8865038fc52",
+      "status": "verified",
+      "what": "current generated tsconfig and parameter routes rejected by snapshot discovery",
+      "root_cause": "SnapshotEligibleTsConfig.files only allowed the older route-module-checks root. SnapshotPath, SnapshotResolutionPath, native hash worker PATH and native watcher RESOLUTION_PATH separately excluded square brackets used by authored parameter/catch-all routes.",
+      "fixed_by": "Accepted only the canonical generated root pair and literal route brackets across schema, native worker and input-watch guards. Focused before/after tests, actual CLI preparation, final prepared HTTP/negative-root/cleanup smoke and all 30 local validation stages pass.",
+      "files": [
+        "packages/cli/src/dev-snapshot/snapshot.schemas.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.schemas.ts",
+        "packages/cli/tests/dev-snapshot/template-compatibility.test.ts",
+        "packages/cli/src/dev-snapshot/snapshot-hash-worker.ts",
+        "packages/cli/src/dev-snapshot/snapshot-input-watch.ts",
+        ".changeset/prepared-template-compatibility.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T23:41:32+00:00",
+      "report": "bug-fix-reports/issues/bf-6c1f59bebfd1c8865038fc52/report.md"
+    }
+  }
+}

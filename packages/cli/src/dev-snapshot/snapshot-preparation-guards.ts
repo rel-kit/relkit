@@ -12,7 +12,7 @@ import {
   sameSnapshotMembers,
   verifySnapshotMembers,
 } from "./snapshot-fingerprint.js";
-import { verifyStaticSnapshotSource } from "./snapshot-eligibility.js";
+import { verifyStaticSnapshotSource, isSnapshotFactoryShadow } from "./snapshot-eligibility.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";
 import type { SnapshotFileOperations } from "./snapshot-files.types.js";
 import type { SnapshotDependency, SnapshotMember } from "./snapshot.types.js";
@@ -22,7 +22,7 @@ import type { SnapshotDependency, SnapshotMember } from "./snapshot.types.js";
  * @param files - Captured complete file authority.
  * @param root - Physical project root.
  * @param inputs - Complete initial project inventory.
- * @returns Declarative eligibility or typed rejection; tests/web/type-only declarations are not backend initialization.
+ * @returns Declarative eligibility or typed rejection; tooling remains fingerprinted outside the closed backend source roots.
  */
 export const verifySnapshotProjectEligibility = Effect.fn("DevSnapshot.projectEligibility")(
   function* (files: SnapshotFileOperations, root: string, inputs: readonly SnapshotMember[]) {
@@ -33,30 +33,62 @@ export const verifySnapshotProjectEligibility = Effect.fn("DevSnapshot.projectEl
       Array.isArray(config) ||
       "extends" in config ||
       "references" in config ||
-      !Schema.is(SnapshotEligibleTsConfig)(config)
+      !Schema.is(SnapshotEligibleTsConfig)(config) ||
+      Object.keys(config.compilerOptions.paths).length !== 1
     )
       return yield* new DevSnapshotRejected({
         reason: "ineligible",
         operation: "compilation.aliases",
       });
+    if (
+      inputs.some(
+        (member) =>
+          isSnapshotFactoryShadow(member.path) ||
+          ["bunfig.toml", ".bunfig.toml"].includes(member.path.toLowerCase()) ||
+          member.path.split("/").some((segment) => segment.toLowerCase() === "node_modules"),
+      )
+    )
+      return yield* new DevSnapshotRejected({
+        reason: "ineligible",
+        operation: "compilation.resolution",
+      });
+    const packageMember = inputs.find((member) => member.path.toLowerCase() === "package.json");
+    if (packageMember !== undefined) {
+      const manifest = yield* snapshotJson(yield* files.read(root, packageMember.path, 1_048_576));
+      if (
+        manifest !== null &&
+        typeof manifest === "object" &&
+        "name" in manifest &&
+        typeof manifest.name === "string" &&
+        isSnapshotFactoryShadow(manifest.name)
+      )
+        return yield* new DevSnapshotRejected({
+          reason: "ineligible",
+          operation: "compilation.resolution",
+        });
+    }
     const sources = inputs.filter(
       (member) =>
-        /\.(?:[cm]?[jt]sx?)$/.test(member.path) &&
-        !member.path.endsWith(".d.ts") &&
-        !member.path.startsWith("tests/") &&
-        !member.path.startsWith("web/") &&
-        !/\.(?:test|spec)\.[^.]+$/.test(member.path),
+        (member.path.toLowerCase().startsWith("src/") ||
+          member.path.toLowerCase() === "relkit.config.ts") &&
+        /\.(?:[cm]?[jt]sx?)$/i.test(member.path) &&
+        !member.path.toLowerCase().endsWith(".d.ts"),
+    );
+    const sourceTexts = new Map(
+      yield* Effect.forEach(
+        sources,
+        (member) =>
+          files
+            .read(root, member.path, 67_108_864)
+            .pipe(
+              Effect.map((bytes) => [member.path, Buffer.from(bytes).toString("utf8")] as const),
+            ),
+        { concurrency: 4 },
+      ),
     );
     yield* Effect.forEach(
-      sources,
-      (member) =>
-        files
-          .read(root, member.path, 67_108_864)
-          .pipe(
-            Effect.flatMap((bytes) =>
-              verifyStaticSnapshotSource(Buffer.from(bytes).toString("utf8"), member.path),
-            ),
-          ),
+      sourceTexts,
+      ([path, text]) => verifyStaticSnapshotSource(text, path, sourceTexts),
       { concurrency: 4, discard: true },
     );
   },

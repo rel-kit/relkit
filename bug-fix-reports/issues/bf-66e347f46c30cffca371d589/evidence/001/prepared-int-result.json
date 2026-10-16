@@ -1,0 +1,37 @@
+{
+  "scenario": "prepared-int",
+  "fixture": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-3o7cg0d4",
+  "appPort": 60295,
+  "inspectorPort": 60296,
+  "cliPid": 28037,
+  "initialHandler": "Hello, lifetime!",
+  "inspectorReady": true,
+  "preparedFastPath": true,
+  "ownedProcesses": [
+    {
+      "pid": 28037,
+      "parent": 27980,
+      "command": "bun /Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts dev --port 60295 --inspector-port 60296 --local off --no-color --verbose"
+    },
+    {
+      "pid": 28041,
+      "parent": 28037,
+      "command": "/Users/mustafaelsayed/.bun/bin/bun --no-env-file /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-3o7cg0d4/.relkit/dev/sessions/dev-session-CaWb3N/generation-1/server/index.js"
+    },
+    {
+      "pid": 28046,
+      "parent": 28037,
+      "command": "next-server"
+    },
+    {
+      "pid": 28047,
+      "parent": 28037,
+      "command": "node /Users/mustafaelsayed/Workspace/relkit/packages/observability/dist/local/duckdb-worker.js"
+    }
+  ],
+  "exitCode": 130,
+  "signalSent": "SIGINT",
+  "shutdownDiagnostic": true,
+  "survivingDescendantsAtExit": [],
+  "cleanupVerified": true
+}

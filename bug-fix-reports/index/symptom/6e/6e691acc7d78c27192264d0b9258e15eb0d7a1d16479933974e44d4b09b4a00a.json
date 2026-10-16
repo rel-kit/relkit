@@ -1,0 +1,21 @@
+{
+  "key": "generated sqlite service fails strict project compilation",
+  "matches": {
+    "bf-0540debf572ceef2383c053a": {
+      "id": "bf-0540debf572ceef2383c053a",
+      "status": "verified",
+      "what": "generated sqlite service fails strict project compilation",
+      "root_cause": "databaseServiceSource adds mkdirSync(dirname(env.DATABASE_PATH)) before narrowing the generic string|undefined environment entry; Bun Database previously accepted an optional path but node:path.dirname requires a string.",
+      "fixed_by": "Validate and narrow DATABASE_PATH before directory creation and database acquisition. All four starters, the same native CLI check, missing and empty path controls, a real nested SQLite query, the complete generator suite, and final repository gates pass.",
+      "files": [
+        "packages/create-relkit/src/render-database-sources.ts",
+        "tests/generator/sqlite-path-typing.test.ts",
+        "tests/generator/sqlite-state-path.test.ts",
+        ".changeset/prepared-commerce-eligibility.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T23:42:50+00:00",
+      "report": "bug-fix-reports/issues/bf-0540debf572ceef2383c053a/report.md"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/invocation/signals.test.ts:
+(pass) invocation owns SIGINT cancellation and releases its listener [1.37ms]
+(pass) invocation owns SIGTERM cancellation and releases its listener
+ 6 |     const previous = process.listeners(signal);
+ 7 |     const controller = new AbortController();
+ 8 |     const remove = installInvocationSignals(controller);
+ 9 |     try {
+10 |       const acquired = process.listeners(signal).filter((handler) => !previous.includes(handler));
+11 |       expect(acquired).toHaveLength(1);
+                            ^
+error: expect(received).toHaveLength(expected)
+
+Expected length: 1
+Received length: 0
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/invocation/signals.test.ts:11:24)
+(fail) invocation owns SIGHUP cancellation and releases its listener [0.54ms]
+
+ 2 pass
+ 1 fail
+ 11 expect() calls
+Ran 3 tests across 1 file. [84.00ms]

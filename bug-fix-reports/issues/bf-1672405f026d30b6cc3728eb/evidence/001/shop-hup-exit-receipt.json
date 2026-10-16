@@ -1,0 +1,12 @@
+{
+  "ownerPid": 68909,
+  "startedAt": 1792152279.463708,
+  "signalsForwarded": [],
+  "cliPid": 68910,
+  "state": "exited",
+  "shop": "http://127.0.0.1:3400",
+  "inspector": "http://127.0.0.1:3410",
+  "log": "/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/evidence/dev-process-lifetime-20261016/hangup-verification/dev.log",
+  "exitCode": 129,
+  "exitedAt": 1792152312.290878
+}

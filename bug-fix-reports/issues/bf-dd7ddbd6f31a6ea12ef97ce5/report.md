@@ -1,0 +1,345 @@
+# bf-dd7ddbd6f31a6ea12ef97ce5: Development reloads remain rejected after repairing dotenv until the CLI restarts.
+
+Status: **verified**
+Attempt: 1 · Updated: 2026-10-15T21:08:47+00:00
+
+## What
+
+Development reloads remain rejected after repairing dotenv until the CLI restarts.
+
+## Expected
+
+Both ordinary and prepared sessions activate a repaired environment without restarting.
+
+## Observed before
+
+Ordinary mode rebuilds using stale values; prepared mode does not enqueue dotenv repairs. Restarting with unchanged repaired files succeeds.
+
+## Root cause
+
+CliDevSupervisor previously forwarded only startup/options environment into a --no-env-file candidate. Deleted values could return through inherited process.env in packages/supervisor/src/candidate-process.ts:55. The prepared epoch filter excluded all dotenv events in packages/cli/src/dev-snapshot/snapshot-epoch-path.ts:10. The fix resolves fresh values at dev-supervisor.service.ts:36.
+
+## Fixed by
+
+Resolve each generation with bounded, joined Bun dotenv helpers and retained file-key ownership; explicitly unset removed inherited keys; preserve SDK/runtime overrides; observe every active standard dotenv file in both paths. Include Bun custom-mode fallback and mode-local precedence. Both complete real CLI/HTTP matrices pass without a process restart.
+
+## Changed files
+
+- .changeset/dev-environment-recovery.md
+- apps/docs/content/docs/fundamentals/environment.mdx
+- packages/cli/src/commands/dev-environment-files.ts
+- packages/cli/src/commands/dev-watch.ts
+- packages/cli/src/dev-snapshot/snapshot-epoch-path.ts
+- packages/cli/src/services/dev-environment.schemas.ts
+- packages/cli/src/services/dev-environment.service.ts
+- packages/cli/src/services/dev-environment.types.ts
+- packages/cli/src/services/dev-supervisor.service.ts
+- packages/cli/tests/dev-environment/recovery-cycles.ts
+- packages/cli/tests/dev-environment/recovery-process.ts
+- packages/cli/tests/dev-environment/recovery.probe.ts
+- packages/cli/tests/dev-environment/recovery.types.ts
+- packages/cli/tests/services/dev-environment-errors.test.ts
+- packages/cli/tests/services/dev-environment-native.test.ts
+- packages/cli/tests/services/dev-environment-values.test.ts
+- packages/cli/tests/services/source-watch-fixture.ts
+- packages/cli/tests/services/source-watch.test.ts
+- packages/supervisor/src/candidate-process.ts
+- packages/supervisor/tests/compatibility/environment.test.ts
+
+## Reproduction
+
+- Start a valid minimal app with bun dev.
+- Add a required RECOVERY_REQUIRED env contract and wait for candidate rejection.
+- Create .env.local with the missing synthetic value.
+- Assert another generation activates in the same CLI; this times out in both startup paths.
+- Restart without further source repair and assert startup succeeds.
+- For the after replay, copy templates/default/v1/minimal into a temporary app and bun install --network-concurrency 2.
+- Run packages/cli/tests/dev-environment/recovery.probe.ts with the temporary app and an evidence directory. It owns literal bun dev runs for ordinary and prepared startup.
+- The probe uses /recovery so the custom app uses complete graph readiness verification instead of the scaffold-only /hello greeting contract.
+
+## Evidence
+
+- before: [integration](evidence/001/dotenv-ordinary-result.log) — Ordinary repair assertion exits 1; candidate still lacks newly provided value.
+- before: [integration](evidence/001/dotenv-result.log) — Prepared repair assertion exits 1; no new candidate admitted.
+- before: [integration](evidence/001/restart-result.log) — Control restart succeeds using the same repaired files.
+- before: [unit](evidence/001/unit-before.txt) — Two regression assertions fail against preserved HEAD supervisor/epoch implementations.
+- before: [unit](evidence/001/custom-mode-before.txt) — Custom NODE_ENV file-selection gap reproduced before correction.
+- before: [unit](evidence/001/mode-local-before.txt) — Pinned Bun mode-local behavior reproduced before correction.
+- after: [integration](evidence/001/runtime-final-after.txt) — Both unchanged CLI PIDs recover throughout the entire expanded environment/source matrix; all observed descendants exit.
+- after: [integration](evidence/001/final/ordinary-after.log) — Ordinary native generations, original rejection diagnostics and joined shutdown.
+- after: [integration](evidence/001/final/prepared-after.log) — Prepared activation, fallback recompilation, original rejection diagnostics and joined shutdown.
+- after: [unit](evidence/001/unit-after.txt) — 15 focused tests pass, including all standard modes, expansion, deletion, inherited values and overrides.
+- after: [integration](evidence/001/full-suite-summary.json) — All local suite stages and final guardrails pass after additional fixture/manual watcher repairs.
+
+## Scope
+
+```json
+{
+  "modules": [
+    "CLI development supervisor/environment resolver",
+    "ordinary and prepared source watchers",
+    "supervisor candidate process",
+    "snapshot validation"
+  ],
+  "entrypoints": [
+    "bun dev",
+    "relkit dev --prepare",
+    "HTTP GET /recovery"
+  ],
+  "invariants": [
+    "Latest valid generation activates without restarting the CLI",
+    "Rejected edits preserve previous-generation traffic and original diagnostics",
+    "File-managed removals cannot resurrect stale startup values",
+    "Unrelated inherited values and explicit runtime overrides survive",
+    "Resolved values stay in memory and snapshot validation stays single-use"
+  ]
+}
+```
+
+## Environment
+
+```json
+{
+  "package": "packages/cli and packages/supervisor",
+  "revision": "ebc3a2544 plus local uncommitted recovery changes",
+  "target": "macOS, Bun 1.3.10; disposable installed minimal 0.7.6 app; source CLI; all processes stopped",
+  "api_exposed": false,
+  "e2e_available": true,
+  "monitoring": "Actual CLI generation/provider diagnostics, generated runtime HTTP logs, exact handler-body assertions and native descendant PID probes. No remote telemetry."
+}
+```
+
+## Verification
+
+```json
+{
+  "unit": {
+    "before": {
+      "status": "failed",
+      "command": "rtk bun test bug-fix-reports/issues/bf-dd7ddbd6f31a6ea12ef97ce5/evidence/001/before-regression.test.ts",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Native candidates use fresh values and prepared epochs admit dotenv repairs",
+      "output": "evidence/001/unit-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk nice -n 10 bun test --max-concurrency 1 packages/cli/tests/services/dev-environment-native.test.ts packages/cli/tests/services/dev-environment-values.test.ts packages/cli/tests/services/dev-invocation-environment.test.ts packages/cli/build-server.test.ts packages/supervisor/tests/compatibility/environment.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "15 focused tests pass; the previously failing resolver and epoch assertions now pass",
+      "output": "evidence/001/unit-after.txt"
+    }
+  },
+  "runtime": {
+    "kind": "integration",
+    "reason": "Development reload orchestration is a CLI workflow, with real generated HTTP responses used as semantic probes rather than an API for triggering reloads.",
+    "boundary": "literal bun dev -> real filesystem watcher/compiler/graph -> supervisor candidate -> stable HTTP proxy -> generated handler",
+    "dependencies": [
+      "Actual workspace CLI/compiler/supervisor/engine modules and installed minimal app 0.7.6",
+      "Native Bun dotenv helpers, filesystem/process/watch adapters and prebuilt inspector",
+      "Local service provisioning is off; the minimal fixture has no external provider"
+    ],
+    "steps": [
+      "Start one CLI per startup mode",
+      "Reject a missing required value while old traffic serves",
+      "Repair/create/change/atomically replace/delete dotenv files and assert exact HTTP values",
+      "Reject and repair source syntax, graph descriptors, imports, config and deleted files; save multiple files during compilation",
+      "Stop during compilation and assert listeners and all observed descendants disappear"
+    ],
+    "before": {
+      "status": "failed",
+      "command": "rtk bun /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-recovery-plan-62wrskz3/dotenv-probe.ts",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Dotenv repair activates a new generation without restarting",
+      "output": "evidence/001/dotenv-ordinary-result.log"
+    },
+    "after": {
+      "status": "passed",
+      "command": "rtk nice -n 10 bun packages/cli/tests/dev-environment/recovery.probe.ts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dev-recovery-7uwlmdbu/app bug-fix-reports/issues/bf-dd7ddbd6f31a6ea12ef97ce5/evidence/001/final",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Ordinary and prepared CLI processes activate all repaired values and newest valid code while preserving previous traffic",
+      "output": "evidence/001/runtime-final-after.txt"
+    }
+  },
+  "e2e": {
+    "status": "passed",
+    "command": "rtk nice -n 10 bun packages/cli/tests/dev-environment/recovery.probe.ts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dev-recovery-7uwlmdbu/app bug-fix-reports/issues/bf-dd7ddbd6f31a6ea12ef97ce5/evidence/001/final",
+    "cwd": ".",
+    "exit_code": 0,
+    "assertion": "Both complete real CLI/HTTP matrices pass with five observed descendants exited per shutdown",
+    "output": "evidence/001/runtime-final-after.txt"
+  },
+  "checks": [
+    {
+      "name": "CLI typecheck",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun node_modules/typescript/bin/tsc -p packages/cli/tsconfig.json --noEmit --composite false --incremental false",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/cli-typecheck-final.txt"
+    },
+    {
+      "name": "supervisor typecheck",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun node_modules/typescript/bin/tsc -p packages/supervisor/tsconfig.json --noEmit --composite false --incremental false",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/supervisor-typecheck-final.txt"
+    },
+    {
+      "name": "formatting",
+      "status": "passed",
+      "command": "rtk bun x prettier --check packages/cli/src/commands/dev-environment-files.ts packages/cli/src/commands/build-server-invocation.ts packages/cli/src/commands/dev-watch.ts packages/cli/src/dev-snapshot/snapshot-epoch-path.ts packages/cli/src/services/dev-environment* packages/cli/src/services/dev-supervisor.service.ts packages/cli/tests/services/dev-environment* packages/cli/tests/services/dev-invocation-environment.test.ts packages/cli/tests/services/source-watch* packages/cli/tests/dev-environment packages/supervisor/src/candidate-process.ts packages/supervisor/tests/compatibility/environment.test.ts apps/docs/content/docs/fundamentals/environment.mdx .changeset/dev-environment-recovery.md",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/format-after.txt"
+    },
+    {
+      "name": "package boundaries",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun run check",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/boundaries-after.txt"
+    },
+    {
+      "name": "authoring lint",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun run lint",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/lint-after.txt"
+    },
+    {
+      "name": "structural configuration",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun run konsistent -- validate",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/konsistent-after.txt"
+    },
+    {
+      "name": "observability sinks",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun scripts/check-observability-sinks.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/observability-after.txt"
+    },
+    {
+      "name": "repository guardrails",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun test --max-concurrency 1 tests/phase0.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/guardrails-after.txt"
+    },
+    {
+      "name": "prepared startup certification",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun test --max-concurrency 1 scripts/tests/dev-readiness/bootstrap-imports.test.ts scripts/tests/packed-manifest.test.ts scripts/tests/registry-cache.test.ts scripts/tests/release-command.test.ts packages/cli/tests/dev-snapshot/input-watch.test.ts packages/cli/tests/dev-snapshot/integrity-process.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/certification-bun-after.txt"
+    },
+    {
+      "name": "packed certification gates",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun x vitest run --maxWorkers=1 scripts/tests/benchmark-packed-cleanup.test.ts scripts/tests/benchmark-packed-dev.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/certification-vitest-after.txt"
+    },
+    {
+      "name": "complete local suite after additional recovery repairs",
+      "status": "passed",
+      "command": "All scripts/test-all.ts local stages run serially with bounded nested workers, followed by final build, certification and guardrails",
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "evidence/001/full-suite-summary.json"
+    }
+  ],
+  "regressions": [
+    {
+      "kind": "integration",
+      "boundary": "CLI adapters and joined process/watch ownership",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun x vitest run --maxWorkers=1 packages/cli/tests/services/dev-environment-errors.test.ts packages/cli/tests/services/dev-supervisor.test.ts packages/cli/tests/services/source-watch.test.ts packages/cli/tests/services/watch-config.test.ts packages/cli/tests/services/dev-initial-check.test.ts packages/cli/tests/services/dev-compiler-reuse.test.ts packages/cli/tests/services/process.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "16 service tests pass, including safe helper errors/timeouts and native process-group cleanup",
+      "output": "evidence/001/cli-services-after.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "snapshot validation, candidate/proxy/watcher and publication ownership",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun x vitest run --maxWorkers=1 packages/cli/tests/dev-snapshot/validation.test.ts packages/cli/tests/dev-snapshot/files.test.ts packages/cli/tests/dev-snapshot/stale-command.test.ts packages/cli/tests/dev-snapshot/prepared-plan.test.ts packages/cli/tests/dev-snapshot/readiness-requests.test.ts packages/supervisor/tests/candidate/service.test.ts packages/supervisor/tests/activation/service.test.ts packages/supervisor/tests/activation/state-machine.test.ts packages/supervisor/tests/watcher/service.test.ts packages/supervisor/tests/proxy/service.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "44 tests pass; single-use validation, integrity, stale-input rejection and previous-generation ownership remain intact",
+      "output": "evidence/001/snapshot-supervisor-after.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "supervisor native compatibility including HTTP/WebSocket generation traffic",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun test --max-concurrency 1 packages/supervisor/tests/compatibility",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "26 native compatibility tests pass",
+      "output": "evidence/001/supervisor-native-after.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "inherited startup environment -> fresh candidate -> HTTP handler",
+      "status": "passed",
+      "command": "rtk sh -c 'RECOVERY_VALUE=preloaded exec nice -n 10 bun test --max-concurrency 1 packages/cli/tests/services/dev-environment-native.test.ts'",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "File-owned additions override a real inherited startup value, removal unsets it, and the parent environment stays unchanged",
+      "output": "evidence/001/preloaded-native-after.txt"
+    },
+    {
+      "kind": "integration",
+      "boundary": "candidate acquisition/cancellation -> native cleanup",
+      "status": "passed",
+      "command": "rtk nice -n 10 bun x --bun vitest run --maxWorkers=1 packages/cli/tests/services/dev-candidate-cancellation.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Four native cancellation/stop-ownership cases pass",
+      "output": "evidence/001/cancellation-after.txt"
+    }
+  ],
+  "limitations": [
+    "Verified locally on macOS with Bun 1.3.10; five Linux-only native watch tests were skipped by their platform guards.",
+    "Every local full-suite stage now passes. Existing Docker/cloud/provider and platform-specific tests retain their declared opt-in skips; hosted CI was not run. The reproduced fixes do not establish the cause of every historical lockup."
+  ]
+}
+```
+
+## Related reports
+
+```json
+[
+  "bf-a2da0ca60e9c828fc35b84bd",
+  "bf-6c16eaa4c0d654629db8b963",
+  "bf-a561f569dacbef352f9ffb95"
+]
+```
+
+## Notes
+
+```json
+[
+  "Changes are uncommitted; all launched processes have stopped. Runtime probes verify every observed descendant and listener release, including inspector ownership.",
+  "A separate reproduced HTTP context propagation defect was found by the exact body assertion and fixed under related report bf-a2da0ca60e9c828fc35b84bd.",
+  "Bun-native values and expansion are retained. Tests cover multiline/quoted/empty/escaped values, inherited references, base/mode/local/mode-local precedence, mode exclusions, custom NODE_ENV fallback, repeated invalid-to-valid cycles and project isolation.",
+  "The initial custom /hello probe was correctly rejected by the scaffold greeting readiness contract; the custom fixture was moved to /recovery without weakening readiness checks.",
+  "A mixed Bun/Vitest runner invocation failed at test setup; the correct runners were used for all final passing checks. The watcher cleanup expectation was updated to record actual active test-mode filenames.",
+  "The original before fixture lived in the planning temporary directory, now gone. Its probe and assertion-bearing logs are retained under evidence/001; the probe selects the app path relative to its own file, independent of caller cwd."
+]
+```

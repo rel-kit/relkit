@@ -1,0 +1,52 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/sqlite-app-tooling.test.ts:
+[21:27:08.251] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 2.623,
+}
+[21:27:08.257] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.302709,
+}
+[21:27:08.276] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 19.536667,
+}
+19 |     const config = ts.readConfigFile(join(root, "tsconfig.json"), ts.sys.readFile);
+20 |     const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, root);
+21 |     const roots = parsed.fileNames.filter(name => /tooling-probe\.ts$|context-registry\.d\.ts$/.test(name));
+22 |     const program = ts.createProgram(roots, { ...parsed.options, noLib: true, noResolve: true });
+23 |     const diagnostics = program.getSemanticDiagnostics().filter(d => d.file?.fileName.endsWith("tooling-probe.ts"));
+24 |     expect(diagnostics.map(d => ts.flattenDiagnosticMessageText(d.messageText, "\n"))).toEqual([]);
+                                                                                            ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "Cannot find namespace 'Relkit'.",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/sqlite-app-tooling.test.ts:24:88)
+[21:27:08.317] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 4.467916,
+}
+(fail) each template admits generated context declarations to the TypeScript program [76.39ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [521.00ms]

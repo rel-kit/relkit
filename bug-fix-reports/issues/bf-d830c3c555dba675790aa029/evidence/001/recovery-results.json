@@ -1,0 +1,82 @@
+[
+  {
+    "scenario": "normal source edit activates",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "syntax invalid-to-valid: diagnostic, previous traffic, repaired activation",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "duplicate service graph descriptor: diagnostic, previous traffic, repaired activation",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "missing import invalid-to-valid: diagnostic, previous traffic, repaired activation",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "invalid config repaired: diagnostic, previous traffic, repaired activation",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "deletion/recreation repairs imported module",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "required dotenv creation recovers rejected candidate",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "dotenv edit activates exact value",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "dotenv atomic replacement activates",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "mode-local precedence over local, mode and base",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "mode-local deletion falls back to local over mode",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "mode deletion falls back to local",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "local deletion falls back to mode file",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "mode deletion falls back to base file",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "required removal rejected; schema default recovers without stale value",
+    "result": "passed",
+    "cliPid": 55765
+  },
+  {
+    "scenario": "rapid multi-file saves during compilation activate newest source",
+    "result": "passed",
+    "cliPid": 55765
+  }
+]

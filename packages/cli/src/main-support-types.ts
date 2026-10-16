@@ -130,5 +130,5 @@ export type CliFailure = Error & {
   /** Established native exit status. */
   readonly exitCode: number;
   /** Native termination signal when one caused the failure. */
-  readonly signal?: "SIGINT" | "SIGTERM";
+  readonly signal?: "SIGINT" | "SIGTERM" | "SIGHUP";
 };

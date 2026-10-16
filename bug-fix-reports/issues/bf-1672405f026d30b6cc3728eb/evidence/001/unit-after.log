@@ -1,0 +1,12 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/invocation/signals.test.ts:
+(pass) invocation owns SIGINT cancellation and releases its listener [1.95ms]
+(pass) invocation owns SIGTERM cancellation and releases its listener [0.08ms]
+(pass) invocation owns SIGHUP cancellation and releases its listener
+(pass) the first shutdown signal wins and unrelated listeners survive release [0.54ms]
+
+ 4 pass
+ 0 fail
+ 21 expect() calls
+Ran 4 tests across 1 file. [117.00ms]

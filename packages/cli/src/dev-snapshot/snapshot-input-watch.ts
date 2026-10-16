@@ -5,7 +5,7 @@ import { isSnapshotEpochPathRelevant } from "./snapshot-epoch-path.js";
 import type { SnapshotMember } from "./snapshot.types.js";
 
 const RESOLUTION_PATH =
-  /^(?!\/)(?![A-Za-z]:)(?!.*(?:^|\/)\.{1,2}(?:\/|$))[A-Za-z0-9_@+.,():=-]+(?:\/[A-Za-z0-9_@+.,():=-]+)*$/;
+  /^(?!\/)(?![A-Za-z]:)(?!.*(?:^|\/)\.{1,2}(?:\/|$))[A-Za-z0-9_@+.,():=\[\]-]+(?:\/[A-Za-z0-9_@+.,():=\[\]-]+)*$/;
 
 /**
  * Opens every witness before hashing or authoritative inventory validation begins.

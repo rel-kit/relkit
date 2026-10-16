@@ -1,0 +1,42 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/dev-snapshot/template-compatibility.test.ts:
+(pass) snapshot discovery accepts the current generated context declaration with supported root discovery [50.77ms]
+(pass) snapshot paths admit authored parameter and catch-all route folders [0.78ms]
+39 |     const worker = resolve(import.meta.dir, "../../src/dev-snapshot/snapshot-hash-worker.ts");
+40 |     const child = Bun.spawn([process.execPath, worker, "200"], {
+41 |       cwd: root, stdin: new Blob([JSON.stringify([path])]), stdout: "pipe", stderr: "pipe",
+42 |     });
+43 |     const [code, stdout, stderr] = await Promise.all([child.exited, new Response(child.stdout).text(), new Response(child.stderr).text()]);
+44 |     expect(stderr).toBe("");
+                        ^
+error: expect(received).toBe(expected)
+
+- ""
++ "Snapshot verification failed.
++ "
+
+- Expected  - 1
++ Received  + 2
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/template-compatibility.test.ts:44:20)
+(fail) native integrity workers hash parameter route source paths [80.79ms]
+ 98 |     if (
+ 99 |       typeof value !== "string" ||
+100 |       value.length > 1024 ||
+101 |       (value !== "." && !RESOLUTION_PATH.test(value))
+102 |     )
+103 |       throw new Error("Invalid snapshot input watch path");
+                      ^
+error: Invalid snapshot input watch path
+      at add (/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/dev-snapshot/snapshot-input-watch.ts:103:17)
+      at installedDirectories (/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/dev-snapshot/snapshot-input-watch.ts:115:5)
+      at watchSnapshotInputs (/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/dev-snapshot/snapshot-input-watch.ts:73:25)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-snapshot/template-compatibility.test.ts:56:19)
+(fail) native input watches accept bracketed source resolution witnesses [6.48ms]
+(pass) route bracket support preserves containment and exact generated root restrictions [0.83ms]
+
+ 3 pass
+ 2 fail
+ 22 expect() calls
+Ran 5 tests across 1 file. [391.00ms]

@@ -1,0 +1,105 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/dev-scaffold.test.ts:
+[20:42:38.394] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 5.874417,
+}
+[20:42:40.484] INFO (#1989): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 5.511333,
+}
+[20:42:40.485] INFO (#1989): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.554833,
+}
+(pass) holds reload until a real scaffold transaction finishes installation or rollback [2098.50ms]
+
+packages/cli/dev-ownership.test.ts:
+[20:42:40.488] INFO (#2067): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.169875,
+}
+[20:42:40.559] INFO (#2393): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.159417,
+}
+[20:42:40.559] INFO (#2393): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.363125,
+}
+(pass) stops an inspector child through the external shutdown signal [71.39ms]
+[20:42:40.559] INFO (#2414): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.149,
+}
+[20:42:40.600] INFO (#2722): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 0.267667,
+}
+[20:42:40.601] INFO (#2722): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.414083,
+}
+(pass) releases the backend port when its terminal closes [41.83ms]
+[20:42:40.602] INFO (#2743): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.199042,
+}
+[20:42:41.522] INFO (#4990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 4.90875,
+}
+[20:42:41.523] INFO (#4990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 1.013625,
+}
+(pass) forwards source, directory, and root configuration changes through the watcher [922.03ms]
+[20:42:41.523] INFO (#5068): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root",
+  outcome: "success",
+  duration_ms: 0.145958,
+}
+[20:42:41.592] INFO (#5319): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.session.release",
+  outcome: "success",
+  duration_ms: 3.52275,
+}
+[20:42:41.592] INFO (#5319): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dev.fixture.root.release",
+  outcome: "success",
+  duration_ms: 0.325375,
+}
+(pass) forwards backend console output through dev logs [69.08ms]
+
+ 5 pass
+ 0 fail
+ 17 expect() calls
+Ran 5 tests across 2 files. [3.55s]

@@ -1,0 +1,245 @@
+import assert from "node:assert/strict";
+import { readFile, writeFile, rename, rm } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
+import { resolve } from "node:path";
+import { recoverySession } from "./recovery-session.js";
+
+const root = resolve(import.meta.dirname, "..");
+assert.equal(
+  root,
+  "/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab",
+  "only this owned lab may be modified",
+);
+const { pid, evidence } = recoverySession(root);
+const names = [
+  "src/services/catalog/revision.ts",
+  "src/services/catalog/functions/list.function.ts",
+  "src/services/catalog/service.ts",
+  "src/platform/env.ts",
+  "relkit.config.ts",
+  ".env",
+  ".env.local",
+  ".env.development",
+  ".env.development.local",
+];
+const originals = new Map<string, string | undefined>();
+for (const name of names)
+  originals.set(
+    name,
+    await readFile(resolve(root, name), "utf8").catch(() => undefined),
+  );
+const original = (name: string) => {
+  const text = originals.get(name);
+  assert.notEqual(text, undefined);
+  return text!;
+};
+const write = (name: string, text: string) =>
+  writeFile(resolve(root, name), text);
+const log = () => readFile(resolve(evidence, "dev.log"), "utf8");
+async function read() {
+  process.kill(pid, 0);
+  const r = await fetch("http://127.0.0.1:3400/products", {
+    signal: AbortSignal.timeout(3000),
+  });
+  assert.equal(r.status, 200);
+  const body = await r.json();
+  assert.equal(body.products.length, 3);
+  assert.equal(
+    body.products.find((p: { id: string }) => p.id === "notebook").priceCents,
+    1250,
+  );
+  return body.revision;
+}
+async function wait(label: string, fn: () => Promise<boolean>, ms = 60000) {
+  const end = Date.now() + ms;
+  while (Date.now() < end) {
+    if (await fn()) return;
+    await Bun.sleep(350);
+  }
+  throw new Error("Timed out: " + label);
+}
+async function headroom() {
+  const end = Date.now() + 120000;
+  const constrained = () => {
+    const pressure = Number(
+      execFileSync(
+        "rtk",
+        ["sysctl", "-n", "kern.memorystatus_vm_pressure_level"],
+        { encoding: "utf8" },
+      ).trim(),
+    );
+    const memory = execFileSync("rtk", ["memory_pressure", "-Q"], {
+      encoding: "utf8",
+    }).match(/free percentage: (\d+)%/);
+    return pressure >= 4 || !memory || Number(memory[1]) < 40;
+  };
+  while (constrained()) {
+    if (Date.now() > end)
+      throw new Error(
+        "Memory pressure persisted; experiment deferred with inputs restored",
+      );
+    await Bun.sleep(2000);
+  }
+}
+async function serving(expected: string) {
+  await wait("activation " + expected, async () => (await read()) === expected);
+}
+const results: { scenario: string; result: string; cliPid: number }[] = [];
+function passed(scenario: string) {
+  results.push({ scenario, result: "passed", cliPid: pid });
+  console.log("PASS " + scenario + " (unchanged CLI " + pid + ")");
+}
+async function rejected(
+  name: string,
+  invalid: string,
+  repaired: string,
+  label: string,
+) {
+  await headroom();
+  const previous = await read(),
+    start = (await log()).length;
+  await write(name, invalid);
+  await wait(
+    label + " diagnostic",
+    async () =>
+      (await log()).slice(start).includes("candidate.compile.failed") ||
+      (await log()).slice(start).includes("candidate.spawn.failed"),
+  );
+  for (let n = 0; n < 3; n++)
+    assert.equal(
+      await read(),
+      previous,
+      "previous valid catalog must serve during rejection",
+    );
+  await write(name, repaired);
+  await serving(previous);
+  await wait(label + " repaired generation activation", async () =>
+    (await log()).slice(start).includes('"state":"switch-succeeded"'),
+  );
+  passed(label + ": diagnostic, previous traffic, repaired activation");
+}
+try {
+  await serving("v1:base");
+  await headroom();
+  await write(names[0]!, 'export const revision = "v2";\n');
+  await serving("v2:base");
+  passed("normal source edit activates");
+  await rejected(
+    names[0]!,
+    "export const revision = (",
+    'export const revision = "v2";\n',
+    "syntax invalid-to-valid",
+  );
+  await rejected(
+    names[2]!,
+    original(names[2]!).replace('id: "catalog"', 'id: "cart"'),
+    original(names[2]!),
+    "duplicate service graph descriptor",
+  );
+  await rejected(
+    names[1]!,
+    original(names[1]!).replace("../revision.js", "../missing.js"),
+    original(names[1]!),
+    "missing import invalid-to-valid",
+  );
+  await rejected(
+    "relkit.config.ts",
+    original("relkit.config.ts").replace(
+      'id: "relkit-ecommerce-lab"',
+      'id: ""',
+    ),
+    original("relkit.config.ts"),
+    "invalid config repaired",
+  );
+  await headroom();
+  let start = (await log()).length;
+  await rm(resolve(root, names[0]!));
+  await wait("deleted import rejection", async () =>
+    (await log()).slice(start).includes("candidate.compile.failed"),
+  );
+  assert.equal(await read(), "v2:base");
+  await write(names[0]!, 'export const revision = "v3";\n');
+  await serving("v3:base");
+  passed("deletion/recreation repairs imported module");
+  await headroom();
+  const env = original("src/platform/env.ts");
+  start = (await log()).length;
+  await write(
+    "src/platform/env.ts",
+    env.replace(
+      'LAB_VALUE: env.string().default("base")',
+      "LAB_VALUE: env.string()",
+    ),
+  );
+  await wait("required env rejected", async () =>
+    (await log()).slice(start).includes("Reload failed"),
+  );
+  assert.equal(await read(), "v3:base");
+  await write(".env.local", "LAB_VALUE=created\n");
+  await serving("v3:created");
+  passed("required dotenv creation recovers rejected candidate");
+  await write(".env.local", "LAB_VALUE=edited\n");
+  await serving("v3:edited");
+  passed("dotenv edit activates exact value");
+  await write(".env.local.next", "LAB_VALUE=atomic\n");
+  await rename(resolve(root, ".env.local.next"), resolve(root, ".env.local"));
+  await serving("v3:atomic");
+  passed("dotenv atomic replacement activates");
+  await write(".env", original(".env") + "\nLAB_VALUE=base-file\n");
+  await write(".env.development", "LAB_VALUE=mode\n");
+  await write(".env.development.local", "LAB_VALUE=mode-local\n");
+  await serving("v3:mode-local");
+  passed("mode-local precedence over local, mode and base");
+  await rm(resolve(root, ".env.development.local"));
+  await serving("v3:atomic");
+  passed("mode-local deletion falls back to local over mode");
+  await rm(resolve(root, ".env.development"));
+  await serving("v3:atomic");
+  passed("mode deletion falls back to local");
+  await write(".env.development", "LAB_VALUE=mode\n");
+  await rm(resolve(root, ".env.local"));
+  await serving("v3:mode");
+  passed("local deletion falls back to mode file");
+  await rm(resolve(root, ".env.development"));
+  await serving("v3:base-file");
+  passed("mode deletion falls back to base file");
+  start = (await log()).length;
+  await write(".env", original(".env"));
+  await wait("removed required env rejection", async () =>
+    (await log()).slice(start).includes("Reload failed"),
+  );
+  assert.equal(await read(), "v3:base-file");
+  await write("src/platform/env.ts", env);
+  await serving("v3:base");
+  passed(
+    "required removal rejected; schema default recovers without stale value",
+  );
+  await headroom();
+  start = (await log()).length;
+  await write(names[0]!, 'export const revision = "burst-a";\n');
+  await wait("in-flight compile", async () =>
+    (await log()).slice(start).includes("candidate.compile.started"),
+  );
+  await write(
+    names[1]!,
+    original(names[1]!) + "\n// in-flight companion save\n",
+  );
+  await write(names[0]!, 'export const revision = "burst-final";\n');
+  await write("src/platform/env.ts", env + "\n// in-flight env save\n");
+  await serving("burst-final:base");
+  passed("rapid multi-file saves during compilation activate newest source");
+} finally {
+  for (const [name, content] of originals) {
+    if (content === undefined) await rm(resolve(root, name), { force: true });
+    else await write(name, content);
+  }
+  await rm(resolve(root, ".env.local.next"), { force: true });
+  await serving("v1:base");
+  await Bun.write(
+    resolve(evidence, "recovery-results.json"),
+    JSON.stringify(results, null, 2),
+  );
+}
+console.log(
+  "Recovery matrix complete; original source/env restored; CLI was never restarted",
+);

@@ -1,0 +1,26 @@
+bun test v1.3.10 (30e609e0)
+
+packages/create-relkit/tests/create-capabilities.effect.test.ts:
+(pass) creation capability evidence > certifies the default tuple for the actual packaged release identity [0.39ms]
+(pass) creation capability evidence > accepts only the current fully evidenced tuple [0.23ms]
+(pass) creation capability evidence > filters partial interactive choices with the same table
+54 |     ).toEqual([]);
+55 |   });
+56 | 
+57 |   it("pins the certified source template bytes", () => {
+58 |     const root = join(import.meta.dirname, "../../../templates/default/v1/minimal");
+59 |     expect(templateDigest(root)).toBe(CREATE_CAPABILITY_TABLE.entries[0]!.templateDigest);
+                                      ^
+error: expect(received).toBe(expected)
+
+Expected: "f72fded9c0ceccefc8140e3104ab4a0eabb8f7f92283ec0ff5237f0a772dd0ef"
+Received: "509f430ed6807c4cb54923a581ce1df2ab5f1b3d5b8abf5519e04a76ee0db721"
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/create-relkit/tests/create-capabilities.test.ts:59:34)
+(fail) creation capability evidence > pins the certified source template bytes [1.96ms]
+(pass) creation capability evidence > gates every table entry on complete passing evidence [0.46ms]
+
+ 4 pass
+ 1 fail
+ 22 expect() calls
+Ran 5 tests across 1 file. [59.00ms]

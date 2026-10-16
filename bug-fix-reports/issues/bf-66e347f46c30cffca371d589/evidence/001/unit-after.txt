@@ -1,0 +1,117 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/services/dev-environment-preload.test.ts:
+[14:10:29.979] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.31375,
+}
+[14:10:29.980] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stat",
+  outcome: "success",
+  duration_ms: 0.254584,
+}
+[14:10:29.981] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.285,
+}
+[14:10:29.981] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.077,
+}
+[14:10:29.981] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.033291,
+}
+[14:10:29.981] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.035625,
+}
+[14:10:29.999] INFO (#4): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.896375,
+}
+[14:10:29.999] INFO (#4): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 17.240084,
+}
+[14:10:30.000] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.environment.resolve",
+  outcome: "success",
+  duration_ms: 23.249833,
+}
+[14:10:30.001] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.054333,
+}
+[14:10:30.002] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stat",
+  outcome: "success",
+  duration_ms: 0.542875,
+}
+[14:10:30.003] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.646458,
+}
+[14:10:30.003] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.038417,
+}
+[14:10:30.003] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.026041,
+}
+[14:10:30.004] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.024042,
+}
+[14:10:30.018] INFO (#11): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 0.281083,
+}
+[14:10:30.018] INFO (#11): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 14.101416,
+}
+[14:10:30.018] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.environment.resolve",
+  outcome: "success",
+  duration_ms: 17.43325,
+}
+(pass) loads dotenv values without executing a logging application preload [49.28ms]
+
+ 1 pass
+ 0 fail
+ 5 expect() calls
+Ran 1 test across 1 file. [200.00ms]

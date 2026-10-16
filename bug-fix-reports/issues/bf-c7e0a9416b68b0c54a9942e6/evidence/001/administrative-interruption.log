@@ -1,0 +1,1168 @@
+CERTIFY ["x","turbo","run","build","--filter=./packages/*","--filter=./integrations/*","--filter=./integrations/packages/*","--concurrency=1"]
+
+   • Packages in scope: @relkit/agents, @relkit/app, @relkit/aws, @relkit/better-auth, @relkit/buckets, @relkit/cache, @relkit/cli, @relkit/client, @relkit/client-generator, @relkit/cloud-aws, @relkit/cloudflare, @relkit/compiler, @relkit/config, @relkit/contracts, @relkit/deploy, @relkit/deploy-pulumi, @relkit/diagnostics, @relkit/docker, @relkit/drizzle, @relkit/effect-mq, @relkit/engine, @relkit/events, @relkit/functions, @relkit/graph, @relkit/inngest, @relkit/inspector-api, @relkit/integrations, @relkit/invocation, @relkit/jobs, @relkit/local, @relkit/local-service, @relkit/observability, @relkit/openapi, @relkit/otlp, @relkit/provider, @relkit/providers-local, @relkit/providers-standard, @relkit/pulumi, @relkit/realtime, @relkit/redis, @relkit/routes, @relkit/runtime-effect, @relkit/runtime-hono, @relkit/s3, @relkit/schema, @relkit/sentry, @relkit/services, @relkit/supervisor, @relkit/testing, @relkit/tools, @relkit/trigger, create-relkit, relkit
+   • Running build in 53 packages
+   • Remote caching disabled
+
+@relkit/contracts:build: cache miss, executing bc616d367d1e6687
+@relkit/contracts:build: $ tsc -b
+@relkit/schema:build: cache miss, executing 2343bfb423e09bd3
+@relkit/schema:build: $ tsc -b
+@relkit/providers-standard:build: cache miss, executing f84dfcbdd3ba9c53
+@relkit/providers-standard:build: $ tsc -b
+@relkit/graph:build: cache miss, executing 0f30da2f90b13d2d
+@relkit/graph:build: $ tsc -b
+@relkit/buckets:build: cache miss, executing d3f59a0dce0432d8
+@relkit/buckets:build: $ tsc -b
+@relkit/observability:build: cache miss, executing 763b7bc947fb02d6
+@relkit/observability:build: $ tsc -b
+@relkit/diagnostics:build: cache miss, executing 7f15f23650976c65
+@relkit/diagnostics:build: $ tsc -b
+@relkit/provider:build: cache miss, executing 050bc9b74c1b7d40
+@relkit/provider:build: $ tsc -b
+@relkit/cache:build: cache miss, executing c82b3e71d10064a8
+@relkit/cache:build: $ tsc -b
+@relkit/realtime:build: cache miss, executing ebd9ec2ad93d52b3
+@relkit/realtime:build: $ tsc -b
+@relkit/invocation:build: cache miss, executing a1b9e71776ba256f
+@relkit/invocation:build: $ tsc -b
+@relkit/openapi:build: cache miss, executing 5b65c6bbeda9fdd9
+@relkit/openapi:build: $ tsc -b
+@relkit/deploy:build: cache miss, executing 3ee7c1d26a770518
+@relkit/deploy:build: $ tsc -b
+@relkit/client-generator:build: cache miss, executing 8e4dfcc4270489fc
+@relkit/client-generator:build: $ tsc -b
+@relkit/config:build: cache miss, executing a96e6943ee22754b
+@relkit/config:build: $ tsc -b
+@relkit/sentry:build: cache miss, executing b4ec83579f7ae6e6
+@relkit/sentry:build: $ tsc -b
+@relkit/otlp:build: cache miss, executing d9a42b08cecfe647
+@relkit/otlp:build: $ tsc -b
+@relkit/local-service:build: cache miss, executing 7901e2212d4dcc12
+@relkit/local-service:build: $ tsc -b
+@relkit/cloudflare:build: cache miss, executing bb1ab1161980ebf0
+@relkit/cloudflare:build: $ tsc -b
+@relkit/functions:build: cache miss, executing 18f8d6856c1db632
+@relkit/functions:build: $ tsc -b
+@relkit/drizzle:build: cache miss, executing 56202ab2f7e21642
+@relkit/drizzle:build: $ tsc -b
+@relkit/client:build: cache miss, executing d00f815b32982e5c
+@relkit/client:build: $ tsc -b
+@relkit/pulumi:build: cache miss, executing abfc94eea9b15ee8
+@relkit/pulumi:build: $ tsc -b
+@relkit/aws:build: cache miss, executing ae6650ea9e713a2e
+@relkit/aws:build: $ tsc -b
+@relkit/runtime-effect:build: cache miss, executing 75fc3ff2d4f4c240
+@relkit/runtime-effect:build: $ tsc -b
+@relkit/compiler:build: cache miss, executing e0d5bd2e115861e8
+@relkit/compiler:build: $ tsc -b
+@relkit/s3:build: cache miss, executing 27f7df3379680c6f
+@relkit/s3:build: $ tsc -b
+@relkit/docker:build: cache miss, executing 2464878634e538c9
+@relkit/docker:build: $ tsc -b
+@relkit/tools:build: cache miss, executing 05d88cbbc4048638
+@relkit/tools:build: $ tsc -b
+@relkit/jobs:build: cache miss, executing 262e4993f13457c5
+@relkit/jobs:build: $ tsc -b
+@relkit/deploy-pulumi:build: cache miss, executing 989acd56bf0f2c7a
+@relkit/deploy-pulumi:build: $ tsc -b
+@relkit/supervisor:build: cache miss, executing 0fb81d6fcaad152e
+@relkit/supervisor:build: $ tsc -b
+@relkit/inspector-api:build: cache miss, executing 67ad5583c90f36a5
+@relkit/inspector-api:build: $ tsc -b
+create-relkit:build: cache miss, executing 7eed545e7883e80d
+create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templates.ts
+@relkit/agents:build: cache miss, executing e0a2e2be4ccd4ff3
+@relkit/agents:build: $ tsc -b
+@relkit/events:build: cache miss, executing 89037fdbae08a696
+@relkit/events:build: $ tsc -b
+@relkit/inngest:build: cache miss, executing 126daa66aa45d283
+@relkit/inngest:build: $ tsc -b
+@relkit/trigger:build: cache miss, executing d263141da3165992
+@relkit/trigger:build: $ tsc -b
+@relkit/effect-mq:build: cache miss, executing 0cf1f2d50f40248a
+@relkit/effect-mq:build: $ tsc -b
+@relkit/providers-local:build: cache miss, executing f9e8a26cb3c839ff
+@relkit/providers-local:build: $ tsc -b
+@relkit/services:build: cache miss, executing 2950d99c1b2886d2
+@relkit/services:build: $ tsc -b
+@relkit/local:build: cache miss, executing 97e6cd5c578a232a
+@relkit/local:build: $ tsc -b
+@relkit/redis:build: cache miss, executing 9a314e4e018fdf6b
+@relkit/redis:build: $ tsc -b
+@relkit/routes:build: cache miss, executing 24b469c5dd15b601
+@relkit/routes:build: $ tsc -b
+@relkit/integrations:build: cache miss, executing 0b58df5115cde268
+@relkit/integrations:build: $ tsc -b
+@relkit/app:build: cache miss, executing 2356bfcca10bfb6b
+@relkit/app:build: $ tsc -b
+@relkit/better-auth:build: cache miss, executing 6f9e5144583d2542
+@relkit/better-auth:build: $ tsc -b
+@relkit/engine:build: cache miss, executing 4d14fe6a4eece9ba
+@relkit/engine:build: $ tsc -b
+@relkit/cloud-aws:build: cache miss, executing 0856f19510d30f3c
+@relkit/cloud-aws:build: $ tsc -b
+@relkit/runtime-hono:build: cache miss, executing 7069367ead7e427a
+@relkit/runtime-hono:build: $ tsc -b
+@relkit/cli:build: cache miss, executing 9a8b40df87eafbb5
+@relkit/cli:build: $ tsc -b && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-inspector.ts && bun run ../../scripts/package-dev-bootstrap.ts
+@relkit/cli:build: $ next build
+@relkit/cli:build: ▲ Next.js 16.3.8 (Turbopack)
+@relkit/cli:build: ✓ Running next.config.ts took 57ms
+@relkit/cli:build: 
+@relkit/cli:build:   Creating an optimized production build ...
+@relkit/cli:build: ✓ Compiled successfully in 719ms
+@relkit/cli:build:   Running TypeScript ...
+@relkit/cli:build:   Finished TypeScript in 115ms ...
+@relkit/cli:build:   Collecting page data using 1 worker ...
+@relkit/cli:build:   Generating static pages using 1 worker (0/27) ...
+@relkit/cli:build:   Generating static pages using 1 worker (6/27) 
+@relkit/cli:build:   Generating static pages using 1 worker (13/27) 
+@relkit/cli:build:   Generating static pages using 1 worker (20/27) 
+@relkit/cli:build: ✓ Generating static pages using 1 worker (27/27) in 485ms
+@relkit/cli:build:   Finalizing page optimization ...
+@relkit/cli:build: 
+@relkit/cli:build: Route (app)
+@relkit/cli:build: ┌ ○ /
+@relkit/cli:build: ├ ○ /_not-found
+@relkit/cli:build: ├ ƒ /_relkit/backend/[...path]
+@relkit/cli:build: ├ ○ /agents
+@relkit/cli:build: ├ ƒ /agents/[id]
+@relkit/cli:build: ├ ƒ /agents/[id]/chat
+@relkit/cli:build: ├ ○ /api-reference
+@relkit/cli:build: ├ ○ /buckets
+@relkit/cli:build: ├ ƒ /buckets/[id]
+@relkit/cli:build: ├ ○ /cache
+@relkit/cli:build: ├ ƒ /cache/[id]
+@relkit/cli:build: ├ ○ /channels
+@relkit/cli:build: ├ ƒ /channels/[id]
+@relkit/cli:build: ├ ○ /diagnostics
+@relkit/cli:build: ├ ○ /domains
+@relkit/cli:build: ├ ƒ /domains/[id]
+@relkit/cli:build: ├ ○ /env
+@relkit/cli:build: ├ ○ /errors
+@relkit/cli:build: ├ ƒ /errors/[id]
+@relkit/cli:build: ├ ○ /events
+@relkit/cli:build: ├ ƒ /events/[id]
+@relkit/cli:build: ├ ○ /functions
+@relkit/cli:build: ├ ƒ /functions/[id]
+@relkit/cli:build: ├ ○ /graph
+@relkit/cli:build: ├ ○ /graphs
+@relkit/cli:build: ├ ƒ /graphs/[id]
+@relkit/cli:build: ├ ○ /jobs
+@relkit/cli:build: ├ ƒ /jobs/[id]
+@relkit/cli:build: ├ ○ /jobs/runs
+@relkit/cli:build: ├ ƒ /jobs/runs/[runId]
+@relkit/cli:build: ├ ○ /jobs/schedules
+@relkit/cli:build: ├ ○ /jobs/services
+@relkit/cli:build: ├ ○ /logs
+@relkit/cli:build: ├ ○ /middlewares
+@relkit/cli:build: ├ ƒ /middlewares/[id]
+@relkit/cli:build: ├ ○ /providers
+@relkit/cli:build: ├ ƒ /providers/[id]
+@relkit/cli:build: ├ ○ /requests
+@relkit/cli:build: ├ ƒ /requests/[requestId]
+@relkit/cli:build: ├ ○ /routes
+@relkit/cli:build: ├ ƒ /routes/[id]
+@relkit/cli:build: ├ ƒ /tasks/[id]
+@relkit/cli:build: ├ ○ /tools
+@relkit/cli:build: ├ ƒ /tools/[id]
+@relkit/cli:build: ├ ○ /traces
+@relkit/cli:build: └ ƒ /traces/[traceId]
+@relkit/cli:build: 
+@relkit/cli:build: 
+@relkit/cli:build: ○  (Static)   prerendered as static content
+@relkit/cli:build: ƒ  (Dynamic)  server-rendered on demand
+@relkit/cli:build: 
+@relkit/cli:build: Packaged inspector server in packages/cli/dist/inspector.
+@relkit/testing:build: cache miss, executing aab97cce4bc98cfb
+@relkit/testing:build: $ tsc -b
+relkit:build: cache miss, executing 0eba5115aac37c77
+relkit:build: $ tsc -b
+
+ Tasks:    53 successful, 53 total
+Cached:    0 cached, 53 total
+  Time:    9.394s 
+
+CERTIFY ["scripts/benchmark-packed-dev.ts","--set","fresh","--runs","20","--cleanup","--output","/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-vI4qUU/fresh.json"]
+[02:07:24.874] INFO (#1): Preparing and installing the packed candidate fixture
+[02:07:24.950] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 67.866417,
+}
+[02:07:24.972] INFO (#5): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 21.655292,
+}
+[02:07:28.546] INFO (#8): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3573.544125,
+}
+[02:07:29.226] INFO (#11): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 679.205875,
+}
+[02:07:29.295] INFO (#14): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 68.740625,
+}
+[02:07:29.333] INFO (#17): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 37.956458,
+}
+[02:07:29.398] INFO (#20): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 63.710583,
+}
+[02:07:29.426] INFO (#23): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 27.599209,
+}
+[02:07:29.492] INFO (#26): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 65.842666,
+}
+[02:07:29.526] INFO (#29): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 34.096208,
+}
+[02:07:29.600] INFO (#32): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 72.855917,
+}
+[02:07:29.660] INFO (#35): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 59.920083,
+}
+[02:07:29.773] INFO (#38): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 112.498958,
+}
+[02:07:29.904] INFO (#41): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 130.569083,
+}
+[02:07:29.975] INFO (#44): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 70.299416,
+}
+[02:07:30.010] INFO (#47): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 35.157916,
+}
+[02:07:30.075] INFO (#50): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 64.66325,
+}
+[02:07:30.101] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 24.97175,
+}
+[02:07:30.164] INFO (#56): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 62.696542,
+}
+[02:07:30.197] INFO (#59): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 32.842459,
+}
+[02:07:30.280] INFO (#62): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 83.197917,
+}
+[02:07:30.322] INFO (#65): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 41.371791,
+}
+[02:07:30.405] INFO (#68): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 81.999667,
+}
+[02:07:30.438] INFO (#71): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 32.890375,
+}
+[02:07:30.514] INFO (#74): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 75.390875,
+}
+[02:07:30.543] INFO (#77): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 28.716458,
+}
+[02:07:30.611] INFO (#80): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 67.657542,
+}
+[02:07:30.636] INFO (#83): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 24.330042,
+}
+[02:07:30.711] INFO (#86): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 75.177334,
+}
+[02:07:30.815] INFO (#89): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 103.2875,
+}
+[02:07:30.885] INFO (#92): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 70.043166,
+}
+[02:07:30.964] INFO (#95): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 77.737709,
+}
+[02:07:31.033] INFO (#98): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 68.565458,
+}
+[02:07:31.224] INFO (#101): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 190.598833,
+}
+[02:07:31.289] INFO (#104): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 64.9715,
+}
+[02:07:31.333] INFO (#107): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 43.956209,
+}
+[02:07:31.403] INFO (#110): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 68.810958,
+}
+[02:07:31.441] INFO (#113): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 38.539166,
+}
+[02:07:31.508] INFO (#116): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 66.281083,
+}
+[02:07:31.537] INFO (#119): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 28.452042,
+}
+[02:07:31.604] INFO (#122): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 66.174125,
+}
+[02:07:31.632] INFO (#125): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 27.876209,
+}
+[02:07:31.696] INFO (#128): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 64.459333,
+}
+[02:07:31.721] INFO (#131): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 24.232584,
+}
+[02:07:31.787] INFO (#134): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 65.472708,
+}
+[02:07:31.828] INFO (#137): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 40.617583,
+}
+[02:07:31.896] INFO (#140): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 67.997208,
+}
+[02:07:31.958] INFO (#143): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 61.591041,
+}
+[02:07:32.024] INFO (#146): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 65.738458,
+}
+[02:07:32.078] INFO (#149): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 53.863375,
+}
+[02:07:32.144] INFO (#152): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 65.580458,
+}
+[02:07:32.205] INFO (#155): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 60.756375,
+}
+[02:07:32.273] INFO (#158): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 67.683167,
+}
+[02:07:32.384] INFO (#161): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 110.280208,
+}
+[02:07:32.450] INFO (#164): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 65.962291,
+}
+[02:07:32.477] INFO (#167): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 26.741417,
+}
+[02:07:32.547] INFO (#170): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 69.019958,
+}
+[02:07:32.636] INFO (#173): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 89.458584,
+}
+[02:07:32.702] INFO (#176): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 65.017625,
+}
+[02:07:32.734] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 31.626666,
+}
+[02:07:32.806] INFO (#182): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 71.535542,
+}
+[02:07:32.908] INFO (#185): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 101.888625,
+}
+[02:07:32.975] INFO (#188): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 66.863291,
+}
+[02:07:33.003] INFO (#191): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 27.770541,
+}
+[02:07:33.069] INFO (#194): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 64.523334,
+}
+[02:07:33.117] INFO (#197): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 47.987167,
+}
+[02:07:33.182] INFO (#200): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 64.266334,
+}
+[02:07:33.210] INFO (#203): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 27.428917,
+}
+[02:07:33.275] INFO (#206): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 64.034,
+}
+[02:07:33.305] INFO (#209): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 29.234292,
+}
+[02:07:33.374] INFO (#212): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 68.796166,
+}
+[02:07:33.410] INFO (#215): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 35.460542,
+}
+[02:07:33.477] INFO (#218): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 66.867625,
+}
+[02:07:33.516] INFO (#221): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 38.656916,
+}
+[02:07:33.581] INFO (#224): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 64.9535,
+}
+[02:07:33.610] INFO (#227): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 28.470708,
+}
+[02:07:33.676] INFO (#230): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 65.705125,
+}
+[02:07:33.709] INFO (#233): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 33.198541,
+}
+[02:07:33.774] INFO (#236): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 64.134834,
+}
+[02:07:33.802] INFO (#239): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 28.065333,
+}
+[02:07:33.869] INFO (#242): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 66.8355,
+}
+[02:07:33.896] INFO (#245): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 26.874459,
+}
+[02:07:33.971] INFO (#248): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 73.992709,
+}
+[02:07:34.002] INFO (#251): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 30.794209,
+}
+[02:07:34.068] INFO (#254): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 66.094083,
+}
+[02:07:34.101] INFO (#257): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 32.440542,
+}
+[02:07:34.174] INFO (#260): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 72.433792,
+}
+[02:07:34.272] INFO (#263): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 97.841416,
+}
+[02:07:34.343] INFO (#266): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 70.2945,
+}
+[02:07:34.368] INFO (#269): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 25.2725,
+}
+Staging release package: @relkit/contracts
+Staging release package: @relkit/schema
+Staging release package: @relkit/buckets
+Staging release package: @relkit/cache
+Staging release package: @relkit/diagnostics
+Staging release package: @relkit/graph
+Staging release package: @relkit/invocation
+Staging release package: @relkit/observability
+Staging release package: @relkit/provider
+Staging release package: @relkit/realtime
+Staging release package: @relkit/client
+Staging release package: @relkit/client-generator
+Staging release package: @relkit/config
+Staging release package: @relkit/deploy
+Staging release package: @relkit/drizzle
+Staging release package: @relkit/functions
+Staging release package: @relkit/local-service
+Staging release package: @relkit/openapi
+Staging release package: @relkit/compiler
+Staging release package: @relkit/docker
+Staging release package: @relkit/jobs
+Staging release package: @relkit/runtime-effect
+Staging release package: @relkit/s3
+Staging release package: @relkit/tools
+Staging release package: @relkit/agents
+Staging release package: @relkit/deploy-pulumi
+Staging release package: @relkit/effect-mq
+Staging release package: @relkit/events
+Staging release package: @relkit/inngest
+Staging release package: @relkit/inspector-api
+Staging release package: @relkit/supervisor
+Staging release package: @relkit/trigger
+Staging release package: create-relkit
+Staging release package: @relkit/providers-local
+Staging release package: @relkit/services
+Staging release package: @relkit/local
+Staging release package: @relkit/redis
+Staging release package: @relkit/routes
+Staging release package: @relkit/app
+Staging release package: @relkit/better-auth
+Staging release package: @relkit/engine
+Staging release package: @relkit/runtime-hono
+Staging release package: @relkit/cli
+Staging release package: @relkit/testing
+Staging release package: relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun install --lockfile-only --ignore-scripts in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/contracts
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-contracts-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-contracts-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-contracts-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/schema
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-schema-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-schema-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-schema-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/buckets
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-buckets-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-buckets-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-buckets-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/cache
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-cache-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-cache-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-cache-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/diagnostics
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-diagnostics-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-diagnostics-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-diagnostics-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/graph
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-graph-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-graph-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-graph-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/invocation
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-invocation-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-invocation-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-invocation-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/observability
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-observability-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-observability-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-observability-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/provider
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-provider-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-provider-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-provider-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/realtime
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-realtime-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-realtime-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-realtime-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/client
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-client-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-client-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-client-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/client-generator
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-client-generator-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-client-generator-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-client-generator-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/config
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-config-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-config-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-config-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/deploy
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-deploy-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-deploy-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-deploy-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/drizzle
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-drizzle-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-drizzle-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-drizzle-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/functions
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-functions-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-functions-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-functions-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/local-service
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-local-service-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-local-service-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-local-service-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/openapi
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-openapi-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-openapi-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-openapi-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/compiler
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-compiler-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-compiler-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-compiler-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/docker
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-docker-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-docker-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-docker-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/jobs
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-jobs-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-jobs-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-jobs-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/runtime-effect
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-runtime-effect-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-runtime-effect-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-runtime-effect-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/s3
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-s3-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-s3-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-s3-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/tools
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-tools-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-tools-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-tools-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/agents
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-agents-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-agents-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-agents-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/deploy-pulumi
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-deploy-pulumi-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-deploy-pulumi-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-deploy-pulumi-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/effect-mq
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-effect-mq-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-effect-mq-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-effect-mq-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/events
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-events-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-events-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-events-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/inngest
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-inngest-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-inngest-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-inngest-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/inspector-api
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-inspector-api-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-inspector-api-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-inspector-api-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/supervisor
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-supervisor-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-supervisor-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-supervisor-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/trigger
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-trigger-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-trigger-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-trigger-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/create-relkit
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/create-relkit-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/create-relkit-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/create-relkit-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/providers-local
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-providers-local-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-providers-local-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-providers-local-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/services
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-services-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-services-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-services-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/local
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-local-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-local-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-local-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/redis
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-redis-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-redis-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-redis-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/routes
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-routes-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-routes-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-routes-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/app
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-app-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-app-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-app-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/better-auth
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-better-auth-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-better-auth-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-better-auth-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/engine
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-engine-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-engine-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-engine-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/runtime-hono
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-runtime-hono-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-runtime-hono-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-runtime-hono-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/cli
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-cli-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-cli-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-cli-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/testing
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-testing-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-testing-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-testing-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-Of2mOJ/packages/relkit
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-oZFD9l/release-artifacts/relkit-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+[02:07:56.934] INFO (#272): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 12356.415792,
+}
+[02:08:11.445] INFO (#275): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 14510.50375,
+}
+[02:08:11.473] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.identity",
+  outcome: "success",
+  duration_ms: 12.308375,
+}
+[02:08:12.071] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 580.772583,
+}
+[02:08:19.733] INFO (#328): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7660.129125,
+}
+[02:08:20.323] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 582.708666,
+}
+[02:08:31.150] INFO (#336): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7281.838042,
+}
+[02:08:31.708] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 550.836334,
+}
+[02:08:42.642] INFO (#344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7351.786375,
+}
+[02:08:43.223] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 572.811625,
+}
+[02:08:54.306] INFO (#352): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7401.90125,
+}
+[02:08:54.874] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 560.318917,
+}
+[02:09:05.707] INFO (#360): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7301.624833,
+}
+[02:09:06.299] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 583.897458,
+}
+[02:09:17.112] INFO (#368): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7290.372291,
+}
+[02:09:17.674] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 555.084625,
+}
+[02:09:28.464] INFO (#376): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7273.626042,
+}
+[02:09:29.032] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 560.423166,
+}
+[02:09:39.914] INFO (#384): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7362.978625,
+}
+[02:09:40.477] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 555.809042,
+}
+[02:09:51.440] INFO (#392): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7345.234333,
+}
+[02:09:52.031] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 583.40475,
+}
+[02:10:03.163] INFO (#400): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7389.028166,
+}
+[02:10:03.725] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 554.771625,
+}
+[02:10:14.651] INFO (#408): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7438.590834,
+}
+[02:10:15.227] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 569.181125,
+}
+[02:10:26.547] INFO (#416): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7819.721208,
+}
+[02:10:27.141] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 585.791541,
+}
+[02:10:38.358] INFO (#424): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7626.3635,
+}
+[02:10:38.947] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 582.176875,
+}
+144 |   for (const reason of self.reasons) {
+145 |     if (reason._tag === "Fail") return reason.error;
+146 |     if (reason._tag === "Die") die ??= reason;
+147 |   }
+148 |   if (die !== undefined) return die.defect;
+149 |   if (self.reasons.length > 0) return new globalThis.Error("All fibers interrupted without error");
+                                            ^
+error: All fibers interrupted without error
+      at causeSquash (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:149:39)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2525:13)
+
+Bun v1.3.10 (macOS arm64)
+Failed certification reports retained at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-vI4qUU
+17 |   const args = [...input];
+18 |   if (args[0] === "x" && args[1] === "turbo") args.push("--concurrency=1");
+19 |   if (args.includes("vitest")) args.push("--maxWorkers=1");
+20 |   console.log("CERTIFY", JSON.stringify(args));
+21 |   const child = Bun.spawn([process.execPath, ...args], { cwd: root, env: process.env, stdout: "inherit", stderr: "inherit" });
+22 |   assert.equal(await child.exited, 0, `certification command must succeed: ${args.join(" ")}`);
+              ^
+AssertionError: certification command must succeed: scripts/benchmark-packed-dev.ts --set fresh --runs 20 --cleanup --output /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-vI4qUU/fresh.json
+
+1 !== 0
+
+ generatedMessage: false,
+     actual: 1,
+   expected: 0,
+   operator: "strictEqual",
+       code: "ERR_ASSERTION"
+
+      at /Users/mustafaelsayed/Workspace/relkit/test-results/full-suite-20261016/certify-current-template.ts:22:10
+      at processTicksAndRejections (native:7:39)
+
+Bun v1.3.10 (macOS arm64)

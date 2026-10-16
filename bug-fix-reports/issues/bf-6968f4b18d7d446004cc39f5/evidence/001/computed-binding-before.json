@@ -1,0 +1,7 @@
+{
+  "boundary": "actual verifyStaticSnapshotSource using pinned TypeScript and Effect",
+  "source": "function key() {return process.env.VALUE ?? \"id\";} const {[key()]: value} = {id:\"captured\"}; export default value;",
+  "observedStdout": "computed binding rejected false",
+  "expected": "computed binding rejected true",
+  "exitCode": 1
+}

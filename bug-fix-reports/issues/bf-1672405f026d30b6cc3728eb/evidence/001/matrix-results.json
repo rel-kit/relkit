@@ -1,0 +1,25 @@
+[
+  {
+    "label": "runtime-after-final",
+    "command": [
+      "python3",
+      "test-results/dev-process-lifetime-20261016/probe.py",
+      "hup",
+      "--prepared",
+      "--expect-graceful"
+    ],
+    "exitCode": 0,
+    "seconds": 32.35
+  },
+  {
+    "label": "ordinary-hup-after",
+    "command": [
+      "python3",
+      "test-results/dev-process-lifetime-20261016/probe.py",
+      "hup",
+      "--expect-graceful"
+    ],
+    "exitCode": 1,
+    "seconds": 21.79
+  }
+]

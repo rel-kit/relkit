@@ -1,0 +1,29 @@
+[FAIL] FAILURES:
+  (fail) candidate generations read dotenv creation, changes and removal without a CLI restart [115.18ms]
+  (fail) prepared epochs observe runtime dotenv repairs but ignore examples and generated state [0.52ms]
+  error: expect(received).toEqual(expected)
+  {
+  "override": "explicit",
+  "token": "2",
+  -   "value": "first",
+  +   "value": null,
+  }
+  - Expected  - 1
+  + Received  + 1
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/bug-fix-reports/issues/bf-dd7ddbd6f31a6ea12ef97ce5/evidence/001/before-regression.test.ts:65:68)
+  at ~effect/Effect/successCont (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+  at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+  at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+  at runInAsyncScope (node:async_hooks:137:23)
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
+  error: .env
+  Expected: true
+  Received: false
+  at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/bug-fix-reports/issues/bf-dd7ddbd6f31a6ea12ef97ce5/evidence/001/before-regression.test.ts:84:53)
+
+SUMMARY:
+   1 pass
+   2 fail
+  Ran 3 tests across 1 file. [464.00ms]
+
+[full output: rtk recall 467c6cb0e012]

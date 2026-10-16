@@ -1,0 +1,170 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/add-platform-acceptance.test.ts:
+[23:28:29.884] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.928375,
+}
+[23:28:29.886] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.259083,
+}
+[23:28:29.903] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 16.831208,
+}
+[23:28:29.947] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 43.797125,
+}
+[23:28:29.965] INFO (#78): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 18.073625,
+}
+[23:28:29.981] INFO (#94): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 15.710166,
+}
+[23:28:30.009] INFO (#112): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 28.347958,
+}
+[23:28:30.038] INFO (#144): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.158333,
+}
+[23:28:30.039] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.380625,
+}
+[23:28:30.039] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.108125,
+}
+[23:28:30.039] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.100459,
+}
+[23:28:30.040] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.094917,
+}
+[23:28:30.040] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.091834,
+}
+[23:28:30.040] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126875,
+}
+[23:28:30.040] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.098042,
+}
+[23:28:30.040] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092666,
+}
+[23:28:30.040] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.110166,
+}
+[23:28:30.040] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.168875,
+}
+[23:28:30.041] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.116834,
+}
+[23:28:30.041] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.088042,
+}
+[23:28:30.041] INFO (#179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.154667,
+}
+21 |     await add(root, ["transform", "Trim Input"]);
+22 |     await add(root, ["database", "--dialect", "sqlite", "--no-install"]);
+23 |     await add(root, ["auth", "--database-dialect", "sqlite", "--no-install"]);
+24 |     await linkDependencies(root);
+25 |     const result = await checkProject({ projectRoot: root });
+26 |     expect(result.diagnostics).toEqual([]);
+                                    ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   {
++     "code": "TS2345",
++     "column": 23,
++     "file": "src/services/database/service.ts",
++     "line": 11,
++     "message": 
++ "Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
++   Type 'undefined' is not assignable to type 'string'."
++ ,
++     "severity": "error",
++   },
++ ]
+
+- Expected  - 1
++ Received  + 13
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/add-platform-acceptance.test.ts:26:32)
+[23:28:32.574] INFO (#492): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.273959,
+}
+(fail) route platform and singleton additions compile in every starter [2699.11ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [3.02s]

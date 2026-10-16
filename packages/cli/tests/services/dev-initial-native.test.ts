@@ -64,20 +64,24 @@ async function awaitPids(
   throw new Error("Initial compiler never reached its CPU-bound fixture.");
 }
 
-test.skipIf(process.platform === "win32")(
-  "initial development SIGTERM joins the CPU-bound compiler group within the strict shutdown limit",
-  async () => {
-    // The executable's contributor launcher delegates external directories to
-    // workspace synchronization. This owned workspace fixture selects the real
-    // CLI command directly without that unrelated build step.
-    const root = await mkdtemp(fileURLToPath(new URL("./.initial-compiler-", import.meta.url)));
-    let child: Bun.Subprocess<"ignore", "pipe", "pipe"> | undefined;
-    let pids: readonly [number, number] | undefined;
-    let output: Promise<readonly string[]> | undefined;
-    try {
-      await writeFile(
-        join(root, "relkit.config.ts"),
-        `
+for (const [signal, expectedCode] of [
+  ["SIGTERM", 143],
+  ["SIGHUP", 129],
+] as const) {
+  test.skipIf(process.platform === "win32")(
+    `initial development ${signal} joins the CPU-bound compiler group within the strict shutdown limit`,
+    async () => {
+      // The executable's contributor launcher delegates external directories to
+      // workspace synchronization. This owned workspace fixture selects the real
+      // CLI command directly without that unrelated build step.
+      const root = await mkdtemp(fileURLToPath(new URL("./.initial-compiler-", import.meta.url)));
+      let child: Bun.Subprocess<"ignore", "pipe", "pipe"> | undefined;
+      let pids: readonly [number, number] | undefined;
+      let output: Promise<readonly string[]> | undefined;
+      try {
+        await writeFile(
+          join(root, "relkit.config.ts"),
+          `
 if (typeof process.send === "function") {
 const descendant = Bun.spawn([process.execPath, "-e", "setInterval(() => {}, 1000)"], {
   stdin: "ignore", stdout: "ignore", stderr: "ignore",
@@ -90,71 +94,75 @@ while (true) {}
 }
 export default {};
 `,
-      );
-      // The CLI has no IPC channel, so its earlier port-config import completes.
-      // Only the live isolated initial worker owns IPC and admits CPU work.
-      const bin = fileURLToPath(new URL("../../src/bin.ts", import.meta.url));
-      child = Bun.spawn(
-        [
-          process.execPath,
-          bin,
-          "dev",
-          "--project-root",
-          root,
-          "--port",
-          "12345",
-          "--inspector-port",
-          "12346",
-        ],
-        {
-          cwd: root,
-          stdin: "ignore",
-          stdout: "pipe",
-          stderr: "pipe",
-        },
-      );
-      output = Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text()]);
-      pids = await awaitPids(root, child, output);
-      expect(pids.every((pid) => pid > 0 && running(pid))).toBe(true);
-      const started = Date.now();
-      child.kill("SIGTERM");
-      const exitCode = await Promise.race([child.exited, Bun.sleep(2_000).then(() => undefined)]);
-      // Assert the finite deadline before awaiting readers so a hung child
-      // reaches finally and its physical cleanup can finish.
-      expect(exitCode).toBeDefined();
-      expect(exitCode, (await output).join("\n")).toBe(143);
-      expect(Date.now() - started).toBeLessThan(2_000);
-      expect(existsSync(join(root, ".relkit"))).toBe(false);
-      for (const pid of pids) {
-        for (let attempt = 0; attempt < 100 && running(pid); attempt++) await Bun.sleep(10);
-        expect(running(pid)).toBe(false);
-      }
-      expect(Date.now() - started).toBeLessThan(2_000);
-    } finally {
-      try {
-        try {
-          if (child?.exitCode === null) {
-            child.kill("SIGTERM");
-            await Promise.race([child.exited, Bun.sleep(2_000)]);
-            if (child.exitCode === null) child.kill("SIGKILL");
-          }
-          await child?.exited;
-        } finally {
-          try {
-            if (pids === undefined) {
-              const text = await readFile(join(root, "pids.json"), "utf8").catch(() => undefined);
-              if (text !== undefined)
-                pids = Schema.decodeUnknownSync(receiptSchema)(JSON.parse(text));
-            }
-            killOwned(pids ?? []);
-          } finally {
-            await output;
-          }
+        );
+        // The CLI has no IPC channel, so its earlier port-config import completes.
+        // Only the live isolated initial worker owns IPC and admits CPU work.
+        const bin = fileURLToPath(new URL("../../src/bin.ts", import.meta.url));
+        child = Bun.spawn(
+          [
+            process.execPath,
+            bin,
+            "dev",
+            "--project-root",
+            root,
+            "--port",
+            "12345",
+            "--inspector-port",
+            "12346",
+          ],
+          {
+            cwd: root,
+            stdin: "ignore",
+            stdout: "pipe",
+            stderr: "pipe",
+          },
+        );
+        output = Promise.all([
+          new Response(child.stdout).text(),
+          new Response(child.stderr).text(),
+        ]);
+        pids = await awaitPids(root, child, output);
+        expect(pids.every((pid) => pid > 0 && running(pid))).toBe(true);
+        const started = Date.now();
+        child.kill(signal);
+        const exitCode = await Promise.race([child.exited, Bun.sleep(2_000).then(() => undefined)]);
+        // Assert the finite deadline before awaiting readers so a hung child
+        // reaches finally and its physical cleanup can finish.
+        expect(exitCode).toBeDefined();
+        expect(exitCode, (await output).join("\n")).toBe(expectedCode);
+        expect(Date.now() - started).toBeLessThan(2_000);
+        expect(existsSync(join(root, ".relkit"))).toBe(false);
+        for (const pid of pids) {
+          for (let attempt = 0; attempt < 100 && running(pid); attempt++) await Bun.sleep(10);
+          expect(running(pid)).toBe(false);
         }
+        expect(Date.now() - started).toBeLessThan(2_000);
       } finally {
-        await rm(root, { recursive: true, force: true });
+        try {
+          try {
+            if (child?.exitCode === null) {
+              child.kill("SIGTERM");
+              await Promise.race([child.exited, Bun.sleep(2_000)]);
+              if (child.exitCode === null) child.kill("SIGKILL");
+            }
+            await child?.exited;
+          } finally {
+            try {
+              if (pids === undefined) {
+                const text = await readFile(join(root, "pids.json"), "utf8").catch(() => undefined);
+                if (text !== undefined)
+                  pids = Schema.decodeUnknownSync(receiptSchema)(JSON.parse(text));
+              }
+              killOwned(pids ?? []);
+            } finally {
+              await output;
+            }
+          }
+        } finally {
+          await rm(root, { recursive: true, force: true });
+        }
       }
-    }
-  },
-  15_000,
-);
+    },
+    15_000,
+  );
+}

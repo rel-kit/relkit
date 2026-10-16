@@ -1,0 +1,52 @@
+{
+  "key": "packages/cli/tests/services/dev-environment-native.test.ts",
+  "matches": {
+    "bf-dd7ddbd6f31a6ea12ef97ce5": {
+      "id": "bf-dd7ddbd6f31a6ea12ef97ce5",
+      "status": "verified",
+      "what": "Development reloads remain rejected after repairing dotenv until the CLI restarts.",
+      "root_cause": "CliDevSupervisor previously forwarded only startup/options environment into a --no-env-file candidate. Deleted values could return through inherited process.env in packages/supervisor/src/candidate-process.ts:55. The prepared epoch filter excluded all dotenv events in packages/cli/src/dev-snapshot/snapshot-epoch-path.t",
+      "fixed_by": "Resolve each generation with bounded, joined Bun dotenv helpers and retained file-key ownership; explicitly unset removed inherited keys; preserve SDK/runtime overrides; observe every active standard dotenv file in both paths. Include Bun custom-mode fallback and mode-local precedence. Both complete real CLI/HTTP matri",
+      "files": [
+        ".changeset/dev-environment-recovery.md",
+        "apps/docs/content/docs/fundamentals/environment.mdx",
+        "packages/cli/src/commands/dev-environment-files.ts",
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/src/dev-snapshot/snapshot-epoch-path.ts",
+        "packages/cli/src/services/dev-environment.schemas.ts",
+        "packages/cli/src/services/dev-environment.service.ts",
+        "packages/cli/src/services/dev-environment.types.ts",
+        "packages/cli/src/services/dev-supervisor.service.ts",
+        "packages/cli/tests/dev-environment/recovery-cycles.ts",
+        "packages/cli/tests/dev-environment/recovery-process.ts",
+        "packages/cli/tests/dev-environment/recovery.probe.ts",
+        "packages/cli/tests/dev-environment/recovery.types.ts",
+        "packages/cli/tests/services/dev-environment-errors.test.ts",
+        "packages/cli/tests/services/dev-environment-native.test.ts",
+        "packages/cli/tests/services/dev-environment-values.test.ts",
+        "packages/cli/tests/services/source-watch-fixture.ts",
+        "packages/cli/tests/services/source-watch.test.ts",
+        "packages/supervisor/src/candidate-process.ts",
+        "packages/supervisor/tests/compatibility/environment.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:08:47+00:00",
+      "report": "bug-fix-reports/issues/bf-dd7ddbd6f31a6ea12ef97ce5/report.md"
+    },
+    "bf-66e347f46c30cffca371d589": {
+      "id": "bf-66e347f46c30cffca371d589",
+      "status": "verified",
+      "what": "Application preloads prevent fresh dotenv resolution",
+      "root_cause": "dev-environment.service.ts runs its Bun JSON helper in the application cwd with default configuration and inherited runtime options",
+      "fixed_by": "Verified explicit empty Bun helper configuration and removal of inherited runtime startup flags only from private helper execution, with application values preserved. Native service tests and actual CLI startup plus same-PID HTTP dotenv recovery pass with the logging application preload retained. All32 local framework ",
+      "files": [
+        "packages/cli/src/services/dev-environment.service.ts",
+        "packages/cli/tests/services/dev-environment-preload.test.ts",
+        "packages/cli/tests/services/dev-environment-native.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-16T15:48:06+00:00",
+      "report": "bug-fix-reports/issues/bf-66e347f46c30cffca371d589/report.md"
+    }
+  }
+}

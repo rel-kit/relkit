@@ -1,0 +1,26 @@
+[
+  {
+    "scenario": "prepared-hup",
+    "exitCode": 0
+  },
+  {
+    "scenario": "ordinary-hup",
+    "exitCode": 0
+  },
+  {
+    "scenario": "ordinary-int",
+    "exitCode": 0
+  },
+  {
+    "scenario": "prepared-term",
+    "exitCode": 0
+  },
+  {
+    "scenario": "prepared-int",
+    "exitCode": 0
+  },
+  {
+    "scenario": "prepared-idle",
+    "exitCode": 0
+  }
+]

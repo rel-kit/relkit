@@ -1,0 +1,44 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/invocation/signals.test.ts:
+(pass) invocation owns SIGINT cancellation and releases its listener [1.07ms]
+(pass) invocation owns SIGTERM cancellation and releases its listener [0.11ms]
+(pass) invocation owns SIGHUP cancellation and releases its listener [0.05ms]
+(pass) the first shutdown signal wins and unrelated listeners survive release [0.14ms]
+62 |   const controller = new AbortController();
+63 |   const reason = Object.assign(new Error("Received SIGHUP."), {
+64 |     code: "RELKIT_INTERRUPTED", exitCode: 129, signal: "SIGHUP",
+65 |   });
+66 |   controller.abort(reason);
+67 |   expect(toFailure(new Error("interrupted work"), controller.signal)).toBe(reason);
+                                                                           ^
+error: expect(received).toBe(expected)
+
+Expected: 58 |   }
+59 | });
+60 | 
+61 | test("ordinary invocation presentation retains the hangup reason and status", () => {
+62 |   const controller = new AbortController();
+63 |   const reason = Object.assign(new Error("Received SIGHUP."), {
+                                        ^
+error: Received SIGHUP.
+ exitCode: 129,
+   signal: "SIGHUP",
+     code: "RELKIT_INTERRUPTED"
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/invocation/signals.test.ts:63:36)
+
+Received: {
+  _tag: "CliFailureError",
+  code: "RELKIT_INTERRUPTED",
+  message: "Operation interrupted.",
+  exitCode: 130,
+}
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/invocation/signals.test.ts:67:71)
+(fail) ordinary invocation presentation retains the hangup reason and status [12.33ms]
+
+ 4 pass
+ 1 fail
+ 22 expect() calls
+Ran 5 tests across 1 file. [1.50s]

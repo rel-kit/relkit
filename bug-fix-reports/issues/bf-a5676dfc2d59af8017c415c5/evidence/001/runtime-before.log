@@ -1,0 +1,23 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/dev-environment/paths.test.ts:
+18 |       child.exited,
+19 |       new Response(child.stdout).text(),
+20 |       new Response(child.stderr).text(),
+21 |     ]);
+22 |     expect(code).not.toBe(0);
+23 |     expect(existsSync(evidence)).toBe(false);
+                                      ^
+error: expect(received).toBe(expected)
+
+Expected: false
+Received: true
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-environment/paths.test.ts:23:34)
+(fail) recovery probe rejects caller-selected evidence directories before writing [121.39ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [295.00ms]

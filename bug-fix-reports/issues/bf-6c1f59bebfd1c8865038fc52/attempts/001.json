@@ -1,0 +1,472 @@
+{
+  "schema_version": 1,
+  "id": "bf-6c1f59bebfd1c8865038fc52",
+  "fingerprint": "6c1f59bebfd1c8865038fc521d3edb88d2a66e9d1fcf05a7afead4608650cbf9",
+  "identity": {
+    "entrypoint": "relkit dev --prepare",
+    "module": "SnapshotCompatibility",
+    "symptom": "current generated tsconfig and parameter routes rejected by snapshot discovery",
+    "scenario": "generated-context-and-route-folders",
+    "error": "inventory.link-or-path compilation.aliases"
+  },
+  "attempt": 1,
+  "created_at": "2026-10-15T22:02:44+00:00",
+  "updated_at": "2026-10-15T23:41:32+00:00",
+  "status": "verified",
+  "what": "current generated tsconfig and parameter routes rejected by snapshot discovery",
+  "expected": "Current generated context roots and valid parameter route paths retain preparation eligibility without relaxing containment or admitting arbitrary generated roots.",
+  "observed": "The real CLI rejects both supported finite preparation fixtures: compilation.aliases for the current two generated files, inventory.link-or-path for bracket route folders.",
+  "root_cause": "SnapshotEligibleTsConfig.files only allowed the older route-module-checks root. SnapshotPath, SnapshotResolutionPath, native hash worker PATH and native watcher RESOLUTION_PATH separately excluded square brackets used by authored parameter/catch-all routes.",
+  "fixed_by": "Accepted only the canonical generated root pair and literal route brackets across schema, native worker and input-watch guards. Focused before/after tests, actual CLI preparation, final prepared HTTP/negative-root/cleanup smoke and all 30 local validation stages pass.",
+  "files": [
+    "packages/cli/src/dev-snapshot/snapshot.schemas.ts",
+    "packages/cli/src/dev-snapshot/snapshot-eligibility.schemas.ts",
+    "packages/cli/tests/dev-snapshot/template-compatibility.test.ts",
+    "packages/cli/src/dev-snapshot/snapshot-hash-worker.ts",
+    "packages/cli/src/dev-snapshot/snapshot-input-watch.ts",
+    ".changeset/prepared-template-compatibility.md"
+  ],
+  "tags": [],
+  "related": [
+    "bf-d830c3c555dba675790aa029"
+  ],
+  "scope": {
+    "modules": [
+      "SnapshotCompatibility",
+      "SnapshotInventory",
+      "SnapshotIntegrityWorker",
+      "SnapshotInputWatch"
+    ],
+    "entrypoints": [
+      "relkit dev --prepare",
+      "relkit dev"
+    ],
+    "invariants": [
+      "Current generated context roots remain eligible",
+      "Valid parameter routes can be prepared, hashed and watched",
+      "Containment and exact root discovery remain enforced"
+    ]
+  },
+  "environment": {
+    "package": "@relkit/cli",
+    "revision": "ebc3a2544ad5521016fd9efc8db3ff1930a3fb75 plus uncommitted recovery, prepared-commerce and certificate fixes",
+    "target": "Local macOS Bun 1.3.10 / Effect 4.0.1; real CLI and HTTP fixtures",
+    "api_exposed": false,
+    "e2e_available": true,
+    "monitoring": "Existing CLI lifecycle/HTTP logs, owned process inventory, native benchmark metrics and physical file hashes; no remote monitoring used."
+  },
+  "reproduction": [
+    "Run bun test packages/cli/tests/dev-snapshot/template-compatibility.test.ts.",
+    "Run bun test-results/full-suite-20261016/snapshot-compatibility.probe.ts before; two real CLI --prepare commands reject supported inputs."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.log",
+        "note": "Two focused compatibility assertions fail, containment controls pass."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.log",
+        "note": "Two real CLI preparation scenarios fail."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/context-before.log",
+        "note": "Native CLI rejects canonical two-file tsconfig."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/routes-before.log",
+        "note": "Native CLI rejects legal parameter route directory."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/worker-runtime-before.log",
+        "note": "After schema repair, actual native integrity worker still rejected bracketed route paths."
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/worker-unit-before.log",
+        "note": "Isolated native worker and watcher assertions failed before their own guard repairs."
+      }
+    ],
+    "after": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-after.log",
+        "note": "Five regressions, 24 assertions pass including strict containment controls."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-after.log",
+        "note": "Both identical actual CLI preparation scenarios succeed."
+      },
+      {
+        "kind": "api",
+        "path": "evidence/001/prepared-http-result.log",
+        "note": "Prepared native session serves exact handler and parameter-route outputs, then listener closes."
+      },
+      {
+        "kind": "api",
+        "path": "evidence/001/prepared-http.log",
+        "note": "Owned backend command proves execution under prepared session rather than ordinary fallback."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/full-suite-results.jsonl",
+        "note": "Actual latest serial results for every local validation stage."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/extra-root-after.log",
+        "note": "Native CLI rejects an arbitrary root without publishing a new receipt."
+      }
+    ]
+  },
+  "verification": {
+    "checks": [
+      {
+        "name": "01-build",
+        "status": "passed",
+        "command": "bun run build",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "02-docs",
+        "status": "passed",
+        "command": "bun x turbo run check test --filter=@relkit/docs --concurrency=1",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "03-restart",
+        "status": "passed",
+        "command": "bun run test:restart",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "04-jobs-coverage",
+        "status": "passed",
+        "command": "bun run test:jobs:coverage",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "05-jobs-mutation",
+        "status": "passed",
+        "command": "bun x stryker run scripts/jobs-coverage/stryker.config.mjs --concurrency 1",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "06-mutation-verification",
+        "status": "passed",
+        "command": "bun scripts/jobs-coverage/verify-mutation.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "07-e2e-inspector",
+        "status": "passed",
+        "command": "bun x playwright test --workers=1 --output=test-results/inspector",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "08-e2e-commerce",
+        "status": "passed",
+        "command": "bun x playwright test --config=playwright.commerce.config.ts --workers=1 --output=test-results/commerce",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "09-jobs-matrix",
+        "status": "passed",
+        "command": "bun run test:jobs:matrix",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "10-types",
+        "status": "passed",
+        "command": "bun run test:types",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "11-unit",
+        "status": "passed",
+        "command": "bun run test:unit",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "12-compiler",
+        "status": "passed",
+        "command": "bun test --timeout 15000 ./tests/compiler",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "13-graph",
+        "status": "passed",
+        "command": "bun x vitest run --config packages/graph/vitest.config.ts --maxWorkers=1",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "14-contracts",
+        "status": "passed",
+        "command": "bun run test:contracts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "15-integration",
+        "status": "passed",
+        "command": "bun run test:integration",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "16-inspector",
+        "status": "passed",
+        "command": "bun run test:inspector",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "17-container",
+        "status": "passed",
+        "command": "bun run test:container",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "18-security",
+        "status": "passed",
+        "command": "bun run test:security",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "19-deployment",
+        "status": "passed",
+        "command": "bun run test:deployment",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "20-examples",
+        "status": "passed",
+        "command": "bun run test:examples",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "21-packages",
+        "status": "passed",
+        "command": "bun run test:packages",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "22-generator",
+        "status": "passed",
+        "command": "bun run test:generator",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "25-certification-bun",
+        "status": "passed",
+        "command": "bun test scripts/tests/dev-readiness/bootstrap-imports.test.ts scripts/tests/packed-manifest.test.ts scripts/tests/registry-cache.test.ts scripts/tests/release-command.test.ts packages/cli/tests/dev-snapshot/input-watch.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "26-certification-vitest",
+        "status": "passed",
+        "command": "bun x vitest run --maxWorkers=1 scripts/tests/benchmark-packed-cleanup.test.ts scripts/tests/benchmark-packed-dev.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "27-guardrails",
+        "status": "passed",
+        "command": "bun test tests/phase0.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "28-lint",
+        "status": "passed",
+        "command": "bun run lint",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "29-boundaries",
+        "status": "passed",
+        "command": "bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "30-konsistent",
+        "status": "passed",
+        "command": "bun run konsistent -- validate",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "31-format",
+        "status": "passed",
+        "command": "bun x prettier --check .changeset/dev-environment-recovery.md .changeset/prepared-commerce-eligibility.md .changeset/prepared-template-compatibility.md .changeset/sqlite-app-tooling.md apps/docs/content/docs/fundamentals/environment.mdx docs/evidence/create-capabilities/0.7.6/fresh.json docs/evidence/create-capabilities/0.7.6/restart.json packages/cli/src/commands/build-server-invocation.ts packages/cli/src/commands/dev-environment-files.ts packages/cli/src/commands/dev-session-engine.ts packages/cli/src/commands/dev-session.types.ts packages/cli/src/commands/dev-watch.ts packages/cli/src/dev-snapshot/snapshot-commerce-eligibility.ts packages/cli/src/dev-snapshot/snapshot-default-eligibility.ts packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts packages/cli/src/dev-snapshot/snapshot-eligibility.schemas.ts packages/cli/src/dev-snapshot/snapshot-eligibility.ts packages/cli/src/dev-snapshot/snapshot-epoch-path.ts packages/cli/src/dev-snapshot/snapshot-hash-worker.ts packages/cli/src/dev-snapshot/snapshot-input-watch.ts packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts packages/cli/src/dev-snapshot/snapshot-sqlite-eligibility.ts packages/cli/src/dev-snapshot/snapshot.schemas.ts packages/cli/src/services/dev-environment.schemas.ts packages/cli/src/services/dev-environment.service.ts packages/cli/src/services/dev-environment.types.ts packages/cli/src/services/dev-supervisor.service.ts packages/cli/tests/dev-environment/recovery-cycles.ts packages/cli/tests/dev-environment/recovery-process.ts packages/cli/tests/dev-environment/recovery.probe.ts packages/cli/tests/dev-environment/recovery.types.ts packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts packages/cli/tests/dev-snapshot/commerce-project-eligibility.test.ts packages/cli/tests/dev-snapshot/template-compatibility.test.ts packages/cli/tests/services/dev-environment-errors.test.ts packages/cli/tests/services/dev-environment-native.test.ts packages/cli/tests/services/dev-environment-values.test.ts packages/cli/tests/services/dev-invocation-environment.test.ts packages/cli/tests/services/dev-support-fixture.ts packages/cli/tests/services/source-watch-fixture.ts packages/cli/tests/services/source-watch-synchronous.test.ts packages/cli/tests/services/source-watch.test.ts packages/create-relkit/src/create-capabilities.ts packages/create-relkit/src/render-database-sources.ts packages/create-relkit/src/render-database.ts packages/supervisor/src/candidate-process.ts packages/supervisor/tests/compatibility/environment.test.ts templates/default/v1/agent/tsconfig.json templates/default/v1/api/tsconfig.json templates/default/v1/fullstack/tsconfig.json templates/default/v1/minimal/tsconfig.json templates/default/v1/tasks/tsconfig.json tests/generator/sqlite-app-tooling.test.ts tests/generator/sqlite-path-typing.test.ts tests/generator/sqlite-state-path.test.ts tests/integration/fixtures/paired-commerce-project.ts tests/unit/paired-commerce-project.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "32-observability",
+        "status": "passed",
+        "command": "bun scripts/check-observability-sinks.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/full-suite-results.jsonl"
+      },
+      {
+        "name": "affected-create-package-after-path-fix",
+        "status": "passed",
+        "command": "bun x --bun vitest run --config packages/create-relkit/vitest.config.ts --maxWorkers=1",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/affected-create-package.log"
+      }
+    ],
+    "limitations": [
+      "Local verification only; cloud acceptance and declared opt-in environment/platform tests remain skipped.",
+      "Stryker793 result retained only after all 80 recorded source/test contents matched current bytes; every other suite stage reran.",
+      "Performance samples refer to the exact packed artifact hashes recorded in the local certificate, not hosted CI or a published release."
+    ],
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "bun test packages/cli/tests/dev-snapshot/template-compatibility.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Current generated roots and route paths are accepted",
+        "output": "evidence/001/unit-before.log"
+      },
+      "after": {
+        "status": "passed",
+        "command": "bun test packages/cli/tests/dev-snapshot/template-compatibility.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Five compatibility, native-worker/watch and containment regressions pass",
+        "output": "evidence/001/unit-after.log"
+      }
+    },
+    "runtime": {
+      "kind": "integration",
+      "reason": "The owning finite preparation command has no HTTP API; its prepared backend is checked additionally through HTTP.",
+      "boundary": "Actual CLI preparation -> source/config inventory -> eligibility -> native hash worker -> receipt publication",
+      "dependencies": [
+        "Actual source CLI",
+        "Physically contained installed minimal app",
+        "Pinned Bun and real filesystem"
+      ],
+      "steps": [
+        "Prepare current two-file tsconfig",
+        "Prepare authored parameter route",
+        "Start prepared backend and assert exact handler outputs",
+        "Reject extra compiler root without replacing receipt",
+        "Join shutdown and assert listener closure"
+      ],
+      "before": {
+        "status": "failed",
+        "command": "bun test-results/full-suite-20261016/snapshot-compatibility.probe.ts before",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Both legal preparation cases succeed",
+        "output": "evidence/001/runtime-before.log"
+      },
+      "after": {
+        "status": "passed",
+        "command": "bun test-results/full-suite-20261016/snapshot-compatibility.probe.ts after",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Both same preparation cases succeed",
+        "output": "evidence/001/runtime-after.log"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "bun test-results/full-suite-20261016/snapshot-compatibility.probe.ts smoke",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Final native prepared backend serves exact handler and parameter outputs; extra-root rejection preserves receipt; owned listener closes",
+      "output": "evidence/001/prepared-http-result.log"
+    },
+    "regressions": [
+      {
+        "status": "passed",
+        "command": "bun test-results/full-suite-20261016/snapshot-compatibility.probe.ts smoke",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Final native prepared backend serves exact handler and parameter outputs; extra-root rejection preserves receipt; owned listener closes",
+        "output": "evidence/001/prepared-http-result.log",
+        "kind": "api",
+        "boundary": "Prepared native session -> HTTP routing -> actual handler"
+      },
+      {
+        "status": "passed",
+        "command": "bun test-results/full-suite-20261016/snapshot-compatibility.probe.ts smoke",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Final native prepared backend serves exact handler and parameter outputs; extra-root rejection preserves receipt; owned listener closes",
+        "output": "evidence/001/prepared-http-result.log",
+        "kind": "integration",
+        "boundary": "Actual CLI closed-root rejection -> preserved prior receipt and joined cleanup"
+      }
+    ]
+  },
+  "notes": [
+    "The native CLI preparation is the owning non-HTTP workflow; the prepared server is an additional HTTP consumer proof.",
+    "Commerce initially remained ineligible at compilation.dynamic after path/config repair. The separately reproduced bounded extension in bf-d830c3c555dba675790aa029 now activates actual prepared commerce and passes its 16-case recovery matrix. Full final framework validation remains in progress.",
+    "An initial smoke observation expected an internal operation name absent from human log formatting. Exact HTTP assertions had passed; the harness now records the actual owned backend command to prove the prepared path.",
+    "Tasks starter has a separately unsupported discovery shape; it was not included in the canonical eligibility expectation and no guard was relaxed."
+  ]
+}

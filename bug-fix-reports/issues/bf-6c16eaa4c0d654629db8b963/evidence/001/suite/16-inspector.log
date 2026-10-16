@@ -1,0 +1,50 @@
+$ bun test ./tests/inspector
+bun test v1.3.10 (30e609e0)
+
+tests/inspector/job-name-filters.test.ts:
+(pass) Inspector job name filters > resolves names before bounded native queries [23.10ms]
+(pass) Inspector job name filters > rejects a cursor after a filter change [11.52ms]
+(pass) Inspector job name filters > rejects browser-controlled scope filters before native listing [2.55ms]
+
+tests/inspector/fixture-backend.test.ts:
+(pass) deterministic inspector fixture backend > serves the versioned graph, collections, and redacted source metadata [93.10ms]
+(pass) deterministic inspector fixture backend > keeps active identity while exposing a deterministic invalid candidate [6.05ms]
+(pass) deterministic inspector fixture backend > applies a local dead-letter retry through the protected action contract [9.84ms]
+[20:31:48.169] INFO (#3013): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 27.356625,
+}
+[20:31:48.268] INFO (#3082): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 98.091417,
+}
+[20:31:48.281] INFO (#3572): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 12.352875,
+}
+[20:31:48.328] INFO (#3630): Execution operation completed {
+  domain: "client",
+  operation: "rpc.invoke",
+  outcome: "success",
+  duration_ms: 47.297125,
+}
+(pass) deterministic inspector fixture backend > streams todo and tool state through a durable human-input resume [188.50ms]
+
+tests/inspector/inspector-scans.test.ts:
+(pass) inspector protocol boundary scans > keeps imports and network access behind the local protocol clients [179.31ms]
+(pass) inspector protocol boundary scans > detects forbidden handler, provider, and secret payloads [0.31ms]
+
+tests/inspector/generated-runtime-wiring.test.ts:
+(pass) generated host connects event runtime inspection [4.14ms]
+(pass) generated host projects bucket binding features [4.46ms]
+
+ 11 pass
+ 0 fail
+ 42 expect() calls
+Ran 11 tests across 4 files. [1020.00ms]

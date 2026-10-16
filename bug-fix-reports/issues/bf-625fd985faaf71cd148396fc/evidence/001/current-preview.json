@@ -1,0 +1,65 @@
+{
+  "status": "passed",
+  "cliPid": 69188,
+  "ownerPid": 69187,
+  "actualPreparedFastPath": true,
+  "processes": [
+    {
+      "pid": 69187,
+      "parent": 1,
+      "nice": 15,
+      "kind": "owner"
+    },
+    {
+      "pid": 69188,
+      "parent": 69187,
+      "nice": 15,
+      "kind": "cli"
+    },
+    {
+      "pid": 69206,
+      "parent": 69188,
+      "nice": 15,
+      "kind": "prepared-backend"
+    },
+    {
+      "pid": 69212,
+      "parent": 69188,
+      "nice": 15,
+      "kind": "inspector"
+    },
+    {
+      "pid": 69213,
+      "parent": 69188,
+      "nice": 15,
+      "kind": "storage-worker"
+    }
+  ],
+  "stop": "kill -TERM 69188",
+  "app": "http://127.0.0.1:3400",
+  "inspector": "http://127.0.0.1:3410",
+  "exitReceipt": "/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/evidence/dev-process-lifetime-20261016/final-preview/preview-session.json",
+  "businessChecks": {
+    "status": "passed",
+    "products": 3,
+    "revision": "v1:base",
+    "authenticated": true,
+    "cartTotalCents": 7200,
+    "historicalOrderTotalCents": 4900,
+    "independentSqliteReadBack": true,
+    "links": 3
+  },
+  "snapshotIntegrity": {
+    "status": "passed",
+    "generation": "sha256:317e000a51693740fbd1bb26620f92ffa2a53d7723d689c07028cbe2e331a7e5",
+    "snapshotCurrentBeforeAndAfterLiveRequests": true,
+    "sourceDependencyArtifactAndGraphValidation": true,
+    "cliPid": 69188,
+    "ownerPid": 69187,
+    "catalogProducts": 3,
+    "authenticated": true,
+    "cartTotalCents": 7200,
+    "historicalOrderTotalCents": 4900,
+    "liveLinks": 3
+  }
+}

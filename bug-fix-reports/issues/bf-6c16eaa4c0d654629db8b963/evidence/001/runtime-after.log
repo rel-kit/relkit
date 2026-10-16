@@ -1,0 +1,436 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/paired-commerce-layout.test.ts:
+[20:29:18.410] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.pair.root",
+  outcome: "success",
+  duration_ms: 1.246541,
+}
+[20:29:18.458] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.pair.copy",
+  outcome: "success",
+  duration_ms: 45.99025,
+}
+[20:29:18.520] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.pair.flatten",
+  outcome: "success",
+  duration_ms: 61.570167,
+}
+[20:29:22.773] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4252.521166,
+}
+[20:29:27.741] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "commerce.pair.run",
+  outcome: "success",
+  duration_ms: 9329.544916,
+}
+flat native commerce acceptance:
+bun test v1.3.10 (30e609e0)
+[20:29:27.439] INFO (#54051): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.consistency.compile",
+  outcome: "success",
+  duration_ms: 1182.063292,
+}
+[20:29:27.543] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.graph",
+  outcome: "success",
+  duration_ms: 17.855208,
+}
+[20:29:27.553] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.manifest",
+  outcome: "success",
+  duration_ms: 9.904209,
+}
+[20:29:27.594] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.publish",
+  outcome: "success",
+  duration_ms: 13.771208,
+}
+[20:29:27.613] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.publish",
+  outcome: "success",
+  duration_ms: 18.799292,
+}
+[20:29:27.628] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.delivery",
+  outcome: "success",
+  duration_ms: 14.081084,
+}
+[20:29:27.643] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.delivery",
+  outcome: "success",
+  duration_ms: 15.452333,
+}
+[20:29:27.644] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.738958,
+}
+[20:29:27.645] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.384791,
+}
+[20:29:27.645] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.243458,
+}
+[20:29:27.645] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.259667,
+}
+[20:29:27.645] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.2355,
+}
+[20:29:27.647] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.invalid",
+  outcome: "failure",
+  duration_ms: 1.411541,
+}
+[20:29:27.659] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.errors.declared",
+  outcome: "success",
+  duration_ms: 11.58375,
+}
+[20:29:27.660] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.errors.validation",
+  outcome: "success",
+  duration_ms: 1.252583,
+}
+[20:29:27.661] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.close",
+  outcome: "success",
+  duration_ms: 1.123041,
+}
+[20:29:27.679] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.original",
+  outcome: "success",
+  duration_ms: 1.148125,
+}
+[20:29:27.679] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.manifest",
+  outcome: "success",
+  duration_ms: 0.12525,
+}
+[20:29:27.685] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.submit",
+  outcome: "success",
+  duration_ms: 4.509541,
+}
+[20:29:27.686] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.accept",
+  outcome: "success",
+  duration_ms: 0.288458,
+}
+[20:29:27.687] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.incompatible",
+  outcome: "success",
+  duration_ms: 0.78925,
+}
+[20:29:27.695] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.execute",
+  outcome: "success",
+  duration_ms: 7.798292,
+}
+[20:29:27.695] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.complete",
+  outcome: "success",
+  duration_ms: 0.252417,
+}
+[20:29:27.695] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.close",
+  outcome: "success",
+  duration_ms: 0.110542,
+}
+
+examples/commerce/tests/http.test.ts:
+(pass) exercises file routes, inferred requests, middleware, methods, and uploads [93.33ms]
+(pass) preserves concurrent announcements [443.61ms]
+
+examples/commerce/tests/cache.test.ts:
+(pass) cached-price tutorial reads hits and reloads after expiry or deletion [58.47ms]
+
+examples/commerce/tests/tool-approvals.test.ts:
+(pass) never permits a read without a separate approval [5.51ms]
+(pass) on-write and always require a decision before cancelling [0.76ms]
+(pass) synchronous approval callbacks accept booleans or decision strings [10.55ms]
+(pass) asynchronous confirmation receives the exact action and fails closed [3.09ms]
+
+tests/integration/http/commerce-example.test.ts:
+(pass) serves the compiled commerce routes through one HTTP engine path [1463.91ms]
+
+tests/integration/agents/commerce-example.test.ts:
+(pass) commerce-example support agent > runs its native model with an explicit persistent thread without storing content [80.89ms]
+
+tests/integration/commerce-example-consistency.test.ts:
+(pass) commerce-example keeps one graph and hash across acceptance consumers [1256.58ms]
+
+tests/integration/fixtures/commerce-layout-events.test.ts:
+(pass) paired native events preserve nested publication, receiver ownership and event-only admission [135.93ms]
+
+tests/integration/fixtures/commerce-layout-tasks.test.ts:
+(pass) paired native task admission retains schedules, pinned builds and original executable ownership [17.41ms]
+
+ 12 pass
+ 0 fail
+ 98 expect() calls
+Ran 12 tests across 8 files. [4.92s]
+
+[20:29:27.756] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.pair.release",
+  outcome: "success",
+  duration_ms: 13.723458,
+}
+(pass) native commerce contracts retain flat source compatibility [9352.35ms]
+[20:29:27.757] INFO (#959): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.pair.root",
+  outcome: "success",
+  duration_ms: 0.271167,
+}
+[20:29:27.793] INFO (#960): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.pair.copy",
+  outcome: "success",
+  duration_ms: 36.5015,
+}
+[20:29:32.016] INFO (#960): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4222.825625,
+}
+[20:29:36.860] INFO (#960): Execution operation completed {
+  domain: "testing",
+  operation: "commerce.pair.run",
+  outcome: "success",
+  duration_ms: 9103.108667,
+}
+grouped native commerce acceptance:
+bun test v1.3.10 (30e609e0)
+[20:29:36.559] INFO (#54051): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.consistency.compile",
+  outcome: "success",
+  duration_ms: 1156.0085,
+}
+[20:29:36.667] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.graph",
+  outcome: "success",
+  duration_ms: 19.413292,
+}
+[20:29:36.678] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.manifest",
+  outcome: "success",
+  duration_ms: 10.773375,
+}
+[20:29:36.722] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.publish",
+  outcome: "success",
+  duration_ms: 15.924375,
+}
+[20:29:36.743] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.publish",
+  outcome: "success",
+  duration_ms: 21.392875,
+}
+[20:29:36.758] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.delivery",
+  outcome: "success",
+  duration_ms: 14.330083,
+}
+[20:29:36.775] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.delivery",
+  outcome: "success",
+  duration_ms: 16.761584,
+}
+[20:29:36.776] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.707708,
+}
+[20:29:36.776] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.277917,
+}
+[20:29:36.776] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.265375,
+}
+[20:29:36.777] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.2515,
+}
+[20:29:36.777] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.denied",
+  outcome: "failure",
+  duration_ms: 0.230041,
+}
+[20:29:36.778] ERROR (#59256): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.invalid",
+  outcome: "failure",
+  duration_ms: 1.45475,
+}
+[20:29:36.790] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.errors.declared",
+  outcome: "success",
+  duration_ms: 11.64025,
+}
+[20:29:36.792] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.errors.validation",
+  outcome: "success",
+  duration_ms: 1.455417,
+}
+[20:29:36.793] INFO (#59256): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.events.close",
+  outcome: "success",
+  duration_ms: 1.073875,
+}
+[20:29:36.811] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.original",
+  outcome: "success",
+  duration_ms: 1.119292,
+}
+[20:29:36.811] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.manifest",
+  outcome: "success",
+  duration_ms: 0.118041,
+}
+[20:29:36.816] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.submit",
+  outcome: "success",
+  duration_ms: 3.701333,
+}
+[20:29:36.817] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.accept",
+  outcome: "success",
+  duration_ms: 0.26475,
+}
+[20:29:36.817] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.incompatible",
+  outcome: "success",
+  duration_ms: 0.733584,
+}
+[20:29:36.826] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.execute",
+  outcome: "success",
+  duration_ms: 8.319917,
+}
+[20:29:36.826] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.complete",
+  outcome: "success",
+  duration_ms: 0.325875,
+}
+[20:29:36.827] INFO (#67627): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.tasks.close",
+  outcome: "success",
+  duration_ms: 0.129375,
+}
+
+examples/commerce/tests/http.test.ts:
+(pass) exercises file routes, inferred requests, middleware, methods, and uploads [91.24ms]
+(pass) preserves concurrent announcements [410.12ms]
+
+examples/commerce/tests/cache.test.ts:
+(pass) cached-price tutorial reads hits and reloads after expiry or deletion [49.74ms]
+
+examples/commerce/tests/tool-approvals.test.ts:
+(pass) never permits a read without a separate approval [5.76ms]
+(pass) on-write and always require a decision before cancelling [0.75ms]
+(pass) synchronous approval callbacks accept booleans or decision strings [8.89ms]
+(pass) asynchronous confirmation receives the exact action and fails closed [2.63ms]
+
+tests/integration/http/commerce-example.test.ts:
+(pass) serves the compiled commerce routes through one HTTP engine path [1430.37ms]
+
+tests/integration/agents/commerce-example.test.ts:
+(pass) commerce-example support agent > runs its native model with an explicit persistent thread without storing content [80.76ms]
+
+tests/integration/commerce-example-consistency.test.ts:
+(pass) commerce-example keeps one graph and hash across acceptance consumers [1236.81ms]
+
+tests/integration/fixtures/commerce-layout-events.test.ts:
+(pass) paired native events preserve nested publication, receiver ownership and event-only admission [145.39ms]
+
+tests/integration/fixtures/commerce-layout-tasks.test.ts:
+(pass) paired native task admission retains schedules, pinned builds and original executable ownership [17.40ms]
+
+ 12 pass
+ 0 fail
+ 98 expect() calls
+Ran 12 tests across 8 files. [4.81s]
+
+[20:29:36.875] INFO (#959): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.commerce.pair.release",
+  outcome: "success",
+  duration_ms: 14.071167,
+}
+(pass) native commerce contracts retain grouped source compatibility [9118.56ms]
+
+ 2 pass
+ 0 fail
+ 8 expect() calls
+Ran 2 tests across 1 file. [18.69s]

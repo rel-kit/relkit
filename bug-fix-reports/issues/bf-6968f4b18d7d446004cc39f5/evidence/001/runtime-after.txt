@@ -1,0 +1,22 @@
+[17:10:40.736] INFO (#53): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 3.770042,
+}
+[17:10:40.739] INFO (#53): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inputs",
+  outcome: "success",
+  duration_ms: 12.826875,
+}
+[17:10:40.751] ERROR (#53): Execution operation failed {
+  domain: "cli",
+  operation: "dev.snapshot.prepare",
+  outcome: "failure",
+  duration_ms: 29.140959,
+}
+Development snapshot ineligible during compilation.dynamic.
+
+native preparation exit: 1
+PASS native CLI rejects ambient asTool construction and publishes no snapshot

@@ -1,0 +1,21 @@
+{
+  "priorCliPid": 55765,
+  "priorInspectorPid": 55817,
+  "priorToolSession": 23250,
+  "launchRiyadh": "2026-10-16 01:35:42",
+  "launch": "foreground exec_command, non-PTY default, bun run dev, bounded env, nice15, stdout and stderr redirected to dev.log",
+  "lastApplicationLogRiyadh": "2026-10-16 02:43:30",
+  "lastApplicationEvent": "GET / -> 200 after successful authenticated cart and order requests",
+  "originalLogSha256": "e1791757f0e3868ce7ed4b0bac3fbae81a4a643872a47163305c574cbc7f9e6a",
+  "logContainsShutdown": false,
+  "originalOwningChatToolPoll": "Unknown process id 23250; no retained exit code or signal",
+  "diagnosticReports": "No contemporaneous Bun crash report found; node13:17 report PID13398 is not prior CLI or recorded inspector",
+  "hostLogObservation": "Desktop instance1355 logged through11:28Riyadh; instance90331 spawned codex90769 at12:39:28Riyadh. No log tied termination to CLI55765. Rotation at03:00 is not proof of a restart.",
+  "currentAppCliPid": 47312,
+  "currentAppParentPid": 1,
+  "limitations": [
+    "Exact shutdown time and sender/signal unavailable",
+    "Host log query timed out after18seconds",
+    "No claim that app/server restart, terminal hangup, OOM, or recovery caused original shutdown"
+  ]
+}

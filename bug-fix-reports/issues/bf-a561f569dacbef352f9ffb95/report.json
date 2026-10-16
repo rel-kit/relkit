@@ -1,0 +1,305 @@
+{
+  "schema_version": 1,
+  "id": "bf-a561f569dacbef352f9ffb95",
+  "fingerprint": "a561f569dacbef352f9ffb95296939e281995bbf6af45c00196347660473f4b5",
+  "identity": {
+    "entrypoint": "startDevSourceWatcher",
+    "module": "DevSessionEngine",
+    "symptom": "synchronous watcher admission suspends on dynamic import",
+    "scenario": "manual-session-source-and-scaffold-reloads",
+    "error": "asyncfibererror"
+  },
+  "attempt": 1,
+  "created_at": "2026-10-15T20:41:44+00:00",
+  "updated_at": "2026-10-15T21:08:23+00:00",
+  "status": "verified",
+  "what": "Manual source-watcher startup threw AsyncFiberError, blocking source and scaffold reload admission.",
+  "expected": "startDevSourceWatcher must synchronously return its owned watcher handle after a manual session has started; CLI startup must retain lazy loading and session-scoped cleanup.",
+  "observed": "A native SDK session served HTTP, but startDevSourceWatcher immediately threw because the effect it passed to runSync always awaited a dynamic import.",
+  "root_cause": "startDevSourceWatcher in dev-watch.ts ran session.nativeEngine.watch synchronously. That effect in dev-session-engine.ts begins with ownedNativePromise importing dev-watch.js, which must suspend even when the module is cached. Effect.runSync correctly rejects suspended work.",
+  "fixed_by": "Add a narrow internal watchWith operation that supplies the existing engine authorities and Scope to an already-loaded watcher effect. The synchronous facade uses it directly; the normal CLI watch effect continues importing lazily and then uses the same owner. Preserve the public watcher return type and supervisor API.",
+  "files": [
+    "packages/cli/src/commands/dev-watch.ts",
+    "packages/cli/src/commands/dev-session-engine.ts",
+    "packages/cli/src/commands/dev-session.types.ts",
+    "packages/cli/tests/services/dev-support-fixture.ts",
+    "packages/cli/tests/services/source-watch-synchronous.test.ts",
+    ".changeset/dev-environment-recovery.md"
+  ],
+  "tags": [
+    "full-suite",
+    "dev-recovery",
+    "watcher",
+    "synchronous-api",
+    "effect"
+  ],
+  "related": [
+    "bf-dd7ddbd6f31a6ea12ef97ce5",
+    "bf-6c16eaa4c0d654629db8b963"
+  ],
+  "scope": {
+    "modules": [
+      "startDevSourceWatcher",
+      "DevSessionEngine",
+      "ManualDevSessionOwner",
+      "source watcher owner"
+    ],
+    "entrypoints": [
+      "startDevSourceWatcher",
+      "bun run test:packages",
+      "bun dev"
+    ],
+    "invariants": [
+      "Manual watcher admission completes synchronously.",
+      "Watch worker and registrations share the acquired native session lifetime.",
+      "Ordinary and prepared CLI loading remains lazy and recovery preserves valid traffic.",
+      "Session shutdown joins workers and removes all owned processes and listeners."
+    ]
+  },
+  "environment": {
+    "package": "packages/cli",
+    "revision": "ebc3a2544 plus local uncommitted recovery and suite fixes",
+    "target": "macOS Bun 1.3.10 / Effect 4.0.1; actual native SDK sessions and disposable installed minimal 0.7.6 app; source CLI",
+    "api_exposed": false,
+    "e2e_available": true,
+    "monitoring": "Existing CLI generation, watcher, scaffold, runtime and cleanup diagnostics; exact HTTP handler assertions and native descendant process checks. No remote telemetry. Local Effect reference lacks core Effect.ts/tests; installed 4.0.1 implementations/examples and available Effectable tests were inspected."
+  },
+  "reproduction": [
+    "Run the complete package layer: both manual watcher and scaffold-reload tests fail with AsyncFiberError.",
+    "Run the isolated scaffold test: the session starts, then synchronous admission throws.",
+    "Add and run focused regression: initial /hello HTTP returns hello, then watcher creation fails.",
+    "Supply the already-loaded watcher effect through existing native capabilities and Scope.",
+    "Replay focused unit, native scaffold/source tests, complete package layer, and both literal bun dev CLI/HTTP matrices."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.log",
+        "note": "Native session HTTP succeeds, then synchronous watch startup fails."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/packages-before.log",
+        "note": "Full package layer contains both original failing manual watcher cases."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.log",
+        "note": "Isolated scaffold case reproduces the same AsyncFiberError."
+      }
+    ],
+    "after": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-after.log",
+        "note": "Synchronous watcher returns and native session shuts down cleanly."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-after.log",
+        "note": "Existing five scaffold, source, signal, console and listener ownership tests pass."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/packages-after.log",
+        "note": "Complete package layer passes."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/cli-replay.log",
+        "note": "Ordinary and prepared real CLI/HTTP recovery matrices pass; five descendants exit per mode."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/suite/summary.json",
+        "note": "Complete local suite and final checks pass."
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "bun test packages/cli/tests/services/source-watch-synchronous.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Native session HTTP works and manual watcher admission returns synchronously.",
+        "output": "evidence/001/unit-before.log"
+      },
+      "after": {
+        "status": "passed",
+        "command": "bun test packages/cli/tests/services/source-watch-synchronous.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Watcher handle returns synchronously, closes, and session releases its active target.",
+        "output": "evidence/001/unit-after.log"
+      }
+    },
+    "runtime": {
+      "kind": "integration",
+      "reason": "Watcher creation is a synchronous SDK operation rather than an HTTP endpoint. Native HTTP probes verify the running session and preserved traffic.",
+      "boundary": "Native Bun test -> startDev manual owner -> actual supervisor/server -> startDevSourceWatcher -> owned native source/scaffold watchers",
+      "dependencies": [
+        "Actual Effect 4.0.1 runtime and native Bun watcher/process implementations",
+        "Controlled compiler emits real readiness/HTTP servers",
+        "Actual scaffolding publication/rollback transactions in owned temporary roots"
+      ],
+      "steps": [
+        "Start the actual manual session and native backend.",
+        "Request synchronous watch admission.",
+        "Mutate source, directories, configuration and scaffold transactions.",
+        "Assert eventual native activation and joined shutdown."
+      ],
+      "before": {
+        "status": "failed",
+        "command": "bun run test:packages",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Manual watcher/scaffold admission must not suspend or throw AsyncFiberError.",
+        "output": "evidence/001/packages-before.log"
+      },
+      "after": {
+        "status": "passed",
+        "command": "bun run test:packages",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "All package cohorts, including both formerly failing native watcher cases, pass.",
+        "output": "evidence/001/packages-after.log"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "env CIRCLE_NODE_TOTAL=2 RAYON_NUM_THREADS=1 UV_THREADPOOL_SIZE=1 NEXT_TELEMETRY_DISABLED=1 nice -n 10 bun packages/cli/tests/dev-environment/recovery.probe.ts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dev-recovery-7uwlmdbu/app bug-fix-reports/issues/bf-a561f569dacbef352f9ffb95/evidence/001/cli-replay",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Both literal bun dev processes recover through environment and source invalidity without restart; HTTP bodies, latest source, retained previous service and shutdown cleanup all pass.",
+      "output": "evidence/001/cli-replay.log"
+    },
+    "regressions": [
+      {
+        "kind": "integration",
+        "boundary": "Manual native SDK source/scaffold/signal/listener behavior",
+        "status": "passed",
+        "command": "bun test packages/cli/dev-scaffold.test.ts packages/cli/dev-ownership.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Five native cases pass, including scaffold install/rollback/crash fencing and watched source changes.",
+        "output": "evidence/001/runtime-after.log"
+      },
+      {
+        "kind": "integration",
+        "boundary": "Ordinary and prepared real CLI -> compiled application HTTP",
+        "status": "passed",
+        "command": "env CIRCLE_NODE_TOTAL=2 RAYON_NUM_THREADS=1 UV_THREADPOOL_SIZE=1 NEXT_TELEMETRY_DISABLED=1 nice -n 10 bun packages/cli/tests/dev-environment/recovery.probe.ts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dev-recovery-7uwlmdbu/app bug-fix-reports/issues/bf-a561f569dacbef352f9ffb95/evidence/001/cli-replay",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Creation, edits, expansion, removal, fallback, syntax, descriptor, missing imports, deletion, config and in-flight multi-file burst recovery pass; all five owned descendants exit per mode.",
+        "output": "evidence/001/cli-replay.log"
+      }
+    ],
+    "checks": [
+      {
+        "name": "final workspace build",
+        "status": "passed",
+        "command": "bun run build",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/23-final-build.log"
+      },
+      {
+        "name": "updated full unit suite",
+        "status": "passed",
+        "command": "bun run test:unit",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/24-final-unit.log"
+      },
+      {
+        "name": "prepared startup certification",
+        "status": "passed",
+        "command": "bun test scripts/tests/dev-readiness/bootstrap-imports.test.ts scripts/tests/packed-manifest.test.ts scripts/tests/registry-cache.test.ts scripts/tests/release-command.test.ts packages/cli/tests/dev-snapshot/input-watch.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/25-certification-bun.log"
+      },
+      {
+        "name": "packed startup certification",
+        "status": "passed",
+        "command": "bun x vitest run --maxWorkers=1 scripts/tests/benchmark-packed-cleanup.test.ts scripts/tests/benchmark-packed-dev.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/26-certification-vitest.log"
+      },
+      {
+        "name": "repository guardrails and root typecheck",
+        "status": "passed",
+        "command": "bun test tests/phase0.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/27-guardrails.log"
+      },
+      {
+        "name": "lint",
+        "status": "passed",
+        "command": "bun run lint",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/28-lint.log"
+      },
+      {
+        "name": "boundaries",
+        "status": "passed",
+        "command": "bun run check",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/29-boundaries.log"
+      },
+      {
+        "name": "structure configuration",
+        "status": "passed",
+        "command": "bun run konsistent -- validate",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/30-konsistent.log"
+      },
+      {
+        "name": "changed file formatting",
+        "status": "passed",
+        "command": "bun x prettier --check tests/integration/fixtures/paired-commerce-project.ts tests/unit/paired-commerce-project.test.ts packages/cli/src/commands/dev-session-engine.ts packages/cli/src/commands/dev-session.types.ts packages/cli/src/commands/dev-watch.ts packages/cli/tests/services/dev-support-fixture.ts packages/cli/tests/services/source-watch-synchronous.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/31-format.log"
+      },
+      {
+        "name": "observability sinks",
+        "status": "passed",
+        "command": "bun scripts/check-observability-sinks.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/32-observability.log"
+      },
+      {
+        "name": "full serial local suite",
+        "status": "passed",
+        "command": "Every local stage from scripts/test-all.ts with serial orchestration and bounded nested workers",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/summary.json"
+      },
+      {
+        "name": "owned process and listener cleanup",
+        "status": "passed",
+        "command": "Python process inventory and lsof listener audit",
+        "cwd": ".",
+        "exit_code": 0,
+        "output": "evidence/001/suite/process-audit.json"
+      }
+    ],
+    "limitations": [
+      "Locally verified on macOS with Bun 1.3.10. Existing Linux, Docker, external-provider and cloud guards retain declared skips; hosted CI was not run.",
+      "This fixes the reproduced synchronous SDK failure. It does not establish the cause of every historical dev-process lockup."
+    ]
+  },
+  "notes": []
+}

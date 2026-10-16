@@ -1,0 +1,37 @@
+{
+  "key": "full-suite",
+  "matches": {
+    "bf-6c16eaa4c0d654629db8b963": {
+      "id": "bf-6c16eaa4c0d654629db8b963",
+      "status": "verified",
+      "what": "The full integration suite could not compare flat and grouped commerce layouts because flat fixture preparation rejected absent destination directories.",
+      "root_cause": "flattenCommerce in tests/integration/fixtures/paired-commerce-project.ts scanned destinations before creating them, used Bun.Glob's default dotfile exclusion, and performed that validation after the source rewrite pass.",
+      "fixed_by": "Preflight every service destination before rewriting: create absent directories, include dotfiles in residue detection, and reject authored collisions. Five filesystem regressions and both maintained native commerce acceptance layouts pass.",
+      "files": [
+        "tests/integration/fixtures/paired-commerce-project.ts",
+        "tests/unit/paired-commerce-project.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:07:51+00:00",
+      "report": "bug-fix-reports/issues/bf-6c16eaa4c0d654629db8b963/report.md"
+    },
+    "bf-a561f569dacbef352f9ffb95": {
+      "id": "bf-a561f569dacbef352f9ffb95",
+      "status": "verified",
+      "what": "Manual source-watcher startup threw AsyncFiberError, blocking source and scaffold reload admission.",
+      "root_cause": "startDevSourceWatcher in dev-watch.ts ran session.nativeEngine.watch synchronously. That effect in dev-session-engine.ts begins with ownedNativePromise importing dev-watch.js, which must suspend even when the module is cached. Effect.runSync correctly rejects suspended work.",
+      "fixed_by": "Add a narrow internal watchWith operation that supplies the existing engine authorities and Scope to an already-loaded watcher effect. The synchronous facade uses it directly; the normal CLI watch effect continues importing lazily and then uses the same owner. Preserve the public watcher return type and supervisor API.",
+      "files": [
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/src/commands/dev-session-engine.ts",
+        "packages/cli/src/commands/dev-session.types.ts",
+        "packages/cli/tests/services/dev-support-fixture.ts",
+        "packages/cli/tests/services/source-watch-synchronous.test.ts",
+        ".changeset/dev-environment-recovery.md"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-15T21:08:23+00:00",
+      "report": "bug-fix-reports/issues/bf-a561f569dacbef352f9ffb95/report.md"
+    }
+  }
+}

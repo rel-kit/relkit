@@ -1,0 +1,48 @@
+bun test v1.3.10 (30e609e0)
+
+packages/supervisor/tests/compatibility/observability.test.ts:
+(pass) publishes lifecycle and diagnostics with graph hashes across generations [84.87ms]
+(pass) turns lifecycle failures into redacted diagnostic SSE records [3.41ms]
+
+packages/supervisor/tests/compatibility/verification.test.ts:
+(pass) verifies v1 API, generation, graph/manifest identity, and readiness [3.98ms]
+(pass) verification failure disposes only the candidate and preserves active state [2.71ms]
+(pass) waits for provider readiness before requesting the gated graph endpoint [14.62ms]
+(pass) rejects generation, API, readiness, and health-timeout failures [31.09ms]
+(pass) rejects a stale provider override generation before activation [0.76ms]
+
+packages/supervisor/tests/compatibility/drain.test.ts:
+(pass) waits for prior work, then closes the candidate and providers exactly once [2.98ms]
+(pass) aborts remaining work at the deadline and still bounds cleanup [8.20ms]
+(pass) finishes the 13.2 drain transition without replacing the active token [2.30ms]
+
+packages/supervisor/tests/compatibility/candidate.test.ts:
+(pass) completed candidate shutdown releases its long kill timer [78.97ms]
+(pass) starts a token-scoped Bun backend on a dynamic port and disposes only itself [23.51ms]
+(pass) cleans a failed compile without touching the active generation [2.13ms]
+(pass) bounds startup output before logging and retaining it [60.20ms]
+
+packages/supervisor/tests/compatibility/watcher.test.ts:
+(pass) debounces source changes and compiles the newest coalesced batch [5.68ms]
+(pass) aborts and obsoletes a compile when a newer source version arrives [6.88ms]
+(pass) ignores an out-of-order source version [2.46ms]
+(pass) runs a queued change after its debounce expires during compilation [12.81ms]
+
+packages/supervisor/tests/compatibility/proxy-origin.test.ts:
+(pass) HTTP and WebSocket forwarding retain the public authority without admitting foreign origins [68.12ms]
+
+packages/supervisor/tests/compatibility/environment.test.ts:
+(pass) explicit removals drop inherited values while supervisor identity remains authoritative [0.12ms]
+
+packages/supervisor/tests/compatibility/proxy.test.ts:
+(pass) native WebSocket construction failure releases its admitted generation prefix [2.75ms]
+(pass) forwards request and SSE metadata without buffering the response [2.06ms]
+(pass) compare-and-switch rejects stale tokens and keeps the stable port [1.79ms]
+(pass) new requests use the candidate while an admitted old request finishes [11.31ms]
+(pass) drain leases abort old proxy work and reject retired traffic [7.61ms]
+(pass) WebSocket tunnels remain pinned to the generation selected at upgrade [21.94ms]
+
+ 26 pass
+ 0 fail
+ 108 expect() calls
+Ran 26 tests across 8 files. [634.00ms]

@@ -1,0 +1,604 @@
+{
+  "status": "verified-local",
+  "scope": "Fresh sequential equivalent of every default local test:all layer, plus certification and repository gates",
+  "includesLatestSighupFix": true,
+  "completedStages": 30,
+  "plannedStages": 30,
+  "failures": 0,
+  "additionalProductFixes": 0,
+  "sourceInputs": {
+    "validated": 7213,
+    "changed": 0,
+    "new": 0,
+    "missing": 0
+  },
+  "stages": [
+    {
+      "stage": "01-build",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 203.2,
+      "log": "01-build.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "02-docs",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "x",
+        "turbo",
+        "run",
+        "check",
+        "test",
+        "--filter=@relkit/docs",
+        "--concurrency=1",
+        "--force"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 142.4,
+      "log": "02-docs.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "03-restart",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "--max-concurrency",
+        "1",
+        "./tests/restart"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 25.1,
+      "log": "03-restart.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "04-jobs-coverage",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "test:jobs:coverage"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 21.1,
+      "log": "04-jobs-coverage.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "05-jobs-mutation",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "x",
+        "stryker",
+        "run",
+        "scripts/jobs-coverage/stryker.config.mjs",
+        "--concurrency",
+        "1"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 767.9,
+      "log": "05-jobs-mutation.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "06-mutation-verification",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "scripts/jobs-coverage/verify-mutation.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.0,
+      "log": "06-mutation-verification.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "07-e2e-inspector",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "x",
+        "playwright",
+        "test",
+        "--workers=1",
+        "--output=test-results/inspector"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 66.9,
+      "log": "07-e2e-inspector.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "08-e2e-commerce",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "x",
+        "playwright",
+        "test",
+        "--config=playwright.commerce.config.ts",
+        "--workers=1",
+        "--output=test-results/commerce"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 19.1,
+      "log": "08-e2e-commerce.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "09-jobs-matrix",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "test:jobs:matrix"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.0,
+      "log": "09-jobs-matrix.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "10-types",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "test:types"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.0,
+      "log": "10-types.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "11-unit",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "--max-concurrency",
+        "1",
+        "./tests/unit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.0,
+      "log": "11-unit.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "12-compiler",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "--max-concurrency",
+        "1",
+        "--timeout",
+        "15000",
+        "./tests/compiler"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 39.9,
+      "log": "12-compiler.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "13-graph",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "x",
+        "vitest",
+        "run",
+        "--config",
+        "packages/graph/vitest.config.ts",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.0,
+      "log": "13-graph.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "14-contracts",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "--max-concurrency",
+        "1",
+        "./tests/contracts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.0,
+      "log": "14-contracts.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "15-integration",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "--max-concurrency",
+        "1",
+        "./tests/integration"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 117.7,
+      "log": "15-integration.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "16-inspector",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "--max-concurrency",
+        "1",
+        "./tests/inspector"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.0,
+      "log": "16-inspector.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "17-container",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "--max-concurrency",
+        "1",
+        "./tests/container"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.0,
+      "log": "17-container.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "18-security",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "--max-concurrency",
+        "1",
+        "./tests/security"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 6.0,
+      "log": "18-security.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "19-deployment",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "--max-concurrency",
+        "1",
+        "./tests/deployment"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.0,
+      "log": "19-deployment.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "20-examples",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "test:examples",
+        "--force"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 129.7,
+      "log": "20-examples.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "21-packages",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "test:packages"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 489.9,
+      "log": "21-packages.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "22-generator",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "test:generator"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 234.4,
+      "log": "22-generator.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "25-certification-bun",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "scripts/tests/dev-readiness/bootstrap-imports.test.ts",
+        "scripts/tests/packed-manifest.test.ts",
+        "scripts/tests/registry-cache.test.ts",
+        "scripts/tests/release-command.test.ts",
+        "packages/cli/tests/dev-snapshot/input-watch.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.0,
+      "log": "25-certification-bun.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "26-certification-vitest",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "x",
+        "vitest",
+        "run",
+        "--maxWorkers=1",
+        "scripts/tests/benchmark-packed-cleanup.test.ts",
+        "scripts/tests/benchmark-packed-dev.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.0,
+      "log": "26-certification-vitest.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "27-guardrails",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "test",
+        "tests/phase0.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 81.5,
+      "log": "27-guardrails.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "28-lint",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.0,
+      "log": "28-lint.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "29-boundaries",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "check"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.0,
+      "log": "29-boundaries.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "30-konsistent",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "run",
+        "konsistent",
+        "--",
+        "validate"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.0,
+      "log": "30-konsistent.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "31-format",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "x",
+        "prettier",
+        "--check",
+        ".changeset/dev-environment-recovery.md",
+        ".changeset/prepared-commerce-eligibility.md",
+        ".changeset/prepared-dev-hangup-cleanup.md",
+        ".changeset/prepared-template-compatibility.md",
+        ".changeset/sqlite-app-tooling.md",
+        "apps/docs/content/docs/fundamentals/environment.mdx",
+        "docs/evidence/create-capabilities/0.7.6/fresh.json",
+        "docs/evidence/create-capabilities/0.7.6/restart.json",
+        "packages/cli/src/cli-errors.ts",
+        "packages/cli/src/commands/build-server-invocation.ts",
+        "packages/cli/src/commands/dev-environment-files.ts",
+        "packages/cli/src/commands/dev-session-engine.ts",
+        "packages/cli/src/commands/dev-session.types.ts",
+        "packages/cli/src/commands/dev-watch.ts",
+        "packages/cli/src/dev-snapshot/snapshot-commerce-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-default-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility-expressions.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.schemas.ts",
+        "packages/cli/src/dev-snapshot/snapshot-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot-epoch-path.ts",
+        "packages/cli/src/dev-snapshot/snapshot-hash-worker.ts",
+        "packages/cli/src/dev-snapshot/snapshot-input-watch.ts",
+        "packages/cli/src/dev-snapshot/snapshot-preparation-guards.ts",
+        "packages/cli/src/dev-snapshot/snapshot-sqlite-eligibility.ts",
+        "packages/cli/src/dev-snapshot/snapshot.schemas.ts",
+        "packages/cli/src/invocation-signals.ts",
+        "packages/cli/src/main-support-types.ts",
+        "packages/cli/src/main-support.ts",
+        "packages/cli/src/services/dev-environment.schemas.ts",
+        "packages/cli/src/services/dev-environment.service.ts",
+        "packages/cli/src/services/dev-environment.types.ts",
+        "packages/cli/src/services/dev-supervisor.service.ts",
+        "packages/cli/tests/dev-environment/recovery-cycles.ts",
+        "packages/cli/tests/dev-environment/recovery-process.ts",
+        "packages/cli/tests/dev-environment/recovery.probe.ts",
+        "packages/cli/tests/dev-environment/recovery.types.ts",
+        "packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts",
+        "packages/cli/tests/dev-snapshot/commerce-project-eligibility.test.ts",
+        "packages/cli/tests/dev-snapshot/template-compatibility.test.ts",
+        "packages/cli/tests/invocation/signals.test.ts",
+        "packages/cli/tests/services/dev-environment-errors.test.ts",
+        "packages/cli/tests/services/dev-environment-native.test.ts",
+        "packages/cli/tests/services/dev-environment-values.test.ts",
+        "packages/cli/tests/services/dev-initial-native.test.ts",
+        "packages/cli/tests/services/dev-invocation-environment.test.ts",
+        "packages/cli/tests/services/dev-support-fixture.ts",
+        "packages/cli/tests/services/source-watch-fixture.ts",
+        "packages/cli/tests/services/source-watch-synchronous.test.ts",
+        "packages/cli/tests/services/source-watch.test.ts",
+        "packages/create-relkit/src/create-capabilities.ts",
+        "packages/create-relkit/src/render-database-sources.ts",
+        "packages/create-relkit/src/render-database.ts",
+        "packages/supervisor/src/candidate-process.ts",
+        "packages/supervisor/tests/compatibility/environment.test.ts",
+        "templates/default/v1/agent/tsconfig.json",
+        "templates/default/v1/api/tsconfig.json",
+        "templates/default/v1/fullstack/tsconfig.json",
+        "templates/default/v1/minimal/tsconfig.json",
+        "templates/default/v1/tasks/tsconfig.json",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        "tests/generator/sqlite-path-typing.test.ts",
+        "tests/generator/sqlite-state-path.test.ts",
+        "tests/integration/fixtures/paired-commerce-project.ts",
+        "tests/unit/paired-commerce-project.test.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.0,
+      "log": "31-format.a1.log",
+      "resourceBackoff": false
+    },
+    {
+      "stage": "32-observability",
+      "attempt": 1,
+      "command": [
+        "bun",
+        "scripts/check-observability-sinks.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.0,
+      "log": "32-observability.a1.log",
+      "resourceBackoff": false
+    }
+  ],
+  "elapsedSeconds": 2403.8,
+  "mutation": {
+    "mutants": 793,
+    "statuses": {
+      "NoCoverage": 17,
+      "Killed": 501,
+      "Survived": 268,
+      "Timeout": 7
+    },
+    "existingSemanticGatePassed": true,
+    "allMutantsKilled": false,
+    "report": "fresh-mutation.json"
+  },
+  "browser": {
+    "inspectorPassed": 31,
+    "commercePassed": 2,
+    "commerceDeclaredSkip": 1
+  },
+  "packageMainVitest": {
+    "passed": 2777,
+    "declaredSkips": 5
+  },
+  "processAudit": {
+    "status": "passed",
+    "observedOwnedProcesses": 251,
+    "ownedProcessesRemaining": 0,
+    "runnerAndObserverExited": true,
+    "testListenersClosed": [
+      3010,
+      4010,
+      3211,
+      3212
+    ],
+    "ownedMutationSandboxRemoved": true,
+    "mutationSandboxNeededManualCleanup": false,
+    "newSourceInputs": []
+  },
+  "commerce": {
+    "cliPid": 69188,
+    "ownerPid": 69187,
+    "sameCliThroughoutFullSuite": true,
+    "manualRestartsDuringFullSuite": 0,
+    "integrity": {
+      "status": "passed",
+      "generation": "sha256:317e000a51693740fbd1bb26620f92ffa2a53d7723d689c07028cbe2e331a7e5",
+      "snapshotCurrentBeforeAndAfterLiveRequests": true,
+      "sourceDependencyArtifactAndGraphValidation": true,
+      "cliPid": 69188,
+      "ownerPid": 69187,
+      "catalogProducts": 3,
+      "authenticated": true,
+      "cartTotalCents": 7200,
+      "historicalOrderTotalCents": 4900,
+      "liveLinks": 3
+    },
+    "business": {
+      "status": "passed",
+      "products": 3,
+      "revision": "v1:base",
+      "authenticated": true,
+      "cartTotalCents": 7200,
+      "historicalOrderTotalCents": 4900,
+      "independentSqliteReadBack": true,
+      "links": 3
+    },
+    "shop": "http://127.0.0.1:3400",
+    "inspector": "http://127.0.0.1:3410",
+    "stop": "kill -TERM 69188",
+    "exitReceipt": "/Users/mustafaelsayed/Workspace/typescripts/relkit-ecommerce-lab/.relkit/evidence/dev-process-lifetime-20261016/final-preview/preview-session.json"
+  },
+  "git": {
+    "head": "ebc3a2544ad5521016fd9efc8db3ff1930a3fb75",
+    "stagedPaths": 0,
+    "uncommitted": true
+  },
+  "privateValuesLogged": false,
+  "limitations": [
+    "Cloud acceptance and other declared opt-in/platform/provider/Docker cases retain their default skips; no cloud spend or hosted CI run.",
+    "The mutation semantic gate passes with268 surviving and17 no-coverage mutants; it does not claim all mutants were killed.",
+    "Process observation captured251 suite-owned processes from the package stage onward; native suite cleanup assertions and final closed test listeners provide additional cleanup evidence.",
+    "An auxiliary cleanup guard initially omitted Next root-params declarations. Its assertion failed before any restore; the known generated-import allowlist was corrected, exact initial bytes restored through the repository helper, and scoped inspector typecheck passed. Before log retained."
+  ]
+}

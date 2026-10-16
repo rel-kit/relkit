@@ -1,0 +1,13 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/paired-commerce-project.test.ts:
+(pass) commerce flattening creates an absent destination and preserves service bytes [8.41ms]
+(pass) commerce flattening accepts an existing empty destination [2.06ms]
+(pass) commerce flattening rejects and preserves existing destination content: keep.txt [1.86ms]
+(pass) commerce flattening rejects and preserves existing destination content: .keep [1.24ms]
+(pass) commerce flattening rejects collisions before rewriting authored imports [1.40ms]
+
+ 5 pass
+ 0 fail
+ 10 expect() calls
+Ran 5 tests across 1 file. [174.00ms]

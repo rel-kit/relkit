@@ -1,0 +1,3615 @@
+$ bun run scripts/test-generator.ts
+generator strict services: 1.9s
+[23:56:55.021] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 1857.409666,
+}
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  10 passed (10)
+      Tests  28 passed (28)
+   Start at  23:56:55
+   Duration  6.21s (tests 58%, import 23%, transform 19%, worker 1%)
+
+    Isolate  10 workers spawned · ~48ms startup each (spawn + environment, per file)
+             at least ~430ms faster with isolate: false — reuses workers across files instead of one per file
+
+generator Effect services: 6.5s
+[23:57:01.536] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 6513.791333,
+}
+bun test v1.3.10 (30e609e0)
+[20:57:01.864] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.116667,
+}
+[20:57:01.866] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.980375,
+}
+[20:57:01.879] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 12.25875,
+}
+[20:57:01.969] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 90.570375,
+}
+[20:57:01.970] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.409625,
+}
+[20:57:01.970] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.162666,
+}
+[20:57:01.971] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.118084,
+}
+[20:57:01.971] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.128458,
+}
+[20:57:01.971] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.106625,
+}
+[20:57:01.971] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.187542,
+}
+[20:57:01.971] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.121875,
+}
+[20:57:01.971] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.10225,
+}
+[20:57:01.972] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.130083,
+}
+[20:57:01.972] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.247583,
+}
+[20:57:01.972] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.129458,
+}
+[20:57:01.972] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.13525,
+}
+[20:57:01.973] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.215,
+}
+[20:57:04.372] INFO (#1053): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.288541,
+}
+[20:57:04.374] INFO (#1053): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.894083,
+}
+[20:57:04.376] INFO (#1053): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.692208,
+}
+[20:57:04.430] INFO (#1055): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 53.650875,
+}
+[20:57:04.430] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.274459,
+}
+[20:57:04.431] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.163375,
+}
+[20:57:04.431] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.173417,
+}
+[20:57:04.431] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.158334,
+}
+[20:57:04.431] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.120375,
+}
+[20:57:04.431] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.16675,
+}
+[20:57:04.432] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.112875,
+}
+[20:57:04.432] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.116583,
+}
+[20:57:04.432] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.179292,
+}
+[20:57:04.432] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.313958,
+}
+[20:57:04.433] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.18725,
+}
+[20:57:04.433] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.163208,
+}
+[20:57:04.433] INFO (#1106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.182958,
+}
+[20:57:06.495] INFO (#2218): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.266959,
+}
+[20:57:06.496] INFO (#2218): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.814334,
+}
+[20:57:06.499] INFO (#2218): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.093125,
+}
+[20:57:06.538] INFO (#2220): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 39.068917,
+}
+[20:57:06.539] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.252584,
+}
+[20:57:06.539] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126417,
+}
+[20:57:06.539] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1985,
+}
+[20:57:06.539] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.179334,
+}
+[20:57:06.540] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122667,
+}
+[20:57:06.540] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105917,
+}
+[20:57:06.540] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.110375,
+}
+[20:57:06.540] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.21875,
+}
+[20:57:06.540] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.229333,
+}
+[20:57:06.541] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.2135,
+}
+[20:57:06.541] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.205375,
+}
+[20:57:06.541] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.14925,
+}
+[20:57:06.541] INFO (#2261): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.222708,
+}
+[20:57:08.921] INFO (#3301): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.318334,
+}
+[20:57:08.922] INFO (#3301): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.991708,
+}
+[20:57:08.925] INFO (#3301): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.29575,
+}
+[20:57:08.962] INFO (#3303): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 36.718625,
+}
+[20:57:08.962] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.2105,
+}
+[20:57:08.962] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1035,
+}
+[20:57:08.962] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.098583,
+}
+[20:57:08.963] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1135,
+}
+[20:57:08.963] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1005,
+}
+[20:57:08.963] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09175,
+}
+[20:57:08.963] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.11825,
+}
+[20:57:08.963] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.107417,
+}
+[20:57:08.963] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.093166,
+}
+[20:57:08.963] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.148125,
+}
+[20:57:08.963] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099375,
+}
+[20:57:08.964] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.097458,
+}
+[20:57:08.964] INFO (#3344): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.13775,
+}
+[20:57:11.079] INFO (#4384): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.874666,
+}
+[20:57:11.086] INFO (#4384): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.5765,
+}
+[20:57:11.092] INFO (#4384): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.392166,
+}
+[20:57:11.098] INFO (#4384): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.977417,
+}
+
+tests/generator/add-kind-acceptance.test.ts:
+
+tests/generator/add-acceptance.test.ts:
+
+tests/generator/add-platform-acceptance.test.ts:
+
+tests/generator/add-resource-acceptance.test.ts:
+
+tests/generator/add-bundle-acceptance.test.ts:
+(pass) the full bundle compiles in every starter and preserves its graph relationships [9237.54ms]
+
+ 1 pass
+ 8 filtered out
+ 0 fail
+ 24 expect() calls
+Ran 1 test across 5 files. [9.56s]
+acceptance compilation: the full bundle: 9.6s
+[23:57:11.120] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 9582.823083,
+}
+bun test v1.3.10 (30e609e0)
+[20:57:11.437] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.006792,
+}
+[20:57:11.438] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.721667,
+}
+[20:57:11.451] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 12.713375,
+}
+[20:57:11.495] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 44.295042,
+}
+[20:57:11.513] INFO (#78): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 17.966459,
+}
+[20:57:11.530] INFO (#94): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 16.432875,
+}
+[20:57:11.555] INFO (#112): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.9185,
+}
+[20:57:11.583] INFO (#143): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 28.009667,
+}
+[20:57:11.584] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.480166,
+}
+[20:57:11.584] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.131542,
+}
+[20:57:11.584] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.128667,
+}
+[20:57:11.585] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.102,
+}
+[20:57:11.585] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.135209,
+}
+[20:57:11.585] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.11,
+}
+[20:57:11.585] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.166542,
+}
+[20:57:11.585] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.167416,
+}
+[20:57:11.586] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.197209,
+}
+[20:57:11.586] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.208292,
+}
+[20:57:11.586] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.153542,
+}
+[20:57:11.586] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.135792,
+}
+[20:57:11.586] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.167458,
+}
+[20:57:13.667] INFO (#502): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.227542,
+}
+[20:57:13.668] INFO (#502): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.854,
+}
+[20:57:13.670] INFO (#502): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.367292,
+}
+[20:57:13.695] INFO (#504): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 25.019083,
+}
+[20:57:13.719] INFO (#533): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.306917,
+}
+[20:57:13.744] INFO (#563): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.888625,
+}
+[20:57:13.776] INFO (#595): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.98325,
+}
+[20:57:13.812] INFO (#640): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 36.362458,
+}
+[20:57:13.813] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.332,
+}
+[20:57:13.813] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.133542,
+}
+[20:57:13.813] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.118375,
+}
+[20:57:13.813] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.116625,
+}
+[20:57:13.813] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.104208,
+}
+[20:57:13.814] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.097417,
+}
+[20:57:13.814] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09525,
+}
+[20:57:13.814] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.120583,
+}
+[20:57:13.814] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105417,
+}
+[20:57:13.814] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.16425,
+}
+[20:57:13.814] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.120625,
+}
+[20:57:13.814] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099333,
+}
+[20:57:13.815] INFO (#689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.370458,
+}
+[20:57:15.698] INFO (#1240): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.149166,
+}
+[20:57:15.698] INFO (#1240): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.732625,
+}
+[20:57:15.701] INFO (#1240): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.774166,
+}
+[20:57:15.721] INFO (#1242): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 20.085458,
+}
+[20:57:15.741] INFO (#1263): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 19.930791,
+}
+[20:57:15.761] INFO (#1285): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 19.360209,
+}
+[20:57:15.788] INFO (#1309): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.182375,
+}
+[20:57:15.815] INFO (#1346): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.23725,
+}
+[20:57:15.816] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.569292,
+}
+[20:57:15.816] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.248875,
+}
+[20:57:15.817] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1445,
+}
+[20:57:15.817] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126875,
+}
+[20:57:15.817] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.103333,
+}
+[20:57:15.817] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.175792,
+}
+[20:57:15.817] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122625,
+}
+[20:57:15.818] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.10975,
+}
+[20:57:15.818] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105375,
+}
+[20:57:15.818] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.152875,
+}
+[20:57:15.818] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.103083,
+}
+[20:57:15.818] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092,
+}
+[20:57:15.818] INFO (#1387): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.168041,
+}
+[20:57:17.965] INFO (#1907): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.221375,
+}
+[20:57:17.966] INFO (#1907): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.930417,
+}
+[20:57:17.970] INFO (#1907): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.178916,
+}
+[20:57:17.991] INFO (#1909): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.6165,
+}
+[20:57:18.012] INFO (#1930): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 20.387833,
+}
+[20:57:18.031] INFO (#1952): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 18.907167,
+}
+[20:57:18.060] INFO (#1976): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 28.971416,
+}
+[20:57:18.089] INFO (#2013): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.072041,
+}
+[20:57:18.089] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.318417,
+}
+[20:57:18.089] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.138625,
+}
+[20:57:18.090] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.179542,
+}
+[20:57:18.090] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.134959,
+}
+[20:57:18.090] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.15075,
+}
+[20:57:18.090] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.138166,
+}
+[20:57:18.091] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.22325,
+}
+[20:57:18.091] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.200125,
+}
+[20:57:18.091] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.191333,
+}
+[20:57:18.091] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.251667,
+}
+[20:57:18.092] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.128792,
+}
+[20:57:18.092] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.115167,
+}
+[20:57:18.092] INFO (#2054): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.143792,
+}
+[20:57:20.551] INFO (#2542): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 7.204833,
+}
+[20:57:20.559] INFO (#2542): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 7.289208,
+}
+[20:57:20.567] INFO (#2542): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 8.231125,
+}
+[20:57:20.575] INFO (#2542): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 7.784709,
+}
+
+tests/generator/add-kind-acceptance.test.ts:
+
+tests/generator/add-acceptance.test.ts:
+
+tests/generator/add-platform-acceptance.test.ts:
+(pass) route platform and singleton additions compile in every starter [9147.07ms]
+
+tests/generator/add-resource-acceptance.test.ts:
+
+tests/generator/add-bundle-acceptance.test.ts:
+
+ 1 pass
+ 8 filtered out
+ 0 fail
+ 20 expect() calls
+Ran 1 test across 5 files. [9.46s]
+acceptance compilation: route platform: 9.5s
+[23:57:20.616] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 9495.376334,
+}
+bun test v1.3.10 (30e609e0)
+[20:57:20.996] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.751584,
+}
+[20:57:20.999] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.246416,
+}
+[20:57:21.014] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 15.530042,
+}
+[20:57:21.076] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 61.164417,
+}
+[20:57:21.077] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.526792,
+}
+[20:57:21.077] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.16525,
+}
+[20:57:21.077] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.141875,
+}
+[20:57:21.077] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.189625,
+}
+[20:57:21.078] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.14075,
+}
+[20:57:21.078] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.170084,
+}
+[20:57:21.078] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.129708,
+}
+[20:57:21.078] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126,
+}
+[20:57:21.078] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.188709,
+}
+[20:57:21.079] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.215167,
+}
+[20:57:21.079] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.151875,
+}
+[20:57:21.079] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.223959,
+}
+[20:57:21.079] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.239959,
+}
+[20:57:23.229] INFO (#311): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.179292,
+}
+[20:57:23.230] INFO (#311): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.681041,
+}
+[20:57:23.233] INFO (#311): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.131375,
+}
+[20:57:23.260] INFO (#313): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 26.995417,
+}
+[20:57:23.261] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.293584,
+}
+[20:57:23.263] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 2.49375,
+}
+[20:57:23.264] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.145667,
+}
+[20:57:23.264] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.114459,
+}
+[20:57:23.264] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.109959,
+}
+[20:57:23.264] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105541,
+}
+[20:57:23.264] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.102375,
+}
+[20:57:23.264] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1255,
+}
+[20:57:23.265] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.116791,
+}
+[20:57:23.265] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.224459,
+}
+[20:57:23.265] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.207209,
+}
+[20:57:23.265] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.172208,
+}
+[20:57:23.266] INFO (#343): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.266459,
+}
+[20:57:25.051] INFO (#616): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.211792,
+}
+[20:57:25.052] INFO (#616): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.49025,
+}
+[20:57:25.068] INFO (#616): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 4.048458,
+}
+[20:57:25.103] INFO (#618): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 35.758958,
+}
+[20:57:25.104] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.275375,
+}
+[20:57:25.104] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.213417,
+}
+[20:57:25.104] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.132959,
+}
+[20:57:25.105] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.111833,
+}
+[20:57:25.105] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.145375,
+}
+[20:57:25.105] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.101292,
+}
+[20:57:25.105] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.142667,
+}
+[20:57:25.105] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1235,
+}
+[20:57:25.105] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.099333,
+}
+[20:57:25.106] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.226042,
+}
+[20:57:25.106] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.109958,
+}
+[20:57:25.106] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.132333,
+}
+[20:57:25.106] INFO (#643): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.195792,
+}
+[20:57:27.611] INFO (#865): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.301708,
+}
+[20:57:27.612] INFO (#865): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.724708,
+}
+[20:57:27.616] INFO (#865): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.4875,
+}
+[20:57:27.647] INFO (#867): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.65325,
+}
+[20:57:27.648] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.367833,
+}
+[20:57:27.648] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.167833,
+}
+[20:57:27.648] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.139167,
+}
+[20:57:27.649] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1315,
+}
+[20:57:27.649] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1085,
+}
+[20:57:27.649] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.133167,
+}
+[20:57:27.649] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.137084,
+}
+[20:57:27.649] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.249583,
+}
+[20:57:27.650] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.238042,
+}
+[20:57:27.650] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.295584,
+}
+[20:57:27.650] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.160292,
+}
+[20:57:27.651] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.139792,
+}
+[20:57:27.651] INFO (#897): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.184333,
+}
+[20:57:30.176] INFO (#1169): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.257083,
+}
+[20:57:30.177] INFO (#1169): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.06025,
+}
+[20:57:30.183] INFO (#1169): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 6.0675,
+}
+[20:57:30.220] INFO (#1171): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 36.881208,
+}
+[20:57:30.221] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.552333,
+}
+[20:57:30.221] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.203167,
+}
+[20:57:30.221] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.182583,
+}
+[20:57:30.222] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.205792,
+}
+[20:57:30.222] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.373083,
+}
+[20:57:30.222] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.216208,
+}
+[20:57:30.223] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.216333,
+}
+[20:57:30.223] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.14525,
+}
+[20:57:30.223] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.216417,
+}
+[20:57:30.224] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.409417,
+}
+[20:57:30.224] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.5085,
+}
+[20:57:30.225] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.270875,
+}
+[20:57:30.225] INFO (#1196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.2795,
+}
+[20:57:31.947] INFO (#1418): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.222375,
+}
+[20:57:31.948] INFO (#1418): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.784417,
+}
+[20:57:31.951] INFO (#1418): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.337166,
+}
+[20:57:31.977] INFO (#1420): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 25.703,
+}
+[20:57:31.978] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.302041,
+}
+[20:57:31.978] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.118875,
+}
+[20:57:31.978] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.112917,
+}
+[20:57:31.978] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.0985,
+}
+[20:57:31.978] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090667,
+}
+[20:57:31.978] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090667,
+}
+[20:57:31.978] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.093125,
+}
+[20:57:31.978] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.089708,
+}
+[20:57:31.979] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.124708,
+}
+[20:57:31.979] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.171916,
+}
+[20:57:31.979] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.103292,
+}
+[20:57:31.979] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.094708,
+}
+[20:57:31.979] INFO (#1450): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.148417,
+}
+[20:57:33.632] INFO (#1722): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.067708,
+}
+[20:57:33.638] INFO (#1722): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.173834,
+}
+[20:57:33.645] INFO (#1722): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.773458,
+}
+[20:57:33.650] INFO (#1722): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.038083,
+}
+[20:57:33.657] INFO (#1722): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.154875,
+}
+[20:57:33.662] INFO (#1722): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.156875,
+}
+
+tests/generator/add-kind-acceptance.test.ts:
+
+tests/generator/add-acceptance.test.ts:
+
+tests/generator/add-platform-acceptance.test.ts:
+(pass) database and auth-chained schemas compile for all Bun-native dialects [12678.07ms]
+
+tests/generator/add-resource-acceptance.test.ts:
+
+tests/generator/add-bundle-acceptance.test.ts:
+
+ 1 pass
+ 8 filtered out
+ 0 fail
+ 6 expect() calls
+Ran 1 test across 5 files. [13.05s]
+acceptance compilation: database and auth: 13.1s
+[23:57:33.702] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 13085.395166,
+}
+bun test v1.3.10 (30e609e0)
+[20:57:34.053] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.140292,
+}
+[20:57:34.055] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.858584,
+}
+[20:57:34.070] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 15.308375,
+}
+[20:57:34.162] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 90.946708,
+}
+[20:57:34.363] INFO (#251): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 53.550291,
+}
+[20:57:34.363] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.350125,
+}
+[20:57:34.364] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.203,
+}
+[20:57:34.364] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.15875,
+}
+[20:57:34.364] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.124542,
+}
+[20:57:34.364] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.103958,
+}
+[20:57:34.364] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.117875,
+}
+[20:57:34.364] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.111333,
+}
+[20:57:34.365] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.281292,
+}
+[20:57:34.365] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.217125,
+}
+[20:57:34.365] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.234667,
+}
+[20:57:34.366] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.125875,
+}
+[20:57:34.366] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.186208,
+}
+[20:57:34.366] INFO (#308): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.294792,
+}
+[20:57:36.930] INFO (#1729): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 10.418791,
+}
+
+tests/generator/add-kind-acceptance.test.ts:
+
+tests/generator/add-acceptance.test.ts:
+
+tests/generator/add-platform-acceptance.test.ts:
+
+tests/generator/add-resource-acceptance.test.ts:
+(pass) reused Docker profiles retain the post-scaffold startup reminder [2881.84ms]
+
+tests/generator/add-bundle-acceptance.test.ts:
+
+ 1 pass
+ 8 filtered out
+ 0 fail
+ 11 expect() calls
+Ran 1 test across 5 files. [3.23s]
+acceptance compilation: reused Docker profiles: 3.3s
+[23:57:36.954] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 3251.586958,
+}
+bun test v1.3.10 (30e609e0)
+[20:57:37.511] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.585458,
+}
+[20:57:37.514] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.037708,
+}
+[20:57:37.528] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 14.746291,
+}
+[20:57:37.581] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 51.930041,
+}
+[20:57:37.603] INFO (#78): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 22.191292,
+}
+[20:57:37.634] INFO (#96): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.312125,
+}
+[20:57:37.664] INFO (#122): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.743292,
+}
+[20:57:37.689] INFO (#145): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.884375,
+}
+[20:57:37.716] INFO (#169): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 26.353833,
+}
+[20:57:37.746] INFO (#196): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.930167,
+}
+[20:57:37.773] INFO (#226): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.379791,
+}
+[20:57:37.804] INFO (#262): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.466625,
+}
+[20:57:37.834] INFO (#299): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.273458,
+}
+[20:57:37.863] INFO (#333): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 28.571958,
+}
+[20:57:37.896] INFO (#371): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.399667,
+}
+[20:57:37.929] INFO (#413): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.9785,
+}
+[20:57:37.963] INFO (#459): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.539792,
+}
+[20:57:38.003] INFO (#511): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 39.594791,
+}
+[20:57:38.043] INFO (#561): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 40.179292,
+}
+[20:57:38.111] INFO (#614): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 68.420333,
+}
+[20:57:38.179] INFO (#668): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 67.808958,
+}
+[20:57:38.228] INFO (#724): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 48.990875,
+}
+[20:57:38.288] INFO (#793): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 59.6045,
+}
+[20:57:38.289] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.394083,
+}
+[20:57:38.289] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.127083,
+}
+[20:57:38.289] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.175041,
+}
+[20:57:38.290] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.149167,
+}
+[20:57:38.290] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.115333,
+}
+[20:57:38.290] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.10975,
+}
+[20:57:38.290] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1945,
+}
+[20:57:38.290] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.173917,
+}
+[20:57:38.291] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.124709,
+}
+[20:57:38.291] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.174333,
+}
+[20:57:38.291] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.19525,
+}
+[20:57:38.291] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.248833,
+}
+[20:57:38.292] INFO (#866): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.215,
+}
+[20:57:41.035] INFO (#2094): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.251459,
+}
+[20:57:41.036] INFO (#2094): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.994125,
+}
+[20:57:41.040] INFO (#2094): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.404083,
+}
+[20:57:41.068] INFO (#2096): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.907,
+}
+[20:57:41.092] INFO (#2125): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.566959,
+}
+[20:57:41.122] INFO (#2157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.4145,
+}
+[20:57:41.151] INFO (#2197): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.183542,
+}
+[20:57:41.182] INFO (#2234): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.403042,
+}
+[20:57:41.211] INFO (#2272): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 29.659083,
+}
+[20:57:41.245] INFO (#2313): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.522917,
+}
+[20:57:41.279] INFO (#2357): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 34.27125,
+}
+[20:57:41.315] INFO (#2407): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 35.04375,
+}
+[20:57:41.346] INFO (#2458): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.564333,
+}
+[20:57:41.381] INFO (#2506): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 34.758125,
+}
+[20:57:41.418] INFO (#2558): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 36.815292,
+}
+[20:57:41.454] INFO (#2614): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 36.085333,
+}
+[20:57:41.493] INFO (#2674): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 38.50875,
+}
+[20:57:41.531] INFO (#2740): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 37.8985,
+}
+[20:57:41.571] INFO (#2804): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 39.721667,
+}
+[20:57:41.611] INFO (#2871): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 40.241208,
+}
+[20:57:41.652] INFO (#2939): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 40.761084,
+}
+[20:57:41.700] INFO (#3009): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 47.952375,
+}
+[20:57:41.751] INFO (#3092): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 50.856625,
+}
+[20:57:41.751] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.239875,
+}
+[20:57:41.751] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.09825,
+}
+[20:57:41.751] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.095583,
+}
+[20:57:41.751] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.096459,
+}
+[20:57:41.751] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.111584,
+}
+[20:57:41.752] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.139958,
+}
+[20:57:41.752] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126583,
+}
+[20:57:41.752] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.096375,
+}
+[20:57:41.752] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.102875,
+}
+[20:57:41.752] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.16075,
+}
+[20:57:41.752] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.098709,
+}
+[20:57:41.753] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.106166,
+}
+[20:57:41.753] INFO (#3179): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.149916,
+}
+[20:57:44.119] INFO (#4552): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.256083,
+}
+[20:57:44.120] INFO (#4552): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.833791,
+}
+[20:57:44.123] INFO (#4552): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.934125,
+}
+[20:57:44.144] INFO (#4554): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.155458,
+}
+[20:57:44.164] INFO (#4575): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 19.611542,
+}
+[20:57:44.187] INFO (#4599): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.328917,
+}
+[20:57:44.210] INFO (#4628): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 22.722583,
+}
+[20:57:44.231] INFO (#4657): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.41025,
+}
+[20:57:44.256] INFO (#4687): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.046542,
+}
+[20:57:44.282] INFO (#4720): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 26.35175,
+}
+[20:57:44.310] INFO (#4756): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.677875,
+}
+[20:57:44.338] INFO (#4798): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.881958,
+}
+[20:57:44.366] INFO (#4841): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 27.870542,
+}
+[20:57:44.396] INFO (#4881): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.435208,
+}
+[20:57:44.429] INFO (#4925): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.610541,
+}
+[20:57:44.460] INFO (#4973): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.414458,
+}
+[20:57:44.499] INFO (#5025): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 38.428625,
+}
+[20:57:44.543] INFO (#5079): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 44.022416,
+}
+[20:57:44.580] INFO (#5135): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 36.945416,
+}
+[20:57:44.626] INFO (#5194): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 45.779,
+}
+[20:57:44.673] INFO (#5254): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 46.548166,
+}
+[20:57:44.748] INFO (#5316): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 75.416333,
+}
+[20:57:44.801] INFO (#5391): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 52.110958,
+}
+[20:57:44.801] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.362417,
+}
+[20:57:44.801] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.199375,
+}
+[20:57:44.802] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.169708,
+}
+[20:57:44.802] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.172584,
+}
+[20:57:44.802] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.161875,
+}
+[20:57:44.802] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.121167,
+}
+[20:57:44.802] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122583,
+}
+[20:57:44.802] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.122792,
+}
+[20:57:44.803] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.182958,
+}
+[20:57:44.803] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.246125,
+}
+[20:57:44.803] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.240792,
+}
+[20:57:44.803] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.133041,
+}
+[20:57:44.804] INFO (#5470): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.157542,
+}
+[20:57:47.415] INFO (#6771): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.205542,
+}
+[20:57:47.416] INFO (#6771): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.933084,
+}
+[20:57:47.419] INFO (#6771): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.908917,
+}
+[20:57:47.440] INFO (#6773): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 20.235833,
+}
+[20:57:47.459] INFO (#6794): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 19.77475,
+}
+[20:57:47.484] INFO (#6818): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 24.8045,
+}
+[20:57:47.508] INFO (#6847): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 23.326583,
+}
+[20:57:47.541] INFO (#6876): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.727167,
+}
+[20:57:47.574] INFO (#6906): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.911083,
+}
+[20:57:47.607] INFO (#6939): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.680708,
+}
+[20:57:47.637] INFO (#6975): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.037792,
+}
+[20:57:47.670] INFO (#7017): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.430292,
+}
+[20:57:47.702] INFO (#7060): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.472667,
+}
+[20:57:47.734] INFO (#7100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 31.891792,
+}
+[20:57:47.767] INFO (#7144): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.184708,
+}
+[20:57:47.800] INFO (#7192): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.329458,
+}
+[20:57:47.834] INFO (#7244): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 33.398791,
+}
+[20:57:47.868] INFO (#7298): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 34.224584,
+}
+[20:57:47.908] INFO (#7354): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 39.843791,
+}
+[20:57:47.943] INFO (#7413): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 35.526708,
+}
+[20:57:47.980] INFO (#7473): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 36.834625,
+}
+[20:57:48.022] INFO (#7535): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 41.904458,
+}
+[20:57:48.067] INFO (#7610): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 44.575084,
+}
+[20:57:48.067] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.252667,
+}
+[20:57:48.068] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1705,
+}
+[20:57:48.068] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.107542,
+}
+[20:57:48.068] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.097166,
+}
+[20:57:48.068] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.097667,
+}
+[20:57:48.068] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090292,
+}
+[20:57:48.068] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.092458,
+}
+[20:57:48.068] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.093125,
+}
+[20:57:48.068] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.0945,
+}
+[20:57:48.069] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.18175,
+}
+[20:57:48.069] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.090416,
+}
+[20:57:48.069] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.089917,
+}
+[20:57:48.069] INFO (#7689): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.14575,
+}
+[20:57:50.539] INFO (#8990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 11.367333,
+}
+[20:57:50.551] INFO (#8990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 11.392083,
+}
+[20:57:50.565] INFO (#8990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 13.859625,
+}
+[20:57:50.576] INFO (#8990): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 10.600875,
+}
+[20:57:50.580] INFO (#8991): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.355333,
+}
+[20:57:50.581] INFO (#8991): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.783125,
+}
+[20:57:50.584] INFO (#8991): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.857916,
+}
+[20:57:50.604] INFO (#9005): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.695208,
+}
+[20:57:50.605] INFO (#9006): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.346125,
+}
+[20:57:50.606] INFO (#9006): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.043417,
+}
+[20:57:50.609] INFO (#9006): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.608375,
+}
+[20:57:50.624] INFO (#9020): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.239708,
+}
+[20:57:50.625] INFO (#9020): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.902,
+}
+[20:57:50.628] INFO (#9020): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.566291,
+}
+[20:57:50.643] INFO (#9033): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.204542,
+}
+[20:57:50.644] INFO (#9033): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.403875,
+}
+[20:57:50.648] INFO (#9033): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.378459,
+}
+[20:57:50.784] INFO (#9047): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 4.035541,
+}
+[20:57:50.788] INFO (#9047): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.247042,
+}
+[20:57:50.791] INFO (#9047): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.264458,
+}
+[20:57:50.792] INFO (#9048): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.178625,
+}
+[20:57:50.796] INFO (#9048): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.134791,
+}
+[20:57:50.801] INFO (#9048): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 4.735667,
+}
+[20:57:50.839] INFO (#9102): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.822625,
+}
+[20:57:50.850] INFO (#9103): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.240417,
+}
+[20:57:50.851] INFO (#9103): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.983958,
+}
+[20:57:50.857] INFO (#9103): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 5.935208,
+}
+[20:57:50.901] INFO (#9106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 43.938042,
+}
+[20:57:50.902] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.3375,
+}
+[20:57:50.902] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.126542,
+}
+[20:57:50.902] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1685,
+}
+[20:57:50.902] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.158666,
+}
+[20:57:50.903] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.155542,
+}
+[20:57:50.903] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.165333,
+}
+[20:57:50.903] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1235,
+}
+[20:57:50.903] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.402792,
+}
+[20:57:50.904] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.196375,
+}
+[20:57:50.904] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.215208,
+}
+[20:57:50.904] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.14125,
+}
+[20:57:50.904] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.223291,
+}
+[20:57:50.905] INFO (#9157): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.232542,
+}
+[20:57:55.355] INFO (#10208): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 9.742541,
+}
+
+tests/generator/add-kind-acceptance.test.ts:
+(pass) every standalone add kind compiles in every starter [13078.24ms]
+
+tests/generator/add-acceptance.test.ts:
+(pass) tool function creation rejects collisions without changing existing files [24.77ms]
+(pass) snapshots simple, custom, and full service plans [187.73ms]
+(pass) rejects ambiguous services and existing route methods before mutation [48.14ms]
+
+tests/generator/add-platform-acceptance.test.ts:
+
+tests/generator/add-resource-acceptance.test.ts:
+
+tests/generator/add-bundle-acceptance.test.ts:
+(pass) API starter integration tests run after adding a full service without Docker [4505.37ms]
+
+ 5 pass
+ 4 filtered out
+ 0 fail
+ 3 snapshots, 22 expect() calls
+Ran 5 tests across 5 files. [18.40s]
+acceptance additions: 18.4s
+[23:57:55.393] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 18438.052375,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/add-options.test.ts:
+(pass) add option resolution > normalizes friendly names and common defaults [3.22ms]
+(pass) add option resolution > resolves command defaults and repeatable values [0.39ms]
+(pass) add option resolution > requires unambiguous headless agent and route choices [0.25ms]
+(pass) add option resolution > supports creating a tool function and rejects conflicting targets [0.11ms]
+(pass) add option resolution > accepts an existing model selector or the offline default [0.06ms]
+
+ 5 pass
+ 0 fail
+ 17 expect() calls
+Ran 5 tests across 1 file. [325.00ms]
+generator: tests/generator/add-options.test.ts: 0.3s
+[23:57:55.729] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 335.350125,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/add-resolver.test.ts:
+(pass) resolves an interactive add through the same normalized request [55.84ms]
+(pass) uses unique services and explicit model selectors headlessly [32.53ms]
+(pass) offers existing functions and function creation when adding a tool [23.26ms]
+(pass) creates a function for a new service and respects explicit creation headlessly [23.74ms]
+(pass) asks for name, template, jobs and destination while keeping silent defaults [1.75ms]
+(pass) rejects unsupported explicit creation flags without any setup question [1.96ms]
+(pass) offers the certified starter template and honors a custom destination [0.83ms]
+(pass) rejects an uncertified inline template after filtering jobs [0.56ms]
+(pass) hides uncertified jobs providers interactively [0.33ms]
+(pass) retains headless defaults without requesting interactive choices [0.16ms]
+
+ 10 pass
+ 0 fail
+ 26 expect() calls
+Ran 10 tests across 1 file. [491.00ms]
+generator: tests/generator/add-resolver.test.ts: 0.5s
+[23:57:56.234] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 504.049583,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/add-transaction.test.ts:
+(pass) add scaffold transaction > validates with the project CLI instead of an unrelated global install [543.25ms]
+(pass) add scaffold transaction > restores bytes, modes, lockfile, and leaves unrelated dirty files [12.97ms]
+(pass) add scaffold transaction > rolls back validation failure and applies a successful plan [8.41ms]
+(pass) add scaffold transaction > skips checking unavailable packages with no install [3.40ms]
+(pass) add scaffold transaction > refuses project-local symlinks without writing through them [2.20ms]
+
+ 5 pass
+ 0 fail
+ 14 expect() calls
+Ran 5 tests across 1 file. [864.00ms]
+generator: tests/generator/add-transaction.test.ts: 0.9s
+[23:57:57.112] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 877.057125,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/create-additions.test.ts:
+(pass) asks only final consent and validates the completed project once [65.38ms]
+(pass) retains no-install behavior without offering artifact additions [29.88ms]
+(pass) declined consent creates no stage and preserves cancellation exit 130 [4.01ms]
+(pass) headless creation never invokes prompt authority [30.38ms]
+
+ 4 pass
+ 0 fail
+ 15 expect() calls
+Ran 4 tests across 1 file. [420.00ms]
+generator: tests/generator/create-additions.test.ts: 0.4s
+[23:57:57.542] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 429.816959,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/failure-cleanup.test.ts:
+(pass) cleans the staged sibling after an injected copy failure [23.33ms]
+(pass) cleans the staged sibling after an injected substitute failure [29.29ms]
+(pass) cleans the staged sibling after an injected install failure [35.40ms]
+(pass) cleans the staged sibling after an injected git failure [25.37ms]
+(pass) cleans the staged sibling after an injected doctor failure [27.37ms]
+(pass) cleans the staged sibling after an injected check failure [25.19ms]
+(pass) cleans the staged sibling after an injected rename failure [27.15ms]
+(pass) preserves an existing empty destination when publication fails [25.90ms]
+(pass) refuses broad cleanup paths without recursive deletion [0.49ms]
+
+ 9 pass
+ 0 fail
+ 46 expect() calls
+Ran 9 tests across 1 file. [512.00ms]
+generator: tests/generator/failure-cleanup.test.ts: 0.5s
+[23:57:58.065] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 523.081,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/installed-cli-create.test.ts:
+Staging release package: @relkit/contracts
+Staging release package: @relkit/providers-standard
+Staging release package: @relkit/schema
+Staging release package: @relkit/buckets
+Staging release package: @relkit/cache
+Staging release package: @relkit/diagnostics
+Staging release package: @relkit/graph
+Staging release package: @relkit/invocation
+Staging release package: @relkit/observability
+Staging release package: @relkit/provider
+Staging release package: @relkit/realtime
+Staging release package: @relkit/client
+Staging release package: @relkit/client-generator
+Staging release package: @relkit/cloudflare
+Staging release package: @relkit/config
+Staging release package: @relkit/deploy
+Staging release package: @relkit/drizzle
+Staging release package: @relkit/functions
+Staging release package: @relkit/local-service
+Staging release package: @relkit/openapi
+Staging release package: @relkit/otlp
+Staging release package: @relkit/sentry
+Staging release package: @relkit/aws
+Staging release package: @relkit/compiler
+Staging release package: @relkit/docker
+Staging release package: @relkit/jobs
+Staging release package: @relkit/pulumi
+Staging release package: @relkit/runtime-effect
+Staging release package: @relkit/s3
+Staging release package: @relkit/tools
+Staging release package: @relkit/agents
+Staging release package: @relkit/deploy-pulumi
+Staging release package: @relkit/effect-mq
+Staging release package: @relkit/events
+Staging release package: @relkit/inngest
+Staging release package: @relkit/inspector-api
+Staging release package: @relkit/supervisor
+Staging release package: @relkit/trigger
+Staging release package: create-relkit
+Staging release package: @relkit/providers-local
+Staging release package: @relkit/services
+Staging release package: @relkit/local
+Staging release package: @relkit/redis
+Staging release package: @relkit/routes
+Staging release package: @relkit/app
+Staging release package: @relkit/better-auth
+Staging release package: @relkit/integrations
+Staging release package: @relkit/engine
+Staging release package: @relkit/cloud-aws
+Staging release package: @relkit/runtime-hono
+Staging release package: @relkit/cli
+Staging release package: @relkit/testing
+Staging release package: relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun install --lockfile-only --ignore-scripts in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/contracts
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-contracts-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-contracts-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-contracts-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/providers-standard
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-providers-standard-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-providers-standard-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-providers-standard-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/schema
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-schema-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-schema-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-schema-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/buckets
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-buckets-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-buckets-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-buckets-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/cache
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cache-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cache-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cache-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/diagnostics
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-diagnostics-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-diagnostics-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-diagnostics-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/graph
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-graph-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-graph-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-graph-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/invocation
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-invocation-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-invocation-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-invocation-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/observability
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-observability-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-observability-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-observability-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/provider
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-provider-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-provider-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-provider-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/realtime
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-realtime-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-realtime-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-realtime-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/client
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-client-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-client-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-client-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/client-generator
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-client-generator-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-client-generator-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-client-generator-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/cloudflare
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cloudflare-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cloudflare-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cloudflare-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/config
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-config-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-config-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-config-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/deploy
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-deploy-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-deploy-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-deploy-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/drizzle
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-drizzle-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-drizzle-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-drizzle-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/functions
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-functions-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-functions-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-functions-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/local-service
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-local-service-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-local-service-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-local-service-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/openapi
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-openapi-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-openapi-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-openapi-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/otlp
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-otlp-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-otlp-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-otlp-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/sentry
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-sentry-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-sentry-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-sentry-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/aws
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-aws-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-aws-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-aws-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/compiler
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-compiler-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-compiler-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-compiler-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/docker
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-docker-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-docker-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-docker-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/jobs
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-jobs-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-jobs-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-jobs-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/pulumi
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-pulumi-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-pulumi-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-pulumi-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/runtime-effect
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-runtime-effect-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-runtime-effect-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-runtime-effect-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/s3
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-s3-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-s3-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-s3-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/tools
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-tools-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-tools-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-tools-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/agents
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-agents-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-agents-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-agents-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/deploy-pulumi
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-deploy-pulumi-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-deploy-pulumi-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-deploy-pulumi-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/effect-mq
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-effect-mq-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-effect-mq-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-effect-mq-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/events
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-events-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-events-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-events-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/inngest
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-inngest-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-inngest-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-inngest-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/inspector-api
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-inspector-api-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-inspector-api-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-inspector-api-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/supervisor
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-supervisor-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-supervisor-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-supervisor-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/trigger
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-trigger-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-trigger-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-trigger-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/create-relkit
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/create-relkit-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/create-relkit-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/create-relkit-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/providers-local
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-providers-local-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-providers-local-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-providers-local-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/services
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-services-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-services-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-services-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/local
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-local-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-local-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-local-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/redis
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-redis-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-redis-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-redis-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/routes
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-routes-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-routes-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-routes-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/app
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-app-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-app-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-app-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/better-auth
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-better-auth-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-better-auth-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-better-auth-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/catalog
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-integrations-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-integrations-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-integrations-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/engine
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-engine-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-engine-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-engine-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/cloud-aws
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cloud-aws-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cloud-aws-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cloud-aws-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/runtime-hono
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-runtime-hono-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-runtime-hono-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-runtime-hono-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/cli
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cli-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cli-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-cli-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/testing
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-testing-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-testing-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-testing-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-l4l40N/packages/relkit
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-0.7.6.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-0.7.6.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-npm-create-EVLkzj/artifacts/relkit-0.7.6.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+(pass) normal CLI installs external projects from packed packages without contributor links [81391.64ms]
+
+ 1 pass
+ 0 fail
+ 62 expect() calls
+Ran 1 test across 1 file. [81.50s]
+generator: tests/generator/installed-cli-create.test.ts: 81.6s
+[23:59:19.612] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 81567.159375,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/job-dot-access.test.ts:
+(pass) generates name-based job dot access without exposing private jobs [12.60ms]
+
+ 1 pass
+ 0 fail
+ 6 expect() calls
+Ran 1 test across 1 file. [198.00ms]
+generator: tests/generator/job-dot-access.test.ts: 0.2s
+[23:59:19.820] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 207.38475,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/jobs-profiles.test.ts:
+(pass) Docker Jobs starters include the local orchestrator and documented config [146.22ms]
+
+ 1 pass
+ 0 fail
+ 6 expect() calls
+Ran 1 test across 1 file. [611.00ms]
+generator: tests/generator/jobs-profiles.test.ts: 0.6s
+[23:59:20.443] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 622.213709,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/local-agent-create.test.ts:
+(pass) candidate acceptance installs and validates the agent starter with shared native packages [35456.18ms]
+(pass) candidate acceptance installs and validates the fullstack starter with shared native packages [48597.97ms]
+
+ 2 pass
+ 0 fail
+ 35 expect() calls
+Ran 2 tests across 1 file. [84.86s]
+generator: tests/generator/local-agent-create.test.ts: 84.9s
+[00:00:45.326] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 84881.260917,
+}
+bun test v1.3.10 (30e609e0)
+[21:00:46.711] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.terminal",
+  outcome: "success",
+  duration_ms: 650.720916,
+}
+
+tests/generator/local-workspace.test.ts:
+(pass) local create asks for jobs and final confirmation when other choices are explicit [656.65ms]
+(pass) local create preserves unrelated dependency versions when linking RELKIT packages [23.55ms]
+(pass) local create shares matching native dependencies without changing different versions [21.87ms]
+(pass) local links keep web dependencies local and repair previously linked inspector packages [19.61ms]
+(pass) doctor accepts local RELKIT package links [2.64ms]
+(pass) local add installs workspace integration exports for a full service bundle [10277.30ms]
+(pass) local launcher exposes the shared add API for events and routes [1193.96ms]
+(pass) local launcher and linked CLI hide workspace build output [7969.23ms]
+
+ 8 pass
+ 0 fail
+ 48 expect() calls
+Ran 8 tests across 1 file. [20.89s]
+generator: tests/generator/local-workspace.test.ts: 20.9s
+[00:01:06.238] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 20911.46775,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/no-examples-layout.test.ts:
+(pass) grouped candidate example removal retains the useful hello boundary and platform inputs [150.86ms]
+
+ 1 pass
+ 0 fail
+ 31 expect() calls
+Ran 1 test across 1 file. [425.00ms]
+generator: tests/generator/no-examples-layout.test.ts: 0.4s
+[00:01:06.672] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 434.177042,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/option-matrix-destinations.test.ts:
+(pass) accepts valid names and rejects invalid names without mutation [13.57ms]
+(pass) handles absent, empty, and non-empty destinations atomically [63.28ms]
+(pass) rolls back every pre-rename failure and removes its temporary sibling [111.31ms]
+
+ 3 pass
+ 0 fail
+ 47 expect() calls
+Ran 3 tests across 1 file. [460.00ms]
+generator: tests/generator/option-matrix-destinations.test.ts: 0.5s
+[00:01:07.142] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 469.412667,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/option-matrix-output.test.ts:
+(pass) normalizes JSON options and keeps generated results JSON-safe [56.62ms]
+(pass) adds AWS and Pulumi only when explicitly selected [24.18ms]
+
+ 2 pass
+ 0 fail
+ 13 expect() calls
+Ran 2 tests across 1 file. [349.00ms]
+generator: tests/generator/option-matrix-output.test.ts: 0.4s
+[00:01:07.501] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 358.360417,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/option-matrix.test.ts:
+(pass) covers every template and examples/install/Git combination [930.62ms]
+(pass) agent starters ship executable native and typed client examples [0.47ms]
+(pass) reports only the create milestones that run [40.80ms]
+(pass) produces byte-identical content from separate destinations [41.31ms]
+
+ 4 pass
+ 0 fail
+ 1292 expect() calls
+Ran 4 tests across 1 file. [1289.00ms]
+generator: tests/generator/option-matrix.test.ts: 1.3s
+[00:01:08.800] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 1298.970958,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/plan-manifest.test.ts:
+(pass) scaffold preserves @relkit/aws's existing Bun link in dependencies [3.15ms]
+(pass) scaffold preserves @relkit/aws's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/better-auth's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/better-auth's existing Bun link in devDependencies [0.09ms]
+(pass) scaffold preserves @relkit/cloudflare's existing Bun link in dependencies [0.12ms]
+(pass) scaffold preserves @relkit/cloudflare's existing Bun link in devDependencies [0.12ms]
+(pass) scaffold preserves @relkit/docker's existing Bun link in dependencies [0.06ms]
+(pass) scaffold preserves @relkit/docker's existing Bun link in devDependencies [0.09ms]
+(pass) scaffold preserves @relkit/effect-mq's existing Bun link in dependencies [0.11ms]
+(pass) scaffold preserves @relkit/effect-mq's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/inngest's existing Bun link in dependencies [0.09ms]
+(pass) scaffold preserves @relkit/inngest's existing Bun link in devDependencies [0.07ms]
+(pass) scaffold preserves @relkit/drizzle's existing Bun link in dependencies [0.06ms]
+(pass) scaffold preserves @relkit/drizzle's existing Bun link in devDependencies [0.02ms]
+(pass) scaffold preserves @relkit/local's existing Bun link in dependencies [0.05ms]
+(pass) scaffold preserves @relkit/local's existing Bun link in devDependencies [0.04ms]
+(pass) scaffold preserves @relkit/pulumi's existing Bun link in dependencies [0.06ms]
+(pass) scaffold preserves @relkit/pulumi's existing Bun link in devDependencies
+(pass) scaffold preserves @relkit/redis's existing Bun link in dependencies [0.05ms]
+(pass) scaffold preserves @relkit/redis's existing Bun link in devDependencies [0.04ms]
+(pass) scaffold preserves @relkit/s3's existing Bun link in dependencies [0.04ms]
+(pass) scaffold preserves @relkit/s3's existing Bun link in devDependencies [0.01ms]
+(pass) scaffold preserves @relkit/trigger's existing Bun link in dependencies
+(pass) scaffold preserves @relkit/trigger's existing Bun link in devDependencies
+(pass) scaffold preserves better-auth's existing Bun link in dependencies [0.08ms]
+(pass) scaffold preserves better-auth's existing Bun link in devDependencies [0.07ms]
+(pass) scaffold preserves drizzle-kit's existing Bun link in dependencies
+(pass) scaffold preserves drizzle-kit's existing Bun link in devDependencies [0.04ms]
+(pass) scaffold preserves drizzle-orm's existing Bun link in dependencies
+(pass) scaffold preserves drizzle-orm's existing Bun link in devDependencies
+(pass) scaffold preserves langchain's existing Bun link in dependencies
+(pass) scaffold preserves langchain's existing Bun link in devDependencies
+(pass) scaffold still rejects conflicting versions and links to another package [0.35ms]
+
+ 33 pass
+ 0 fail
+ 100 expect() calls
+Ran 33 tests across 1 file. [116.00ms]
+generator: tests/generator/plan-manifest.test.ts: 0.1s
+[00:01:08.925] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 124.61,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/project-discovery.test.ts:
+(pass) scaffold project discovery > appends exports while preserving leading and internal whitespace [9.69ms]
+(pass) scaffold project discovery > discovers canonical services, members, tools, prompts, profiles, and imported env [88.20ms]
+(pass) scaffold project discovery > requires real AWS and Pulumi imports before offering provisioning [3.20ms]
+(pass) scaffold project discovery > plans byte-preserving canonical insertions and refuses unsafe shapes [1.15ms]
+
+ 4 pass
+ 0 fail
+ 27 expect() calls
+Ran 4 tests across 1 file. [369.00ms]
+generator: tests/generator/project-discovery.test.ts: 0.4s
+[00:01:09.304] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 378.731709,
+}
+bun test v1.3.10 (30e609e0)
+
+tests/generator/scaffold-catalog.test.ts:
+(pass) keeps scaffold dependency versions aligned with owning manifests [22.15ms]
+
+ 1 pass
+ 0 fail
+ 16 expect() calls
+Ran 1 test across 1 file. [302.00ms]
+generator: tests/generator/scaffold-catalog.test.ts: 0.3s
+[00:01:09.616] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "generator.gate",
+  outcome: "success",
+  duration_ms: 312.28175,
+}
