@@ -1,0 +1,140 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/sqlite-app-tooling.test.ts:
+[21:26:53.274] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.225667,
+}
+[21:26:53.278] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.39525,
+}
+[21:26:53.291] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 12.541042,
+}
+[21:26:53.356] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 64.615875,
+}
+[21:26:53.357] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.683708,
+}
+[21:26:53.357] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105875,
+}
+[21:26:53.357] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.100166,
+}
+[21:26:53.357] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.0925,
+}
+[21:26:53.357] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.098417,
+}
+[21:26:53.357] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.131,
+}
+[21:26:53.358] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.143667,
+}
+[21:26:53.358] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.112709,
+}
+[21:26:53.358] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.1225,
+}
+[21:26:53.358] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.174542,
+}
+[21:26:53.358] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.112958,
+}
+[21:26:53.358] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.105459,
+}
+[21:26:53.359] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.link",
+  outcome: "success",
+  duration_ms: 0.144667,
+}
+36 |   const generated = await new Response(generate.stdout).text() + await new Response(generate.stderr).text();
+37 |   expect(await generate.exited, generated).toBe(0);
+38 |   for (let run = 0; run < 2; run++) {
+39 |     const child = Bun.spawn([process.execPath, "run", "db:migrate"], { cwd: root, env, stdout: "pipe", stderr: "pipe" });
+40 |     const output = await new Response(child.stdout).text() + await new Response(child.stderr).text();
+41 |     expect(await child.exited, output).toBe(0);
+                                            ^
+error: No config path provided, using default 'drizzle.config.ts'
+Reading config file '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-add-acceptance-PsZr8w/app/drizzle.config.ts'
+Using 'better-sqlite3' driver for database querying
+$ bun --bun drizzle-kit migrate
+Error  'better-sqlite3' is not yet supported in Bun.
+Track the status in https://github.com/oven-sh/bun/issues/4290
+In the meantime, you could try bun:sqlite which has a similar API.
+error: "drizzle-kit" exited with code 1
+error: script "db:migrate" exited with code 1
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/sqlite-app-tooling.test.ts:41:40)
+[21:26:54.045] INFO (#94): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.200917,
+}
+(fail) generated SQLite migration command creates auth tables and is repeatable under Bun [781.69ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [1154.00ms]
