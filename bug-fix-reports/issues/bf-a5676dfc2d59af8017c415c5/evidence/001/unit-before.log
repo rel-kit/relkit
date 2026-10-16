@@ -1,0 +1,38 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/dev-environment/paths.test.ts:
+18 |       child.exited,
+19 |       new Response(child.stdout).text(),
+20 |       new Response(child.stderr).text(),
+21 |     ]);
+22 |     expect(code).not.toBe(0);
+23 |     expect(existsSync(evidence)).toBe(false);
+                                      ^
+error: expect(received).toBe(expected)
+
+Expected: false
+Received: true
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-environment/paths.test.ts:23:34)
+(fail) recovery probe rejects caller-selected evidence directories before writing [143.48ms]
+48 |   }).outputText;
+49 |   const phase = new Function("process", javascript + "\nreturn phase;");
+50 |   for (const value of [undefined, "before", "after", "smoke"])
+51 |     expect(phase({ argv: ["bun", "probe", value] })).toBe(value ?? "before");
+52 |   for (const value of ["../../escape", "before/../../escape", "/tmp/escape", "after\\escape", ""])
+53 |     expect(() => phase({ argv: ["bun", "probe", value] })).toThrow("Invalid probe phase");
+                                                                ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "Invalid probe phase"
+
+Received function did not throw
+Received value: "../../escape"
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-environment/paths.test.ts:53:60)
+(fail) archived probe only uses literal phases in log filenames [32.56ms]
+
+ 0 pass
+ 2 fail
+ 7 expect() calls
+Ran 2 tests across 1 file. [487.00ms]

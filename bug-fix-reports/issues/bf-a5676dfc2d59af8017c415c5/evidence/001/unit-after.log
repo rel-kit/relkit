@@ -1,0 +1,11 @@
+bun test v1.3.10 (30e609e0)
+
+tests/security/dev-recovery-probe-paths.test.ts:
+(pass) recovery probe rejects caller-selected evidence directories before writing [100.45ms]
+(pass) archived probe only uses literal phases in log filenames [31.50ms]
+(pass) recovery probe rejects external, sibling-prefix and escaping symlink apps [389.09ms]
+
+ 3 pass
+ 0 fail
+ 24 expect() calls
+Ran 3 tests across 1 file. [697.00ms]
