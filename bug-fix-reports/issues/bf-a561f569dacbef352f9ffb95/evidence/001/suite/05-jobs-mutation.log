@@ -1,0 +1,3126 @@
+[32m23:11:41 (83000) INFO ProjectReader[39m Found 11 of 42648 file(s) to be mutated.
+[32m23:11:41 (83000) INFO Instrumenter[39m Instrumented 11 source file(s) with 793 mutant(s)
+[32m23:11:42 (83000) INFO ConcurrencyTokenProvider[39m Creating 1 test runner process(es).
+[32m23:12:00 (83000) INFO Sandbox[39m Running build command "bun scripts/jobs-coverage/link-sandbox-dependencies.ts" in "/Users/mustafaelsayed/Workspace/relkit/.stryker-tmp/sandbox-W6GYE0".
+[32m23:12:01 (83000) INFO DryRunExecutor[39m Starting initial test run (vitest test runner with "perTest" coverage analysis). This may take a while.
+[32m23:12:17 (83000) INFO DryRunExecutor[39m Initial test run succeeded. Ran 242 tests in 16 seconds (net 1026.0877879999962 ms, overhead 15040.912212000003 ms).
+[33m23:12:17 (83000) WARN MutantTestPlanner[39m Detected 54 static mutants (7% of total) that are estimated to take 56% of the time running the tests!
+  You might want to enable "ignoreStatic" to ignore these static mutants for your next run. 
+  For more information about static mutants visit: https://stryker-mutator.io/docs/mutation-testing-elements/static-mutants
+  (disable "warnings.slow" to ignore this warning)
+
+All tests
+  client/tests
+    compatibility
+      jobs-watch.test.ts
+        ✓ watch controllers stay idle until connect and share a first-snapshot promise (killed 57)
+        ~ terminal watch frames require an authoritative terminal confirmation (covered 136)
+        ✓ EOF reconciles through authoritative reads and never fabricates completion (killed 1)
+        ~ proxy clients use get for EOF reconciliation (covered 141)
+        ✓ sequence and cursor duplicates are ignored while a shared lease survives another disconnect (killed 6)
+        ✓ watch-only refetch closes its temporary iterator and remains disconnected (killed 18)
+        ✓ dispose settles an interrupted connect and ignores late frames (killed 1)
+        ✓ a reconnect waits for interrupted teardown before reusing a shared feed (killed 13)
+        ✓ bounded reads surface timeout instead of leaving connect pending (killed 3)
+        ✓ polling uses serialized authoritative reads and reports its source (killed 2)
+        ✓ authorization denial stops reconnects and clears the view (killed 7)
+        ~ manual disconnect requires an explicit reconnect to reach terminal state (covered 163)
+        ✓ completed feeds release their shared entry (killed 6)
+        ✘ stream establishment is bounded by the read timeout (covered 0)
+        ✘ named content resets its sequence per attempt and reports gaps or overflow explicitly (covered 0)
+        ✓ shared watch envelope keeps 100 unique feeds and 1,000 leases bounded (killed 1)
+      pending.test.ts
+        ✘ job pending metadata matches the transmitted request and retains input only in memory (covered 0)
+        ✘ job pending tracking rejects a 101st intent without evicting unresolved entries (covered 0)
+        ✘ unknown job intents require an active same-key recovery window before reuse (covered 0)
+    jobs
+      content.test.ts
+        ✘ an acquired stream preserves the caller's original pre-pull abort reason (covered 0)
+        ✘ interruption during eager iterator transfer releases the acquired native prefix (covered 0)
+        ✘ named content substitutes its complete service contract (covered 0)
+      quality.test.ts
+        ✓ covers offline recovery and polling terminal/error transitions (killed 44)
+        ✓ covers polling changes, terminal rechecks and active-generation exits (killed 13)
+        ~ covers native feed frames, reconciliation and retry exits (covered 21)
+      registry.test.ts
+        ✓ reentrant connecting publication cannot acquire after view retirement (killed 1)
+        ✓ a substituted registry preserves passive state and original lookup failure (killed 2)
+        ✓ complete-key groups isolate transports and identity while retaining other views (killed 8)
+        ✓ registry owner closure interrupts a borrowed native feed and settles pending observation (killed 1)
+      support.test.ts
+        ✘ native compatibility wait releases its borrowed abort listener on timeout (covered 0)
+        ✘ covers controller state transitions and support helpers (covered 0)
+        ✘ uses default reconnect bounds and waits for teardown without a prior feed (covered 0)
+  jobs/tests
+    adapter-effect.test.ts
+      ✘ Effect and synchronous adapters accept a valid runtime (covered 0)
+      ✘ invalid adapter shape fails with tagged Effect errors (covered 0)
+    authoring-boundaries.test.ts
+      ✘ task and job descriptors preserve the new authoring boundaries (covered 0)
+      ~ job names and durations reject unsafe spellings (covered 34)
+    authorization-cursor.test.ts
+      ✘ signs and verifies bounded job cursors (covered 0)
+      ✘ does not accept signed cursors without the signing key (covered 0)
+      ✘ Effect cursor operations report tagged failures and use the observer (covered 0)
+    authorization-effect.test.ts
+      ✓ Effect authorization narrows a policy grant and uses a telemetry Layer (killed 5)
+      ✓ policy rejection becomes a tagged denial while adapter keeps its error (killed 2)
+      ✓ grant validation checks expiry and operation using deterministic time (killed 4)
+    authorization-projection-effect.test.ts
+      ✘ Effect snapshot projection redacts ungranted fields and matches the sync adapter (covered 0)
+      ✘ Effect page projection observes one page operation and preserves order (covered 0)
+    authorization.test.ts
+      ✓ validates job grants and passes trusted authorization context (killed 27)
+      ✓ rejects boolean, expired, and out-of-scope grants while keeping public scope dedicated (killed 14)
+      ✘ redacts unknown failures while preserving bounded declared details (covered 0)
+    boundary-policy.test.ts
+      ✓ accepts only exact readable duration boundaries (killed 19)
+      ~ enforces exact memory, attempt, factor, and ordering boundaries (covered 62)
+      ✓ requires canonical scalar key fields without expressions (killed 14)
+      ~ checks calendar instants and positive observer/schedule durations (covered 32)
+      ✓ keeps resource and concurrency numeric limits finite (killed 2)
+      ~ requires client projections to match task declarations (covered 44)
+    canonical-support-effect.test.ts
+      ✘ walks nested canonical schema positions in Effect (covered 0)
+      ✘ reports a typed failure for noncanonical nested values (covered 0)
+    capabilities-effect.test.ts
+      ✘ Effect validates a capability report and checks supported features (covered 0)
+      ✘ invalid reports and unavailable capabilities have typed Effect failures (covered 0)
+      ✘ adapter method checks fail by missing method in Effect and sync adapters (covered 0)
+      ✘ detailed capability reports preserve frozen evidence and support levels (covered 0)
+      ✘ rejects malformed capability report {"service":" ","features":{}} (covered 0)
+      ✘ rejects malformed capability report {"service":"test","protocolVersion":2,"features":{}} (covered 0)
+      ✘ rejects malformed capability report {"service":"test","features":{"submission":"yes"}} (covered 0)
+      ✘ rejects malformed capability report {"service":"test","features":{},"capabilities":[]} (covered 0)
+      ✘ rejects malformed capability report {"service":"test","features":{},"capabilities":{"retry":{"support":"maybe"}}} (covered 0)
+      ✘ rejects malformed capability report {"service":"test","features":{},"capabilities":{"retry":{"support":"native","constraints":[]}}} (covered 0)
+      ✘ rejects malformed capability report {"service":"test","features":{},"capabilities":{"retry":{"support":"native","evidence":[42]}}} (covered 0)
+      ✘ rejects malformed capability report {"service":"test","features":{},"limits":[]} (covered 0)
+      ✘ rejects malformed capability report {"service":"test","features":{},"limits":{"maxPageSize":0}} (covered 0)
+    client-abort-effect.test.ts
+      ✘ Effect releases the listener after success and preserves the Promise result (covered 0)
+      ✘ pre-abort, registration abort, and expired deadline never start work (covered 0)
+      ✘ provider failure and partial registration preserve the original cause (covered 0)
+      ✘ interruption releases the listener (covered 0)
+      ✘ client deadline uses the supplied Effect clock (covered 0)
+    client-interruption.test.ts
+      ✘ interrupting enqueueEffect aborts provider work (covered 0)
+    client-utils-effect.test.ts
+      ✘ client helpers expose typed validation failures and observed Effect paths (covered 0)
+    client.test.ts
+      ✘ job Promise client validates input, resolves a logical profile, and correlates bridge/hooks (covered 0)
+      ✘ job Promise client captures propagation inside the producer span (covered 0)
+      ✘ job Promise client rejects invalid input before provider work and propagates cancellation (covered 0)
+      ✘ Effect client reports setup and enqueue failures through tagged results and telemetry (covered 0)
+    control-observe-effect.test.ts
+      ✘ observation compatibility iterable closes native observation after early return (covered 0)
+      ✘ observation stream times out on TestClock and closes native observation (covered 0)
+      ✘ observation aborts a pending read and closes native observation (covered 0)
+      ✘ observation cleans partial registration and does not start a cancelled read (covered 0)
+      ✘ observation handles cancellation during listener registration without starting a read (covered 0)
+      ✘ observation iterator closes its native source once after repeated disposal (covered 0)
+    control-receipts-effect.test.ts
+      ✘ native control receipts are validated and frozen through Effect (covered 0)
+      ✘ uncertain control outcomes expose bounded recovery metadata (covered 0)
+    control-result-effect.test.ts
+      ~ result polling reads from its Layer and releases the abort listener (covered 28)
+      ~ result polling handles pre-abort before reading (covered 28)
+      ~ result polling releases its listener on abort during a pending read (covered 28)
+      ~ result polling cleans partial abort registration failures (covered 28)
+      ~ result polling expires on TestClock time without a real timer (covered 28)
+      ~ result polling times out and aborts a stalled native read (covered 28)
+    control-support-effect.test.ts
+      ✘ control helpers expose typed failures and observable Effect operations (covered 0)
+    control-write-effect.test.ts
+      ✘ success and provider failure release the abort listener (covered 0)
+      ✘ pre-aborted signals prevent provider start and preserve their reason (covered 0)
+      ✘ abort after provider start reports an unknown outcome and releases (covered 0)
+      ✘ synchronous abort and partial registration failure clean up without starting (covered 0)
+      ✘ interruption releases the listener and records bounded metrics (covered 0)
+    controls-pipeline.test.ts
+      ~ run controls read, observe, cancel, retry, and await a result (covered 28)
+    controls-read-effect.test.ts
+      ✘ native reads validate capability and limit before context or provider work (covered 0)
+      ✘ native read provider failures preserve their cause for compatibility (covered 0)
+    controls-write-effect.test.ts
+      ✘ pre-aborted cancellation does not build context or start provider work (covered 0)
+      ✘ retry compatibility preserves pinned input and creates a new run (covered 0)
+      ✘ uncertain native cancellation retains the recovery identity (covered 0)
+    define-job-effect.test.ts
+      ~ Effect job definition validates descriptors and records operations (covered 44)
+    define-task-effect.test.ts
+      ~ Effect task definition validates descriptors and records operations (covered 44)
+    define-task-support-effect.test.ts
+      ~ Effect helpers copy bounded strings and inspect authoring shapes (covered 14)
+      ~ invalid fields use a tagged error while adapters retain TypeError (covered 14)
+    duration-effect.test.ts
+      ~ the Effect path returns exact milliseconds and a tagged validation failure (covered 29)
+      ~ compatibility adapters keep values and TypeError behavior (covered 31)
+      ~ records bounded success, failure, and duration metrics (covered 31)
+      ~ uses a deterministic telemetry Layer when supplied (covered 28)
+    identity-effect.test.ts
+      ✘ Effect identities preserve tuple order and primitive distinctions (covered 0)
+      ✘ unsupported object values fail with a tagged Effect error (covered 0)
+      ✘ identity operations use a substitutable telemetry Layer (covered 0)
+    identity.test.ts
+      ✘ keeps event-to-run identities and signing-key rotation stable (covered 0)
+    instant-effect.test.ts
+      ✘ Effect predicate checks leap days, offsets, and malformed dates (covered 0)
+      ✘ Effect assertion exposes a tagged error and sync adapter keeps TypeError (covered 0)
+    job-name-effect.test.ts
+      ✘ validates names in Effect with a tagged failure (covered 0)
+      ✘ keeps synchronous assertions and aliases compatible (covered 0)
+      ✘ records failure metrics and accepts an observer Layer (covered 0)
+    job-validation-effect.test.ts
+      ~ job policy Effect operations validate admission and client access (covered 57)
+    jobs-quality.test.ts
+      ✓ covers readable duration and policy boundary conversions (killed 32)
+      ✓ covers retry multiplication, jitter and policy copy boundaries (killed 96)
+      ✓ covers canonical field and logging validation (killed 30)
+      ✓ covers deterministic provider profile selection and binding errors (killed 29)
+    legacy-define-job-effect.test.ts
+      ✘ legacy job descriptor is frozen in Effect and the sync API (covered 0)
+      ✘ invalid legacy retry fails with a tagged Effect error (covered 0)
+      ✘ legacy jobs retain bounded schedules and idempotency policy (covered 0)
+      ✘ rejects invalid legacy job option {} (covered 0)
+      ✘ rejects invalid legacy job option {"input":null} (covered 0)
+      ✘ rejects invalid legacy job option {"target":null} (covered 0)
+      ✘ rejects invalid legacy job option {"timeoutMs":0} (covered 0)
+      ✘ rejects invalid legacy job option {"concurrency":0} (covered 0)
+      ✘ rejects invalid legacy job option {"schedule":{}} (covered 0)
+      ✘ rejects invalid legacy job option {"schedule":[null]} (covered 0)
+      ✘ rejects invalid legacy job option {"schedule":[{"id":"hourly","cron":"0 * * * *","timezone":"UTC","input":{},"overlap":"bad"}]} (covered 0)
+      ✘ rejects invalid legacy job option {"schedule":[{"id":"hourly","cron":" ","timezone":"UTC","input":{},"overlap":"skip"}]} (covered 0)
+      ✘ rejects invalid legacy job option {"idempotency":{}} (covered 0)
+      ✘ rejects invalid legacy job option {"idempotency":{"key":"id","retentionMs":0}} (covered 0)
+      ✘ rejects duplicate schedule identities (covered 0)
+    migration-effect.test.ts
+      ✘ Effect migration path preserves diagnostics and ordering (covered 0)
+      ✘ legacy diagnostics and telemetry use the Effect path (covered 0)
+    migration.test.ts
+      ✘ explains identity, binding, schema, history, and client migration hazards (covered 0)
+      ✘ keeps legacy execution explicitly gated and aliases exclusive (covered 0)
+    resolve-binding.test.ts
+      ~ resolveTaskBinding creates a private implicit binding and selects the sole profile (covered 42)
+      ~ resolveTaskBinding selects the designated default across service profiles (covered 61)
+      ~ resolveTaskBinding rejects ambiguous jobs and wrong-task selectors (covered 21)
+      ~ resolveTaskBinding Effect resolves the same binding and reports a tagged ambiguous failure (covered 51)
+      ✘ binding helpers selects defaults and reads task references through Effect and compatibility APIs (covered 0)
+      ✘ binding helpers reports a tagged profile failure and preserves compatibility errors (covered 0)
+    retry-policy-effect.test.ts
+      ✘ Effect validation returns a frozen copy (covered 0)
+      ✘ invalid policy fails with a tagged error and the adapter throws TypeError (covered 0)
+    run-id-effect.test.ts
+      ✘ Effect signs, verifies, and rotates run locator keys (covered 0)
+      ✘ mismatched namespace is a tagged Effect failure (covered 0)
+      ✘ router loads and persists through a substitute storage Layer (covered 0)
+      ✘ public namespace and key-ring helpers run through typed Effect paths (covered 0)
+    runtime-effect.test.ts
+      ✘ Effect creates a runtime and closes the owned adapter once (covered 0)
+      ✘ invalid manifest has a tagged Effect failure and a TypeError adapter (covered 0)
+      ✘ ambient runtime is visible to callbacks and original callback throws survive (covered 0)
+    runtime-selection-effect.test.ts
+      ✘ Effect selects a manifest job and matches the sync adapter (covered 0)
+      ✘ ambiguous manifest bindings fail with a tagged error (covered 0)
+    schedule-controls-operations.test.ts
+      ✘ pre-aborted schedule writes never create context or start native work (covered 0)
+      ✘ invalid schedule cursors fail before native reads (covered 0)
+      ✘ uncertain schedule writes retain the operation identity and recovery action (covered 0)
+    schedule-controls.test.ts
+      ✘ schedule controls validate reads and write receipts (covered 0)
+    schedule-identity-effect.test.ts
+      ✘ schedule identity Effects are stable, scoped, and observable (covered 0)
+    schedule-reconciliation.test.ts
+      ✘ reconciles owned schedules after worker publication and preserves operator schedules (covered 0)
+      ✘ rejects an ownership collision instead of changing operator state (covered 0)
+      ✘ keeps an owned operator pause while updating input/build and gives each tick a fresh identity (covered 0)
+      ✘ Effect reconciliation injects the native provider and exposes typed ownership failures (covered 0)
+      ✘ native write recovery retries ambiguous outcomes and stops on a terminal error (covered 0)
+      ✘ unsupported native writes fail without retrying (covered 0)
+    schedule-validation-effect.test.ts
+      ~ Effect copies valid schedules and preserves the sync API (covered 28)
+      ~ invalid schedule has a tagged Effect failure (covered 28)
+    server-effect.test.ts
+      ✘ decodes a manifest and reports typed malformed input (covered 0)
+      ✘ an owned runtime closes after success and callback failure (covered 0)
+      ✘ interruption releases an owned runtime and a borrowed runtime remains open (covered 0)
+      ✘ Promise adapter preserves the original callback error (covered 0)
+    service-options-effect.test.ts
+      ✘ Effect validates and serializes service options with sync compatibility (covered 0)
+      ✘ invalid service options and unsupported names fail with typed errors (covered 0)
+      ✘ service options operations use the injectable observer (covered 0)
+    service-options-validation.test.ts
+      ✓ validates every service option family through Effect and the sync API (killed 1)
+      ✘ rejects invalid service option {"limits":{"inputBytes":0}} (covered 0)
+      ✘ rejects invalid service option {"limits":{"outputBytes":0}} (covered 0)
+      ✘ rejects invalid service option {"limits":{"progressItemBytes":0}} (covered 0)
+      ✘ rejects invalid service option {"limits":{"streamItemBytes":0}} (covered 0)
+      ~ rejects invalid service option {"maxElapsed":"0 seconds"} (covered 28)
+      ~ rejects invalid service option {"observation":{"pollInterval":"1 second"}} (covered 28)
+      ~ rejects invalid service option {"observation":{"readTimeout":"11 seconds"}} (covered 28)
+      ✘ rejects invalid service option {"workers":{"classes":[{"id":"bad id","cpu":1,"memory":"1 MiB"}]}} (covered 0)
+      ✘ rejects invalid service option {"workers":{"classes":[{"id":"worker","cpu":0,"memory":"1 MiB"}]}} (covered 0)
+      ~ rejects invalid service option {"workers":{"classes":[{"id":"worker","cpu":1,"memory":"0.1 MiB"}]}} (covered 20)
+      ~ rejects invalid service option {"workers":{"classes":[{"id":"worker","cpu":1,"memory":"1 MiB","nativeClass":"bad id"}]}} (covered 31)
+      ~ rejects duplicate worker classes (covered 31)
+    submission-admission-effect.test.ts
+      ~ admission Effect uses injected operation identity and clock (covered 32)
+      ~ prepared submission Effect preserves receipt identity and pre-abort failure (covered 18)
+    submission-pipeline.test.ts
+      ✓ submission pipeline prepares canonical input before native acceptance (killed 1)
+      ~ invalid input and pre-aborted submission never call the provider (covered 18)
+      ~ Effect task and job submission use the observer Layer (covered 18)
+      ~ Effect preparation reports validation failures in a typed channel (covered 18)
+      ✘ canonical submission pins the input hash before provider acceptance (covered 0)
+      ✘ canonical Effect submission uses the injected digest through native acceptance (covered 0)
+    submission-prepare-effect.test.ts
+      ~ preparation composes validation, admission identity, clock, and telemetry Layers (covered 46)
+      ~ canonical preparation succeeds and invalid trigger options stop before binding (covered 18)
+    submission-support-effect.test.ts
+      ✘ submission helpers expose typed receipt errors and injectable digest IO (covered 0)
+      ~ compatibility helpers preserve idempotency, time, and receipt boundaries (covered 28)
+    submission-write-effect.test.ts
+      ✘ successful submission releases its abort listener and preserves the receipt (covered 0)
+      ✘ pre-abort and synchronous abort during registration prevent provider start (covered 0)
+      ✘ abort after provider start reports unknown outcome and provider rejection stays original (covered 0)
+      ✘ registration failure releases any partial listener (covered 0)
+      ✘ interruption releases the listener (covered 0)
+      ✘ interruption aborts the signal passed to the native submission (covered 0)
+    task-observation-effect.test.ts
+      ✘ defaults declared progress and streams to live observation (covered 0)
+      ✘ rejects contradictory declarations with a typed failure (covered 0)
+    task-policy-effect.test.ts
+      ~ task policy Effect operations validate values and inject retry randomness (covered 161)
+    task-policy.test.ts
+      ✓ freezes task policy defaults and applies retry-after lower bounds (killed 36)
+      ✓ rejects unsupported task policy combinations and unsafe bounds (killed 4)
+      ~ requires an identity-preserving wire schema for transformed input (covered 44)
+      ✘ rejects declarations without executable canonical validators (covered 0)
+    task-progress.test.ts
+      ✘ validates progress and stream inputs and returns delivery receipts (covered 0)
+      ✘ reports live delivery loss and rejects durable delivery loss (covered 0)
+      ✘ enforces item size and stream naming contracts (covered 0)
+      ✘ Effect emitters expose typed failures and substitutable operation telemetry (covered 0)
+    task-validation-boundaries.test.ts
+      ✘ task dependency declarations reject unsupported shapes before binding (covered 0)
+      ✘ task error and stream declarations keep validation in the Effect path (covered 0)
+    task-validation-effect.test.ts
+      ~ task validation Effect paths preserve typed errors and telemetry (covered 28)
+    task-wire-effect.test.ts
+      ✘ Effect wire codec and validators expose typed failures and telemetry (covered 0)
+    task-wire.test.ts
+      ✘ keeps raw handler output separate from validated canonical output (covered 0)
+      ✘ validates a transformed input once and replays its canonical value (covered 0)
+      ✘ rejects a changing wire validator and preserves void envelopes (covered 0)
+      ✘ rejects non-JSON values, unsafe envelopes, and oversized payloads (covered 0)
+      ✘ rejects schemas whose canonical projection contains binary values (covered 0)
+    trigger-boundaries.test.ts
+      ~ covers trigger and result option boundaries (covered 58)
+    trigger-schedule.test.ts
+      ~ validates trigger and observer boundaries (covered 46)
+      ✓ validates exclusive schedules and admission policies (killed 1)
+      ✘ checks real RFC 3339 calendar and offset values (covered 0)
+      ~ canonicalizes authored schedule inputs through the task input schema (covered 44)
+      ~ preserves task selectors in copied trigger options (covered 4)
+    trigger-validation-effect.test.ts
+      ~ Effect validates trigger and result options with sync compatibility (covered 46)
+      ✘ invalid trigger options fail with a tagged Effect error (covered 0)
+
+[NoCoverage] BlockStatement
+packages/client/src/jobs/controller.service.ts:124:47
+-         return current.releaseView().then(() => {
+-           throw new JobWatchAbortedError();
+-         });
++         return current.releaseView().then(() => {});
+
+[NoCoverage] CallExpression
+packages/client/src/jobs/controller.service.ts:125:9
+-           throw new JobWatchAbortedError();
++           ;
+
+[NoCoverage] ArrowFunction
+packages/client/src/jobs/controller.service.ts:215:59
+-             return release(new JobWatchAbortedError()).then(() =>
+-               requestedEpoch === epoch && !disposed ? start() : undefined,
++             return release(new JobWatchAbortedError()).then(() => undefined,
+
+[NoCoverage] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:216:13
+-               requestedEpoch === epoch && !disposed ? start() : undefined,
++               true ? start() : undefined,
+
+[NoCoverage] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:216:13
+-               requestedEpoch === epoch && !disposed ? start() : undefined,
++               false ? start() : undefined,
+
+[NoCoverage] LogicalOperator
+packages/client/src/jobs/controller.service.ts:216:13
+-               requestedEpoch === epoch && !disposed ? start() : undefined,
++               requestedEpoch === epoch || !disposed ? start() : undefined,
+
+[NoCoverage] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:216:13
+-               requestedEpoch === epoch && !disposed ? start() : undefined,
++               true && !disposed ? start() : undefined,
+
+[NoCoverage] EqualityOperator
+packages/client/src/jobs/controller.service.ts:216:13
+-               requestedEpoch === epoch && !disposed ? start() : undefined,
++               requestedEpoch !== epoch && !disposed ? start() : undefined,
+
+[NoCoverage] BooleanLiteral
+packages/client/src/jobs/controller.service.ts:216:41
+-               requestedEpoch === epoch && !disposed ? start() : undefined,
++               requestedEpoch === epoch && disposed ? start() : undefined,
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:91:9
+-       if (requestedEpoch === epoch && !disposed)
++       if (true)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 12 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:91:9
+-       if (requestedEpoch === epoch && !disposed)
++       if (requestedEpoch === epoch || !disposed)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 12 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:91:9
+-       if (requestedEpoch === epoch && !disposed)
++       if (true && !disposed)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 12 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:102:9
+-       if (previous === undefined || previousLease === undefined) return Promise.resolve();
++       if (previous === undefined && previousLease === undefined) return Promise.resolve();
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 14 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:102:9
+-       if (previous === undefined || previousLease === undefined) return Promise.resolve();
++       if (false || previousLease === undefined) return Promise.resolve();
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 14 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:102:35
+-       if (previous === undefined || previousLease === undefined) return Promise.resolve();
++       if (previous === undefined || false) return Promise.resolve();
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 11 more tests!
+
+
+[Survived] CallExpression
+packages/client/src/jobs/controller.service.ts:103:5
+-       previous.retireView();
++       ;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 11 more tests!
+
+
+[Survived] UpdateOperator
+packages/client/src/jobs/controller.service.ts:112:28
+-       const requestedEpoch = ++epoch;
++       const requestedEpoch = --epoch;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] BooleanLiteral
+packages/client/src/jobs/controller.service.ts:117:16
+-         isStale: false,
++         isStale: true,
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:120:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if (false)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:120:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if ((requestedEpoch !== epoch || disposed) && disconnected)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:120:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if (false || disconnected)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:120:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if (requestedEpoch !== epoch && disposed || disconnected)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:120:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if (false || disposed || disconnected)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:123:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if (false)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 11 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:123:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if ((requestedEpoch !== epoch || disposed) && disconnected)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 11 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:123:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if (false || disconnected)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 11 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:123:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if (requestedEpoch !== epoch && disposed || disconnected)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 11 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:123:9
+-       if (requestedEpoch !== epoch || disposed || disconnected)
++       if (false || disposed || disconnected)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 11 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:134:11
+-             requestedEpoch === epoch &&
+-             !disposed &&
+-             !disconnected &&
+-             snapshot().connection !== "unauthorized"
++             false
+Tests ran:
+    dispose settles an interrupted connect and ignores late frames
+    a reconnect waits for interrupted teardown before reusing a shared feed
+    bounded reads surface timeout instead of leaving connect pending
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:134:11
+-             requestedEpoch === epoch &&
+-             !disposed &&
+-             !disconnected &&
++             true &&
+Tests ran:
+    dispose settles an interrupted connect and ignores late frames
+    a reconnect waits for interrupted teardown before reusing a shared feed
+    bounded reads surface timeout instead of leaving connect pending
+  and 1 more test!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:134:11
+-             requestedEpoch === epoch &&
+-             !disposed &&
+-             !disconnected &&
++             requestedEpoch === epoch && !disposed || !disconnected &&
+Tests ran:
+    dispose settles an interrupted connect and ignores late frames
+    a reconnect waits for interrupted teardown before reusing a shared feed
+    bounded reads surface timeout instead of leaving connect pending
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:134:11
+-             requestedEpoch === epoch &&
+-             !disposed &&
++             true &&
+Tests ran:
+    dispose settles an interrupted connect and ignores late frames
+    a reconnect waits for interrupted teardown before reusing a shared feed
+    bounded reads surface timeout instead of leaving connect pending
+  and 1 more test!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:134:11
+-             requestedEpoch === epoch &&
+-             !disposed &&
++             requestedEpoch === epoch || !disposed &&
+Tests ran:
+    dispose settles an interrupted connect and ignores late frames
+    a reconnect waits for interrupted teardown before reusing a shared feed
+    bounded reads surface timeout instead of leaving connect pending
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:134:11
+-             requestedEpoch === epoch &&
++             true &&
+Tests ran:
+    dispose settles an interrupted connect and ignores late frames
+    a reconnect waits for interrupted teardown before reusing a shared feed
+    bounded reads surface timeout instead of leaving connect pending
+  and 1 more test!
+
+
+[Survived] EqualityOperator
+packages/client/src/jobs/controller.service.ts:134:11
+-             requestedEpoch === epoch &&
++             requestedEpoch !== epoch &&
+Tests ran:
+    dispose settles an interrupted connect and ignores late frames
+    a reconnect waits for interrupted teardown before reusing a shared feed
+    bounded reads surface timeout instead of leaving connect pending
+  and 1 more test!
+
+
+[Survived] BooleanLiteral
+packages/client/src/jobs/controller.service.ts:135:11
+-             !disposed &&
++             disposed &&
+Tests ran:
+    bounded reads surface timeout instead of leaving connect pending
+    authorization denial stops reconnects and clears the view
+
+
+[Survived] BooleanLiteral
+packages/client/src/jobs/controller.service.ts:136:11
+-             !disconnected &&
++             disconnected &&
+Tests ran:
+    bounded reads surface timeout instead of leaving connect pending
+    authorization denial stops reconnects and clears the view
+
+
+[Survived] BooleanLiteral
+packages/client/src/jobs/controller.service.ts:139:66
+-             publish({ ...snapshot(), connection: "error", isStale: false, connectionError: error });
++             publish({ ...snapshot(), connection: "error", isStale: true, connectionError: error });
+Tests ran:
+    bounded reads surface timeout instead of leaving connect pending
+
+
+[Survived] CallExpression
+packages/client/src/jobs/controller.service.ts:146:5
+-       assertLive();
++       ;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/controller.service.ts:153:9
+-           "client",
++           "",
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/controller.service.ts:154:9
+-           "jobs.refetch",
++           "",
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/controller.service.ts:155:19
+-           Effect.fn("JobControllers.refetch")(function* () {
++           Effect.fn("")(function* () {
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:158:13
+-               borrow === undefined
++               true
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ArrayDeclaration
+packages/client/src/jobs/controller.service.ts:165:56
+-                     current.feed.refetch(AbortSignal.any([controller.signal, owned])),
++                     current.feed.refetch(AbortSignal.any([])),
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:167:21
+-                   if (frame === undefined || controller.signal.aborted || disposed) return;
++                   if (false) return;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:167:21
+-                   if (frame === undefined || controller.signal.aborted || disposed) return;
++                   if ((frame === undefined || controller.signal.aborted) && disposed) return;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:167:21
+-                   if (frame === undefined || controller.signal.aborted || disposed) return;
++                   if (false || disposed) return;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:167:21
+-                   if (frame === undefined || controller.signal.aborted || disposed) return;
++                   if (frame === undefined && controller.signal.aborted || disposed) return;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:167:21
+-                   if (frame === undefined || controller.signal.aborted || disposed) return;
++                   if (false || controller.signal.aborted || disposed) return;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/controller.service.ts:168:33
+-                   receive({ kind: "frame", frame }, requestedEpoch);
++                   receive({ kind: "", frame }, requestedEpoch);
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:169:21
+-                   if (disconnected && previousConnection === "disconnected")
++                   if (true)
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:169:21
+-                   if (disconnected && previousConnection === "disconnected")
++                   if (disconnected || previousConnection === "disconnected")
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:169:37
+-                   if (disconnected && previousConnection === "disconnected")
++                   if (disconnected && true)
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ArrowFunction
+packages/client/src/jobs/controller.service.ts:172:13
+-               (temporary) => temporary?.release ?? Effect.void,
++               () => undefined,
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:172:28
+-               (temporary) => temporary?.release ?? Effect.void,
++               (temporary) => temporary?.release && Effect.void,
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] OptionalChaining
+packages/client/src/jobs/controller.service.ts:172:28
+-               (temporary) => temporary?.release ?? Effect.void,
++               (temporary) => temporary.release ?? Effect.void,
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] BlockStatement
+packages/client/src/jobs/controller.service.ts:175:33
+-                 Effect.sync(() => {
+-                   if (refetchAbort === controller) refetchAbort = undefined;
+-                 }),
++                 Effect.sync(() => {}),
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:176:21
+-                   if (refetchAbort === controller) refetchAbort = undefined;
++                   if (true) refetchAbort = undefined;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:176:21
+-                   if (refetchAbort === controller) refetchAbort = undefined;
++                   if (false) refetchAbort = undefined;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] EqualityOperator
+packages/client/src/jobs/controller.service.ts:176:21
+-                   if (refetchAbort === controller) refetchAbort = undefined;
++                   if (refetchAbort !== controller) refetchAbort = undefined;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] CallExpression
+packages/client/src/jobs/controller.service.ts:202:7
+-         assertLive();
++         ;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:205:9
+-           connection === "connected" ||
+-           connection === "connecting" ||
+-           connection === "reconnecting"
++           false
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:205:9
+-           connection === "connected" ||
+-           connection === "connecting" ||
+-           connection === "reconnecting"
++           (connection === "connected" || connection === "connecting") && connection === "reconnecting"
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:205:9
+-           connection === "connected" ||
+-           connection === "connecting" ||
++           false ||
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:205:9
+-           connection === "connected" ||
+-           connection === "connecting" ||
++           connection === "connected" && connection === "connecting" ||
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:205:9
+-           connection === "connected" ||
++           false ||
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/controller.service.ts:205:24
+-           connection === "connected" ||
++           connection === "" ||
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:206:9
+-           connection === "connecting" ||
++           false ||
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/controller.service.ts:206:24
+-           connection === "connecting" ||
++           connection === "" ||
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:207:9
+-           connection === "reconnecting"
++           false
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/controller.service.ts:207:24
+-           connection === "reconnecting"
++           connection === ""
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:212:13
+-           if (snapshot().connection === "completed" || requestedEpoch !== epoch || disposed)
++           if (false)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:212:13
+-           if (snapshot().connection === "completed" || requestedEpoch !== epoch || disposed)
++           if ((snapshot().connection === "completed" || requestedEpoch !== epoch) && disposed)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:212:13
+-           if (snapshot().connection === "completed" || requestedEpoch !== epoch || disposed)
++           if (false || disposed)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/controller.service.ts:212:13
+-           if (snapshot().connection === "completed" || requestedEpoch !== epoch || disposed)
++           if (snapshot().connection === "completed" && requestedEpoch !== epoch || disposed)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:212:13
+-           if (snapshot().connection === "completed" || requestedEpoch !== epoch || disposed)
++           if (false || requestedEpoch !== epoch || disposed)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/controller.service.ts:212:39
+-           if (snapshot().connection === "completed" || requestedEpoch !== epoch || disposed)
++           if (snapshot().connection === "" || requestedEpoch !== epoch || disposed)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:212:54
+-           if (snapshot().connection === "completed" || requestedEpoch !== epoch || disposed)
++           if (snapshot().connection === "completed" || false || disposed)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:214:13
+-           if (borrow !== undefined)
++           if (false)
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:220:14
+-         return connection === "completed" ? refetch().then(resume) : resume();
++         return false ? refetch().then(resume) : resume();
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/controller.service.ts:220:29
+-         return connection === "completed" ? refetch().then(resume) : resume();
++         return connection === "" ? refetch().then(resume) : resume();
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:223:11
+-         if (disposed) return Promise.resolve();
++         if (false) return Promise.resolve();
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+    watch-only refetch closes its temporary iterator and remains disconnected
+  and 3 more tests!
+
+
+[Survived] UpdateOperator
+packages/client/src/jobs/controller.service.ts:225:7
+-         epoch++;
++         epoch--;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+    watch-only refetch closes its temporary iterator and remains disconnected
+  and 3 more tests!
+
+
+[Survived] BooleanLiteral
+packages/client/src/jobs/controller.service.ts:230:18
+-           isStale: false,
++           isStale: true,
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+    watch-only refetch closes its temporary iterator and remains disconnected
+  and 3 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.service.ts:236:11
+-         if (closing !== undefined) return closing;
++         if (false) return closing;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 14 more tests!
+
+
+[Survived] BooleanLiteral
+packages/client/src/jobs/controller.service.ts:237:18
+-         disposed = true;
++         disposed = false;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 14 more tests!
+
+
+[Survived] UpdateOperator
+packages/client/src/jobs/controller.service.ts:238:7
+-         epoch++;
++         epoch--;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 14 more tests!
+
+
+[Survived] BooleanLiteral
+packages/client/src/jobs/controller.service.ts:244:52
+-           publish({ connection: "disposed", isStale: false });
++           publish({ connection: "disposed", isStale: true });
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 14 more tests!
+
+
+[Survived] CallExpression
+packages/client/src/jobs/controller.service.ts:245:9
+-           listeners.clear();
++           ;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 14 more tests!
+
+
+[Survived] CallExpression
+packages/client/src/jobs/controller.ts:57:5
+-       this.service.assertLive();
++       ;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 12 more tests!
+
+
+[Survived] BlockStatement
+packages/client/src/jobs/controller.ts:62:42
+-       const shared = pending.finally(() => {
+-         if (this.connecting === shared) this.connecting = undefined;
+-       });
++       const shared = pending.finally(() => {});
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 12 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.ts:63:11
+-         if (this.connecting === shared) this.connecting = undefined;
++         if (true) this.connecting = undefined;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 12 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.ts:63:11
+-         if (this.connecting === shared) this.connecting = undefined;
++         if (false) this.connecting = undefined;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 12 more tests!
+
+
+[Survived] EqualityOperator
+packages/client/src/jobs/controller.ts:63:11
+-         if (this.connecting === shared) this.connecting = undefined;
++         if (this.connecting !== shared) this.connecting = undefined;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 12 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.ts:71:9
+-       if (this.closing !== undefined) return Promise.resolve();
++       if (false) return Promise.resolve();
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+    watch-only refetch closes its temporary iterator and remains disconnected
+  and 3 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.ts:72:9
+-       if (this.disconnecting !== undefined) return this.disconnecting;
++       if (false) return this.disconnecting;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+    watch-only refetch closes its temporary iterator and remains disconnected
+  and 3 more tests!
+
+
+[Survived] BlockStatement
+packages/client/src/jobs/controller.ts:74:42
+-       const joined = pending.finally(() => {
+-         if (this.disconnecting === joined) this.disconnecting = undefined;
+-       });
++       const joined = pending.finally(() => {});
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+    watch-only refetch closes its temporary iterator and remains disconnected
+  and 3 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.ts:75:11
+-         if (this.disconnecting === joined) this.disconnecting = undefined;
++         if (true) this.disconnecting = undefined;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+    watch-only refetch closes its temporary iterator and remains disconnected
+  and 3 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.ts:75:11
+-         if (this.disconnecting === joined) this.disconnecting = undefined;
++         if (false) this.disconnecting = undefined;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+    watch-only refetch closes its temporary iterator and remains disconnected
+  and 3 more tests!
+
+
+[Survived] EqualityOperator
+packages/client/src/jobs/controller.ts:75:11
+-         if (this.disconnecting === joined) this.disconnecting = undefined;
++         if (this.disconnecting !== joined) this.disconnecting = undefined;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+    watch-only refetch closes its temporary iterator and remains disconnected
+  and 3 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/controller.ts:83:9
+-       if (this.closing !== undefined) return this.closing;
++       if (false) return this.closing;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] CallExpression
+packages/client/src/jobs/controller.ts:89:5
+-       this.service.assertLive();
++       ;
+Tests ran:
+    watch-only refetch closes its temporary iterator and remains disconnected
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/feed-registry.service.ts:54:21
+-                   if (groups.get(key.value)?.feed !== feed) return;
++                   if (false) return;
+Tests ran:
+    EOF reconciles through authoritative reads and never fabricates completion
+    proxy clients use get for EOF reconciliation
+    a reconnect waits for interrupted teardown before reusing a shared feed
+  and 5 more tests!
+
+
+[Survived] OptionalChaining
+packages/client/src/jobs/feed-registry.service.ts:54:21
+-                   if (groups.get(key.value)?.feed !== feed) return;
++                   if (groups.get(key.value).feed !== feed) return;
+Tests ran:
+    EOF reconciles through authoritative reads and never fabricates completion
+    proxy clients use get for EOF reconciliation
+    a reconnect waits for interrupted teardown before reusing a shared feed
+  and 5 more tests!
+
+
+[Survived] ArrowFunction
+packages/client/src/jobs/feed-registry.service.ts:64:50
+-       yield* Effect.addFinalizer(() => Effect.sync(() => groups.clear()));
++       yield* Effect.addFinalizer(() => Effect.sync(() => undefined));
+Tests ran:
+    registry owner closure interrupts a borrowed native feed and settles pending observation
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/feed-registry.service.ts:77:11
+-         if (group === undefined) {
++         if (true) {
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ArrowFunction
+packages/client/src/jobs/feed-registry.service.ts:82:31
+-               Effect.catchCause((cause) =>
+-                 Scope.close(scope, Exit.failCause(cause)).pipe(
+-                   Effect.andThen(Effect.failCause(cause)),
+-                 ),
++               Effect.catchCause(() => undefined,
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/feed-registry.service.ts:100:13
+-           if (Ref.getUnsafe(entry.references) !== 0 || groups.get(key.value) !== entry) return;
++           if (false) return;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/feed-registry.service.ts:100:13
+-           if (Ref.getUnsafe(entry.references) !== 0 || groups.get(key.value) !== entry) return;
++           if (Ref.getUnsafe(entry.references) !== 0 && groups.get(key.value) !== entry) return;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/feed-registry.service.ts:100:13
+-           if (Ref.getUnsafe(entry.references) !== 0 || groups.get(key.value) !== entry) return;
++           if (false || groups.get(key.value) !== entry) return;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/feed-registry.service.ts:100:54
+-           if (Ref.getUnsafe(entry.references) !== 0 || groups.get(key.value) !== entry) return;
++           if (Ref.getUnsafe(entry.references) !== 0 || false) return;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] CallExpression
+packages/client/src/jobs/feed-registry.service.ts:102:9
+-           runClientSync(RcMap.invalidate(feeds, key));
++           ;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    sequence and cursor duplicates are ignored while a shared lease survives another disconnect
+  and 6 more tests!
+
+
+[Survived] CallExpression
+packages/client/src/jobs/feed-registry.service.ts:105:9
+-           retireView();
++           ;
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/feed-registry.service.ts:107:11
+-             Ref.getUnsafe(entry.references) === 0
++             false
+Tests ran:
+    watch controllers stay idle until connect and share a first-snapshot promise
+    terminal watch frames require an authoritative terminal confirmation
+    EOF reconciles through authoritative reads and never fabricates completion
+  and 13 more tests!
+
+
+[NoCoverage] StringLiteral
+packages/client/src/jobs/watch-feed-polling.ts:40:49
+-               return yield* Effect.fail(new Error("Polling returned no run snapshot."));
++               return yield* Effect.fail(new Error(""));
+
+[NoCoverage] LogicalOperator
+packages/client/src/jobs/watch-feed-polling.ts:68:29
+-             const requested = feed.options.pollIntervalMs ?? 2_000;
++             const requested = feed.options.pollIntervalMs && 2_000;
+
+[NoCoverage] MethodExpression
+packages/client/src/jobs/watch-feed-polling.ts:69:60
+-             yield* Effect.sleep(Number.isFinite(requested) ? Math.max(2_000, requested) : 2_000);
++             yield* Effect.sleep(Number.isFinite(requested) ? Math.min(2_000, requested) : 2_000);
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:25:15
+-             if (yield* nativeCall(() => offline(controller.signal))) return;
++             if (false) return;
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:26:15
+-             if (!connected)
++             if (true)
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] EqualityOperator
+packages/client/src/jobs/watch-feed-polling.ts:29:23
+-                 status: feed.failureCount() === 0 ? "connecting" : "reconnecting",
++                 status: feed.failureCount() !== 0 ? "connecting" : "reconnecting",
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/watch-feed-polling.ts:29:51
+-                 status: feed.failureCount() === 0 ? "connecting" : "reconnecting",
++                 status: feed.failureCount() === 0 ? "" : "reconnecting",
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:39:15
+-             if (observed === undefined)
++             if (false)
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:41:15
+-             if (!feed.isActive(generation)) return;
++             if (false) return;
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ObjectLiteral
+packages/client/src/jobs/watch-feed-polling.ts:42:43
+-             const snapshot = JSON.stringify({ run: observed.run, cursor: observed.cursor });
++             const snapshot = JSON.stringify({});
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:43:25
+-             const frame = snapshot === lastSnapshot ? undefined : feed.acceptFrame(observed);
++             const frame = false ? undefined : feed.acceptFrame(observed);
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:45:15
+-             if (!connected) {
++             if (true) {
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/watch-feed-polling.ts:46:31
+-               feed.emit({ kind: "status", status: "connected" });
++               feed.emit({ kind: "", status: "connected" });
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] BooleanLiteral
+packages/client/src/jobs/watch-feed-polling.ts:47:25
+-               connected = true;
++               connected = false;
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:49:15
+-             if (frame !== undefined) {
++             if (true) {
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] CallExpression
+packages/client/src/jobs/watch-feed-polling.ts:50:13
+-               feed.setFailureCount(0);
++               ;
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:55:19
+-                 if (confirmed === true) {
++                 if (true) {
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:61:19
+-                 if (confirmed === false) feed.resolveFirsts();
++                 if (true) feed.resolveFirsts();
+Tests ran:
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:61:19
+-                 if (confirmed === false) feed.resolveFirsts();
++                 if (false) feed.resolveFirsts();
+Tests ran:
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] EqualityOperator
+packages/client/src/jobs/watch-feed-polling.ts:61:19
+-                 if (confirmed === false) feed.resolveFirsts();
++                 if (confirmed !== false) feed.resolveFirsts();
+Tests ran:
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] BooleanLiteral
+packages/client/src/jobs/watch-feed-polling.ts:61:33
+-                 if (confirmed === false) feed.resolveFirsts();
++                 if (confirmed === true) feed.resolveFirsts();
+Tests ran:
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] CallExpression
+packages/client/src/jobs/watch-feed-polling.ts:61:40
+-                 if (confirmed === false) feed.resolveFirsts();
++                 if (confirmed === false) ;
+Tests ran:
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-polling.ts:67:15
+-             if (controller.signal.aborted) return yield* Effect.interrupt;
++             if (true) return yield* Effect.interrupt;
+Tests ran:
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] BlockStatement
+packages/client/src/jobs/watch-feed-polling.ts:76:31
+-               Effect.sync(() => {
+-                 controller.abort();
+-                 feed.setAbort(undefined);
+-               }),
++               Effect.sync(() => {}),
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] CallExpression
+packages/client/src/jobs/watch-feed-polling.ts:77:15
+-                 controller.abort();
++                 ;
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] CallExpression
+packages/client/src/jobs/watch-feed-polling.ts:78:15
+-                 feed.setAbort(undefined);
++                 ;
+Tests ran:
+    polling uses serialized authoritative reads and reports its source
+    covers offline recovery and polling terminal/error transitions
+    covers polling changes, terminal rechecks and active-generation exits
+
+
+[Survived] StringLiteral
+packages/client/src/jobs/watch-feed-polling.ts:16:41
+-   export const runPollingFeed = Effect.fn("JobObservation.poll")(
++   export const runPollingFeed = Effect.fn("")(
+Ran all tests for this mutant.
+
+[Survived] ConditionalExpression
+packages/client/src/jobs/watch-feed-recovery.ts:20:9
+-       if (controller.signal.aborted || !feed.isActive(generation)) return yield* Effect.interrupt;
++       if (false) return yield* Effect.interrupt;
+Tests ran:
+    EOF reconciles through authoritative reads and never fabricates completion
+    bounded reads surface timeout instead of leaving connect pending
+    authorization denial stops reconnects and clears the view
+  and 2 more tests!
+
+
+[Survived] LogicalOperator
+packages/client/src/jobs/watch-feed-recovery.ts:20:9
+-       if (controller.signal.aborted || !feed.isActive(generation)) return yield* Effect.interrupt;
++       if (controller.signal.aborted && !feed.isActive(generation)) return yield* Effect.interrupt;
+Tests ran:
+    EOF reconciles through authoritative reads and never fabricates completion
+    bounded reads surface timeout instead of leaving connect pending
+    authorization denial stops reconnects and clears the view
+  and 2 more tests!
+
+
+[Survived] CallExpression
+packages/client/src/jobs/watch-feed-recovery.ts:30:7
+-         feed.releaseTerminal();
++         ;
+Tests ran:
+    bounded reads surface timeout instead of leaving connect pending
+    authorization denial stops reconnects and clears the view
+    covers offline recovery and polling terminal/error transitions
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/authorization-grant.ts:24:7
+-         typeof grant.scope !== "string" ||
++         false ||
+Tests ran:
+    validates job grants and passes trusted authorization context
+    rejects boolean, expired, and out-of-scope grants while keeping public scope dedicated
+    Effect authorization narrows a policy grant and uses a telemetry Layer
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/authorization-grant.ts:25:9
+-         !(grant.scope === trusted.scope || grant.scope.startsWith(`${trusted.scope}:`))
++         !(false || grant.scope.startsWith(`${trusted.scope}:`))
+Tests ran:
+    validates job grants and passes trusted authorization context
+    rejects boolean, expired, and out-of-scope grants while keeping public scope dedicated
+    Effect authorization narrows a policy grant and uses a telemetry Layer
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/authorization-grant.ts:30:11
+-         if (typeof grant.expiresAt !== "string") return yield* deny();
++         if (false) return yield* deny();
+Tests ran:
+    validates job grants and passes trusted authorization context
+    rejects boolean, expired, and out-of-scope grants while keeping public scope dedicated
+    grant validation checks expiry and operation using deterministic time
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/authorization-grant.ts:32:11
+-         if (!(yield* isRfc3339InstantEffect(grant.expiresAt))) return yield* deny();
++         if (false) return yield* deny();
+Tests ran:
+    validates job grants and passes trusted authorization context
+    rejects boolean, expired, and out-of-scope grants while keeping public scope dedicated
+    grant validation checks expiry and operation using deterministic time
+
+
+[Survived] EqualityOperator
+packages/jobs/src/authorization-grant.ts:35:39
+-         if (!Number.isFinite(expiry) || expiry <= current) return yield* deny();
++         if (!Number.isFinite(expiry) || expiry < current) return yield* deny();
+Tests ran:
+    validates job grants and passes trusted authorization context
+    rejects boolean, expired, and out-of-scope grants while keeping public scope dedicated
+    grant validation checks expiry and operation using deterministic time
+
+
+[NoCoverage] ObjectLiteral
+packages/jobs/src/authorization.ts:111:59
+-       return yield* Effect.fail(new JobAuthorizationFailure({ reason: "operation" }));
++       return yield* Effect.fail(new JobAuthorizationFailure({}));
+
+[NoCoverage] StringLiteral
+packages/jobs/src/authorization.ts:111:69
+-       return yield* Effect.fail(new JobAuthorizationFailure({ reason: "operation" }));
++       return yield* Effect.fail(new JobAuthorizationFailure({ reason: "" }));
+
+[Survived] StringLiteral
+packages/jobs/src/authorization.ts:108:69
+-       return yield* Effect.fail(new JobAuthorizationFailure({ reason: "jobId" }));
++       return yield* Effect.fail(new JobAuthorizationFailure({ reason: "" }));
+Tests ran:
+    policy rejection becomes a tagged denial while adapter keeps its error
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/authorization.ts:110:7
+-     if (policy === undefined || !policy.operations.includes(request.operation))
++     if (false)
+Tests ran:
+    validates job grants and passes trusted authorization context
+    rejects boolean, expired, and out-of-scope grants while keeping public scope dedicated
+    Effect authorization narrows a policy grant and uses a telemetry Layer
+  and 1 more test!
+
+
+[Survived] LogicalOperator
+packages/jobs/src/authorization.ts:110:7
+-     if (policy === undefined || !policy.operations.includes(request.operation))
++     if (policy === undefined && !policy.operations.includes(request.operation))
+Tests ran:
+    validates job grants and passes trusted authorization context
+    rejects boolean, expired, and out-of-scope grants while keeping public scope dedicated
+    Effect authorization narrows a policy grant and uses a telemetry Layer
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/authorization.ts:110:7
+-     if (policy === undefined || !policy.operations.includes(request.operation))
++     if (false || !policy.operations.includes(request.operation))
+Tests ran:
+    validates job grants and passes trusted authorization context
+    rejects boolean, expired, and out-of-scope grants while keeping public scope dedicated
+    Effect authorization narrows a policy grant and uses a telemetry Layer
+  and 1 more test!
+
+
+[Survived] BlockStatement
+packages/jobs/src/duration.ts:66:56
+-       if (wholeText === undefined || unit === undefined) {
+-         return yield* Effect.fail(
+-           new DurationValidationError({
+-             input: String(value),
+-             reason: `Invalid duration "${String(value)}"`,
+-           }),
+-         );
+-       }
++       if (wholeText === undefined || unit === undefined) {}
+Tests ran:
+    accepts only exact readable duration boundaries
+    job names and durations reject unsafe spellings
+
+
+[Survived] ObjectLiteral
+packages/jobs/src/duration.ts:68:37
+-           new DurationValidationError({
+-             input: String(value),
+-             reason: `Invalid duration "${String(value)}"`,
+-           }),
++           new DurationValidationError({}),
+Tests ran:
+    accepts only exact readable duration boundaries
+    job names and durations reject unsafe spellings
+
+
+[Survived] StringLiteral
+packages/jobs/src/duration.ts:70:19
+-             reason: `Invalid duration "${String(value)}"`,
++             reason: ``,
+Tests ran:
+    accepts only exact readable duration boundaries
+    job names and durations reject unsafe spellings
+
+
+[Survived] StringLiteral
+packages/jobs/src/duration.ts:60:49
+-   export const durationToMillisEffect = Effect.fn("Jobs.durationToMillis")(
++   export const durationToMillisEffect = Effect.fn("")(
+Ran all tests for this mutant.
+
+[Survived] OptionalChaining
+packages/jobs/src/duration.ts:63:23
+-       const wholeText = match?.[1];
++       const wholeText = match[1];
+Ran all tests for this mutant.
+
+[Survived] OptionalChaining
+packages/jobs/src/duration.ts:64:26
+-       const fractionText = match?.[2];
++       const fractionText = match[2];
+Ran all tests for this mutant.
+
+[Survived] OptionalChaining
+packages/jobs/src/duration.ts:65:18
+-       const unit = match?.[3];
++       const unit = match[3];
+Ran all tests for this mutant.
+
+[Survived] ConditionalExpression
+packages/jobs/src/duration.ts:66:9
+-       if (wholeText === undefined || unit === undefined) {
++       if (false) {
+Ran all tests for this mutant.
+
+[Survived] LogicalOperator
+packages/jobs/src/duration.ts:66:9
+-       if (wholeText === undefined || unit === undefined) {
++       if (wholeText === undefined && unit === undefined) {
+Ran all tests for this mutant.
+
+[Survived] ConditionalExpression
+packages/jobs/src/duration.ts:66:9
+-       if (wholeText === undefined || unit === undefined) {
++       if (false || unit === undefined) {
+Ran all tests for this mutant.
+
+[Survived] ConditionalExpression
+packages/jobs/src/duration.ts:66:36
+-       if (wholeText === undefined || unit === undefined) {
++       if (wholeText === undefined || false) {
+Ran all tests for this mutant.
+
+[Survived] StringLiteral
+packages/jobs/src/duration.ts:77:67
+-       const amount = BigInt(wholeText) * scale + BigInt(fraction || "0");
++       const amount = BigInt(wholeText) * scale + BigInt(fraction || "");
+Ran all tests for this mutant.
+
+[Survived] EqualityOperator
+packages/jobs/src/duration.ts:88:9
+-       if (milliseconds > MAX_SAFE_INTEGER) {
++       if (milliseconds >= MAX_SAFE_INTEGER) {
+Ran all tests for this mutant.
+
+[Survived] StringLiteral
+packages/jobs/src/resolve-binding.ts:37:7
+-         "binding.resolve",
++         "",
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 2 more tests!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:41:15
+-             if (error instanceof JobBindingResolutionError)
++             if (true)
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding rejects ambiguous jobs and wrong-task selectors
+    resolveTaskBinding Effect resolves the same binding and reports a tagged ambiguous failure
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:41:15
+-             if (error instanceof JobBindingResolutionError)
++             if (false)
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding rejects ambiguous jobs and wrong-task selectors
+    resolveTaskBinding Effect resolves the same binding and reports a tagged ambiguous failure
+
+
+[Survived] ArrayDeclaration
+packages/jobs/src/resolve-binding.ts:65:40
+-     const allJobs = [...(options.jobs ?? [])];
++     const allJobs = [...(options.jobs ?? ["Stryker was here"])];
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding Effect resolves the same binding and reports a tagged ambiguous failure
+
+
+[Survived] MethodExpression
+packages/jobs/src/resolve-binding.ts:67:16
+-     const jobs = allJobs.filter((job) => taskIdOf(job.task) === taskId);
++     const jobs = allJobs;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 2 more tests!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:67:40
+-     const jobs = allJobs.filter((job) => taskIdOf(job.task) === taskId);
++     const jobs = allJobs.filter((job) => true);
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding selects the designated default across service profiles
+    resolveTaskBinding rejects ambiguous jobs and wrong-task selectors
+  and 1 more test!
+
+
+[Survived] LogicalOperator
+packages/jobs/src/resolve-binding.ts:104:8
+-         (defaults[0] ?? jobs[0])!,
++         (defaults[0] && jobs[0])!,
+Tests ran:
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] StringLiteral
+packages/jobs/src/resolve-binding.ts:105:7
+-         "default",
++         "",
+Tests ran:
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] BooleanLiteral
+packages/jobs/src/resolve-binding.ts:106:7
+-         false,
++         true,
+Tests ran:
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:107:7
+-         defaults.length === 1,
++         true,
+Tests ran:
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:107:7
+-         defaults.length === 1,
++         false,
+Tests ran:
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] EqualityOperator
+packages/jobs/src/resolve-binding.ts:107:7
+-         defaults.length === 1,
++         defaults.length !== 1,
+Tests ran:
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] BooleanLiteral
+packages/jobs/src/resolve-binding.ts:110:61
+-     return makeBinding(options, taskId, selected, "explicit", false, selected.default === true);
++     return makeBinding(options, taskId, selected, "explicit", true, selected.default === true);
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:110:68
+-     return makeBinding(options, taskId, selected, "explicit", false, selected.default === true);
++     return makeBinding(options, taskId, selected, "explicit", false, true);
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:110:68
+-     return makeBinding(options, taskId, selected, "explicit", false, selected.default === true);
++     return makeBinding(options, taskId, selected, "explicit", false, false);
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+
+
+[Survived] EqualityOperator
+packages/jobs/src/resolve-binding.ts:110:68
+-     return makeBinding(options, taskId, selected, "explicit", false, selected.default === true);
++     return makeBinding(options, taskId, selected, "explicit", false, selected.default !== true);
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+
+
+[Survived] BooleanLiteral
+packages/jobs/src/resolve-binding.ts:110:89
+-     return makeBinding(options, taskId, selected, "explicit", false, selected.default === true);
++     return makeBinding(options, taskId, selected, "explicit", false, selected.default === false);
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:128:15
+-     const job = typeof jobOrName === "string" ? undefined : jobOrName;
++     const job = false ? undefined : jobOrName;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] StringLiteral
+packages/jobs/src/resolve-binding.ts:128:36
+-     const job = typeof jobOrName === "string" ? undefined : jobOrName;
++     const job = typeof jobOrName === "" ? undefined : jobOrName;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:129:16
+-     const name = typeof jobOrName === "string" ? jobOrName : jobOrName.name;
++     const name = true ? jobOrName : jobOrName.name;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:129:16
+-     const name = typeof jobOrName === "string" ? jobOrName : jobOrName.name;
++     const name = false ? jobOrName : jobOrName.name;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] EqualityOperator
+packages/jobs/src/resolve-binding.ts:129:16
+-     const name = typeof jobOrName === "string" ? jobOrName : jobOrName.name;
++     const name = typeof jobOrName !== "string" ? jobOrName : jobOrName.name;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] StringLiteral
+packages/jobs/src/resolve-binding.ts:129:37
+-     const name = typeof jobOrName === "string" ? jobOrName : jobOrName.name;
++     const name = typeof jobOrName === "" ? jobOrName : jobOrName.name;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:130:35
+-     const jobId = jobIdOverride ?? (typeof jobOrName === "string" ? jobOrName : jobOrName.id);
++     const jobId = jobIdOverride ?? (false ? jobOrName : jobOrName.id);
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] StringLiteral
+packages/jobs/src/resolve-binding.ts:130:56
+-     const jobId = jobIdOverride ?? (typeof jobOrName === "string" ? jobOrName : jobOrName.id);
++     const jobId = jobIdOverride ?? (typeof jobOrName === "" ? jobOrName : jobOrName.id);
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] LogicalOperator
+packages/jobs/src/resolve-binding.ts:131:21
+-     const requested = job?.service ?? job?.profile ?? options.defaultProfile;
++     const requested = (job?.service ?? job?.profile) && options.defaultProfile;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] LogicalOperator
+packages/jobs/src/resolve-binding.ts:131:21
+-     const requested = job?.service ?? job?.profile ?? options.defaultProfile;
++     const requested = job?.service && job?.profile ?? options.defaultProfile;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] OptionalChaining
+packages/jobs/src/resolve-binding.ts:131:21
+-     const requested = job?.service ?? job?.profile ?? options.defaultProfile;
++     const requested = job.service ?? job?.profile ?? options.defaultProfile;
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] OptionalChaining
+packages/jobs/src/resolve-binding.ts:131:37
+-     const requested = job?.service ?? job?.profile ?? options.defaultProfile;
++     const requested = job?.service ?? job.profile ?? options.defaultProfile;
+Tests ran:
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding Effect resolves the same binding and reports a tagged ambiguous failure
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:135:9
+-       ...(typeof job?.task.version === "string" ? { taskVersion: job.task.version } : {}),
++       ...(true ? { taskVersion: job.task.version } : {}),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:135:9
+-       ...(typeof job?.task.version === "string" ? { taskVersion: job.task.version } : {}),
++       ...(false ? { taskVersion: job.task.version } : {}),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] EqualityOperator
+packages/jobs/src/resolve-binding.ts:135:9
+-       ...(typeof job?.task.version === "string" ? { taskVersion: job.task.version } : {}),
++       ...(typeof job?.task.version !== "string" ? { taskVersion: job.task.version } : {}),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] OptionalChaining
+packages/jobs/src/resolve-binding.ts:135:16
+-       ...(typeof job?.task.version === "string" ? { taskVersion: job.task.version } : {}),
++       ...(typeof job.task.version === "string" ? { taskVersion: job.task.version } : {}),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] StringLiteral
+packages/jobs/src/resolve-binding.ts:135:38
+-       ...(typeof job?.task.version === "string" ? { taskVersion: job.task.version } : {}),
++       ...(typeof job?.task.version === "" ? { taskVersion: job.task.version } : {}),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ObjectLiteral
+packages/jobs/src/resolve-binding.ts:135:49
+-       ...(typeof job?.task.version === "string" ? { taskVersion: job.task.version } : {}),
++       ...(typeof job?.task.version === "string" ? {} : {}),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:139:9
+-       ...(job?.service === undefined ? {} : { service: job.service }),
++       ...(false ? {} : { service: job.service }),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] OptionalChaining
+packages/jobs/src/resolve-binding.ts:139:9
+-       ...(job?.service === undefined ? {} : { service: job.service }),
++       ...(job.service === undefined ? {} : { service: job.service }),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:143:14
+-       private: implicit || job?.client === undefined,
++       private: true,
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:143:14
+-       private: implicit || job?.client === undefined,
++       private: false,
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] LogicalOperator
+packages/jobs/src/resolve-binding.ts:143:14
+-       private: implicit || job?.client === undefined,
++       private: implicit && job?.client === undefined,
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:143:26
+-       private: implicit || job?.client === undefined,
++       private: implicit || false,
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] EqualityOperator
+packages/jobs/src/resolve-binding.ts:143:26
+-       private: implicit || job?.client === undefined,
++       private: implicit || job?.client !== undefined,
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] OptionalChaining
+packages/jobs/src/resolve-binding.ts:143:26
+-       private: implicit || job?.client === undefined,
++       private: implicit || job.client === undefined,
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:144:9
+-       ...(job === undefined ? {} : { job }),
++       ...(true ? {} : { job }),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/resolve-binding.ts:144:9
+-       ...(job === undefined ? {} : { job }),
++       ...(false ? {} : { job }),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] EqualityOperator
+packages/jobs/src/resolve-binding.ts:144:9
+-       ...(job === undefined ? {} : { job }),
++       ...(job !== undefined ? {} : { job }),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding creates a private implicit binding and selects the sole profile
+    resolveTaskBinding selects the designated default across service profiles
+  and 1 more test!
+
+
+[Survived] ObjectLiteral
+packages/jobs/src/resolve-binding.ts:144:34
+-       ...(job === undefined ? {} : { job }),
++       ...(job === undefined ? {} : {}),
+Tests ran:
+    covers deterministic provider profile selection and binding errors
+    resolveTaskBinding selects the designated default across service profiles
+
+
+[Survived] StringLiteral
+packages/jobs/src/resolve-binding.ts:26:3
+-     "Jobs.BindingFailure",
++     "",
+Ran all tests for this mutant.
+
+[Survived] StringLiteral
+packages/jobs/src/resolve-binding.ts:34:51
+-   export const resolveTaskBindingEffect = Effect.fn("Jobs.resolveTaskBinding")(
++   export const resolveTaskBindingEffect = Effect.fn("")(
+Ran all tests for this mutant.
+
+[NoCoverage] BlockStatement
+packages/jobs/src/task-policy-value-copy.ts:93:5
+-     ) {
+-       throw new TypeError(`${name} requires a projected canonical object schema`);
+-     }
++     ) {}
+
+[NoCoverage] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:94:25
+-       throw new TypeError(`${name} requires a projected canonical object schema`);
++       throw new TypeError(``);
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:18:7
+-     if (!Array.isArray(value) || value.length > TASK_MAX_TAGS) {
++     if (false) {
+Tests ran:
+    rejects unsupported task policy combinations and unsafe bounds
+    covers retry multiplication, jitter and policy copy boundaries
+    covers trigger and result option boundaries
+
+
+[Survived] LogicalOperator
+packages/jobs/src/task-policy-value-copy.ts:18:7
+-     if (!Array.isArray(value) || value.length > TASK_MAX_TAGS) {
++     if (!Array.isArray(value) && value.length > TASK_MAX_TAGS) {
+Tests ran:
+    rejects unsupported task policy combinations and unsafe bounds
+    covers retry multiplication, jitter and policy copy boundaries
+    covers trigger and result option boundaries
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:18:32
+-     if (!Array.isArray(value) || value.length > TASK_MAX_TAGS) {
++     if (!Array.isArray(value) || false) {
+Tests ran:
+    rejects unsupported task policy combinations and unsafe bounds
+    covers retry multiplication, jitter and policy copy boundaries
+    covers trigger and result option boundaries
+
+
+[Survived] EqualityOperator
+packages/jobs/src/task-policy-value-copy.ts:18:32
+-     if (!Array.isArray(value) || value.length > TASK_MAX_TAGS) {
++     if (!Array.isArray(value) || value.length >= TASK_MAX_TAGS) {
+Tests ran:
+    rejects unsupported task policy combinations and unsafe bounds
+    covers retry multiplication, jitter and policy copy boundaries
+    covers trigger and result option boundaries
+
+
+[Survived] BlockStatement
+packages/jobs/src/task-policy-value-copy.ts:18:62
+-     if (!Array.isArray(value) || value.length > TASK_MAX_TAGS) {
+-       throw new TypeError(`Task tags must contain at most ${TASK_MAX_TAGS} entries`);
+-     }
++     if (!Array.isArray(value) || value.length > TASK_MAX_TAGS) {}
+Tests ran:
+    rejects unsupported task policy combinations and unsafe bounds
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:19:25
+-       throw new TypeError(`Task tags must contain at most ${TASK_MAX_TAGS} entries`);
++       throw new TypeError(``);
+Tests ran:
+    rejects unsupported task policy combinations and unsafe bounds
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:22:30
+-       assertBoundedString(tag, "Task tag");
++       assertBoundedString(tag, "");
+Tests ran:
+    covers retry multiplication, jitter and policy copy boundaries
+    covers trigger and result option boundaries
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:37:5
+-       !isRecord(value) ||
+-       typeof value.cpu !== "number" ||
++       false ||
+Tests ran:
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+    rejects unsupported task policy combinations and unsafe bounds
+  and 2 more tests!
+
+
+[Survived] LogicalOperator
+packages/jobs/src/task-policy-value-copy.ts:37:5
+-       !isRecord(value) ||
+-       typeof value.cpu !== "number" ||
++       !isRecord(value) && typeof value.cpu !== "number" ||
+Tests ran:
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+    rejects unsupported task policy combinations and unsafe bounds
+  and 2 more tests!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:38:5
+-       typeof value.cpu !== "number" ||
++       false ||
+Tests ran:
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+    rejects unsupported task policy combinations and unsafe bounds
+  and 2 more tests!
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:42:25
+-       throw new TypeError("resources.cpu must be a positive finite number");
++       throw new TypeError("");
+Tests ran:
+    keeps resource and concurrency numeric limits finite
+    rejects unsupported task policy combinations and unsafe bounds
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:44:7
+-     if (typeof value.memory !== "string") {
++     if (false) {
+Tests ran:
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+    rejects unsupported task policy combinations and unsafe bounds
+  and 2 more tests!
+
+
+[Survived] BlockStatement
+packages/jobs/src/task-policy-value-copy.ts:44:41
+-     if (typeof value.memory !== "string") {
+-       throw new TypeError("resources.memory must be a positive MiB or GiB duration");
+-     }
++     if (typeof value.memory !== "string") {}
+Tests ran:
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:45:25
+-       throw new TypeError("resources.memory must be a positive MiB or GiB duration");
++       throw new TypeError("");
+Tests ran:
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:62:7
+-     if (!isRecord(value)) throw new TypeError("Task concurrency must be an object");
++     if (false) throw new TypeError("Task concurrency must be an object");
+Tests ran:
+    requires canonical scalar key fields without expressions
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 2 more tests!
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:62:45
+-     if (!isRecord(value)) throw new TypeError("Task concurrency must be an object");
++     if (!isRecord(value)) throw new TypeError("");
+Tests ran:
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:64:7
+-     if (typeof limit !== "number" || !Number.isSafeInteger(limit) || limit < 1) {
++     if (false || !Number.isSafeInteger(limit) || limit < 1) {
+Tests ran:
+    requires canonical scalar key fields without expressions
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 2 more tests!
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:65:25
+-       throw new TypeError("concurrency.limit must be a positive integer");
++       throw new TypeError("");
+Tests ran:
+    keeps resource and concurrency numeric limits finite
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:69:26
+-       assertFieldName(key, "concurrency.key");
++       assertFieldName(key, "");
+Tests ran:
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+    rejects unsupported task policy combinations and unsafe bounds
+  and 1 more test!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:70:9
+-       if (canonicalSchema !== undefined)
++       if (true)
+Tests ran:
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:71:54
+-         assertCanonicalScalarKey(canonicalSchema, key, "concurrency.key");
++         assertCanonicalScalarKey(canonicalSchema, key, "");
+Tests ran:
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:73:37
+-     return Object.freeze({ limit, ...(key === undefined ? {} : { key }) });
++     return Object.freeze({ limit, ...(false ? {} : { key }) });
+Tests ran:
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] ObjectLiteral
+packages/jobs/src/task-policy-value-copy.ts:88:44
+-     const projection = getJsonSchema(schema, { direction: "output" });
++     const projection = getJsonSchema(schema, {});
+Tests ran:
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+  and 2 more tests!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:90:5
+-       !projection.ok ||
+-       !isRecord(projection.schema.properties) ||
+-       !Array.isArray(projection.schema.required)
++       false
+Tests ran:
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+  and 2 more tests!
+
+
+[Survived] LogicalOperator
+packages/jobs/src/task-policy-value-copy.ts:90:5
+-       !projection.ok ||
+-       !isRecord(projection.schema.properties) ||
+-       !Array.isArray(projection.schema.required)
++       (!projection.ok || !isRecord(projection.schema.properties)) && !Array.isArray(projection.schema.required)
+Tests ran:
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+  and 2 more tests!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:90:5
+-       !projection.ok ||
+-       !isRecord(projection.schema.properties) ||
++       false ||
+Tests ran:
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+  and 2 more tests!
+
+
+[Survived] LogicalOperator
+packages/jobs/src/task-policy-value-copy.ts:90:5
+-       !projection.ok ||
+-       !isRecord(projection.schema.properties) ||
++       !projection.ok && !isRecord(projection.schema.properties) ||
+Tests ran:
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+  and 2 more tests!
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:97:25
+-       throw new TypeError(`${name} must identify a required canonical field`);
++       throw new TypeError(``);
+Tests ran:
+    requires canonical scalar key fields without expressions
+    covers retry multiplication, jitter and policy copy boundaries
+    covers canonical field and logging validation
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:102:60
+-       (field.type !== "string" && field.type !== "number" && field.type !== "integer")
++       (field.type !== "string" && field.type !== "number" && true)
+Tests ran:
+    requires canonical scalar key fields without expressions
+    covers canonical field and logging validation
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:102:75
+-       (field.type !== "string" && field.type !== "number" && field.type !== "integer")
++       (field.type !== "string" && field.type !== "number" && field.type !== "")
+Tests ran:
+    requires canonical scalar key fields without expressions
+    covers canonical field and logging validation
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:104:25
+-       throw new TypeError(`${name} must identify a canonical string or number field`);
++       throw new TypeError(``);
+Tests ran:
+    requires canonical scalar key fields without expressions
+    covers canonical field and logging validation
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:115:7
+-     if (!isRecord(value)) throw new TypeError("Task logging must be an object");
++     if (false) throw new TypeError("Task logging must be an object");
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers canonical field and logging validation
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:115:45
+-     if (!isRecord(value)) throw new TypeError("Task logging must be an object");
++     if (!isRecord(value)) throw new TypeError("");
+Tests ran:
+    covers canonical field and logging validation
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:118:7
+-       !["trace", "debug", "info", "warn", "error"].includes(value.level as string)
++       !["", "debug", "info", "warn", "error"].includes(value.level as string)
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers canonical field and logging validation
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:118:16
+-       !["trace", "debug", "info", "warn", "error"].includes(value.level as string)
++       !["trace", "", "info", "warn", "error"].includes(value.level as string)
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers canonical field and logging validation
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:118:41
+-       !["trace", "debug", "info", "warn", "error"].includes(value.level as string)
++       !["trace", "debug", "info", "warn", ""].includes(value.level as string)
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers canonical field and logging validation
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:120:25
+-       throw new TypeError("logging.level is invalid");
++       throw new TypeError("");
+Tests ran:
+    covers canonical field and logging validation
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:122:7
+-     if (value.redact !== undefined && !Array.isArray(value.redact)) {
++     if (false) {
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers canonical field and logging validation
+
+
+[Survived] BlockStatement
+packages/jobs/src/task-policy-value-copy.ts:122:67
+-     if (value.redact !== undefined && !Array.isArray(value.redact)) {
+-       throw new TypeError("logging.redact must be an array of strings");
+-     }
++     if (value.redact !== undefined && !Array.isArray(value.redact)) {}
+Tests ran:
+    covers canonical field and logging validation
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:123:25
+-       throw new TypeError("logging.redact must be an array of strings");
++       throw new TypeError("");
+Tests ran:
+    covers canonical field and logging validation
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value-copy.ts:126:32
+-       assertBoundedString(entry, "logging.redact entry");
++       assertBoundedString(entry, "");
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers canonical field and logging validation
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:138:10
+-     return value !== null && typeof value === "object" && !Array.isArray(value);
++     return true;
+Tests ran:
+    requires canonical scalar key fields without expressions
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 5 more tests!
+
+
+[Survived] LogicalOperator
+packages/jobs/src/task-policy-value-copy.ts:138:10
+-     return value !== null && typeof value === "object" && !Array.isArray(value);
++     return value !== null && typeof value === "object" || !Array.isArray(value);
+Tests ran:
+    requires canonical scalar key fields without expressions
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 5 more tests!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:138:10
+-     return value !== null && typeof value === "object" && !Array.isArray(value);
++     return true && !Array.isArray(value);
+Tests ran:
+    requires canonical scalar key fields without expressions
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 5 more tests!
+
+
+[Survived] LogicalOperator
+packages/jobs/src/task-policy-value-copy.ts:138:10
+-     return value !== null && typeof value === "object" && !Array.isArray(value);
++     return value !== null || typeof value === "object" && !Array.isArray(value);
+Tests ran:
+    requires canonical scalar key fields without expressions
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 5 more tests!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:138:10
+-     return value !== null && typeof value === "object" && !Array.isArray(value);
++     return true && typeof value === "object" && !Array.isArray(value);
+Tests ran:
+    requires canonical scalar key fields without expressions
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 5 more tests!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value-copy.ts:138:28
+-     return value !== null && typeof value === "object" && !Array.isArray(value);
++     return value !== null && true && !Array.isArray(value);
+Tests ran:
+    requires canonical scalar key fields without expressions
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 5 more tests!
+
+
+[NoCoverage] StringLiteral
+packages/jobs/src/task-policy-value.ts:62:56
+-   export function assertFieldName(value: unknown, name = "field name"): asserts value is string {
++   export function assertFieldName(value: unknown, name = ""): asserts value is string {
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value.ts:51:7
+-     if (typeof value !== "string" || value.length === 0 || utf8Bytes(value) > maxBytes) {
++     if (false || value.length === 0 || utf8Bytes(value) > maxBytes) {
+Tests ran:
+    validates trigger and observer boundaries
+    validates exclusive schedules and admission policies
+    requires canonical scalar key fields without expressions
+  and 18 more tests!
+
+
+[Survived] EqualityOperator
+packages/jobs/src/task-policy-value.ts:51:58
+-     if (typeof value !== "string" || value.length === 0 || utf8Bytes(value) > maxBytes) {
++     if (typeof value !== "string" || value.length === 0 || utf8Bytes(value) >= maxBytes) {
+Tests ran:
+    validates trigger and observer boundaries
+    validates exclusive schedules and admission policies
+    requires canonical scalar key fields without expressions
+  and 18 more tests!
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value.ts:52:25
+-       throw new TypeError(`${name} must be a non-empty string of at most ${maxBytes} UTF-8 bytes`);
++       throw new TypeError(``);
+Tests ran:
+    covers readable duration and policy boundary conversions
+
+
+[Survived] CallExpression
+packages/jobs/src/task-policy-value.ts:63:3
+-     assertBoundedString(value, name);
++     ;
+Tests ran:
+    validates exclusive schedules and admission policies
+    requires canonical scalar key fields without expressions
+    freezes task policy defaults and applies retry-after lower bounds
+  and 5 more tests!
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value.ts:65:25
+-       throw new TypeError(`${name} must identify one top-level field, not a path or expression`);
++       throw new TypeError(``);
+Tests ran:
+    validates exclusive schedules and admission policies
+    requires canonical scalar key fields without expressions
+    rejects unsupported task policy combinations and unsafe bounds
+  and 2 more tests!
+
+
+[Survived] EqualityOperator
+packages/jobs/src/task-policy-value.ts:76:17
+-     if (!match || value.length > 128)
++     if (!match || value.length >= 128)
+Tests ran:
+    enforces exact memory, attempt, factor, and ordering boundaries
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 8 more tests!
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value.ts:82:62
+-     const amount = BigInt(whole!) * scale + BigInt(fraction || "0");
++     const amount = BigInt(whole!) * scale + BigInt(fraction || "");
+Tests ran:
+    enforces exact memory, attempt, factor, and ordering boundaries
+    keeps resource and concurrency numeric limits finite
+    covers readable duration and policy boundary conversions
+  and 5 more tests!
+
+
+[Survived] EqualityOperator
+packages/jobs/src/task-policy-value.ts:87:7
+-     if (bytes < 1n || bytes > MAX_SAFE) throw new TypeError("Memory is outside the safe byte range");
++     if (bytes <= 1n || bytes > MAX_SAFE) throw new TypeError("Memory is outside the safe byte range");
+Tests ran:
+    enforces exact memory, attempt, factor, and ordering boundaries
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 6 more tests!
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value.ts:87:21
+-     if (bytes < 1n || bytes > MAX_SAFE) throw new TypeError("Memory is outside the safe byte range");
++     if (bytes < 1n || false) throw new TypeError("Memory is outside the safe byte range");
+Tests ran:
+    enforces exact memory, attempt, factor, and ordering boundaries
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 6 more tests!
+
+
+[Survived] EqualityOperator
+packages/jobs/src/task-policy-value.ts:87:21
+-     if (bytes < 1n || bytes > MAX_SAFE) throw new TypeError("Memory is outside the safe byte range");
++     if (bytes < 1n || bytes >= MAX_SAFE) throw new TypeError("Memory is outside the safe byte range");
+Tests ran:
+    enforces exact memory, attempt, factor, and ordering boundaries
+    keeps resource and concurrency numeric limits finite
+    freezes task policy defaults and applies retry-after lower bounds
+  and 6 more tests!
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value.ts:106:25
+-       throw new TypeError("attempt must be positive");
++       throw new TypeError("");
+Tests ran:
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value.ts:108:25
+-       throw new TypeError("retry-after must be a non-negative safe integer");
++       throw new TypeError("");
+Tests ran:
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value.ts:113:42
+-     for (let index = 1; index < attempt && cap < maximum; index += 1) {
++     for (let index = 1; index < attempt && true; index += 1) {
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+    task policy Effect operations validate values and inject retry randomness
+
+
+[Survived] EqualityOperator
+packages/jobs/src/task-policy-value.ts:113:42
+-     for (let index = 1; index < attempt && cap < maximum; index += 1) {
++     for (let index = 1; index < attempt && cap <= maximum; index += 1) {
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+    task policy Effect operations validate values and inject retry randomness
+
+
+[Survived] ConditionalExpression
+packages/jobs/src/task-policy-value.ts:115:7
+-         cap > maximum / policy.factor ? maximum : Math.min(maximum, Math.floor(cap * policy.factor));
++         false ? maximum : Math.min(maximum, Math.floor(cap * policy.factor));
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+    task policy Effect operations validate values and inject retry randomness
+
+
+[Survived] EqualityOperator
+packages/jobs/src/task-policy-value.ts:115:7
+-         cap > maximum / policy.factor ? maximum : Math.min(maximum, Math.floor(cap * policy.factor));
++         cap >= maximum / policy.factor ? maximum : Math.min(maximum, Math.floor(cap * policy.factor));
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+    task policy Effect operations validate values and inject retry randomness
+
+
+[Survived] ArithmeticOperator
+packages/jobs/src/task-policy-value.ts:115:13
+-         cap > maximum / policy.factor ? maximum : Math.min(maximum, Math.floor(cap * policy.factor));
++         cap > maximum * policy.factor ? maximum : Math.min(maximum, Math.floor(cap * policy.factor));
+Tests ran:
+    freezes task policy defaults and applies retry-after lower bounds
+    covers retry multiplication, jitter and policy copy boundaries
+    task policy Effect operations validate values and inject retry randomness
+
+
+[Survived] StringLiteral
+packages/jobs/src/task-policy-value.ts:119:53
+-     if (!Number.isFinite(sample)) throw new TypeError("jitter sample must be finite");
++     if (!Number.isFinite(sample)) throw new TypeError("");
+Tests ran:
+    covers retry multiplication, jitter and policy copy boundaries
+
+
+Ran 7.32 tests per mutant on average.
+-----------------------------|------------------|----------|-----------|------------|----------|----------|
+                             | % Mutation score |          |           |            |          |          |
+File                         |  total | covered | # killed | # timeout | # survived | # no cov | # errors |
+-----------------------------|--------|---------|----------|-----------|------------|----------|----------|
+All files                    |  64.06 |   65.46 |      501 |         7 |        268 |       17 |        0 |
+ client                      |  57.01 |   59.13 |      184 |         7 |        132 |       12 |        0 |
+  src                        |  57.01 |   59.13 |      184 |         7 |        132 |       12 |        0 |
+   jobs                      |  57.01 |   59.13 |      184 |         7 |        132 |       12 |        0 |
+    controller.service.ts    |  44.03 |   46.67 |       70 |         0 |         80 |        9 |        0 |
+    controller.ts            |  56.67 |   56.67 |       17 |         0 |         13 |        0 |        0 |
+    feed-registry.service.ts |  73.91 |   73.91 |       34 |         0 |         12 |        0 |        0 |
+    watch-feed-polling.ts    |  64.47 |   67.12 |       44 |         5 |         24 |        3 |        0 |
+    watch-feed-recovery.ts   |  87.50 |   87.50 |       19 |         2 |          3 |        0 |        0 |
+ jobs                        |  69.21 |   69.98 |      317 |         0 |        136 |        5 |        0 |
+  src                        |  69.21 |   69.98 |      317 |         0 |        136 |        5 |        0 |
+   authorization-grant.ts    |  90.00 |   90.00 |       45 |         0 |          5 |        0 |        0 |
+   authorization.ts          |  53.85 |   63.64 |        7 |         0 |          4 |        2 |        0 |
+   duration.ts               |  62.86 |   62.86 |       22 |         0 |         13 |        0 |        0 |
+   resolve-binding.ts        |  37.18 |   37.18 |       29 |         0 |         49 |        0 |        0 |
+   task-policy-value-copy.ts |  72.00 |   72.83 |      126 |         0 |         47 |        2 |        0 |
+   task-policy-value.ts      |  82.24 |   83.02 |       88 |         0 |         18 |        1 |        0 |
+-----------------------------|--------|---------|----------|-----------|------------|----------|----------|
+[32m23:24:04 (83000) INFO JsonReporter[39m Your report can be found at: file:///Users/mustafaelsayed/Workspace/relkit/reports/mutation/mutation.json
+[32m23:24:04 (83000) INFO MutationTestExecutor[39m Done in 12 minutes and 32 seconds.
