@@ -34,8 +34,9 @@ For a release-branch repair, dispatch the existing CI workflow on
 `changeset-release/main` with `certify_create=true`. Its optional certification
 job uploads passing candidate source and reports as a commit-specific artifact
 for review; it has read-only repository access. Regular CI checks remain required.
-Timing certification runs on the standard `ubuntu-24.04-arm` runner with four
-cores and 16 GB RAM, while regular CI remains on x64 Ubuntu. Each completed
+Timing certification runs on the standard `macos-15` Apple Silicon runner with
+Turbo and Vitest limited to one worker and a 2 GiB Node heap cap, while regular
+CI remains on x64 Ubuntu. Each completed
 measurement is checkpointed so a later project-creation failure cannot discard
 earlier attempts. Timing evidence identifies the actual host; passing one
 reference host does not establish a latency bound for every machine.
