@@ -1,0 +1,20 @@
+[
+  {
+    "mode": "ordinary",
+    "cliPid": 24905,
+    "preparedFastPath": false,
+    "casesPassed": 16,
+    "originalMatrixSha256": "02f185439dfa79803f0a5f6a986234a42f4d9c3fd811183c3c7af4e484ac1727",
+    "exitCode": 0,
+    "joinedCleanup": true
+  },
+  {
+    "mode": "prepared",
+    "cliPid": 26459,
+    "preparedFastPath": true,
+    "casesPassed": 16,
+    "originalMatrixSha256": "02f185439dfa79803f0a5f6a986234a42f4d9c3fd811183c3c7af4e484ac1727",
+    "exitCode": 0,
+    "joinedCleanup": true
+  }
+]
