@@ -1,0 +1,19 @@
+2026-10-16T02:13:34.984621+03:00
+sysctl -n hw.logicalcpu
+10
+uptime
+ 2:13  up  4:11, 1 user, load averages: 3.53 2.86 3.11
+memory_pressure -Q
+The system has 17179869184 (1048576 pages with a page size of 16384).
+System-wide memory free percentage: 54%
+sysctl -n kern.memorystatus_vm_pressure_level
+1
+top -l 1 -n 0
+Processes: 631 total, 3 running, 628 sleeping, 4502 threads 
+2026/10/16 02:13:35
+Load Avg: 3.53, 2.86, 3.11 
+CPU usage: 21.31% user, 18.65% sys, 60.3% idle 
+SharedLibs: 481M resident, 110M data, 75M linkedit.
+MemRegions: 634205 total, 4714M resident, 114M private, 1349M shared.
+PhysMem: 15G used (2200M wired, 5014M compressor), 645M unused.
+VM: 301T vsize, 5703M framework vsize, 821196(0) swapins, 1332661(0) swapouts.

@@ -1,0 +1,25 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/dev-snapshot/input-watch.test.ts:
+(pass) installed-input registration never recursively walks unrelated dependencies or runtime state [7.64ms]
+(skip) native input observation invalidates after changing src/deep/helper.ts
+(skip) native input observation invalidates after changing src/new/deeper/helper.ts
+(skip) native input observation invalidates after changing new-source/helper.ts
+(skip) native input observation invalidates after changing node_modules/library/types/index.d.ts
+(skip) native input observation invalidates after changing node_modules/library/absent/nested.d.ts
+(pass) partial registration failures close every previously acquired native watcher [3.65ms]
+(pass) escaped member/query paths and external installed links reject registration [5.91ms]
+(pass) preflight refuses unauthenticated receipt bytes before trusting their watch inventory [3.63ms]
+
+packages/cli/tests/dev-snapshot/template-compatibility.test.ts:
+(pass) snapshot discovery accepts the current generated context declaration with supported root discovery [4.90ms]
+(pass) snapshot paths admit authored parameter and catch-all route folders [0.19ms]
+(pass) native integrity workers hash parameter route source paths [22.04ms]
+(pass) native input watches accept bracketed source resolution witnesses [1.77ms]
+(pass) route bracket support preserves containment and exact generated root restrictions [0.65ms]
+
+ 9 pass
+ 5 skip
+ 0 fail
+ 33 expect() calls
+Ran 14 tests across 2 files. [169.00ms]
