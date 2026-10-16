@@ -1,0 +1,5 @@
+PASS real source create + add auth generate the native SQLite migration script
+PASS real CLI scaffold admits generated context declarations
+PASS real generated db:generate/db:migrate commands create all auth tables and repeat idempotently
+PASS fresh generated auth application check
+Disposable tooling fixture removed; no server started
