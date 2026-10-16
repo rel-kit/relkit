@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "id": "bf-66e347f46c30cffca371d589",
+  "fingerprint": "66e347f46c30cffca371d5893be90dee9a59f1c0c6fd8e529e438577b330350b",
+  "identity": {
+    "entrypoint": "relkit dev",
+    "module": "CliDevEnvironment",
+    "symptom": "preload contaminates environment helper",
+    "scenario": "dotenv-with-bun-preload",
+    "error": ""
+  },
+  "attempt": 1,
+  "created_at": "2026-10-16T14:05:58+00:00",
+  "updated_at": "2026-10-16T15:48:06+00:00",
+  "status": "verified",
+  "what": "Application preloads prevent fresh dotenv resolution",
+  "expected": "The private dotenv helper never executes application preloads",
+  "observed": "Actual resolver with native adapters failed dev.environment.decode after a logging preload contaminated stdout",
+  "root_cause": "dev-environment.service.ts runs its Bun JSON helper in the application cwd with default configuration and inherited runtime options",
+  "fixed_by": "Verified explicit empty Bun helper configuration and removal of inherited runtime startup flags only from private helper execution, with application values preserved. Native service tests and actual CLI startup plus same-PID HTTP dotenv recovery pass with the logging application preload retained. All32 local framework gates pass.",
+  "files": [
+    "packages/cli/src/services/dev-environment.service.ts",
+    "packages/cli/tests/services/dev-environment-preload.test.ts",
+    "packages/cli/tests/services/dev-environment-native.test.ts"
+  ],
+  "tags": [],
+  "related": [
+    "bf-6968f4b18d7d446004cc39f5"
+  ],
+  "scope": {
+    "modules": [
+      "CliDevEnvironment",
+      "CliProcess",
+      "CliDevSupervisor",
+      "SupervisorCandidate"
+    ],
+    "entrypoints": [
+      "relkit dev"
+    ],
+    "invariants": [
+      "Private dotenv parsing cannot execute application preload code",
+      "The entire helper response must still satisfy strict JSON/schema validation",
+      "Application preload behavior and runtime option values remain available to actual candidates",
+      "Failures preserve last-known-good traffic and repairs do not restart the CLI"
+    ]
+  },
+  "environment": {
+    "package": "packages/cli",
+    "revision": "ebc3a2544ad5521016fd9efc8db3ff1930a3fb75 plus uncommitted fixes; exact final scoped hashes in evidence/001/fix-source-sha256.json and complete7217-input audit",
+    "target": "Actual native CLI fixtures, isolated commerce copies, and preserved preview http://127.0.0.1:3400",
+    "api_exposed": false,
+    "e2e_available": true,
+    "monitoring": "Existing CLI observeCli structured operation logs retained. No new monitoring installed. Native subprocess and HTTP readback provide behavioral evidence."
+  },
+  "reproduction": [
+    "Run the recorded focused regression on the baseline and retain its actual assertion failure",
+    "Run the recorded actual native integration before/after commands against isolated equivalent fixtures",
+    "Replay ordinary/prepared commerce recovery matrices, native lifetime cases and complete serial local framework checks"
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Real filesystem/process layers reproduce preload contamination"
+      }
+    ],
+    "after": [
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-after.txt",
+        "note": "Private helper excludes logging preloads and retains runtime option values"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/http-preload-after.txt",
+        "note": "Real candidate HTTP sees dotenv and application preload runs exactly once"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/native-adjacent.txt",
+        "note": "Creation, deletion, precedence, isolation and signal metadata regressions pass"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/adjacent-vitest.txt",
+        "note": "Permit release, malformed output and timeout behavior pass"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-cli-after.txt",
+        "note": "Actual native CLI and HTTP preload/dotenv end-to-end replay"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/native-preload-result.json",
+        "note": "Same PID and joined cleanup receipt"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/recovery-final-summary.json",
+        "note": "Final source ordinary/prepared16-case matrices pass32 cases"
+      },
+      {
+        "kind": "check",
+        "path": "evidence/001/full-framework-summary.json",
+        "note": "All32 local gates, fresh793-mutant run and retained timeout/retry evidence"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/existing-preview-final.json",
+        "note": "Unchanged approved preview, authenticated business state and full capsule validation"
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/unit-after.txt",
+        "note": "The same real native resolver composition also supplies the runtime after proof"
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "status": "failed",
+        "command": "bun test --max-concurrency 1 packages/cli/tests/services/dev-environment-preload.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Private dotenv helper must not execute a logging application preload",
+        "output": "evidence/001/unit-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "bun test --max-concurrency 1 packages/cli/tests/services/dev-environment-preload.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Private helper resolves fresh dotenv without preload side effects and retains application runtime option values",
+        "output": "evidence/001/unit-after.txt"
+      }
+    },
+    "runtime": {
+      "kind": "integration",
+      "reason": "Private dotenv resolution has no HTTP API; real service composition and native filesystem/process adapters exercise the reported interaction",
+      "boundary": "CliDevEnvironment -> real filesystem/key ownership -> owned Bun parser subprocess -> strict schema decoder",
+      "dependencies": [
+        "Actual CliDevEnvironment, Effect Layer wiring, CliFileSystem and CliProcess",
+        "Actual Bun dotenv parser, application bunfig/preload and synthetic dotenv files; no adapter doubles"
+      ],
+      "steps": [
+        "Create controlled dotenv and a logging preload in a temporary project",
+        "Resolve through the actual service with native adapters",
+        "Edit dotenv and resolve again, checking exact values and absence of preload effects"
+      ],
+      "before": {
+        "status": "failed",
+        "command": "bun test --max-concurrency 1 packages/cli/tests/services/dev-environment-preload.test.ts",
+        "cwd": ".",
+        "exit_code": 1,
+        "assertion": "Baseline incorrectly executes preload and fails dev.environment.decode",
+        "output": "evidence/001/unit-before.txt"
+      },
+      "after": {
+        "status": "passed",
+        "command": "bun test --max-concurrency 1 packages/cli/tests/services/dev-environment-preload.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Real resolver returns both current dotenv values and never executes the private helper preload",
+        "output": "evidence/001/unit-after.txt"
+      }
+    },
+    "e2e": {
+      "status": "passed",
+      "command": "python3 bug-fix-reports/issues/bf-66e347f46c30cffca371d589/evidence/001/native-preload.py",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Actual ordinary CLI starts with a logging preload and reloads changed dotenv into HTTP through the same PID; owned processes join cleanup",
+      "output": "evidence/001/runtime-cli-after.txt"
+    },
+    "checks": [
+      {
+        "name": "all32 local framework stages and source/process audit",
+        "status": "passed",
+        "command": "python3 test-results/full-suite-integrity-fixes-20261016/finish.py",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "All32 latest stage results pass; all7217 authored inputs match; HEAD unchanged and staging empty; completed suite ownership records contain no live owned process",
+        "output": "evidence/001/full-framework-audit.txt"
+      },
+      {
+        "name": "full workspace build",
+        "status": "passed",
+        "command": "bun run build",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Every workspace build task succeeds",
+        "output": "evidence/001/framework-build.txt"
+      },
+      {
+        "name": "root typecheck and commerce CLI check",
+        "status": "passed",
+        "command": "bun run typecheck",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Root TypeScript and actual canonical commerce check succeed",
+        "output": "evidence/001/framework-typecheck.txt"
+      }
+    ],
+    "regressions": [
+      {
+        "kind": "integration",
+        "boundary": "Actual ordinary/prepared commerce CLI -> stable HTTP proxy -> last-known-good traffic and repaired activation",
+        "status": "passed",
+        "command": "RELKIT_RECOVERY_MODES=prepared RELKIT_RECOVERY_EVIDENCE=test-results/integrity-fixes-20261016/final-prepared-retry python3 test-results/integrity-fixes-20261016/recovery.py",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "All16 recovery assertions pass on unchanged prepared CLI59668; combined final ordinary/prepared summary contains32 passing cases",
+        "output": "evidence/001/prepared-recovery.txt"
+      },
+      {
+        "kind": "integration",
+        "boundary": "Native prepared/ordinary invocation cancellation -> owned child cleanup",
+        "status": "passed",
+        "command": "python3 test-results/dev-process-lifetime-20261016/probe.py hup --prepared --expect-graceful",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Actual prepared SIGHUP exits129 with diagnostics, no surviving descendants, and verified cleanup",
+        "output": "evidence/001/prepared-hup-result.json"
+      },
+      {
+        "kind": "integration",
+        "boundary": "Existing approved commerce preview -> authenticated session/cart/order -> independent SQLite readback and full snapshot validation",
+        "status": "passed",
+        "command": "bun test-results/integrity-fixes-20261016/final-live.probe.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Original CLI69188 remains live; complete capsule validates before/after authenticated reads; cart7200 and historical order4900 match SQLite",
+        "output": "evidence/001/existing-preview-final.json"
+      },
+      {
+        "kind": "integration",
+        "boundary": "CLI environment resolver -> supervisor SDK -> real native candidate HTTP and preload effects",
+        "status": "passed",
+        "command": "bun test --max-concurrency 1 packages/cli/tests/services/dev-environment-native.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Candidate receives fresh values and executes the configured preload exactly once; helper does not execute it",
+        "output": "evidence/001/http-preload-after.txt"
+      },
+      {
+        "kind": "integration",
+        "boundary": "Environment resolver failure channels, timeout cleanup and permit reuse",
+        "status": "passed",
+        "command": "bun x vitest run --maxWorkers=1 --no-file-parallelism packages/cli/tests/dev-snapshot/eligibility.test.ts packages/cli/tests/dev-snapshot/commerce-eligibility.test.ts packages/cli/tests/dev-snapshot/commerce-project-eligibility.test.ts packages/cli/tests/services/dev-environment-errors.test.ts",
+        "cwd": ".",
+        "exit_code": 0,
+        "assertion": "Malformed helper output stays private, failures retain future use and timeout joins cleanup",
+        "output": "evidence/001/adjacent-vitest.txt"
+      }
+    ],
+    "limitations": [
+      "No new monitoring or remote infrastructure installed; all evidence is local",
+      "First packed-export guardrail subprocess timed out; identical checks passed on scoped cache-disabled retry; no assertion or deadline relaxed"
+    ]
+  },
+  "notes": [
+    "All changes remain uncommitted; HEAD unchanged and staging empty. No source/dependency/artifact/graph integrity guard or test deadline was relaxed.",
+    "Mac responsiveness took priority: resource-warning recovery stopped and resumed only with normal pressure; all deferred/interrupted evidence retained.",
+    "The approved existing preview CLI69188 was not stopped or restarted. All newly owned test processes and fixture roots were cleaned.",
+    "Default local framework scope completed; opt-in real AWS/Docker acceptance and hosted CI were not run. Framework browser results: inspector31 passed; commerce2 passed/1 declared skip; main package Vitest2777 passed/5 declared skips.",
+    "First packed-export guardrail attempt reached the existing540000ms deadline. Import/inventory probes succeeded; identical28 tests passed with BUN_RUNTIME_TRANSPILER_CACHE_PATH=0 scoped to retry. Exact runtime stall cause is unconfirmed; no global cache or system settings changed.",
+    "The timed-out packed-export fixture was atomically moved from temporary storage into test-results/full-suite-integrity-fixes-20261016/guardrail-timeout-fixture as retained diagnostic evidence; no live process uses it."
+  ]
+}
