@@ -1,0 +1,66 @@
+14:52:39.281 INFO  relkit            Starting development server
+14:52:39.295 DEBUG relkit            supervisor.transition
+                                     {"phase":"idle","state":"compiling-candidate"}
+14:52:39.296 INFO  build             Compiling application
+14:52:39.302 DEBUG relkit            candidate.compile.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-2xfqswvz/.relkit/generated/.dev-XsLo57/generation-1"}
+14:52:39.586 DEBUG relkit            candidate.compile.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-2xfqswvz/.relkit/generated/.dev-XsLo57/generation-1","entrypoint":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-2xfqswvz/.relkit/generated/.dev-XsLo57/generation-1/server/index.js"}
+14:52:39.591 DEBUG relkit            candidate.start.started
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-2xfqswvz/.relkit/generated/.dev-XsLo57/generation-1","port":58116}
+14:52:39.594 DEBUG relkit            candidate.start.succeeded
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-2xfqswvz/.relkit/generated/.dev-XsLo57/generation-1","pid":56377,"port":58116}
+14:52:39.597 DEBUG relkit            supervisor.transition
+                                     {"phase":"compiling-candidate","state":"starting-candidate"}
+14:52:39.598 DEBUG relkit            supervisor.transition
+                                     {"phase":"starting-candidate","state":"verifying-hash-and-readiness"}
+14:52:40.021 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.2145,"operation":"server.readiness","outcome":"success"}
+14:52:40.037 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.218,"operation":"server.provider-delay","outcome":"success"}
+14:52:40.038 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.047292,"operation":"server.readiness","outcome":"success"}
+14:52:40.039 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":3.105209,"operation":"server.invocation","outcome":"success"}
+14:52:40.051 DEBUG relkit            supervisor.outcome
+                                     {"phase":"verification","state":"verification-succeeded"}
+14:52:40.052 DEBUG relkit            supervisor.transition
+                                     {"phase":"verifying-hash-and-readiness","state":"switching"}
+14:52:40.054 DEBUG relkit            supervisor.outcome
+                                     {"phase":"switch","state":"switch-succeeded"}
+14:52:40.055 DEBUG relkit            supervisor.transition
+                                     {"phase":"switching","state":"active"}
+14:52:40.056 INFO  build             Compiled in 759ms
+14:52:40.056 INFO  server            Ready
+                                     API        http://127.0.0.1:58091
+                                     Reference  http://127.0.0.1:58091/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:58091/_relkit/v1/openapi.json
+14:52:40.040 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":5.552333,"operation":"server.resource","outcome":"success"}
+14:52:40.174 INFO  hello.greet       hello invoked
+                                     request: request-263a904d-3d58-41c5-9373-37c573bd2552
+                                     trace: 1258526c5d41ae5c990aae936af5e692
+                                     {"name":"lifetime","requestId":"request-263a904d-3d58-41c5-9373-37c573bd2552","traceId":"1258526c5d41ae5c990aae936af5e692","spanId":"3d85eb39716f4779","functionId":"hello.greet","serviceId":"hello"}
+14:52:40.183 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":34.938292,"operation":"server.invocation","outcome":"success"}
+14:52:40.192 INFO  http              GET /hello → 200 in 65ms
+                                     request: request-263a904d-3d58-41c5-9373-37c573bd2552
+                                     trace: 1258526c5d41ae5c990aae936af5e692
+14:52:40.239 DEBUG relkit            dev.shutdown.requested
+                                     {"signal":"SIGHUP"}
+14:52:40.243 INFO  relkit            Stopping development server
+14:52:40.249 INFO  lifecycle         Execution operation completed
+                                     {"domain":"engine","duration_ms":0.225667,"operation":"providers.release","outcome":"success"}
+14:52:40.250 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":1.375542,"operation":"server.cleanup","outcome":"success"}
+14:52:40.263 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":12.0465,"operation":"server.cleanup","outcome":"success"}
+14:52:40.273 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":9.348958,"operation":"server.cleanup","outcome":"success"}
+14:52:40.275 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":0.246833,"operation":"server.cleanup","outcome":"success"}
+14:52:40.276 INFO  lifecycle         Execution operation completed
+                                     {"domain":"runtime","duration_ms":29.753917,"operation":"server.shutdown","outcome":"success"}
+14:52:40.284 DEBUG relkit            candidate.process-exited
+                                     {"directory":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-process-lifetime-2xfqswvz/.relkit/generated/.dev-XsLo57/generation-1","exitCode":0}
+14:52:40.289 INFO  relkit            Development server stopped

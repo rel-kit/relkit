@@ -1,0 +1,5 @@
+{
+  "status": "timed-out",
+  "timeoutSeconds": 18,
+  "limitation": "Native log query bounded to preserve responsiveness."
+}
