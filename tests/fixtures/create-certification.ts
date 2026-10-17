@@ -8,6 +8,12 @@ export const entry = {
   restartEvidence: "docs/evidence/create-capabilities/9.9.9/restart.json",
 };
 
+/**
+ * Constructs synthetic passing inputs for strict and functional policy regressions.
+ * @param set - Cohort the validator must require.
+ * @param readinessOnly - Selects the explicit version-2 functional report format.
+ * @returns Mutable synthetic report for identity, sample, and rollback fault injection.
+ */
 export function report(set: "fresh" | "restart", readinessOnly = false) {
   return {
     protocol: "relkit.dev-readiness",

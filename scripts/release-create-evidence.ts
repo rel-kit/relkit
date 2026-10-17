@@ -116,7 +116,7 @@ export function validateCreationReport(
   );
 }
 
-function belowTarget(value: unknown): boolean {
+function belowTarget<Value>(value: Value): boolean {
   const sample = record(value);
   return typeof sample.durationMs === "number" && sample.durationMs < 1_000;
 }
