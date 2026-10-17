@@ -238,7 +238,7 @@ jobs:
   release-pr-handoff:
     name: Dispatch main CI after the release merges
     if: >-
-      always() && needs.ci-gate.result == 'success' &&
+      !cancelled() && needs.ci-gate.result == 'success' &&
       needs.dispatched-branch-status.result == 'success' &&
       github.event_name == 'workflow_dispatch' &&
       github.ref == 'refs/heads/changeset-release/main'
@@ -270,7 +270,7 @@ jobs:
   dispatch-release:
     name: Dispatch release after manual main CI
     if: >-
-      needs.ci-gate.result == 'success' &&
+      !cancelled() && needs.ci-gate.result == 'success' &&
       github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     needs: ci-gate
     runs-on: ubuntu-24.04

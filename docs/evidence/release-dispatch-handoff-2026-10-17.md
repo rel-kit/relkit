@@ -37,3 +37,10 @@ inputs, workflow wiring, and the existing exact-PR handoff adversarial matrix
 (17 tests). The verifier CLI also checked real completed main CI run
 39045205476 against commit `c83abb69e728ac4d2bba1ef9fddd765af1349842`.
 Hosted dispatch and publication outcomes remain separate acceptance evidence.
+
+Main dispatch probe 39047432443 passed its CI Gate but skipped the downstream
+dispatch job because its implicit `success()` included skipped optional
+ancestors. Both explicit handoffs now use `!cancelled()` plus successful gate
+results: this overrides implicit status propagation while refusing dispatch
+after cancellation. Workflow regression checks retain this condition for each
+handoff. The release verifier still requires actual completed successful CI.
