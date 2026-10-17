@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.7.7
+
+### Changes
+
+- Handle SIGHUP through invocation cancellation so prepared development joins its backend, inspector, and storage workers before exiting with status 129. Terminal hangup now retains shutdown diagnostics instead of leaving orphaned children.
+- Require complete packed creation functionality for release admission and report shared-host startup performance separately without discarding slow samples.
+- Generate a native Bun SQLite migration runner so database and auth apps can apply Drizzle migrations without selecting a Node-only driver. Include generated context declarations in every starter's TypeScript program so database and auth context types are available to application functions.
+- Refresh development candidate environments after dotenv edits and observe dotenv repairs in prepared sessions. Preserve the last valid server during failed reloads and remove deleted file-managed values from subsequent candidates. Forward resolved application environment values to HTTP function invocations. Keep manual source-watcher admission synchronous while retaining lazy watcher loading for CLI sessions.
+- Require proven function descriptor provenance for eager `asTool` construction during prepared startup. Isolate dotenv helper execution from application preload configuration and inherited runtime options while preserving those options for application candidates.
+- Accept the generated context declaration and parameter route folders during development snapshot preparation, integrity verification, and input watching while retaining containment and generated-root checks.
+- Support declarative SQLite/Drizzle and Better Auth applications in prepared development startup. Audit SQLite metadata callbacks and literal descriptor options, defer native database client lifecycle work until activation, and reject ambient values, eager clients and imports outside the audited backend sources. Tooling stays fingerprinted without being evaluated during eligibility checking. Generated SQLite services store mutable data under `.relkit/state` and create missing parent directories only during migration or runtime client acquisition. Validate and narrow database paths before filesystem setup so generated services also compile with the generic environment context.
+
 ## 0.7.6
 
 ### Changes
