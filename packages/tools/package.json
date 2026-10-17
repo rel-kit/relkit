@@ -1,6 +1,6 @@
 {
   "name": "@relkit/tools",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "description": "RELKIT tool authoring API; prefer @relkit/app/tools in applications.",
   "license": "MIT",
   "repository": {
