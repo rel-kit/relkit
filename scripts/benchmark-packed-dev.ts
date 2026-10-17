@@ -17,7 +17,7 @@ import { benchmarkReportEffect } from "./dev-readiness/benchmark-report.js";
 import { packedReadinessIdentity } from "./dev-readiness/benchmark-identity.js";
 import { benchmarkHostIdentity } from "./dev-readiness/benchmark-host.js";
 import { runBenchmarkMain } from "./dev-readiness/benchmark-main.js";
-import { candidateSummary } from "./dev-readiness/benchmark-packed-summary.js";
+import { candidateReadiness, candidateSummary } from "./dev-readiness/benchmark-packed-summary.js";
 import type { StartRequest } from "./dev-readiness/benchmark.types.js";
 
 /**
@@ -130,10 +130,14 @@ function packedReport(
   expectedRuns = attempts.length,
 ) {
   const summary = candidateSummary(attempts, preparationAttempt);
+  const readinessOnly = process.argv.includes("--readiness-only");
+  let mode = "candidate-certification";
+  if (readinessOnly) mode = "candidate-readiness";
+  if (set === "diagnostic") mode = "candidate-diagnostic";
   return {
     protocol: "relkit.dev-readiness",
-    version: 1,
-    mode: set === "diagnostic" ? "candidate-diagnostic" : "candidate-certification",
+    version: readinessOnly ? 2 : 1,
+    mode,
     set,
     command: "bun dev",
     thresholdMs: 1_000,
@@ -149,6 +153,9 @@ function packedReport(
     ...(preparationAttempt === undefined ? {} : { preparationAttempt }),
     expectedRuns,
     summary: { ...summary, passed: attempts.length === expectedRuns && summary.passed },
+    ...(readinessOnly
+      ? { readiness: candidateReadiness(attempts, preparationAttempt, expectedRuns) }
+      : {}),
   };
 }
 

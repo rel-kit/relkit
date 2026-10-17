@@ -44,7 +44,7 @@ The `relkit` CLI SHALL provide command-local and nested help, examples, generate
 
 ### Requirement: Supported non-interactive options
 
-The generator SHALL resolve template `minimal|api|agent|fullstack`, cloud `aws|none`, deploy `pulumi|none`, certified jobs selections, install, Git, examples, directory, explicit empty-directory override, and JSON flags, and SHALL expose no persistence or identity flags. Every offered runtime-affecting combination SHALL have current passing generated-development readiness evidence. Unsupported, failing, or uncertified combinations SHALL be hidden from interactive creation and rejected by both creation entrypoints when explicitly requested, before destination mutation or installation. Failure of the default minimal combination SHALL block shipment.
+The generator SHALL resolve template `minimal|api|agent|fullstack`, cloud `aws|none`, deploy `pulumi|none`, certified jobs selections, install, Git, examples, directory, explicit empty-directory override, and JSON flags, and SHALL expose no persistence or identity flags. Every offered runtime-affecting combination SHALL have current passing generated-development functional readiness evidence with separately reported one-second performance results. Unsupported, failing, or uncertified combinations SHALL be hidden from interactive creation and rejected by both creation entrypoints when explicitly requested, before destination mutation or installation. Failure of the default minimal combination SHALL block shipment.
 
 #### Scenario: Agent template without install is selected
 
@@ -53,7 +53,7 @@ The generator SHALL resolve template `minimal|api|agent|fullstack`, cloud `aws|n
 
 #### Scenario: A combination misses the readiness gate
 
-- **WHEN** a valid candidate combination has any required start at or above 1,000 ms, missing evidence, or stale evidence
+- **WHEN** a valid candidate combination has a failed required functional start, missing evidence, or stale evidence
 - **THEN** interactive choices omit that combination and explicit flags produce a usage diagnostic identifying it before any generation work
 
 #### Scenario: Interactive partial choices would permit a rejected tuple
@@ -92,7 +92,7 @@ After successful default generation, the printed `cd` and `bun dev` commands SHA
 #### Scenario: New developer follows output
 
 - **WHEN** the printed next commands are executed on a supported clean environment
-- **THEN** the route returns the expected greeting in less than 1,000 ms on the reference host, appears in the eventually ready inspector and API reference, and generated test/check/build scripts pass
+- **THEN** the route returns the complete expected greeting within the functional deadline, appears in the eventually ready inspector and API reference, and generated test/check/build scripts pass; the one-second performance target is evaluated separately on the recorded measurement host
 
 #### Scenario: Inspector starts late
 

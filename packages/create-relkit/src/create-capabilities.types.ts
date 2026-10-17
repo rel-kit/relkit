@@ -1,4 +1,4 @@
-/** Describes exact creation tuples and their reference-host package, tool and template evidence identities. */
+/** Describes exact creation tuples and their recorded package, tool and template evidence identities. */
 import type { CreateOptions } from "./options.js";
 
 /** Complete public creation combination; absence of jobs preserves the native no-jobs option. */
@@ -33,7 +33,7 @@ export interface CreateCapabilityIdentity {
 
 /** Offered tuple backed by complete fresh and restart measurements for its template bytes. */
 export interface CreateCapabilityEvidence extends CreateCapabilityTuple {
-  /** Exact tool and package catalog identity measured by the reference host. */
+  /** Exact tool and package catalog identity measured by the recorded certification host. */
   readonly identity: CreateCapabilityIdentity;
   /** SHA-256 over ordered template paths and their complete bytes. */
   readonly templateDigest: string;
