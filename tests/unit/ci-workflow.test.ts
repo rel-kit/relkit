@@ -38,12 +38,11 @@ test("fast CI gates merges and only green main runs start releases", async () =>
   expect(checks).toContain('"conclusion":"${{ needs.ci-gate.result }}"');
   // A status function avoids implicit success() rejecting skipped optional ancestors.
   // Unlike always(), !cancelled() also prevents new dispatch after cancellation.
-  for (const job of ["release-pr-handoff", "dispatch-release"])
-    expect(checks).toMatch(
-      new RegExp(
-        `${job}:[\\s\\S]*?if: >-\\s+!cancelled\\(\\) && needs\\.ci-gate\\.result == 'success'`,
-      ),
-    );
+  const jobs = Bun.YAML.parse(checks).jobs;
+  for (const job of ["release-pr-handoff", "dispatch-release"]) {
+    expect(jobs[job].if).toContain("!cancelled()");
+    expect(jobs[job].if).toContain("needs.ci-gate.result == 'success'");
+  }
   expect(release).toContain("ref: ${{ github.sha }}");
   expect(release).not.toContain("needs.select-release-mode.outputs.sha");
   expect(release).toContain("github.event.workflow_run.event == 'workflow_dispatch'");
