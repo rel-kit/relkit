@@ -61,11 +61,14 @@ checkpoint, and fixture cleanup regression checks shared by CI and pre-push.
 The certification step has a shorter deadline than its job so failure artifacts
 can still upload when a native setup operation stalls.
 
-Successful release-PR CI owns the publication handoff independently of the
-versioning job. It waits briefly for the reviewed PR to merge, then dispatches
-CI for its exact merge commit when no main CI run exists. Successful push or
-manually dispatched CI on the current `main` commit starts the release workflow.
-This explicit dispatch handles bot merges whose token suppresses push workflows.
+Successful dispatched release-PR CI owns the publication handoff independently
+of the versioning job. After publishing its actual CI Gate status, it waits
+briefly for the reviewed PR to merge and explicitly dispatches CI for the exact
+merge commit when no main CI run exists. Dispatched main CI explicitly starts
+Release with its own run ID and commit. Release waits for that run to finish and
+requires its real successful conclusion before packing or publication. These
+dispatches handle bot events that suppress both push and downstream workflow
+triggers. Ordinary main pushes retain the existing `workflow_run` path.
 For recovery, dispatch CI on `main`; its successful completion resumes release
 selection. Publishing verifies every package's registry integrity before the
 GitHub release is declared complete. Later CI-only or documentation changes skip

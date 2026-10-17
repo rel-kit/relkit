@@ -1,3 +1,4 @@
+/** Checks workflow wiring into the required CI and release boundaries; adversarial authority behavior is exercised by the verifier and handoff suites. */
 import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -29,8 +30,12 @@ test("fast CI gates merges and only green main runs start releases", async () =>
   );
   expect(release).toContain("github.event.workflow_run.event == 'push'");
   expect(release).toContain("github.ref == 'refs/heads/main'");
-  expect(release).toContain('.conclusion == "success"');
-  expect(release).toContain(".head_sha == $sha");
+  expect(release).toContain("run: bun scripts/release-ci-verification.ts");
+  expect(release).toContain("CI_RUN_ID: ${{ inputs.ci_run_id }}");
+  expect(release).toContain("VERIFIED_SHA: ${{ inputs.verified_sha }}");
+  expect(checks).toContain('gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref main');
+  expect(checks).toContain("needs.dispatched-branch-status.result == 'success'");
+  expect(checks).toContain('"conclusion":"${{ needs.ci-gate.result }}"');
   expect(release).toContain("ref: ${{ github.sha }}");
   expect(release).not.toContain("needs.select-release-mode.outputs.sha");
   expect(release).toContain("github.event.workflow_run.event == 'workflow_dispatch'");
