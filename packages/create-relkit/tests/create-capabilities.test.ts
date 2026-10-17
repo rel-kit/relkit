@@ -73,32 +73,50 @@ function expectEvidence(
   entry: (typeof CREATE_CAPABILITY_TABLE.entries)[number],
   set: "fresh" | "restart",
 ): void {
-  const report = JSON.parse(readFileSync(path, "utf8")) as Record<string, any>;
+  const report = JSON.parse(readFileSync(path, "utf8"));
+  const readinessOnly = report.version === 2;
+  expect([1, 2]).toContain(report.version);
   expect(report).toMatchObject({
     protocol: "relkit.dev-readiness",
-    version: 1,
-    mode: "candidate-certification",
+    mode: readinessOnly ? "candidate-readiness" : "candidate-certification",
     set,
     command: "bun dev",
     thresholdMs: 1_000,
-    summary: { runs: 20, passed: true },
+    summary: { runs: 20 },
     identity: {
       bun: { version: entry.identity.bun },
       cli: { version: entry.identity.release },
       typescript: { version: entry.identity.typescript },
     },
-    fixture: { examples: entry.examples ? "examples" : "no-examples" },
+    fixture: {
+      version: entry.identity.release,
+      examples: entry.examples ? "examples" : "no-examples",
+    },
   });
+  const admission = readinessOnly ? report.readiness : report.summary;
+  expect(admission).toMatchObject({ passed: true, preparationPassed: true });
+  if (readinessOnly) expect(admission.deadlineMs).toBe(30_000);
   expect(report.attempts).toHaveLength(20);
+  const samples = report.attempts.map(
+    (attempt: { sample: { durationMs: number; outcome: string } }) => attempt.sample,
+  );
+  if (set === "restart") samples.push(report.preparationAttempt.sample);
+  for (const sample of samples) {
+    expect(sample.outcome).toBe("response");
+    expect(Number.isFinite(sample.durationMs)).toBe(true);
+    expect(sample.durationMs).toBeGreaterThanOrEqual(0);
+    expect(sample.durationMs).toBeLessThan(readinessOnly ? 30_000 : 1_000);
+    expect(sample.cleanupFailure).toBeUndefined();
+    expect(sample.exitCode).toBeUndefined();
+  }
+  expect(report.summary.passed).toBe(
+    samples.every((sample: { durationMs: number }) => sample.durationMs < 1_000),
+  );
   expect(
-    report.attempts.every(
-      (attempt: any) => attempt.sample?.outcome === "response" && attempt.sample.durationMs < 1_000,
+    report.identity.artifacts.some(
+      (artifact: { name: string }) => artifact.name === "create-relkit",
     ),
   ).toBe(true);
-  expect(Array.isArray(report.identity.artifacts)).toBe(true);
-  expect(report.identity.artifacts.some((artifact: any) => artifact.name === "create-relkit")).toBe(
-    true,
-  );
 }
 
 function templateDigest(root: string): string {

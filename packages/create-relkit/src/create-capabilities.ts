@@ -1,5 +1,5 @@
 /**
- * Packaged creation support is an allow-list backed by reference-host evidence.
+ * Packaged creation support is an allow-list backed by exact packed readiness evidence.
  * Candidate literals remain parseable so explicit unsupported requests can return
  * a precise pre-staging diagnostic instead of masquerading as syntax errors.
  */
@@ -125,7 +125,7 @@ function supportedTuples(identity: CreateCapabilityIdentity): readonly string[] 
 
 /**
  * Compares all mandatory tool identity fields without ignoring patch versions.
- * @param left - Recorded reference-host identity.
+ * @param left - Recorded certification identity.
  * @param right - Current executing identity.
  * @returns Whether every mandatory field matches.
  */

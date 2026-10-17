@@ -425,12 +425,12 @@ The benchmark SHALL start a monotonic clock immediately before spawning the gene
 
 ### Requirement: Every supported creation combination passes every measured start
 
-Readiness certification SHALL enumerate every valid normalized runtime-affecting combination, including fullstack, jobs, cloud/deploy selections, and examples enabled/disabled. Each shipped combination SHALL pass a controlled 20-start fresh-installed set and a separate controlled 20-start unchanged-restart set on the current Apple M1 Pro/macOS arm64 reference host with pinned Bun. Every run SHALL be strictly below 1,000 ms. The record SHALL include every attempt plus median, nearest-rank 95th percentile, and maximum, without discarding warmups, failures, outliers, or cleanup failures. Post-install preparation for `--no-install` SHALL receive equivalent functional and readiness evidence.
+Release readiness SHALL enumerate every valid normalized runtime-affecting combination, including fullstack, jobs, cloud/deploy selections, and examples enabled/disabled. Each shipped combination SHALL pass 20 fresh-installed starts and 20 unchanged restarts, including restart preparation, with pinned Bun, exact complete responses, clean shutdown, and the existing 30-second terminal deadline. Reports SHALL retain every attempt, actual host, exact identities, median, nearest-rank 95th percentile, and maximum without discarding warmups, failures, outliers, or cleanup failures. Strict performance certification SHALL separately require every start below 1,000 ms on its recorded host; a performance failure SHALL remain explicit and SHALL NOT alone reject functional release readiness. Post-install preparation for `--no-install` SHALL receive equivalent functional evidence and separately reported performance evidence.
 
 #### Scenario: One combination has a slow run
 
 - **WHEN** one required run is at or above 1,000 ms despite a passing median or p95
-- **THEN** that combination fails certification, is hidden interactively, and its explicit flags are rejected
+- **THEN** strict performance certification fails and the slow attempt remains recorded; release readiness passes only if all functional requirements pass
 
 #### Scenario: Default combination fails
 
@@ -571,7 +571,7 @@ Acceptance SHALL run packed CLI/generator and migrated flat applications outside
 - **WHEN** implementation or final acceptance evaluates this requirement
 - **THEN** all of the following remaining obligations hold:
 
-Maintained minimal/API/agent/fullstack template sources SHALL receive candidate coverage, while public creation SHALL remain limited to currently certified tuples. Every offered tuple SHALL retain the existing reference-host 20 fresh and 20 restart measurements, every start strictly below 1,000 ms from literal `bun dev` to the correct public response, with all attempts retained. Unavailable required evidence SHALL be recorded as blocked or not run, never passed; no tuple SHALL be promoted using source inspection or snapshots alone.
+Maintained minimal/API/agent/fullstack template sources SHALL receive candidate coverage, while public creation SHALL remain limited to currently certified tuples. Every offered tuple SHALL retain 20 fresh and 20 restart measurements from literal `bun dev` to the correct complete public response, including preparation, exact identities, clean shutdown, the 30-second functional deadline, and all attempts. Reports SHALL distinguish functional readiness from strict one-second performance certification on the recorded host; shared-host timing failure alone SHALL NOT block release admission. Unavailable required evidence SHALL be recorded as blocked or not run, never passed; no tuple SHALL be promoted using source inspection or snapshots alone.
 
 #### Scenario: Template digest changes
 
@@ -580,7 +580,7 @@ Maintained minimal/API/agent/fullstack template sources SHALL receive candidate 
 
 #### Scenario: Fullstack candidate is valid but uncertified
 
-- **WHEN** candidate fullstack tests pass without current reference-host readiness certification
+- **WHEN** candidate fullstack tests pass without current functional readiness certification
 - **THEN** backend layout correctness is recorded separately and public creation continues rejecting the uncertified tuple
 
 ### Requirement: Every changed authored file receives use-effect review

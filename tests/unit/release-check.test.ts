@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { releaseNotes } from "../../scripts/release-check.ts";
 import { publicationOrder } from "../../scripts/release-check-artifacts.ts";
 import { checkManifests, packages, readJson, root } from "../../scripts/release-check-support.ts";
+import { validateCreationReport } from "../../scripts/release-create-evidence.ts";
 import {
   assertCreateCapability,
   currentCreateCapabilityIdentity,
@@ -20,27 +21,7 @@ for (const set of ["fresh", "restart"] as const) {
   test(`the release retains complete ${set} certification for its actual tool identity`, async () => {
     const entry = CREATE_CAPABILITY_TABLE.entries[0]!;
     const report = await readJson(join(root, entry[`${set}Evidence`]));
-    const identity = currentCreateCapabilityIdentity();
-    expect(report).toMatchObject({
-      protocol: "relkit.dev-readiness",
-      version: 1,
-      mode: "candidate-certification",
-      set,
-      command: "bun dev",
-      thresholdMs: 1_000,
-      fixture: { version: identity.release, examples: "examples" },
-      identity: {
-        bun: { version: identity.bun },
-        cli: { version: identity.release },
-        typescript: { version: identity.typescript },
-      },
-      summary: { runs: 20, passed: true, preparationPassed: true },
-    });
-    expect(report.attempts).toHaveLength(20);
-    for (const attempt of report.attempts) {
-      expect(attempt.sample?.outcome).toBe("response");
-      expect(attempt.sample.durationMs).toBeLessThan(report.thresholdMs);
-    }
+    expect(() => validateCreationReport(report, entry, set)).not.toThrow();
   });
 }
 

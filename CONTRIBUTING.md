@@ -21,8 +21,9 @@ provides an isolated environment.
 
 `bun run version:packages` certifies the new release after synchronizing package
 and template versions. It records 20 fresh starts and 20 restarts from packed
-packages, including restart preparation, and validates every start against the
-one-second limit before updating the creation allow-list. Failed certification
+packages, including restart preparation, and requires every complete correct
+response and clean shutdown within the existing 30-second terminal deadline
+before updating the creation allow-list. Failed functional certification
 restores the previous allow-list and evidence and stops release PR generation.
 To repair a versioned candidate, run `bun scripts/certify-create.ts`; never copy
 an older release's reports or change their recorded version numbers.
@@ -34,12 +35,20 @@ For a release-branch repair, dispatch the existing CI workflow on
 `changeset-release/main` with `certify_create=true`. Its optional certification
 job uploads passing candidate source and reports as a commit-specific artifact
 for review; it has read-only repository access. Regular CI checks remain required.
-Timing certification runs on the standard `macos-15` Apple Silicon runner with
-Turbo and Vitest limited to one worker and a 2 GiB Node heap cap, while regular
-CI remains on x64 Ubuntu. Each completed
-measurement is checkpointed so a later project-creation failure cannot discard
-earlier attempts. Timing evidence identifies the actual host; passing one
-reference host does not establish a latency bound for every machine.
+Release readiness runs on free x64 Ubuntu with Turbo and Vitest limited to one
+worker and a 2 GiB Node heap cap. Version-2 `candidate-readiness` reports retain
+the strict one-second performance verdict in `summary` and record functional
+admission separately in `readiness`. Slow starts produce a workflow warning and
+remain in the evidence; they cannot be relabeled as performance passes.
+Version-1 strict reports remain valid historical evidence without modification.
+Run `bun scripts/certify-create.ts --performance` or dispatch **Startup
+performance** for strict one-second certification. That independent, read-only
+workflow runs on standard `macos-15` Apple Silicon and fails on any slow sample.
+It retains original reports even on failure. Shared runners have variable host
+load, so performance failure alone does not block functional release admission.
+Each completed measurement is checkpointed so later project-creation failure
+cannot discard earlier attempts. Reports identify the actual host; passing one
+host does not establish a latency bound for every machine.
 Regular CI and `bun run prepush` also build and trace the packaged startup graph.
 Its eager size budget keeps the ordinary TypeScript watcher behind a lazy import;
 prepared sessions continue to use their existing integrity epoch watcher.

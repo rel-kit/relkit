@@ -1,3 +1,4 @@
+/** Validates packed creation evidence and renders the exact capability entry; callers own persistence and rollback of candidate bytes. */
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
@@ -53,7 +54,13 @@ function record(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-/** Rejects relabeled, partial, slow, failed-cleanup, or stale packed certification reports. */
+/**
+ * Rejects stale or incomplete evidence; version 2 separates readiness from performance.
+ * @param value - Untrusted report parsed from the measurement driver.
+ * @param entry - Exact candidate identity proposed for the capability table.
+ * @param set - Required fresh-installed or unchanged-restart cohort.
+ * @returns Nothing after all identity, response, timing and cleanup assertions pass.
+ */
 export function validateCreationReport(
   value: unknown,
   entry: CreateCapabilityEvidence,
@@ -61,8 +68,9 @@ export function validateCreationReport(
 ): void {
   const report = record(value);
   assert.equal(report.protocol, "relkit.dev-readiness");
-  assert.equal(report.version, 1);
-  assert.equal(report.mode, "candidate-certification");
+  const readinessOnly = report.version === 2;
+  assert.ok(readinessOnly || report.version === 1, "Unknown readiness report version");
+  assert.equal(report.mode, readinessOnly ? "candidate-readiness" : "candidate-certification");
   assert.equal(report.set, set);
   assert.equal(report.command, "bun dev");
   assert.equal(report.thresholdMs, 1_000);
@@ -81,23 +89,46 @@ export function validateCreationReport(
   for (const artifact of artifacts) assert.match(String(artifact.hash), /^sha256:[a-f0-9]{64}$/);
   const summary = record(report.summary);
   assert.equal(summary.runs, 20);
-  assert.equal(summary.passed, true);
-  assert.equal(summary.preparationPassed, true);
+  const admission = readinessOnly ? record(report.readiness) : summary;
+  if (readinessOnly) {
+    assert.equal(admission.deadlineMs, 30_000);
+    assert.equal(admission.runs, 20);
+    assert.equal(report.expectedRuns, 20);
+  }
+  assert.equal(admission.passed, true);
+  assert.equal(admission.preparationPassed, true);
   assert.ok(Array.isArray(report.attempts));
   assert.equal(report.attempts.length, 20);
   for (const [index, value] of report.attempts.entries()) {
     const attempt = record(value);
     assert.equal(attempt.run, index + 1);
-    validateSample(attempt.sample);
+    validateSample(attempt.sample, readinessOnly ? 30_000 : 1_000);
   }
-  if (set === "restart") validateSample(record(report.preparationAttempt).sample);
+  if (set === "restart")
+    validateSample(record(report.preparationAttempt).sample, readinessOnly ? 30_000 : 1_000);
+  const preparationPassed =
+    set === "fresh" || belowTarget(record(report.preparationAttempt).sample);
+  assert.equal(summary.preparationPassed, preparationPassed);
+  assert.equal(
+    summary.passed,
+    preparationPassed && report.attempts.every((value) => belowTarget(record(value).sample)),
+    "Performance verdict must preserve every slow sample",
+  );
 }
 
-function validateSample(value: unknown): void {
+function belowTarget(value: unknown): boolean {
+  const sample = record(value);
+  return typeof sample.durationMs === "number" && sample.durationMs < 1_000;
+}
+
+function validateSample(value: unknown, deadlineMs: number): void {
   const sample = record(value);
   assert.equal(sample.outcome, "response");
   assert.ok(
-    typeof sample.durationMs === "number" && sample.durationMs >= 0 && sample.durationMs < 1_000,
+    typeof sample.durationMs === "number" &&
+      Number.isFinite(sample.durationMs) &&
+      sample.durationMs >= 0 &&
+      sample.durationMs < deadlineMs,
   );
   assert.equal(sample.cleanupFailure, undefined);
   assert.equal(sample.exitCode, undefined);

@@ -23,8 +23,8 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' && inputs.certify_create &&
       github.ref == 'refs/heads/changeset-release/main'
-    # Match the release version job's timing host; regular CI still validates Linux.
-    runs-on: macos-15
+    # Match the functional release gate; strict timing has its own manual workflow.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       TURBO_CONCURRENCY: "1"

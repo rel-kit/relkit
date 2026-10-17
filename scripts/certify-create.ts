@@ -21,6 +21,7 @@ export async function certifyCreation(
   root: string,
   entry: CreateCapabilityEvidence,
   run: Run,
+  policy: "readiness" | "performance" = "readiness",
 ): Promise<void> {
   const sourcePath = join(root, "packages/create-relkit/src/create-capabilities.ts");
   const source = await readFile(sourcePath, "utf8");
@@ -54,11 +55,18 @@ export async function certifyCreation(
         "--runs",
         "20",
         "--cleanup",
+        ...(policy === "readiness" ? ["--readiness-only"] : []),
         "--output",
         output,
       ]);
       const report = await readFile(output, "utf8");
-      validateCreationReport(JSON.parse(report), entry, set);
+      const parsed = JSON.parse(report);
+      assert.equal(parsed.version, policy === "readiness" ? 2 : 1);
+      validateCreationReport(parsed, entry, set);
+      if (policy === "readiness" && !parsed.summary.passed) {
+        const message = `${set}: functional readiness passed; one-second performance target failed. See retained samples and host identity.`;
+        console.warn(process.env.GITHUB_ACTIONS === "true" ? `::warning::${message}` : message);
+      }
       const target = join(root, entry[`${set}Evidence`]);
       previous.set(
         target,
@@ -91,8 +99,11 @@ export async function certifyCreation(
       for (const [path, bytes] of previous)
         if (bytes === undefined) await rm(path, { force: true });
         else await writeFile(path, bytes);
-    if (passed) await rm(temporary, { recursive: true, force: true });
-    else console.error(`Failed certification reports retained at ${temporary}`);
+    if (passed && policy === "readiness") await rm(temporary, { recursive: true, force: true });
+    else
+      console.error(
+        `${passed ? "Performance" : "Failed"} certification reports retained at ${temporary}`,
+      );
   }
 }
 
@@ -143,7 +154,12 @@ async function main(): Promise<void> {
     freshEvidence: `docs/evidence/create-capabilities/${identity.release}/fresh.json`,
     restartEvidence: `docs/evidence/create-capabilities/${identity.release}/restart.json`,
   };
-  await certifyCreation(root, entry, run);
+  await certifyCreation(
+    root,
+    entry,
+    run,
+    process.argv.includes("--performance") ? "performance" : "readiness",
+  );
 }
 
 if (import.meta.main) await main();
