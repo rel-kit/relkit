@@ -1,0 +1,65 @@
+[
+  {
+    "args": [
+      "scripts/package-create-relkit-templates.ts"
+    ],
+    "passed": true,
+    "ms": 91
+  },
+  {
+    "args": [
+      "scripts/benchmark-packed-dev.ts",
+      "--set",
+      "fresh",
+      "--runs",
+      "20",
+      "--cleanup",
+      "--readiness-only",
+      "--output",
+      "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-8EdrMF/fresh.json",
+      "--artifacts",
+      "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-awqQkg"
+    ],
+    "passed": true,
+    "ms": 263862
+  },
+  {
+    "args": [
+      "scripts/benchmark-packed-dev.ts",
+      "--set",
+      "restart",
+      "--runs",
+      "20",
+      "--cleanup",
+      "--readiness-only",
+      "--output",
+      "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-8EdrMF/restart.json",
+      "--artifacts",
+      "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-awqQkg"
+    ],
+    "passed": true,
+    "ms": 82859
+  },
+  {
+    "args": [
+      "test",
+      "tests/unit/release-check.test.ts"
+    ],
+    "passed": true,
+    "ms": 167
+  },
+  {
+    "args": [
+      "x",
+      "--bun",
+      "vitest",
+      "run",
+      "--config",
+      "packages/create-relkit/vitest.config.ts",
+      "packages/create-relkit/tests/create-capabilities.effect.test.ts",
+      "--maxWorkers=1"
+    ],
+    "passed": true,
+    "ms": 573
+  }
+]
