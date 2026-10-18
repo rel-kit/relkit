@@ -1,0 +1,395 @@
+{
+  "revision": "05a53404222d9c5de4ef0126d719066ca21b6f30",
+  "initialDirty": [
+    "?? openspec/changes/refine-application-skills-and-generated-projects/"
+  ],
+  "files": {
+    ".agents/skills/relkit-app/SKILL.md": "ca587aa1505cd022219c4eef3c44e772a731c19851cd5fc86188239e2bd4a270",
+    "templates/default/v1/agent/.agents/skills/relkit/SKILL.md": "6854a26c3a6b12e20dcea9fc77cb33423f6151db046906f7e762f7e0e5963482",
+    "templates/default/v1/agent/.agents/skills/relkit/references/agent-apis.md": "56f45e9f1cf1cec27e1e2360b7269c801f269a0947726f94150f17f8d75e8771",
+    "templates/default/v1/agent/.agents/skills/relkit/references/cli.md": "c61e00fab749fa8c0daec706972cb19cdf15f3a8879bccfd4eba02ac44885c0a",
+    "templates/default/v1/agent/.agents/skills/relkit/references/config-environments.md": "79d2abc034cd15a8e3532933b2654c07b300e39df596a2d5ef88f2aa3edc7d5f",
+    "templates/default/v1/agent/.agents/skills/relkit/references/data-apis.md": "ba99986ebe7d48a808de928405d8b6e02391ff17dc542b106fa690cd86cc4e84",
+    "templates/default/v1/agent/.agents/skills/relkit/references/domain-apis.md": "f74976741bf6f7e65afe0f24adfe47a47bd50857170eb2e4967ffe440a9df91d",
+    "templates/default/v1/agent/.agents/skills/relkit/references/http-apis.md": "d151f8d2db3afd26ce0516795416db6aad28500e0483bd2cbd21e8dd86f9ad71",
+    "templates/default/v1/agent/.agents/skills/relkit/references/jobs-apis.md": "79f92b0d2dbca53a649d0c64c44c6acffcdb17cfd5e12acda53c9eac539c0bbf",
+    "templates/default/v1/agent/.agents/skills/relkit/references/layout-migration.md": "e96c6978fd83ccb297c58cbdfdfd05a713158c9400253a3ad9a4df437ecf225a",
+    "templates/default/v1/agent/.agents/skills/relkit/references/observability-apis.md": "ac7a3dd23df45fdae83f3a78d61e7976fd3e84f2e5273af9fd1cd3d2c0d4e4c6",
+    "templates/default/v1/agent/.agents/skills/relkit/references/realtime-apis.md": "31135cccb2eafcd271dff8f1470f8d70d48f1ff8eadc215df306cb79f8756cd1",
+    "templates/default/v1/agent/.agents/skills/relkit/references/streaming-apis.md": "1d89fad9859b4bb24ee7d132fa6ee61e0b12804d2a1c7b72d0294b78da4a845f",
+    "templates/default/v1/agent/.agents/skills/relkit/references/testing-apis.md": "b0b432f1122c53421d00ccf6888eae61a6bbe82d5218a67c718129ead15b4b03",
+    "templates/default/v1/agent/.gitignore": "88d31549ec471841f21de7c786da365c86c9cb2a17d6ddf0b1e26401323f013b",
+    "templates/default/v1/agent/package.json": "28e2b77e72c29e2b7f1dfca0cdc5d18b3eaf34dc6517801efb7a50f43887b995",
+    "templates/default/v1/agent/tsconfig.json": "4328ff0b8f18e3e45f86590317132377801d04f788cc007ef4180faa61a24367",
+    "templates/default/v1/api/.agents/skills/relkit/SKILL.md": "6854a26c3a6b12e20dcea9fc77cb33423f6151db046906f7e762f7e0e5963482",
+    "templates/default/v1/api/.agents/skills/relkit/references/agent-apis.md": "56f45e9f1cf1cec27e1e2360b7269c801f269a0947726f94150f17f8d75e8771",
+    "templates/default/v1/api/.agents/skills/relkit/references/cli.md": "c61e00fab749fa8c0daec706972cb19cdf15f3a8879bccfd4eba02ac44885c0a",
+    "templates/default/v1/api/.agents/skills/relkit/references/config-environments.md": "79d2abc034cd15a8e3532933b2654c07b300e39df596a2d5ef88f2aa3edc7d5f",
+    "templates/default/v1/api/.agents/skills/relkit/references/data-apis.md": "ba99986ebe7d48a808de928405d8b6e02391ff17dc542b106fa690cd86cc4e84",
+    "templates/default/v1/api/.agents/skills/relkit/references/domain-apis.md": "f74976741bf6f7e65afe0f24adfe47a47bd50857170eb2e4967ffe440a9df91d",
+    "templates/default/v1/api/.agents/skills/relkit/references/http-apis.md": "d151f8d2db3afd26ce0516795416db6aad28500e0483bd2cbd21e8dd86f9ad71",
+    "templates/default/v1/api/.agents/skills/relkit/references/jobs-apis.md": "79f92b0d2dbca53a649d0c64c44c6acffcdb17cfd5e12acda53c9eac539c0bbf",
+    "templates/default/v1/api/.agents/skills/relkit/references/layout-migration.md": "e96c6978fd83ccb297c58cbdfdfd05a713158c9400253a3ad9a4df437ecf225a",
+    "templates/default/v1/api/.agents/skills/relkit/references/observability-apis.md": "ac7a3dd23df45fdae83f3a78d61e7976fd3e84f2e5273af9fd1cd3d2c0d4e4c6",
+    "templates/default/v1/api/.agents/skills/relkit/references/realtime-apis.md": "31135cccb2eafcd271dff8f1470f8d70d48f1ff8eadc215df306cb79f8756cd1",
+    "templates/default/v1/api/.agents/skills/relkit/references/streaming-apis.md": "1d89fad9859b4bb24ee7d132fa6ee61e0b12804d2a1c7b72d0294b78da4a845f",
+    "templates/default/v1/api/.agents/skills/relkit/references/testing-apis.md": "b0b432f1122c53421d00ccf6888eae61a6bbe82d5218a67c718129ead15b4b03",
+    "templates/default/v1/api/.gitignore": "88d31549ec471841f21de7c786da365c86c9cb2a17d6ddf0b1e26401323f013b",
+    "templates/default/v1/api/package.json": "d6fc5db9e0888ccbb10ef68f32650d1fc6de8cf32fd1ca7b89085e015b4a5028",
+    "templates/default/v1/api/tsconfig.json": "4328ff0b8f18e3e45f86590317132377801d04f788cc007ef4180faa61a24367",
+    "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md": "6854a26c3a6b12e20dcea9fc77cb33423f6151db046906f7e762f7e0e5963482",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/agent-apis.md": "56f45e9f1cf1cec27e1e2360b7269c801f269a0947726f94150f17f8d75e8771",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/cli.md": "c61e00fab749fa8c0daec706972cb19cdf15f3a8879bccfd4eba02ac44885c0a",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/config-environments.md": "79d2abc034cd15a8e3532933b2654c07b300e39df596a2d5ef88f2aa3edc7d5f",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/data-apis.md": "ba99986ebe7d48a808de928405d8b6e02391ff17dc542b106fa690cd86cc4e84",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/domain-apis.md": "f74976741bf6f7e65afe0f24adfe47a47bd50857170eb2e4967ffe440a9df91d",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/http-apis.md": "d151f8d2db3afd26ce0516795416db6aad28500e0483bd2cbd21e8dd86f9ad71",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/jobs-apis.md": "79f92b0d2dbca53a649d0c64c44c6acffcdb17cfd5e12acda53c9eac539c0bbf",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/layout-migration.md": "e96c6978fd83ccb297c58cbdfdfd05a713158c9400253a3ad9a4df437ecf225a",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/observability-apis.md": "ac7a3dd23df45fdae83f3a78d61e7976fd3e84f2e5273af9fd1cd3d2c0d4e4c6",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/realtime-apis.md": "31135cccb2eafcd271dff8f1470f8d70d48f1ff8eadc215df306cb79f8756cd1",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/streaming-apis.md": "1d89fad9859b4bb24ee7d132fa6ee61e0b12804d2a1c7b72d0294b78da4a845f",
+    "templates/default/v1/fullstack/.agents/skills/relkit/references/testing-apis.md": "b0b432f1122c53421d00ccf6888eae61a6bbe82d5218a67c718129ead15b4b03",
+    "templates/default/v1/fullstack/.gitignore": "8f181e3653ff28baf61e1ba7f496ca38f3f5543a0a3a886a078991077f96f6db",
+    "templates/default/v1/fullstack/package.json": "aee052c53f915a396ba8bbd1f6c5be8b7e5ee60294198c3a38b0d02e604385fb",
+    "templates/default/v1/fullstack/tsconfig.json": "1b9ea31ecdbeceb94355c61bced0a019c3965f99a43f1787296b48fe97b851f7",
+    "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md": "6854a26c3a6b12e20dcea9fc77cb33423f6151db046906f7e762f7e0e5963482",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/agent-apis.md": "56f45e9f1cf1cec27e1e2360b7269c801f269a0947726f94150f17f8d75e8771",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/cli.md": "c61e00fab749fa8c0daec706972cb19cdf15f3a8879bccfd4eba02ac44885c0a",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/config-environments.md": "79d2abc034cd15a8e3532933b2654c07b300e39df596a2d5ef88f2aa3edc7d5f",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/data-apis.md": "ba99986ebe7d48a808de928405d8b6e02391ff17dc542b106fa690cd86cc4e84",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/domain-apis.md": "f74976741bf6f7e65afe0f24adfe47a47bd50857170eb2e4967ffe440a9df91d",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/http-apis.md": "d151f8d2db3afd26ce0516795416db6aad28500e0483bd2cbd21e8dd86f9ad71",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/jobs-apis.md": "79f92b0d2dbca53a649d0c64c44c6acffcdb17cfd5e12acda53c9eac539c0bbf",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/layout-migration.md": "e96c6978fd83ccb297c58cbdfdfd05a713158c9400253a3ad9a4df437ecf225a",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/observability-apis.md": "ac7a3dd23df45fdae83f3a78d61e7976fd3e84f2e5273af9fd1cd3d2c0d4e4c6",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/realtime-apis.md": "31135cccb2eafcd271dff8f1470f8d70d48f1ff8eadc215df306cb79f8756cd1",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/streaming-apis.md": "1d89fad9859b4bb24ee7d132fa6ee61e0b12804d2a1c7b72d0294b78da4a845f",
+    "templates/default/v1/minimal/.agents/skills/relkit/references/testing-apis.md": "b0b432f1122c53421d00ccf6888eae61a6bbe82d5218a67c718129ead15b4b03",
+    "templates/default/v1/minimal/.gitignore": "88d31549ec471841f21de7c786da365c86c9cb2a17d6ddf0b1e26401323f013b",
+    "templates/default/v1/minimal/package.json": "d6fc5db9e0888ccbb10ef68f32650d1fc6de8cf32fd1ca7b89085e015b4a5028",
+    "templates/default/v1/minimal/tsconfig.json": "4328ff0b8f18e3e45f86590317132377801d04f788cc007ef4180faa61a24367",
+    "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md": "6854a26c3a6b12e20dcea9fc77cb33423f6151db046906f7e762f7e0e5963482",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/agent-apis.md": "56f45e9f1cf1cec27e1e2360b7269c801f269a0947726f94150f17f8d75e8771",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/cli.md": "c61e00fab749fa8c0daec706972cb19cdf15f3a8879bccfd4eba02ac44885c0a",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/config-environments.md": "79d2abc034cd15a8e3532933b2654c07b300e39df596a2d5ef88f2aa3edc7d5f",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/data-apis.md": "ba99986ebe7d48a808de928405d8b6e02391ff17dc542b106fa690cd86cc4e84",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/domain-apis.md": "f74976741bf6f7e65afe0f24adfe47a47bd50857170eb2e4967ffe440a9df91d",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/http-apis.md": "d151f8d2db3afd26ce0516795416db6aad28500e0483bd2cbd21e8dd86f9ad71",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/jobs-apis.md": "79f92b0d2dbca53a649d0c64c44c6acffcdb17cfd5e12acda53c9eac539c0bbf",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/layout-migration.md": "e96c6978fd83ccb297c58cbdfdfd05a713158c9400253a3ad9a4df437ecf225a",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/observability-apis.md": "ac7a3dd23df45fdae83f3a78d61e7976fd3e84f2e5273af9fd1cd3d2c0d4e4c6",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/realtime-apis.md": "31135cccb2eafcd271dff8f1470f8d70d48f1ff8eadc215df306cb79f8756cd1",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/streaming-apis.md": "1d89fad9859b4bb24ee7d132fa6ee61e0b12804d2a1c7b72d0294b78da4a845f",
+    "templates/default/v1/tasks/.agents/skills/relkit/references/testing-apis.md": "b0b432f1122c53421d00ccf6888eae61a6bbe82d5218a67c718129ead15b4b03",
+    "templates/default/v1/tasks/.gitignore": "88d31549ec471841f21de7c786da365c86c9cb2a17d6ddf0b1e26401323f013b",
+    "templates/default/v1/tasks/package.json": "7bb170a188142698ef8ad5817e23e27ab28c69313f6038ee6e1c78a02ec9a9ed",
+    "templates/default/v1/tasks/tsconfig.json": "9c1e45eb811a1abeae480b26b837d875a52e890dff244ecf4dd98b843a0e2eb5"
+  },
+  "samples": {
+    "data-model": {
+      "history": {
+        "examples/data-model/drizzle/20260831090701_initial/migration.sql": "ba8bfddd5f7e8de731afddf2683ba174439457c377339ec15a2964958f3f1172",
+        "examples/data-model/drizzle/20260831090701_initial/snapshot.json": "8b6c8f0ed377775fd0ddc780dcbcfe5abaf113817398f60985005b7046d7fc41"
+      },
+      "config": "/Users/mustafaelsayed/Workspace/relkit/examples/data-model/drizzle.config.ts"
+    },
+    "auth-drizzle": {
+      "history": {
+        "examples/auth-drizzle/drizzle/20260831094750_auth/migration.sql": "e1df74edaaf8262ca42010cd88a441fa643ccf4ba9e2276670e7318cfd4c67d5",
+        "examples/auth-drizzle/drizzle/20260831094750_auth/snapshot.json": "ae61f5a4a152b4bc0178d4379855ab6af7ea3c29b8ebbb7fe2527b602b962cc7"
+      },
+      "config": "/Users/mustafaelsayed/Workspace/relkit/examples/auth-drizzle/drizzle.config.ts"
+    },
+    "commerce": {
+      "history": {},
+      "config": null
+    },
+    "commerce-web": {
+      "history": {},
+      "config": null
+    }
+  },
+  "patchSha256": "10ea188b9409dd19aac7bf27f4b12911ae4844c063362b9c2bd11d6a3d936374",
+  "patchHunks": [
+    {
+      "path": "sqlite-core/effect/db.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "29cb82bf56dd542bbdc64f04f0f49ad526338ecad1cf0b82236aee43508da610"
+    },
+    {
+      "path": "sqlite-core/effect/db.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "541cf8be47a97500d38381e691d859c513f22c86713cc89860630e5fcfbf3fe8"
+    },
+    {
+      "path": "sqlite-core/effect/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "d143613202c4e0a70743c051c0c4ba5e5a9ac0b1c2437fdefe864b1ed6dc9d84"
+    },
+    {
+      "path": "sqlite-core/effect/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "f013003f2cfe742439f1e0c895963fbf72a90463ea2ea5ac975c54e15d54b97d"
+    },
+    {
+      "path": "effect-libsql/migrator.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "9144e438619f79dcdd031d6407ff6ca88a79c9e1991a1d7869a3a80383eae949"
+    },
+    {
+      "path": "effect-libsql/migrator.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "7b6a7bd09802d882e15ba77e472747005d4143c5cc56aeca4763cb44adff5228"
+    },
+    {
+      "path": "effect-libsql/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "de46a68680814244a86be2b3957a2394e2cb5b2158ade0e6d5f64ebb0521e98d"
+    },
+    {
+      "path": "effect-libsql/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "92b35d97be60c75e1e923d4ab172a57f2becfc664f43bfb1a425ec0ed2122943"
+    },
+    {
+      "path": "effect-sqlite-wasm/migrator.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "c85e16e062894956ebd1d37c1a7b771f1f86e98aa3cdc87f34d6b7d10a367887"
+    },
+    {
+      "path": "effect-sqlite-wasm/migrator.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "4b6accb9459513d152d2443d619dad779a12f35c26df6c4bd287f1eea7cf8bde"
+    },
+    {
+      "path": "effect-sqlite-wasm/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "7d7822fb350c05aae2580de757356aae343ac2ba32c4fe26b5f507ea118bf149"
+    },
+    {
+      "path": "effect-sqlite-wasm/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "39e6dc6b41314c7ab0d7ea4ced77b6ac04d2a36c09af884c6ba839c0f0c132e2"
+    },
+    {
+      "path": "effect-pglite/migrator.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "065242beb0870998f384c8dd22019200b2dfa695389f8ed413ab662714115cc0"
+    },
+    {
+      "path": "effect-pglite/migrator.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "468e3aef47f6a9ecd4e89bd2189ec5fe247cb7119786d276e91ebf74c1b56c4e"
+    },
+    {
+      "path": "effect-pglite/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "594ee5108cf8608931f1ed7615144a583f95f70102b05420d4cdee6a99f8bc2f"
+    },
+    {
+      "path": "effect-pglite/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "fffb08bd81720141f53b13160a5aca78e8b6bfde05bfb0a88c450b42acbd02c9"
+    },
+    {
+      "path": "effect-sqlite-do/migrator.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "277333df8632401c7361efda7981b0fb745ffb001f56e5049f46a594ab8a107c"
+    },
+    {
+      "path": "effect-sqlite-do/migrator.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "3f77dea5a83aef93c935b9a84df958bee040c5c0186997c7729869f34062ff53"
+    },
+    {
+      "path": "effect-sqlite-do/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "6c5109ef29214c5c61c5b579446b18021ec906fd27b66a005dc2eca0483ed523"
+    },
+    {
+      "path": "effect-sqlite-do/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "e1b3b2c64886d824b937f9832f24b330eaefda15c16c11160d70dc51a30d31d8"
+    },
+    {
+      "path": "effect-postgres/migrator.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "5af9d0c4e9879e92c6450dd42784a597377971adcb3057a317a8811d5d32feaf"
+    },
+    {
+      "path": "effect-postgres/migrator.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "0126a7f4676ed11803a0548c362cdd96f424d3a115c3f1683c5a1a419e485fa4"
+    },
+    {
+      "path": "effect-postgres/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "595b063ebe4a61103792aa26f3ce0a0fe7e7ae1011f095e64bb6d654a5a55102"
+    },
+    {
+      "path": "effect-postgres/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "cf2a575e3a22dc947f639e1211e65bf4fa848a2271d88cc216d3e882bbfa0cb6"
+    },
+    {
+      "path": "effect-d1/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "78eed10e97bdad732d71130780f012b0105e094c6fecd42e584b98c03404390a"
+    },
+    {
+      "path": "effect-d1/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "6fc202ca084291a32b19a23d4e12e712c25d735e2c4d8e1ed65109941adb5151"
+    },
+    {
+      "path": "effect-mysql2/migrator.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "bcc4c8006fc3682b6c9fe3c84f3f981e967e567090ca9c19bf68665e97ebacef"
+    },
+    {
+      "path": "effect-mysql2/migrator.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "14f8d61ae4e698c3604f30c3107b199ba0c0210539d9dc38fd864d5b663f14df"
+    },
+    {
+      "path": "effect-mysql2/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "a51c423bc0ad9d8a7276fb9a45400bc022c12f9169d9faa13be9418fd34543c3"
+    },
+    {
+      "path": "effect-mysql2/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "9cefc458080bf80ee031c9f732442bdf62f21d9578e95e2f365e16d8bf78e71c"
+    },
+    {
+      "path": "pg-core/effect/db.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "2e2b712df1abb9e5d5df41f8933b0624add4de3c81c9d139f28cf9e776325d9d"
+    },
+    {
+      "path": "pg-core/effect/db.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "ff7ad0b0f1f103eb27cff05f41b74f8bbaf2ad99286eabeb36398e91b923a607"
+    },
+    {
+      "path": "pg-core/effect/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "eeab747049cc60444b4f39e3bb0dee5f8e7fcdf0550b2453906bbb2aa8960368"
+    },
+    {
+      "path": "pg-core/effect/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "e9363146d49904d25f94f0bf3290ab8623d0e5a1180d31b03391721952b8ea24"
+    },
+    {
+      "path": "effect-sqlite-node/migrator.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "f845ad86f5d2c15b6b30fe0aa4b911f5f6729d4bb15e2e1029c8070ea440c1ec"
+    },
+    {
+      "path": "effect-sqlite-node/migrator.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "10022a854845858b912e4c5c86d661b840300276d1ab09410c97889b80fce034"
+    },
+    {
+      "path": "effect-sqlite-node/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "8d3e2ced6b351d3a14537dcf8a55e535e8ea520062babb5ee1fe442f85324931"
+    },
+    {
+      "path": "effect-sqlite-node/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "ddbca6801113f70ce428e3aaaa0ed8f7d297e6f00f8ee02437aec2b5b8a9720e"
+    },
+    {
+      "path": "effect-sqlite-bun/migrator.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "8c94e414b60fed9681fc56a72dedcef549c9709d7c138a194adf9c0ce71c6ef4"
+    },
+    {
+      "path": "effect-sqlite-bun/migrator.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "8433017594dfc9673990c43bff85a3a47a6347c765a16a71cfb45c5c99296a05"
+    },
+    {
+      "path": "effect-sqlite-bun/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "fd159a452486648a69315484f350f6cdabc7967be53a38acd84be27e91e6ba92"
+    },
+    {
+      "path": "effect-sqlite-bun/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "8170ee77bc2a2872bea961b9ec4fc4dadaa80aa74f7187adb72d40073bfd601b"
+    },
+    {
+      "path": "mysql-core/effect/db.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "f5686f628da3a64c2e27e3272e66fbf0ed09586be1cc43863de26f41b725f2f5"
+    },
+    {
+      "path": "mysql-core/effect/db.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "57bab84f2ce75e3137271adae0a7a3c9b19a282119ba0dafcfd273e102f67268"
+    },
+    {
+      "path": "mysql-core/effect/session.d.cts",
+      "class": "effect-sql-import",
+      "sha256": "8a4a80a13de2cfeffdc1ffd9258e3d8b606bcab1fc0368247429251b8df2fe58"
+    },
+    {
+      "path": "mysql-core/effect/session.d.ts",
+      "class": "effect-sql-import",
+      "sha256": "878bdae3731a792a7a0c66d5b38589437b3bb76df3d393b6f8dce49178b353a5"
+    },
+    {
+      "path": "pg-core/policies.d.ts",
+      "class": "exact-optional-policy",
+      "sha256": "57509c36f7dfd39e472188a0bd541de12468482364ceafef02bb7ac57d057747"
+    },
+    {
+      "path": "pg-core/policies.d.cts",
+      "class": "exact-optional-policy",
+      "sha256": "b5eef0c73ddc7d3396fff1ff2e70ebb71a5689600a0dab6b86dc24a7622c73e5"
+    },
+    {
+      "path": "pg-core/roles.d.ts",
+      "class": "exact-optional-role",
+      "sha256": "045fafc27ed9927e24f888fdcbbc67e802da3f9851602816e7f051d4a2eb4794"
+    },
+    {
+      "path": "pg-core/roles.d.cts",
+      "class": "exact-optional-role",
+      "sha256": "2c943353e0ad5be6205ea01de5ffa69d5eb0ba8a24b0fc678f96061342389789"
+    },
+    {
+      "path": "cockroach-core/policies.d.ts",
+      "class": "exact-optional-policy",
+      "sha256": "0bc63d22f66e3cfb818685b7590996cbb3564619f99c7e9df71f580db0f1c30b"
+    },
+    {
+      "path": "cockroach-core/policies.d.cts",
+      "class": "exact-optional-policy",
+      "sha256": "79f8731d815a2e889613358936d6d93668ca5d8c613ec475fb22a58a01304d0f"
+    },
+    {
+      "path": "cockroach-core/roles.d.ts",
+      "class": "exact-optional-role",
+      "sha256": "ffdfd26f3bca77540ad69101bac34c5c486c679d4950e7bedf4ef595661e78f2"
+    },
+    {
+      "path": "cockroach-core/roles.d.cts",
+      "class": "exact-optional-role",
+      "sha256": "571f482682729e86692c3f79f4433294ddd0c502e124ae09e9727d094bf04c64"
+    }
+  ],
+  "protectedOtherChange": {
+    "openspec/changes/separate-release-readiness-performance/.openspec.yaml": "4c39792c289debca8ac94a151082057ea2a2931a0cf9910b40c425e493bd3ab9",
+    "openspec/changes/separate-release-readiness-performance/design.md": "a80f183ee653d643f0e0c64dadbcf4e92e0da94c2330d8e7eb58e7e13904c4f4",
+    "openspec/changes/separate-release-readiness-performance/evidence/hosted-failed-fresh.json": "dd8b04fbbc2109d0d95855412a4fac397e9ee8a5496504225fc1c3dd02424164",
+    "openspec/changes/separate-release-readiness-performance/proposal.md": "3bd96fd91578b9082fe71330a932fec4fd116850da072904695ea35dfe648184",
+    "openspec/changes/separate-release-readiness-performance/specs/acceptance-verification/spec.md": "cb3a61fe548805411c4432df8fe0752863c8840e1665c1a2301134da1d35fff6",
+    "openspec/changes/separate-release-readiness-performance/specs/cli-scaffolding/spec.md": "8b06a2e9b04a57416d0c1f03aad3ca9cc258079e38444539adb53f25a48ee6d8",
+    "openspec/changes/separate-release-readiness-performance/tasks.md": "b8412e7a44518dfdd5504facf7f3d11d24229859c22c5460a822bf8b234c0327"
+  }
+}
