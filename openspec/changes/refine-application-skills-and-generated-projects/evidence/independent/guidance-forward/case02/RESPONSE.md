@@ -1,0 +1,1 @@
+I will scaffold the backend, add the supported SQLite Drizzle service using Bun's SQLite driver, and leave authentication absent. Resource constraints require --no-install, so dependency installation, graph checks, migrations and runtime acceptance will remain explicit follow-up gates.
