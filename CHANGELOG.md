@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.7.8
+
+### Changes
+
+- feat: centralize database migrations and refine application guidance
+
 ## 0.7.7
 
 ### Changes
