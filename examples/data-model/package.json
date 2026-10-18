@@ -9,8 +9,8 @@
     "typecheck": "bun ../../packages/cli/dist/bin.js check && tsc --noEmit",
     "test": "bun test",
     "build": "bun ../../packages/cli/dist/bin.js build",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:generate": "bun --bun drizzle-kit generate",
+    "db:migrate": "relkit db migrate"
   },
   "dependencies": {
     "@relkit/app": "workspace:*",

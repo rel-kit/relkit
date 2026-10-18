@@ -14,9 +14,14 @@ bun test
 bun run dev
 ```
 
-Drizzle Kit generates migrations from `src/services/database/schema/index.ts`; the initial
-migration is already included. After editing a table, run `bun run db:generate --name=your-change`,
-review the output, then migrate. The service opens a connection; it does not create tables.
+Drizzle Kit generates migrations from `src/services/database/schema/index.ts` into
+`src/services/database/migrations`; the initial SQL and snapshot are already tracked.
+After editing a table, run `bun run db:generate --name=your-change`, review the SQL
+and required metadata, then migrate. `db:migrate` uses installed `relkit db migrate`
+and root `drizzle.config.ts`; `--config <path>` selects another explicit config.
+Migration execution lives in RELKIT rather than a copied application runner.
+Keep one ordered history for the database and preserve applied identifiers/logs.
+The service opens a connection; it does not create tables.
 Do not apply the initial migration to an existing database without establishing a baseline.
 
 `users.registerMember` inserts a user and membership together. `users.updateUserEmail`
@@ -25,4 +30,4 @@ write routes; add authorization before exposing them. Only `listUsers` is mounte
 
 See the Database guides in `apps/docs/content/docs/database/` for setup, modeling,
 customization, migrations, and testing. Tests apply generated migrations to isolated
-databases; the migration test verifies that a second Kit run preserves rows.
+databases; the migration test verifies that a second shared-tooling run preserves rows.

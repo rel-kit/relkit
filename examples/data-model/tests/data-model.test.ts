@@ -25,7 +25,9 @@ test("runs CRUD, custom methods, composite selectors, schemas, and rollback", ()
           (owner) => Effect.promise(() => owner.close()),
         );
         expect(
-          migrate(active.client, { migrationsFolder: resolve(import.meta.dir, "../drizzle") }),
+          migrate(active.client, {
+            migrationsFolder: resolve(import.meta.dir, "../src/services/database/migrations"),
+          }),
         ).toBeUndefined();
         const user = yield* verifyDataModelCrud(active.context);
         yield* verifyCompositeSelectors(active.context, user);
@@ -55,7 +57,9 @@ test("rolls back member registration if membership persistence fails", async () 
   const active = await activateDrizzleService(service, { DATABASE_PATH: ":memory:" });
   try {
     expect(
-      migrate(active.client, { migrationsFolder: resolve(import.meta.dir, "../drizzle") }),
+      migrate(active.client, {
+        migrationsFolder: resolve(import.meta.dir, "../src/services/database/migrations"),
+      }),
     ).toBeUndefined();
     await expect(
       invokeFunction(
