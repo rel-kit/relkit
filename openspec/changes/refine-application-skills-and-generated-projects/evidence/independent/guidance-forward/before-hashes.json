@@ -1,0 +1,136 @@
+{
+  "case02/app": {
+    "relkit.config.ts": "467c350773b1975c37f98783f8bd1d5b265f1892bc33fcce5454353f66278c54",
+    "README.md": "f95cad9a2f686ce378d36da603c984b169cda6696b6bfb40f45e77e20d3cbc4b",
+    ".gitignore": "d6e8546a94c8f2809765cfb118bee9f4286cdc912c9edfbf268a29e68f1acb63",
+    "package.json": "7db6adfef22c9f39de650c4ee48fba69d1c93d69a05b3c97d42c124d6b762bee",
+    "tsconfig.json": "4328ff0b8f18e3e45f86590317132377801d04f788cc007ef4180faa61a24367",
+    ".env.example": "99e86796c141b4cea34b3997d786acf6c2a9f34354832d3a2eed98bffcad619b",
+    "drizzle.config.ts": "3c4cd7ffa1c4d60fd0aaf4f2c33c2a3f09b18b1b2bb19928a8f48e99f6a4050c",
+    "patches/drizzle-orm@1.0.0-rc.5-169397b.patch": "10ea188b9409dd19aac7bf27f4b12911ae4844c063362b9c2bd11d6a3d936374",
+    "scripts/migrate.ts": "52474b4562b1d3fb2f7eb05e9d5146c9ea806605b3ec48f30283f0dabe81604a",
+    ".vscode/settings.json": "971a8b30b05a95f1f45e414b4513c120d339067fefb86519aca9edbb00435377",
+    "src/platform/env.ts": "d4218582c32581b93e2db39a5ed2200be165f225085894579fde67d33ab373c1",
+    "src/services/database/service.ts": "a07bef82aa225429df59d124bf06cc540010a2b5bd68a01a81d106b10fc3ad75",
+    "src/services/hello/service.ts": "23ce0eef5aa7ad5f61c34f4363088627c57ec505508f56e2e203e4667a6db835",
+    "src/services/hello/functions/hello.function.ts": "cf2e6c7b9cb0bd073bb9293a59e438f20b67540f93bda87e34e5d4edb30aef2a",
+    "src/services/database/schema/index.ts": "cb2dfdf47a48a2a1f450942c672918b9e2849fdfa69bc564b65a71c3a2dd85f9",
+    "src/routes/hello/route.ts": "740424cb52525f6a274c9859211282db79353039a39073cabe3f42c9a1cdbfb5",
+    ".agents/skills/relkit/SKILL.md": "6854a26c3a6b12e20dcea9fc77cb33423f6151db046906f7e762f7e0e5963482",
+    ".agents/skills/relkit/references/realtime-apis.md": "31135cccb2eafcd271dff8f1470f8d70d48f1ff8eadc215df306cb79f8756cd1",
+    ".agents/skills/relkit/references/config-environments.md": "79d2abc034cd15a8e3532933b2654c07b300e39df596a2d5ef88f2aa3edc7d5f",
+    ".agents/skills/relkit/references/http-apis.md": "d151f8d2db3afd26ce0516795416db6aad28500e0483bd2cbd21e8dd86f9ad71",
+    ".agents/skills/relkit/references/streaming-apis.md": "1d89fad9859b4bb24ee7d132fa6ee61e0b12804d2a1c7b72d0294b78da4a845f",
+    ".agents/skills/relkit/references/cli.md": "c61e00fab749fa8c0daec706972cb19cdf15f3a8879bccfd4eba02ac44885c0a",
+    ".agents/skills/relkit/references/observability-apis.md": "ac7a3dd23df45fdae83f3a78d61e7976fd3e84f2e5273af9fd1cd3d2c0d4e4c6",
+    ".agents/skills/relkit/references/domain-apis.md": "f74976741bf6f7e65afe0f24adfe47a47bd50857170eb2e4967ffe440a9df91d",
+    ".agents/skills/relkit/references/data-apis.md": "ba99986ebe7d48a808de928405d8b6e02391ff17dc542b106fa690cd86cc4e84",
+    ".agents/skills/relkit/references/jobs-apis.md": "79f92b0d2dbca53a649d0c64c44c6acffcdb17cfd5e12acda53c9eac539c0bbf",
+    ".agents/skills/relkit/references/testing-apis.md": "b0b432f1122c53421d00ccf6888eae61a6bbe82d5218a67c718129ead15b4b03",
+    ".agents/skills/relkit/references/agent-apis.md": "56f45e9f1cf1cec27e1e2360b7269c801f269a0947726f94150f17f8d75e8771",
+    ".agents/skills/relkit/references/layout-migration.md": "e96c6978fd83ccb297c58cbdfdfd05a713158c9400253a3ad9a4df437ecf225a",
+    "tests/unit/hello.function.test.ts": "2b8ca2d39571b93e6b7d412544beb323b826c2d459cdcc5000261f20506b58ca",
+    "tests/integration/hello.route.test.ts": "c6b0af3c76f39f8acddef841e984d4f13e38e22430df99c2d995b7ba54fc3d70"
+  },
+  "case03/app": {
+    "relkit.config.ts": "3df8c4269ba1a59afea370c099f831cbcab5c45fb78537ba971b7b19875d7114",
+    "README.md": "7f27b3d972559beb5a33dc3b91069cf7e0d8690bf7492f06fd5e7695db97020d",
+    ".gitignore": "88d31549ec471841f21de7c786da365c86c9cb2a17d6ddf0b1e26401323f013b",
+    "package.json": "7926e38b5cdd17167bc27fcccffbf99d20a245809f01ddfa2b74b5c7be60b0d9",
+    "tsconfig.json": "4328ff0b8f18e3e45f86590317132377801d04f788cc007ef4180faa61a24367",
+    ".env.example": "7a967e71a9a53a5a4bea5d4fd6d38bb91f64e2148b9f5a56fa03f83dab220ab6",
+    "patches/drizzle-orm@1.0.0-rc.5-169397b.patch": "10ea188b9409dd19aac7bf27f4b12911ae4844c063362b9c2bd11d6a3d936374",
+    ".vscode/settings.json": "971a8b30b05a95f1f45e414b4513c120d339067fefb86519aca9edbb00435377",
+    "src/platform/env.ts": "4a60fad5a1db996d225643cb40e620b4b61f5a66ffeafee396bf1c6047dc6b80",
+    "src/services/hello/service.ts": "23ce0eef5aa7ad5f61c34f4363088627c57ec505508f56e2e203e4667a6db835",
+    "src/services/hello/functions/hello.function.ts": "cf2e6c7b9cb0bd073bb9293a59e438f20b67540f93bda87e34e5d4edb30aef2a",
+    "src/routes/hello/route.ts": "740424cb52525f6a274c9859211282db79353039a39073cabe3f42c9a1cdbfb5",
+    ".agents/skills/relkit/SKILL.md": "6854a26c3a6b12e20dcea9fc77cb33423f6151db046906f7e762f7e0e5963482",
+    ".agents/skills/relkit/references/realtime-apis.md": "31135cccb2eafcd271dff8f1470f8d70d48f1ff8eadc215df306cb79f8756cd1",
+    ".agents/skills/relkit/references/config-environments.md": "79d2abc034cd15a8e3532933b2654c07b300e39df596a2d5ef88f2aa3edc7d5f",
+    ".agents/skills/relkit/references/http-apis.md": "d151f8d2db3afd26ce0516795416db6aad28500e0483bd2cbd21e8dd86f9ad71",
+    ".agents/skills/relkit/references/streaming-apis.md": "1d89fad9859b4bb24ee7d132fa6ee61e0b12804d2a1c7b72d0294b78da4a845f",
+    ".agents/skills/relkit/references/cli.md": "c61e00fab749fa8c0daec706972cb19cdf15f3a8879bccfd4eba02ac44885c0a",
+    ".agents/skills/relkit/references/observability-apis.md": "ac7a3dd23df45fdae83f3a78d61e7976fd3e84f2e5273af9fd1cd3d2c0d4e4c6",
+    ".agents/skills/relkit/references/domain-apis.md": "f74976741bf6f7e65afe0f24adfe47a47bd50857170eb2e4967ffe440a9df91d",
+    ".agents/skills/relkit/references/data-apis.md": "ba99986ebe7d48a808de928405d8b6e02391ff17dc542b106fa690cd86cc4e84",
+    ".agents/skills/relkit/references/jobs-apis.md": "79f92b0d2dbca53a649d0c64c44c6acffcdb17cfd5e12acda53c9eac539c0bbf",
+    ".agents/skills/relkit/references/testing-apis.md": "b0b432f1122c53421d00ccf6888eae61a6bbe82d5218a67c718129ead15b4b03",
+    ".agents/skills/relkit/references/agent-apis.md": "56f45e9f1cf1cec27e1e2360b7269c801f269a0947726f94150f17f8d75e8771",
+    ".agents/skills/relkit/references/layout-migration.md": "e96c6978fd83ccb297c58cbdfdfd05a713158c9400253a3ad9a4df437ecf225a",
+    "tests/unit/hello.function.test.ts": "2b8ca2d39571b93e6b7d412544beb323b826c2d459cdcc5000261f20506b58ca",
+    "tests/integration/hello.route.test.ts": "c6b0af3c76f39f8acddef841e984d4f13e38e22430df99c2d995b7ba54fc3d70"
+  },
+  "case05/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde",
+    "tests/items.test.ts": "c89aae699c6d0bec316bad9de1b0a3b5a5703754ba9922aea70c2de83fd5d917",
+    "src/routes/items/route.ts": "097b7218c1814b7083c300c7d17e31381b6da73662513761226e7acd7c38c2c8"
+  },
+  "case06/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde"
+  },
+  "case07/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde"
+  },
+  "case08/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde",
+    "tests/items.test.ts": "c89aae699c6d0bec316bad9de1b0a3b5a5703754ba9922aea70c2de83fd5d917",
+    "src/routes/items/route.ts": "097b7218c1814b7083c300c7d17e31381b6da73662513761226e7acd7c38c2c8"
+  },
+  "case09/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "EXISTING.md": "d020654f28acec449974470af087b2de8659961d8bf74455d6995917f7172a15",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde",
+    "src/services/database/service.ts": "710055350b9bc6e4e4eba90b08b70f1d82dcb6394e0cb22631fb796ba8f18e22"
+  },
+  "case10/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "EXISTING.md": "bcf2aeb0af8a38227ce6227eb08f597127ca703d501ddebb83e147e2d837f69f",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde"
+  },
+  "case11/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "EXISTING.md": "48bc48f980a9daa4a8302f9d50d3bbf6e93092016a36687c9d20f8a97e6124d7",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde",
+    "src/services/auth/service.ts": "e7e51a8d20bb032be96fc244414759c079a4896222af6ba18382d6661a8168ef",
+    "src/routes/api/auth/[...all]/route.ts": "e3abc0ab54591c4f4810ae9a65548f827ae3608134bc87140004cd5243347e2f"
+  },
+  "case12/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde",
+    "src/services/database/service.ts": "a20f06c640b278531b62eddc149abf29ff487abea4f4ea500b155413ed5576c7",
+    "src/services/auth/service.ts": "e7e51a8d20bb032be96fc244414759c079a4896222af6ba18382d6661a8168ef",
+    "src/services/database/migrations/0000-existing.sql": "cd7585b61161644aaeb8041a65dd63ccd31e4146743c1d597bcef643f87cba74",
+    "src/routes/api/auth/[...all]/route.ts": "e3abc0ab54591c4f4810ae9a65548f827ae3608134bc87140004cd5243347e2f"
+  },
+  "case13/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "EXISTING.md": "a363cecb35a6371f0d807a18965079df65cdf6112a0fc537530153ad1a3ab768",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde",
+    "web/page.tsx": "7c5414defd2d2040ba415b0a5837c9d1eebe5b9254ca95c892a7577351fff68c",
+    "src/services/database/service.ts": "a20f06c640b278531b62eddc149abf29ff487abea4f4ea500b155413ed5576c7",
+    "src/services/auth/service.ts": "e7e51a8d20bb032be96fc244414759c079a4896222af6ba18382d6661a8168ef",
+    "src/services/database/migrations/0000-existing.sql": "cd7585b61161644aaeb8041a65dd63ccd31e4146743c1d597bcef643f87cba74",
+    "src/routes/api/auth/[...all]/route.ts": "e3abc0ab54591c4f4810ae9a65548f827ae3608134bc87140004cd5243347e2f"
+  },
+  "case14/app": {
+    "relkit.config.ts": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "package.json": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde",
+    "tests/items.test.ts": "72870815b443fb25bdcba307f303fe641b395571849005a1290f84b0618bf2d1",
+    "src/routes/items/route.ts": "097b7218c1814b7083c300c7d17e31381b6da73662513761226e7acd7c38c2c8"
+  }
+}
