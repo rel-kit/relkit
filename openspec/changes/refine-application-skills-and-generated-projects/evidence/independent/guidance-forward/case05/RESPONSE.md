@@ -1,0 +1,1 @@
+Reproduction returned 404 for item 0 where the test expected 200. The route uses !id, which treats valid zero as absent. I will validate the raw query parameter and integer ID explicitly, then replay Request/Response tests for zero, existing and missing items, and malformed input.
