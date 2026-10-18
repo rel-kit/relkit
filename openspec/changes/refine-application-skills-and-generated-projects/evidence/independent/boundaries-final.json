@@ -1,0 +1,14 @@
+{
+  "args": [
+    "nice",
+    "-n",
+    "10",
+    "bun",
+    "--smol",
+    "scripts/check-boundaries.ts"
+  ],
+  "pid": 52699,
+  "exit": 0,
+  "seconds": 2.561768054962158,
+  "startingPressure": "1"
+}

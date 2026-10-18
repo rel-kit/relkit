@@ -1,0 +1,18 @@
+{
+  "args": [
+    "nice",
+    "-n",
+    "10",
+    "node",
+    "--max-old-space-size=512",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "packages/cli/tsconfig.json",
+    "--pretty",
+    "false"
+  ],
+  "pid": 51005,
+  "exit": 0,
+  "seconds": 4.548632860183716,
+  "startingPressure": "1"
+}
