@@ -1,0 +1,8 @@
+{
+  "pid": 6090,
+  "ownedCommand": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysqld --no-defaults --basedir=/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7 --datadir=/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/data --innodb-buffer-pool-size=16M --performance-schema=OFF --bind-address=127.0.0.1 --port=61448 --socket=/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/mysql.sock --max-connections=5 --table-open-cache=32 --thread-cache-size=0 --innodb-read-io-threads=1 --innodb-write-io-threads=1 --mysqlx=OFF --skip-log-bin",
+  "gracefulSignal": "SIGTERM",
+  "forced": true,
+  "remaining": "",
+  "note": "Final process inventory caught the native MySQL PID after its RTK wrapper exited; the wrapper exit was insufficient cleanup proof."
+}
