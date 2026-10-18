@@ -1,0 +1,40 @@
+{
+  "args": [
+    "bun",
+    "--smol",
+    "test",
+    "apps/docs/tests/auth-learning.test.ts",
+    "apps/docs/tests/database-learning.test.ts",
+    "apps/docs/tests/start-learning.test.ts",
+    "apps/docs/tests/http-learning.test.ts",
+    "apps/docs/tests/service-learning.test.ts",
+    "--timeout",
+    "15000"
+  ],
+  "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+  "before": {
+    "at": "2026-10-18T15:09:01.516018+00:00",
+    "cpu": 10,
+    "load": [
+      9.498046875,
+      7.205078125,
+      5.2958984375
+    ],
+    "pressure": 1,
+    "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                3383.\nPages active:                            251122.\nPages inactive:                          245343.\nPages speculative:                         4881.\nPages throttled:                              0.\nPages wired down:                        177116.\nPages purgeable:                           4502.\n\"Translation faults\":                3651788043.\nPages copy-on-write:                  222116367.\nPages zero filled:                   1691687431.\nPages reactivated:                    344379577.\nPages purged:                          14691107.\nFile-backed pages:                       120839.\nAnonymous pages:                         380507.\nPages stored in compressor:             1508108.\nPages occupied by compressor:            325371.\nDecompressions:                       275283858.\nCompressions:                         354756309.\nPageins:                               67635624.\nPageouts:                                486890.\nSwapins:                                6203359.\nSwapouts:                              10399466.\n"
+  },
+  "pid": 405,
+  "exit": 0,
+  "seconds": 0.177918540983228,
+  "after": {
+    "at": "2026-10-18T15:09:01.734721+00:00",
+    "cpu": 10,
+    "load": [
+      9.498046875,
+      7.205078125,
+      5.2958984375
+    ],
+    "pressure": 1,
+    "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                3991.\nPages active:                            248566.\nPages inactive:                          242310.\nPages speculative:                         5713.\nPages throttled:                              0.\nPages wired down:                        177108.\nPages purgeable:                           4550.\n\"Translation faults\":                3651808689.\nPages copy-on-write:                  222118119.\nPages zero filled:                   1691693719.\nPages reactivated:                    344389682.\nPages purged:                          14691121.\nFile-backed pages:                       123498.\nAnonymous pages:                         373091.\nPages stored in compressor:             1516960.\nPages occupied by compressor:            329616.\nDecompressions:                       275286887.\nCompressions:                         354768194.\nPageins:                               67637415.\nPageouts:                                486890.\nSwapins:                                6203383.\nSwapouts:                              10399466.\n"
+  }
+}
