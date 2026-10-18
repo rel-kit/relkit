@@ -1,0 +1,144 @@
+--- before/src/services/auth/helpers/session.ts
++++ app/src/services/auth/helpers/session.ts
+@@ -1,19 +0,0 @@
+-import { defineError, type AuthContext } from "@relkit/app/functions";
+-import { z } from "@relkit/app/schema";
+-
+-export const AuthenticationRequired = defineError({
+-  id: "auth.required",
+-  data: z.object({}),
+-  message: "Authentication required",
+-  http: { status: 401 },
+-});
+-
+-const session = z.object({
+-  user: z.object({ id: z.string().min(1), name: z.string(), email: z.string().email() }),
+-});
+-
+-export async function requireUser(auth: AuthContext) {
+-  const result = await session["~standard"].validate(await auth.getSession());
+-  if (result.issues !== undefined) throw new AuthenticationRequired({});
+-  return result.value.user;
+-}
+--- before/src/services/auth/service.ts
++++ app/src/services/auth/service.ts
+@@ -1,6 +1,4 @@
+ import { defineBetterAuthService } from "@relkit/better-auth";
+-
+-export { AuthenticationRequired, requireUser } from "./helpers/session.js";
+ 
+ export default defineBetterAuthService({
+   baseURL: process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000",
+--- before/src/services/orders/errors/authentication-required.error.ts
++++ app/src/services/orders/errors/authentication-required.error.ts
+@@ -0,0 +1,9 @@
++import { defineError } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++export default defineError({
++  id: "orders.authentication-required",
++  data: z.object({}),
++  message: "Authentication required",
++  http: { status: 401 },
++});
+--- before/src/services/orders/functions/create-order.function.ts
++++ app/src/services/orders/functions/create-order.function.ts
+@@ -1,5 +1,6 @@
+-import { defineFunction } from "@relkit/app/functions";
+-import { AuthenticationRequired, requireUser } from "@app/services/auth/service.js";
++import { defineFunction, fail } from "@relkit/app/functions";
++import AuthenticationRequired from "../errors/authentication-required.error.js";
++import { readCurrentUser } from "../helpers/current-user.js";
+ import { createOrderInput, orderOutput } from "../schemas/order.schema.js";
+ 
+ export default defineFunction({
+@@ -8,7 +9,8 @@
+   output: orderOutput,
+   errors: [AuthenticationRequired],
+   handler: async ({ sku, quantity }, context) => {
+-    const user = await requireUser(context.auth);
++    const user = await readCurrentUser(context.auth);
++    if (user === null) return fail(AuthenticationRequired, {});
+     return context.database.orders.insert({
+       data: { id: crypto.randomUUID(), ownerId: user.id, sku, quantity },
+     });
+--- before/src/services/orders/functions/list-orders.function.ts
++++ app/src/services/orders/functions/list-orders.function.ts
+@@ -1,6 +1,7 @@
+-import { defineFunction } from "@relkit/app/functions";
++import { defineFunction, fail } from "@relkit/app/functions";
+ import { z } from "@relkit/app/schema";
+-import { AuthenticationRequired, requireUser } from "@app/services/auth/service.js";
++import AuthenticationRequired from "../errors/authentication-required.error.js";
++import { readCurrentUser } from "../helpers/current-user.js";
+ import { orderOutput } from "../schemas/order.schema.js";
+ 
+ export default defineFunction({
+@@ -9,7 +10,8 @@
+   output: z.array(orderOutput),
+   errors: [AuthenticationRequired],
+   handler: async (_input, context) => {
+-    const user = await requireUser(context.auth);
++    const user = await readCurrentUser(context.auth);
++    if (user === null) return fail(AuthenticationRequired, {});
+     return context.database.orders.findMany({ where: { ownerId: user.id } });
+   },
+ });
+--- before/src/services/orders/helpers/current-user.ts
++++ app/src/services/orders/helpers/current-user.ts
+@@ -0,0 +1,9 @@
++import type { AuthContext } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++const session = z.object({ user: z.object({ id: z.string().min(1) }) });
++
++export async function readCurrentUser(auth: AuthContext) {
++  const result = await session["~standard"].validate(await auth.getSession());
++  return result.issues === undefined ? result.value.user : null;
++}
+--- before/src/services/users/errors/authentication-required.error.ts
++++ app/src/services/users/errors/authentication-required.error.ts
+@@ -0,0 +1,9 @@
++import { defineError } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++export default defineError({
++  id: "users.authentication-required",
++  data: z.object({}),
++  message: "Authentication required",
++  http: { status: 401 },
++});
+--- before/src/services/users/functions/current.function.ts
++++ app/src/services/users/functions/current.function.ts
+@@ -1,11 +1,16 @@
+-import { defineFunction } from "@relkit/app/functions";
++import { defineFunction, fail } from "@relkit/app/functions";
+ import { z } from "@relkit/app/schema";
+-import { AuthenticationRequired, requireUser } from "@app/services/auth/service.js";
++import AuthenticationRequired from "../errors/authentication-required.error.js";
++import { readCurrentUser } from "../helpers/current-user.js";
+ 
+ export default defineFunction({
+   id: "users.current",
+   input: z.object({}),
+   output: z.object({ id: z.string().min(1), name: z.string(), email: z.string().email() }),
+   errors: [AuthenticationRequired],
+-  handler: async (_input, context) => requireUser(context.auth),
++  handler: async (_input, context) => {
++    const user = await readCurrentUser(context.auth);
++    if (user === null) return fail(AuthenticationRequired, {});
++    return user;
++  },
+ });
+--- before/src/services/users/helpers/current-user.ts
++++ app/src/services/users/helpers/current-user.ts
+@@ -0,0 +1,9 @@
++import type { AuthContext } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++const session = z.object({ user: z.object({ id: z.string().min(1), name: z.string(), email: z.string().email() }) });
++
++export async function readCurrentUser(auth: AuthContext) {
++  const result = await session["~standard"].validate(await auth.getSession());
++  return result.issues === undefined ? result.value.user : null;
++}
