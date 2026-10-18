@@ -12,6 +12,16 @@ installed RELKIT version and conventions. For a new app, start with
 examples enabled, no jobs, no cloud, and no deployment. API/agent/fullstack/jobs
 and cloud creation are internal candidates until their exact release evidence is certified.
 
+## Start from the request
+
+For features, establish scope, expected behavior and acceptance criteria, then explain a short implementation/verification plan before editing. For bugs, establish expected versus actual behavior, attempt reproduction and trace the failing path; separate confirmed causes from hypotheses and explain the fix before editing. If reproduction is unavailable, say so. Discussion requests stay read-only; mixed requests apply those rules separately. An explicit implementation request authorizes proceeding after the plan without another approval prompt.
+
+Before creating an app, establish database engine/driver or explicit no database and whether authentication is needed. Ask missing choices together before writes, reuse supplied/project decisions, and do not repeat onboarding for unrelated fixes. Resolve auth requiring persistence versus a no-database choice before scaffolding. Use supported create/add commands rather than inventing flags.
+
+Suggest only task-relevant optional modules, explain their benefit, and ask for a selection before adding an unrequested capability. For capabilities already requested, resolve only missing provider/configuration decisions. Check installed help/types; explain unsupported choices before editing.
+
+Default to backend work without unsolicited pages, app.js, assets.css or demo interfaces. Preserve explicit fullstack requests, existing frontend files and the Inspector. Give users/orders separate validated resource contracts with applicable authorization; do not expose a generic public table dispatcher. Infrastructure services and private tables need no endpoint; preserve intentional auth protocol handlers and shared internal helpers.
+
 ## Put behavior in the right place
 
 - `src/services/<domain>/` owns one business area. Keep functions, specialized service
@@ -46,12 +56,13 @@ created; do not create a second service for an existing domain.
 
 ## Verify the change
 
-From the application root, run the relevant checks:
+Review the diff and run focused checks after logical changes. Before completion, run applicable check, typecheck, build, unit/integration and existing relevant end-to-end coverage, using scripts present in package.json:
 
 ```sh
 bun run check
 bun run typecheck
 bun run test
+bun run build
 ```
 
 Exercise a changed endpoint against `bun run dev` and check its actual status and response.
@@ -62,6 +73,10 @@ For protected streams, check the session and ownership inside the function as we
 Exercise an authorized stream through real HTTP until its completion event, then
 check foreign user/tenant denial and cancellation cleanup. An in-memory invocation
 alone does not verify the generated server's request context or iterator lifetime.
+
+Replay the original bug through its failing boundary. A direct function test alone does not verify an HTTP route or complete flow; test valid/invalid input and denied/allowed access where applicable. Use backend/API verification without adding a frontend for testing. Report the change, exact checks/results, and failed/skipped/blocked verification; do not claim full completion from partial checks. Stop test-owned servers and clients.
+
+New database scaffolds keep one tracked SQL/metadata history beside their database service at `src/services/database/migrations`, shared by auth and business tables. Configure the target and output explicitly in root `drizzle.config.ts`, set the required environment, run `bun run db:generate`, review history, then explicitly run `bun run db:migrate` (`relkit db migrate`, or `--config <path>`). Runner implementation belongs to installed tooling, not copied scripts. Scaffolding opens no database and applies no SQL. Preserve existing schema/history/data, current flat layout support and any required dependency patch; do not split histories by business service or reset migration logs.
 
 Follow the [Orders tutorial](https://relkit.up.railway.app/docs/start/create-an-app) for a
 continuous first app, [Service](https://relkit.up.railway.app/docs/service) for code placement,

@@ -6,6 +6,11 @@ over this file. Read it before editing.
 
 ## Repository
 
+RELKIT is experimental: interfaces may change, and current consumers are
+repository samples. Update affected samples directly within the task while
+preserving their data and applied migration history. This does not authorize
+data deletion or new legacy upgrade commands or compatibility layers.
+
 RELKIT is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
 The main product topology is:
 
