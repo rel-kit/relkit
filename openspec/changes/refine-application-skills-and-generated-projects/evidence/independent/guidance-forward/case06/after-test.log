@@ -1,0 +1,9 @@
+bun test v1.3.10 (30e609e0)
+
+tests/health.test.ts:
+(pass) health validates optional input and explicit output [80.40ms]
+
+ 1 pass
+ 0 fail
+ 4 expect() calls
+Ran 1 test across 1 file. [850.00ms]

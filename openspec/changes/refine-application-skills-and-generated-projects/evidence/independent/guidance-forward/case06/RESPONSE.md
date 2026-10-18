@@ -1,0 +1,1 @@
+I will add a health service with explicit validated input/output and map GET /health to its public operation. I will use the installed descriptors and invocation validation in finite tests; app graph checks, typecheck, build and full runtime HTTP verification remain blocked by the resource constraint.
