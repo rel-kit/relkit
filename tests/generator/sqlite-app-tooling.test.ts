@@ -4,6 +4,7 @@ import { join, resolve } from "node:path";
 import { mkdir, symlink } from "node:fs/promises";
 import { Database } from "bun:sqlite";
 import ts from "typescript";
+import { buildCatalogDependency } from "../../packages/create-relkit/src/build-catalog.js";
 import { project, add, linkDependencies, registerAddCleanup } from "./add-acceptance-fixture.js";
 
 registerAddCleanup();
@@ -42,11 +43,18 @@ test("generated SQLite migration command creates auth tables and is repeatable u
   await add(root, ["auth", "--database-dialect", "sqlite", "--no-install"]);
   await linkDependencies(root);
   await symlink(
-    join(repository, "node_modules/.bun/drizzle-kit@1.0.0-rc.5-ab785fc/node_modules/drizzle-kit"),
+    join(
+      repository,
+      `node_modules/.bun/drizzle-kit@${buildCatalogDependency("drizzle-kit")}/node_modules/drizzle-kit`,
+    ),
     join(root, "node_modules/drizzle-kit"),
   );
   await mkdir(join(root, "node_modules/.bin"), { recursive: true });
   await symlink("../drizzle-kit/bin.cjs", join(root, "node_modules/.bin/drizzle-kit"));
+  await symlink(
+    join(repository, "packages/cli/dist/bin.js"),
+    join(root, "node_modules/.bin/relkit"),
+  );
   const env = { ...process.env, DATABASE_PATH: join(root, ".relkit/state/app.sqlite") };
   const generate = Bun.spawn(
     [process.execPath, "--bun", join(root, "node_modules/drizzle-kit/bin.cjs"), "generate"],

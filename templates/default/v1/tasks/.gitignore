@@ -2,9 +2,6 @@ node_modules/
 .env
 .env.*
 !.env.example
-.relkit/generated/
-.relkit/build/
-.relkit/state/
-.relkit/observability/
+.relkit/
 coverage/
 dist/
