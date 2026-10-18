@@ -1,0 +1,115 @@
+{
+  "temporary": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42",
+  "registry": "http://127.0.0.1:49569",
+  "results": [
+    {
+      "label": "parent-install",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--force",
+        "--no-cache",
+        "--registry",
+        "http://127.0.0.1:49569"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42",
+      "passed": true,
+      "ms": 168094,
+      "pressure": 2
+    },
+    {
+      "label": "create-direct",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42/node_modules/.bin/create-relkit",
+        "acceptance-app",
+        "--directory",
+        "consumer-direct",
+        "--template",
+        "minimal",
+        "--cloud",
+        "none",
+        "--deploy",
+        "none",
+        "--examples",
+        "--no-install",
+        "--no-git",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42",
+      "passed": true,
+      "ms": 465,
+      "pressure": 1
+    },
+    {
+      "label": "direct-install",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--force",
+        "--no-cache",
+        "--registry",
+        "http://127.0.0.1:49569"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42/consumer-direct",
+      "passed": true,
+      "ms": 20196,
+      "pressure": 1
+    },
+    {
+      "label": "direct-frozen",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--frozen-lockfile",
+        "--registry",
+        "http://127.0.0.1:49569"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42/consumer-direct",
+      "passed": true,
+      "ms": 68,
+      "pressure": 1
+    }
+  ],
+  "observations": {
+    "parentIdentity": [
+      {
+        "name": "@relkit/cli",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42/node_modules/@relkit/cli",
+        "version": "0.7.7",
+        "binSha256": "7b439e073f89e51fcc792ae8aa1ce56443a77b8cf2e3c21ddcac3baa92ba23eb"
+      },
+      {
+        "name": "create-relkit",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42/node_modules/create-relkit",
+        "version": "0.7.7",
+        "binSha256": "00735b75abda57c2f43af062ea6d8c3dd2da459daea2d037d177a72ba7434392"
+      }
+    ],
+    "packedSkillsMatch": true,
+    "directIdentity": [
+      {
+        "name": "@relkit/cli",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42/consumer-direct/node_modules/@relkit/cli",
+        "version": "0.7.7",
+        "binSha256": "7b439e073f89e51fcc792ae8aa1ce56443a77b8cf2e3c21ddcac3baa92ba23eb"
+      },
+      {
+        "name": "create-relkit",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-JCof42/consumer-direct/node_modules/create-relkit",
+        "version": "0.7.7",
+        "binSha256": "00735b75abda57c2f43af062ea6d8c3dd2da459daea2d037d177a72ba7434392"
+      }
+    ],
+    "blocker": "AssertionError [ERR_ASSERTION]: Missing expected exception.",
+    "cleanup": {
+      "registryStopped": true,
+      "temporaryRemoved": true
+    }
+  }
+}
