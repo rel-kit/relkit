@@ -1,0 +1,457 @@
+[20:07:29.195] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 17.634209,
+}
+[20:07:29.203] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inputs",
+  outcome: "success",
+  duration_ms: 25.870375,
+}
+[20:07:29.257] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.exists",
+  outcome: "success",
+  duration_ms: 0.057708,
+}
+[20:07:29.283] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "modules.load",
+  outcome: "success",
+  duration_ms: 26.633042,
+}
+[20:07:29.283] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "project.readConfig",
+  outcome: "success",
+  duration_ms: 27.330708,
+}
+[20:07:29.286] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.loadConfig",
+  outcome: "success",
+  duration_ms: 2.649917,
+}
+[20:07:29.287] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.files",
+  outcome: "success",
+  duration_ms: 0.359208,
+}
+[20:07:29.287] INFO (#54): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.208958,
+}
+[20:07:29.287] INFO (#56): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.178333,
+}
+[20:07:29.287] INFO (#55): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.262166,
+}
+[20:07:29.287] INFO (#57): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.231083,
+}
+[20:07:29.287] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "project.readSources",
+  outcome: "success",
+  duration_ms: 1.140667,
+}
+[20:07:29.294] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeChanged",
+  outcome: "success",
+  duration_ms: 5.991167,
+}
+[20:07:29.294] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "project.writeRouteModuleChecks",
+  outcome: "success",
+  duration_ms: 6.529791,
+}
+[20:07:29.295] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 0.219042,
+}
+[20:07:29.295] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "project.discoverySources",
+  outcome: "success",
+  duration_ms: 0.515416,
+}
+[20:07:29.505] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.evaluate",
+  outcome: "success",
+  duration_ms: 189.486083,
+}
+[20:07:29.517] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeChanged",
+  outcome: "success",
+  duration_ms: 0.930042,
+}
+[20:07:29.517] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "project.writeEventRegistry",
+  outcome: "success",
+  duration_ms: 1.5205,
+}
+[20:07:29.517] INFO (#59): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeChanged",
+  outcome: "success",
+  duration_ms: 0.356666,
+}
+[20:07:29.517] INFO (#59): Execution operation completed {
+  domain: "cli",
+  operation: "project.writeContextRegistry",
+  outcome: "success",
+  duration_ms: 1.055459,
+}
+[20:07:31.884] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.typecheck",
+  outcome: "success",
+  duration_ms: 2367.518833,
+}
+[20:07:31.894] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.integrationPackages",
+  outcome: "success",
+  duration_ms: 9.433375,
+}
+[20:07:31.904] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 10.155916,
+}
+[20:07:31.905] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "project.applicationId",
+  outcome: "success",
+  duration_ms: 11.602375,
+}
+[20:07:31.996] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "compiler.writeArtifacts",
+  outcome: "success",
+  duration_ms: 2.882791,
+}
+[20:07:31.996] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "project.emitCheckResult",
+  outcome: "success",
+  duration_ms: 4.431292,
+}
+[20:07:31.996] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "project.check",
+  outcome: "success",
+  duration_ms: 2742.266792,
+}
+[20:07:32.444] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.typecheckQueries",
+  outcome: "success",
+  duration_ms: 40.87125,
+}
+[20:07:32.454] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.stage",
+  outcome: "success",
+  duration_ms: 0.243625,
+}
+[20:07:32.472] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.readText",
+  outcome: "success",
+  duration_ms: 9.264166,
+}
+[20:07:32.476] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.755,
+}
+[20:07:32.476] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.3085,
+}
+[20:07:32.478] ERROR (#1): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.954,
+}
+[20:07:32.478] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "build.stageJobs",
+  outcome: "success",
+  duration_ms: 1.492083,
+}
+[20:07:32.479] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.581792,
+}
+[20:07:32.479] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.mkdir",
+  outcome: "success",
+  duration_ms: 0.323125,
+}
+[20:07:32.479] ERROR (#1): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.copy",
+  outcome: "failure",
+  duration_ms: 0.126833,
+}
+[20:07:32.492] INFO (#3162): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 7.905416,
+}
+[20:07:32.492] INFO (#3163): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 8.1325,
+}
+[20:07:32.492] INFO (#3164): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 8.160042,
+}
+[20:07:32.492] INFO (#3165): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 8.176,
+}
+[20:07:32.492] INFO (#3166): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.359334,
+}
+[20:07:32.493] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.symlink",
+  outcome: "success",
+  duration_ms: 0.151083,
+}
+[20:07:32.654] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "process.release",
+  outcome: "success",
+  duration_ms: 1.115709,
+}
+[20:07:32.654] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "process.run",
+  outcome: "success",
+  duration_ms: 158.502583,
+}
+[20:07:32.655] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.unlink",
+  outcome: "success",
+  duration_ms: 0.211416,
+}
+[20:07:32.655] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "build.moduleLink.remove",
+  outcome: "success",
+  duration_ms: 0.285333,
+}
+[20:07:32.655] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "build.bundleServer",
+  outcome: "success",
+  duration_ms: 162.373959,
+}
+[20:07:32.656] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.314292,
+}
+[20:07:32.656] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.194541,
+}
+[20:07:32.656] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 0.152584,
+}
+[20:07:32.657] ERROR (#1): Execution operation failed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "failure",
+  duration_ms: 0.191292,
+}
+[20:07:32.657] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.rename",
+  outcome: "success",
+  duration_ms: 0.243459,
+}
+[20:07:32.657] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "build.activate",
+  outcome: "success",
+  duration_ms: 1.027208,
+}
+[20:07:32.657] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage",
+  outcome: "success",
+  duration_ms: 203.674834,
+}
+[20:07:32.658] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.remove",
+  outcome: "success",
+  duration_ms: 0.096667,
+}
+[20:07:32.658] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "build.stage.remove",
+  outcome: "success",
+  duration_ms: 0.200166,
+}
+[20:07:32.658] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "project.build",
+  outcome: "success",
+  duration_ms: 204.83625,
+}
+[20:07:32.846] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.dependencies",
+  outcome: "success",
+  duration_ms: 188.059208,
+}
+[20:07:32.863] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "filesystem.writeText",
+  outcome: "success",
+  duration_ms: 7.845291,
+}
+[20:07:32.869] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 0.780792,
+}
+[20:07:32.941] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 6.093292,
+}
+[20:07:32.944] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inputs",
+  outcome: "success",
+  duration_ms: 9.332875,
+}
+[20:07:33.197] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.typecheckQueries",
+  outcome: "success",
+  duration_ms: 61.415542,
+}
+[20:07:33.199] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.epoch",
+  outcome: "success",
+  duration_ms: 0.083667,
+}
+[20:07:33.231] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 1.847542,
+}
+[20:07:33.235] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inputs",
+  outcome: "success",
+  duration_ms: 5.4725,
+}
+[20:07:33.582] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.typecheckQueries",
+  outcome: "success",
+  duration_ms: 72.171,
+}
+[20:07:33.583] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.epoch",
+  outcome: "success",
+  duration_ms: 0.029875,
+}
+[20:07:33.599] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inventory",
+  outcome: "success",
+  duration_ms: 4.618375,
+}
+[20:07:33.602] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.inputs",
+  outcome: "success",
+  duration_ms: 7.945625,
+}
+[20:07:33.879] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.typecheckQueries",
+  outcome: "success",
+  duration_ms: 48.887625,
+}
+[20:07:33.880] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.epoch",
+  outcome: "success",
+  duration_ms: 0.023167,
+}
+[20:07:33.882] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.publish",
+  outcome: "success",
+  duration_ms: 986.506166,
+}
+[20:07:33.885] INFO (#1): Execution operation completed {
+  domain: "cli",
+  operation: "dev.snapshot.prepare",
+  outcome: "success",
+  duration_ms: 4714.30225,
+}
+Prepared development snapshot sha256:d609426ab9b9ec2d9d104176113ce9033030229e9878a3f6cd3dfc5afc6f6094.
