@@ -1,0 +1,1905 @@
+--- before/.agents/skills/relkit/SKILL.md
++++ after/.agents/skills/relkit/SKILL.md
+@@ -0,0 +1,48 @@
++---
++name: relkit
++description: Build or extend a RELKIT CLI-generated application using its installed scaffolding and project commands. Use for application config, environments, services, functions, routes, auth, database, jobs, providers, and related app work.
++---
++
++# Work in a RELKIT application
++
++Run commands from the generated application's root, where `relkit.config.ts` and `package.json` live. Use `bun run relkit` to invoke the project's installed CLI. Check `bun run relkit <command> --help` before relying on an option, especially after a dependency upgrade.
++
++## Source placement
++
++New projects place every generic, database, and auth boundary at `src/services/<name>/service.ts`. Keep its functions, events, tasks, jobs, tools, agents, channels, schemas, resources, helpers, and assets under that service. Routes live at `src/routes`; configuration support and environment contracts live at `src/platform`. Application descriptors use plain TypeScript and supported public APIs; Effect imports are not required.
++
++Existing flat projects with `src/<name>/service.ts` remain supported. `relkit add` preserves the detected layout; empty projects default to grouped. Never mix flat and grouped boundaries or add an aggregate `src/services/service.ts`. Across services and from routes, import only the destination's `service.ts`; Platform cannot import services or Routes. Ordinary helpers do not become independently discovered descriptors.
++
++Read [layout migration](references/layout-migration.md) before moving an existing app. Keep logical IDs, exposure, provider profiles, and durable contract versions stable during a source-only move.
++
++## Add application artifacts
++
++Inspect the existing `src/` tree and `relkit.config.ts` before scaffolding. Prefer `relkit add` for supported artifacts, then edit the generated source for the required behavior. An interactive terminal can prompt for missing choices; scripts and noninteractive runs should provide the kind, name, service, route mode, and mappings explicitly.
++
++Read [the CLI reference](references/cli.md) for commands and option patterns covering services, functions, routes, auth, database, and the other add kinds.
++
++## Authoring API references
++
++Read only the reference relevant to the requested change. These examples describe the template's public APIs; check the installed package's TypeScript declarations when an exact option or signature matters.
++
++- [Application configuration and environments](references/config-environments.md)
++- [Functions, services, events, and errors](references/domain-apis.md)
++- [HTTP routes and request policy](references/http-apis.md)
++- [Streaming responses](references/streaming-apis.md)
++- [Tasks and jobs](references/jobs-apis.md)
++- [Agents, tools, and prompts](references/agent-apis.md)
++- [Database, auth, cache, and storage](references/data-apis.md)
++- [Realtime channels](references/realtime-apis.md)
++- [Observability and tracing](references/observability-apis.md)
++- [Testing functions, routes, and providers](references/testing-apis.md)
++
++## Working conventions
++
++- Generic domain services own callable functions and public event contracts. Other domains and routes should import a service's public members through its `service.ts`.
++- A service route maps HTTP methods to existing public callable members. A raw route is a standalone handler. The CLI will not overwrite an existing route file.
++- Database and auth are singletons under `src/services/database` and `src/services/auth`; extend an existing one instead of creating another. Auth may create a database baseline if none exists. Scaffolding does not run migrations, create secrets, or provision cloud resources.
++- Preserve existing application configuration, environment fields, service members, routes, and user changes when specializing generated files.
++
++## Verify the result
++
++Review the CLI's created and updated files, warnings, and next steps. Run `bun run check`, `bun run typecheck`, and focused tests after editing. For HTTP work, exercise the route itself; a direct function test does not cover request mapping. Database and auth work also needs the reported environment and migration steps before runtime verification.
+--- before/.agents/skills/relkit/references/agent-apis.md
++++ after/.agents/skills/relkit/references/agent-apis.md
+@@ -0,0 +1,59 @@
++# Agents, tools, and prompts
++
++| API                                             | Import               | Role                                 |
++| ----------------------------------------------- | -------------------- | ------------------------------------ |
++| `defineAgent`, `defineGraph`, `defineGraphNode` | `@relkit/app/agents` | Model-driven agent or explicit graph |
++| `defineTool`                                    | `@relkit/app/tools`  | Policy-controlled view of a function |
++| `definePrompt`                                  | `@relkit/app`        | Reusable instructions                |
++| `z`                                             | `@relkit/app/schema` | Agent and tool schemas               |
++
++## `defineAgent`
++
++Use `defineAgent` when a model should choose among tools. The agent template provides an executable offline LangChain model example. This shortened form uses the same public options:
++
++```ts
++import { defineAgent } from "@relkit/app/agents";
++import { z } from "@relkit/app/schema";
++import { FakeToolCallingModel } from "langchain";
++import lookup from "@app/services/hello/tools/lookup.tool.js";
++export default defineAgent({
++  id: "hello.assistant",
++  input: z.object({ message: z.string().min(1) }),
++  output: z.object({ answer: z.string() }),
++  model: new FakeToolCallingModel({
++    toolCalls: [[{ name: "relkit_output", args: { value: { answer: "Hello!" } }, id: "output-1" }]],
++  }),
++  instructions: "Answer greeting questions with the available tools.",
++  tools: [lookup],
++  limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },
++});
++```
++
++Other generated projects may need a native model package and application-owned provider configuration. `limits` requires positive `maxSteps`, `maxToolCalls`, and `timeoutMs`. `instructions` can be text or a `definePrompt` descriptor. A model can call only tools listed in the agent's `tools` array. A fixed sequence can be a function; a stateful explicit workflow can use `defineGraph` and `defineGraphNode`.
++
++## `defineTool` and `definePrompt`
++
++A RELKIT tool wraps a callable function without duplicating its schemas:
++
++```ts
++import { defineTool } from "@relkit/app/tools";
++import lookup from "@app/services/orders/functions/lookup.function.js";
++export default defineTool({
++  id: "orders.lookup",
++  target: lookup,
++  description: "Look up an order by ID",
++  sideEffect: "read",
++  approval: "never",
++  timeoutMs: 2_000,
++});
++```
++
++```ts
++import { definePrompt } from "@relkit/app";
++export default definePrompt("Answer using the available tools.", {
++  id: "hello.assistant-instructions",
++});
++```
++
++`lookup.asTool({ ... })` is the alternate tool form. Choose accurate `sideEffect` (`none`, `read`, `write`, or `external`) and `approval` (`never`, `on-write`, or `always`) policies. Tools are available to MCP by default; set `mcp: false` when a tool should remain inside the app. Permission checks belong in application logic.
++If a browser client needs an agent, configure its explicit `client` contract. Keep provider credentials and native model instances on the server. A typed agent run uses a stable thread ID; resume the same thread instead of creating a replacement run.
+--- before/.agents/skills/relkit/references/cli.md
++++ after/.agents/skills/relkit/references/cli.md
+@@ -0,0 +1,63 @@
++# CLI commands in a generated project
++
++These examples use the local binary through `bun run relkit`. The installed CLI's `--help` is authoritative if its version differs from the template.
++
++## Service and HTTP scaffolding
++
++| Goal                                           | Command                                                                                        |
++| ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
++| Create a domain with a public example function | `bun run relkit add service Billing`                                                           |
++| Select extra domain artifacts                  | `bun run relkit add service Billing --include function --include error`                        |
++| Create the full domain bundle                  | `bun run relkit add service Billing --full`                                                    |
++| Add a public callable function                 | `bun run relkit add function "Send Receipt" --service billing`                                 |
++| Add a standalone GET handler                   | `bun run relkit add route '/status' --mode route`                                              |
++| Map an existing public member to HTTP          | `bun run relkit add route '/billing' --mode service-route --service billing --map GET=example` |
++
++`--include` is repeatable and exclusive with `--full`. `--service` selects an existing generic domain; `--create-service` creates it while adding an artifact. Use `--internal` on a function or event that should stay out of the public service API. A service route needs one or more `--map METHOD=member` values in noninteractive use; the member must be a public callable function. Quote paths containing `*` or `?`.
++
++## Database and auth
++
++| Goal                                         | Command                                                                   |
++| -------------------------------------------- | ------------------------------------------------------------------------- |
++| Scaffold a SQLite Drizzle service            | `bun run relkit add database --orm drizzle --dialect sqlite`              |
++| Scaffold Better Auth and its catch-all route | `bun run relkit add auth --adapter better-auth --database-dialect sqlite` |
++
++Database `--dialect` and auth `--database-dialect` also accept `postgresql` and `mysql`. Auth's `--base-path` changes the default `/api/auth` mount. The CLI adds dependencies and an environment example as needed, but it does not apply database migrations or populate secrets. Follow the scaffold's reported next steps after reviewing the schema and environment values.
++
++## Other add kinds
++
++Run `bun run relkit add <kind> --help` for each kind's flags and requirements:
++
++| Area            | Kinds                                    |
++| --------------- | ---------------------------------------- |
++| Domain behavior | `function`, `task`, `error`, `constants` |
++| Events and work | `event`, `event-function`, `job`         |
++| Providers       | `cache`, `bucket`                        |
++| AI              | `tool`, `prompt`, `agent`                |
++| HTTP            | `middleware`, `transform`, `route`       |
++
++For example, jobs need a target task, tools need an existing or newly created function, and agents need a prompt or inline instructions. Check the existing service and profile before selecting one. `--no-install` skips installing newly required packages and may skip verification; `--project-root <directory>` targets another app. `bun run relkit --json add ...` disables prompts and emits structured results for automation.
++
++There is no `relkit add channel` or `relkit add observability` kind. Author channels with `defineChannel` and configure observability in `defineApp({ telemetry })`; see the [realtime](realtime-apis.md) and [observability](observability-apis.md) references.
++
++For streaming responses, scaffold a function and route, then edit the function's output to `streamOf(itemSchema)` and the route's `stream` option; see the [streaming reference](streaming-apis.md).
++
++## Inspect and run the app
++
++| Goal                                    | Command                             |
++| --------------------------------------- | ----------------------------------- |
++| Validate the application graph          | `bun run check`                     |
++| Typecheck and test                      | `bun run typecheck`, `bun run test` |
++| Start app, inspector, and API reference | `bun run dev`                       |
++| Inspect the graph                       | `bun run relkit graph print`        |
++| Inspect environment value status        | `bun run relkit env list`           |
++| Validate active environment values      | `bun run relkit env check`          |
++| Explain one environment declaration     | `bun run relkit env explain NAME`   |
++| Render a safe environment example       | `bun run relkit env example`        |
++| Check local prerequisites               | `bun run relkit doctor`             |
++| Inspect local service status            | `bun run relkit local status`       |
++| Build or start a built app              | `bun run build`, `bun run start`    |
++
++Use `bun run relkit --help` to discover additional `graph`, `env`, `local`, `jobs`, `client`, and deployment commands. Start Docker-backed local services with `bun run relkit local up --detach` only when the app actually declares and needs them. Deployment commands require a configured deployment target.
++
++For optional flat-to-grouped migration, use `bun run relkit migrate layout` for preview, `--write` for validated publication, and `--rollback <receipt>` for guarded restoration. See [layout migration](layout-migration.md). After `--no-install`, install dependencies and run `bun run relkit dev --prepare` before evaluating prepared-start readiness.
+--- before/.agents/skills/relkit/references/config-environments.md
++++ after/.agents/skills/relkit/references/config-environments.md
+@@ -0,0 +1,96 @@
++# Application configuration and environments
++
++A generated application has two authoring files at its root: `relkit.config.ts` declares topology and runtime policy with `defineApp`, and `src/platform/env.ts` declares application environment values with `defineEnv`. Extend these existing files rather than creating a second application or environment contract.
++
++## `defineEnv`: values for handlers
++
++In `src/platform/env.ts`:
++
++```ts
++import { defineEnv, env } from "@relkit/app/config";
++
++export default defineEnv({
++  LOG_LEVEL: env.literal("debug", "info", "warn", "error").default("info"),
++  DATABASE_PATH: env.string().default(".relkit/app.sqlite"),
++  BETTER_AUTH_SECRET: env.secret().requiredIn("production"),
++  PUBLIC_ORIGIN: env.url().optional(),
++});
++```
++
++Builders include `string`, `secret`, `number`, `boolean`, `port`, `url`, `json`, and `literal(...)`. Use `.default(value)` only for intentional safe defaults, `.optional()` for absent values, `.requiredIn("production")` for environment-specific requirements, and `.description(text)` or `.example(value)` for safe metadata. A URL field resolves to a `URL`, a number field to a number, and a Boolean field to a boolean. Do not declare `PORT` or `RELKIT_ENV`; RELKIT reserves them.
++
++Pass the definition into `defineApp({ env })`. Functions read the resolved, typed values through `context.env`:
++
++```ts
++import { defineFunction } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++export default defineFunction({
++  input: z.object({}),
++  output: z.object({ level: z.string() }),
++  handler: async (_input, context) => ({ level: context.env.LOG_LEVEL }),
++});
++```
++
++Mark credentials with `env.secret()`; keep actual values outside source control. Secret metadata enables redaction in generated output, diagnostics, telemetry, and Inspector data. Avoid placeholder production secrets or logging resolved secrets.
++
++## `defineApp`: topology and policy
++
++In `relkit.config.ts`, the baseline application contains the environment contract, telemetry redaction, backend settings, and Inspector settings:
++
++```ts
++import { defineApp } from "@relkit/app/config";
++import env from "@app/platform/env.js";
++
++export default defineApp({
++  env,
++  telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
++  server: { port: 3000, maxBodyBytes: 1_048_576 },
++  inspector: { port: 3210 },
++});
++```
++
++`defineApp` also accepts `id`, `defaults`, `deployment`, and provider capabilities `bucket`, `cache`, `jobs`, `event`, `model`, `realtime`, and `"agent-state"`. A capability can have one `default` profile or a named profile map. `defaults.<capability>` must name a configured profile. The `jobs` key is the public spelling for the job provider. Add only providers the app uses; the base template has none. Public creation currently certifies only the minimal starter with examples, no jobs, no cloud, and no deployment. API, agent, fullstack, jobs, and AWS/Pulumi creation tuples are internal candidates and must remain rejected until their exact release evidence is certified. Configure an existing app's optional integrations only when the installed version supports them and the task requires them.
++
++For a one-machine realtime provider and a named Docker-backed cache profile, the complete configuration shape is:
++
++```ts
++import { defineApp, env as binding } from "@relkit/app/config";
++import { docker } from "@relkit/docker";
++import { localRealtime } from "@relkit/local";
++import { redis } from "@relkit/redis";
++import env from "@app/platform/env.js";
++
++export default defineApp({
++  env,
++  cache: {
++    requests: docker(redis({ url: binding.secret("REQUESTS_REDIS_URL") })),
++  },
++  realtime: localRealtime(),
++  defaults: { cache: "requests", realtime: "default" },
++  telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
++  server: { port: 3000, maxBodyBytes: 1_048_576 },
++  inspector: { port: 3210 },
++});
++```
++
++Merge only the needed capabilities into the existing `defineApp`, preserving its other settings. Install the optional integration packages before importing them. `binding.secret("REQUESTS_REDIS_URL")` is a value-free provider binding; it is not a `context.env` field unless `defineEnv` declares that name too. Stable topology belongs in source; machine, stack, and secret values belong in environment bindings.
++
++Platform fragments may explicitly export server, Inspector, telemetry, deployment, or provider settings and be imported by `relkit.config.ts`. Unimported files are not autoloaded. Keep provider acquisition in supported lazy factories and compose one `defineApp`.
++
++CLI `--environment` selects provider configuration; `RELKIT_ENV` selects the application environment. `.env` and `.env.local` supply runtime values according to existing CLI loading; `.env.example` is informational and is not loaded as credentials.
++
++## Inspect and verify environment values
++
++From the generated project root:
++
++```sh
++bun run relkit env check
++bun run relkit env list
++bun run relkit env explain BETTER_AUTH_SECRET
++bun run relkit env example
++```
++
++`check` validates active values, `list` shows presence/status without printing secrets, `explain` describes one declaration, and `example` renders a safe template. `env example --write --path .env.example` writes it when requested. Use `--environment <name>` with environment-aware CLI commands to select provider configuration; it does not define an application env field. Run `bun run check` and `bun run typecheck` after changing the contract, then exercise the affected runtime path. Run `bun run relkit local status` before using Docker-backed providers.
++
++For observability settings, see [Observability and tracing](observability-apis.md); for realtime provider behavior, see [Realtime channels](realtime-apis.md).
+--- before/.agents/skills/relkit/references/data-apis.md
++++ after/.agents/skills/relkit/references/data-apis.md
+@@ -0,0 +1,74 @@
++# Database, authentication, cache, and storage
++
++For the full `defineApp`, `defineEnv`, provider profile, and environment binding workflow, read [Application configuration and environments](config-environments.md).
++
++The database and auth integrations are specialized services, separate from `defineService` domain maps. `relkit add database` creates the Drizzle baseline in `src/services/database`; `relkit add auth` creates `src/services/auth` and its recognized `ALL` handler route. There should be one of each. Extend an existing one while preserving schema exports, environment fields, and routes.
++
++## `defineEnv` and `defineDrizzleService`
++
++```ts
++import { defineEnv, env as envFactory } from "@relkit/app/config";
++
++export default defineEnv({
++  DATABASE_PATH: envFactory.string().default(".relkit/app.sqlite"),
++  BETTER_AUTH_SECRET: envFactory.secret(),
++});
++```
++
++```ts
++import { Database } from "bun:sqlite";
++import { defineDrizzleService } from "@relkit/drizzle";
++import { drizzle } from "drizzle-orm/bun-sqlite";
++import * as schema from "./schema/index.js";
++
++export default defineDrizzleService({
++  schema,
++  client: ({ env }) => drizzle({ client: new Database(env.DATABASE_PATH, { create: true }) }),
++  dispose: (database) => database.$client.close(),
++});
++```
++
++Open the native connection in the `client({ env })` factory and close it with `dispose` when needed. Discovery does not run the factory. Generate and review migrations with the installed Drizzle tooling; service creation does not create tables or apply migrations. After `bun run check`, generated context declarations provide typed `context.database`.
++
++## `defineBetterAuthService`
++
++```ts
++import { defineBetterAuthService } from "@relkit/better-auth";
++
++export default defineBetterAuthService({
++  baseURL: process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000",
++  emailAndPassword: { enabled: true },
++});
++```
++
++Better Auth uses the same Drizzle connection and needs its tables in that schema. Mount `auth.handler` directly with `export const ALL = defineRoute({ handler: auth.handler })` under the auth base path. Supply a stable server-side `BETTER_AUTH_SECRET` and correct public `BETTER_AUTH_URL`; the scaffold only adds environment examples. Protect application routes and enforce ownership separately from signing in.
++
++## `defineCache` and `defineBucket`
++
++```ts
++import { defineCache } from "@relkit/app/cache";
++import { z } from "@relkit/app/schema";
++
++export default defineCache({
++  id: "orders.prices",
++  profile: "requests",
++  key: z.object({ sku: z.string() }),
++  value: z.number().int().nonnegative(),
++  defaultTtlMs: 60_000,
++  maxTtlMs: 300_000,
++});
++```
++
++```ts
++import { defineBucket } from "@relkit/app/buckets";
++
++export default defineBucket({
++  id: "assets.objects",
++  profile: "assets",
++  visibility: "private",
++  maxObjectBytes: 5_000_000,
++  allowedContentTypes: ["application/json", "image/*"],
++});
++```
++
++Configure compatible profiles in `relkit.config.ts` and declare each resource in a function's `dependencies` before using its checked context client. A profile selects a provider; the descriptor does not create Redis, S3, or credentials. Use `bun run relkit local status` to inspect Docker-backed resources.
+--- before/.agents/skills/relkit/references/domain-apis.md
++++ after/.agents/skills/relkit/references/domain-apis.md
+@@ -0,0 +1,92 @@
++# Functions, services, events, and errors
++
++Generated projects map `@app/*` to `src/*`; keep the `.js` suffix on source imports. Use the installed package types when an exact signature matters, and run `bun run check` to validate the discovered graph.
++
++## `defineFunction` and `defineService`
++
++Put domain behavior in `src/services/<domain>/functions/*.function.ts`. A function validates input before its handler and validates the returned output:
++
++```ts
++import { defineFunction } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++const greet = defineFunction({
++  id: "hello.greet",
++  input: z.object({ name: z.string().min(1) }),
++  output: z.object({ message: z.string() }),
++  handler: async ({ name }) => ({ message: `Hello, ${name}!` }),
++});
++
++export default greet;
++```
++
++Expose selected functions from `src/services/<domain>/service.ts`:
++
++```ts
++import { defineService } from "@relkit/app/services";
++import greet from "@app/services/hello/functions/greet.function.js";
++
++export default defineService({ functions: { greet } });
++```
++
++The service also accepts `events`, `tasks`, and `jobs` maps. Its members appear directly as `service.greet`; there is no `service.functions.greet` namespace. Membership makes a function available across domains, but does not create an HTTP route or grant authorization.
++
++Within a domain, import a sibling function directly. Across domains and from routes, import the other domain's `service.ts`. Invoke a function descriptor with `await service.greet.invoke(input)`; do not call its handler directly. Leave an internal function out of the service map. Tools, agents, caches, buckets, and event-only functions are not service members.
++
++## `defineEvent` and `defineEventFunction`
++
++Declare an event payload in `src/services/<domain>/events/*.event.ts`:
++
++```ts
++import { defineEvent } from "@relkit/app/events";
++import { z } from "@relkit/app/schema";
++
++const orderCreated = defineEvent({
++  id: "orders.created",
++  version: 1,
++  input: z.object({ orderId: z.string() }),
++});
++
++declare global {
++  namespace Relkit {
++    interface EventRegistry {
++      readonly "orders.created": typeof orderCreated;
++    }
++  }
++}
++
++export default orderCreated;
++```
++
++Expose it through `defineService({ events: { orderCreated } })` when other domains need it. A publisher declares the exact ID in `publishes: ["orders.created"]` and calls `await context.events["orders.created"].publish({ orderId })`.
++
++An event-only consumer reacts without returning a result to its publisher:
++
++```ts
++import { defineEventFunction } from "@relkit/app/events";
++
++export default defineEventFunction({
++  id: "orders.confirmation",
++  event: "orders.created",
++  handler: async ({ orderId }, context) => {
++    context.log.info("Order created", { orderId });
++  },
++});
++```
++
++## `defineError`
++
++```ts
++import { defineError } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++export default defineError({
++  id: "orders.not-found",
++  data: z.object({ orderId: z.string() }),
++  message: ({ orderId }) => `Order ${orderId} was not found`,
++  http: { status: 404 },
++  retry: { kind: "later", afterMs: 1_000 },
++});
++```
++
++Declare only expected failures callers should handle on a function. Use the route layer for HTTP-specific request mapping and middleware.
+--- before/.agents/skills/relkit/references/http-apis.md
++++ after/.agents/skills/relkit/references/http-apis.md
+@@ -0,0 +1,70 @@
++# HTTP routes and request policy
++
++Routes live under `src/routes/**/route.ts`. The file path supplies the URL, and named exports supply methods. Import route APIs from `@relkit/app/routes`. Use a public service function as the target for ordinary application endpoints.
++
++## `defineRoute`: one function-backed method
++
++In `src/routes/hello/route.ts`, this exposes the service's public `hello` function as `GET /hello`:
++
++```ts
++import { defineRoute } from "@relkit/app/routes";
++import hello from "@app/services/hello/service.js";
++
++export const GET = defineRoute({ target: hello.hello });
++```
++
++A function-backed route can also set `successStatus`, `request`, `responses`, `rateLimit`, and `timeoutMs` when needed. The target must be a public callable function; jobs, events, agents, and tools are not route targets. Ordinary JSON request and response schemas are inferred from the target unless you supply explicit mapping.
++
++## `defineRoute`: raw Web handler
++
++Use `handler` instead of `target` for a standalone Web `Request`/`Response` handler:
++
++```ts
++import { defineRoute } from "@relkit/app/routes";
++
++export const GET = defineRoute({
++  handler: async () => Response.json({ ok: true }),
++});
++```
++
++A raw handler has a generic OpenAPI response. The recognized Better Auth mount also uses a raw route:
++
++```ts
++import { defineRoute } from "@relkit/app/routes";
++import auth from "@app/services/auth/service.js";
++
++export const ALL = defineRoute({ handler: auth.handler });
++```
++
++## `defineServiceRoutes`: methods on one service
++
++```ts
++import { defineServiceRoutes } from "@relkit/app/routes";
++import orders from "@app/services/orders/service.js";
++
++export const { GET, POST } = defineServiceRoutes(orders, {
++  GET: "listOrders",
++  POST: { member: "createOrder", successStatus: 201 },
++});
++```
++
++`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS` are supported service-route exports. `ALL` is for raw handlers. Do not add a `path` or `method` option to `defineRoute`; the filesystem and export determine both. The CLI can scaffold either form through `add route --mode route` or `--mode service-route`. It will not overwrite an existing route file; edit it directly to add a method.
++
++Use `request` mapping only when inference cannot express headers, cookies, names, or nesting; it replaces the inferred mapping. Use `responses` only when you need an explicit response contract. `defineMiddleware(path, handler)` is for HTTP policy, and `defineTransform({ schema })` is for request transforms:
++
++```ts
++import { defineMiddleware } from "@relkit/app/routes";
++
++export default defineMiddleware("/orders/*", async (_context, next) => {
++  await next();
++});
++```
++
++```ts
++import { defineTransform } from "@relkit/app/routes";
++import { z } from "@relkit/app/schema";
++
++export default defineTransform({ schema: z.string() });
++```
++
++Application authorization must be enforced in the relevant route or function logic. After changing a route, run `bun run check` and `bun run typecheck`, exercise the HTTP endpoint, and inspect `/_relkit/v1/api-reference` while `bun run dev` is running.
+--- before/.agents/skills/relkit/references/jobs-apis.md
++++ after/.agents/skills/relkit/references/jobs-apis.md
+@@ -0,0 +1,49 @@
++# Tasks and jobs
++
++Use a task for work that must outlive its initiating request; a function remains a request- or event-scoped operation.
++
++## `defineTask`
++
++```ts
++import { defineTask } from "@relkit/app/tasks";
++import { z } from "@relkit/app/schema";
++
++export default defineTask({
++  id: "orders.export-orders",
++  version: "1",
++  execution: "durable",
++  input: z.object({ orderIds: z.array(z.string()) }),
++  output: z.object({ exported: z.number().int().nonnegative() }),
++  progress: z.object({ completed: z.number().int().nonnegative() }),
++  handler: async ({ orderIds }, context) => {
++    await context.progress.emit({ completed: orderIds.length });
++    return { exported: orderIds.length };
++  },
++});
++```
++
++## `defineJob`
++
++Bind the task to a public job name and an explicit client policy in `src/services/orders/jobs/export-orders.job.ts`:
++
++```ts
++import { defineJob } from "@relkit/app/jobs";
++import exportOrders from "@app/services/orders/tasks/export-orders.task.js";
++
++export default defineJob({
++  id: "orders.export-orders-job",
++  name: "exportOrders",
++  task: exportOrders,
++  client: {
++    public: true,
++    operations: ["trigger", "get", "list", "watch"],
++    fields: ["status", "progress", "output"],
++  },
++});
++```
++
++Expose the task and job through the owning service's `tasks` and `jobs` maps. Keep the task ID and version stable; change the version for an intentional incompatible task contract. Make side effects idempotent because work may retry or resume.
++
++The app's `relkit.config.ts` selects a compatible jobs provider. Run `bun run relkit jobs capabilities` to inspect its actual guarantees; a durable task needs a binding that supports durable execution. `relkit add task` and `relkit add job --target <task-id>` scaffold the pair without running a worker or provisioning a provider.
++
++A trigger admits work and returns a run handle, not the task's output. Keep its `runId` and `operationId`, then read or watch the run; a typed client alone does not authorize a caller. A raw HTTP trigger can return the accepted handle with status `202`. Use `bun run relkit local status` to inspect local provider state before exercising a Docker-backed job.
+--- before/.agents/skills/relkit/references/layout-migration.md
++++ after/.agents/skills/relkit/references/layout-migration.md
+@@ -0,0 +1,35 @@
++# Optional flat layout migration
++
++Flat `src/<name>/service.ts` applications remain supported. Migrate only when grouped placement helps the app. Preview from the application root:
++
++```sh
++bun run relkit migrate layout
++bun run relkit --json migrate layout
++```
++
++The deterministic plan moves complete service roots to `src/services/<name>`, including helpers and assets. It reports import, test, tooling, documentation, and local guidance rewrites, conflicts, and references needing manual action. Preview leaves authored files, lockfiles, generated output, persistent state, migration history, and credentials unchanged.
++
++Stop the app's active development session and resolve touched tracked changes, occupied destinations, mixed boundaries, symlinks, and ambiguous/computed references before applying:
++
++```sh
++bun run relkit migrate layout --write
++```
++
++Write stages the candidate with installed dependencies and requires baseline/candidate check, typecheck, logical graph, and offline deployment compatibility before publication. It does not install packages, run database migrations or seeds, provision providers, or edit global skills. Publication is coordinated across files; the restricted local receipt retains exact before/after bytes and permissions for failure or crash recovery. Keep that receipt private.
++
++Rollback with the exact path returned by the write result:
++
++```sh
++bun run relkit migrate layout --rollback .relkit/migrations/RECEIPT_ID/receipt.json
++```
++
++Rollback refuses later edits or occupied original locations instead of overwriting them. Recovery conflicts preserve user bytes and require inspection of the retained receipt. Successful migration or restoration needs fresh preparation:
++
++```sh
++bun run check
++bun run typecheck
++bun run relkit dev --prepare
++bun run dev
++```
++
++Compare actual application responses and durable runs after the move. Logical service/function/task/job/channel/agent IDs and versions remain unchanged; diagnostic and editor paths point at their real grouped sources.
+--- before/.agents/skills/relkit/references/observability-apis.md
++++ after/.agents/skills/relkit/references/observability-apis.md
+@@ -0,0 +1,53 @@
++# Observability and tracing
++
++RELKIT records HTTP requests and invocation spans automatically. Use `context.log` for structured application records and `context.trace` for application work inside an existing function that needs more detail.
++
++## Log and trace inside a function
++
++```ts
++import { defineFunction } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++export default defineFunction({
++  id: "orders.total",
++  input: z.object({ quantity: z.number().int().positive() }),
++  output: z.object({ totalCents: z.number().int().nonnegative() }),
++  handler: async ({ quantity }, context) => {
++    const totalCents = await context.trace.span(
++      "pricing.calculate",
++      { attributes: { "pricing.strategy": "catalog" } },
++      async () => quantity * 1_000,
++    );
++    context.trace.event("pricing.calculated", { "pricing.total_cents": totalCents });
++    context.trace.setAttributes({ "pricing.quantity": quantity });
++    context.log.info("orders.total.calculated", { quantity, totalCents });
++    return { totalCents };
++  },
++});
++```
++
++`span(name, callback)` creates an internal child span; `span(name, { attributes, kind }, callback)` adds attributes and an `internal` or `client` kind. `event(name, attributes?)` adds an event to the active span, and `setAttributes` annotates it. RELKIT ends child spans on success or failure. Attribute values must be strings, finite numbers, or booleans. Do not log secrets or put payloads or random IDs in span attributes.
++
++## Configure capture and export
++
++Edit the existing `relkit.config.ts` and preserve its environment and provider settings:
++
++```ts
++import { defineApp } from "@relkit/app/config";
++import env from "@app/platform/env.js";
++
++export default defineApp({
++  env,
++  telemetry: {
++    redaction: { mode: "development-redacted", maxBytes: 65_536 },
++    localRetention: { maxRecords: 2_000, maxAgeMs: 3_600_000, maxBytes: 16_777_216 },
++    exportSampling: { traceRate: 0.25, minimumLogLevel: "info" },
++  },
++  server: { port: 3000 },
++  inspector: { port: 3210 },
++});
++```
++
++The template already supplies redaction. `localRetention` bounds development history; `exportSampling` controls remote export independently of local capture. Add named Sentry or OTLP exporters only when those integrations and their secret environment bindings are configured. Redact before storage or export. No `relkit add observability` kind exists; configure `telemetry` in `defineApp`.
++
++Run `bun run dev`, make one identifiable HTTP request, then inspect Requests, Traces, and Logs in the Inspector. Use `bun run dev -- --verbose` for DEBUG terminal output or `--json` for structured terminal records. Development history is stored in `.relkit/observability/observability.duckdb`; this is diagnostic history, not business storage.
+--- before/.agents/skills/relkit/references/realtime-apis.md
++++ after/.agents/skills/relkit/references/realtime-apis.md
+@@ -0,0 +1,98 @@
++# Realtime channels
++
++Use a channel to notify connected clients about a change. Keep the authoritative state in a route or database query; use channel events to refresh or update that state. Application events deliver backend work, while channels deliver live client updates.
++
++## `defineChannel`
++
++Create `src/services/announcements/channels/announcements.channel.ts`:
++
++```ts
++import { defineChannel } from "@relkit/app/realtime";
++import { z } from "@relkit/app/schema";
++
++const announcements = defineChannel({
++  id: "announcements.feed",
++  params: z.object({}),
++  events: { posted: z.object({ message: z.string(), postedAt: z.string() }) },
++  client: { public: true },
++  replay: { retentionMs: 300_000, maxEvents: 1_000 },
++});
++
++export default announcements;
++```
++
++`params` selects a partition, `events` validates named payloads, and `client` controls browser exposure. Omit `client` for backend-only channels. Use `client: { authorize: async (params, context) => ... }` for protected partitions and verify access to the specific resource, not merely that a session exists. `presence: "count"` adds connection counts. A channel with no events must declare presence.
++
++## Publish and subscribe
++
++After the application change succeeds, publish one validated event from a backend function:
++
++```ts
++import { defineFunction } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++import announcements from "@app/services/announcements/channels/announcements.channel.js";
++
++export default defineFunction({
++  id: "announcements.post",
++  input: z.object({ message: z.string().min(1) }),
++  output: z.object({ accepted: z.literal(true) }),
++  handler: async ({ message }) => {
++    await announcements.trigger({}, "posted", {
++      message,
++      postedAt: new Date().toISOString(),
++    });
++    return { accepted: true as const };
++  },
++});
++```
++
++The `trigger()` receipt confirms the provider accepted the append; it does not prove delivery to every browser. If a database write and publication must be atomic, use an outbox in the database transaction. A retryable publish can pass a RELKIT-issued `idempotencyKey` as the fourth argument.
++
++In a React client with `@relkit/client`, subscribe using the generated channel registry:
++
++```tsx
++"use client";
++
++import { useChannel, useRoute } from "@relkit/client/react";
++
++export default function Announcements() {
++  const announcements = useRoute("GET /announcements", { input: {} });
++  const channel = useChannel("announcements.feed", {
++    params: {},
++    on: { posted: () => void announcements.refetch() },
++    onCaughtUp: async () => {
++      await announcements.refetch();
++    },
++    onGap: async () => {
++      await announcements.refetch();
++    },
++  });
++
++  return <p>Channel: {channel.status}</p>;
++}
++```
++
++Load authoritative state through a route before relying on updates. `onGap` must restore it when replay cannot bridge a disconnect. `channel.status` and `channel.caughtUp` report connection and recovery state. `useRealtime()` is the lower-level subscription manager; a channel descriptor's `getPresence(params)` reads presence when declared.
++
++## Provider and verification
++
++Configure a compatible `realtime` provider and `defaults.realtime` in `relkit.config.ts`. For a one-machine app with `@relkit/local` installed, the relevant configuration is:
++
++```ts
++import { defineApp } from "@relkit/app/config";
++import { localRealtime } from "@relkit/local";
++import env from "@app/platform/env.js";
++
++export default defineApp({
++  env,
++  realtime: localRealtime(),
++  defaults: { realtime: "default" },
++  telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
++  server: { port: 3000 },
++  inspector: { port: 3210 },
++});
++```
++
++Merge these fields into an existing `defineApp` while preserving its other providers and settings. Redis supports fanout across application instances. Provider storage, retention, and Redis persistence determine recovery guarantees. Run `bun run check`, `bun run typecheck`, then test publication, browser subscription, reconnect, and gap recovery. Inspect channels in the Inspector while `bun run dev` is running.
++
++The current `relkit add` kinds do not include `channel`. Create the descriptor and provider configuration in the app source.
+--- before/.agents/skills/relkit/references/streaming-apis.md
++++ after/.agents/skills/relkit/references/streaming-apis.md
+@@ -0,0 +1,75 @@
++# Streaming responses
++
++Use a typed stream when one request returns a sequence to its caller. It ends with that request and can be cancelled. A realtime channel notifies connected clients across requests; a job watch follows one accepted background run. Agent and job content streams have their own client contracts.
++
++## `streamOf` with `defineFunction`
++
++Create a function in `src/services/reports/functions/stream-report.function.ts`:
++
++```ts
++import { defineFunction, streamOf } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++export default defineFunction({
++  id: "reports.stream",
++  input: z.object({ reportId: z.string().min(1) }),
++  output: streamOf(z.object({ completed: z.number().int(), total: z.number().int() })),
++  handler: async function* (_input, context) {
++    for (let completed = 1; completed <= 10; completed += 1) {
++      if (context.signal.aborted) return;
++      yield { completed, total: 10 };
++    }
++  },
++});
++```
++
++`streamOf(itemSchema)` validates each yielded item. The iterator is lazy and single-consumer; its invocation scope stays open until completion or cancellation. Expose this function from its domain service before mapping it to HTTP.
++
++For protected data, read the authenticated session and enforce ownership inside the
++function. Verify an authorized stream through the actual generated HTTP server to
++its completion event, then check other users/tenants and cancellation cleanup.
++Direct test-runtime invocation alone does not verify request context through lazy
++iterator pulls. Keep public descriptors as plain TypeScript.
++
++## `defineRoute` for a stream
++
++In `src/routes/reports/[reportId]/route.ts`, import the public service member:
++
++```ts
++import { defineRoute, http } from "@relkit/app/routes";
++import reports from "@app/services/reports/service.js";
++
++export const GET = defineRoute({
++  target: reports.streamReport,
++  request: http.input({ reportId: http.path("reportId") }),
++  client: { operation: "query" },
++  stream: { format: "sse" },
++});
++```
++
++A function-backed stream preserves typed items and failures with the managed client. Native SSE sends `relkit-item` events and an explicit completion or sanitized error event. For custom text, byte, or Web stream responses, use a raw `defineRoute({ handler })` and a Web `Response`. A raw response does not provide the managed item contract.
++
++## `useStream` in React
++
++With `@relkit/client` and a generated route registry:
++
++```tsx
++"use client";
++
++import { useStream } from "@relkit/client/react";
++
++export default function Report() {
++  const report = useStream("GET /reports/:reportId");
++
++  return (
++    <section>
++      <button onClick={() => void report.start({ reportId: "daily" })}>Start</button>
++      <button onClick={() => report.cancel()}>Cancel</button>
++      <p>Status: {report.status}</p>
++      <p>Items: {report.items.length}</p>
++    </section>
++  );
++}
++```
++
++`useStream` also exposes `reset`. Query-classified streams can opt into `autoStart`; mutation streams require an explicit `start`. Cancelling or ending iteration releases upstream work. Test item validation, normal completion, cancellation, and a failure after the first item by exercising the HTTP/client path.
+--- before/.agents/skills/relkit/references/testing-apis.md
++++ after/.agents/skills/relkit/references/testing-apis.md
+@@ -0,0 +1,71 @@
++# Testing a RELKIT application
++
++Generated projects use Bun's test runner and `@relkit/testing`. Start with the existing `tests/unit` and `tests/integration` examples, then test the boundary that owns the behavior. Keep external providers and test state explicit; `RELKIT_ENV=test` alone does not select fakes.
++
++## Direct function tests
++
++`invokeFunction` runs a function descriptor through RELKIT's input/output validation and handler path without an HTTP server. Import a service's public function through its `service.ts` when testing the public member:
++
++```ts
++import { expect, test } from "bun:test";
++import { invokeFunction } from "@relkit/testing";
++import orders from "@app/services/orders/service.js";
++
++test("createOrder calculates its total", async () => {
++  await expect(
++    invokeFunction(orders.createOrder, { orderId: "order-1", sku: "book", quantity: 3 }),
++  ).resolves.toEqual({ orderId: "order-1", sku: "book", totalCents: 300 });
++});
++```
++
++Pass explicit `env`, `context`, `clients`, or other `InvokeFunctionOptions` when the function needs them. Test invalid input and declared errors as well as success. Direct invocation does not test route mapping or middleware.
++
++For several invocations that share a deterministic clock or provider state, use `createTestRuntime({ app, env, providers, startTimeMs })` and `runtime.invoke(target, input)`. `runtime.clock.advance(ms)` controls its test clock. Always `await runtime.close()` in `finally` or `afterAll`.
++
++## Application and HTTP tests
++
++`createTestApplication` discovers the generated project's routes and services. Pass its existing `relkit.config.ts`; `resourceProviders: "fake"` explicitly replaces graph-required resource providers for local tests:
++
++```ts
++import { afterAll, expect, test } from "bun:test";
++import { createTestApplication } from "@relkit/testing";
++import config from "../../relkit.config.js";
++
++const app = await createTestApplication(config, { resourceProviders: "fake" });
++afterAll(() => app.close());
++
++test("POST /orders maps and validates input", async () => {
++  const response = await app.http.request("/orders", {
++    method: "POST",
++    headers: { "content-type": "application/json" },
++    body: JSON.stringify({ orderId: "order-1", sku: "book", quantity: 3 }),
++  });
++  expect(response.status).toBe(201);
++  expect(await response.json()).toEqual({ orderId: "order-1", sku: "book", totalCents: 300 });
++});
++```
++
++Use `app.http.request`, `get`, or other client methods to assert status, body, and headers. Add requests for invalid input, anonymous callers, and unauthorized resource access where relevant. The harness has `runtime`, `clock`, `fakes`, and `observability` for controlled state and inspection. Options include `env`, `environment`, `bindingValues`, `providers`, and `projectRoot`; use explicit values for test-only configuration. This in-process HTTP boundary does not prove the full production middleware, cookie/origin policy, OpenAPI, or network transport. Verify those against a running backend when relevant.
++
++## Provider and feature tests
++
++- `createTestCacheFake`, `createTestBucketFake`, `createTestJobFake`, and `createTestEventFake` provide owned, inspectable test dependencies. `createTestFakes` groups native clients. Close any separately created fake after use. Replace every configured provider profile the graph needs, not only the one under direct assertion.
++- `createTestHttpClient` exercises a standalone in-memory HTTP application. Use `createTestApplication` when route discovery and service wiring matter. `createTestRealtimeProvider` and `createTestAgentStateProvider` supply local stateful provider replacements.
++- `createTestModel`, `createTestAgent`, and `assertAgentTrace` support deterministic agent execution. Use scripted responses and inspect tool calls or traces instead of live model calls or sleeps.
++- For jobs, assert behavior beyond the descriptor shape: input/output, accepted run handle, progress, retry or cancellation policy, and idempotency where applicable. Use the test job adapter or fake appropriate to the contract.
++- For database and auth integration, migrate an isolated temporary database before starting the application. Supply both parsed RELKIT environment and any native auth process environment required by the provider; close the app before removing test-owned files. Test public and protected requests with real cookies and separate users. A direct function mock does not verify migrations, sessions, or route protection.
++- For realtime, streaming, and observability, test the exposed route or channel contract and recorded events/spans as applicable. Use a running backend for actual transport, connection, and browser behavior.
++
++## Run the generated project checks
++
++```sh
++bun test tests/unit/hello.function.test.ts
++bun run test:unit
++bun run test:integration
++bun run test
++bun run check
++bun run typecheck
++bun run build
++```
++
++Run only scripts present in the generated `package.json`; the task template may have a different test layout. Keep Docker, external providers, and cloud acceptance as explicit integration gates. The installed `@relkit/testing` declarations and the project's existing tests are the source for exact helper options.
+--- before/.env.example
++++ after/.env.example
+@@ -0,0 +1,2 @@
++LOG_LEVEL=info
++DATABASE_PATH=./.relkit/state/app.sqlite
+--- before/.gitignore
++++ after/.gitignore
+@@ -0,0 +1,13 @@
++node_modules/
++.env
++.env.*
++!.env.example
++.relkit/generated/
++.relkit/build/
++.relkit/state/
++.relkit/observability/
++coverage/
++dist/
++/drizzle/
++*.sqlite
++*.sqlite-*
+--- before/.vscode/settings.json
++++ after/.vscode/settings.json
+@@ -0,0 +1,4 @@
++{
++  "typescript.tsdk": "node_modules/typescript/lib",
++  "typescript.enablePromptUseWorkspaceTsdk": true
++}
+--- before/README.md
++++ after/README.md
+@@ -0,0 +1,28 @@
++# sqlite-app
++
++A small RelKit TypeScript/Bun project with one function and one HTTP route.
++Application code uses public RelKit descriptors and ordinary async handlers.
++
++## Commands
++
++```sh
++bun install
++bun run dev
++bun run test
++bun run check
++bun run typecheck
++bun run build
++```
++
++The example route is `GET /hello?name=RelKit`. The default project needs no
++Docker daemon, cloud account, or deployment credentials.
++
++Hello lives in `src/services/hello/`, with its public boundary at `service.ts`
++and behavior in `functions/hello.function.ts`. Routes stay in `src/routes/`;
++shared configuration belongs in `src/platform/`. Public descriptors and
++ordinary handlers remain plain TypeScript.
++
++Creation with installation prepares development automatically. After
++`--no-install`, run `bun install` and `bunx --no-install relkit dev --prepare`
++before `bun run dev`. Existing flat applications remain supported; additions
++preserve their root, and `bun run relkit migrate layout` previews an optional move.
+--- before/drizzle.config.ts
++++ after/drizzle.config.ts
+@@ -0,0 +1,13 @@
++import { defineConfig } from "drizzle-kit";
++
++const path = process.env.DATABASE_PATH;
++if (path === undefined || path.trim() === "" || path === ":memory:") {
++  throw new Error("Set DATABASE_PATH to the database you intend to migrate");
++}
++
++export default defineConfig({
++  schema: "./src/services/database/schema/index.ts",
++  dialect: "sqlite",
++  out: "./drizzle",
++  dbCredentials: { url: path },
++});
+--- before/package.json
++++ after/package.json
+@@ -0,0 +1,35 @@
++{
++  "name": "sqlite-app",
++  "private": true,
++  "type": "module",
++  "packageManager": "bun@1.3.10",
++  "scripts": {
++    "build": "relkit build",
++    "check": "relkit check",
++    "db:generate": "bun --bun drizzle-kit generate",
++    "db:migrate": "bun scripts/migrate.ts",
++    "dev": "relkit dev",
++    "graph": "relkit graph print",
++    "start": "relkit start",
++    "test": "bun test",
++    "test:integration": "bun test tests/integration",
++    "test:unit": "bun test tests/unit",
++    "typecheck": "tsc --noEmit"
++  },
++  "dependencies": {
++    "@relkit/app": "0.7.7",
++    "@relkit/drizzle": "0.7.7",
++    "drizzle-orm": "1.0.0-rc.5-169397b",
++    "effect": "4.0.1"
++  },
++  "devDependencies": {
++    "@relkit/cli": "0.7.7",
++    "@relkit/testing": "0.7.7",
++    "@types/bun": "1.3.10",
++    "drizzle-kit": "1.0.0-rc.5-ab785fc",
++    "typescript": "5.9.3"
++  },
++  "patchedDependencies": {
++    "drizzle-orm@1.0.0-rc.5-169397b": "patches/drizzle-orm@1.0.0-rc.5-169397b.patch"
++  }
++}
+--- before/patches/drizzle-orm@1.0.0-rc.5-169397b.patch
++++ after/patches/drizzle-orm@1.0.0-rc.5-169397b.patch
+@@ -0,0 +1,692 @@
++diff --git a/sqlite-core/effect/db.d.cts b/sqlite-core/effect/db.d.cts
++--- a/sqlite-core/effect/db.d.cts
+++++ b/sqlite-core/effect/db.d.cts
++@@ -14,7 +14,7 @@
++ import { NoDuplicateColumns } from "../query-builders/insert.cjs";
++ import { Effect } from "effect";
++ import { EffectCacheShape } from "../../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { QueryEffectHKTBase } from "../../effect-core/query-effect.cjs";
++ import { SQLiteEffectCountBuilder } from "./count.cjs";
++ import { SQLiteEffectDeleteBase } from "./delete.cjs";
++diff --git a/sqlite-core/effect/db.d.ts b/sqlite-core/effect/db.d.ts
++--- a/sqlite-core/effect/db.d.ts
+++++ b/sqlite-core/effect/db.d.ts
++@@ -22,7 +22,7 @@
++ import { SQLiteEffectRaw } from "./raw.js";
++ import { SQLiteEffectSelectBuilder } from "./select.js";
++ import { SQLiteEffectUpdateBuilder } from "./update.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ 
++ //#region src/sqlite-core/effect/db.d.ts
++ declare class SQLiteEffectDatabase<TEffectHKT extends QueryEffectHKTBase, TRunResult, TRelations extends AnyRelations = EmptyRelations> {
++diff --git a/sqlite-core/effect/session.d.cts b/sqlite-core/effect/session.d.cts
++--- a/sqlite-core/effect/session.d.cts
+++++ b/sqlite-core/effect/session.d.cts
++@@ -8,7 +8,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod, SQLitePreparedQuery, SQLiteSession } from "../session.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectTransactionRollbackError, MigratorInitError } from "../../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../../effect-core/logger.cjs";
++ import { QueryEffectHKTBase, QueryEffectKind } from "../../effect-core/query-effect.cjs";
++diff --git a/sqlite-core/effect/session.d.ts b/sqlite-core/effect/session.d.ts
++--- a/sqlite-core/effect/session.d.ts
+++++ b/sqlite-core/effect/session.d.ts
++@@ -10,7 +10,7 @@
++ import { EffectTransactionRollbackError, MigratorInitError } from "../../effect-core/errors.js";
++ import { PreparedQueryConfig, SQLiteExecuteMethod, SQLitePreparedQuery, SQLiteSession } from "../session.js";
++ import { WithCacheConfig } from "../../cache/core/types.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../../effect-core/logger.js";
++ 
++ //#region src/sqlite-core/effect/session.d.ts
++diff --git a/effect-libsql/migrator.d.cts b/effect-libsql/migrator.d.cts
++--- a/effect-libsql/migrator.d.cts
+++++ b/effect-libsql/migrator.d.cts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.cjs";
++ import { AnyRelations } from "../relations.cjs";
++ import * as effect_Effect0 from "effect/Effect";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-libsql/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectLibsqlDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-libsql/migrator.d.ts b/effect-libsql/migrator.d.ts
++--- a/effect-libsql/migrator.d.ts
+++++ b/effect-libsql/migrator.d.ts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.js";
++ import * as effect_Effect0 from "effect/Effect";
++ import { AnyRelations } from "../relations.js";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-libsql/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectLibsqlDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-libsql/session.d.cts b/effect-libsql/session.d.cts
++--- a/effect-libsql/session.d.cts
+++++ b/effect-libsql/session.d.cts
++@@ -6,7 +6,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectDrizzleQueryError } from "../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../effect-core/logger.cjs";
++ import { QueryEffectHKTBase } from "../effect-core/query-effect.cjs";
++diff --git a/effect-libsql/session.d.ts b/effect-libsql/session.d.ts
++--- a/effect-libsql/session.d.ts
+++++ b/effect-libsql/session.d.ts
++@@ -10,7 +10,7 @@
++ import { LibsqlClient } from "@effect/sql-libsql/LibsqlClient";
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.js";
++ import { WithCacheConfig } from "../cache/core/types.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../effect-core/logger.js";
++ 
++ //#region src/effect-libsql/session.d.ts
++diff --git a/effect-sqlite-wasm/migrator.d.cts b/effect-sqlite-wasm/migrator.d.cts
++--- a/effect-sqlite-wasm/migrator.d.cts
+++++ b/effect-sqlite-wasm/migrator.d.cts
++@@ -2,7 +2,7 @@
++ import { EffectSQLiteWasmDatabase } from "./driver.cjs";
++ import { AnyRelations } from "../relations.cjs";
++ import * as effect_Effect0 from "effect/Effect";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-sqlite-wasm/migrator.d.ts
++ interface MigrationConfig {
++diff --git a/effect-sqlite-wasm/migrator.d.ts b/effect-sqlite-wasm/migrator.d.ts
++--- a/effect-sqlite-wasm/migrator.d.ts
+++++ b/effect-sqlite-wasm/migrator.d.ts
++@@ -2,7 +2,7 @@
++ import { EffectSQLiteWasmDatabase } from "./driver.js";
++ import * as effect_Effect0 from "effect/Effect";
++ import { AnyRelations } from "../relations.js";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-sqlite-wasm/migrator.d.ts
++ interface MigrationConfig {
++diff --git a/effect-sqlite-wasm/session.d.cts b/effect-sqlite-wasm/session.d.cts
++--- a/effect-sqlite-wasm/session.d.cts
+++++ b/effect-sqlite-wasm/session.d.cts
++@@ -6,7 +6,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectDrizzleQueryError } from "../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../effect-core/logger.cjs";
++ import { QueryEffectHKTBase } from "../effect-core/query-effect.cjs";
++diff --git a/effect-sqlite-wasm/session.d.ts b/effect-sqlite-wasm/session.d.ts
++--- a/effect-sqlite-wasm/session.d.ts
+++++ b/effect-sqlite-wasm/session.d.ts
++@@ -10,7 +10,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.js";
++ import { SqliteClient } from "@effect/sql-sqlite-wasm/SqliteClient";
++ import { WithCacheConfig } from "../cache/core/types.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../effect-core/logger.js";
++ 
++ //#region src/effect-sqlite-wasm/session.d.ts
++diff --git a/effect-pglite/migrator.d.cts b/effect-pglite/migrator.d.cts
++--- a/effect-pglite/migrator.d.cts
+++++ b/effect-pglite/migrator.d.cts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.cjs";
++ import { AnyRelations } from "../relations.cjs";
++ import * as effect_Effect0 from "effect/Effect";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-pglite/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectPgDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-pglite/migrator.d.ts b/effect-pglite/migrator.d.ts
++--- a/effect-pglite/migrator.d.ts
+++++ b/effect-pglite/migrator.d.ts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.js";
++ import * as effect_Effect0 from "effect/Effect";
++ import { AnyRelations } from "../relations.js";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-pglite/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectPgDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-pglite/session.d.cts b/effect-pglite/session.d.cts
++--- a/effect-pglite/session.d.cts
+++++ b/effect-pglite/session.d.cts
++@@ -7,7 +7,7 @@
++ import { PgQueryResultHKT, PgTransactionConfig, PreparedQueryConfig } from "../pg-core/session.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectDrizzleQueryError } from "../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../effect-core/logger.cjs";
++ import { QueryEffectHKTBase } from "../effect-core/query-effect.cjs";
++diff --git a/effect-pglite/session.d.ts b/effect-pglite/session.d.ts
++--- a/effect-pglite/session.d.ts
+++++ b/effect-pglite/session.d.ts
++@@ -11,7 +11,7 @@
++ import { PgliteClient } from "@effect/sql-pglite/PgliteClient";
++ import { WithCacheConfig } from "../cache/core/types.js";
++ import { PgQueryResultHKT, PgTransactionConfig, PreparedQueryConfig } from "../pg-core/session.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../effect-core/logger.js";
++ 
++ //#region src/effect-pglite/session.d.ts
++diff --git a/effect-sqlite-do/migrator.d.cts b/effect-sqlite-do/migrator.d.cts
++--- a/effect-sqlite-do/migrator.d.cts
+++++ b/effect-sqlite-do/migrator.d.cts
++@@ -2,7 +2,7 @@
++ import { EffectSQLiteDoDatabase } from "./driver.cjs";
++ import { AnyRelations } from "../relations.cjs";
++ import * as effect_Effect0 from "effect/Effect";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-sqlite-do/migrator.d.ts
++ interface MigrationConfig {
++diff --git a/effect-sqlite-do/migrator.d.ts b/effect-sqlite-do/migrator.d.ts
++--- a/effect-sqlite-do/migrator.d.ts
+++++ b/effect-sqlite-do/migrator.d.ts
++@@ -2,7 +2,7 @@
++ import { EffectSQLiteDoDatabase } from "./driver.js";
++ import * as effect_Effect0 from "effect/Effect";
++ import { AnyRelations } from "../relations.js";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-sqlite-do/migrator.d.ts
++ interface MigrationConfig {
++diff --git a/effect-sqlite-do/session.d.cts b/effect-sqlite-do/session.d.cts
++--- a/effect-sqlite-do/session.d.cts
+++++ b/effect-sqlite-do/session.d.cts
++@@ -6,7 +6,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectDrizzleQueryError } from "../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../effect-core/logger.cjs";
++ import { QueryEffectHKTBase } from "../effect-core/query-effect.cjs";
++diff --git a/effect-sqlite-do/session.d.ts b/effect-sqlite-do/session.d.ts
++--- a/effect-sqlite-do/session.d.ts
+++++ b/effect-sqlite-do/session.d.ts
++@@ -10,7 +10,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.js";
++ import { SqliteClient } from "@effect/sql-sqlite-do/SqliteClient";
++ import { WithCacheConfig } from "../cache/core/types.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../effect-core/logger.js";
++ 
++ //#region src/effect-sqlite-do/session.d.ts
++diff --git a/effect-postgres/migrator.d.cts b/effect-postgres/migrator.d.cts
++--- a/effect-postgres/migrator.d.cts
+++++ b/effect-postgres/migrator.d.cts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.cjs";
++ import { AnyRelations } from "../relations.cjs";
++ import * as effect_Effect0 from "effect/Effect";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-postgres/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectPgDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-postgres/migrator.d.ts b/effect-postgres/migrator.d.ts
++--- a/effect-postgres/migrator.d.ts
+++++ b/effect-postgres/migrator.d.ts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.js";
++ import * as effect_Effect0 from "effect/Effect";
++ import { AnyRelations } from "../relations.js";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-postgres/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectPgDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-postgres/session.d.cts b/effect-postgres/session.d.cts
++--- a/effect-postgres/session.d.cts
+++++ b/effect-postgres/session.d.cts
++@@ -7,7 +7,7 @@
++ import { PgQueryResultHKT, PgTransactionConfig, PreparedQueryConfig } from "../pg-core/session.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectDrizzleQueryError } from "../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../effect-core/logger.cjs";
++ import { QueryEffectHKTBase } from "../effect-core/query-effect.cjs";
++diff --git a/effect-postgres/session.d.ts b/effect-postgres/session.d.ts
++--- a/effect-postgres/session.d.ts
+++++ b/effect-postgres/session.d.ts
++@@ -11,7 +11,7 @@
++ import { PgEffectPreparedQuery, PgEffectSession, PgEffectTransaction } from "../pg-core/effect/session.js";
++ import { WithCacheConfig } from "../cache/core/types.js";
++ import { PgQueryResultHKT, PgTransactionConfig, PreparedQueryConfig } from "../pg-core/session.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../effect-core/logger.js";
++ 
++ //#region src/effect-postgres/session.d.ts
++diff --git a/effect-d1/session.d.cts b/effect-d1/session.d.cts
++--- a/effect-d1/session.d.cts
+++++ b/effect-d1/session.d.cts
++@@ -7,7 +7,7 @@
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../cache/core/cache-effect.cjs";
++ import { D1Client } from "@effect/sql-d1/D1Client";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectDrizzleQueryError } from "../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../effect-core/logger.cjs";
++ import { QueryEffectHKTBase } from "../effect-core/query-effect.cjs";
++diff --git a/effect-d1/session.d.ts b/effect-d1/session.d.ts
++--- a/effect-d1/session.d.ts
+++++ b/effect-d1/session.d.ts
++@@ -10,7 +10,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.js";
++ import { D1Client } from "@effect/sql-d1/D1Client";
++ import { WithCacheConfig } from "../cache/core/types.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../effect-core/logger.js";
++ 
++ //#region src/effect-d1/session.d.ts
++diff --git a/effect-mysql2/migrator.d.cts b/effect-mysql2/migrator.d.cts
++--- a/effect-mysql2/migrator.d.cts
+++++ b/effect-mysql2/migrator.d.cts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.cjs";
++ import { AnyRelations } from "../relations.cjs";
++ import * as effect_Effect0 from "effect/Effect";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-mysql2/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectMysql2Database<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-mysql2/migrator.d.ts b/effect-mysql2/migrator.d.ts
++--- a/effect-mysql2/migrator.d.ts
+++++ b/effect-mysql2/migrator.d.ts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.js";
++ import * as effect_Effect0 from "effect/Effect";
++ import { AnyRelations } from "../relations.js";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-mysql2/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectMysql2Database<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-mysql2/session.d.cts b/effect-mysql2/session.d.cts
++--- a/effect-mysql2/session.d.cts
+++++ b/effect-mysql2/session.d.cts
++@@ -7,7 +7,7 @@
++ import { MySqlPreparedQueryConfig, MySqlQueryResultHKT } from "../mysql-core/session.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectDrizzleQueryError } from "../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../effect-core/logger.cjs";
++ import { QueryEffectHKTBase } from "../effect-core/query-effect.cjs";
++diff --git a/effect-mysql2/session.d.ts b/effect-mysql2/session.d.ts
++--- a/effect-mysql2/session.d.ts
+++++ b/effect-mysql2/session.d.ts
++@@ -11,7 +11,7 @@
++ import { MySqlEffectPreparedQuery, MySqlEffectSession, MySqlEffectTransaction } from "../mysql-core/effect/session.js";
++ import { WithCacheConfig } from "../cache/core/types.js";
++ import { MySqlPreparedQueryConfig, MySqlQueryResultHKT } from "../mysql-core/session.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../effect-core/logger.js";
++ 
++ //#region src/effect-mysql2/session.d.ts
++diff --git a/pg-core/effect/db.d.cts b/pg-core/effect/db.d.cts
++--- a/pg-core/effect/db.d.cts
+++++ b/pg-core/effect/db.d.cts
++@@ -21,7 +21,7 @@
++ import { PgDialect } from "../dialect.cjs";
++ import { Effect } from "effect";
++ import { EffectCacheShape } from "../../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { QueryEffectHKTBase } from "../../effect-core/query-effect.cjs";
++ import { PgEffectCountBuilder } from "./count.cjs";
++ import { PgEffectInsertHKT } from "./insert.cjs";
++diff --git a/pg-core/effect/db.d.ts b/pg-core/effect/db.d.ts
++--- a/pg-core/effect/db.d.ts
+++++ b/pg-core/effect/db.d.ts
++@@ -27,7 +27,7 @@
++ import { PgEffectSelectBuilder } from "./select.js";
++ import { NoDuplicateColumns, PgInsertBuilder } from "../query-builders/insert.js";
++ import { RelationalQueryBuilder } from "../query-builders/query.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ 
++ //#region src/pg-core/effect/db.d.ts
++ declare class PgEffectDatabase<TEffectHKT extends QueryEffectHKTBase, TQueryResult extends PgQueryResultHKT, TRelations extends AnyRelations = EmptyRelations> {
++diff --git a/pg-core/effect/session.d.cts b/pg-core/effect/session.d.cts
++--- a/pg-core/effect/session.d.cts
+++++ b/pg-core/effect/session.d.cts
++@@ -8,7 +8,7 @@
++ import { WithCacheConfig } from "../../cache/core/types.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectTransactionRollbackError, MigratorInitError } from "../../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../../effect-core/logger.cjs";
++ import { QueryEffectHKTBase, QueryEffectKind } from "../../effect-core/query-effect.cjs";
++diff --git a/pg-core/effect/session.d.ts b/pg-core/effect/session.d.ts
++--- a/pg-core/effect/session.d.ts
+++++ b/pg-core/effect/session.d.ts
++@@ -10,7 +10,7 @@
++ import { QueryEffectHKTBase, QueryEffectKind } from "../../effect-core/query-effect.js";
++ import { EffectTransactionRollbackError, MigratorInitError } from "../../effect-core/errors.js";
++ import { WithCacheConfig } from "../../cache/core/types.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../../effect-core/logger.js";
++ 
++ //#region src/pg-core/effect/session.d.ts
++diff --git a/effect-sqlite-node/migrator.d.cts b/effect-sqlite-node/migrator.d.cts
++--- a/effect-sqlite-node/migrator.d.cts
+++++ b/effect-sqlite-node/migrator.d.cts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.cjs";
++ import { AnyRelations } from "../relations.cjs";
++ import * as effect_Effect0 from "effect/Effect";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-sqlite-node/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectSQLiteNodeDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-sqlite-node/migrator.d.ts b/effect-sqlite-node/migrator.d.ts
++--- a/effect-sqlite-node/migrator.d.ts
+++++ b/effect-sqlite-node/migrator.d.ts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.js";
++ import * as effect_Effect0 from "effect/Effect";
++ import { AnyRelations } from "../relations.js";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-sqlite-node/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectSQLiteNodeDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-sqlite-node/session.d.cts b/effect-sqlite-node/session.d.cts
++--- a/effect-sqlite-node/session.d.cts
+++++ b/effect-sqlite-node/session.d.cts
++@@ -6,7 +6,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectDrizzleQueryError } from "../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../effect-core/logger.cjs";
++ import { QueryEffectHKTBase } from "../effect-core/query-effect.cjs";
++diff --git a/effect-sqlite-node/session.d.ts b/effect-sqlite-node/session.d.ts
++--- a/effect-sqlite-node/session.d.ts
+++++ b/effect-sqlite-node/session.d.ts
++@@ -10,7 +10,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.js";
++ import { SqliteClient } from "@effect/sql-sqlite-node/SqliteClient";
++ import { WithCacheConfig } from "../cache/core/types.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../effect-core/logger.js";
++ 
++ //#region src/effect-sqlite-node/session.d.ts
++diff --git a/effect-sqlite-bun/migrator.d.cts b/effect-sqlite-bun/migrator.d.cts
++--- a/effect-sqlite-bun/migrator.d.cts
+++++ b/effect-sqlite-bun/migrator.d.cts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.cjs";
++ import { AnyRelations } from "../relations.cjs";
++ import * as effect_Effect0 from "effect/Effect";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-sqlite-bun/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectSQLiteBunDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-sqlite-bun/migrator.d.ts b/effect-sqlite-bun/migrator.d.ts
++--- a/effect-sqlite-bun/migrator.d.ts
+++++ b/effect-sqlite-bun/migrator.d.ts
++@@ -3,7 +3,7 @@
++ import { MigrationConfig } from "../migrator.js";
++ import * as effect_Effect0 from "effect/Effect";
++ import { AnyRelations } from "../relations.js";
++-import * as effect_unstable_sql_SqlError0 from "effect/unstable/sql/SqlError";
+++import * as effect_unstable_sql_SqlError0 from "effect/sql/SqlError";
++ 
++ //#region src/effect-sqlite-bun/migrator.d.ts
++ declare function migrate<TRelations extends AnyRelations>(db: EffectSQLiteBunDatabase<TRelations>, config: MigrationConfig): effect_Effect0.Effect<undefined, MigratorInitError | EffectDrizzleQueryError | effect_unstable_sql_SqlError0.SqlError, never>;
++diff --git a/effect-sqlite-bun/session.d.cts b/effect-sqlite-bun/session.d.cts
++--- a/effect-sqlite-bun/session.d.cts
+++++ b/effect-sqlite-bun/session.d.cts
++@@ -6,7 +6,7 @@
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectDrizzleQueryError } from "../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../effect-core/logger.cjs";
++ import { QueryEffectHKTBase } from "../effect-core/query-effect.cjs";
++diff --git a/effect-sqlite-bun/session.d.ts b/effect-sqlite-bun/session.d.ts
++--- a/effect-sqlite-bun/session.d.ts
+++++ b/effect-sqlite-bun/session.d.ts
++@@ -10,7 +10,7 @@
++ import { EffectDrizzleQueryError } from "../effect-core/errors.js";
++ import { PreparedQueryConfig, SQLiteExecuteMethod } from "../sqlite-core/session.js";
++ import { WithCacheConfig } from "../cache/core/types.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../effect-core/logger.js";
++ 
++ //#region src/effect-sqlite-bun/session.d.ts
++diff --git a/mysql-core/effect/db.d.cts b/mysql-core/effect/db.d.cts
++--- a/mysql-core/effect/db.d.cts
+++++ b/mysql-core/effect/db.d.cts
++@@ -24,7 +24,7 @@
++ import { ResultSetHeader } from "mysql2/promise";
++ import { Effect } from "effect";
++ import { EffectCacheShape } from "../../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { QueryEffectHKTBase } from "../../effect-core/query-effect.cjs";
++ 
++ //#region src/mysql-core/effect/db.d.ts
++diff --git a/mysql-core/effect/db.d.ts b/mysql-core/effect/db.d.ts
++--- a/mysql-core/effect/db.d.ts
+++++ b/mysql-core/effect/db.d.ts
++@@ -25,7 +25,7 @@
++ import { AnyRelations, EmptyRelations } from "../../relations.js";
++ import { QueryEffectHKTBase } from "../../effect-core/query-effect.js";
++ import { ResultSetHeader } from "mysql2/promise";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ 
++ //#region src/mysql-core/effect/db.d.ts
++ declare class MySqlEffectDatabase<TEffectHKT extends QueryEffectHKTBase, TQueryResult extends MySqlQueryResultHKT, TRelations extends AnyRelations = EmptyRelations> {
++diff --git a/mysql-core/effect/session.d.cts b/mysql-core/effect/session.d.cts
++--- a/mysql-core/effect/session.d.cts
+++++ b/mysql-core/effect/session.d.cts
++@@ -8,7 +8,7 @@
++ import { WithCacheConfig } from "../../cache/core/types.cjs";
++ import * as Effect from "effect/Effect";
++ import { EffectCacheShape } from "../../cache/core/cache-effect.cjs";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectTransactionRollbackError, MigratorInitError } from "../../effect-core/errors.cjs";
++ import { EffectLoggerShape } from "../../effect-core/logger.cjs";
++ import { QueryEffectHKTBase, QueryEffectKind } from "../../effect-core/query-effect.cjs";
++diff --git a/mysql-core/effect/session.d.ts b/mysql-core/effect/session.d.ts
++--- a/mysql-core/effect/session.d.ts
+++++ b/mysql-core/effect/session.d.ts
++@@ -10,7 +10,7 @@
++ import { QueryEffectHKTBase, QueryEffectKind } from "../../effect-core/query-effect.js";
++ import { EffectTransactionRollbackError, MigratorInitError } from "../../effect-core/errors.js";
++ import { WithCacheConfig } from "../../cache/core/types.js";
++-import { SqlError } from "effect/unstable/sql/SqlError";
+++import { SqlError } from "effect/sql/SqlError";
++ import { EffectLoggerShape } from "../../effect-core/logger.js";
++ 
++ //#region src/mysql-core/effect/session.d.ts
++diff --git a/pg-core/policies.d.ts b/pg-core/policies.d.ts
++--- a/pg-core/policies.d.ts
+++++ b/pg-core/policies.d.ts
++@@ -6,11 +6,11 @@
++ //#region src/pg-core/policies.d.ts
++ type PgPolicyToOption = 'public' | 'current_role' | 'current_user' | 'session_user' | (string & {}) | PgPolicyToOption[] | PgRole;
++ interface PgPolicyConfig {
++-  as?: 'permissive' | 'restrictive';
++-  for?: 'all' | 'select' | 'insert' | 'update' | 'delete';
++-  to?: PgPolicyToOption;
++-  using?: SQL;
++-  withCheck?: SQL;
+++  as?: 'permissive' | 'restrictive' | undefined;
+++  for?: 'all' | 'select' | 'insert' | 'update' | 'delete' | undefined;
+++  to?: PgPolicyToOption | undefined;
+++  using?: SQL | undefined;
+++  withCheck?: SQL | undefined;
++ }
++ declare class PgPolicy implements PgPolicyConfig {
++   readonly name: string;
++diff --git a/pg-core/policies.d.cts b/pg-core/policies.d.cts
++--- a/pg-core/policies.d.cts
+++++ b/pg-core/policies.d.cts
++@@ -6,11 +6,11 @@
++ //#region src/pg-core/policies.d.ts
++ type PgPolicyToOption = 'public' | 'current_role' | 'current_user' | 'session_user' | (string & {}) | PgPolicyToOption[] | PgRole;
++ interface PgPolicyConfig {
++-  as?: 'permissive' | 'restrictive';
++-  for?: 'all' | 'select' | 'insert' | 'update' | 'delete';
++-  to?: PgPolicyToOption;
++-  using?: SQL;
++-  withCheck?: SQL;
+++  as?: 'permissive' | 'restrictive' | undefined;
+++  for?: 'all' | 'select' | 'insert' | 'update' | 'delete' | undefined;
+++  to?: PgPolicyToOption | undefined;
+++  using?: SQL | undefined;
+++  withCheck?: SQL | undefined;
++ }
++ declare class PgPolicy implements PgPolicyConfig {
++   readonly name: string;
++diff --git a/pg-core/roles.d.ts b/pg-core/roles.d.ts
++--- a/pg-core/roles.d.ts
+++++ b/pg-core/roles.d.ts
++@@ -2,9 +2,9 @@
++ 
++ //#region src/pg-core/roles.d.ts
++ interface PgRoleConfig {
++-  createDb?: boolean;
++-  createRole?: boolean;
++-  inherit?: boolean;
+++  createDb?: boolean | undefined;
+++  createRole?: boolean | undefined;
+++  inherit?: boolean | undefined;
++ }
++ declare class PgRole implements PgRoleConfig {
++   readonly name: string;
++diff --git a/pg-core/roles.d.cts b/pg-core/roles.d.cts
++--- a/pg-core/roles.d.cts
+++++ b/pg-core/roles.d.cts
++@@ -2,9 +2,9 @@
++ 
++ //#region src/pg-core/roles.d.ts
++ interface PgRoleConfig {
++-  createDb?: boolean;
++-  createRole?: boolean;
++-  inherit?: boolean;
+++  createDb?: boolean | undefined;
+++  createRole?: boolean | undefined;
+++  inherit?: boolean | undefined;
++ }
++ declare class PgRole implements PgRoleConfig {
++   readonly name: string;
++diff --git a/cockroach-core/policies.d.ts b/cockroach-core/policies.d.ts
++--- a/cockroach-core/policies.d.ts
+++++ b/cockroach-core/policies.d.ts
++@@ -6,11 +6,11 @@
++ //#region src/cockroach-core/policies.d.ts
++ type CockroachPolicyToOption = 'public' | 'current_user' | 'session_user' | (string & {}) | CockroachPolicyToOption[] | CockroachRole;
++ interface CockroachPolicyConfig {
++-  as?: 'permissive' | 'restrictive';
++-  for?: 'all' | 'select' | 'insert' | 'update' | 'delete';
++-  to?: CockroachPolicyToOption;
++-  using?: SQL;
++-  withCheck?: SQL;
+++  as?: 'permissive' | 'restrictive' | undefined;
+++  for?: 'all' | 'select' | 'insert' | 'update' | 'delete' | undefined;
+++  to?: CockroachPolicyToOption | undefined;
+++  using?: SQL | undefined;
+++  withCheck?: SQL | undefined;
++ }
++ declare class CockroachPolicy implements CockroachPolicyConfig {
++   readonly name: string;
++diff --git a/cockroach-core/policies.d.cts b/cockroach-core/policies.d.cts
++--- a/cockroach-core/policies.d.cts
+++++ b/cockroach-core/policies.d.cts
++@@ -6,11 +6,11 @@
++ //#region src/cockroach-core/policies.d.ts
++ type CockroachPolicyToOption = 'public' | 'current_user' | 'session_user' | (string & {}) | CockroachPolicyToOption[] | CockroachRole;
++ interface CockroachPolicyConfig {
++-  as?: 'permissive' | 'restrictive';
++-  for?: 'all' | 'select' | 'insert' | 'update' | 'delete';
++-  to?: CockroachPolicyToOption;
++-  using?: SQL;
++-  withCheck?: SQL;
+++  as?: 'permissive' | 'restrictive' | undefined;
+++  for?: 'all' | 'select' | 'insert' | 'update' | 'delete' | undefined;
+++  to?: CockroachPolicyToOption | undefined;
+++  using?: SQL | undefined;
+++  withCheck?: SQL | undefined;
++ }
++ declare class CockroachPolicy implements CockroachPolicyConfig {
++   readonly name: string;
++diff --git a/cockroach-core/roles.d.ts b/cockroach-core/roles.d.ts
++--- a/cockroach-core/roles.d.ts
+++++ b/cockroach-core/roles.d.ts
++@@ -2,8 +2,8 @@
++ 
++ //#region src/cockroach-core/roles.d.ts
++ interface CockroachRoleConfig {
++-  createDb?: boolean;
++-  createRole?: boolean;
+++  createDb?: boolean | undefined;
+++  createRole?: boolean | undefined;
++ }
++ declare class CockroachRole implements CockroachRoleConfig {
++   readonly name: string;
++diff --git a/cockroach-core/roles.d.cts b/cockroach-core/roles.d.cts
++--- a/cockroach-core/roles.d.cts
+++++ b/cockroach-core/roles.d.cts
++@@ -2,8 +2,8 @@
++ 
++ //#region src/cockroach-core/roles.d.ts
++ interface CockroachRoleConfig {
++-  createDb?: boolean;
++-  createRole?: boolean;
+++  createDb?: boolean | undefined;
+++  createRole?: boolean | undefined;
++ }
++ declare class CockroachRole implements CockroachRoleConfig {
++   readonly name: string;
+--- before/relkit.config.ts
++++ after/relkit.config.ts
+@@ -0,0 +1,12 @@
++import { defineApp } from "@relkit/app/config";
++import env from "@app/platform/env.js";
++
++
++export default defineApp({
++  id: "sqlite-app",
++  env,
++  telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
++  server: { port: 3000, maxBodyBytes: 1_048_576 },
++  inspector: { port: 3210 },
++
++});
+--- before/scripts/migrate.ts
++++ after/scripts/migrate.ts
+@@ -0,0 +1,19 @@
++import { Database } from "bun:sqlite";
++import { mkdirSync } from "node:fs";
++import { dirname } from "node:path";
++import { drizzle } from "drizzle-orm/bun-sqlite";
++import { migrate } from "drizzle-orm/bun-sqlite/migrator";
++
++const path = process.env.DATABASE_PATH;
++if (!path?.trim() || path === ":memory:") {
++  throw new Error("Set DATABASE_PATH to a persistent SQLite file");
++}
++mkdirSync(dirname(path), { recursive: true });
++const client = new Database(path, { create: true });
++try {
++  client.exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
++  migrate(drizzle({ client }), { migrationsFolder: "./drizzle" });
++  console.log("SQLite migrations applied");
++} finally {
++  client.close();
++}
+--- before/src/platform/env.ts
++++ after/src/platform/env.ts
+@@ -0,0 +1,6 @@
++import { defineEnv, env } from "@relkit/app/config";
++
++export default defineEnv({
++  LOG_LEVEL: env.literal("trace", "debug", "info", "warn", "error").default("info"),
++  DATABASE_PATH: env.string().default("./.relkit/state/app.sqlite"),
++});
+--- before/src/routes/hello/route.ts
++++ after/src/routes/hello/route.ts
+@@ -0,0 +1,7 @@
++/** Maps the HTTP endpoint to its owning service's public member. */
++import { defineRoute } from "@relkit/app/routes";
++import hello from "@app/services/hello/service.js";
++
++export const GET = defineRoute({
++  target: hello.hello,
++});
+--- before/src/services/database/schema/index.ts
++++ after/src/services/database/schema/index.ts
+@@ -0,0 +1,6 @@
++import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
++
++export const items = sqliteTable("items", {
++  id: integer().primaryKey({ autoIncrement: true }),
++  name: text().notNull(),
++});
+--- before/src/services/database/service.ts
++++ after/src/services/database/service.ts
+@@ -0,0 +1,18 @@
++import { Database } from "bun:sqlite";
++import { mkdirSync } from "node:fs";
++import { dirname } from "node:path";
++import { defineDrizzleService } from "@relkit/drizzle";
++import { drizzle } from "drizzle-orm/bun-sqlite";
++import * as schema from "./schema/index.js";
++
++export default defineDrizzleService({
++  schema,
++  client: ({ env }) => {
++    const path = env.DATABASE_PATH;
++    if (!path) throw new Error("DATABASE_PATH is required");
++    mkdirSync(dirname(path), { recursive: true });
++    const sqlite = new Database(path);
++    return drizzle({ client: sqlite });
++  },
++  dispose: (database) => database.$client.close(),
++});
+--- before/src/services/hello/functions/hello.function.ts
++++ after/src/services/hello/functions/hello.function.ts
+@@ -0,0 +1,21 @@
++/** Returns a validated named greeting and logs each invocation through RELKIT's request context. */
++import { defineFunction } from "@relkit/app/functions";
++import { z } from "@relkit/app/schema";
++
++const hello = defineFunction({
++  id: "hello.greet",
++  input: z.object({ name: z.string().min(1).default("world") }),
++  output: z.object({ message: z.string() }),
++  /**
++   * Logs the greeting invocation and returns the validated greeting response.
++   * @param input - Validated name from the function schema.
++   * @param context - RELKIT invocation context owning structured logging.
++   * @returns Greeting response matching the output schema.
++   */
++  handler: async ({ name }, context) => {
++    context.log.info("hello invoked", { name });
++    return { message: `Hello, ${name}!` };
++  },
++});
++
++export default hello;
+--- before/src/services/hello/service.ts
++++ after/src/services/hello/service.ts
+@@ -0,0 +1,5 @@
++/** Declares the hello service boundary and its public members. */
++import { defineService } from "@relkit/app/services";
++import hello from "@app/services/hello/functions/hello.function.js";
++
++export default defineService({ functions: { hello } });
+--- before/tests/integration/hello.route.test.ts
++++ after/tests/integration/hello.route.test.ts
+@@ -0,0 +1,13 @@
++import { afterAll, expect, test } from "bun:test";
++import { createTestApplication } from "@relkit/testing";
++import config from "../../relkit.config.js";
++
++const testApp = await createTestApplication(config, { resourceProviders: "fake" });
++
++test("GET /hello", async () => {
++  const response = await testApp.http.request("/hello?name=Mustafa");
++  expect(response.status).toBe(200);
++  expect(await response.json()).toEqual({ message: "Hello, Mustafa!" });
++});
++
++afterAll(() => testApp.close());
+--- before/tests/unit/hello.function.test.ts
++++ after/tests/unit/hello.function.test.ts
+@@ -0,0 +1,10 @@
++/** Checks hello.function through the supported public RELKIT APIs. */
++import { expect, test } from "bun:test";
++import { invokeFunction } from "@relkit/testing";
++import hello from "@app/services/hello/functions/hello.function.js";
++
++test("hello returns a greeting", async () => {
++  await expect(invokeFunction(hello, { name: "Mustafa" })).resolves.toEqual({
++    message: "Hello, Mustafa!",
++  });
++});
+--- before/tsconfig.json
++++ after/tsconfig.json
+@@ -0,0 +1,25 @@
++{
++  "$schema": "https://json.schemastore.org/tsconfig",
++  "compilerOptions": {
++    "target": "ES2022",
++    "module": "ESNext",
++    "moduleResolution": "Bundler",
++    "baseUrl": ".",
++    "paths": { "@app/*": ["src/*"] },
++    "lib": ["ES2022"],
++    "types": ["bun"],
++    "typeRoots": ["./node_modules/@types"],
++    "plugins": [{ "name": "@relkit/cli/editor" }],
++    "strict": true,
++    "noUncheckedIndexedAccess": true,
++    "exactOptionalPropertyTypes": true,
++    "verbatimModuleSyntax": true,
++    "isolatedModules": true,
++    "noEmit": true,
++    "skipLibCheck": true,
++    "forceConsistentCasingInFileNames": true
++  },
++  "files": [".relkit/generated/route-module-checks.ts", ".relkit/generated/context-registry.d.ts"],
++  "include": ["src/**/*.ts", "tests/**/*.ts", "relkit.config.ts"],
++  "exclude": ["node_modules", ".relkit"]
++}
