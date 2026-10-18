@@ -59,7 +59,7 @@ test("uses application workflows and Drizzle Kit rather than SQL bootstrap or te
   expect(tutorial).toContain("bun test tests/data-model.test.ts");
   expect(read("migrations")).toContain("../../examples/data-model/drizzle.config.ts");
   expect(read("migrations")).toContain("drizzle-kit generate");
-  expect(read("migrations")).toContain("drizzle-kit migrate");
+  expect(read("migrations")).toContain("relkit db migrate");
   expect(read("testing")).toContain("../../examples/data-model/tests/migrations.test.ts");
   for (const page of databaseGuideGroup.pages) {
     const source = read(page);

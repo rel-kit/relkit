@@ -1,0 +1,52 @@
+
+Running 1 test using 1 worker
+
+Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+      at emitWarning (unknown:1:1)
+      at warnOnDeactivatedColors (internal:tty:33:24)
+      at getColorDepth (internal:tty:42:39)
+      at shouldColorize (internal:util/colors:14:109)
+      at refresh (internal:util/colors:18:31)
+      at internal:util/colors (internal:util/colors:24:16)
+      at anonymous (unknown:1:1)
+      at internal:assert/assertion_error (internal:assert/assertion_error:2:187)
+      at anonymous (unknown:1:1)
+      at loadAssertionError (node:assert:28:96)
+
+  ✘  1 tests/browser/greeting.spec.ts:5:0 › name form updates via backend while preserving fullstack content and wrapper (770ms)
+
+
+  1) tests/browser/greeting.spec.ts:5:0 › name form updates via backend while preserving fullstack content and wrapper 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected: "Greeting could not load. Try updating it again."
+    Error: strict mode violation: getByRole('alert') resolved to 2 elements:
+        1) <p role="alert">Greeting could not load. Try updating it again.</p> aka getByText('Greeting could not load. Try')
+        2) <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div> aka locator('[id="__next-route-announcer__"]')
+
+    Call log:
+      - Expect "toHaveText" getByRole('alert') with timeout 10000ms
+      - waiting for getByRole('alert')
+        - locator resolved to <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div>
+        - unexpected value ""
+
+
+      25 |   await page.route(apiOrigin + "/**", (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Test-owned unavailable backend" }) }));
+      26 |   await submit.click();
+    > 27 |   await expect(page.getByRole("alert")).toHaveText("Greeting could not load. Try updating it again.");
+         |                                        ^
+      28 |   await page.unroute(apiOrigin + "/**");
+      29 |   await submit.click();
+      30 |   await expect(page.getByRole("heading", { name: "Hello, Grace!", exact: true })).toBeVisible();
+        at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02/tests/browser/greeting.spec.ts:27:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .relkit/browser-test-results/greeting-name-form-updates-11fcb-llstack-content-and-wrapper/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: .relkit/browser-test-results/greeting-name-form-updates-11fcb-llstack-content-and-wrapper/error-context.md
+
+  1 failed
+    tests/browser/greeting.spec.ts:5:0 › name form updates via backend while preserving fullstack content and wrapper 

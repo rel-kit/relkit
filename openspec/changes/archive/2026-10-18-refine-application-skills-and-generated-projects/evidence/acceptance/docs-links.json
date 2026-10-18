@@ -1,0 +1,33 @@
+{
+  "args": [
+    "bun",
+    "--smol",
+    "scripts/check-links.ts"
+  ],
+  "cwd": "/Users/mustafaelsayed/Workspace/relkit/apps/docs",
+  "before": {
+    "at": "2026-10-18T14:58:06.110666+00:00",
+    "cpu": 10,
+    "load": [
+      3.5693359375,
+      3.7666015625,
+      3.7470703125
+    ],
+    "pressure": 1,
+    "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                4026.\nPages active:                            265499.\nPages inactive:                          259666.\nPages speculative:                         4472.\nPages throttled:                              0.\nPages wired down:                        178571.\nPages purgeable:                           1930.\n\"Translation faults\":                3632407180.\nPages copy-on-write:                  221282801.\nPages zero filled:                   1683650174.\nPages reactivated:                    339552839.\nPages purged:                          14518166.\nFile-backed pages:                       140501.\nAnonymous pages:                         389136.\nPages stored in compressor:             1320031.\nPages occupied by compressor:            295030.\nDecompressions:                       270687026.\nCompressions:                         349054909.\nPageins:                               67050351.\nPageouts:                                480658.\nSwapins:                                6183354.\nSwapouts:                              10280378.\n"
+  },
+  "pid": 93557,
+  "exit": 0,
+  "seconds": 0.2346062920114491,
+  "after": {
+    "at": "2026-10-18T14:58:06.386612+00:00",
+    "cpu": 10,
+    "load": [
+      3.5693359375,
+      3.7666015625,
+      3.7470703125
+    ],
+    "pressure": 1,
+    "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                4975.\nPages active:                            264355.\nPages inactive:                          259760.\nPages speculative:                         4044.\nPages throttled:                              0.\nPages wired down:                        177661.\nPages purgeable:                           1588.\n\"Translation faults\":                3632425191.\nPages copy-on-write:                  221284457.\nPages zero filled:                   1683656420.\nPages reactivated:                    339569270.\nPages purged:                          14518188.\nFile-backed pages:                       141136.\nAnonymous pages:                         387023.\nPages stored in compressor:             1322237.\nPages occupied by compressor:            296497.\nDecompressions:                       270689916.\nCompressions:                         349060048.\nPageins:                               67052158.\nPageouts:                                480702.\nSwapins:                                6183354.\nSwapouts:                              10280378.\n"
+  }
+}

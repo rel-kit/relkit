@@ -1,0 +1,20 @@
+[
+  {
+    "path": "src/services/database/migrations/0001-order-status.sql",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "71fd96b790e848624e09c8fc0ea8374a6e1bc1cda6b12d29d2f7e93bd035641f"
+  },
+  {
+    "path": "src/services/database/order-status.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "cda724f9ef84ddeb71139eed5d2e895c7f1082f8d717fce35e5a19db69656c61"
+  },
+  {
+    "path": "tests/order-status.test.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "575b2b971e8707694bdb642d96f350f758a239c340f02e35d3c3905576869096"
+  }
+]

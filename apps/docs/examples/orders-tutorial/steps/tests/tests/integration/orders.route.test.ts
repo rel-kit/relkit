@@ -15,7 +15,7 @@ test("orders persist and remain private to their owner", async () => {
   const sqlite = new Database(path);
   try {
     await migrate(drizzle({ client: sqlite }), {
-      migrationsFolder: resolve(import.meta.dir, "../../drizzle"),
+      migrationsFolder: resolve(import.meta.dir, "../../src/services/database/migrations"),
     });
   } finally {
     sqlite.close();

@@ -1,0 +1,264 @@
+[20:22:49.209] INFO (#1): Preparing and installing the packed candidate fixture
+[20:23:05.535] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 16215.301,
+}
+[20:23:17.767] INFO (#5): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 12223.627791,
+}
+[20:23:17.798] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.identity",
+  outcome: "success",
+  duration_ms: 13.517417,
+}
+[20:23:18.427] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 610.576791,
+}
+[20:23:26.619] INFO (#66): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8189.928375,
+}
+[20:23:27.205] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 576.863625,
+}
+[20:23:39.273] INFO (#74): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8279.734167,
+}
+[20:23:39.896] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 613.034833,
+}
+[20:23:51.899] INFO (#82): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8226.726708,
+}
+[20:23:52.510] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 601.83425,
+}
+[20:24:04.425] INFO (#90): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8191.694459,
+}
+[20:24:05.024] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 590.563875,
+}
+[20:24:17.038] INFO (#98): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8254.921458,
+}
+[20:24:17.674] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 626.360791,
+}
+[20:24:29.569] INFO (#106): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8133.658125,
+}
+[20:24:30.480] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 900.892125,
+}
+[20:24:42.658] INFO (#114): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8412.863083,
+}
+[20:24:43.304] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 637.578667,
+}
+[20:24:54.978] INFO (#122): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7916.171875,
+}
+[20:24:55.606] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 620.774,
+}
+[20:25:07.491] INFO (#130): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7965.586666,
+}
+[20:25:08.395] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 895.399333,
+}
+[20:25:20.021] INFO (#138): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7905.048125,
+}
+[20:25:20.636] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 606.074709,
+}
+[20:25:32.787] INFO (#146): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8229.592292,
+}
+[20:25:33.428] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 630.234,
+}
+[20:25:46.121] INFO (#154): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8964.345125,
+}
+[20:25:46.737] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 605.838833,
+}
+[20:25:59.846] INFO (#162): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8778.9935,
+}
+[20:26:00.448] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 592.16925,
+}
+[20:26:12.425] INFO (#170): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7994.507083,
+}
+[20:26:13.015] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 581.45925,
+}
+[20:26:24.553] INFO (#178): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7893.634667,
+}
+[20:26:25.156] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 595.029625,
+}
+[20:26:36.948] INFO (#186): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7934.387667,
+}
+[20:26:37.565] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 608.938292,
+}
+[20:26:49.426] INFO (#194): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7916.671667,
+}
+[20:26:50.033] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 599.327125,
+}
+[20:27:01.891] INFO (#202): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8159.18925,
+}
+[20:27:02.492] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 593.699542,
+}
+[20:27:14.573] INFO (#210): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8352.631,
+}
+[20:27:15.172] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 590.155875,
+}
+[20:27:18.918] INFO (#1): Packed candidate recorded {
+  path: "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-FZf7gW/fresh.json",
+  summary: {
+    runs: 20,
+    medianMs: 574.6285,
+    p95Ms: 855.831542,
+    maximumMs: 858.497125,
+    passed: true,
+    preparationPassed: true,
+  },
+}

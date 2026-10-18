@@ -95,17 +95,14 @@ in-memory path so the migration cannot quietly target the wrong database.
 
 Generate and review the initial SQL migration, then apply it and start the app:
 
-Drizzle Kit's `migrate` command currently selects `better-sqlite3` in this Bun project.
-Create `scripts/migrate.ts` to apply generated SQL with the Bun SQLite driver used by the app:
-
-<include cwd lang="ts" meta='title="scripts/migrate.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/database/scripts/migrate.ts
-</include>
+Use installed RELKIT migration tooling, which selects the Bun-native SQLite driver.
+Keep generated SQL and required metadata tracked beside the database service in
+`src/services/database/migrations`; do not copy runner code into the application.
 
 ```sh title="Terminal — relkit-orders"
 export DATABASE_PATH=./orders.sqlite
 bun --bun drizzle-kit generate --name=initial
-bun scripts/migrate.ts
+bun run relkit db migrate
 bun run check
 bun run typecheck
 bun run dev

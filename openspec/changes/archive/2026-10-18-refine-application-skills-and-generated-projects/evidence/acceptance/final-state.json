@@ -1,0 +1,17 @@
+{
+  "state": "all_done",
+  "progress": {
+    "total": 31,
+    "complete": 31,
+    "remaining": 0
+  },
+  "preservationPassed": true,
+  "ownedProcessesRemaining": [],
+  "cpu": 10,
+  "load": [
+    4.1630859375,
+    4.96142578125,
+    6.3388671875
+  ],
+  "pressure": 1
+}

@@ -1,0 +1,374 @@
+{
+  "commands": [
+    {
+      "label": "final-format",
+      "args": [
+        "bun",
+        "--smol",
+        "node_modules/prettier/bin/prettier.cjs",
+        "--write",
+        ".agents/skills/relkit-app/SKILL.md",
+        "AGENTS.md",
+        "CONTRIBUTING.md",
+        "apps/docs/content/docs/auth/first-auth.mdx",
+        "apps/docs/content/docs/database/better-auth.mdx",
+        "apps/docs/content/docs/database/first-database.mdx",
+        "apps/docs/content/docs/database/migrations.mdx",
+        "apps/docs/content/docs/operations/cli-reference.mdx",
+        "apps/docs/content/docs/start/protect-orders.mdx",
+        "apps/docs/content/docs/start/save-orders.mdx",
+        "apps/docs/examples/orders-tutorial/steps/database/drizzle.config.ts",
+        "apps/docs/examples/orders-tutorial/steps/tests/tests/integration/orders.route.test.ts",
+        "apps/docs/scripts/check-orders-tutorial.ts",
+        "apps/docs/scripts/generate.ts",
+        "apps/docs/scripts/orders-tutorial-project.ts",
+        "apps/docs/tests/auth-learning.test.ts",
+        "apps/docs/tests/database-learning.test.ts",
+        "docs/evidence/create-capabilities/0.7.7/fresh.json",
+        "docs/evidence/create-capabilities/0.7.7/restart.json",
+        "examples/auth-drizzle/README.md",
+        "examples/auth-drizzle/drizzle.config.ts",
+        "examples/auth-drizzle/package.json",
+        "examples/auth-drizzle/src/services/database/migrations/20260831094750_auth/snapshot.json",
+        "examples/auth-drizzle/tests/auth.test.ts",
+        "examples/data-model/README.md",
+        "examples/data-model/drizzle.config.ts",
+        "examples/data-model/package.json",
+        "examples/data-model/src/services/database/migrations/20260831090701_initial/snapshot.json",
+        "examples/data-model/tests/data-model.test.ts",
+        "examples/data-model/tests/migrations.test.ts",
+        "packages/cli/src/cli-command-db.ts",
+        "packages/cli/src/cli-command.ts",
+        "packages/cli/src/cli-help-db.ts",
+        "packages/cli/src/cli-help-model.ts",
+        "packages/cli/src/command-dispatch.ts",
+        "packages/cli/src/commands/db.ts",
+        "packages/cli/src/database/migration-config.ts",
+        "packages/cli/src/database/migration-execute.ts",
+        "packages/cli/src/database/migration-worker.ts",
+        "packages/cli/src/database/migration.schemas.ts",
+        "packages/cli/src/main.ts",
+        "packages/cli/tests/database/cancellation.test.ts",
+        "packages/cli/tests/database/delegate.test.ts",
+        "packages/cli/tests/database/environment.test.ts",
+        "packages/cli/tests/database/fixture.ts",
+        "packages/cli/tests/database/migrate.test.ts",
+        "packages/cli/tests/database/sample-history.test.ts",
+        "packages/create-relkit/src/create-capabilities.ts",
+        "packages/create-relkit/src/render-database-sources.ts",
+        "packages/create-relkit/src/render-database.ts",
+        "scripts/pack-and-smoke-create-relkit-pack.ts",
+        "scripts/release-check-listing.ts",
+        "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+        "templates/default/v1/agent/.agents/skills/relkit/references/cli.md",
+        "templates/default/v1/agent/.agents/skills/relkit/references/data-apis.md",
+        "templates/default/v1/agent/.agents/skills/relkit/references/domain-apis.md",
+        "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+        "templates/default/v1/api/.agents/skills/relkit/references/cli.md",
+        "templates/default/v1/api/.agents/skills/relkit/references/data-apis.md",
+        "templates/default/v1/api/.agents/skills/relkit/references/domain-apis.md",
+        "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+        "templates/default/v1/fullstack/.agents/skills/relkit/references/cli.md",
+        "templates/default/v1/fullstack/.agents/skills/relkit/references/data-apis.md",
+        "templates/default/v1/fullstack/.agents/skills/relkit/references/domain-apis.md",
+        "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+        "templates/default/v1/minimal/.agents/skills/relkit/references/cli.md",
+        "templates/default/v1/minimal/.agents/skills/relkit/references/data-apis.md",
+        "templates/default/v1/minimal/.agents/skills/relkit/references/domain-apis.md",
+        "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+        "templates/default/v1/tasks/.agents/skills/relkit/references/cli.md",
+        "templates/default/v1/tasks/.agents/skills/relkit/references/data-apis.md",
+        "templates/default/v1/tasks/.agents/skills/relkit/references/domain-apis.md",
+        "tests/generator/database-ownership.test.ts",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        "tests/unit/packed-registry.test.ts",
+        "tests/unit/release-check-listing.test.ts"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.0413744999968912,
+      "pid": 23589
+    },
+    {
+      "label": "final-native",
+      "args": [
+        "bun",
+        "--smol",
+        "test",
+        "packages/cli/tests/database",
+        "tests/generator/database-ownership.test.ts",
+        "tests/unit/packed-registry.test.ts",
+        "tests/unit/release-check-listing.test.ts",
+        "tests/unit/sync-release.test.ts",
+        "tests/unit/build-catalog.test.ts",
+        "tests/unit/catalog-manifest.test.ts",
+        "tests/unit/catalog-bootstrap.test.ts",
+        "--timeout",
+        "30000"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 8.356645374995423,
+      "pid": 23620
+    },
+    {
+      "label": "final-generator",
+      "args": [
+        "bun",
+        "--smol",
+        "test",
+        "tests/generator/sqlite-app-tooling.test.ts",
+        "tests/generator/add-transaction.test.ts",
+        "tests/generator/add-platform-acceptance.test.ts",
+        "--timeout",
+        "30000"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 23.13946429200587,
+      "pid": 23944
+    },
+    {
+      "label": "final-sync-first",
+      "args": [
+        "bun",
+        "--smol",
+        "scripts/sync-release.ts"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.048175167001318187,
+      "pid": 24366
+    },
+    {
+      "label": "final-sync-second",
+      "args": [
+        "bun",
+        "--smol",
+        "scripts/sync-release.ts"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.04517679099808447,
+      "pid": 24372
+    },
+    {
+      "label": "final-release-notes-write",
+      "args": [
+        "bun",
+        "--smol",
+        "scripts/release-check.ts",
+        "--notes-only",
+        "--write-notes",
+        "--allow-dirty"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.16957516700495034,
+      "pid": 24380
+    },
+    {
+      "label": "final-release-notes-check",
+      "args": [
+        "bun",
+        "--smol",
+        "scripts/release-check.ts",
+        "--notes-only",
+        "--allow-dirty"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.15640470798825845,
+      "pid": 24390
+    },
+    {
+      "label": "final-typecheck-product",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "node_modules/typescript/bin/tsc",
+        "-b",
+        "packages/cli",
+        "packages/create-relkit",
+        "--pretty",
+        "false"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.09895783301908523,
+      "pid": 24399
+    },
+    {
+      "label": "final-typecheck-docs",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "../../node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--pretty",
+        "false"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit/apps/docs",
+      "exit": 134,
+      "expected": 0,
+      "seconds": 2.9659405830025207,
+      "pid": 24407
+    },
+    {
+      "label": "final-typecheck-docs",
+      "args": [
+        "node",
+        "--max-old-space-size=768",
+        "../../node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--pretty",
+        "false"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit/apps/docs",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 2.898428792017512,
+      "pid": 26729
+    },
+    {
+      "label": "final-docs",
+      "args": [
+        "bun",
+        "--smol",
+        "test",
+        "apps/docs/tests/auth-learning.test.ts",
+        "apps/docs/tests/database-learning.test.ts",
+        "apps/docs/tests/start-learning.test.ts",
+        "apps/docs/tests/service-learning.test.ts",
+        "apps/docs/tests/cli-scaffolding.test.ts"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.21377695800038055,
+      "pid": 26778
+    },
+    {
+      "label": "final-cli-reference",
+      "args": [
+        "bun",
+        "--smol",
+        "apps/docs/scripts/generate.ts",
+        "--cli-only",
+        "--check"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.3212419170013163,
+      "pid": 26789
+    },
+    {
+      "label": "final-mdx",
+      "args": [
+        "bun",
+        "--smol",
+        "-e",
+        "import {createRequire} from \"node:module\"; import {resolve} from \"node:path\"; const require=createRequire(resolve(\"apps/docs/node_modules/fumadocs-mdx/package.json\")); const {compile}=await import(require.resolve(\"@mdx-js/mdx\")); for (const path of process.argv.slice(1)) { await compile(await Bun.file(path).text(),{jsx:true}); console.log(\"Compiled MDX: \"+path); }",
+        "apps/docs/content/docs/auth/first-auth.mdx",
+        "apps/docs/content/docs/database/better-auth.mdx",
+        "apps/docs/content/docs/database/first-database.mdx",
+        "apps/docs/content/docs/database/migrations.mdx",
+        "apps/docs/content/docs/operations/cli-reference.mdx",
+        "apps/docs/content/docs/start/protect-orders.mdx",
+        "apps/docs/content/docs/start/save-orders.mdx"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 1,
+      "expected": 0,
+      "seconds": 0.03164754100725986,
+      "pid": 26799
+    },
+    {
+      "label": "final-mdx",
+      "args": [
+        "bun",
+        "--smol",
+        "-e",
+        "import {createRequire} from \"node:module\"; import {resolve} from \"node:path\"; import {realpathSync} from \"node:fs\"; const require=createRequire(realpathSync(resolve(\"apps/docs/node_modules/fumadocs-mdx/package.json\"))); const {compile}=await import(require.resolve(\"@mdx-js/mdx\")); for (const path of process.argv.slice(1)) { await compile(await Bun.file(path).text(),{jsx:true}); console.log(\"Compiled MDX: \"+path); }",
+        "apps/docs/content/docs/auth/first-auth.mdx",
+        "apps/docs/content/docs/database/better-auth.mdx",
+        "apps/docs/content/docs/database/first-database.mdx",
+        "apps/docs/content/docs/database/migrations.mdx",
+        "apps/docs/content/docs/operations/cli-reference.mdx",
+        "apps/docs/content/docs/start/protect-orders.mdx",
+        "apps/docs/content/docs/start/save-orders.mdx"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.8934999169723596,
+      "pid": 27307
+    },
+    {
+      "label": "final-boundaries",
+      "args": [
+        "bun",
+        "--smol",
+        "scripts/check-boundaries.ts"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 3.1614471659995615,
+      "pid": 27447
+    },
+    {
+      "label": "final-authoring-lint",
+      "args": [
+        "bun",
+        "--smol",
+        "scripts/lint.ts"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.24166016600793228,
+      "pid": 27512
+    },
+    {
+      "label": "final-konsistent",
+      "args": [
+        "bun",
+        "--smol",
+        "run",
+        "konsistent",
+        "--",
+        "validate"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.354258374980418,
+      "pid": 27527
+    },
+    {
+      "label": "final-openspec",
+      "args": [
+        "openspec",
+        "validate",
+        "refine-application-skills-and-generated-projects",
+        "--strict"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.8887828329752665,
+      "pid": 27537
+    }
+  ],
+  "passed": true
+}

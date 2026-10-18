@@ -1,0 +1,45 @@
+bun test v1.3.10 (30e609e0)
+
+tests/operations.test.ts:
+[14:16:43.424] INFO (#456): Execution operation completed {
+  domain: "runtime",
+  operation: "database.acquire",
+  outcome: "success",
+  duration_ms: 14.137209,
+}
+[14:16:43.510] INFO (#3690): Execution operation completed {
+  domain: "runtime",
+  operation: "database.insert",
+  outcome: "success",
+  duration_ms: 4.233958,
+}
+[14:16:43.524] INFO (#4656): Execution operation completed {
+  domain: "runtime",
+  operation: "database.insert",
+  outcome: "success",
+  duration_ms: 0.40025,
+}
+[14:16:43.538] INFO (#5601): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findMany",
+  outcome: "success",
+  duration_ms: 1.540791,
+}
+[14:16:43.548] INFO (#6554): Execution operation completed {
+  domain: "runtime",
+  operation: "database.findMany",
+  outcome: "success",
+  duration_ms: 0.329416,
+}
+[14:16:43.568] INFO (#7617): Execution operation completed {
+  domain: "runtime",
+  operation: "database.close",
+  outcome: "success",
+  duration_ms: 0.206167,
+}
+(pass) session guard, validation and order ownership with isolated SQLite [159.85ms]
+
+ 1 pass
+ 0 fail
+ 9 expect() calls
+Ran 1 test across 1 file. [1050.00ms]

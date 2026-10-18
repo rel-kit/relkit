@@ -7,6 +7,20 @@ description: Build or extend a RELKIT CLI-generated application using its instal
 
 Run commands from the generated application's root, where `relkit.config.ts` and `package.json` live. Use `bun run relkit` to invoke the project's installed CLI. Check `bun run relkit <command> --help` before relying on an option, especially after a dependency upgrade.
 
+## Understand the requested work
+
+Infer the intent from the request; do not ask the user to classify it.
+
+- For a feature, establish the problem, scope, expected behavior and acceptance criteria. Explain a short implementation and verification plan before editing, then proceed with the authorized work.
+- For a bug, establish expected versus actual behavior, attempt reproduction, and trace the affected execution path. Distinguish a confirmed cause from a hypothesis, and explain the proposed fix and verification before editing. Report unavailable reproduction honestly.
+- For a discussion, explain options, tradeoffs and a recommendation without changing files. For mixed requests, keep the discussion portion read-only and implement only the requested work.
+
+Before scaffolding a new app, establish the database engine and driver (or an explicit no-database choice) and whether authentication is needed. Ask missing choices together before writing files. Reuse supplied choices and existing project decisions; do not restart onboarding for an unrelated bug or small change. If requested auth needs persistence but the user chose no database, explain and resolve that conflict before scaffolding. Use supported create/add options; do not invent database/auth creation flags or change headless defaults.
+
+Recommend optional modules only when they solve a concrete part of this task: for example, realtime for live order status or a bucket for uploads. Explain the benefit and ask for a selection when the capability was not requested. For an explicitly requested capability, resolve only missing provider/configuration decisions. Check installed CLI help and declarations for support; explain unavailable options before editing. A plan is not another permission gate for work already authorized.
+
+Default to backend work. Do not introduce frontend pages, app.js, assets.css or demo interfaces unless requested. Preserve existing frontend files, explicitly selected fullstack functionality and the framework Inspector. For users and orders, define separate resource endpoints with explicit input/output contracts, validation and applicable authorization; avoid a public table dispatcher controlled by an entity parameter. Internal tables and infrastructure services need no public endpoint. Preserve intentional protocol handlers such as the Better Auth mount and shared internal helpers.
+
 ## Source placement
 
 New projects place every generic, database, and auth boundary at `src/services/<name>/service.ts`. Keep its functions, events, tasks, jobs, tools, agents, channels, schemas, resources, helpers, and assets under that service. Routes live at `src/routes`; configuration support and environment contracts live at `src/platform`. Application descriptors use plain TypeScript and supported public APIs; Effect imports are not required.
@@ -45,4 +59,6 @@ Read only the reference relevant to the requested change. These examples describ
 
 ## Verify the result
 
-Review the CLI's created and updated files, warnings, and next steps. Run `bun run check`, `bun run typecheck`, and focused tests after editing. For HTTP work, exercise the route itself; a direct function test does not cover request mapping. Database and auth work also needs the reported environment and migration steps before runtime verification.
+Review the CLI's created and updated files, warnings, next steps and final diff. Run focused checks after logical changes. Before completion, run applicable check, typecheck, build, unit/integration tests and existing relevant end-to-end coverage. Inspect package.json for actual script names. For HTTP work, test the route's status/body, valid and invalid input, and denied and allowed access where relevant; a direct function test does not cover request mapping or the complete flow. Replay the original bug through the boundary that failed. Backend/API tests do not require an unsolicited frontend.
+
+Database/auth changes also need explicit environment setup and migration steps from [the data reference](references/data-apis.md), followed by persistence/session/authorization verification. Stop all test-owned servers and clients. Report what changed, exact verification performed, and every failed, skipped or blocked check with its effect on confidence. Written code or passing unit tests alone is not fully verified delivery when affected runtime behavior remains untested.

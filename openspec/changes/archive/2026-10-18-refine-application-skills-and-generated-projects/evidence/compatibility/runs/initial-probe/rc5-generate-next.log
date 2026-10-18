@@ -1,0 +1,3 @@
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5/drizzle.config.ts'
+[✓] Your SQL migration ➜ history/20261018134142_next/migration.sql 🚀

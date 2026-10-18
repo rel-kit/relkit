@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/guidance.py", line 38, in <module>
+    link(app)
+    ~~~~^^^^^
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/local_support.py", line 64, in link
+    assert target.exists(), str(target)
+           ~~~~~~~~~~~~~^^
+AssertionError: /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/better-auth@1.7.1/node_modules/better-auth

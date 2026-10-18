@@ -1,0 +1,1 @@
+Created the actual default minimal backend without database/auth services or frontend pages. The framework Inspector remains configured on port 3210. CLI warned that validation was skipped with --no-install. Dependencies, preparation, checks, typecheck, build and HTTP runtime tests were not run.

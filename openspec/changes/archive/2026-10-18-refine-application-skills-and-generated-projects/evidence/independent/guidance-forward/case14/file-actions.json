@@ -1,0 +1,14 @@
+[
+  {
+    "path": "src/routes/items/route.ts",
+    "action": "updated",
+    "before_sha256": "097b7218c1814b7083c300c7d17e31381b6da73662513761226e7acd7c38c2c8",
+    "after_sha256": "30381a99c67a2dca7cb92ad108a3f5ccca7dc43410aed35c12a8967466cad8ce"
+  },
+  {
+    "path": "tests/items.test.ts",
+    "action": "updated",
+    "before_sha256": "72870815b443fb25bdcba307f303fe641b395571849005a1290f84b0618bf2d1",
+    "after_sha256": "730d0eca8ad8b5d04a954f97e46c604fe8ef61418f5c18fa4a7cebb9ee45c9e1"
+  }
+]

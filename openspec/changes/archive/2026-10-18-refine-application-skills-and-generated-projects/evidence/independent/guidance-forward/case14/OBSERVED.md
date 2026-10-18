@@ -1,0 +1,1 @@
+Changed the statically identified zero-ID guard and added edge assertions. Both before/after verification attempts failed to load unavailable-runtime-harness, with 0 passing tests. No HTTP behavior was observed in this case, and the patch is explicitly unverified. Full verification was not substituted with direct-function or mocked evidence.

@@ -1,0 +1,13 @@
+dyld[85534]: Symbol not found: __ZN6icu_7811StringPieceC1EPKc
+  Referenced from: <6BCD1C78-C341-30F2-9B10-CDDAE7832B50> /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysqld
+  Expected in:     <no uuid> unknown
+[rtk] nice -n 10 /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysqld --version: process terminated by signal 6
+
+Traceback (most recent call last):
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/mysql-recover.py", line 13, in <module>
+    result.check_returncode()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 509, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+                             self.stderr)
+subprocess.CalledProcessError: Command '['rtk', 'nice', '-n', '10', '/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysqld', '--version']' returned non-zero exit status 134.

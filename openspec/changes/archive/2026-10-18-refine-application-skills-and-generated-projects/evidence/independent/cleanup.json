@@ -1,0 +1,91 @@
+{
+  "time": "2026-10-18T14:28:16.136959+00:00",
+  "recordedCommands": [
+    {
+      "source": "final-focused.json",
+      "pid": 48957,
+      "commandNow": ""
+    },
+    {
+      "source": "fixture-final.json",
+      "pid": 53316,
+      "commandNow": ""
+    },
+    {
+      "source": "boundaries.json",
+      "pid": 51956,
+      "commandNow": ""
+    },
+    {
+      "source": "cli-compile.json",
+      "pid": 39101,
+      "commandNow": ""
+    },
+    {
+      "source": "native-tests.json",
+      "pid": 31944,
+      "commandNow": ""
+    },
+    {
+      "source": "generator-compile.json",
+      "pid": 39733,
+      "commandNow": ""
+    },
+    {
+      "source": "retained-patch-and-docs.json",
+      "pid": 34464,
+      "commandNow": ""
+    },
+    {
+      "source": "lightweight-checks.json",
+      "pid": 53852,
+      "commandNow": ""
+    },
+    {
+      "source": "lightweight-checks.json",
+      "pid": 53853,
+      "commandNow": ""
+    },
+    {
+      "source": "lightweight-checks.json",
+      "pid": 53857,
+      "commandNow": ""
+    },
+    {
+      "source": "lightweight-checks.json",
+      "pid": 53859,
+      "commandNow": ""
+    },
+    {
+      "source": "lightweight-checks.json",
+      "pid": 53867,
+      "commandNow": ""
+    },
+    {
+      "source": "generated-sqlite.json",
+      "pid": 42529,
+      "commandNow": ""
+    },
+    {
+      "source": "boundaries-final.json",
+      "pid": 52699,
+      "commandNow": ""
+    },
+    {
+      "source": "cli-final-compile.json",
+      "pid": 51005,
+      "commandNow": ""
+    }
+  ],
+  "stillLiveRecordedCommands": [],
+  "ownedEvaluatorRootRemoved": true,
+  "workerOrFixtureProcesses": [],
+  "pressure": 1,
+  "load": [
+    4.80029296875,
+    4.12158203125,
+    4.1015625
+  ],
+  "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                               21431.\nPages active:                            270621.\nPages inactive:                          264727.\nPages speculative:                         4967.\nPages throttled:                              0.\nPages wired down:                        154229.\nPages purgeable:                            840.\n\"Translation faults\":                3489073831.\nPages copy-on-write:                  216035168.\nPages zero filled:                   1655564905.\nPages reactivated:                    331876558.\nPages purged:                          14339222.\nFile-backed pages:                       151245.\nAnonymous pages:                         389070.\nPages stored in compressor:             1340133.\nPages occupied by compressor:            291314.\nDecompressions:                       264983034.\nCompressions:                         341744502.\nPageins:                               66111271.\nPageouts:                                470181.\nSwapins:                                6168039.\nSwapouts:                              10280378.\n",
+  "cleanup": "No servers, browser, containers, database daemons or registry were started in independent work; finite test process cleanup asserted by tests. No unrelated process was stopped."
+}

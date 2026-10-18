@@ -1,0 +1,392 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/release-check-listing.test.ts:
+(pass) CLI packages retain the finite migration worker and its relative helpers [1.52ms]
+(pass) accepts the complete generator's exact portable catalog source pair [0.04ms]
+(pass) requires the relkit skill in the minimal template [0.09ms]
+(pass) requires the relkit skill in the api template [0.03ms]
+(pass) requires the relkit skill in the agent template [0.02ms]
+(pass) requires the relkit skill in the fullstack template [0.04ms]
+(pass) requires the relkit skill in the tasks template [0.04ms]
+(pass) retains development-file rejection beside approved catalog assets [0.05ms]
+(pass) requires the portable catalog asset package/src/catalog-resolution.ts even without an export target [0.09ms]
+(pass) requires the portable catalog asset package/src/catalog-resolution.types.ts even without an export target [0.07ms]
+(pass) forbids the same catalog source pair in every unrelated package [0.02ms]
+
+tests/generator/database-ownership.test.ts:
+[14:11:23.244] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 1.023167,
+}
+[14:11:23.251] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.422083,
+}
+[14:11:23.267] INFO (#53): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 16.454333,
+}
+[14:11:23.331] INFO (#63): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 63.452833,
+}
+[14:11:23.333] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.115708,
+}
+[14:11:23.334] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.624916,
+}
+[14:11:23.336] INFO (#93): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.506167,
+}
+[14:11:23.358] INFO (#95): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.616959,
+}
+[14:11:23.385] INFO (#120): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 25.827709,
+}
+[14:11:23.386] INFO (#149): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.113,
+}
+[14:11:23.386] INFO (#149): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.648625,
+}
+[14:11:23.388] INFO (#149): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 1.910792,
+}
+[14:11:23.410] INFO (#151): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.455166,
+}
+[14:11:23.410] INFO (#180): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.124916,
+}
+[14:11:23.411] INFO (#180): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.683,
+}
+[14:11:23.414] INFO (#180): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.540792,
+}
+[14:11:23.431] INFO (#182): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 17.654,
+}
+[14:11:23.453] INFO (#206): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.022333,
+}
+[14:11:23.453] INFO (#235): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.100709,
+}
+[14:11:23.454] INFO (#235): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.591708,
+}
+[14:11:23.456] INFO (#235): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 1.548125,
+}
+[14:11:23.474] INFO (#237): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 18.410666,
+}
+[14:11:23.475] INFO (#266): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.12325,
+}
+[14:11:23.475] INFO (#266): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.652666,
+}
+[14:11:23.477] INFO (#266): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.029166,
+}
+[14:11:23.494] INFO (#268): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 16.805,
+}
+[14:11:23.515] INFO (#292): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 20.833375,
+}
+[14:11:23.520] INFO (#321): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.561167,
+}
+[14:11:23.524] INFO (#321): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 4.306042,
+}
+[14:11:23.528] INFO (#321): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.44175,
+}
+[14:11:23.531] INFO (#321): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 2.996791,
+}
+[14:11:23.535] INFO (#321): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.641459,
+}
+[14:11:23.538] INFO (#321): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 3.358541,
+}
+(pass) database-only, auth-created and reused histories share the selected owner for every dialect [303.76ms]
+[14:11:23.539] INFO (#322): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.172041,
+}
+[14:11:23.540] INFO (#322): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.702458,
+}
+[14:11:23.544] INFO (#322): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 4.236084,
+}
+[14:11:23.563] INFO (#325): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 19.253667,
+}
+[14:11:23.640] INFO (#350): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.407292,
+}
+[14:11:23.641] INFO (#350): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 1.0035,
+}
+[14:11:23.644] INFO (#350): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 3.169625,
+}
+[14:11:23.700] INFO (#352): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 55.856417,
+}
+[14:11:23.773] INFO (#391): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.206958,
+}
+[14:11:23.773] INFO (#391): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.814167,
+}
+[14:11:23.776] INFO (#391): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.698083,
+}
+[14:11:23.807] INFO (#393): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 30.725417,
+}
+[14:11:23.874] INFO (#424): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.200917,
+}
+[14:11:23.875] INFO (#424): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.8735,
+}
+[14:11:23.879] INFO (#424): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 4.011084,
+}
+[14:11:23.914] INFO (#426): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 32.252584,
+}
+[14:11:23.968] INFO (#457): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.temporary",
+  outcome: "success",
+  duration_ms: 0.213125,
+}
+[14:11:23.968] INFO (#457): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.copy",
+  outcome: "success",
+  duration_ms: 0.716708,
+}
+[14:11:23.971] INFO (#457): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.dependencyPatch",
+  outcome: "success",
+  duration_ms: 2.811375,
+}
+[14:11:23.993] INFO (#459): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.add",
+  outcome: "success",
+  duration_ms: 21.744792,
+}
+[14:11:24.063] INFO (#488): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.468,
+}
+[14:11:24.070] INFO (#488): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 7.084,
+}
+[14:11:24.077] INFO (#488): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 6.707917,
+}
+[14:11:24.082] INFO (#488): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.484542,
+}
+[14:11:24.088] INFO (#488): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.release",
+  outcome: "success",
+  duration_ms: 5.636375,
+}
+(pass) all maintained templates ignore framework state/secrets/database files and retain SQL/metadata [549.93ms]
+
+packages/cli/tests/database/migrate.test.ts:
+(pass) database help and completion are pure and share --config metadata [35.03ms]
+(pass) selected nested/absolute config owns target, output and log; repeat is a no-op [289.78ms]
+(pass) invalid or absent configuration/history never creates the target [745.71ms]
+(pass) noisy config and secret-bearing exceptions produce one safe JSON result [110.86ms]
+(pass) SQL errors are operational failures without retry or successful publication [149.42ms]
+(pass) missing consumer ORM is actionable without a CLI or workspace fallback [119.05ms]
+
+packages/cli/tests/database/sample-history.test.ts:
+(pass) both sample histories move without resetting IDs, log rows, schema or data [530.41ms]
+
+packages/cli/tests/database/delegate.test.ts:
+(pass) PostgreSQL/MySQL invoke only consumer Kit with literal config, cwd and safe diagnostics [502.00ms]
+
+packages/cli/tests/database/environment.test.ts:
+(pass) config wins over a conflicting environment target; native SQLite pragmas are established [830.23ms]
+(pass) Bun dotenv supplies generated-style config, inherited variables win, examples are never loaded [1600.34ms]
+
+packages/cli/tests/database/cancellation.test.ts:
+(pass) interruption emits one safe result and joins worker/descendant cleanup [116.34ms]
+
+ 24 pass
+ 0 fail
+ 183 expect() calls
+Ran 24 tests across 7 files. [6.85s]

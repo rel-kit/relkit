@@ -1,0 +1,1 @@
+{"command":"db migrate","configPath":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dialect-auth-dw7UoJ/app/drizzle.config.ts","dialect":"mysql","migrationPath":"/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-dialect-auth-dw7UoJ/app/src/services/database/migrations","ok":true}

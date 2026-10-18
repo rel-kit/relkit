@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-18T15:14:36.443742+00:00",
+  "recordedPidCommands": {
+    "95884": "",
+    "405": "",
+    "93802": "",
+    "2606": "",
+    "93971": "",
+    "6668": "",
+    "462": "",
+    "99884": "",
+    "93557": "",
+    "3263": "",
+    "467": "",
+    "307": "",
+    "93869": "",
+    "463": ""
+  },
+  "registryListening": false,
+  "consumerRemoved": true,
+  "archivesRemoved": true,
+  "patchUnchanged": true,
+  "protectedChange": {
+    "openspec/changes/separate-release-readiness-performance/.openspec.yaml": true,
+    "openspec/changes/separate-release-readiness-performance/design.md": true,
+    "openspec/changes/separate-release-readiness-performance/evidence/hosted-failed-fresh.json": true,
+    "openspec/changes/separate-release-readiness-performance/proposal.md": true,
+    "openspec/changes/separate-release-readiness-performance/specs/acceptance-verification/spec.md": true,
+    "openspec/changes/separate-release-readiness-performance/specs/cli-scaffolding/spec.md": true,
+    "openspec/changes/separate-release-readiness-performance/tasks.md": true
+  },
+  "historyUnchanged": {
+    "examples/data-model/src/services/database/migrations/20260831090701_initial/migration.sql": true,
+    "examples/data-model/src/services/database/migrations/20260831090701_initial/snapshot.json": true,
+    "examples/auth-drizzle/src/services/database/migrations/20260831094750_auth/migration.sql": true,
+    "examples/auth-drizzle/src/services/database/migrations/20260831094750_auth/snapshot.json": true
+  },
+  "pressure": "2",
+  "noUserProcessesStopped": true
+}

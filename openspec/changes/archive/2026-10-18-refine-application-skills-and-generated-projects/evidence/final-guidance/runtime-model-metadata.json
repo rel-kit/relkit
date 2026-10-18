@@ -1,0 +1,22 @@
+{
+  "parentModel": "gpt-6.1-sol",
+  "children": [
+    {
+      "id": "01a14f59-ef52-7033-8da8-28cb94809a19",
+      "models": [
+        "gpt-6.1-sol"
+      ],
+      "source": {
+        "subagent": {
+          "thread_spawn": {
+            "parent_thread_id": "01a14f34-a5e6-7e83-8372-afa2a2afd970",
+            "depth": 1,
+            "agent_path": "/root/guidance_forward_test",
+            "agent_nickname": "Locke",
+            "agent_role": null
+          }
+        }
+      }
+    }
+  ]
+}

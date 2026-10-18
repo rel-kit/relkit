@@ -1,0 +1,9 @@
+{
+  "auth_service_restored": true,
+  "auth_protocol_handler": true,
+  "database_singleton": true,
+  "auth_schema": true,
+  "drizzle_patch": true,
+  "case01_test_source": true,
+  "case02_unchanged": true
+}

@@ -1,0 +1,15 @@
+{
+  "args": [
+    "nice",
+    "-n",
+    "10",
+    "bun",
+    "test",
+    "tests/generator/sqlite-app-tooling.test.ts",
+    "examples/data-model/tests/migrations.test.ts",
+    "--timeout",
+    "30000"
+  ],
+  "pid": 42529,
+  "exit": 0
+}

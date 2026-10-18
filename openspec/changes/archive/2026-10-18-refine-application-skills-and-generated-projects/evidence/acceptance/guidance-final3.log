@@ -1,0 +1,64 @@
+guidance01-generate-before
+guidance01-migrate-before
+guidance01-seed-business
+guidance01-generate-extension
+guidance01-migrate-extension
+guidance01-repeat
+guidance01-check
+guidance01-typecheck
+guidance01-test
+guidance01-build
+guidance01-production-http
+guidance02-check
+guidance02-typecheck-backend
+guidance02-typecheck-web
+guidance02-test
+guidance02-build-api
+guidance02-build-web
+Traceback (most recent call last):
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/guidance.py", line 63, in <module>
+    run(report,"guidance02-"+label,args,second,env,timeout=240)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/local_support.py", line 42, in run
+    raise RuntimeError(label + " failed: " + output[-3000:])
+RuntimeError: guidance02-build-web failed: e invalid.
+warning @relkit/tools@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/events@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/routes@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/config@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/schema@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/cache@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/buckets@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/provider@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/realtime@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/contracts@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/services@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/invocation@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/functions@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/observability@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/client@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/cli@0.7.7: The engine "bun" appears to be invalid.
+warning create-relkit@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/graph@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/compiler@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/supervisor@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/diagnostics@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/runtime-hono@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/engine@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/deploy@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/deploy-pulumi@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/local-service@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/inspector-api@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/runtime-effect@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/client-generator@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/openapi@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/testing@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/better-auth@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/drizzle@0.7.7: The engine "bun" appears to be invalid.
+warning @relkit/providers-local@0.7.7: The engine "bun" appears to be invalid.
+[3/4] Linking dependencies...
+warning "@relkit/app > @relkit/agents > @langchain/langgraph@1.4.14" has unmet peer dependency "zod@^3.25.32 || ^4.2.0".
+warning " > @relkit/client@0.7.7" has unmet peer dependency "@tanstack/query-core@>=5.80.2".
+warning "@relkit/client > @orpc/tanstack-query@2.0.0-beta.31" has unmet peer dependency "@tanstack/query-core@>=5.80.2".
+warning "@relkit/cli > @relkit/runtime-effect > @effect/platform-bun > @effect/platform-node-shared@4.0.5" has incorrect peer dependency "effect@^4.0.5".
+

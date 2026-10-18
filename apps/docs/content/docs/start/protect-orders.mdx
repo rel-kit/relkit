@@ -59,7 +59,7 @@ Orders table and adds auth tables; do not regenerate the initial migration.
 
 ```sh title="Terminal — relkit-orders"
 bun --bun drizzle-kit generate --name=auth
-bun scripts/migrate.ts
+bun run relkit db migrate
 bun run check
 ```
 

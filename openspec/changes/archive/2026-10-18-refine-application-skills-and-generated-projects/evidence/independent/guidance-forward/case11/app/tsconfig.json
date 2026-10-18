@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@app/*": [
+        "./src/*"
+      ]
+    },
+    "strict": true,
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "target": "ES2022"
+  }
+}

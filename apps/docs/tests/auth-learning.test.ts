@@ -75,7 +75,7 @@ test("teaches a migrated existing-app flow without hard-coded server secrets", (
     expect(tutorial).toContain(operation);
   }
   expect(tutorial).toContain("drizzle-kit generate");
-  expect(tutorial).toContain("drizzle-kit migrate");
+  expect(tutorial).toContain("relkit db migrate");
   const example = resolve(content, "../../../../examples/auth-drizzle");
   expect(readFileSync(resolve(example, "src/services/database/service.ts"), "utf8")).not.toMatch(
     /\.exec\(|create table/i,

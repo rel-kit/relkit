@@ -1,0 +1,301 @@
+{
+  "temporary": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq",
+  "workspaceLinked": true,
+  "commands": [
+    {
+      "label": "guidance01-generate-before",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before/node_modules/.bin/drizzle-kit",
+        "generate",
+        "--name=before"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.5158377089828718,
+      "pid": 22225
+    },
+    {
+      "label": "guidance01-migrate-before",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before/node_modules/.bin/relkit",
+        "db",
+        "migrate"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.3321920830057934,
+      "pid": 22287
+    },
+    {
+      "label": "guidance01-seed-business",
+      "args": [
+        "bun",
+        "--smol",
+        "-e",
+        "import {Database} from \"bun:sqlite\"; const db=new Database(process.env.DATABASE_PATH); db.exec(\"INSERT INTO notes(id,content) VALUES (0,'Preserve this existing record')\"); db.close();"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.0410262499935925,
+      "pid": 22315
+    },
+    {
+      "label": "guidance01-generate-extension",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before/node_modules/.bin/drizzle-kit",
+        "generate",
+        "--name=orders"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.3499156670004595,
+      "pid": 22321
+    },
+    {
+      "label": "guidance01-migrate-extension",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before/node_modules/.bin/relkit",
+        "db",
+        "migrate"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.9861477499944158,
+      "pid": 22337
+    },
+    {
+      "label": "guidance01-repeat",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before/node_modules/.bin/relkit",
+        "db",
+        "migrate"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.9401782500208355,
+      "pid": 22391
+    },
+    {
+      "label": "guidance01-check",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before/node_modules/.bin/relkit",
+        "check"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 9.41471325000748,
+      "pid": 22408
+    },
+    {
+      "label": "guidance01-typecheck",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before/node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.5359465830260888,
+      "pid": 22587
+    },
+    {
+      "label": "guidance01-test",
+      "args": [
+        "bun",
+        "--smol",
+        "test",
+        "tests/integration/auth-orders.test.ts",
+        "--timeout",
+        "30000"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.172159334004391,
+      "pid": 22616
+    },
+    {
+      "label": "guidance01-build",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before/node_modules/.bin/relkit",
+        "build"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 3.72792383300839,
+      "pid": 22640
+    },
+    {
+      "label": "guidance01-production-http",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/guidance-network.ts",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.7358637090073898,
+      "pid": 22725
+    },
+    {
+      "label": "guidance02-check",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02/node_modules/.bin/relkit",
+        "check"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 8.249542250006925,
+      "pid": 22772
+    },
+    {
+      "label": "guidance02-typecheck-backend",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02/node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.5563175840070471,
+      "pid": 22952
+    },
+    {
+      "label": "guidance02-typecheck-web",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02/node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "web/tsconfig.json"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.2483205420139711,
+      "pid": 22980
+    },
+    {
+      "label": "guidance02-test",
+      "args": [
+        "bun",
+        "--smol",
+        "test",
+        "tests/integration/greeting.test.ts"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.303101749974303,
+      "pid": 23003
+    },
+    {
+      "label": "guidance02-build-api",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02/node_modules/.bin/relkit",
+        "build"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 3.4408229170076083,
+      "pid": 23031
+    },
+    {
+      "label": "guidance02-build-web",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02/node_modules/next/dist/bin/next",
+        "build",
+        "web",
+        "--webpack"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 14.15096262501902,
+      "pid": 23096
+    },
+    {
+      "label": "guidance02-browser",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02/node_modules/.bin/playwright",
+        "test",
+        "--config",
+        "playwright.config.ts",
+        "--workers=1"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02",
+      "exit": 1,
+      "expected": 0,
+      "seconds": 2.294431041984353,
+      "pid": 23453
+    }
+  ],
+  "case01": {
+    "migrationBeforeAndExtension": true,
+    "realHTTPHarness": true,
+    "ownershipValidationPersistence": true,
+    "network": {
+      "passed": true,
+      "productionHTTP": true,
+      "distinctResources": true,
+      "trustedOwnership": true,
+      "validation": true,
+      "revocation": true,
+      "preservedBusinessRows": true
+    }
+  },
+  "servers": [
+    {
+      "label": "guidance02-api",
+      "pid": 23405
+    },
+    {
+      "label": "guidance02-web",
+      "pid": 23442
+    }
+  ],
+  "blocker": "guidance02-browser failed: \nRunning 1 test using 1 worker\n\nWarning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n      at emitWarning (unknown:1:1)\n      at warnOnDeactivatedColors (internal:tty:33:24)\n      at getColorDepth (internal:tty:42:39)\n      at shouldColorize (internal:util/colors:14:109)\n      at refresh (internal:util/colors:18:31)\n      at internal:util/colors (internal:util/colors:24:16)\n      at anonymous (unknown:1:1)\n      at internal:assert/assertion_error (internal:assert/assertion_error:2:187)\n      at anonymous (unknown:1:1)\n      at loadAssertionError (node:assert:28:96)\n\n  \u2718  1 tests/browser/greeting.spec.ts:5:0 \u203a name form updates via backend while preserving fullstack content and wrapper (770ms)\n\n\n  1) tests/browser/greeting.spec.ts:5:0 \u203a name form updates via backend while preserving fullstack content and wrapper \n\n    Error: expect(locator).toHaveText(expected) failed\n\n    Locator: getByRole('alert')\n    Expected: \"Greeting could not load. Try updating it again.\"\n    Error: strict mode violation: getByRole('alert') resolved to 2 elements:\n        1) <p role=\"alert\">Greeting could not load. Try updating it again.</p> aka getByText('Greeting could not load. Try')\n        2) <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\"></div> aka locator('[id=\"__next-route-announcer__\"]')\n\n    Call log:\n      - Expect \"toHaveText\" getByRole('alert') with timeout 10000ms\n      - waiting for getByRole('alert')\n        - locator resolved to <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\"></div>\n        - unexpected value \"\"\n\n\n      25 |   await page.route(apiOrigin + \"/**\", (route) => route.fulfill({ status: 503, contentType: \"application/json\", body: JSON.stringify({ error: \"Test-owned unavailable backend\" }) }));\n      26 |   await submit.click();\n    > 27 |   await expect(page.getByRole(\"alert\")).toHaveText(\"Greeting could not load. Try updating it again.\");\n         |                                        ^\n      28 |   await page.unroute(apiOrigin + \"/**\");\n      29 |   await submit.click();\n      30 |   await expect(page.getByRole(\"heading\", { name: \"Hello, Grace!\", exact: true })).toBeVisible();\n        at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02/tests/browser/greeting.spec.ts:27:40\n\n    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n    .relkit/browser-test-results/greeting-name-form-updates-11fcb-llstack-content-and-wrapper/test-failed-1.png\n    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n    Error Context: .relkit/browser-test-results/greeting-name-form-updates-11fcb-llstack-content-and-wrapper/error-context.md\n\n  1 failed\n    tests/browser/greeting.spec.ts:5:0 \u203a name form updates via backend while preserving fullstack content and wrapper \n",
+  "cleanup": {
+    "childrenExited": true,
+    "temporaryRemoved": false
+  }
+}

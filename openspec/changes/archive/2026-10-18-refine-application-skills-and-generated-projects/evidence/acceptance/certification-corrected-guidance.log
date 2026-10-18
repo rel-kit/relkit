@@ -1,0 +1,272 @@
+Release command: node --max-old-space-size=512 node_modules/typescript/bin/tsc -b packages/create-relkit packages/cli --pretty false in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun --smol scripts/package-create-relkit-templates.ts in /Users/mustafaelsayed/Workspace/relkit
+Staging release package: @relkit/contracts
+Staging release package: @relkit/providers-standard
+Staging release package: @relkit/schema
+Staging release package: @relkit/buckets
+Staging release package: @relkit/cache
+Staging release package: @relkit/diagnostics
+Staging release package: @relkit/graph
+Staging release package: @relkit/invocation
+Staging release package: @relkit/observability
+Staging release package: @relkit/provider
+Staging release package: @relkit/realtime
+Staging release package: @relkit/client
+Staging release package: @relkit/client-generator
+Staging release package: @relkit/cloudflare
+Staging release package: @relkit/config
+Staging release package: @relkit/deploy
+Staging release package: @relkit/drizzle
+Staging release package: @relkit/functions
+Staging release package: @relkit/local-service
+Staging release package: @relkit/openapi
+Staging release package: @relkit/otlp
+Staging release package: @relkit/sentry
+Staging release package: @relkit/aws
+Staging release package: @relkit/compiler
+Staging release package: @relkit/docker
+Staging release package: @relkit/jobs
+Staging release package: @relkit/pulumi
+Staging release package: @relkit/runtime-effect
+Staging release package: @relkit/s3
+Staging release package: @relkit/tools
+Staging release package: @relkit/agents
+Staging release package: @relkit/deploy-pulumi
+Staging release package: @relkit/effect-mq
+Staging release package: @relkit/events
+Staging release package: @relkit/inngest
+Staging release package: @relkit/inspector-api
+Staging release package: @relkit/supervisor
+Staging release package: @relkit/trigger
+Staging release package: create-relkit
+Staging release package: @relkit/providers-local
+Staging release package: @relkit/services
+Staging release package: @relkit/local
+Staging release package: @relkit/redis
+Staging release package: @relkit/routes
+Staging release package: @relkit/app
+Staging release package: @relkit/better-auth
+Staging release package: @relkit/integrations
+Staging release package: @relkit/engine
+Staging release package: @relkit/cloud-aws
+Staging release package: @relkit/runtime-hono
+Staging release package: @relkit/cli
+Staging release package: @relkit/testing
+Staging release package: relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun install --lockfile-only --ignore-scripts in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/contracts
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-contracts-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-contracts-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-contracts-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/providers-standard
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-providers-standard-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-providers-standard-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-providers-standard-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/schema
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-schema-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-schema-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-schema-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/buckets
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-buckets-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-buckets-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-buckets-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/cache
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cache-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cache-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cache-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/diagnostics
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-diagnostics-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-diagnostics-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-diagnostics-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/graph
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-graph-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-graph-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-graph-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/invocation
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-invocation-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-invocation-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-invocation-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/observability
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-observability-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-observability-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-observability-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/provider
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-provider-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-provider-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-provider-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/realtime
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-realtime-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-realtime-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-realtime-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/client
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-client-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-client-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-client-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/client-generator
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-client-generator-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-client-generator-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-client-generator-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/cloudflare
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cloudflare-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cloudflare-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cloudflare-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/config
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-config-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-config-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-config-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/deploy
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-deploy-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-deploy-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-deploy-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/drizzle
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-drizzle-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-drizzle-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-drizzle-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/functions
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-functions-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-functions-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-functions-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/local-service
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-local-service-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-local-service-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-local-service-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/openapi
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-openapi-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-openapi-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-openapi-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/otlp
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-otlp-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-otlp-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-otlp-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/sentry
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-sentry-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-sentry-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-sentry-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/aws
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-aws-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-aws-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-aws-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/compiler
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-compiler-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-compiler-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-compiler-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/docker
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-docker-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-docker-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-docker-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/jobs
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-jobs-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-jobs-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-jobs-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/pulumi
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-pulumi-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-pulumi-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-pulumi-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/runtime-effect
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-runtime-effect-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-runtime-effect-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-runtime-effect-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/s3
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-s3-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-s3-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-s3-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/tools
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-tools-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-tools-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-tools-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/agents
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-agents-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-agents-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-agents-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/deploy-pulumi
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-deploy-pulumi-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-deploy-pulumi-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-deploy-pulumi-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/effect-mq
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-effect-mq-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-effect-mq-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-effect-mq-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/events
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-events-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-events-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-events-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/inngest
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-inngest-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-inngest-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-inngest-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/inspector-api
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-inspector-api-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-inspector-api-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-inspector-api-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/supervisor
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-supervisor-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-supervisor-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-supervisor-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/trigger
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-trigger-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-trigger-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-trigger-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/create-relkit
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/create-relkit-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/create-relkit-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/create-relkit-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/providers-local
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-providers-local-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-providers-local-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-providers-local-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/services
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-services-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-services-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-services-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/local
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-local-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-local-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-local-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/redis
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-redis-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-redis-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-redis-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/routes
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-routes-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-routes-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-routes-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/app
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-app-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-app-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-app-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/better-auth
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-better-auth-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-better-auth-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-better-auth-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/catalog
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-integrations-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-integrations-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-integrations-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/engine
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-engine-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-engine-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-engine-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/cloud-aws
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cloud-aws-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cloud-aws-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cloud-aws-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/runtime-hono
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-runtime-hono-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-runtime-hono-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-runtime-hono-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/cli
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cli-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cli-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-cli-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/testing
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-testing-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-testing-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-testing-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-h3mTvm/packages/relkit
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC/relkit-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun --smol scripts/benchmark-packed-dev.ts --set fresh --runs 20 --cleanup --readiness-only --output /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-FZf7gW/fresh.json --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun --smol scripts/benchmark-packed-dev.ts --set restart --runs 20 --cleanup --readiness-only --output /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-FZf7gW/restart.json --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-WCNkbC in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun --smol test tests/unit/release-check.test.ts in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun --smol x --bun vitest run --config packages/create-relkit/vitest.config.ts packages/create-relkit/tests/create-capabilities.effect.test.ts --maxWorkers=1 in /Users/mustafaelsayed/Workspace/relkit

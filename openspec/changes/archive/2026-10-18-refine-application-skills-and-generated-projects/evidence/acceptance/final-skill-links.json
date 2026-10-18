@@ -1,0 +1,531 @@
+{
+  "links": [
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/cli.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/config-environments.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/domain-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/http-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/jobs-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/agent-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/testing-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/references/config-environments.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/references/config-environments.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/references/cli.md",
+      "target": "data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/references/cli.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/references/cli.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/references/cli.md",
+      "target": "streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/references/cli.md",
+      "target": "layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/minimal/.agents/skills/relkit/references/data-apis.md",
+      "target": "config-environments.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/cli.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/config-environments.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/domain-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/http-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/jobs-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/agent-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/testing-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/references/config-environments.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/references/config-environments.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/references/cli.md",
+      "target": "data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/references/cli.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/references/cli.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/references/cli.md",
+      "target": "streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/references/cli.md",
+      "target": "layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/api/.agents/skills/relkit/references/data-apis.md",
+      "target": "config-environments.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/cli.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/config-environments.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/domain-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/http-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/jobs-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/agent-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/testing-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/references/config-environments.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/references/config-environments.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/references/cli.md",
+      "target": "data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/references/cli.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/references/cli.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/references/cli.md",
+      "target": "streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/references/cli.md",
+      "target": "layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/agent/.agents/skills/relkit/references/data-apis.md",
+      "target": "config-environments.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/cli.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/config-environments.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/domain-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/http-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/jobs-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/agent-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/testing-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/references/config-environments.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/references/config-environments.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/references/cli.md",
+      "target": "data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/references/cli.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/references/cli.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/references/cli.md",
+      "target": "streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/references/cli.md",
+      "target": "layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/fullstack/.agents/skills/relkit/references/data-apis.md",
+      "target": "config-environments.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/cli.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/config-environments.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/domain-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/http-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/jobs-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/agent-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/testing-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/SKILL.md",
+      "target": "references/data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/references/config-environments.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/references/config-environments.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/references/cli.md",
+      "target": "data-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/references/cli.md",
+      "target": "realtime-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/references/cli.md",
+      "target": "observability-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/references/cli.md",
+      "target": "streaming-apis.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/references/cli.md",
+      "target": "layout-migration.md",
+      "exists": true
+    },
+    {
+      "source": "templates/default/v1/tasks/.agents/skills/relkit/references/data-apis.md",
+      "target": "config-environments.md",
+      "exists": true
+    }
+  ],
+  "count": 105,
+  "passed": true
+}

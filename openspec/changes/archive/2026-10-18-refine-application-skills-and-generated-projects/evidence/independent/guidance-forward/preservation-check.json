@@ -1,0 +1,9 @@
+{
+  "case07 unchanged": true,
+  "case10 unchanged": true,
+  "case12 unchanged": true,
+  "case13 unchanged": true,
+  "case11 preserves src/routes/api/auth/[...all]/route.ts": true,
+  "case11 preserves src/services/database/service.ts": true,
+  "case13 fullstack page preserved": true
+}

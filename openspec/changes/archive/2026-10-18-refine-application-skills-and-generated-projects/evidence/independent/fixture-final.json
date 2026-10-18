@@ -1,0 +1,15 @@
+{
+  "args": [
+    "nice",
+    "-n",
+    "10",
+    "bun",
+    "test",
+    "packages/cli/tests/database/migrate.test.ts",
+    "--timeout",
+    "15000"
+  ],
+  "pid": 53316,
+  "exit": 0,
+  "seconds": 2.6045801639556885
+}

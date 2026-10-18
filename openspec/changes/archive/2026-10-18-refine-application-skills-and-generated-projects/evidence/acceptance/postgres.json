@@ -1,0 +1,19 @@
+{
+  "args": [
+    "python3",
+    "openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/postgres.py"
+  ],
+  "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+  "before": {
+    "at": "2026-10-18T15:13:00.168413+00:00",
+    "cpu": 10,
+    "load": [
+      11.814453125,
+      9.31201171875,
+      6.6298828125
+    ],
+    "pressure": 2,
+    "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                4072.\nPages active:                            170172.\nPages inactive:                          167660.\nPages speculative:                         1754.\nPages throttled:                              0.\nPages wired down:                        195873.\nPages purgeable:                              2.\n\"Translation faults\":                3666929765.\nPages copy-on-write:                  222894304.\nPages zero filled:                   1696220792.\nPages reactivated:                    348765612.\nPages purged:                          14867073.\nFile-backed pages:                       110414.\nAnonymous pages:                         229172.\nPages stored in compressor:             1796255.\nPages occupied by compressor:            467783.\nDecompressions:                       279888016.\nCompressions:                         360342738.\nPageins:                               68054452.\nPageouts:                                491565.\nSwapins:                                6225663.\nSwapouts:                              10425762.\n"
+  },
+  "blocked": "Kernel memory pressure is not normal; command was not started."
+}

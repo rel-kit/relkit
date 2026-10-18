@@ -1,0 +1,18 @@
+DESCRIPTION
+  Apply pending migrations using the application's installed tools
+
+USAGE
+  relkit db migrate [flags]
+
+FLAGS
+  --json             Emit machine-readable output
+  --config string    Application Drizzle config; defaults to drizzle.config.ts. Relative paths use the application root
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Apply pending migrations using the application's installed tools
+  relkit db migrate

@@ -33,6 +33,26 @@ const completeGenerator = [
   ),
 ];
 
+test("CLI packages retain the finite migration worker and its relative helpers", () => {
+  const cli: PackageInfo = { name: "@relkit/cli", directory: "/fixture", manifest: {} };
+  const assets = [
+    "migration-worker",
+    "migration-config",
+    "migration-execute",
+    "migration.schemas",
+  ].map((name) => `package/dist/database/${name}.js`);
+  const listing = [...metadata, "package/editor/package.json", ...assets];
+  expect(() => assertListing(cli, listing, {})).not.toThrow();
+  for (const missing of assets)
+    expect(() =>
+      assertListing(
+        cli,
+        listing.filter((path) => path !== missing),
+        {},
+      ),
+    ).toThrow("Packed CLI migration asset is missing");
+});
+
 test("accepts the complete generator's exact portable catalog source pair", () => {
   expect(() => assertListing(generator, completeGenerator, {})).not.toThrow();
 });

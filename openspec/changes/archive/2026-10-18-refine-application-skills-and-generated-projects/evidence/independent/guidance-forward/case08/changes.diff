@@ -1,0 +1,30 @@
+--- before/src/routes/items/route.ts
++++ after/src/routes/items/route.ts
+@@ -1,7 +1,10 @@
+ const items = new Map([[0, { id: 0, title: "Zero" }], [1, { id: 1, title: "One" }]]);
+ 
+ export async function GET(request: Request): Promise<Response> {
+-  const id = Number(new URL(request.url).searchParams.get("id"));
+-  if (!id || !items.has(id)) return Response.json({ error: "Not found" }, { status: 404 });
++  const rawId = new URL(request.url).searchParams.get("id");
++  const id = rawId === null || rawId.trim() === "" ? NaN : Number(rawId);
++  if (!Number.isSafeInteger(id) || id < 0 || !items.has(id)) {
++    return Response.json({ error: "Not found" }, { status: 404 });
++  }
+   return Response.json(items.get(id));
+ }
+--- before/tests/items.test.ts
++++ after/tests/items.test.ts
+@@ -6,3 +6,12 @@
+   expect(response.status).toBe(200);
+   expect(await response.json()).toEqual({ id: 0, title: "Zero" });
+ });
++
++test("existing, absent and malformed IDs retain their contracts", async () => {
++  expect((await GET(new Request("http://fixture.test/items?id=1"))).status).toBe(200);
++  for (const query of ["", "?id=", "?id=  ", "?id=nope", "?id=-1", "?id=1.5", "?id=2"]) {
++    const response = await GET(new Request(`http://fixture.test/items${query}`));
++    expect(response.status).toBe(404);
++    expect(await response.json()).toEqual({ error: "Not found" });
++  }
++});

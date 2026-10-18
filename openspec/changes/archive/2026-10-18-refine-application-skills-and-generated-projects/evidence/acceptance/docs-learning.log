@@ -1,0 +1,32 @@
+bun test v1.3.10 (30e609e0)
+
+apps/docs/tests/service-learning.test.ts:
+(pass) introduces Service after Core concepts with source-backed, connected guides [2.46ms]
+(pass) routes code-placement questions into existing capability and HTTP guides [0.20ms]
+(pass) walks through the Orders service using the executable API starter [0.10ms]
+
+apps/docs/tests/auth-learning.test.ts:
+(pass) connects Auth after Database with source-backed guides and API reference [2.23ms]
+(pass) separates identity, integration, transport protection, and business authorization [0.27ms]
+(pass) teaches a migrated existing-app flow without hard-coded server secrets [0.47ms]
+
+apps/docs/tests/database-learning.test.ts:
+(pass) connects Database guides and the generated Drizzle reference [2.02ms]
+(pass) uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets [0.76ms]
+(pass) states validation, override, transaction, and lifecycle boundaries [0.13ms]
+(pass) explains generated data shapes and Better Auth's native-client boundary [0.13ms]
+
+apps/docs/tests/start-learning.test.ts:
+(pass) keeps a single ordered Orders journey with optional scaffolding last [0.62ms]
+(pass) extends the certified minimal app into the same Orders journey [0.99ms]
+(pass) redirects retired Start URLs directly to current guidance [0.19ms]
+
+apps/docs/tests/http-learning.test.ts:
+(pass) connects Service to HTTP Routes without changing existing HTTP guide URLs [2.58ms]
+(pass) teaches the Orders HTTP boundary with executable starter source and tests [0.11ms]
+(pass) documents raw and RPC boundaries without promising REST-only policies on RPC [0.14ms]
+
+ 16 pass
+ 0 fail
+ 332 expect() calls
+Ran 16 tests across 5 files. [94.00ms]

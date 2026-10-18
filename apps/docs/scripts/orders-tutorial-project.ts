@@ -131,6 +131,13 @@ export const configureTutorial = Effect.fn("Tutorial.dependencies")(function* (
       manifest.devDependencies,
     )),
   };
+  const scripts = {
+    ...(yield* Schema.decodeUnknownEffect(Schema.Record(Schema.String, Schema.String))(
+      manifest.scripts,
+    )),
+    "db:generate": "bun --bun drizzle-kit generate",
+    "db:migrate": "relkit db migrate",
+  };
   const versionText = yield* Effect.promise(() =>
     readFile(join(root, "packages/drizzle/package.json"), "utf8"),
   );
@@ -148,7 +155,7 @@ export const configureTutorial = Effect.fn("Tutorial.dependencies")(function* (
     try: () =>
       writeFile(
         join(project.app, "package.json"),
-        JSON.stringify({ ...manifest, dependencies, devDependencies }, null, 2) + "\n",
+        JSON.stringify({ ...manifest, dependencies, devDependencies, scripts }, null, 2) + "\n",
       ),
     catch: () =>
       new TutorialFailure({

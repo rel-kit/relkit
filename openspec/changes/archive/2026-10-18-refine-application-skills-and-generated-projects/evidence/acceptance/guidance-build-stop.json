@@ -1,0 +1,4 @@
+{
+  "ownedProcessGroup": 20764,
+  "reason": "Next attempted an implicit Yarn install for a missing fixture type dependency; stop and link the existing local type package instead."
+}

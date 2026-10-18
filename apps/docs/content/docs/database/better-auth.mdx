@@ -63,9 +63,10 @@ export DATABASE_PATH=./data-model.sqlite
 bun --bun drizzle-kit generate --name=better-auth
 ```
 
-Review and test the generated change, then run `bun --bun drizzle-kit migrate` before enabling the auth
+Review and test the generated change, then run `bun run relkit db migrate` before enabling the auth
 service. A table export registers a model; it does not create or update the physical table. Adding
 Better Auth does not cause RELKIT to generate or apply migrations automatically.
+Keep auth and business-table SQL/metadata together in the database service's tracked migration history.
 
 Auth plugins and additional fields can require further tables, columns, and indexes. Keep the Better
 Auth configuration, Drizzle definitions, and migrations aligned. If you use Better Auth's own schema

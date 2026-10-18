@@ -24,6 +24,13 @@ These examples use the local binary through `bun run relkit`. The installed CLI'
 
 Database `--dialect` and auth `--database-dialect` also accept `postgresql` and `mysql`. Auth's `--base-path` changes the default `/api/auth` mount. The CLI adds dependencies and an environment example as needed, but it does not apply database migrations or populate secrets. Follow the scaffold's reported next steps after reviewing the schema and environment values.
 
+Run `bun run db:generate`, review tracked SQL/metadata under the database service's
+`migrations` directory, then explicitly run `bun run db:migrate`. The latter uses
+installed `relkit db migrate`, defaulting to root `drizzle.config.ts`; select another
+with `bun run relkit db migrate --config <path>`. Configuration owns the target,
+history and supported log settings; relative paths use the app root. No copied
+runner is needed. See [database tooling](data-apis.md) for environment and failure behavior.
+
 ## Other add kinds
 
 Run `bun run relkit add <kind> --help` for each kind's flags and requirements:

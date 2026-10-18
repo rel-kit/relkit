@@ -1,0 +1,151 @@
+--- before/playwright.config.ts
++++ app/playwright.config.ts
+@@ -0,0 +1,18 @@
++import { defineConfig } from "@playwright/test";
++
++export default defineConfig({
++  testDir: "./tests/browser",
++  fullyParallel: false,
++  workers: 1,
++  timeout: 30_000,
++  expect: { timeout: 10_000 },
++  outputDir: ".relkit/browser-test-results",
++  use: {
++    baseURL: process.env.FULLSTACK_BASE_URL ?? "http://127.0.0.1:3001",
++    headless: true,
++    viewport: { width: 1280, height: 800 },
++    reducedMotion: "reduce",
++    screenshot: "only-on-failure",
++    trace: "off",
++  },
++});
+--- before/src/services/hello/functions/hello.function.ts
++++ app/src/services/hello/functions/hello.function.ts
+@@ -3,7 +3,9 @@
+ 
+ export default defineFunction({
+   id: "hello.greet",
+-  input: z.object({ name: z.string().min(1).default("world") }),
++  input: z.object({
++    name: z.string().min(1).max(80).refine((value) => value.trim().length > 0, "Enter a name").default("world"),
++  }),
+   output: z.object({ message: z.string() }),
+   handler: async ({ name }) => ({ message: `Hello, ${name}!` }),
+ });
+--- before/tests/browser/greeting.spec.ts
++++ app/tests/browser/greeting.spec.ts
+@@ -0,0 +1,35 @@
++import { expect, test } from "@playwright/test";
++
++const apiOrigin = new URL(process.env.RELKIT_API_URL ?? "http://127.0.0.1:3000").origin;
++
++test("name form updates via backend while preserving fullstack content and wrapper", async ({ page }) => {
++  await page.goto("/");
++  await expect(page.getByRole("link", { name: "Existing workspace" })).toBeVisible();
++  await expect(page.getByText("Existing fullstack wrapper")).toBeVisible();
++  await expect(page.getByRole("heading", { name: "Existing information" })).toBeVisible();
++  await expect(page.getByRole("heading", { name: "Hello, Relkit!", exact: true })).toBeVisible();
++  const name = page.getByLabel("Name", { exact: true });
++  const submit = page.getByRole("button", { name: "Update greeting" });
++  await name.fill("Ada");
++  const backendResponse = page.waitForResponse(async (response) => {
++    if (new URL(response.url()).origin !== apiOrigin || !response.ok()) return false;
++    return (await response.text()).includes("Hello, Ada!");
++  });
++  await name.press("Enter");
++  await backendResponse;
++  await expect(page.getByRole("heading", { name: "Hello, Ada!", exact: true })).toBeVisible();
++  await name.fill("   ");
++  await expect(submit).toBeDisabled();
++  await expect(page.getByRole("heading", { name: "Hello, Ada!", exact: true })).toBeVisible();
++  await name.fill("Grace");
++  await page.route(apiOrigin + "/**", (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Test-owned unavailable backend" }) }));
++  await submit.click();
++  await expect(page.getByRole("alert")).toHaveText("Greeting could not load. Try updating it again.");
++  await page.unroute(apiOrigin + "/**");
++  await submit.click();
++  await expect(page.getByRole("heading", { name: "Hello, Grace!", exact: true })).toBeVisible();
++  await page.setViewportSize({ width: 375, height: 812 });
++  await expect(name).toBeVisible();
++  await expect(submit).toBeVisible();
++  await expect(page.getByText("This page belongs to the selected fullstack application.")).toBeVisible();
++});
+--- before/tests/integration/greeting.test.ts
++++ app/tests/integration/greeting.test.ts
+@@ -0,0 +1,21 @@
++import { expect, test } from "bun:test";
++import { resolve } from "node:path";
++import { createTestApplication } from "@relkit/testing";
++import config from "../../relkit.config.js";
++
++test("greeting HTTP route maps the submitted name and rejects invalid names", async () => {
++  const app = await createTestApplication(config, { projectRoot: resolve(import.meta.dir, "../.."), resourceProviders: "fake" });
++  try {
++    const response = await app.http.request("/hello?name=Ada");
++    expect(response.status).toBe(200);
++    expect(await response.json()).toEqual({ message: "Hello, Ada!" });
++    const defaultName = await app.http.request("/hello");
++    expect(defaultName.status).toBe(200);
++    expect(await defaultName.json()).toEqual({ message: "Hello, world!" });
++    for (const name of ["", "   ", "x".repeat(81)]) {
++      const invalid = await app.http.request("/hello?name=" + encodeURIComponent(name));
++      expect(invalid.status).toBe(422);
++      await invalid.text();
++    }
++  } finally { await app.close(); }
++}, 15_000);
+--- before/web/app/page.tsx
++++ app/web/app/page.tsx
+@@ -1,13 +1,50 @@
+ "use client";
+ 
+ import { useRoute } from "@relkit/client/react";
++import { useState, type FormEvent } from "react";
+ 
+ export default function Page() {
+-  const greeting = useRoute("route.get.hello", { input: { name: "Relkit" } });
++  const [draft, setDraft] = useState("Relkit");
++  const [name, setName] = useState("Relkit");
++  const greeting = useRoute("route.get.hello", { input: { name }, retry: false });
++  const validName = draft.trim().length > 0 && draft.trim().length <= 80;
++
++  function updateGreeting(event: FormEvent<HTMLFormElement>) {
++    event.preventDefault();
++    if (!validName || greeting.isFetching) return;
++    const submitted = draft.trim();
++    setDraft(submitted);
++    if (submitted === name) void greeting.refetch();
++    else setName(submitted);
++  }
+ 
+   return (
+     <main>
+-      <h1>{greeting.data?.message ?? "Loading greeting…"}</h1>
++      <h1 aria-live="polite">{greeting.data?.message ?? "Loading greeting…"}</h1>
++      <section aria-label="Greeting" aria-busy={greeting.isFetching}>
++        <form onSubmit={updateGreeting}>
++          <label htmlFor="greeting-name">Name</label>
++          <input
++            id="greeting-name"
++            name="name"
++            autoComplete="given-name"
++            value={draft}
++            onChange={(event) => setDraft(event.target.value)}
++            required
++            minLength={1}
++            maxLength={80}
++            aria-describedby="greeting-name-hint"
++          />
++          <p id="greeting-name-hint">Use 1 to 80 characters. Spaces alone are invalid.</p>
++          <button type="submit" disabled={!validName || greeting.isFetching}>
++            Update greeting
++          </button>
++        </form>
++        {greeting.isFetching ? <p role="status">Updating greeting…</p> : null}
++        {greeting.error ? (
++          <p role="alert">Greeting could not load. Try updating it again.</p>
++        ) : null}
++      </section>
+       <section aria-labelledby="existing-information">
+         <h2 id="existing-information">Existing information</h2>
+         <p>This page belongs to the selected fullstack application.</p>

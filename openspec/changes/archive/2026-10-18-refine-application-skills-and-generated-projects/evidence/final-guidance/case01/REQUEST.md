@@ -1,0 +1,1 @@
+Extend a RELKIT application with existing SQLite database and Better Auth: add separate current-user and orders backend operations, let signed-in users create/list their own orders, reject invalid order input, and prevent cross-user access.

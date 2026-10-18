@@ -1,0 +1,12 @@
+[
+  {
+    "pid": 72221,
+    "parent": 72213,
+    "command": "/Users/mustafaelsayed/.bun/bin/bun --smol install --network-concurrency 1 --registry http://127.0.0.1:53323"
+  },
+  {
+    "pid": 73435,
+    "parent": 73286,
+    "command": "/Users/mustafaelsayed/.bun/bin/bun --smol install --network-concurrency 1 --registry http://127.0.0.1:53587"
+  }
+]

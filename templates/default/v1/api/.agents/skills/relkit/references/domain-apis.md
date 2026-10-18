@@ -31,6 +31,8 @@ export default defineService({ functions: { greet } });
 
 The service also accepts `events`, `tasks`, and `jobs` maps. Its members appear directly as `service.greet`; there is no `service.functions.greet` namespace. Membership makes a function available across domains, but does not create an HTTP route or grant authorization.
 
+Each `service.ts` constructs and exports exactly one runtime service value. Keep ordinary helpers and error descriptors inside their owning domain; expose callable operations through the service's `functions` map. Do not re-export helpers or descriptors from a specialized database or auth `service.ts`.
+
 Within a domain, import a sibling function directly. Across domains and from routes, import the other domain's `service.ts`. Invoke a function descriptor with `await service.greet.invoke(input)`; do not call its handler directly. Leave an internal function out of the service map. Tools, agents, caches, buckets, and event-only functions are not service members.
 
 ## `defineEvent` and `defineEventFunction`
@@ -89,4 +91,21 @@ export default defineError({
 });
 ```
 
-Declare only expected failures callers should handle on a function. Use the route layer for HTTP-specific request mapping and middleware.
+Declare only expected failures callers should handle on a function. Return each declared error through the public `fail` helper so it appears in the inferred handler result; throwing a declared error from an ordinary helper does not satisfy that contract. Use the route layer for HTTP-specific request mapping and middleware.
+
+```ts
+import { defineFunction, fail } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+import AuthenticationRequired from "../errors/authentication-required.error.js";
+
+export default defineFunction({
+  input: z.object({}),
+  output: z.object({ id: z.string() }),
+  errors: [AuthenticationRequired],
+  handler: async (_input, context) => {
+    const session = await context.auth.getSession();
+    if (session === null) return fail(AuthenticationRequired, {});
+    return { id: session.user.id };
+  },
+});
+```

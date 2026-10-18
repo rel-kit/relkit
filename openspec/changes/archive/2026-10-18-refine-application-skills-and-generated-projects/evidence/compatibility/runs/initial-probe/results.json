@@ -1,0 +1,758 @@
+{
+  "commands": [
+    {
+      "label": "baseline-install",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "args": [
+        "bun",
+        "install",
+        "--ignore-scripts",
+        "--network-concurrency",
+        "1"
+      ],
+      "pid": 94489,
+      "exit": 0,
+      "log": "baseline-install.log"
+    },
+    {
+      "label": "baseline-frozen",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "args": [
+        "bun",
+        "install",
+        "--frozen-lockfile",
+        "--ignore-scripts",
+        "--network-concurrency",
+        "1"
+      ],
+      "pid": 94530,
+      "exit": 0,
+      "log": "baseline-frozen.log"
+    },
+    {
+      "label": "baseline-types",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.json",
+        "--pretty",
+        "false"
+      ],
+      "pid": 94531,
+      "exit": 2,
+      "log": "baseline-types.log"
+    },
+    {
+      "label": "baseline-generate",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "args": [
+        "bun",
+        "--bun",
+        "node_modules/drizzle-kit/bin.cjs",
+        "generate",
+        "--name",
+        "initial"
+      ],
+      "pid": 94622,
+      "exit": 0,
+      "log": "baseline-generate.log"
+    },
+    {
+      "label": "baseline-apply",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "args": [
+        "bun",
+        "migrate.ts",
+        "app.sqlite",
+        "--seed"
+      ],
+      "pid": 94645,
+      "exit": 0,
+      "log": "baseline-apply.log"
+    },
+    {
+      "label": "baseline-noop",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "args": [
+        "bun",
+        "migrate.ts",
+        "app.sqlite"
+      ],
+      "pid": 94650,
+      "exit": 0,
+      "log": "baseline-noop.log"
+    },
+    {
+      "label": "current-unpatched-install",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
+      "args": [
+        "bun",
+        "install",
+        "--ignore-scripts",
+        "--network-concurrency",
+        "1"
+      ],
+      "pid": 94711,
+      "exit": 0,
+      "log": "current-unpatched-install.log"
+    },
+    {
+      "label": "current-unpatched-frozen",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
+      "args": [
+        "bun",
+        "install",
+        "--frozen-lockfile",
+        "--ignore-scripts",
+        "--network-concurrency",
+        "1"
+      ],
+      "pid": 94724,
+      "exit": 0,
+      "log": "current-unpatched-frozen.log"
+    },
+    {
+      "label": "current-unpatched-types",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.json",
+        "--pretty",
+        "false"
+      ],
+      "pid": 94726,
+      "exit": 2,
+      "log": "current-unpatched-types.log"
+    },
+    {
+      "label": "current-unpatched-baseline-history",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
+      "args": [
+        "bun",
+        "migrate.ts",
+        "app.sqlite"
+      ],
+      "pid": 94811,
+      "exit": 0,
+      "log": "current-unpatched-baseline-history.log"
+    },
+    {
+      "label": "rc5-install",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "args": [
+        "bun",
+        "install",
+        "--ignore-scripts",
+        "--network-concurrency",
+        "1"
+      ],
+      "pid": 94892,
+      "exit": 0,
+      "log": "rc5-install.log"
+    },
+    {
+      "label": "rc5-frozen",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "args": [
+        "bun",
+        "install",
+        "--frozen-lockfile",
+        "--ignore-scripts",
+        "--network-concurrency",
+        "1"
+      ],
+      "pid": 94995,
+      "exit": 0,
+      "log": "rc5-frozen.log"
+    },
+    {
+      "label": "rc5-types",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.json",
+        "--pretty",
+        "false"
+      ],
+      "pid": 94997,
+      "exit": -6,
+      "log": "rc5-types.log"
+    },
+    {
+      "label": "rc5-baseline-history",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "args": [
+        "bun",
+        "migrate.ts",
+        "app.sqlite"
+      ],
+      "pid": 95127,
+      "exit": 0,
+      "log": "rc5-baseline-history.log"
+    },
+    {
+      "label": "rc5-generate-next",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "args": [
+        "bun",
+        "--bun",
+        "node_modules/drizzle-kit/bin.cjs",
+        "generate",
+        "--name",
+        "next"
+      ],
+      "pid": 95132,
+      "exit": 0,
+      "log": "rc5-generate-next.log"
+    },
+    {
+      "label": "rc5-apply-next",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "args": [
+        "bun",
+        "migrate.ts",
+        "app.sqlite"
+      ],
+      "pid": 95152,
+      "exit": 0,
+      "log": "rc5-apply-next.log"
+    },
+    {
+      "label": "rc5-next-noop",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "args": [
+        "bun",
+        "migrate.ts",
+        "app.sqlite"
+      ],
+      "pid": 95155,
+      "exit": 0,
+      "log": "rc5-next-noop.log"
+    },
+    {
+      "label": "rc5-fresh",
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "args": [
+        "bun",
+        "migrate.ts",
+        "fresh.sqlite"
+      ],
+      "pid": 95157,
+      "exit": 0,
+      "log": "rc5-fresh.log"
+    }
+  ],
+  "fixtures": {
+    "baseline": {
+      "manifest": {
+        "name": "baseline",
+        "private": true,
+        "type": "module",
+        "dependencies": {
+          "effect": "4.0.1",
+          "@effect/sql-pg": "4.0.1",
+          "typescript": "5.9.3",
+          "@types/bun": "1.3.10",
+          "drizzle-orm": "1.0.0-rc.5-169397b",
+          "drizzle-kit": "1.0.0-rc.5-ab785fc"
+        },
+        "patchedDependencies": {
+          "drizzle-orm@1.0.0-rc.5-169397b": "repair.patch"
+        }
+      },
+      "packages": {
+        "effect": {
+          "version": "4.0.1",
+          "dist": {
+            "shasum": "823e6870716e77902666874a24834ec7cdda50d8",
+            "tarball": "https://registry.npmjs.org/effect/-/effect-4.0.1.tgz",
+            "fileCount": 2561,
+            "integrity": "sha512-b1VlQG9g8fwxE5QnIZuPoOP/0MsqHJSRKxUijjoM80E5q95FXrX5yWtY5XI8G+GJsBQAVSDbLS458z9a++uVvw==",
+            "signatures": [
+              {
+                "sig": "MEUCIEwQPqEKmOEgjphN8hX7+6spzrPkFw30Beswk1uNoCsfAiEA9uZ/Tecb6oxWLaND7nq4ZPCEsi9CpZA2shZR1lbuoOE=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEUCIAmSxVVwhixsCXdrb9mIaxu4ZFZEenMsKI+/923BVjYOAiEA/+CXSpfXB8wvBRoMMMimnS/mOZfRQGQDSiZsXjINZFw=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/effect@4.0.1",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 49597078
+          }
+        },
+        "@effect/sql-pg": {
+          "version": "4.0.1",
+          "dist": {
+            "shasum": "bb1fd26ded4460343f16e17ae989166b7edd58de",
+            "tarball": "https://registry.npmjs.org/@effect/sql-pg/-/sql-pg-4.0.1.tgz",
+            "fileCount": 136,
+            "integrity": "sha512-X5aqOxHNWqVXL+vyTQZLYDip65lm5rrZHuNkWyyr672iup1tjYAs5Dn9tHR5h1t0blpJ57j8Ng5G5AUQ8teIqA==",
+            "signatures": [
+              {
+                "sig": "MEUCICky9sk18zH4dyQumt4xDxT2jrJppj0rpMYia5iFIYQTAiEAqiDvFNGetX88sFgH0+kpHI+5xY3+eR3ZpZElRsNQ5pY=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEQCICfWsUQhc63a2mHShwAj7VKv3+yVEVu97WKOjUZiPTLiAiAyF0dt8S2zeBZKlWsOTwHlhqQffM8E9JH+VQ6293Sjuw==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/@effect%2fsql-pg@4.0.1",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 881413
+          }
+        },
+        "typescript": {
+          "version": "5.9.3",
+          "dist": {
+            "shasum": "5b4f59e15310ab17a216f5d6cf53ee476ede670f",
+            "tarball": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+            "fileCount": 132,
+            "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+            "signatures": [
+              {
+                "sig": "MEYCIQC5ifNi1il+zAZC19ov+Q5oSrhOwlpOpghAaAAXYA0RpAIhAKdcZ6pMNZGuprpke8Zi3OPB1zol9c88KVW+apJNVjTy",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 23625066
+          }
+        },
+        "@types/bun": {
+          "version": "1.3.10",
+          "dist": {
+            "shasum": "9d05bd654a55e2d780469ae407eaf5bb957e19c5",
+            "tarball": "https://registry.npmjs.org/@types/bun/-/bun-1.3.10.tgz",
+            "fileCount": 5,
+            "integrity": "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDuGbuVUe1emiI3zFR4sYbw+mLHwQ2ITU6cfAl5uRFjcgIgCY+Ng9uDWN892Ju6Maso5jGoQ3yW/U7j+eA1k8fnUZo=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 3648
+          }
+        },
+        "drizzle-orm": {
+          "version": "1.0.0-rc.5-169397b",
+          "dist": {
+            "shasum": "cf66c2641dcdf1649e8874874115e60ae2f9eefc",
+            "tarball": "https://registry.npmjs.org/drizzle-orm/-/drizzle-orm-1.0.0-rc.5-169397b.tgz",
+            "fileCount": 4715,
+            "integrity": "sha512-xf5TudQhFplMMzjwgmMY5f64Sqbv4iwXxdTHBHqvLMt+SHyY8rAYhzNLQchEkDxiqMclTS/txPEOg5pdQy0Tcw==",
+            "signatures": [
+              {
+                "sig": "MEYCIQCHWtqsYPhiKNKwV8a+nT9ZzzNsRaZu6br3oX7AIhjdeQIhAKit+jYMzSjOBySuzAETgWmffe+/H31P4LnIpT87SdFD",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEYCIQDCHQtz4jAvMBLBsAAgTM06+pEJyWnpcmNZCBTIIyxySgIhAKINASxQughI5tDlaXHr8IiI6lUI0Wt0/udfQKNN3DQ0",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/drizzle-orm@1.0.0-rc.5-169397b",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 16596695
+          }
+        },
+        "drizzle-kit": {
+          "version": "1.0.0-rc.5-ab785fc",
+          "dist": {
+            "shasum": "cbdac5984d98fbae2713978f8b5d4702798ea10b",
+            "tarball": "https://registry.npmjs.org/drizzle-kit/-/drizzle-kit-1.0.0-rc.5-ab785fc.tgz",
+            "fileCount": 75,
+            "integrity": "sha512-TSg7sK1finOxdo48O9mDfyMY3lhi/aHCVIil5TFhthyq/H/89H/3nwX5V9Gdp7HYMUGFHyWJD5iowSn98l0elw==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDP1adi22dtrlRGyPAjB8RJqZXlDfCSk2O7K4oZlD+aNAIgRoCoCxdXsYvIvVWlWiJa0sQdT1xn1/DWG/Zd/3nu8qk=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEYCIQDjZYC2jRWh5Pjx9VxRn+X06KIogw9nYaPpfdj9U/d8agIhAMJvKpKYyjELrDezk/fEV89ILQ7WgW7qB2TwVFu3AJ19",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/drizzle-kit@1.0.0-rc.5-ab785fc",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 99981969
+          }
+        }
+      }
+    },
+    "current-unpatched": {
+      "manifest": {
+        "name": "current-unpatched",
+        "private": true,
+        "type": "module",
+        "dependencies": {
+          "effect": "4.0.1",
+          "@effect/sql-pg": "4.0.1",
+          "typescript": "5.9.3",
+          "@types/bun": "1.3.10",
+          "drizzle-orm": "1.0.0-rc.5-169397b",
+          "drizzle-kit": "1.0.0-rc.5-ab785fc"
+        }
+      },
+      "packages": {
+        "effect": {
+          "version": "4.0.1",
+          "dist": {
+            "shasum": "823e6870716e77902666874a24834ec7cdda50d8",
+            "tarball": "https://registry.npmjs.org/effect/-/effect-4.0.1.tgz",
+            "fileCount": 2561,
+            "integrity": "sha512-b1VlQG9g8fwxE5QnIZuPoOP/0MsqHJSRKxUijjoM80E5q95FXrX5yWtY5XI8G+GJsBQAVSDbLS458z9a++uVvw==",
+            "signatures": [
+              {
+                "sig": "MEUCIEwQPqEKmOEgjphN8hX7+6spzrPkFw30Beswk1uNoCsfAiEA9uZ/Tecb6oxWLaND7nq4ZPCEsi9CpZA2shZR1lbuoOE=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEUCIAmSxVVwhixsCXdrb9mIaxu4ZFZEenMsKI+/923BVjYOAiEA/+CXSpfXB8wvBRoMMMimnS/mOZfRQGQDSiZsXjINZFw=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/effect@4.0.1",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 49597078
+          }
+        },
+        "@effect/sql-pg": {
+          "version": "4.0.1",
+          "dist": {
+            "shasum": "bb1fd26ded4460343f16e17ae989166b7edd58de",
+            "tarball": "https://registry.npmjs.org/@effect/sql-pg/-/sql-pg-4.0.1.tgz",
+            "fileCount": 136,
+            "integrity": "sha512-X5aqOxHNWqVXL+vyTQZLYDip65lm5rrZHuNkWyyr672iup1tjYAs5Dn9tHR5h1t0blpJ57j8Ng5G5AUQ8teIqA==",
+            "signatures": [
+              {
+                "sig": "MEUCICky9sk18zH4dyQumt4xDxT2jrJppj0rpMYia5iFIYQTAiEAqiDvFNGetX88sFgH0+kpHI+5xY3+eR3ZpZElRsNQ5pY=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEQCICfWsUQhc63a2mHShwAj7VKv3+yVEVu97WKOjUZiPTLiAiAyF0dt8S2zeBZKlWsOTwHlhqQffM8E9JH+VQ6293Sjuw==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/@effect%2fsql-pg@4.0.1",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 881413
+          }
+        },
+        "typescript": {
+          "version": "5.9.3",
+          "dist": {
+            "shasum": "5b4f59e15310ab17a216f5d6cf53ee476ede670f",
+            "tarball": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+            "fileCount": 132,
+            "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+            "signatures": [
+              {
+                "sig": "MEYCIQC5ifNi1il+zAZC19ov+Q5oSrhOwlpOpghAaAAXYA0RpAIhAKdcZ6pMNZGuprpke8Zi3OPB1zol9c88KVW+apJNVjTy",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 23625066
+          }
+        },
+        "@types/bun": {
+          "version": "1.3.10",
+          "dist": {
+            "shasum": "9d05bd654a55e2d780469ae407eaf5bb957e19c5",
+            "tarball": "https://registry.npmjs.org/@types/bun/-/bun-1.3.10.tgz",
+            "fileCount": 5,
+            "integrity": "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDuGbuVUe1emiI3zFR4sYbw+mLHwQ2ITU6cfAl5uRFjcgIgCY+Ng9uDWN892Ju6Maso5jGoQ3yW/U7j+eA1k8fnUZo=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 3648
+          }
+        },
+        "drizzle-orm": {
+          "version": "1.0.0-rc.5-169397b",
+          "dist": {
+            "shasum": "cf66c2641dcdf1649e8874874115e60ae2f9eefc",
+            "tarball": "https://registry.npmjs.org/drizzle-orm/-/drizzle-orm-1.0.0-rc.5-169397b.tgz",
+            "fileCount": 4715,
+            "integrity": "sha512-xf5TudQhFplMMzjwgmMY5f64Sqbv4iwXxdTHBHqvLMt+SHyY8rAYhzNLQchEkDxiqMclTS/txPEOg5pdQy0Tcw==",
+            "signatures": [
+              {
+                "sig": "MEYCIQCHWtqsYPhiKNKwV8a+nT9ZzzNsRaZu6br3oX7AIhjdeQIhAKit+jYMzSjOBySuzAETgWmffe+/H31P4LnIpT87SdFD",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEYCIQDCHQtz4jAvMBLBsAAgTM06+pEJyWnpcmNZCBTIIyxySgIhAKINASxQughI5tDlaXHr8IiI6lUI0Wt0/udfQKNN3DQ0",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/drizzle-orm@1.0.0-rc.5-169397b",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 16596695
+          }
+        },
+        "drizzle-kit": {
+          "version": "1.0.0-rc.5-ab785fc",
+          "dist": {
+            "shasum": "cbdac5984d98fbae2713978f8b5d4702798ea10b",
+            "tarball": "https://registry.npmjs.org/drizzle-kit/-/drizzle-kit-1.0.0-rc.5-ab785fc.tgz",
+            "fileCount": 75,
+            "integrity": "sha512-TSg7sK1finOxdo48O9mDfyMY3lhi/aHCVIil5TFhthyq/H/89H/3nwX5V9Gdp7HYMUGFHyWJD5iowSn98l0elw==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDP1adi22dtrlRGyPAjB8RJqZXlDfCSk2O7K4oZlD+aNAIgRoCoCxdXsYvIvVWlWiJa0sQdT1xn1/DWG/Zd/3nu8qk=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEYCIQDjZYC2jRWh5Pjx9VxRn+X06KIogw9nYaPpfdj9U/d8agIhAMJvKpKYyjELrDezk/fEV89ILQ7WgW7qB2TwVFu3AJ19",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/drizzle-kit@1.0.0-rc.5-ab785fc",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 99981969
+          }
+        }
+      },
+      "historyUnchanged": true
+    },
+    "rc5": {
+      "manifest": {
+        "name": "rc5",
+        "private": true,
+        "type": "module",
+        "dependencies": {
+          "effect": "4.0.1",
+          "@effect/sql-pg": "4.0.1",
+          "typescript": "5.9.3",
+          "@types/bun": "1.3.10",
+          "drizzle-orm": "1.0.0-rc.5-5935859",
+          "drizzle-kit": "1.0.0-rc.5-5935859"
+        }
+      },
+      "packages": {
+        "effect": {
+          "version": "4.0.1",
+          "dist": {
+            "shasum": "823e6870716e77902666874a24834ec7cdda50d8",
+            "tarball": "https://registry.npmjs.org/effect/-/effect-4.0.1.tgz",
+            "fileCount": 2561,
+            "integrity": "sha512-b1VlQG9g8fwxE5QnIZuPoOP/0MsqHJSRKxUijjoM80E5q95FXrX5yWtY5XI8G+GJsBQAVSDbLS458z9a++uVvw==",
+            "signatures": [
+              {
+                "sig": "MEUCIEwQPqEKmOEgjphN8hX7+6spzrPkFw30Beswk1uNoCsfAiEA9uZ/Tecb6oxWLaND7nq4ZPCEsi9CpZA2shZR1lbuoOE=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEUCIAmSxVVwhixsCXdrb9mIaxu4ZFZEenMsKI+/923BVjYOAiEA/+CXSpfXB8wvBRoMMMimnS/mOZfRQGQDSiZsXjINZFw=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/effect@4.0.1",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 49597078
+          }
+        },
+        "@effect/sql-pg": {
+          "version": "4.0.1",
+          "dist": {
+            "shasum": "bb1fd26ded4460343f16e17ae989166b7edd58de",
+            "tarball": "https://registry.npmjs.org/@effect/sql-pg/-/sql-pg-4.0.1.tgz",
+            "fileCount": 136,
+            "integrity": "sha512-X5aqOxHNWqVXL+vyTQZLYDip65lm5rrZHuNkWyyr672iup1tjYAs5Dn9tHR5h1t0blpJ57j8Ng5G5AUQ8teIqA==",
+            "signatures": [
+              {
+                "sig": "MEUCICky9sk18zH4dyQumt4xDxT2jrJppj0rpMYia5iFIYQTAiEAqiDvFNGetX88sFgH0+kpHI+5xY3+eR3ZpZElRsNQ5pY=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEQCICfWsUQhc63a2mHShwAj7VKv3+yVEVu97WKOjUZiPTLiAiAyF0dt8S2zeBZKlWsOTwHlhqQffM8E9JH+VQ6293Sjuw==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/@effect%2fsql-pg@4.0.1",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 881413
+          }
+        },
+        "typescript": {
+          "version": "5.9.3",
+          "dist": {
+            "shasum": "5b4f59e15310ab17a216f5d6cf53ee476ede670f",
+            "tarball": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+            "fileCount": 132,
+            "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+            "signatures": [
+              {
+                "sig": "MEYCIQC5ifNi1il+zAZC19ov+Q5oSrhOwlpOpghAaAAXYA0RpAIhAKdcZ6pMNZGuprpke8Zi3OPB1zol9c88KVW+apJNVjTy",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 23625066
+          }
+        },
+        "@types/bun": {
+          "version": "1.3.10",
+          "dist": {
+            "shasum": "9d05bd654a55e2d780469ae407eaf5bb957e19c5",
+            "tarball": "https://registry.npmjs.org/@types/bun/-/bun-1.3.10.tgz",
+            "fileCount": 5,
+            "integrity": "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDuGbuVUe1emiI3zFR4sYbw+mLHwQ2ITU6cfAl5uRFjcgIgCY+Ng9uDWN892Ju6Maso5jGoQ3yW/U7j+eA1k8fnUZo=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 3648
+          }
+        },
+        "drizzle-orm": {
+          "version": "1.0.0-rc.5-5935859",
+          "dist": {
+            "shasum": "671af2151e5e59623d6e39c0f61ac3ae39004eda",
+            "tarball": "https://registry.npmjs.org/drizzle-orm/-/drizzle-orm-1.0.0-rc.5-5935859.tgz",
+            "fileCount": 4876,
+            "integrity": "sha512-PkVjyxhamD7IOVfpDMn3BmV9afyvj3eeLvIPind3NmPv+cfv6/jh6GN0fHP0zzgrprGx/jGE4mkE0ttRFlzHwA==",
+            "signatures": [
+              {
+                "sig": "MEYCIQDCO5NQ/wlqd8N6cpOkVM4rI65TDRszQy6CR1j9CmWw2wIhAIhAuF8ijuO9J3hEjhh/2Pe/k8j4owc3D7g0++oykgcw",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEUCIQCcq4i8eoeL5I252FA1de2SUzIy6iV2RDGBm4S1yGV15AIgZS0BRRkqJ9io82ct/UU5Yp2fOtuFlfd0U7RSZ7VREaE=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/drizzle-orm@1.0.0-rc.5-5935859",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 17424200
+          }
+        },
+        "drizzle-kit": {
+          "version": "1.0.0-rc.5-5935859",
+          "dist": {
+            "shasum": "7d41b43bbbcfae10409de7328c3de49773a41986",
+            "tarball": "https://registry.npmjs.org/drizzle-kit/-/drizzle-kit-1.0.0-rc.5-5935859.tgz",
+            "fileCount": 75,
+            "integrity": "sha512-p//MvJbSeDFxa3pODv0ebNVJmk/5aAHHaCyQTtDGFlCYX4e7eY9rrSX/liBJ7098Ei9WUi9VT65JQkSFDuG1ng==",
+            "signatures": [
+              {
+                "sig": "MEYCIQCAY3EqG0xTSSYjC3jDVNSKeSkQvxFVRi4TxDA6ItBN+AIhAN+5gzAPRl/O9ADftGQSBGo+Pzv2MQJHd5e21VCv+XiW",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEQCIGyFf+s1SY9UtgPBTm8J5zWg22JFOGskUY70AAPtkUTmAiA25KyVvbDj9T3FcnpNSKIi40Qlqa4h99Hx/6HKPOyi7g==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "attestations": {
+              "url": "https://registry.npmjs.org/-/npm/v1/attestations/drizzle-kit@1.0.0-rc.5-5935859",
+              "provenance": {
+                "predicateType": "https://slsa.dev/provenance/v1"
+              }
+            },
+            "unpackedSize": 100262330
+          }
+        }
+      },
+      "historyUnchanged": true
+    }
+  },
+  "cleanup": false,
+  "baseline": {
+    "historyHashes": {
+      "20261018134125_initial/migration.sql": "b704819abb4374015925c1a4bfd588a343de19fc2173b6983f063aac23d3d2eb",
+      "20261018134125_initial/snapshot.json": "3130dd073a9e8d364cb0047f1f84737397a23df69937a18d17e43515c2b3cd92"
+    },
+    "state": {
+      "schema": [
+        {
+          "name": "__drizzle_migrations",
+          "sql": "CREATE TABLE \"__drizzle_migrations\" (\n\t\t\t\tid INTEGER PRIMARY KEY,\n\t\t\t\thash text NOT NULL,\n\t\t\t\tcreated_at numeric,\n\t\t\t\tname text,\n\t\t\t\tapplied_at TEXT\n\t\t\t)"
+        },
+        {
+          "name": "items",
+          "sql": "CREATE TABLE `items` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT,\n\t`name` text NOT NULL\n)"
+        },
+        {
+          "name": "sqlite_sequence",
+          "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "preserved business row"
+        }
+      ],
+      "log": [
+        {
+          "id": 1,
+          "hash": "b704819abb4374015925c1a4bfd588a343de19fc2173b6983f063aac23d3d2eb",
+          "created_at": 1792330885000,
+          "name": "20261018134125_initial",
+          "applied_at": "2026-10-18T13:41:25.237Z"
+        }
+      ]
+    }
+  }
+}

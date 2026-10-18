@@ -1,0 +1,10 @@
+bun test v1.3.10 (30e609e0)
+
+tests/items.test.ts:
+(pass) GET item zero succeeds through Request/Response [0.33ms]
+(pass) existing, absent and malformed IDs retain their contracts [0.07ms]
+
+ 2 pass
+ 0 fail
+ 17 expect() calls
+Ran 2 tests across 1 file. [7.00ms]

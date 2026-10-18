@@ -5,6 +5,11 @@ work so maintainers can confirm scope and avoid duplicate effort.
 
 ## Development
 
+RELKIT is experimental, interfaces may change, and current consumers are the
+repository samples. Update affected samples directly within a scoped change;
+preserve data and applied migration history. Do not add legacy upgrade commands
+or compatibility layers merely to retain an experimental sample's old layout.
+
 Install Bun `1.3.10`, clone the repository, and run:
 
 ```sh

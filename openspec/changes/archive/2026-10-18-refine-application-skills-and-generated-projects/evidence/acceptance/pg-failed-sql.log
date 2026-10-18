@@ -1,0 +1,1 @@
+{"error":{"code":"RELKIT_DB_MIGRATE_FAILED","message":"Migration failed. Inspect the selected configuration and SQL; statements were not retried and rollback is not guaranteed."},"ok":false}

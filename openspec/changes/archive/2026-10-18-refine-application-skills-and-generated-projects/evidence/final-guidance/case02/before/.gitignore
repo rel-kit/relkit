@@ -1,0 +1,4 @@
+node_modules/
+.relkit/
+web/.next/
+.env

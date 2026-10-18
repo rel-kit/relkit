@@ -24,7 +24,11 @@ valid session. The HTML page exercises these flows without a frontend framework.
 `src/platform/browser-client.ts` is a separate RELKIT transport-header example:
 setting a bearer header does not enable server-side bearer authentication.
 
-Tables live in `src/services/database/schema/index.ts`. After changing them, run
-`bun run db:generate`, review the generated migration, and run `bun run db:migrate`
-against the explicitly selected database. Startup does not create tables. Tests
+Tables live in `src/services/database/schema/index.ts`; tracked SQL and metadata
+live beside it in `src/services/database/migrations`. Auth and business tables
+share that one ordered history. After changing them, run `bun run db:generate`,
+review the generated migration, and run `bun run db:migrate` against the explicitly
+selected database. That script uses installed `relkit db migrate` with root
+`drizzle.config.ts` (or an explicit `--config <path>`), without a copied runner.
+Preserve migration identifiers and applied logs. Startup does not create tables. Tests
 migrate a temporary database and clean it up; they never use your local database.

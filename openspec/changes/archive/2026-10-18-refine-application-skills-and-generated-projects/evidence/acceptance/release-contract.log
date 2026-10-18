@@ -1,0 +1,13 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/release-check.test.ts:
+(pass) the release certifies default creation using its actual tool identity [3.45ms]
+(pass) the release retains complete fresh certification for its actual tool identity [3.57ms]
+(pass) the release retains complete restart certification for its actual tool identity [0.44ms]
+(pass) accepts the unscoped CLI package and publishes its dependency first [9.93ms]
+(pass) tracked release notes exclude rebuild-dependent tarball hashes [0.38ms]
+
+ 5 pass
+ 0 fail
+ 13 expect() calls
+Ran 5 tests across 1 file. [280.00ms]

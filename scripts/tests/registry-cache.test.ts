@@ -31,7 +31,7 @@ for (const failure of ["network", "HTTP 503"] as const)
         true,
       );
       expect((await nativeFetch(path)).status).toBe(200);
-      expect(attempts).toBe(2);
+      expect(attempts).toBe(3);
     } finally {
       upstream.mockRestore();
       await server.stop(true);

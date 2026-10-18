@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, spyOn, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -53,6 +53,47 @@ test("smoke registry serves verified tarball metadata instead of workspace metad
       ),
     );
   } finally {
+    await server?.stop(true);
+    await rm(fixture, { recursive: true, force: true });
+  }
+});
+
+test("upstream proxy requests compact metadata and releases completed response bodies", async () => {
+  const fixture = await mkdtemp(join(tmpdir(), "relkit-packed-registry-memory-"));
+  const original = globalThis.fetch;
+  const accepts: Array<string | null> = [];
+  const proxy = spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+    if (String(input).startsWith("https://registry.npmjs.org/")) {
+      accepts.push(new Headers(init?.headers).get("accept"));
+      return Promise.resolve(Response.json({ name: "external", request: accepts.length }));
+    }
+    return original(input, init);
+  });
+  let server: Awaited<ReturnType<typeof startRegistry>> | undefined;
+  try {
+    server = await startRegistry(
+      fixture,
+      new Map(),
+      new Map([
+        [
+          "unpacked-candidate",
+          { directory: fixture, manifest: { name: "unpacked-candidate", version: "1.0.0" } },
+        ],
+      ]),
+    );
+    const url = `http://127.0.0.1:${server.port}/external`;
+    expect(await (await original(url)).json()).toMatchObject({ request: 1 });
+    expect(await (await original(url)).json()).toMatchObject({ request: 2 });
+    expect(accepts).toEqual([
+      "application/vnd.npm.install-v1+json",
+      "application/vnd.npm.install-v1+json",
+    ]);
+    const missing = await original(`http://127.0.0.1:${server.port}/unpacked-candidate`);
+    expect(missing.status).toBe(404);
+    await missing.arrayBuffer();
+    expect(accepts).toHaveLength(2);
+  } finally {
+    proxy.mockRestore();
     await server?.stop(true);
     await rm(fixture, { recursive: true, force: true });
   }

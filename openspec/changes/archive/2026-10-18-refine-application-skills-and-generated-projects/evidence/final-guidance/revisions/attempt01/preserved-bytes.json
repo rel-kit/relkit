@@ -1,0 +1,9 @@
+{
+  "auth_handler": true,
+  "database_singleton": true,
+  "auth_schema": true,
+  "drizzle_patch": true,
+  "fullstack_layout": true,
+  "client_wrapper": true,
+  "next_adapter": true
+}

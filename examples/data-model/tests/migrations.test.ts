@@ -39,7 +39,7 @@ test("applies the initial migration once and keeps rows on a second run", async 
         new Response(child.stderr).text(),
       ]);
       if (code !== 0) throw new Error(`Migration failed: ${stdout}\n${stderr}`);
-      expect(stdout).toContain("migrations applied successfully");
+      expect(stdout).toContain("Database migrations applied.");
       const sqlite = new Database(path);
       try {
         const database = drizzle({ client: sqlite });

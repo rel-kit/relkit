@@ -4,6 +4,7 @@
  * factories stay lazy and source rendering never opens a database client.
  */
 import type { DatabaseDialect } from "./add-types.js";
+import { dirname } from "node:path";
 
 /**
  * Renders database Service Source as source text without executing user modules.
@@ -82,34 +83,8 @@ if (${value} === undefined || ${value}.trim() === ""${invalid}) {
 export default defineConfig({
   schema: "./${schemaPath}",
   dialect: "${dialect}",
-  out: "./drizzle",
+  out: "./${dirname(dirname(schemaPath))}/migrations",
   dbCredentials: { url: ${value} },
 });
-`;
-}
-
-/** Renders the native Bun SQLite migration runner without loading a Node-only driver.
- * @returns Standalone, finite migration script using the installed Drizzle migrator.
- */
-export function sqliteMigrationSource(): string {
-  return `import { Database } from "bun:sqlite";
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-
-const path = process.env.DATABASE_PATH;
-if (!path?.trim() || path === ":memory:") {
-  throw new Error("Set DATABASE_PATH to a persistent SQLite file");
-}
-mkdirSync(dirname(path), { recursive: true });
-const client = new Database(path, { create: true });
-try {
-  client.exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
-  migrate(drizzle({ client }), { migrationsFolder: "./drizzle" });
-  console.log("SQLite migrations applied");
-} finally {
-  client.close();
-}
 `;
 }

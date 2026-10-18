@@ -1,0 +1,21 @@
+{
+  "measured": true,
+  "entry": {
+    "template": "minimal",
+    "cloud": "none",
+    "deploy": "none",
+    "examples": true,
+    "identity": {
+      "release": "0.7.7",
+      "bun": "1.3.10",
+      "typescript": "5.9.3",
+      "packageCatalogDigest": "ac7c2f56e61fca5ab890775cf4c483722cb590e488ee7fc4741224cbb4f50ccd",
+      "template": "default/v1/minimal",
+      "snapshotProtocol": 1
+    },
+    "templateDigest": "1ed32235af2ffe5f87210acffb3dabbe9e3c3bc2e40abbf912ad7517823e4b2c",
+    "freshEvidence": "docs/evidence/create-capabilities/0.7.7/fresh.json",
+    "restartEvidence": "docs/evidence/create-capabilities/0.7.7/restart.json"
+  },
+  "archivesRemoved": true
+}

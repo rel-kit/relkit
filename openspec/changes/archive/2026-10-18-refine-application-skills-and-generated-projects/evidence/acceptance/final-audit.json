@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "patch": "10ea188b9409dd19aac7bf27f4b12911ae4844c063362b9c2bd11d6a3d936374",
+  "templateDigest": "d9129d4de9f15273b80dc609311ad9ea298dbd1abc14b5e14e286910cf61a771",
+  "exactCertifiedArchives": 53,
+  "packedCommands": 49,
+  "distributedSkillFiles": 65,
+  "sources": {
+    "mysql-results.json": true,
+    "postgres-results.json": true,
+    "guidance-results.json": true,
+    "final-checks-results.json": true,
+    "final-skill-links.json": true
+  },
+  "timing": {
+    "fresh": {
+      "runs": 20,
+      "medianMs": 574.6285,
+      "p95Ms": 855.831542,
+      "maximumMs": 858.497125,
+      "passed": true,
+      "preparationPassed": true
+    },
+    "restart": {
+      "runs": 20,
+      "medianMs": 568.5200835,
+      "p95Ms": 766.621,
+      "maximumMs": 883.867625,
+      "passed": true,
+      "preparationPassed": true
+    }
+  },
+  "skillHashes": {
+    "SKILL.md": "b3e77a015b0431664f723543f2b5792dcd1f59936e05897f5517424dcff17180",
+    "references/realtime-apis.md": "31135cccb2eafcd271dff8f1470f8d70d48f1ff8eadc215df306cb79f8756cd1",
+    "references/config-environments.md": "79d2abc034cd15a8e3532933b2654c07b300e39df596a2d5ef88f2aa3edc7d5f",
+    "references/http-apis.md": "d151f8d2db3afd26ce0516795416db6aad28500e0483bd2cbd21e8dd86f9ad71",
+    "references/streaming-apis.md": "1d89fad9859b4bb24ee7d132fa6ee61e0b12804d2a1c7b72d0294b78da4a845f",
+    "references/cli.md": "cde6f71724e2761e8abc89ce6f38be118f4f81d9b7520a5f144916fc8ecbbbc4",
+    "references/observability-apis.md": "ac7a3dd23df45fdae83f3a78d61e7976fd3e84f2e5273af9fd1cd3d2c0d4e4c6",
+    "references/domain-apis.md": "02088f0c0ebec9dbcc15ae6acee8a14c504c6d27c194b45abad4c626d33c3135",
+    "references/data-apis.md": "888b02ea105daac3392a629ba19dfa0ef4d2da16a6400e1da84c68ec8ee22ef4",
+    "references/jobs-apis.md": "79f92b0d2dbca53a649d0c64c44c6acffcdb17cfd5e12acda53c9eac539c0bbf",
+    "references/testing-apis.md": "b0b432f1122c53421d00ccf6888eae61a6bbe82d5218a67c718129ead15b4b03",
+    "references/agent-apis.md": "56f45e9f1cf1cec27e1e2360b7269c801f269a0947726f94150f17f8d75e8771",
+    "references/layout-migration.md": "e96c6978fd83ccb297c58cbdfdfd05a713158c9400253a3ad9a4df437ecf225a"
+  }
+}

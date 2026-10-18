@@ -1,0 +1,524 @@
+{
+  "temporary": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7",
+  "commands": [
+    {
+      "label": "initdb",
+      "args": [
+        "initdb",
+        "-D",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/cluster",
+        "-U",
+        "relkit_acceptance",
+        "-A",
+        "trust",
+        "--no-locale",
+        "--encoding=UTF8",
+        "--no-sync"
+      ],
+      "beforePressure": 1,
+      "pid": 25926,
+      "exit": 0,
+      "seconds": 0.7755392089893576,
+      "afterPressure": 1
+    },
+    {
+      "label": "start",
+      "args": [
+        "pg_ctl",
+        "-D",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/cluster",
+        "-w",
+        "-t",
+        "10",
+        "-l",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/postgres.log",
+        "-o",
+        "-h 127.0.0.1 -p 52575 -k '' -c shared_buffers=8MB -c max_connections=5 -c autovacuum=off -c max_worker_processes=0 -c max_parallel_workers=0",
+        "start"
+      ],
+      "beforePressure": 1,
+      "pid": 25959,
+      "exit": 0,
+      "seconds": 0.16823929201927967,
+      "afterPressure": 1
+    },
+    {
+      "label": "generate-initial",
+      "args": [
+        "bun",
+        "--smol",
+        "--bun",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/node_modules/drizzle-kit/bin.cjs",
+        "generate",
+        "--config",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts",
+        "--name=initial"
+      ],
+      "beforePressure": 1,
+      "pid": 25978,
+      "exit": 0,
+      "seconds": 0.40011587500339374,
+      "afterPressure": 1
+    },
+    {
+      "label": "migrate-initial",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "beforePressure": 1,
+      "pid": 25995,
+      "exit": 0,
+      "seconds": 1.2618292499973904,
+      "afterPressure": 1
+    },
+    {
+      "label": "insert",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "INSERT INTO entries(value) VALUES ('business-row-survives');"
+      ],
+      "beforePressure": 1,
+      "pid": 26022,
+      "exit": 0,
+      "seconds": 0.15669324999907985,
+      "afterPressure": 1
+    },
+    {
+      "label": "log-before-repeat",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "SELECT coalesce(json_agg(t), '[]') FROM (SELECT * FROM acceptance_history.acceptance_log ORDER BY id) t;"
+      ],
+      "beforePressure": 1,
+      "pid": 26033,
+      "exit": 0,
+      "seconds": 0.062276040989672765,
+      "afterPressure": 1
+    },
+    {
+      "label": "repeat-initial",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "beforePressure": 1,
+      "pid": 26045,
+      "exit": 0,
+      "seconds": 1.2329117499757558,
+      "afterPressure": 1
+    },
+    {
+      "label": "log-after-repeat",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "SELECT coalesce(json_agg(t), '[]') FROM (SELECT * FROM acceptance_history.acceptance_log ORDER BY id) t;"
+      ],
+      "beforePressure": 1,
+      "pid": 26071,
+      "exit": 0,
+      "seconds": 0.05723241699161008,
+      "afterPressure": 1
+    },
+    {
+      "label": "generate-second",
+      "args": [
+        "bun",
+        "--smol",
+        "--bun",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/node_modules/drizzle-kit/bin.cjs",
+        "generate",
+        "--config",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts",
+        "--name=second"
+      ],
+      "beforePressure": 1,
+      "pid": 26084,
+      "exit": 0,
+      "seconds": 0.3387181250145659,
+      "afterPressure": 1
+    },
+    {
+      "label": "migrate-second",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "beforePressure": 1,
+      "pid": 26099,
+      "exit": 0,
+      "seconds": 1.2258928329974879,
+      "afterPressure": 1
+    },
+    {
+      "label": "log-second",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "SELECT coalesce(json_agg(t), '[]') FROM (SELECT * FROM acceptance_history.acceptance_log ORDER BY id) t;"
+      ],
+      "beforePressure": 1,
+      "pid": 26130,
+      "exit": 0,
+      "seconds": 0.05622008300269954,
+      "afterPressure": 1
+    },
+    {
+      "label": "business-rows",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "SELECT json_agg(t) FROM (SELECT value,note FROM entries ORDER BY id) t;"
+      ],
+      "beforePressure": 1,
+      "pid": 26137,
+      "exit": 0,
+      "seconds": 0.054860000003827736,
+      "afterPressure": 1
+    },
+    {
+      "label": "repeat-second",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "beforePressure": 1,
+      "pid": 26150,
+      "exit": 0,
+      "seconds": 1.2390181250229944,
+      "afterPressure": 1
+    },
+    {
+      "label": "log-repeat-second",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "SELECT coalesce(json_agg(t), '[]') FROM (SELECT * FROM acceptance_history.acceptance_log ORDER BY id) t;"
+      ],
+      "beforePressure": 1,
+      "pid": 26174,
+      "exit": 0,
+      "seconds": 0.05664337502093986,
+      "afterPressure": 1
+    },
+    {
+      "label": "fresh-database",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "CREATE DATABASE acceptance_fresh;"
+      ],
+      "beforePressure": 1,
+      "pid": 26181,
+      "exit": 0,
+      "seconds": 0.13068883298547007,
+      "afterPressure": 1
+    },
+    {
+      "label": "fresh-full-history",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "beforePressure": 1,
+      "pid": 26194,
+      "exit": 0,
+      "seconds": 1.2479680420074146,
+      "afterPressure": 1
+    },
+    {
+      "label": "fresh-log",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/acceptance_fresh",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "SELECT coalesce(json_agg(t), '[]') FROM (SELECT * FROM acceptance_history.acceptance_log ORDER BY id) t;"
+      ],
+      "beforePressure": 1,
+      "pid": 26220,
+      "exit": 0,
+      "seconds": 0.056145874987123534,
+      "afterPressure": 1
+    },
+    {
+      "label": "failed-sql",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "beforePressure": 1,
+      "pid": 26233,
+      "exit": 1,
+      "seconds": 1.2376487500150688,
+      "afterPressure": 1
+    },
+    {
+      "label": "log-after-failure",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "SELECT coalesce(json_agg(t), '[]') FROM (SELECT * FROM acceptance_history.acceptance_log ORDER BY id) t;"
+      ],
+      "beforePressure": 1,
+      "pid": 26258,
+      "exit": 0,
+      "seconds": 0.05560020898701623,
+      "afterPressure": 1
+    },
+    {
+      "label": "rows-after-failure",
+      "args": [
+        "psql",
+        "--no-psqlrc",
+        "--tuples-only",
+        "--no-align",
+        "--dbname",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--command",
+        "SELECT json_agg(t) FROM (SELECT value,note FROM entries ORDER BY id) t;"
+      ],
+      "beforePressure": 1,
+      "pid": 26266,
+      "exit": 0,
+      "seconds": 0.05626283399760723,
+      "afterPressure": 1
+    },
+    {
+      "label": "auth-runtime",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/dialect-auth.ts",
+        "postgresql",
+        "postgresql://relkit_acceptance@127.0.0.1:52575/postgres"
+      ],
+      "beforePressure": 1,
+      "pid": 26277,
+      "exit": 0,
+      "seconds": 20.128615833004005,
+      "afterPressure": 1
+    },
+    {
+      "label": "stop",
+      "args": [
+        "pg_ctl",
+        "-D",
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/cluster",
+        "-m",
+        "fast",
+        "-w",
+        "-t",
+        "10",
+        "stop"
+      ],
+      "beforePressure": 1,
+      "pid": 26633,
+      "exit": 0,
+      "seconds": 0.15464866597903892,
+      "afterPressure": 1
+    }
+  ],
+  "workspaceLinked": true,
+  "postmasterPid": 25962,
+  "initialMigrate": {
+    "command": "db migrate",
+    "configPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts",
+    "dialect": "postgresql",
+    "migrationPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/src/services/database/migrations",
+    "ok": true
+  },
+  "failedMigration": {
+    "error": {
+      "code": "RELKIT_DB_MIGRATE_FAILED",
+      "message": "Migration failed. Inspect the selected configuration and SQL; statements were not retried and rollback is not guaranteed."
+    },
+    "ok": false
+  },
+  "auth": {
+    "passed": true,
+    "dialect": "postgresql",
+    "steps": [
+      {
+        "label": "create",
+        "exit": 0
+      },
+      {
+        "label": "add",
+        "exit": 0
+      },
+      {
+        "label": "link",
+        "exit": 0
+      },
+      {
+        "label": "generate",
+        "exit": 0
+      },
+      {
+        "label": "migrate",
+        "exit": 0
+      },
+      {
+        "label": "repeat",
+        "exit": 0
+      },
+      {
+        "label": "check",
+        "exit": 0
+      },
+      {
+        "label": "typecheck",
+        "exit": 0
+      },
+      {
+        "label": "build",
+        "exit": 0
+      }
+    ],
+    "http": {
+      "signup": true,
+      "signin": true,
+      "sessionCookie": true,
+      "deniedAllowed": true,
+      "revocation": true
+    },
+    "workspaceLinked": true
+  },
+  "passed": true,
+  "businessRows": [
+    {
+      "value": "business-row-survives",
+      "note": "second"
+    }
+  ],
+  "appliedLog": [
+    {
+      "id": 1,
+      "hash": "6fc77e4abca9307dd059ded6c3cfeaa196bfb08f850db85bb587eef78e8f4006",
+      "created_at": 1792345056000,
+      "name": "20261018173736_initial",
+      "applied_at": "2026-10-18T20:37:37.607071+03:00"
+    },
+    {
+      "id": 2,
+      "hash": "1edc68c23ca9632866c1c45c2ebab812c968c2e3ec9e154a730084745f641ccf",
+      "created_at": 1792345059000,
+      "name": "20261018173739_second",
+      "applied_at": "2026-10-18T20:37:40.928626+03:00"
+    }
+  ],
+  "historyHashes": {
+    "src/services/database/migrations/20300101000000_invalid/migration.sql": "eea43449a623687595fb7db67c929ba93fb8348929ecb41477e006dd360eeae4",
+    "src/services/database/migrations/20261018173739_second/migration.sql": "1edc68c23ca9632866c1c45c2ebab812c968c2e3ec9e154a730084745f641ccf",
+    "src/services/database/migrations/20261018173739_second/snapshot.json": "00a0e1770fcaa8a55989c93052ceee1014d95adfc91270c9735ebc4ad8decbc4",
+    "src/services/database/migrations/20261018173736_initial/migration.sql": "6fc77e4abca9307dd059ded6c3cfeaa196bfb08f850db85bb587eef78e8f4006",
+    "src/services/database/migrations/20261018173736_initial/snapshot.json": "6c07d1dafa0db26e2dfabef899707ef79f87bc725a0fd36fe5a863cdbb3e53da"
+  },
+  "cleanup": {
+    "postmasterPidFileAbsent": true,
+    "temporaryRemoved": true
+  }
+}

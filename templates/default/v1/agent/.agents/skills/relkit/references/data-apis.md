@@ -30,6 +30,22 @@ export default defineDrizzleService({
 
 Open the native connection in the `client({ env })` factory and close it with `dispose` when needed. Discovery does not run the factory. Generate and review migrations with the installed Drizzle tooling; service creation does not create tables or apply migrations. After `bun run check`, generated context declarations provide typed `context.database`.
 
+## Version and apply migration source
+
+New grouped scaffolds configure `src/services/database/migrations` beside the database service and schema. Keep SQL and required Drizzle metadata in Git, outside ignored `.relkit/`. One shared database has one ordered history, including authentication tables; do not create separate histories for business services. Existing flat apps retain their selected database service directory.
+
+Set the required environment in the application root's `.env` or shell, then run:
+
+```sh
+bun run db:generate
+# Review the generated SQL and metadata before applying them.
+bun run db:migrate
+```
+
+`db:generate` uses the installed Drizzle Kit. `db:migrate` invokes installed RELKIT tooling, `relkit db migrate`, without copying a runner into the app. Root `drizzle.config.ts` explicitly owns dialect, schema, migration output, connection and supported log options. To select another config, use `bun run relkit db migrate --config configs/database.ts`; relative output/database paths still use the application root. Keep delegated PostgreSQL/MySQL config deterministic because Kit loads it again. Existing shell variables take precedence over Bun's normal dotenv loading; `.env.example` is documentation only.
+
+Migration applies pending SQL only when explicitly invoked; scaffolding and service startup do not apply it, generate secrets or open the database. SQLite uses the Bun-native driver. PostgreSQL/MySQL delegate to the app's installed Kit under Bun. Missing/empty/incompatible history requires generation or a compatible ORM/Kit pair, not a reset or fallback directory. Review failures before another manual run: SQL is not automatically retried, and dialect-specific partial DDL is not guaranteed to roll back. Keep the generated dependency patch and registration while required by the installed release.
+
 ## `defineBetterAuthService`
 
 ```ts

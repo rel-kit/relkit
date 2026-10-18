@@ -1,0 +1,18 @@
+{
+  "args": [
+    "nice",
+    "-n",
+    "10",
+    "node",
+    "--max-old-space-size=512",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "packages/create-relkit/tsconfig.json",
+    "--pretty",
+    "false"
+  ],
+  "pid": 39733,
+  "exit": 0,
+  "seconds": 1.8787147998809814,
+  "initialPressure": "1"
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "args": [
+      "node",
+      "--max-old-space-size=256",
+      "node_modules/prettier/bin/prettier.cjs",
+      "--check",
+      "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/tasks.md",
+      "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/independent-verification.md",
+      "packages/cli/tests/database/fixture.ts"
+    ],
+    "exit": 0,
+    "output": "Checking formatting...\nAll matched files use Prettier code style!\n"
+  },
+  {
+    "args": [
+      "openspec",
+      "validate",
+      "refine-application-skills-and-generated-projects",
+      "--strict"
+    ],
+    "exit": 0,
+    "output": "Change 'refine-application-skills-and-generated-projects' is valid\n"
+  },
+  {
+    "args": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "output": ""
+  }
+]

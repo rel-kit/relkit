@@ -1,0 +1,324 @@
+Acceptance: parent-install
+[20:06:23.345] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 163387.777041,
+}
+Acceptance: create-direct
+[20:06:23.556] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 189.982416,
+}
+Acceptance: direct-install
+[20:06:33.627] INFO (#7): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 10065.364542,
+}
+Acceptance: direct-frozen
+[20:06:33.699] INFO (#10): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 66.199709,
+}
+Acceptance: direct-help-without-orm
+[20:06:34.786] INFO (#13): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1055.089125,
+}
+Acceptance: direct-check-without-orm
+[20:06:40.464] INFO (#16): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5672.193417,
+}
+Acceptance: direct-dev-prepare-without-orm
+[20:06:46.763] INFO (#19): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 6291.487542,
+}
+Acceptance: direct-check
+[20:06:51.643] INFO (#22): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4872.108709,
+}
+Acceptance: direct-typecheck
+[20:06:53.538] INFO (#25): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1888.673667,
+}
+Acceptance: direct-test
+[20:06:54.239] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 693.740083,
+}
+Acceptance: direct-build
+[20:06:57.671] INFO (#31): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3424.445875,
+}
+Acceptance: direct-prepare
+[20:07:02.392] INFO (#34): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4714.765375,
+}
+Acceptance: create-cli
+[20:07:04.799] INFO (#37): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1094.992416,
+}
+Acceptance: cli-install
+[20:07:05.714] INFO (#40): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 908.520875,
+}
+Acceptance: cli-frozen
+[20:07:05.779] INFO (#43): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 58.876583,
+}
+Acceptance: cli-help-without-orm
+[20:07:06.787] INFO (#46): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 983.420959,
+}
+Acceptance: cli-check-without-orm
+[20:07:12.001] INFO (#49): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5208.932333,
+}
+Acceptance: cli-dev-prepare-without-orm
+[20:07:18.858] INFO (#52): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 6850.641666,
+}
+Acceptance: cli-check
+[20:07:23.195] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4331.700917,
+}
+Acceptance: cli-typecheck
+[20:07:24.794] INFO (#58): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1593.17575,
+}
+Acceptance: cli-test
+[20:07:25.470] INFO (#61): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 670.576667,
+}
+Acceptance: cli-build
+[20:07:28.732] INFO (#64): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3257.510209,
+}
+Acceptance: cli-prepare
+[20:07:33.909] INFO (#67): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5171.872541,
+}
+Acceptance: existing-database-auth-add
+[20:07:36.274] INFO (#70): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1141.330167,
+}
+Acceptance: existing-database-auth-install
+[20:07:44.376] INFO (#73): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8098.247,
+}
+Acceptance: existing-database-auth-frozen
+[20:07:44.410] INFO (#76): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 26.822041,
+}
+Acceptance: existing-database-auth-generate
+[20:07:45.021] INFO (#79): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 605.994834,
+}
+Acceptance: existing-database-auth-migrate
+[20:07:45.992] INFO (#82): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 965.014833,
+}
+Acceptance: existing-database-auth-auth-add
+[20:07:52.019] INFO (#85): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 6017.689542,
+}
+Acceptance: existing-database-auth-auth-install
+[20:07:52.058] INFO (#88): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 29.156958,
+}
+Acceptance: existing-database-auth-auth-generate
+[20:07:52.468] INFO (#91): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 404.005708,
+}
+Acceptance: existing-database-auth-auth-migrate
+[20:07:53.309] INFO (#94): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 834.086583,
+}
+Acceptance: existing-database-auth-repeat
+[20:07:54.232] INFO (#97): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 916.629458,
+}
+Acceptance: existing-database-auth-check
+[20:07:59.180] INFO (#100): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4938.657041,
+}
+Acceptance: existing-database-auth-typecheck
+[20:08:00.859] INFO (#103): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1667.110166,
+}
+Acceptance: existing-database-auth-test
+[20:08:01.561] ERROR (#106): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "failure",
+  duration_ms: 695.736792,
+}
+ 98 |       });
+ 99 |     const code = exit.value,
+100 |       stdout = out.value,
+101 |       stderr = error.value;
+102 |     if (code !== 0)
+103 |       return yield* new ScaffoldProcessFailure({
+                          ^
+error: run test failed in /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct (1)
+bun test v1.3.10 (30e609e0)
+$ bun test
+
+tests/unit/hello.function.test.ts:
+(pass) hello returns a greeting [45.41ms]
+
+tests/integration/hello.route.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+22 |         const issues = [];
+23 |         for (const name of Object.keys(definition.shape)) {
+24 |             resolveField(name, definition.shape[name], options.source, options.environment, values, issues);
+25 |         }
+26 |         if (issues.length)
+27 |             return yield* Effect.fail(new EnvResolutionError(issues));
+                                           ^
+EnvResolutionError: BETTER_AUTH_SECRET: Required value is missing
+ issues: [
+  [Object ...]
+],
+   _tag: "EnvResolutionError",
+
+      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/config/dist/resolve.js:27:39)
+      at ~effect/Effect/successCont (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:973:28)
+      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)
+      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)
+      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2538:19)
+      at runConfigSync (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/config/dist/config-observability.js:47:25)
+      at try (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/testing/dist/application.js:82:17)
+      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:753:22)
+      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)
+      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)
+      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/ManagedRuntime.js:104:27)
+      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)
+      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)
+      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2512:19)
+      at runExecutionPromise (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/contracts/dist/operation-runtime.js:53:32)
+      at createTestApplication (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/testing/dist/application.js:52:31)
+      at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/tests/integration/hello.route.test.ts:5:23
+-------------------------------
+
+
+ 1 pass
+ 1 fail
+ 1 error
+ 1 expect() calls
+Ran 2 tests across 2 files. [670.00ms]
+error: script "test" exited with code 1
+
+ operation: "process.exit",
+      _tag: "ScaffoldProcessFailure",
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/scripts/scaffold-process.ts:103:21)
+      at ~effect/Effect/successCont (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
+
+Bun v1.3.10 (macOS arm64)

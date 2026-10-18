@@ -1,0 +1,17 @@
+{
+  "args": [
+    "nice",
+    "-n",
+    "10",
+    "bun",
+    "test",
+    "packages/cli/tests/database",
+    "tests/generator/database-ownership.test.ts",
+    "tests/unit/release-check-listing.test.ts",
+    "--timeout",
+    "15000"
+  ],
+  "pid": 31944,
+  "exit": 0,
+  "seconds": 6.873974084854126
+}

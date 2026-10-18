@@ -1,0 +1,42 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/build-catalog.test.ts:
+(pass) catalog metadata derives exact patch identity, bytes, and native literal types [11.95ms]
+(pass) release staging provides catalogs, overrides, and patch bytes before installation [3.97ms]
+
+tests/unit/sync-release.test.ts:
+(pass) release sync retains the CLI editor assets and remains idempotent [112.76ms]
+
+apps/docs/tests/auth-learning.test.ts:
+(pass) connects Auth after Database with source-backed guides and API reference [3.82ms]
+(pass) separates identity, integration, transport protection, and business authorization [0.21ms]
+(pass) teaches a migrated existing-app flow without hard-coded server secrets [0.73ms]
+
+apps/docs/tests/database-learning.test.ts:
+(pass) connects Database guides and the generated Drizzle reference [3.23ms]
+(pass) uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets [1.88ms]
+(pass) states validation, override, transaction, and lifecycle boundaries [0.50ms]
+(pass) explains generated data shapes and Better Auth's native-client boundary [0.30ms]
+
+packages/create-relkit/tests/dependency-patch-generation.test.ts:
+(pass) every starter owns the canonical declaration repair before its first installation [213.40ms]
+(pass) no-install creation still publishes the portable asset and declaration [39.84ms]
+
+packages/create-relkit/tests/dependency-patches.test.ts:
+(pass) portable dependency patches > uses the central version and byte-identical canonical patch asset [0.75ms]
+(pass) portable dependency patches > reuses identical assets and preserves unrelated patch entries and file modes [4.41ms]
+(pass) portable dependency patches > rejects a conflicting entry or asset before changing the manifest [7.71ms]
+(pass) portable dependency patches > rejects symlinked patch directories instead of reusing external assets [2.08ms]
+(pass) portable dependency patches > patch-only plans install, retain public package results, and can be finished twice [9.36ms]
+(pass) portable dependency patches > repairs an existing testing dependency without introducing direct Drizzle [5.28ms]
+(pass) portable dependency patches > adding Effect MQ delivers its transitive Drizzle repair and reports only the new provider [4.13ms]
+(pass) portable dependency patches > manifest-only patch registration also installs an already delivered asset [3.64ms]
+(pass) portable dependency patches > asset-only repair snapshots a lock created during the failed installation [7.53ms]
+(pass) portable dependency patches > rolls back manifest, text and binary locks, assets, and modes after patch-only failure [6.71ms]
+(pass) portable dependency patches > no-install patch-only plans defer checks until Bun applies the repair [3.46ms]
+(pass) portable dependency patches > cancellation during patch-only installation restores the lock and patch ownership [12.93ms]
+
+ 24 pass
+ 0 fail
+ 286 expect() calls
+Ran 24 tests across 6 files. [773.00ms]

@@ -1,0 +1,105 @@
+
+<--- Last few GCs --->
+
+[24408:0x130008000]     2748 ms: Mark-Compact (reduce) 509.5 (517.1) -> 509.0 (513.4) MB, pooled: 0 MB, 74.75 / 0.00 ms  (+ 0.0 ms in 0 steps since start of marking, biggest step 0.0 ms, walltime since start of marking 76 ms) (average mu = 0.290, current [24408:0x130008000]     2824 ms: Mark-Compact 510.3 (513.9) -> 510.0 (517.6) MB, pooled: 0 MB, 73.33 / 0.00 ms  (average mu = 0.176, current mu = 0.038) allocation failure; scavenge might not succeed
+
+FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x1005ec2e4 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+ 2: 0x1007ec868 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+ 3: 0x100a4c498 v8::internal::Heap::stack() [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+ 4: 0x100a4a380 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+ 5: 0x100a3eea8 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+ 6: 0x100a205b4 v8::internal::Factory::NewFillerObject(int, v8::internal::AllocationAlignment, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+ 7: 0x100eaf7d0 v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+ 8: 0x101505f74 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+ 9: 0x1014cd290 Builtins_MapConstructor [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+10: 0x101465b8c Builtins_JSBuiltinsConstructStub [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+11: 0x1384697d0 
+12: 0x1380455bc 
+13: 0x1384e8fec 
+14: 0x13833ac70 
+15: 0x138052be8 
+16: 0x13806ffe4 
+17: 0x138062600 
+18: 0x1384eb828 
+19: 0x1384feeac 
+20: 0x13805f314 
+21: 0x13804aff8 
+22: 0x13833c06c 
+23: 0x13807010c 
+24: 0x138062600 
+25: 0x1384eb828 
+26: 0x1384834dc 
+27: 0x13805f314 
+28: 0x13804aff8 
+29: 0x13833c848 
+30: 0x13807010c 
+31: 0x13841a004 
+32: 0x1381c1bf8 
+33: 0x13805f314 
+34: 0x13804aff8 
+35: 0x13833c06c 
+36: 0x13807010c 
+37: 0x1384ad0e0 
+38: 0x13807379c 
+39: 0x13833cb44 
+40: 0x13804ae58 
+41: 0x13833c06c 
+42: 0x13807010c 
+43: 0x138072894 
+44: 0x1380047d0 
+45: 0x138069784 
+46: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+47: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+48: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+49: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+50: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+51: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+52: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+53: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+54: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+55: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+56: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+57: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+58: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+59: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+60: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+61: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+62: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+63: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+64: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+65: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+66: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+67: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+68: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+69: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+70: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+71: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+72: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+73: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+74: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+75: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+76: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+77: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+78: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+79: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+80: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+81: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+82: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+83: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+84: 0x1014668cc Builtins_JSEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+85: 0x101466570 Builtins_JSEntry [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+86: 0x1009906e4 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+87: 0x100990048 v8::internal::Execution::Call(v8::internal::Isolate*, v8::internal::DirectHandle<v8::internal::Object>, v8::internal::DirectHandle<v8::internal::Object>, v8::base::Vector<v8::internal::DirectHandle<v8::internal::Object> const>) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+88: 0x1008047e0 v8::Function::Call(v8::Isolate*, v8::Local<v8::Context>, v8::Local<v8::Value>, int, v8::Local<v8::Value>*) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+89: 0x1005c574c node::builtins::BuiltinLoader::CompileAndCall(v8::Local<v8::Context>, char const*, node::Realm*) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+90: 0x10068c960 node::Realm::ExecuteBootstrapper(char const*) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+91: 0x1005a2b58 node::StartExecution(node::Environment*, char const*) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+92: 0x1005a2aac node::StartExecution(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfo const&)>) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+93: 0x1004f188c node::LoadEnvironment(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfo const&)>, std::__1::function<void (node::Environment*, v8::Local<v8::Value>, v8::Local<v8::Value>)>) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+94: 0x10064005c node::NodeMainInstance::Run() [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+95: 0x1005a6344 node::Start(int, char**) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]
+96: 0x18d706b98 start [/usr/lib/dyld]
+[rtk] node --max-old-space-size=512 ../../node_modules/typescript/bin/tsc --noEmit --pretty false: process terminated by signal 6

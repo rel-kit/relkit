@@ -23,6 +23,15 @@ export function assertListing(item: PackageInfo, listing: string[], packed: Reco
       throw new Error(`Packed file is missing: ${item.name} -> ${required}`);
   if (item.name === "@relkit/cli" && !listing.includes("package/editor/package.json"))
     throw new Error("Packed CLI editor resolver entry is missing.");
+  if (item.name === "@relkit/cli")
+    for (const file of [
+      "migration-worker",
+      "migration-config",
+      "migration-execute",
+      "migration.schemas",
+    ])
+      if (!listing.includes(`package/dist/database/${file}.js`))
+        throw new Error(`Packed CLI migration asset is missing: ${file}.js`);
   const forbidden = listing.filter(
     (path) =>
       !(item.name === "create-relkit" && path.startsWith("package/dist/templates/")) &&

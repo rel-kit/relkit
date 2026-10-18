@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "openspec/changes/separate-release-readiness-performance/.openspec.yaml": true,
+    "openspec/changes/separate-release-readiness-performance/design.md": true,
+    "openspec/changes/separate-release-readiness-performance/evidence/hosted-failed-fresh.json": true,
+    "openspec/changes/separate-release-readiness-performance/proposal.md": true,
+    "openspec/changes/separate-release-readiness-performance/specs/acceptance-verification/spec.md": true,
+    "openspec/changes/separate-release-readiness-performance/specs/cli-scaffolding/spec.md": true,
+    "openspec/changes/separate-release-readiness-performance/tasks.md": true,
+    "bun.lock": true,
+    "patches/drizzle-orm.patch": true,
+    "package.json": true,
+    "tsconfig.base.json": true
+  },
+  "allPreserved": true,
+  "patchSha256": "10ea188b9409dd19aac7bf27f4b12911ae4844c063362b9c2bd11d6a3d936374"
+}
