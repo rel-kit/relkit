@@ -1,0 +1,30 @@
+bun test v1.3.10 (30e609e0)
+
+apps/docs/tests/service-learning.test.ts:
+(pass) introduces Service after Core concepts with source-backed, connected guides [2.12ms]
+(pass) routes code-placement questions into existing capability and HTTP guides [0.11ms]
+(pass) walks through the Orders service using the executable API starter [0.04ms]
+
+apps/docs/tests/cli-scaffolding.test.ts:
+(pass) every add command has a guide and complete CLI reference without inline option tables [29.64ms]
+
+apps/docs/tests/auth-learning.test.ts:
+(pass) connects Auth after Database with source-backed guides and API reference [1.31ms]
+(pass) separates identity, integration, transport protection, and business authorization [0.18ms]
+(pass) teaches a migrated existing-app flow without hard-coded server secrets [1.13ms]
+
+apps/docs/tests/database-learning.test.ts:
+(pass) connects Database guides and the generated Drizzle reference [1.40ms]
+(pass) uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets [0.84ms]
+(pass) states validation, override, transaction, and lifecycle boundaries [0.09ms]
+(pass) explains generated data shapes and Better Auth's native-client boundary [0.11ms]
+
+apps/docs/tests/start-learning.test.ts:
+(pass) keeps a single ordered Orders journey with optional scaffolding last [0.74ms]
+(pass) extends the certified minimal app into the same Orders journey [0.20ms]
+(pass) redirects retired Start URLs directly to current guidance [0.32ms]
+
+ 14 pass
+ 0 fail
+ 487 expect() calls
+Ran 14 tests across 5 files. [186.00ms]
