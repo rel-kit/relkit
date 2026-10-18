@@ -9,6 +9,6 @@ if (path === undefined || path.trim() === "" || path === ":memory:") {
 export default defineConfig({
   schema: "./src/services/database/schema/index.ts",
   dialect: "sqlite",
-  out: "./drizzle",
+  out: "./src/services/database/migrations",
   dbCredentials: { url: path },
 });

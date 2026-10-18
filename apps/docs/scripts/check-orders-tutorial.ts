@@ -19,13 +19,13 @@ const check = Effect.fn("Tutorial.check")(function* () {
   yield* configureTutorial(project, false);
   yield* applyTutorial(project, "database");
   yield* run(globalThis.process.execPath, "--bun", "drizzle-kit", "generate", "--name=initial");
-  yield* run(globalThis.process.execPath, "scripts/migrate.ts");
+  yield* run(globalThis.process.execPath, "run", "relkit", "db", "migrate");
   yield* run(globalThis.process.execPath, "run", "check");
   yield* run(globalThis.process.execPath, "run", "typecheck");
   yield* configureTutorial(project, true);
   yield* applyTutorial(project, "auth");
   yield* run(globalThis.process.execPath, "--bun", "drizzle-kit", "generate", "--name=auth");
-  yield* run(globalThis.process.execPath, "scripts/migrate.ts");
+  yield* run(globalThis.process.execPath, "run", "relkit", "db", "migrate");
   yield* run(globalThis.process.execPath, "run", "check");
   yield* applyTutorial(project, "tests");
   yield* run(globalThis.process.execPath, "run", "typecheck");
