@@ -1,0 +1,17 @@
+{
+  "revision": "05a53404222d9c5de4ef0126d719066ca21b6f30",
+  "files": {
+    "capability-source.ts": {
+      "source": "packages/create-relkit/src/create-capabilities.ts",
+      "sha256": "13744184c2d36c86c9312dea4535bed89012299994c29be93ae8dd52b3330b21"
+    },
+    "fresh.json": {
+      "source": "docs/evidence/create-capabilities/0.7.7/fresh.json",
+      "sha256": "c7dcd17c92290a5a2c781022a11b43b0e9db444c348398b05df56678957f5c63"
+    },
+    "restart.json": {
+      "source": "docs/evidence/create-capabilities/0.7.7/restart.json",
+      "sha256": "7d1ee13a0ae028d3440d2baea7a2d8e5c6006946dc64549a45cf7f3f4198fac4"
+    }
+  }
+}
