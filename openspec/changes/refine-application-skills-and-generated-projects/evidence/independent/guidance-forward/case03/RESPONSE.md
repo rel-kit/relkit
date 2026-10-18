@@ -1,0 +1,1 @@
+I will create the default backend scaffold with no database or authentication and preserve the framework Inspector. Dependency installation and runtime validation are unavailable under this evaluation's resource limit.
