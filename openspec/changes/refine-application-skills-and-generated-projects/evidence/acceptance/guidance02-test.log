@@ -1,0 +1,9 @@
+bun test v1.3.10 (30e609e0)
+
+tests/integration/greeting.test.ts:
+(pass) greeting HTTP route maps the submitted name and rejects invalid names [123.73ms]
+
+ 1 pass
+ 0 fail
+ 7 expect() calls
+Ran 1 test across 1 file. [729.00ms]
