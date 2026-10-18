@@ -1,0 +1,128 @@
+[
+  {
+    "path": ".env.example",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "a58f556e4617209af7cae622e4cab1d47525f7d7d91c6516511032666eb21233"
+  },
+  {
+    "path": ".gitignore",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "9c586bcf80fe14185bea7f674f562378c49e3f103631608c2383ac995cf660e2"
+  },
+  {
+    "path": "drizzle.config.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "3c4cd7ffa1c4d60fd0aaf4f2c33c2a3f09b18b1b2bb19928a8f48e99f6a4050c"
+  },
+  {
+    "path": "package.json",
+    "action": "updated",
+    "before_sha256": "c0d4c37c631e3e1c5c0340de9dbe38d23dbed9d2fc72707863e630bec148f757",
+    "after_sha256": "addae3f52d05701849d2d9b60910e5db3a8e77b2b1cd018081fe96bcb3007601"
+  },
+  {
+    "path": "patches/drizzle-orm@1.0.0-rc.5-169397b.patch",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "10ea188b9409dd19aac7bf27f4b12911ae4844c063362b9c2bd11d6a3d936374"
+  },
+  {
+    "path": "relkit.config.ts",
+    "action": "updated",
+    "before_sha256": "a2d8b222dc38ce77923f6f38b79076b66ecd9072ca52b9fbb6fedb883b3c0190",
+    "after_sha256": "8b5c9e0f0d9fb58b0918f60c6ebd5a78cce492e79c9def776e8ffbfbb7bd9073"
+  },
+  {
+    "path": "scripts/migrate.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "52474b4562b1d3fb2f7eb05e9d5146c9ea806605b3ec48f30283f0dabe81604a"
+  },
+  {
+    "path": "src/platform/env.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "f22a9be97052840aab41e3eb4be1c0c2eed1707374e4fc6ef14e327955dd5061"
+  },
+  {
+    "path": "src/routes/orders/route.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "3dbc2448339cbefc13c34a7b150743045657c06c4fd26dc708f3772ede60f0ef"
+  },
+  {
+    "path": "src/routes/users/me/route.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "82804416ba0b02b8d7e4a12a4f17f78447989bb0c03361936c7be1d766583482"
+  },
+  {
+    "path": "src/services/auth/service.ts",
+    "action": "updated",
+    "before_sha256": "e7e51a8d20bb032be96fc244414759c079a4896222af6ba18382d6661a8168ef",
+    "after_sha256": "d96d6fce81e78b1ec6b7e1f498f105d10124820212d8d29db6f25f62b1149357"
+  },
+  {
+    "path": "src/services/database/migrations/0001-orders.sql",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "6a4b37812d168862e3e1178c31ca7a1906161d4df621b0e27d6e5eb6d132d4ef"
+  },
+  {
+    "path": "src/services/database/schema/index.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "799fe48b8f8f30f4dfe9a89a63e7594ee81d00ef1e98b666aef09e248bc211ce"
+  },
+  {
+    "path": "src/services/database/service.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "a07bef82aa225429df59d124bf06cc540010a2b5bd68a01a81d106b10fc3ad75"
+  },
+  {
+    "path": "src/services/orders/functions/create.function.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "29cf0f0f74dbc829695b5f74bb49a6caa59bb4dd6d5c1186ec244dd48e93166f"
+  },
+  {
+    "path": "src/services/orders/functions/list.function.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "4680df57cc9b1fa2fce58d776bcbbdad79bf8a4cd96c82c983215af4b690f489"
+  },
+  {
+    "path": "src/services/orders/schemas/order.schema.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "1bb300c9f3695dd61a4eecbcb5a401a3a4cc23ae1c23cbc41f7bb70e74831d5a"
+  },
+  {
+    "path": "src/services/orders/service.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "dc38434c7ba7d0cb807fe85ea9b3074cb25412edc8c52e0d188643e85e2a7f48"
+  },
+  {
+    "path": "src/services/users/functions/profile.function.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "aa12c592e8e17f9db12f50aa6901c6725a646700243db18917a4b2c69e34559f"
+  },
+  {
+    "path": "src/services/users/service.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "9284053dfaa5a4ef01e976b32232277596a54c3bf9287fc58ce2dd6e5dd5373f"
+  },
+  {
+    "path": "tests/operations.test.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "72acb8f98ea3d2f8c321866700278c82d221de6ce4e0b54af467e9d498d41962"
+  }
+]
