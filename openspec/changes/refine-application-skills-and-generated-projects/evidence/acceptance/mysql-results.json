@@ -1,0 +1,467 @@
+{
+  "temporary": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp",
+  "workspaceLinked": true,
+  "commands": [
+    {
+      "label": "mysql-initialize",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysqld",
+        "--no-defaults",
+        "--basedir=/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7",
+        "--datadir=/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/data",
+        "--innodb-buffer-pool-size=16M",
+        "--performance-schema=OFF",
+        "--initialize-insecure"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.6176089169748593,
+      "pid": 6059
+    },
+    {
+      "label": "mysql-create",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "--execute",
+        "CREATE DATABASE acceptance; CREATE DATABASE acceptance_fresh;"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.33525383297819644,
+      "pid": 6117
+    },
+    {
+      "label": "mysql-generate-initial",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/node_modules/drizzle-kit/bin.cjs",
+        "generate",
+        "--config",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts",
+        "--name=initial"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.5603373329795431,
+      "pid": 6130
+    },
+    {
+      "label": "mysql-migrate-initial",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.7801002500054892,
+      "pid": 6142
+    },
+    {
+      "label": "mysql-insert",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "acceptance",
+        "--execute",
+        "INSERT INTO entries(value) VALUES ('business-row-survives');"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.10861816600663587,
+      "pid": 6173
+    },
+    {
+      "label": "mysql-log-before",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "acceptance",
+        "--execute",
+        "SELECT * FROM acceptance_log ORDER BY id;"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.10413079199497588,
+      "pid": 6179
+    },
+    {
+      "label": "mysql-repeat-initial",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.3417667909816373,
+      "pid": 6192
+    },
+    {
+      "label": "mysql-log-repeat-initial",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "acceptance",
+        "--execute",
+        "SELECT * FROM acceptance_log ORDER BY id;"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.1035191249975469,
+      "pid": 6212
+    },
+    {
+      "label": "mysql-generate-second",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/node_modules/drizzle-kit/bin.cjs",
+        "generate",
+        "--config",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts",
+        "--name=second"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.39307604197529145,
+      "pid": 6220
+    },
+    {
+      "label": "mysql-migrate-second",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.3339599590108264,
+      "pid": 6236
+    },
+    {
+      "label": "mysql-log-second",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "acceptance",
+        "--execute",
+        "SELECT * FROM acceptance_log ORDER BY id;"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.09995304100448266,
+      "pid": 6259
+    },
+    {
+      "label": "mysql-business-rows",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "acceptance",
+        "--execute",
+        "SELECT value,note FROM entries ORDER BY id;"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.10546649998286739,
+      "pid": 6269
+    },
+    {
+      "label": "mysql-repeat-second",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.3446028750040568,
+      "pid": 6275
+    },
+    {
+      "label": "mysql-log-repeat-second",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "acceptance",
+        "--execute",
+        "SELECT * FROM acceptance_log ORDER BY id;"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.10405862500192598,
+      "pid": 6304
+    },
+    {
+      "label": "mysql-fresh-history",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.361194750003051,
+      "pid": 6311
+    },
+    {
+      "label": "mysql-fresh-log",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "acceptance_fresh",
+        "--execute",
+        "SELECT * FROM acceptance_log ORDER BY id;"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.10078149999026209,
+      "pid": 6345
+    },
+    {
+      "label": "mysql-failed-sql",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "--json",
+        "db",
+        "migrate",
+        "--config",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 1,
+      "expected": 1,
+      "seconds": 1.333882207982242,
+      "pid": 6352
+    },
+    {
+      "label": "mysql-log-after-failure",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "acceptance",
+        "--execute",
+        "SELECT * FROM acceptance_log ORDER BY id;"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.10026062501128763,
+      "pid": 6388
+    },
+    {
+      "label": "mysql-rows-after-failure",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "--no-defaults",
+        "--protocol=TCP",
+        "--host=127.0.0.1",
+        "--port=61448",
+        "--user=root",
+        "--batch",
+        "--skip-column-names",
+        "acceptance",
+        "--execute",
+        "SELECT value,note FROM entries ORDER BY id;"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.10435408301418647,
+      "pid": 6396
+    },
+    {
+      "label": "mysql-auth-runtime",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/dialect-auth.ts",
+        "mysql",
+        "mysql://root@127.0.0.1:61448/acceptance"
+      ],
+      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 20.59591045801062,
+      "pid": 6406
+    }
+  ],
+  "serverPid": 6086,
+  "initialMigrate": {
+    "command": "db migrate",
+    "configPath": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts",
+    "dialect": "mysql",
+    "migrationPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/src/services/database/migrations",
+    "ok": true
+  },
+  "failedMigration": {
+    "error": {
+      "code": "RELKIT_DB_MIGRATE_FAILED",
+      "message": "Migration failed. Inspect the selected configuration and SQL; statements were not retried and rollback is not guaranteed."
+    },
+    "ok": false
+  },
+  "auth": {
+    "passed": true,
+    "dialect": "mysql",
+    "steps": [
+      {
+        "label": "create",
+        "exit": 0
+      },
+      {
+        "label": "add",
+        "exit": 0
+      },
+      {
+        "label": "link",
+        "exit": 0
+      },
+      {
+        "label": "generate",
+        "exit": 0
+      },
+      {
+        "label": "migrate",
+        "exit": 0
+      },
+      {
+        "label": "repeat",
+        "exit": 0
+      },
+      {
+        "label": "check",
+        "exit": 0
+      },
+      {
+        "label": "typecheck",
+        "exit": 0
+      },
+      {
+        "label": "build",
+        "exit": 0
+      }
+    ],
+    "http": {
+      "signup": true,
+      "signin": true,
+      "sessionCookie": true,
+      "deniedAllowed": true,
+      "revocation": true
+    },
+    "workspaceLinked": true
+  },
+  "passed": true,
+  "businessRows": "business-row-survives\tsecond",
+  "appliedLog": "1\tdcc2b9dc36a3b4650bf55d5383d68441170f1647415c0c5a8747e4aff7f3e2e1\t1792344121000\t20261018172201_initial\t2026-10-18 20:22:03\n2\t367d7030c287db8f4b2575238da856e05f17d129d3907330fc63a41548160a38\t1792344125000\t20261018172205_second\t2026-10-18 20:22:06",
+  "historyHashes": {
+    "src/services/database/migrations/20261018172205_second/migration.sql": "367d7030c287db8f4b2575238da856e05f17d129d3907330fc63a41548160a38",
+    "src/services/database/migrations/20261018172205_second/snapshot.json": "3c3446e4f1788c54773c155f724fc79cc9345655b6e4ee1aa46f80b8a60c08a1",
+    "src/services/database/migrations/20261018172201_initial/migration.sql": "dcc2b9dc36a3b4650bf55d5383d68441170f1647415c0c5a8747e4aff7f3e2e1",
+    "src/services/database/migrations/20261018172201_initial/snapshot.json": "b703f105dae8bbb4e4f6a61ae62c076917c0fea3bb6dd3e9a1e62f71fbabd06d"
+  },
+  "cleanup": {
+    "serverExited": true,
+    "temporaryRemoved": true
+  }
+}
