@@ -1,0 +1,16 @@
+{
+  "relkit.config.ts": "8b5c9e0f0d9fb58b0918f60c6ebd5a78cce492e79c9def776e8ffbfbb7bd9073",
+  ".gitignore": "9c586bcf80fe14185bea7f674f562378c49e3f103631608c2383ac995cf660e2",
+  "package.json": "addae3f52d05701849d2d9b60910e5db3a8e77b2b1cd018081fe96bcb3007601",
+  "EXISTING.md": "48bc48f980a9daa4a8302f9d50d3bbf6e93092016a36687c9d20f8a97e6124d7",
+  "tsconfig.json": "fdaf48a3fb35491af71c5c3cce8610443f83c95b831af5d79522cee2be7b8dde",
+  ".env.example": "a58f556e4617209af7cae622e4cab1d47525f7d7d91c6516511032666eb21233",
+  "drizzle.config.ts": "3c4cd7ffa1c4d60fd0aaf4f2c33c2a3f09b18b1b2bb19928a8f48e99f6a4050c",
+  "patches/drizzle-orm@1.0.0-rc.5-169397b.patch": "10ea188b9409dd19aac7bf27f4b12911ae4844c063362b9c2bd11d6a3d936374",
+  "scripts/migrate.ts": "52474b4562b1d3fb2f7eb05e9d5146c9ea806605b3ec48f30283f0dabe81604a",
+  "src/platform/env.ts": "f22a9be97052840aab41e3eb4be1c0c2eed1707374e4fc6ef14e327955dd5061",
+  "src/services/database/service.ts": "a07bef82aa225429df59d124bf06cc540010a2b5bd68a01a81d106b10fc3ad75",
+  "src/services/auth/service.ts": "e7e51a8d20bb032be96fc244414759c079a4896222af6ba18382d6661a8168ef",
+  "src/services/database/schema/index.ts": "cb2dfdf47a48a2a1f450942c672918b9e2849fdfa69bc564b65a71c3a2dd85f9",
+  "src/routes/api/auth/[...all]/route.ts": "e3abc0ab54591c4f4810ae9a65548f827ae3608134bc87140004cd5243347e2f"
+}
