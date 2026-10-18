@@ -1,6 +1,9 @@
 /** Selects lazy command domains and supplies only their invocation-owned capabilities. */
 import { Cause, Effect, Layer } from "effect";
 import { runMigrateEffect } from "./commands/migrate.js";
+import { runDbEffect } from "./commands/db.js";
+import { processLayer } from "./services/process.service.js";
+import { fileSystemLayer } from "./services/filesystem.service.js";
 import { layoutMigrationLayer } from "./migration/layout-migration.service.js";
 import { executeProjectEffect } from "./command-project.js";
 import { executeStartEffect } from "./command-start.js";
@@ -113,6 +116,10 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
       return runJobsEffect(args, context).pipe(Effect.provide(jobsLiveLayer()));
     case "migrate":
       return runMigrateEffect(args, context).pipe(Effect.provide(layoutMigrationLayer));
+    case "db":
+      return runDbEffect(args, context).pipe(
+        Effect.provide(Layer.merge(processLayer, fileSystemLayer)),
+      );
     default:
       return Effect.fail(
         fail("RELKIT_COMMAND_UNAVAILABLE", `Command is not implemented: ${invocation.command}`),

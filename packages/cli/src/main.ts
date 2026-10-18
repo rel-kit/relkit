@@ -30,18 +30,20 @@ export async function runCli(
   const io = runtime.io ?? processIo;
   const json = isJsonMode(argv);
   const migration = argv.find((argument) => !argument.startsWith("-")) === "migrate";
+  const database = argv.find((argument) => !argument.startsWith("-")) === "db";
   const reporter = createReporter(json, io);
   let publish: (() => void) | undefined;
-  const commandReporter: CliReporter = migration
-    ? {
-        output: (value, human) => {
-          publish = () => reporter.output(value, human);
-        },
-        error: (code, message) => {
-          publish = () => reporter.error(code, message);
-        },
-      }
-    : reporter;
+  const commandReporter: CliReporter =
+    migration || database
+      ? {
+          output: (value, human) => {
+            publish = () => reporter.output(value, human);
+          },
+          error: (code, message) => {
+            publish = () => reporter.error(code, message);
+          },
+        }
+      : reporter;
   const controller = new AbortController();
   const signal = runtime.signal
     ? AbortSignal.any([runtime.signal, controller.signal])
@@ -54,7 +56,7 @@ export async function runCli(
       runCliProgram(argv, runtime, commandReporter, io, json, signal),
       Layer.merge(fileSystemLayer, interactionLayer),
       signal,
-      { json, io: migration && json ? { stdout: io.stderr, stderr: io.stderr } : io },
+      { json, io: (migration || database) && json ? { stdout: io.stderr, stderr: io.stderr } : io },
     );
     publish?.();
     return code;
@@ -62,11 +64,13 @@ export async function runCli(
     const failure = toFailure(error, signal);
     reporter.error(
       failure.code,
-      migration
-        ? "Migration stopped without reporting successful publication; inspect retained local recovery receipts."
-        : failure.message,
+      database
+        ? "Database migration stopped without success. Inspect configuration and SQL; rollback is not guaranteed."
+        : migration
+          ? "Migration stopped without reporting successful publication; inspect retained local recovery receipts."
+          : failure.message,
     );
-    return migration && signal.aborted ? 130 : failure.exitCode;
+    return (migration || database) && signal.aborted ? 130 : failure.exitCode;
   } finally {
     removeSignals();
   }
