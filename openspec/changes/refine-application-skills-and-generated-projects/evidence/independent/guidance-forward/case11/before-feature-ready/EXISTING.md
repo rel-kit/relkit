@@ -1,0 +1,1 @@
+Established grouped backend with existing Better Auth sessions. Database and auth already exist. Implement current user profile and an owner's order creation/listing; use explicit session and storage test fakes for the lightweight evaluation. Real sessions/migrations remain runtime gates.

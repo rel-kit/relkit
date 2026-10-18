@@ -1,0 +1,21 @@
+{
+  "name": "existing-fixture",
+  "type": "module",
+  "scripts": {
+    "db:generate": "bun --bun drizzle-kit generate",
+    "db:migrate": "bun scripts/migrate.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@relkit/app": "0.7.7",
+    "@relkit/drizzle": "0.7.7",
+    "drizzle-orm": "1.0.0-rc.5-169397b"
+  },
+  "devDependencies": {
+    "@relkit/testing": "0.7.7",
+    "drizzle-kit": "1.0.0-rc.5-ab785fc"
+  },
+  "patchedDependencies": {
+    "drizzle-orm@1.0.0-rc.5-169397b": "patches/drizzle-orm@1.0.0-rc.5-169397b.patch"
+  }
+}
