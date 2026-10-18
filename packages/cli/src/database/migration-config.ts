@@ -12,7 +12,7 @@ export async function loadMigrationConfig(
   configPath: string,
 ): Promise<MigrationConfig> {
   try {
-    for (const path of ["package.json", "relkit.config.ts", configPath]) {
+    for (const path of ["package.json", "relkit.config.ts"]) {
       if (!(await stat(resolve(root, path))).isFile()) throw new Error("Missing file");
     }
   } catch {
