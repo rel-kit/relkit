@@ -101,12 +101,13 @@ export async function startRegistry(
   }
   const upstreamResponses = new Map<
     string,
-    Promise<{ body: Uint8Array; contentType: string; status: number }>
+    Promise<{ body: Uint8Array<ArrayBuffer>; contentType: string; status: number }>
   >();
   const proxyUpstream = async (url: URL): Promise<Response> => {
     const load = async () => {
       const response = await fetch(`https://registry.npmjs.org${url.pathname}${url.search}`, {
         signal: AbortSignal.timeout(60_000),
+        headers: { accept: "application/vnd.npm.install-v1+json" },
       });
       return {
         body: new Uint8Array(await response.arrayBuffer()),
@@ -125,13 +126,16 @@ export async function startRegistry(
         });
         return pending;
       })();
-    const result = await pending;
-    if (result.status >= 500 && upstreamResponses.get(key) === pending)
-      upstreamResponses.delete(key);
-    return new Response(result.body.slice(), {
-      status: result.status,
-      headers: { "content-type": result.contentType },
-    });
+    try {
+      const result = await pending;
+      return new Response(result.body, {
+        status: result.status,
+        headers: { "content-type": result.contentType },
+      });
+    } finally {
+      // Deduplicate active transfers without retaining every npm tarball/packument in RAM.
+      if (upstreamResponses.get(key) === pending) upstreamResponses.delete(key);
+    }
   };
   let port = 0;
   const server = Bun.serve({
