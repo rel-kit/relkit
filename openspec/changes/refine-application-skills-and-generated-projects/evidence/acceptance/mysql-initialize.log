@@ -1,0 +1,8 @@
+2026-10-18T17:21:57.850875Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+2026-10-18T17:21:57.859262Z 0 [System] [MY-013169] [Server] /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysqld (mysqld 8.4.11) initializing of server in progress as process 6065
+2026-10-18T17:21:57.864110Z 0 [Warning] [MY-010159] [Server] Setting lower_case_table_names=2 because file system for /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/data/ is case insensitive
+2026-10-18T17:21:57.870287Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-18T17:21:57.916532Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-18T17:21:58.345684Z 5 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+2026-10-18T17:21:58.684482Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 8.4.11).
+2026-10-18T17:21:59.198896Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
