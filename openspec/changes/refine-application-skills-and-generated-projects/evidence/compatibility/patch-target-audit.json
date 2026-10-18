@@ -1,0 +1,733 @@
+{
+  "1.0.0-rc.5-169397b": {
+    "integrity": "sha512-xf5TudQhFplMMzjwgmMY5f64Sqbv4iwXxdTHBHqvLMt+SHyY8rAYhzNLQchEkDxiqMclTS/txPEOg5pdQy0Tcw==",
+    "tarballSha256": "8e5ed315949cab608db54d342406c9925443d657ba3fa494b177f5d1c98ce344",
+    "tarball": "https://registry.npmjs.org/drizzle-orm/-/drizzle-orm-1.0.0-rc.5-169397b.tgz",
+    "hunks": {
+      "sqlite-core/effect/db.d.cts": {
+        "sha256": "cb97cbf552519f255b83f69b10c630bc6edcaf7cfab94e59ee83b573915f46d9",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "sqlite-core/effect/db.d.ts": {
+        "sha256": "b0c1e2351c1e57f0cade423b25f97c2d28fd2d7c8dda9c2742ac5fccbf9f7171",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "sqlite-core/effect/session.d.cts": {
+        "sha256": "d4fac903e7ecb892ef3a45e6b77232bd4089cd9ddf90fb72db5280ff544229b3",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "sqlite-core/effect/session.d.ts": {
+        "sha256": "9b30ceec43ce36b2f3f7046b4f32030b0797b938a96c9e7e86e521387311f32e",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-libsql/migrator.d.cts": {
+        "sha256": "affbfde167a2c81a5f4817adb2181b40573bf872afe9796efec7f6d917e7e0ae",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-libsql/migrator.d.ts": {
+        "sha256": "4966f0fc212da17c687f6d7e14004f19ca760d455157131b7c1f4dba6da61114",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-libsql/session.d.cts": {
+        "sha256": "da8c757eb9e7c79299a33ce794def55eee6938d63c817805ce53d3d65d99ead8",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-libsql/session.d.ts": {
+        "sha256": "ce5fd8caf934456d54499f90116140ec8994c15fce9e0b1fc57638f47c2e184c",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-wasm/migrator.d.cts": {
+        "sha256": "38a941340bc35b793327c2fb086c2983aef8b7d2752d501730ebfefe1516b16e",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-wasm/migrator.d.ts": {
+        "sha256": "ed2839642ebe34377a2ad0f9d0effc7218b057e204b356f2603363e5ab745e4f",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-wasm/session.d.cts": {
+        "sha256": "766f4c39e7e83e801803746c3f68e93ab963efbb0c829f6d6614153685a634e0",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-wasm/session.d.ts": {
+        "sha256": "0d9e639c6ff8970a25d73af55e954b6721f634d02a46eb6770187eb386766561",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-pglite/migrator.d.cts": {
+        "sha256": "de1dc6a15aa92c29394391eaecbe9d9a830757038efd1a13f502ae0d36e28f92",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-pglite/migrator.d.ts": {
+        "sha256": "f0aa8c9f9d64f8f9a7704c7455292338629af0782ee6cb3c50cb5362c0231bee",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-pglite/session.d.cts": {
+        "sha256": "d2238ccd03e6ff7fd60e7e61b85be4f5d32c8c1c5a111fde3fdc16ab5333d07e",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-pglite/session.d.ts": {
+        "sha256": "67d493bf6937993f5533e0c33286a2863bbe783b73f41145de4d6cffda96a0bd",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-do/migrator.d.cts": {
+        "sha256": "d51946d6a772c19e231720af5a9a28f6db9318edd7009d85972fedb21608b682",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-do/migrator.d.ts": {
+        "sha256": "13c2300f00b483e3cd3c79c2fca8ac69e1ab2c9b50eedecce16850718a539fed",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-do/session.d.cts": {
+        "sha256": "c19357025eb97dbc40228ac5c4a104731ba24cb40df719f112d5f6de1972a278",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-do/session.d.ts": {
+        "sha256": "86b4aa5aa7b016bddef873fc668acd7cebf36d673eebee618cacc0a1e24b79c5",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-postgres/migrator.d.cts": {
+        "sha256": "b91f8e86435fa1133a6d16eaab7c979a27fc8d53d5f17a69be6f21f164c7ee80",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-postgres/migrator.d.ts": {
+        "sha256": "ee92e2058b985718936e8513c83ebbc2c4bd481a22388bcdb118afb5101b30f7",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-postgres/session.d.cts": {
+        "sha256": "82608f86dcf65855cfee21787c39f5fa94e6068882e4a12b92e2db2ac0bafc35",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-postgres/session.d.ts": {
+        "sha256": "49336883db4840f1fa1d998652f965959c83bbf6d6afc6e48b0e32d15f671216",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-d1/session.d.cts": {
+        "sha256": "dfde8d7487ab75ad15b4eaf15d543762f6ee7353e3d2a239d3c44efb99080855",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-d1/session.d.ts": {
+        "sha256": "dfbdff74b62d16592f8e01d5f90b3c6ad1f9d7602aed1617004c9a436eabe7a6",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-mysql2/migrator.d.cts": {
+        "sha256": "e2d88b7fd3f4e32e07954593d2f7bc5c44998687990cafbf8a76f009c24a247e",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-mysql2/migrator.d.ts": {
+        "sha256": "d127719f131264d1f3a2f80ec1b34a85dd4ff3e05ab28536e75a34d94cd19d77",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-mysql2/session.d.cts": {
+        "sha256": "9fb9ade00c2901ab769bf15b7e7c3bbe45f3d011e74992e151ba5e1a358f54e5",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-mysql2/session.d.ts": {
+        "sha256": "8569c85fcf44dda6cdf7a2e2f218da40557f1b50d1c89d65647acbfda854c46b",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/effect/db.d.cts": {
+        "sha256": "9029ced40b3f3172414c1a8380d4ff1e4fe32249f2c603afb9357c994033a02d",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/effect/db.d.ts": {
+        "sha256": "6866f46782554a0c00d20bb6f829d293a1ce67254c948582e4e909bd31599fb7",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/effect/session.d.cts": {
+        "sha256": "5c95b0d1490dc15e4c7e4e6d0d17d1da3785ac72bbd4379931872901bc860bab",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/effect/session.d.ts": {
+        "sha256": "bfb6d71042a681d0deea05eaa9667eddef835be48ff24e387a822f68c87c418b",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-node/migrator.d.cts": {
+        "sha256": "74900808f4002ab2f3075d601d7077d47c1ef40b118f7ff804acc2262e1e2e2b",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-node/migrator.d.ts": {
+        "sha256": "4a1c6ba4fc2c81d13c9c2d095d779d8820e9f3a1e62183e6284e5129d2864238",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-node/session.d.cts": {
+        "sha256": "3ace59865997c4308f8a106cabc096a85b85bd30d0406114e8093167a9fb3128",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-node/session.d.ts": {
+        "sha256": "7ae0c2ec3c6bca894c99771f98a2504a9fcc3a9eb8a64f981b43a9ab74046247",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-bun/migrator.d.cts": {
+        "sha256": "af9f16f07f39d2e9552a4e7e5021c632750e1593fb151f5783cbb3850cc2049f",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-bun/migrator.d.ts": {
+        "sha256": "ad74212820d511f07b8ef7f34629e32b61debdd43056e631868ea03e467ac1c9",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-bun/session.d.cts": {
+        "sha256": "23b112cf54a3a16b3adfbeb834c431fef97a3936bcaba6401c1008f0132d78d4",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-bun/session.d.ts": {
+        "sha256": "4dcfc2f747bb2874a26080d77dfec529b856eec797c9c85a4c5c38ba23531958",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "mysql-core/effect/db.d.cts": {
+        "sha256": "ee58dedb70d5af9eecd43864abb48d35db769fbec9275cb5bc15b8608de83744",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "mysql-core/effect/db.d.ts": {
+        "sha256": "db2a57c65857c6c09efd8cfbe8280c58aa215cdc876545c91d459f169ffcc2cd",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "mysql-core/effect/session.d.cts": {
+        "sha256": "69370aeac537adcae796797e04c260fd6f5b8b8a11f36a6a4f01d14b920242d9",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "mysql-core/effect/session.d.ts": {
+        "sha256": "36cbefdc7bee3cf16532c793f55168559947a83061c08a0a8625702f7a1c5b8a",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/policies.d.ts": {
+        "sha256": "50efbd1e8eb5cbb5888bf148d75b70ca5fd552b48703e650629aec28235576eb",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "pg-core/policies.d.cts": {
+        "sha256": "ac34facac2543974fab5f0d344f74f7ca2e678d00c9f4ea3818e4be6ac06d647",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "pg-core/roles.d.ts": {
+        "sha256": "351f7b49543f958d47f931b18318ede41b9ad1f1852493a794efbd54bbca3121",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "pg-core/roles.d.cts": {
+        "sha256": "d4caecf126b4d946d730e53a745f82c788eaff6eb5b4bca997fb33a68170b867",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "cockroach-core/policies.d.ts": {
+        "sha256": "4eb5f50180873ec96caa153f2914c48053c4ece436bc4140cd441a5be93294b1",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "cockroach-core/policies.d.cts": {
+        "sha256": "ae5f79ac3ade277d9319d5f0c73b8f9e91137a1c06633379ef52ed7e60383499",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "cockroach-core/roles.d.ts": {
+        "sha256": "ddf1128e91d8c354de7e36b29dce299eb5104613266f4e92149a0339bc027576",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "cockroach-core/roles.d.cts": {
+        "sha256": "fe65fffa37707c413e148084699271e76e5ec1f38f698d8885c69ffb821bd7be",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      }
+    }
+  },
+  "1.0.0-rc.5-5935859": {
+    "integrity": "sha512-PkVjyxhamD7IOVfpDMn3BmV9afyvj3eeLvIPind3NmPv+cfv6/jh6GN0fHP0zzgrprGx/jGE4mkE0ttRFlzHwA==",
+    "tarballSha256": "b8f9a7b3f14fc99aeae2db06b924e0bbb6c7a1568ad933dfaa85bf95cc994d29",
+    "tarball": "https://registry.npmjs.org/drizzle-orm/-/drizzle-orm-1.0.0-rc.5-5935859.tgz",
+    "hunks": {
+      "sqlite-core/effect/db.d.cts": {
+        "sha256": "8e4ec6df9470d021cf6566ae3ac17f0ff824fde4ebe8d972ee2d1f00ef3980c4",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "sqlite-core/effect/db.d.ts": {
+        "sha256": "c591b5819697c15edbc6d9506ae70e0f8ef1804e6bb5dd4647a836db44a5781f",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "sqlite-core/effect/session.d.cts": {
+        "sha256": "de6e9d825ba0d17457239a777e0a9a1efe2195fedb6ec9aaca495371c1b00a1c",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "sqlite-core/effect/session.d.ts": {
+        "sha256": "8784fe9617e5279ccf9e7afada26c7c1c311ed0b557b3284cdea68b7e41d94a4",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-libsql/migrator.d.cts": {
+        "sha256": "4b1a278d3a105c5b6eaaec90ee314c373c0bbb713553a8a3a52f34fa784bd650",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-libsql/migrator.d.ts": {
+        "sha256": "e101acf8ba7d1fce5460bc51f9fa8c08ea0f0b47d8954701c8d932d969ac902c",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-libsql/session.d.cts": {
+        "sha256": "b5bcd69a520801f0a599a09ae086bf22d44cbf22ad6d1b5c38ba266f6cea84d7",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-libsql/session.d.ts": {
+        "sha256": "c5419f1dee3098a961f0352f804ea4060e7c4b0b0fddaa0ee5cfd2e1f8bb10fc",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-wasm/migrator.d.cts": {
+        "sha256": "e4dc5b5221e1963e331b6b7984860a20e9bed0379c52a35b16fbd6438ccdad13",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-wasm/migrator.d.ts": {
+        "sha256": "bdd0160e5eff7439a3ee6e1ac4ec954d83e46d4ee30a5e2606e1f613d8bad170",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-wasm/session.d.cts": {
+        "sha256": "bb15f6f79df69828b212ff612b9dbcd26f402fdca906b6d93ffe9b86cceaf716",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-wasm/session.d.ts": {
+        "sha256": "b98b631431f8d7162e10ca1473d81a960ab86b3e1892da34fee05c7d3433abd9",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-pglite/migrator.d.cts": {
+        "sha256": "fab052fbf92306657a57be3cfe49dbd74847f93c6206e325af8ce935fcb38a37",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-pglite/migrator.d.ts": {
+        "sha256": "90cc165a5a1a15f4c09dcfa4e7fcad0db1eba04322cd4ae56b3e3f309bb9dc10",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-pglite/session.d.cts": {
+        "sha256": "71c47cfe86e9e320be49fd9752591857cd65868844cb5fadd57ddba178a44b72",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-pglite/session.d.ts": {
+        "sha256": "0880072e2d5875d8ed1f5d51604ac33645a2dda60090d1bfd5c04a3f7abb7fb4",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-do/migrator.d.cts": {
+        "sha256": "0017d12be764ea1675368a628d593f7803d6627e75537ef6ff164304f22862e2",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-do/migrator.d.ts": {
+        "sha256": "d1710499d1bc048ac807a90b8cad92fbf1a4e12ce20e3866279b30862a80c60d",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-do/session.d.cts": {
+        "sha256": "d029d4367bfaba14176381ed8d0a0485ccf072b22407e62277d2e531d80d4c76",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-do/session.d.ts": {
+        "sha256": "a7a0bf03afc338bd09db3636dcaef3587bb4095636ad3abf4d807ff9a1b58483",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-postgres/migrator.d.cts": {
+        "sha256": "eaf641f6ca08beb4daf7118a497f45cdb14bac69f55eb2726cec2f6ba49bdef1",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-postgres/migrator.d.ts": {
+        "sha256": "327f4be0a5261051967308dfca2880f7892057d8ed6960c19ba1a8d98bd4bf87",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-postgres/session.d.cts": {
+        "sha256": "4eea1f6660f6e36b889ed84d85305d515ab392e4042d081cb2c44866cc006ede",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-postgres/session.d.ts": {
+        "sha256": "a2025a8a699bb4048d9e17b5dd1875ad7eeda0a6134aea80a02193a70007377b",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-d1/session.d.cts": {
+        "sha256": "7c5e118de07a520038f7b8e450fd75a4d2191c1d970f30d9b0a713cad1564617",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-d1/session.d.ts": {
+        "sha256": "781b03f2427855a4770997c9a83c3a2ad98b1698445586585405bda8f162e666",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-mysql2/migrator.d.cts": {
+        "sha256": "9a9c413e9ed9f692c3e94c39f4c3f924d9e3c0c370fceb5ff33c955f29398587",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-mysql2/migrator.d.ts": {
+        "sha256": "3c91c2ca17e152e21ecfc387f93c54c4254a38fb6c4d88d85c2d53167cea8f54",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-mysql2/session.d.cts": {
+        "sha256": "2693c09070f758182805537c847291f5eae4d5589a6c44603a6bf20f80d4b231",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-mysql2/session.d.ts": {
+        "sha256": "e818029d1fb7bc05f63598f74679d802259cc246f7e7385e3c7ea4613d73eb4d",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/effect/db.d.cts": {
+        "sha256": "eddc63c8ce775852a7a259860ed771653a1236fdd73ad41c2e363643092547f3",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/effect/db.d.ts": {
+        "sha256": "bed45d05eb5a0c209ec508744ceb8523cd219c0beb5661cf32f0664ff1eb190c",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/effect/session.d.cts": {
+        "sha256": "45ec397e2fe8a4a2d1a64fc4a0cf6439b7821b01dd2b150c0bee74222d0b7f16",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/effect/session.d.ts": {
+        "sha256": "08cfa5530644c898577357c45a1e3647cc84c87ebbb2ad1c6258c2c10bcb73d7",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-node/migrator.d.cts": {
+        "sha256": "f98f1760524fcf101b572e71207ba562337a8f9262fa0859f9e1c132d404a879",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-node/migrator.d.ts": {
+        "sha256": "784713c091577c5cb630618c320247608ce3b6c1c48cc6626e51c76d9f8e5776",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-node/session.d.cts": {
+        "sha256": "352cd8e99a1ce4dcccaf95a82c58703602e05f8e4237e3d9a237a5f3d64972b7",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-node/session.d.ts": {
+        "sha256": "ddf4a81d96c2718eef187835efab774f2a640435b0b43151acf032a19996a4ee",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-bun/migrator.d.cts": {
+        "sha256": "32ad6cf927cacaf0f2f54370d21af0a28b07e8db7c6198c7c918f8e618c96be9",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-bun/migrator.d.ts": {
+        "sha256": "728a8a7dcbdcf6483f3f322d71f5721026550831c9ece593f14bc1586f210949",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-bun/session.d.cts": {
+        "sha256": "8b0ccf2f7666ab6663e62d6b20a5753b03cfed9caeec7e6f1ccd83e98f4933ae",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "effect-sqlite-bun/session.d.ts": {
+        "sha256": "100fa1725e329f4a7749eb37d4f78bef48de095f683bbb42d71b1532d163ac76",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "mysql-core/effect/db.d.cts": {
+        "sha256": "b760bde2c2dc05d56ad65c0e96d29577313718a58f83752702565c1f448734e2",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "mysql-core/effect/db.d.ts": {
+        "sha256": "c7e505e18bb02e80f9be51f192cd99a33c5a648b8f2a52f62302709136a46731",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "mysql-core/effect/session.d.cts": {
+        "sha256": "676e4f63682daf1760818c29375f499287f0294af64eeebc3d0da59eaee0a721",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "mysql-core/effect/session.d.ts": {
+        "sha256": "adf2af86734496a14222a401e5fe59a4d3f7a6c5acf2a7749a2a2fdc221341a9",
+        "oldSqlImport": true,
+        "repairedSqlImport": false
+      },
+      "pg-core/policies.d.ts": {
+        "sha256": "44a234f5b9cb4a151c94da9b9745a0d680aed3767b68a1a756a70fdfa56df7a6",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "pg-core/policies.d.cts": {
+        "sha256": "dc07e1af25bbc34fb758b2e8f18b05658c418b476c2005be2e0390fa2431df36",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "pg-core/roles.d.ts": {
+        "sha256": "43e350a5b320d0b6b17366f9ddaef30a5b0ddf592fdc0e0c1fa176d0694773e5",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "pg-core/roles.d.cts": {
+        "sha256": "d368309134f88f64602643f554f2f277f765959f82a3b13f2a8e0a36465103c4",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "cockroach-core/policies.d.ts": {
+        "sha256": "e8a96a0b24a0e17d55c0c661abbf2befab6ef96c604fb71e99965eb8b3316a4a",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "cockroach-core/policies.d.cts": {
+        "sha256": "afefa089118a9a916fb396b09580a6664bbeda37d21fcc5486597277b648b05b",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "cockroach-core/roles.d.ts": {
+        "sha256": "96db4e0d7a120a1ddf3ae9a578d6aef230155c4367e6ac3a6b67cbaf8e270b4c",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "cockroach-core/roles.d.cts": {
+        "sha256": "0caab04f8b891aee8335d9e5770d1db89ef7622f7bace95d81ea638488424e49",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      }
+    }
+  },
+  "0.45.4": {
+    "integrity": "sha512-NiM1YZpJ2UxyeE67DpDDZ+Tsw4YLX3trSlkNT7Tm9eKoUNb1LvaAaQzXgYQsWs+AQ9TUmmwMmBOCXuqqxUWKKQ==",
+    "tarballSha256": "9d28e78c15fbd781001ad2da3f1dfe41561791cba0304b801a5bc5e73b5f4464",
+    "tarball": "https://registry.npmjs.org/drizzle-orm/-/drizzle-orm-0.45.4.tgz",
+    "hunks": {
+      "sqlite-core/effect/db.d.cts": {
+        "missing": true
+      },
+      "sqlite-core/effect/db.d.ts": {
+        "missing": true
+      },
+      "sqlite-core/effect/session.d.cts": {
+        "missing": true
+      },
+      "sqlite-core/effect/session.d.ts": {
+        "missing": true
+      },
+      "effect-libsql/migrator.d.cts": {
+        "missing": true
+      },
+      "effect-libsql/migrator.d.ts": {
+        "missing": true
+      },
+      "effect-libsql/session.d.cts": {
+        "missing": true
+      },
+      "effect-libsql/session.d.ts": {
+        "missing": true
+      },
+      "effect-sqlite-wasm/migrator.d.cts": {
+        "missing": true
+      },
+      "effect-sqlite-wasm/migrator.d.ts": {
+        "missing": true
+      },
+      "effect-sqlite-wasm/session.d.cts": {
+        "missing": true
+      },
+      "effect-sqlite-wasm/session.d.ts": {
+        "missing": true
+      },
+      "effect-pglite/migrator.d.cts": {
+        "missing": true
+      },
+      "effect-pglite/migrator.d.ts": {
+        "missing": true
+      },
+      "effect-pglite/session.d.cts": {
+        "missing": true
+      },
+      "effect-pglite/session.d.ts": {
+        "missing": true
+      },
+      "effect-sqlite-do/migrator.d.cts": {
+        "missing": true
+      },
+      "effect-sqlite-do/migrator.d.ts": {
+        "missing": true
+      },
+      "effect-sqlite-do/session.d.cts": {
+        "missing": true
+      },
+      "effect-sqlite-do/session.d.ts": {
+        "missing": true
+      },
+      "effect-postgres/migrator.d.cts": {
+        "missing": true
+      },
+      "effect-postgres/migrator.d.ts": {
+        "missing": true
+      },
+      "effect-postgres/session.d.cts": {
+        "missing": true
+      },
+      "effect-postgres/session.d.ts": {
+        "missing": true
+      },
+      "effect-d1/session.d.cts": {
+        "missing": true
+      },
+      "effect-d1/session.d.ts": {
+        "missing": true
+      },
+      "effect-mysql2/migrator.d.cts": {
+        "missing": true
+      },
+      "effect-mysql2/migrator.d.ts": {
+        "missing": true
+      },
+      "effect-mysql2/session.d.cts": {
+        "missing": true
+      },
+      "effect-mysql2/session.d.ts": {
+        "missing": true
+      },
+      "pg-core/effect/db.d.cts": {
+        "missing": true
+      },
+      "pg-core/effect/db.d.ts": {
+        "missing": true
+      },
+      "pg-core/effect/session.d.cts": {
+        "missing": true
+      },
+      "pg-core/effect/session.d.ts": {
+        "missing": true
+      },
+      "effect-sqlite-node/migrator.d.cts": {
+        "missing": true
+      },
+      "effect-sqlite-node/migrator.d.ts": {
+        "missing": true
+      },
+      "effect-sqlite-node/session.d.cts": {
+        "missing": true
+      },
+      "effect-sqlite-node/session.d.ts": {
+        "missing": true
+      },
+      "effect-sqlite-bun/migrator.d.cts": {
+        "missing": true
+      },
+      "effect-sqlite-bun/migrator.d.ts": {
+        "missing": true
+      },
+      "effect-sqlite-bun/session.d.cts": {
+        "missing": true
+      },
+      "effect-sqlite-bun/session.d.ts": {
+        "missing": true
+      },
+      "mysql-core/effect/db.d.cts": {
+        "missing": true
+      },
+      "mysql-core/effect/db.d.ts": {
+        "missing": true
+      },
+      "mysql-core/effect/session.d.cts": {
+        "missing": true
+      },
+      "mysql-core/effect/session.d.ts": {
+        "missing": true
+      },
+      "pg-core/policies.d.ts": {
+        "sha256": "1f4700278d1383d6b53ef1f5aecd88e84d1b7e77578761838ffac8e305655c29",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "pg-core/policies.d.cts": {
+        "sha256": "403136d01a416d3ef0c71853d1eb5c90180cb9f49c93ad1b3ad0c6d8994f5242",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "pg-core/roles.d.ts": {
+        "sha256": "e3588e9db86c6eaa572c313a23bf10f7f2f8370e62972996ac79b99da065acaa",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "pg-core/roles.d.cts": {
+        "sha256": "4fcdc7b23a423ea65395b09b6cafeb657cd8b141bae37154f6a5ae2657b915ff",
+        "oldSqlImport": false,
+        "repairedSqlImport": false
+      },
+      "cockroach-core/policies.d.ts": {
+        "missing": true
+      },
+      "cockroach-core/policies.d.cts": {
+        "missing": true
+      },
+      "cockroach-core/roles.d.ts": {
+        "missing": true
+      },
+      "cockroach-core/roles.d.cts": {
+        "missing": true
+      }
+    }
+  }
+}
