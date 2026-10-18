@@ -1,0 +1,307 @@
+{
+  "temporary": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb",
+  "workspaceLinked": true,
+  "commands": [
+    {
+      "label": "guidance01-generate-before",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/drizzle-kit",
+        "generate",
+        "--name=before"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.3755482090055011,
+      "pid": 24519
+    },
+    {
+      "label": "guidance01-migrate-before",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "db",
+        "migrate"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.2451295829960145,
+      "pid": 24666
+    },
+    {
+      "label": "guidance01-seed-business",
+      "args": [
+        "bun",
+        "--smol",
+        "-e",
+        "import {Database} from \"bun:sqlite\"; const db=new Database(process.env.DATABASE_PATH); db.exec(\"INSERT INTO notes(id,content) VALUES (0,'Preserve this existing record')\"); db.close();"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.03939250000985339,
+      "pid": 24704
+    },
+    {
+      "label": "guidance01-generate-extension",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/drizzle-kit",
+        "generate",
+        "--name=orders"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.3602846249996219,
+      "pid": 24711
+    },
+    {
+      "label": "guidance01-migrate-extension",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "db",
+        "migrate"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.190641624998534,
+      "pid": 24726
+    },
+    {
+      "label": "guidance01-repeat",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "db",
+        "migrate"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.9581181250105146,
+      "pid": 24753
+    },
+    {
+      "label": "guidance01-check",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "check"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 8.590966666000895,
+      "pid": 24806
+    },
+    {
+      "label": "guidance01-typecheck",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.5782041249913163,
+      "pid": 24960
+    },
+    {
+      "label": "guidance01-test",
+      "args": [
+        "bun",
+        "--smol",
+        "test",
+        "tests/integration/auth-orders.test.ts",
+        "--timeout",
+        "30000"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.10413249998237,
+      "pid": 24984
+    },
+    {
+      "label": "guidance01-build",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "build"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 3.627151083026547,
+      "pid": 25008
+    },
+    {
+      "label": "guidance01-production-http",
+      "args": [
+        "bun",
+        "--smol",
+        "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/guidance-network.ts",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.6897988749842625,
+      "pid": 25065
+    },
+    {
+      "label": "guidance02-check",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/.bin/relkit",
+        "check"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 7.75255066700629,
+      "pid": 25095
+    },
+    {
+      "label": "guidance02-typecheck-backend",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.5378508330031764,
+      "pid": 25373
+    },
+    {
+      "label": "guidance02-typecheck-web",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "web/tsconfig.json"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.1344338330090977,
+      "pid": 25432
+    },
+    {
+      "label": "guidance02-test",
+      "args": [
+        "bun",
+        "--smol",
+        "test",
+        "tests/integration/greeting.test.ts"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.7612509590107948,
+      "pid": 25459
+    },
+    {
+      "label": "guidance02-build-api",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/.bin/relkit",
+        "build"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 2.938555458007613,
+      "pid": 25475
+    },
+    {
+      "label": "guidance02-build-web",
+      "args": [
+        "node",
+        "--max-old-space-size=512",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/next/dist/bin/next",
+        "build",
+        "web",
+        "--webpack"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 14.229792832979001,
+      "pid": 25519
+    },
+    {
+      "label": "guidance02-browser",
+      "args": [
+        "bun",
+        "--smol",
+        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/.bin/playwright",
+        "test",
+        "--config",
+        "playwright.config.ts",
+        "--workers=1"
+      ],
+      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.5984319999988656,
+      "pid": 25824
+    }
+  ],
+  "case01": {
+    "migrationBeforeAndExtension": true,
+    "realHTTPHarness": true,
+    "ownershipValidationPersistence": true,
+    "network": {
+      "passed": true,
+      "productionHTTP": true,
+      "distinctResources": true,
+      "trustedOwnership": true,
+      "validation": true,
+      "revocation": true,
+      "preservedBusinessRows": true
+    }
+  },
+  "servers": [
+    {
+      "label": "guidance02-api",
+      "pid": 25791
+    },
+    {
+      "label": "guidance02-web",
+      "pid": 25813
+    }
+  ],
+  "case02": {
+    "backendHTTP": true,
+    "frontendProductionBuild": true,
+    "realBrowser": true,
+    "workers": 1
+  },
+  "passed": true,
+  "cleanup": {
+    "childrenExited": true,
+    "temporaryRemoved": true
+  }
+}
