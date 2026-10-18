@@ -1,0 +1,1 @@
+The fixture cannot reproduce runtime behavior because its test harness dependency is unavailable. Static inspection shows !id rejects zero, so I will replace that guard with explicit query/integer validation and add edge-case assertions. I will attempt the required test again and report the verification blocker; written code alone will not count as verified delivery.

@@ -1,0 +1,14 @@
+bun test v1.3.10 (30e609e0)
+
+tests/items.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find package 'unavailable-runtime-harness' from '/private/tmp/relkit-skill-forward-d4_6o6f0/case14/app/tests/items.test.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [5.00ms]
