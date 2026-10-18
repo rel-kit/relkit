@@ -1,0 +1,15 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/database/migrate.test.ts:
+(pass) database help and completion are pure and share --config metadata [22.72ms]
+(pass) selected nested/absolute config owns target, output and log; repeat is a no-op [266.73ms]
+(pass) invalid or absent configuration/history never creates the target [882.52ms]
+(pass) noisy config and secret-bearing exceptions produce one safe JSON result [95.64ms]
+(pass) empty SQL or an invalid migration timestamp fails before opening a database [198.17ms]
+(pass) SQL errors are operational failures without retry or successful publication [117.59ms]
+(pass) missing consumer ORM is actionable without a CLI or workspace fallback [90.85ms]
+
+ 7 pass
+ 0 fail
+ 35 expect() calls
+Ran 7 tests across 1 file. [2.53s]

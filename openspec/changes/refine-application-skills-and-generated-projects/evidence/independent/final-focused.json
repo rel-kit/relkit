@@ -1,0 +1,17 @@
+{
+  "args": [
+    "nice",
+    "-n",
+    "10",
+    "bun",
+    "test",
+    "packages/cli/tests/database",
+    "tests/generator/add-transaction.test.ts",
+    "tests/generator/add-platform-acceptance.test.ts",
+    "--timeout",
+    "30000"
+  ],
+  "pid": 48957,
+  "exit": 0,
+  "seconds": 26.996506214141846
+}
