@@ -18,6 +18,10 @@ async function main(): Promise<void> {
     await readFile(resolve(root, "packages/cli/package.json"), "utf8"),
   ) as { readonly version: string };
   const cliModel = getCliHelpModel(cliPackage.version);
+  if (process.argv.includes("--cli-only")) {
+    await emit("operations/cli-reference.mdx", renderCliReference(cliModel));
+    return;
+  }
   await pruneEmptyNavigation();
   await pruneGeneratedRelations();
   await pruneRemovedApiPages();

@@ -33,7 +33,13 @@ The configuration deliberately requires an explicit persistent file path. A sepa
 migrate the in-memory connection later opened by your application.
 
 The example's package scripts use `bun --bun drizzle-kit generate` and
-`bun --bun drizzle-kit migrate`. Running Kit under Bun lets this SQLite workflow use Bun's driver.
+`relkit db migrate`. Shared migration execution lives in installed RELKIT tooling;
+SQLite uses the Bun-native driver without a copied runner. PostgreSQL/MySQL
+delegate to the application's installed Drizzle Kit under Bun.
+
+Keep SQL and required metadata tracked in `src/services/database/migrations`, beside
+the owning service and schema. Auth and business tables share this one ordered
+history; `.relkit/` contains ignored runtime/build output, not migration source.
 
 ## Generate, review, and apply
 
@@ -42,7 +48,7 @@ For a new app and a new local file, run these commands from the application root
 ```sh
 export DATABASE_PATH=./data-model.sqlite
 bun --bun drizzle-kit generate --name=initial
-bun --bun drizzle-kit migrate
+bun run db:migrate
 bun run check
 bun run typecheck
 bun run dev
@@ -50,7 +56,16 @@ bun run dev
 
 If you are running the repository example, its initial migration is already generated and checked in;
 start with `bun run db:migrate` after setting `DATABASE_PATH`. Use the same path for the migration
-command and the running server. A relative path is resolved from the process's working directory.
+command and the running server. Run from the application root containing package.json
+and relkit.config.ts. Select another config with `bun run relkit db migrate --config
+configs/database.ts`; the default is root `drizzle.config.ts`. Its connection, output
+and supported log settings are authoritative. Relative database/output paths still
+use the application root even for nested or absolute config selections.
+
+Bun loads the application's normal dotenv files, with inherited variables taking
+precedence; `.env.example` is never loaded. Keep PostgreSQL/MySQL configuration
+deterministic because delegated Kit loads it again. Missing tooling is an explicit
+installation error; the migration command never downloads packages implicitly.
 
 `generate` compares TypeScript schema definitions with migration snapshots and creates migration
 artifacts; it does not modify your database. Review the generated changes before applying them.
@@ -74,7 +89,7 @@ bun --bun drizzle-kit generate --name=users-change
 
 Review the diff and test it on an isolated copy of the old schema with representative data. After
 verification, apply the pending migrations to the intended target with `bun run db:migrate`
-(or `bun --bun drizzle-kit migrate` if you have not added the script).
+(or `bun run relkit db migrate` if you have not added the script).
 
 Keep model changes, generated artifacts, and affected application contracts in the same change.
 Renames need particular attention so they are not mistaken for deleting and recreating data.
@@ -112,10 +127,17 @@ bun run check
 bun run typecheck
 ```
 
-The migration test invokes Drizzle Kit against a temporary file, writes data through Drizzle, and
+The migration test invokes shared RELKIT tooling against a temporary file, writes data through Drizzle, and
 runs migrations again to verify that the data survives. Application tests apply the generated
 migration to their own isolated connection. As history grows, add upgrade tests from deployed
 versions, not just tests of an empty database.
+
+`relkit db migrate --json` emits one secret-safe result after cleanup: success
+identifies command, dialect and config/history paths, without inventing an applied
+count. Usage/configuration errors exit 2, operational failures 1, interruption 130,
+and success 0. Missing, empty or incompatible history fails before opening the
+target database and points to generation/compatibility checks. Failed SQL is not
+automatically retried; partial DDL rollback is not guaranteed.
 
 See [Testing](/docs/database/testing) for the executable tests and
 [Better Auth](/docs/database/better-auth) before adding authentication tables.

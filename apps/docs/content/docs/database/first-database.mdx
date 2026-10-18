@@ -93,12 +93,14 @@ From your application's root, generate the migration from the table definitions 
 ```sh
 export DATABASE_PATH=./data-model.sqlite
 bun --bun drizzle-kit generate --name=initial
-bun --bun drizzle-kit migrate
+bun run relkit db migrate
 ```
 
 Review the generated migration before applying it. In the repository example, the initial migration
 already exists, so set `DATABASE_PATH` and run `bun run db:migrate` instead of creating another one.
-Keep this environment value for the server, and commit the generated migration history with the schema.
+Keep this environment value for the server, and commit generated SQL and required metadata under
+`src/services/database/migrations` with the schema. The installed command owns execution;
+scaffolding and service startup do not apply SQL.
 
 Run the compiler now so the database context is available to the next function:
 
