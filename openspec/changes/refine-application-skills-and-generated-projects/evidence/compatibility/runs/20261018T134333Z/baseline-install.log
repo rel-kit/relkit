@@ -1,0 +1,13 @@
+bun install v1.3.10 (30e609e0)
+Resolving dependencies
+Resolved, downloaded and extracted [2]
+Saved lockfile
+
++ @effect/sql-pg@4.0.1
++ @types/bun@1.3.10
++ drizzle-kit@1.0.0-rc.5-ab785fc
++ drizzle-orm@1.0.0-rc.5-169397b
++ effect@4.0.1
++ typescript@5.9.3
+
+17 packages installed [191.00ms]
