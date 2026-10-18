@@ -1,0 +1,19 @@
+{
+  "args": [
+    "nice",
+    "-n",
+    "10",
+    "bun",
+    "test",
+    "packages/create-relkit/tests/dependency-patches.test.ts",
+    "packages/create-relkit/tests/dependency-patch-generation.test.ts",
+    "tests/unit/build-catalog.test.ts",
+    "tests/unit/sync-release.test.ts",
+    "apps/docs/tests/auth-learning.test.ts",
+    "apps/docs/tests/database-learning.test.ts",
+    "--timeout",
+    "15000"
+  ],
+  "pid": 34464,
+  "exit": 0
+}

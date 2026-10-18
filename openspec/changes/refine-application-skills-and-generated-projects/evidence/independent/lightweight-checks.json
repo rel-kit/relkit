@@ -1,0 +1,66 @@
+[
+  {
+    "name": "evidence-format",
+    "args": [
+      "node",
+      "--max-old-space-size=256",
+      "node_modules/prettier/bin/prettier.cjs",
+      "--write",
+      "openspec/changes/refine-application-skills-and-generated-projects/tasks.md",
+      "openspec/changes/refine-application-skills-and-generated-projects/evidence/guidance-evaluation.md",
+      "openspec/changes/refine-application-skills-and-generated-projects/evidence/independent-verification.md"
+    ],
+    "pid": 53852,
+    "exit": 0,
+    "seconds": 0.1835918426513672
+  },
+  {
+    "name": "docs-cli-check",
+    "args": [
+      "bun",
+      "--smol",
+      "apps/docs/scripts/generate.ts",
+      "--cli-only",
+      "--check"
+    ],
+    "pid": 53853,
+    "exit": 0,
+    "seconds": 0.40517187118530273
+  },
+  {
+    "name": "konsistent",
+    "args": [
+      "bun",
+      "run",
+      "konsistent",
+      "--",
+      "validate"
+    ],
+    "pid": 53857,
+    "exit": 0,
+    "seconds": 0.3515892028808594
+  },
+  {
+    "name": "openspec-strict",
+    "args": [
+      "openspec",
+      "validate",
+      "refine-application-skills-and-generated-projects",
+      "--strict"
+    ],
+    "pid": 53859,
+    "exit": 0,
+    "seconds": 0.8401076793670654
+  },
+  {
+    "name": "diff-check",
+    "args": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "pid": 53867,
+    "exit": 0,
+    "seconds": 0.07757401466369629
+  }
+]
