@@ -1,0 +1,1 @@
+Kept hosting discussion read-only and changed only the requested item route and its regression tests. Same original HTTP-boundary reproduction and passing replay as case05: before 404 failure, after 2 tests and 17 assertions. No hosting provider was selected/provisioned and no config/frontend changes were made.
