@@ -1,0 +1,24 @@
+Retaining completed source gate: final-format
+Retaining completed source gate: final-native
+Retaining completed source gate: final-generator
+Retaining completed source gate: final-sync-first
+Retaining completed source gate: final-sync-second
+Retaining completed source gate: final-release-notes-write
+Retaining completed source gate: final-release-notes-check
+Retaining completed source gate: final-typecheck-product
+final-typecheck-docs
+final-docs
+final-cli-reference
+final-mdx
+Traceback (most recent call last):
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/final-checks.py", line 33, in <module>
+    run(report,"final-mdx",["bun","--smol","-e",mdx,*[path for path in files if path.endswith(".mdx")]],repository,timeout=120)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/final-checks.py", line 15, in run
+    return invoke(report,label,args,cwd,**options)
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/local_support.py", line 42, in run
+    raise RuntimeError(label + " failed: " + output[-3000:])
+RuntimeError: final-mdx failed: error: Cannot find module '@mdx-js/mdx' from '/Users/mustafaelsayed/Workspace/relkit/apps/docs/node_modules/fumadocs-mdx/package.json'
+
+Bun v1.3.10 (macOS arm64)
+

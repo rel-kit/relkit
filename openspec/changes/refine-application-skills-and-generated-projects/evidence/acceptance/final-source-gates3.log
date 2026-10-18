@@ -1,0 +1,16 @@
+Retaining completed source gate: final-format
+Retaining completed source gate: final-native
+Retaining completed source gate: final-generator
+Retaining completed source gate: final-sync-first
+Retaining completed source gate: final-sync-second
+Retaining completed source gate: final-release-notes-write
+Retaining completed source gate: final-release-notes-check
+Retaining completed source gate: final-typecheck-product
+Retaining completed source gate: final-typecheck-docs
+Retaining completed source gate: final-docs
+Retaining completed source gate: final-cli-reference
+final-mdx
+final-boundaries
+final-authoring-lint
+final-konsistent
+final-openspec
