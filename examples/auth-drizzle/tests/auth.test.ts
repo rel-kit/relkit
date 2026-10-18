@@ -20,7 +20,9 @@ test("migrated auth supports sign-up, session lookup, sign-out, and sign-in", as
     const sqlite = new Database(path);
     try {
       const database = drizzle({ client: sqlite });
-      const options = { migrationsFolder: resolve(import.meta.dir, "../drizzle") };
+      const options = {
+        migrationsFolder: resolve(import.meta.dir, "../src/services/database/migrations"),
+      };
       expect(migrate(database, options)).toBeUndefined();
       expect(migrate(database, options)).toBeUndefined();
     } finally {

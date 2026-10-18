@@ -10,7 +10,7 @@
     "test": "bun test",
     "build": "bun ../../packages/cli/dist/bin.js build",
     "db:generate": "bun --bun drizzle-kit generate",
-    "db:migrate": "bun --bun drizzle-kit migrate"
+    "db:migrate": "relkit db migrate"
   },
   "dependencies": {
     "@relkit/app": "workspace:*",
