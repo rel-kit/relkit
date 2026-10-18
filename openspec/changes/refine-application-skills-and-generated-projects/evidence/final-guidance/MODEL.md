@@ -1,0 +1,1 @@
+Parent reports its turn_context model as gpt-6.1-sol and confirms this agent was spawned without an override. Therefore inherited parent metadata identifies the expected child model as gpt-6.1-sol. I cannot independently inspect child-specific model/version metadata through the tools available in this child session; no independent runtime identity result is claimed.
