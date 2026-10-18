@@ -1,0 +1,1 @@
+Stopped because the requested internal database behavior is unspecified. Database singleton, existing migration and Better Auth ALL handler are byte-for-byte unchanged. No public infrastructure endpoint was introduced.
