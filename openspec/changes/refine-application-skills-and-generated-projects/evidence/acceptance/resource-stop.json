@@ -1,0 +1,8 @@
+{
+  "pid": 467,
+  "parent": 463,
+  "group": 467,
+  "verifiedCommand": "463   467 /Users/mustafaelsayed/.bun/bin/bun --smol install --network-concurrency 1 --force --no-cache --registry http://127.0.0.1:55968",
+  "signal": "SIGTERM",
+  "reason": "memory warning and increased load during isolated install"
+}
