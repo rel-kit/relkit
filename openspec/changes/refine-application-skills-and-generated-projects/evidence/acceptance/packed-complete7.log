@@ -1,0 +1,39 @@
+Acceptance: auth-chained-business-generate
+[20:10:14.434] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 496.920292,
+}
+Acceptance: auth-chained-business-migrate
+[20:10:15.652] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1210.278041,
+}
+Acceptance: auth-chained-repeat
+[20:10:16.656] INFO (#7): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 995.091083,
+}
+20 |   ]) {
+21 |     await mkdir(dirname(join(root, path)), { recursive: true });
+22 |     await cp(join(repository, "examples/auth-drizzle", path), join(root, path));
+23 |   }
+24 |   const source = await readFile(join(root, "src/services/database/schema/index.ts"), "utf8");
+25 |   assert.ok(source.includes("items") && source.includes("auth"));
+              ^
+AssertionError: false == true
+ generatedMessage: true,
+     actual: false,
+   expected: true,
+   operator: "==",
+       code: "ERR_ASSERTION"
+
+      at protect (/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed-auth.ts:25:10)
+      at processTicksAndRejections (native:7:39)
+
+Bun v1.3.10 (macOS arm64)

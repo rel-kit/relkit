@@ -1,0 +1,28 @@
+Acceptance: auth-chained-check
+[20:13:21.003] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5466.363709,
+}
+Acceptance: auth-chained-typecheck
+[20:13:22.599] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1584.735084,
+}
+Acceptance: auth-chained-test
+[20:13:23.447] INFO (#7): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 841.987542,
+}
+Acceptance: auth-chained-build
+[20:13:27.189] INFO (#10): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3735.902292,
+}
