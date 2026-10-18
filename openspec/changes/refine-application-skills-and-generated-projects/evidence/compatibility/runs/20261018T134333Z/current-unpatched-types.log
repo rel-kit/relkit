@@ -1,0 +1,26 @@
+pg-core/policies.d.ts: 1 diagnostics
+Class 'PgPolicy' incorrectly implements interface 'PgPolicyConfig'.
+  Types of property 'as' are incompatible.
+    Type '"permissive" | "restrictive" | undefined' is not assignable to type '"permissive" | "restrictive"'.
+      Type 'undefined' is not assignable to type '"permissive" | "restrictive"'.
+pg-core/roles.d.ts: 1 diagnostics
+Class 'PgRole' incorrectly implements interface 'PgRoleConfig'.
+  Types of property 'createDb' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+cockroach-core/policies.d.ts: 1 diagnostics
+Class 'CockroachPolicy' incorrectly implements interface 'CockroachPolicyConfig'.
+  Types of property 'as' are incompatible.
+    Type '"permissive" | "restrictive" | undefined' is not assignable to type '"permissive" | "restrictive"'.
+      Type 'undefined' is not assignable to type '"permissive" | "restrictive"'.
+cockroach-core/roles.d.ts: 1 diagnostics
+Class 'CockroachRole' incorrectly implements interface 'CockroachRoleConfig'.
+  Types of property 'createDb' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+pg-core/effect/db.d.ts: 1 diagnostics
+Cannot find module 'effect/unstable/sql/SqlError' or its corresponding type declarations.
+pg-core/effect/session.d.ts: 1 diagnostics
+Cannot find module 'effect/unstable/sql/SqlError' or its corresponding type declarations.
+effect-postgres/session.d.ts: 1 diagnostics
+Cannot find module 'effect/unstable/sql/SqlError' or its corresponding type declarations.
