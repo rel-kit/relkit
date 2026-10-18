@@ -1,0 +1,13 @@
+{
+  "name": "existing-fixture",
+  "type": "module",
+  "scripts": {
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@relkit/app": "0.7.7"
+  },
+  "devDependencies": {
+    "@relkit/testing": "0.7.7"
+  }
+}
