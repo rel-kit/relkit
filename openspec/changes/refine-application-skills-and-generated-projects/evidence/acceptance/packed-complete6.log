@@ -1,0 +1,65 @@
+Acceptance: existing-database-auth-test
+[20:09:41.087] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1037.456667,
+}
+Acceptance: existing-database-auth-build
+[20:09:45.867] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4763.934,
+}
+Acceptance: auth-chained-add
+[20:09:48.729] INFO (#7): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1105.568417,
+}
+Acceptance: auth-chained-install
+[20:09:54.549] INFO (#10): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5813.260584,
+}
+Acceptance: auth-chained-frozen
+[20:09:54.585] INFO (#13): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 28.709583,
+}
+Acceptance: auth-chained-generate
+[20:09:55.210] INFO (#16): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 618.584958,
+}
+Acceptance: auth-chained-migrate
+[20:09:56.364] INFO (#19): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1148.051333,
+}
+156 |   try {
+157 |     const tables = db.query("SELECT name FROM sqlite_master WHERE type='table'").all();
+158 |     const initial = context.observations[label + "Initial"] as { log: unknown[] } | undefined;
+159 |     const log = initial?.log ?? db.query("SELECT * FROM __drizzle_migrations").all();
+160 |     context.observations[label + "Initial"] ??= { tables, log };
+161 |     if (db.query("SELECT name FROM items").all().length === 0)
+                 ^
+SQLiteError: no such table: items
+      errno: 1,
+ byteOffset: -1,
+
+      at prepare (bun:sqlite:345:37)
+      at query (bun:sqlite:367:28)
+      at databaseFlow (/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed.ts:161:12)
+
+Bun v1.3.10 (macOS arm64)
