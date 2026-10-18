@@ -1,0 +1,430 @@
+{
+  "directory": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-SmY86T",
+  "version": "0.7.7",
+  "packages": [
+    {
+      "name": "@relkit/contracts",
+      "version": "0.7.7",
+      "file": "relkit-contracts-0.7.7.tgz",
+      "sha256": "9ee4f90fdef2160e02a27984e656cb0a043e58ebb4369bd94e0dfbfe1fe198b7",
+      "sha512": "73c92cc5533ed19bb6c548504da5bc52e78ddbab563f321b205ad3d834c7c58a0ba2303352ce7e9cd823868cedd4288f6754b9665530352a5bbec4cad8b42150",
+      "integrity": "sha512-c8ksxVM+0Zu2xUhQTaW8UueN26tWPzIbIFrT2DTHxYoLojAzUs5+nNgjhozt1CiPZ1S5ZlUwNSpbvsTK2LQhUA=="
+    },
+    {
+      "name": "@relkit/providers-standard",
+      "version": "0.7.7",
+      "file": "relkit-providers-standard-0.7.7.tgz",
+      "sha256": "1050e69ad06dbfb8db1ddec95e9adb61892721b5db376588176d6539734334c7",
+      "sha512": "9de9dd0a4b1cc01681b624f084afc097e29713ae0c12b747219260202f03ee626c005cf40e4a63d8240098ea85e6dbd1d428b72d0e6f551138c7aa28e5d3d5fe",
+      "integrity": "sha512-nendCkscwBaBtiTwhK/Al+KXE64MErdHIZJgIC8D7mJsAFz0Dkpj2CQAmOqF5tvR1Ci3LQ5vVRE4x6oo5dPV/g=="
+    },
+    {
+      "name": "@relkit/schema",
+      "version": "0.7.7",
+      "file": "relkit-schema-0.7.7.tgz",
+      "sha256": "1eb0666076d41b5c67f18c7de8a1e59f4abad3cf195234728481443cf42d6f7a",
+      "sha512": "edc8708536a903e2009243d746f254f92d134e0f5b203759ad8be0d7cb9e20d9e703024a49bef3e33389290f1bd11dc1d8180d33c9596ca77deabbfb6f9ee85f",
+      "integrity": "sha512-7chwhTapA+IAkkPXRvJU+S0TTg9bIDdZrYvg18ueINnnAwJKSb7z4zOJKQ8b0R3B2BgNM8lZbKd96rv7b57oXw=="
+    },
+    {
+      "name": "@relkit/buckets",
+      "version": "0.7.7",
+      "file": "relkit-buckets-0.7.7.tgz",
+      "sha256": "5a84ec6ef011706fe7c81fce609e8d6c5661791a4aa2e98a491cd0d492b5ad6b",
+      "sha512": "fc1e06146b84c7fea20fab02ed25b94768521c3a619ba98bfe9ff415b896653219232ed4ce2f0132379aab4504e24798bb802390828de5610b9993b815b24312",
+      "integrity": "sha512-/B4GFGuEx/6iD6sC7SW5R2hSHDphm6mL/p/0FbiWZTIZIy7Uzi8BMjeaq0UE4keYu4AjkIKN5WELmZO4FbJDEg=="
+    },
+    {
+      "name": "@relkit/cache",
+      "version": "0.7.7",
+      "file": "relkit-cache-0.7.7.tgz",
+      "sha256": "40e3dab16d0f656e11cce0765965f2b1e63ecf890d0a89d39532320407a61d54",
+      "sha512": "c8cd45020e4aeec0304d5d5ea53bc284ab8c95aea457e914c144c7c7ea3001d3168486b9d54c3dca0cef4ced26726f75ab97a26147214a8c1bb033ca558a654e",
+      "integrity": "sha512-yM1FAg5K7sAwTV1epTvChKuMla6kV+kUwUTHx+owAdMWhIa51Uw9ygzvTO0mcm91q5eiYUchSowbsDPKVYplTg=="
+    },
+    {
+      "name": "@relkit/diagnostics",
+      "version": "0.7.7",
+      "file": "relkit-diagnostics-0.7.7.tgz",
+      "sha256": "84d8eec402fb75cd66d9fbc0012e3ecafcdb98216c50719bdb0fde10d2f0f69e",
+      "sha512": "127c9e8111a379412e2da31e4c35340ac67ffe23f517d49b6afae46aa5a2ef535819cea07dc8a306cc71fee4313f6c5c15b8d442516528b9b3556754f4c1fc63",
+      "integrity": "sha512-EnyegRGjeUEuLaMeTDU0CsZ//iP1F9SbavrkaqWi71NYGc6gfcijBsxx/uQxP2xcFbjUQlFlKLmzVWdU9MH8Yw=="
+    },
+    {
+      "name": "@relkit/graph",
+      "version": "0.7.7",
+      "file": "relkit-graph-0.7.7.tgz",
+      "sha256": "cb9a072f22c0014f48c3a3ce66ce7d60b4c13dfa64bf96986de9898173d81166",
+      "sha512": "976cdb6dd3b39747c82d04e6fed1257660b2d52d991d81bb6c3196431757a550d70fd05c50811f53c57ff280ce1bbe5cbb288314325a1971189d3c03db816ece",
+      "integrity": "sha512-l2zbbdOzl0fILQTm/tEldmCy1S2ZHYG7bDGWQxdXpVDXD9BcUIEfU8V/8oDOG75cuyiDFDJaGXEYnTwD24Fuzg=="
+    },
+    {
+      "name": "@relkit/invocation",
+      "version": "0.7.7",
+      "file": "relkit-invocation-0.7.7.tgz",
+      "sha256": "6ad2884c0813f104a37c9879aeee14aa89566b95c1efdf7f56ea49415c1ffd9e",
+      "sha512": "92174989b6c35b6a12f907fb4a920f691b85b6fa32eaef923f015be2a91729500b15181155db110569476f2db3def98401ba663f9ca7d363a148351dc0a83509",
+      "integrity": "sha512-khdJibbDW2oS+Qf7SpIPaRuFtvoy6u+SPwFb4qkXKVALFRgRVdsRBWlHby2z3vmEAbpmP5yn02OhSDUdwKg1CQ=="
+    },
+    {
+      "name": "@relkit/observability",
+      "version": "0.7.7",
+      "file": "relkit-observability-0.7.7.tgz",
+      "sha256": "2f2e76fd24d9bb12c69ca8fd644f0727feb0f1800451c00ad7525225d1aab9fe",
+      "sha512": "c7a076eb580ac97d49ed911047b2e6ccba2327d3c1702a98297b56d92bc110f4e8b5e1fb0f96f58e9677d24c9ea8b7f78eab78a2ef95e10f26c43d517663df55",
+      "integrity": "sha512-x6B261gKyX1J7ZEQR7LmzLojJ9PBcCqYKXtW2SvBEPToteH7D5b1jpZ30kyeqLf3jqt4ou+V4Q8mxD1RdmPfVQ=="
+    },
+    {
+      "name": "@relkit/provider",
+      "version": "0.7.7",
+      "file": "relkit-provider-0.7.7.tgz",
+      "sha256": "dda340738227e604d0348f0b1ce2643c7e97de69f8eb8f9dd2dd4733b43bd85a",
+      "sha512": "4a0f322c7975c746943e22a90fe93e803704e38510aa743ceb1af0a65161c96d44799edb33339f6d8b837fcf0cd99b64907d9fabf82a75bf31bf89d01876ce64",
+      "integrity": "sha512-Sg8yLHl1x0aUPiKpD+k+gDcE44UQqnQ86xrwplFhyW1EeZ7bMzOfbYuDf88M2ZtkkH2fq/gqdb8xv4nQGHbOZA=="
+    },
+    {
+      "name": "@relkit/realtime",
+      "version": "0.7.7",
+      "file": "relkit-realtime-0.7.7.tgz",
+      "sha256": "dd0d6cbd0106a8e80c8a08d615a9620dfc987c7a8f1c241f6af2191423686c6c",
+      "sha512": "20124f1bd56664c384441f080c57ca083b11d4147876b3c38dfdffe04e230c4c74d51592f62157c0e265ec6eb0fbd9d9d32243370e9ed167ef099fae9a05f0ba",
+      "integrity": "sha512-IBJPG9VmZMOERB8IDFfKCDsR1BR4drPDjf3/4E4jDEx01RWS9iFXwOJl7G6w+9nZ0yJDNw6e0WfvCZ+umgXwug=="
+    },
+    {
+      "name": "@relkit/client",
+      "version": "0.7.7",
+      "file": "relkit-client-0.7.7.tgz",
+      "sha256": "1b2802bd2ac429451acb1e4bbc2c8c2a01f7760435fd9d3ded1ec31180a19203",
+      "sha512": "a39baf0250f9c33e81b96006b5585a0f802ff2560d173d10894efe1c3037755aa29abb56747efd966ca7f199ff3a09991d4d0bc86e290bf240756efc10fa04ea",
+      "integrity": "sha512-o5uvAlD5wz6BuWAGtVhaD4Av8lYNFz0QiU7+HDA3dVqimrtWdH79lmyn8Zn/OgmZHU0LyG4pC/JAdW78EPoE6g=="
+    },
+    {
+      "name": "@relkit/client-generator",
+      "version": "0.7.7",
+      "file": "relkit-client-generator-0.7.7.tgz",
+      "sha256": "6c96edb41f210d814953cbc9acfb59c1abec1c22a865f30f5fc8cb16499ed0c2",
+      "sha512": "12741571707184c04df0316767dc82b68ae822effa5b39592ddbaae2b5ae89a3b5d120d99c09131759f44be4055ec992d0830bc7a56379e5eb6d5fd6e39712ee",
+      "integrity": "sha512-EnQVcXBxhMBN8DFnZ9yCtoroIu/6WzlZLduq4rWuiaO10SDZnAkTF1n0S+QFXsmS0IMLx6VjeeXrbV/W45cS7g=="
+    },
+    {
+      "name": "@relkit/cloudflare",
+      "version": "0.7.7",
+      "file": "relkit-cloudflare-0.7.7.tgz",
+      "sha256": "4dbbc85f6638f9d16be1aa3ccaa2df7af55a6ad7952eefd12d57b066bf5ba8fe",
+      "sha512": "7b38d9bb4510caacb075b05f600f987f5b3e4cd1d279d9745315231c628c5fb2a782ff707ca392138458053fe06bc6185d3aa53ba0a4310eeb56f04264fa1713",
+      "integrity": "sha512-ezjZu0UQyqywdbBfYA+Yf1s+TNHSedl0UxUjHGKMX7Kngv9wfKOSE4RYBT/ga8YYXTqlO6CkMQ7rVvBCZPoXEw=="
+    },
+    {
+      "name": "@relkit/config",
+      "version": "0.7.7",
+      "file": "relkit-config-0.7.7.tgz",
+      "sha256": "eeca3c7bfdf2aeb8e7f442fb8343e7f552c99f28226476231f246117b89f169a",
+      "sha512": "e154a426fe580161c430d293ee2d0a9a525ced5c3e9a06a52a0a063fcc0e3e9b9d9fb5fb1d67f14fa1ab291aa988393ce4a8c25951cb5625fc9cfa550c3df504",
+      "integrity": "sha512-4VSkJv5YAWHEMNKT7i0KmlJc7Vw+mgalKgoGP8wOPpudn7X7HWfxT6GrKRqpiDk85KjCWVHLViX8nPpVDD31BA=="
+    },
+    {
+      "name": "@relkit/deploy",
+      "version": "0.7.7",
+      "file": "relkit-deploy-0.7.7.tgz",
+      "sha256": "8cce6f0530009b8092acdc8a2e3f566cd5e6015ae96ed0c1386340014eb029c8",
+      "sha512": "e4ca95e6c7ca20f3cb89ba6a69e8ab58d3d8dcd7049526550837d0ef5ebe1278d6928e0c1f6e84de4dbf0610265cc4eab645748dfc5d947c17dffbda1deb4d22",
+      "integrity": "sha512-5MqV5sfKIPPLibpqaeirWNPY3NcElSZVCDfQ716+EnjWko4MH26E3k2/BhAmXMTqtkV0jfxdlHwX3/vaHetNIg=="
+    },
+    {
+      "name": "@relkit/drizzle",
+      "version": "0.7.7",
+      "file": "relkit-drizzle-0.7.7.tgz",
+      "sha256": "41cd86b20e09a586ddead9afb7465f385bf55118f5cc06519480075b0d0c6882",
+      "sha512": "fa90f120e83ec86bd9916b8d27404cfbfceab0086e15b5fedc12808f8d9ccbd4f4528df09d409430e4a617fe466c07314bce9f4ca3b8bb860dc08b461a491bfa",
+      "integrity": "sha512-+pDxIOg+yGvZkWuNJ0BM+/zqsAhuFbX+3BKAj42cy9T0Uo3wnUCUMOSmF/5GbAcxS86fTKO4u4YNwItGGkkb+g=="
+    },
+    {
+      "name": "@relkit/functions",
+      "version": "0.7.7",
+      "file": "relkit-functions-0.7.7.tgz",
+      "sha256": "ff2e5bd69440d07fe44b0e9311715f3e809392e591a21ef01093b151f9606d8e",
+      "sha512": "24be26bd9ad2ac0607632e368c0d93d7e0cc06cae9fc5c6c0ccb0d59321826ed220b67bc91da2f21f115722842869da1c78496686bb5c4e1667a13c825e77ba8",
+      "integrity": "sha512-JL4mvZrSrAYHYy42jA2T1+DMBsrp/FxsDMsNWTIYJu0iC2e8kdovIfEVcihChp2hx4SWaGu1xOFmehPIJed7qA=="
+    },
+    {
+      "name": "@relkit/local-service",
+      "version": "0.7.7",
+      "file": "relkit-local-service-0.7.7.tgz",
+      "sha256": "cd233a68bf6b50f7e58cdd40a396966bd314d36d594f6184ee4f508b1821d588",
+      "sha512": "62f26ef07c24569f8dd7b7d7e9f85dd24e717938f75eafd314015f7e14ef637760aaf0058fdba9edd492a4ead365afd5209523d25b7996cb5e5095d0d4f2e9b6",
+      "integrity": "sha512-YvJu8HwkVp+N17fX6fhd0k5xeTj3Xq/TFAFffhTvY3dgqvAFj9up7dSSpOrTZa/VIJUj0lt5lsteUJXQ1PLptg=="
+    },
+    {
+      "name": "@relkit/openapi",
+      "version": "0.7.7",
+      "file": "relkit-openapi-0.7.7.tgz",
+      "sha256": "6346bc84fcca25bdbc88b07995d9ea1c4bcc338f1ff3fe38f008e22aaa77ef38",
+      "sha512": "27b8240608ae3a5091cb1046bfe70d4e47a61c868f702091ad255df588e529bc4e44f6d78933ad980defcabce50ba93005df0d15c576ae876421654a354ed664",
+      "integrity": "sha512-J7gkBgiuOlCRyxBGv+cNTkemHIaPcCCRrSVd9YjlKbxORPbXiTOtmA3vyrzlC6kwBd8NFcV2rodkIWVKNU7WZA=="
+    },
+    {
+      "name": "@relkit/otlp",
+      "version": "0.7.7",
+      "file": "relkit-otlp-0.7.7.tgz",
+      "sha256": "4a72abd5512af3e2288da3d9e767142a35a4ac0ad8442c437f2019442132500e",
+      "sha512": "eb0a1b7f589e127053a18c623ef7de4a8150f4b03d17f15a41e80fa285463e90b75128ce3b764b914e6a90b843c3ade2f6743e96bbd011e4d01942a5b9423dff",
+      "integrity": "sha512-6wobf1ieEnBToYxiPvfeSoFQ9LA9F/FaQegPooVGPpC3USjOO3ZLkU5qkLhDw63i9nQ+lrvQEeTQGUKluUI9/w=="
+    },
+    {
+      "name": "@relkit/sentry",
+      "version": "0.7.7",
+      "file": "relkit-sentry-0.7.7.tgz",
+      "sha256": "f9f65e7b95ac6c90b47f1604079879d9f08844c4a918e1a1c46d3e81586ca934",
+      "sha512": "b61154a61c7e30aa712653e7ed7214cf0bb34ba97589aec8d5ea1501c9431c42c0978f213ae11d51fd80c9183f040d88b58d14d892b85988cce32179f1f5efc6",
+      "integrity": "sha512-thFUphx+MKpxJlPn7XIUzwuzS6l1ia7I1eoVAclDHELAl48hOuEdUf2AyRg/BA2ItY0U2JK4WYjM4yF58fXvxg=="
+    },
+    {
+      "name": "@relkit/aws",
+      "version": "0.7.7",
+      "file": "relkit-aws-0.7.7.tgz",
+      "sha256": "8717da24836706a79313b43033497418123ef9a41e2a5862d2d33f4eb4f440bc",
+      "sha512": "6bb65b773ce6839fd4d0f6ee7b63befa225acdc1ac6ba5c752904926c8fba67aecadf7c347a7a0812d945f6c9349868ccb32987e72a4d9c60b7d51df44e6382c",
+      "integrity": "sha512-a7Zbdzzmg5/U0Pbue2O++iJazcGsa6XHUpBJJsj7pnrsrffDR6eggS2UX2yTSYaMyzKYfnKk2cYLfVHfROY4LA=="
+    },
+    {
+      "name": "@relkit/compiler",
+      "version": "0.7.7",
+      "file": "relkit-compiler-0.7.7.tgz",
+      "sha256": "6ababd752b38d562c1ff8d03821c0deb8627dfd2b1f731abd14d904911eaaa24",
+      "sha512": "e2aa99e894ccb29ef422fae751f79d5c1125c7b8a9528f5d34349fc56c3816bc3be3c9ab8b8be037f2c6fb0dcce6e524b55229bf72a02a8a66deba0809bf7e95",
+      "integrity": "sha512-4qqZ6JTMsp70IvrnUfedXBElx7ipUo9dNDSfxWw4Frw748mri4vgN/LG+w3M5uUktVIpv3KgKopm3roICb9+lQ=="
+    },
+    {
+      "name": "@relkit/docker",
+      "version": "0.7.7",
+      "file": "relkit-docker-0.7.7.tgz",
+      "sha256": "49723f42fd0dc28f5782af05f4fa2da70aad88fbbf0b6d80ce2c529aa66f4faa",
+      "sha512": "d8238dc8879e9aa5265946714e3b64863161ef624a15b80febf0805e080bff59a3a582a87b39cd8cd7301b33d4bc5cfcea59f1a5ec3f7e3dea8a5c1ffe698f99",
+      "integrity": "sha512-2CONyIeemqUmWUZxTjtkhjFh72JKFbgP6/CAXggL/1mjpYKoeznNjNcwGzPUvFz86lnxpew/fj3qilwf/mmPmQ=="
+    },
+    {
+      "name": "@relkit/jobs",
+      "version": "0.7.7",
+      "file": "relkit-jobs-0.7.7.tgz",
+      "sha256": "9517df90050d2113612e8a51085e5f4545ec5705c37de4c86d98aba570b40710",
+      "sha512": "940c4d96686047b7a7d0c9647796598a33dded49e38c555337224ae2af80e5030e478ed9709386cd5c6e096f74fd0b20c016fcc06fd45eb043a97b2e4f8c5591",
+      "integrity": "sha512-lAxNlmhgR7en0Mlkd5ZZijPd7UnjjFVTNyJK4q+A5QMOR47ZcJOGzVxuCW90/QsgwBb8wG/UXrBDqXsuT4xVkQ=="
+    },
+    {
+      "name": "@relkit/pulumi",
+      "version": "0.7.7",
+      "file": "relkit-pulumi-0.7.7.tgz",
+      "sha256": "b27e6db2350ae5907c397c22b0bd38289a0d998ce6287faa153ce067e2a70a65",
+      "sha512": "70f9fa1cc2a882c4e1c87567493ea3c625e2ec14b9bef501f01e929cae8286dd9f06c6aa64d1208d1e024a12a3c2df334a72862f6984bed2b8767990464046f7",
+      "integrity": "sha512-cPn6HMKogsThyHVnST6jxiXi7BS5vvUB8B6SnK6Cht2fBsaqZNEgjR4CShKjwt8zSnKGL2mEvtK4dnmQRkBG9w=="
+    },
+    {
+      "name": "@relkit/runtime-effect",
+      "version": "0.7.7",
+      "file": "relkit-runtime-effect-0.7.7.tgz",
+      "sha256": "9eaf47c500642c80515e0b4c66093afeec521e61c15cf4b19458ca5db2c0fb46",
+      "sha512": "88b6101488cfa415e7cf0ee1572e212ff0fc5833456a088cbcf9f46f6085aa33929ab776a3f1a3ee19ddfb863a803075ad74eb1fd388382a662bfe4e9281ac35",
+      "integrity": "sha512-iLYQFIjPpBXnzw7hVy4hL/D8WDNFagiMvPn0b2CFqjOSmrd2o/Gj7hnd+4Y6gDB1rXTrH9OIOCpmK/5OkoGsNQ=="
+    },
+    {
+      "name": "@relkit/s3",
+      "version": "0.7.7",
+      "file": "relkit-s3-0.7.7.tgz",
+      "sha256": "6e1c03e7f70319f091d4c05462b1012f45f19595d7fd74f7a389607ca24b4894",
+      "sha512": "53fd2746aa0d315d42072200041276bb6cfca7e814e1859716b1862ae20102f056142d890b3703a0a2868dc9f38093d826da823934df3e01cbe10c7facbdb034",
+      "integrity": "sha512-U/0nRqoNMV1CByIABBJ2u2z8p+gU4YWXFrGGKuIBAvBWFC2JCzcDoKKGjcnzgJPYJtqCOTTfPgHL4Qx/rL2wNA=="
+    },
+    {
+      "name": "@relkit/tools",
+      "version": "0.7.7",
+      "file": "relkit-tools-0.7.7.tgz",
+      "sha256": "66165de9360b7292bca0ba0399c65c9e72556705082cdd9e397e80e8472ac21f",
+      "sha512": "6384163a56cf8b25e2a206fc6ed4c2ffdb0d6bee5b89b2ab2709793789022a46d6c50bde6aaf134b8cbfeb9f4a99263e2dfc2552e9c1c5c311acd8da6290e317",
+      "integrity": "sha512-Y4QWOlbPiyXiogb8btTC/9sNa+5bibKrJwl5N4kCKkbWxQveaq8TS4y/659KmSY+LfwlUunBxcMRrNjaYpDjFw=="
+    },
+    {
+      "name": "@relkit/agents",
+      "version": "0.7.7",
+      "file": "relkit-agents-0.7.7.tgz",
+      "sha256": "f0d011852d62a13cb416de5520dbac1a248edbbbc0f233400da148f12ee880db",
+      "sha512": "ac8242b7abe57a59f5a12113fe918a900e15530f626b48fa1ee1fa1e310e2a7350a158743b0872af17d1cd2653df2fd0408d2e56334c08f292ef4798e1c69887",
+      "integrity": "sha512-rIJCt6vleln1oSET/pGKkA4VUw9ia0j6HuH6HjEOKnNQoVh0OwhyrxfRzSZT3y/QQI0uVjNMCPKS70eY4caYhw=="
+    },
+    {
+      "name": "@relkit/deploy-pulumi",
+      "version": "0.7.7",
+      "file": "relkit-deploy-pulumi-0.7.7.tgz",
+      "sha256": "8f26505646dc0a644bc1cfc5d3914de4bc14bdc711994087656a127e38f488df",
+      "sha512": "acbbd7f2db4948c4cc62d6a6375014106c84548404e895eb52864f5456fe5411bbd23b50eaab411f225d26a2986090b356f7dbf703a5ec0979c21255ccdc09e6",
+      "integrity": "sha512-rLvX8ttJSMTMYtamN1AUEGyEVIQE6JXrUoZPVFb+VBG70jtQ6qtBHyJdJqKYYJCzVvfb9wOl7Al5whJVzNwJ5g=="
+    },
+    {
+      "name": "@relkit/effect-mq",
+      "version": "0.7.7",
+      "file": "relkit-effect-mq-0.7.7.tgz",
+      "sha256": "62e3e2bc9e95afd65dbb47f69f75a5b4df1ea85b70b6e9abd9ea338d5d93ca46",
+      "sha512": "ccfe47d63a51f492a6ded04be1e011783b90e7894c874cdffbb877a911000159d8e16c87f171afb435498a6e8ca3c3f729c623ed82bb7200dfa5560bb8e72d91",
+      "integrity": "sha512-zP5H1jpR9JKm3tBL4eAReDuQ54lMh0zf+7h3qREAAVnY4WyH8XGvtDVJim6Mo8P3KcYj7YK7cgDfpVYLuOctkQ=="
+    },
+    {
+      "name": "@relkit/events",
+      "version": "0.7.7",
+      "file": "relkit-events-0.7.7.tgz",
+      "sha256": "fccf59c8a161272e982e2c7ad56102c39cfef8d4608aaf86d9b0bf3444242e2a",
+      "sha512": "cd24bbda8535b01ee6c8d8adb2675488154b25e123a8d647746464386081da03e52075d4c83b9b2bbd3307b9f5bb4eea75514e00d44e8ffee438363531c1b855",
+      "integrity": "sha512-zSS72oU1sB7myNitsmdUiBVLJeEjqNZHdGRkOGCB2gPlIHXUyDubK70zB7n1u07qdVFOANROj/7kODY1McG4VQ=="
+    },
+    {
+      "name": "@relkit/inngest",
+      "version": "0.7.7",
+      "file": "relkit-inngest-0.7.7.tgz",
+      "sha256": "bdaf1341daa1fb6486f409fb43c6b908d87d36741c741c0aa5e1bfc20a221886",
+      "sha512": "85f4391344596754e371c61ae990cfea73ecb60063f9dc1bb50c46c32380e31d385dd5199f64d1f153b84fcbc43b4bae27edcce2ba112bd85f575040c537fce8",
+      "integrity": "sha512-hfQ5E0RZZ1TjccYa6ZDP6nPstgBj+dwbtQxGwyOA4x04XdUZn2TR8VO4T8vEO0uuJ+3M4roRK9hfV1BAxTf86A=="
+    },
+    {
+      "name": "@relkit/inspector-api",
+      "version": "0.7.7",
+      "file": "relkit-inspector-api-0.7.7.tgz",
+      "sha256": "c73d31c59e0411274418c3c74cc6e45c665470dcfacd4fb652df7d52ce165901",
+      "sha512": "747ff10691dfdd26679ba52bc7ff043c14991508dc78582052a5af81aaf2449da78161d85be7af374d519f11112ee4024057db31f75c43d21e0efc6e8b28eb0a",
+      "integrity": "sha512-dH/xBpHf3SZnm6Urx/8EPBSZFQjceFggUqWvgaryRJ2ngWHYW+evN01RnxERLuQCQFfbMfdcQ9IeDvxuiyjrCg=="
+    },
+    {
+      "name": "@relkit/supervisor",
+      "version": "0.7.7",
+      "file": "relkit-supervisor-0.7.7.tgz",
+      "sha256": "9c4775d75b369949d975f5ac353478fc59564d5c44bcb7e7fdc6ef0a7e686b78",
+      "sha512": "9eb26a15bccc48274892667e56397d3f5cfa7117c24b04578fd980542a2cd297e16fcf2bb7fb6142c55009bba311d83f16532306312c9732d32c9b24301d78ae",
+      "integrity": "sha512-nrJqFbzMSCdIkmZ+Vjl9P1z6cRfCSwRXj9mAVCos0pfhb88rt/thQsVQCbujEdg/FlMjBjEslzLTLJskMB14rg=="
+    },
+    {
+      "name": "@relkit/trigger",
+      "version": "0.7.7",
+      "file": "relkit-trigger-0.7.7.tgz",
+      "sha256": "9761127fb56660fd5e38891bb3b6c97a8889a07e3110214b357c4c67dc3673b5",
+      "sha512": "9ac5e024959c32bd0047844cb48827b9c5b53a7f30a74bf749edafe150f844a12e896be2df5a61b8d54c333ea5888451e5f5667ced3f61444bd1be85eaaec1dc",
+      "integrity": "sha512-msXgJJWcMr0AR4RMtIgnucW1On8wp0v3Se2v4VD4RKEuiWvi31phuNVMMz6liIRR5fVmfO0/YURL0b6F6q7B3A=="
+    },
+    {
+      "name": "create-relkit",
+      "version": "0.7.7",
+      "file": "create-relkit-0.7.7.tgz",
+      "sha256": "3072697b7a7a892b3606ed47f24423813a46decf7cba23b5f2a4389ec1c05130",
+      "sha512": "2c2af85dc3182087a36f5ca01236f42b0b9821293b2964d7d0d00a5ca20af95ce4bc83b268ae9e9e5f042acd53796400f5849efab90f5f197e5e4753066a1c8a",
+      "integrity": "sha512-LCr4XcMYIIejb1ygEjb0KwuYISk7KWTX0NAKXKIK+VzkvIOyaK6enl8EKs1TeWQA9YSe+rkPXxl+XkdTBmocig=="
+    },
+    {
+      "name": "@relkit/providers-local",
+      "version": "0.7.7",
+      "file": "relkit-providers-local-0.7.7.tgz",
+      "sha256": "93c86c50c856c2bb7f1e2604955813ee29cebbdf9cba7b3a19e42769f1d58f75",
+      "sha512": "a8467f5ff9a3a0fc3c83d51f61bfcd4d0855c62a653abe8057b869e710083b0b058822a3a1a7b7f3b8057c324c2d9cac2d32ff0d6ba9a541f16c6afa84bb9648",
+      "integrity": "sha512-qEZ/X/mjoPw8g9UfYb/NTQhVxiplOr6AV7hp5xAIOwsFiCKjoae387gFfDJMLZysLTL/DWuppUHxbGr6hLuWSA=="
+    },
+    {
+      "name": "@relkit/services",
+      "version": "0.7.7",
+      "file": "relkit-services-0.7.7.tgz",
+      "sha256": "d411cab42e637eef9b6468fb203d4643852fbb8dbcf74e58765c90753418e6c6",
+      "sha512": "6d5f30b5d7d74aa09a3cf87012f75f824eb105896a9fb2a208e48ea4b6fe48604c7536d47a4c8033ab845ce57b0668fde77cc429d211d4d4b775e981e661b329",
+      "integrity": "sha512-bV8wtdfXSqCaPPhwEvdfgk6xBYlqn7KiCOSOpLb+SGBMdTbUekyAM6uEXOV7Bmj953zEKdIR1NS3demB5mGzKQ=="
+    },
+    {
+      "name": "@relkit/local",
+      "version": "0.7.7",
+      "file": "relkit-local-0.7.7.tgz",
+      "sha256": "d60487f617a36717a0c5e907f44d0360695cfc13ab5866a0efea9bb24b73340f",
+      "sha512": "442c11fbbb4a4be12216c23f6175e7847a6a5ba65169c4349a65472381327387fe5cb8a5326adc846c651724cc87bdbbaae1bca713178f8ee02154b52cd7c62e",
+      "integrity": "sha512-RCwR+7tKS+EiFsI/YXXnhHpqW6ZRacQ0mmVHI4Eyc4f+XLilMmrchGxlFyTMh727quG8pxMXj47gIVS1LNfGLg=="
+    },
+    {
+      "name": "@relkit/redis",
+      "version": "0.7.7",
+      "file": "relkit-redis-0.7.7.tgz",
+      "sha256": "b49ce00aa5ce025486e91ee687ba026e24d7484f8234ef07a50c5d6292a0902f",
+      "sha512": "4c1172e33df782a9bacb7772280131496e84080ef585a84060e8ea5bca4c4f316a552fcddfe9307583f7418835d0ec4ec45a878696653819e9b0abec66229aeb",
+      "integrity": "sha512-TBFy4z33gqm6y3dyKAExSW6ECA71hahAYOjqW8pMTzFqVS/N3+kwdYP3QYg10OxOxFqHhpZlOBnpsKvsZiKa6w=="
+    },
+    {
+      "name": "@relkit/routes",
+      "version": "0.7.7",
+      "file": "relkit-routes-0.7.7.tgz",
+      "sha256": "d39b893e8af4c34f988fd00f02104b3a7bd073ddf1bf775da4189b962fe4f57f",
+      "sha512": "3d6ed1fdae8abb2f4c89b3d4c59d9d931955e1f39fe14cf51110b5ff70567174127fd99ab2371b4d39597bab14a6f3068af2b09f837b3d22ac52365285e2b9f2",
+      "integrity": "sha512-PW7R/a6Kuy9MibPUxZ2dkxlV4fOf4Uz1ERC1/3BWcXQSf9masjcbTTlZe6sUpvMGivKwn4N7PSKsUjZSheK58g=="
+    },
+    {
+      "name": "@relkit/app",
+      "version": "0.7.7",
+      "file": "relkit-app-0.7.7.tgz",
+      "sha256": "7fc31bc2423f595b67b44085976e1266c3a030677ecb934673e4838851f0e85b",
+      "sha512": "de880674c2e81c7d5186193a324b4a0e40efd5257af52ee24ff51be8676b79d6386c3b93e78f2ed9c54f4e39b83989d09e344823c74c5f47b129ae4cc6435850",
+      "integrity": "sha512-3ogGdMLoHH1Rhhk6MktKDkDv1SV69S7iT/Ub6GdredY4bDuT548u2cVPTjm4OYnQnjRII8dMX0exKa5MxkNYUA=="
+    },
+    {
+      "name": "@relkit/better-auth",
+      "version": "0.7.7",
+      "file": "relkit-better-auth-0.7.7.tgz",
+      "sha256": "60bdba0a23a49ef6ed0667172f48eff809e2e0ed25b34beb6b25de7737f3f8e3",
+      "sha512": "1665065652280e264caf1e108f31caf94e2349d474112c9fae0b008de8b1495a573df6ebdf5204b9ebf8476961deac927a31ba18bf84cc36c1eb68f11631b271",
+      "integrity": "sha512-FmUGVlIoDiZMrx4QjzHK+U4jSdR0ESyfrgsAjeixSVpXPfbr31IEuev4R2lh3qySejG6GL+EzDbB62jxFjGycQ=="
+    },
+    {
+      "name": "@relkit/integrations",
+      "version": "0.7.7",
+      "file": "relkit-integrations-0.7.7.tgz",
+      "sha256": "a9aba8ea292a1b21a504e7a7b498ada34bfa019f5f435ac917ef29710f341882",
+      "sha512": "ab2f1cab38514705583edd5118ccc51b1ea3cbfd6bcabd5b9459b10d2d32d9907b8d497aac84477118014ef72f05d3c823c427f21599eb13d93590bdc1e22fbe",
+      "integrity": "sha512-qy8cqzhRRwVYPt1RGMzFGx6jy/1ryr1blFmxDS0y2ZB7jUl6rIRHcRgBTvcvBdPII8Qn8hWZ6xPZNZC9weIvvg=="
+    },
+    {
+      "name": "@relkit/engine",
+      "version": "0.7.7",
+      "file": "relkit-engine-0.7.7.tgz",
+      "sha256": "e7426c3d092588882f51305ed42dd61ee77f8a14b784635cbf8da8148474d6c8",
+      "sha512": "9d8fa9a751c409795c6f0e268b5bb389229e5b16edee0bde0c8365f765b7162b53b74c7d021c557fc00f80c406fefae11cc004fb158a988ab1075a538aca3b63",
+      "integrity": "sha512-nY+pp1HECXlcbw4mi1uziSKeWxbt7gveDINl92W3FitTt0x9AhxVf8APgMQG/vrhHMAE+xWKmIqxB1pTiso7Yw=="
+    },
+    {
+      "name": "@relkit/cloud-aws",
+      "version": "0.7.7",
+      "file": "relkit-cloud-aws-0.7.7.tgz",
+      "sha256": "b5065f3670c18cca5b6e87f7facd0f9eed7f264381da848aff3f1aadb9ee89ee",
+      "sha512": "0b53673028111d625c5989b8a99023bb96200f2483c44bc30b3ee9e4fc2a5cf9c02450cb4cdeb2bccf7b26f09e5494fe0c80b46c8fe3fb8ba2ef1b75e2bd90a1",
+      "integrity": "sha512-C1NnMCgRHWJcWYm4qZAju5YgDySDxEvDCz7p5PwqXPnAJFDLTN6yvM97JvCeVJT+DIC0bI/j+4ui7xt14r2QoQ=="
+    },
+    {
+      "name": "@relkit/runtime-hono",
+      "version": "0.7.7",
+      "file": "relkit-runtime-hono-0.7.7.tgz",
+      "sha256": "61a8ce8461031d8f7f150c455c2855ca63cb6fe7f2a85be38d5fdfec64db9d44",
+      "sha512": "5d9a307fadbb0cd0d5c6e7293d3f582034f62db32ceb693b8d3ea2fabf5be10108530528d27bbc038371435b26c87da7305ef9cf31081c4a34afdeb44d30f681",
+      "integrity": "sha512-XZowf627DNDVxucpPT9YIDT2LbMs62k7jT6i+r9b4QEIUwUo0nu8A4NxQ1smyH2nMF75zzEIHEo0r960TTD2gQ=="
+    },
+    {
+      "name": "@relkit/cli",
+      "version": "0.7.7",
+      "file": "relkit-cli-0.7.7.tgz",
+      "sha256": "2c445d875d7c14429ee276f82200a2faa816839acc88ae731e1f9599f47ab62b",
+      "sha512": "e4273821b24fb747daf6f07b8c7a7c7d575b4514bcfcc58773b26f63b130fe5986ba580f1a233c905083964b232d2660d516422e5461c2c0d027be7bb894b3ad",
+      "integrity": "sha512-5Cc4IbJPt0fa9vB7jHp8fVdbRRS8/MWHc7JvY7Ew/lmGulgPGiM8kFCDlksjLSZg1RZCLlRhwsDQJ757uJSzrQ=="
+    },
+    {
+      "name": "@relkit/testing",
+      "version": "0.7.7",
+      "file": "relkit-testing-0.7.7.tgz",
+      "sha256": "fd2e287eba8631540840ae220dcab6d60ca72614042aab5555351964c02df666",
+      "sha512": "4f6b2df0e69764b69f0868fe3a8f781a5a0ca24a6206478b3bc6584713f963957e439777312e3f97ac03f1a940b2579809fc4ea6b08fcacd8c62c6d61b4c8fb0",
+      "integrity": "sha512-T2st8OaXZLafCGj+Oo94GloMokpiBkeLO8ZYRxP5Y5V+Q5d3MS4/l6wD8alAsleYCfxOprCPys2MYsbWG0yPsA=="
+    },
+    {
+      "name": "relkit",
+      "version": "0.7.7",
+      "file": "relkit-0.7.7.tgz",
+      "sha256": "54172e37b6e1dd0684d270009c97e4831fe55dd2b8d6c75dc3d43f95452ab51a",
+      "sha512": "1a94a1dd975536cc6a30a50cb78fc0d97b638f7b7a68608dff3bb46a2ad747c520bcce10ce6a57debb32b8674be2c2f2eddcbcbf38b4899aa4db0fe676c5448f",
+      "integrity": "sha512-GpSh3ZdVNsxqMKUMt4/A2Xtjj3t6aGCN/zu0airXR8UgvM4QzmpX3rsyuGdL4sLy7dy8vzi0iZqk2w/mdsVEjw=="
+    }
+  ]
+}
