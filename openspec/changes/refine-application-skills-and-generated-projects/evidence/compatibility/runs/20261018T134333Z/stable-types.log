@@ -1,0 +1,12 @@
+pg-core/policies.d.ts: 1 diagnostics
+Class 'PgPolicy' incorrectly implements interface 'PgPolicyConfig'.
+  Types of property 'as' are incompatible.
+    Type '"permissive" | "restrictive" | undefined' is not assignable to type '"permissive" | "restrictive"'.
+      Type 'undefined' is not assignable to type '"permissive" | "restrictive"'.
+pg-core/roles.d.ts: 1 diagnostics
+Type 'PgRole' has no properties in common with type 'PgRoleConfig'.
+MISSING required declaration: cockroach-core/policies.d.ts
+MISSING required declaration: cockroach-core/roles.d.ts
+MISSING required declaration: pg-core/effect/db.d.ts
+MISSING required declaration: pg-core/effect/session.d.ts
+MISSING required declaration: effect-postgres/session.d.ts

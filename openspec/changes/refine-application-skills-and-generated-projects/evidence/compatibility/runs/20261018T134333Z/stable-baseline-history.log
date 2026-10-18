@@ -1,0 +1,14 @@
+3 | function readMigrationFiles(config) {
+4 |   const migrationFolderTo = config.migrationsFolder;
+5 |   const migrationQueries = [];
+6 |   const journalPath = `${migrationFolderTo}/meta/_journal.json`;
+7 |   if (!fs.existsSync(journalPath)) {
+8 |     throw new Error(`Can't find meta/_journal.json file`);
+                  ^
+error: Can't find meta/_journal.json file
+      at readMigrationFiles (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-2yex8qcd/stable/node_modules/drizzle-orm/migrator.js:8:15)
+      at migrate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-2yex8qcd/stable/node_modules/drizzle-orm/bun-sqlite/migrator.js:3:22)
+      at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-2yex8qcd/stable/migrate.ts:11:18
+      at loadAndEvaluateModule (2:1)
+
+Bun v1.3.10 (macOS arm64)
