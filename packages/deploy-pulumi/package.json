@@ -1,6 +1,6 @@
 {
   "name": "@relkit/deploy-pulumi",
-  "version": "0.7.7",
+  "version": "0.7.8",
   "description": "Unsupported internal Pulumi deployment engine for RELKIT; use @relkit/cli.",
   "license": "MIT",
   "repository": {
