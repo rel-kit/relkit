@@ -1,0 +1,22 @@
+4 | import { join } from "node:path";
+5 | import { templateDigest } from "../../../../../scripts/release-create-evidence.ts";
+6 | import { repository } from "./packed-support.ts";
+7 | const result = await Bun.file(join(import.meta.dir, "certification-result.json")).json();
+8 | assert.equal(result.measured, true, "Final consumers require completed certification");
+9 | assert.equal(await templateDigest(join(repository, "templates/default/v1/minimal")), result.entry.templateDigest, "Final consumers require certification of current template bytes");
+           ^
+AssertionError: Final consumers require certification of current template bytes
++ actual - expected
+
++ 'd9129d4de9f15273b80dc609311ad9ea298dbd1abc14b5e14e286910cf61a771'
+- '1ed32235af2ffe5f87210acffb3dabbe9e3c3bc2e40abbf912ad7517823e4b2c'
+
+ generatedMessage: false,
+     actual: "d9129d4de9f15273b80dc609311ad9ea298dbd1abc14b5e14e286910cf61a771",
+   expected: "1ed32235af2ffe5f87210acffb3dabbe9e3c3bc2e40abbf912ad7517823e4b2c",
+   operator: "strictEqual",
+       code: "ERR_ASSERTION"
+
+      at /Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/final-packed.ts:9:8
+
+Bun v1.3.10 (macOS arm64)
