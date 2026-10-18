@@ -1,0 +1,36 @@
+{
+  "args": [
+    "bun",
+    "--smol",
+    "test",
+    "tests/unit/packed-registry.test.ts",
+    "--timeout",
+    "15000"
+  ],
+  "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+  "before": {
+    "at": "2026-10-18T16:59:26.387662+00:00",
+    "cpu": 10,
+    "load": [
+      5.291015625,
+      9.3408203125,
+      9.26708984375
+    ],
+    "pressure": 1,
+    "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                3961.\nPages active:                            259489.\nPages inactive:                          253806.\nPages speculative:                         4751.\nPages throttled:                              0.\nPages wired down:                        189427.\nPages purgeable:                           3224.\n\"Translation faults\":                3783475721.\nPages copy-on-write:                  230650065.\nPages zero filled:                   1737934445.\nPages reactivated:                    374166032.\nPages purged:                          15861848.\nFile-backed pages:                       162466.\nAnonymous pages:                         355580.\nPages stored in compressor:             1499104.\nPages occupied by compressor:            295863.\nDecompressions:                       305562082.\nCompressions:                         391147542.\nPageins:                               70142307.\nPageouts:                                521139.\nSwapins:                                6450174.\nSwapouts:                              10689790.\n"
+  },
+  "pid": 69732,
+  "exit": 0,
+  "seconds": 0.6000026669935323,
+  "after": {
+    "at": "2026-10-18T16:59:27.027099+00:00",
+    "cpu": 10,
+    "load": [
+      5.291015625,
+      9.3408203125,
+      9.26708984375
+    ],
+    "pressure": 1,
+    "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                4216.\nPages active:                            249143.\nPages inactive:                          240535.\nPages speculative:                         7340.\nPages throttled:                              0.\nPages wired down:                        202295.\nPages purgeable:                           1446.\n\"Translation faults\":                3783512191.\nPages copy-on-write:                  230652012.\nPages zero filled:                   1737953700.\nPages reactivated:                    374219859.\nPages purged:                          15861916.\nFile-backed pages:                       167301.\nAnonymous pages:                         329717.\nPages stored in compressor:             1512001.\nPages occupied by compressor:            303835.\nDecompressions:                       305567062.\nCompressions:                         391165443.\nPageins:                               70147295.\nPageouts:                                521175.\nSwapins:                                6450206.\nSwapouts:                              10689790.\n"
+  }
+}

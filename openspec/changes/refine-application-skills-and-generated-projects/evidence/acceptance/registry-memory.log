@@ -1,0 +1,10 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/packed-registry.test.ts:
+(pass) smoke registry serves verified tarball metadata instead of workspace metadata [39.39ms]
+(pass) upstream proxy requests compact metadata and releases completed response bodies [5.21ms]
+
+ 2 pass
+ 0 fail
+ 11 expect() calls
+Ran 2 tests across 1 file. [503.00ms]
