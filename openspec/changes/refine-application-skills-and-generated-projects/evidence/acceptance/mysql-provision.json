@@ -1,0 +1,34 @@
+{
+  "args": [
+    "python3",
+    "openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/mysql-portable.py"
+  ],
+  "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+  "before": {
+    "at": "2026-10-18T17:08:05.916502+00:00",
+    "cpu": 10,
+    "load": [
+      8.05419921875,
+      7.08544921875,
+      7.87890625
+    ],
+    "pressure": 2,
+    "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                               48998.\nPages active:                            191207.\nPages inactive:                          193379.\nPages speculative:                         6845.\nPages throttled:                              0.\nPages wired down:                        197955.\nPages purgeable:                            199.\n\"Translation faults\":                3807340557.\nPages copy-on-write:                  231981894.\nPages zero filled:                   1746659581.\nPages reactivated:                    380458001.\nPages purged:                          16078505.\nFile-backed pages:                       143048.\nAnonymous pages:                         248383.\nPages stored in compressor:             1568582.\nPages occupied by compressor:            368852.\nDecompressions:                       311227610.\nCompressions:                         398040746.\nPageins:                               70819301.\nPageouts:                                526213.\nSwapins:                                6467275.\nSwapouts:                              10699146.\n",
+    "availableMiB": 875.65625
+  },
+  "pid": 81708,
+  "exit": 1,
+  "seconds": 92.02592120898771,
+  "after": {
+    "at": "2026-10-18T17:09:37.982941+00:00",
+    "cpu": 10,
+    "load": [
+      6.21875,
+      6.71630859375,
+      7.6474609375
+    ],
+    "pressure": 1,
+    "vmStat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                3838.\nPages active:                            237048.\nPages inactive:                          234262.\nPages speculative:                         2048.\nPages throttled:                              0.\nPages wired down:                        195036.\nPages purgeable:                           1393.\n\"Translation faults\":                3810441633.\nPages copy-on-write:                  232287500.\nPages zero filled:                   1747875250.\nPages reactivated:                    380962291.\nPages purged:                          16083572.\nFile-backed pages:                       138886.\nAnonymous pages:                         334472.\nPages stored in compressor:             1520754.\nPages occupied by compressor:            335069.\nDecompressions:                       311586600.\nCompressions:                         398393033.\nPageins:                               70855198.\nPageouts:                                527109.\nSwapins:                                6468148.\nSwapouts:                              10699146.\n",
+    "availableMiB": 113.734375
+  }
+}

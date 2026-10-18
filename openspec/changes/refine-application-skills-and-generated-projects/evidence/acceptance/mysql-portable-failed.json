@@ -1,0 +1,59 @@
+{
+  "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg",
+  "bottles": [
+    {
+      "name": "abseil",
+      "version": "20260817.0",
+      "sha256": "8a6b64d5f9d44c579343f1ffa7587d08be653c193f5af24579f6ffc1530431ea",
+      "url": "https://ghcr.io/v2/homebrew/core/abseil/blobs/sha256:8a6b64d5f9d44c579343f1ffa7587d08be653c193f5af24579f6ffc1530431ea",
+      "base": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/abseil/20260817.0"
+    },
+    {
+      "name": "icu4c@78",
+      "installedLibraryOnly": "/opt/homebrew/opt/icu4c@78",
+      "base": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/icu4c@78/78.3",
+      "sha256": "d1206febbce23e5014f51b631afd7129b2a247ee18a9f97226cd5889e66c1686",
+      "url": "https://ghcr.io/v2/homebrew/core/icu4c/78/blobs/sha256:d1206febbce23e5014f51b631afd7129b2a247ee18a9f97226cd5889e66c1686"
+    },
+    {
+      "name": "lz4",
+      "installedLibraryOnly": "/opt/homebrew/opt/lz4"
+    },
+    {
+      "name": "ca-certificates",
+      "installedLibraryOnly": "/opt/homebrew/opt/ca-certificates"
+    },
+    {
+      "name": "openssl@4",
+      "version": "4.0.3",
+      "sha256": "e9968c63732a4aa642c6131f120d0a89a119885f7ce3cfec796ae672369b98a6",
+      "url": "https://ghcr.io/v2/homebrew/core/openssl/4/blobs/sha256:e9968c63732a4aa642c6131f120d0a89a119885f7ce3cfec796ae672369b98a6",
+      "base": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/openssl@4/4.0.3"
+    },
+    {
+      "name": "protobuf",
+      "version": "36.2",
+      "sha256": "153d9b9b322fc8c54fe66dbaf2c8fe382294ee6a8fba35fd4c090dd61de3d77a",
+      "url": "https://ghcr.io/v2/homebrew/core/protobuf/blobs/sha256:153d9b9b322fc8c54fe66dbaf2c8fe382294ee6a8fba35fd4c090dd61de3d77a",
+      "base": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/protobuf/36.2"
+    },
+    {
+      "name": "zlib-ng-compat",
+      "version": "2.3.3",
+      "sha256": "73a98dbbff35ba8f880438081be740da8131b0e3bbfa41f01e0072d140f4a9e7",
+      "url": "https://ghcr.io/v2/homebrew/core/zlib-ng-compat/blobs/sha256:73a98dbbff35ba8f880438081be740da8131b0e3bbfa41f01e0072d140f4a9e7",
+      "base": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/zlib-ng-compat/2.3.3_1"
+    },
+    {
+      "name": "zstd",
+      "installedLibraryOnly": "/opt/homebrew/opt/zstd"
+    },
+    {
+      "name": "mysql@8.4",
+      "version": "8.4.11",
+      "sha256": "88c1d662b11082b2cc82be2318f3ef1f5a61d61442b21ce5a56a19928b7518dd",
+      "url": "https://ghcr.io/v2/homebrew/core/mysql/8.4/blobs/sha256:88c1d662b11082b2cc82be2318f3ef1f5a61d61442b21ce5a56a19928b7518dd",
+      "base": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7"
+    }
+  ]
+}
