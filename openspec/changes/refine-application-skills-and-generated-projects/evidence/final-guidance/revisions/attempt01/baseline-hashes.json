@@ -1,0 +1,33 @@
+{
+  "case01": {
+    "relkit.config.ts": "176a004243a98e8f783d20166e34d0b88176933d175e5ef337d63f12b462ffe7",
+    ".gitignore": "3b2014ef6071417065308c1c6c8dff78752a58fe72c3aa36109a91099d61b0b5",
+    "package.json": "01d0cd518bc4a822f012d9ab20820b707c835f7748febddceef7772f43456dee",
+    "tsconfig.json": "fdde531df7a34154f927440830e8cbf1e23e495fb6c93e4669d2328573b32c8d",
+    ".env.example": "1567079e95ab8834a523b09dc3460726ebc227b7473825489789301c4316fcfd",
+    "drizzle.config.ts": "d3fec7d5494e4c6547b9f8b82c3341564e1440ce71f9d06838d3dc6b96b1c5bc",
+    "patches/drizzle-orm.patch": "10ea188b9409dd19aac7bf27f4b12911ae4844c063362b9c2bd11d6a3d936374",
+    "src/platform/env.ts": "dbcab9e7e26bae6014af59c87ddc1a28f134b5a8e53d9d52b0ba81abb135f15b",
+    "src/services/database/service.ts": "110443a007b109139f0605a38a7c5411035dd92d3c90f8db0e7d5f933445f02d",
+    "src/services/auth/service.ts": "cecae6a1ca33d71fb08860c716284978c133527df09766d1946a479a095d6457",
+    "src/services/database/schema/index.ts": "fe53c5afced0d1b32a6d50a8634f8cebaf75081186706c7212a6903cb8d7175c",
+    "src/services/database/schema/auth.ts": "b76065b360eeed597b6bb33b3e9fc30dabe085d76f6f9b2eb915cff8b3fc2147",
+    "src/routes/api/auth/[...all]/route.ts": "ae759351e9e3afc79d3eea6deffe6e4c159b317d4a25073dc98a011da79d6802"
+  },
+  "case02": {
+    "relkit.config.ts": "176a004243a98e8f783d20166e34d0b88176933d175e5ef337d63f12b462ffe7",
+    ".gitignore": "506af511b1e9538dff2b1a5cc592fbccb5cecf85358780c535ea5abf7dc9a22e",
+    "package.json": "a0274cc0aba11c7a21c3991e096d389acdaded7c4401353044c164aa1afe33fd",
+    "tsconfig.json": "b1b80adbf6a18dd65a5fba2e66dc3d2e0724801ff1802430708646cf145aaf6e",
+    "web/next-env.d.ts": "879741880b6ab48da99dcc06dcc674d381c9826137b0496bf7bb368f302de9fc",
+    "web/tsconfig.json": "bef7575685442f8628104552593a9f9c7de2d3e308350c6cc9e4199ff2ee1550",
+    "web/next.config.ts": "ce07edae14444bfea12c465b933d47293574e1b79277daa29fa5eaab63d44597",
+    "src/platform/env.ts": "0338f01713f07e646c6319abca2fe4d9a4ac276717b8284102f0c47642010309",
+    "src/services/hello/service.ts": "9c5f507d688dc5c220c58fa6a0fc893ec044b39796bf26968d5a254c92d2b3f1",
+    "src/services/hello/functions/hello.function.ts": "06cf10bff98ec001c6f57f3b31299b1d61ff8724e9b5e7bb9c39110de22cf80b",
+    "src/routes/hello/route.ts": "343bf70b55473822a890c96f78a65fb086b45a4d658726df2ec2714d774fb533",
+    "web/app/layout.tsx": "c3d97a779c20a58a0f13a48256732e474cc85f9424fa751b3d203e5ae5a5929e",
+    "web/app/page.tsx": "4a11c83e40848ab79c03316bb49a230afd01ed18486529a2ed2167fa9f0b6db6",
+    "web/app/providers.tsx": "ceff309c8dd209153d49b508fa248ed8b6e93a189ec0303c126dc63c13924bb4"
+  }
+}
