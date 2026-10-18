@@ -1,0 +1,30 @@
+{
+  "temporary": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-X8BdJ5",
+  "registry": "http://127.0.0.1:53587",
+  "fingerprint": "60b4c06345aac79543fb9118c3c7bf39ee0f2d508713c121e5a98ce7515a9315",
+  "results": [
+    {
+      "label": "parent-install",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--registry",
+        "http://127.0.0.1:53587"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-X8BdJ5",
+      "passed": false,
+      "error": "ScaffoldProcessFailure: --smol install --network-concurrency 1 --registry http://127.0.0.1:53587 failed in /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-X8BdJ5 (143)\nbun install v1.3.10 (30e609e0)\nResolving dependencies\n",
+      "ms": 44633,
+      "pressure": 2
+    }
+  ],
+  "observations": {
+    "blocker": "ScaffoldProcessFailure: --smol install --network-concurrency 1 --registry http://127.0.0.1:53587 failed in /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-X8BdJ5 (143)\nbun install v1.3.10 (30e609e0)\nResolving dependencies\n",
+    "cleanup": {
+      "registryStopped": true,
+      "temporaryRemoved": false
+    }
+  }
+}
