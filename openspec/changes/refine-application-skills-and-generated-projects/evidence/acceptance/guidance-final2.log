@@ -1,0 +1,23 @@
+guidance01-generate-before
+guidance01-migrate-before
+guidance01-seed-business
+guidance01-generate-extension
+guidance01-migrate-extension
+guidance01-repeat
+guidance01-check
+Traceback (most recent call last):
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/guidance.py", line 50, in <module>
+    run(report,"guidance01-"+operation,args,app,env,timeout=120)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/local_support.py", line 42, in run
+    raise RuntimeError(label + " failed: " + output[-3000:])
+RuntimeError: guidance01-check failed:  Type '(_input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => Promise<{ id: string; sku: string; quantity: number; ownerId: string; }[]>' is not assignable to type '((input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => unknown) & ((_input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => Promise<...>) & { ...; }'.
+      Type '(_input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => Promise<{ id: string; sku: string; quantity: number; ownerId: string; }[]>' is not assignable to type '{ readonly __relkit_handler_error__: "Return every error declared in the function's errors list"; }'.
+src/services/users/functions/current.function.ts:10:3 - error TS2769: No overload matches this call.
+  Overload 1 of 2, '(options: Omit<DefineFunctionOptions<"users.current", Schema<ObjectInput<{}>, ObjectOutput<{}>>, Schema<ObjectInput<{ id: StringSchema; name: StringSchema; email: StringSchema; }>, ObjectOutput<...>>, {}, readonly ErrorDescriptorAny[], readonly [], undefined>, "handler" | ... 1 more ... | "onAfter"> & { ...; } & { ...; } & { ...; } & { ...; }): FunctionDescriptor<...>', gave the following error.
+    Type '(_input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => Promise<ObjectOutput<{ id: StringSchema; name: StringSchema; email: StringSchema; }>>' is not assignable to type '((input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => unknown) & ((_input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => Promise<...>) & { ...; }'.
+      Type '(_input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => Promise<ObjectOutput<{ id: StringSchema; name: StringSchema; email: StringSchema; }>>' is not assignable to type '{ readonly __relkit_handler_error__: "Return every error declared in the function's errors list"; }'.
+  Overload 2 of 2, '(options: Omit<DefineFunctionOptions<"users.current", Schema<ObjectInput<{}>, ObjectOutput<{}>>, Schema<ObjectInput<{ id: StringSchema; name: StringSchema; email: StringSchema; }>, ObjectOutput<...>>, {}, readonly ErrorDescriptorAny[], readonly [], undefined>, "handler" | ... 1 more ... | "onAfter"> & { ...; } & { ...; } & { ...; }): FunctionDescriptor<...>', gave the following error.
+    Type '(_input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => Promise<ObjectOutput<{ id: StringSchema; name: StringSchema; email: StringSchema; }>>' is not assignable to type '((input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => unknown) & ((_input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => Promise<...>) & { ...; }'.
+      Type '(_input: ObjectOutput<{}>, context: FunctionContextBase<{}, readonly []>) => Promise<ObjectOutput<{ id: StringSchema; name: StringSchema; email: StringSchema; }>>' is not assignable to type '{ readonly __relkit_handler_error__: "Return every error declared in the function's errors list"; }'.
+
