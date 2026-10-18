@@ -1,0 +1,156 @@
+[20:27:32.012] INFO (#1): Preparing and installing the packed candidate fixture
+[20:27:47.621] INFO (#2): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 15492.2775,
+}
+[20:28:00.119] INFO (#5): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 12497.446208,
+}
+[20:28:00.153] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.identity",
+  outcome: "success",
+  duration_ms: 14.832167,
+}
+[20:28:00.768] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 605.548167,
+}
+[20:28:01.386] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 608.185958,
+}
+[20:28:02.312] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 917.306,
+}
+[20:28:02.931] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 611.230958,
+}
+[20:28:03.564] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 623.19525,
+}
+[20:28:04.169] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 597.394084,
+}
+[20:28:04.757] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 579.950625,
+}
+[20:28:05.364] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 598.423542,
+}
+[20:28:05.986] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 614.27,
+}
+[20:28:06.586] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 591.710166,
+}
+[20:28:07.194] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 600.599042,
+}
+[20:28:07.804] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 601.547083,
+}
+[20:28:08.404] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 592.120959,
+}
+[20:28:09.019] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 606.669834,
+}
+[20:28:09.625] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 598.042959,
+}
+[20:28:10.211] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 578.482959,
+}
+[20:28:10.847] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 627.780583,
+}
+[20:28:11.439] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 584.049042,
+}
+[20:28:12.043] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 596.637042,
+}
+[20:28:12.645] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 594.054292,
+}
+[20:28:13.472] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "dev.readiness.measure",
+  outcome: "success",
+  duration_ms: 818.091292,
+}
+[20:28:13.484] INFO (#1): Packed candidate recorded {
+  path: "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-FZf7gW/restart.json",
+  summary: {
+    runs: 20,
+    medianMs: 568.5200835,
+    p95Ms: 766.621,
+    maximumMs: 883.867625,
+    passed: true,
+    preparationPassed: true,
+  },
+}
