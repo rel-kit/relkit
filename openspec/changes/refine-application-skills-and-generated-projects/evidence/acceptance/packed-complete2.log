@@ -1,0 +1,45 @@
+Acceptance: parent-install
+[18:38:15.216] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 217639.037459,
+}
+Acceptance: create-direct
+[18:38:15.427] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 191.72575,
+}
+Acceptance: direct-install
+[18:38:37.715] INFO (#7): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 22284.491541,
+}
+Acceptance: direct-frozen
+[18:38:37.791] INFO (#10): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 70.605083,
+}
+71 |     const removed = join(root, "disabled-orm");
+72 |     const resolved = require.resolve("drizzle-orm");
+73 |     assert.ok(resolved.startsWith(root + "/"));
+74 |     await rename(optional, removed);
+75 |     try {
+76 |       assert.equal(existsSync(optional), false);
+                  ^
+AssertionError: Missing expected exception.
+ generatedMessage: false,
+     actual: undefined,
+   expected: undefined,
+   operator: "throws",
+       code: "ERR_ASSERTION"
+
+      at /Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed.ts:76:14
+
+Bun v1.3.10 (macOS arm64)

@@ -1,0 +1,46 @@
+Acceptance: parent-install
+[18:32:19.573] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 168083.992292,
+}
+Waiting for normal memory pressure before the next acceptance operation
+Acceptance: create-direct
+[18:32:30.067] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 462.415958,
+}
+Acceptance: direct-install
+[18:32:50.267] INFO (#7): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 20194.957583,
+}
+Acceptance: direct-frozen
+[18:32:50.339] INFO (#10): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 66.567125,
+}
+64 |     projects.push(root);
+65 |     await candidate.install(entry + "-install", root);
+66 |     await candidate.install(entry + "-frozen", root, true);
+67 |     candidate.observations[entry + "Identity"] = await candidate.identity(root);
+68 |     const require = createRequire(join(root, "package.json"));
+69 |     assert.throws(() => require.resolve("drizzle-orm"));
+                ^
+AssertionError: Missing expected exception.
+ generatedMessage: false,
+     actual: undefined,
+   expected: undefined,
+   operator: "throws",
+       code: "ERR_ASSERTION"
+
+      at /Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed.ts:69:12
+
+Bun v1.3.10 (macOS arm64)

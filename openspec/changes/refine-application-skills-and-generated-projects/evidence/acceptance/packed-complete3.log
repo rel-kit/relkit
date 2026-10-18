@@ -1,0 +1,207 @@
+Acceptance: parent-install
+[18:42:44.983] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 164610.634958,
+}
+Waiting for normal memory pressure before the next acceptance operation
+Acceptance: create-direct
+[18:42:55.167] INFO (#4): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 170.973875,
+}
+Acceptance: direct-install
+[18:43:15.182] INFO (#7): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 20010.112917,
+}
+Waiting for normal memory pressure before the next acceptance operation
+Waiting for normal memory pressure before the next acceptance operation
+Acceptance: direct-frozen
+[18:43:35.263] INFO (#10): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 66.140292,
+}
+Acceptance: direct-help-without-orm
+[18:43:36.353] INFO (#13): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1057.001541,
+}
+Acceptance: direct-check-without-orm
+[18:43:41.739] INFO (#16): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5382.037,
+}
+Acceptance: direct-dev-prepare-without-orm
+[18:43:48.639] INFO (#19): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 6892.914584,
+}
+Acceptance: direct-check
+[18:43:53.208] INFO (#22): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 4561.8175,
+}
+Waiting for normal memory pressure before the next acceptance operation
+Acceptance: direct-typecheck
+[18:44:05.022] INFO (#25): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1804.768417,
+}
+Acceptance: direct-test
+[18:44:05.733] INFO (#28): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 707.822333,
+}
+Acceptance: direct-build
+[18:44:09.018] INFO (#31): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3280.11675,
+}
+Acceptance: direct-prepare
+[18:44:14.698] INFO (#34): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5672.798292,
+}
+Acceptance: create-cli
+[18:44:17.306] INFO (#37): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1182.679833,
+}
+Acceptance: cli-install
+[18:44:20.146] INFO (#40): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 2836.310042,
+}
+Waiting for normal memory pressure before the next acceptance operation
+Waiting for normal memory pressure before the next acceptance operation
+Waiting for normal memory pressure before the next acceptance operation
+Acceptance: cli-frozen
+[18:45:41.107] INFO (#43): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 134.457875,
+}
+Acceptance: cli-help-without-orm
+[18:45:42.466] INFO (#46): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1266.957083,
+}
+Acceptance: cli-check-without-orm
+[18:46:03.007] INFO (#49): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 20512.447292,
+}
+Acceptance: cli-dev-prepare-without-orm
+[18:46:36.412] INFO (#52): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 13196.500792,
+}
+Acceptance: cli-check
+[18:46:58.933] INFO (#55): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 7621.24475,
+}
+Acceptance: cli-typecheck
+[18:47:00.802] INFO (#58): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1863.939208,
+}
+Acceptance: cli-test
+[18:47:01.479] INFO (#61): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 672.735583,
+}
+Acceptance: cli-build
+[18:47:09.879] INFO (#64): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 8395.141959,
+}
+Acceptance: cli-prepare
+[18:47:15.444] INFO (#67): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5175.057,
+}
+Acceptance: existing-database-auth-add
+[18:54:07.724] INFO (#70): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3141.159958,
+}
+Acceptance: existing-database-auth-install
+[19:01:00.015] ERROR (#73): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "failure",
+  duration_ms: 7378.595792,
+}
+ 98 |       });
+ 99 |     const code = exit.value,
+100 |       stdout = out.value,
+101 |       stderr = error.value;
+102 |     if (code !== 0)
+103 |       return yield* new ScaffoldProcessFailure({
+                          ^
+error: --smol install --network-concurrency 1 --force --no-cache --registry http://127.0.0.1:51548 failed in /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct (1)
+bun install v1.3.10 (30e609e0)
+Resolving dependencies
+Resolved, downloaded and extracted [11]
+error: GET http://127.0.0.1:51548/drizzle-kit - 502
+error: drizzle-kit@1.0.0-rc.5-ab785fc failed to resolve
+
+ operation: "process.exit",
+      _tag: "ScaffoldProcessFailure",
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/scripts/scaffold-process.ts:103:21)
+      at ~effect/Effect/successCont (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
+
+Bun v1.3.10 (macOS arm64)
