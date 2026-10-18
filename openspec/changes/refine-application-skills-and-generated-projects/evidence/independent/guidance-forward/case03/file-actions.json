@@ -1,0 +1,164 @@
+[
+  {
+    "path": ".agents/skills/relkit/SKILL.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "6854a26c3a6b12e20dcea9fc77cb33423f6151db046906f7e762f7e0e5963482"
+  },
+  {
+    "path": ".agents/skills/relkit/references/agent-apis.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "56f45e9f1cf1cec27e1e2360b7269c801f269a0947726f94150f17f8d75e8771"
+  },
+  {
+    "path": ".agents/skills/relkit/references/cli.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "c61e00fab749fa8c0daec706972cb19cdf15f3a8879bccfd4eba02ac44885c0a"
+  },
+  {
+    "path": ".agents/skills/relkit/references/config-environments.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "79d2abc034cd15a8e3532933b2654c07b300e39df596a2d5ef88f2aa3edc7d5f"
+  },
+  {
+    "path": ".agents/skills/relkit/references/data-apis.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "ba99986ebe7d48a808de928405d8b6e02391ff17dc542b106fa690cd86cc4e84"
+  },
+  {
+    "path": ".agents/skills/relkit/references/domain-apis.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "f74976741bf6f7e65afe0f24adfe47a47bd50857170eb2e4967ffe440a9df91d"
+  },
+  {
+    "path": ".agents/skills/relkit/references/http-apis.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "d151f8d2db3afd26ce0516795416db6aad28500e0483bd2cbd21e8dd86f9ad71"
+  },
+  {
+    "path": ".agents/skills/relkit/references/jobs-apis.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "79f92b0d2dbca53a649d0c64c44c6acffcdb17cfd5e12acda53c9eac539c0bbf"
+  },
+  {
+    "path": ".agents/skills/relkit/references/layout-migration.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "e96c6978fd83ccb297c58cbdfdfd05a713158c9400253a3ad9a4df437ecf225a"
+  },
+  {
+    "path": ".agents/skills/relkit/references/observability-apis.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "ac7a3dd23df45fdae83f3a78d61e7976fd3e84f2e5273af9fd1cd3d2c0d4e4c6"
+  },
+  {
+    "path": ".agents/skills/relkit/references/realtime-apis.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "31135cccb2eafcd271dff8f1470f8d70d48f1ff8eadc215df306cb79f8756cd1"
+  },
+  {
+    "path": ".agents/skills/relkit/references/streaming-apis.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "1d89fad9859b4bb24ee7d132fa6ee61e0b12804d2a1c7b72d0294b78da4a845f"
+  },
+  {
+    "path": ".agents/skills/relkit/references/testing-apis.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "b0b432f1122c53421d00ccf6888eae61a6bbe82d5218a67c718129ead15b4b03"
+  },
+  {
+    "path": ".env.example",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "7a967e71a9a53a5a4bea5d4fd6d38bb91f64e2148b9f5a56fa03f83dab220ab6"
+  },
+  {
+    "path": ".gitignore",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "88d31549ec471841f21de7c786da365c86c9cb2a17d6ddf0b1e26401323f013b"
+  },
+  {
+    "path": ".vscode/settings.json",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "971a8b30b05a95f1f45e414b4513c120d339067fefb86519aca9edbb00435377"
+  },
+  {
+    "path": "README.md",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "7f27b3d972559beb5a33dc3b91069cf7e0d8690bf7492f06fd5e7695db97020d"
+  },
+  {
+    "path": "package.json",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "7926e38b5cdd17167bc27fcccffbf99d20a245809f01ddfa2b74b5c7be60b0d9"
+  },
+  {
+    "path": "patches/drizzle-orm@1.0.0-rc.5-169397b.patch",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "10ea188b9409dd19aac7bf27f4b12911ae4844c063362b9c2bd11d6a3d936374"
+  },
+  {
+    "path": "relkit.config.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "3df8c4269ba1a59afea370c099f831cbcab5c45fb78537ba971b7b19875d7114"
+  },
+  {
+    "path": "src/platform/env.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "4a60fad5a1db996d225643cb40e620b4b61f5a66ffeafee396bf1c6047dc6b80"
+  },
+  {
+    "path": "src/routes/hello/route.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "740424cb52525f6a274c9859211282db79353039a39073cabe3f42c9a1cdbfb5"
+  },
+  {
+    "path": "src/services/hello/functions/hello.function.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "cf2e6c7b9cb0bd073bb9293a59e438f20b67540f93bda87e34e5d4edb30aef2a"
+  },
+  {
+    "path": "src/services/hello/service.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "23ce0eef5aa7ad5f61c34f4363088627c57ec505508f56e2e203e4667a6db835"
+  },
+  {
+    "path": "tests/integration/hello.route.test.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "c6b0af3c76f39f8acddef841e984d4f13e38e22430df99c2d995b7ba54fc3d70"
+  },
+  {
+    "path": "tests/unit/hello.function.test.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "2b8ca2d39571b93e6b7d412544beb323b826c2d459cdcc5000261f20506b58ca"
+  },
+  {
+    "path": "tsconfig.json",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "4328ff0b8f18e3e45f86590317132377801d04f788cc007ef4180faa61a24367"
+  }
+]
