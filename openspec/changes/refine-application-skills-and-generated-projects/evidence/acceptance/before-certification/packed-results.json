@@ -1,0 +1,830 @@
+{
+  "temporary": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a",
+  "registry": "http://127.0.0.1:54802",
+  "fingerprint": "60b4c06345aac79543fb9118c3c7bf39ee0f2d508713c121e5a98ce7515a9315",
+  "results": [
+    {
+      "label": "parent-install",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--registry",
+        "http://127.0.0.1:53697"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a",
+      "passed": true,
+      "ms": 163398,
+      "pressure": 1
+    },
+    {
+      "label": "create-direct",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/node_modules/.bin/create-relkit",
+        "acceptance-app",
+        "--directory",
+        "consumer-direct",
+        "--template",
+        "minimal",
+        "--cloud",
+        "none",
+        "--deploy",
+        "none",
+        "--examples",
+        "--no-install",
+        "--no-git",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a",
+      "passed": true,
+      "ms": 191,
+      "pressure": 1
+    },
+    {
+      "label": "direct-install",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--registry",
+        "http://127.0.0.1:53697"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 10066,
+      "pressure": 1
+    },
+    {
+      "label": "direct-frozen",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--frozen-lockfile",
+        "--registry",
+        "http://127.0.0.1:53697"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 67,
+      "pressure": 1
+    },
+    {
+      "label": "direct-help-without-orm",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/.bin/relkit",
+        "db",
+        "migrate",
+        "--help"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 1056,
+      "pressure": 1
+    },
+    {
+      "label": "direct-check-without-orm",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/.bin/relkit",
+        "check"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 5673,
+      "pressure": 1
+    },
+    {
+      "label": "direct-dev-prepare-without-orm",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/.bin/relkit",
+        "dev",
+        "--prepare"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 6293,
+      "pressure": 1
+    },
+    {
+      "label": "direct-check",
+      "args": [
+        "run",
+        "check"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 4873,
+      "pressure": 2
+    },
+    {
+      "label": "direct-typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 1890,
+      "pressure": 2
+    },
+    {
+      "label": "direct-test",
+      "args": [
+        "run",
+        "test"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 695,
+      "pressure": 2
+    },
+    {
+      "label": "direct-build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 3425,
+      "pressure": 2
+    },
+    {
+      "label": "direct-prepare",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/.bin/relkit",
+        "dev",
+        "--prepare"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 4716,
+      "pressure": 2
+    },
+    {
+      "label": "create-cli",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/node_modules/.bin/relkit",
+        "create",
+        "acceptance-app",
+        "--directory",
+        "consumer-cli",
+        "--template",
+        "minimal",
+        "--cloud",
+        "none",
+        "--deploy",
+        "none",
+        "--examples",
+        "--no-install",
+        "--no-git",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a",
+      "passed": true,
+      "ms": 1096,
+      "pressure": 2
+    },
+    {
+      "label": "cli-install",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--registry",
+        "http://127.0.0.1:53697"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 910,
+      "pressure": 2
+    },
+    {
+      "label": "cli-frozen",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--frozen-lockfile",
+        "--registry",
+        "http://127.0.0.1:53697"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 60,
+      "pressure": 2
+    },
+    {
+      "label": "cli-help-without-orm",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli/node_modules/.bin/relkit",
+        "db",
+        "migrate",
+        "--help"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 984,
+      "pressure": 2
+    },
+    {
+      "label": "cli-check-without-orm",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli/node_modules/.bin/relkit",
+        "check"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 5210,
+      "pressure": 2
+    },
+    {
+      "label": "cli-dev-prepare-without-orm",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli/node_modules/.bin/relkit",
+        "dev",
+        "--prepare"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 6851,
+      "pressure": 1
+    },
+    {
+      "label": "cli-check",
+      "args": [
+        "run",
+        "check"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 4331,
+      "pressure": 1
+    },
+    {
+      "label": "cli-typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 1593,
+      "pressure": 1
+    },
+    {
+      "label": "cli-test",
+      "args": [
+        "run",
+        "test"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 671,
+      "pressure": 1
+    },
+    {
+      "label": "cli-build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 3257,
+      "pressure": 1
+    },
+    {
+      "label": "cli-prepare",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli/node_modules/.bin/relkit",
+        "dev",
+        "--prepare"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 5171,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-add",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/.bin/relkit",
+        "--json",
+        "add",
+        "database",
+        "--dialect",
+        "sqlite",
+        "--no-install"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 1142,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-install",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--registry",
+        "http://127.0.0.1:53697"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 8098,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-frozen",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--frozen-lockfile",
+        "--registry",
+        "http://127.0.0.1:53697"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 28,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-generate",
+      "args": [
+        "run",
+        "db:generate",
+        "--name=initial"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 607,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-migrate",
+      "args": [
+        "run",
+        "db:migrate"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 965,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-auth-add",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/.bin/relkit",
+        "--json",
+        "add",
+        "auth",
+        "--database-dialect",
+        "sqlite",
+        "--no-install"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 6019,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-auth-install",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--registry",
+        "http://127.0.0.1:53697"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 31,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-auth-generate",
+      "args": [
+        "run",
+        "db:generate",
+        "--name=auth"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 405,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-auth-migrate",
+      "args": [
+        "run",
+        "db:migrate"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 835,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-repeat",
+      "args": [
+        "run",
+        "db:migrate"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 917,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-check",
+      "args": [
+        "run",
+        "check"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 4941,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 1668,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-test",
+      "args": [
+        "run",
+        "test"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": false,
+      "error": "ScaffoldProcessFailure: run test failed in /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct (1)\nbun test v1.3.10 (30e609e0)\n$ bun test\n\ntests/unit/hello.function.test.ts:\n(pass) hello returns a greeting [45.41ms]\n\ntests/integration/hello.route.test.ts:\n\n# Unhandled error between tests\n-------------------------------\n22 |         const issues = [];\n23 |         for (const name of Object.keys(definition.shape)) {\n24 |             resolveField(name, definition.shape[name], options.source, options.environment, values, issues);\n25 |         }\n26 |         if (issues.length)\n27 |             return yield* Effect.fail(new EnvResolutionError(issues));\n                                           ^\nEnvResolutionError: BETTER_AUTH_SECRET: Required value is missing\n issues: [\n  [Object ...]\n],\n   _tag: \"EnvResolutionError\",\n\n      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/config/dist/resolve.js:27:39)\n      at ~effect/Effect/successCont (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:973:28)\n      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)\n      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)\n      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)\n      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2538:19)\n      at runConfigSync (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/config/dist/config-observability.js:47:25)\n      at try (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/testing/dist/application.js:82:17)\n      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:753:22)\n      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)\n      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)\n      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)\n      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/ManagedRuntime.js:104:27)\n      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)\n      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)\n      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)\n      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2512:19)\n      at runExecutionPromise (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/contracts/dist/operation-runtime.js:53:32)\n      at createTestApplication (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/testing/dist/application.js:52:31)\n      at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/tests/integration/hello.route.test.ts:5:23\n-------------------------------\n\n\n 1 pass\n 1 fail\n 1 error\n 1 expect() calls\nRan 2 tests across 2 files. [670.00ms]\nerror: script \"test\" exited with code 1\n",
+      "ms": 696,
+      "pressure": 2
+    },
+    {
+      "label": "existing-database-auth-test",
+      "args": [
+        "run",
+        "test"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 1045,
+      "pressure": 1
+    },
+    {
+      "label": "existing-database-auth-build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct",
+      "passed": true,
+      "ms": 4765,
+      "pressure": 2
+    },
+    {
+      "label": "auth-chained-add",
+      "args": [
+        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli/node_modules/.bin/relkit",
+        "--json",
+        "add",
+        "auth",
+        "--database-dialect",
+        "sqlite",
+        "--no-install"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 1107,
+      "pressure": 2
+    },
+    {
+      "label": "auth-chained-install",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--registry",
+        "http://127.0.0.1:54540"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 5814,
+      "pressure": 2
+    },
+    {
+      "label": "auth-chained-frozen",
+      "args": [
+        "--smol",
+        "install",
+        "--network-concurrency",
+        "1",
+        "--frozen-lockfile",
+        "--registry",
+        "http://127.0.0.1:54540"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 29,
+      "pressure": 2
+    },
+    {
+      "label": "auth-chained-generate",
+      "args": [
+        "run",
+        "db:generate",
+        "--name=initial"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 619,
+      "pressure": 1
+    },
+    {
+      "label": "auth-chained-migrate",
+      "args": [
+        "run",
+        "db:migrate"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 1149,
+      "pressure": 1
+    },
+    {
+      "label": "auth-chained-business-generate",
+      "args": [
+        "run",
+        "db:generate",
+        "--name=business"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 502,
+      "pressure": 1
+    },
+    {
+      "label": "auth-chained-business-migrate",
+      "args": [
+        "run",
+        "db:migrate"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 1211,
+      "pressure": 2
+    },
+    {
+      "label": "auth-chained-repeat",
+      "args": [
+        "run",
+        "db:migrate"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 995,
+      "pressure": 2
+    },
+    {
+      "label": "auth-chained-check",
+      "args": [
+        "run",
+        "check"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 5473,
+      "pressure": 1
+    },
+    {
+      "label": "auth-chained-typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 1586,
+      "pressure": 1
+    },
+    {
+      "label": "auth-chained-test",
+      "args": [
+        "run",
+        "test"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 843,
+      "pressure": 1
+    },
+    {
+      "label": "auth-chained-build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli",
+      "passed": true,
+      "ms": 3736,
+      "pressure": 1
+    }
+  ],
+  "observations": {
+    "parentIdentity": [
+      {
+        "name": "@relkit/cli",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/node_modules/@relkit/cli",
+        "version": "0.7.7",
+        "binSha256": "7b439e073f89e51fcc792ae8aa1ce56443a77b8cf2e3c21ddcac3baa92ba23eb"
+      },
+      {
+        "name": "create-relkit",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/node_modules/create-relkit",
+        "version": "0.7.7",
+        "binSha256": "00735b75abda57c2f43af062ea6d8c3dd2da459daea2d037d177a72ba7434392"
+      }
+    ],
+    "packedSkillsMatch": true,
+    "directIdentity": [
+      {
+        "name": "@relkit/cli",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/cli",
+        "version": "0.7.7",
+        "binSha256": "7b439e073f89e51fcc792ae8aa1ce56443a77b8cf2e3c21ddcac3baa92ba23eb"
+      },
+      {
+        "name": "create-relkit",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/create-relkit",
+        "version": "0.7.7",
+        "binSha256": "00735b75abda57c2f43af062ea6d8c3dd2da459daea2d037d177a72ba7434392"
+      }
+    ],
+    "directNoDatabase": {
+      "ormAbsent": true,
+      "kitAbsent": true,
+      "help": true,
+      "prepare": true,
+      "startHello": true
+    },
+    "cliIdentity": [
+      {
+        "name": "@relkit/cli",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli/node_modules/@relkit/cli",
+        "version": "0.7.7",
+        "binSha256": "7b439e073f89e51fcc792ae8aa1ce56443a77b8cf2e3c21ddcac3baa92ba23eb"
+      },
+      {
+        "name": "create-relkit",
+        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-cli/node_modules/create-relkit",
+        "version": "0.7.7",
+        "binSha256": "00735b75abda57c2f43af062ea6d8c3dd2da459daea2d037d177a72ba7434392"
+      }
+    ],
+    "cliNoDatabase": {
+      "ormAbsent": true,
+      "kitAbsent": true,
+      "help": true,
+      "prepare": true,
+      "startHello": true
+    },
+    "existing-database-authPort": 54243,
+    "existing-database-authInitial": {
+      "tables": [
+        {
+          "name": "__drizzle_migrations"
+        },
+        {
+          "name": "items"
+        },
+        {
+          "name": "sqlite_sequence"
+        }
+      ],
+      "log": [
+        {
+          "id": 1,
+          "hash": "b704819abb4374015925c1a4bfd588a343de19fc2173b6983f063aac23d3d2eb",
+          "created_at": 1792343265000,
+          "name": "20261018170745_initial",
+          "applied_at": "2026-10-18T17:07:45.977Z"
+        }
+      ]
+    },
+    "existing-database-authPreservation": {
+      "log": [
+        {
+          "id": 1,
+          "hash": "b704819abb4374015925c1a4bfd588a343de19fc2173b6983f063aac23d3d2eb",
+          "created_at": 1792343265000,
+          "name": "20261018170745_initial",
+          "applied_at": "2026-10-18T17:07:45.977Z"
+        },
+        {
+          "id": 2,
+          "hash": "e1df74edaaf8262ca42010cd88a441fa643ccf4ba9e2276670e7318cfd4c67d5",
+          "created_at": 1792343272000,
+          "name": "20261018170752_auth",
+          "applied_at": "2026-10-18T17:07:53.296Z"
+        }
+      ],
+      "businessRows": [
+        {
+          "name": "business-row-survives"
+        }
+      ]
+    },
+    "cleanup": {
+      "registryStopped": true,
+      "temporaryRemoved": true
+    },
+    "existing-database-authHTTP": {
+      "signup": true,
+      "signin": true,
+      "sessionCookie": true,
+      "deniedAllowed": true,
+      "revocation": true
+    },
+    "auth-chainedPort": 54605,
+    "auth-chainedInitial": {
+      "tables": [
+        {
+          "name": "__drizzle_migrations"
+        },
+        {
+          "name": "account"
+        },
+        {
+          "name": "session"
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "verification"
+        }
+      ],
+      "log": [
+        {
+          "id": 1,
+          "hash": "e1df74edaaf8262ca42010cd88a441fa643ccf4ba9e2276670e7318cfd4c67d5",
+          "created_at": 1792343395000,
+          "name": "20261018170955_initial",
+          "applied_at": "2026-10-18T17:09:56.349Z"
+        }
+      ]
+    },
+    "auth-chainedPreservation": {
+      "log": [
+        {
+          "id": 1,
+          "hash": "e1df74edaaf8262ca42010cd88a441fa643ccf4ba9e2276670e7318cfd4c67d5",
+          "created_at": 1792343395000,
+          "name": "20261018170955_initial",
+          "applied_at": "2026-10-18T17:09:56.349Z"
+        },
+        {
+          "id": 2,
+          "hash": "b704819abb4374015925c1a4bfd588a343de19fc2173b6983f063aac23d3d2eb",
+          "created_at": 1792343414000,
+          "name": "20261018171014_business",
+          "applied_at": "2026-10-18T17:10:15.637Z"
+        }
+      ],
+      "businessRows": [
+        {
+          "name": "business-row-survives"
+        }
+      ]
+    },
+    "auth-chainedHTTP": {
+      "signup": true,
+      "signin": true,
+      "sessionCookie": true,
+      "deniedAllowed": true,
+      "revocation": true
+    },
+    "passed": true
+  }
+}
