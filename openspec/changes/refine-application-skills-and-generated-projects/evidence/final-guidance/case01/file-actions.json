@@ -1,0 +1,92 @@
+[
+  {
+    "path": "src/routes/orders/route.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "1085ffd12084cb8483d658468f91e48c490743bbb477e3a41d9d42d959156a2d"
+  },
+  {
+    "path": "src/routes/users/me/route.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "86410e3c7a9da61296bf6134486d32433b0b7a82b2177e3729b14be09c62b31f"
+  },
+  {
+    "path": "src/services/database/schema/index.ts",
+    "action": "updated",
+    "before_sha256": "fe53c5afced0d1b32a6d50a8634f8cebaf75081186706c7212a6903cb8d7175c",
+    "after_sha256": "45ef2b3deac1ce50a0caab154e1bef3d2e21b3bd4036b14c2af18d16c9773a16"
+  },
+  {
+    "path": "src/services/database/schema/orders.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "d4b6159edfcf08177ccc1a6a420ca1a12e1ff6b3a304f4d4a0e5a156a5956fb8"
+  },
+  {
+    "path": "src/services/orders/errors/authentication-required.error.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "2287c1cdfaf3d551cde10d38fe542033680b0f073709d74037d795412e7f7ab1"
+  },
+  {
+    "path": "src/services/orders/functions/create-order.function.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "234d2ad361d34bbe0fd19dcd63c0335063539e4d65b4a2b6c357f23fa3072a23"
+  },
+  {
+    "path": "src/services/orders/functions/list-orders.function.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "f127ed7b352a4da6f7d733fbfd943183b3044a990a37841e4545c8efcf14547b"
+  },
+  {
+    "path": "src/services/orders/helpers/current-user.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "3a6ae0694634793747dcfa5589467677bb1821bc87d56f8f867eac7736c6da0e"
+  },
+  {
+    "path": "src/services/orders/schemas/order.schema.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "9c72e1483cab9532eca04136dbfbd2cf051f77bc412a63050e07f37011d0a4bb"
+  },
+  {
+    "path": "src/services/orders/service.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "f48409f3cd28e5736c2acd523b4e8e93eb4c4df63885cc09756e1fab20ad0fd2"
+  },
+  {
+    "path": "src/services/users/errors/authentication-required.error.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "78df0398d1ad1e7f6a6c28b2dbcb9201653b9a5b4b46912b421f0753733a5c7d"
+  },
+  {
+    "path": "src/services/users/functions/current.function.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "33e19e5abe91955d2d3c4fb0283b9c1d6bb081407e9b8387a8ce4910e6c5c79c"
+  },
+  {
+    "path": "src/services/users/helpers/current-user.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "44e7e8ee8894965a7a12c531893f0ae5fb96d53b76df5e906d03cf55c40d6eda"
+  },
+  {
+    "path": "src/services/users/service.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "df0eb259e4affa7c0f13250d1d6cfbed6cd5fd05940760ff9393f54f4638ff46"
+  },
+  {
+    "path": "tests/integration/auth-orders.test.ts",
+    "action": "created",
+    "before_sha256": null,
+    "after_sha256": "f8a737c46d327b45d913c633b94835485343856d8e8578ff6efe19373d24f01d"
+  }
+]
