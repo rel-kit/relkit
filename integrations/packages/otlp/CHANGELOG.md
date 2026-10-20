@@ -1,5 +1,5 @@
 # @relkit/otlp
 
-## 0.7.9
+## 0.7.10
 
-See the root CHANGELOG.md for this fixed release train.
+See the root CHANGELOG.md for this release batch.
