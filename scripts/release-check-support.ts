@@ -141,10 +141,12 @@ export function checkManifests(
   summary: RecordValue[];
 } {
   const workspaceNames = new Set(items.map((item) => item.name));
-  const versions = new Set(items.map((item) => item.manifest.version));
-  if (versions.size !== 1 || !exactVersion(items[0]?.manifest.version))
-    throw new Error("Package versions are not one exact release version.");
-  const version = String(items[0]!.manifest.version);
+  if (items.length === 0 || items.some((item) => !exactVersion(item.manifest.version)))
+    throw new Error("Every package must have an exact release version.");
+  const version = String(
+    items.find((item) => item.name === "create-relkit")?.manifest.version ??
+      items[0]!.manifest.version,
+  );
   const summary: RecordValue[] = [];
   for (const item of items) {
     const directoryName = basename(item.directory);
@@ -201,7 +203,7 @@ export function checkManifests(
       }
     summary.push({
       name: item.name,
-      version,
+      version: item.manifest.version,
       exports: stable(item.manifest.exports),
       dependencyFields: Object.fromEntries(
         packageFields.map((field) => [field, stable(dependencies[field])]),

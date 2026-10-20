@@ -24,7 +24,9 @@ export async function smokePackedRelkit(artifacts: string): Promise<void> {
     const wrapper = tarballs.get("relkit");
     assert.ok(wrapper, "Release artifacts do not include relkit");
     const packed = await readPackedManifest(wrapper);
-    assert.equal(packed.dependencies?.["@relkit/cli"], packed.version);
+    const cliVersion = manifests.get("@relkit/cli")?.manifest.version;
+    assert.ok(cliVersion);
+    assert.equal(packed.dependencies?.["@relkit/cli"], cliVersion);
     server = await startRegistry(temporary, tarballs, manifests);
     const registry = `http://127.0.0.1:${server.port!}`;
     const consumer = join(temporary, "consumer");
@@ -69,16 +71,16 @@ export async function smokePackedRelkit(artifacts: string): Promise<void> {
     const installed = JSON.parse(await readFile(join(installedWrapper, "package.json"), "utf8"));
     assert.equal(installed.name, "relkit");
     assert.equal(installed.version, packed.version);
-    assert.equal(installed.dependencies["@relkit/cli"], packed.version);
+    assert.equal(installed.dependencies["@relkit/cli"], cliVersion);
     // Bun can link the hoisted dependency's bin; exercise the wrapper itself too.
     const wrapperBinary = join(installedWrapper, "dist/bin.js");
     assert.deepEqual(help, JSON.parse(await execute([wrapperBinary, "--json", "--help"])));
-    const scoped = ["x", "--package", `@relkit/cli@${packed.version}`, "relkit"];
+    const scoped = ["x", "--package", `@relkit/cli@${cliVersion}`, "relkit"];
     assert.deepEqual(help, JSON.parse(await execute([...scoped, "--json", "--help"])));
     for (const specifier of ["relkit@latest", `relkit@${packed.version}`])
       assert.deepEqual(JSON.parse(await execute(["x", specifier, "--json", "--version"])), {
         name: "relkit",
-        version: packed.version,
+        version: cliVersion,
       });
     const invalid = ["--json", "--help", "--version"];
     const scopedFailure = await execute([...scoped, ...invalid], 2);
@@ -114,7 +116,7 @@ export async function smokePackedRelkit(artifacts: string): Promise<void> {
       const result = JSON.parse(await execute([...command, ...create, "--directory", destination]));
       assert.equal(result.destination, destination);
       const project = JSON.parse(await readFile(join(destination, "package.json"), "utf8"));
-      assert.equal(project.devDependencies["@relkit/cli"], packed.version);
+      assert.equal(project.devDependencies["@relkit/cli"], cliVersion);
     }
     assert.deepEqual(await snapshotProject(aliasProject), await snapshotProject(scopedProject));
     assert.deepEqual(await snapshotProject(wrapperProject), await snapshotProject(scopedProject));

@@ -70,8 +70,8 @@ test("packed dependency validation requires concrete pins in every dependency fi
     dependencies: { effect: "4.0.1", "@relkit/app": "0.6.0" },
     peerDependencies: { react: ">=18.0.0" },
   };
-  const names = new Set(["@relkit/app"]);
-  expect(() => assertPackedDependencies(source, packed, catalog, names, "0.6.0")).not.toThrow();
+  const names = new Map([["@relkit/app", "0.6.0"]]);
+  expect(() => assertPackedDependencies(source, packed, catalog, names)).not.toThrow();
   for (const dependencies of [
     { ...packed.dependencies, effect: "catalog:" },
     { ...packed.dependencies, effect: "4.0.0" },
@@ -80,7 +80,7 @@ test("packed dependency validation requires concrete pins in every dependency fi
     { ...packed.dependencies, unrelated: "1.0.0" },
   ])
     expect(() =>
-      assertPackedDependencies(source, { ...packed, dependencies }, catalog, names, "0.6.0"),
+      assertPackedDependencies(source, { ...packed, dependencies }, catalog, names),
     ).toThrow();
   expect(() =>
     assertPackedDependencies(
@@ -91,7 +91,6 @@ test("packed dependency validation requires concrete pins in every dependency fi
       },
       catalog,
       names,
-      "0.6.0",
     ),
   ).toThrow();
 });

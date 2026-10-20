@@ -49,10 +49,16 @@ export const preparePackedFixture = Effect.fn("ReadinessBenchmark.preparePacked"
     (server) => Effect.promise(() => server.stop(true)),
   );
   const registry = `http://127.0.0.1:${server.port}`;
-  const version = manifests.get("@relkit/app")?.manifest.version;
+  const version = manifests.get("create-relkit")?.manifest.version;
   if (version === undefined)
     return yield* Effect.die(new Error("Packed application version is absent"));
-  yield* installPackedGenerator(temporary, version, registry);
+  const cliVersion = manifests.get("@relkit/cli")?.manifest.version;
+  if (cliVersion === undefined) return yield* Effect.die(new Error("Packed CLI version is absent"));
+  yield* installPackedGenerator(
+    temporary,
+    { "@relkit/cli": cliVersion, "create-relkit": version },
+    registry,
+  );
   const projectRoot = yield* createPackedProject(
     temporary,
     registry,
@@ -111,13 +117,13 @@ export const createPackedProject = Effect.fn("ReadinessBenchmark.createPackedPro
 /**
  * Installs the packed generator with isolated registry resolution and cache.
  * @param temporary - Outside-workspace parent owned by this benchmark.
- * @param version - Verified common first-party release version.
+ * @param dependencies - Exact CLI and generator versions.
  * @param registry - Owned local registry serving verified tarballs.
  * @returns Completion after finite installation settles, including interruption.
  */
 const installPackedGenerator = Effect.fn("ReadinessBenchmark.installGenerator")(function* (
   temporary: string,
-  version: string,
+  dependencies: Record<string, string>,
   registry: string,
 ) {
   yield* ownedNativePromise("benchmark.parentManifest", () =>
@@ -127,7 +133,7 @@ const installPackedGenerator = Effect.fn("ReadinessBenchmark.installGenerator")(
         name: "relkit-readiness-parent",
         private: true,
         type: "module",
-        dependencies: { "@relkit/cli": version, "create-relkit": version },
+        dependencies,
       }) + "\n",
     ),
   );
