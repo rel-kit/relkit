@@ -168,6 +168,18 @@ test("publisher resumes exact archives, skips completed packages, and protects l
     state.stale = "@relkit/schema@0.8.1";
     await writeFile(statePath, JSON.stringify(state));
     expect((await execute()).output).toContain("integrity mismatch");
+    state = {
+      published: { "@relkit/contracts@0.7.9": "sha512-conflict" },
+      calls: [],
+      stale: "@relkit/contracts@0.7.9",
+      duplicate: true,
+    };
+    await writeFile(statePath, JSON.stringify(state));
+    const dependencyConflict = await execute();
+    expect(dependencyConflict.code).not.toBe(0);
+    expect(dependencyConflict.output).toContain("integrity mismatch");
+    state = JSON.parse(await readFile(statePath, "utf8"));
+    expect(state.calls).toHaveLength(1);
     state = { published: {}, calls: [], denied: true };
     await writeFile(statePath, JSON.stringify(state));
     const denied = await execute();

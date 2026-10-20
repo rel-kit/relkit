@@ -160,8 +160,9 @@ async function main(): Promise<void> {
         )
           throw cause;
         console.log(
-          `Already submitted ${artifact.name}@${artifact.version}; deferring integrity verification`,
+          `Already submitted ${artifact.name}@${artifact.version}; verifying integrity before continuing`,
         );
+        await verifyPublishedPackages([artifact], publishedIntegrity);
       }
       console.log(`Submitted ${artifact.name}@${artifact.version}; continuing in dependency order`);
     }
