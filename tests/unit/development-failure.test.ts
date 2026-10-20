@@ -82,6 +82,34 @@ test("keeps the failure visible when startup details are unavailable", async () 
   expect((await loadDevelopmentFailure(client))?.details).toEqual([]);
 });
 
+test.each(["build", "startup"] as const)(
+  "retries a transient %s detail-query failure on the unchanged generation",
+  async (stage) => {
+    const build = { message: "dev.build.started", timestamp: startedAt };
+    const startup = {
+      origin: "application",
+      message: "Database startup failed",
+      fields: { detail: "Retention must be an integer" },
+    };
+    const unavailable = new Error("Details temporarily unavailable");
+    const { client, requests } = fixture([
+      [failed],
+      ...(stage === "build" ? [unavailable] : [[build], unavailable]),
+      [failed],
+      [build],
+      [startup],
+      [failed],
+    ]);
+    const incomplete = await loadDevelopmentFailure(client);
+    expect(incomplete?.details).toEqual([]);
+    const recovered = await loadDevelopmentFailure(client, incomplete);
+    expect(recovered?.details).toEqual(["Database startup failed: Retention must be an integer"]);
+    const detailRequests = requests.length;
+    expect(await loadDevelopmentFailure(client, recovered)).toBe(recovered);
+    expect(requests).toHaveLength(detailRequests + 1);
+  },
+);
+
 test("reuses unchanged startup details and handles environments without dev logs", async () => {
   const { client, requests } = fixture([[failed], [], [failed], []]);
   const failure = await loadDevelopmentFailure(client);

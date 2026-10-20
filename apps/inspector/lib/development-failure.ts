@@ -5,6 +5,7 @@ export interface DevelopmentFailure {
   readonly cursor: string;
   readonly message: string;
   readonly details: readonly string[];
+  readonly detailsUnavailable: boolean;
   readonly suggestion: string;
   readonly logsHref: string;
 }
@@ -27,17 +28,19 @@ export async function loadDevelopmentFailure(
       (item.message === "dev.generation.failed" || item.message === "dev.generation.active"),
   );
   if (latest?.message !== "dev.generation.failed") return undefined;
-  if (previous !== undefined && latest.cursor === previous.cursor) return previous;
+  if (previous !== undefined && latest.cursor === previous.cursor && !previous.detailsUnavailable)
+    return previous;
   const fields = record(latest.fields);
   const message = text(fields?.message) ?? "The latest application version could not start.";
   const to = timestamp(latest.timestamp);
-  const details = to === undefined ? [] : await startupFailures(client, to).catch(() => []);
+  const details = to === undefined ? [] : await startupFailures(client, to).catch(() => undefined);
   const logs = new URLSearchParams({ source: "all", range: "custom", severity: "error" });
   if (to !== undefined) logs.set("to", to);
   return {
     cursor: text(latest.cursor) ?? to ?? message,
     message,
-    details,
+    details: details ?? [],
+    detailsUnavailable: details === undefined,
     suggestion: /docker/i.test(message)
       ? "Start Docker Desktop or your Docker daemon and check that docker ps succeeds. Then save a source file to retry the reload."
       : "Resolve the reported errors, then save .env or a source file to retry the reload.",
