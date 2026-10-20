@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.7.9
+
+### Changes
+
+- Guide cohesive domain services and add agent evaluations
+
 ## 0.7.8
 
 ### Changes

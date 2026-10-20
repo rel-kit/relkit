@@ -1,6 +1,6 @@
 {
   "name": "@relkit/buckets",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "description": "RELKIT bucket authoring API; prefer @relkit/app/buckets in applications.",
   "license": "MIT",
   "repository": {

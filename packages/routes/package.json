@@ -1,6 +1,6 @@
 {
   "name": "@relkit/routes",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "description": "RELKIT route authoring API; prefer @relkit/app/routes in applications.",
   "license": "MIT",
   "repository": {

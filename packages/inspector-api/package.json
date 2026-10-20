@@ -1,6 +1,6 @@
 {
   "name": "@relkit/inspector-api",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "description": "Unsupported internal API for the RELKIT inspector; use @relkit/cli.",
   "license": "MIT",
   "repository": {
