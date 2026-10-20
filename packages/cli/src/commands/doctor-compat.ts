@@ -1,4 +1,5 @@
 import { Effect, Layer, Schema } from "effect";
+import { dirname, join, resolve } from "node:path";
 import { isDescriptor } from "@relkit/contracts";
 import { generatorFileSystemLive, resolveProjectDependenciesEffect } from "create-relkit";
 import cliManifest from "../../package.json" with { type: "json" };
@@ -79,7 +80,7 @@ export const versionChecksEffect = Effect.fn("Doctor.versions")(
     const typeScriptOk =
       actualTypeScript !== undefined &&
       (yield* toolchain.satisfies(actualTypeScript, expectedTypeScript));
-    const relkit = relkitVersions(dependencies);
+    const relkit = yield* relkitVersions(dependencies, root);
     return [
       {
         name: "bun",
@@ -127,34 +128,62 @@ function packageManagerVersion(manifest: PackageJson): string | undefined {
   return /^bun@(.+)$/.exec(value)?.[1] ?? (typeof engine === "string" ? engine : undefined);
 }
 
-/** Compares the RELKIT release train while preserving workspace/link compatibility.
+/** Checks each installed RELKIT package against its own declaration.
  * @param dependencies - Strictly resolved version specifications.
+ * @param root - Project dependency resolution root.
  * @returns Compatibility and package/version names suitable for public diagnostics.
  */
-function relkitVersions(dependencies: Readonly<Record<string, string>>): {
-  ok: boolean;
-  message: string;
-  details: Readonly<Record<string, unknown>>;
-} {
-  const entries = Object.entries(dependencies).filter(([name]) => name.startsWith("@relkit/"));
-  const versions = [
-    ...new Set(
-      entries
-        .map(([, version]) => String(version))
-        .filter(
-          (version) => !["workspace:*", "*"].includes(version) && !version.startsWith("link:"),
-        ),
-    ),
-  ];
+const relkitVersions = Effect.fn("Doctor.relkitVersions")(function* (
+  dependencies: Readonly<Record<string, string>>,
+  root: string,
+) {
+  const toolchain = yield* CliDoctorToolchain;
+  const entries = Object.entries(dependencies).filter(
+    ([name]) => name.startsWith("@relkit/") || name === "relkit" || name === "create-relkit",
+  );
+  const mismatches: { name: string; expected: string; installed: unknown }[] = [];
+  for (const [name, expected] of entries) {
+    if (expected.startsWith("workspace:") || expected.startsWith("link:")) continue;
+    const metadata = yield* installedPackage(root, name);
+    const installed = metadata?.version;
+    const range = expected.startsWith("file:") ? "*" : expected;
+    if (
+      metadata?.name !== name ||
+      typeof installed !== "string" ||
+      !(yield* toolchain.satisfies(installed, range))
+    )
+      mismatches.push({ name, expected, installed: installed ?? null });
+  }
   return {
-    ok: versions.length <= 1,
+    ok: mismatches.length === 0,
     message:
-      versions.length <= 1
+      mismatches.length === 0
         ? "RelKit package versions are compatible."
-        : "RelKit package versions do not match.",
-    details: { packages: entries.map(([name]) => name), versions },
+        : `RelKit installations do not satisfy their declarations: ${mismatches.map(({ name }) => name).join(", ")}.`,
+    details: {
+      packages: entries.map(([name]) => name),
+      versions: [...new Set(entries.map(([, version]) => version))],
+      mismatches,
+    },
   };
-}
+});
+
+/** Reads metadata without requiring package.json to be publicly exported.
+ * @param root - Project directory, including nested workspace projects.
+ * @param name - Declared first-party package name.
+ * @returns Nearest installation metadata, or undefined when absent or malformed.
+ */
+const installedPackage = Effect.fn("Doctor.installedPackage")(function* (
+  root: string,
+  name: string,
+) {
+  const files = yield* CliFileSystem;
+  for (let current = resolve(root); ; current = dirname(current)) {
+    const path = join(current, "node_modules", name, "package.json");
+    if (yield* files.exists(path)) return yield* readJsonEffect(path);
+    if (dirname(current) === current) return undefined;
+  }
+});
 
 /** Detects the established explicit or dependency-owned Pulumi opt-in.
  * @param manifest - Optional metadata object.

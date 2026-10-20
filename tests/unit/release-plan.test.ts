@@ -91,6 +91,7 @@ test("real Changesets versions only the generator and its two dependents", async
       ["@relkit/cli", "0.8.0", { "create-relkit": "workspace:*" }],
       ["relkit", "0.8.0", { "@relkit/cli": "workspace:*" }],
       ["@relkit/sentry", "0.7.9", {}],
+      ["@relkit/redis", "0.7.9", {}],
     ] as const) {
       const directory = join(fixture, "packages", name.replace("@relkit/", ""));
       await mkdir(directory, { recursive: true });
@@ -231,6 +232,22 @@ test("real Changesets versions only the generator and its two dependents", async
     const cliPlan = JSON.parse(await readFile(join(fixture, ".changeset/release.json"), "utf8"));
     expect(cliPlan.packages.map((item: { name: string }) => item.name).sort()).toEqual([
       "@relkit/cli",
+      "create-relkit",
+      "relkit",
+    ]);
+    expect(await readFile(join(fixture, "certified"), "utf8")).toBe("yes");
+    await rm(join(fixture, "certified"));
+    await writeFile(
+      join(fixture, ".changeset/redis.md"),
+      '---\n"@relkit/redis": patch\n---\n\nUpdate optional scaffold dependency.\n',
+    );
+    execFileSync(process.execPath, ["scripts/version-packages.ts"], { cwd: fixture });
+    const providerPlan = JSON.parse(
+      await readFile(join(fixture, ".changeset/release.json"), "utf8"),
+    );
+    expect(providerPlan.packages.map((item: { name: string }) => item.name).sort()).toEqual([
+      "@relkit/cli",
+      "@relkit/redis",
       "create-relkit",
       "relkit",
     ]);
