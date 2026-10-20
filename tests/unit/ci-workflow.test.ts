@@ -62,6 +62,22 @@ test("release writes use the App and recovery cannot rebuild its archives", asyn
     await readFile(resolve(root, ".github/workflows/checks.yml"), "utf8"),
   );
   const version = release.jobs.version;
+  for (const name of ["version", "pack", "publish"]) {
+    const checkout = release.jobs[name].steps.find((step: { uses?: string }) =>
+      step.uses?.startsWith("actions/checkout"),
+    );
+    expect(checkout.with.ref).toBe("${{ github.sha }}");
+  }
+  const packGuard = release.jobs.pack.steps.find(
+    (step: { name?: string }) => step.name === "Require the exact verified pack commit",
+  );
+  expect(packGuard.env.VERIFIED_SHA).toBe("${{ needs.select-release-mode.outputs.sha }}");
+  expect(packGuard.run).toContain('test "$GITHUB_SHA" = "$VERIFIED_SHA"');
+  expect(packGuard.run).toContain('test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"');
+  const selector = release.jobs["select-release-mode"].steps.find(
+    (step: { id?: string }) => step.id === "select",
+  );
+  expect(selector.run).toBe('bun scripts/select-release.ts >> "$GITHUB_OUTPUT"');
   expect(
     version.steps.find((step: { id: string }) => step.id === "release-app").with,
   ).toMatchObject({

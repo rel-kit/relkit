@@ -73,7 +73,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERIFIED_SHA: ${{ github.event.workflow_run.head_sha || inputs.verified_sha }}
           RECOVERY_RUN_ID: ${{ inputs.recovery_run_id }}
-        run: bun scripts/select-release.ts
+        run: bun scripts/select-release.ts >> "$GITHUB_OUTPUT"
 
   version:
     name: Update release pull request
@@ -97,7 +97,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          ref: ${{ needs.select-release-mode.outputs.sha }}
+          ref: ${{ github.sha }}
       - name: Require the verified main commit
         env:
           GH_TOKEN: ${{ github.token }}
@@ -159,7 +159,13 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          ref: ${{ needs.select-release-mode.outputs.sha }}
+          ref: ${{ github.sha }}
+      - name: Require the exact verified pack commit
+        env:
+          VERIFIED_SHA: ${{ needs.select-release-mode.outputs.sha }}
+        run: |
+          test "$GITHUB_SHA" = "$VERIFIED_SHA"
+          test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"

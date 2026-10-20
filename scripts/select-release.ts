@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { appendFileSync, readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { findReleaseRecovery, recoverRelease } from "./release-recovery.ts";
 import { readReleasePlan } from "./release-plan.ts";
@@ -11,9 +11,7 @@ assert.ok(repository && /^[\w.-]+\/[\w.-]+$/.test(repository));
 const gh = (args: string[]) => execFileSync("gh", args, { encoding: "utf8", timeout: 30_000 });
 const read = async (path: string) => JSON.parse(gh(["api", "--hostname", "github.com", path]));
 const output = (values: Record<string, string>) => {
-  assert.ok(process.env.GITHUB_OUTPUT);
-  for (const [name, value] of Object.entries(values))
-    appendFileSync(process.env.GITHUB_OUTPUT, `${name}=${value}\n`);
+  for (const [name, value] of Object.entries(values)) console.log(`${name}=${value}`);
 };
 if (process.env.RECOVERY_RUN_ID) {
   const recovery = await recoverRelease(repository, process.env.RECOVERY_RUN_ID, read);
@@ -29,7 +27,7 @@ if (process.env.RECOVERY_RUN_ID) {
   assert.ok(sha && /^[a-f0-9]{40}$/.test(sha), "A verified CI commit is required");
   const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
   if (head !== sha) {
-    console.log(`::notice::Main advanced beyond ${sha}; its superseded release run is skipped`);
+    console.error(`::notice::Main advanced beyond ${sha}; its superseded release run is skipped`);
     output({ mode: "none", sha });
   } else {
     const pending = readdirSync(resolve(root, ".changeset")).some((name) => {

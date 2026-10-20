@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { chmod, copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -55,8 +55,6 @@ test("real selector skips empty changesets, reuses archives, and recovers after 
     let sha = git("rev-parse", "HEAD");
     const run = async (state: Record<string, unknown> = {}, env: Record<string, string> = {}) => {
       await writeFile(statePath, JSON.stringify({ sha, ...state }));
-      const outputPath = join(fixture, "outputs");
-      await writeFile(outputPath, "");
       const child = Bun.spawn([process.execPath, "scripts/select-release.ts"], {
         cwd: fixture,
         env: {
@@ -65,7 +63,6 @@ test("real selector skips empty changesets, reuses archives, and recovers after 
           STATE: statePath,
           GITHUB_REPOSITORY: "rel-kit/relkit",
           GITHUB_RUN_ID: "44",
-          GITHUB_OUTPUT: outputPath,
           VERIFIED_SHA: sha,
           RECOVERY_RUN_ID: "",
           ...env,
@@ -78,10 +75,10 @@ test("real selector skips empty changesets, reuses archives, and recovers after 
         new Response(child.stdout).text(),
         new Response(child.stderr).text(),
       ]);
-      return { code, diagnostics: stdout + stderr, output: await readFile(outputPath, "utf8") };
+      return { code, diagnostics: stdout + stderr, output: stdout };
     };
     await writeFile(join(fixture, ".changeset/empty.md"), "---\n---\n\nNo public change.\n");
-    expect((await run()).output).toContain("mode=none");
+    expect((await run()).output).toBe(`mode=none\nsha=${sha}\n`);
     await writeFile(
       join(fixture, ".changeset/change.md"),
       '---\n"create-relkit": patch\n---\n\nChanged.\n',
@@ -108,7 +105,7 @@ test("real selector skips empty changesets, reuses archives, and recovers after 
     git("add", "docs.md");
     commit();
     const advanced = git("rev-parse", "HEAD");
-    expect((await run()).output).toContain("mode=none");
+    expect((await run()).output).toBe(`mode=none\nsha=${sha}\n`);
     const refused = await run({}, { VERIFIED_SHA: advanced });
     expect(refused.code).not.toBe(0);
     expect(refused.diagnostics).toContain("original archives");
