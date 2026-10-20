@@ -1,0 +1,28 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/environment-runtime.test.ts:
+31 |     projectRoot: root, port: 0, healthTimeoutMs: 10_000,
+32 |     environment: { NODE_ENV: "development", EVENT_RETENTION_DAYS: "7", ENABLED: "false", ENDPOINT: "http://localhost:3000" },
+33 |   });
+34 |   try {
+35 |     const response = await fetch(`http://127.0.0.1:${started.port}/hello/probe`);
+36 |     expect(await response.json()).toEqual({ message: "number:7:boolean:false:true" });
+                                       ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "message": "number:7:boolean:false:true",
++   "message": "string:7:string:false:false",
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/environment-runtime.test.ts:36:35)
+(fail) the emitted HTTP server supplies decoded dotenv values to application functions [1188.62ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [1500.00ms]

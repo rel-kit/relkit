@@ -1,0 +1,129 @@
+bun test v1.3.10 (30e609e0)
+
+tests/unit/runtime-environment-values.test.ts:
+(pass) generated runtime uses decoded source values and defaults without changing the process source [9.69ms]
+(pass) generated runtime retains invalid environment errors [4.00ms]
+
+tests/unit/development-failure.test.ts:
+(pass) explains Docker failures while preserving the active workspace [1.12ms]
+(pass) includes startup errors only from the failed build's time window [0.26ms]
+(pass) clears failures after recovery and ignores application lifecycle lookalikes [0.09ms]
+(pass) keeps the failure visible when startup details are unavailable [0.13ms]
+(pass) reuses unchanged startup details and handles environments without dev logs [0.12ms]
+
+packages/cli/environment-runtime.test.ts:
+(pass) the emitted HTTP server supplies decoded dotenv values to application functions [1111.21ms]
+(pass) the emitted server rejects missing production environment before provider startup [2237.17ms]
+
+apps/inspector/lib/source-links.test.ts:
+(pass) builds only configured local editor links from relative source metadata [0.28ms]
+(pass) does not create executable links outside local development [0.05ms]
+(pass) rejects absolute, escaping, and malformed source paths before rendering [0.05ms]
+
+apps/inspector/lib/route-stream.test.ts:
+(pass) native stream explorer reports SSE terminal events without buffering forever [0.66ms]
+
+apps/inspector/lib/accessibility-contract.test.ts:
+(pass) inspector accessibility contract > critical forms expose names, descriptions, errors, and live status [0.32ms]
+(pass) inspector accessibility contract > critical actions use semantic groups and an accessible modal confirmation [0.20ms]
+(pass) inspector accessibility contract > the API reference opens Scalar directly in a new tab [0.09ms]
+(pass) inspector accessibility contract > provider and runtime topology panels expose accessible headings [0.14ms]
+
+apps/inspector/lib/observability-model.test.ts:
+(pass) inspector observability model > defaults logs to the previous 24 hours [0.49ms]
+(pass) inspector observability model > bounds query filters and merges a redacted live record once [0.24ms]
+(pass) inspector observability model > builds request timelines and parent-aware span waterfalls [1.03ms]
+(pass) inspector observability model > attaches correlated logs and generation-safe descriptor sources to spans [0.26ms]
+(pass) inspector observability model > merges span updates and renders canonical parent-aware spans [0.39ms]
+(pass) inspector observability model > numbers spans and lifecycle events by recorded time with safe input and results [8.69ms]
+
+apps/inspector/lib/log-query.test.ts:
+(pass) logs default to rolling application history and retain cursor identity in URL filters
+
+apps/inspector/lib/tool-actions.test.ts:
+(pass) inspector tool approval actions > uses advertised capabilities and sends active identity and call ids
+
+apps/inspector/lib/graph-model.test.ts:
+(pass) inspector graph model > sorts graph data deterministically and keeps observed edges separate [0.71ms]
+(pass) inspector graph model > lays out 1,000 nodes with ELK [391.30ms]
+(pass) inspector graph model > extracts graph definitions without agents, tools, resources, or todo prose [124.82ms]
+(pass) inspector graph model > filters nodes and edges without changing deterministic source order [0.27ms]
+(pass) inspector graph model > keeps live executions and retry attempts separate from definitions [0.30ms]
+
+apps/inspector/lib/route-composer.test.ts:
+(pass) route composer contract > documents raw handlers without a target function or inferred validation response [0.33ms]
+(pass) route composer contract > extracts mapped fields and builds the active route request [0.36ms]
+(pass) route composer contract > reports missing values and derives an OpenAPI operation [0.27ms]
+
+apps/inspector/lib/backend-proxy-security.test.ts:
+(pass) application proxy admits same-origin writes and strips browser provenance
+
+apps/inspector/lib/job-actions.test.ts:
+(pass) inspector job actions > follows advertised capabilities and sends active identity to the action boundary [0.32ms]
+
+apps/inspector/lib/agent-observation.test.ts:
+(pass) agent observation state > updates one tool call through its full streamed lifecycle
+(pass) agent observation state > merges live public values, deduplicates events, and replaces cursor gaps [0.52ms]
+
+apps/inspector/lib/stream.test.ts:
+(pass) inspector SSE client > persists cursors, counts gaps, and invalidates affected caches [2.39ms]
+(pass) inspector SSE client > clears expired and future cursors before replay [4.20ms]
+
+apps/inspector/lib/backend-url.test.ts:
+(pass) joins a same-origin proxy prefix without treating it as an absolute URL
+(pass) joins absolute backend URLs [0.02ms]
+
+apps/inspector/lib/events-model.test.ts:
+(pass) inspector event projections > joins versioned contracts, publishers, trigger listeners, and delivery state [0.41ms]
+(pass) inspector event projections > derives consumers only through exact-event trigger edges [0.04ms]
+
+apps/inspector/lib/function-invocation.test.ts:
+(pass) function invocation client > uses the versioned local action boundary with active identity [0.32ms]
+
+apps/inspector/lib/resources-model.test.ts:
+(pass) inspector managed-resource projections > joins safe bucket metadata and capability-gated operations [0.55ms]
+(pass) inspector managed-resource projections > keeps cache schemas and counters while dropping raw key/value fields [0.10ms]
+
+apps/inspector/lib/jobs-model.test.ts:
+(pass) inspector job projections > keeps per-job queue counts and safe next-run metadata [0.28ms]
+
+apps/inspector/lib/inspector-redesign-contract.test.ts:
+(pass) inspector redesign contracts > uses the shared accessible shell and resource pattern [1.14ms]
+(pass) inspector redesign contracts > provides React Flow and an interactive redacted trace waterfall [1.41ms]
+(pass) inspector redesign contracts > renders provider topology and complete local observability status [0.28ms]
+
+apps/inspector/lib/client.test.ts:
+(pass) uses the same-origin proxy when a runtime public URL is unavailable [0.17ms]
+(pass) preserves an explicitly configured backend URL [0.02ms]
+(pass) uses the same-origin proxy for a local hostname alias [0.14ms]
+
+apps/inspector/lib/agent-live-observer.test.ts:
+(pass) agent observation resumes after a transport close without losing its checkpoint [302.45ms]
+
+apps/inspector/lib/api.test.ts:
+(pass) inspector API client > preserves a same-origin proxy prefix [0.27ms]
+(pass) inspector API client > negotiates the version and invalidates cached graph data [0.27ms]
+(pass) inspector API client > retries transient GET failures during backend startup [252.32ms]
+(pass) inspector API client > falls back immediately when task-first job APIs are unavailable [0.45ms]
+(pass) inspector API client > rejects protocol mismatch and reports network disconnection [0.27ms]
+(pass) inspector API client > accepts full and bounded runtime signal pages [0.21ms]
+(pass) inspector API client > loads safe runtime status metadata [0.20ms]
+
+apps/inspector/lib/agents-model.test.ts:
+(pass) inspector tool and agent projections > joins tool contracts and exposes pending approval metadata [0.61ms]
+(pass) inspector tool and agent projections > keeps agent limits and model/tool span metadata without raw content [0.38ms]
+(pass) inspector tool and agent projections > keeps graph definitions out of the agent catalog [0.07ms]
+
+apps/inspector/lib/env-diagnostics-model.test.ts:
+(pass) normalizes value-free environment metadata and keeps generation identity [0.50ms]
+(pass) keeps active diagnostics while exposing candidate diagnostics separately [0.12ms]
+(pass) uses graph identity for runtime diagnostic stubs [0.16ms]
+
+apps/inspector/lib/observability-api.test.ts:
+(pass) preserves the log-detail 404 status from the shared inspector error envelope [0.37ms]
+(pass) surfaces a missing trace detail backend without substituting list data [0.09ms]
+
+ 69 pass
+ 0 fail
+ 317 expect() calls
+Ran 69 tests across 27 files. [4.87s]

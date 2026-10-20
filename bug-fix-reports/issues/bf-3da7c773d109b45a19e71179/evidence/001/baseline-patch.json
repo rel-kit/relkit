@@ -1,0 +1,31 @@
+{
+  "what": "bun dev terminated a healthy but slow-starting Inspector, requiring a separate launch.",
+  "expected": "bun dev owns Inspector through cold compilation, advertises readiness only after a complete HTTP response, and recovers failed reloads without restarting the Inspector.",
+  "observed": "The actual CLI served the backend, then emitted dev.inspector.failed and terminated its delayed real Inspector child after five seconds.",
+  "root_cause": "waitInspectorReady in packages/cli/src/commands/dev-inspector-support.service.ts applied Effect.timeout(5000) to the entire first-page HTTP probe; timeout unwound the scoped child owner during legitimate startup.",
+  "files": [
+    "packages/cli/src/commands/dev-inspector-support.service.ts",
+    "packages/cli/tests/services/inspector-readiness.test.ts",
+    "tests/inspector/reload-recovery.probe.ts",
+    "scripts/test-inspector-recovery-fixture.ts"
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.txt",
+        "note": "Actual bun dev with six-second delayed real Next launch terminated Inspector at five seconds."
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.txt",
+        "note": "TestClock shows readiness already failed at 5.5 seconds."
+      }
+    ],
+    "after": []
+  },
+  "notes": [
+    "An undelayed cold replay completed inside five seconds on this machine; the explicit six-second launch delay makes the known timing defect reproducible.",
+    "Read-only repos/effect checkout lacks Effect/Schedule/TestClock implementations and dedicated tests; checked installed Effect 4.0.1 source/examples and available upstream Vitest timeout/finalizer tests."
+  ]
+}

@@ -1,0 +1,136 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/inspector-startup.test.ts:
+[18:01:08.531] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.probe.close",
+  outcome: "success",
+  duration_ms: 1.251833,
+}
+[18:01:08.535] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.start",
+  outcome: "success",
+  duration_ms: 10.379959,
+}
+[18:01:08.543] ERROR (#26): Execution operation failed {
+  domain: "cli",
+  operation: "http.request",
+  outcome: "failure",
+  duration_ms: 4.7395,
+}
+[18:01:08.565] INFO (#30): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.capture",
+  outcome: "success",
+  duration_ms: 17.101583,
+}
+[18:01:08.565] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.capture",
+  outcome: "success",
+  duration_ms: 20.944625,
+}
+[18:01:08.568] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.child.stop",
+  outcome: "success",
+  duration_ms: 0.399791,
+}
+[18:01:08.568] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.child.release",
+  outcome: "success",
+  duration_ms: 0.785167,
+}
+[18:01:08.569] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.release",
+  outcome: "success",
+  duration_ms: 0.072459,
+}
+[18:01:08.569] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.scope",
+  outcome: "success",
+  duration_ms: 0.047916,
+}
+[18:01:08.569] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.stop",
+  outcome: "success",
+  duration_ms: 1.689917,
+}
+[18:01:08.570] ERROR (#20): Execution operation failed {
+  domain: "cli",
+  operation: "dev.inspector.support",
+  outcome: "failure",
+  duration_ms: 46.199917,
+}
+(pass) a real Inspector child exit fails immediately and releases its owner [60.86ms]
+[18:01:08.580] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.probe.close",
+  outcome: "success",
+  duration_ms: 0.900458,
+}
+[18:01:08.581] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.start",
+  outcome: "success",
+  duration_ms: 7.421667,
+}
+[18:01:08.582] ERROR (#62): Execution operation failed {
+  domain: "cli",
+  operation: "http.request",
+  outcome: "failure",
+  duration_ms: 0.972958,
+}
+[18:01:08.585] INFO (#66): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.capture",
+  outcome: "success",
+  duration_ms: 2.985667,
+}
+[18:01:08.585] INFO (#65): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.capture",
+  outcome: "success",
+  duration_ms: 3.612084,
+}
+[18:01:08.585] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.child.stop",
+  outcome: "success",
+  duration_ms: 0.743084,
+}
+[18:01:08.586] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.child.release",
+  outcome: "success",
+  duration_ms: 0.925625,
+}
+[18:01:08.586] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.release",
+  outcome: "success",
+  duration_ms: 0.138166,
+}
+[18:01:08.586] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.scope",
+  outcome: "success",
+  duration_ms: 0.021,
+}
+[18:01:08.586] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.stop",
+  outcome: "success",
+  duration_ms: 1.640417,
+}
+(pass) shutdown while Inspector startup is pending joins the real child and output readers [16.86ms]
+
+ 2 pass
+ 0 fail
+ 6 expect() calls
+Ran 2 tests across 1 file. [311.00ms]

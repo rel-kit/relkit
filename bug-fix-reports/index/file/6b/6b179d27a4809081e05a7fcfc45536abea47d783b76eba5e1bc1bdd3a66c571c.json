@@ -1,0 +1,24 @@
+{
+  "key": "packages/cli/inspector-startup.test.ts",
+  "matches": {
+    "bf-3da7c773d109b45a19e71179": {
+      "id": "bf-3da7c773d109b45a19e71179",
+      "status": "verified",
+      "what": "bun dev terminated a healthy but slow-starting Inspector, requiring a separate launch.",
+      "root_cause": "waitInspectorReady in packages/cli/src/commands/dev-inspector-support.service.ts applied Effect.timeout(5000) to the entire first-page HTTP probe; timeout unwound the scoped child owner during legitimate startup.",
+      "fixed_by": "Changed the independent Inspector HTTP readiness window from five seconds to sixty seconds, retaining complete-body checks, bounded timeout, immediate child-exit detection and scoped cleanup. Added five deterministic readiness tests and two real child-process tests to the existing CI certification gate. The recovery ha",
+      "files": [
+        "packages/cli/src/commands/dev-inspector-support.service.ts",
+        "packages/cli/tests/services/inspector-readiness.test.ts",
+        "packages/cli/inspector-startup.test.ts",
+        "packages/cli/tests/dev-environment/recovery-process.ts",
+        "tests/inspector/reload-recovery.probe.ts",
+        "scripts/test-inspector-recovery-fixture.ts",
+        "package.json"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-20T18:20:35+00:00",
+      "report": "bug-fix-reports/issues/bf-3da7c773d109b45a19e71179/report.md"
+    }
+  }
+}

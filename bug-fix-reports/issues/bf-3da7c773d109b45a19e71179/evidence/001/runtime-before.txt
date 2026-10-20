@@ -1,0 +1,29 @@
+$ bun run tests/inspector/reload-recovery.probe.ts ordinary
+shutdown: 3 owned descendants exited; listener unavailable
+89 |     assert.equal(dev.logs().includes(".relkit/dev/sessions/"), mode === "prepared");
+90 |     await dev.wait(
+91 |       "CLI-owned Inspector ready",
+92 |       () => {
+93 |         if (dev?.logs().includes("dev.inspector.failed"))
+94 |           throw new Error(`CLI-owned Inspector failed during startup: ${dev.logs().slice(-4000)}`);
+                         ^
+error: CLI-owned Inspector failed during startup: omponent":"runtime.lifecycle","fields":{"domain":"runtime","duration_ms":0.051,"operation":"server.readiness","outcome":"success"},"generationId":"generation.runtime","graphHash":"sha256:3c8296d952f57bde30de34a4833bf2a525ffa03071f0568151e20a6bdbfaefac","level":"info","message":"Execution operation completed","signal":"log","source":"direct","timestamp":"2026-10-20T17:56:01.467Z","version":2}
+{"component":"runtime.lifecycle","fields":{"domain":"runtime","duration_ms":6.259084,"operation":"server.invocation","outcome":"success"},"generationId":"generation.runtime","graphHash":"sha256:3c8296d952f57bde30de34a4833bf2a525ffa03071f0568151e20a6bdbfaefac","level":"info","message":"Execution operation completed","signal":"log","source":"direct","timestamp":"2026-10-20T17:56:01.469Z","version":2}
+{"component":"cli.dev","fields":{"phase":"verification","state":"verification-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-20T17:56:01.488Z","version":2}
+{"component":"cli.dev","fields":{"phase":"verifying-hash-and-readiness","state":"switching"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-20T17:56:01.489Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switch","state":"switch-succeeded"},"level":"debug","message":"supervisor.outcome","signal":"log","timestamp":"2026-10-20T17:56:01.491Z","version":2}
+{"component":"cli.dev","fields":{"phase":"switching","state":"active"},"level":"debug","message":"supervisor.transition","signal":"log","timestamp":"2026-10-20T17:56:01.493Z","version":2}
+{"component":"cli.dev","fields":{"changedFiles":0,"durationMs":1209.4189999999999,"initial":true,"version":0},"level":"info","message":"dev.generation.active","signal":"log","timestamp":"2026-10-20T17:56:01.494Z","version":2}
+{"component":"cli.dev","fields":{"apiReference":"http://127.0.0.1:62085/_relkit/v1/api-reference","backend":"http://127.0.0.1:62085","openapi":"http://127.0.0.1:62085/_relkit/v1/openapi.json"},"level":"info","message":"dev.ready","signal":"log","timestamp":"2026-10-20T17:56:01.495Z","version":2}
+{"component":"runtime.lifecycle","fields":{"domain":"runtime","duration_ms":10.194083,"operation":"server.resource","outcome":"success"},"generationId":"generation.runtime","graphHash":"sha256:3c8296d952f57bde30de34a4833bf2a525ffa03071f0568151e20a6bdbfaefac","level":"info","message":"Execution operation completed","signal":"log","source":"direct","timestamp":"2026-10-20T17:56:01.469Z","version":2}
+{"component":"inspector","fields":{"channel":"stderr"},"level":"warn","message":"$ bun launch.mjs","signal":"log","timestamp":"2026-10-20T17:56:01.617Z","version":2}
+{"component":"runtime.lifecycle","fields":{"domain":"runtime","duration_ms":93.521292,"operation":"server.invocation","outcome":"success"},"generationId":"generation.runtime","graphHash":"sha256:3c8296d952f57bde30de34a4833bf2a525ffa03071f0568151e20a6bdbfaefac","level":"info","message":"Execution operation completed","originRequestId":"request-eb981615-6dc7-4af6-9957-38d40cc3f760","requestId":"request-eb981615-6dc7-4af6-9957-38d40cc3f760","signal":"log","source":"direct","spanId":"c77939aec5f3608d","timestamp":"2026-10-20T17:56:01.776Z","traceId":"1f667048221b4322f2560f58581738d7","version":2}
+{"component":"runtime.http","fields":{"durationMs":252,"method":"GET","path":"/hello/probe","status":200},"generationId":"generation.runtime","graphHash":"sha256:3c8296d952f57bde30de34a4833bf2a525ffa03071f0568151e20a6bdbfaefac","level":"info","message":"request.completed","originRequestId":"request-eb981615-6dc7-4af6-9957-38d40cc3f760","requestId":"request-eb981615-6dc7-4af6-9957-38d40cc3f760","signal":"log","timestamp":"2026-10-20T17:56:01.808Z","traceId":"1f667048221b4322f2560f58581738d7","version":2}
+{"component":"cli.dev","fields":{"message":"Inspector unavailable; backend remains serving."},"level":"error","message":"dev.inspector.failed","signal":"log","timestamp":"2026-10-20T17:56:06.573Z","version":2}
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/inspector/reload-recovery.probe.ts:94:21)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/dev-environment/recovery-process.ts:77:17)
+      at async replay (/Users/mustafaelsayed/Workspace/relkit/tests/inspector/reload-recovery.probe.ts:90:15)
+
+Bun v1.3.10 (macOS arm64)
+error: script "test:inspector:recovery" exited with code 1

@@ -1,0 +1,13 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  2 passed (2)
+      Tests  9 passed (9)
+   Start at  20:57:13
+   Duration  3.38s (transform 66%, import 32%, tests 1%)
+
+  Transform  transforming modules took 2.12s · 66% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+

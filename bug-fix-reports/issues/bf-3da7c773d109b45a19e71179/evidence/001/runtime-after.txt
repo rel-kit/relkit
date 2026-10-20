@@ -1,0 +1,5 @@
+$ bun run tests/inspector/reload-recovery.probe.ts
+ordinary: bun dev owns Inspector; rejection, visible failure, typed recovery, new routes/OpenAPI and automatic error clearing passed (PID 85756).
+shutdown: 11 owned descendants exited; listener unavailable
+prepared: bun dev owns Inspector; rejection, visible failure, typed recovery, new routes/OpenAPI and automatic error clearing passed (PID 87862).
+shutdown: 9 owned descendants exited; listener unavailable

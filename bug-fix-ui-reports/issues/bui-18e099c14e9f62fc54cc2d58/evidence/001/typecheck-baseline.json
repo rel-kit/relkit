@@ -1,0 +1,52 @@
+[
+  {
+    "file": "apps/inspector/components/ui/dialog.tsx",
+    "code": 2375,
+    "message": "Type '{ children: (Element | ReactNode)[]; isOpen: boolean | undefined; onOpenChange: ((open: boolean) => void) | undefined; }' is not assignable to type 'DialogTriggerProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.   Types of property 'isOpen' are incompatible.     Type 'boolean | undefined' is not assignable to type 'boolean'.       Type 'undefined' is not assignable to type 'boolean'."
+  },
+  {
+    "file": "apps/inspector/components/ui/select.tsx",
+    "code": 2375,
+    "message": "Type '{ children: Element[]; className: string; selectedKey: string | undefined; onSelectionChange: (key: Key | null) => void; }' is not assignable to type 'SelectProps<unknown, \"single\">' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.   Types of property 'selectedKey' are incompatible.     Type 'string | undefined' is not assignable to type 'Key | null'.       Type 'undefined' is not assignable to type 'Key | null'."
+  },
+  {
+    "file": "apps/inspector/components/ui/select.tsx",
+    "code": 2375,
+    "message": "Type '{ children: Element[]; className: string; inputValue: string | undefined; onInputChange: (value: string) => void; onSelectionChange: (key: Key | null) => false | void; }' is not assignable to type 'ComboBoxProps<unknown, \"single\">' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.   Types of property 'inputValue' are incompatible.     Type 'string | undefined' is not assignable to type 'string'.       Type 'undefined' is not assignable to type 'string'."
+  },
+  {
+    "file": "apps/inspector/components/ui/sidebar-layout.tsx",
+    "code": 2345,
+    "message": "Argument of type 'ClassNameOrFunction<ButtonRenderProps> | undefined' is not assignable to parameter of type 'string | false | null | undefined'.   Type '(values: ButtonRenderProps & { defaultClassName: string | undefined; }) => string' is not assignable to type 'string | false | null | undefined'."
+  },
+  {
+    "file": "apps/inspector/lib/api.ts",
+    "code": 2719,
+    "message": "Type 'Promise<T>' is not assignable to type 'Promise<T>'. Two different types with this name exist, but they are unrelated.   Type 'T' is not assignable to type 'T'. Two different types with this name exist, but they are unrelated.     'T' could be instantiated with an arbitrary type which could be unrelated to 'T'."
+  },
+  {
+    "file": "apps/inspector/lib/api.ts",
+    "code": 2719,
+    "message": "Type 'Promise<T>' is not assignable to type 'Promise<T>'. Two different types with this name exist, but they are unrelated.   Type 'T' is not assignable to type 'T'. Two different types with this name exist, but they are unrelated.     'T' could be instantiated with an arbitrary type which could be unrelated to 'T'."
+  },
+  {
+    "file": "apps/inspector/lib/graph-model.ts",
+    "code": 2322,
+    "message": "Type '{ exposure?: string; domainId?: string; id: string; kind: string; }[]' is not assignable to type 'readonly GraphNode[]'.   Type '{ exposure?: string; domainId?: string; id: string; kind: string; }' is not assignable to type 'GraphNode' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.     Types of property 'exposure' are incompatible.       Type 'string' is not assignable to type '\"public\" | \"internal\"'."
+  },
+  {
+    "file": "apps/inspector/lib/graph-model.ts",
+    "code": 2345,
+    "message": "Argument of type '(left: GraphNode, right: GraphNode) => number' is not assignable to parameter of type '(a: { exposure?: string; domainId?: string; id: string; kind: string; }, b: { exposure?: string; domainId?: string; id: string; kind: string; }) => number'.   Types of parameters 'left' and 'a' are incompatible.     Type '{ exposure?: string; domainId?: string; id: string; kind: string; }' is not assignable to type 'GraphNode' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.       Types of property 'exposure' are incompatible.         Type 'string' is not assignable to type '\"public\" | \"internal\"'."
+  },
+  {
+    "file": "apps/inspector/lib/route-request.ts",
+    "code": 2339,
+    "message": "Property 'event' does not exist on type 'RouteStreamFrame'.   Property 'event' does not exist on type '{ readonly kind: \"text\"; readonly value: string; }'."
+  },
+  {
+    "file": "apps/inspector/lib/route-request.ts",
+    "code": 2339,
+    "message": "Property 'event' does not exist on type 'RouteStreamFrame'.   Property 'event' does not exist on type '{ readonly kind: \"text\"; readonly value: string; }'."
+  }
+]

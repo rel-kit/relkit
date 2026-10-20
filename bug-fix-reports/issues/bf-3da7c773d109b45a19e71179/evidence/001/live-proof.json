@@ -1,0 +1,16 @@
+{
+  "applicationPaths": 34,
+  "authPaths": 30,
+  "openApiPaths": 64,
+  "proxyMatchesActiveBackend": true,
+  "apiReferenceServed": true,
+  "cliPid": 90959,
+  "inspectorListenerPid": 91007,
+  "inspectorAncestorChain": [
+    91007,
+    91006,
+    91005,
+    90959
+  ],
+  "separateInspectorStarted": false
+}

@@ -1,0 +1,28 @@
+$ bun run tests/inspector/reload-recovery.probe.ts
+shutdown: 9 owned descendants exited; listener unavailable
+1644 | /** @internal */
+1645 | export const delay = /*#__PURE__*/dual(2, (self, duration) => andThen(sleep(duration), self));
+1646 | /** @internal */
+1647 | export const timeoutOrElse = /*#__PURE__*/dual(2, (self, options) => flatMap(timeoutOption(self, options.duration), option => Option.isNone(option) ? options.orElse() : succeed(option.value)));
+1648 | /** @internal */
+1649 | const timeoutErrorFromDuration = duration => new TimeoutError(`Operation timed out after '${Duration.format(duration)}'`);
+                                                        ^
+error: Operation timed out after '30s'
+       _tag: "TimeoutError",
+ ~effect/Cause/TimeoutError: "~effect/Cause/TimeoutError",
+
+      at timeoutErrorFromDuration (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:1649:50)
+      at orElse (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:1857:75)
+      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:383:16)
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:327:10)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+      at loop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:560:1)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:555:45
+      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:347:14)
+      at runInAsyncScope (node:async_hooks:137:23)
+      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:792:30
+      at processTicksAndRejections (unknown:7:39)
+
+Bun v1.3.10 (macOS arm64)
+error: script "test:inspector:recovery" exited with code 1

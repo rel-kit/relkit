@@ -1,0 +1,28 @@
+{
+  "before": {
+    "url": "http://localhost:3210/routes",
+    "routeCount": 1,
+    "connection": "connected",
+    "failureBanner": false
+  },
+  "after": {
+    "url": "http://127.0.0.1:3215/routes",
+    "reloadFailure": true,
+    "staleRoutes": true,
+    "databaseError": true,
+    "helloStillAvailable": true,
+    "errorLogLink": "/logs?source=all&range=custom&severity=error&to=2026-10-20T15%3A59%3A03.864Z"
+  },
+  "logsLink": {
+    "path": "/logs",
+    "errorFilter": "error",
+    "startupVisible": true,
+    "bannerVisible": true
+  },
+  "mobile": {
+    "viewport": 390,
+    "page": 390,
+    "bannerWidth": 342,
+    "hasRecoveryText": true
+  }
+}

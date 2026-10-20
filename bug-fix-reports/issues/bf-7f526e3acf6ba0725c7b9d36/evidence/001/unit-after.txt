@@ -1,0 +1,10 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/services/runtime-environment-values.test.ts:
+(pass) generated runtime uses decoded source values and defaults without changing the process source [8.37ms]
+(pass) generated runtime retains invalid environment errors [1.39ms]
+
+ 2 pass
+ 0 fail
+ 8 expect() calls
+Ran 2 tests across 1 file. [152.00ms]

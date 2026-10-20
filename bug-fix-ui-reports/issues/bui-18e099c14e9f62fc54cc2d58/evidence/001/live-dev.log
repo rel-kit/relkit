@@ -1,0 +1,17 @@
+20:46:30.879 INFO  relkit            Starting development server
+20:46:30.895 INFO  build             Compiling application
+20:46:31.452 INFO  relkit            Stopping development server
+20:46:31.458 INFO  relkit            Development server stopped
+RELKIT_DOCKER_COMMAND_FAILED: Docker container listing failed with exit code 1.
+20:47:25.627 INFO  relkit            Starting development server
+20:47:25.644 INFO  build             Compiling application
+20:47:29.167 INFO  build             Compiled in 3523ms
+20:47:29.169 INFO  server            Ready
+                                     API        http://127.0.0.1:3000
+                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json
+20:47:35.204 ERROR relkit            dev.inspector.failed
+21:16:21.150 INFO  relkit            Stopping development server
+21:16:21.815 INFO  relkit            Development server stopped
+Cleanup failed after command completion: dev.inspector.support
+RELKIT_INTERRUPTED: Received SIGTERM.

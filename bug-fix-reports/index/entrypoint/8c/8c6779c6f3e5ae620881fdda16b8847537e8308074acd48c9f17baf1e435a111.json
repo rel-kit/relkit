@@ -31,6 +31,21 @@
       "attempt": 1,
       "updated_at": "2026-10-16T15:48:06+00:00",
       "report": "bug-fix-reports/issues/bf-66e347f46c30cffca371d589/report.md"
+    },
+    "bf-7f526e3acf6ba0725c7b9d36": {
+      "id": "bf-7f526e3acf6ba0725c7b9d36",
+      "status": "verified",
+      "what": "Valid numeric dotenv settings caused database startup failure and prevented new routes from activating.",
+      "root_cause": "packages/cli/src/commands/build-server-runtime-support.ts:125 skipped every resolved value already present in the raw source. As a result numeric and boolean values stayed strings and URL values stayed text, despite resolveEnv decoding them successfully. Database client Number.isInteger checks therefore rejected valid ",
+      "fixed_by": "Always merge resolved declared values into the runtime environment, preserving undeclared source keys and validation failures. A real generated HTTP backend reproduces the original failure and passes after the one-line correction. Both ordinary and prepared same-PID reload recovery are verified; the restarted real app ",
+      "files": [
+        "packages/cli/src/commands/build-server-runtime-support.ts",
+        "packages/cli/environment-runtime.test.ts",
+        "tests/unit/runtime-environment-values.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-20T18:21:19+00:00",
+      "report": "bug-fix-reports/issues/bf-7f526e3acf6ba0725c7b9d36/report.md"
     }
   }
 }

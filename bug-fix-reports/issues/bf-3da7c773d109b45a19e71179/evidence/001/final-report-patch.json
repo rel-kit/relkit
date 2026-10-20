@@ -1,0 +1,233 @@
+{
+  "status": "verified",
+  "fixed_by": "Changed the independent Inspector HTTP readiness window from five seconds to sixty seconds, retaining complete-body checks, bounded timeout, immediate child-exit detection and scoped cleanup. Added five deterministic readiness tests and two real child-process tests to the existing CI certification gate. The recovery harness now uses only the CLI-owned Inspector in ordinary and genuinely prepared bun dev startup. Both delayed startup/reload/recovery cycles passed. The live app is now owned by a single local source CLI (PID 90959), including Inspector on 3210; no separate Inspector launch is required.",
+  "files": [
+    "packages/cli/src/commands/dev-inspector-support.service.ts",
+    "packages/cli/tests/services/inspector-readiness.test.ts",
+    "packages/cli/inspector-startup.test.ts",
+    "packages/cli/tests/dev-environment/recovery-process.ts",
+    "tests/inspector/reload-recovery.probe.ts",
+    "scripts/test-inspector-recovery-fixture.ts",
+    "package.json"
+  ],
+  "scope": {
+    "modules": [
+      "CliInspectorSupport",
+      "DevSession Inspector lifetime",
+      "Source Inspector installation",
+      "Prepared and ordinary development startup",
+      "Browser reload status"
+    ],
+    "entrypoints": [
+      "bun dev",
+      "relkit dev",
+      "GET Inspector /",
+      "GET Inspector /routes"
+    ],
+    "invariants": [
+      "Backend readiness does not wait for Inspector compilation.",
+      "Inspector requires a successful complete HTTP response before readiness is advertised.",
+      "Startup is bounded at sixty seconds, with prompt exit/cancellation and joined cleanup.",
+      "The unchanged dev PID retains old traffic on rejection and automatically publishes repaired routes and metadata.",
+      "Inspector is launched and stopped by the CLI, without a separately managed server."
+    ]
+  },
+  "environment": {
+    "package": "packages/cli",
+    "revision": "843ffa246b501c3be585444aeb9b71a977322b90 plus local startup/recovery changes",
+    "target": "Disposable installed minimal fixtures on dynamic loopback ports; live logistic-platform-3 on 3000 and source Inspector on 3210",
+    "api_exposed": false,
+    "e2e_available": true,
+    "monitoring": "Actual CLI dev.inspector.ready/failed, supervisor generation logs, source Next output, retained development logs, real HTTP bodies/OpenAPI and browser accessibility states. No remote telemetry service is required."
+  },
+  "reproduction": [
+    "Launch source CLI through literal bun dev with a disposable configured source Inspector wrapper that delays real Next launch by six seconds.",
+    "Assert backend number:7 response, then require the CLI-owned Inspector readiness event. Original code terminates it at five seconds.",
+    "With the fix, open routes, reject DAYS=invalid while adding a route, and assert retained old response/OpenAPI plus visible failure.",
+    "Repair DAYS=30 and assert typed new response, new route/OpenAPI and automatic warning clearing without refreshing the browser.",
+    "Repeat through a verified prepared snapshot startup and join every owned child/listener/browser before removing the fixture."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-before.txt",
+        "note": "Actual CLI kills delayed source Inspector at five seconds while backend remains available."
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-before.txt",
+        "note": "Clock-based regression fails at 5.5 seconds on the original deadline."
+      }
+    ],
+    "after": [
+      {
+        "kind": "integration",
+        "path": "evidence/001/runtime-after.txt",
+        "note": "Both CLI-owned slow-start and reload/recovery cycles pass; owned descendants and listeners are released."
+      },
+      {
+        "kind": "unit",
+        "path": "evidence/001/unit-after.txt",
+        "note": "Nine focused readiness/support cases pass."
+      },
+      {
+        "kind": "integration",
+        "path": "evidence/001/live-proof.json",
+        "note": "Live app has 34 application and 30 auth paths; proxy matches backend; Inspector ancestry reaches sole CLI owner PID 90959."
+      },
+      {
+        "kind": "e2e",
+        "path": "evidence/001/live-routes-tree.txt",
+        "note": "Company routes visible with no failed-reload banner."
+      }
+    ]
+  },
+  "verification": {
+    "unit": {
+      "before": {
+        "command": "bun x vitest run packages/cli/tests/services/inspector-readiness.test.ts --maxWorkers=1 --no-file-parallelism -t 'keeps a cold'",
+        "cwd": ".",
+        "status": "failed",
+        "exit_code": 1,
+        "assertion": "A cold Inspector remains pending at 5.5 seconds rather than failing during legitimate compilation.",
+        "output": "evidence/001/unit-before.txt"
+      },
+      "after": {
+        "command": "bun x vitest run packages/cli/tests/services/inspector-readiness.test.ts packages/cli/tests/services/dev-support.test.ts --maxWorkers=1 --no-file-parallelism",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "assertion": "Five readiness cases and four existing backend/support ownership cases pass using deterministic clocks and barriers.",
+        "output": "evidence/001/unit-after.txt"
+      }
+    },
+    "runtime": {
+      "kind": "integration",
+      "reason": "Startup is a CLI-owned process workflow rather than a business API operation. Acceptance still checks actual backend and Inspector HTTP, API reference and browser state.",
+      "boundary": "bun dev -> CliInspectorSupport -> actual source Next child -> complete HTTP readiness -> retained/repaired backend generation -> Inspector browser",
+      "dependencies": [
+        "Actual source CLI, Effect 4.0.1, compiled backend transport, prepared snapshot validation, real Next 16.3.8 and installed agent-browser; only explicit startup delay is injected. No mocked Inspector or replacement manual server."
+      ],
+      "steps": [
+        "Perform ordinary and genuinely prepared starts.",
+        "Reject then repair environment/source and observe runtime and browser state.",
+        "Join all owned descendants and verify listener release."
+      ],
+      "before": {
+        "command": "bun run test:inspector:recovery ordinary",
+        "cwd": ".",
+        "status": "failed",
+        "exit_code": 1,
+        "assertion": "Actual bun dev must retain and start its real source Inspector after an explicit six-second startup delay.",
+        "output": "evidence/001/runtime-before.txt"
+      },
+      "after": {
+        "command": "bun run test:inspector:recovery",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "assertion": "Ordinary and prepared bun dev own the delayed real Next Inspector, retain old traffic on invalid environment, publish repaired typed values and new routes/OpenAPI, and clear the browser warning without refresh.",
+        "output": "evidence/001/runtime-after.txt"
+      }
+    },
+    "e2e": {
+      "command": "bun run test:inspector:recovery",
+      "cwd": ".",
+      "status": "passed",
+      "exit_code": 0,
+      "assertion": "Ordinary and prepared bun dev own the delayed real Next Inspector, retain old traffic on invalid environment, publish repaired typed values and new routes/OpenAPI, and clear the browser warning without refresh.",
+      "output": "evidence/001/runtime-after.txt"
+    },
+    "regressions": [
+      {
+        "kind": "integration",
+        "boundary": "CLI Inspector support -> real Bun child exit/cancellation -> output join and physical process cleanup",
+        "command": "bun test packages/cli/inspector-startup.test.ts --max-concurrency 1",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "assertion": "Early child exit fails promptly; cancellation during pending readiness physically reaps the owned child and joins output readers.",
+        "output": "evidence/001/native-processes.txt"
+      },
+      {
+        "kind": "e2e",
+        "boundary": "Actual bun dev -> CLI-owned source Next -> backend HTTP/OpenAPI -> browser reload-failure and recovery state",
+        "command": "bun run test:inspector:recovery",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "assertion": "ordinary uses one unchanged dev PID; new route and banner recovery happen without refresh, and shutdown releases all owned descendants/listeners.",
+        "output": "evidence/001/after/ordinary/result.json"
+      },
+      {
+        "kind": "e2e",
+        "boundary": "Actual bun dev -> CLI-owned source Next -> backend HTTP/OpenAPI -> browser reload-failure and recovery state",
+        "command": "bun run test:inspector:recovery",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "assertion": "prepared uses one unchanged dev PID; new route and banner recovery happen without refresh, and shutdown releases all owned descendants/listeners.",
+        "output": "evidence/001/after/prepared/result.json"
+      }
+    ],
+    "checks": [
+      {
+        "name": "certification CI gate",
+        "command": "bun run test:certification --maxWorkers=1 --no-file-parallelism",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/certification.txt"
+      },
+      {
+        "name": "scoped strict typecheck",
+        "command": "node --max-old-space-size=1024 --expose-gc bug-fix-reports/issues/bf-3da7c773d109b45a19e71179/evidence/001/typecheck.probe.mjs",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/typecheck.txt"
+      },
+      {
+        "name": "boundaries",
+        "command": "bun run check",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/boundaries.txt"
+      },
+      {
+        "name": "lint",
+        "command": "bun run lint",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/lint.txt"
+      },
+      {
+        "name": "format",
+        "command": "bun x prettier --check affected files",
+        "cwd": ".",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/format.txt"
+      }
+    ],
+    "limitations": [
+      "Changes are local, uncommitted and unpublished; the app dependency and package scripts were not rewritten to point at local sources.",
+      "Full repository builds, full acceptance and release packaging were not run. The scoped strict TypeScript baseline/current both have zero errors.",
+      "The six-second controlled delay proves startup tolerance and ownership, not a performance SLA.",
+      "The installed agent-browser screenshot operation stalled during a repeat. Required DOM/HTTP assertions are unchanged; evidence capture now uses accessibility snapshots, and finite browser/preparation commands reuse the existing process-group owner with thirty-second deadlines."
+    ]
+  },
+  "notes": [
+    "An undelayed cold baseline happened to complete within five seconds; the deliberate six-second delay makes the timing regression reproducible.",
+    "Read-only repos/effect lacks the relevant Effect/Schedule/TestClock implementation/test files. Verified installed Effect 4.0.1 implementation/examples and available upstream Vitest timeout/finalizer tests.",
+    "Unit baseline exposes the unchanged internal readiness helper for direct testing; its five-second behavior remains unchanged until the functional fix.",
+    "CI certification completed with 24 passing tests and five existing skips, including all seven new deadline/lifecycle regressions.",
+    "Ordinary: backend ready at 3602ms and Inspector at 15712ms with the injected delay. Prepared: backend at 834ms and Inspector at 9138ms. These are individual functional runs.",
+    "The prior separate Inspector PID 58981 and backend PID 58694 were stopped after identity/CWD verification. The new single CLI PID 90959 remains running by existing user authorization; kill -TERM 90959 stops backend and Inspector.",
+    "No authored application files, dependencies, persisted data or migration history were modified. All disposable fixture processes, browsers, listeners and owned build directories were cleaned.",
+    "Related previously verified defects: bf-7f526e3acf6ba0725c7b9d36 and bui-18e099c14e9f62fc54cc2d58."
+  ]
+}

@@ -33,12 +33,20 @@ async function deadline<A>(work: Promise<A>, milliseconds: number): Promise<A> {
  * @param port - Stable public HTTP port owned by this fixture.
  * @returns Output observations, HTTP probes, and an idempotent joined stop.
  */
-export function recoveryProcess(root: string, mode: "ordinary" | "prepared", port: number) {
+export function recoveryProcess(
+  root: string,
+  mode: "ordinary" | "prepared",
+  port: number,
+  options: {
+    readonly path?: string;
+    readonly environment?: Readonly<Record<string, string | undefined>>;
+  } = {},
+) {
   const args = [process.execPath, "dev"];
   if (mode === "ordinary") args.push("--json");
   const child = Bun.spawn(args, {
     cwd: root,
-    env: { ...process.env, NODE_ENV: "development" },
+    env: { ...process.env, NODE_ENV: "development", ...options.environment },
     stdin: "ignore",
     stdout: "pipe",
     stderr: "pipe",
@@ -52,7 +60,7 @@ export function recoveryProcess(root: string, mode: "ordinary" | "prepared", por
   void readers.catch(() => undefined);
   const read = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:${port}/recovery`, {
+      const response = await fetch(`http://127.0.0.1:${port}${options.path ?? "/recovery"}`, {
         signal: AbortSignal.timeout(1_000),
       });
       return await response.text();

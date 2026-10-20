@@ -1,0 +1,26 @@
+$ bun run tests/inspector/reload-recovery.probe.ts
+shutdown: 9 owned descendants exited; listener unavailable
+29 |     child.exited,
+30 |     new Response(child.stdout).text(),
+31 |     new Response(child.stderr).text(),
+32 |   ]);
+33 |   if (log !== undefined) await writeFile(log, stdout + "\n" + stderr);
+34 |   assert.equal(code, 0, `${command[0]} failed: ${stderr}\n${stdout}`);
+              ^
+AssertionError: agent-browser failed: ✗ Failed to read: Resource temporarily unavailable (os error 35) (after 5 retries - daemon may be busy or unresponsive)
+
+
+
+1 !== 0
+
+ generatedMessage: false,
+     actual: 1,
+   expected: 0,
+   operator: "strictEqual",
+       code: "ERR_ASSERTION"
+
+      at run (/Users/mustafaelsayed/Workspace/relkit/tests/inspector/reload-recovery.probe.ts:34:10)
+      at processTicksAndRejections (native:7:39)
+
+Bun v1.3.10 (macOS arm64)
+error: script "test:inspector:recovery" exited with code 1
