@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.7.10
+
+### Changes
+
+- Validate installed RELKIT packages against their own declared versions so doctor accepts independently versioned releases and still reports missing or incompatible installations. Use each optional scaffold dependency's own version rather than the generator version, and refresh the generator when any bundled scaffold dependency changes.
+- Resolve generated provider dependencies using each package's own release version.
+
 ## 0.7.9
 
 ### Changes

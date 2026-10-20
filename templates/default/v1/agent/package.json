@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@types/bun": "1.3.10",
-    "@relkit/cli": "0.7.9",
+    "@relkit/cli": "0.7.10",
     "@relkit/testing": "0.7.9",
     "typescript": "5.9.3"
   }
