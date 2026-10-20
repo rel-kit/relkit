@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
@@ -61,8 +62,16 @@ export function affectedPackages(
       affected.add("create-relkit");
     if (path.startsWith("apps/inspector/") || path === "scripts/package-inspector.ts")
       affected.add("@relkit/cli");
-    if (path === "LICENSE" || path === "tsconfig.base.json")
+    if (path === "LICENSE" || path === "tsconfig.base.json" || path === "package.json")
       for (const name of packages.values()) affected.add(name);
+    if (
+      path === "package.json" ||
+      path.startsWith("patches/") ||
+      path === "scripts/build-catalog.ts"
+    ) {
+      for (const name of ["create-relkit", "@relkit/cli", "@relkit/effect-mq"])
+        if ([...packages.values()].includes(name)) affected.add(name);
+    }
   }
   return [...affected].sort();
 }
@@ -71,6 +80,16 @@ export function renderChangeset(packages: readonly string[], summary: string): s
   const release = [...new Set(packages)].sort().map((name) => `${JSON.stringify(name)}: patch`);
   if (release.length === 0) throw new Error("Cannot render an empty Changeset");
   return `---\n${release.join("\n")}\n---\n\n${summary.trim()}\n`;
+}
+
+/** Only package declarations in frontmatter satisfy another changed package's release coverage. */
+export function changesetPackages(source: string): string[] {
+  const header = /^---[^\S\n]*\r?\n([\s\S]*?)^---[^\S\n]*(?:\r?\n|$)/m.exec(source)?.[1] ?? "";
+  return [
+    ...header.matchAll(
+      /^\s*["']?(@relkit\/[a-z0-9-]+|create-relkit|relkit)["']?\s*:\s*(?:patch|minor|major)\s*$/gm,
+    ),
+  ].map((match) => match[1]!);
 }
 
 export function changedPathArguments(base: string, head: string): string[] {
@@ -109,21 +128,36 @@ async function changedPaths(base: string, head: string): Promise<string[]> {
 async function main(): Promise<void> {
   const input = options(process.argv.slice(2));
   const paths = await changedPaths(input.base, input.head);
-  if (hasCurrentChangeset(paths, (path) => existsSync(join(root, path)))) {
-    console.log(JSON.stringify({ created: false, reason: "changeset-present" }));
-    return;
-  }
-  const affected = affectedPackages(paths, await publishablePackages());
+  const current = paths.filter((path) => isChangeset(path) && existsSync(join(root, path)));
+  const covered = new Set(
+    (
+      await Promise.all(
+        current.map(async (path) => changesetPackages(await readFile(join(root, path), "utf8"))),
+      )
+    ).flat(),
+  );
+  const affected = affectedPackages(paths, await publishablePackages()).filter(
+    (name) => !covered.has(name),
+  );
   if (affected.length === 0) {
-    console.log(JSON.stringify({ created: false, reason: "no-release-paths" }));
+    console.log(
+      JSON.stringify({
+        created: false,
+        reason: current.length ? "changeset-present" : "no-release-paths",
+      }),
+    );
     return;
   }
   if (!input.write)
     throw new Error(`Release-impacting paths require a Changeset: ${affected.join(", ")}`);
   const summary =
     input.summary.trim().replace(/\s+/g, " ") || `Release changes from PR #${input.pr}.`;
-  const path = join(root, ".changeset", `auto-pr-${input.pr}.md`);
-  await writeFile(path, renderChangeset(affected, summary));
+  let path = join(root, ".changeset", `auto-pr-${input.pr}.md`);
+  if (existsSync(path)) {
+    const suffix = createHash("sha256").update(affected.join("\n")).digest("hex").slice(0, 12);
+    path = join(root, ".changeset", `auto-pr-${input.pr}-${suffix}.md`);
+  }
+  await writeFile(path, renderChangeset(affected, summary), { flag: "wx" });
   console.log(JSON.stringify({ created: true, path, packages: affected }));
 }
 
