@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.7.11
+
+### Changes
+
+- Fix Inspector cold startup, failed reload visibility, and decoded runtime environment values.
+
 ## 0.7.10
 
 ### Changes

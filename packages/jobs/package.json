@@ -1,6 +1,6 @@
 {
   "name": "@relkit/jobs",
-  "version": "0.7.9",
+  "version": "0.7.10",
   "description": "RELKIT job authoring API; prefer @relkit/app/jobs in applications.",
   "license": "MIT",
   "repository": {
