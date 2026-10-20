@@ -233,9 +233,18 @@ jobs:
           path: npm-release/publish.log
           if-no-files-found: ignore
           retention-days: 30
+      - name: Authenticate historical GitHub release recovery
+        if: needs.select-release-mode.outputs.mode == 'recover'
+        id: recovery-app
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-workflows: write
       - name: Publish the immutable GitHub release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.recovery-app.outputs.token || github.token }}
           RELEASE_SHA: ${{ needs.select-release-mode.outputs.sha }}
         run: |
           version="$(jq -r .version npm-release/manifest.json)"
@@ -249,4 +258,10 @@ jobs:
             gh release create "$tag" --draft --target "$RELEASE_SHA" --title "$tag" --notes-file npm-release/RELEASE_NOTES.md
           fi
           gh release upload "$tag" npm-release/*.tgz npm-release/SHA256SUMS npm-release/SHA512SUMS npm-release/manifest.json npm-release/RELEASE_NOTES.md --clobber
-          gh release edit "$tag" --draft=false
+          latest="$(gh api graphql -f owner="${GITHUB_REPOSITORY%/*}" -f repo="${GITHUB_REPOSITORY#*/}" -f query='query($owner: String!, $repo: String!) { repository(owner: $owner, name: $repo) { latestRelease { tagName } } }' --jq '.data.repository.latestRelease.tagName // ""')"
+          latest="${latest#v}"
+          make_latest=true
+          if [[ "$latest" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && test "$(printf '%s\n' "$version" "$latest" | sort -V | tail -1)" != "$version"; then
+            make_latest=false
+          fi
+          gh release edit "$tag" --draft=false --latest="$make_latest"

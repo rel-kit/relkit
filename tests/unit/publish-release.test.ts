@@ -41,7 +41,17 @@ test("a partially published train fails instead of reporting a complete release"
       async () => {},
     ),
   ).rejects.toThrow("relkit@0.7.6");
-  expect(calls).toBe(61);
+  expect(calls).toBe(181);
+});
+
+test("an accepted publish may become visible beyond the previous five-minute retry window", async () => {
+  let calls = 0;
+  await verifyPublishedPackages(
+    [packages[0]!],
+    (artifact) => (++calls < 90 ? undefined : artifact.integrity),
+    async () => {},
+  );
+  expect(calls).toBe(90);
 });
 
 test("an immutable registry integrity mismatch fails immediately", async () => {

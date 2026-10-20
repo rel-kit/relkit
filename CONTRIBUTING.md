@@ -84,13 +84,18 @@ assets. Root package/catalog changes conservatively release the whole workspace;
 patch and catalog-builder changes release their metadata owners. Existing
 package versions are checked against the original tarball integrity and never
 overwritten. A package is considered published only after registry verification.
+Accepted npm uploads can take several minutes to become public. The publisher
+allows up to 180 visibility checks with five-second pauses (about fifteen minutes,
+plus registry lookup time) before failing with the original-artifact recovery command.
 
 ### GitHub App setup
 
 1. Register a GitHub App owned by `rel-kit`, for example **RELKIT Release**.
    Disable webhooks; no webhook endpoint or user permissions are needed.
 2. Give it repository **Contents: read and write** and **Pull requests: read and
-   write** permissions. Metadata read access is automatic. No Actions, Workflows,
+   write** permissions. Historical release recovery also requires **Workflows:
+   read and write**: GitHub requires it when the original release commit's workflow
+   files differ from current main. Metadata read access is automatic. No Actions,
    administration, or branch-protection bypass permission is needed.
 3. Install it on the `rel-kit/relkit` repository only. Generate a private key.
 4. Add repository Actions variable `RELEASE_APP_CLIENT_ID` with the App's client ID
@@ -100,7 +105,9 @@ overwritten. A package is considered published only after registry verification.
    follows the existing merge requirements; it does not bypass them.
 
 Both automatic Changeset commits and release PR writes use repository-scoped,
-short-lived App tokens. Fork checks never receive the key. Missing configuration
+short-lived App tokens. Their tokens request only Contents and Pull requests;
+only the historical GitHub release recovery step requests Contents and Workflows.
+Fork checks never receive the key. Missing configuration
 stops release PR generation with a setup error; there is no `GITHUB_TOKEN`
 fallback that would recreate approval-expired runs. npm continues to use OIDC
 trusted publishing in **ci.yml**, environment **npm**, with
@@ -129,7 +136,8 @@ batch remains unfinished. New release archives and npm diagnostics are retained
 for 30 days. Missing,
 expired, or ambiguous archives stop recovery; do not rebuild a partially published
 version. If a higher package version already exists, a recovered older package
-uses a batch-specific dist-tag instead of lowering `latest`. The GitHub release
+uses a batch-specific dist-tag instead of lowering npm `latest`. Recovery also
+preserves a newer GitHub latest release. The GitHub release
 is completed only after all selected npm integrities match. Later CI-only or
 documentation changes skip completed batches. For an unfinished earlier batch,
 use recovery rather than packing it from a later commit.

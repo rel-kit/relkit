@@ -4,6 +4,7 @@ import { join, resolve } from "node:path";
 import { readManifest, type Artifact, type Manifest } from "./release-manifest.ts";
 
 let logFile: string | undefined;
+const visibilityAttempts = 180;
 
 function argument(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -56,10 +57,10 @@ export async function verifyPublishedPackages(
 ): Promise<void> {
   for (const artifact of packages) {
     let integrity: string | undefined;
-    for (let attempt = 0; attempt < 60; attempt++) {
+    for (let attempt = 0; attempt < visibilityAttempts; attempt++) {
       integrity = await lookup(artifact);
       if (integrity !== undefined) break;
-      if (attempt < 59) await pause();
+      if (attempt + 1 < visibilityAttempts) await pause();
     }
     if (integrity === undefined)
       throw new Error(
