@@ -15,6 +15,7 @@ import { SCALAR_API_REFERENCE_URL } from "../lib/api-reference";
 import { AppSidebar } from "../components/app-sidebar";
 import { CommandPalette } from "./command-palette";
 import { navigation } from "./navigation-data";
+import { DevelopmentFailureBanner } from "./development-failure-banner";
 
 export function InspectorShell({ children }: { readonly children: ReactNode }) {
   const pathname = usePathname() ?? "/";
@@ -112,6 +113,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
             API reference <ExternalLink aria-hidden="true" className="size-3" />
           </a>
         </div>
+        <DevelopmentFailureBanner />
         <div id="main-content" className="main-content" tabIndex={-1}>
           {children}
         </div>
