@@ -26,16 +26,16 @@ const entries: readonly CreateCapabilityEvidence[] = Object.freeze([
     deploy: "none",
     examples: true,
     identity: Object.freeze({
-      release: "0.7.8",
+      release: "0.7.9",
       bun: "1.3.10",
       typescript: "5.9.3",
       packageCatalogDigest: "ac7c2f56e61fca5ab890775cf4c483722cb590e488ee7fc4741224cbb4f50ccd",
       template: "default/v1/minimal",
       snapshotProtocol: 1,
     }),
-    templateDigest: "579d32ffc180edbf06bb6656099882285cc0d4795601557efdee86d1b470212a",
-    freshEvidence: "docs/evidence/create-capabilities/0.7.8/fresh.json",
-    restartEvidence: "docs/evidence/create-capabilities/0.7.8/restart.json",
+    templateDigest: "e21547aecfb921ffe180f89707686e7bd68cafa8eec21881607b10d64141da02",
+    freshEvidence: "docs/evidence/create-capabilities/0.7.9/fresh.json",
+    restartEvidence: "docs/evidence/create-capabilities/0.7.9/restart.json",
   }),
 ]);
 
