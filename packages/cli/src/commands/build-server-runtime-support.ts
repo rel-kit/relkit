@@ -122,7 +122,7 @@ function resolveRuntimeEnvironment(definition, environment, source) {
     const resolved = resolveEnv(definition, { environment, source });
     const values = { ...source };
     for (const [name, value] of Object.entries(resolved)) {
-      if (source[name] !== undefined || value === undefined) continue;
+      if (value === undefined) continue;
       values[name] = runtimeEnvironmentValue(value);
     }
     return { values, error: undefined };

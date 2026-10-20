@@ -7,6 +7,51 @@ import { linkWorkspacePackages } from "./test-workspace.js";
 
 const roots: string[] = [];
 
+test("the emitted HTTP server supplies decoded dotenv values to application functions", async () => {
+  const root = await mkdtemp(join(process.cwd(), ".relkit-environment-test-"));
+  roots.push(root);
+  await cp(join(process.cwd(), "tests/compiler/fixtures/valid-minimal"), root, { recursive: true });
+  await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
+  await linkWorkspacePackages(root);
+  await writeFile(
+    join(root, "relkit.config.ts"),
+    `import { defineApp, defineEnv, env } from "@relkit/app/config";
+export default defineApp({ id: "typed-environment", env: defineEnv({
+  EVENT_RETENTION_DAYS: env.number().default(7),
+  ENABLED: env.boolean().default(true),
+  ENDPOINT: env.url(),
+}) });`,
+  );
+  const functionPath = join(root, "src/hello/functions/hello.function.ts");
+  const original = await readFile(functionPath, "utf8");
+  await writeFile(
+    functionPath,
+    original.replace(
+      "return { message: `Hello, ${input.name}` };",
+      'return { message: [typeof context.env.EVENT_RETENTION_DAYS, context.env.EVENT_RETENTION_DAYS, typeof context.env.ENABLED, context.env.ENABLED, context.env.ENDPOINT instanceof URL].join(":") };',
+    ),
+  );
+  const built = await buildProject({ projectRoot: root });
+  expect(built.ok).toBe(true);
+  const started = await startProject({
+    projectRoot: root,
+    port: 0,
+    healthTimeoutMs: 10_000,
+    environment: {
+      NODE_ENV: "development",
+      EVENT_RETENTION_DAYS: "7",
+      ENABLED: "false",
+      ENDPOINT: "http://localhost:3000",
+    },
+  });
+  try {
+    const response = await fetch(`http://127.0.0.1:${started.port}/hello/probe`);
+    expect(await response.json()).toEqual({ message: "number:7:boolean:false:true" });
+  } finally {
+    await started.stop();
+  }
+}, 30_000);
+
 test("the emitted server rejects missing production environment before provider startup", async () => {
   const root = await copyFullProject();
   const appPath = join(root, "relkit.config.ts");
