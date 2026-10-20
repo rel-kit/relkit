@@ -1,0 +1,134 @@
+- link "Skip to content" [ref=e1]
+- list
+  - listitem [level=1]
+    - link "RELKIT Inspector overview" [ref=e13]
+- generic
+  - generic
+    - StaticText "Workspace"
+    - list
+      - listitem [level=1]
+        - link "Overview" [ref=e29]
+      - listitem [level=1]
+        - link "Graphs" [ref=e30]
+      - listitem [level=1]
+        - link "Application graph" [ref=e31]
+      - listitem [level=1]
+        - link "Domains" [ref=e32]
+      - listitem [level=1]
+        - link "Routes" [ref=e33]
+      - listitem [level=1]
+        - link "Middleware" [ref=e34]
+      - listitem [level=1]
+        - link "API Reference" [ref=e35]
+      - listitem [level=1]
+        - link "Functions" [ref=e36]
+      - listitem [level=1]
+        - link "Errors" [ref=e37]
+  - generic
+    - StaticText "Runtime"
+    - list
+      - listitem [level=1]
+        - link "Jobs" [ref=e38]
+      - listitem [level=1]
+        - link "Events & listeners" [ref=e39]
+      - listitem [level=1]
+        - link "Buckets" [ref=e40]
+      - listitem [level=1]
+        - link "Cache" [ref=e41]
+      - listitem [level=1]
+        - link "Providers" [ref=e42]
+      - listitem [level=1]
+        - link "Tools" [ref=e43]
+      - listitem [level=1]
+        - link "Agents" [ref=e44]
+      - listitem [level=1]
+        - link "Channels" [ref=e45]
+  - generic
+    - StaticText "Signals"
+    - list
+      - listitem [level=1]
+        - link "Requests" [ref=e46]
+      - listitem [level=1]
+        - link "Logs" [ref=e47]
+      - listitem [level=1]
+        - link "Traces" [ref=e48]
+      - listitem [level=1]
+        - link "Environment" [ref=e49]
+      - listitem [level=1]
+        - link "Diagnostics" [ref=e50]
+- list
+  - listitem [level=1]
+    - generic [ref=e14] clickable [onclick]
+- main
+  - sectionheader
+    - button "Toggle navigation" [ref=e3]
+      - StaticText "Toggle Sidebar"
+    - navigation "Breadcrumb" [ref=e4]
+      - list
+        - listitem [level=1]
+          - link "Overview" [ref=e51]
+    - button "Search inspector" [expanded=false, ref=e5]
+      - StaticText "Search"
+      - StaticText "⌘K"
+    - StaticText "connected"
+    - button "Use dark theme" [ref=e6]
+    - button "Open resources" [expanded=false, ref=e7]
+  - StaticText "Generation "
+  - code
+    - StaticText "generation.runtime"
+  - StaticText "Graph "
+  - code
+    - StaticText "sha256:66bb7…715d3089"
+  - link "API reference" [ref=e2]
+  - sectionheader
+    - paragraph
+      - StaticText "ACTIVE WORKSPACE"
+    - heading "Routes" [level=1, ref=e15]
+    - paragraph
+      - StaticText "Inspect transport contracts and send a safe request to the active backend."
+    - StaticText "2"
+    - StaticText " visible"
+  - region "Routes filters" [ref=e10]
+    - strong
+      - StaticText "Filters"
+    - StaticText "Search and narrow the active collection."
+    - LabelText
+      - StaticText "Search routes"
+    - textbox "Search routes" [ref=e16]
+    - LabelText
+      - StaticText "Domain"
+    - textbox "Domain" [ref=e17]
+    - LabelText
+      - StaticText "Layer"
+    - textbox "Layer" [ref=e18]
+    - generic [ref=e19] clickable [onclick]
+      - StaticText "Kind"
+    - button "All Kind" [expanded=false, ref=e20]
+      - StaticText "All"
+    - button "Reset filters" [ref=e21]
+  - table
+    - rowgroup
+      - row
+        - columnheader "ID" [ref=e52]
+        - columnheader "Transport" [ref=e53]
+        - columnheader "Target" [ref=e54]
+        - columnheader "Actions" [ref=e55]
+    - row
+      - cell "hello.recovered-route" [ref=e58]
+      - cell "GET /recovered/:name" [ref=e59]
+      - cell "hello.say-hello" [ref=e60]
+      - cell "Quick view Open route" [ref=e61]
+        - button "Quick view" [ref=e62]
+        - link "Open route" [ref=e63]
+    - row
+      - cell "hello.route" [ref=e24]
+      - cell "GET /hello/:name" [ref=e25]
+      - cell "hello.say-hello" [ref=e26]
+      - cell "Quick view Open route" [ref=e27]
+        - button "Quick view" [ref=e56]
+        - link "Open route" [ref=e57]
+  - navigation "Pagination" [ref=e11]
+    - button "Previous" [disabled, ref=e22]
+    - button "Next" [disabled, ref=e23]
+  - button "Open quick view" [expanded=false, ref=e12]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e28]

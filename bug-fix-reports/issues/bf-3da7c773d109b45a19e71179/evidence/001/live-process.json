@@ -1,0 +1,8 @@
+{
+  "pid": 90959,
+  "app": "/Users/mustafaelsayed/Workspace/typescripts/logistic-platform-3",
+  "sourceCli": "/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts",
+  "sourceInspector": "/Users/mustafaelsayed/Workspace/relkit/apps/inspector",
+  "leaveRunningAuthorized": true,
+  "separateInspectorStarted": false
+}

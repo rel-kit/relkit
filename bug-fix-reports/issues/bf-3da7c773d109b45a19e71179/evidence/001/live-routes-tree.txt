@@ -1,0 +1,260 @@
+- link "Skip to content" [ref=e1]
+- list
+  - listitem [level=1]
+    - link "RELKIT Inspector overview" [ref=e11]
+- generic
+  - generic
+    - StaticText "Workspace"
+    - list
+      - listitem [level=1]
+        - link "Overview" [ref=e23]
+      - listitem [level=1]
+        - link "Graphs" [ref=e24]
+      - listitem [level=1]
+        - link "Application graph" [ref=e25]
+      - listitem [level=1]
+        - link "Domains" [ref=e26]
+      - listitem [level=1]
+        - link "Routes" [ref=e27]
+      - listitem [level=1]
+        - link "Middleware" [ref=e28]
+      - listitem [level=1]
+        - link "API Reference" [ref=e29]
+      - listitem [level=1]
+        - link "Functions" [ref=e30]
+      - listitem [level=1]
+        - link "Errors" [ref=e31]
+  - generic
+    - StaticText "Runtime"
+    - list
+      - listitem [level=1]
+        - link "Jobs" [ref=e32]
+      - listitem [level=1]
+        - link "Events & listeners" [ref=e33]
+      - listitem [level=1]
+        - link "Buckets" [ref=e34]
+      - listitem [level=1]
+        - link "Cache" [ref=e35]
+      - listitem [level=1]
+        - link "Providers" [ref=e36]
+      - listitem [level=1]
+        - link "Tools" [ref=e37]
+      - listitem [level=1]
+        - link "Agents" [ref=e38]
+      - listitem [level=1]
+        - link "Channels" [ref=e39]
+  - generic
+    - StaticText "Signals"
+    - list
+      - listitem [level=1]
+        - link "Requests" [ref=e40]
+      - listitem [level=1]
+        - link "Logs" [ref=e41]
+      - listitem [level=1]
+        - link "Traces" [ref=e42]
+      - listitem [level=1]
+        - link "Environment" [ref=e43]
+      - listitem [level=1]
+        - link "Diagnostics" [ref=e44]
+- list
+  - listitem [level=1]
+    - generic [ref=e12] clickable [onclick]
+- main
+  - sectionheader
+    - button "Toggle navigation" [ref=e3]
+      - StaticText "Toggle Sidebar"
+    - navigation "Breadcrumb" [ref=e4]
+      - list
+        - listitem [level=1]
+          - link "Overview" [ref=e45]
+    - button "Search inspector" [expanded=false, ref=e5]
+      - StaticText "Search"
+      - StaticText "⌘K"
+    - StaticText "connected"
+    - button "Use dark theme" [ref=e6]
+    - button "Open resources" [expanded=false, ref=e7]
+  - StaticText "Generation "
+  - code
+    - StaticText "generation.runtime"
+  - StaticText "Graph "
+  - code
+    - StaticText "sha256:c8b1a…5b2c539f"
+  - link "API reference" [ref=e2]
+  - sectionheader
+    - paragraph
+      - StaticText "ACTIVE WORKSPACE"
+    - heading "Routes" [level=1, ref=e13]
+    - paragraph
+      - StaticText "Inspect transport contracts and send a safe request to the active backend."
+    - StaticText "20"
+    - StaticText " visible"
+  - region "Routes filters" [ref=e8]
+    - strong
+      - StaticText "Filters"
+    - StaticText "Search and narrow the active collection."
+    - LabelText
+      - StaticText "Search routes"
+    - textbox "Search routes" [ref=e14]
+    - LabelText
+      - StaticText "Domain"
+    - textbox "Domain" [ref=e15]
+    - LabelText
+      - StaticText "Layer"
+    - textbox "Layer" [ref=e16]
+    - generic [ref=e17] clickable [onclick]
+      - StaticText "Kind"
+    - button "All Kind" [expanded=false, ref=e18]
+      - StaticText "All"
+    - button "Reset filters" [ref=e19]
+  - table
+    - rowgroup
+      - row
+        - columnheader "ID" [ref=e126]
+        - columnheader "Transport" [ref=e127]
+        - columnheader "Target" [ref=e128]
+        - columnheader "Actions" [ref=e129]
+    - row
+      - cell "route.all.api.auth.optional-catch-all-auth" [ref=e46]
+      - cell "ALL /api/auth/*auth?" [ref=e47]
+      - cell "Raw HTTP handler" [ref=e48]
+      - cell "Quick view Open route" [ref=e49]
+        - button "Quick view" [ref=e130]
+        - link "Open route" [ref=e131]
+    - row
+      - cell "route.get.api.companies" [ref=e50]
+      - cell "GET /api/companies" [ref=e51]
+      - cell "companies.list" [ref=e52]
+      - cell "Quick view Open route" [ref=e53]
+        - button "Quick view" [ref=e132]
+        - link "Open route" [ref=e133]
+    - row
+      - cell "route.get.api.companies.by-company-id.changes" [ref=e54]
+      - cell "GET /api/companies/:companyId/changes" [ref=e55]
+      - cell "realtime.poll" [ref=e56]
+      - cell "Quick view Open route" [ref=e57]
+        - button "Quick view" [ref=e134]
+        - link "Open route" [ref=e135]
+    - row
+      - cell "route.get.api.companies.by-company-id.drivers" [ref=e58]
+      - cell "GET /api/companies/:companyId/drivers" [ref=e59]
+      - cell "fleet.list-drivers" [ref=e60]
+      - cell "Quick view Open route" [ref=e61]
+        - button "Quick view" [ref=e136]
+        - link "Open route" [ref=e137]
+    - row
+      - cell "route.get.api.companies.by-company-id.events" [ref=e62]
+      - cell "GET /api/companies/:companyId/events" [ref=e63]
+      - cell "realtime.subscribe" [ref=e64]
+      - cell "Quick view Open route" [ref=e65]
+        - button "Quick view" [ref=e138]
+        - link "Open route" [ref=e139]
+    - row
+      - cell "route.get.api.companies.by-company-id.members" [ref=e66]
+      - cell "GET /api/companies/:companyId/members" [ref=e67]
+      - cell "companies.list-members" [ref=e68]
+      - cell "Quick view Open route" [ref=e69]
+        - button "Quick view" [ref=e140]
+        - link "Open route" [ref=e141]
+    - row
+      - cell "route.get.api.companies.by-company-id.providers" [ref=e70]
+      - cell "GET /api/companies/:companyId/providers" [ref=e71]
+      - cell "providers.list" [ref=e72]
+      - cell "Quick view Open route" [ref=e73]
+        - button "Quick view" [ref=e142]
+        - link "Open route" [ref=e143]
+    - row
+      - cell "route.get.api.companies.by-company-id.snapshot" [ref=e74]
+      - cell "GET /api/companies/:companyId/snapshot" [ref=e75]
+      - cell "realtime.snapshot" [ref=e76]
+      - cell "Quick view Open route" [ref=e77]
+        - button "Quick view" [ref=e144]
+        - link "Open route" [ref=e145]
+    - row
+      - cell "route.get.api.companies.by-company-id.trips" [ref=e78]
+      - cell "GET /api/companies/:companyId/trips" [ref=e79]
+      - cell "dispatch.list" [ref=e80]
+      - cell "Quick view Open route" [ref=e81]
+        - button "Quick view" [ref=e146]
+        - link "Open route" [ref=e147]
+    - row
+      - cell "route.get.api.companies.by-company-id.trips.by-trip-id" [ref=e82]
+      - cell "GET /api/companies/:companyId/trips/:tripId" [ref=e83]
+      - cell "dispatch.get" [ref=e84]
+      - cell "Quick view Open route" [ref=e85]
+        - button "Quick view" [ref=e148]
+        - link "Open route" [ref=e149]
+    - row
+      - cell "route.get.api.companies.by-company-id.trips.by-trip-id.proofs.by-proof-id" [ref=e86]
+      - cell "GET /api/companies/:companyId/trips/:tripId/proofs/:proofId" [ref=e87]
+      - cell "dispatch.download-proof" [ref=e88]
+      - cell "Quick view Open route" [ref=e89]
+        - button "Quick view" [ref=e150]
+        - link "Open route" [ref=e151]
+    - row
+      - cell "route.get.api.companies.by-company-id.vehicles" [ref=e90]
+      - cell "GET /api/companies/:companyId/vehicles" [ref=e91]
+      - cell "fleet.list-vehicles" [ref=e92]
+      - cell "Quick view Open route" [ref=e93]
+        - button "Quick view" [ref=e152]
+        - link "Open route" [ref=e153]
+    - row
+      - cell "route.get.api.companies.by-company-id.vehicles.by-vehicle-id.location" [ref=e94]
+      - cell "GET /api/companies/:companyId/vehicles/:vehicleId/location" [ref=e95]
+      - cell "tracking.latest" [ref=e96]
+      - cell "Quick view Open route" [ref=e97]
+        - button "Quick view" [ref=e154]
+        - link "Open route" [ref=e155]
+    - row
+      - cell "route.get.api.companies.by-company-id.vehicles.by-vehicle-id.locations" [ref=e98]
+      - cell "GET /api/companies/:companyId/vehicles/:vehicleId/locations" [ref=e99]
+      - cell "tracking.history" [ref=e100]
+      - cell "Quick view Open route" [ref=e101]
+        - button "Quick view" [ref=e156]
+        - link "Open route" [ref=e157]
+    - row
+      - cell "route.get.api.companies.by-company-id.vehicles.by-vehicle-id.maintenance" [ref=e102]
+      - cell "GET /api/companies/:companyId/vehicles/:vehicleId/maintenance" [ref=e103]
+      - cell "fleet.list-maintenance" [ref=e104]
+      - cell "Quick view Open route" [ref=e105]
+        - button "Quick view" [ref=e158]
+        - link "Open route" [ref=e159]
+    - row
+      - cell "route.get.hello" [ref=e106]
+      - cell "GET /hello" [ref=e107]
+      - cell "hello.greet" [ref=e108]
+      - cell "Quick view Open route" [ref=e109]
+        - button "Quick view" [ref=e160]
+        - link "Open route" [ref=e161]
+    - row
+      - cell "route.patch.api.companies.by-company-id" [ref=e110]
+      - cell "PATCH /api/companies/:companyId" [ref=e111]
+      - cell "companies.update" [ref=e112]
+      - cell "Quick view Open route" [ref=e113]
+        - button "Quick view" [ref=e162]
+        - link "Open route" [ref=e163]
+    - row
+      - cell "route.patch.api.companies.by-company-id.drivers.by-driver-id" [ref=e114]
+      - cell "PATCH /api/companies/:companyId/drivers/:driverId" [ref=e115]
+      - cell "fleet.update-driver" [ref=e116]
+      - cell "Quick view Open route" [ref=e117]
+        - button "Quick view" [ref=e164]
+        - link "Open route" [ref=e165]
+    - row
+      - cell "route.patch.api.companies.by-company-id.members.by-user-id" [ref=e118]
+      - cell "PATCH /api/companies/:companyId/members/:userId" [ref=e119]
+      - cell "companies.update-member" [ref=e120]
+      - cell "Quick view Open route" [ref=e121]
+        - button "Quick view" [ref=e166]
+        - link "Open route" [ref=e167]
+    - row
+      - cell "route.patch.api.companies.by-company-id.providers.by-provider-id" [ref=e122]
+      - cell "PATCH /api/companies/:companyId/providers/:providerId" [ref=e123]
+      - cell "providers.update" [ref=e124]
+      - cell "Quick view Open route" [ref=e125]
+        - button "Quick view" [ref=e168]
+        - link "Open route" [ref=e169]
+  - navigation "Pagination" [ref=e9]
+    - button "Previous" [disabled, ref=e20]
+    - button "Next" [ref=e21]
+  - button "Open quick view" [expanded=false, ref=e10]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e22]

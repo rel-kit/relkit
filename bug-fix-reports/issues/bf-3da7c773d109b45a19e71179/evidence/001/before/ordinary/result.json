@@ -1,0 +1,13 @@
+{
+  "mode": "ordinary",
+  "sameDevPid": 63075,
+  "inspectorLaunchedByBunDev": true,
+  "backendReadyMs": 5129,
+  "inspectorReadyMs": 9152,
+  "rejectedEditRetainedOldResponse": true,
+  "failureVisible": true,
+  "recoveredResponse": "number:30",
+  "newOpenApiPath": "/recovered/{name}",
+  "newRouteVisibleWithoutRefresh": true,
+  "errorClearedWithoutRefresh": true
+}

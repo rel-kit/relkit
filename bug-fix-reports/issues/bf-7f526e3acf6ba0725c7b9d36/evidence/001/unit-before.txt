@@ -1,0 +1,23 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/tests/services/runtime-environment-values.test.ts:
+14 |   const result = runInNewContext(
+15 |     `${SERVER_RUNTIME_SUPPORT_SOURCE}\nresolveRuntimeEnvironment(definition, "development", source)`,
+16 |     { resolveEnv, definition, source },
+17 |   );
+18 |   expect(result.error).toBeUndefined();
+19 |   expect(result.values.DAYS).toBe(7);
+                                  ^
+error: expect(received).toBe(expected)
+
+Expected: 7
+Received: "7"
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/runtime-environment-values.test.ts:19:30)
+(fail) generated runtime uses decoded source values and defaults without changing the process source [8.35ms]
+(pass) generated runtime retains invalid environment errors [1.03ms]
+
+ 1 pass
+ 1 fail
+ 3 expect() calls
+Ran 2 tests across 1 file. [133.00ms]

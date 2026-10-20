@@ -1,0 +1,16 @@
+{
+  "version": "16.3.8",
+  "bundler": "Turbopack",
+  "get_compilation_issues": {
+    "issues": []
+  },
+  "get_errors": {
+    "configErrors": [],
+    "sessionErrors": []
+  },
+  "get_page_metadata": {
+    "url": "/routes",
+    "routerType": "app"
+  },
+  "reactTreeCommandExit": 0
+}

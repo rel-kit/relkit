@@ -1,0 +1,27 @@
+{
+  "key": "tests/unit/development-failure.test.ts",
+  "matches": {
+    "bui-18e099c14e9f62fc54cc2d58": {
+      "id": "bui-18e099c14e9f62fc54cc2d58",
+      "status": "verified",
+      "what": "Inspector silently showed old routes and API reference after a failed development reload.",
+      "root_cause": "apps/inspector/app/inspector-shell.tsx used only the active child graph connection for status. Failed reloads belong to the CLI supervisor; the active child diagnostics remain empty. No shell component consumed retained dev.generation.failed logs or startup failures.",
+      "fixed_by": "Added a global failure banner backed by retained supervisor logs. It explains the previous version is serving, provides Docker-specific recovery, correlates startup errors to the failed build window, links filtered error logs, and clears on a later dev.generation.active record. Supporting-detail failures do not hide th",
+      "files": [
+        "apps/inspector/app/inspector-shell.tsx",
+        "apps/inspector/app/development-failure-banner.tsx",
+        "apps/inspector/lib/development-failure.ts",
+        "apps/inspector/lib/use-development-failure.ts",
+        "tests/unit/development-failure.test.ts",
+        "tests/inspector/reload-recovery.probe.ts",
+        "scripts/test-inspector-recovery-fixture.ts",
+        "scripts/test-inspector-recovery-dependencies.ts",
+        "packages/cli/tests/dev-environment/recovery-process.ts",
+        "package.json"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-20T18:21:19+00:00",
+      "report": "bug-fix-ui-reports/issues/bui-18e099c14e9f62fc54cc2d58/report.md"
+    }
+  }
+}

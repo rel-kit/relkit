@@ -1,0 +1,8 @@
+21:16:47.812 INFO  relkit            Starting development server
+21:16:47.826 INFO  build             Compiling application
+21:16:51.105 INFO  build             Compiled in 3279ms
+21:16:51.106 INFO  server            Ready
+                                     API        http://127.0.0.1:3000
+                                     Reference  http://127.0.0.1:3000/_relkit/v1/api-reference
+                                     OpenAPI    http://127.0.0.1:3000/_relkit/v1/openapi.json
+21:16:53.539 INFO  relkit            dev.inspector.ready

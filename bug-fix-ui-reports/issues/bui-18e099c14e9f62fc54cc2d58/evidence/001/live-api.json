@@ -1,0 +1,19 @@
+{
+  "openApiPaths": 64,
+  "applicationPaths": 34,
+  "authPaths": 30,
+  "sampleApplicationPaths": [
+    "/api/companies",
+    "/api/companies/{companyId}",
+    "/api/companies/{companyId}/changes",
+    "/api/companies/{companyId}/drivers",
+    "/api/companies/{companyId}/drivers/{driverId}",
+    "/api/companies/{companyId}/events",
+    "/api/companies/{companyId}/invitations",
+    "/api/companies/{companyId}/members",
+    "/api/companies/{companyId}/members/{userId}",
+    "/api/companies/{companyId}/providers",
+    "/api/companies/{companyId}/providers/{providerId}",
+    "/api/companies/{companyId}/realtime/cleanup"
+  ]
+}

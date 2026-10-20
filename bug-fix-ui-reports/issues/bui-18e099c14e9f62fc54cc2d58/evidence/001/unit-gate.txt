@@ -1,0 +1,253 @@
+$ bun test ./tests/unit --max-concurrency "1"
+bun test v1.3.10 (30e609e0)
+
+tests/unit/release-pack-scoped.test.ts:
+Staging release package: @relkit/contracts
+Staging release package: @relkit/schema
+Release command: /Users/mustafaelsayed/.bun/bin/bun install --lockfile-only --ignore-scripts in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-aTp8qp
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mixed-pack-cKETj2/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-aTp8qp/packages/contracts
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mixed-pack-cKETj2/artifacts/relkit-contracts-0.7.9.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mixed-pack-cKETj2/artifacts/relkit-contracts-0.7.9.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mixed-pack-cKETj2/artifacts/relkit-contracts-0.7.9.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mixed-pack-cKETj2/artifacts --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-aTp8qp/packages/schema
+Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mixed-pack-cKETj2/artifacts/relkit-schema-0.8.1.tgz in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mixed-pack-cKETj2/artifacts/relkit-schema-0.8.1.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
+Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mixed-pack-cKETj2/artifacts/relkit-schema-0.8.1.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
+(pass) real Bun archives preserve different package versions and exact dependency pins [106.43ms]
+
+tests/unit/scaffold-provider-versions.test.ts:
+(pass) scaffold catalog uses each provider's metadata instead of the generator release [13.33ms]
+
+tests/unit/auto-changeset-coverage.test.ts:
+(pass) real automatic Changesets preserve a manual bump and cover another changed package [304.06ms]
+
+tests/unit/release-check.test.ts:
+(pass) the release certifies default creation using its actual tool identity [1.55ms]
+(pass) the release retains complete fresh certification for its actual tool identity [0.97ms]
+(pass) the release retains complete restart certification for its actual tool identity [0.33ms]
+(pass) accepts the unscoped CLI package and publishes its dependency first [6.09ms]
+(pass) tracked release notes exclude rebuild-dependent tarball hashes [0.07ms]
+
+tests/unit/publish-release.test.ts:
+(pass) every package must be present with the actual release artifact integrity
+(pass) registry propagation is retried within a finite bound [0.48ms]
+(pass) a partially published train fails instead of reporting a complete release [0.20ms]
+(pass) an accepted publish may become visible beyond the previous five-minute retry window [0.11ms]
+(pass) an immutable registry integrity mismatch fails immediately [0.05ms]
+
+tests/unit/build-catalog.test.ts:
+(pass) catalog metadata derives exact patch identity, bytes, and native literal types [1.65ms]
+(pass) release staging provides catalogs, overrides, and patch bytes before installation [1.36ms]
+
+tests/unit/root-scripts.test.ts:
+(pass) test:all points to a checked-in orchestration script [0.83ms]
+
+tests/unit/job-name.test.ts:
+(pass) accepts safe camelCase job names [5.05ms]
+(pass) rejects unsafe and reserved job names [3.63ms]
+
+tests/unit/jobs-mutation-gate.test.ts:
+(pass) requires killed mutants in all retained semantic responsibilities [0.35ms]
+(pass) old facade line numbers cannot satisfy migrated stale-epoch ownership [0.17ms]
+(pass) mutation execution errors fail even when every semantic requirement has a kill [0.06ms]
+
+tests/unit/runtime-environment-values.test.ts:
+(pass) generated runtime uses decoded source values and defaults without changing the process source [3.13ms]
+(pass) generated runtime retains invalid environment errors [0.48ms]
+
+tests/unit/auto-changeset.test.ts:
+(pass) release paths map to their published packages
+(pass) shared packaged inputs conservatively release all affected packages [0.67ms]
+(pass) Changesets are detected and rendered deterministically [0.02ms]
+(pass) release diffs retain deletions and both sides of renames [0.06ms]
+(pass) a deleted Changeset does not satisfy release policy [0.02ms]
+(pass) manual release intent only covers packages actually declared in frontmatter [0.10ms]
+
+tests/unit/development-failure.test.ts:
+(pass) explains Docker failures while preserving the active workspace [0.78ms]
+(pass) includes startup errors only from the failed build's time window [0.16ms]
+(pass) clears failures after recovery and ignores application lifecycle lookalikes [0.10ms]
+(pass) keeps the failure visible when startup details are unavailable [0.18ms]
+(pass) reuses unchanged startup details and handles environments without dev logs [0.14ms]
+
+tests/unit/release-selection.test.ts:
+(pass) real selector skips empty changesets, reuses archives, and recovers after main advances [1291.58ms]
+
+tests/unit/release-recovery.test.ts:
+(pass) a partially failed main release recovers its original artifact ID [0.38ms]
+(pass) automatic retries reuse a prior validated pack and ignore unfinished runs [0.11ms]
+(pass) recovery refuses foreign, unvalidated, ambiguous, and expired archives [1.10ms]
+
+tests/unit/version-packages.test.ts:
+(pass) the release train promotes Unreleased into one root changelog entry [0.14ms]
+(pass) the Changesets action receives an untracked package changelog [0.03ms]
+(pass) versioning stops before release notes when new-version certification fails [108.89ms]
+
+tests/unit/catalog-manifest.test.ts:
+(pass) catalog resolution preserves concrete declarations and named peer ranges [0.02ms]
+(pass) missing or recursive catalogs fail without inventing a dependency version [0.20ms]
+(pass) packed dependency validation requires concrete pins in every dependency field [0.02ms]
+
+tests/unit/package-tests.test.ts:
+(pass) package test discovery includes standalone integrations without build output [20.55ms]
+
+tests/unit/release-ci-verification.test.ts:
+(pass) explicit release dispatch waits for actual CI completion [0.28ms]
+(pass) pending or successful CI for another authority cannot admit publication [0.46ms]
+(pass) CI waiting is bounded and never promotes an unfinished run [0.08ms]
+(pass) a slow API lookup cannot admit CI beyond the five-minute window [0.17ms]
+(pass) malformed caller identities are rejected before API access [0.62ms]
+
+tests/unit/paired-commerce-project.test.ts:
+(pass) commerce flattening creates an absent destination and preserves service bytes [8.94ms]
+(pass) commerce flattening accepts an existing empty destination [1.93ms]
+(pass) commerce flattening rejects and preserves existing destination content: keep.txt [1.85ms]
+(pass) commerce flattening rejects and preserves existing destination content: .keep [2.19ms]
+(pass) commerce flattening rejects collisions before rewriting authored imports [1.44ms]
+
+tests/unit/ci-workflow.test.ts:
+(pass) fast CI gates merges and only green main runs start releases [0.52ms]
+(pass) release writes use the App and recovery cannot rebuild its archives [1.04ms]
+
+tests/unit/phase0-harness-ownership.test.ts:
+[17:45:28.349] INFO (#68): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.618875,
+}
+[17:45:28.350] INFO (#68): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.manifest",
+  outcome: "success",
+  duration_ms: 0.283583,
+}
+[17:45:28.350] INFO (#68): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.source",
+  outcome: "success",
+  duration_ms: 0.311334,
+}
+[17:45:28.351] ERROR (#68): Execution operation failed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "failure",
+  duration_ms: 0.304958,
+}
+[17:45:28.351] INFO (#68): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.274125,
+}
+[17:45:28.351] ERROR (#68): Execution operation failed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "failure",
+  duration_ms: 4.104584,
+}
+(pass) guardrail fixtures release after native assertion failure [5.73ms]
+[17:45:28.352] INFO (#69): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.temporary",
+  outcome: "success",
+  duration_ms: 0.1335,
+}
+[17:45:28.866] ERROR (#70): Execution operation failed {
+  domain: "testing",
+  operation: "guardrail.command",
+  outcome: "failure",
+  duration_ms: 513.434125,
+}
+[17:45:28.867] INFO (#69): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.assertions",
+  outcome: "success",
+  duration_ms: 514.711208,
+}
+[17:45:28.868] INFO (#69): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.guardrail.release",
+  outcome: "success",
+  duration_ms: 0.786958,
+}
+[17:45:28.868] INFO (#69): Execution operation completed {
+  domain: "testing",
+  operation: "guardrail.fixture",
+  outcome: "success",
+  duration_ms: 516.413666,
+}
+(pass) guardrail command timeout joins the actual child before root release [516.69ms]
+
+tests/unit/doctor-versions.test.ts:
+(pass) doctor accepts independently versioned packages with closed metadata exports [13.61ms]
+(pass) doctor rejects a wrong installed version even when declarations match each other [2.87ms]
+(pass) doctor rejects missing packages and malformed installed versions [3.35ms]
+(pass) doctor resolves hoisted packages from the project and preserves local links [5.67ms]
+(pass) doctor validates independently resolved catalog pins [6.09ms]
+(pass) doctor does not hide a broken nearer installation behind a valid hoisted one [4.18ms]
+
+tests/unit/release-github-recovery.test.ts:
+(pass) only recovery requests workflow authority, after npm verification [0.14ms]
+(pass) publishing 0.7.10 with latest v0.7.11 sets latest=false [350.50ms]
+(pass) publishing 0.7.10 with latest v0.7.9 sets latest=true [271.25ms]
+(pass) publishing 0.7.10 with latest v0.7.10 sets latest=true [242.95ms]
+(pass) publishing 0.7.10 with latest  sets latest=true [237.27ms]
+
+tests/unit/release-check-listing.test.ts:
+(pass) CLI packages retain the finite migration worker and its relative helpers [0.09ms]
+(pass) accepts the complete generator's exact portable catalog source pair [0.07ms]
+(pass) requires the relkit skill in the minimal template [0.05ms]
+(pass) requires the relkit skill in the api template [0.01ms]
+(pass) requires the relkit skill in the agent template [0.02ms]
+(pass) requires the relkit skill in the fullstack template [0.01ms]
+(pass) requires the relkit skill in the tasks template [0.02ms]
+(pass) retains development-file rejection beside approved catalog assets [0.03ms]
+(pass) requires the portable catalog asset package/src/catalog-resolution.ts even without an export target [0.09ms]
+(pass) requires the portable catalog asset package/src/catalog-resolution.types.ts even without an export target [0.04ms]
+(pass) forbids the same catalog source pair in every unrelated package [0.02ms]
+
+tests/unit/catalog-bootstrap.test.ts:
+(pass) pure catalog subpath boots before any generator or framework dist exists [19.40ms]
+(pass) actual generator tarball carries the same source resolver and works without dist [303.03ms]
+
+tests/unit/create-certification.test.ts:
+(pass) certification requires all original packed attempts and exact identities [0.71ms]
+(pass) certification preserves owned bytes when failure is none [107.98ms]
+Failed certification reports retained at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-fugipW
+(pass) certification preserves owned bytes when failure is performance [16.73ms]
+Failed certification reports retained at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-Islsnc
+(pass) certification preserves owned bytes when failure is measurement [16.99ms]
+Failed certification reports retained at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-MLnCeQ
+(pass) certification preserves owned bytes when failure is report [22.08ms]
+Failed certification reports retained at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-cAxBm4
+(pass) certification preserves owned bytes when failure is final-check [19.56ms]
+
+tests/unit/release-plan.test.ts:
+(pass) batch identities remain unique when separate packages reach the same version [0.21ms]
+Saved lockfile
+(pass) real Changesets versions only the generator and its two dependents [1645.16ms]
+
+tests/unit/packed-registry.test.ts:
+(pass) smoke registry serves verified tarball metadata instead of workspace metadata [12.40ms]
+(pass) upstream proxy requests compact metadata and releases completed response bodies [4.96ms]
+
+tests/unit/sync-release.test.ts:
+(pass) release sync retains the CLI editor assets and remains idempotent [103.32ms]
+
+tests/unit/public-declarations.test.ts:
+(pass) allows the documented native Effect constructors and injectable services [14.05ms]
+(pass) follows split Next middleware types within the existing middleware exception [14.55ms]
+(pass) still rejects unrelated framework, cloud, and internal provider declarations [10.80ms]
+
+tests/unit/release-publish-recovery.test.ts:
+(pass) publisher resumes exact archives, skips completed packages, and protects latest [1069.38ms]
+
+tests/unit/create-readiness.test.ts:
+(pass) shared-host slow starts pass only functional readiness and remain performance failures [1.03ms]
+(pass) functional readiness independently rejects failed, malformed, partial or stale evidence [0.50ms]
+
+ 100 pass
+ 0 fail
+ 514 expect() calls
+Ran 100 tests across 32 files. [7.33s]

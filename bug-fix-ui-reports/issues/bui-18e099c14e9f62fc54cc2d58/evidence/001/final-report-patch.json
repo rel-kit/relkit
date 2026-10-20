@@ -1,0 +1,181 @@
+{
+  "status": "verified",
+  "what": "Inspector silently showed old routes and API reference after a failed development reload.",
+  "expected": "Keep working routes visible and display a persistent reload error with its cause and recovery steps.",
+  "observed": "The live routes page showed connected and one hello route despite many failed reloads; diagnostics returned no errors.",
+  "root_cause": "apps/inspector/app/inspector-shell.tsx used only the active child graph connection for status. Failed reloads belong to the CLI supervisor; the active child diagnostics remain empty. No shell component consumed retained dev.generation.failed logs or startup failures.",
+  "fixed_by": "Added a global failure banner backed by retained supervisor logs. It explains the previous version is serving, provides Docker-specific recovery, correlates startup errors to the failed build window, links filtered error logs, and clears on a later dev.generation.active record. Supporting-detail failures do not hide the main failure. Verified against the real logistic-platform-3 backend in the source Inspector. Ordinary and genuinely prepared CLI startup both passed failed-edit retention, visible errors, typed .env repair, new routes/OpenAPI, and automatic banner clearing without refresh under the same dev PID. The real app now exposes all 34 application paths plus 30 auth paths.",
+  "files": [
+    "apps/inspector/app/inspector-shell.tsx",
+    "apps/inspector/app/development-failure-banner.tsx",
+    "apps/inspector/lib/development-failure.ts",
+    "apps/inspector/lib/use-development-failure.ts",
+    "tests/unit/development-failure.test.ts",
+    "tests/inspector/reload-recovery.probe.ts",
+    "scripts/test-inspector-recovery-fixture.ts",
+    "scripts/test-inspector-recovery-dependencies.ts",
+    "packages/cli/tests/dev-environment/recovery-process.ts",
+    "package.json"
+  ],
+  "tags": [],
+  "related": [],
+  "environment": {
+    "url": "http://127.0.0.1:3215/routes",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "role": "local developer",
+    "framework": "Next.js 16.3.8, React 19.2.8",
+    "package": "apps/inspector"
+  },
+  "reproduction": [
+    "Observe a failed reload while the previous hello backend stays active.",
+    "Open the routes page; the original Inspector shows connected without explaining the failure.",
+    "Open the edited source Inspector against the same backend; assert failure cause and stale routes notice.",
+    "Follow View error logs and inspect the same startup failure; check 390px viewport for overflow."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "screenshot",
+        "path": "evidence/001/before.png",
+        "note": "Original routes page had no reload failure warning."
+      },
+      {
+        "kind": "assertion",
+        "path": "evidence/001/browser-assertions.json",
+        "note": "Before and after browser observations."
+      }
+    ],
+    "after": [
+      {
+        "kind": "screenshot",
+        "path": "evidence/001/after.png",
+        "note": "Real startup failure and stale API warning."
+      },
+      {
+        "kind": "screenshot",
+        "path": "evidence/001/after-mobile.png",
+        "note": "Recovery steps fit at 390px."
+      },
+      {
+        "kind": "screenshot",
+        "path": "evidence/001/live-routes.png",
+        "note": "Real app routes visible in patched source Inspector on 3210."
+      },
+      {
+        "kind": "assertion",
+        "path": "evidence/001/live-api.json",
+        "note": "34 application and 30 auth OpenAPI paths."
+      }
+    ]
+  },
+  "verification": {
+    "browser": {
+      "status": "passed",
+      "assertion": "The failed-reload banner includes real startup errors, leaves hello routes visible, and opens error-filtered logs. Live localhost:3210/routes now includes company routes and has no failed-reload banner.",
+      "steps": [
+        "Open routes with the same backend.",
+        "Assert alert, retention error, stale-docs notice and existing route.",
+        "Follow error logs and verify the retention detail.",
+        "Reject DAYS=invalid, preserve old response, then repair DAYS=30 with a new route under the same ordinary/prepared dev PID.",
+        "Assert route visibility and banner clearing without refreshing.",
+        "Verify all 34 application OpenAPI paths and 30 auth paths in the restarted real app."
+      ]
+    },
+    "checks": [
+      {
+        "name": "inspector-tests",
+        "command": "bun test apps/inspector/lib --max-concurrency 1",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/inspector-tests.txt"
+      },
+      {
+        "name": "boundaries",
+        "command": "bun run check",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/boundaries.txt"
+      },
+      {
+        "name": "lint",
+        "command": "bun run lint",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/lint.txt"
+      },
+      {
+        "name": "format",
+        "command": "bun x prettier --check affected files",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/format.txt"
+      },
+      {
+        "name": "react-doctor",
+        "command": "bun x react-doctor@latest apps/inspector --scope files --base HEAD --include-untracked --no-parallel --no-score --no-supply-chain",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/react-doctor.txt"
+      },
+      {
+        "name": "typecheck",
+        "status": "pre-existing",
+        "baseline": "evidence/001/typecheck-baseline.json",
+        "output": "evidence/001/typecheck-current.json",
+        "reason": "Strict scoped TypeScript baseline and edited code both report the same 10 existing dependency errors; comparison found no new errors."
+      },
+      {
+        "name": "final-focused-tests",
+        "command": "bun test apps/inspector/lib tests/unit/development-failure.test.ts tests/unit/runtime-environment-values.test.ts packages/cli/environment-runtime.test.ts --max-concurrency 1",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/final-tests.txt"
+      },
+      {
+        "name": "merge-blocking-unit-gate",
+        "command": "bun run test:unit --max-concurrency 1",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/unit-gate.txt"
+      }
+    ],
+    "regressions": [
+      {
+        "assertion": "390px layout has no horizontal overflow and recovery text remains visible.",
+        "status": "passed",
+        "output": "evidence/001/browser-assertions.json"
+      },
+      {
+        "assertion": "Next compilation and runtime errors are empty.",
+        "status": "passed",
+        "output": "evidence/001/next-runtime.json"
+      },
+      {
+        "assertion": "ordinary: same-PID failed edit and typed recovery, new route/OpenAPI, automatic warning clearing, joined owned-process shutdown.",
+        "status": "passed",
+        "output": "evidence/001/recovery/ordinary/result.json"
+      },
+      {
+        "assertion": "prepared: same-PID failed edit and typed recovery, new route/OpenAPI, automatic warning clearing, joined owned-process shutdown.",
+        "status": "passed",
+        "output": "evidence/001/recovery/prepared/result.json"
+      }
+    ],
+    "limitations": [
+      "Changes are local and unpublished; full repository acceptance/release packaging were not run.",
+      "Contributor Next.js source startup exceeded the existing CLI five-second Inspector readiness deadline; the live patched source Inspector was started separately. Recovery browser acceptance also owns its source Inspector separately from the CLI prebuilt Inspector. This does not certify or change that source-startup deadline.",
+      "Standalone Scalar reference HTML is outside the Inspector shell.",
+      "Focused strict TypeScript comparison retains the same 10 pre-existing dependency errors with no introduced errors."
+    ]
+  },
+  "notes": [
+    "100 unit tests and 69 focused tests passed. New fast regressions live in the existing merge-blocking unit gate; browser recovery is chained into test:inspector:browser.",
+    "Disposable ordinary and prepared apps, their Inspector processes, browsers, listeners, and owned descendants were joined and removed.",
+    "User authorized the original PID 47237 restart after framework proof. Backend PID 58694 and source Inspector PID 58981 remain running by that authorization; stop using kill -TERM 58694 58981.",
+    "Docker became unavailable again before restart; reopened Docker, then confirmed docker ps and application startup succeeded. No authored app files or persisted data were deleted.",
+    "Related runtime defect: bf-7f526e3acf6ba0725c7b9d36."
+  ]
+}

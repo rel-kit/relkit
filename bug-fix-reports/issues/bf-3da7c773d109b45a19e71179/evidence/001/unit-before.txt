@@ -1,0 +1,85 @@
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+stdout | packages/cli/tests/services/inspector-readiness.test.ts > keeps a cold compiling Inspector alive beyond five seconds
+[20:56:03.866] ERROR (#1): Error [AssertionError]: expected { _id: 'Exit', _tag: 'Failure', …(1) } to be undefined
+    at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/services/inspector-readiness.test.ts:30:32 {
+  actual: {
+    _id: 'Exit',
+    _tag: 'Failure',
+    cause: { _id: 'Cause', failures: [Array] }
+  },
+  expected: undefined,
+  showDiff: true,
+  operator: 'strictEqual',
+  [cause]: undefined
+}
+
+ ❯ packages/cli/tests/services/inspector-readiness.test.ts (5 tests | 1 failed | 4 skipped) 13ms
+   × keeps a cold compiling Inspector alive beyond five seconds 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/cli/tests/services/inspector-readiness.test.ts > keeps a cold compiling Inspector alive beyond five seconds
+AssertionError: expected { _id: 'Exit', _tag: 'Failure', …(1) } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "~effect/Effect/args": CauseImpl {
+    "reasons": [
+      Fail {
+        "_tag": "Fail",
+        "annotations": Map {
+          "effect/Cause/StackTrace" => {
+            "name": "Dev.inspectorReady",
+            "parent": {
+              "name": "Dev.inspectorReady (definition)",
+              "parent": undefined,
+              "stack": [Function anonymous],
+            },
+            "stack": [Function anonymous],
+          },
+        },
+        "error": CliAdapterError {
+          "message": "Inspector did not become ready within its deadline.",
+          "cause": TimeoutError {
+            "message": "Operation timed out after '5s'",
+            "_tag": "TimeoutError",
+            "~effect/Cause/TimeoutError": "~effect/Cause/TimeoutError",
+          },
+          "_tag": "CliAdapterError",
+          "operation": "dev.inspector.readiness",
+        },
+        "~effect/Cause/Reason": "~effect/Cause/Reason",
+      },
+    ],
+    "~effect/Cause": "~effect/Cause",
+  },
+}
+
+ ❯ packages/cli/tests/services/inspector-readiness.test.ts:30:32
+     28|     yield* Deferred.await(entered);
+     29|     yield* TestClock.adjust(5_500);
+     30|     expect(fiber.pollUnsafe()).toBeUndefined();
+       |                                ^
+     31|     yield* TestClock.adjust(500);
+     32|     yield* Fiber.join(fiber);
+ ❯ IteratorImpl.~effect/Effect/successCont node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1417:28
+ ❯ ExitPrimitive.~effect/Effect/evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/core.ts:565:30
+ ❯ FiberImpl.runLoop node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:650:39
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:592:23
+ ❯ FiberImpl.evaluate node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:586:27
+ ❯ Array.<anonymous> node_modules/.bun/effect@4.0.1/node_modules/effect/src/internal/effect.ts:1020:13
+ ❯ MixedSchedulerDispatcher.runTasks node_modules/.bun/effect@4.0.1/node_modules/effect/src/Scheduler.ts:240:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 skipped (5)
+   Start at  20:56:01
+   Duration  2.39s (transform 75%, import 24%, tests 1%)
+

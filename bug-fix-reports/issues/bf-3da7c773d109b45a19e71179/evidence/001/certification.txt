@@ -1,0 +1,176 @@
+$ bun test scripts/tests/dev-readiness/bootstrap-imports.test.ts scripts/tests/packed-manifest.test.ts scripts/tests/registry-cache.test.ts scripts/tests/release-command.test.ts packages/cli/tests/dev-snapshot/input-watch.test.ts packages/cli/inspector-startup.test.ts && bun x vitest run scripts/tests/benchmark-packed-cleanup.test.ts scripts/tests/benchmark-packed-dev.test.ts packages/cli/tests/services/inspector-readiness.test.ts "--maxWorkers=1" --no-file-parallelism
+bun test v1.3.10 (30e609e0)
+
+scripts/tests/packed-manifest.test.ts:
+(pass) reads the exact packed package manifest from a gzipped archive [10.13ms]
+(pass) rejects archives without a packed package manifest [1.60ms]
+
+scripts/tests/registry-cache.test.ts:
+(pass) evicts an upstream network failure and retains its native deadline [5.45ms]
+(pass) evicts an upstream HTTP 503 failure and retains its native deadline [3.27ms]
+
+scripts/tests/release-command.test.ts:
+Release command: /Users/mustafaelsayed/.bun/bin/bun -e console.log("complete") in /Users/mustafaelsayed/Workspace/relkit
+Release command: /Users/mustafaelsayed/.bun/bin/bun -e console.error("packing failed");process.exit(7) in /Users/mustafaelsayed/Workspace/relkit
+(pass) release commands return stdout and preserve nonzero-exit diagnostics [22.69ms]
+Release command: /Users/mustafaelsayed/.bun/bin/bun -e console.log(process.pid);console.error("stalled install");setInterval(()=>{},100) in /Users/mustafaelsayed/Workspace/relkit
+(pass) release command deadlines terminate and join the owned process group [1004.69ms]
+
+packages/cli/inspector-startup.test.ts:
+[18:15:56.381] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.probe.close",
+  outcome: "success",
+  duration_ms: 0.701958,
+}
+[18:15:56.383] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.start",
+  outcome: "success",
+  duration_ms: 7.021084,
+}
+[18:15:56.387] ERROR (#26): Execution operation failed {
+  domain: "cli",
+  operation: "http.request",
+  outcome: "failure",
+  duration_ms: 3.141666,
+}
+[18:15:56.393] INFO (#30): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.capture",
+  outcome: "success",
+  duration_ms: 9.241,
+}
+[18:15:56.394] INFO (#29): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.capture",
+  outcome: "success",
+  duration_ms: 10.010666,
+}
+[18:15:56.396] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.child.stop",
+  outcome: "success",
+  duration_ms: 0.374625,
+}
+[18:15:56.396] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.child.release",
+  outcome: "success",
+  duration_ms: 0.591625,
+}
+[18:15:56.396] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.release",
+  outcome: "success",
+  duration_ms: 0.061375,
+}
+[18:15:56.396] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.scope",
+  outcome: "success",
+  duration_ms: 0.043166,
+}
+[18:15:56.397] INFO (#20): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.stop",
+  outcome: "success",
+  duration_ms: 1.371042,
+}
+[18:15:56.397] ERROR (#20): Execution operation failed {
+  domain: "cli",
+  operation: "dev.inspector.support",
+  outcome: "failure",
+  duration_ms: 21.634416,
+}
+(pass) a real Inspector child exit fails immediately and releases its owner [29.78ms]
+[18:15:56.402] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.probe.close",
+  outcome: "success",
+  duration_ms: 0.906167,
+}
+[18:15:56.403] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.start",
+  outcome: "success",
+  duration_ms: 4.555708,
+}
+[18:15:56.404] ERROR (#62): Execution operation failed {
+  domain: "cli",
+  operation: "http.request",
+  outcome: "failure",
+  duration_ms: 0.557166,
+}
+[18:15:56.411] INFO (#66): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.capture",
+  outcome: "success",
+  duration_ms: 6.892708,
+}
+[18:15:56.411] INFO (#65): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.capture",
+  outcome: "success",
+  duration_ms: 7.154083,
+}
+[18:15:56.411] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.child.stop",
+  outcome: "success",
+  duration_ms: 0.811334,
+}
+[18:15:56.411] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.child.release",
+  outcome: "success",
+  duration_ms: 0.898542,
+}
+[18:15:56.411] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.release",
+  outcome: "success",
+  duration_ms: 0.04425,
+}
+[18:15:56.411] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.output.scope",
+  outcome: "success",
+  duration_ms: 0.017667,
+}
+[18:15:56.411] INFO (#58): Execution operation completed {
+  domain: "cli",
+  operation: "dev.inspector.stop",
+  outcome: "success",
+  duration_ms: 1.192167,
+}
+(pass) shutdown while Inspector startup is pending joins the real child and output readers [13.96ms]
+
+scripts/tests/dev-readiness/bootstrap-imports.test.ts:
+(pass) packaged snapshot hits keep checking and bundling behind dynamic miss imports [1197.01ms]
+
+packages/cli/tests/dev-snapshot/input-watch.test.ts:
+(pass) installed-input registration never recursively walks unrelated dependencies or runtime state [8.82ms]
+(skip) native input observation invalidates after changing src/deep/helper.ts
+(skip) native input observation invalidates after changing src/new/deeper/helper.ts
+(skip) native input observation invalidates after changing new-source/helper.ts
+(skip) native input observation invalidates after changing node_modules/library/types/index.d.ts
+(skip) native input observation invalidates after changing node_modules/library/absent/nested.d.ts
+(pass) partial registration failures close every previously acquired native watcher [4.45ms]
+(pass) escaped member/query paths and external installed links reject registration [6.22ms]
+(pass) preflight refuses unauthenticated receipt bytes before trusting their watch inventory [4.55ms]
+
+ 13 pass
+ 5 skip
+ 0 fail
+ 44 expect() calls
+Ran 18 tests across 6 files. [2.68s]
+
+ RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+
+
+ Test Files  3 passed (3)
+      Tests  11 passed (11)
+   Start at  21:15:58
+   Duration  2.09s (import 52%, transform 46%, tests 2%)
+

@@ -1,0 +1,133 @@
+{
+  "status": "verified",
+  "what": "Inspector silently showed old routes and API reference after a failed development reload.",
+  "expected": "Keep working routes visible and display a persistent reload error with its cause and recovery steps.",
+  "observed": "The live routes page showed connected and one hello route despite many failed reloads; diagnostics returned no errors.",
+  "root_cause": "apps/inspector/app/inspector-shell.tsx used only the active child graph connection for status. Failed reloads belong to the CLI supervisor; the active child diagnostics remain empty. No shell component consumed retained dev.generation.failed logs or startup failures.",
+  "fixed_by": "Added a global failure banner backed by retained supervisor logs. It explains the previous version is serving, provides Docker-specific recovery, correlates startup errors to the failed build window, links filtered error logs, and clears on a later dev.generation.active record. Supporting-detail failures do not hide the main failure. Verified against the real logistic-platform-3 backend in the source Inspector.",
+  "files": [
+    "apps/inspector/app/inspector-shell.tsx",
+    "apps/inspector/app/development-failure-banner.tsx",
+    "apps/inspector/lib/development-failure.ts",
+    "apps/inspector/lib/use-development-failure.ts",
+    "apps/inspector/lib/development-failure.test.tsx"
+  ],
+  "environment": {
+    "url": "http://127.0.0.1:3215/routes",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "role": "local developer",
+    "framework": "Next.js 16.3.8, React 19.2.8",
+    "package": "apps/inspector"
+  },
+  "reproduction": [
+    "Observe a failed reload while the previous hello backend stays active.",
+    "Open the routes page; the original Inspector shows connected without explaining the failure.",
+    "Open the edited source Inspector against the same backend; assert failure cause and stale routes notice.",
+    "Follow View error logs and inspect the same startup failure; check 390px viewport for overflow."
+  ],
+  "evidence": {
+    "before": [
+      {
+        "kind": "screenshot",
+        "path": "evidence/001/before.png",
+        "note": "Original routes page had no reload failure warning."
+      },
+      {
+        "kind": "assertion",
+        "path": "evidence/001/browser-assertions.json",
+        "note": "Before and after browser observations."
+      }
+    ],
+    "after": [
+      {
+        "kind": "screenshot",
+        "path": "evidence/001/after.png",
+        "note": "Real startup failure and stale API warning."
+      },
+      {
+        "kind": "screenshot",
+        "path": "evidence/001/after-mobile.png",
+        "note": "Recovery steps fit at 390px."
+      }
+    ]
+  },
+  "verification": {
+    "browser": {
+      "status": "passed",
+      "assertion": "The failed-reload banner includes real startup errors, leaves hello routes visible, and opens error-filtered logs.",
+      "steps": [
+        "Open routes with the same backend.",
+        "Assert alert, retention error, stale-docs notice and existing route.",
+        "Follow error logs and verify the retention detail."
+      ]
+    },
+    "checks": [
+      {
+        "name": "inspector-tests",
+        "command": "bun test apps/inspector/lib --max-concurrency 1",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/inspector-tests.txt"
+      },
+      {
+        "name": "boundaries",
+        "command": "bun run check",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/boundaries.txt"
+      },
+      {
+        "name": "lint",
+        "command": "bun run lint",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/lint.txt"
+      },
+      {
+        "name": "format",
+        "command": "bun x prettier --check affected files",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/format.txt"
+      },
+      {
+        "name": "react-doctor",
+        "command": "bun x react-doctor@latest apps/inspector --scope files --base HEAD --include-untracked --no-parallel --no-score --no-supply-chain",
+        "status": "passed",
+        "exit_code": 0,
+        "output": "evidence/001/react-doctor.txt"
+      },
+      {
+        "name": "typecheck",
+        "status": "pre-existing",
+        "baseline": "evidence/001/typecheck-baseline.json",
+        "output": "evidence/001/typecheck-current.json",
+        "reason": "Strict scoped TypeScript baseline and edited code both report the same 10 existing dependency errors; comparison found no new errors."
+      }
+    ],
+    "regressions": [
+      {
+        "assertion": "390px layout has no horizontal overflow and recovery text remains visible.",
+        "status": "passed",
+        "output": "evidence/001/browser-assertions.json"
+      },
+      {
+        "assertion": "Next compilation and runtime errors are empty.",
+        "status": "passed",
+        "output": "evidence/001/next-runtime.json"
+      }
+    ],
+    "limitations": [
+      "The installed CLI Inspector on 3210 was not replaced; live adoption requires the user-approved restart with local sources.",
+      "Standalone Scalar reference HTML is outside the Inspector shell.",
+      "Full repository acceptance and release packaging were not run."
+    ]
+  },
+  "notes": [
+    "Temporary source Inspector on 3215 and its isolated browser were stopped. Existing project dev process and Docker service were preserved.",
+    "Related generated-runtime environment defect: bf-7f526e3acf6ba0725c7b9d36."
+  ]
+}

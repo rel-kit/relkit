@@ -1,0 +1,9 @@
+{
+  "pid": 58694,
+  "app": "/Users/mustafaelsayed/Workspace/typescripts/logistic-platform-3",
+  "sourceCli": "/Users/mustafaelsayed/Workspace/relkit/packages/cli/src/bin.ts",
+  "sourceInspector": "/Users/mustafaelsayed/Workspace/relkit/apps/inspector",
+  "leaveRunningAuthorized": true,
+  "inspectorPid": 58981,
+  "inspectorStartedSeparately": "Contributor Next source compilation exceeded CLI five-second readiness; prebuilt production Inspector is not under test."
+}

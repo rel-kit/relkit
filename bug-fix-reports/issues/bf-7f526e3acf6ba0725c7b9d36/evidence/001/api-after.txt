@@ -1,0 +1,10 @@
+bun test v1.3.10 (30e609e0)
+
+packages/cli/environment-runtime.test.ts:
+(pass) the emitted HTTP server supplies decoded dotenv values to application functions [1141.78ms]
+(pass) the emitted server rejects missing production environment before provider startup [2391.39ms]
+
+ 2 pass
+ 0 fail
+ 4 expect() calls
+Ran 2 tests across 1 file. [3.83s]
