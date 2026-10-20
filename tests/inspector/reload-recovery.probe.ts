@@ -8,7 +8,7 @@ import { recoveryFixture, recoveryInspector } from "../../scripts/test-inspector
 import { scaffoldChild } from "../../scripts/scaffold-process";
 
 const repository = resolve(import.meta.dirname, "../..");
-const evidence = resolve(process.env.RELKIT_RECOVERY_EVIDENCE_DIR ?? ".relkit/reload-recovery");
+const evidence = join(repository, ".relkit/reload-recovery");
 const sessionName = `relkit-reload-recovery-${process.pid}`;
 const inspector = join(repository, "apps/inspector");
 const nextEnvPath = join(inspector, "next-env.d.ts");
