@@ -17,6 +17,11 @@ export const generatorProviders = [
   "@relkit/inngest",
   "@relkit/trigger",
   "@relkit/effect-mq",
+  "@relkit/better-auth",
+  "@relkit/cloudflare",
+  "@relkit/drizzle",
+  "@relkit/redis",
+  "@relkit/s3",
 ] as const;
 
 /** The root release number identifies a batch independently of individual package versions. */
