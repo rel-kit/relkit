@@ -63,11 +63,25 @@ test("publisher resumes exact archives, skips completed packages, and protects l
       else if (args[0] === "view" && args[1].includes("@>")) { if (state.newer !== false) console.log(JSON.stringify("9.0.0")); }
       else if (args[0] === "view") {
         const integrity = state.published[args[1]];
+        if (state.stale === args[1]) {
+          delete state.stale;
+          writeFileSync(process.env.STATE, JSON.stringify(state));
+          console.error("npm error E404 Not Found"); process.exit(1);
+        }
+        if (state.defer && integrity && Object.keys(state.published).length < manifest.packages.length) {
+          console.error("visibility checks blocked the next submission"); process.exit(2);
+        }
         if (integrity) console.log(JSON.stringify(integrity));
         else { console.error("npm error E404 Not Found"); process.exit(1); }
       } else if (args[0] === "publish") {
         const artifact = manifest.packages.find((item) => item.file === basename(args[1]));
         state.calls.push(args);
+        if (state.duplicate && state.published[artifact.name + "@" + artifact.version]) {
+          writeFileSync(process.env.STATE, JSON.stringify(state));
+          console.error("npm error E403 You cannot publish over the previously published versions: " + artifact.version);
+          process.exit(1);
+        }
+        if (state.denied) { console.error("npm error E403 permission denied"); process.exit(1); }
         state.published[artifact.name + "@" + artifact.version] = artifact.integrity;
         writeFileSync(process.env.STATE, JSON.stringify(state));
         console.log("accepted original archive");
@@ -75,11 +89,14 @@ test("publisher resumes exact archives, skips completed packages, and protects l
     `,
     );
     await chmod(npm, 0o755);
-    const execute = async () => {
+    const clock = join(temporary, "clock.mjs");
+    await writeFile(clock, "let time = 0; Date.now = () => time += 300000;\n");
+    const execute = async (advanceClock = false) => {
       const child = Bun.spawn(
         [
           "node",
           "--experimental-strip-types",
+          ...(advanceClock ? ["--import", clock] : []),
           resolve(import.meta.dir, "../../scripts/publish-release.ts"),
           "--directory",
           temporary,
@@ -131,6 +148,36 @@ test("publisher resumes exact archives, skips completed packages, and protects l
     const conflict = await execute();
     expect(conflict.code).not.toBe(0);
     expect(conflict.output).toContain("Registry integrity mismatch");
+    state = { published: {}, calls: [], defer: true, newer: false };
+    await writeFile(statePath, JSON.stringify(state));
+    const delayed = await execute();
+    expect(delayed.output).not.toContain("visibility checks blocked");
+    expect(delayed.code).toBe(0);
+    state = JSON.parse(await readFile(statePath, "utf8"));
+    expect(state.calls.map((args: string[]) => args[1])).toEqual([
+      join(temporary, artifacts[0]!.file),
+      join(temporary, artifacts[1]!.file),
+    ]);
+    state.stale = "@relkit/schema@0.8.1";
+    state.duplicate = true;
+    await writeFile(statePath, JSON.stringify(state));
+    expect((await execute()).code).toBe(0);
+    state = JSON.parse(await readFile(statePath, "utf8"));
+    expect(state.calls).toHaveLength(3);
+    state.published["@relkit/schema@0.8.1"] = "sha512-conflict";
+    state.stale = "@relkit/schema@0.8.1";
+    await writeFile(statePath, JSON.stringify(state));
+    expect((await execute()).output).toContain("integrity mismatch");
+    state = { published: {}, calls: [], denied: true };
+    await writeFile(statePath, JSON.stringify(state));
+    const denied = await execute();
+    expect(denied.code).not.toBe(0);
+    expect(denied.output).toContain("permission denied");
+    state = { published: {}, calls: [] };
+    await writeFile(statePath, JSON.stringify(state));
+    const expired = await execute(true);
+    expect(expired.code).not.toBe(0);
+    expect(expired.output).toContain("publication deadline");
     await writeFile(join(temporary, artifacts[1]!.file), "different rebuild bytes");
     expect(() => readManifest(temporary)).toThrow("checksum mismatch");
   } finally {

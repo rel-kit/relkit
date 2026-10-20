@@ -67,3 +67,51 @@ test("an immutable registry integrity mismatch fails immediately", async () => {
   ).rejects.toThrow("integrity mismatch");
   expect(pauses).toBe(0);
 });
+
+test("53 packages share propagation waits instead of adding a wait per package", async () => {
+  const train = Array.from({ length: 53 }, (_, index) => ({
+    name: `@relkit/package-${index}`,
+    version: "1.0.0",
+    integrity: `sha512-${index}`,
+  }));
+  const attempts = new Map<string, number>();
+  let pauses = 0;
+  await verifyPublishedPackages(
+    train,
+    (artifact) => {
+      const attempt = (attempts.get(artifact.name) ?? 0) + 1;
+      attempts.set(artifact.name, attempt);
+      return attempt < 90 ? undefined : artifact.integrity;
+    },
+    async () => {
+      pauses++;
+    },
+  );
+  expect(pauses).toBe(89);
+});
+
+test("a missing first package cannot hide another package's immutable conflict", async () => {
+  await expect(
+    verifyPublishedPackages(
+      packages,
+      (artifact) => (artifact.name === "relkit" ? "sha512-conflict" : undefined),
+      async () => {},
+    ),
+  ).rejects.toThrow("integrity mismatch: relkit@0.7.6");
+});
+
+test("slow registry requests consume one wall clock budget for the whole train", async () => {
+  let time = 0;
+  await expect(
+    verifyPublishedPackages(
+      packages,
+      () => {
+        time += 100_000;
+        return undefined;
+      },
+      async () => {},
+      () => time,
+    ),
+  ).rejects.toThrow("unavailable");
+  expect(time).toBeLessThanOrEqual(1_000_000);
+});

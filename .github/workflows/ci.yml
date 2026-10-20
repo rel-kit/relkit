@@ -220,6 +220,9 @@ jobs:
       - name: Pin the npm trusted-publishing client
         run: npm install --global npm@11.19.0
       - name: Publish missing original archives in dependency order
+        # The publisher has a 25-minute total budget and one shared 15-minute
+        # visibility window, leaving time to preserve diagnostics and release assets.
+        timeout-minutes: 30
         env:
           NPM_RELEASES_ENABLED: ${{ vars.NPM_RELEASES_ENABLED }}
           GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}

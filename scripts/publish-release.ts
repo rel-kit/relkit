@@ -5,6 +5,7 @@ import { readManifest, type Artifact, type Manifest } from "./release-manifest.t
 
 let logFile: string | undefined;
 const visibilityAttempts = 180;
+let publicationDeadline = Infinity;
 
 function argument(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -12,9 +13,14 @@ function argument(name: string): string | undefined {
 }
 
 function run(args: string[], allowNotFound = false): string | undefined {
+  const remaining = publicationDeadline - Date.now();
+  if (remaining <= 0)
+    throw new Error(
+      "Release publication deadline (25 minutes) exceeded. Resume with the original release artifacts; inspect publish.log.",
+    );
   const result = spawnSync("npm", args, {
     encoding: "utf8",
-    timeout: 30_000,
+    timeout: Math.min(30_000, remaining),
     maxBuffer: 8 * 1024 * 1024,
   });
   if (logFile)
@@ -23,7 +29,7 @@ function run(args: string[], allowNotFound = false): string | undefined {
       `npm ${args.join(" ")} (${result.status})\n${result.stdout ?? ""}${result.stderr ?? ""}\n`,
     );
   if (result.status === 0) return result.stdout.trim();
-  const output = `${result.stdout}${result.stderr}`;
+  const output = `${result.stdout ?? ""}${result.stderr ?? ""}${result.error ? `\n${result.error.message}` : ""}`;
   if (allowNotFound && /E404|404 Not Found/.test(output)) return undefined;
   throw new Error(`npm ${args.join(" ")} failed (${result.status}):\n${output}`);
 }
@@ -54,23 +60,30 @@ export async function verifyPublishedPackages(
   packages: readonly PublishedPackage[],
   lookup: (artifact: PublishedPackage) => string | undefined | Promise<string | undefined>,
   pause: () => Promise<void> = () => new Promise((resolve) => setTimeout(resolve, 5_000)),
+  now: () => number = Date.now,
+  report: (pending: number) => void = () => {},
 ): Promise<void> {
-  for (const artifact of packages) {
-    let integrity: string | undefined;
-    for (let attempt = 0; attempt < visibilityAttempts; attempt++) {
-      integrity = await lookup(artifact);
-      if (integrity !== undefined) break;
-      if (attempt + 1 < visibilityAttempts) await pause();
+  const pending = new Set(packages);
+  const deadline = now() + 900_000;
+  rounds: for (let attempt = 0; attempt < visibilityAttempts && pending.size > 0; attempt++) {
+    for (const artifact of pending) {
+      if (now() >= deadline) break rounds;
+      const integrity = await lookup(artifact);
+      if (now() >= deadline) break rounds;
+      if (integrity === undefined) continue;
+      if (integrity !== artifact.integrity)
+        throw new Error(
+          `Registry integrity mismatch: ${artifact.name}@${artifact.version}; expected ${artifact.integrity}, received ${integrity}. The immutable version cannot be overwritten.`,
+        );
+      pending.delete(artifact);
     }
-    if (integrity === undefined)
-      throw new Error(
-        `Published package unavailable after bounded retries: ${artifact.name}@${artifact.version}. Resume with the original release artifacts; inspect publish.log.`,
-      );
-    if (integrity !== artifact.integrity)
-      throw new Error(
-        `Registry integrity mismatch: ${artifact.name}@${artifact.version}; expected ${artifact.integrity}, received ${integrity}. The immutable version cannot be overwritten.`,
-      );
+    report(pending.size);
+    if (pending.size > 0 && attempt + 1 < visibilityAttempts && now() < deadline) await pause();
   }
+  if (pending.size > 0)
+    throw new Error(
+      `Published packages unavailable after the shared 15-minute visibility window: ${[...pending].map((item) => `${item.name}@${item.version}`).join(", ")}. Resume with the original release artifacts; inspect publish.log.`,
+    );
 }
 
 function requirePublishingContext(manifest: Manifest): void {
@@ -92,8 +105,20 @@ async function main(): Promise<void> {
   const directory = resolve(directoryOption);
   const manifest = readManifest(directory);
   if (process.argv.includes("--publish")) {
-    requirePublishingContext(manifest);
     logFile = join(directory, "publish.log");
+    publicationDeadline = Date.now() + 1_500_000;
+    requirePublishingContext(manifest);
+    const batch = new Set(manifest.packages.map((artifact) => artifact.name));
+    const checkedDependencies = new Set<string>();
+    for (const artifact of manifest.packages) {
+      for (const [name, version] of Object.entries(artifact.dependencies ?? {})) {
+        const key = `${name}@${version}`;
+        if (batch.has(name) || checkedDependencies.has(key)) continue;
+        if (publishedIntegrity({ name, version, integrity: "" }) === undefined)
+          throw new Error(`Unreleased dependency: ${artifact.name} requires ${key}`);
+        checkedDependencies.add(key);
+      }
+    }
     for (const artifact of manifest.packages) {
       const existing = publishedIntegrity(artifact);
       if (existing !== undefined) {
@@ -101,12 +126,6 @@ async function main(): Promise<void> {
           throw new Error(`Registry integrity mismatch for ${artifact.name}@${artifact.version}`);
         console.log(`verified ${artifact.name}@${artifact.version}`);
         continue;
-      }
-      for (const [name, version] of Object.entries(artifact.dependencies ?? {})) {
-        const dependency = manifest.packages.find((item) => item.name === name);
-        if (dependency) await verifyPublishedPackages([dependency], publishedIntegrity);
-        else if (publishedIntegrity({ name, version, integrity: "" }) === undefined)
-          throw new Error(`Unreleased dependency: ${artifact.name} requires ${name}@${version}`);
       }
       // A historical recovery may fill missing exact versions, but must never lower latest.
       const newer = run(
@@ -120,22 +139,49 @@ async function main(): Promise<void> {
         ],
         true,
       );
-      run([
-        "publish",
-        join(directory, artifact.file),
-        "--access",
-        "public",
-        "--tag",
-        newer === undefined || newer === "" || newer === "[]"
-          ? "latest"
-          : `release-${manifest.version}`,
-        "--provenance",
-      ]);
-      console.log(`Submitted ${artifact.name}@${artifact.version}; checking registry visibility`);
-      await verifyPublishedPackages([artifact], publishedIntegrity);
-      console.log(`Verified published ${artifact.name}@${artifact.version}`);
+      try {
+        run([
+          "publish",
+          join(directory, artifact.file),
+          "--access",
+          "public",
+          "--tag",
+          newer === undefined || newer === "" || newer === "[]"
+            ? "latest"
+            : `release-${manifest.version}`,
+          "--provenance",
+        ]);
+      } catch (cause) {
+        // npm can reject an already accepted version while public metadata still returns 404.
+        if (
+          !(cause instanceof Error) ||
+          !/\bE403\b/.test(cause.message) ||
+          !/cannot publish over the previously published versions/i.test(cause.message)
+        )
+          throw cause;
+        console.log(
+          `Already submitted ${artifact.name}@${artifact.version}; deferring integrity verification`,
+        );
+      }
+      console.log(`Submitted ${artifact.name}@${artifact.version}; continuing in dependency order`);
     }
-    await verifyPublishedPackages(manifest.packages, publishedIntegrity);
+    let lastPending = -1,
+      lastReport = 0;
+    await verifyPublishedPackages(
+      manifest.packages,
+      publishedIntegrity,
+      undefined,
+      Date.now,
+      (pending) => {
+        if (pending !== lastPending || Date.now() - lastReport >= 60_000) {
+          console.log(
+            `Registry visibility: ${manifest.packages.length - pending}/${manifest.packages.length} verified; ${pending} pending (one shared 15-minute deadline)`,
+          );
+          lastPending = pending;
+          lastReport = Date.now();
+        }
+      },
+    );
     console.log(
       `verified all ${manifest.packages.length} published packages for ${manifest.version}`,
     );
@@ -144,4 +190,11 @@ async function main(): Promise<void> {
   }
 }
 
-if (import.meta.main) await main();
+if (import.meta.main) {
+  try {
+    await main();
+  } catch (cause) {
+    if (logFile) appendFileSync(logFile, `Publication failed: ${String(cause)}\n`);
+    throw cause;
+  }
+}
