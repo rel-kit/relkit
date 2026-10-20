@@ -105,6 +105,8 @@ jobs:
         run: |
           test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
           test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$VERIFIED_SHA"
+      - name: Restore the local Changesets base branch
+        run: git branch --force main "$GITHUB_SHA"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"

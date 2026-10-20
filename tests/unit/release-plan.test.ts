@@ -130,6 +130,42 @@ test("real Changesets versions only the generator and its two dependents", async
       new Response(lock.stderr).text(),
     ]);
     expect(lockCode, lockOut + lockError).toBe(0);
+    execFileSync("git", ["checkout", "--detach", "HEAD"], { cwd: fixture, stdio: "ignore" });
+    execFileSync("git", ["branch", "-D", "main"], { cwd: fixture, stdio: "ignore" });
+    const detached = Bun.spawn([process.execPath, "scripts/version-packages.ts", "--check"], {
+      cwd: fixture,
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const [detachedCode, detachedOut, detachedError] = await Promise.all([
+      detached.exited,
+      new Response(detached.stdout).text(),
+      new Response(detached.stderr).text(),
+    ]);
+    expect(detachedCode).not.toBe(0);
+    expect(detachedOut + detachedError).toContain('HEAD diverged from "main"');
+    const workflow = Bun.YAML.parse(await readFile(join(root, ".github/workflows/ci.yml"), "utf8"));
+    const restore = workflow.jobs.version.steps.find(
+      (step: { name?: string }) => step.name === "Restore the local Changesets base branch",
+    );
+    expect(restore).toBeDefined();
+    const versionStep = workflow.jobs.version.steps.find((step: { uses?: string }) =>
+      step.uses?.startsWith("changesets/action/version@"),
+    );
+    expect(workflow.jobs.version.steps.indexOf(restore)).toBeLessThan(
+      workflow.jobs.version.steps.indexOf(versionStep),
+    );
+    execFileSync("sh", ["-c", restore.run], {
+      cwd: fixture,
+      env: {
+        ...process.env,
+        GITHUB_SHA: execFileSync("git", ["rev-parse", "HEAD"], {
+          cwd: fixture,
+          encoding: "utf8",
+        }).trim(),
+      },
+      stdio: "ignore",
+    });
     const child = Bun.spawn([process.execPath, "scripts/version-packages.ts"], {
       cwd: fixture,
       stdout: "pipe",
