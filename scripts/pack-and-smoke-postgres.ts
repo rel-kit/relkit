@@ -20,8 +20,8 @@ try {
   if (configured !== undefined) tarballs = await loadReleaseTarballs(directory);
   else {
     const items = await packages();
-    const { version } = checkManifests(items, await readJson(join(root, "package.json")));
-    const artifacts = await packAll(items, version, directory);
+    checkManifests(items, await readJson(join(root, "package.json")));
+    const artifacts = await packAll(items, directory);
     tarballs = new Map(
       artifacts.map((artifact) => [String(artifact.name), join(directory, String(artifact.file))]),
     );

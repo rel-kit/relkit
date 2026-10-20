@@ -73,15 +73,13 @@ async function stagePackages(items: PackageInfo[]): Promise<string> {
     throw error;
   }
 }
-export async function packAll(
-  items: PackageInfo[],
-  version: string,
-  destination: string,
-): Promise<RecordValue[]> {
+export async function packAll(items: PackageInfo[], destination: string): Promise<RecordValue[]> {
   await mkdir(destination, { recursive: true });
   const ordered = publicationOrder(items);
   const rootManifest = await readJson(join(root, "package.json"));
-  const workspaceNames = new Set(items.map((item) => item.name));
+  const workspaceVersions = new Map(
+    items.map((item) => [item.name, String(item.manifest.version)]),
+  );
   const staging = await stagePackages(ordered);
   try {
     const artifacts: RecordValue[] = [];
@@ -107,7 +105,7 @@ export async function packAll(
         (await readFile(join(root, "LICENSE"), "utf8"))
       )
         throw new Error(`Packed license mismatch: ${item.name}`);
-      assertPackedDependencies(item.manifest, packed, rootManifest, workspaceNames, version);
+      assertPackedDependencies(item.manifest, packed, rootManifest, workspaceVersions);
       if (JSON.stringify(stable(packed.relkit)) !== JSON.stringify(stable(item.manifest.relkit)))
         throw new Error(`Packed RELKIT metadata mismatch: ${item.name}`);
       if (JSON.stringify(stable(packed.files)) !== JSON.stringify(stable(item.manifest.files)))
@@ -117,11 +115,17 @@ export async function packAll(
       const sha512 = digest(bytes, "sha512");
       artifacts.push({
         name: item.name,
-        version,
+        version: String(item.manifest.version),
         file,
         sha256: digest(bytes),
         sha512,
         integrity: `sha512-${Buffer.from(sha512, "hex").toString("base64")}`,
+        dependencies: Object.fromEntries(
+          Object.entries({
+            ...packed.dependencies,
+            ...packed.optionalDependencies,
+          }).filter(([name]) => workspaceVersions.has(name)),
+        ),
       });
     }
     return artifacts;

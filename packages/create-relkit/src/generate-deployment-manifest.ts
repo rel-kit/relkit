@@ -7,6 +7,7 @@ import { GenerateProjectError } from "./generate-types.js";
 import { domainError, domainTry } from "./generator-errors.js";
 import { TemplateManifest, JsonObject } from "./project-manifest.schemas.js";
 import type { CreateOptions } from "./options.js";
+import { buildCatalogProvider } from "./build-catalog.js";
 
 /** Applies the original validated manifest patch while preserving unrelated native JSON fields.
  * @param root - Owned staged project root.
@@ -43,13 +44,18 @@ export const customizeDeploymentManifestEffect = Effect.fn(
           ),
         ),
       );
-    if (options.cloud === "aws") manifest.dependencies["@relkit/aws"] = version;
-    if (options.deploy === "pulumi") manifest.dependencies["@relkit/pulumi"] = version;
+    const providers: string[] = [];
+    if (options.cloud === "aws") providers.push("@relkit/aws");
+    if (options.deploy === "pulumi") providers.push("@relkit/pulumi");
     if (options.jobs !== undefined) {
-      manifest.dependencies["@relkit/docker"] = version;
-      manifest.dependencies["@relkit/local"] = version;
-      manifest.dependencies[`@relkit/${options.jobs.replace(/-docker$/u, "")}`] = version;
+      providers.push(
+        "@relkit/docker",
+        "@relkit/local",
+        `@relkit/${options.jobs.replace(/-docker$/u, "")}`,
+      );
     }
+    for (const provider of providers)
+      manifest.dependencies[provider] = yield* domainTry(() => buildCatalogProvider(provider));
     if (options.cloud === "aws" && options.deploy === "pulumi") {
       manifest.scripts["deploy:preview"] = "relkit deploy preview";
       manifest.scripts.deploy = "relkit deploy up";

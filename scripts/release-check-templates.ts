@@ -13,13 +13,13 @@ import { resolveCatalogVersion } from "./catalog-manifest.js";
 
 /**
  * Checks standalone template contracts and hashes their complete source trees.
- * @param version - Exact first-party release version.
+ * @param versions - Exact first-party package versions.
  * @param rootManifest - Root manifest owning tooling catalogs.
  * @returns Deterministic template file counts and hashes.
  * @throws When scripts, versions, or application import boundaries diverge.
  */
 export async function templateInputs(
-  version: string,
+  versions: ReadonlyMap<string, string>,
   rootManifest: RecordValue,
 ): Promise<RecordValue[]> {
   const result: RecordValue[] = [];
@@ -32,7 +32,7 @@ export async function templateInputs(
     const manifest = await readJson(join(directory, "package.json"));
     for (const field of packageFields)
       for (const [dependency, spec] of Object.entries(manifest[field] ?? {}))
-        if (dependency.startsWith("@relkit/") && spec !== version)
+        if (dependency.startsWith("@relkit/") && spec !== versions.get(dependency))
           throw new Error(`Template ${name} has incompatible ${dependency}@${spec}`);
     if (
       manifest.packageManager !== rootManifest.packageManager ||

@@ -74,8 +74,7 @@ export function resolveDependencyFields(
  * @param source - Source package manifest.
  * @param packed - Actual package manifest read from its tarball.
  * @param rootManifest - Root manifest that owns source catalogs.
- * @param workspaceNames - First-party package names that resolve to the release.
- * @param version - Exact first-party release version.
+ * @param workspaceVersions - Exact version of each first-party dependency.
  * @returns Nothing when every dependency field matches.
  * @throws When an entry is missing, added, unresolved, or changed during packing.
  */
@@ -83,14 +82,13 @@ export function assertPackedDependencies(
   source: CatalogManifest,
   packed: CatalogManifest,
   rootManifest: CatalogManifest,
-  workspaceNames: ReadonlySet<string>,
-  version: string,
+  workspaceVersions: ReadonlyMap<string, string>,
 ): void {
   const expected = resolveDependencyFields(source, rootManifest);
   const actual = resolveDependencyFields(packed, {});
   for (const field of dependencyFields) {
     for (const [name, spec] of Object.entries(expected[field])) {
-      const resolved = workspaceNames.has(name) ? version : spec;
+      const resolved = workspaceVersions.get(name) ?? spec;
       if (actual[field][name] !== resolved)
         throw new Error(
           `Packed dependency mismatch: ${source.name} -> ${name}@${actual[field][name]}`,

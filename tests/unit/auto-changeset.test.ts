@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import {
   affectedPackages,
+  changesetPackages,
   changedPathArguments,
   hasCurrentChangeset,
   isChangeset,
@@ -38,7 +39,7 @@ test("release paths map to their published packages", () => {
   ]);
 });
 
-test("shared packaged inputs release the fixed train", () => {
+test("shared packaged inputs conservatively release all affected packages", () => {
   expect(affectedPackages(["LICENSE"], packages)).toEqual([
     "@relkit/app",
     "@relkit/cli",
@@ -47,6 +48,9 @@ test("shared packaged inputs release the fixed train", () => {
     "@relkit/schema",
     "create-relkit",
   ]);
+  expect(affectedPackages(["package.json"], packages)).toEqual(
+    affectedPackages(["LICENSE"], packages),
+  );
 });
 
 test("Changesets are detected and rendered deterministically", () => {
@@ -71,4 +75,11 @@ test("a deleted Changeset does not satisfy release policy", () => {
   const paths = [".changeset/deleted.md", ".changeset/current.md"];
   expect(hasCurrentChangeset(paths, (path) => path.endsWith("current.md"))).toBe(true);
   expect(hasCurrentChangeset([paths[0]!], () => false)).toBe(false);
+});
+
+test("manual release intent only covers packages actually declared in frontmatter", () => {
+  expect(
+    changesetPackages('---\n"@relkit/schema": minor\nrelkit: major\n---\n\n"@relkit/cli": patch\n'),
+  ).toEqual(["@relkit/schema", "relkit"]);
+  expect(changesetPackages("---\n---\n\nEmpty.")).toEqual([]);
 });

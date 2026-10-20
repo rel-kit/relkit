@@ -24,8 +24,12 @@ provides an isolated environment.
 
 ## Changesets
 
-`bun run version:packages` certifies the new release after synchronizing package
-and template versions. It records 20 fresh starts and 20 restarts from packed
+`bun run version:packages` records the exact package/version list in
+`.changeset/release.json` after applying Changesets and synchronizing template
+pins. Packages have independent versions; the root changelog and `v` tag number
+identify the release batch, not a version shared by every package. When the
+generator is in that batch, versioning certifies it with 20 fresh starts and
+20 restarts from packed
 packages, including restart preparation, and requires every complete correct
 response and clean shutdown within the existing 30-second terminal deadline
 before updating the creation allow-list. Failed functional certification
@@ -66,18 +70,69 @@ checkpoint, and fixture cleanup regression checks shared by CI and pre-push.
 The certification step has a shorter deadline than its job so failure artifacts
 can still upload when a native setup operation stalls.
 
-Successful dispatched release-PR CI owns the publication handoff independently
-of the versioning job. After publishing its actual CI Gate status, it waits
-briefly for the reviewed PR to merge and explicitly dispatches CI for the exact
-merge commit when no main CI run exists. Dispatched main CI explicitly starts
-Release with its own run ID and commit. Release waits for that run to finish and
-requires its real successful conclusion before packing or publication. These
-dispatches handle bot events that suppress both push and downstream workflow
-triggers. Ordinary main pushes retain the existing `workflow_run` path.
-For recovery, dispatch CI on `main`; its successful completion resumes release
-selection. Publishing verifies every package's registry integrity before the
-GitHub release is declared complete. Later CI-only or documentation changes skip
-an already completed release instead of rebuilding and republishing its version.
+The release GitHub App creates and updates release PRs and enables auto-merge.
+Normal pull-request CI must pass before merging; the App's merge then triggers
+normal main CI. Successful main CI starts Release for the exact verified commit.
+Superseded CI commits are skipped. Manually dispatched main CI can also explicitly
+start Release, which verifies the CI run's actual successful conclusion.
+
+Publishing validates the complete local packed closure, then saves and publishes
+only the packages in the reviewed batch, in dependency order. First-party
+dependencies retain their own exact versions. Template dependency and optional
+provider changes also release the generator because those pins are bundled
+assets. Root package/catalog changes conservatively release the whole workspace;
+patch and catalog-builder changes release their metadata owners. Existing
+package versions are checked against the original tarball integrity and never
+overwritten. A package is considered published only after registry verification.
+
+### GitHub App setup
+
+1. Register a GitHub App owned by `rel-kit`, for example **RELKIT Release**.
+   Disable webhooks; no webhook endpoint or user permissions are needed.
+2. Give it repository **Contents: read and write** and **Pull requests: read and
+   write** permissions. Metadata read access is automatic. No Actions, Workflows,
+   administration, or branch-protection bypass permission is needed.
+3. Install it on the `rel-kit/relkit` repository only. Generate a private key.
+4. Add repository Actions variable `RELEASE_APP_CLIENT_ID` with the App's client ID
+   (not its numeric App ID), and Actions secret `RELEASE_APP_PRIVATE_KEY` with the full
+   PEM private key. Never commit the key.
+5. Enable repository auto-merge and keep `CI Gate` required for `main`. The App
+   follows the existing merge requirements; it does not bypass them.
+
+Both automatic Changeset commits and release PR writes use repository-scoped,
+short-lived App tokens. Fork checks never receive the key. Missing configuration
+stops release PR generation with a setup error; there is no `GITHUB_TOKEN`
+fallback that would recreate approval-expired runs. npm continues to use OIDC
+trusted publishing in **ci.yml**, environment **npm**, with
+`NPM_RELEASES_ENABLED=true`; existing npm trusted-publisher settings stay in place.
+
+### Recover a partial release
+
+Use the original **Release** run ID, even after `main` advances:
+
+```sh
+gh workflow run ci.yml --repo rel-kit/relkit --ref main \
+  -f recovery_run_id=39413146882
+```
+
+The workflow checks that the source run belongs to this repository's main release
+workflow, completed, and successfully validated its archives. It requires the
+source commit to be an ancestor of current main, downloads the original artifact
+by ID, and independently checks its manifest and checksums. Recovery skips
+building and republishes only missing exact versions. It accepts historical v1
+manifests as well as scoped v2 manifests. A checksum or registry integrity conflict
+fails explicitly; recovery cannot replace an immutable npm version.
+
+Repeated CI for the same release commit automatically reuses its earlier
+successful pack. A new batch cannot be versioned while the preceding recorded
+batch remains unfinished. New release archives and npm diagnostics are retained
+for 30 days. Missing,
+expired, or ambiguous archives stop recovery; do not rebuild a partially published
+version. If a higher package version already exists, a recovered older package
+uses a batch-specific dist-tag instead of lowering `latest`. The GitHub release
+is completed only after all selected npm integrities match. Later CI-only or
+documentation changes skip completed batches. For an unfinished earlier batch,
+use recovery rather than packing it from a later commit.
 
 Pull requests from this repository automatically receive a patch Changeset when
 they touch a publishable package, the bundled templates, or the bundled
@@ -87,9 +142,11 @@ Markdown file because GitHub does not grant their workflows write access.
 
 Automatic Changesets are intentionally patch-only. Run `bun run changeset`
 before pushing when a public change requires a minor or major bump; automation
-preserves that explicit release intent. All public packages ship on one fixed
-version, so select the package whose public behavior changed rather than the
-whole workspace.
+preserves that explicit release intent and adds patch Changesets for uncovered
+changed packages without replacing authored files. Select the packages whose public behavior
+changed. Changesets includes required dependents; unrelated packages keep their
+versions. For example, a generator-only change releases `create-relkit`,
+`@relkit/cli`, and `relkit`, rather than the entire workspace.
 
 ## Bootstrap the unscoped CLI package
 

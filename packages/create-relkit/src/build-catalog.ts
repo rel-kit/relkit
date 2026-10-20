@@ -8,7 +8,15 @@ import type { DependencyPatchDescriptor } from "./dependency-patches.types.js";
  * @returns Its release-supported version without requiring the repository root at runtime.
  */
 export function buildCatalogDependency(name: string): string {
-  const version = record(buildCatalog().dependencies)[name];
+  return concreteVersion(record(buildCatalog().dependencies)[name], name);
+}
+
+/** Reads a selected provider's own version independently of the application API version. */
+export function buildCatalogProvider(name: string): string {
+  return concreteVersion(record(record(record(manifest).relkit).providerVersions)[name], name);
+}
+
+function concreteVersion(version: unknown, name: string): string {
   if (
     typeof version !== "string" ||
     !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/u.test(version)

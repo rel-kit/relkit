@@ -29,11 +29,10 @@ export const packBaselineArtifacts = Effect.fn("ReadinessBenchmark.packArtifacts
     if (source === undefined) throw new Error(`Built package has no declaration: ${name}`);
     return { ...source, name };
   });
-  const version = items[0]?.manifest.version;
-  if (version === undefined) return yield* Effect.die(new Error("No packages were built"));
+  if (items.length === 0) return yield* Effect.die(new Error("No packages were built"));
   const directory = join(temporary, "release-artifacts");
   const artifacts = yield* ownedNativePromise("benchmark.releasePack", () =>
-    packAll(items, version, directory),
+    packAll(items, directory),
   );
   const decode = Schema.decodeUnknownSync(
     Schema.Struct({ name: Schema.String, file: Schema.String }),

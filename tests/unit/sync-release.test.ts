@@ -18,6 +18,7 @@ test("release sync retains the CLI editor assets and remains idempotent", async 
       "catalog-manifest.types.ts",
       "build-catalog.ts",
       "build-catalog.types.ts",
+      "release-plan.ts",
     ])
       await copyFile(join(root, "scripts", file), join(fixture, "scripts", file));
     await copyFile(join(root, "package.json"), join(fixture, "package.json"));
@@ -43,12 +44,17 @@ test("release sync retains the CLI editor assets and remains idempotent", async 
       await mkdir(directory, { recursive: true });
       await copyFile(join(root, "packages", name, "package.json"), join(directory, "package.json"));
     }
+    const appPath = join(fixture, "packages/app/package.json");
+    const appSource = JSON.parse(await readFile(appPath, "utf8"));
+    appSource.version = "0.8.1";
+    await writeFile(appPath, JSON.stringify(appSource));
     for (const template of packedTemplates) {
       const directory = join(fixture, "templates/default/v1", template);
       await mkdir(directory, { recursive: true });
       await writeFile(
         join(directory, "package.json"),
         JSON.stringify({
+          dependencies: { "@relkit/app": "0.0.0" },
           devDependencies: { typescript: "0.0.0", "@types/bun": "catalog:" },
         }),
       );
@@ -92,6 +98,7 @@ test("release sync retains the CLI editor assets and remains idempotent", async 
       typescript: "5.9.3",
       "@types/bun": "1.3.10",
     });
+    expect(template.dependencies["@relkit/app"]).toBe("0.8.1");
     const check = Bun.spawn([process.execPath, "scripts/sync-release.ts"], {
       cwd: fixture,
       stdout: "pipe",

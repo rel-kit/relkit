@@ -89,13 +89,15 @@ export async function startRegistry(
   const rootManifest = JSON.parse(
     await readFile(resolve(import.meta.dir, "../package.json"), "utf8"),
   );
-  const workspaceNames = new Set(manifests.keys());
+  const workspaceVersions = new Map(
+    [...manifests].map(([name, item]) => [name, item.manifest.version]),
+  );
   for (const [name, path] of tarballs) {
     const packed = await readPackedManifest(path);
     const source = manifests.get(name)?.manifest;
     if (source === undefined || packed.name !== name || packed.version !== source.version)
       throw new Error(`Packed registry identity mismatch: ${name}`);
-    assertPackedDependencies(source, packed, rootManifest, workspaceNames, packed.version);
+    assertPackedDependencies(source, packed, rootManifest, workspaceVersions);
     packedManifests.set(name, packed);
     bytes.set(name, await readFile(path));
   }

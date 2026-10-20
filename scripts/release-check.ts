@@ -15,6 +15,7 @@ import {
   type RecordValue,
 } from "./release-check-support.js";
 import { packAll, templateInputs } from "./release-check-artifacts.js";
+import { readReleasePlan, selectReleasePackages } from "./release-plan.js";
 
 export function releaseNotes(data: RecordValue): string {
   const packageRows = (data.packages as RecordValue[])
@@ -89,8 +90,16 @@ async function main(): Promise<void> {
   await command(bun, ["run", "scripts/sync-release.ts"]);
   const items = await packages();
   const rootManifest = await readJson(join(root, "package.json"));
-  const { version, summary } = checkManifests(items, rootManifest);
-  const templates = await templateInputs(version, rootManifest);
+  const checked = checkManifests(items, rootManifest);
+  const plan = await readReleasePlan(root);
+  const selected = plan === undefined ? items : selectReleasePackages(items, plan);
+  const selectedNames = new Set(selected.map((item) => item.name));
+  const version = plan?.version ?? checked.version;
+  const summary = checked.summary.filter((item) => selectedNames.has(item.name));
+  const templates = await templateInputs(
+    new Map(items.map((item) => [item.name, String(item.manifest.version)])),
+    rootManifest,
+  );
   const input = {
     version,
     packageManager: rootManifest.packageManager,
@@ -141,7 +150,8 @@ async function main(): Promise<void> {
     ? resolve(configuredOutput)
     : await mkdtemp(join(tmpdir(), "relkit-release-artifacts-"));
   try {
-    const artifacts = await packAll(items, version, artifactRoot);
+    const validationArtifacts = await packAll(items, artifactRoot);
+    const artifacts = validationArtifacts.filter((item) => selectedNames.has(item.name));
     const commit = (await command("git", ["rev-parse", "HEAD"])).trim();
     const data = {
       ...input,
@@ -150,13 +160,13 @@ async function main(): Promise<void> {
       artifacts,
     };
     const manifest = {
-      protocol: "relkit.release-manifest.v1",
+      protocol: "relkit.release-manifest.v2",
       version,
       commit,
       packageManager: rootManifest.packageManager,
       inputFingerprint: data.inputFingerprint,
-      packageOrder: artifacts.map((item) => item.name),
-      packages: artifacts,
+      packages: validationArtifacts,
+      packageOrder: validationArtifacts.map((item) => item.name),
     };
     await writeFile(
       join(artifactRoot, "manifest.json"),
@@ -175,6 +185,15 @@ async function main(): Promise<void> {
         artifactRoot,
       ]);
     }
+    // Smoke tests consume the complete local closure; publication retains only the reviewed batch.
+    for (const artifact of validationArtifacts)
+      if (!selectedNames.has(artifact.name)) await rm(join(artifactRoot, artifact.file));
+    manifest.packages = artifacts;
+    manifest.packageOrder = artifacts.map((item) => item.name);
+    await writeFile(
+      join(artifactRoot, "manifest.json"),
+      `${JSON.stringify(stable(manifest), null, 2)}\n`,
+    );
     if (writeNotes) await writeFile(notePath, notes, "utf8");
     else if (!readiness && (await readFile(notePath, "utf8")) !== notes)
       throw new Error("RELEASE_NOTES.md is stale; rerun with --write-notes and review the diff.");

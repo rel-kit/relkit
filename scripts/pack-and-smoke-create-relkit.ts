@@ -62,9 +62,13 @@ const fixture = Effect.fn("PackedScaffold.fixture")(function* (run: PackedComman
   assert.ok(server.port);
   const registry = "http://127.0.0.1:" + server.port;
   const cacheDir = join(temporary, "cache");
-  const version = manifests.get("@relkit/app")?.manifest.version;
-  assert.ok(version);
-  yield* installGenerator(run, temporary, registry, cacheDir, version);
+  const generatorVersion = manifests.get("create-relkit")?.manifest.version;
+  const cliVersion = manifests.get("@relkit/cli")?.manifest.version;
+  assert.ok(generatorVersion && cliVersion);
+  yield* installGenerator(run, temporary, registry, cacheDir, {
+    "@relkit/cli": cliVersion,
+    "create-relkit": generatorVersion,
+  });
   return {
     temporary,
     registry,
@@ -80,7 +84,7 @@ const fixture = Effect.fn("PackedScaffold.fixture")(function* (run: PackedComman
  * @param temporary - Scope-owned parent directory.
  * @param registry - Exact local candidate registry.
  * @param cacheDir - Isolated package-manager cache.
- * @param version - Verified first-party package version.
+ * @param dependencies - Exact CLI and generator versions.
  * @returns Completion after the native installation child has exited and drained.
  */
 const installGenerator = Effect.fn("PackedScaffold.installGenerator")(function* (
@@ -88,7 +92,7 @@ const installGenerator = Effect.fn("PackedScaffold.installGenerator")(function* 
   temporary: string,
   registry: string,
   cacheDir: string,
-  version: string,
+  dependencies: Record<string, string>,
 ) {
   yield* scaffoldNative("parent.manifest", () =>
     writeFile(
@@ -97,7 +101,7 @@ const installGenerator = Effect.fn("PackedScaffold.installGenerator")(function* 
         name: "relkit-packed-smoke",
         private: true,
         type: "module",
-        dependencies: { "@relkit/cli": version, "create-relkit": version },
+        dependencies,
       }) + "\n",
     ),
   );
