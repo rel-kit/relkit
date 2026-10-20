@@ -84,6 +84,9 @@ assets. Root package/catalog changes conservatively release the whole workspace;
 patch and catalog-builder changes release their metadata owners. Existing
 package versions are checked against the original tarball integrity and never
 overwritten. A package is considered published only after registry verification.
+Accepted npm uploads can take several minutes to become public. The publisher
+allows up to 180 visibility checks with five-second pauses (about fifteen minutes,
+plus registry lookup time) before failing with the original-artifact recovery command.
 
 ### GitHub App setup
 
