@@ -22,6 +22,33 @@ Suggest only task-relevant optional modules, explain their benefit, and ask for 
 
 Default to backend work without unsolicited pages, app.js, assets.css or demo interfaces. Preserve explicit fullstack requests, existing frontend files and the Inspector. Give users/orders separate validated resource contracts with applicable authorization; do not expose a generic public table dispatcher. Infrastructure services and private tables need no endpoint; preserve intentional auth protocol handlers and shared internal helpers.
 
+## Design domain ownership
+
+Before scaffolding business behavior, identify its owning domain. For multi-capability work,
+include a compact ownership map in the implementation plan: service name, owned rules/state,
+public operations/events, dependencies, and any transaction spanning capabilities. Proceed
+with authorized implementation after the plan; this adds no approval gate.
+
+A service owns one cohesive business responsibility and its invariants. Separate capabilities
+with distinct rules, lifecycles, or public contracts. Keep related entities together when
+they share those rules; do not create a service per table, endpoint, or noun. Shared auth,
+database, tenant ID, or deployment does not make the whole application one domain. Avoid a
+product-named catch-all containing unrelated capabilities.
+
+For example, orders can own order acceptance/lifecycle, pricing its quote/discount rules,
+and notifications delivery/deduplication. Orders calls the pricing public `service.ts`
+contract; notifications can react to an orders-owned event. Routes target the owning service,
+and each function/event belongs to exactly one domain. Read the generated application's
+`.agents/skills/relkit/references/domain-apis.md` for collaboration examples when available.
+
+Reuse an existing owner for a small feature; do not reorganize unrelated code. Name the
+owner of cross-domain invariants and explain the atomic boundary. Never assume a nested
+`.invoke()` inherits the caller's database transaction or resources. Use supported transaction
+coordination or keep tightly coupled invariants with one owner; events handle post-commit
+reactions, with an outbox when required. Keep one shared database/auth service and migration
+history. Moving operations between domains is a redesign requiring ID/durable-contract and
+caller review, not an identity-preserving grouped/flat layout migration.
+
 ## Put behavior in the right place
 
 - `src/services/<domain>/` owns one business area. Keep functions, specialized service
@@ -55,6 +82,12 @@ Use `bun run relkit add --help` for available scaffolding commands, then inspect
 created; do not create a second service for an existing domain.
 
 ## Verify the change
+
+Compare actual services and route targets with the ownership map. Each capability needs real
+operations under its owner, public cross-service imports, and owner-local rules; empty facade
+services around a catch-all implementation do not satisfy the design. Explain intentional
+merges/splits and test cross-domain consistency/failure behavior. Graph validity alone does
+not establish domain cohesion.
 
 Review the diff and run focused checks after logical changes. Before completion, run applicable check, typecheck, build, unit/integration and existing relevant end-to-end coverage, using scripts present in package.json:
 

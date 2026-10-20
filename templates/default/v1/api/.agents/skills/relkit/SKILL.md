@@ -21,6 +21,16 @@ Recommend optional modules only when they solve a concrete part of this task: fo
 
 Default to backend work. Do not introduce frontend pages, app.js, assets.css or demo interfaces unless requested. Preserve existing frontend files, explicitly selected fullstack functionality and the framework Inspector. For users and orders, define separate resource endpoints with explicit input/output contracts, validation and applicable authorization; avoid a public table dispatcher controlled by an entity parameter. Internal tables and infrastructure services need no public endpoint. Preserve intentional protocol handlers such as the Better Auth mount and shared internal helpers.
 
+## Design domain ownership
+
+Before scaffolding business behavior, identify its owning domain. For a request spanning multiple business capabilities, include a compact ownership map in the implementation plan: service name, owned rules/state, public operations/events, dependencies, and any transaction spanning capabilities. Then proceed with authorized implementation; the map is not another approval gate.
+
+A domain service owns one cohesive business responsibility and its invariants. Separate capabilities with distinct rules, lifecycles, or public contracts. Keep closely related entities together when they share those rules; do not create a service per table, endpoint, or noun. Shared authentication, database, tenant ID, or deployment does not make the entire application one domain. Avoid a product-named catch-all service containing unrelated capabilities.
+
+For existing apps, reuse the service that owns the behavior. Do not reorganize unrelated domains or move existing code without task scope. A small single-domain feature needs only its existing owner, not a new architecture exercise.
+
+Read [domain design and public contracts](references/domain-apis.md) when choosing boundaries or coordinating services. Name the owner of each invariant that spans domains and explain how atomic updates remain atomic. Do not assume a nested service invocation shares the caller's database transaction. Keep the shared database/auth singletons and one migration history; business boundaries do not require separate databases or deployments.
+
 ## Source placement
 
 New projects place every generic, database, and auth boundary at `src/services/<name>/service.ts`. Keep its functions, events, tasks, jobs, tools, agents, channels, schemas, resources, helpers, and assets under that service. Routes live at `src/routes`; configuration support and environment contracts live at `src/platform`. Application descriptors use plain TypeScript and supported public APIs; Effect imports are not required.
@@ -58,6 +68,8 @@ Read only the reference relevant to the requested change. These examples describ
 - Preserve existing application configuration, environment fields, service members, routes, and user changes when specializing generated files.
 
 ## Verify the result
+
+Compare the final services and route targets with the ownership map. Confirm each capability has real operations under its owner, cross-service imports use public contracts, and no catch-all implementation hides behind empty services. Explain deliberate boundary changes and verify cross-domain consistency/failure behavior. A passing graph check validates structure, not domain cohesion.
 
 Review the CLI's created and updated files, warnings, next steps and final diff. Run focused checks after logical changes. Before completion, run applicable check, typecheck, build, unit/integration tests and existing relevant end-to-end coverage. Inspect package.json for actual script names. For HTTP work, test the route's status/body, valid and invalid input, and denied and allowed access where relevant; a direct function test does not cover request mapping or the complete flow. Replay the original bug through the boundary that failed. Backend/API tests do not require an unsolicited frontend.
 

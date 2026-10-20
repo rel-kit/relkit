@@ -75,6 +75,11 @@ rather than relying on timing or arbitrary sleeps.
 
 ## Repository checks
 
+Application-skill changes also have a [domain service design evaluation](../tests/agent-evals/domain-services.md).
+It uses fresh agents and isolated projects to inspect actual ownership and executable
+business rules, including a single-domain counterexample. Run it explicitly; the
+generator suite checks template consistency without invoking models or proving semantic design.
+
 From the RELKIT repository root, the shipped focused commands are:
 
 | Concern                          | Command                         |
