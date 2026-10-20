@@ -94,12 +94,12 @@ const runInspectorSupport = Effect.fn("Dev.inspectorLifetime")(function* (
 });
 
 /**
- * Probes a real inspector response within its independent startup deadline.
+ * Allows cold source compilation within a bounded minute, independently of backend readiness.
  * @param http - Acquired bounded HTTP authority.
  * @param port - Actual owned listener port.
  * @returns Completion after successful response bytes; failures cannot advertise readiness.
  */
-const waitInspectorReady = Effect.fn("Dev.inspectorReady")(function* (
+export const waitInspectorReady = Effect.fn("Dev.inspectorReady")(function* (
   http: HttpCapabilities,
   port: number,
 ) {
@@ -124,12 +124,12 @@ const waitInspectorReady = Effect.fn("Dev.inspectorReady")(function* (
   );
   yield* ready.pipe(
     Effect.repeat({ schedule: Schedule.spaced(25), until: (value) => value }),
-    Effect.timeout(5_000),
+    Effect.timeout(60_000),
     Effect.mapError(
       (cause) =>
         new CliAdapterError({
           operation: "dev.inspector.readiness",
-          message: "Inspector did not become ready within its deadline.",
+          message: "Inspector did not become ready within 60 seconds. Review its startup output.",
           cause,
         }),
     ),
