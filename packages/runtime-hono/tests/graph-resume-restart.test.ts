@@ -1,3 +1,5 @@
+/** A recreated runtime competes for one stored graph continuation and publishes one terminal result. */
+import { reviewGraph, graphPlan } from "./graph-restart-graph.fixture.js";
 import { trackFixtureRun, trackFixtureProvider, joinFixtureRuns } from "./fixture-lifetime.js";
 import { createFixtureClient, appFetch } from "./fixture-client.js";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -5,13 +7,13 @@ import { afterEach, expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Command, END, MemorySaver, START, StateSchema, interrupt } from "@langchain/langgraph";
-import { defineGraph, defineGraphNode, invokeAgent } from "@relkit/agents";
+import { MemorySaver } from "@langchain/langgraph";
+import { invokeAgent } from "@relkit/langchain";
 
 import type { RegistrationPlan } from "@relkit/graph";
 import { createLocalAgentStateProvider } from "@relkit/providers-local";
 import { createOperationId } from "@relkit/realtime";
-import { z } from "@relkit/schema";
+
 import { createApp, type RuntimeManifest } from "../src/index.ts";
 import { waitForAgentRun } from "../src/agent-run-tasks.ts";
 import { digest } from "../src/agent-rpc-support.ts";
@@ -24,29 +26,8 @@ afterEach(async () => {
 });
 
 test("a restarted runtime admits one competing graph resume and one terminal output", async () => {
-  const root = await mkdtemp(join(tmpdir(), "relkit-graph-restart-"));
-  roots.push(root);
-  const checkpointer = new MemorySaver();
-  const entries = { review: 0, finish: 0 };
-  const graphA = reviewGraph(checkpointer, entries);
-  const plan = graphPlan(graphA.workflow);
-  const clientA = runtimeClient(
-    graphA,
-    plan,
-    trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 })),
-    "generation-a",
-  );
-  const threadId = "order:restart";
-
-  const initial = await clientA["relkit.agent.run"]({
-    agentId: graphA.id,
-    threadId,
-    operationId: createOperationId(),
-    kind: "run",
-    payload: { orderId: "42" },
-  });
-  const waitingA = await waitForStatus(clientA, graphA.id, threadId, "waiting");
-  await waitForAgentRun(initial.runId);
+  const { root, checkpointer, entries, plan, graphA, threadId, waitingA } =
+    await startWaitingGraph();
 
   const providerB = trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 }));
   const graphB = reviewGraph(checkpointer, entries);
@@ -82,74 +63,8 @@ test("a restarted runtime admits one competing graph resume and one terminal out
     parts: [{ kind: "text", text: '{"result":"approved"}', state: "complete" }],
   });
 
-  const journal = await providerB.readJournal({
-    applicationId: "fixture",
-    environment: "test",
-    profile: "default",
-    providerEpoch: finished.providerEpoch,
-    agentId: graphB.id,
-    ownerScope: "viewer",
-    identityScope: "viewer",
-    sessionEpoch: "session",
-    authorizationGrantId: digest({
-      identity: { identityScope: "viewer", sessionEpoch: "session" },
-      agentId: graphB.id,
-    }),
-    threadId,
-    after: { ...finished.checkpoint, sequence: "0" },
-    limit: 100,
-    maxEncodedBytes: 1024 * 1024,
-  });
-  expect(journal.records.filter((record) => record.kind === "terminal")).toEqual([
-    expect.objectContaining({
-      publicValue: expect.objectContaining({ output: { result: "approved" } }),
-    }),
-  ]);
+  await assertRestartJournal(providerB, finished, graphB.id, threadId);
 });
-
-function reviewGraph(checkpointer: MemorySaver, entries: { review: number; finish: number }) {
-  const state = new StateSchema({
-    orderId: z.string(),
-    approved: z.boolean().optional(),
-    result: z.string().optional(),
-  });
-  const review = defineGraphNode({
-    id: "review",
-    input: z.object({ orderId: z.string() }),
-    output: z.object({ approved: z.boolean() }),
-    resume: z.boolean(),
-    ends: ["finish"] as const,
-    handler: () => {
-      entries.review += 1;
-      const approved = interrupt({ question: "Approve?" }) as boolean;
-      return new Command<unknown, { approved: boolean }, "finish">({
-        update: { approved },
-        goto: "finish",
-      });
-    },
-  });
-  const finish = defineGraphNode({
-    id: "finish",
-    input: z.object({ approved: z.boolean() }),
-    output: z.object({ result: z.string() }),
-    handler: ({ approved }) => {
-      entries.finish += 1;
-      return { result: approved ? "approved" : "rejected" };
-    },
-  });
-  return defineGraph({
-    id: "orders.restart",
-    state,
-    input: z.object({ orderId: z.string() }),
-    output: z.object({ result: z.string() }),
-    nodes: [review, finish],
-    edges: (edge) => edge.addEdge(START, "review").addEdge("finish", END),
-    checkpointer,
-    limits: { maxSteps: 5, maxToolCalls: 1, timeoutMs: 2_000 },
-    stateProfile: "default",
-    client: { authorize: () => true },
-  });
-}
 
 function runtimeClient(
   graph: ReturnType<typeof reviewGraph>,
@@ -208,41 +123,60 @@ async function waitForStatus(client: any, agentId: string, threadId: string, sta
   throw new Error(`Agent did not reach ${status}.`);
 }
 
-function graphPlan(workflow: unknown): RegistrationPlan {
-  return {
-    graphHash: "sha256:graph-restart",
-    functions: [],
-    httpTriggers: [],
-    queues: [],
-    schedules: [],
-    eventTriggers: [],
-    buckets: [],
-    caches: [],
-    tools: [],
-    channels: [],
-    middlewares: [],
-    agents: [
-      {
-        kind: "agent",
-        id: "orders.restart",
-        source: { file: "graph.ts", line: 1, column: 1 },
-        input: {},
-        output: {},
-        instructions: "",
-        toolIds: [],
-        limits: {},
-        generatedFunction: {
-          functionId: "relkit.agent.orders.restart.invoke",
-          generated: true,
-          generatedBy: "agent",
-          agentId: "orders.restart",
-        },
-        profile: "default",
-        stateProfile: "default",
-        client: "protected",
-        execution: "graph",
-        workflow: workflow as never,
-      },
-    ],
-  };
+async function startWaitingGraph() {
+  const root = await mkdtemp(join(tmpdir(), "relkit-graph-restart-"));
+  roots.push(root);
+  const checkpointer = new MemorySaver();
+  const entries = { review: 0, finish: 0 };
+  const graphA = reviewGraph(checkpointer, entries);
+  const plan = graphPlan(graphA.workflow);
+  const clientA = runtimeClient(
+    graphA,
+    plan,
+    trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 })),
+    "generation-a",
+  );
+  const threadId = "order:restart";
+
+  const initial = await clientA["relkit.agent.run"]({
+    agentId: graphA.id,
+    threadId,
+    operationId: createOperationId(),
+    kind: "run",
+    payload: { orderId: "42" },
+  });
+  const waitingA = await waitForStatus(clientA, graphA.id, threadId, "waiting");
+  await waitForAgentRun(initial.runId);
+  return { root, checkpointer, entries, plan, graphA, threadId, waitingA };
+}
+
+async function assertRestartJournal(
+  providerB: ReturnType<typeof createLocalAgentStateProvider>,
+  finished: Awaited<ReturnType<typeof waitForStatus>>,
+  agentId: string,
+  threadId: string,
+) {
+  const journal = await providerB.readJournal({
+    applicationId: "fixture",
+    environment: "test",
+    profile: "default",
+    providerEpoch: finished.providerEpoch,
+    agentId: agentId,
+    ownerScope: "viewer",
+    identityScope: "viewer",
+    sessionEpoch: "session",
+    authorizationGrantId: digest({
+      identity: { identityScope: "viewer", sessionEpoch: "session" },
+      agentId: agentId,
+    }),
+    threadId,
+    after: { ...finished.checkpoint, sequence: "0" },
+    limit: 100,
+    maxEncodedBytes: 1024 * 1024,
+  });
+  expect(journal.records.filter((record) => record.kind === "terminal")).toEqual([
+    expect.objectContaining({
+      publicValue: expect.objectContaining({ output: { result: "approved" } }),
+    }),
+  ]);
 }

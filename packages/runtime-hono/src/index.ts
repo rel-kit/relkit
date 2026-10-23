@@ -1,3 +1,8 @@
+/**
+ * Exposes core REST/RPC, security and identity transports without loading optional
+ * MCP, AG-UI or Scalar SDKs. Their native installers live at /mcp, /ag-ui and
+ * /scalar; prepared startup validates explicit selections before readiness.
+ */
 export * from "./create-app.js";
 export * from "./api-docs.js";
 export * from "./materialize-routes.js";
@@ -10,7 +15,6 @@ export * from "./rate-limit-store.js";
 export * from "./auth.js";
 export * from "./rpc.js";
 export * from "./rpc-websocket.js";
-export * from "./mcp.js";
 export * from "./static-files.js";
 export * from "./client-contract.js";
 export * from "./client-identity.js";
@@ -20,7 +24,6 @@ export * from "./transport-security.js";
 export * from "./agent-inspector.js";
 export * from "./realtime-runtime.js";
 export * from "./agent-runtime.js";
-export * from "./agent-protocol.js";
 export * from "./jobs/types.js";
 export * from "./jobs/rpc.js";
 export * from "./jobs/cursors.js";
