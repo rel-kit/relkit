@@ -1,7 +1,9 @@
+/** Normalizes native invocation utility values shared by runtime adapters without changing the owning request's execution context. */
+
 import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import { validate, type StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { createExecutionSignal, signalFailure, withSignal } from "./signal.js";
@@ -75,7 +77,10 @@ async function validateValueCore(
  */
 export const jsonValueEffect = Effect.fn("Agents.runtime.jsonValue")(
   (value: unknown, maxBytes: number, label: string) =>
-    Effect.try({ try: () => jsonValueCore(value, maxBytes, label), catch: agentInvocationFailure }),
+    Effect.try({
+      try: () => jsonValueCore(value, maxBytes, label),
+      catch: agentInvocationFailure,
+    }),
   (effect) => observeAgent("runtime.json-value", effect),
 );
 

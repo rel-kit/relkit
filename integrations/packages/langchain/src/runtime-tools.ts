@@ -1,7 +1,9 @@
+/** Builds invocation tool bindings from the selected RELKIT registry and native tool descriptors, keeping execution ownership with the caller. */
+
 import type { JsonValue } from "@relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { ApprovalRequiredError } from "./approval.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { ApprovalRequiredError } from "@relkit/agents/internal/approval";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";

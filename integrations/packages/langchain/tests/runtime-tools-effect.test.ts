@@ -1,8 +1,11 @@
+/** Exercises native runtime tools effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect } from "effect";
 import { expect, test } from "vitest";
 import { defineFunction } from "@relkit/functions";
 import { z } from "@relkit/schema";
 import { defineTool } from "@relkit/tools";
+import { defineAgent } from "../src/define-agent.js";
 import {
   findModelToolEffect,
   findToolEffect,
@@ -39,25 +42,7 @@ test("tool execution Effect returns a safe error for an unlisted tool", async ()
 });
 
 test("tool execution Effect validates and invokes an allowed tool", async () => {
-  const target = defineFunction({
-    id: "orders.lookup",
-    input: z.object({ id: z.string() }),
-    output: z.object({ state: z.string() }),
-    handler: async ({ id }) => ({ state: id }),
-  });
-  const tool = defineTool({
-    id: "orders.lookup.tool",
-    target,
-    description: "Look up order",
-    sideEffect: "read",
-    approval: "never",
-  });
-  const options = {
-    agent: { tools: [tool] },
-    tools: [tool],
-    engine: { invoke: async () => ({ state: "ready" }) },
-  } as never;
-  const call = { callId: "one", toolId: tool.id, input: { id: "known" } };
+  const { options, call } = allowedToolRunFixture();
   expect(
     await Effect.runPromise(
       runToolEffect(options, call, new AbortController().signal, 1024, "invoke"),
@@ -95,3 +80,45 @@ test("tool execution Effect validates and invokes an allowed tool", async () => 
     error: { code: "RELKIT_AGENT_RESPONSE_LIMIT", message: "Tool call failed" },
   });
 });
+
+/** Constructs the native allowed tool fixture once for its owning case, preserving callback and resource identity.
+ * @returns The unchanged native descriptors and directly observed fixture values.
+ */
+function allowedToolFixture() {
+  const target = defineFunction({
+    id: "orders.lookup",
+    input: z.object({ id: z.string() }),
+    output: z.object({ state: z.string() }),
+    handler: async ({ id }) => ({ state: id }),
+  });
+  const tool = defineTool({
+    id: "orders.lookup.tool",
+    target,
+    description: "Look up order",
+    sideEffect: "read",
+    approval: "never",
+  });
+  return tool;
+}
+
+/** Constructs the native allowed tool run fixture once for its owning case, preserving callback and resource identity.
+ * @returns The unchanged native descriptors and directly observed fixture values.
+ */
+function allowedToolRunFixture() {
+  const tool = allowedToolFixture();
+  const options = {
+    agent: defineAgent({
+      id: "allowed.tool.fixture",
+      input: z.object({ prompt: z.string() }),
+      output: z.object({ answer: z.string() }),
+      instructions: "Use the selected tool.",
+      tools: [tool],
+      limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1000 },
+    }),
+    input: { prompt: "lookup" },
+    tools: [tool],
+    engine: { invoke: async () => ({ state: "ready" }) },
+  };
+  const call = { callId: "one", toolId: tool.id, input: { id: "known" } };
+  return { options, call };
+}

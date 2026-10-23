@@ -1,6 +1,8 @@
+/** Resolves authored RELKIT tool references against the invocation tool registry before native tool construction. */
+
 import type { ToolDescriptor, ToolSource } from "@relkit/tools";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 
 /** Produces a bounded model-facing name for one tool ID.
  * @param id - RELKIT tool ID.
