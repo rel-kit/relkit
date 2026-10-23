@@ -1,3 +1,5 @@
+/** Exercises native graph node validation effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { END } from "@langchain/langgraph";
 import { z } from "@relkit/schema";
 import { Effect, Result } from "effect";

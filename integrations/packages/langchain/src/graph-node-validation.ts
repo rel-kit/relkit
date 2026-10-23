@@ -1,8 +1,10 @@
+/** Validates native graph node contracts and execution configuration before the node descriptor is published to graph assembly. */
+
 import { Command, END, START, isCommand } from "@langchain/langgraph";
 import { normalizeId } from "@relkit/contracts";
 import type { InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import type { GraphNodeAny, GraphNodeResult } from "./define-graph-node.js";
 import { graphNodeValidationFailure } from "./graph-node-validation-error.js";
 import {

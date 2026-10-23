@@ -1,3 +1,5 @@
+/** Defines authoring failures for native graph nodes and retains the invalid field for focused descriptor diagnostics. */
+
 import { Schema } from "effect";
 
 /** Tagged graph node validation failure. */
