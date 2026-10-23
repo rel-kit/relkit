@@ -1,3 +1,4 @@
+/** Audits authored observability sources for output and record serialization outside their owning adapters. */
 import { readFileSync, realpathSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import * as ts from "typescript";
@@ -5,6 +6,7 @@ import { resolveOwnedSourceFile, scanLoggerSinks } from "./check-logger-sinks.ts
 
 export const OBSERVABILITY_SOURCE_ROOTS = Object.freeze([
   "packages/observability/src",
+  "packages/observability-local/src",
   "packages/runtime-effect/src",
   "packages/runtime-hono/src",
   "packages/engine/src",
@@ -23,6 +25,7 @@ export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
   "packages/observability/src/record-admission.ts",
   // Byte accounting and search operate on admitted, redacted records.
   "packages/observability/src/local/batch-queue-effect.ts",
+  "packages/observability/src/memory-storage.ts",
   "packages/observability/src/query.ts",
   "packages/observability/src/query-detail-effect.ts",
   "packages/observability/src/query-validation.ts",
