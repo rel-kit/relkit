@@ -1,6 +1,10 @@
+/** Keeps log coalescing, trace lifecycle and viewport assertions on this run's
+ * selected Inspector backend without sharing another invocation's fixture.
+ */
 import { expect, test } from "@playwright/test";
+import { playwrightSelection } from "../../scripts/playwright-selection.js";
 
-const backend = "http://127.0.0.1:3212";
+const { backend } = playwrightSelection("inspector");
 const initialTraceId = "11111111111111111111111111111111";
 test.beforeEach(async ({ request }) => {
   await request.post(`${backend}/__fixture__/reset`);

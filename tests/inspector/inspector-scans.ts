@@ -1,3 +1,6 @@
+/** Scans native Inspector source boundaries and the actual selected compiled
+ * output, preserving the existing forbidden-payload and synthetic-secret rules.
+ */
 import { readdir, readFile } from "node:fs/promises";
 import { extname, relative, resolve } from "node:path";
 import * as ts from "typescript";
@@ -74,14 +77,17 @@ export async function scanInspectorImports(root: string): Promise<InspectorImpor
   return { files: files.length, violations: violations.sort(), networkFiles: [...network].sort() };
 }
 
-export async function scanInspectorBundles(root: string): Promise<InspectorBundleScan> {
+export async function scanInspectorBundles(
+  root: string,
+  dist = ".next",
+): Promise<InspectorBundleScan> {
   const browser = await firstBundleFiles([
-    resolve(root, "apps/inspector/.next/static"),
-    resolve(root, "apps/inspector/.next/dev/static"),
+    resolve(root, "apps/inspector", dist, "static"),
+    resolve(root, "apps/inspector", dist, "dev/static"),
   ]);
   const server = await firstBundleFiles([
-    resolve(root, "apps/inspector/.next/server"),
-    resolve(root, "apps/inspector/.next/dev/server"),
+    resolve(root, "apps/inspector", dist, "server"),
+    resolve(root, "apps/inspector", dist, "dev/server"),
   ]);
   const violations: string[] = [];
   for (const [kind, files] of [
