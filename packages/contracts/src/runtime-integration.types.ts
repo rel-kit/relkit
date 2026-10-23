@@ -1,3 +1,8 @@
+/**
+ * Carries verified package/export identity and selected dependency declarations
+ * from compiler plans into runtime activation without importing implementations.
+ */
+import type { IntegrationDependencyRequirement } from "./integration-dependencies.types.js";
 import type {
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
@@ -33,6 +38,8 @@ export interface RuntimeIntegrationPlanEntry {
   readonly packageName: string;
   readonly packageVersion: string;
   readonly exportName: string;
+  /** Requirements for this selected capability; each retains its execution phases. */
+  readonly requirements?: readonly IntegrationDependencyRequirement[];
 }
 
 /** Versioned integration plan consumed by the runtime. */

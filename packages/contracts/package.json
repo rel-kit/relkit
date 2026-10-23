@@ -44,9 +44,11 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "semver": "7.8.5"
   },
   "devDependencies": {
+    "@types/semver": "7.8.0",
     "@effect/vitest": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "vitest": "catalog:"
