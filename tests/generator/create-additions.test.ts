@@ -11,7 +11,7 @@ import {
   generateProject,
   normalizeCreateOptions,
   type PromptDriver,
-} from "../../packages/create-relkit/src/index.ts";
+} from "../../packages/cli/src/scaffolding/index.ts";
 
 const roots: string[] = [];
 const templateRoot = resolve(import.meta.dir, "../../templates/default/v1");
