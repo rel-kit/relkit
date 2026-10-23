@@ -1,5 +1,7 @@
+/** Extracts validated loop input and output values for native execution, keeping schema failure handling at the invocation boundary. */
+
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import type { AgentLoopOptions } from "./runtime-loop.types.js";

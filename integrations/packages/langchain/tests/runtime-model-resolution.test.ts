@@ -1,3 +1,5 @@
+/** Exercises native runtime model resolution behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { describe, expect, test } from "vitest";
 import { defineFunction } from "@relkit/functions";
 import {
@@ -108,6 +110,7 @@ describe("bounded agent runtime", () => {
     )?.span;
     expect(modelSpan?.attributes.get("relkit.model.id")).toBe("test:default");
     expect("model" in state.runtime.agent).toBe(true);
+    if (!("model" in state.runtime.agent)) throw new Error("Expected authored model selector");
     expect(typeof state.runtime.agent.model).toBe("string");
   });
 });

@@ -1,3 +1,5 @@
+/** Defines model selection and initialization failures with the selected model identifier and underlying SDK cause. */
+
 import { Schema } from "effect";
 
 /** Tagged model resolution or content limit failure. */

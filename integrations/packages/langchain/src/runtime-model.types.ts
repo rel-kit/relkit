@@ -1,3 +1,5 @@
+/** Resolves authored model selectors or native model instances for an invocation without replacing the caller's model resource identity. This companion preserves the native input and output types without starting runtime work. */
+
 import type { LanguageModelLike } from "@langchain/core/language_models/base";
 import type { AgentModel } from "./define-agent-native.types.js";
 

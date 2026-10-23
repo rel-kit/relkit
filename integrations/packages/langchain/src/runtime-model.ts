@@ -1,6 +1,8 @@
+/** Resolves authored model selectors or native model instances for an invocation without replacing the caller's model resource identity. */
+
 import type { LanguageModelLike } from "@langchain/core/language_models/base";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { agentModelResolutionFailure } from "./runtime-model-error.js";
 import type {
@@ -28,19 +30,9 @@ export const resolveRuntimeModelEffect = Effect.fn("Agents.runtime.resolveModel"
   function* (options: RuntimeModelOptions) {
     const { maxInputBytes, maxOutputBytes } = yield* resolveAgentContentLimitsEffect(options);
     if (typeof options.model === "function") {
-      const factory = options.model;
-      const model = yield* Effect.tryPromise({
-        try: () => Promise.resolve(factory(options.environment)),
-        catch: agentModelResolutionFailure,
-      });
-      return yield* Effect.try({
-        try: (): ResolvedRuntimeModel => ({
-          id: nativeId(model),
-          model: asLanguageModel(model),
-          maxInputBytes,
-          maxOutputBytes,
-        }),
-        catch: agentModelResolutionFailure,
+      return yield* resolveFactoryModelEffect(options.model, options.environment, {
+        maxInputBytes,
+        maxOutputBytes,
       });
     }
     if (options.model !== undefined && typeof options.model !== "string") {
@@ -157,3 +149,28 @@ function unavailable() {
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object";
 }
+
+/** Resolves a lazy native model factory while retaining its original failure.
+ * @param factory - Environment-bound native model constructor.
+ * @param environment - Validated application environment.
+ * @param limits - Resolved content byte limits.
+ * @returns A native model identity and its content limits.
+ */
+const resolveFactoryModelEffect = Effect.fn("Agents.runtime.resolveFactoryModel")(function* (
+  factory: import("./define-agent-native.types.js").AgentModelFactory,
+  environment: Readonly<Record<string, unknown>>,
+  limits: AgentContentLimits,
+) {
+  const model = yield* Effect.tryPromise({
+    try: () => Promise.resolve(factory(environment)),
+    catch: agentModelResolutionFailure,
+  });
+  return yield* Effect.try({
+    try: (): ResolvedRuntimeModel => ({
+      id: nativeId(model),
+      model: asLanguageModel(model),
+      ...limits,
+    }),
+    catch: agentModelResolutionFailure,
+  });
+});

@@ -1,3 +1,5 @@
+/** Exercises native runtime loop effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { z } from "@relkit/schema";
 import { MemorySaver } from "@langchain/langgraph";
 import { Effect, Result } from "effect";
@@ -16,8 +18,13 @@ const agent = defineAgent({
   tools: [],
   limits: { maxSteps: 2, maxToolCalls: 1, timeoutMs: 1000 },
 });
-const options = { agent, tools: [], engine: {} } as never;
 const input = { prompt: "hello" };
+const options = {
+  agent,
+  input,
+  tools: [],
+  engine: { invoke: () => Promise.reject(new Error("No tool expected")) },
+};
 
 test("native loop Effect tags an invalid resume request", async () => {
   const model = createTestModel([{ type: "final", output: { answer: "ok" } }]).model;
