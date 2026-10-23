@@ -1,3 +1,5 @@
+/** Exercises native graph state schema behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { StateSchema } from "@langchain/langgraph";
 import { z, type StandardSchemaV1 } from "@relkit/schema";
 import { Effect, Metric, Tracer } from "effect";
@@ -69,7 +71,7 @@ test("selection emits a named span", () => {
   expect(spans.map(({ name }) => name)).toEqual(["Agents.graphState.select"]);
 });
 
-function metricCount(snapshot: Metric.Snapshot[], name: string): number {
+function metricCount(snapshot: Effect.Success<typeof Metric.snapshot>, name: string): number {
   const state = snapshot.find((metric) => metric.id === name)?.state;
   return state !== undefined && "count" in state && typeof state.count === "number"
     ? state.count

@@ -1,8 +1,10 @@
+/** Creates nested graph descriptors with their native execution metadata so parent compilation can retain subgraph state and interruption semantics. */
+
 import { normalizeId } from "@relkit/contracts";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { isRecordEffect } from "./agent-validation-value.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { isRecordEffect } from "@relkit/agents/internal/agent-validation-value";
 import type { GraphDescriptor } from "./define-graph.js";
 import { graphNodeValidationFailure } from "./graph-node-validation-error.js";
 import { copyGraphNodeEndsEffect } from "./graph-node-validation.js";

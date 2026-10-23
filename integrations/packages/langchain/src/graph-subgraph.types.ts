@@ -1,3 +1,5 @@
+/** Creates nested graph descriptors with their native execution metadata so parent compilation can retain subgraph state and interruption semantics. This companion preserves the native input and output types without starting runtime work. */
+
 import type { StandardSchemaV1 } from "@relkit/schema";
 import type { GraphDescriptor } from "./define-graph.js";
 import type { RELKIT_SUBGRAPH, RELKIT_SUBGRAPH_NODE } from "./graph-subgraph-symbol.js";

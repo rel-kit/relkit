@@ -1,7 +1,9 @@
+/** Adapts native graph execution to the RELKIT workflow contract, carrying invocation context and scoped persistence through completion. */
+
 import { END, START } from "@langchain/langgraph";
 import type { JsonValue } from "@relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { isFunctionGraphNode, type FunctionGraphNodeDescriptor } from "@relkit/functions";
 import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
 import type { GraphNodeAny } from "./define-graph-node.js";

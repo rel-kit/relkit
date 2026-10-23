@@ -1,3 +1,5 @@
+/** Defines graph workflow failures at the RELKIT execution boundary, preserving graph identity and the native failure cause. */
+
 import { Schema } from "effect";
 
 /** Tagged graph workflow projection failure. */

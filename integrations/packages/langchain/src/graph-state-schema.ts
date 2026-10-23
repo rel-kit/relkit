@@ -1,7 +1,9 @@
+/** Adapts authored state schemas to the native graph state contract and preserves the reducers and validated channel shapes required by compilation. */
+
 import { StateSchema, type AnyStateSchema } from "@langchain/langgraph";
 import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
 import { Effect, Metric, Schema } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { AgentRuntimeError } from "./runtime-errors.js";
 
 const selectionCount = Metric.counter("relkit.agents.graph_state.selection.total");
