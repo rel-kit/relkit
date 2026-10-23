@@ -16,6 +16,7 @@ import { materializeRestRoutes } from "./materialize-rest-routes.js";
 import { createFrameworkMiddleware, FRAMEWORK_MIDDLEWARE_ORDER } from "./middleware.js";
 import { installStaticFiles } from "./static-files.js";
 import { installTransportSecurity } from "./transport-security.js";
+import { installCoreEndpoints } from "./core-endpoints.js";
 
 /** Constructs only eagerly required HTTP behavior.
  * @param options - Complete checked cohort and runtime dependencies.
@@ -48,9 +49,15 @@ export function createApplicationShell(options: CreateAppOptions): Hono {
     options.frameworkMiddleware ?? createFrameworkMiddleware(middlewareOptions),
   );
   installTransportSecurity(app, options.transportSecurity);
-  installInternalEndpoints(app, {
+  const internal = {
     graph: graphSnapshot(options.plan),
     ...(options.internalEndpoints ?? {}),
+  };
+  installCoreEndpoints(app, internal);
+  const mode = internal.environment ?? internal.mode ?? "development";
+  installInternalEndpoints(app, {
+    ...internal,
+    enabled: mode !== "production" && internal.enabled !== false,
   });
   return app;
 }
