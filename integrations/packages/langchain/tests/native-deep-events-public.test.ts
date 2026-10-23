@@ -1,3 +1,5 @@
+/** Exercises native deep events public behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { expect, test } from "vitest";
 import { z } from "@relkit/schema";
 import type { BrowserMessage } from "@relkit/contracts";

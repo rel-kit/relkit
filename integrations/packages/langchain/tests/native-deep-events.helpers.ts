@@ -1,3 +1,5 @@
+/** Exercises native deep events.helpers behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import type { ProtocolEvent } from "@langchain/langgraph";
 import type { BrowserMessage } from "@relkit/contracts";
 import type { AgentContentSink, AgentExecutionEvent } from "../src/index.ts";
@@ -31,9 +33,9 @@ export function sink(
 ): AgentContentSink {
   return {
     emitOutput: () => undefined,
-    emitEvent: (event) => events.push(event),
-    emitTool: ({ toolId, state }) => tools.push({ toolId, state }),
-    emitMessage: (message) => messages.push(message),
+    emitEvent: (event) => void events.push(event),
+    emitTool: ({ toolId, state }) => void tools.push({ toolId, state }),
+    emitMessage: (message) => void messages.push(message),
   };
 }
 

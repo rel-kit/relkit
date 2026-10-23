@@ -1,8 +1,25 @@
+/** Exercises native todo behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { expect, test } from "vitest";
 import { z } from "@relkit/schema";
 import { todoListMiddleware } from "langchain";
 import { defineAgent, invokeAgent, type AgentExecutionEvent } from "../src/index.ts";
 import { createTestModel } from "./test-model.ts";
+
+const expectedToolStates = [
+  "started",
+  "input-ready",
+  "running",
+  "succeeded",
+  "started",
+  "input-ready",
+  "running",
+  "succeeded",
+  "started",
+  "input-ready",
+  "running",
+  "succeeded",
+];
 
 const pending = [
   { content: "Find the order", status: "in_progress" },
@@ -18,25 +35,7 @@ const completed = [
 ] as const;
 
 test("native todo middleware replaces public state before final output", async () => {
-  const todos = todoListMiddleware();
-  const model = createTestModel([
-    nativeTodo("todo-1", pending),
-    nativeTodo("todo-2", progressing),
-    nativeTodo("todo-3", completed),
-    { type: "final", output: { answer: "The order is ready." } },
-  ]);
-  const agent = defineAgent({
-    id: "support.todos",
-    input: z.object({ message: z.string() }),
-    output: z.object({ answer: z.string() }),
-    model: model.model,
-    instructions: "Use the todo list for this request.",
-    tools: [],
-    middleware: [todos],
-    limits: { maxSteps: 5, maxToolCalls: 4, timeoutMs: 1_000 },
-    stateProfile: "public",
-    client: { public: true, state: ["todos"] },
-  });
+  const { agent, model } = todoAgentFixture();
   const states: unknown[] = [];
   const toolStates: string[] = [];
   const timeline: string[] = [];
@@ -64,7 +63,7 @@ test("native todo middleware replaces public state before final output", async (
       emitTool: ({ toolId, state }) => {
         if (toolId === "write_todos") toolStates.push(state);
       },
-      emitOutput: () => timeline.push("output"),
+      emitOutput: () => void timeline.push("output"),
     },
   });
 
@@ -77,20 +76,7 @@ test("native todo middleware replaces public state before final output", async (
   expect(states).toEqual(expect.arrayContaining([pending, progressing, completed]));
   expect(states.at(-1)).toEqual(completed);
   expect(timeline.lastIndexOf("todos")).toBeLessThan(timeline.indexOf("output"));
-  expect(toolStates).toEqual([
-    "started",
-    "input-ready",
-    "running",
-    "succeeded",
-    "started",
-    "input-ready",
-    "running",
-    "succeeded",
-    "started",
-    "input-ready",
-    "running",
-    "succeeded",
-  ]);
+  expect(toolStates).toEqual(expectedToolStates);
   expect(model.calls).toHaveLength(4);
 });
 
@@ -106,4 +92,30 @@ function nativeTodo(callId: string, todos: typeof pending | typeof progressing |
 
 function hasTodos(value: unknown): value is { readonly todos: unknown } {
   return value !== null && typeof value === "object" && "todos" in value;
+}
+
+/** Constructs the native todo agent fixture once for its owning case, preserving callback and resource identity.
+ * @returns The unchanged native descriptors and directly observed fixture values.
+ */
+function todoAgentFixture() {
+  const todos = todoListMiddleware();
+  const model = createTestModel([
+    nativeTodo("todo-1", pending),
+    nativeTodo("todo-2", progressing),
+    nativeTodo("todo-3", completed),
+    { type: "final", output: { answer: "The order is ready." } },
+  ]);
+  const agent = defineAgent({
+    id: "support.todos",
+    input: z.object({ message: z.string() }),
+    output: z.object({ answer: z.string() }),
+    model: model.model,
+    instructions: "Use the todo list for this request.",
+    tools: [],
+    middleware: [todos],
+    limits: { maxSteps: 5, maxToolCalls: 4, timeoutMs: 1_000 },
+    stateProfile: "public",
+    client: { public: true, state: ["todos"] },
+  });
+  return { agent, model };
 }

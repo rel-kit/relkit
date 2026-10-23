@@ -1,3 +1,5 @@
+/** Exercises native deep events scopes behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { expect, test } from "vitest";
 import { z } from "@relkit/schema";
 import { createDeepAgent } from "deepagents";
@@ -8,33 +10,7 @@ import { createTestModel } from "./test-model.ts";
 import { native, relkitOutput, sink, stream } from "./native-deep-events.helpers.ts";
 
 test("normalizes real DeepAgents child execution without native payloads", async () => {
-  const model = createTestModel([
-    {
-      type: "tool-call",
-      callId: "delegate-1",
-      toolId: "task",
-      native: true,
-      input: { description: "Research", subagent_type: "researcher" },
-    },
-    { type: "final", output: { answer: "done" } },
-  ]);
-  const agent = createDeepAgent({
-    name: "parent",
-    model: model.model,
-    systemPrompt: "Delegate once.",
-    tools: [],
-    subagents: [
-      {
-        name: "researcher",
-        description: "Research facts.",
-        model: new FakeToolCallingModel(),
-        tools: [],
-        systemPrompt: "Answer.",
-      },
-    ],
-    generalPurposeAgent: false,
-    responseFormat: relkitOutput(),
-  });
+  const agent = delegatedAgentFixture();
   const run = await agent.streamEvents(
     { messages: [{ role: "user", content: "go" }] },
     { version: "v3" },
@@ -114,7 +90,10 @@ test("keeps scoped public state isolated and sanitizes failure and human input",
   );
 
   expect(events[0]).toMatchObject({ agent: "researcher", value: { status: "started" } });
-  expect(events[1]).toMatchObject({ scope: ["tools:delegate-task"], value: { todos: ["child"] } });
+  expect(events[1]).toMatchObject({
+    scope: ["tools:delegate-task"],
+    value: { todos: ["child"] },
+  });
   expect(events[2]?.value).toEqual({
     event: "message-finish",
     usage: { input_tokens: 2 },
@@ -123,3 +102,38 @@ test("keeps scoped public state isolated and sanitizes failure and human input",
   expect(events[4]?.value).toEqual({ event: "failed", graph_name: "researcher" });
   expect(JSON.stringify(events)).not.toMatch(/private|hidden|credential|responseMetadata/);
 });
+
+/** Constructs the native delegated agent fixture once for its owning case, preserving callback and resource identity.
+ * @returns The unchanged native descriptors and directly observed fixture values.
+ */
+function delegatedAgentFixture() {
+  const model = createTestModel([
+    {
+      type: "tool-call",
+      callId: "delegate-1",
+      toolId: "task",
+      native: true,
+      input: { description: "Research", subagent_type: "researcher" },
+    },
+    { type: "final", output: { answer: "done" } },
+  ]);
+  const configuration = {
+    name: "parent",
+    model: model.model,
+    systemPrompt: "Delegate once.",
+    tools: [],
+    subagents: [
+      {
+        name: "researcher",
+        description: "Research facts.",
+        model: new FakeToolCallingModel(),
+        tools: [],
+        systemPrompt: "Answer.",
+      },
+    ],
+    generalPurposeAgent: false,
+    responseFormat: relkitOutput(),
+  };
+  const agent = createDeepAgent(configuration);
+  return agent;
+}

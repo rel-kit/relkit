@@ -1,3 +1,5 @@
+/** Exercises native deep hitl behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { expect, test } from "vitest";
 import { MemorySaver } from "@langchain/langgraph";
 import { z } from "@relkit/schema";
@@ -6,16 +8,7 @@ import { createTestModel } from "./test-model.ts";
 import { defineAgent, GraphInterruptedError, invokeAgent } from "../src/index.ts";
 
 test("resumes a native DeepAgents human-input checkpoint", async () => {
-  const model = createTestModel([
-    {
-      type: "tool-call",
-      callId: "write-1",
-      toolId: "danger",
-      native: true,
-      input: { value: "approved" },
-    },
-    { type: "final", output: { answer: "finished" } },
-  ]);
+  const model = approvalModel();
   let effects = 0;
   const danger = createNativeStringTool("danger", ({ value }) => {
     effects += 1;
@@ -40,7 +33,7 @@ test("resumes a native DeepAgents human-input checkpoint", async () => {
     engine: { invoke: () => Promise.reject(new Error("unused")) },
     contentSink: {
       emitOutput: () => undefined,
-      emitWaiting: (value: unknown) => waiting.push(value),
+      emitWaiting: (value: unknown) => void waiting.push(value),
     },
   } as const;
 
@@ -58,3 +51,20 @@ test("resumes a native DeepAgents human-input checkpoint", async () => {
   ).resolves.toEqual({ answer: "finished" });
   expect(effects).toBe(1);
 });
+
+/** Constructs the native approval model once for its owning case, preserving callback and resource identity.
+ * @returns The unchanged native descriptors and directly observed fixture values.
+ */
+function approvalModel() {
+  const model = createTestModel([
+    {
+      type: "tool-call",
+      callId: "write-1",
+      toolId: "danger",
+      native: true,
+      input: { value: "approved" },
+    },
+    { type: "final", output: { answer: "finished" } },
+  ]);
+  return model;
+}

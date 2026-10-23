@@ -1,3 +1,5 @@
+/** Decodes native agent interruption data and rejects invalid continuation payloads before approval or resume processing. */
+
 import { validate } from "@cfworker/json-schema";
 import type { GraphWaitingInterrupt } from "./graph-interruption.js";
 import {
@@ -8,7 +10,7 @@ import {
   publicHitlRequest,
   type ReviewConfig,
 } from "./native-agent-interruption-schema.js";
-import type { AgentWaitingRequest } from "./state.types.js";
+import type { AgentWaitingRequest } from "@relkit/agents/internal/state.types";
 
 /** Extracts public native interruptions from nested graph state.
  * @param snapshot - Native graph state.
@@ -97,7 +99,10 @@ function validateDecision(value: unknown, config: ReviewConfig): unknown {
     if (value.message !== undefined && typeof value.message !== "string") {
       throw new TypeError("Agent rejection message must be text");
     }
-    return { type: "reject", ...(value.message === undefined ? {} : { message: value.message }) };
+    return {
+      type: "reject",
+      ...(value.message === undefined ? {} : { message: value.message }),
+    };
   }
   exactKeys(value, ["type", "editedAction"]);
   if (
