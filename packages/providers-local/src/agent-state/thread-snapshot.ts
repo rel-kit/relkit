@@ -1,9 +1,10 @@
+/** Builds public thread snapshots, receipts and bounded history projections from persisted state. */
 import type {
   CreateThreadReceipt,
   LoadThreadRequest,
   ThreadSnapshot,
   StoredRun,
-} from "@relkit/agents";
+} from "@relkit/contracts";
 import { checkpoint, ownedThread } from "./common.js";
 import { journalProjection } from "./snapshot-projection.js";
 

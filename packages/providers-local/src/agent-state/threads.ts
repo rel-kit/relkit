@@ -1,103 +1,15 @@
-import { receipt, makeSnapshot } from "./thread-snapshot.js";
+/** Loads owned thread snapshots and bounded pages of their pinned message history. */
+import { makeSnapshot } from "./thread-snapshot.js";
 import { Clock, Effect } from "effect";
 import { localOperation, localSync } from "../local-effect.js";
 import type {
-  CreateThreadRequest,
-  CreateThreadReceipt,
   LoadThreadRequest,
   ReadSnapshotHistoryRequest,
   BrowserMessage,
-} from "@relkit/agents";
-import {
-  encodedBytes,
-  LocalAgentStateError,
-  operationStorageKey,
-  ownedThread,
-  scopeKey,
-  threadStorageKey,
-} from "./common.js";
+} from "@relkit/contracts";
+import { encodedBytes, LocalAgentStateError, ownedThread } from "./common.js";
 import { replaceThread } from "./run-state.js";
 import type { AgentStateStoreEffects as AgentStateStore } from "./storage.js";
-
-/**
- * Creates or recovers an idempotent thread under its owner and capacity policy.
- * @param store - Atomic snapshot operations supplied by the owning service.
- * @param request - Scoped operation input, identity and capacity or pagination policy.
- * @returns A lazy operation yielding the domain result or LocalOperationError.
- * @remarks State changes commit atomically before acknowledgement.
- */
-export const createThread = Effect.fn("AgentState.createThread")(
-  function* (store: AgentStateStore, request: CreateThreadRequest) {
-    const operationNow = yield* Clock.currentTimeMillis;
-    return yield* Effect.flatten(
-      localSync(() => {
-        return store.update<CreateThreadReceipt>((state) => {
-          if (request.providerEpoch !== state.providerEpoch) {
-            throw new LocalAgentStateError("PROVIDER_STATE_LOST", "Agent provider epoch changed.");
-          }
-          const receiptKey = operationStorageKey(request, request.operationId);
-          const prior = state.createReceipts[receiptKey];
-          if (prior !== undefined) {
-            if (prior.digest !== request.semanticDigest || prior.threadId !== request.threadId)
-              throw new LocalAgentStateError("IDEMPOTENCY_CONFLICT", "Thread request conflicts.");
-            const existing = ownedThread(state, request, prior.threadId);
-            return [state, receipt(existing.thread)] as const;
-          }
-          const owned = Object.values(state.threads).filter(
-            (item) => item.scopeKey === scopeKey(request),
-          );
-          const existing = state.threads[threadStorageKey(request, request.threadId)];
-          if (existing !== undefined) return [state, receipt(existing.thread)] as const;
-          if (owned.length >= request.limits.maxThreadsPerPrincipal)
-            throw new LocalAgentStateError(
-              "AGENT_PRINCIPAL_OVERLOADED",
-              "Thread capacity is full.",
-            );
-          const threadId = request.threadId;
-          const thread = {
-            threadId,
-            agentId: request.agentId,
-            ownerScope: request.ownerScope,
-            status: "idle" as const,
-            revision: "0",
-            createdAt: request.now,
-            updatedAt: request.now,
-          };
-          return [
-            {
-              ...state,
-              revision: state.revision + 1,
-              createReceipts: {
-                ...state.createReceipts,
-                [receiptKey]: { digest: request.semanticDigest, threadId },
-              },
-              threads: {
-                ...state.threads,
-                [threadStorageKey(request, threadId)]: {
-                  scopeKey: scopeKey(request),
-                  thread,
-                  runs: {},
-                  messages: [],
-                  approvals: [],
-                  journal: [],
-                  controls: {},
-                  sequence: 0,
-                  controlSequence: 0,
-                  nextFence: 0,
-                  runClaims: {},
-                  controlClaims: {},
-                  snapshots: {},
-                },
-              },
-            },
-            receipt(thread),
-          ] as const;
-        });
-      }),
-    );
-  },
-  (effect) => localOperation("AgentState.createThread", effect),
-);
 
 /**
  * Loads an owned thread and pins public history for bounded pagination.
@@ -159,7 +71,7 @@ export const readSnapshotHistory = Effect.fn("AgentState.readSnapshotHistory")(
     const operationNow = yield* Clock.currentTimeMillis;
 
     const state = yield* store.read();
-    const local = ownedThread(state, request, request.threadId);
+    const local = yield* localSync(() => ownedThread(state, request, request.threadId));
     const pinned = local.snapshots?.[request.snapshotId];
     if (pinned === undefined)
       return yield* localSync(() => {
