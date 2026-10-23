@@ -1,0 +1,1147 @@
+{
+  "proofExecutedAgainst": "b17",
+  "reusedInputEquivalenceFor": "b18",
+  "newRun": false,
+  "beforeManifestSha256": "d539bc67635a435ebf31c812534f9e1a12945fd77e6fab1924ba9f84f81d1f6a",
+  "afterManifestSha256": "316773589b84cad655c60636fdf1ec5a1a51ebd8d573fbe58f1810f58af2f3f8",
+  "basis": "Preserved report/lock/source hashes, controlled-registry run provenance, exact selected archive bytes.",
+  "limitation": "First-party locks have empty integrity and reports archive:null; original verified registry execution supplies archive provenance, not an installed-file digest.",
+  "reports": [
+    {
+      "label": "isolated",
+      "manager": "bun-isolated",
+      "reportPath": "/private/tmp/relkit-stage1-b17-strict-isolated/report.json",
+      "reportSha256": "d68dcef6bc36e27a4e096a7790b264ec54f2ae79e075cf1d666e3f7d4328485f",
+      "cleanupPath": "/tmp/relkit-s1-b17-strict-isolated-cleanup.json",
+      "profiles": [
+        {
+          "name": "backend-auth",
+          "root": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/backend-auth",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/backend-auth/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/better-auth",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/provider",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/routes",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/functions",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/services",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/buckets",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/cache",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/events",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/jobs",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "selected-auth-bridge",
+          "root": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/selected-auth-bridge",
+          "cases": 1,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/selected-auth-bridge/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/better-auth",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/drizzle",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/provider",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/routes",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/functions",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/services",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/buckets",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/cache",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/events",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/jobs",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "general-testing",
+          "root": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/general-testing",
+          "cases": 1,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/general-testing/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/testing",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/buckets",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/cache",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/compiler",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/config",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/engine",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/events",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/functions",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/graph",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/jobs",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/providers-local",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/runtime-effect",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/runtime-hono",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/tools",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/client-generator",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/diagnostics",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/local-service",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/openapi",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/provider",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/app",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/observability",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/agents",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/routes",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/services",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "sqlite-only",
+          "root": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/sqlite-only",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/sqlite-only/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/drizzle",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/testing",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/provider",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/buckets",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/cache",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/compiler",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/config",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/engine",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/events",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/functions",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/graph",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/jobs",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/providers-local",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/runtime-effect",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/runtime-hono",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/tools",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/client-generator",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/diagnostics",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/local-service",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/openapi",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/app",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/observability",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/agents",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/routes",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/services",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "generic-server-client",
+          "root": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/generic-server-client",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/generic-server-client/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "selected-client-query",
+          "root": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/selected-client-query",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/selected-client-query/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "selected-client-react",
+          "root": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/selected-client-react",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-isolated/bun-isolated/selected-client-react/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "hoisted",
+      "manager": "bun",
+      "reportPath": "/private/tmp/relkit-stage1-b17-strict-hoisted/report.json",
+      "reportSha256": "30c693635e0baa4341d731ace33be09c5c65a6956f53abb00edee73b2e57fe16",
+      "cleanupPath": "/tmp/relkit-s1-b17-strict-hoisted-cleanup.json",
+      "profiles": [
+        {
+          "name": "backend-auth",
+          "root": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/backend-auth",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/backend-auth/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/better-auth",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/provider",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/routes",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/functions",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/services",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/buckets",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/cache",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/events",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/jobs",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "selected-auth-bridge",
+          "root": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/selected-auth-bridge",
+          "cases": 1,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/selected-auth-bridge/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/better-auth",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/drizzle",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/provider",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/routes",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/functions",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/services",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/buckets",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/cache",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/events",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/jobs",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "general-testing",
+          "root": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/general-testing",
+          "cases": 1,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/general-testing/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/testing",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/buckets",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/cache",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/compiler",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/config",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/engine",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/events",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/functions",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/graph",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/jobs",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/providers-local",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/runtime-effect",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/runtime-hono",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/tools",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/client-generator",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/diagnostics",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/local-service",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/openapi",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/provider",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/app",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/observability",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/agents",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/routes",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/services",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "sqlite-only",
+          "root": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/sqlite-only",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/sqlite-only/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/drizzle",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/testing",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/provider",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/buckets",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/cache",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/compiler",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/config",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/engine",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/events",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/functions",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/graph",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/jobs",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/providers-local",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/runtime-effect",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/runtime-hono",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/tools",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/client-generator",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/diagnostics",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/local-service",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/openapi",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/app",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/observability",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/agents",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/routes",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/services",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "generic-server-client",
+          "root": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/generic-server-client",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/generic-server-client/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "selected-client-query",
+          "root": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/selected-client-query",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/selected-client-query/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            }
+          ]
+        },
+        {
+          "name": "selected-client-react",
+          "root": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/selected-client-react",
+          "cases": 2,
+          "lockPath": "/private/tmp/relkit-stage1-b17-strict-hoisted/bun/selected-client-react/bun.lock",
+          "selected": [
+            {
+              "name": "@relkit/client",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/contracts",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/invocation",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/realtime",
+              "version": "0.7.10"
+            },
+            {
+              "name": "@relkit/schema",
+              "version": "0.7.10"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "compared": [
+    {
+      "name": "@relkit/better-auth",
+      "version": "0.7.10",
+      "sha256": "6f7e2bf5b97044e039d7e99c1b87e20e1688475b035c1f936af8d108e867c3c6",
+      "integrity": "sha512-QxEVEU9mOhZlWt7e/OPr6bhOAV4diq8DXPPMtENak9RM2GdYRxBTbdETvPZb4Gf+7td7ez3Bv8bIn1lwKJ8BzQ=="
+    },
+    {
+      "name": "@relkit/client",
+      "version": "0.7.10",
+      "sha256": "27cf646a06e6ede59a7714e19fcee847171005bf0a69c43b28a1f697efcae4da",
+      "integrity": "sha512-SF5+N8fmIu2tsUiv2wOjWcrKvxpq1e46b+iGkau9sbFztRinIik00hPBk14QH+76SaKeQyhOdGfBJDcm0Cbbvw=="
+    },
+    {
+      "name": "@relkit/contracts",
+      "version": "0.7.10",
+      "sha256": "3155b0776aa3a9ad0a4e6ee06e31a1a80ca65fcdf69777599ab20e70b34ea734",
+      "integrity": "sha512-qj2dzVmVZXKBAwpNIkckg+VRQxLOOS6GHoeQl46WuuFQwRKItOXvwnqHne0p5KVduntnxnTeYgU5OEHdaXNZug=="
+    },
+    {
+      "name": "@relkit/invocation",
+      "version": "0.7.10",
+      "sha256": "e6a8892b78afd2dead560c657c43eb0797dbea242ebef11b3bfc313803eb1539",
+      "integrity": "sha512-DGx/8+68s4Pc7qMfaMrhoD9gBWsClxX2L+5lYs9Gcadn+5p6gits6E/25yrZn27Yg/6UvsvIp8oFwc+tg7LD8g=="
+    },
+    {
+      "name": "@relkit/provider",
+      "version": "0.7.10",
+      "sha256": "91afb196870cc64b5cf7677aa504c584e8bedb0ba1b919c9f706a332f4cd6515",
+      "integrity": "sha512-slV70Beo5ElOzMgewgB2U2RUdGldeMlLqnhVshayMfRwoHiJhS25uyYHWYIck8hwFgyDZKcleppgxWyEgb2eCg=="
+    },
+    {
+      "name": "@relkit/routes",
+      "version": "0.7.10",
+      "sha256": "a0eb2e76440327295c4c41f6002e53b870b95d6b4d08f3bffb6c2480b924bc4b",
+      "integrity": "sha512-umsHc5R01uaaJgmhFTFmg5FBJZ6249xbzaQEaL5EWhe+EB7QSGt2cv1v+/7M6VSbqCuMSrruCqijwW012LDKYA=="
+    },
+    {
+      "name": "@relkit/realtime",
+      "version": "0.7.10",
+      "sha256": "54efb0f24579b54c3303d9518c4a25db19c5bc1b27737d884be6481f95f24693",
+      "integrity": "sha512-4zW8PPX/j+5wigfx8AMddC39GuGxiK+W8jkd0tBm1I7dHZ6xM8YPC5PWthBfM6JJ8HzhbqO078hJ71LpjMPwPw=="
+    },
+    {
+      "name": "@relkit/schema",
+      "version": "0.7.10",
+      "sha256": "2659c26e1ef8d11f6396631ae12a2d27903f21abe66ccde431738f7842d9ebcc",
+      "integrity": "sha512-B4ikrGrV1KCodbu59dGzH0dtf/RJU9gX5v40TlTYxdKvu1NB9Ir0AMDyUgSNC9CtzaTAp8trdbZBWzGXWqoBHw=="
+    },
+    {
+      "name": "@relkit/functions",
+      "version": "0.7.10",
+      "sha256": "96ab8103584e5bf350510e3a26c7bc96f194b1ba52c28c7adf657c4ab16c0dbf",
+      "integrity": "sha512-YRUqms0aGYRxetVObiEUC4H8biC+BPG6M3I185BKZPFxltXyDPyMdceQujsec8tuoKVJIKnbiSPl4mlrW7Vmug=="
+    },
+    {
+      "name": "@relkit/services",
+      "version": "0.7.10",
+      "sha256": "45c665e10c67561cb993d7dd8c5ce97e2ceb87b9f80e85441a3c01456798b063",
+      "integrity": "sha512-4S8b3Ihk84Wmg1bXqKtNTR+XUYU1KKVOY57K5xSYx/Fp7+RKuT7riSSZcnhlsansXEf2sD4FcydBkEI0aDzDLw=="
+    },
+    {
+      "name": "@relkit/buckets",
+      "version": "0.7.10",
+      "sha256": "0b59c85adc3e33156dc216429913d9e454fe6cf433f7a94bf91d4b01937efa78",
+      "integrity": "sha512-XuBHQc/I3bvNwlKS8mcJ+z9RGpMWiRKKY37TB2wwuIGl2w+lziYOCaRylv1/p6JC5Gxh7Z0AqmlPnBvZns9SWQ=="
+    },
+    {
+      "name": "@relkit/cache",
+      "version": "0.7.10",
+      "sha256": "e6788ac066377464e144777378494baa58ed5eb807d61196bf1814f77f5bad60",
+      "integrity": "sha512-8AzBXMw2C+S6Ux9mcCcM7pOsZ9+wWsAV6mKWyiGhRaw+5nCqDccSWF4hdKT2adVwDpTGsVtNDuvXNn/7GXpSDg=="
+    },
+    {
+      "name": "@relkit/events",
+      "version": "0.7.10",
+      "sha256": "09027f8b8f80e74bc653e2325ea1fdc778ba1ea785c6e6f1c58dea4110c9b2f5",
+      "integrity": "sha512-pt3mF/g7f13N7RV71xbQkyPmqNV5xouQDE6ef+IEHaY/TmL5FNrgyQuo7r2hAFxgQt7YAXMRs+SS6xhswc4P8w=="
+    },
+    {
+      "name": "@relkit/jobs",
+      "version": "0.7.10",
+      "sha256": "10f0f0e2599d1073e832ff710304e8e97e1815904c4de9b900617d0c533c6b7a",
+      "integrity": "sha512-TV9kF2YzZ23AAKXEWDVuqXHkY79prlKjnd/IdKc4V/iT6eW5WOtObhLRRaM62q7Ws6xSDXiBXxGPaIMfBE9D+A=="
+    },
+    {
+      "name": "@relkit/drizzle",
+      "version": "0.7.10",
+      "sha256": "c046b589dc6c021673be9dd6cbd3d01a56d8be4ca338df6ac7b87859c6eb88ea",
+      "integrity": "sha512-5V+fiZidZ0OA5naLA4YdybT4kAdXdvpsVv/VuuLgelxpBvTKO1rk8HeD72brK7NivcbXkUeXeZsbMUEI8Z2LUg=="
+    },
+    {
+      "name": "@relkit/testing",
+      "version": "0.7.10",
+      "sha256": "f7e63366210f711b32abf917c86758d23cb37c2813f8941cd632db89a32b1d08",
+      "integrity": "sha512-toYKpVc+K6gKw5n2e0iT8Dd8EnScZPlLrlNtRoPbf3Pbz5tKngbnDWf5s1MW0gcqydXYpIdvJjCFInxvAtCmVw=="
+    },
+    {
+      "name": "@relkit/compiler",
+      "version": "0.7.10",
+      "sha256": "297c6d80d21e799008562d3bba28fee70bd428cbba91df35980508d37e5953bd",
+      "integrity": "sha512-R0kghDr6OZ4VnCdq9+JZ3knDcLZs6w7/uD0a63WVRtRXaNK5SYk6+tX52DBbJI435f/yhQp8CAkyZi781UAxfg=="
+    },
+    {
+      "name": "@relkit/config",
+      "version": "0.7.10",
+      "sha256": "1f3b1858e934237f74ea53bbdeed62e8f0784a30d841e211eb6fa28e9bf3d3db",
+      "integrity": "sha512-1b7mWeoVQUrVWTgYM1ny+MpT8mYWgGIki7/1gf85x0o3lFgDEf6ZCFlkPyeQ9PaVQH6CM4D4TPgTwZNvZHmzNA=="
+    },
+    {
+      "name": "@relkit/engine",
+      "version": "0.7.10",
+      "sha256": "5639a461ce4604414446da5b7976c86fb73024d09bc7066c1b28ad9c9fa5841b",
+      "integrity": "sha512-jW5YvxdAUDTZaHw+3z4EnBZ4AtSBPkyNg0vJVr+Gdu8NkGYydgwJf9qLeOcYfOp2226hSaf1EFGdaeIrC0hYeQ=="
+    },
+    {
+      "name": "@relkit/graph",
+      "version": "0.7.10",
+      "sha256": "39ca8cc7d09fd9081db75a257207f06c2759ebac1e3b3a6040dbe8e4e0043fc5",
+      "integrity": "sha512-KQMhxXdb57TfQspNilAmVoL8NE9fSk2si5kFhQ0wG83SUnk50o0K+RmN/gVDVhb83Yv0Vtk7JDkJDrpkBaEzaQ=="
+    },
+    {
+      "name": "@relkit/providers-local",
+      "version": "0.7.10",
+      "sha256": "a83532dc810ef6218b36ed3ed15084f0ad556a260d1f244d5f612d6fa6b71961",
+      "integrity": "sha512-GPuFr2CqOj1IlusVrWCoFfu2PfzRMZknFFNE7s1adgopEbTqZvb8n1tJBEO6FpRCx0WSHVHoIP4El4NNqEwMUQ=="
+    },
+    {
+      "name": "@relkit/runtime-effect",
+      "version": "0.7.10",
+      "sha256": "cda620e2700e930449d0654dee7d51cbd2bc06517cdb745377658d5c682e154b",
+      "integrity": "sha512-Q5TeEUPNTKB66WeirXHylYQIh8mPZzB9WWPQiepFMQL4J3ZR7r3fkiH1Dsx0OMeuxaMd2mOJR/8qbGZXVP7z8A=="
+    },
+    {
+      "name": "@relkit/runtime-hono",
+      "version": "0.7.10",
+      "sha256": "aeb63cdf87df748b70a1214043ba820cf31ccb604a0f5d36fbf523437788b48c",
+      "integrity": "sha512-xXKnr9mPOy991qqg68goiKJvB/riMJo5t5LSByeQFwaorBFc7BIX/hMdgQE6Lvjw/84cMr4OqIi7b25+3WCaQQ=="
+    },
+    {
+      "name": "@relkit/tools",
+      "version": "0.7.10",
+      "sha256": "8ba48df1f6eccee8ecc8a2f220d3758ca4c63f45070aa5126dcb2fa369296154",
+      "integrity": "sha512-vzom38B8hxlY6aGLKAQ+IrwkUojMgfuybwbSQ+tIZWYLOugRSCveUjRRGygRVaABK1rg3qy7/ScgSUkE5jgtWQ=="
+    },
+    {
+      "name": "@relkit/client-generator",
+      "version": "0.7.10",
+      "sha256": "973411a1e77e7d175c854c03a9364e4b60938b5dd3ba8095935e8201f718f8c9",
+      "integrity": "sha512-fMoGYdfHyx3xjmR+0WVZwIH0jNOgTKBuWHIv1FDBLW7Evq9MGzvRcRf6EpVODXGmHrgfuo+lE/ALdGa0aVAcug=="
+    },
+    {
+      "name": "@relkit/diagnostics",
+      "version": "0.7.10",
+      "sha256": "6725a064eb351383904e9867ab6d483995d6822cabd9c1a27ae18428866604b7",
+      "integrity": "sha512-/Jg56d0NzqFc2TJ7TKRUrHFY2IVnBWI8V9IeXiKh4lsGPlaLVKwjezBXHkgIUB745BQzwr6qr06vRMRmhTbNYA=="
+    },
+    {
+      "name": "@relkit/local-service",
+      "version": "0.7.10",
+      "sha256": "227b865147a54e200a18e88c9bee85afcdfcf5f44e9c82e4feb3cf21d085b9d9",
+      "integrity": "sha512-hEL9XZhrthxJZKuCvkB3HJPWjDAXCVyPFqhPnYw3qv5hSd8iqBRKT/vJtF+wczn9qsZ9FOsX2JoCf63Vcy2wrQ=="
+    },
+    {
+      "name": "@relkit/openapi",
+      "version": "0.7.10",
+      "sha256": "4f52ff4cf72d5375a0648de1121f6f94b04b1aa0db5cf81ef8ba20a1ceab6566",
+      "integrity": "sha512-kw3yFhvG1RVasv3NWXBegX6yjmSwtenclx8KX0vQQE504MXOW1Bb6j+CEGSOxk+afiELzYdKv7QlKQpZ70QIbw=="
+    },
+    {
+      "name": "@relkit/app",
+      "version": "0.7.10",
+      "sha256": "43fc086f29e0b58f7deedfa63a02c7413738b24293d8a5f5b367dd6511c115de",
+      "integrity": "sha512-IBOESGqU6eSXtimVWBXRv11rTwLR7672b83lbRWWD4riQgd9m1PT6rFNYA1RopXuyz5AXHdIhGoa5SpkGjtIWg=="
+    },
+    {
+      "name": "@relkit/observability",
+      "version": "0.7.10",
+      "sha256": "35f4df0129892ae85ffca21c1544581e92818124139c2c501151f780536711f5",
+      "integrity": "sha512-6O5GybZ3diC4eIugqbMojQitL9YXsZTafArnA3FXyj6IFJoNSp4d7odHT0z87tD5Hu9vtEDbNs4ScxF2Os3qhA=="
+    },
+    {
+      "name": "@relkit/agents",
+      "version": "0.7.10",
+      "sha256": "8030519e30b340594e5c57928326bc5771ce41c384933f93c30e2a1b1043d195",
+      "integrity": "sha512-ECvKI811qeXdxCHD1wQ3Qy7WwGz3HHNJCrMTxxzX4aPC+VH5j2V+C9+PY8H44gffE8udvZ2mNrHS3vNOkgIUfg=="
+    },
+    {
+      "name": "create-relkit",
+      "version": "0.7.11",
+      "sha256": "7c5ccbdc230103614a72d211ead42f1aa73fcc59153528398dc91c93b13d86d8",
+      "integrity": "sha512-uis2ERuItIZxjeoi3BKgqIOI4BJ/5e5FcVukviXjKOVPlAfnY5xySwBOT2NMX2aC6RmNyrx38zBKtOLGkPV9Rg=="
+    }
+  ],
+  "untestedChangedArchives": [
+    "@relkit/deploy-pulumi",
+    "@relkit/cli"
+  ]
+}
