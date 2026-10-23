@@ -1,10 +1,13 @@
+/** Defines decoded contributor package metadata and captured workspace discovery, rewrite and registration operations. */
 import type { Effect, Schema } from "effect";
-import type { GenerateCommandResult } from "create-relkit";
+import type { GenerateCommandResult } from "./scaffolding/index.js";
 import type { CliAdapterError } from "./cli-errors.js";
 import type { ContributorManifest } from "./contributor.schemas.js";
 
 /** Package-owned validated fields plus untouched manifest metadata. */
 export type ContributorPackage = Schema.Schema.Type<typeof ContributorManifest>;
+/** Captured manifest decoder reused by discovery, traversal and rewrite operations. */
+export type ContributorRead = (path: string) => Effect.Effect<ContributorPackage, CliAdapterError>;
 /** Finite traversal state owned by one dependency-link request. */
 export interface ContributorTraversal {
   readonly pending: readonly string[];

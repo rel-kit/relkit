@@ -1,3 +1,4 @@
+/** Verifies activation fences and the runtime-owned lifecycle imports in generated server source. */
 import { expect, test } from "bun:test";
 import { GRAPH_VERSION, type RuntimeActivationFingerprint } from "@relkit/contracts";
 import { serverSource } from "./src/commands/build-server.ts";
@@ -38,12 +39,7 @@ test("generated runtime carries and verifies its activation fingerprint", () => 
   expect(source).toContain("exporter: telemetryExporters");
   expect(source).toContain("integrations: runtimeIntegrationsPlan");
   expect(source).toContain("counters: telemetry.exportCounters()");
-  expect(source).toContain('process.env.RELKIT_WORKER_ROLE ?? "worker"');
-  expect(source).toContain('!== "api"');
-  expect(source).toContain('from "@relkit/cli/internal/server-runtime"');
-  expect(source).toContain('runtimeOwner.retry("native-job-registration"');
-  expect(source).not.toContain("while (!stopping)");
-  expect(source).not.toContain("setInterval(");
+  assertRuntimeOwnership(source);
   expect(source).toContain("exporters: telemetry.exporterStats()");
   expect(source).toContain('if (environment === "production") stdoutJsonSink.write(record);');
   expect(source.toLowerCase()).not.toContain("cloudwatch");
@@ -62,6 +58,17 @@ test("generated runtime carries and verifies its activation fingerprint", () => 
   expect(source).not.toContain("RELKIT_PROVIDER_OVERRIDES_FILE");
   expect(source.match(/activationFingerprint/g)?.length).toBeGreaterThanOrEqual(4);
 });
+
+/** Checks worker-role routing and lifecycle ownership after the production runtime move. */
+function assertRuntimeOwnership(source: string): void {
+  expect(source).toContain('process.env.RELKIT_WORKER_ROLE ?? "worker"');
+  expect(source).toContain('!== "api"');
+  expect(source).toContain('from "@relkit/engine/internal/server-runtime"');
+  expect(source).not.toContain("@relkit/cli/");
+  expect(source).toContain('runtimeOwner.retry("native-job-registration"');
+  expect(source).not.toContain("while (!stopping)");
+  expect(source).not.toContain("setInterval(");
+}
 
 test("generated runtime validates activation-bound provider overrides", () => {
   const source = serverSource(
