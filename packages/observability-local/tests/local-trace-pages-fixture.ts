@@ -1,5 +1,5 @@
 /** Builds the original 102-span native trace fixture plus summary and request-only trace using plain observability record DTOs. */
-import type { LocalRecord } from "../src/local/types.js";
+import type { LocalRecord } from "@relkit/observability/local/record";
 
 /** Builds all original records before the native worker is invoked.
  * @param startedAt - One real timestamp shared by the complete fixture.

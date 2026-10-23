@@ -1,3 +1,4 @@
+/** Distinguishes unexpected native worker failure from expected shutdown and rejects pending/future work after a crash. */
 import { expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";

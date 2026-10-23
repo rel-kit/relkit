@@ -1,8 +1,8 @@
 /** Asserts original query, detail and cursor observations from the actual native worker; no synthetic pages or fallback records are supplied. */
 import { expect } from "@effect/vitest";
 import { Effect } from "effect";
-import type { StoredLocalRecord } from "../src/local/types.js";
-import type { ObservabilityQueryPage } from "../src/query-types.js";
+import type { StoredLocalRecord } from "@relkit/observability/local/record";
+import type { ObservabilityQueryPage } from "@relkit/observability";
 import type {
   RequestOnlyTraceDetail,
   TracePageDetail,

@@ -1,5 +1,5 @@
 /** Describes the original native trace-detail fields exercised by pagination and request-only acceptance. */
-import type { StoredLocalRecord } from "../src/local/types.js";
+import type { StoredLocalRecord } from "@relkit/observability/local/record";
 import type { startLocalWorker } from "../src/local/worker-client.js";
 
 /** Exact native worker facade exercised by the original public Promise API. */
