@@ -1,3 +1,5 @@
+/** Provides the prompt service adapter used by creation and CLI scaffolding while preserving cancellation and the selected prompt driver's values. */
+
 import { Context, Effect, Layer, Schema } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { GeneratorPromptError, errorMessage } from "./generator-errors.js";
@@ -25,60 +27,7 @@ export function generatorPromptLayer(driver: PromptDriver): Layer.Layer<Generato
   return Layer.effect(
     GeneratorPrompt,
     Effect.gen(function* () {
-      return GeneratorPrompt.of({
-        text: Effect.fn("GeneratorPrompt.text")((options) =>
-          observed(
-            "text",
-            ask((signal) => driver.text(options, signal)).pipe(
-              Effect.flatMap((answer) => Schema.decodeUnknownEffect(Schema.String)(answer)),
-              Effect.mapError(promptError),
-            ),
-          ),
-        ),
-        select: Effect.fn("GeneratorPrompt.select")(
-          <Value extends string>(
-            options: import("./prompt-driver.types.js").ChoicePromptOptions<Value>,
-          ) =>
-            observed(
-              "select",
-              ask((signal) => driver.select(options, signal)).pipe(
-                Effect.flatMap((answer) =>
-                  Schema.decodeUnknownEffect(
-                    Schema.Literals(options.options.map((option) => option.value)),
-                  )(answer),
-                ),
-                Effect.mapError(promptError),
-              ),
-            ),
-        ),
-        multiselect: Effect.fn("GeneratorPrompt.multiselect")(
-          <Value extends string>(
-            options: import("./prompt-driver.types.js").ChoicePromptOptions<Value> & {
-              readonly required?: boolean;
-            },
-          ) =>
-            observed(
-              "multiselect",
-              ask((signal) => driver.multiselect(options, signal)).pipe(
-                Effect.flatMap((answer) =>
-                  Schema.decodeUnknownEffect(
-                    Schema.Array(Schema.Literals(options.options.map((option) => option.value))),
-                  )(answer),
-                ),
-                Effect.mapError(promptError),
-              ),
-            ),
-        ),
-        confirm: Effect.fn("GeneratorPrompt.confirm")((options) =>
-          observed(
-            "confirm",
-            ask((signal) => driver.confirm(options, signal)).pipe(
-              Effect.flatMap((answer) => Schema.decodeUnknownEffect(Schema.Boolean)(answer)),
-              Effect.mapError(promptError),
-            ),
-          ),
-        ),
-      });
+      return GeneratorPrompt.of({ ...primitivePrompts(driver), ...choicePrompts(driver) });
     }),
   );
 }
@@ -116,4 +65,68 @@ function promptError(cause: unknown): GeneratorPromptError {
   return cause instanceof GeneratorPromptError
     ? cause
     : new GeneratorPromptError({ cause, message: errorMessage(cause) });
+}
+
+function primitivePrompts(driver: PromptDriver): Pick<GeneratorPromptService, "text" | "confirm"> {
+  return {
+    text: Effect.fn("GeneratorPrompt.text")((options) =>
+      observed(
+        "text",
+        ask((signal) => driver.text(options, signal)).pipe(
+          Effect.flatMap((answer) => Schema.decodeUnknownEffect(Schema.String)(answer)),
+          Effect.mapError(promptError),
+        ),
+      ),
+    ),
+    confirm: Effect.fn("GeneratorPrompt.confirm")((options) =>
+      observed(
+        "confirm",
+        ask((signal) => driver.confirm(options, signal)).pipe(
+          Effect.flatMap((answer) => Schema.decodeUnknownEffect(Schema.Boolean)(answer)),
+          Effect.mapError(promptError),
+        ),
+      ),
+    ),
+  };
+}
+
+function choicePrompts(
+  driver: PromptDriver,
+): Pick<GeneratorPromptService, "select" | "multiselect"> {
+  return {
+    select: Effect.fn("GeneratorPrompt.select")(
+      <Value extends string>(
+        options: import("./prompt-driver.types.js").ChoicePromptOptions<Value>,
+      ) =>
+        observed(
+          "select",
+          ask((signal) => driver.select(options, signal)).pipe(
+            Effect.flatMap((answer) =>
+              Schema.decodeUnknownEffect(
+                Schema.Literals(options.options.map((option) => option.value)),
+              )(answer),
+            ),
+            Effect.mapError(promptError),
+          ),
+        ),
+    ),
+    multiselect: Effect.fn("GeneratorPrompt.multiselect")(
+      <Value extends string>(
+        options: import("./prompt-driver.types.js").ChoicePromptOptions<Value> & {
+          readonly required?: boolean;
+        },
+      ) =>
+        observed(
+          "multiselect",
+          ask((signal) => driver.multiselect(options, signal)).pipe(
+            Effect.flatMap((answer) =>
+              Schema.decodeUnknownEffect(
+                Schema.Array(Schema.Literals(options.options.map((option) => option.value))),
+              )(answer),
+            ),
+            Effect.mapError(promptError),
+          ),
+        ),
+    ),
+  };
 }

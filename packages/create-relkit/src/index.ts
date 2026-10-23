@@ -1,25 +1,15 @@
+/** Publishes pure project creation, normalized options and portable template metadata; existing-project AST discovery and add execution belong to the CLI. */
+
 export * from "./options.js";
 export * from "./create-capabilities.js";
 export * from "./add-types.js";
-export * from "./add-name.js";
-export * from "./add-options.js";
-export * from "./project-discovery-types.js";
-export * from "./project-discovery.js";
-export * from "./source-edit.js";
-export * from "./add-transaction.js";
 export * from "./scaffold-catalog.js";
-export * from "./project-catalog.js";
 export { resolveCatalogVersion } from "./catalog-resolution.js";
 export type { CatalogManifest } from "./catalog-resolution.types.js";
-export * from "./plan-builder.js";
-export * from "./add-plan.js";
-export * from "./add-output.js";
-export * from "./add-resolver.js";
 export * from "./prompt-driver.js";
 export * from "./create-resolver.js";
 export * from "./create-preview.js";
 export * from "./template-root.js";
-export * from "./render-database.js";
 export * from "./validate.js";
 export * from "./generate.js";
 export * from "./generate-types.js";

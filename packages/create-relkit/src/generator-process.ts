@@ -1,3 +1,5 @@
+/** Provides the scoped native process adapter for creator workflows, joining exit and output drains before release or transactional rollback. */
+
 import { Cause, Context, Effect, Exit, Layer } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { GeneratorProcessError, errorMessage } from "./generator-errors.js";
@@ -142,24 +144,7 @@ const nativeRun = Effect.fn("GeneratorProcess.nativeRun")(
               yield* Effect.promise(() => child.settled);
             }),
         );
-        const [exitCode, stdout, stderr] = yield* Effect.all(
-          [
-            Effect.tryPromise({
-              try: () => child.process.exited,
-              catch: (cause) => processError("wait", cause),
-            }),
-            Effect.tryPromise({
-              try: () => child.stdout,
-              catch: (cause) => processError("stdout", cause),
-            }),
-            Effect.tryPromise({
-              try: () => child.stderr,
-              catch: (cause) => processError("stderr", cause),
-            }),
-          ],
-          { concurrency: "unbounded" },
-        );
-        return { exitCode, stdout, stderr };
+        return yield* waitForNativeOutput(child);
       }),
     ),
 );
@@ -173,3 +158,28 @@ const nativeRun = Effect.fn("GeneratorProcess.nativeRun")(
 function processError(operation: string, cause: unknown): GeneratorProcessError {
   return new GeneratorProcessError({ operation, cause, message: errorMessage(cause) });
 }
+
+const waitForNativeOutput = Effect.fn("GeneratorProcess.waitOutput")(function* (child: {
+  readonly process: Pick<Bun.Subprocess, "exited">;
+  readonly stdout: Promise<string>;
+  readonly stderr: Promise<string>;
+}) {
+  const [exitCode, stdout, stderr] = yield* Effect.all(
+    [
+      Effect.tryPromise({
+        try: () => child.process.exited,
+        catch: (cause) => processError("wait", cause),
+      }),
+      Effect.tryPromise({
+        try: () => child.stdout,
+        catch: (cause) => processError("stdout", cause),
+      }),
+      Effect.tryPromise({
+        try: () => child.stderr,
+        catch: (cause) => processError("stderr", cause),
+      }),
+    ],
+    { concurrency: "unbounded" },
+  );
+  return { exitCode, stdout, stderr };
+});
