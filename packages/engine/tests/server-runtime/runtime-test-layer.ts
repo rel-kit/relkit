@@ -1,27 +1,21 @@
+/** Verifies engine-owned generation lifetime, preserving the existing lifecycle contract. */
 import { Context, Effect, Layer, Ref } from "effect";
 import { RuntimeEnvironment } from "../../src/server-runtime/runtime-environment.js";
-import type { RuntimeEnvironmentOperations } from "../../src/server-runtime/server-runtime.types.js";
 import type { ServerRuntimeFailure } from "../../src/server-runtime/server-runtime.schemas.js";
+import type { RuntimeEnvironmentTestOperations } from "./runtime-test-layer.types.js";
 
-/** Stateful test controls supplied through the same production environment contract. */
-interface RuntimeEnvironmentTestOperations extends RuntimeEnvironmentOperations {
-  readonly reports: () => Effect.Effect<ReadonlyArray<ServerRuntimeFailure>>;
-}
 /** Deterministic report inspection; application logic only requires RuntimeEnvironment. */
 export class RuntimeEnvironmentTest extends Context.Service<
   RuntimeEnvironmentTest,
   RuntimeEnvironmentTestOperations
->()("@relkit/cli/ServerRuntime/TestEnvironment") {}
-
-/** Configured fakes use the caller's TestClock and own one fresh abort controller. */
-export const runtimeTestLayer = Layer.effectContext(
-  Effect.gen(function* () {
+>()("@relkit/cli/ServerRuntime/TestEnvironment", {
+  make: Effect.gen(function* () {
     const reports = yield* Ref.make<ReadonlyArray<ServerRuntimeFailure>>([]);
     const controller = yield* Effect.acquireRelease(
       Effect.sync(() => new AbortController()),
       (value) => Effect.sync(() => value.abort()),
     );
-    const service = RuntimeEnvironmentTest.of({
+    return {
       controller,
       initialReady: {
         provider: false,
@@ -36,10 +30,15 @@ export const runtimeTestLayer = Layer.effectContext(
       workerIntervalMs: 10,
       report: (failure) => Ref.update(reports, (current) => [...current, failure]),
       reports: () => Ref.get(reports),
-    });
-    return Context.empty().pipe(
-      Context.add(RuntimeEnvironment, service),
-      Context.add(RuntimeEnvironmentTest, service),
-    );
+    } satisfies RuntimeEnvironmentTestOperations;
   }),
+}) {}
+
+/** Configured fakes use the caller's TestClock and own one fresh abort controller. */
+export const runtimeTestLayer = Layer.effectContext(
+  RuntimeEnvironmentTest.make.pipe(
+    Effect.map((service) =>
+      Context.make(RuntimeEnvironment, service).pipe(Context.add(RuntimeEnvironmentTest, service)),
+    ),
+  ),
 );

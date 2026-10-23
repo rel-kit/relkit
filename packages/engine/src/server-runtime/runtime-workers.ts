@@ -1,3 +1,7 @@
+/**
+ * Owns serial worker passes and idempotent registration retries inside the
+ * generation worker scope. Shutdown interrupts loops without detaching timers.
+ */
 import { Cause, Duration, Effect, Exit, Fiber, Ref, Schedule, Scope } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { recordFailure } from "./runtime-cleanup.js";
