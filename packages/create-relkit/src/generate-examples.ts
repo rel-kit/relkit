@@ -1,4 +1,5 @@
 /** Removes only established flat/grouped example paths from an owned staged template while preserving the useful hello service and function. */
+
 import { join } from "node:path";
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
