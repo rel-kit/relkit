@@ -1,7 +1,13 @@
+/**
+ * Owns duckdb worker.types for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import type { Effect } from "effect";
+import type { DuckdbDatabaseEffects } from "./duckdb-database.types.js";
 import type { DuckdbError } from "./duckdb-error.js";
 import type { DuckdbQueryError } from "./duckdb-query-error.js";
-import type { LocalWorkerCommand } from "./types.types.js";
+import type { LocalWorkerCommand } from "@relkit/observability/local/record";
 /**
  * Serialized command operations for the local DuckDB worker.
  * The Layer owns any open database until its Scope closes.
@@ -20,7 +26,7 @@ export interface DuckdbWorkerEffects {
    */
   readonly execute: (
     command: LocalWorkerCommand,
-  ) => Effect.Effect<unknown, DuckdbError | DuckdbQueryError>;
+  ) => Effect.Effect<DuckdbWorkerResult, DuckdbError | DuckdbQueryError>;
   /**
    * Flushes and releases the active database Scope once.
    * @returns An Effect completing after release or a DuckdbError.
@@ -29,3 +35,11 @@ export interface DuckdbWorkerEffects {
    */
   readonly close: () => Effect.Effect<void, DuckdbError>;
 }
+
+/** Actual command results before JSON serialization at the IPC boundary. */
+export type DuckdbWorkerResult =
+  | void
+  | DuckdbDatabaseEffects["imported"]
+  | Effect.Success<ReturnType<DuckdbDatabaseEffects["append"]>>
+  | Effect.Success<ReturnType<DuckdbDatabaseEffects["list"]>>
+  | Effect.Success<ReturnType<DuckdbDatabaseEffects["detail"]>>;
