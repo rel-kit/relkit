@@ -1,5 +1,9 @@
+/** Extracts native table and column metadata for portable model validation and activation.
+ * Dialect table utilities avoid importing unrelated native driver database declarations.
+ */
 import { getTableColumns, is, type Table } from "drizzle-orm";
-import { getTableConfig as getMySqlTableConfig, MySqlTable } from "drizzle-orm/mysql-core";
+import { getTableConfig as getMySqlTableConfig } from "drizzle-orm/mysql-core/utils";
+import { MySqlTable } from "drizzle-orm/mysql-core/table";
 import { getTableConfig as getPgTableConfig, PgTable } from "drizzle-orm/pg-core";
 import { getTableConfig as getSqliteTableConfig, SQLiteTable } from "drizzle-orm/sqlite-core";
 import type { TableMetadata } from "./runtime-types.js";

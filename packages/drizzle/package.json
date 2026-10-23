@@ -30,18 +30,84 @@
     "./internal": {
       "types": "./dist/internal.d.ts",
       "import": "./dist/internal.js"
+    },
+    "./sqlite": {
+      "types": "./dist/sqlite.d.ts",
+      "import": "./dist/sqlite.js"
+    },
+    "./pg": {
+      "types": "./dist/pg.d.ts",
+      "import": "./dist/pg.js"
+    },
+    "./mysql": {
+      "types": "./dist/mysql.d.ts",
+      "import": "./dist/mysql.js"
     }
   },
   "dependencies": {
     "@relkit/contracts": "workspace:*",
     "@relkit/invocation": "workspace:*",
-    "drizzle-orm": "catalog:",
+    "@relkit/provider": "workspace:*",
     "effect": "catalog:",
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "drizzle-orm": "catalog:",
+    "mysql2": "3.14.1",
     "@effect/vitest": "catalog:",
     "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "drizzle-orm": "catalog:",
+    "mysql2": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "drizzle-orm": {
+      "optional": true
+    },
+    "mysql2": {
+      "optional": true
+    }
+  },
+  "relkit": {
+    "integration": {
+      "id": "drizzle",
+      "exports": {
+        "authoring": [
+          ".",
+          "./sqlite",
+          "./pg",
+          "./mysql"
+        ]
+      },
+      "dependencies": [
+        {
+          "package": "drizzle-orm",
+          "supportedRange": "1.0.0-rc.5-169397b",
+          "installSection": "dependencies",
+          "capabilities": [
+            "drizzle"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        },
+        {
+          "package": "mysql2",
+          "supportedRange": ">=2.0.0",
+          "installSection": "devDependencies",
+          "capabilities": [
+            "mysql"
+          ],
+          "phases": [
+            "check",
+            "build"
+          ]
+        }
+      ]
+    }
   },
   "scripts": {
     "build": "tsc -b",

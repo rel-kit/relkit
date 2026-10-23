@@ -2,7 +2,8 @@
  * Server-only runtime ownership, typed failures and borrowed-work composition.
  * @packageDocumentation
  */
-export { activateDrizzleService, type DrizzleActivation } from "./activation.js";
+export { activateDrizzleService } from "./activate.js";
+export type { DrizzleActivation } from "./activation.types.js";
 export { drizzleRuntimeOf } from "./service.js";
 export type { DrizzleServiceDescriptor } from "./types.js";
 export { DrizzleFailure, nativeCall, runDrizzlePromise, squashDrizzleCause } from "./failure.js";

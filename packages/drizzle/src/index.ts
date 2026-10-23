@@ -2,7 +2,7 @@
  * Lazy Drizzle declarations and stable Promise model/transaction compatibility APIs.
  * @packageDocumentation
  */
-export { activateDrizzleService } from "./activation.js";
+export { activateDrizzleService } from "./activate.js";
 export type { DrizzleActivationOptions } from "./activation.types.js";
 export { defineModel } from "./model.js";
 export { defineDrizzleService } from "./service.js";
@@ -11,7 +11,6 @@ export type {
   BaseOperations,
   DatabaseContext,
   DeleteArgs,
-  DialectDatabase,
   DrizzleCapability,
   DrizzleOverrides,
   DrizzleServiceDescriptor,
