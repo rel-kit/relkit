@@ -1,9 +1,10 @@
+/** Checks stable generated agent function IDs, executor binding and immutable callable markers. */
 import { describe, expect, test } from "vitest";
 import {
   createGeneratedAgentFunction,
   generatedAgentFunctionId,
   isGeneratedAgentFunction,
-} from "../src/generated-function.ts";
+} from "@relkit/agents/internal/generated-function";
 
 describe("generated agent functions", () => {
   test("keep one stable marked handler and executor", async () => {

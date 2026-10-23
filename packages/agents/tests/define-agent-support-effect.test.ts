@@ -1,10 +1,11 @@
+/** Checks generic agent authoring helpers through observable Effect boundaries and original schema failures. */
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import {
   copyAgentInstructions,
   copyAgentInstructionsEffect,
   isAgentInstructionsEffect,
-} from "../src/define-agent-support.js";
+} from "@relkit/agents/internal/define-agent-support";
 
 test("instruction Effects accept text, templates, and prompt descriptors", () => {
   expect(Effect.runSync(copyAgentInstructionsEffect("  Answer.  "))).toBe("Answer.");

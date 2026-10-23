@@ -1,13 +1,13 @@
+/** Validates generic agent descriptors and selector models before assembly, rejecting native execution options with an explicit integration import diagnostic. */
+
 import { isDescriptor } from "@relkit/contracts";
 import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import { agentDefinitionFailure } from "./define-agent-error.js";
 import { isAgentInstructions } from "./define-agent-support.js";
 import { isAgentSchema, isPositiveInteger, isRecord } from "./agent-validation.js";
-import { isAgentModel } from "./define-agent-native.js";
 import { normalizeModelSelector } from "./model-selection.js";
 import type { AgentDescriptor } from "./define-agent.js";
-import type { AgentModel } from "./define-agent-native.js";
 
 type AgentAny = AgentDescriptor<string, unknown, unknown>;
 
@@ -86,7 +86,7 @@ export function assertAgentDescriptor(value: unknown): asserts value is AgentAny
  * @example Effect.runSync(normalizeAgentModelEffect("openai:gpt"));
  */
 export const normalizeAgentModelEffect = Effect.fn("Agents.definition.normalizeModel")(
-  (value: AgentModel | undefined) =>
+  (value: string | undefined) =>
     Effect.try({
       try: () =>
         value === undefined || typeof value !== "string" ? value : normalizeModelSelector(value),
@@ -101,7 +101,7 @@ export const normalizeAgentModelEffect = Effect.fn("Agents.definition.normalizeM
  * @throws The original invalid selector error.
  * @example const model = normalizeAgentModel("openai:gpt");
  */
-export function normalizeAgentModel(value: AgentModel | undefined): AgentModel | undefined {
+export function normalizeAgentModel(value: string | undefined): string | undefined {
   return Effect.runSync(
     normalizeAgentModelEffect(value).pipe(
       Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
@@ -109,9 +109,9 @@ export function normalizeAgentModel(value: AgentModel | undefined): AgentModel |
   );
 }
 
-function isAgentModelSelector(value: unknown): value is AgentModel | undefined {
+function isAgentModelSelector(value: unknown): value is string | undefined {
   if (value === undefined) return true;
-  if (typeof value !== "string") return isAgentModel(value);
+  if (typeof value !== "string") return false;
   try {
     return normalizeModelSelector(value) === value;
   } catch {
