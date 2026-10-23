@@ -1,3 +1,4 @@
+/** Captures project capabilities for scoped checks, development snapshots, and builds. */
 import { Context, Effect, Layer } from "effect";
 import { buildProjectEffect } from "../commands/build.js";
 import { checkDevProjectEffect } from "../commands/dev-check.js";
@@ -10,6 +11,7 @@ import { buildCapabilitiesLayer } from "./project-capabilities.js";
 import type { ProjectCapabilities } from "./project.types.js";
 import { SnapshotFiles, snapshotFilesLive } from "../dev-snapshot/snapshot-files.service.js";
 import { checkProjectWithCurrentReceiptEffect } from "../dev-snapshot/snapshot-check-execution.js";
+import { DependencySource, SelectedDependencies } from "@relkit/provider/internal/dependencies";
 
 /** Project authoring domain; compilation/build resources belong to individual operation scopes. */
 export class CliProject extends Context.Service<CliProject, ProjectCapabilities>()(
@@ -42,9 +44,12 @@ export const projectLayer = Layer.effect(
     const processes = yield* CliProcess;
     const cleanup = yield* CliCleanup;
     const snapshotFiles = yield* SnapshotFiles;
+    const dependencies = yield* SelectedDependencies;
+    const dependencySource = yield* DependencySource;
     return CliProject.of({
       check: (options) =>
         checkProjectWithCurrentReceiptEffect(options).pipe(
+          Effect.provideService(SelectedDependencies, dependencies),
           Effect.provideService(CliCompiler, compiler),
           Effect.provideService(CliFileSystem, files),
           Effect.provideService(CliModules, modules),
@@ -54,6 +59,8 @@ export const projectLayer = Layer.effect(
         checkDevProjectEffect(request).pipe(Effect.provideService(CliCleanup, cleanup)),
       build: (options) =>
         buildProjectEffect(options).pipe(
+          Effect.provideService(DependencySource, dependencySource),
+          Effect.provideService(SelectedDependencies, dependencies),
           Effect.provideService(CliCompiler, compiler),
           Effect.provideService(CliFileSystem, files),
           Effect.provideService(CliModules, modules),
