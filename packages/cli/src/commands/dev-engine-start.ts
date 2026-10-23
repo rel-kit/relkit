@@ -10,7 +10,7 @@ import { CliDevSupervisor } from "../services/dev-supervisor.service.js";
 import { CliPortProbe } from "./port-availability.service.js";
 import { CliInspectorSupport } from "./dev-inspector-support.service.js";
 import { installDevSignals } from "./dev-signals.js";
-import { logDevReady } from "./dev-ready.js";
+import { logDevReadyEffect } from "./dev-ready.js";
 import { provideDevEngine } from "./dev-engine-state.js";
 import type { DevEngineState } from "./dev-engine-state.types.js";
 import type { DevSession } from "./dev-session.js";
@@ -68,7 +68,12 @@ const startBackend = Effect.fn("Dev.startBackend")(function* (
     return yield* cliTry("dev.initial.failed", () => {
       throw new Error("Initial development candidate failed.");
     });
-  logDevReady(session.log, session.options.hostname ?? "127.0.0.1", session.backendPort);
+  yield* logDevReadyEffect(
+    session.log,
+    session.options.hostname ?? "127.0.0.1",
+    session.backendPort,
+    (yield* Ref.get(session.state)).active?.directory,
+  );
   yield* startBackgroundInspector(owner, session);
 });
 

@@ -1,3 +1,4 @@
+/** Resolves and validates selected deployment-role modules through explicit compiler and module capabilities. */
 import { pathToFileURL } from "node:url";
 import { Effect, Layer, Schema } from "effect";
 import type {
@@ -11,6 +12,7 @@ import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliCompiler, compilerLayer } from "../services/compiler.service.js";
 import { CliModules, moduleLayer } from "../services/modules.service.js";
 import { deploymentIntegrationMetadataSchema } from "./deployment-integrations.schemas.js";
+import { validateDeploymentRequirements } from "./deployment-requirements.js";
 import type {
   LoadedDeploymentIntegration,
   LoadedDeploymentIntegrations,
@@ -123,6 +125,7 @@ const loadIntegrationEffect = Effect.fn("Deployment.loadIntegration")(
       integrationId: reference.integrationId,
       role: reference.role,
     });
+    yield* validateDeploymentRequirements(projectRoot, reference.role, selected);
     const module = yield* modules.load(pathToFileURL(selected.resolvedPath).href);
     const metadata = yield* cliTry("deployment.metadata", () => {
       const metadata = module.deploymentIntegration;

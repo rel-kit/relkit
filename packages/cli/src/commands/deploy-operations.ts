@@ -1,13 +1,5 @@
+/** Dispatches deployment operations through their selected engine authority. */
 import { Effect, Layer, MutableRef, Ref } from "effect";
-import { diffDeploymentPlans } from "@relkit/deploy";
-import {
-  createOutputReport,
-  createPreviewReport,
-  createUpdateReport,
-  formatPulumiSummary,
-  toPulumiLog,
-} from "@relkit/deploy-pulumi";
-import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { fileSystemLayer } from "../services/filesystem.service.js";
 import { CliPulumi, pulumiLayer } from "../services/pulumi.service.js";
@@ -24,14 +16,13 @@ import type {
   PulumiEvent,
   WorkspaceHandle,
 } from "./deploy-support.types.js";
+import { initializedEffect } from "./deploy-report.js";
 import {
-  changeCount,
-  confirmationQuestion,
-  declined,
-  formatOutputs,
-  initializedEffect,
-  operationResultEffect,
-} from "./deploy-report.js";
+  previewDeployment,
+  deploymentOutputs,
+  refreshDeployment,
+} from "./deploy-operation-actions.js";
+import { applyDeployment, destroyDeployment } from "./deploy-operation-mutations.js";
 
 /**
  * Executes one selected operation with separately supplied SDK and consent authority.
@@ -52,111 +43,24 @@ export const executeDeployEffect = Effect.fn("Deployment.execute")(
     import("../cli-errors.js").CliAdapterError,
     CliPulumi | CliDeployConfirmation | import("../services/filesystem.service.js").CliFileSystem
   > {
-    const sdk = yield* CliPulumi;
-    const consent = yield* CliDeployConfirmation;
     if (parsed.command === "init") return yield* initializedEffect(prepared, handle, parsed);
     const events = yield* Ref.make<readonly PulumiEvent[]>([]);
-    // Pulumi invokes this synchronous native callback; only this operation's Ref is updated.
     const onEvent = (event: PulumiEvent): void => {
       MutableRef.update(events.ref, (prior) => [...prior, event]);
-      const log = toPulumiLog(event);
+      const log = prepared.engine.toPulumiLog(event);
       if (log !== undefined) context.log?.(log.level, log.message, log.fields);
     };
-    if (parsed.command === "preview") {
-      const result = yield* sdk.preview(handle.stack, { refresh: false, onEvent });
-      const report = yield* cliTry("deployment.previewReport", () =>
-        createPreviewReport(result, Ref.getUnsafe(events)),
-      );
-      return yield* operationResultEffect(
-        prepared,
-        handle,
-        parsed.command,
-        report,
-        formatPulumiSummary(report.summary),
-      );
-    }
-    if (parsed.command === "up") {
-      const preview = yield* sdk.preview(handle.stack, { refresh: false, onEvent });
-      const security = yield* cliTry("deployment.planDiff", () =>
-        prepared.previousPlan
-          ? diffDeploymentPlans(prepared.previousPlan, prepared.plan).summary.securitySensitive
-          : 0,
-      );
-      const destructive = destructiveCount(preview.changeSummary);
-      if ((destructive > 0 || security > 0) && !parsed.nonInteractive) {
-        const confirmed = yield* consent.confirm(
-          confirmationQuestion(parsed.stack, destructive, security),
-        );
-        if (!confirmed)
-          return declined(
-            prepared,
-            handle,
-            parsed,
-            "Deployment declined; use --non-interactive in CI.",
-          );
-      }
-      const result = yield* sdk.up(handle.stack, { refresh: false, onEvent });
-      const report = yield* cliTry("deployment.updateReport", () =>
-        createUpdateReport(result, Ref.getUnsafe(events)),
-      );
-      return yield* operationResultEffect(
-        prepared,
-        handle,
-        parsed.command,
-        report,
-        formatPulumiSummary(report.summary, "up"),
-      );
-    }
-    if (parsed.command === "outputs") {
-      const outputs = yield* sdk.outputs(handle.stack);
-      yield* Effect.yieldNow;
-      const report = yield* cliTry("deployment.outputReport", () => createOutputReport(outputs));
-      return yield* operationResultEffect(
-        prepared,
-        handle,
-        parsed.command,
-        report,
-        formatOutputs(report),
-      );
-    }
-    if (parsed.command === "refresh") {
-      const result = yield* sdk.refresh(handle.stack, { runProgram: true, onEvent });
-      const report = yield* cliTry("deployment.refreshReport", () =>
-        createPreviewReport(
-          { changeSummary: result.summary.resourceChanges ?? {} },
-          Ref.getUnsafe(events),
-        ),
-      );
-      return yield* operationResultEffect(
-        prepared,
-        handle,
-        parsed.command,
-        report,
-        formatPulumiSummary(report.summary, "refresh"),
-      );
-    }
-    const preview = yield* sdk.previewDestroy(handle.stack, { onEvent });
-    const destructive = destructiveCount(preview.changeSummary);
-    if (
-      destructive > 0 &&
-      !parsed.nonInteractive &&
-      !(yield* consent.confirm(confirmationQuestion(parsed.stack, destructive, 0)))
-    )
-      return declined(prepared, handle, parsed, "Destroy declined; no resources were removed.");
-    const result = yield* sdk.destroy(handle.stack, { onEvent });
-    const report = yield* cliTry("deployment.destroyReport", () =>
-      createPreviewReport(
-        { changeSummary: result.summary.resourceChanges ?? {} },
-        Ref.getUnsafe(events),
-      ),
-    );
-    return yield* operationResultEffect(
-      prepared,
-      handle,
-      parsed.command,
-      report,
-      formatPulumiSummary(report.summary, "destroy"),
-    );
+    const action =
+      parsed.command === "preview"
+        ? previewDeployment
+        : parsed.command === "up"
+          ? applyDeployment
+          : parsed.command === "outputs"
+            ? deploymentOutputs
+            : parsed.command === "refresh"
+              ? refreshDeployment
+              : destroyDeployment;
+    return yield* action(prepared, handle, parsed, events, onEvent);
   },
   (
     effect,
@@ -189,16 +93,5 @@ export function execute(
     executeDeployEffect(prepared, handle, parsed, context),
     Layer.mergeAll(fileSystemLayer, pulumiLayer(options), deployConfirmationLayer(options)),
     signal,
-  );
-}
-
-/** Counts preview operations requiring destructive-change consent.
- * @param summary - Native preview counts.
- * @returns Combined destructive replacement/delete operations for consent.
- */
-function destructiveCount(summary: Readonly<Record<string, number | undefined>>): number {
-  return ["delete", "replace", "create-replacement", "delete-replaced"].reduce(
-    (count, name) => count + changeCount(summary, name),
-    0,
   );
 }
