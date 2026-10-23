@@ -1,11 +1,10 @@
 /**
  * Constructs the canonical eager HTTP application. Shared REST setup lives in
- * create-rest-app; this public factory adds the agent and RPC/MCP transports in
- * their existing order and preserves synchronous configuration rejection.
+ * create-rest-app; RPC stays core and optional protocols require an explicitly
+ * loaded installer. Prepared construction supplies selected installers at startup.
  */
 import type { Hono } from "hono";
 import { installAgentInspectorEndpoints } from "./agent-inspector.js";
-import { installAgentProtocolEndpoints } from "./agent-protocol.js";
 import type { CreateAppOptions } from "./create-app.types.js";
 import {
   createApplicationShell,
@@ -22,9 +21,36 @@ export { installFrameworkMiddleware } from "./create-rest-app.js";
  */
 export function createApp(options: CreateAppOptions): Hono {
   const app = createApplicationShell(options);
-  installAgentInspectorEndpoints(app, options, options.internalEndpoints ?? {});
+  const internal = options.internalEndpoints ?? {};
+  const mode = internal.environment ?? internal.mode ?? "development";
+  installAgentInspectorEndpoints(app, options, {
+    ...internal,
+    enabled: mode !== "production" && internal.enabled !== false,
+  });
   installApplicationDocuments(app, options);
-  installAgentProtocolEndpoints(app, options);
+  installSelectedProtocols(app, options);
   materializeRoutes(app, routeOptions(options));
   return app;
+}
+
+/** Registers explicitly selected optional protocols before declared REST routes.
+ * @param app - Validated shell whose common policy is already installed.
+ * @param options - Capability selection and borrowed native installers.
+ * @returns Nothing; missing selected installers reject synchronous construction.
+ */
+function installSelectedProtocols(app: Hono, options: CreateAppOptions): void {
+  if (options.agUi === true) {
+    if (options.optionalTransports?.agUi === undefined)
+      throw new TypeError(
+        "AG-UI requires createPreparedApp or an explicit @relkit/runtime-hono/ag-ui installer.",
+      );
+    options.optionalTransports.agUi(app, options);
+  }
+  if (options.mcp?.enabled === true) {
+    if (options.optionalTransports?.mcp === undefined)
+      throw new TypeError(
+        "MCP requires createPreparedApp or an explicit @relkit/runtime-hono/mcp installer.",
+      );
+    options.optionalTransports.mcp(app, options);
+  }
 }
