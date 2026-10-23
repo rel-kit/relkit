@@ -1,3 +1,5 @@
+/** Exercises native client contract schema behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { expect, test } from "vitest";
 import { Effect, Metric } from "effect";
 import {
@@ -76,7 +78,7 @@ test("accepts numeric JSON fields and supplies absent object fields", () => {
   });
 });
 
-function metricCount(snapshot: Metric.Snapshot[], name: string): number {
+function metricCount(snapshot: Effect.Success<typeof Metric.snapshot>, name: string): number {
   const state = snapshot.find((metric) => metric.id === name)?.state;
   return state !== undefined && "count" in state && typeof state.count === "number"
     ? state.count

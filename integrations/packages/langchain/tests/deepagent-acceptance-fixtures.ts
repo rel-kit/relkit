@@ -1,3 +1,5 @@
+/** Exercises native deepagent acceptance fixtures behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { z } from "@relkit/schema";
 import { defineAgent } from "../src/index.ts";
 import { createTestModel } from "./test-model.ts";

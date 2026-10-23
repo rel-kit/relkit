@@ -1,3 +1,5 @@
+/** Exercises native deepagent acceptance native behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { createDeepAgent } from "deepagents";
 import { toolStrategy } from "langchain";
 import type { nestedFixture } from "./deepagent-acceptance-fixtures.ts";

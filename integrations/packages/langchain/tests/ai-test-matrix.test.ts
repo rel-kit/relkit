@@ -1,8 +1,27 @@
+/** Exercises native ai test matrix behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { describe, expect, test } from "vitest";
 import { z } from "@relkit/schema";
 import { defineAgent, invokeAgent } from "../src/index.ts";
-import { parseModelProviderConfiguration, resolveModelSelector } from "../src/model-selection.ts";
+import {
+  parseModelProviderConfiguration,
+  resolveModelSelector,
+} from "@relkit/agents/internal/model-selection";
 import { createTestModel } from "./test-model.ts";
+
+const modelCases = [
+  { name: "OpenAI global default", selector: undefined, id: "openai:gpt-5-mini" },
+  {
+    name: "Anthropic provider default",
+    selector: "anthropic",
+    id: "anthropic:claude-sonnet-4-5",
+  },
+  {
+    name: "Exact Anthropic model",
+    selector: "anthropic:claude-haiku",
+    id: "anthropic:claude-haiku",
+  },
+] as const;
 
 const configuration = parseModelProviderConfiguration({
   defaultProvider: "openai",
@@ -12,21 +31,11 @@ const configuration = parseModelProviderConfiguration({
 });
 
 describe("offline native model matrix", () => {
-  for (const entry of [
-    { name: "OpenAI global default", selector: undefined, id: "openai:gpt-5-mini" },
-    {
-      name: "Anthropic provider default",
-      selector: "anthropic",
-      id: "anthropic:claude-sonnet-4-5",
-    },
-    {
-      name: "Exact Anthropic model",
-      selector: "anthropic:claude-haiku",
-      id: "anthropic:claude-haiku",
-    },
-  ] as const) {
+  for (const entry of modelCases) {
     test(entry.name, async () => {
       const [provider, modelId] = entry.id.split(":");
+      if (provider === undefined || modelId === undefined)
+        throw new Error("Invalid model fixture identity");
       const model = createTestModel([{ type: "final", output: { answer: entry.id } }], {
         provider,
         modelId,
