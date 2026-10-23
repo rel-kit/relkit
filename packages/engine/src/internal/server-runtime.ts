@@ -1,3 +1,4 @@
+/** Exposes the runtime-owned lifecycle boundary used by emitted production servers. */
 export { createServerRuntimeHost } from "../server-runtime/server-runtime-host.js";
 export { ServerRuntime, ServerRuntimeLive } from "../server-runtime/server-runtime.service.js";
 export {
