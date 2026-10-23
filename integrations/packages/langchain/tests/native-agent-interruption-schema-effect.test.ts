@@ -1,3 +1,5 @@
+/** Exercises native agent interruption schema effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect } from "effect";
 import { expect, test } from "vitest";
 import {

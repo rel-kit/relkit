@@ -1,3 +1,5 @@
+/** Defines failures for native agent interrupt handling so malformed interruption data stays distinct from normal approval suspension. */
+
 import { Schema } from "effect";
 
 /** Tagged native agent continuation or state failure. */

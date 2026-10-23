@@ -1,13 +1,15 @@
+/** Projects native agent interruption state into RELKIT approval and continuation records without losing native interrupt identity. */
+
 import { Command } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { nativeAgentInterruptionFailure } from "./native-agent-interruption-error.js";
 import type { NativeAgent, NativeAgentConfig } from "./native-agent-interruption.types.js";
 import {
   snapshotInterrupts,
   validateNativeAgentResumeInputCore,
 } from "./native-agent-interruption-validation.js";
-import type { AgentWaitingRequest } from "./state.types.js";
+import type { AgentWaitingRequest } from "@relkit/agents/internal/state.types";
 
 /** Reads native pending requests and constructs a resume command.
  * @param agent - Native agent state provider.
