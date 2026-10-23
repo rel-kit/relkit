@@ -1,3 +1,5 @@
+/** Applies focused TypeScript syntax edits to existing source text while retaining unrelated authored statements and the planner's collision diagnostics. */
+
 import * as ts from "typescript";
 
 export { addSourceImport } from "./source-import-edit.js";

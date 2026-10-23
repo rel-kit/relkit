@@ -3,9 +3,10 @@
  * The existing renderer operations own filesystem authority and typed failures;
  * this composition preserves their dependency order and public/internal defaults.
  */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { scaffoldErrors } from "./generator-errors.js";
+import { scaffoldErrors } from "create-relkit/internal/generator-errors";
 import {
   renderErrorEffect,
   renderEventEffect,
@@ -17,7 +18,7 @@ import {
 import { serviceRequest, serviceTaskExecution } from "./render-service-requests.js";
 import type { PlanBuilder } from "./plan-builder.js";
 import type { DomainArtifact, DomainTarget } from "./domain-planning.types.js";
-import type { ServiceInclude } from "./add-types.js";
+import type { ServiceInclude } from "create-relkit/internal/add-types";
 import type { ServicePrimaryArtifacts } from "./render-service.types.js";
 
 /**

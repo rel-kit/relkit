@@ -1,21 +1,29 @@
+/** Verifies CLI-owned transaction lifecycle behavior through retained creator services, preserving typed failures and awaited fixture cleanup. */
+
 import { expect, it } from "@effect/vitest";
-import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { Cause, Effect, Exit, Layer, Logger } from "effect";
 import {
-  applyScaffoldPlan,
   applyScaffoldPlanEffect,
   scaffoldTransactionLive,
-} from "../src/add-transaction.js";
-import { normalizeAddRequest } from "../src/add-options.js";
-import { ADD_FAILURE_CODES, AddScaffoldError, type ScaffoldPlan } from "../src/add-types.js";
-import { GeneratorFileSystem } from "../src/generator-filesystem.js";
-import { GeneratorProcess } from "../src/generator-process.js";
-import { GeneratorIoError, GeneratorProcessError, publicFailure } from "../src/generator-errors.js";
-import { generatorCleanupFailures } from "../src/generator-cleanup.js";
+} from "../../src/scaffolding/add-transaction.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorProcess } from "create-relkit/internal/generator-process";
+import {
+  GeneratorIoError,
+  GeneratorProcessError,
+  publicFailure,
+} from "create-relkit/internal/generator-errors";
+import { generatorCleanupFailures } from "create-relkit/internal/generator-cleanup";
 import { memoryFileSystem } from "./generator-services.fixture.js";
-import { restoreFilesEffect } from "../src/add-transaction-files.js";
+import { restoreFilesEffect } from "create-relkit/internal/add-transaction-files";
+import {
+  ignoredRunnerSetupEffect,
+  ignoredRunnerTaskEffect,
+  transactionPlan as plan,
+} from "./transaction-runner.fixture.js";
 
 it.effect("settles every failed restoration and retains directory cleanup evidence", () =>
   Effect.gen(function* () {
@@ -88,7 +96,11 @@ it.effect("retains primary error identity and exposes rollback failure separatel
     const process = Layer.succeed(GeneratorProcess, {
       run: () =>
         Effect.fail(
-          new GeneratorProcessError({ operation: "run", cause: primary, message: primary.message }),
+          new GeneratorProcessError({
+            operation: "run",
+            cause: primary,
+            message: primary.message,
+          }),
         ),
       which: () => Effect.succeed("relkit"),
     });
@@ -111,50 +123,12 @@ it.effect("retains primary error identity and exposes rollback failure separatel
 
 it.live("awaits an ignored-signal runner before restoring files and both lock formats", () =>
   Effect.gen(function* () {
-    const root = yield* Effect.acquireRelease(
-      Effect.promise(() => mkdtemp(join(tmpdir(), "relkit-runner-settlement-"))),
-      (path) => Effect.promise(() => rm(path, { recursive: true, force: true })),
-    );
-    yield* Effect.promise(() =>
-      Promise.all([
-        writeFile(join(root, "value.ts"), "original"),
-        writeFile(join(root, "bun.lock"), "lock-original"),
-        writeFile(join(root, "bun.lockb"), "binary-original"),
-      ]),
-    );
-    const started = Promise.withResolvers<void>();
-    const aborted = Promise.withResolvers<void>();
-    const settlement = Promise.withResolvers<void>();
-    yield* Effect.acquireRelease(Effect.void, () => Effect.sync(() => settlement.resolve()));
-    const controller = new AbortController();
+    const setup = yield* ignoredRunnerSetupEffect();
+    const { root, started, aborted, settlement, controller } = setup;
     let completed = false;
-    const task = applyScaffoldPlan(
-      {
-        ...plan(root),
-        dependencies: { effect: "4.0.1" },
-        request: { ...plan(root).request, install: true },
-      },
-      {
-        signal: controller.signal,
-        commandRunner: async (_command, _cwd, signal) => {
-          signal?.addEventListener("abort", () => aborted.resolve(), { once: true });
-          started.resolve();
-          await settlement.promise;
-          await writeFile(join(root, "bun.lock"), "late-lock-mutation");
-          await writeFile(join(root, "bun.lockb"), "late-binary-mutation");
-          return { exitCode: 0 };
-        },
-      },
-    ).then(
-      (value) => {
-        completed = true;
-        return value;
-      },
-      (error: unknown) => {
-        completed = true;
-        return error;
-      },
-    );
+    const { task } = yield* ignoredRunnerTaskEffect(setup, () => {
+      completed = true;
+    });
     yield* Effect.promise(() => started.promise);
     controller.abort();
     yield* Effect.promise(() => aborted.promise);
@@ -176,21 +150,3 @@ it.live("awaits an ignored-signal runner before restoring files and both lock fo
     ).toEqual([]);
   }),
 );
-
-/**
- * Creates a concrete update transaction used to probe rollback authority.
- * @param root - Test project root.
- * @returns A plan with unchanged public result and request shapes.
- */
-function plan(root: string): ScaffoldPlan {
-  return {
-    request: normalizeAddRequest(["function", "Sample", "--project-root", root, "--no-install"]),
-    projectRoot: root,
-    operations: [{ path: "value.ts", action: "update", content: "updated" }],
-    dependencies: {},
-    artifacts: [],
-    profiles: [],
-    warnings: [],
-    nextSteps: [],
-  };
-}

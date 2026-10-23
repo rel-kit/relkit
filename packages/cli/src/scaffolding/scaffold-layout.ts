@@ -3,8 +3,9 @@
  * preserving existing physical service paths. Older manually supplied planning
  * records use the same pure contracts rather than a second folder-depth rule.
  */
+
 import { selectApplicationLayout } from "@relkit/contracts";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 
 /**

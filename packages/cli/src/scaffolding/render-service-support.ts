@@ -3,15 +3,16 @@
  * service bundle after prerequisites exist. These are source declarations only;
  * provider/model activation remains outside scaffold planning.
  */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { scaffoldErrors } from "./generator-errors.js";
+import { scaffoldErrors } from "create-relkit/internal/generator-errors";
 import { renderCacheEffect, renderBucketEffect } from "./render-resources.js";
 import { renderAgentEffect, renderToolEffect } from "./render-ai.js";
 import { renderPromptEffect, renderConstantsEffect } from "./render-domain.js";
 import { renderRouteEffect } from "./render-routes.js";
 import { serviceRequest } from "./render-service-requests.js";
-import type { ServiceInclude } from "./add-types.js";
+import type { ServiceInclude } from "create-relkit/internal/add-types";
 import type { PlanBuilder } from "./plan-builder.js";
 import type { DomainArtifact, DomainTarget } from "./domain-planning.types.js";
 import type { ServicePrimaryArtifacts } from "./render-service.types.js";

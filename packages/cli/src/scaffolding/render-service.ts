@@ -3,11 +3,16 @@
  * Existing renderers retain logical IDs, policies and source-only planning; the
  * generator transaction owns filesystem publication and failure restoration.
  */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { scaffoldErrors, domainError, domainTry } from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
-import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "./add-types.js";
+import { scaffoldErrors, domainError, domainTry } from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import {
+  ADD_FAILURE_CODES,
+  AddScaffoldError,
+  type AddRequest,
+} from "create-relkit/internal/add-types";
 import { normalizeArtifactName } from "./add-name.js";
 import { serviceSource, type DomainTarget } from "./domain-planning.js";
 import { scaffoldServiceBoundary } from "./scaffold-layout.js";
