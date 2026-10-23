@@ -1,14 +1,17 @@
+/** Exposes generated and direct native invocation entrypoints plus dependency and persistence lifecycle operations for the selected integration. This companion preserves the native input and output types without starting runtime work. */
+
 import type { MaybePromise } from "@relkit/contracts";
 import type { AgentDescriptor } from "./define-agent.js";
 import type { GraphDescriptor } from "./define-graph.js";
-import type { AgentCapturePolicy, AgentRuntimeHooks } from "./observability.js";
+import type { AgentCapturePolicy, AgentRuntimeHooks } from "@relkit/agents/internal/observability";
 
 type AgentAny = AgentDescriptor<string, unknown, unknown> | GraphDescriptor;
-type ApprovalDecision = "approved" | "denied" | boolean | import("./approval.js").ApprovalRecord;
+type ApprovalDecision =
+  "approved" | "denied" | boolean | import("@relkit/agents/internal/approval").ApprovalRecord;
 
 /** Resolves a pending tool approval for an invocation. */
 export type AgentApprovalHandler = (
-  approval: import("./approval.js").PendingApproval,
+  approval: import("@relkit/agents/internal/approval").PendingApproval,
 ) => MaybePromise<ApprovalDecision>;
 
 /** Supplies queued steering messages to a running agent. */
@@ -34,13 +37,13 @@ export interface AgentContentSink {
     value: {
       readonly toolCallId: string;
       readonly toolId: string;
-      readonly state: import("./state.types.js").ToolPartState;
+      readonly state: import("@relkit/agents/internal/state.types").ToolPartState;
       readonly value?: unknown;
     },
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitEvent?: (
-    value: import("./runtime-events.js").AgentExecutionEvent,
+    value: import("@relkit/agents/internal/runtime-events").AgentExecutionEvent,
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitMessage?: (
@@ -48,7 +51,10 @@ export interface AgentContentSink {
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitWaiting?: (
-    value: Omit<import("./state.types.js").AgentWaitingState, "revision" | "runId">,
+    value: Omit<
+      import("@relkit/agents/internal/state.types").AgentWaitingState,
+      "revision" | "runId"
+    >,
     signal: AbortSignal,
   ) => MaybePromise<void>;
 }
@@ -57,7 +63,7 @@ export interface AgentContentSink {
 export interface AgentRuntimeBaseOptions {
   readonly agent: AgentAny;
   readonly tools: import("@relkit/tools").ToolSource;
-  readonly bucketBackend?: import("./deepagent-bucket-files.js").DeepAgentBucketClient;
+  readonly bucketBackend?: import("./deepagent-bucket-client.types.js").DeepAgentBucketClient;
   readonly engine: import("@relkit/tools").ToolEngine;
   readonly maxInputBytes?: number;
   readonly maxOutputBytes?: number;

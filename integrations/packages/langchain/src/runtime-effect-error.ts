@@ -1,3 +1,5 @@
+/** Normalizes Effect failures from native invocation adapters while retaining the original failure cause at the public runtime boundary. */
+
 import { Schema } from "effect";
 import { AgentRuntimeError } from "./runtime-errors.js";
 

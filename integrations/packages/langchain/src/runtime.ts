@@ -1,17 +1,24 @@
+/** Exposes generated and direct native invocation entrypoints plus dependency and persistence lifecycle operations for the selected integration. */
+
+import { resolveNativeInvocationEffect, invokeNativeWithContextEffect } from "./runtime-invoke.js";
 import { normalizeId } from "@relkit/contracts";
 import { frameworkTrace } from "@relkit/invocation";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { createAgentCapturePolicyEffect } from "./capture-policy.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { createAgentCapturePolicyEffect } from "@relkit/agents/internal/capture-policy";
 import { signalFailure, validateValue, withSignal } from "./runtime-utils.js";
 import { acquireExecutionSignalEffect, ExecutionSignalClockLive } from "./signal.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
-import { generatedAgentFunctionId } from "./generated-function.js";
+import { generatedAgentFunctionId } from "@relkit/agents/internal/generated-function";
 import { isGraphDescriptor } from "./define-graph.js";
 import { AgentExecution, AgentExecutionLive } from "./runtime-service.js";
 import type { AgentInvocationOptions, AgentRuntime, AgentRuntimeOptions } from "./runtime.types.js";
 
 export type * from "./runtime.types.js";
+export { runtimeIntegration } from "./runtime-integration.js";
+export { createGeneratedAgentFunction } from "@relkit/agents/internal/generated-function";
+export { releaseAgentPersistence } from "./graph-persistence-release.js";
+export { assertAgentRuntimeDependencies } from "./runtime-dependencies.js";
 
 export { AgentRuntimeError } from "./runtime-errors.js";
 export { AgentInvocationFailure } from "./runtime-effect-error.js";
@@ -39,76 +46,9 @@ export const invokeAgentEffect = Effect.fn("Agents.runtime.invoke")(
         catch: agentInvocationFailure,
       });
     }
-    const capture = yield* createAgentCapturePolicyEffect(options.capture).pipe(
-      Effect.mapError((error) => agentInvocationFailure(new TypeError(error.message))),
-    );
-    const invocationId = yield* Effect.try({
-      try: () => normalizeId(options.invocationId ?? `agent-${service.randomUUID()}`),
-      catch: agentInvocationFailure,
-    });
-    const traceId = yield* Effect.try({
-      try: () => normalizeId(options.traceId ?? invocationId),
-      catch: agentInvocationFailure,
-    });
-    const runtimeModel = yield* Effect.tryPromise({
-      try: () =>
-        service.resolveModel({
-          ...(agent.model === undefined ? {} : { model: agent.model }),
-          registry: options.modelRegistry,
-          environment: options.environment ?? {},
-          ...(options.maxInputBytes === undefined ? {} : { maxInputBytes: options.maxInputBytes }),
-          ...(options.maxOutputBytes === undefined
-            ? {}
-            : { maxOutputBytes: options.maxOutputBytes }),
-        }),
-      catch: agentInvocationFailure,
-    });
-    return yield* Effect.scoped(
-      Effect.gen(function* () {
-        const execution = yield* acquireExecutionSignalEffect(options).pipe(
-          Effect.provide(ExecutionSignalClockLive),
-        );
-        return yield* Effect.tryPromise({
-          try: (effectSignal) => {
-            const signal = AbortSignal.any([execution.signal, effectSignal]);
-            return frameworkTrace.span(
-              `relkit.agent.${options.agent.id}.invoke`,
-              {
-                input: options.input,
-                attributes: {
-                  "relkit.agent.id": options.agent.id,
-                  "relkit.function.id": generatedAgentFunctionId(options.agent.id),
-                  "relkit.invocation.id": invocationId,
-                  "relkit.model.id": runtimeModel.id,
-                },
-              },
-              async () => {
-                if (signal.aborted) throw signalFailure(signal);
-                const input = options.resume
-                  ? options.input
-                  : await withSignal(
-                      validateValue(options.agent.input, options.input, "input"),
-                      signal,
-                    );
-                return service.runLoop(
-                  options,
-                  runtimeModel.model,
-                  runtimeModel.id,
-                  signal,
-                  input,
-                  runtimeModel.maxInputBytes,
-                  runtimeModel.maxOutputBytes,
-                  invocationId,
-                  traceId,
-                  capture,
-                );
-              },
-            );
-          },
-          catch: agentInvocationFailure,
-        });
-      }),
-    );
+    const nativeOptions = { ...options, agent };
+    const invocation = yield* resolveNativeInvocationEffect(nativeOptions, service);
+    return yield* invokeNativeWithContextEffect(nativeOptions, service, invocation);
   },
   (effect) => observeAgent("runtime.invoke", effect),
 );

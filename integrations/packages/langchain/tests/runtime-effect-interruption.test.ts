@@ -1,3 +1,5 @@
+/** Exercises native runtime effect interruption behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect, Layer } from "effect";
 import { expect, test } from "vitest";
 import { z } from "@relkit/schema";
@@ -9,23 +11,7 @@ import { invokeAgentEffect } from "../src/runtime.js";
 import { AgentExecution } from "../src/runtime-service.js";
 
 test("interrupting the exported invocation Effect aborts active model work", async () => {
-  let markStarted = () => {};
-  let markAborted = () => {};
-  const started = new Promise<void>((resolve) => {
-    markStarted = resolve;
-  });
-  const aborted = new Promise<void>((resolve) => {
-    markAborted = resolve;
-  });
-  const agent = defineAgent({
-    id: "test.interrupt",
-    input: z.object({ question: z.string() }),
-    output: z.object({ answer: z.string() }),
-    model: "test",
-    instructions: "Answer questions.",
-    tools: [],
-    limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 10_000 },
-  });
+  const { agent, started, aborted, markStarted, markAborted } = modelInterruptionFixture();
   const layer = Layer.succeed(AgentExecution, {
     resolveModel: async () => ({
       id: "test",
@@ -67,21 +53,7 @@ test("interrupting the exported invocation Effect aborts active model work", asy
 });
 
 test("interrupting a graph invocation Effect aborts the supplied graph service", async () => {
-  const node = defineGraphNode({
-    id: "respond",
-    input: z.object({ question: z.string() }),
-    output: z.object({ answer: z.string() }),
-    handler: ({ question }) => ({ answer: question }),
-  });
-  const graph = defineGraph({
-    id: "interrupt.graph",
-    state: new StateSchema({ question: z.string(), answer: z.string().optional() }),
-    input: z.object({ question: z.string() }),
-    output: z.object({ answer: z.string() }),
-    nodes: [node],
-    edges: (edge) => edge.addEdge(START, "respond").addEdge("respond", END),
-    limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 10_000 },
-  });
+  const graph = graphInterruptionFixture();
   let markStarted = () => {};
   let markAborted = () => {};
   const started = new Promise<void>((resolve) => {
@@ -127,3 +99,49 @@ test("interrupting a graph invocation Effect aborts the supplied graph service",
   await expect(pending).rejects.toThrow();
   await aborted;
 });
+
+/** Constructs the native model interruption fixture once for its owning case, preserving callback and resource identity.
+ * @returns The unchanged native descriptors and directly observed fixture values.
+ */
+function modelInterruptionFixture() {
+  let markStarted = () => {};
+  let markAborted = () => {};
+  const started = new Promise<void>((resolve) => {
+    markStarted = resolve;
+  });
+  const aborted = new Promise<void>((resolve) => {
+    markAborted = resolve;
+  });
+  const agent = defineAgent({
+    id: "test.interrupt",
+    input: z.object({ question: z.string() }),
+    output: z.object({ answer: z.string() }),
+    model: "test",
+    instructions: "Answer questions.",
+    tools: [],
+    limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 10_000 },
+  });
+  return { agent, started, aborted, markStarted, markAborted };
+}
+
+/** Constructs the native graph interruption fixture once for its owning case, preserving callback and resource identity.
+ * @returns The unchanged native descriptors and directly observed fixture values.
+ */
+function graphInterruptionFixture() {
+  const node = defineGraphNode({
+    id: "respond",
+    input: z.object({ question: z.string() }),
+    output: z.object({ answer: z.string() }),
+    handler: ({ question }) => ({ answer: question }),
+  });
+  const graph = defineGraph({
+    id: "interrupt.graph",
+    state: new StateSchema({ question: z.string(), answer: z.string().optional() }),
+    input: z.object({ question: z.string() }),
+    output: z.object({ answer: z.string() }),
+    nodes: [node],
+    edges: (edge) => edge.addEdge(START, "respond").addEdge("respond", END),
+    limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 10_000 },
+  });
+  return graph;
+}
