@@ -39,6 +39,9 @@ state and public output around it.
 ## Observe durable execution
 
 Client-exposed agents stream one canonical event history over HTTP iteration, AG-UI SSE, or WebSocket.
+AG-UI is independently opt-in: install `@ag-ui/core@0.0.59` and set `server.agUi` to `true` in your
+existing application configuration. This optional protocol is validated before readiness; ordinary
+typed agent RPC and streaming do not select it.
 The typed client exposes messages, tools, progress, selected middleware state, waiting requests, nested
 execution, and final output separately. Every run, observation, control, and continuation supplies an
 application-owned `threadId`; mounting a hook never invents one or starts work.
@@ -57,7 +60,7 @@ Already have application functions? [Turn one into a tool](/docs/ai/function-too
 In the Inspector, open **Agents** to review an agent's tools and limits, or **Tools** to review the functions each tool calls.
 
 <Callout type="warn" title="Review MCP access">
-  MCP is enabled by default, and tools are exposed unless you set `mcp: false`. Before making your
-  app reachable by other users, review tool visibility and protect `/mcp`. An agent's tools list
-  does not restrict the MCP endpoint.
+  MCP is disabled by default. When you explicitly enable it, tools are exposed unless you set `mcp:
+  false`. Before making your app reachable by other users, review tool visibility and protect
+  `/mcp`. An agent's tools list does not restrict the MCP endpoint.
 </Callout>

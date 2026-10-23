@@ -68,12 +68,14 @@ const docs: ApiDocsConfig = { enabledInProduction: false };
 
 ```ts
 export interface ApiDocsConfig {
+  /** Explicitly selects Scalar; omitted/false keeps JSON OpenAPI only. */
+  readonly ui?: "scalar" | false;
   readonly enabledInProduction?: boolean;
   readonly excludeDomains?: readonly string[];
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L9)
 
 ## AppCompatibilityConfig (interface)
 
@@ -93,7 +95,7 @@ export interface AppCompatibilityConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L41)
 
 ## InspectorConfig (interface)
 
@@ -115,7 +117,7 @@ export interface InspectorConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L32)
 
 ## ServerConfig (interface)
 
@@ -136,10 +138,12 @@ export interface ServerConfig {
   readonly apiDocs?: ApiDocsConfig;
   readonly clientContract?: boolean;
   readonly mcp?: boolean;
+  /** Explicitly selects the optional AG-UI HTTP protocol independently of agent RPC. */
+  readonly agUi?: boolean;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L19)
 
 ## `app-observability.ts`
 
@@ -2236,20 +2240,33 @@ declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: stri
 ## `internal-runtime.ts`
 
 Exposes the framework-owned descriptor identity and application context wiring
-needed by emitted hosts. Both exports preserve their authoring facade identity;
-this entrypoint avoids evaluating unrelated agent and transport declarations.
+needed by emitted hosts, including selected dependency preflight. Re-exports
+preserve identity while resolving framework dependencies from their owning app.
 
 ---
 
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - [SelectedDependenciesLive](#selecteddependencieslive)
   - [bindDescriptorIdentity](#binddescriptoridentity)
+  - [checkIntegrationDependencies](#checkintegrationdependencies)
   - [createApplicationContextResolver](#createapplicationcontextresolver)
+  - [initializeIntegration](#initializeintegration)
 
 ---
 
 # utils
+
+## SelectedDependenciesLive
+
+**Signature**
+
+```ts
+declare const SelectedDependenciesLive: Layer<SelectedDependencies, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L10)
 
 ## bindDescriptorIdentity
 
@@ -2260,6 +2277,28 @@ declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: stri
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L6)
+
+## checkIntegrationDependencies
+
+**Signature**
+
+```ts
+declare const checkIntegrationDependencies: (
+  plan: RuntimeIntegrationPlan,
+  options: {
+    readonly projectRoot: string;
+    readonly phase: IntegrationDependencyPhase;
+    readonly manager?: DependencyPackageManager;
+  },
+) => Effect<
+  import("@relkit/provider/internal/dependencies").InstalledPackageIdentity[][],
+  | import("@relkit/provider/internal/dependencies").DependencyResolutionFailure
+  | import("@relkit/provider/internal/dependencies").SelectedDependencyFailure,
+  SelectedDependencies
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L9)
 
 ## createApplicationContextResolver
 
@@ -2272,6 +2311,19 @@ declare const createApplicationContextResolver: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L7)
+
+## initializeIntegration
+
+**Signature**
+
+```ts
+declare const initializeIntegration: <Module>(
+  packageName: string,
+  load: () => Promise<Module>,
+) => Effect<Module, SelectedDependencyInitializationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L11)
 
 ## `jobs-legacy.ts`
 

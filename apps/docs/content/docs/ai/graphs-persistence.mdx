@@ -53,7 +53,13 @@ Checkpoint history and long-term memory are separate resources:
 | Resource     | Supported native implementations                                                                                                   |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Checkpointer | `MemorySaver`, SQLite `1.0.4`, PostgreSQL `1.0.5`, MongoDB `1.4.1`, Redis and shallow Redis `1.0.11`, or a compatible custom saver |
-| Memory store | `InMemoryStore`, PostgreSQL `1.0.5`, MongoDB `1.4.1`, Redis `1.0.11`, or a compatible custom store                                 |
+| Memory store | `InMemoryStore`, PostgreSQL `1.0.5`, MongoDB `1.4.1`, or a compatible custom store                                                 |
+
+`RedisStore` `1.0.11` does not satisfy the selected LangGraph `BaseStore` declarations: it lacks
+the lifecycle methods and operation-specific batch result typing required by `defineMemoryDb`.
+Strict Redis memory-store compatibility is therefore not guaranteed in this cohort. This declaration
+limitation does not establish that Redis memory cannot run through LangGraph's internal batching
+wrapper. The Redis and shallow Redis checkpointer entries above remain supported separately.
 
 Driver-specific retention, TTL, serialization, shallow-history, and semantic-search capabilities remain
 native. RelKit does not flatten them into options that every driver supposedly supports.
