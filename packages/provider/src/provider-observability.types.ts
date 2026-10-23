@@ -1,3 +1,4 @@
+/** Names provider operations and typed failures for substitutable instrumentation that preserves Effect result channels. */
 import type { Effect } from "effect";
 import type {
   ProviderBindingResolutionFailure,
@@ -7,6 +8,10 @@ import type {
 } from "./provider-errors.js";
 /** Fixed names for provider operations; never derived from user input. */
 export type ProviderOperation =
+  | "dependency.resolve"
+  | "dependency.manager"
+  | "dependency.check"
+  | "dependency.initialize"
   | "binding-value.create"
   | "binding-value.is-ref"
   | "binding.resolve"
