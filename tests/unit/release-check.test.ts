@@ -1,14 +1,27 @@
+/** Checks actual creation evidence, lightweight wrapper publication order and stable release notes. */
 import { expect, test } from "bun:test";
 import { join } from "node:path";
 import { releaseNotes } from "../../scripts/release-check.ts";
 import { publicationOrder } from "../../scripts/release-check-artifacts.ts";
 import { checkManifests, packages, readJson, root } from "../../scripts/release-check-support.ts";
 import { validateCreationReport } from "../../scripts/release-create-evidence.ts";
+import { expectedTemplateScripts, packedTemplates } from "../../scripts/release-templates.ts";
 import {
   assertCreateCapability,
   currentCreateCapabilityIdentity,
   CREATE_CAPABILITY_TABLE,
 } from "../../packages/create-relkit/src/create-capabilities.ts";
+
+test("release template contracts preserve canonical emitted-JavaScript startup", async () => {
+  for (const template of packedTemplates) {
+    const manifest = await readJson(join(root, "templates/default/v1", template, "package.json"));
+    const scripts = expectedTemplateScripts(template);
+    expect(scripts).toEqual(manifest.scripts);
+    expect(scripts.start).toBe(
+      "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
+    );
+  }
+});
 
 test("the release certifies default creation using its actual tool identity", () => {
   expect(CREATE_CAPABILITY_TABLE.entries[0]?.identity).toEqual(currentCreateCapabilityIdentity());
@@ -25,17 +38,17 @@ for (const set of ["fresh", "restart"] as const) {
   });
 }
 
-test("accepts the unscoped CLI package and publishes its dependency first", async () => {
+test("accepts the unscoped wrapper and publishes its creator dependency first", async () => {
   const items = await packages();
   const wrapper = items.find((item) => item.name === "relkit");
   expect(wrapper).toBeDefined();
   const manifest = await readJson(join(root, "package.json"));
   const checked = checkManifests(items, manifest);
   expect(checked.summary.find((item) => item.name === "relkit")?.workspaceDependencies).toEqual([
-    "@relkit/cli",
+    "create-relkit",
   ]);
   const ordered = publicationOrder(items).map((item) => item.name);
-  expect(ordered.indexOf("relkit")).toBeGreaterThan(ordered.indexOf("@relkit/cli"));
+  expect(ordered.indexOf("relkit")).toBeGreaterThan(ordered.indexOf("create-relkit"));
   expect(() =>
     checkManifests(
       items.map((item) => (item === wrapper ? { ...item, name: "@relkit/relkit" } : item)),

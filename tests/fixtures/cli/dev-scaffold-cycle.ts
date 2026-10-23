@@ -2,7 +2,8 @@
 import { expect } from "bun:test";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { applyScaffoldPlan, type ScaffoldPlan } from "../../../packages/create-relkit/src/index.js";
+import { applyScaffoldPlan } from "../../../packages/cli/src/scaffolding/add-transaction.js";
+import type { ScaffoldPlan } from "create-relkit/internal/add-types";
 import type { startDev } from "../../../packages/cli/src/commands/dev.js";
 import { waitFor } from "./dev-fixture.js";
 
