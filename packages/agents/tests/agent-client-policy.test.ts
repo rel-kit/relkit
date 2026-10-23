@@ -1,7 +1,11 @@
+/** Checks generic public agent state selection, client policy copying and invalid policy diagnostics. */
 import { z } from "@relkit/schema";
 import { Effect, Metric, Tracer } from "effect";
 import { expect, test } from "vitest";
-import { copyAgentClientPolicy, copyAgentClientPolicyEffect } from "../src/agent-client.ts";
+import {
+  copyAgentClientPolicy,
+  copyAgentClientPolicyEffect,
+} from "@relkit/agents/internal/agent-client";
 
 test("copies public and guarded client policies through Effect and sync adapters", () => {
   const allowed = new Set(["answer"]);

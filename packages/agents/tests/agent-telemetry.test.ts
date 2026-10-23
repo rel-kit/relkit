@@ -1,7 +1,8 @@
+/** Checks generic agent operation observations and their captured telemetry records. */
 import { Effect, Layer, Metric } from "effect";
 import { expect, test } from "vitest";
-import { AgentTelemetry, AgentTelemetryLive } from "../src/agent-telemetry.js";
-import { createAgentCapturePolicyEffect } from "../src/capture-policy.js";
+import { AgentTelemetry, AgentTelemetryLive } from "@relkit/agents/internal/agent-telemetry";
+import { createAgentCapturePolicyEffect } from "@relkit/agents/internal/capture-policy";
 
 test("live telemetry records calls, failures, and durations", () => {
   const registry: Metric.MetricRegistry = new Map();

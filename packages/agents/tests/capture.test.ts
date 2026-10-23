@@ -1,3 +1,4 @@
+/** Checks generic agent capture policies, redaction and encoded payload limits. */
 import { expect, test } from "vitest";
 import { Effect, Metric, Tracer } from "effect";
 import {
@@ -7,7 +8,7 @@ import {
   createAgentCapturePolicyEffect,
   createAgentSpanCapture,
   createAgentSpanCaptureEffect,
-} from "../src/capture.ts";
+} from "@relkit/agents/internal/capture";
 
 test("capture policy preserves synchronous behavior and exposes tagged validation errors", () => {
   expect(Effect.runSync(createAgentCapturePolicyEffect(undefined))).toEqual({ mode: "off" });
