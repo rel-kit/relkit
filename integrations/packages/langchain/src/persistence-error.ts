@@ -1,3 +1,5 @@
+/** Defines typed failures for native persistence acquisition and release, retaining the selected resource and underlying cause. */
+
 import { Schema } from "effect";
 
 /** A typed persistence acquire, validation, or release failure. */

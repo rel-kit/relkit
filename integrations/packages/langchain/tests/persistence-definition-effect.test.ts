@@ -1,3 +1,5 @@
+/** Exercises native persistence definition effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { MemorySaver } from "@langchain/langgraph";
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";

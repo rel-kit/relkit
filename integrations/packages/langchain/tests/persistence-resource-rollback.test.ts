@@ -1,3 +1,5 @@
+/** Exercises native persistence resource rollback behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { expect, test } from "vitest";
 import { MemorySaver } from "@langchain/langgraph";
 import { Effect } from "effect";
