@@ -1,3 +1,6 @@
+/** Owns actual SQLite clients for isolated harness acquisition and cookie-free native auth requests.
+ * Account persistence and migrations are exercised separately by the maintained auth application.
+ */
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";

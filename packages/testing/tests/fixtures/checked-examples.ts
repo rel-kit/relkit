@@ -1,3 +1,4 @@
+/** Typechecks documented testing patterns with explicit reverse-order resource cleanup. */
 import { Effect, Layer, ManagedRuntime } from "effect";
 import { defineEnv } from "@relkit/config";
 import { z } from "@relkit/schema";
@@ -5,7 +6,7 @@ import { createTestRuntime } from "../../src/runtime.js";
 import { createTestBucketFake } from "../../src/buckets.js";
 import { createTestCacheFake } from "../../src/cache.js";
 import { createTestHttpClient } from "../../src/http.js";
-import { createTestModel } from "../../src/agents-model.js";
+import { createTestModel } from "@relkit/langchain/testing";
 import { TestIdentity, identityLayer } from "../../src/identity.js";
 import { TestDeterministicClock, deterministicClockLayer } from "../../src/runtime-clock.js";
 import { disposeTestingOwner, testingLoggerLayer } from "../../src/testing-owner.js";
