@@ -1,7 +1,14 @@
+/**
+ * Declares server exposure and optional HTTP capability selection without loading
+ * native SDKs. Compiler validation supplies defaults before runtime generation;
+ * inspector settings retain their existing independent Stage-1 behavior.
+ */
 /** API documentation visibility and domain exclusions.
  * @example const docs: ApiDocsConfig = { enabledInProduction: false };
  */
 export interface ApiDocsConfig {
+  /** Explicitly selects Scalar; omitted/false keeps JSON OpenAPI only. */
+  readonly ui?: "scalar" | false;
   readonly enabledInProduction?: boolean;
   readonly excludeDomains?: readonly string[];
 }
@@ -15,6 +22,8 @@ export interface ServerConfig {
   readonly apiDocs?: ApiDocsConfig;
   readonly clientContract?: boolean;
   readonly mcp?: boolean;
+  /** Explicitly selects the optional AG-UI HTTP protocol independently of agent RPC. */
+  readonly agUi?: boolean;
 }
 
 /** Inspector settings attached to an application descriptor.
