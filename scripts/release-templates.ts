@@ -20,7 +20,7 @@ const backendScripts = {
   "test:unit": "bun test tests/unit",
   "test:integration": "bun test tests/integration",
   build: "relkit build",
-  start: "relkit start",
+  start: "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
   graph: "relkit graph print",
 };
 
@@ -32,7 +32,7 @@ const fullstackScripts = {
   typecheck: "tsc --noEmit && tsc --noEmit -p web/tsconfig.json",
   test: "bun test",
   build: "relkit build && next build web",
-  start: "relkit start",
+  start: "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
 };
 
 const taskScripts = {
@@ -41,7 +41,7 @@ const taskScripts = {
   typecheck: "tsc --noEmit",
   test: "bun test",
   build: "relkit build",
-  start: "relkit start",
+  start: "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
   "jobs:trigger":
     "relkit jobs trigger --job exportOrders --input-file examples/export-orders.json --operation-id example-trigger",
 };

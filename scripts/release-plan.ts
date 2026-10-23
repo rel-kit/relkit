@@ -1,3 +1,4 @@
+/** Validates independently versioned release plans and enumerates the creator's selected provider catalog. */
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -14,6 +15,7 @@ export const generatorProviders = [
   "@relkit/pulumi",
   "@relkit/docker",
   "@relkit/local",
+  "@relkit/langchain",
   "@relkit/inngest",
   "@relkit/trigger",
   "@relkit/effect-mq",

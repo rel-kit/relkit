@@ -32,7 +32,6 @@ export const verifyScaffoldDevContracts = Effect.fn("ScaffoldDev.contracts")(fun
     [`${base}/_relkit/v1/graph`, '"graphHash"'],
     [`http://127.0.0.1:${inspector}/_relkit/backend/_relkit/v1/graph`, '"graphHash"'],
     [`${base}/_relkit/v1/openapi.json`, '"openapi":"3.1.0"'],
-    [`${base}/_relkit/v1/api-reference`, "scalar"],
   ] as const;
   for (const [url, expected] of endpoints) {
     const result = yield* scaffoldRequest(url);
@@ -42,4 +41,7 @@ export const verifyScaffoldDevContracts = Effect.fn("ScaffoldDev.contracts")(fun
       url,
     );
   }
+  const reference = yield* scaffoldRequest(`${base}/_relkit/v1/api-reference`);
+  assert.equal(reference.status, 404, "Default scaffolds do not select the Scalar UI");
+  assert.doesNotMatch(yield* Effect.promise(() => reference.text()), /scalar/i);
 });
