@@ -1,7 +1,9 @@
+/** Validates and retains SDK middleware supplied by native agent authors so runtime construction receives the original middleware objects. */
+
 import { MIDDLEWARE_BRAND } from "langchain";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { agentDefinitionFailure } from "./define-agent-error.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { agentDefinitionFailure } from "@relkit/agents/internal/define-agent-error";
 import type { AgentClientStateKey, AgentMiddleware } from "./define-agent-native.types.js";
 
 /** Validates middleware names and brands, retaining input order.

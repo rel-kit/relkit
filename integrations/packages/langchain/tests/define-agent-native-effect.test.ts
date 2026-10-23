@@ -1,3 +1,5 @@
+/** Exercises native define agent native effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { MIDDLEWARE_BRAND } from "langchain";
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
@@ -37,7 +39,7 @@ test("native authoring Effects tag duplicate definitions and preserve adapters",
   expect(Result.isFailure(result)).toBe(true);
   if (Result.isFailure(result)) expect(result.failure._tag).toBe("AgentDefinitionFailure");
   expect(() => copyAgentMiddleware(duplicate)).toThrow("Duplicate agent middleware");
-  const tools = [{ ref: { kind: "tool" as const, id: "one" } }];
+  const tools = [{ ref: { kind: "tool" as const, id: "one" } }] as const;
   expect(Effect.runSync(copyAgentToolsEffect(tools))).toEqual(tools);
   expect(Effect.runSync(relkitToolRefsEffect(tools))).toHaveLength(1);
   expect(() => copyAgentTools([tools[0], tools[0]])).toThrow("Duplicate agent tool");

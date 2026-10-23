@@ -1,5 +1,7 @@
+/** Accepts native chat-model instances or supported model selectors and preserves the model's inference contract for descriptor construction. */
+
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import type { AgentModel } from "./define-agent-native.types.js";
 
 /** Checks whether a value can select or provide a native agent model.
