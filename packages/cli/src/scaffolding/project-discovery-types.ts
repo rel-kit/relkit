@@ -3,9 +3,10 @@
  * supplies layout/ownership; renderers preserve logical identities and provider
  * declarations while creating sources at their selected physical boundaries.
  */
+
 import type { SourceFactoryKind } from "@relkit/compiler";
 import type { ApplicationLayout } from "@relkit/contracts";
-import type { DatabaseDialect } from "./add-types.js";
+import type { DatabaseDialect } from "create-relkit/internal/add-types";
 
 /**
  * Statically discovered service member name and referenced binding.

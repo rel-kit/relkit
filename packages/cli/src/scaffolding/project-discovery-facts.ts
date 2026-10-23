@@ -3,13 +3,14 @@
  * The result keeps native specialized service metadata, actual boundaries and
  * provider declarations; no user module or live client is imported.
  */
+
 import { join } from "node:path";
 import { discoverApplicationLayout, type AstSourceModule } from "@relkit/compiler";
 import * as ts from "typescript";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 import { readAppDiscovery } from "./project-discovery-app.js";
 import { collectProjectArtifacts } from "./project-discovery-artifacts.js";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 
 /**
  * Converts authored syntax into layout-aware scaffold discovery records.

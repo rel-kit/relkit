@@ -1,16 +1,21 @@
+/** Plans provider declarations and environment changes for the selected feature, preserving existing profile names and incompatible-provider diagnostics. */
+
+import { configureProviderProfile } from "./provider-profile-publication.js";
+import { ensureEnvironmentEffect } from "./provider-environment.js";
+export { ensureEnvironmentEffect } from "./provider-environment.js";
 import { Effect } from "effect";
 
 import { observeExecution } from "@relkit/contracts/operation";
 
-import { GeneratorFileSystem } from "./generator-filesystem.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "./generator-errors.js";
+} from "create-relkit/internal/generator-errors";
 
-import { runGeneratorPromise } from "./generator-runtime.js";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 
 import { normalizeArtifactName } from "./add-name.js";
 
@@ -18,13 +23,7 @@ import { PlanBuilder } from "./plan-builder.js";
 
 import type { DiscoveredProfile } from "./project-discovery-types.js";
 
-import {
-  defaultProviderProfile,
-  providerDefinitions,
-  requireAwsDeployment,
-} from "./provider-planning-definitions.js";
-
-import { addFactoryObjectMember, addSourceImport } from "./source-edit.js";
+import { defaultProviderProfile, providerDefinitions } from "./provider-planning-definitions.js";
 
 /**
  * Plans ensure provider profile through the owning request and typed filesystem authority.
@@ -64,82 +63,19 @@ export const ensureProviderProfileEffect = Effect.fn("Scaffold.ensureProviderPro
       }
       return yield* reuseProfileEffect(builder, existing);
     }
-    if (options.source === "aws") requireAwsDeployment(builder.discovery.awsPulumiDeployment);
-    for (const dependency of definition.dependencies) yield* builder.dependencyEffect(dependency);
-    for (const declaration of definition.imports) {
-      yield* builder.updateEffect("relkit.config.ts", (source) =>
-        addSourceImport(source, "relkit.config.ts", declaration),
-      );
-    }
-    for (const environment of definition.environment) {
-      yield* ensureEnvironmentEffect(builder, environment.name, environment.definition);
-    }
-    yield* builder.updateEffect("relkit.config.ts", (source) => {
-      const path = profiles.length === 0 ? [] : [configCapability];
-      const member =
-        profiles.length === 0
-          ? `${configCapability}: { ${JSON.stringify(name)}: ${definition.expression} }`
-          : `${JSON.stringify(name)}: ${definition.expression}`;
-      return addFactoryObjectMember(
-        source,
-        "relkit.config.ts",
-        [builder.discovery.appFactory],
-        path,
-        profiles.length === 0 ? configCapability : name,
-        member,
-      );
-    });
-    if (!profiles.some((item) => item.isDefault)) {
-      yield* builder.updateEffect("relkit.config.ts", (source) =>
-        addFactoryObjectMember(
-          source,
-          "relkit.config.ts",
-          [builder.discovery.appFactory],
-          ["defaults"],
-          configCapability,
-          `${configCapability}: "${name}"`,
-        ),
-      );
-    }
-    if (definition.warning)
-      yield* builder.warningEffect(definition.warning.code, definition.warning.message);
-    if (definition.adapter === "docker") yield* builder.nextStepEffect("relkit local up");
-    yield* builder.registerProfileEffect({
+    yield* configureProviderProfile(
+      builder,
       capability,
+      options,
+      configCapability,
+      profiles,
       name,
-      adapter: definition.adapter,
-      isDefault: !profiles.some((item) => item.isDefault),
-    });
+      definition,
+    );
     return name;
   },
   (effect) =>
     observeExecution("generator", "planning.ensureProviderProfile", scaffoldErrors(effect)),
-);
-
-/**
- * Plans ensure environment through the owning request and typed filesystem authority.
- * @param builder - Per-request planning owner.
- * @param name - Authored name or declaration key.
- * @param definition - Rendered environment schema expression.
- * @param example - Example value included only when adding a declaration.
- * @returns Completion after the environment schema and missing example value are planned.
- */
-export const ensureEnvironmentEffect = Effect.fn("Scaffold.ensureEnvironment")(
-  function* (
-    builder: PlanBuilder,
-    name: string,
-    definition: string,
-    example = "",
-  ): Effect.fn.Return<void, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem> {
-    const path = builder.discovery.envPath
-      ? builder.relative(builder.discovery.envPath)
-      : "relkit.config.ts";
-    yield* builder.updateEffect(path, (source) =>
-      addFactoryObjectMember(source, path, ["defineEnv"], [], name, `${name}: ${definition}`),
-    );
-    yield* builder.envExampleEffect(name, example);
-  },
-  (effect) => observeExecution("generator", "planning.ensureEnvironment", scaffoldErrors(effect)),
 );
 
 /**

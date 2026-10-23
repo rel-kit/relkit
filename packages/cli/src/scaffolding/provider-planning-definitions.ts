@@ -1,5 +1,7 @@
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
-import type { ScaffoldDependencyName } from "./scaffold-catalog.js";
+/** Defines the concrete configuration and dependencies delivered by selected provider additions, keeping backend choices explicit in generated platform source. */
+
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog";
 
 /**
  * Provider constructor source, imports, dependencies and environment declarations.

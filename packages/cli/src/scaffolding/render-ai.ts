@@ -1,13 +1,19 @@
+/** Plans agent and tool artifacts plus their explicit native integration and SDK dependencies before any generated project file is mutated. */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
-import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "./add-types.js";
+} from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import {
+  ADD_FAILURE_CODES,
+  AddScaffoldError,
+  type AddRequest,
+} from "create-relkit/internal/add-types";
 import {
   assertAvailableId,
   domainArtifact,
@@ -87,6 +93,14 @@ export const renderAgentEffect = Effect.fn("Scaffold.renderAgent")(
   > {
     const artifact = domainArtifact(target, request.name, "agents", "agent", "agent");
     assertAvailableId(builder, artifact.id);
+    for (const dependency of [
+      "@relkit/langchain",
+      "@langchain/core",
+      "@langchain/langgraph",
+      "langchain",
+      "langsmith",
+    ] as const)
+      yield* builder.dependencyEffect(dependency);
     if (request.model !== undefined) {
       const [profile] = request.model.split(":", 1);
       if (
@@ -99,8 +113,6 @@ export const renderAgentEffect = Effect.fn("Scaffold.renderAgent")(
           `Model profile ${profile} does not exist; configure a native model profile first.`,
         );
       }
-    } else {
-      yield* builder.dependencyEffect("langchain");
     }
     const tools = request.tools.map((value) => {
       const tool = resolveArtifact(builder, target, "tool", value);
