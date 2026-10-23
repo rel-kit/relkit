@@ -1,5 +1,5 @@
 /** Verifies grouped scaffolding through installed public creation/addition APIs. */
-import { expect, test } from "bun:test";
+import { expect } from "bun:test";
 import { join } from "node:path";
 import { checkProject } from "../../packages/cli/src/commands/check.ts";
 import { createRegistrationPlan, type ApplicationGraph } from "../../packages/graph/src/index.ts";
@@ -7,10 +7,10 @@ import {
   ADD_FAILURE_CODES,
   normalizeAddRequest,
   planAdd,
-} from "../../packages/create-relkit/src/index.ts";
+} from "../../packages/cli/src/scaffolding/index.ts";
 import { project, add, linkDependencies, releaseVersion } from "./add-acceptance-fixture.js";
 import { bundleEdges } from "./add-acceptance-cases.js";
-import { registerAddCleanup } from "./add-acceptance-fixture.js";
+import { registerAddCleanup, addTest as test } from "./add-acceptance-fixture.js";
 
 registerAddCleanup();
 
