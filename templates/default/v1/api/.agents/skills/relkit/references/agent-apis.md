@@ -1,18 +1,21 @@
 # Agents, tools, and prompts
 
-| API                                             | Import               | Role                                 |
-| ----------------------------------------------- | -------------------- | ------------------------------------ |
-| `defineAgent`, `defineGraph`, `defineGraphNode` | `@relkit/app/agents` | Model-driven agent or explicit graph |
-| `defineTool`                                    | `@relkit/app/tools`  | Policy-controlled view of a function |
-| `definePrompt`                                  | `@relkit/app`        | Reusable instructions                |
-| `z`                                             | `@relkit/app/schema` | Agent and tool schemas               |
+| API                                                    | Import               | Role                                      |
+| ------------------------------------------------------ | -------------------- | ----------------------------------------- |
+| Generic `defineAgent`                                  | `@relkit/app/agents` | SDK-free agent declaration                |
+| Native `defineAgent`, `defineGraph`, `defineGraphNode` | `@relkit/langchain`  | LangChain model execution or native graph |
+| `defineTool`                                           | `@relkit/app/tools`  | Policy-controlled view of a function      |
+| `definePrompt`                                         | `@relkit/app`        | Reusable instructions                     |
+| `z`                                                    | `@relkit/app/schema` | Agent and tool schemas                    |
+
+The native integration requires application-installed `@langchain/core`, `@langchain/langgraph`, `langchain` and `langsmith` at the supported versions. Add `deepagents` only for a deep-agent declaration. Check/build/start validate selected requirements before readiness; they do not install missing peers. Generic descriptors, tools and agent-state provider contracts do not select a native engine.
 
 ## `defineAgent`
 
 Use `defineAgent` when a model should choose among tools. The agent template provides an executable offline LangChain model example. This shortened form uses the same public options:
 
 ```ts
-import { defineAgent } from "@relkit/app/agents";
+import { defineAgent } from "@relkit/langchain";
 import { z } from "@relkit/app/schema";
 import { FakeToolCallingModel } from "langchain";
 import lookup from "@app/services/hello/tools/lookup.tool.js";
