@@ -1,9 +1,13 @@
+/** Combines authored native tools and RELKIT callable adapters for invocation, retaining input schemas and native dispatch identity. This companion preserves the native input and output types without starting runtime work. */
+
 import type { ClientTool, ServerTool } from "@langchain/core/tools";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 
 /** Native tools and public identity mapping for one invocation. */
 export interface NativeTools {
-  readonly values: readonly (ClientTool | ServerTool)[];
+  readonly values: readonly (
+    ClientTool | ServerTool | ReturnType<typeof import("langchain").tool>
+  )[];
   readonly publicIds: ReadonlyMap<string, string>;
   readonly relkitNames: ReadonlySet<string>;
   readonly failure: () => unknown;

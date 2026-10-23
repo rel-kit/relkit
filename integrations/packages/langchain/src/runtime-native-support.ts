@@ -1,9 +1,10 @@
+/** Resolves native execution support, including optional DeepAgents loading, preserving initialization and nested dependency errors as invocation causes. */
+
 import { Context, Effect, Layer } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import type { AgentDescriptor } from "./define-agent.js";
 import { hasDeepAgentCapabilities } from "./define-agent-deep.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
-import { AgentRuntimeError } from "./runtime-errors.js";
 import type { NativeTools } from "./runtime-native-tools.js";
 import type { DeepAgentsLoaderService } from "./runtime-native-support.types.js";
 
@@ -110,13 +111,7 @@ export const loadDeepAgentsEffect = Effect.fn("Agents.runtime.loadDeepAgents")(
     const loader = yield* DeepAgentsLoader;
     return yield* Effect.tryPromise({
       try: () => loader.load(),
-      catch: () =>
-        agentInvocationFailure(
-          new AgentRuntimeError(
-            "RELKIT_DEEPAGENTS_UNAVAILABLE",
-            "DeepAgents capabilities require the application dependency deepagents@1.13.3",
-          ),
-        ),
+      catch: agentInvocationFailure,
     });
   },
   (effect) => observeAgent("runtime.load-deepagents", effect),
