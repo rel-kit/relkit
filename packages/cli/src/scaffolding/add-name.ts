@@ -1,4 +1,6 @@
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
+/** Normalizes authored artifact names into stable file stems, identifiers and logical ID segments before add planning can mutate project files. */
+
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 
 /**
  * Normalized user label, file stem, binding identifier and descriptor ID segment.

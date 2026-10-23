@@ -8,6 +8,8 @@ import { join } from "node:path";
 import { canonicalJson } from "@relkit/contracts";
 import { observeExecution } from "@relkit/contracts/operation";
 import { Context, Effect, Layer } from "effect";
+import { ProductionManifest } from "../commands/build-production.schemas.js";
+import { decodeSnapshotJson } from "./snapshot-json.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { SnapshotFiles } from "./snapshot-files.service.js";
 import { SnapshotCompilation } from "./snapshot-compilation.service.js";
@@ -137,11 +139,20 @@ const prepareRecipe = Effect.fn("DevSnapshot.prepareRecipe")(function* (
   if (!built.ok || built.activationFingerprint === undefined)
     return yield* rejected("preparation.bundle");
   const metafilePath = `${directory.slice(root.length + 1)}/server/bun.inputs.json`;
+  const production = yield* decodeSnapshotJson(
+    ProductionManifest,
+    yield* authorities.files.read(
+      root,
+      `${directory.slice(root.length + 1)}/package.json`,
+      1_048_576,
+    ),
+  );
   const dependencies = yield* authorities.dependencies.capture(
     root,
     yield* authorities.files.read(root, metafilePath, 8_388_608),
     directory,
     authorities.writes,
+    production.dependencies,
   );
   const cohort = yield* readSnapshotBuildCohort(authorities.files, root, directory, request.probe);
   yield* authorities.writes.writeText(

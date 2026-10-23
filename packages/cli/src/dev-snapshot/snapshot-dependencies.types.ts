@@ -16,6 +16,7 @@ export interface SnapshotDependencyOperations {
     metafile: Uint8Array,
     capsuleRoot?: string,
     writes?: FileSystemCapabilities,
+    selected?: Readonly<Record<string, string>>,
   ) => Effect.Effect<
     readonly SnapshotDependency[],
     CliAdapterError | DevSnapshotIoError | DevSnapshotRejected

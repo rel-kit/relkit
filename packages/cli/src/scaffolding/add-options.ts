@@ -1,40 +1,35 @@
-import { type AddRequest, type RouteMethod, type ServiceInclude } from "./add-types.js";
+/** Builds normalized existing-project add requests from CLI arguments and enforces headless requirements before interactive resolution. */
+
+import { domainRequest, executionRequest } from "./add-options-domain.js";
+import {
+  type AddRequest,
+  type AddRequestBase,
+  type RouteMethod,
+} from "create-relkit/internal/add-types";
 import {
   choice,
   many,
   one,
   optional,
   parseAddArguments,
+  type ParsedAddArguments,
   required,
+  requiredName,
   usage,
 } from "./add-options-parser.js";
 import { resourceRequest } from "./add-options-resource.js";
+/** Supported event delivery guarantees. */
 
-/**
- * Supported event delivery guarantees.
- */
-const DELIVERIES = ["transient", "durable"] as const;
-/**
- * Supported task execution guarantees.
- */
-const EXECUTIONS = ["durable", "retryable"] as const;
-/**
- * Supported tool side-effect classifications.
- */
+/** Supported task execution guarantees. */
+undefined;
+/** Supported tool side-effect classifications. */
 const SIDE_EFFECTS = ["none", "read", "write", "external"] as const;
-/**
- * Supported tool approval policies.
- */
+/** Supported tool approval policies. */
 const APPROVALS = ["never", "on-write", "always"] as const;
-/**
- * Supported database dialects.
- */
+/** Supported database dialects. */
 const DIALECTS = ["sqlite", "postgresql", "mysql"] as const;
-/**
- * Supported route methods.
- */
+/** Supported route methods. */
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] as const;
-
 /**
  * Parses one complete non-interactive `relkit add` request.
  * @param args - Literal flag and positional arguments.
@@ -53,56 +48,25 @@ export function normalizeAddRequest(
     ...optional("createService", parsed.createService),
     install: parsed.install,
   };
-  const name = (): string => required(parsed.positional, `${parsed.kind} requires a name.`);
+  const request =
+    domainRequest(parsed, common) ??
+    executionRequest(parsed, common) ??
+    resourceArtifactRequest(parsed, common) ??
+    platformRequest(parsed, common);
+  if (request === undefined) usage("Unsupported add kind.");
+  return request;
+}
 
+function resourceArtifactRequest(
+  parsed: ParsedAddArguments,
+  common: AddRequestBase,
+): AddRequest | undefined {
+  const values = parsed.values;
   switch (parsed.kind) {
-    case "service": {
-      const include = many(values, "include").map(serviceInclude);
-      if (parsed.flags.has("full") && include.length > 0)
-        usage("--full and --include are exclusive.");
-      return { ...common, kind: "service", name: name(), full: parsed.flags.has("full"), include };
-    }
-    case "function":
-      return { ...common, kind: "function", name: name(), internal: parsed.flags.has("internal") };
-    case "error":
-      return { ...common, kind: "error", name: name() };
-    case "event":
-      return {
-        ...common,
-        kind: "event",
-        name: name(),
-        internal: parsed.flags.has("internal"),
-        ...optional("profile", one(values, "profile")),
-      };
-    case "event-function":
-      return {
-        ...common,
-        kind: "event-function",
-        name: name(),
-        event: required(one(values, "event"), "--event is required."),
-        delivery: choice(one(values, "delivery"), "delivery", DELIVERIES, "durable")!,
-        ...optional("profile", one(values, "profile")),
-      };
-    case "task":
-      return {
-        ...common,
-        kind: "task",
-        name: name(),
-        version: one(values, "version") ?? "1",
-        execution: choice(one(values, "execution"), "execution", EXECUTIONS, "durable")!,
-      };
-    case "job":
-      return {
-        ...common,
-        kind: "job",
-        name: name(),
-        target: required(one(values, "target"), "--target is required."),
-        ...optional("profile", one(values, "profile")),
-      };
     case "cache":
-      return resourceRequest(common, "cache", name(), values);
+      return resourceRequest(common, "cache", requiredName(parsed), values);
     case "bucket":
-      return resourceRequest(common, "bucket", name(), values);
+      return resourceRequest(common, "bucket", requiredName(parsed), values);
     case "tool": {
       const target = one(values, "target");
       const createFunction = one(values, "create-function");
@@ -111,7 +75,7 @@ export function normalizeAddRequest(
       return {
         ...common,
         kind: "tool",
-        name: name(),
+        name: requiredName(parsed),
         target: required(target ?? createFunction, "--target or --create-function is required."),
         ...(createFunction === undefined ? {} : { createFunction: true }),
         sideEffect: choice(one(values, "side-effect"), "side-effect", SIDE_EFFECTS, "read")!,
@@ -121,23 +85,32 @@ export function normalizeAddRequest(
     case "prompt": {
       const text = many(values, "text").map((entry) => required(entry, "--text cannot be empty."));
       if (text.length === 0) usage("At least one --text is required.");
-      return { ...common, kind: "prompt", name: name(), text };
+      return { ...common, kind: "prompt", name: requiredName(parsed), text };
     }
     case "agent":
-      return agentRequest(common, name(), values);
+      return agentRequest(common, requiredName(parsed), values);
+  }
+}
+
+function platformRequest(
+  parsed: ParsedAddArguments,
+  common: AddRequestBase,
+): AddRequest | undefined {
+  const values = parsed.values;
+  switch (parsed.kind) {
     case "constants":
-      return { ...common, kind: "constants", name: name() };
+      return { ...common, kind: "constants", name: requiredName(parsed) };
     case "route":
       return routeRequest(common, parsed.positional, values);
     case "middleware":
       return {
         ...common,
         kind: "middleware",
-        name: name(),
+        name: requiredName(parsed),
         path: required(one(values, "path"), "--path is required."),
       };
     case "transform":
-      return { ...common, kind: "transform", name: name() };
+      return { ...common, kind: "transform", name: requiredName(parsed) };
     case "database":
       return {
         ...common,
@@ -188,7 +161,6 @@ function agentRequest(
     ...optional("instructions", instructions),
   } as AddRequest;
 }
-
 /**
  * Validates route mode and method-to-member mappings.
  * @param common - Shared project, service and installation fields.
@@ -212,7 +184,6 @@ function routeRequest(
   }
   return { ...common, kind: "route", path: required(path, "route requires a path."), mode, maps };
 }
-
 /**
  * Parses a METHOD=member service route mapping.
  * @param value - Raw METHOD=member mapping.
@@ -225,15 +196,4 @@ function routeMap(value: string): readonly [RouteMethod, string] {
   if (!METHODS.includes(method as RouteMethod) || member === "")
     usage(`Invalid route map: ${value}`);
   return [method as RouteMethod, member];
-}
-
-/**
- * Rejects artifact kinds that cannot be included in a service scaffold.
- * @param value - Requested artifact kind.
- * @returns The supported service include; excluded kinds raise a usage error.
- */
-function serviceInclude(value: string): ServiceInclude {
-  const excluded = new Set(["service", "database", "auth", "middleware", "transform"]);
-  if (excluded.has(value)) usage(`Unsupported service include: ${value}`);
-  return value as ServiceInclude;
 }
