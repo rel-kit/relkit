@@ -1,3 +1,4 @@
+/** Composes create and add transactions with existing prompt, progress, and consent policies. */
 import { Effect } from "effect";
 import { observeCli } from "./cli-runtime.js";
 import {
@@ -5,7 +6,7 @@ import {
   formatAddResult,
   formatGenerateResult,
   formatScaffoldPlan,
-} from "create-relkit";
+} from "./scaffolding/index.js";
 import { CliGenerator } from "./services/generator.service.js";
 import { CliInteraction } from "./cli-interaction.service.js";
 import { cliAdapterError, cliOriginalError } from "./cli-errors.js";

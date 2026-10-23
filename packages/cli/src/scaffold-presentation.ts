@@ -1,4 +1,5 @@
-import type { PromptDriver } from "create-relkit";
+/** Projects scaffold plans and progress through the invocation's human presentation policy. */
+import type { PromptDriver } from "./scaffolding/index.js";
 import type { ScaffoldStatus } from "./cli-interaction.types.js";
 import type { CliCommandContext, CliRuntime } from "./main-support.js";
 

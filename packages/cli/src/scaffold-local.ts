@@ -1,4 +1,5 @@
-import type { AddResult, PromptDriver } from "create-relkit";
+/** Coordinates consented local-service startup after a completed scaffold transaction. */
+import type { AddResult, PromptDriver } from "./scaffolding/index.js";
 import { Effect, Layer } from "effect";
 import type { CliCommandContext } from "./main-support.js";
 import { CliInteraction, interactionLayer } from "./cli-interaction.service.js";
