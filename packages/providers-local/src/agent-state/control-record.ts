@@ -1,4 +1,5 @@
-import type { ControlClaim } from "@relkit/agents";
+/** Locates owned controls and replaces their records, receipts and claims together. */
+import type { ControlClaim } from "@relkit/contracts";
 import { LocalAgentStateError, ownedThread } from "./common.js";
 import { replaceThread } from "./run-state.js";
 

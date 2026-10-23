@@ -1,3 +1,4 @@
+/** Mutates a control only after validating its current owner and fenced claim. */
 import { requireControl, withControl } from "./control-record.js";
 import { Clock, Effect } from "effect";
 import { localOperation, localSync } from "../local-effect.js";
@@ -5,7 +6,7 @@ import type {
   ControlReceipt,
   MarkControlEffectStartedRequest,
   SettleControlRequest,
-} from "@relkit/agents";
+} from "@relkit/contracts";
 import { activeClaim, operationStorageKey, ownedThread } from "./common.js";
 import { settleIdleThread } from "./run-state.js";
 import type { AgentStateStoreEffects as AgentStateStore } from "./storage.js";
