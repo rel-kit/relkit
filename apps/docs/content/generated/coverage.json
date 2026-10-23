@@ -770,7 +770,7 @@
     },
     {
       "path": "ai/index",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -778,7 +778,7 @@
     },
     {
       "path": "ai/agents",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -786,7 +786,7 @@
     },
     {
       "path": "ai/native-runtime",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -794,7 +794,7 @@
     },
     {
       "path": "ai/graphs-persistence",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -802,7 +802,7 @@
     },
     {
       "path": "ai/streaming",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -810,7 +810,7 @@
     },
     {
       "path": "ai/threads-recovery",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -818,7 +818,7 @@
     },
     {
       "path": "ai/approvals",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -826,7 +826,7 @@
     },
     {
       "path": "ai/tools",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -834,7 +834,7 @@
     },
     {
       "path": "ai/function-tools",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -842,7 +842,7 @@
     },
     {
       "path": "ai/mcp",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -850,7 +850,7 @@
     },
     {
       "path": "ai/first-agent",
-      "api": ["agents", "tools", "functions", "testing"],
+      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"

@@ -30,16 +30,15 @@ Install standalone packages when you want the smallest dependency surface:
 bun add @relkit/redis @relkit/docker
 ```
 
-The optional `@relkit/integrations` catalog exposes the same public packages through side-effect-free
-subpaths. Its root intentionally exports nothing:
+The optional `@relkit/integrations` catalog contains package metadata and installs no adapters.
+Import executable capabilities directly from the selected standalone packages:
 
-<include cwd lang="ts" meta='title="Catalog subpath imports"'>
+<include cwd lang="ts" meta='title="Standalone integration imports"'>
   ../../apps/docs/examples/landing/catalog.ts
 </include>
 
-Native LangChain model packages are installed directly by the application rather than through a RelKit
-integration adapter. Both supported integration import styles describe the same adapter identities. Do not install a standalone package and its catalog
-subpath for the same role in one app.
+Native agents use `@relkit/langchain` together with its documented LangChain SDK requirements.
+Install the model provider package selected by your application directly.
 
 ## Understand ownership
 
@@ -50,5 +49,21 @@ Redis, S3-compatible, Cloudflare, or model resource.
 
 Run `bun run check` to validate package registration, source wrappers, profile selection, and deployment-role
 compatibility before starting a runtime or previewing infrastructure.
+
+## Declare authoring entrypoints
+
+Integration package authors list their application authoring entrypoints in
+`package.json` under `relkit.integration.exports.authoring`. Use a string for one exact export,
+such as `"."`, or an explicit list when multiple authoring leaves are public:
+
+```json
+{ "authoring": [".", "./sqlite", "./pg", "./mysql"] }
+```
+
+Every listed leaf must also exist in the package's `exports` map. The compiler accepts only those
+exact imports; listing a parent does not permit its children. Wildcards and path traversal are
+rejected. Drizzle declares its three dialect model entrypoints, and Better Auth declares its root
+and `./drizzle` bridge. Runtime internals, React adapters, and testing helpers do not become
+application authoring entrypoints through this declaration.
 
 <include cwd>content/generated/related/integrations-index.mdx</include>

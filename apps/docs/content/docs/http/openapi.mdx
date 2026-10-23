@@ -7,8 +7,8 @@ RELKIT generates OpenAPI from the same checked graph used by the runtime. Paths,
 schemas, statuses, declared errors, rate limits, and operation IDs therefore come from authored descriptors
 rather than a separate annotation file.
 
-The document describes function-backed HTTP routes, not the generated client's `/rpc` protocol.
-[Raw handlers](/docs/http/raw-handlers) are excluded because their adapters own their contracts.
+The document describes HTTP routes, not the generated client's `/rpc` protocol.
+[Raw handlers](/docs/http/raw-handlers) use a generic response contract because their adapters own the response.
 
 ## Generate the document
 
@@ -38,6 +38,16 @@ The document describes function-backed HTTP routes, not the generated client's `
   </Step>
   <Step>
     ### Open the interactive reference
+
+    JSON OpenAPI needs no documentation UI package. To select Scalar, install its optional peer from
+    your application root, then set `server.apiDocs.ui` to `"scalar"` in your existing `relkit.config.ts`:
+
+    ```sh title="Terminal — relkit-orders"
+    bun add @scalar/hono-api-reference@0.12.9
+    ```
+
+    Restart the application after changing the selection. Startup validates the selected peer and
+    initializes the renderer before publishing readiness.
 
     ```sh title="Terminal — relkit-orders"
     open "http://localhost:3000/_relkit/v1/api-reference"
@@ -78,7 +88,8 @@ treat removed paths, newly required inputs, and narrowed outputs as compatibilit
   error.
 </Callout>
 
-In development and test, the endpoints are enabled unless `server.apiDocs.enabled` is false.
+In development and test, JSON OpenAPI is available independently of the UI. Scalar is disabled by
+default; `server.apiDocs.ui: false` leaves the JSON document available without loading Scalar.
 `server.apiDocs.excludeDomains` filters the served document; it does not disable those domains'
 routes, revoke access, or remove generated-client operations. Documentation visibility is not authorization.
 

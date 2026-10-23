@@ -51,9 +51,10 @@ behavior. Check security policy and alternate transports against the running ser
 
 ## Inspect the generated contract
 
-Run `bun run check` and `bun run typecheck`, then open `/_relkit/v1/api-reference` on the
+Run `bun run check` and `bun run typecheck`, then open `/_relkit/v1/openapi.json` on the
 running backend. Find `POST /orders`, its request fields, success response, and validation
 response. Edit source to change the contract; do not edit `.relkit/generated` output.
+Select the [optional Scalar UI](/docs/http/openapi) when you want an interactive reference.
 
 For path parameters, headers, and cookies, continue with [Request mapping](/docs/http/requests).
 
