@@ -1,3 +1,7 @@
+/**
+ * Registers native handles in generation-owned child scopes before materializing
+ * them. Failed startup rolls back; interruption retains ownership until drain.
+ */
 import { Cause, Effect, Exit, Ref, Scope } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { boundedCleanup, recordFailure } from "./runtime-cleanup.js";
