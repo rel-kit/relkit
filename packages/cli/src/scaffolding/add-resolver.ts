@@ -1,3 +1,5 @@
+/** Composes add discovery and interactive resolution into one request workflow, preserving typed cancellation and validation failures. */
+
 import { Context, Effect, Layer } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { normalizeAddRequest } from "./add-options.js";
@@ -7,13 +9,13 @@ import { resolvePlatformOptionsEffect } from "./add-resolver-platform.js";
 import { resolveResourceOptionsEffect } from "./add-resolver-resources.js";
 import { resolveServiceForKindEffect } from "./add-resolution-discovery.js";
 import { AddResolutionState, choices } from "./add-resolution-state.js";
-import { ADD_KINDS, type AddRequest } from "./add-types.js";
+import { ADD_KINDS, type AddRequest } from "create-relkit/internal/add-types";
 import { ProjectDiscoveryServiceTag, projectDiscoveryLive } from "./project-discovery.js";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
-import { GeneratorPrompt, generatorPromptLayer } from "./generator-prompt.js";
-import { domainTry, scaffoldErrors } from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
-import { createClackPromptDriver } from "./prompt-driver.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/internal/generator-prompt";
+import { domainTry, scaffoldErrors } from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";
 import type {
   AddResolutionService,
   ResolveAddContext,
@@ -41,39 +43,7 @@ export const addResolutionLive = Layer.effect(
         observeExecution(
           "generator",
           "add.resolve",
-          Effect.gen(function* () {
-            const interactive = context.interactive === true;
-            const input = [...args];
-            let prompted = false;
-            if (!ADD_KINDS.some((kind) => kind === input[0])) {
-              if (!interactive) usage("Usage: relkit add <kind> [name] [options]");
-              input.unshift(
-                yield* prompt.select({
-                  message: "What would you like to add?",
-                  options: choices(ADD_KINDS),
-                }),
-              );
-              prompted = true;
-            }
-            const state = new AddResolutionState(
-              input,
-              context.cwd,
-              interactive,
-              context.promptDriver,
-            );
-            const facts = yield* discovery.discover(state.parsed.projectRoot);
-            yield* resolveServiceForKindEffect(state, facts);
-            yield* resolveDomainOptionsEffect(state, facts);
-            yield* resolveResourceOptionsEffect(state, facts);
-            yield* resolvePlatformOptionsEffect(state, facts);
-            const request = yield* domainTry(() =>
-              normalizeAddRequest(
-                state.args,
-                context.cwd === undefined ? {} : { cwd: context.cwd },
-              ),
-            );
-            return Object.freeze({ request, prompted: prompted || state.prompted });
-          }).pipe(
+          resolveRequestWithDiscovery(args, context, discovery, prompt).pipe(
             scaffoldErrors,
             Effect.provideService(GeneratorFileSystem, fs),
             Effect.provideService(GeneratorPrompt, prompt),
@@ -129,3 +99,34 @@ export function resolveAddRequestDetails(
     context.signal,
   );
 }
+
+const resolveRequestWithDiscovery = Effect.fn("AddResolution.resolveRequest")(function* (
+  args: readonly string[],
+  context: ResolveAddContext,
+  discovery: ProjectDiscoveryServiceTag["Service"],
+  prompt: GeneratorPrompt["Service"],
+) {
+  const interactive = context.interactive === true;
+  const input = [...args];
+  let prompted = false;
+  if (!ADD_KINDS.some((kind) => kind === input[0])) {
+    if (!interactive) usage("Usage: relkit add <kind> [name] [options]");
+    input.unshift(
+      yield* prompt.select({
+        message: "What would you like to add?",
+        options: choices(ADD_KINDS),
+      }),
+    );
+    prompted = true;
+  }
+  const state = new AddResolutionState(input, context.cwd, interactive, context.promptDriver);
+  const facts = yield* discovery.discover(state.parsed.projectRoot);
+  yield* resolveServiceForKindEffect(state, facts);
+  yield* resolveDomainOptionsEffect(state, facts);
+  yield* resolveResourceOptionsEffect(state, facts);
+  yield* resolvePlatformOptionsEffect(state, facts);
+  const request = yield* domainTry(() =>
+    normalizeAddRequest(state.args, context.cwd === undefined ? {} : { cwd: context.cwd }),
+  );
+  return Object.freeze({ request, prompted: prompted || state.prompted });
+});

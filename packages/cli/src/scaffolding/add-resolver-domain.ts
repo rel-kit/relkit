@@ -1,21 +1,23 @@
+/** Coordinates domain artifact resolution through the existing service boundary before rendering an add plan. */
+
 import { Effect } from "effect";
 
 import { observeExecution } from "@relkit/contracts/operation";
 
-import { GeneratorFileSystem } from "./generator-filesystem.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 
-import { GeneratorPrompt, generatorPromptLayer } from "./generator-prompt.js";
+import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/internal/generator-prompt";
 
-import { createClackPromptDriver } from "./prompt-driver.js";
+import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "./generator-errors.js";
+} from "create-relkit/internal/generator-errors";
 
-import { runGeneratorPromise } from "./generator-runtime.js";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 
 import { AddResolutionState } from "./add-resolution-state.js";
 

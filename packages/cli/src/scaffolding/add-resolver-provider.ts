@@ -1,14 +1,16 @@
+/** Resolves provider choices and profile names for the selected resource, rejecting incompatible existing configuration before planning changes. */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
-import { GeneratorPrompt } from "./generator-prompt.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "./generator-errors.js";
+} from "create-relkit/internal/generator-errors";
 
 import { bucketProfileOwnersEffect } from "./bucket-profiles.js";
 import { profiles } from "./add-resolution-discovery.js";
@@ -53,27 +55,7 @@ export const providerSourceEffect = Effect.fn("AddResolution.providerSource")(
     }
     const value = yield* state.selectEffect(
       `${capability} provider`,
-      [
-        ...existing.map((profile) => ({
-          value: `profile:${profile.name}`,
-          label: profile.name,
-          hint: profile.isDefault ? "configured default" : "existing profile",
-        })),
-        { value: local, label: capability === "cache" ? "Redis Docker" : "MinIO / S3 Docker" },
-        { value: connected, label: capability === "cache" ? "Connected Redis" : "Connected S3" },
-        ...(discovery.awsPulumiDeployment
-          ? [
-              {
-                value: `${capability === "cache" ? "redis" : "s3"}:aws`,
-                label: "Existing AWS / Pulumi deployment",
-              },
-            ]
-          : []),
-        {
-          value: cloudflare,
-          label: capability === "cache" ? "Connected Cloudflare KV" : "Connected Cloudflare R2",
-        },
-      ],
+      providerChoices(capability, existing, discovery, local, connected, cloudflare),
       local,
     );
     if (!value) return;
@@ -86,3 +68,34 @@ export const providerSourceEffect = Effect.fn("AddResolution.providerSource")(
   },
   (effect) => observeExecution("generator", "add.resolve.providerSource", scaffoldErrors(effect)),
 );
+
+function providerChoices(
+  capability: "cache" | "bucket",
+  existing: ProjectDiscovery["profiles"],
+  discovery: ProjectDiscovery,
+  local: string,
+  connected: string,
+  cloudflare: string,
+) {
+  return [
+    ...existing.map((profile) => ({
+      value: `profile:${profile.name}`,
+      label: profile.name,
+      hint: profile.isDefault ? "configured default" : "existing profile",
+    })),
+    { value: local, label: capability === "cache" ? "Redis Docker" : "MinIO / S3 Docker" },
+    { value: connected, label: capability === "cache" ? "Connected Redis" : "Connected S3" },
+    ...(discovery.awsPulumiDeployment
+      ? [
+          {
+            value: `${capability === "cache" ? "redis" : "s3"}:aws`,
+            label: "Existing AWS / Pulumi deployment",
+          },
+        ]
+      : []),
+    {
+      value: cloudflare,
+      label: capability === "cache" ? "Connected Cloudflare KV" : "Connected Cloudflare R2",
+    },
+  ];
+}

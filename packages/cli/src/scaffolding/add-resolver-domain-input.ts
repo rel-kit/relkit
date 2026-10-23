@@ -1,16 +1,18 @@
+/** Resolves service and callable input choices from discovered artifacts while preserving explicit target and creation flags. */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
-import { GeneratorPrompt } from "./generator-prompt.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "./generator-errors.js";
+} from "create-relkit/internal/generator-errors";
 
-import type { ServiceInclude } from "./add-types.js";
+import type { ServiceInclude } from "create-relkit/internal/add-types";
 import { AddResolutionState, choices } from "./add-resolution-state.js";
 
 /** Supported custom service inclusions in their established prompt order. */

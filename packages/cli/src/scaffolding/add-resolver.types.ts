@@ -1,11 +1,13 @@
+/** Composes add discovery and interactive resolution into one request workflow, preserving typed cancellation and validation failures. This companion contains the shared planning contracts without executing work. */
+
 import type { Effect } from "effect";
-import type { AddRequest } from "./add-types.js";
-import type { PromptDriver } from "./prompt-driver.types.js";
+import type { AddRequest } from "create-relkit/internal/add-types";
+import type { PromptDriver } from "create-relkit/internal/prompt-driver.types";
 import type {
   GeneratorDomainError,
   GeneratorIoError,
   GeneratorPromptError,
-} from "./generator-errors.js";
+} from "create-relkit/internal/generator-errors";
 
 /** Existing interactive-add resolution context. */
 export interface ResolveAddContext {
