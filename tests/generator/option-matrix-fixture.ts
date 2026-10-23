@@ -10,7 +10,7 @@ import { join, relative, resolve } from "node:path";
 import type {
   CreateOptions,
   GenerateProjectContext,
-} from "../../packages/create-relkit/src/index.ts";
+} from "../../packages/cli/src/scaffolding/index.ts";
 import type { GeneratedProjectSnapshot } from "./option-matrix.types.js";
 const roots: string[] = [];
 export const templateRoot = resolve(import.meta.dir, "../../templates/default/v1");

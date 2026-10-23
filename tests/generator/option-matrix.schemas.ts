@@ -41,7 +41,7 @@ export const GeneratedOutput = Schema.Struct({
       backend: Schema.String,
       inspector: Schema.String,
       openapi: Schema.String,
-      apiReference: Schema.String,
+      apiReference: Schema.optionalKey(Schema.String),
       route: Schema.optional(Schema.String),
     }),
   }),

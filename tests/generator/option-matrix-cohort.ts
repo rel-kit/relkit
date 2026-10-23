@@ -9,6 +9,11 @@ import { join } from "node:path";
 import { Schema } from "effect";
 import { generateProject } from "../../packages/create-relkit/src/generate.js";
 import appManifest from "../../packages/app/package.json" with { type: "json" };
+import cliManifest from "../../packages/cli/package.json" with { type: "json" };
+import clientManifest from "../../packages/client/package.json" with { type: "json" };
+import testingManifest from "../../packages/testing/package.json" with { type: "json" };
+import localManifest from "../../integrations/packages/local/package.json" with { type: "json" };
+import nativeManifest from "../../integrations/packages/langchain/package.json" with { type: "json" };
 import workspaceManifest from "../../package.json" with { type: "json" };
 import { createOptions, contextFor, templateRoot } from "./option-matrix-fixture.js";
 import { GeneratedManifest, GeneratedTsconfig } from "./option-matrix.schemas.js";
@@ -77,16 +82,20 @@ function verifyGeneratedManifest(
   expect(manifest.dependencies).toEqual({
     ...(["agent", "fullstack"].includes(template)
       ? {
+          "@relkit/langchain": nativeManifest.version,
+          "@langchain/core": workspaceManifest.catalog["@langchain/core"],
           "@langchain/langgraph": workspaceManifest.catalog["@langchain/langgraph"],
-          "@relkit/local": appManifest.version,
+          "@relkit/local": localManifest.version,
           langchain: workspaceManifest.catalog.langchain,
+          langsmith: workspaceManifest.catalog.langsmith,
         }
       : {}),
     "@relkit/app": appManifest.version,
     effect: workspaceManifest.catalog.effect,
     ...(template === "fullstack"
       ? {
-          "@relkit/client": appManifest.version,
+          "@ag-ui/core": "0.0.59",
+          "@relkit/client": clientManifest.version,
           "@tanstack/react-query": workspaceManifest.catalog["@tanstack/react-query"],
           next: workspaceManifest.catalog.next,
           react: workspaceManifest.catalog.react,
@@ -96,8 +105,8 @@ function verifyGeneratedManifest(
   });
   expect(manifest.devDependencies).toMatchObject({
     "@types/bun": workspaceManifest.catalog["@types/bun"],
-    "@relkit/cli": appManifest.version,
-    "@relkit/testing": appManifest.version,
+    "@relkit/cli": cliManifest.version,
+    "@relkit/testing": testingManifest.version,
     typescript: workspaceManifest.catalog.typescript,
   });
 }
