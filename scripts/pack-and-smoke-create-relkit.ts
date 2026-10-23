@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { strict as assert } from "node:assert";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Exit, Layer } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { ScaffoldProcess, scaffoldProcessLayer } from "./scaffold-process.js";
 import { scaffoldPort } from "./scaffold-http.js";
@@ -43,10 +43,12 @@ const fixture = Effect.fn("PackedScaffold.fixture")(function* (run: PackedComman
   const repository = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   const temporary = yield* Effect.acquireRelease(
     scaffoldNative("temporary", () => mkdtemp(join(tmpdir(), "relkit-create-smoke-"))),
-    (root) =>
-      scaffoldNative("temporary.release", () => rm(root, { recursive: true, force: true })).pipe(
-        Effect.orDie,
-      ),
+    (root, exit) =>
+      Exit.isSuccess(exit)
+        ? scaffoldNative("temporary.release", () =>
+            rm(root, { recursive: true, force: true }),
+          ).pipe(Effect.orDie)
+        : Effect.sync(() => console.error(`Retained failed packed scaffold: ${root}`)),
   );
   const manifests = yield* scaffoldNative("manifests", () => readManifests(repository));
   const artifactIndex = process.argv.indexOf("--artifacts");
