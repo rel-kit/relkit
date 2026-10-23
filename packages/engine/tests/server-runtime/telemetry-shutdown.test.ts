@@ -1,6 +1,8 @@
+/** Verifies engine-owned generation lifetime, preserving the existing lifecycle contract. */
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { createServerRuntimeHost } from "../../src/server-runtime/server-runtime-host.js";
+import { registerTelemetryHandles, registerProducerHandles } from "./telemetry-shutdown-fixture.js";
 import { ServerRuntimeFailure } from "../../src/server-runtime/server-runtime.schemas.js";
 
 it.live(
@@ -9,57 +11,18 @@ it.live(
     Effect.promise(async () => {
       const host = await createServerRuntimeHost({ report: () => {} });
       const order: string[] = [];
-      let providerOpen = true;
-      let telemetryOpen = true;
-      const records = ["pending event"];
-      await host.resource(
-        "telemetry.exporters",
-        async () => 1,
-        () => {
-          order.push("exporters");
-        },
-        undefined,
-        "telemetry",
-      );
-      await host.resource(
-        "telemetry",
-        async () => 1,
-        () => {
-          telemetryOpen = false;
-          order.push("telemetry");
-        },
-        undefined,
-        "telemetry",
-      );
-      await host.resource(
-        "provider",
-        async () => 1,
-        () => {
-          expect(telemetryOpen).toBe(true);
-          providerOpen = false;
-          records.push("provider stopped");
-          order.push("provider");
-        },
-      );
-      await host.resource(
-        "native-worker",
-        async () => 1,
-        () => {
-          expect(providerOpen).toBe(true);
-          order.push("worker");
-        },
-        undefined,
-        "worker",
-      );
+      const state = { order, records: ["pending event"], providerOpen: true, telemetryOpen: true };
+      await registerTelemetryHandles(host, state);
+      await registerProducerHandles(host, state);
       const beforeRelease = async () => {
-        expect(providerOpen).toBe(true);
-        expect(telemetryOpen).toBe(true);
+        expect(state.providerOpen).toBe(true);
+        expect(state.telemetryOpen).toBe(true);
         order.push("agents.release");
       };
       const beforeTelemetry = async () => {
-        expect(providerOpen).toBe(false);
-        expect(telemetryOpen).toBe(true);
-        expect(records.splice(0)).toEqual(["pending event", "provider stopped"]);
+        expect(state.providerOpen).toBe(false);
+        expect(state.telemetryOpen).toBe(true);
+        expect(state.records.splice(0)).toEqual(["pending event", "provider stopped"]);
         order.push("flush");
       };
       await Promise.all([

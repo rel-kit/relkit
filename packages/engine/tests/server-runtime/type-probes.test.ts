@@ -1,3 +1,4 @@
+/** Verifies engine-owned generation lifetime, preserving the existing lifecycle contract. */
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { fileURLToPath } from "node:url";

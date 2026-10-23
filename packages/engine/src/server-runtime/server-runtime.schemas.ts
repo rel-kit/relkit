@@ -1,3 +1,7 @@
+/**
+ * Defines readiness and published lifecycle evidence shared by the engine service
+ * and generated host. Native failure causes retain their original identity.
+ */
 import { Schema } from "effect";
 
 /** Readiness dimensions retained by the generated HTTP health contract. */
@@ -12,7 +16,12 @@ export const RuntimeAreaSchema = Schema.Literals([
 /** Internal failures retain native evidence without changing public error constructors. */
 export class ServerRuntimeFailure extends Schema.TaggedError<ServerRuntimeFailure>()(
   "ServerRuntimeFailure",
-  { operation: Schema.String, cause: Schema.Defect() },
+  {
+    /** Fixed lifecycle stage identifying the failed startup or cleanup boundary. */
+    operation: Schema.String,
+    /** Original native rejection or Effect cause retained for compatibility reporting. */
+    cause: Schema.Defect(),
+  },
 ) {}
 
 /** Published state is initialized before any startup or worker fiber can run. */
