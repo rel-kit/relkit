@@ -1,6 +1,9 @@
+/** Builds and validates RELKIT signal descriptors used by native agent execution while retaining their payload schema and stable identity. */
+
+import { executionDeadline } from "./signal-deadline.js";
 import type { MaybePromise } from "@relkit/contracts";
 import { Context, Effect, Layer } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import type {
@@ -68,20 +71,7 @@ export const createExecutionSignalEffect = Effect.fn("Agents.signal.create")(
         const controller = new AbortController();
         const listeners: Array<readonly [AbortSignal, () => void]> = [];
         const now = clock.now();
-        const deadlines = [now + options.agent.limits.timeoutMs, options.deadlineMs];
-        if (
-          options.timeoutMs !== undefined &&
-          (!Number.isSafeInteger(options.timeoutMs) || options.timeoutMs < 0)
-        ) {
-          throw new AgentRuntimeError("RELKIT_AGENT_DEADLINE_INVALID", "Agent timeout is invalid");
-        }
-        if (options.timeoutMs !== undefined) deadlines.push(now + options.timeoutMs);
-        if (deadlines.some((deadline) => deadline !== undefined && !Number.isFinite(deadline))) {
-          throw new AgentRuntimeError("RELKIT_AGENT_DEADLINE_INVALID", "Agent deadline is invalid");
-        }
-        const deadline = Math.min(
-          ...deadlines.filter((value): value is number => value !== undefined),
-        );
+        const deadline = executionDeadline(options, now);
         const timeout = new AgentRuntimeError("RELKIT_AGENT_TIMEOUT", "Agent deadline exceeded");
         if (deadline <= now) controller.abort(timeout);
         const timer = clock.setTimeout(

@@ -1,7 +1,9 @@
+/** Exercises native thread transition behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { describe, expect, test } from "vitest";
 import { Effect, Metric } from "effect";
 import { decideThreadTransition, type ThreadAction, type ThreadStatus } from "../src/index.ts";
-import { decideThreadTransitionEffect } from "../src/thread-transition.ts";
+import { decideThreadTransitionEffect } from "@relkit/agents/internal/thread-transition";
 
 const statuses: readonly ThreadStatus[] = [
   "idle",

@@ -1,3 +1,5 @@
+/** Builds and validates RELKIT signal descriptors used by native agent execution while retaining their payload schema and stable identity. This companion preserves the native input and output types without starting runtime work. */
+
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 
 /** Options whose limits and caller signal determine an execution deadline. */

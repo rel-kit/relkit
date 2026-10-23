@@ -1,3 +1,5 @@
+/** Exercises native signal effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect, Layer, Result } from "effect";
 import { expect, test } from "vitest";
 import {
@@ -6,8 +8,22 @@ import {
   ExecutionSignalClock,
   withSignalEffect,
 } from "../src/signal.js";
+import { defineAgent } from "../src/define-agent.js";
+import { z } from "@relkit/schema";
 
-const options = { agent: { limits: { timeoutMs: 500 } } } as never;
+const options = {
+  agent: defineAgent({
+    id: "signal.fixture",
+    input: z.string(),
+    output: z.string(),
+    instructions: "Exercise cancellation.",
+    tools: [],
+    limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 500 },
+  }),
+  input: "fixture",
+  tools: [],
+  engine: { invoke: () => Promise.reject(new Error("No tool expected")) },
+};
 
 test("execution signal Effect uses a replaceable clock and clears its timer once", () => {
   let deadline!: () => void;

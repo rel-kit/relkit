@@ -1,3 +1,5 @@
+/** Exercises native test model behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { AIMessage, type BaseMessage } from "@langchain/core/messages";
 import type { ChatResult } from "@langchain/core/outputs";
 import type { CallbackManagerForLLMRun } from "@langchain/core/callbacks/manager";
