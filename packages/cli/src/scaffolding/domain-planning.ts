@@ -3,22 +3,23 @@
  * authority. Shared layout discovery chooses physical destinations; operations
  * remain lazy and translate expected scaffold failures without changing IDs.
  */
+
 import { Effect } from "effect";
-import { domainError, domainTry } from "./generator-errors.js";
+import { domainError, domainTry } from "create-relkit/internal/generator-errors";
 import { scaffoldServiceBoundary } from "./scaffold-layout.js";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 
 import { observeExecution } from "@relkit/contracts/operation";
 
-import { GeneratorFileSystem } from "./generator-filesystem.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "./generator-errors.js";
+} from "create-relkit/internal/generator-errors";
 
-import { runGeneratorPromise } from "./generator-runtime.js";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 
 import { normalizeArtifactName } from "./add-name.js";
 

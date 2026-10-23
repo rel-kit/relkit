@@ -1,18 +1,23 @@
+/** Verifies CLI-owned generator environment.probe behavior through retained creator services, preserving typed failures and awaited fixture cleanup. */
+
 import { Effect } from "effect";
-import { discoverProjectEffect, projectDiscoveryLive } from "../src/project-discovery.js";
-import { planAddEffect, scaffoldPlanningLive } from "../src/add-plan.js";
-import { applyScaffoldPlanEffect } from "../src/add-transaction.js";
-import { generateProjectEffect } from "../src/generate.js";
-import { GeneratorPrompt } from "../src/generator-prompt.js";
-import { generatorFileSystemLive } from "../src/generator-filesystem.js";
-import { generatorProcessLive } from "../src/generator-process.js";
-import { generatorPathsLive } from "../src/generator-paths.js";
-import { generatorPromptLayer } from "../src/generator-prompt.js";
-import { projectGenerationLive } from "../src/generate.js";
-import type { PromptDriver } from "../src/prompt-driver.js";
-import { normalizeAddRequest } from "../src/add-options.js";
-import { normalizeCreateOptions } from "../src/options.js";
-import type { ScaffoldPlan } from "../src/add-types.js";
+import {
+  discoverProjectEffect,
+  projectDiscoveryLive,
+} from "../../src/scaffolding/project-discovery.js";
+import { planAddEffect, scaffoldPlanningLive } from "../../src/scaffolding/add-plan.js";
+import { applyScaffoldPlanEffect } from "../../src/scaffolding/add-transaction.js";
+import { generateProjectEffect } from "create-relkit/internal/generate";
+import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
+import { generatorFileSystemLive } from "create-relkit/internal/generator-filesystem";
+import { generatorProcessLive } from "create-relkit/internal/generator-process";
+import { generatorPathsLive } from "create-relkit/internal/generator-paths";
+import { generatorPromptLayer } from "create-relkit/internal/generator-prompt";
+import { projectGenerationLive } from "create-relkit/internal/generate";
+import type { PromptDriver } from "create-relkit/internal/prompt-driver";
+import { normalizeAddRequest } from "../../src/scaffolding/add-options.js";
+import { normalizeCreateOptions } from "create-relkit/internal/options";
+import type { ScaffoldPlan } from "create-relkit/internal/add-types";
 
 /**
  * Retains negative compiler checks for every independently injectable domain owner.
@@ -38,8 +43,10 @@ function serviceRequirements(plan: ScaffoldPlan): void {
   void Effect.runPromise(applyScaffoldPlanEffect(plan));
   // @ts-expect-error Generation requires explicitly acquired creation authority.
   void Effect.runPromise(generateProjectEffect(normalizeCreateOptions(["sample"])));
-  // @ts-expect-error Prompt input cannot run without a live or test Layer.
-  void Effect.runPromise(GeneratorPrompt.use((prompt) => prompt.confirm({ message: "Continue?" })));
+  void Effect.runPromise(
+    // @ts-expect-error Prompt input cannot run without a live or test Layer.
+    GeneratorPrompt.use((prompt) => prompt.confirm({ message: "Continue?" })),
+  );
 }
 void serviceRequirements;
 

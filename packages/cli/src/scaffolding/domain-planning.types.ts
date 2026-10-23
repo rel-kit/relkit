@@ -1,3 +1,5 @@
+/** Describes service-local artifact targets and creation decisions shared by callable, event and job renderers before any source is written. This companion contains the shared planning contracts without executing work. */
+
 import { type NormalizedArtifactName } from "./add-name.js";
 
 import type { DiscoveredService } from "./project-discovery-types.js";

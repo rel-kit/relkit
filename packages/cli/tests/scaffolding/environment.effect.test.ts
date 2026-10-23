@@ -1,3 +1,5 @@
+/** Verifies CLI-owned environment behavior through retained creator services, preserving typed failures and awaited fixture cleanup. */
+
 import { expect, it } from "@effect/vitest";
 import { resolve } from "node:path";
 import { Effect } from "effect";
@@ -8,13 +10,16 @@ it.live(
   () =>
     Effect.sync(() => {
       const root = process.cwd();
-      const fixture = resolve(root, "packages/create-relkit/tests/generator-environment.probe.ts");
-      const configPath = resolve(root, "packages/create-relkit/tsconfig.tests.json");
+      const fixture = resolve(
+        root,
+        "packages/cli/tests/scaffolding/generator-environment.probe.ts",
+      );
+      const configPath = resolve(root, "packages/cli/tsconfig.scaffolding-tests.json");
       const config = ts.readConfigFile(configPath, ts.sys.readFile);
       const parsed = ts.parseJsonConfigFileContent(
         config.config,
         ts.sys,
-        resolve(root, "packages/create-relkit"),
+        resolve(root, "packages/cli"),
       );
       const actual = ts.createProgram([fixture], parsed.options);
       expect(ts.getPreEmitDiagnostics(actual).map((error) => error.code)).toEqual([]);

@@ -3,8 +3,9 @@
  * while preserving logical artifact IDs and bindings. Pure compatibility helpers
  * report usage/collision exceptions; owning generator workflows translate them.
  */
+
 import { dirname } from "node:path";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 
 import { normalizeArtifactName, type NormalizedArtifactName } from "./add-name.js";
 

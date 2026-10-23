@@ -1,9 +1,11 @@
+/** Verifies CLI-owned dependency patches.fixture behavior through retained creator services, preserving typed failures and awaited fixture cleanup. */
+
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { PlanBuilder } from "../src/plan-builder.js";
-import { SCAFFOLD_DEPENDENCIES } from "../src/scaffold-catalog.js";
-import type { ScaffoldDependencyName } from "../src/scaffold-catalog.types.js";
+import { PlanBuilder } from "../../src/scaffolding/plan-builder.js";
+import { SCAFFOLD_DEPENDENCIES } from "create-relkit/internal/scaffold-catalog";
+import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog.types";
 
 export async function withProject(
   run: (root: string) => Promise<void>,
