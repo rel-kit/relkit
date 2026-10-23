@@ -1,4 +1,5 @@
-import type { AgentRequestScope, JournalCheckpoint } from "@relkit/agents";
+/** Validates scoped ownership, receipt freshness, claims and agent-state checkpoints. */
+import type { AgentRequestScope, JournalCheckpoint } from "@relkit/contracts";
 import { REALTIME_RUNTIME_LIMITS } from "@relkit/contracts";
 import { operationIdTimestamp } from "@relkit/realtime";
 import type { LocalAgentState, LocalAgentThread, StoredReceipt } from "./state.js";
