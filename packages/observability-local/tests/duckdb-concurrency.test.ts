@@ -1,3 +1,4 @@
+/** Verifies transaction/read serialization and rollback at the injected native-driver boundary. */
 import { expect, test } from "vitest";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -8,54 +9,7 @@ import type { DuckdbConnectionPort, DuckdbInstancePort } from "../src/local/duck
 import { makeDuckdbStorage } from "../src/local/duckdb-storage.js";
 test("append transaction and query share one native connection permit", async () => {
   const root = await mkdtemp(join("/tmp", "relkit-duckdb-concurrency-"));
-  const events: string[] = [];
-  let release!: () => void;
-  let started!: () => void;
-  const gate = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  const began = new Promise<void>((resolve) => {
-    started = resolve;
-  });
-  let holdBegin = false;
-  let active = 0;
-  let peak = 0;
-  const enter = async <T>(label: string, result: T): Promise<T> => {
-    events.push(label);
-    active++;
-    peak = Math.max(peak, active);
-    if (holdBegin && label === "BEGIN TRANSACTION") {
-      started();
-      await gate;
-    }
-    active--;
-    return result;
-  };
-  const connection: DuckdbConnectionPort = {
-    run: (sql) => enter(sql, undefined),
-    runAndReadAll: (sql) =>
-      enter(sql, {
-        getRowObjectsJson: () =>
-          sql.includes("pragma_table_info")
-            ? [{ name: "origin_request_id" }, { name: "span_id" }]
-            : sql.includes("RETURNING key")
-              ? [{ key: "ordered" }]
-              : sql.includes("SELECT nextval")
-                ? [{ id: "1" }]
-                : [],
-      }),
-    closeSync: () => undefined,
-  };
-  const instance: DuckdbInstancePort = {
-    connect: async () => connection,
-    closeSync: () => undefined,
-  };
-  const layer = Layer.succeed(
-    DuckdbDriverService,
-    DuckdbDriverService.of({
-      create: () => Effect.succeed(instance),
-    }),
-  );
+  const { events, state, release, began, layer } = concurrencyFixture();
   const scope = Effect.runSync(Scope.make());
   try {
     await writeFile(join(root, "observability.duckdb"), "");
@@ -63,8 +17,8 @@ test("append transaction and query share one native connection permit", async ()
       openDuckdbDatabaseEffect(root).pipe(Scope.provide(scope), Effect.provide(layer)),
     );
     events.length = 0;
-    peak = 0;
-    holdBegin = true;
+    state.peak = 0;
+    state.holdBegin = true;
     const append = Effect.runPromise(
       database.append([
         {
@@ -88,7 +42,7 @@ test("append transaction and query share one native connection permit", async ()
     const [stored, page] = await Promise.all([append, query]);
     expect(stored).toHaveLength(1);
     expect(page.items).toHaveLength(0);
-    expect(peak).toBe(1);
+    expect(state.peak).toBe(1);
     expect(events.indexOf("COMMIT")).toBeLessThan(
       events.findIndex((item) => item.includes("SELECT id::VARCHAR")),
     );
@@ -146,3 +100,61 @@ test("commit failure attempts rollback and remains a tagged storage failure", as
   expect(commands.at(-2)).toBe("COMMIT");
   expect(commands.at(-1)).toBe("ROLLBACK");
 });
+
+/** @returns Explicit gate, state and native driver fixture used by the real database owner. */
+function concurrencyFixture() {
+  const events: string[] = [];
+  let release!: () => void;
+  let started!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const began = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const state = { holdBegin: false, active: 0, peak: 0 };
+  const enter = async <T>(label: string, result: T): Promise<T> => {
+    events.push(label);
+    state.active++;
+    state.peak = Math.max(state.peak, state.active);
+    if (state.holdBegin && label === "BEGIN TRANSACTION") {
+      started();
+      await gate;
+    }
+    state.active--;
+    return result;
+  };
+  const connection = serializedConnection(enter);
+  const instance: DuckdbInstancePort = {
+    connect: async () => connection,
+    closeSync: () => undefined,
+  };
+  const layer = Layer.succeed(
+    DuckdbDriverService,
+    DuckdbDriverService.of({
+      create: () => Effect.succeed(instance),
+    }),
+  );
+  return { events, state, release, began, layer };
+}
+
+/** @param enter - Gate that records native overlap. @returns A complete substitutable connection port. */
+function serializedConnection(
+  enter: <Result>(label: string, result: Result) => Promise<Result>,
+): DuckdbConnectionPort {
+  return {
+    run: (sql) => enter(sql, undefined),
+    runAndReadAll: (sql) =>
+      enter(sql, {
+        getRowObjectsJson: () =>
+          sql.includes("pragma_table_info")
+            ? [{ name: "origin_request_id" }, { name: "span_id" }]
+            : sql.includes("RETURNING key")
+              ? [{ key: "ordered" }]
+              : sql.includes("SELECT nextval")
+                ? [{ id: "1" }]
+                : [],
+      }),
+    closeSync: () => undefined,
+  };
+}

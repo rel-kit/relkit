@@ -1,3 +1,4 @@
+/** Checks serialized worker commands and scoped release of database handles, process listeners and maintenance timers. */
 import { expect, test } from "vitest";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";

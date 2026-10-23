@@ -1,3 +1,4 @@
+/** Exercises direct native persistence, query and incremental legacy-history import while retaining fixed historical records. */
 import { expect, test } from "vitest";
 import { appendFile, mkdir, mkdtemp, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";

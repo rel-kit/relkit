@@ -1,7 +1,8 @@
+/** Exercises the native process entrypoint and restores every test-owned listener and process override. */
 import { expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
-import type { LocalWorkerCommand, LocalWorkerResponse } from "../src/local/types.js";
+import type { LocalWorkerCommand, LocalWorkerResponse } from "@relkit/observability/local/record";
 test("worker message entrypoint opens, writes, queries, and closes a database", async () => {
   const root = await mkdtemp(join("/tmp", "relkit-worker-entry-"));
   const events = ["message", "disconnect", "SIGINT"] as const;
@@ -30,34 +31,7 @@ test("worker message entrypoint opens, writes, queries, and closes a database", 
       handler.call(process, { id: current, command });
       return reply;
     };
-    // Exercise the worker protocol independently of the fixed record's age.
-    expect(
-      (await call({ type: "open", root, retention: { maxAgeMs: Number.MAX_SAFE_INTEGER } })).value,
-    ).toEqual({ records: 0, malformed: 0 });
-    const appended = await call({
-      type: "append",
-      records: [
-        {
-          key: "worker:1",
-          origin: "application",
-          record: {
-            version: 2,
-            signal: "log",
-            timestamp: "2026-09-25T00:00:00.000Z",
-            level: "info",
-            component: "test",
-            message: "worker entry",
-          },
-        },
-      ],
-    });
-    expect(appended.error).toBeUndefined();
-    const page = await call({ type: "query", kind: "logs", query: {} });
-    expect(page.value).toMatchObject({ items: [{ message: "worker entry" }] });
-    const invalid = await call({ type: "query", kind: "logs", query: { cursor: "invalid" } });
-    expect(invalid.code).toBe("RELKIT_OBSERVABILITY_QUERY_INVALID");
-    expect((await call({ type: "close" })).error).toBeUndefined();
-    expect((await call({ type: "flush" })).error).toContain("Telemetry database is not open");
+    await verifyWorkerEntrypoint(call, root);
   } finally {
     for (const event of events)
       for (const listener of process.listeners(event))
@@ -69,3 +43,38 @@ test("worker message entrypoint opens, writes, queries, and closes a database", 
     await rm(root, { recursive: true, force: true });
   }
 });
+
+/** @param call - Actual registered IPC handler adapter. @param root - Test-owned history root. @returns Completion after native protocol assertions. */
+async function verifyWorkerEntrypoint(
+  call: (command: LocalWorkerCommand) => Promise<LocalWorkerResponse>,
+  root: string,
+) {
+  // Exercise the worker protocol independently of the fixed record's age.
+  expect(
+    (await call({ type: "open", root, retention: { maxAgeMs: Number.MAX_SAFE_INTEGER } })).value,
+  ).toEqual({ records: 0, malformed: 0 });
+  const appended = await call({
+    type: "append",
+    records: [
+      {
+        key: "worker:1",
+        origin: "application",
+        record: {
+          version: 2,
+          signal: "log",
+          timestamp: "2026-09-25T00:00:00.000Z",
+          level: "info",
+          component: "test",
+          message: "worker entry",
+        },
+      },
+    ],
+  });
+  expect(appended.error).toBeUndefined();
+  const page = await call({ type: "query", kind: "logs", query: {} });
+  expect(page.value).toMatchObject({ items: [{ message: "worker entry" }] });
+  const invalid = await call({ type: "query", kind: "logs", query: { cursor: "invalid" } });
+  expect(invalid.code).toBe("RELKIT_OBSERVABILITY_QUERY_INVALID");
+  expect((await call({ type: "close" })).error).toBeUndefined();
+  expect((await call({ type: "flush" })).error).toContain("Telemetry database is not open");
+}

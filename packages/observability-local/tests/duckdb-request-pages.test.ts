@@ -1,3 +1,4 @@
+/** Verifies completed request lifecycle selection precedes pagination, ordering and request/route filtering. */
 import { expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";

@@ -1,9 +1,10 @@
+/** Checks malformed legacy-line accounting and source-marker replay suppression during diagnostic history import. */
 import { expect, test } from "vitest";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { importLocalHistory } from "../src/local/import-history.js";
-import type { LocalRecord, StoredLocalRecord } from "../src/local/types.js";
+import type { LocalRecord, StoredLocalRecord } from "@relkit/observability/local/record";
 test("legacy import accounts for malformed lines and skips a repeated file", async () => {
   const root = await mkdtemp(join("/tmp", "relkit-import-history-"));
   const directory = join(root, "logs", "2026-09-25");

@@ -1,3 +1,4 @@
+/** Proves native bulk-insert key ownership, ordered cursors, replay and the transaction batch bound against DuckDB. */
 import { expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
@@ -7,7 +8,7 @@ import { Effect, Semaphore } from "effect";
 import { initializeDuckdbSchema } from "../src/local/duckdb-schema.js";
 import { makeDuckdbStorage } from "../src/local/duckdb-storage.js";
 import type { DuckdbConnectionPort } from "../src/local/duckdb-driver.types.js";
-import type { LocalRecord } from "../src/local/types.types.js";
+import type { LocalRecord } from "@relkit/observability/local/record";
 
 /**
  * Builds distinct current log records for the actual native storage boundary.

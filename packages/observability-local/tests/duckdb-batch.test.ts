@@ -1,10 +1,11 @@
+/** Checks transaction receipt/sequence mapping and bounded batch behavior through deterministic native connection substitutes. */
 import { expect, test } from "vitest";
 import { Effect, Fiber, Semaphore } from "effect";
 import type { DuckDBValue } from "@duckdb/node-api";
 import { appendDuckdbBatchEffect } from "../src/local/duckdb-batch.js";
 import { makeDuckdbStorage } from "../src/local/duckdb-storage.js";
 import type { DuckdbConnectionPort } from "../src/local/duckdb-driver.types.js";
-import type { LocalRecord } from "../src/local/types.types.js";
+import type { LocalRecord } from "@relkit/observability/local/record";
 
 /** Builds a current, valid log envelope for deterministic transaction tests. */
 function record(key: string, message = key): LocalRecord {

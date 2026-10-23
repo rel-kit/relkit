@@ -1,3 +1,4 @@
+/** Checks database acquisition and failure cleanup release connections before their owning native instances. */
 import { expect, test } from "vitest";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
