@@ -1,5 +1,6 @@
+/** Checks the retained cross-domain descriptor inference and negative authoring contracts against public package APIs. */
 import { defineApp, defineService } from "@relkit/app";
-import { defineAgent } from "@relkit/agents";
+import { defineAgent } from "@relkit/langchain";
 import { defineBucket } from "@relkit/buckets";
 import { defineCache } from "@relkit/cache";
 import { defineEnv, env, type EnvRef } from "@relkit/config";
@@ -11,7 +12,7 @@ import { z, type InferInput, type InferOutput } from "@relkit/schema";
 import { defineTool } from "@relkit/tools";
 
 const input = z.object({ id: z.string() });
-const output = z.object({ ok: z.boolean() });
+import { output } from "./descriptor-schemas.fixture.js";
 const declared = defineError({
   id: "types.invalid-order",
   data: z.object({ reason: z.string() }),
@@ -24,72 +25,7 @@ const child = defineFunction({
   output,
   handler: async () => ({ ok: true }),
 });
-const createdPayload = z.object({ orderId: z.string() });
-const changedPayload = z.object({ orderId: z.string(), state: z.string() });
-export const eventCreated = defineEvent({
-  id: "types.created",
-  version: 1,
-  input: createdPayload,
-});
-export const eventChanged = defineEvent({
-  id: "types.changed",
-  version: 2,
-  input: changedPayload,
-});
-const createdEnvelope = z.object({
-  instanceId: z.string(),
-  eventId: z.literal("types.created"),
-  version: z.literal(1),
-  payload: createdPayload,
-  occurredAt: z.string(),
-  publishedAt: z.string(),
-  traceId: z.string(),
-  attributes: z.object({}),
-});
-const changedEnvelope = z.object({
-  instanceId: z.string(),
-  eventId: z.literal("types.changed"),
-  version: z.literal(2),
-  payload: changedPayload,
-  occurredAt: z.string(),
-  publishedAt: z.string(),
-  traceId: z.string(),
-  attributes: z.object({}),
-});
-const anyEnvelope = z.union([createdEnvelope, changedEnvelope]);
-const singleEnvelopeTarget = defineFunction({
-  id: "types.single-envelope",
-  input: createdEnvelope,
-  output,
-  handler: async (value) => {
-    const envelope: EventEnvelope<"types.created", 1, { orderId: string }> = value;
-    const eventId: "types.created" = value.eventId;
-    const version: 1 = value.version;
-    void envelope;
-    void eventId;
-    void version;
-    return { ok: true };
-  },
-});
-const unionEnvelopeTarget = defineFunction({
-  id: "types.union-envelope",
-  input: anyEnvelope,
-  output,
-  handler: async (value) => {
-    if (value.eventId === "types.created") {
-      const version: 1 = value.version;
-      const orderId: string = value.payload.orderId;
-      void version;
-      void orderId;
-    } else {
-      const version: 2 = value.version;
-      const state: string = value.payload.state;
-      void version;
-      void state;
-    }
-    return { ok: true };
-  },
-});
+export { eventCreated, eventChanged } from "./descriptor-events.fixture.js";
 const job = defineJob({
   id: "types.job",
   input,
@@ -140,7 +76,9 @@ const parent = defineFunction({
     const queued = await context.jobs.job.enqueue({ id: value.id });
     const published = await context.events["types.created"].publish({ orderId: value.id });
     const object = await context.buckets.bucket.get("orders/1");
-    const cached: { price: number } | undefined = await context.cache.cache.get({ sku: value.id });
+    const cached: { price: number } | undefined = await context.cache.cache.get({
+      sku: value.id,
+    });
     // @ts-expect-error increment is not exposed for object-valued caches
     await context.cache.cache.increment({ sku: value.id });
     const count: number = await context.cache.numericCache.increment(value.id);
@@ -220,7 +158,9 @@ const serviceTool = service.lookup.asTool({
 const serviceToolOutput: Promise<InferOutput<typeof child.output>> = serviceTool.invoke({
   id: "order-1",
 });
-const directToolOutput: Promise<InferOutput<typeof child.output>> = tool.invoke({ id: "order-1" });
+const directToolOutput: Promise<InferOutput<typeof child.output>> = tool.invoke({
+  id: "order-1",
+});
 const originalMember: typeof child = service.lookup;
 void serviceOutput;
 void serviceToolOutput;

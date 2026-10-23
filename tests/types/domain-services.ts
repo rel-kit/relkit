@@ -1,5 +1,8 @@
+/** Checks authoring inference for domain services and explicitly selected SQLite model extensions.
+ * Compile-time assignments exercise public service and native operation contracts without acquiring resources.
+ */
 import { defineBetterAuthService } from "@relkit/better-auth";
-import { defineDrizzleService, defineModel, type DatabaseContext } from "@relkit/drizzle";
+import { defineDrizzleService, defineModel, type DatabaseContext } from "@relkit/drizzle/sqlite";
 import { defineEvent } from "@relkit/events";
 import { defineFunction, type AuthContext } from "@relkit/functions";
 import { defineServiceRoutes, defineServiceRoutesEffect } from "@relkit/routes";
