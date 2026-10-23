@@ -1,8 +1,13 @@
+/**
+ * Owns import history for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import { Effect } from "effect";
 import { duckdbError } from "./duckdb-error.js";
 import type { DuckdbConnectionPort } from "./duckdb-driver.types.js";
 import { importLocalHistoryEffect } from "./import-history-effect.js";
-import type { LocalRecord, StoredLocalRecord } from "./types.types.js";
+import type { LocalRecord, StoredLocalRecord } from "@relkit/observability/local/record";
 /**
  * Imports legacy NDJSON through the scoped Effect implementation.
  *
