@@ -8,15 +8,17 @@ import type { ApplicationGraph } from "@relkit/graph";
 
 /** Validated HTTP settings supplied to the pure generated-server emitter. */
 export interface ServerSourceConfiguration {
-  /** Prepared capsules select the scoped transport facade; production remains eager. */
+  /** Prepared capsules embed a checked registration plan instead of rebuilding it. */
   readonly httpApplication?: "prepared";
   readonly maxBodyBytes: number;
   readonly apiDocs: {
+    readonly ui?: "scalar" | false;
     readonly enabledInProduction: boolean;
     readonly excludeDomains?: readonly string[];
   };
   readonly clientContract: boolean;
   readonly mcp: boolean;
+  readonly agUi?: boolean;
   readonly maxPreviewBytes: number;
 }
 
