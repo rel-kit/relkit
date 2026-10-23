@@ -1,3 +1,8 @@
+/**
+ * Validates data-only server and legacy inspector configuration before generation.
+ * Optional protocols and documentation UI are selected explicitly; invalid values
+ * accumulate diagnostics without loading SDKs or changing inspector behavior.
+ */
 import {
   CONFIG_CODES,
   ConfigPort,
@@ -7,6 +12,7 @@ import {
 } from "./config-loader-types.js";
 import { Schema } from "effect";
 import { readRecord } from "./config-loader-utils.js";
+import { readBoolean, rejectUnknown } from "./config-loader-fields.js";
 
 /**
  * Validates inspector settings and applies tooling defaults.
@@ -63,7 +69,7 @@ export function readServer(value: unknown, issues: ConfigIssue[]) {
   rejectUnknown(
     record,
     "server",
-    ["port", "maxBodyBytes", "apiDocs", "clientContract", "mcp"],
+    ["port", "maxBodyBytes", "apiDocs", "clientContract", "mcp", "agUi"],
     issues,
   );
   const port = readPort(record.port, "server.port", DEFAULT_TOOLING_CONFIG.server.port, issues);
@@ -75,30 +81,9 @@ export function readServer(value: unknown, issues: ConfigIssue[]) {
   );
   const apiDocs = readApiDocs(record.apiDocs, issues);
   const clientContract = readBoolean(record.clientContract, "server.clientContract", true, issues);
-  const mcp = readBoolean(record.mcp, "server.mcp", true, issues);
-  return { port, maxBodyBytes, apiDocs, clientContract, mcp };
-}
-
-/**
- * Checks a boolean option while retaining its fallback and diagnostic path.
- * @param value - Declared metadata inspected without coercion.
- * @param path - Portable source, property, or runtime path.
- * @param fallback - Value retained when metadata is absent.
- * @param issues - Caller-owned ordered configuration issues.
- * @returns The validated boolean or its default, with invalid settings recorded as issues.
- */
-function readBoolean(
-  value: unknown,
-  path: string,
-  fallback: boolean,
-  issues: ConfigIssue[],
-): boolean {
-  if (value === undefined) return fallback;
-  if (typeof value !== "boolean") {
-    issues.push({ code: CONFIG_CODES.behavior, path, message: `${path} must be a boolean.` });
-    return fallback;
-  }
-  return value;
+  const mcp = readBoolean(record.mcp, "server.mcp", false, issues);
+  const agUi = readBoolean(record.agUi, "server.agUi", false, issues);
+  return { port, maxBodyBytes, apiDocs, clientContract, mcp, agUi };
 }
 
 /**
@@ -111,7 +96,13 @@ function readApiDocs(value: unknown, issues: ConfigIssue[]) {
   if (value === undefined) return DEFAULT_TOOLING_CONFIG.server.apiDocs;
   const record = readRecord(value, "server.apiDocs", issues);
   if (record === undefined) return DEFAULT_TOOLING_CONFIG.server.apiDocs;
-  rejectUnknown(record, "server.apiDocs", ["enabledInProduction", "excludeDomains"], issues);
+  rejectUnknown(record, "server.apiDocs", ["enabledInProduction", "excludeDomains", "ui"], issues);
+  if (record.ui !== undefined && record.ui !== false && record.ui !== "scalar")
+    issues.push({
+      code: CONFIG_CODES.behavior,
+      path: "server.apiDocs.ui",
+      message: 'server.apiDocs.ui must be "scalar" or false.',
+    });
   if (record.enabledInProduction !== undefined && typeof record.enabledInProduction !== "boolean") {
     issues.push({
       code: CONFIG_CODES.behavior,
@@ -133,6 +124,7 @@ function readApiDocs(value: unknown, issues: ConfigIssue[]) {
     });
   }
   return {
+    ui: record.ui === "scalar" ? ("scalar" as const) : (false as const),
     enabledInProduction:
       typeof record.enabledInProduction === "boolean" ? record.enabledInProduction : false,
     ...(validDomains
@@ -186,29 +178,4 @@ function readPositive(
     return fallback;
   }
   return Number(value);
-}
-
-/**
- * Records unsupported nested configuration keys.
- * @param record - Validated configuration record whose keys are inspected.
- * @param path - Portable source, property, or runtime path.
- * @param allowed - Supported nested configuration keys.
- * @param issues - Caller-owned ordered configuration issues.
- * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
- */
-function rejectUnknown(
-  record: Record<string, unknown>,
-  path: string,
-  allowed: readonly string[],
-  issues: ConfigIssue[],
-): void {
-  for (const key of Object.keys(record)) {
-    if (!allowed.includes(key)) {
-      issues.push({
-        code: CONFIG_CODES.key,
-        path: `${path}.${key}`,
-        message: `Unknown ${path} setting "${key}".`,
-      });
-    }
-  }
 }

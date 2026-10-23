@@ -1,5 +1,7 @@
+/** Validates exact integration authoring selections, catalog routing, and contained package role paths without evaluating SDKs. */
 import { IntegrationPackageValidationError } from "./integration-package-errors.js";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
+import { IntegrationAuthoringExports } from "./integration-authoring-exports.schemas.js";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 
@@ -8,23 +10,56 @@ import { isAbsolute, relative } from "node:path";
 import type { RuntimeIntegrationPackage } from "./normalize-types.js";
 
 /**
- * Rejects imports outside an integration's declared authoring export.
+ * Rejects imports outside the integration's exact declared authoring exports.
  * @param manifest - Parsed package metadata.
  * @param specifier - Literal module import specifier.
+ * @param usage - Source role; only application modules may use public testing helpers.
  * @returns A lazy effect yielding void or failing with IntegrationPackageValidationError; getter defects propagate.
  */
 export const assertAuthoringImportEffect = Effect.fn("Compiler.assertAuthoringImport")(
-  function* (manifest: Record<string, unknown>, specifier: string) {
+  function* (
+    manifest: Record<string, unknown>,
+    specifier: string,
+    usage: "authoring" | "application" = "authoring",
+  ) {
     const metadata = integrationMetadata(manifest);
     if (metadata === undefined) return;
     const name = manifest.name;
-    const authoring = record(metadata.exports)?.authoring;
-    if (typeof name !== "string" || typeof authoring !== "string")
+    const selected = yield* Schema.decodeUnknownEffect(IntegrationAuthoringExports)(
+      record(metadata.exports)?.authoring,
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new IntegrationPackageValidationError({
+            cause: new TypeError("Integration authoring export metadata is invalid."),
+          }),
+      ),
+    );
+    const authoring = typeof selected === "string" ? [selected] : selected;
+    const exports = record(manifest.exports);
+    if (
+      typeof name !== "string" ||
+      authoring.length === 0 ||
+      authoring.some(
+        (leaf) =>
+          !/^(?:\.|\.\/[a-z0-9._-]+(?:\/[a-z0-9._-]+)*)$/i.test(leaf) ||
+          leaf
+            .split("/")
+            .slice(1)
+            .some((part) => part === "." || part === "..") ||
+          exports === undefined ||
+          !Object.hasOwn(exports, leaf),
+      )
+    )
       return yield* new IntegrationPackageValidationError({
         cause: new TypeError("Integration authoring export metadata is invalid."),
       });
-    const expected = authoring === "." ? name : `${name}/${authoring.replace(/^\.\//, "")}`;
-    if (specifier !== expected)
+    const expected = authoring.map((leaf) => (leaf === "." ? name : `${name}/${leaf.slice(2)}`));
+    const testing =
+      usage === "application" &&
+      specifier === `${name}/testing` &&
+      Object.hasOwn(exports ?? {}, "./testing");
+    if (!expected.includes(specifier) && !testing)
       return yield* new IntegrationPackageValidationError({
         cause: new TypeError(
           `Application integration import "${specifier}" is not an authoring export.`,

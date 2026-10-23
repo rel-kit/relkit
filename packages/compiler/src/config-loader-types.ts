@@ -1,3 +1,8 @@
+/**
+ * Defines accepted server/tooling data and defaults without acquiring transports.
+ * Optional MCP, AG-UI and Scalar remain explicit selections; inspector settings
+ * continue to use the existing Stage-1 schema.
+ */
 export type {
   ConfigIssueCode,
   ConfigIssue,
@@ -39,12 +44,14 @@ export const ToolingConfigInputSchema = Schema.Struct({
       maxBodyBytes: Schema.optionalKey(Schema.Number),
       apiDocs: Schema.optionalKey(
         Schema.Struct({
+          ui: Schema.optionalKey(Schema.Literals(["scalar", false])),
           enabledInProduction: Schema.optionalKey(Schema.Boolean),
           excludeDomains: Schema.optionalKey(Schema.Array(Schema.String)),
         }),
       ),
       clientContract: Schema.optionalKey(Schema.Boolean),
       mcp: Schema.optionalKey(Schema.Boolean),
+      agUi: Schema.optionalKey(Schema.Boolean),
     }),
   ),
   inspector: Schema.optionalKey(
@@ -67,11 +74,13 @@ export const LoadedToolingConfigSchema = Schema.Struct({
     port: ConfigPort,
     maxBodyBytes: ConfigPositive,
     apiDocs: Schema.Struct({
+      ui: Schema.optionalKey(Schema.Literals(["scalar", false])),
       enabledInProduction: Schema.Boolean,
       excludeDomains: Schema.optionalKey(Schema.Array(Schema.String)),
     }),
     clientContract: Schema.Boolean,
     mcp: Schema.Boolean,
+    agUi: Schema.optionalKey(Schema.Boolean),
   }),
   inspector: Schema.Struct({
     port: ConfigPort,
@@ -101,9 +110,10 @@ export const DEFAULT_TOOLING_CONFIG = Object.freeze({
   server: Object.freeze({
     port: 3000,
     maxBodyBytes: 1_048_576,
-    apiDocs: Object.freeze({ enabledInProduction: false }),
+    apiDocs: Object.freeze({ enabledInProduction: false, ui: false as const }),
     clientContract: true,
-    mcp: true,
+    mcp: false,
+    agUi: false,
   }),
   inspector: Object.freeze({
     port: 3210,

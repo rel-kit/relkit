@@ -1,5 +1,7 @@
+/** Resolves selected authoring packages and roles through validated metadata and contained roots. */
 import { IntegrationPackageValidationError } from "./integration-package-errors.js";
 import { runtimePackageEffect } from "./integration-package-runtime.js";
+import { integrationPackageDependencies } from "./integration-package-dependencies.js";
 import {
   catalogTargetEffect,
   assertAuthoringImportEffect,
@@ -45,10 +47,16 @@ export const resolveRuntimeIntegrationPackagesEffect = Effect.fn(
 )(
   function* (options: ResolveRuntimeIntegrationPackagesOptions) {
     const byId = new Map<string, RuntimeIntegrationPackage>();
-    for (const specifier of [...new Set(options.imports)].sort()) {
+    const imports = [...new Set([...options.imports, ...(options.applicationImports ?? [])])];
+    for (const specifier of imports.sort()) {
       const imported = yield* loadPackageEffect(specifier, options.projectRoot);
       const target = yield* catalogTargetEffect(imported.manifest, specifier);
-      if (target === undefined) yield* assertAuthoringImportEffect(imported.manifest, specifier);
+      if (target === undefined)
+        yield* assertAuthoringImportEffect(
+          imported.manifest,
+          specifier,
+          options.imports.includes(specifier) ? "authoring" : "application",
+        );
       const selected =
         target === undefined ? imported : yield* loadPackageEffect(target, imported.root);
       const entry = yield* runtimePackageEffect(selected);
@@ -68,11 +76,7 @@ export const resolveRuntimeIntegrationPackagesEffect = Effect.fn(
   (effect) => observeCompiler("configuration", "resolveRuntimeIntegrationPackages", effect),
 );
 
-/**
- * Resolves deduplicated authoring imports into validated runtime package registrations.
- * @param options - Caller-supplied configuration for this operation.
- * @returns Validated, deduplicated runtime package registrations sorted by identity.
- */
+/** Resolves role-separated imports into validated runtime package registrations. */
 export function resolveRuntimeIntegrationPackages(
   options: ResolveRuntimeIntegrationPackagesOptions,
 ): readonly RuntimeIntegrationPackage[] {
@@ -125,7 +129,15 @@ export const resolveIntegrationPackageRoleEffect = Effect.fn(
           `Package "${options.packageName}" ${options.role} export escapes its root.`,
         ),
       });
-    return Object.freeze({ ...options, packageVersion, exportName, resolvedPath });
+    const requirements = yield* integrationPackageDependencies(metadata?.dependencies);
+    return Object.freeze({
+      ...options,
+      packageVersion,
+      exportName,
+      resolvedPath,
+      packageRoot: loaded.root,
+      ...(requirements.length === 0 ? {} : { requirements }),
+    });
   },
   (effect) => observeCompiler("configuration", "resolveIntegrationPackageRole", effect),
 );
