@@ -1,3 +1,5 @@
+/** Owns native agent construction and invocation adaptation, retaining the authored SDK configuration and selected persistence context. This companion preserves the native input and output types without starting runtime work. */
+
 import type { LanguageModelLike } from "@langchain/core/language_models/base";
 import type { createAgent } from "langchain";
 import type { AgentDescriptor } from "./define-agent.js";

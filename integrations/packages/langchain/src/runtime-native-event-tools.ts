@@ -1,11 +1,13 @@
+/** Projects native tool events into RELKIT tool lifecycle observations while preserving tool call identifiers and status order. */
+
 import type { ProtocolEvent } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { publicToolValueEffect } from "./runtime-native-public-tools.js";
 import type { AgentContentSink } from "./runtime.types.js";
 import { signalFailure, withSignal } from "./signal.js";
-import type { ToolPartState } from "./state.types.js";
+import type { ToolPartState } from "@relkit/agents/internal/state.types";
 
 /** Emits public lifecycle updates for a native tool event.
  * @param event - Native event.

@@ -1,7 +1,9 @@
+/** Maps the native event stream into RELKIT execution events and public observations in the order delivered by the native iterator. */
+
 import type { ProtocolEvent } from "@langchain/langgraph";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import type { AgentContentSink } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";

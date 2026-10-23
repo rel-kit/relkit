@@ -1,3 +1,5 @@
+/** Extracts native event identifiers and payload fragments shared by stream adapters, retaining the SDK's event identity conventions. */
+
 import type { ProtocolEvent } from "@langchain/langgraph";
 import { publicToolValue, type NativeExecutionContext } from "./runtime-native-public.js";
 

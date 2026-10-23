@@ -1,3 +1,5 @@
+/** Exercises native runtime native events effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect, Result } from "effect";
 import { expect, test, vi } from "vitest";
 import { collectNativeEventsEffect } from "../src/runtime-native-events.js";

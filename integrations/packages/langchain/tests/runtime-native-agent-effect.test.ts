@@ -1,3 +1,5 @@
+/** Exercises native runtime native agent effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { z } from "@relkit/schema";
 import { Effect, Layer, Result } from "effect";
 import { expect, test } from "vitest";
@@ -29,7 +31,7 @@ test("native agent Effect builds a runnable with injected services", async () =>
   const created = await Effect.runPromise(
     Effect.provide(
       createNativeAgentEffect({
-        runtime: { agent, tools: [], engine: {} as never },
+        runtime: { agent, input: { prompt: "hello" }, tools: [], engine: {} as never },
         model,
         signal: new AbortController().signal,
         maxOutputBytes: 1024,
@@ -49,7 +51,12 @@ test("native agent Effect tags an unregistered authored tool", async () => {
     Effect.result(
       Effect.provide(
         createNativeAgentEffect({
-          runtime: { agent: invalid, tools: [], engine: {} as never },
+          runtime: {
+            agent: invalid,
+            input: { prompt: "hello" },
+            tools: [],
+            engine: {} as never,
+          },
           model: "default",
           signal: new AbortController().signal,
           maxOutputBytes: 1024,

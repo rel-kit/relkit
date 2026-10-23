@@ -1,13 +1,15 @@
+/** Constructs the native agent from resolved model, tools, middleware and optional DeepAgents configuration immediately before invocation. */
+
+import { childAgentCommon, nestedChildAgentEffect } from "./runtime-native-subagents.js";
+import { responseFormatEffect } from "./runtime-native-response-format.js";
 import type { LanguageModelLike } from "@langchain/core/language_models/base";
-import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
-import { toolStrategy, type AnyAgentMiddleware } from "langchain";
+import type { AnyAgentMiddleware } from "langchain";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import type { AgentDescriptor } from "./define-agent.js";
 import { hasDeepAgentCapabilities } from "./define-agent-deep.js";
 import { resolveAgentPersistenceEffect } from "./graph-persistence.js";
 import { AgentInvocationFailure, agentInvocationFailure } from "./runtime-effect-error.js";
-import { AgentRuntimeError } from "./runtime-errors.js";
 import type {
   CreateNativeAgentOptions,
   NativeAgentRuntimeOptions,
@@ -38,38 +40,6 @@ export const createToolsForAgentEffect = Effect.fn("Agents.runtime.createAgentTo
       options.traceId,
     ),
   (effect) => observeAgent("runtime.create-agent-tools", effect),
-);
-
-/** Creates the native structured output strategy.
- * @param schema - Authored output validator.
- * @returns An Effect with a strategy or AgentInvocationFailure.
- * @example Effect.runSync(responseFormatEffect(output));
- */
-export const responseFormatEffect = Effect.fn("Agents.runtime.responseFormat")(
-  (schema: StandardSchemaV1) =>
-    Effect.try({
-      try: () => {
-        const projection = getJsonSchema(schema);
-        if (!projection.ok) {
-          throw new AgentRuntimeError(
-            "RELKIT_SCHEMA_UNAVAILABLE",
-            "Agent output schema is unavailable",
-          );
-        }
-        return toolStrategy(
-          {
-            title: "relkit_output",
-            type: "object",
-            properties: { value: projection.schema },
-            required: ["value"],
-            additionalProperties: false,
-          },
-          { handleError: false },
-        );
-      },
-      catch: agentInvocationFailure,
-    }),
-  (effect) => observeAgent("runtime.response-format", effect),
 );
 
 /** Resolves a child model or inherits its parent model.
@@ -150,19 +120,19 @@ function createSubagentsCore(
       const model = yield* childModelEffect(child, inheritedModel, runtime);
       const instructions = yield* nativeInstructionsEffect(child);
       const format = yield* responseFormatEffect(child.output);
-      const common = {
-        name: child.id,
+      const common = childAgentCommon(
+        child,
         model,
-        systemPrompt: instructions,
-        tools: [...childTools.values],
-        middleware: [
-          ...(child.middleware as unknown as readonly AnyAgentMiddleware[]),
-          limitMiddleware,
-        ],
-        responseFormat: format,
-      };
+        instructions,
+        format,
+        childTools,
+        limitMiddleware,
+      );
       if (!hasDeepAgentCapabilities(child)) {
-        subagents.push({ ...common, description: child.description ?? child.title ?? child.id });
+        subagents.push({
+          ...common,
+          description: child.description ?? child.title ?? child.id,
+        });
         continue;
       }
       const backend = child.backend ?? inheritedBackend;
@@ -181,24 +151,11 @@ function createSubagentsCore(
         limitMiddleware,
       );
       subagents.push(
-        yield* Effect.try({
-          try: () => ({
-            name: child.id,
-            description: child.description ?? child.title ?? child.id,
-            runnable: deepagents.createDeepAgent({
-              ...common,
-              ...persistence,
-              subagents: nested,
-              ...(child.skills === undefined ? {} : { skills: [...child.skills] }),
-              ...(child.memory === undefined ? {} : { memory: [...child.memory] }),
-              ...(backend === undefined ? {} : { backend }),
-              ...(child.interruptOn === undefined ? {} : { interruptOn: child.interruptOn }),
-            } as never),
-          }),
-          catch: agentInvocationFailure,
-        }),
+        yield* nestedChildAgentEffect(child, common, persistence, nested, backend, deepagents),
       );
     }
     return subagents;
   });
 }
+
+export { responseFormatEffect } from "./runtime-native-response-format.js";

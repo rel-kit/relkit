@@ -1,6 +1,8 @@
+/** Owns native agent construction and invocation adaptation, retaining the authored SDK configuration and selected persistence context. */
+
 import { createAgent, StructuredOutputParsingError, type AnyAgentMiddleware } from "langchain";
 import { Effect, Layer } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { hasDeepAgentCapabilities } from "./define-agent-deep.js";
 import { createThreadBucketBackendEffect } from "./deepagent-bucket-scope.js";
 import { resolveAgentPersistenceEffect } from "./graph-persistence.js";
@@ -32,26 +34,7 @@ export type { CreateNativeAgentOptions, NativeAgent } from "./runtime-native-age
 export const createNativeAgentEffect = Effect.fn("Agents.runtime.createNativeAgent")(
   function* (options: CreateNativeAgentOptions) {
     const { runtime } = options;
-    const tools = yield* createToolsForAgentEffect(runtime, options, runtime.agent);
-    const persistence = yield* resolveAgentPersistenceEffect(
-      runtime.agent,
-      runtime.environment ?? {},
-    ).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)));
-    const limitMiddleware = yield* createNativeLimitMiddlewareEffect(runtime.agent.limits);
-    const instructions = yield* nativeInstructionsEffect(runtime.agent);
-    const format = yield* responseFormatEffect(runtime.agent.output);
-    const common = {
-      name: runtime.agent.id,
-      model: options.model,
-      systemPrompt: instructions,
-      tools: [...tools.values],
-      middleware: [
-        ...(runtime.agent.middleware as unknown as readonly AnyAgentMiddleware[]),
-        limitMiddleware,
-      ],
-      responseFormat: format,
-      ...persistence,
-    };
+    const { tools, persistence, limitMiddleware, common } = yield* nativeAgentCommonEffect(options);
     if (!hasDeepAgentCapabilities(runtime.agent)) {
       const agent = yield* Effect.try({
         try: () => createAgent(common),
@@ -116,3 +99,34 @@ export function createNativeAgent(options: CreateNativeAgentOptions): Promise<{
     { signal: options.signal },
   );
 }
+
+/** Resolves native tools, persistence and response configuration in the original order.
+ * @param options - One invocation's native runtime dependencies.
+ * @returns Shared configuration for ordinary and DeepAgents execution.
+ */
+const nativeAgentCommonEffect = Effect.fn("Agents.runtime.nativeCommon")(function* (
+  options: CreateNativeAgentOptions,
+) {
+  const { runtime } = options;
+  const tools = yield* createToolsForAgentEffect(runtime, options, runtime.agent);
+  const persistence = yield* resolveAgentPersistenceEffect(
+    runtime.agent,
+    runtime.environment ?? {},
+  ).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)));
+  const limitMiddleware = yield* createNativeLimitMiddlewareEffect(runtime.agent.limits);
+  const instructions = yield* nativeInstructionsEffect(runtime.agent);
+  const format = yield* responseFormatEffect(runtime.agent.output);
+  const common = {
+    name: runtime.agent.id,
+    model: options.model,
+    systemPrompt: instructions,
+    tools: [...tools.values],
+    middleware: [
+      ...(runtime.agent.middleware as unknown as readonly AnyAgentMiddleware[]),
+      limitMiddleware,
+    ],
+    responseFormat: format,
+    ...persistence,
+  };
+  return { tools, persistence, limitMiddleware, common };
+});
