@@ -1,6 +1,8 @@
+/** Runs a compiled graph within the invocation context, coordinating input, continuation and persistence before projecting final output. */
+
 import { currentInvocationScope, runInInvocationScope } from "@relkit/invocation";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { compileGraphEffect } from "./graph-compile.js";
 import { graphConfigEffect } from "./graph-continuation.js";
 import { resolveGraphPersistenceEffect } from "./graph-persistence.js";
@@ -31,18 +33,7 @@ export const runCompiledGraphEffect = Effect.fn("Agents.graph.runCompiled")(
     maxOutputBytes: number,
   ) {
     if (signal.aborted) return yield* Effect.fail(graphInvocationFailure(signalFailure(signal)));
-    const persistence = yield* resolveGraphPersistenceEffect(
-      options.agent,
-      options.environment ?? {},
-    ).pipe(Effect.mapError((failure) => graphInvocationFailure(failure.cause)));
-    if (
-      persistence.checkpointer === undefined &&
-      (yield* graphWorkflowRequiresPersistenceEffect(options.agent.workflow))
-    ) {
-      return yield* Effect.fail(
-        graphInvocationFailure(new TypeError("Graphs with resumable nodes require a checkpointer")),
-      );
-    }
+    const persistence = yield* runnableGraphPersistenceEffect(options);
     const graph = yield* compileGraphEffect(options.agent, persistence).pipe(
       Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
     );
@@ -111,3 +102,25 @@ export function runCompiledGraph(
     { signal },
   );
 }
+
+/** Requires a checkpointer when graph nodes declare resumable waiting.
+ * @param options - Native graph and environment bindings.
+ * @returns Resolved persistence or the original graph failure.
+ */
+const runnableGraphPersistenceEffect = Effect.fn("Agents.graph.runnablePersistence")(function* (
+  options: GraphRuntimeOptions,
+) {
+  const persistence = yield* resolveGraphPersistenceEffect(
+    options.agent,
+    options.environment ?? {},
+  ).pipe(Effect.mapError((failure) => graphInvocationFailure(failure.cause)));
+  if (
+    persistence.checkpointer === undefined &&
+    (yield* graphWorkflowRequiresPersistenceEffect(options.agent.workflow))
+  ) {
+    return yield* Effect.fail(
+      graphInvocationFailure(new TypeError("Graphs with resumable nodes require a checkpointer")),
+    );
+  }
+  return persistence;
+});

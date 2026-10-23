@@ -1,6 +1,8 @@
+/** Acquires native graph checkpointer and store configuration for invocation and supplies the release action to the owning graph scope. */
+
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { graphExecution, type GraphDescriptor } from "./define-graph.js";
 import { assertPersistenceProtocol, isPersistenceResource } from "./define-persistence.js";
 import type {

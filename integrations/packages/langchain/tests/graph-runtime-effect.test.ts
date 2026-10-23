@@ -1,3 +1,5 @@
+/** Exercises native graph runtime effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { END, MemorySaver, START, StateSchema } from "@langchain/langgraph";
 import { z } from "@relkit/schema";
 import { Effect, Layer } from "effect";
@@ -8,6 +10,33 @@ import { defineCheckpointerDb } from "../src/define-persistence.js";
 import { GraphInvocationIdentity, invokeGraphEffect } from "../src/graph-runtime.js";
 
 test("interrupting graph Effect rolls back a late persistence acquisition", async () => {
+  const { graph, started, disposed, finishFactory } = lateGraphFixture();
+  const identity = Layer.succeed(GraphInvocationIdentity, { randomUUID: () => "fixed" });
+  const controller = new AbortController();
+  const pending = Effect.runPromise(
+    Effect.provide(
+      invokeGraphEffect({
+        agent: graph,
+        input: { question: "Hi" },
+        threadId: "thread",
+        tools: {},
+        engine: { invoke: async () => undefined },
+      }),
+      identity,
+    ),
+    { signal: controller.signal },
+  );
+  await started;
+  controller.abort();
+  finishFactory(new MemorySaver());
+  await expect(pending).rejects.toThrow();
+  await disposed;
+});
+
+/** Constructs the native late graph fixture once for its owning case, preserving callback and resource identity.
+ * @returns The unchanged native descriptors and directly observed fixture values.
+ */
+function lateGraphFixture() {
   let finishFactory = (_value: MemorySaver) => {};
   const factory = new Promise<MemorySaver>((resolve) => {
     finishFactory = resolve;
@@ -46,24 +75,5 @@ test("interrupting graph Effect rolls back a late persistence acquisition", asyn
     checkpointer,
     limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 10_000 },
   });
-  const identity = Layer.succeed(GraphInvocationIdentity, { randomUUID: () => "fixed" });
-  const controller = new AbortController();
-  const pending = Effect.runPromise(
-    Effect.provide(
-      invokeGraphEffect({
-        agent: graph,
-        input: { question: "Hi" },
-        threadId: "thread",
-        tools: {},
-        engine: { invoke: async () => undefined },
-      }),
-      identity,
-    ),
-    { signal: controller.signal },
-  );
-  await started;
-  controller.abort();
-  finishFactory(new MemorySaver());
-  await expect(pending).rejects.toThrow();
-  await disposed;
-});
+  return { graph, started, disposed, finishFactory };
+}

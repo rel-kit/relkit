@@ -1,3 +1,5 @@
+/** Acquires native graph checkpointer and store configuration for invocation and supplies the release action to the owning graph scope. This companion preserves the native input and output types without starting runtime work. */
+
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
 import type { PersistenceResource } from "./define-persistence.js";
 

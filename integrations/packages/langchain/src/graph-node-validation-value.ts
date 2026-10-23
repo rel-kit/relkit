@@ -1,7 +1,9 @@
+/** Checks graph node authoring values and callable shapes before construction, keeping runtime callbacks untouched after validation. */
+
 import { validate, type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { isRecord } from "./agent-validation.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { isRecord } from "@relkit/agents/internal/agent-validation";
 import { graphNodeValidationFailure } from "./graph-node-validation-error.js";
 
 /** Checks that native command destinations were declared by the node.

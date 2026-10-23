@@ -1,3 +1,5 @@
+/** Translates native graph execution failures into the RELKIT graph error boundary while preserving their original causes. */
+
 import { Schema } from "effect";
 
 /** Tagged graph invocation failure with the original runtime cause. */

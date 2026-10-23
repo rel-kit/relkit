@@ -1,8 +1,10 @@
+/** Composes graph compilation, scoped persistence and execution into the native invocation entrypoint, retaining stream and continuation behavior. */
+
 import { normalizeId } from "@relkit/contracts";
 import { frameworkTrace } from "@relkit/invocation";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { generatedAgentFunctionId } from "./generated-function.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { generatedAgentFunctionId } from "@relkit/agents/internal/generated-function";
 import { graphInvocationFailure } from "./graph-runtime-error.js";
 import { runCompiledGraph } from "./graph-runtime-execution.js";
 import { GraphInvocationIdentity, GraphInvocationIdentityLive } from "./graph-runtime-identity.js";
@@ -22,15 +24,7 @@ export { GraphInvocationIdentity, GraphInvocationIdentityLive } from "./graph-ru
  */
 export const invokeGraphEffect = Effect.fn("Agents.graph.invoke")(
   function* (options: GraphRuntimeOptions) {
-    const identity = yield* GraphInvocationIdentity;
-    const invocationId = yield* Effect.try({
-      try: () => normalizeId(options.invocationId ?? `agent-${identity.randomUUID()}`),
-      catch: graphInvocationFailure,
-    });
-    const traceId = yield* Effect.try({
-      try: () => normalizeId(options.traceId ?? invocationId),
-      catch: graphInvocationFailure,
-    });
+    const { invocationId, traceId } = yield* graphInvocationIdentityEffect(options);
     const limits = yield* resolveAgentContentLimitsEffect(options).pipe(
       Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
     );
@@ -95,3 +89,22 @@ export function invokeGraph(options: GraphRuntimeOptions): Promise<unknown> {
     ),
   );
 }
+
+/** Normalizes graph identities through the replaceable ID service.
+ * @param options - Caller identity overrides.
+ * @returns Stable invocation and trace IDs.
+ */
+const graphInvocationIdentityEffect = Effect.fn("Agents.graph.invocationIdentity")(function* (
+  options: GraphRuntimeOptions,
+) {
+  const identity = yield* GraphInvocationIdentity;
+  const invocationId = yield* Effect.try({
+    try: () => normalizeId(options.invocationId ?? `agent-${identity.randomUUID()}`),
+    catch: graphInvocationFailure,
+  });
+  const traceId = yield* Effect.try({
+    try: () => normalizeId(options.traceId ?? invocationId),
+    catch: graphInvocationFailure,
+  });
+  return { invocationId, traceId };
+});

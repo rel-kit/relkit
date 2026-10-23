@@ -1,5 +1,7 @@
+/** Releases native graph persistence resources through their supported close protocol after graph work has settled. */
+
 import { Effect, Result } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { graphExecution, isGraphDescriptor } from "./define-graph.js";
 import { isPersistenceResource } from "./define-persistence.js";
 import type { AgentPersistenceDeclaration } from "./graph-persistence.types.js";
