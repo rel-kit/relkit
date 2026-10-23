@@ -1,8 +1,17 @@
+/** Merges selected add dependencies and scripts into project metadata, preserving existing values and applying feature-owned auth repair checks before serialization. */
+
 import { Schema } from "effect";
-import { JsonObject, ScaffoldManifestSchema } from "./project-manifest.schemas.js";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
-import { SCAFFOLD_DEPENDENCIES, type ScaffoldDependencyName } from "./scaffold-catalog.js";
+import {
+  JsonObject,
+  ScaffoldManifestSchema,
+} from "create-relkit/internal/project-manifest.schemas";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import {
+  SCAFFOLD_DEPENDENCIES,
+  type ScaffoldDependencyName,
+} from "create-relkit/internal/scaffold-catalog";
 import type { ScaffoldManifest, ScaffoldManifestMerge } from "./plan-manifest.types.js";
+import { repairSelectedAuthManifest } from "./auth-manifest-repair.js";
 
 /**
  * Merges supported dependencies and scripts while retaining compatible authored specifications.
@@ -50,6 +59,7 @@ export function mergeScaffoldManifest(
   if (manifest.dependencies) manifest.dependencies = sort(manifest.dependencies);
   if (manifest.devDependencies) manifest.devDependencies = sort(manifest.devDependencies);
   manifest.scripts = sort(scripts);
+  repairSelectedAuthManifest(manifest);
   return { content: `${JSON.stringify(manifest, null, 2)}\n`, added };
 }
 

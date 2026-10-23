@@ -1,9 +1,14 @@
+/** Finalizes selected dependencies, scripts and portable repair assets before the scaffold transaction starts, preserving unrelated authored manifest fields. */
+
 import { observeExecution } from "@relkit/contracts/operation";
 import { Effect } from "effect";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
-import { domainError, domainTry } from "./generator-errors.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { domainError, domainTry } from "create-relkit/internal/generator-errors";
 import { mergeScaffoldManifest, scaffoldManifestDependencies } from "./plan-manifest.js";
-import { planDependencyPatchEffect, readDrizzlePatchEffect } from "./dependency-patches.js";
+import {
+  planDependencyPatchEffect,
+  readDrizzlePatchEffect,
+} from "create-relkit/internal/dependency-patches";
 import { resolveProjectDependenciesEffect } from "./project-catalog.js";
 import type { PlanBuilderEffects } from "./plan-builder-effects.js";
 import type { PlanBuilderState } from "./plan-builder.types.js";
@@ -35,9 +40,7 @@ export const finalizeManifestEffect = Effect.fn("PlanBuilder.finalizeManifest")(
     let content = result.content;
     const dependencies = new Set<string>([...state.dependencies, ...Object.keys(declared)]);
     if (
-      ["drizzle-orm", "@relkit/drizzle", "@relkit/testing", "@relkit/effect-mq"].some((name) =>
-        dependencies.has(name),
-      )
+      ["drizzle-orm", "@relkit/drizzle", "@relkit/effect-mq"].some((name) => dependencies.has(name))
     ) {
       const patch = yield* readDrizzlePatchEffect();
       const planned = state.files.get(patch.path);

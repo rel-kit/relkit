@@ -1,18 +1,18 @@
+/** Owns request-local scaffold state in Effect and serializes file reservations, dependency registration and artifact updates before plan finalization. */
+
+import { finishPlannedRequest } from "./plan-builder-finish.js";
 import { Effect, Ref } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { type AddRequest } from "./add-types.js";
+import { type AddRequest } from "create-relkit/internal/add-types";
 import type {
   DiscoveredArtifact,
   DiscoveredProfile,
   ProjectDiscovery,
 } from "./project-discovery-types.js";
-import type { ScaffoldDependencyName } from "./scaffold-catalog.js";
+import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog";
 import type { PlanBuilderState, PlannedArtifactInput } from "./plan-builder.types.js";
 
-import { finalizeManifestEffect } from "./plan-builder-manifest.js";
-
 import { planBuilderFiles } from "./plan-builder-files.js";
-
 /** Private Ref-backed Effect implementation inherited by the public compatibility owner. */
 export class PlanBuilderEffects {
   readonly #state: Ref.Ref<PlanBuilderState>;
@@ -45,7 +45,6 @@ export class PlanBuilderEffects {
    * @returns Planned file text when present, otherwise text read through explicit filesystem authority.
    */
   readonly readEffect = (path: string) => this.#files.readEffect(path);
-
   /**
    * Atomically reserves one create operation after checking the native destination.
    * @param path - Path inside the current project or owned resource.
@@ -55,7 +54,6 @@ export class PlanBuilderEffects {
    */
   readonly createEffect = (path: string, content: string, mode?: number) =>
     this.#files.createEffect(path, content, mode);
-
   /**
    * Adds a source transformation to this request; transformations preserve expected validator errors.
    * @param path - Path inside the current project or owned resource.
@@ -64,7 +62,6 @@ export class PlanBuilderEffects {
    */
   readonly updateEffect = (path: string, transform: (source: string) => string) =>
     this.#files.updateEffect(path, transform);
-
   /**
    * Plans an environment example only when the declaration is absent.
    * @param name - Environment variable name.
@@ -73,7 +70,6 @@ export class PlanBuilderEffects {
    */
   readonly envExampleEffect = (name: string, value = "") =>
     this.#files.envExampleEffect(name, value);
-
   /**
    * Plans a gitignore entry without duplicating an authored line.
    * @param pattern - Declaration-owned glob or ignore pattern.
@@ -93,7 +89,6 @@ export class PlanBuilderEffects {
       })),
     (effect) => observeExecution("generator", "planning.dependency", effect),
   );
-
   /**
    * Adds one artifact identity to the current request's discovery view.
    * @param kind - Authoritative artifact kind.
@@ -121,7 +116,6 @@ export class PlanBuilderEffects {
       })),
     (effect) => observeExecution("generator", "planning.registerArtifact", effect),
   );
-
   /**
    * Adds one provider profile to the current request's discovery view.
    * @param profile - Selected provider profile.
@@ -132,7 +126,6 @@ export class PlanBuilderEffects {
       Ref.update(this.#state, (state) => ({ ...state, profiles: [...state.profiles, profile] })),
     (effect) => observeExecution("generator", "planning.registerProfile", effect),
   );
-
   /**
    * Records one owned package script.
    * @param name - Authored name or declaration key.
@@ -147,7 +140,6 @@ export class PlanBuilderEffects {
       })),
     (effect) => observeExecution("generator", "planning.script", effect),
   );
-
   /**
    * Records a bounded warning by its stable code.
    * @param code - Stable category code included in the resulting diagnostic.
@@ -162,7 +154,6 @@ export class PlanBuilderEffects {
       })),
     (effect) => observeExecution("generator", "planning.warning", effect),
   );
-
   /**
    * Records one next command without duplicating it.
    * @param command - Shell command shown as a follow-up instruction.
@@ -176,41 +167,12 @@ export class PlanBuilderEffects {
       })),
     (effect) => observeExecution("generator", "planning.nextStep", effect),
   );
-
   /**
    * Finishes manifest ownership and returns a deterministic immutable plan.
    * @returns The frozen plan containing ordered operations, concrete dependencies and public follow-up metadata.
    */
   readonly finishEffect = Effect.fn("PlanBuilder.finish")(() =>
-    observeExecution(
-      "generator",
-      "planning.finish",
-      Effect.gen({ self: this }, function* () {
-        const dependencies = yield* finalizeManifestEffect(this, yield* Ref.get(this.#state));
-        const state = yield* Ref.get(this.#state);
-        return Object.freeze({
-          request: this.request,
-          projectRoot: this.discovery.projectRoot,
-          operations: Object.freeze(
-            [...state.files.values()].sort((a, b) => a.path.localeCompare(b.path)),
-          ),
-          dependencies: Object.freeze(dependencies),
-          artifacts: Object.freeze(
-            state.artifacts.map(({ kind, path, id, binding }) => ({
-              kind,
-              path,
-              id: id ?? binding,
-              binding,
-            })),
-          ),
-          profiles: Object.freeze(
-            state.profiles.map(({ capability, name }) => ({ capability, name })),
-          ),
-          warnings: Object.freeze([...state.warnings.values()]),
-          nextSteps: Object.freeze([...state.nextSteps]),
-        });
-      }),
-    ),
+    finishPlannedRequest(this, this.#state),
   );
   /**
    * Returns a synchronous immutable projection of this request's authoritative Ref.
@@ -219,7 +181,6 @@ export class PlanBuilderEffects {
   get artifacts(): readonly DiscoveredArtifact[] {
     return [...this.discovery.artifacts, ...Ref.getUnsafe(this.#state).artifacts];
   }
-
   /**
    * Returns a synchronous immutable profile projection of the request Ref.
    * @returns A new array combining discovered profiles and this request's planned profiles.

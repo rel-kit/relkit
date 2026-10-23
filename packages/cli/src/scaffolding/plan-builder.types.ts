@@ -1,6 +1,8 @@
-import type { ScaffoldFileOperation, ScaffoldWarning } from "./add-types.js";
+/** Exposes the synchronous planning facade over request-local Effect state; file writes remain deferred until the transaction applies the resulting plan. This companion contains the shared planning contracts without executing work. */
+
+import type { ScaffoldFileOperation, ScaffoldWarning } from "create-relkit/internal/add-types";
 import type { DiscoveredArtifact, DiscoveredProfile } from "./project-discovery-types.js";
-import type { ScaffoldDependencyName } from "./scaffold-catalog.js";
+import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog";
 
 /** One request's authoritative immutable planning state, held only in its owning Ref. */
 export interface PlanBuilderState {

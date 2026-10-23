@@ -1,11 +1,13 @@
+/** Exposes the synchronous planning facade over request-local Effect state; file writes remain deferred until the transaction applies the resulting plan. */
+
 import { relative } from "node:path";
 
-import { type ScaffoldPlan } from "./add-types.js";
+import { type ScaffoldPlan } from "create-relkit/internal/add-types";
 import type { DiscoveredArtifact, DiscoveredProfile } from "./project-discovery-types.js";
-import type { ScaffoldDependencyName } from "./scaffold-catalog.js";
+import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog";
 import type { PlannedArtifactInput } from "./plan-builder.types.js";
 
-import { runGeneratorPromise, runGeneratorSync } from "./generator-runtime.js";
+import { runGeneratorPromise, runGeneratorSync } from "create-relkit/internal/generator-runtime";
 
 import { PlanBuilderEffects } from "./plan-builder-effects.js";
 
