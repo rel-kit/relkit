@@ -3,21 +3,26 @@
  * schema tooling and environment declarations. Generator filesystem authority owns
  * source publication; no database client or migration runs during this workflow.
  */
+
 import { Effect } from "effect";
 import { dirname } from "node:path";
 import { scaffoldServiceBoundary } from "./scaffold-layout.js";
-import { domainError, domainTry } from "./generator-errors.js";
+import { domainError, domainTry } from "create-relkit/internal/generator-errors";
 import type { RenderedDatabase } from "./render-database.types.js";
 export type { RenderedDatabase } from "./render-database.types.js";
 import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
-import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "./add-types.js";
+} from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import {
+  ADD_FAILURE_CODES,
+  AddScaffoldError,
+  type AddRequest,
+} from "create-relkit/internal/add-types";
 import { PlanBuilder } from "./plan-builder.js";
 import { ensureEnvironmentEffect } from "./provider-planning.js";
 import { authSchemaSource } from "./render-auth-schema.js";
@@ -65,22 +70,7 @@ export const renderDatabaseEffect = Effect.fn("Scaffold.renderDatabase")(
     }
     yield* builder.scriptEffect("db:generate", "bun --bun drizzle-kit generate");
     yield* builder.scriptEffect("db:migrate", "relkit db migrate");
-    if (request.dialect === "sqlite") {
-      yield* ensureEnvironmentEffect(
-        builder,
-        "DATABASE_PATH",
-        `env.string().default("./.relkit/state/app.sqlite")`,
-        "./.relkit/state/app.sqlite",
-      );
-      yield* builder.gitignoreEffect("*.sqlite");
-      yield* builder.gitignoreEffect("*.sqlite-*");
-    } else {
-      yield* ensureEnvironmentEffect(builder, "DATABASE_URL", "env.string()");
-      yield* builder.warningEffect(
-        "database-url-required",
-        "Populate DATABASE_URL before starting the database service.",
-      );
-    }
+    yield* databaseEnvironmentEffect(builder, request.dialect);
     yield* builder.nextStepEffect("bun run db:generate");
     yield* builder.nextStepEffect("bun run db:migrate");
     yield* builder.registerArtifactEffect("service", {
@@ -106,3 +96,25 @@ export function renderDatabase(
 ): Promise<RenderedDatabase> {
   return runGeneratorPromise(renderDatabaseEffect(builder, request));
 }
+
+const databaseEnvironmentEffect = Effect.fn("Scaffold.databaseEnvironment")(function* (
+  builder: PlanBuilder,
+  dialect: Extract<AddRequest, { kind: "database" }>["dialect"],
+) {
+  if (dialect === "sqlite") {
+    yield* ensureEnvironmentEffect(
+      builder,
+      "DATABASE_PATH",
+      `env.string().default("./.relkit/state/app.sqlite")`,
+      "./.relkit/state/app.sqlite",
+    );
+    yield* builder.gitignoreEffect("*.sqlite");
+    yield* builder.gitignoreEffect("*.sqlite-*");
+  } else {
+    yield* ensureEnvironmentEffect(builder, "DATABASE_URL", "env.string()");
+    yield* builder.warningEffect(
+      "database-url-required",
+      "Populate DATABASE_URL before starting the database service.",
+    );
+  }
+});

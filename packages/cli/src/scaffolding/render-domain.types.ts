@@ -1,3 +1,5 @@
+/** Publishes the cohesive domain artifact renderer entrypoints used by scaffold planning; rendering remains separate from transaction mutation. This companion contains the shared planning contracts without executing work. */
+
 import type { DomainArtifact } from "./domain-planning.js";
 
 /** Planned identity shared by domain artifact renderers. */

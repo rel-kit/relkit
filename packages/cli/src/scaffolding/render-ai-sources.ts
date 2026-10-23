@@ -1,3 +1,5 @@
+/** Renders explicit native agent and tool source using the selected service layout; generated imports name the integration that owns SDK execution. */
+
 import { sourceImport, type DomainArtifact } from "./domain-planning.js";
 
 /**
@@ -62,7 +64,7 @@ export function agentSource(
   },
 ): string {
   const imports = [
-    `import { defineAgent } from "@relkit/app/agents";`,
+    `import { defineAgent } from "@relkit/langchain";`,
     `import { z } from "@relkit/app/schema";`,
     ...(model === undefined ? [`import { FakeToolCallingModel } from "langchain";`] : []),
     ...tools.map((tool) => sourceImport(tool.binding, tool.module, tool.exportKind)),

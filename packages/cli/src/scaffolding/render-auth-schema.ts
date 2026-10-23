@@ -1,4 +1,6 @@
-import type { DatabaseDialect } from "./add-types.js";
+/** Renders selected auth schema declarations for the supported database dialect while preserving the existing service and migration ownership boundaries. */
+
+import type { DatabaseDialect } from "create-relkit/internal/add-types";
 
 /**
  * Dialect-specific Drizzle constructor tokens used to render authentication tables.
@@ -76,7 +78,12 @@ export const session = ${value.table}("session", {
   ...timestamps,
 });
 
-export const account = ${value.table}(
+${authAccountTables(value)}
+`;
+}
+
+function authAccountTables(value: AuthDialect): string {
+  return `export const account = ${value.table}(
   "account",
   {
     id: ${value.string}.primaryKey(),
@@ -102,6 +109,5 @@ export const verification = ${value.table}("verification", {
   value: ${value.token}.notNull(),
   expiresAt: ${value.timestamp}.notNull(),
   ...timestamps,
-});
-`;
+});`;
 }

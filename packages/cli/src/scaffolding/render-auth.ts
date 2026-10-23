@@ -3,12 +3,17 @@
  * layout. Existing databases retain their owner/schema/dialect; the transaction
  * owns source publication and no live client, migration or secret is created here.
  */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { scaffoldErrors, domainError, domainTry } from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
+import { scaffoldErrors, domainError, domainTry } from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 import { routePathToFilePath } from "@relkit/compiler";
-import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "./add-types.js";
+import {
+  ADD_FAILURE_CODES,
+  AddScaffoldError,
+  type AddRequest,
+} from "create-relkit/internal/add-types";
 import type { PlanBuilder } from "./plan-builder.js";
 import { scaffoldServiceBoundary } from "./scaffold-layout.js";
 import { ensureEnvironmentEffect } from "./provider-planning.js";
@@ -82,6 +87,7 @@ const authEnvironmentEffect = Effect.fn("Scaffold.authEnvironment")(function* (
 ) {
   yield* builder.dependencyEffect("@relkit/better-auth");
   yield* builder.dependencyEffect("better-auth");
+  yield* builder.dependencyEffect("@cloudflare/workers-types");
   yield* ensureEnvironmentEffect(builder, "BETTER_AUTH_SECRET", "env.secret()");
   yield* ensureEnvironmentEffect(
     builder,

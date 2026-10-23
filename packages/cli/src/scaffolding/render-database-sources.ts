@@ -3,7 +3,8 @@
  * The selected physical schema path is passed by layout-aware planning; connection
  * factories stay lazy and source rendering never opens a database client.
  */
-import type { DatabaseDialect } from "./add-types.js";
+
+import type { DatabaseDialect } from "create-relkit/internal/add-types";
 import { dirname } from "node:path";
 
 /**
