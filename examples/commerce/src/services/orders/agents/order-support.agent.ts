@@ -1,5 +1,5 @@
 /** Composes the offline support model, explicit order/native tools, todo middleware and shared checkpoint/memory drivers. */
-import { defineAgent } from "@relkit/app/agents";
+import { defineAgent } from "@relkit/langchain";
 import { todoListMiddleware } from "langchain";
 import { supportInput, supportOutput } from "../../../platform/schemas.js";
 import lookupOrder from "../tools/lookup-order.tool.js";
