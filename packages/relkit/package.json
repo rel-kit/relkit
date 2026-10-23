@@ -32,7 +32,7 @@
     }
   },
   "dependencies": {
-    "@relkit/cli": "workspace:*"
+    "create-relkit": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",
