@@ -1,3 +1,4 @@
+/** Declares selected Pulumi engine metadata and exposes its owning deployment implementation. */
 import {
   DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
   type DeploymentIntegrationMetadata,
@@ -11,3 +12,6 @@ export const pulumiEngine = Object.freeze({
 }) satisfies DeploymentIntegrationMetadata<"pulumi", "engine">;
 
 export const deploymentIntegration = pulumiEngine;
+
+// The selected engine owns the implementation; authoring stays metadata-only.
+export * from "@relkit/deploy-pulumi";

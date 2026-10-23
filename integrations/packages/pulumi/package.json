@@ -35,6 +35,19 @@
   "relkit": {
     "integration": {
       "id": "pulumi",
+      "dependencies": [
+        {
+          "package": "@pulumi/pulumi",
+          "supportedRange": "3.259.0",
+          "installSection": "devDependencies",
+          "capabilities": [
+            "engine"
+          ],
+          "phases": [
+            "deploy"
+          ]
+        }
+      ],
       "exports": {
         "authoring": ".",
         "deploymentEngine": "./engine"
@@ -47,6 +60,18 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
+    "@relkit/deploy-pulumi": "workspace:*",
     "@relkit/deploy": "workspace:*"
+  },
+  "peerDependencies": {
+    "@pulumi/pulumi": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@pulumi/pulumi": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@pulumi/pulumi": "catalog:"
   }
 }

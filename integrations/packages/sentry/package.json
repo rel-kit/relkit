@@ -47,7 +47,22 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        {
+          "package": "@sentry/bun",
+          "supportedRange": "10.71.0",
+          "installSection": "dependencies",
+          "capabilities": [
+            "telemetry"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        }
+      ]
     }
   },
   "scripts": {
@@ -57,7 +72,17 @@
   },
   "dependencies": {
     "@relkit/observability": "workspace:*",
-    "@relkit/provider": "workspace:*",
+    "@relkit/provider": "workspace:*"
+  },
+  "peerDependencies": {
+    "@sentry/bun": "10.71.0"
+  },
+  "peerDependenciesMeta": {
+    "@sentry/bun": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
     "@sentry/bun": "10.71.0"
   }
 }
