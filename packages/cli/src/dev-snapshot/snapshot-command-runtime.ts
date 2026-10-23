@@ -4,6 +4,7 @@
  * fallback authorities import lazily when the existing supervisor receives edits.
  */
 import { Layer } from "effect";
+import { DependencySourceLive } from "@relkit/provider/internal/dependencies";
 import { devSessionCapabilitiesLayer } from "../commands/dev-session-engine.js";
 import { snapshotFilesLive } from "./snapshot-files.service.js";
 import { snapshotEpochsLive } from "./snapshot-epoch.service.js";
@@ -19,6 +20,7 @@ import { telemetryStorageLayer } from "../commands/dev-telemetry-storage.service
 import { telemetryRelaysLayer } from "../commands/dev-telemetry-relay.service.js";
 
 const authorities = Layer.mergeAll(
+  DependencySourceLive,
   devSessionCapabilitiesLayer,
   snapshotFilesLive,
   snapshotEpochsLive,

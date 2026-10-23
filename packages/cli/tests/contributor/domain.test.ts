@@ -50,12 +50,14 @@ it.effect("missing catalogs fail explicitly before project mutation", () =>
 
 it.effect("rejects malformed owned fields without manifest casts", () =>
   Effect.gen(function* () {
-    const fixture = workspaceFixture();
-    fixture.manifests.set("/app/package.json", { dependencies: { effect: 4 } });
-    const result = yield* Effect.flatMap(ContributorWorkspace, (service) =>
-      service.rewrite("/app"),
-    ).pipe(Effect.result, Effect.provide(fixture.layer));
-    expect(result._tag).toBe("Failure");
+    for (const field of ["dependencies", "peerDependencies"]) {
+      const fixture = workspaceFixture();
+      fixture.manifests.set("/app/package.json", { [field]: { effect: 4 } });
+      const result = yield* Effect.flatMap(ContributorWorkspace, (service) =>
+        service.rewrite("/app"),
+      ).pipe(Effect.result, Effect.provide(fixture.layer));
+      expect(result._tag).toBe("Failure");
+    }
   }).pipe(Effect.provide(Logger.layer([]))),
 );
 
