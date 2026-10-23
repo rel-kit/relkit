@@ -1,13 +1,18 @@
+/**
+ * Owns worker client for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import { Effect } from "effect";
-import { ObservabilityQueryError } from "../query-types.js";
-import { LocalWorkerError } from "./worker-client-error.js";
+import { ObservabilityQueryError } from "@relkit/observability";
+import { LocalWorkerError } from "@relkit/observability/local/worker-contract";
 import { startLocalWorkerEffect } from "./worker-client-effect.js";
-import type { LocalWorkerCommand } from "./types.types.js";
+import type { LocalWorkerCommand } from "@relkit/observability/local/record";
 
-export { LocalWorkerError } from "./worker-client-error.js";
+export { LocalWorkerError } from "@relkit/observability/local/worker-contract";
 export { startLocalWorkerEffect } from "./worker-client-effect.js";
 export { LocalWorkerService, localWorkerLayer } from "./worker-client-service.js";
-export type { LocalWorkerEffects } from "./worker-client.types.js";
+export type { LocalWorkerEffects } from "@relkit/observability/local/worker-contract";
 
 const compatibilityError = (error: LocalWorkerError): Error =>
   error.code ? new ObservabilityQueryError(error.code, error.message) : new Error(error.message);
