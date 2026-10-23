@@ -1,3 +1,4 @@
+/** Guards public event terminology while preserving archived evaluation observations. */
 import { expect, test } from "vitest";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
@@ -35,7 +36,7 @@ const evidencePathPrefix = "tests/jobs/compatibility/evidence/";
 const scanRoots = ["apps", "packages", "templates", "tests", ".relkit/generated", ".relkit/build"];
 const scanGuardFiles = new Set([
   "packages/events/tests/source-export.test.ts",
-  "tests/e2e/inspector.spec.ts",
+  "tests/e2e/inspector-pages.spec.ts",
   "tests/phase0.test.ts",
 ]);
 
@@ -83,6 +84,7 @@ function violations(files: readonly SourceFile[]): string[] {
       !isProviderInternal(path) &&
       !realtimeTerminologyFiles.has(path) &&
       !path.startsWith(evidencePathPrefix) &&
+      !(path.startsWith("tests/agent-evals/results/") && path.endsWith(".json")) &&
       forbidden.test(text)
     ) {
       findings.push(`${path}:source-name`);
@@ -151,4 +153,13 @@ test("the scan rejects public names but permits allowlisted provider terminology
   expect(
     violations([{ path: `examples/commerce/src/events.${term}.ts`, text: "export {};\n" }]),
   ).toEqual([`examples/commerce/src/events.${term}.ts:source-suffix`]);
+});
+
+test("archived evaluation JSON preserves observations without exempting executable sources", () => {
+  const historical = `tests/agent-evals/results/retained.json`;
+  const executable = `tests/agent-evals/results/retained.ts`;
+  expect(violations([{ path: historical, text: `{"observation":"${term}"}` }])).toEqual([]);
+  expect(violations([{ path: executable, text: `export const name = "${term}";` }])).toEqual([
+    `${executable}:source-name`,
+  ]);
 });
