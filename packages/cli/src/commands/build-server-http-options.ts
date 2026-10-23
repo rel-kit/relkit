@@ -39,6 +39,7 @@ function coreHttpOptionsSource(configuration: ServerSourceConfiguration): string
   middlewareContext: routeMiddlewareContext,
   middleware: httpMiddlewareOptions,
   apiDocs: {
+    ui: ${JSON.stringify(configuration.apiDocs.ui ?? false)},
     mode: environment,
     document: openapiDocument,
     enabledInProduction: ${String(configuration.apiDocs.enabledInProduction)},
@@ -114,6 +115,7 @@ const HTTP_OPTIONAL_TRANSPORT_SOURCE = `  ...((plan.channels ?? []).length === 0
  */
 function internalHttpOptionsSource(configuration: ServerSourceConfiguration): string {
   return `  mcp: { enabled: ${String(configuration.mcp)} },
+  agUi: ${String(configuration.agUi ?? false)},
   staticFiles: { root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
   rateLimitRuntime: { resolveStore: resolveRateLimitStore },
   ...(authRuntime === undefined ? {} : { auth: authRuntime }),

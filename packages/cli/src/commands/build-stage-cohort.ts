@@ -13,7 +13,10 @@ import { selectedLocalServicePlan } from "./build-cohort.js";
 import { parseJobsManifest } from "./build-jobs.js";
 import { rebaseManifest } from "./build-support.js";
 import { preparedRuntimeManifest } from "./build-prepared-manifest.js";
+import { captureProductionDependencies } from "./build-production-dependencies.js";
+import { selectedHttpCapabilities } from "@relkit/runtime-hono/internal/prepared";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
+import { captureProductionRepairs } from "./build-production-repairs.js";
 
 /**
  * Captures validated graph, manifest and plans without publishing executable data.
@@ -24,8 +27,7 @@ import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
 export const loadBuildStageCohort = Effect.fn("Project.buildCohort")(function* (
   input: BuildStageInputs,
 ) {
-  const { projectRoot, buildDirectory, stage, checked } = input;
-  const files = yield* CliFileSystem;
+  const { projectRoot, stage, checked } = input;
   const graph = yield* parseBuildGraph(checked.outputs.graph, projectRoot);
   const graphHash = hashGraph(graph);
   if (graphHash !== checked.graphHash)
@@ -33,18 +35,7 @@ export const loadBuildStageCohort = Effect.fn("Project.buildCohort")(function* (
   const jobsManifest = yield* cliTry("build.jobsManifest", () =>
     parseJobsManifest(checked.outputs.jobsManifest),
   );
-  const manifestPath = join(checked.generatedDirectory, "runtime.manifest.ts");
-  const manifestText = yield* files.readText(manifestPath);
-  const preparedManifest =
-    input.options.bundleInputInventory === undefined
-      ? manifestText
-      : preparedRuntimeManifest(manifestText, graph, projectRoot, dirname(manifestPath));
-  const manifestSource = rebaseManifest(
-    preparedManifest,
-    projectRoot,
-    dirname(manifestPath),
-    join(buildDirectory, "server"),
-  );
+  const manifestSource = yield* loadManifestSource(input, graph);
   const localServicesPlanSource = yield* cliTry("build.localPlan", () =>
     selectedLocalServicePlan(
       graphHash,
@@ -58,16 +49,50 @@ export const loadBuildStageCohort = Effect.fn("Project.buildCohort")(function* (
     manifestSource,
     localServicesPlanSource,
   );
+  const tooling = checked.config ?? DEFAULT_TOOLING_CONFIG;
+  const httpCapabilities = selectedHttpCapabilities({
+    apiDocs: tooling.server.apiDocs,
+    mcp: { enabled: tooling.server.mcp },
+    agUi: tooling.server.agUi ?? false,
+  });
+  const productionDependencies = yield* captureProductionDependencies(
+    projectRoot,
+    checked.outputs.runtimeIntegrations,
+    graph,
+    httpCapabilities,
+  );
   return {
+    productionDependencies,
+    productionRepairs: yield* captureProductionRepairs(productionDependencies),
     graph,
     graphHash,
     jobsManifest,
     manifestSource,
     localServicesPlanSource,
     activationFingerprint,
-    tooling: checked.config ?? DEFAULT_TOOLING_CONFIG,
+    tooling,
     serverDirectory: join(stage, "server"),
   } satisfies BuildStageCohort;
+});
+
+/** Rebases the checked executable source while retaining the selected preparation partition. */
+const loadManifestSource = Effect.fn("Project.buildManifestSource")(function* (
+  input: BuildStageInputs,
+  graph: ApplicationGraph,
+) {
+  const files = yield* CliFileSystem;
+  const path = join(input.checked.generatedDirectory, "runtime.manifest.ts");
+  const text = yield* files.readText(path);
+  const source =
+    input.options.bundleInputInventory === undefined
+      ? text
+      : preparedRuntimeManifest(text, graph, input.projectRoot, dirname(path));
+  return rebaseManifest(
+    source,
+    input.projectRoot,
+    dirname(path),
+    join(input.buildDirectory, "server"),
+  );
 });
 
 /**

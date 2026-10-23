@@ -20,6 +20,12 @@ export function preparedInspectorSource(configuration: ServerSourceConfiguration
   return `async (app) => {
   const module = await import("@relkit/inspector-api");
   InspectorQueryError = module.InspectorQueryError;
-  ${registration}
+  try {
+    ${registration}
+    return () => module.disposeInspectorEndpoints(app);
+  } catch (cause) {
+    await module.disposeInspectorEndpoints(app);
+    throw cause;
+  }
 }`;
 }
