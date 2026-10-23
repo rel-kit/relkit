@@ -106,7 +106,7 @@ const packagePreparedCohort = Effect.fn("Packaging.preparedCohort")(function* ()
   yield* ownedNativePromise("package.dev.worker-entry", () =>
     Bun.write(
       resolve(destination, "duckdb-worker.js"),
-      'import "@relkit/observability/internal/local-worker";\n',
+      'import "@relkit/observability-local/internal/local-worker";\n',
     ),
   );
 });
