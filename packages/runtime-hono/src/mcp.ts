@@ -1,3 +1,8 @@
+/**
+ * Owns the explicitly selected MCP Streamable HTTP boundary. Import this entrypoint
+ * with @modelcontextprotocol/server@2.3.0 installed; tools retain per-request
+ * authentication, approval checks, engine cancellation and native handler lifetime.
+ */
 import { McpServer, createMcpHandler } from "@modelcontextprotocol/server";
 import type { ToolRegistration } from "@relkit/graph";
 import { Effect, Context as EffectContext, Layer, Result } from "effect";
@@ -8,7 +13,7 @@ import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import type { RuntimeTool } from "./mcp.types.js";
 import { getRequestState } from "./middleware.js";
-export type { McpOptions } from "./mcp.types.js";
+export type { McpOptions } from "./optional-transports.types.js";
 
 /** Registers the configured MCP endpoint with the existing protocol handler.
  * @param app - Hono application receiving the configured endpoints or middleware.
