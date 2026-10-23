@@ -1,22 +1,34 @@
+/** Checks native Promise cancellation settlement and configured database instrumentation.
+ * Actual compatibility adapters retain Request identity, database ownership and per-operation logging/metrics.
+ */
 import { expect, it } from "@effect/vitest";
 import { activateDrizzleService, defineDrizzleService } from "@relkit/drizzle";
-import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
-import {
-  Context,
-  Deferred,
-  Effect,
-  Layer,
-  Logger,
-  ManagedRuntime,
-  Metric,
-  References,
-} from "effect";
+import { Context, Deferred, Effect, Logger, Metric, References } from "effect";
 import { authNativeAdapter } from "../../src/activation.js";
-import { activateBetterAuthService, defineBetterAuthService } from "../../src/index.js";
+import { activateBetterAuthService, defineBetterAuthService } from "../../src/drizzle.js";
 import { AuthService, authNativeOf } from "../../src/auth.service.js";
-import { authTestLayer, nativeAuthStub } from "./auth-test-layer.js";
+import { authTestDatabase, managedTestAuth, nativeAuthStub } from "./auth-test-layer.js";
+import * as authSchema from "./native-schema.js";
 
-const user = sqliteTable("user", { id: integer().primaryKey() });
+/** Captures actual configured logging and metrics without changing service instrumentation. */
+function instrumentationFixture() {
+  const entries: {
+    readonly level: string;
+    readonly annotations: Readonly<Record<string, unknown>>;
+  }[] = [];
+  const registry: Metric.MetricRegistry = new Map();
+  const logger = Logger.make((options) => {
+    entries.push({
+      level: options.logLevel,
+      annotations: options.fiber.getRef(References.CurrentLogAnnotations),
+    });
+  });
+  const instrumentation = Context.make(Logger.CurrentLoggers, new Set([logger])).pipe(
+    Context.add(References.MinimumLogLevel, "Info"),
+    Context.add(Metric.MetricRegistry, registry),
+  );
+  return { entries, registry, logger, instrumentation };
+}
 
 it.effect(
   "Request abort reaches the SDK but Promise completion and DB close wait for native settlement",
@@ -25,17 +37,7 @@ it.effect(
       const started = yield* Deferred.make<void>();
       const finish = yield* Deferred.make<void>();
       const events: string[] = [];
-      const declaration = defineDrizzleService({
-        schema: { user },
-        client: () => ({}),
-        dispose: () => {
-          events.push("disposed");
-        },
-      });
-      const database = yield* Effect.acquireRelease(
-        Effect.promise(() => activateDrizzleService(declaration, {}, { isolated: true })),
-        (active) => Effect.promise(() => active.close()),
-      );
+      const database = yield* authTestDatabase(() => events.push("disposed"));
       let received: Request | undefined;
       const native = nativeAuthStub({
         handler: (request) => {
@@ -47,13 +49,9 @@ it.effect(
           });
         },
       });
-      const owner = yield* Effect.acquireRelease(
-        Effect.sync(() =>
-          ManagedRuntime.make(
-            authTestLayer({ database, options: {}, basePath: "/api/auth" }, Effect.succeed(native)),
-          ),
-        ),
-        (runtime) => Effect.promise(() => runtime.dispose()),
+      const owner = yield* managedTestAuth(
+        { database, options: {}, basePath: "/api/auth" },
+        Effect.succeed(native),
       );
       const service = yield* Effect.promise(() => owner.runPromise(AuthService));
       const auth = authNativeAdapter(owner, authNativeOf(service));
@@ -90,22 +88,8 @@ it.effect(
   "native compatibility entrypoints inherit configured DB sinks during acquisition and calls",
   () =>
     Effect.gen(function* () {
-      const entries: {
-        readonly level: string;
-        readonly annotations: Readonly<Record<string, unknown>>;
-      }[] = [];
-      const registry: Metric.MetricRegistry = new Map();
-      const logger = Logger.make((options) => {
-        entries.push({
-          level: options.logLevel,
-          annotations: options.fiber.getRef(References.CurrentLogAnnotations),
-        });
-      });
-      const instrumentation = Context.make(Logger.CurrentLoggers, new Set([logger])).pipe(
-        Context.add(References.MinimumLogLevel, "Info"),
-        Context.add(Metric.MetricRegistry, registry),
-      );
-      const declaration = defineDrizzleService({ schema: { user }, client: () => ({}) });
+      const { entries, registry, logger, instrumentation } = instrumentationFixture();
+      const declaration = defineDrizzleService({ schema: authSchema, client: () => ({}) });
       const database = yield* Effect.acquireRelease(
         Effect.promise(() =>
           activateDrizzleService(declaration, {}, { isolated: true, instrumentation }),

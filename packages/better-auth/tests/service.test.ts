@@ -1,20 +1,22 @@
+/** Exercises lazy native auth declarations and shared versus isolated activation with actual SQLite.
+ * Borrowed database release and retry behavior remain observable through the public Drizzle bridge.
+ */
 import { expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
 import { defineRoute } from "@relkit/routes";
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { activateDrizzleService, defineDrizzleService } from "@relkit/drizzle";
 import {
   activateBetterAuthService,
   BETTER_AUTH_HANDLER,
   defineBetterAuthService,
-} from "../src/index.ts";
+} from "../src/drizzle.ts";
 
-const user = sqliteTable("user", { id: text().primaryKey(), email: text().notNull() });
+import * as authSchema from "./auth/native-schema.js";
 
 test("creates a stable lazy handler and derives route protection", async () => {
   const database = defineDrizzleService({
-    schema: { user },
+    schema: authSchema,
     client: () => drizzle({ client: new Database(":memory:") }),
     dispose: (client) => client.$client.close(),
   });
@@ -48,7 +50,7 @@ test("forbids database and basePath options", () => {
 
 test("isolated native auth does not acquire or replace the descriptor handler", async () => {
   const declaration = defineDrizzleService({
-    schema: { user },
+    schema: authSchema,
     client: () => drizzle({ client: new Database(":memory:") }),
     dispose: (client) => client.$client.close(),
   });
@@ -70,7 +72,7 @@ test("isolated native auth does not acquire or replace the descriptor handler", 
 test("failed shared auth acquisition resets and borrows the database without disposal", async () => {
   let disposals = 0;
   const declaration = defineDrizzleService({
-    schema: { user },
+    schema: authSchema,
     client: () => drizzle({ client: new Database(":memory:") }),
     dispose: (client) => {
       disposals++;

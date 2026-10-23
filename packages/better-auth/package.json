@@ -30,26 +30,87 @@
     "./react": {
       "types": "./dist/react.d.ts",
       "import": "./dist/react.js"
+    },
+    "./drizzle": {
+      "types": "./dist/drizzle.d.ts",
+      "import": "./dist/drizzle.js"
     }
   },
   "dependencies": {
     "@relkit/client": "workspace:*",
     "@relkit/contracts": "workspace:*",
-    "@relkit/drizzle": "workspace:*",
     "@relkit/invocation": "workspace:*",
+    "@relkit/provider": "workspace:*",
     "@relkit/routes": "workspace:*",
-    "better-auth": "catalog:",
     "effect": "catalog:"
   },
   "peerDependencies": {
+    "@cloudflare/workers-types": "4.20250121.0",
+    "@relkit/drizzle": "workspace:*",
+    "better-auth": "catalog:",
     "react": "catalog:peer"
   },
+  "peerDependenciesMeta": {
+    "@cloudflare/workers-types": {
+      "optional": true
+    },
+    "@relkit/drizzle": {
+      "optional": true
+    },
+    "better-auth": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@cloudflare/workers-types": "4.20250121.0",
+    "@relkit/drizzle": "workspace:*",
+    "better-auth": "catalog:",
     "@effect/vitest": "catalog:",
     "@types/react": "catalog:",
     "drizzle-orm": "catalog:",
     "react": "catalog:",
     "vitest": "catalog:"
+  },
+  "relkit": {
+    "integration": {
+      "id": "better-auth",
+      "exports": {
+        "authoring": [
+          ".",
+          "./drizzle"
+        ]
+      },
+      "dependencies": [
+        {
+          "package": "better-auth",
+          "supportedRange": "1.7.1",
+          "installSection": "dependencies",
+          "capabilities": [
+            "better-auth"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        },
+        {
+          "package": "@cloudflare/workers-types",
+          "supportedRange": "4.20250121.0",
+          "installSection": "devDependencies",
+          "capabilities": [
+            "better-auth"
+          ],
+          "phases": [
+            "check",
+            "build"
+          ]
+        }
+      ]
+    }
   },
   "scripts": {
     "build": "tsc -b",
