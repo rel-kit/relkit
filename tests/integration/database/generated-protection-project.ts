@@ -6,6 +6,7 @@ import { Effect } from "effect";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 import { generatedProtectionAuthoritySources } from "./generated-protection-authority.sources.js";
 import { generatedProtectionFunctionSources } from "./generated-protection-functions.sources.js";
+import nativeManifest from "../../../integrations/packages/langchain/package.json";
 
 /**
  * Extends one owned native host fixture using only existing public authoring APIs and local providers.
@@ -21,11 +22,7 @@ export const prepareGeneratedProtection = Effect.fn("GeneratedProtection.stage")
           join(repository, "integrations/packages/local"),
           join(root, "node_modules/@relkit/local"),
         );
-      if (!existsSync(join(root, "node_modules/langchain")))
-        await symlink(
-          join(repository, "packages/agents/node_modules/langchain"),
-          join(root, "node_modules/langchain"),
-        );
+      await linkNativeAgentPackages(root, repository);
       const configPath = join(root, "relkit.config.ts");
       const config = await readFile(configPath, "utf8");
       if (!config.includes("  server: { port: 3000 },"))
@@ -47,3 +44,27 @@ export const prepareGeneratedProtection = Effect.fn("GeneratedProtection.stage")
       }
     }),
 );
+
+/** Installs no packages; borrows the exact already-installed SDK selection for this private fixture. */
+async function linkNativeAgentPackages(root: string, repository: string): Promise<void> {
+  const integration = join(repository, "integrations/packages/langchain");
+  const sdkNames = ["@langchain/core", "@langchain/langgraph", "langchain", "langsmith"] as const;
+  for (const [name, source] of [
+    ["@relkit/langchain", integration],
+    ...sdkNames.map((name) => [name, join(integration, "node_modules", name)] as const),
+  ]) {
+    const target = join(root, "node_modules", name);
+    if (!existsSync(target)) {
+      await mkdir(dirname(target), { recursive: true });
+      await symlink(source, target);
+    }
+  }
+  const path = join(root, "package.json");
+  const manifest = JSON.parse(await readFile(path, "utf8"));
+  manifest.dependencies = {
+    ...manifest.dependencies,
+    "@relkit/langchain": nativeManifest.version,
+    ...Object.fromEntries(sdkNames.map((name) => [name, nativeManifest.peerDependencies[name]])),
+  };
+  await writeFile(path, JSON.stringify(manifest, null, 2) + "\n");
+}

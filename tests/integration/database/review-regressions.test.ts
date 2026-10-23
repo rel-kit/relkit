@@ -1,3 +1,6 @@
+/** Preserves native database lifetime, PostgreSQL bigint and standalone CRUD telemetry regressions.
+ * Actual SQLite operations expose transaction settlement, cleanup and configured instrumentation outcomes.
+ */
 import { expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
@@ -5,7 +8,7 @@ import { bigint, pgTable } from "drizzle-orm/pg-core";
 import { Context, Effect, Logger, Metric, References, Schema } from "effect";
 import { activateDrizzleService } from "../../../packages/drizzle/src/activation.js";
 import { defineDrizzleService, drizzleRuntimeOf } from "../../../packages/drizzle/src/service.js";
-import { defineModel } from "../../../packages/drizzle/src/model.js";
+import { defineModel } from "../../../packages/drizzle/src/sqlite.js";
 import { operationEffect } from "../../../packages/drizzle/src/operations.js";
 import { owners } from "../../../packages/drizzle/src/owner.js";
 import { effectSchemasFor } from "../../../packages/drizzle/src/table.schemas.js";
@@ -75,9 +78,8 @@ test("installed PostgreSQL string bigint contracts accept native strings", async
     expect(exit).toMatchObject({ _tag: "Success", value: { id: "9007199254740993" } });
 });
 
-test("standalone CRUD uses actual SQLite and records one outcome", async () => {
-  const sqlite = new Database(":memory:");
-  sqlite.exec("create table records (id integer primary key); insert into records values (1)");
+/** Captures native instrumentation without hiding the CRUD execution path under test. */
+function crudInstrumentation() {
   const registry: Metric.MetricRegistry = new Map();
   const logs: unknown[] = [];
   const instrumentation = Context.empty().pipe(
@@ -88,6 +90,13 @@ test("standalone CRUD uses actual SQLite and records one outcome", async () => {
     Context.add(References.MinimumLogLevel, "Info"),
     Context.add(Metric.MetricRegistry, registry),
   );
+  return { registry, logs, instrumentation };
+}
+
+test("standalone CRUD uses actual SQLite and records one outcome", async () => {
+  const sqlite = new Database(":memory:");
+  sqlite.exec("create table records (id integer primary key); insert into records values (1)");
+  const { registry, logs, instrumentation } = crudInstrumentation();
   const service = defineDrizzleService({
     schema: { records },
     client: () => drizzle({ client: sqlite }),
