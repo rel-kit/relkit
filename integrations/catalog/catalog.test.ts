@@ -1,4 +1,7 @@
+/** Keeps catalog discovery metadata-only without installing or evaluating integrations. */
 import { expect, test } from "bun:test";
+import manifest from "./package.json";
+import * as catalog from "./src/index.js";
 
 const integrations = [
   "redis",
@@ -13,13 +16,16 @@ const integrations = [
   "inngest",
   "trigger",
   "effect-mq",
+  "langchain",
 ] as const;
 
-test("subpaths re-export the standalone authoring modules exactly", async () => {
-  for (const name of integrations) {
-    const catalog = await import(`./src/${name}.ts`);
-    const standalone = await import(`@relkit/${name}`);
-    expect(Object.keys(catalog).sort()).toEqual(Object.keys(standalone).sort());
-    for (const key of Object.keys(standalone)) expect(catalog[key]).toBe(standalone[key]);
-  }
+test("catalog exposes metadata without executable integration exports or dependencies", () => {
+  expect(Object.keys(catalog)).toEqual([]);
+  expect(Object.keys(manifest.exports)).toEqual(["."]);
+  expect(manifest).not.toHaveProperty("dependencies");
+  expect(manifest).not.toHaveProperty("optionalDependencies");
+  expect(manifest).not.toHaveProperty("peerDependencies");
+  expect(Object.entries(manifest.relkit.catalog).sort()).toEqual(
+    integrations.map((name): [string, string] => [`./${name}`, `@relkit/${name}`]).sort(),
+  );
 });
