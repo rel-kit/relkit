@@ -1,3 +1,4 @@
+/** Defines lazy generator adapter operations and explicit prompt and cancellation inputs. */
 import type { Effect } from "effect";
 import type {
   AddRequest,
@@ -6,7 +7,7 @@ import type {
   CreateScaffoldPlan,
   PromptDriver,
   ScaffoldPlan,
-} from "create-relkit";
+} from "../scaffolding/index.js";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { CliCommandContext } from "../main-support-types.js";
 
