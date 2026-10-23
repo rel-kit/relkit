@@ -1,10 +1,12 @@
+/** Validates and redacts worker appends, publishes committed records and applies normalized diagnostic retention policy. */
 import { Effect, Ref, Schema } from "effect";
 import {
   admitObservabilityRecordEffect,
   normalizeTelemetryConfigurationEffect,
   type TelemetryConfiguration,
 } from "@relkit/observability";
-import type { LocalRecord, LocalWorkerEffects } from "@relkit/observability/local";
+import type { LocalRecord } from "@relkit/observability/local/record";
+import type { LocalWorkerEffects } from "@relkit/observability/local/worker-contract";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { telemetryEnvelopeSchema, telemetryStoredSchema } from "./dev-telemetry.schemas.js";
@@ -25,7 +27,7 @@ export function telemetryAppendEffect(
   worker: LocalWorkerEffects,
   stream: ObservabilityStream,
   state: TelemetryState,
-  failure: (reason: unknown) => void,
+  failure: (reason: Error) => void,
 ) {
   return Effect.fn("DevTelemetry.append")(
     function* (records: readonly LocalRecord[]) {
@@ -60,7 +62,7 @@ export function telemetryAppendEffect(
     },
     (effect) =>
       observeCli("dev.telemetry.append", effect).pipe(
-        Effect.tapError((error) => Effect.sync(() => failure(error.cause))),
+        Effect.tapError((error) => Effect.sync(() => failure(telemetryFailureCause(error.cause)))),
       ),
   );
 }
@@ -75,7 +77,7 @@ export function telemetryAppendEffect(
 export function telemetryConfigureEffect(
   worker: LocalWorkerEffects,
   state: TelemetryState,
-  failure: (reason: unknown) => void,
+  failure: (reason: Error) => void,
 ) {
   return Effect.fn("DevTelemetry.configure")(
     function* (configuration: TelemetryConfiguration) {
@@ -90,7 +92,9 @@ export function telemetryConfigureEffect(
         retention: next.localRetention ?? {},
         ...(next.redaction ? { redaction: next.redaction } : {}),
       }).pipe(
-        Effect.catchTag("CliAdapterError", (error) => Effect.sync(() => failure(error.cause))),
+        Effect.catchTag("CliAdapterError", (error) =>
+          Effect.sync(() => failure(telemetryFailureCause(error.cause))),
+        ),
       );
     },
     (effect) => observeCli("dev.telemetry.configure", effect),
@@ -100,17 +104,23 @@ export function telemetryConfigureEffect(
 /**
  * Decodes untrusted transport values without manufacturing model authority.
  * @typeParam S - Declared boundary Schema.
+ * @typeParam Input - Untrusted native input decoded before domain use.
  * @param schema - Existing protocol/model shape.
  * @param value - Unknown native transport value.
  * @returns Owner-validated value or the original TypeError compatibility category.
  */
-export function decodeTelemetry<S extends Schema.Top & { readonly DecodingServices: never }>(
+export function decodeTelemetry<S extends Schema.Top & { readonly DecodingServices: never }, Input>(
   schema: S,
-  value: unknown,
+  value: Input,
 ) {
   return Schema.decodeUnknownEffect(schema)(value).pipe(
     Effect.mapError((error) =>
       cliAdapterError("dev.telemetry.schema", new TypeError(error.message)),
     ),
   );
+}
+
+/** @typeParam Cause - Native rejection type. @param cause - Original rejection retained as Error.cause when needed. @returns A truthful Error for the observational failure callback. */
+function telemetryFailureCause<Cause>(cause: Cause): Error {
+  return cause instanceof Error ? cause : new Error(String(cause), { cause });
 }

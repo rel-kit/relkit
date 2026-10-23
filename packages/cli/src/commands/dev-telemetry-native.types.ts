@@ -1,5 +1,6 @@
+/** Declares native telemetry acquisition and close capabilities whose lifetimes belong to the dev telemetry scope. */
 import type { Effect } from "effect";
-import type { LocalWorkerEffects } from "@relkit/observability/local";
+import type { LocalWorkerEffects } from "@relkit/observability/local/worker-contract";
 import type { ObservabilityStream } from "@relkit/observability";
 import type { CliAdapterError } from "../cli-errors.js";
 

@@ -1,7 +1,11 @@
+/** Validates diagnostic worker replies before exposing the existing Promise query API through one captured execution context. */
 import { Effect, type Context } from "effect";
 import { runExecutionPromiseWith } from "@relkit/contracts/operation";
 import type { ObservabilityQuery } from "@relkit/observability";
-import type { LocalWorkerCommand, LocalWorkerEffects } from "@relkit/observability/local";
+import type {
+  LocalWorkerCommand,
+  LocalWorkerEffects,
+} from "@relkit/observability/local/worker-contract";
 import { cliOriginalError } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { telemetryWorkerCall } from "./dev-telemetry-native.service.js";

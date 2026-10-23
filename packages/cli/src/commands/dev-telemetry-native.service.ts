@@ -1,10 +1,11 @@
+/** Owns explicit diagnostic worker, stream and loopback-listener factories, including joined physical worker cleanup. */
 import { createObservabilityStream, ObservabilityQueryError } from "@relkit/observability";
 import {
   startLocalWorkerEffect,
   type LocalWorkerError,
   type LocalWorkerEffects,
   type LocalWorkerCommand,
-} from "@relkit/observability/local/worker";
+} from "@relkit/observability-local/worker";
 import { Cause, Clock, Context, Effect, Exit, Layer } from "effect";
 import { cliAdapterError, cliPromise, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
