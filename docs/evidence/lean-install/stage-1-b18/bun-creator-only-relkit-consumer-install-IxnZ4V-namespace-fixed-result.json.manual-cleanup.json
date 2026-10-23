@@ -1,0 +1,30 @@
+{
+  "removed": [
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/node_modules"
+  ],
+  "preservedFileHashes": {
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/.consumer-probe/bundle.js": "420:0603e0f8480fc5825a1f294f281f9acce53eb084799d9ca23dbf25bd934a2ef8",
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/.consumer-probe/evaluated-19cbd8b1-fef8-45a1-903c-e7fb3e40b0ef.json": "420:b280084b9357c0b76a18a6804777b243835ae2a4af73b300c98b908119a69d99",
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/.consumer-probe/evaluated-d178d7e5-8d4a-484a-b466-250da9c7c683.json": "420:f4fcb0bed9440b4b7bbb083ae1e772c28c5b49a1b9cb229e64e6b5d5e7fff8b3",
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/.consumer-probe/metafile.json": "420:fb5086273e021cb70c746344a24789d78883a72d3e90bf315bb5aa6beb15b218",
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/.consumer-probe/observe-19cbd8b1-fef8-45a1-903c-e7fb3e40b0ef.mjs": "420:0a05881de82fad11ba15d006bd33ec7974e07711b48f874d7fc23e1ea33b4db7",
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/.consumer-probe/observe-d178d7e5-8d4a-484a-b466-250da9c7c683.mjs": "420:841d8441a7c8b477dd38ac4aaf906fae1272199af28bca7589f427568a1c0134",
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/.consumer-probe/retained-public-entry-namespace-fixed.ts": "420:6913c473fbcc61d305c7a5abf20f5b2232f0d991aca0ef22404805738c35afdf",
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/.consumer-probe/retained-public-entry.ts": "420:6913c473fbcc61d305c7a5abf20f5b2232f0d991aca0ef22404805738c35afdf",
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/bun.lock": "420:c8b40e92cc45c1c8cd9df854826755be60ba69a9404a20c352d59e79d76dd360",
+    "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only/package.json": "420:a2ada35fd079e082b379e2b260ea03ba5d4d40de38f7c8a2033428ec8fbe5e3f",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-result.json": "420:5f275fd90be8201c0073eb3c3d403ae4c473d16295ea2201181c2a8dfd14e0b8",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-raw.json": "420:0d3ffef03beb05a9a72f512e14dc9a59ec96c72ba62e948832d7afaa4df569d2",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-namespace-fixed-raw.json": "420:eccaef32193a0db04f7dbee2460ccdd61529c9106fcbd65229a8a1a857014f21",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-namespace-fixed-result.json": "420:14c46813f9934ff848501a0f0f12cc391adf47aa3807b722e4912cc50858f2b8",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-installs.json": "420:f02bd3f9b4423586ac1d6f64808776b6d9bd310cc2768dc7af33eae31bfcd44e",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-installs-relkit-consumer-install-IxnZ4V.json": "420:c80074476915d5bce6644cb5bb1c3d97e801bf65a6a4a6fadf70952305303d51",
+    "/tmp/relkit-s1-namespace-collector-red.log": "420:a58172964e557658c1bddb3b26153a46ae99a0c5e4bcc3b02ea313d56e2b193d",
+    "/tmp/relkit-s1-namespace-collector-green.log": "420:dcf35e64d13581249c42cc87e7ca4d8a41635d350e606b0cacd47117bed581ea",
+    "/tmp/relkit-s1-b18-creator-collector-reprobe.log": "420:9f6368592848412efcb7440c23f429e467f7540379ef5f75096b1bd1f194e673",
+    "/tmp/relkit-s1-b18-creator-collector-policy-green.log": "420:78f8f80b1333ad810fc90c1522a7e68549037a703c6bcd6287ec07e83ef47699"
+  },
+  "availableBytesBefore": 8279945216,
+  "availableBytesAfter": 8341168128,
+  "note": "Only successful installed bytes removed; all source/lock/probe/report bytes retained. Historical installation inventory remains measurement-time evidence."
+}
