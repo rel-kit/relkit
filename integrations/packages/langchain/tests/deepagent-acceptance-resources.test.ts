@@ -1,3 +1,5 @@
+/** Exercises native deepagent acceptance resources behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { afterEach, expect, test } from "vitest";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";

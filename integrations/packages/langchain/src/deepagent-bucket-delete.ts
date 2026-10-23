@@ -1,6 +1,8 @@
+/** Deletes normalized DeepAgents file paths through the selected bucket service and reports native file-operation results without changing unrelated keys. */
+
 import type { DeleteResult } from "deepagents";
 import { Effect, Result } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import {

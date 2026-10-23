@@ -1,4 +1,4 @@
-import type { FileData } from "deepagents";
+/** Defines the SDK-independent bucket IO boundary shared by ordinary runtime options and DeepAgents backends. */
 
 /** Bucket client and prefix bound to one DeepAgents backend. */
 export interface DeepAgentBucketContext {
@@ -12,9 +12,6 @@ export interface DeepAgentBucketMetadata {
   readonly size?: number;
   readonly metadata?: Readonly<Record<string, string>>;
 }
-
-/** DeepAgents file payload that carries a concrete MIME type. */
-export type DeepAgentBucketFileData = Extract<FileData, { readonly mimeType: string }>;
 
 /** IO operations required by the DeepAgents bucket bridge. */
 export interface DeepAgentBucketClient {

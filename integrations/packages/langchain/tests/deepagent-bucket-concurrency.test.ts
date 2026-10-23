@@ -1,3 +1,5 @@
+/** Exercises native deepagent bucket concurrency behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { expect, test } from "vitest";
 import { Effect, Result } from "effect";
 import { listDirectory } from "../src/deepagent-bucket-search.js";
@@ -59,7 +61,10 @@ test("direct delete Effect exposes a tagged bucket failure", async () => {
   );
   expect(Result.isFailure(result)).toBe(true);
   if (Result.isFailure(result)) {
-    expect(result.failure).toMatchObject({ _tag: "DeepAgentBucketFailure", cause: providerError });
+    expect(result.failure).toMatchObject({
+      _tag: "DeepAgentBucketFailure",
+      cause: providerError,
+    });
   }
 });
 

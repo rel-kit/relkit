@@ -1,6 +1,8 @@
+/** Adapts a configured RELKIT bucket to the DeepAgents file backend, sharing the invocation scope and preserving bucket failures at the native adapter. */
+
 import type { BackendProtocolV2 } from "deepagents";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { createBucketContext, type DeepAgentBucketClient } from "./deepagent-bucket-files.js";
 import { readBucket, readBucketRaw } from "./deepagent-bucket-read.js";

@@ -1,3 +1,5 @@
+/** Exercises native deepagent acceptance nested behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { expect, test } from "vitest";
 import type { AgentExecutionEvent } from "../src/index.ts";
 import { invokeAgent } from "../src/index.ts";
@@ -44,8 +46,8 @@ async function invokeNested(
     engine: { invoke: () => Promise.reject(new Error("unexpected RELKIT tool")) },
     contentSink: {
       emitOutput: () => undefined,
-      emitEvent: (event) => events.push(event),
-      emitTool: ({ toolId, state }) => tools.push(`${toolId}:${state}`),
+      emitEvent: (event) => void events.push(event),
+      emitTool: ({ toolId, state }) => void tools.push(`${toolId}:${state}`),
     },
   });
 }
