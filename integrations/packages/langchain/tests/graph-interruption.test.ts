@@ -1,3 +1,5 @@
+/** Exercises native graph interruption behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect, Metric, Tracer } from "effect";
 import { expect, test } from "vitest";
 import {
@@ -11,7 +13,12 @@ import {
 } from "../src/graph-interruption.ts";
 
 test("waiting responses preserve one or many request shapes", () => {
-  const first = { id: "private", node: "review", value: { question: "Continue?" }, response: true };
+  const first = {
+    id: "private",
+    node: "review",
+    value: { question: "Continue?" },
+    response: true,
+  };
   const second = { node: "confirm", response: { type: "string" } };
   expect(Effect.runSync(graphWaitingResponseEffect([first]))).toBe(true);
   expect(graphWaitingResponse([first, second])).toEqual({
@@ -68,7 +75,7 @@ test("recognizes internal interruption errors and emits named spans", () => {
   expect(spans.map(({ name }) => name)).toEqual(["Agents.graphInterruption.isError"]);
 });
 
-function metricCount(snapshot: Metric.Snapshot[], name: string): number {
+function metricCount(snapshot: Effect.Success<typeof Metric.snapshot>, name: string): number {
   const state = snapshot.find((metric) => metric.id === name)?.state;
   return state !== undefined && "count" in state && typeof state.count === "number"
     ? state.count

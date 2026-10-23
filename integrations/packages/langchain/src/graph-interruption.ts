@@ -1,8 +1,10 @@
+/** Converts native graph interrupt observations into RELKIT continuation data while preserving the interrupt identifiers needed for resume. */
+
 import type { JsonValue } from "@relkit/contracts";
 import { Effect, Metric, Schema } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import type { GraphWaitingInterrupt } from "./graph-interruption.types.js";
-import type { AgentWaitingRequest } from "./state.types.js";
+import type { AgentWaitingRequest } from "@relkit/agents/internal/state.types";
 
 export type { GraphWaitingInterrupt } from "./graph-interruption.types.js";
 
