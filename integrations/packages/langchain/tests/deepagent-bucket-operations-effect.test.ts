@@ -1,3 +1,5 @@
+/** Exercises native deepagent bucket operations effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import { deepAgentBucketLayer } from "../src/deepagent-bucket-service.js";
@@ -103,7 +105,9 @@ test("direct read Effects cover missing, empty, and binary files", async () => {
   expect(await run(readBucketRawEffect("/missing"))).toEqual({
     error: "File '/missing' not found",
   });
-  expect(await run(readBucketEffect("/missing"))).toEqual({ error: "File '/missing' not found" });
+  expect(await run(readBucketEffect("/missing"))).toEqual({
+    error: "File '/missing' not found",
+  });
   expect(await run(readBucketEffect("/note.txt", 9, 1))).toEqual({
     content: "",
     mimeType: "text/plain",

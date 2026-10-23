@@ -1,5 +1,7 @@
+/** Normalizes native file paths into scoped bucket keys and rejects paths that would escape the configured backend prefix. */
+
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import type {
   DeepAgentBucketClient,

@@ -1,6 +1,8 @@
+/** Reads normalized native files from the selected bucket, applying the backend's content and missing-file conventions. */
+
 import type { ReadRawResult, ReadResult } from "deepagents";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import { readFileDataEffect } from "./deepagent-bucket-file-data.js";
 import {

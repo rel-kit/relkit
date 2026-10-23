@@ -1,3 +1,5 @@
+/** Provides the Effect service used by native bucket operations, translating selected provider access into the backend's typed operation boundary. */
+
 import { Context, Layer } from "effect";
 import type { DeepAgentBucketContext } from "./deepagent-bucket-files.types.js";
 

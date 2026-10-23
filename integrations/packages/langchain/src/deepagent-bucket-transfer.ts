@@ -1,6 +1,8 @@
+/** Transfers native file content between backend requests and bucket objects while retaining per-file success and failure results. */
+
 import type { FileDownloadResponse, FileUploadResponse } from "deepagents";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import { putFileDataEffect } from "./deepagent-bucket-file-data.js";

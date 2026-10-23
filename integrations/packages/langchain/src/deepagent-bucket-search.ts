@@ -1,6 +1,8 @@
+/** Coordinates native bucket listing and content search, sharing normalized paths and file metadata with the read backend. */
+
 import type { FileInfo, LsResult } from "deepagents";
 import { Effect, Result } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import {
