@@ -1,4 +1,6 @@
-import type { AgentApprovalHandler } from "@relkit/agents";
+/** Exercises native agent approval continuations through the harness's scoped model and execution owner, retaining resume identity and cleanup. This companion preserves the native input and output types without starting runtime work. */
+
+import type { AgentApprovalHandler } from "../index.js";
 import type { Deferred } from "effect";
 import type { TestAgentApprovals } from "./agents-types.js";
 
@@ -15,4 +17,11 @@ export interface AgentApprovalState extends TestAgentApprovals {
   readonly reset: () => void;
   readonly registerSignal: (id: string, signal: AbortSignal) => void;
   readonly releaseSignal: (id: string) => void;
+}
+
+/** Native callback state retained by one test approval owner. */
+export interface AgentApprovalOwnedState {
+  readonly pending: Map<string, import("../index.js").PendingApproval>;
+  readonly decisions: Map<string, PendingAgentDecision>;
+  readonly signals: Map<string, AbortSignal>;
 }
