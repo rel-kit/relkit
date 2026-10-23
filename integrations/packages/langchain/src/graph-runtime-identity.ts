@@ -1,3 +1,5 @@
+/** Derives graph invocation, thread and checkpoint identity used consistently by native execution and persisted continuation lookup. */
+
 import { Context, Layer } from "effect";
 import type { GraphInvocationIdentityService } from "./graph-runtime-identity.types.js";
 

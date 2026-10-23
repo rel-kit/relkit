@@ -1,6 +1,9 @@
+/** Consumes native graph streams and publishes RELKIT execution events, finalizing the native iterator before settling the invocation. */
+
+import { collectCompiledGraphStateEffect } from "./graph-runtime-stream-state.js";
 import { isInterrupted } from "@langchain/langgraph";
 import { Effect, Exit } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { graphExecutionEffect } from "./define-graph.js";
 import { resumeCommandEffect, waitingInterruptsEffect } from "./graph-continuation.js";
 import type { GraphConfig } from "./graph-continuation.types.js";
@@ -55,67 +58,8 @@ export const streamCompiledGraphEffect = Effect.fn("Agents.graph.streamCompiled"
         ),
       catch: graphInvocationFailure,
     });
-    return yield* Effect.gen(function* () {
-      const execution = yield* graphExecutionEffect(options.agent);
-      const stateSchemas = yield* selectedStateSchemasEffect(
-        [execution.state],
-        options.agent.client?.state ?? [],
-      ).pipe(Effect.mapError((failure) => graphInvocationFailure(failure.cause)));
-      yield* collectNativeEventsEffect(
-        run,
-        options.contentSink,
-        new Map(),
-        new Set(),
-        signal,
-        options.agent.limits,
-        stateSchemas,
-        () => undefined,
-        undefined,
-        (reason) => run.abort(reason),
-        options.agent.client?.events,
-      ).pipe(Effect.mapError((failure) => graphInvocationFailure(failure.cause)));
-      const state = yield* Effect.tryPromise({
-        try: () => withSignal(run.output, signal),
-        catch: graphInvocationFailure,
-      });
-      if (isInterrupted(state)) {
-        const interrupts = yield* waitingInterruptsEffect(graph, options.agent, config).pipe(
-          Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
-        );
-        yield* Effect.tryPromise({
-          try: () =>
-            withSignal(
-              options.contentSink?.emitWaiting?.(
-                {
-                  response: graphWaitingResponse(interrupts),
-                  requests: publicWaitingRequests(interrupts),
-                },
-                signal,
-              ),
-              signal,
-            ),
-          catch: graphInvocationFailure,
-        });
-        return yield* Effect.fail(
-          graphInvocationFailure(new GraphInterruptedError(options.threadId!, interrupts)),
-        );
-      }
-      const validated = yield* validateValueEffect(options.agent.output, state, "output").pipe(
-        Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
-      );
-      const output = yield* jsonValueEffect(validated, maxOutputBytes, "graph output").pipe(
-        Effect.mapError((failure) => graphInvocationFailure(failure.cause)),
-      );
-      yield* Effect.tryPromise({
-        try: () => withSignal(options.contentSink?.emitOutput(output, signal), signal),
-        catch: graphInvocationFailure,
-      });
-      yield* Effect.tryPromise({
-        try: () => withSignal(options.contentSink?.finishOutput?.(signal), signal),
-        catch: graphInvocationFailure,
-      });
-      return output;
-    }).pipe(
+    const context = { options, graph, config, input, signal, maxOutputBytes, run };
+    return yield* collectCompiledGraphStateEffect(context).pipe(
       Effect.onExit((exit) =>
         Exit.isFailure(exit)
           ? Effect.sync(() => {
