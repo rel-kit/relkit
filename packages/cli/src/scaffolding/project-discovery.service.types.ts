@@ -1,5 +1,10 @@
+/** Composes source inspection and filesystem discovery into service, artifact and provider facts used by CLI scaffolding resolution. This companion contains the shared planning contracts without executing work. */
+
 import type { Effect } from "effect";
-import type { GeneratorDomainError, GeneratorIoError } from "./generator-errors.js";
+import type {
+  GeneratorDomainError,
+  GeneratorIoError,
+} from "create-relkit/internal/generator-errors";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 
 /** Declaration-only discovery service consumed by planning and interactive add resolution. */

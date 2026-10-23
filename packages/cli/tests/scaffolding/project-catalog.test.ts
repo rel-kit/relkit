@@ -1,10 +1,12 @@
+/** Verifies CLI-owned project catalog behavior through retained creator services, preserving typed failures and awaited fixture cleanup. */
+
 import { expect, test } from "bun:test";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { ADD_FAILURE_CODES } from "../src/add-types.js";
-import { mergeScaffoldManifest } from "../src/plan-manifest.js";
-import { resolveProjectDependencies } from "../src/project-catalog.js";
-import { SCAFFOLD_DEPENDENCIES } from "../src/scaffold-catalog.js";
+import { ADD_FAILURE_CODES } from "create-relkit/internal/add-types";
+import { mergeScaffoldManifest } from "../../src/scaffolding/plan-manifest.js";
+import { resolveProjectDependencies } from "../../src/scaffolding/project-catalog.js";
+import { SCAFFOLD_DEPENDENCIES } from "create-relkit/internal/scaffold-catalog";
 import { patchBuilder, withProject } from "./dependency-patches.fixture.js";
 
 test("resolves default and named workspace catalogs while retaining authored aliases", async () => {
@@ -23,7 +25,9 @@ test("resolves default and named workspace catalogs while retaining authored ali
     for (const specification of ["catalog:", "catalog:sql"]) {
       const source = JSON.stringify({ dependencies: { "drizzle-orm": specification } });
       await writeFile(join(project, "package.json"), source);
-      const resolved = await resolveProjectDependencies(project, { "drizzle-orm": specification });
+      const resolved = await resolveProjectDependencies(project, {
+        "drizzle-orm": specification,
+      });
       expect(resolved).toEqual({ "drizzle-orm": version });
       const merged = mergeScaffoldManifest(source, new Set(["drizzle-orm"]), new Map(), resolved);
       expect(JSON.parse(merged.content).dependencies["drizzle-orm"]).toBe(specification);

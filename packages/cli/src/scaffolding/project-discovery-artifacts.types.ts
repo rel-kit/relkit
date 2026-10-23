@@ -3,6 +3,7 @@
  * Compiler syntax facts provide factory identity; scaffold discovery retains
  * exact physical source paths and does not import application modules.
  */
+
 import type { AstPrefilterCandidate, AstSourceModule } from "@relkit/compiler";
 import type { DiscoveredArtifact, DiscoveredService } from "./project-discovery-types.js";
 

@@ -1,10 +1,12 @@
+/** Composes source inspection and filesystem discovery into service, artifact and provider facts used by CLI scaffolding resolution. */
+
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
-import { domainError, domainTry } from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { domainError, domainTry } from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 import { discoveryFacts } from "./project-discovery-facts.js";
 import type { ProjectDiscoveryService } from "./project-discovery.service.types.js";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
@@ -67,7 +69,7 @@ export const projectDiscoveryLive = Layer.effect(
  * @example
  * ```ts
  * import { Effect } from "effect";
- * import { discoverProjectEffect, projectDiscoveryLive } from "create-relkit";
+ * import { discoverProjectEffect, projectDiscoveryLive } from "@relkit/cli/scaffolding";
  * const inspect = discoverProjectEffect("./my-app").pipe(Effect.provide(projectDiscoveryLive));
  * // Supply GeneratorFileSystem at the application or test composition boundary.
  * ```

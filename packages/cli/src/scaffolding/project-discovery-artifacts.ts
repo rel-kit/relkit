@@ -3,6 +3,7 @@
  * Shared layout paths supply service names; database/auth keep native capability
  * metadata and ordinary modules remain excluded from descriptor registration.
  */
+
 import { prefilterSources, type AstSourceModule } from "@relkit/compiler";
 import { serviceSource, normalizeSourcePath } from "@relkit/contracts";
 import { readFactoryStringProperty } from "./source-edit.js";

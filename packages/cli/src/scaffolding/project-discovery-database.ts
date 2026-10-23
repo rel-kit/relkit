@@ -1,6 +1,8 @@
+/** Inspects database boundaries and authored schema paths for add planning while leaving applied migrations and database contents untouched. */
+
 import { posix } from "node:path";
 import * as ts from "typescript";
-import type { DatabaseDialect } from "./add-types.js";
+import type { DatabaseDialect } from "create-relkit/internal/add-types";
 import { readFactoryObject, staticPropertyName } from "./source-edit.js";
 
 /**

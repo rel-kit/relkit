@@ -1,11 +1,16 @@
+/** Verifies CLI-owned planning behavior through retained creator services, preserving typed failures and awaited fixture cleanup. */
+
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit, Layer, Logger } from "effect";
-import { normalizeAddRequest } from "../src/add-options.js";
-import { discoverProjectEffect, projectDiscoveryLive } from "../src/project-discovery.js";
-import { PlanBuilder } from "../src/plan-builder.js";
-import { publicFailure } from "../src/generator-errors.js";
-import { GeneratorPaths } from "../src/generator-paths.js";
-import { canonicalizeMissingPathEffect } from "../src/validate-paths.js";
+import { normalizeAddRequest } from "../../src/scaffolding/add-options.js";
+import {
+  discoverProjectEffect,
+  projectDiscoveryLive,
+} from "../../src/scaffolding/project-discovery.js";
+import { PlanBuilder } from "../../src/scaffolding/plan-builder.js";
+import { publicFailure } from "create-relkit/internal/generator-errors";
+import { GeneratorPaths } from "create-relkit/internal/generator-paths";
+import { canonicalizeMissingPathEffect } from "create-relkit/internal/validate-paths";
 import { memoryFileSystem } from "./generator-services.fixture.js";
 
 const root = "/memory/app";

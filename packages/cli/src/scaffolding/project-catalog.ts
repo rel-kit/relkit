@@ -1,12 +1,19 @@
+/** Resolves declared package versions for selected scaffold dependencies using installed project metadata and the portable release catalog. */
+
 import { observeExecution } from "@relkit/contracts/operation";
 import { dirname, join, resolve } from "node:path";
 import { Effect, Schema } from "effect";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
-import { resolveCatalogVersion } from "./catalog-resolution.js";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
-import { domainError, domainTry, errorMessage, hasErrno } from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
-import { JsonObject } from "./project-manifest.schemas.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { resolveCatalogVersion } from "create-relkit/internal/catalog-resolution";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import {
+  domainError,
+  domainTry,
+  errorMessage,
+  hasErrno,
+} from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import { JsonObject } from "create-relkit/internal/project-manifest.schemas";
 
 /**
  * Resolves authored Bun aliases without replacing declarations or hiding filesystem authority.
