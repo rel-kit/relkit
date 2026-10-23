@@ -2,6 +2,7 @@
 import type { AgentStateProvider } from "../../packages/agents/src/index.ts";
 import type { RealtimeProvider } from "../../packages/realtime/src/index.ts";
 import type { CreateAppOptions } from "../../packages/runtime-hono/src/index.ts";
+import { playwrightSelection } from "../../scripts/playwright-selection.js";
 
 /**
  * Composes native runtime policies without opening a client, listener or state journal.
@@ -16,6 +17,7 @@ export function commerceAgentRuntimeSettings(
   publicFingerprint: string,
 ) {
   return {
+    agUi: true,
     clientIdentity: {
       applicationId: "commerce-api",
       publicFingerprint,
@@ -38,12 +40,12 @@ export function commerceAgentRuntimeSettings(
       provider: () => realtimeProvider,
     },
     transportSecurity: {
-      allowedOrigins: ["http://127.0.0.1:3010"],
+      allowedOrigins: [playwrightSelection("commerce").ui],
       validateCsrf: (_request: Request, token: string | undefined) =>
         token === "commerce-browser-csrf",
     },
   } satisfies Pick<
     CreateAppOptions,
-    "clientIdentity" | "agentRuntime" | "realtime" | "transportSecurity"
+    "agUi" | "clientIdentity" | "agentRuntime" | "realtime" | "transportSecurity"
   >;
 }

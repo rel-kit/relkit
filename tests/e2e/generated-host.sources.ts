@@ -19,7 +19,7 @@ export default defineApp({ id: "browser-generated-host", env: defineEnv({}),
 });
 `,
   "src/services/hello/agents/consumer.agent.ts": `/** Public offline agent whose declared input is validated before model execution. */
-import { defineAgent } from "@relkit/app/agents";
+import { defineAgent } from "@relkit/langchain";
 import { z } from "@relkit/app/schema";
 import { FakeToolCallingModel } from "langchain";
 export default defineAgent({ id: "hello.consumer",
