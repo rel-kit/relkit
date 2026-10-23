@@ -1,4 +1,5 @@
-import { createApp } from "../../src/index.ts";
+/** Hosts an explicitly selected MCP fixture; the parent owns its finite server process and SIGTERM releases the listener. */
+import { createMcpApp as createApp } from "../optional-app-fixture.js";
 import { runtimeCohort } from "../test-cohort.ts";
 import { input, output, tool, toolPlan } from "./mcp-setup.ts";
 const plan = toolPlan([tool("echo", true, "never")]);

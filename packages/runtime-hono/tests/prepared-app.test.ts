@@ -47,11 +47,23 @@ it.live("real prepared dispatch preserves REST, RPC, MCP and absent agent respon
 
 test("optional path selection matches transport boundaries without claiming sibling paths", () => {
   expect(
-    ["/rpc", "/rpc/", "/mcp", "/_relkit/v1/agents/a/ag-ui"].map(requiresDeferredTransport),
+    [
+      "/_relkit/v1",
+      "/_relkit/v1/graph/descriptors",
+      "/_relkit/v1/runtime",
+      "/_relkit/v1/agents/a/workflow",
+    ].map(requiresDeferredTransport),
   ).toEqual([true, true, true, true]);
   expect(
-    ["/hello", "/rpc-other", "/mcp-other", "/_relkit/v1/graph"].map(requiresDeferredTransport),
-  ).toEqual([false, false, false, false]);
+    [
+      "/hello",
+      "/rpc",
+      "/mcp",
+      "/_relkit/v1/graph",
+      "/_relkit/v1/client/identity",
+      "/_relkit/v1/agents/a/ag-ui",
+    ].map(requiresDeferredTransport),
+  ).toEqual([false, false, false, false, false, false]);
 });
 
 it.live("prepared REST resolves the real target before inference and invocation", () =>
