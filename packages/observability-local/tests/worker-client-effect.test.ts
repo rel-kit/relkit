@@ -1,13 +1,14 @@
+/** Checks IPC error codes, cancellation, send/timeouts and scoped worker release through Effect and Promise adapters. */
 import { fork } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
 import { EventEmitter } from "node:events";
 import { Effect, Fiber, Layer } from "effect";
 import { beforeEach, expect, test, vi } from "vitest";
-import { LocalWorkerError } from "../src/local/worker-client-error.js";
+import { LocalWorkerError } from "@relkit/observability/local/worker-contract";
 import { startLocalWorkerEffect } from "../src/local/worker-client-effect.js";
 import { LocalWorkerService, localWorkerLayer } from "../src/local/worker-client-service.js";
 import { startLocalWorker } from "../src/local/worker-client.js";
-import { ObservabilityQueryError } from "../src/query-types.js";
+import { ObservabilityQueryError } from "@relkit/observability";
 
 vi.mock("node:child_process", () => ({ fork: vi.fn() }));
 
@@ -23,7 +24,7 @@ function fakeWorker() {
   child.disconnect.mockImplementation(() => {
     child.connected = false;
   });
-  vi.mocked(fork).mockReturnValue(child as unknown as ChildProcess);
+  vi.mocked(fork).mockReturnValue(child as ChildProcess);
   return child;
 }
 

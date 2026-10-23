@@ -1,15 +1,16 @@
+/** Installs real packed observability artifacts and starts the managed Node/native worker in an isolated consumer. */
 import { expect, test } from "vitest";
-import { spawn } from "node:child_process";
 import { mkdtemp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { packedCommand as run } from "./packed-consumer.js";
 
 test("packed observability installs and starts its managed Node/native worker", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-native-package-"));
   try {
     const tarballs: Record<string, string> = {};
-    for (const name of ["contracts", "observability"]) {
+    for (const name of ["contracts", "observability", "observability-local"]) {
       const artifacts = join(root, name);
       await mkdir(artifacts);
       await run(
@@ -27,9 +28,20 @@ test("packed observability installs and starts its managed Node/native worker", 
         overrides: tarballs,
       }),
     );
-    await run(["bun", "install", "--ignore-scripts"], root);
+    await run(
+      [
+        "bun",
+        "install",
+        "--ignore-scripts",
+        "--network-concurrency",
+        "1",
+        "--concurrent-scripts",
+        "1",
+      ],
+      root,
+    );
     const script = `
-      import { startLocalWorker } from "@relkit/observability/local";
+      import { startLocalWorker } from "@relkit/observability-local";
       const worker = startLocalWorker();
       try {
         await worker.call({ type: "open", root: "./history" });
@@ -43,21 +55,4 @@ test("packed observability installs and starts its managed Node/native worker", 
   } finally {
     await rm(root, { recursive: true, force: true });
   }
-}, 60_000);
-
-async function run(command: string[], cwd: string): Promise<void> {
-  const child = spawn(command[0]!, command.slice(1), { cwd });
-  let stdout = "";
-  let stderr = "";
-  child.stdout.on("data", (chunk: Buffer) => {
-    stdout += chunk.toString();
-  });
-  child.stderr.on("data", (chunk: Buffer) => {
-    stderr += chunk.toString();
-  });
-  const code = await new Promise<number | null>((resolve, reject) => {
-    child.once("error", reject);
-    child.once("close", resolve);
-  });
-  if (code !== 0) throw new Error(`${command.join(" ")} failed: ${stdout}${stderr}`);
-}
+}, 75_000);
