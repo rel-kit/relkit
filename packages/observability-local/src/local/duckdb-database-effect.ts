@@ -1,8 +1,13 @@
+/**
+ * Owns duckdb database effect for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import { chmod, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { Context, Effect, Layer, Semaphore } from "effect";
-import type { RedactionPolicy } from "../redaction.js";
-import type { TelemetryLocalRetentionPolicy } from "../telemetry-config.js";
+import type { RedactionPolicy } from "@relkit/observability";
+import type { TelemetryLocalRetentionPolicy } from "@relkit/observability";
 import type { DuckdbDatabaseEffects } from "./duckdb-database.types.js";
 import { DuckdbDriverService } from "./duckdb-driver.js";
 import { duckdbError } from "./duckdb-error.js";
@@ -21,7 +26,10 @@ import { importLocalHistoryEffect } from "./import-history-effect.js";
 // prettier-ignore
 export class DuckdbDatabaseService extends Context.Service<
   DuckdbDatabaseService, DuckdbDatabaseEffects
->()("@relkit/observability/DuckdbDatabase") {}
+>()("@relkit/observability/DuckdbDatabase", {
+  make: (root: string, configured: TelemetryLocalRetentionPolicy = {}, redaction?: RedactionPolicy) =>
+    openDuckdbDatabaseEffect(root, configured, redaction),
+}) {}
 /**
  * Acquires an instance and connection in the caller's Scope, initializes schema,
  * and returns Effect operations. Scope finalizers close the connection first,
@@ -69,7 +77,7 @@ export const openDuckdbDatabaseEffect = Effect.fn("ObservabilityDuckdb.open")(fu
       const query = makeDuckdbQueryEffect(connection, permit);
       const imported = yield* importLocalHistoryEffect(root, connection, storage.append);
       yield* storage.flush();
-      return DuckdbDatabaseService.of({ ...query, ...storage, imported });
+      return { ...query, ...storage, imported } satisfies DuckdbDatabaseEffects;
     }),
   );
 });
@@ -89,5 +97,8 @@ export function duckdbDatabaseLayer(
   configured: TelemetryLocalRetentionPolicy = {},
   redaction?: RedactionPolicy,
 ) {
-  return Layer.effect(DuckdbDatabaseService, openDuckdbDatabaseEffect(root, configured, redaction));
+  return Layer.effect(
+    DuckdbDatabaseService,
+    DuckdbDatabaseService.make(root, configured, redaction),
+  );
 }

@@ -1,3 +1,8 @@
+/**
+ * Owns duckdb error for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import { Schema } from "effect";
 
 /**
@@ -15,13 +20,14 @@ export class DuckdbError extends Schema.TaggedError<DuckdbError>()("DuckdbError"
 /**
  * Converts a native DuckDB failure to the local storage error channel.
  *
+ * @typeParam Cause - Native rejection type retained in the error cause.
  * @param operation - Stable operation name without SQL or user values.
  * @param cause - Native failure value.
  * @returns A tagged storage failure preserving the cause.
  * @example
  * const error = duckdbError("connect", cause);
  */
-export function duckdbError(operation: string, cause: unknown): DuckdbError {
+export function duckdbError<Cause>(operation: string, cause: Cause): DuckdbError {
   return new DuckdbError({
     operation,
     message: cause instanceof Error ? cause.message : String(cause),

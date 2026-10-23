@@ -1,4 +1,9 @@
-import type { DuckDBValue } from "@duckdb/node-api";
+/**
+ * Owns duckdb driver.types for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
+import type { DuckDBValue, Json, DuckDBMaterializedResult } from "@duckdb/node-api";
 import type { Effect } from "effect";
 import type { DuckdbError } from "./duckdb-error.js";
 
@@ -15,7 +20,7 @@ export interface DuckdbRows {
    * @example
    * const rows = result.getRowObjectsJson();
    */
-  readonly getRowObjectsJson: () => Record<string, unknown>[];
+  readonly getRowObjectsJson: () => Record<string, Json>[];
 }
 
 /**
@@ -34,7 +39,7 @@ export interface DuckdbConnectionPort {
    * @example
    * await connection.run("CHECKPOINT");
    */
-  readonly run: (sql: string, values?: DuckDBValue[]) => Promise<unknown>;
+  readonly run: (sql: string, values?: DuckDBValue[]) => Promise<DuckDBMaterializedResult | void>;
   /**
    * Reads all rows from a completed statement.
    * @param sql - SQL query.

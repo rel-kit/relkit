@@ -1,3 +1,8 @@
+/**
+ * Owns duckdb driver for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import { DuckDBInstance } from "@duckdb/node-api";
 import { Context, Effect, Layer } from "effect";
 import { duckdbError } from "./duckdb-error.js";
@@ -11,6 +16,16 @@ import type { DuckdbDriver } from "./duckdb-driver.types.js";
  */
 export class DuckdbDriverService extends Context.Service<DuckdbDriverService, DuckdbDriver>()(
   "@relkit/observability/DuckdbDriver",
+  {
+    make: Effect.sync((): DuckdbDriver => ({
+      create: Effect.fn("ObservabilityDuckdb.driver.create")((path: string) =>
+        Effect.tryPromise({
+          try: () => DuckDBInstance.create(path),
+          catch: (cause) => duckdbError("create", cause),
+        }),
+      ),
+    })),
+  },
 ) {}
 /**
  * Live native driver for local observability storage.
@@ -20,14 +35,4 @@ export class DuckdbDriverService extends Context.Service<DuckdbDriverService, Du
  *   Effect.provide(duckdbDriverLayer),
  * );
  */
-export const duckdbDriverLayer = Layer.succeed(
-  DuckdbDriverService,
-  DuckdbDriverService.of({
-    create: Effect.fn("ObservabilityDuckdb.driver.create")((path: string) =>
-      Effect.tryPromise({
-        try: () => DuckDBInstance.create(path),
-        catch: (cause) => duckdbError("create", cause),
-      }),
-    ),
-  }),
-);
+export const duckdbDriverLayer = Layer.effect(DuckdbDriverService, DuckdbDriverService.make);

@@ -1,11 +1,16 @@
+/**
+ * Owns duckdb database for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import { Effect, Exit, Scope } from "effect";
-import type { RedactionPolicy } from "../redaction.js";
-import type { TelemetryLocalRetentionPolicy } from "../telemetry-config.js";
+import type { RedactionPolicy } from "@relkit/observability";
+import type { TelemetryLocalRetentionPolicy } from "@relkit/observability";
 import { openDuckdbDatabaseEffect } from "./duckdb-database-effect.js";
 import { duckdbDriverLayer } from "./duckdb-driver.js";
 import { duckdbError } from "./duckdb-error.js";
 import { DuckdbQueryError } from "./duckdb-query-error.js";
-import { ObservabilityQueryError } from "../query-types.js";
+import { ObservabilityQueryError } from "@relkit/observability";
 /**
  * Opens a private DuckDB database and owns its Effect Scope until close.
  * The scoped Effect implementation contains acquisition and operation logic.
@@ -32,16 +37,6 @@ export async function openDuckdbDatabase(
         Effect.provide(duckdbDriverLayer),
       ),
     );
-    const runDirect = <A, E>(operation: Effect.Effect<A, E>): Promise<A> =>
-      Effect.runPromise(
-        operation.pipe(
-          Effect.mapError((error) =>
-            error instanceof DuckdbQueryError
-              ? new ObservabilityQueryError(error.code, error.message)
-              : error,
-          ),
-        ),
-      );
     let closing = false;
     const run = <A, E>(operation: Effect.Effect<A, E>): Promise<A> =>
       closing
@@ -75,3 +70,15 @@ export async function openDuckdbDatabase(
     throw error;
   }
 }
+
+/** @typeParam A - Native success value. @typeParam E - Native failure. @param operation - Lazy database operation. @returns Promise preserving public query error identity. */
+const runDirect = <A, E>(operation: Effect.Effect<A, E>): Promise<A> =>
+  Effect.runPromise(
+    operation.pipe(
+      Effect.mapError((error) =>
+        error instanceof DuckdbQueryError
+          ? new ObservabilityQueryError(error.code, error.message)
+          : error,
+      ),
+    ),
+  );
