@@ -1,3 +1,5 @@
+/** Coordinates native graph resume requests with persisted waiting state and the invocation scope, preserving continuation failures and thread identity. This companion preserves the native input and output types without starting runtime work. */
+
 import type { compileGraph } from "./graph-compile.js";
 
 /** LangGraph run configuration with an optional persistent thread identity. */

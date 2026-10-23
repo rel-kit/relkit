@@ -1,6 +1,8 @@
+/** Coordinates native graph resume requests with persisted waiting state and the invocation scope, preserving continuation failures and thread identity. */
+
 import { Command } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { graphExecution, type GraphDescriptor } from "./define-graph.js";
 import { graphContinuationFailure } from "./graph-continuation-error.js";
 import type { CompiledGraph, GraphConfig } from "./graph-continuation.types.js";

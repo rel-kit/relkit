@@ -1,3 +1,5 @@
+/** Exercises native graph compile effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import { runGraphRouteEffect } from "../src/graph-compile.js";

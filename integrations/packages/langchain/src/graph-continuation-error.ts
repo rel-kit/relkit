@@ -1,3 +1,5 @@
+/** Defines continuation failures for persisted native graphs so invalid or unavailable resume state remains distinct from invocation failures. */
+
 import { Schema } from "effect";
 
 /** Tagged validation or state failure while resuming a graph. */

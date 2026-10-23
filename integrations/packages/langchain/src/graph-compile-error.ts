@@ -1,3 +1,5 @@
+/** Defines typed failures for native graph compilation, preserving the graph identity and underlying native compile cause. */
+
 import { Schema } from "effect";
 
 /** Tagged graph compilation or route execution failure. */

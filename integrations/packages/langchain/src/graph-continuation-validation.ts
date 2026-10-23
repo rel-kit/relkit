@@ -1,10 +1,12 @@
+/** Checks persisted graph continuation input and identity before native resume admission, preventing execution against a mismatched thread or graph. */
+
 import type { GraphDescriptor, GraphNodeLike } from "./define-graph.js";
 import { isGraphNodeDescriptor } from "./define-graph-node.js";
 import { isSubgraphNode, subgraphForNode } from "./graph-subgraph.js";
-import type { AgentWaitingRequest } from "./state.types.js";
+import type { AgentWaitingRequest } from "@relkit/agents/internal/state.types";
 import { validateValue } from "./runtime-utils.js";
 import { Effect, Result } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { graphContinuationFailure } from "./graph-continuation-error.js";
 
 /** Validates one or more graph continuation replies with bounded concurrency.

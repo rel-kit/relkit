@@ -1,8 +1,10 @@
+/** Compiles validated RELKIT graph descriptors into LangGraph execution objects using the authored nodes, edges, state and persistence options. */
+
 import { StateGraph, type LangGraphRunnableConfig } from "@langchain/langgraph";
 import type { MaybePromise } from "@relkit/contracts";
 import { isFunctionGraphNode } from "@relkit/functions";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { graphCompilationFailure } from "./graph-compile-error.js";
 import { graphExecution, type GraphDescriptor, type GraphNodeLike } from "./define-graph.js";
 import { isGraphNodeDescriptor } from "./define-graph-node.js";

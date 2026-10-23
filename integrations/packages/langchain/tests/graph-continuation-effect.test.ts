@@ -1,3 +1,5 @@
+/** Exercises native graph continuation effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import { z, type StandardSchemaV1 } from "@relkit/schema";
@@ -30,10 +32,10 @@ test("continuation Effect validates a large reply batch with bounded concurrency
   };
   const node = defineGraphNode({
     id: "worker",
-    input: z.number(),
-    output: z.number(),
+    input: z.object({ value: z.number() }),
+    output: z.object({ value: z.number() }),
     resume,
-    handler: ({}) => 1,
+    handler: () => ({ value: 1 }),
   });
   const descriptor = { nodes: [node] } as unknown as GraphDescriptor;
   const requests = Array.from({ length: 40 }, () => ({ node: "worker", response: null }));
@@ -60,7 +62,9 @@ test("graph configuration Effect enforces thread identity for persistent graphs"
   expect(Effect.runSync(graphConfigEffect(persistent, "thread-1"))).toEqual({
     configurable: { thread_id: "thread-1" },
   });
-  expect(graphConfig(persistent, "thread-2")).toEqual({ configurable: { thread_id: "thread-2" } });
+  expect(graphConfig(persistent, "thread-2")).toEqual({
+    configurable: { thread_id: "thread-2" },
+  });
   expect(Effect.runSync(Effect.flip(graphConfigEffect(persistent)))).toMatchObject({
     _tag: "GraphContinuationFailure",
   });
