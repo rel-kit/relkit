@@ -83,9 +83,11 @@ test("owns a stable proxy, dynamic backend, candidate, and clean stop", async ()
     event: "dev.ready",
     fields: expect.objectContaining({
       openapi: `http://127.0.0.1:${session.backendPort}/_relkit/v1/openapi.json`,
-      apiReference: `http://127.0.0.1:${session.backendPort}/_relkit/v1/api-reference`,
     }),
   });
+  expect(logs.find(({ event }) => event === "dev.ready")?.fields).not.toHaveProperty(
+    "apiReference",
+  );
   expect(await (await fetch(`http://127.0.0.1:${session.backendPort}/hello`)).text()).toBe("hello");
 
   const candidate = session.active;

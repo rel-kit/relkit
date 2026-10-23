@@ -1,3 +1,4 @@
+/** Verifies emitted-server environment decoding and production validation before provider startup. */
 import { afterEach, expect, test } from "bun:test";
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";

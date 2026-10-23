@@ -1,8 +1,13 @@
+/** Runs contributor commands with one captured workspace/process context and explicit local generator callbacks. */
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect, Schema, type Context } from "effect";
 import { runExecutionPromiseWith } from "@relkit/contracts/operation";
-import { applyScaffoldPlan, generateProject, type GenerateCommandResult } from "create-relkit";
+import {
+  applyScaffoldPlan,
+  generateProject,
+  type GenerateCommandResult,
+} from "./scaffolding/index.js";
 import { runCli } from "./main.js";
 import { loadCreateRelkitEffect, type CliCommandContext } from "./main-support.js";
 import {
@@ -111,23 +116,7 @@ export function main(argv: readonly string[] = process.argv.slice(2)): Promise<n
                 },
               }
             : {}),
-          loadCreateRelkit: async () => ({
-            ...(await runExecutionPromiseWith(owner, loadCreateRelkitEffect)),
-            generateProject: (options: unknown, context: CliCommandContext) =>
-              generateProject(Schema.decodeUnknownSync(ContributorCreateOptions)(options), {
-                ...context,
-                bunExecutable: process.execPath,
-                relkitExecutable: cli,
-                commandRunner: runner,
-              }),
-            applyScaffoldPlan: (plan, context) =>
-              applyScaffoldPlan(plan, {
-                ...context,
-                bunExecutable: process.execPath,
-                relkitExecutable: cli,
-                commandRunner: runner,
-              }),
-          }),
+          loadCreateRelkit: contributorGenerator(owner, runner),
         }),
       );
     }).pipe((effect) => observeCli("contributor.main", effect)),
@@ -141,6 +130,30 @@ export function main(argv: readonly string[] = process.argv.slice(2)): Promise<n
       },
     },
   );
+}
+
+/** Captures the same command runner for creation and add without acquiring another service graph. */
+function contributorGenerator(
+  owner: Context.Context<ContributorWorkspace | CliProcess>,
+  runner: ReturnType<typeof commandRunner>,
+): NonNullable<NonNullable<Parameters<typeof runCli>[1]>["loadCreateRelkit"]> {
+  return async () => ({
+    ...(await runExecutionPromiseWith(owner, loadCreateRelkitEffect)),
+    generateProject: (options: unknown, context: CliCommandContext) =>
+      generateProject(Schema.decodeUnknownSync(ContributorCreateOptions)(options), {
+        ...context,
+        bunExecutable: process.execPath,
+        relkitExecutable: cli,
+        commandRunner: runner,
+      }),
+    applyScaffoldPlan: (plan, context) =>
+      applyScaffoldPlan(plan, {
+        ...context,
+        bunExecutable: process.execPath,
+        relkitExecutable: cli,
+        commandRunner: runner,
+      }),
+  });
 }
 
 if (import.meta.main) process.exitCode = await main();
