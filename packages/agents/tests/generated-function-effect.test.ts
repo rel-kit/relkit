@@ -1,3 +1,4 @@
+/** Checks generated agent function identity and callable markers through Effect entrypoints. */
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import {
@@ -5,7 +6,7 @@ import {
   createGeneratedAgentFunctionEffect,
   generatedAgentFunctionIdEffect,
   isGeneratedAgentFunctionEffect,
-} from "../src/generated-function.js";
+} from "@relkit/agents/internal/generated-function";
 
 test("generated function Effects derive, mark, and invoke a bound handler", async () => {
   expect(Effect.runSync(generatedAgentFunctionIdEffect("support"))).toBe(
