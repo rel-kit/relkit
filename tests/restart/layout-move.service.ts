@@ -9,6 +9,7 @@ import { scaffoldChild } from "../../scripts/scaffold-process.js";
 import { ScaffoldProcessFailure } from "../../scripts/scaffold-process.errors.js";
 import { copyRestartSource } from "./layout-move.sources.js";
 import { RestartAgentReport } from "./layout-move.schemas.js";
+import { nativeAgentRuntimePackages } from "../compiler/native-agent-runtime.fixture.js";
 
 const repository = resolve(import.meta.dir, "../..");
 
@@ -17,10 +18,11 @@ export class RestartLayout extends Context.Service<RestartLayout>()("relkit.test
   make: Effect.gen(function* () {
     const root = yield* Effect.acquireRelease(
       scaffoldNative("restart.layout.root", () => mkdtemp(join(tmpdir(), "relkit-restart-jobs-"))),
-      (root) =>
-        scaffoldNative("restart.layout.release", () =>
-          rm(root, { recursive: true, force: true }),
-        ).pipe(Effect.orDie),
+      (root, exit) =>
+        scaffoldNative("restart.layout.release", async () => {
+          if (exit._tag === "Failure") console.error(`Failed restart fixture retained: ${root}`);
+          else await rm(root, { recursive: true, force: true });
+        }).pipe(Effect.orDie),
     );
     yield* prepareSources(root);
     return {
@@ -46,6 +48,9 @@ const prepareSources = Effect.fn("RestartLayout.prepare")(function* (root: strin
   yield* scaffoldNative("restart.layout.manifest", () =>
     writeFile(join(root, "package.json"), '{"type":"module"}\n'),
   );
+  yield* scaffoldNative("restart.layout.metadata", () =>
+    writeFile(join(root, "runtime-integrations.json"), JSON.stringify(nativeAgentRuntimePackages)),
+  );
   yield* scaffoldNative("restart.layout.directory", () => mkdir(destination, { recursive: true }));
   yield* scaffoldNative("restart.layout.modules", () =>
     symlink(join(repository, "node_modules"), join(root, "node_modules"), "dir"),
@@ -54,6 +59,7 @@ const prepareSources = Effect.fn("RestartLayout.prepare")(function* (root: strin
     "jobs-worker.ts",
     "agent-graph-worker.ts",
     "agent-graph-fixture.ts",
+    "agent-graph-runtime.fixture.ts",
     "state-root.ts",
     "layout-move-effect-mq-worker.ts",
   ])
