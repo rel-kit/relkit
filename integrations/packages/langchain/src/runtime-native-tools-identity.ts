@@ -1,3 +1,5 @@
+/** Derives stable native tool identities used by descriptor adaptation and runtime dispatch without cloning the SDK tool instances. */
+
 import { Context, Layer } from "effect";
 import type { NativeToolIdentityService } from "./runtime-native-tools.types.js";
 

@@ -1,18 +1,21 @@
+/** Publishes tool lifecycle observations for native calls with stable call identity, preserving failure and completion ordering. */
+
+import { resolveApprovalDecisionEffect } from "./runtime-approval-decision.js";
 import { frameworkTrace } from "@relkit/invocation";
 import type { ToolApprovalRequest } from "@relkit/tools";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import {
   approveApprovalEffect,
   assertApprovalGrantedEffect,
   createApprovalEffect,
   denyApprovalEffect,
-} from "./approval.js";
+} from "@relkit/agents/internal/approval";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { signalFailure } from "./signal.js";
 import type { RuntimeToolOptions } from "./runtime-tool-events.types.js";
 import type { AgentToolCall } from "./runtime-tools.types.js";
-import type { ToolPartState } from "./state.types.js";
+import type { ToolPartState } from "@relkit/agents/internal/state.types";
 
 /** Emits a public tool transition with linked Effect cancellation.
  * @param options - Runtime content sink.
@@ -124,16 +127,7 @@ export const resolveAgentApprovalEffect = Effect.fn("Agents.runtime.resolveAppro
       try: () => Promise.resolve(handler(approval)),
       catch: agentInvocationFailure,
     });
-    const decision =
-      response === "approved" || response === true
-        ? yield* approveApprovalEffect(approval).pipe(
-            Effect.mapError((failure) => agentInvocationFailure(failure.cause)),
-          )
-        : response === "denied" || response === false
-          ? yield* denyApprovalEffect(approval).pipe(
-              Effect.mapError((failure) => agentInvocationFailure(failure.cause)),
-            )
-          : response;
+    const decision = yield* resolveApprovalDecisionEffect(approval, response);
     yield* Effect.sync(() =>
       frameworkTrace.event("agent.tool.approval.resolved", {
         "relkit.tool.id": request.toolId,

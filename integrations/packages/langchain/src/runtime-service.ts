@@ -1,3 +1,5 @@
+/** Provides the Effect runtime service that composes native model resolution, tools and loop execution under the invocation owner. */
+
 import { Context, Effect, Layer } from "effect";
 import { invokeGraph } from "./graph-runtime.js";
 import { runAgentLoop } from "./runtime-loop.js";

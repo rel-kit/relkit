@@ -1,3 +1,6 @@
+/** Adapts RELKIT callable tools to native SDK tools while preserving validated input, execution context and typed invocation failures. */
+
+import { invokeRegisteredAgentToolEffect } from "./runtime-tool-invocation.js";
 import {
   currentInvocationScope,
   runInInvocationScope,
@@ -7,8 +10,8 @@ import {
 import { validate } from "@relkit/schema";
 import type { ToolDescriptor, ToolEngine, ToolEngineInvocation } from "@relkit/tools";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { ApprovalDeniedError } from "./approval.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { ApprovalDeniedError } from "@relkit/agents/internal/approval";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { signalFailure } from "./signal.js";
@@ -70,63 +73,17 @@ export const invokeAgentToolEffect = Effect.fn("Agents.runtime.invokeTool")(
         }),
       catch: agentInvocationFailure,
     });
-    const outcome = yield* Effect.gen(function* () {
-      const current = yield* Effect.sync(() => currentInvocationScope());
-      const baseDispatcher =
-        current?.dispatcher ??
-        (yield* createAgentInvocationDispatcherEffect(
-          engine,
-          options,
-          invocationId,
-          traceId,
-          parentSpanId,
-          signal,
-        ));
-      const dispatcher =
-        progressSink === undefined
-          ? baseDispatcher
-          : withProgressSink(baseDispatcher, progressSink);
-      const result = yield* Effect.tryPromise({
-        try: (effectSignal) => {
-          const combined = AbortSignal.any([signal, effectSignal]);
-          return Promise.resolve(
-            runInInvocationScope(
-              current === undefined
-                ? {
-                    dispatcher,
-                    parent: {
-                      id: invocationId,
-                      traceId: traceId ?? invocationId,
-                      signal: combined,
-                      ...(parentSpanId === undefined ? {} : { spanId: parentSpanId }),
-                    },
-                  }
-                : { ...current, dispatcher },
-              () =>
-                tool.invoke(turn.input, {
-                  signal: combined,
-                  approval: (request) =>
-                    resolveAgentApproval(options, request, turn.callId, invocationId, combined),
-                }),
-            ),
-          );
-        },
-        catch: agentInvocationFailure,
-      });
-      yield* emitToolEffect(options, turn, "succeeded", result, signal);
-      return result;
-    }).pipe(
-      Effect.catchTag("AgentInvocationFailure", (failure) =>
-        Effect.gen(function* () {
-          const state = failure.cause instanceof ApprovalDeniedError ? "denied" : "failed";
-          yield* emitToolEffect(options, turn, state, undefined, signal).pipe(
-            Effect.catchTag("AgentInvocationFailure", () => Effect.void),
-          );
-          return yield* Effect.fail(failure);
-        }),
-      ),
+    return yield* invokeRegisteredAgentToolEffect(
+      engine,
+      tool,
+      turn,
+      options,
+      signal,
+      invocationId,
+      traceId,
+      parentSpanId,
+      progressSink,
     );
-    return outcome;
   },
   (effect) => observeAgent("runtime.invoke-tool", effect),
 );
@@ -167,20 +124,4 @@ export function invokeAgentTool(
     ).pipe(Effect.catchTag("AgentInvocationFailure", (failure) => Effect.fail(failure.cause))),
     { signal },
   );
-}
-
-function withProgressSink(
-  dispatcher: InvocationDispatcher,
-  progressSink: NonNullable<ToolEngineInvocation["progressSink"]>,
-): InvocationDispatcher {
-  const scoped: InvocationDispatcher = {
-    dispatch: <Input, Output, Context extends { readonly signal: AbortSignal }>(
-      request: InvocationDispatchRequest<Input, Output, Context>,
-    ): Promise<Output> =>
-      dispatcher.dispatch({
-        ...request,
-        options: { ...request.options, progressSink },
-      }),
-  };
-  return Object.freeze(scoped);
 }

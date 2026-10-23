@@ -1,6 +1,8 @@
+/** Decodes invocation state and output values at the native runtime boundary before persisted or public projections consume them. */
+
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 
 /** Resolves validators for selected public state keys.
