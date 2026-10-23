@@ -1,3 +1,7 @@
+/**
+ * Bounds native cleanup and records primary failures separately from teardown
+ * evidence. Observational report failures cannot replace the original outcome.
+ */
 import { Cause, Effect, Option, Ref } from "effect";
 import { ServerRuntimeFailure } from "./server-runtime.schemas.js";
 import type { RuntimeSnapshot } from "./server-runtime.types.js";
@@ -32,14 +36,15 @@ export const recordFailure = Effect.fn("ServerRuntime.failure")(function* (
  * @param state - Mutable generation evidence.
  * @param operation - Fixed cleanup-stage identity.
  * @param task - Lazy cleanup work.
+ * @typeParam Result - Native cleanup result discarded after completion.
  * @param milliseconds - This stage's configured deadline.
  * @returns A non-failing release effect; evidence remains available in the snapshot.
  */
-export const boundedCleanup = Effect.fn("ServerRuntime.cleanup")(function* (
+export const boundedCleanup = Effect.fn("ServerRuntime.cleanup")(function* <Result>(
   environment: RuntimeEnvironmentOperations,
   state: Ref.Ref<RuntimeSnapshot>,
   operation: string,
-  task: Effect.Effect<unknown, ServerRuntimeFailure>,
+  task: Effect.Effect<Result, ServerRuntimeFailure>,
   milliseconds: number,
 ) {
   const completed = yield* task.pipe(

@@ -1,3 +1,4 @@
+/** Verifies engine-owned generation lifetime, preserving the existing lifecycle contract. */
 /** Verifies configured host operation diagnostics and preservation of native Promise failure identity across owned partial-startup cleanup. */
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";

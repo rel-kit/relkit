@@ -1,3 +1,4 @@
+/** Verifies engine-owned generation lifetime, preserving the existing lifecycle contract. */
 /** Exercises native host acquisition/drain barriers and cancellation without publishing late handles or replacing primary failures. */
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";

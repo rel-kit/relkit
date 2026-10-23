@@ -1,3 +1,4 @@
+/** Verifies engine-owned generation lifetime, preserving the existing lifecycle contract. */
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Exit, Fiber, Layer, Queue, Ref } from "effect";
 import { TestClock } from "effect/testing";
