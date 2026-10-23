@@ -1,7 +1,9 @@
+/** Normalizes optional DeepAgents authoring fields without loading the DeepAgents runtime; the same defined-field selection controls the graph marker. */
+
 import { isAgentDescriptor } from "./define-agent-validation.js";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { agentDefinitionFailure } from "./define-agent-error.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { agentDefinitionFailure } from "@relkit/agents/internal/define-agent-error";
 import type { AgentSubagent, DeepAgentCapabilities } from "./define-agent-deep.types.js";
 
 export type * from "./define-agent-deep.types.js";

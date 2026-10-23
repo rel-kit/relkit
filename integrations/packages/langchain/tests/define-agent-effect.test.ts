@@ -1,3 +1,5 @@
+/** Exercises native define agent effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { IdentityStore } from "@relkit/invocation";
 import { z } from "@relkit/schema";
 import { Effect, Result } from "effect";
