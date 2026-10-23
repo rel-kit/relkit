@@ -10,8 +10,7 @@ import {
 } from "@relkit/contracts";
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { nativeServiceError } from "./application-service-auth.js";
-import type { AuthDeclaration, DatabaseDeclaration } from "./application-services.types.js";
+import { nativeServiceError } from "./application-errors.js";
 
 /**
  * Loads only evidenced boundaries, in deterministic order, without activating clients.
@@ -79,7 +78,7 @@ function isService<Value>(value: Value): value is Value & DescriptorAny {
 export function soleNativeService<Kind extends "drizzle" | "better-auth">(
   services: readonly DescriptorAny[],
   kind: Kind,
-): (Kind extends "drizzle" ? DatabaseDeclaration : AuthDeclaration) | undefined {
+): DescriptorAny | undefined {
   const matches = services.filter(
     (service) =>
       "capability" in service &&
@@ -90,5 +89,5 @@ export function soleNativeService<Kind extends "drizzle" | "better-auth">(
   );
   if (matches.length > 1) throw new Error(`Test application has multiple ${kind} services`);
   // Branding and capability choose the SDK boundary; activation checks hidden native metadata.
-  return matches[0] as (Kind extends "drizzle" ? DatabaseDeclaration : AuthDeclaration) | undefined;
+  return matches[0];
 }
