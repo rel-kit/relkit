@@ -1,6 +1,12 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "stream",
+  "globalPassThroughEnv": [
+    "CIRCLE_NODE_TOTAL",
+    "RAYON_NUM_THREADS",
+    "NODE_OPTIONS",
+    "RELKIT_DOCGEN_CONCURRENCY"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
