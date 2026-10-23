@@ -1,13 +1,19 @@
+/** Runs selected installation and local verification commands within the scaffold transaction, awaiting owned process and output settlement before rollback. */
+
 import { join } from "node:path";
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { resolveRelkitExecutableEffect } from "./generate-process.js";
+import { resolveRelkitExecutableEffect } from "create-relkit/internal/generate-process";
 
-import { ADD_FAILURE_CODES, AddScaffoldError, type ScaffoldPlan } from "./add-types.js";
+import {
+  ADD_FAILURE_CODES,
+  AddScaffoldError,
+  type ScaffoldPlan,
+} from "create-relkit/internal/add-types";
 
-import { GeneratorFileSystem } from "./generator-filesystem.js";
-import { GeneratorProcess } from "./generator-process.js";
-import { domainError } from "./generator-errors.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorProcess } from "create-relkit/internal/generator-process";
+import { domainError } from "create-relkit/internal/generator-errors";
 
 import type { ApplyScaffoldContext } from "./add-transaction.types.js";
 

@@ -1,3 +1,5 @@
+/** Acquires file and lock snapshots before applying an immutable scaffold plan; commit, rollback and cleanup retain the original transaction owner. */
+
 import { Context, Effect, Layer } from "effect";
 
 import { observeExecution } from "@relkit/contracts/operation";
@@ -7,19 +9,24 @@ import {
   AddScaffoldError,
   type AddResult,
   type ScaffoldPlan,
-} from "./add-types.js";
+} from "create-relkit/internal/add-types";
 
-import { GeneratorFileSystem } from "./generator-filesystem.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 
-import { GeneratorProcess, generatorProcessLayer } from "./generator-process.js";
+import { GeneratorProcess, generatorProcessLayer } from "create-relkit/internal/generator-process";
 
-import { domainError, errorMessage, publicFailure, scaffoldErrors } from "./generator-errors.js";
+import {
+  domainError,
+  errorMessage,
+  publicFailure,
+  scaffoldErrors,
+} from "create-relkit/internal/generator-errors";
 
-import { runGeneratorPromise } from "./generator-runtime.js";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 
 import type { ApplyScaffoldContext, ScaffoldTransactionService } from "./add-transaction.types.js";
 
-import { transferCleanupFailures } from "./generator-cleanup.js";
+import { transferCleanupFailures } from "create-relkit/internal/generator-cleanup";
 
 export type { AddCommandResult, ApplyScaffoldContext } from "./add-transaction.types.js";
 

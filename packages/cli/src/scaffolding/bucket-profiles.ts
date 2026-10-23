@@ -1,10 +1,12 @@
+/** Discovers bucket provider profile choices and validates their backend selections for existing-project resource planning. */
+
 import { observeExecution } from "@relkit/contracts/operation";
 import { join } from "node:path";
 import { Effect } from "effect";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
-import { domainError, domainTry } from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { domainError, domainTry } from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 import { readFactoryStringProperty } from "./source-edit.js";
 import type { BucketDiscovery, BucketSourceReader } from "./bucket-profiles.types.js";
 
