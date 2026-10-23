@@ -1,9 +1,14 @@
+/**
+ * Owns duckdb query for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import { Effect, Semaphore } from "effect";
 import type { DuckdbConnectionPort } from "./duckdb-driver.types.js";
 import { makeDuckdbQueryEffect } from "./duckdb-query-effect.js";
 import { DuckdbQueryError } from "./duckdb-query-error.js";
-import { ObservabilityQueryError } from "../query-types.js";
-import type { ObservabilityQueryRequest } from "../query-types.js";
+import { ObservabilityQueryError } from "@relkit/observability";
+import type { ObservabilityQueryRequest } from "@relkit/observability";
 /**
  * Creates Promise query adapters for a scoped DuckDB connection.
  *

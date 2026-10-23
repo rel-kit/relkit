@@ -1,5 +1,10 @@
+/**
+ * Owns duckdb query error for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import { Schema } from "effect";
-import { ObservabilityQueryError } from "../query-types.js";
+import { ObservabilityQueryError } from "@relkit/observability";
 /**
  * Invalid local query input reported through the Effect error channel.
  *

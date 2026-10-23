@@ -1,3 +1,8 @@
+/**
+ * Owns duckdb metrics for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import { Clock, Duration, Effect, Exit, Metric } from "effect";
 /**
  * Records bounded operation, duration, and outcome telemetry for DuckDB work.
