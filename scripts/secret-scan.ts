@@ -1,3 +1,4 @@
+/** Scans release artifacts and optional Docker images for raw synthetic test secrets. */
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { artifactFiles } from "./secret-scan-files.ts";
@@ -158,9 +159,11 @@ async function saveImage(reference: string): Promise<Uint8Array> {
 
 async function main(): Promise<void> {
   const root = resolve(process.argv[2] ?? join(import.meta.dir, ".."));
-  const report = await scanReleaseArtifacts(root, {
-    imageReference: process.env.RELKIT_SECURITY_IMAGE,
-  });
+  const imageReference = process.env.RELKIT_SECURITY_IMAGE;
+  const report = await scanReleaseArtifacts(
+    root,
+    imageReference === undefined ? {} : { imageReference },
+  );
   if (report.matches.length > 0) {
     for (const match of report.matches)
       console.error(`${match.source}:${match.line}:${match.column} raw ${match.secretName}`);

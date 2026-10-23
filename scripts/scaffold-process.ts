@@ -3,6 +3,7 @@ import { Context, Effect, Layer } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { ScaffoldProcessFailure } from "./scaffold-process.errors.js";
 import type { ScaffoldChild, ScaffoldCommand } from "./scaffold-process.types.js";
+import { spawnScaffoldProcess } from "./scaffold-process-spawn.js";
 
 /**
  * Starts one native child and joins its exit/output before releasing ownership.
@@ -12,66 +13,7 @@ import type { ScaffoldChild, ScaffoldCommand } from "./scaffold-process.types.js
 export const scaffoldChild = Effect.fn("ScaffoldProcess.acquire")((command: ScaffoldCommand) =>
   Effect.acquireRelease(
     Effect.try({
-      try: (): ScaffoldChild => {
-        let executable = globalThis.process.execPath;
-        if (command.executable === "node" || command.executable === "git")
-          executable = command.executable;
-        const process = Bun.spawn([executable, ...command.args], {
-          cwd: command.cwd,
-          detached: true,
-          stdin: "ignore",
-          stdout: "pipe",
-          stderr: "pipe",
-          env: {
-            ...globalThis.process.env,
-            ...command.env,
-            ...(command.registry === undefined
-              ? {}
-              : {
-                  BUN_CONFIG_REGISTRY: command.registry,
-                  npm_config_registry: command.registry,
-                }),
-            ...(command.cacheDir === undefined ? {} : { BUN_INSTALL_CACHE_DIR: command.cacheDir }),
-          },
-        });
-        let stdoutText = "",
-          stderrText = "";
-        let timer: ReturnType<typeof setTimeout> | undefined;
-        const stop = (): void => {
-          if (timer !== undefined) return;
-          signalScaffoldGroup(process.pid, "SIGTERM");
-          timer = setTimeout(() => signalScaffoldGroup(process.pid, "SIGKILL"), 2000);
-        };
-        const stdout = observedScaffoldOutput(stop, process.stdout, (text) => {
-          stdoutText = text;
-        });
-        const stderr = observedScaffoldOutput(stop, process.stderr, (text) => {
-          stderrText = text;
-        });
-        const settled = Promise.allSettled([process.exited, stdout, stderr]);
-        return {
-          process,
-          stdout,
-          stderr,
-          output: () => stdoutText + stderrText,
-          settled,
-          release: async () => {
-            stop();
-            try {
-              const results = await settled;
-              const failures = results.flatMap((result) =>
-                result.status === "rejected"
-                  ? [new Error("Owned scaffold child settlement failed", { cause: result.reason })]
-                  : [],
-              );
-              if (failures.length > 0)
-                throw new AggregateError(failures, "Scaffold child release failed");
-            } finally {
-              clearTimeout(timer);
-            }
-          },
-        };
-      },
+      try: () => ownScaffoldChild(spawnScaffoldProcess(command)),
       catch: (cause) =>
         new ScaffoldProcessFailure({
           operation: "process.spawn",
@@ -81,6 +23,50 @@ export const scaffoldChild = Effect.fn("ScaffoldProcess.acquire")((command: Scaf
     (owner) => Effect.promise(owner.release),
   ),
 );
+
+/** Observes one real piped child until both streams and native exit settle.
+ * @param process - Detached subprocess acquired by the closed native spawn leaf.
+ * @returns Existing idempotent group shutdown and bounded output ownership.
+ */
+function ownScaffoldChild(process: Bun.ReadableSubprocess): ScaffoldChild {
+  let stdoutText = "",
+    stderrText = "";
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const stop = (): void => {
+    if (timer !== undefined) return;
+    signalScaffoldGroup(process.pid, "SIGTERM");
+    timer = setTimeout(() => signalScaffoldGroup(process.pid, "SIGKILL"), 2000);
+  };
+  const stdout = observedScaffoldOutput(stop, process.stdout, (text) => {
+    stdoutText = text;
+  });
+  const stderr = observedScaffoldOutput(stop, process.stderr, (text) => {
+    stderrText = text;
+  });
+  const settled = Promise.allSettled([process.exited, stdout, stderr]);
+  return {
+    process,
+    stdout,
+    stderr,
+    output: () => stdoutText + stderrText,
+    settled,
+    release: async () => {
+      stop();
+      try {
+        const results = await settled;
+        const failures = results.flatMap((result) =>
+          result.status === "rejected"
+            ? [new Error("Owned scaffold child settlement failed", { cause: result.reason })]
+            : [],
+        );
+        if (failures.length > 0)
+          throw new AggregateError(failures, "Scaffold child release failed");
+      } finally {
+        clearTimeout(timer);
+      }
+    },
+  };
+}
 
 /**
  * Executes a finite native command within its own child scope.
