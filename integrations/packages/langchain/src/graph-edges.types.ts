@@ -1,3 +1,5 @@
+/** Defines typed native graph edge and routing descriptors whose endpoints are checked during graph assembly and compilation. This companion preserves the native input and output types without starting runtime work. */
+
 import type { END, START, LangGraphRunnableConfig, Send } from "@langchain/langgraph";
 import type { MaybePromise } from "@relkit/contracts";
 

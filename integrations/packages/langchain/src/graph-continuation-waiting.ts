@@ -1,6 +1,8 @@
+/** Projects native graph interrupts into durable waiting state used by the RELKIT continuation protocol before returning control to callers. */
+
 import { getJsonSchema } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import type { GraphDescriptor } from "./define-graph.js";
 import { isGraphNodeDescriptor } from "./define-graph-node.js";
 import { isSubgraphNode, subgraphForNode } from "./graph-subgraph.js";

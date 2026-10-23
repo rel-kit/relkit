@@ -1,9 +1,11 @@
+/** Validates graph structure and resolves authored node identities before native compilation, reporting missing or inconsistent graph definitions. */
+
 import { StateSchema, type AnyStateSchema } from "@langchain/langgraph";
 import { isFunctionGraphNode } from "@relkit/functions";
 import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { isRecord } from "./agent-validation.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { isRecord } from "@relkit/agents/internal/agent-validation";
 import type { GraphNodeLike } from "./define-graph.js";
 import { assertGraphNodeDestinations, isGraphNodeDescriptor } from "./define-graph-node.js";
 import { graphDefinitionFailure } from "./define-graph-error.js";

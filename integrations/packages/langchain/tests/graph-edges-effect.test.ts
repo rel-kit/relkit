@@ -1,3 +1,5 @@
+/** Exercises native graph edges effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { END, START } from "@langchain/langgraph";
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
