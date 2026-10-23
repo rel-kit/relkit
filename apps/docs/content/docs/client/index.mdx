@@ -18,6 +18,10 @@ generated declarations in your TypeScript project and regenerate them when the p
 changes. The backend must be reachable while you pull; do not import backend source into a
 browser bundle.
 
+`@relkit/client` declares `@opentelemetry/api@1.9.1` as a required peer for oRPC.
+If your package manager does not install required peers automatically, add that exact
+version to the frontend's dependencies.
+
 ## Install the provider
 
 Wrap your React tree in `RelkitClientProvider`. The commerce frontend below is an optional,

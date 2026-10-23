@@ -325,6 +325,8 @@ declare const redisLocalRecipe: ProviderLocalRecipeReference;
 
 ## `agent-state-provider.ts`
 
+Binds the native Redis transaction adapter to the generic agent-state provider contract.
+
 ---
 
 ## Exports Grouped by Category
@@ -349,7 +351,7 @@ export interface RedisAgentStateProviderOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/agent-state-provider.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/agent-state-provider.ts#L14)
 
 ## createRedisAgentStateProvider
 
@@ -361,7 +363,7 @@ declare const createRedisAgentStateProvider: (
 ) => AgentStateProvider & { ready(): Promise<void>; close(): Promise<void> };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/agent-state-provider.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/agent-state-provider.ts#L20)
 
 ## `client.ts`
 
