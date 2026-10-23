@@ -1,3 +1,8 @@
+/**
+ * Owns duckdb sql for the optional local history store.
+ * Shared records and query contracts come from lightweight observability; native
+ * handles and worker lifetimes remain owned by this storage package.
+ */
 import type { DuckDBValue } from "@duckdb/node-api";
 import { Effect } from "effect";
 import { duckdbError } from "./duckdb-error.js";
