@@ -1,6 +1,8 @@
+/** Projects permitted native state values for public client events using the agent's declared visibility policy. */
+
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect, Result } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { validateValueEffect } from "./runtime-utils.js";
 
 /** Projects selected state keys from direct or nested native updates.

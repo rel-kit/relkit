@@ -1,7 +1,9 @@
+/** Converts invocation messages into native LangChain message shapes while preserving content, tool calls and reply correlation. */
+
 import type { BrowserMessage } from "@relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import type { AgentExecutionEvent } from "./runtime-events.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import type { AgentExecutionEvent } from "@relkit/agents/internal/runtime-events";
 import type { MessageState } from "./runtime-native-messages.types.js";
 
 /** Per-invocation accumulator of streamed native assistant message parts.

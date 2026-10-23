@@ -1,9 +1,11 @@
+/** Coordinates native state and tool projection for public execution sinks without exposing undeclared private state. */
+
 import type { ProtocolEvent } from "@langchain/langgraph";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
-import type { AgentExecutionEvent } from "./runtime-events.js";
+import type { AgentExecutionEvent } from "@relkit/agents/internal/runtime-events";
 import { publicToolValue } from "./runtime-native-public-tools.js";
 import { selectedStateEffect } from "./runtime-native-public-state.js";
 import type { NativeExecutionContext } from "./runtime-native-public.types.js";
@@ -97,7 +99,10 @@ const publicValueEffect = Effect.fn("Agents.runtime.publicEventValue")(
     if (method === "custom" && isRecord(value) && typeof value.name === "string") {
       const schema = eventSchemas[value.name];
       if (schema === undefined) return undefined;
-      return { name: value.name, data: yield* validateValueEffect(schema, value.data, "output") };
+      return {
+        name: value.name,
+        data: yield* validateValueEffect(schema, value.data, "output"),
+      };
     }
     return undefined;
   },

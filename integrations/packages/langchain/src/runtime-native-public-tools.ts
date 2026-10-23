@@ -1,5 +1,7 @@
+/** Projects native tool activity into client-visible tool events after applying the declared public visibility contract. */
+
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 
 /** Projects a native tool result to its public value.
  * @param value - Native result or serialized result.
