@@ -1,7 +1,9 @@
+/** Matches normalized bucket paths against DeepAgents glob patterns so search traverses only the backend's visible file namespace. */
+
 import { matchesGlob } from "node:path";
 import type { FileInfo, GlobResult } from "deepagents";
 import { Effect, Result } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import {

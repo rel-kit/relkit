@@ -1,10 +1,12 @@
+/** Encodes and decodes DeepAgents file records stored in bucket objects, preserving file content and timestamps across backend operations. */
+
 import type {
   DeepAgentBucketFileData,
   DeepAgentBucketMetadata,
   DeepAgentBucketContext,
 } from "./deepagent-bucket-files.types.js";
 import { Clock, Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import { bucketKey, isTextMimeType } from "./deepagent-bucket-files.js";

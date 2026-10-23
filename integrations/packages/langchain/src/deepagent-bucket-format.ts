@@ -1,5 +1,7 @@
+/** Formats bucket file records into the native DeepAgents listing and content shapes consumed by backend callers. */
+
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 
 const TEXT_MIME_TYPES = new Set(["application/javascript", "application/json", "image/svg+xml"]);
 

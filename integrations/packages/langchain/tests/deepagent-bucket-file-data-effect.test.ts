@@ -1,3 +1,5 @@
+/** Exercises native deepagent bucket file data effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Clock, Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import { putFileDataEffect, readFileDataEffect } from "../src/deepagent-bucket-file-data.js";
@@ -15,7 +17,10 @@ test("file data Effects use a substituted clock and bucket service", async () =>
     head: async () => metadata,
     put: async (_key, bytes, options) => {
       stored = bytes;
-      metadata = { contentType: options?.contentType, metadata: options?.metadata };
+      metadata = {
+        ...(options?.contentType === undefined ? {} : { contentType: options.contentType }),
+        ...(options?.metadata === undefined ? {} : { metadata: options.metadata }),
+      };
     },
     delete: async () => undefined,
     exists: async () => false,

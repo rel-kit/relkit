@@ -1,3 +1,5 @@
+/** Collects bucket-backed file entries for native filesystem operations after path normalization, keeping metadata separate from fetched file content. */
+
 export type * from "./deepagent-bucket-files.types.js";
 export {
   bucketKey,

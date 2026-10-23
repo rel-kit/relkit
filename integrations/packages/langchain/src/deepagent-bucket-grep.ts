@@ -1,7 +1,9 @@
+/** Searches bucket file content for native grep requests and projects matching lines into DeepAgents results. */
+
 import { matchesGlob } from "node:path";
 import type { GrepResult } from "deepagents";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import {

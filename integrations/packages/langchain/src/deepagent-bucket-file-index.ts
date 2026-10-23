@@ -1,10 +1,12 @@
+/** Maintains the invocation file index used by bucket-backed listing and lookup; reads and mutations share the same backend state. */
+
 import type { FileInfo } from "deepagents";
 import type {
   DeepAgentBucketContext,
   DeepAgentBucketMetadata,
 } from "./deepagent-bucket-files.types.js";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import { bucketKey, filePath, virtualPath } from "./deepagent-bucket-files.js";

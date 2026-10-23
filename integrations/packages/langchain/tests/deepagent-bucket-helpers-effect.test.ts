@@ -1,3 +1,5 @@
+/** Exercises native deepagent bucket helpers effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import {
@@ -15,7 +17,14 @@ import {
 } from "../src/deepagent-bucket-format.js";
 
 test("bucket helper Effects normalize paths and format results", () => {
-  const bucket = { put() {}, get() {}, head() {}, delete() {}, exists() {}, list() {} } as never;
+  const bucket = {
+    put() {},
+    get() {},
+    head() {},
+    delete() {},
+    exists() {},
+    list() {},
+  } as never;
   const context = Effect.runSync(createBucketContextEffect(bucket, "agents"));
   expect(Effect.runSync(virtualPathEffect("docs/./readme.md"))).toBe("/docs/readme.md");
   expect(Effect.runSync(bucketKeyEffect(context, "/readme.md"))).toBe("agents/readme.md");

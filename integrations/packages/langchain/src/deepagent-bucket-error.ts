@@ -1,3 +1,5 @@
+/** Translates bucket operation failures into the DeepAgents backend error format while retaining the affected operation and path. */
+
 import { Schema } from "effect";
 
 /** Typed bucket validation or IO failure for DeepAgents operations. */
