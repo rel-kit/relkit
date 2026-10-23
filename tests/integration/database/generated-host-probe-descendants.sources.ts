@@ -1,6 +1,6 @@
 /** Authored native SDK acceptance callback; resource ownership is explicit and native lease context is retained. */
 export const probeDescendantsSource = `/** Native transaction callbacks retain lease inheritance across their accepted descendants. */
-import { activateDrizzleService, defineDrizzleService, defineModel } from "@relkit/drizzle";
+import { activateDrizzleService, defineDrizzleService, defineModel } from "@relkit/drizzle/sqlite";
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import * as schema from "./schema/index.js";

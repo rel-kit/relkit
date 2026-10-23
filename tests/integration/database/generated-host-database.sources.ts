@@ -24,7 +24,7 @@ export default defineDrizzleService({
 });
 `,
   "src/services/database/models/records.model.ts": `/** Exposes native lifecycle probes as model extensions while preserving admitted SDK lease context. */
-import { defineModel } from "@relkit/drizzle";
+import { defineModel } from "@relkit/drizzle/sqlite";
 import { records } from "../schema/index.js";
 import { probeLifecycle, probeDescendants, probeNestedAuth } from "../lifecycle.js";
 export default defineModel({

@@ -1,7 +1,7 @@
 /** Authored native SDK acceptance callback; resource ownership is explicit and native lease context is retained. */
 export const lifecycleSource = `/** Native SDK callbacks retain their admitted lease context; the Effect entrypoint owns the outer test scope. */
 import { activateDrizzleService, defineDrizzleService, type ApplicationEnv } from "@relkit/drizzle";
-import { activateBetterAuthService } from "@relkit/better-auth";
+import { activateBetterAuthService } from "@relkit/better-auth/drizzle";
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import database from "./service.js";
