@@ -4,6 +4,7 @@
  * schema guards recognize presentation values without promoting arbitrary output
  * into the generated-result contract. Formatting performs no runtime acquisition.
  */
+
 import { basename, relative, resolve } from "node:path";
 import { Schema } from "effect";
 import { GeneratePresentation } from "./generate-output.schemas.js";
@@ -40,7 +41,6 @@ export function createGenerateNextSteps(
     backend: "http://localhost:3000" as const,
     inspector: "http://localhost:3210" as const,
     openapi: "http://localhost:3000/_relkit/v1/openapi.json" as const,
-    apiReference: "http://localhost:3000/_relkit/v1/api-reference" as const,
     ...(options.examples ? { route: "GET http://localhost:3000/hello?name=RelKit" as const } : {}),
   });
   return Object.freeze({ commands, endpoints });
@@ -70,7 +70,7 @@ export function formatGenerateResult<T>(value: T): string {
     `backend:   ${endpoints.backend}`,
     `inspector: ${endpoints.inspector}`,
     `openapi:   ${endpoints.openapi}`,
-    `api docs:  ${endpoints.apiReference}`,
+    ...(endpoints.apiReference === undefined ? [] : [`api docs:  ${endpoints.apiReference}`]),
     ...(endpoints.route === undefined ? [] : [`route:     ${endpoints.route}`]),
     ...(warnings.length ? ["", ...warnings.map((warning) => `warning:   ${warning}`)] : []),
     "",

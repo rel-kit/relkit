@@ -16,7 +16,8 @@ export interface GenerateNextSteps {
     readonly backend: "http://localhost:3000";
     readonly inspector: "http://localhost:3210";
     readonly openapi: "http://localhost:3000/_relkit/v1/openapi.json";
-    readonly apiReference: "http://localhost:3000/_relkit/v1/api-reference";
+    /** Present only when the generated application selects a reference UI. */
+    readonly apiReference?: "http://localhost:3000/_relkit/v1/api-reference";
     readonly route?: "GET http://localhost:3000/hello?name=RelKit";
   }>;
 }
