@@ -1,8 +1,11 @@
 /** Checks scaffold classification parity and preservation of flat/grouped public boundaries. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Logger } from "effect";
-import { discoverProjectEffect, projectDiscoveryLive } from "../src/project-discovery.js";
-import { scaffoldServiceBoundary } from "../src/scaffold-layout.js";
+import {
+  discoverProjectEffect,
+  projectDiscoveryLive,
+} from "../../src/scaffolding/project-discovery.js";
+import { scaffoldServiceBoundary } from "../../src/scaffolding/scaffold-layout.js";
 import { memoryFileSystem } from "./generator-services.fixture.js";
 
 const root = "/memory/grouped-layout";
