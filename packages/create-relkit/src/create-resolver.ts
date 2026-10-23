@@ -1,3 +1,5 @@
+/** Resolves creation options and certified template choices through the prompt service while preserving headless defaults and explicit user arguments. */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { CREATE_OPTION_DEFAULTS, normalizeCreateOptions, type CreateOptions } from "./options.js";
@@ -53,12 +55,7 @@ export const resolveCreateOptionsDetailsEffect = Effect.fn("CreateResolution.res
         prompted = true;
       }
       if (!has(output, "jobs")) {
-        const jobs = yield* prompt.select({
-          message: "Jobs service",
-          options: [{ value: "none", label: "None" }],
-          initialValue: "none",
-        });
-        if (jobs !== "none") output.push("--jobs", jobs);
+        yield* resolveJobsChoice(output, prompt);
         prompted = true;
       }
       if (!has(output, "directory")) {
@@ -172,3 +169,15 @@ function title(value: string): string {
     .replace(/-docker$/u, " (Docker)")
     .replace(/^./u, (character) => character.toUpperCase());
 }
+
+const resolveJobsChoice = Effect.fn("CreateResolution.jobs")(function* (
+  output: string[],
+  prompt: GeneratorPrompt["Service"],
+) {
+  const jobs = yield* prompt.select({
+    message: "Jobs service",
+    options: [{ value: "none", label: "None" }],
+    initialValue: "none",
+  });
+  if (jobs !== "none") output.push("--jobs", jobs);
+});

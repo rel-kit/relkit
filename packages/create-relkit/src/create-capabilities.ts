@@ -3,6 +3,7 @@
  * Candidate literals remain parseable so explicit unsupported requests can return
  * a precise pre-staging diagnostic instead of masquerading as syntax errors.
  */
+
 import { createHash } from "node:crypto";
 import manifest from "../package.json";
 import { CreateOptionsError, type CreateOptions, type CreateTemplate } from "./options.js";
@@ -29,13 +30,14 @@ const entries: readonly CreateCapabilityEvidence[] = Object.freeze([
       release: "0.7.11",
       bun: "1.3.10",
       typescript: "5.9.3",
-      packageCatalogDigest: "ac7c2f56e61fca5ab890775cf4c483722cb590e488ee7fc4741224cbb4f50ccd",
+      packageCatalogDigest: "ce65fe520bfeb28e66f60731493948b0811e851cd836a7c7977c9bf128adee5c",
       template: "default/v1/minimal",
       snapshotProtocol: 1,
     }),
-    templateDigest: "ed5308354b19b823f5b58ff9c09bbb86c2c08ce2789ac457f2ee53e2dacbeb48",
-    freshEvidence: "docs/evidence/create-capabilities/0.7.11/fresh.json",
-    restartEvidence: "docs/evidence/create-capabilities/0.7.11/restart.json",
+    templateDigest: "c9604a3cc86e4f7cce3b2fcaf23f9fb8d645cf0e1b9932f3ff6fdaa34238aefc",
+    freshEvidence: "docs/evidence/create-capabilities/0.7.11/lean-stage-1-2026-10-21/fresh.json",
+    restartEvidence:
+      "docs/evidence/create-capabilities/0.7.11/lean-stage-1-2026-10-21/restart.json",
   }),
 ]);
 

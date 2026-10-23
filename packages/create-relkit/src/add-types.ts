@@ -1,6 +1,4 @@
-/**
- * Supported artifact kinds accepted by relkit add.
- */
+/** Supported artifact kinds accepted by relkit add. */
 export const ADD_KINDS = [
   "service",
   "function",
@@ -21,37 +19,24 @@ export const ADD_KINDS = [
   "database",
   "auth",
 ] as const;
-
-/**
- * Supported relkit add artifact discriminant.
- */
+/** Supported relkit add artifact discriminant. */
 export type AddKind = (typeof ADD_KINDS)[number];
-/**
- * Artifact kinds that can be included in a generic service scaffold.
- */
+/** Artifact kinds that can be included in a generic service scaffold. */
 export type ServiceInclude = Exclude<
   AddKind,
   "service" | "database" | "auth" | "middleware" | "transform"
 >;
-/**
- * Supported HTTP method used by generated route mappings.
- */
+/** Supported HTTP method used by generated route mappings. */
 export type RouteMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
-/**
- * Supported database dialect for Drizzle and authentication scaffolds.
- */
+/** Supported database dialect for Drizzle and authentication scaffolds. */
 export type DatabaseDialect = "sqlite" | "postgresql" | "mysql";
-
-/**
- * Project, installation and optional service selection shared by all add requests.
- */
+/** Project, installation and optional service selection shared by all add requests. */
 export interface AddRequestBase {
   readonly projectRoot: string;
   readonly service?: string;
   readonly createService?: string;
   readonly install: boolean;
 }
-
 /**
  * Shared named-artifact fields combined with kind-specific options.
  * @typeParam Kind - Discriminant identifying the artifact kind.
@@ -60,10 +45,7 @@ export interface AddRequestBase {
 type NamedRequest<Kind extends AddKind, Options = object> = AddRequestBase &
   Readonly<{ kind: Kind; name: string }> &
   Readonly<Options>;
-
-/**
- * Validated discriminated union of supported artifact scaffold requests.
- */
+/** Validated discriminated union of supported artifact scaffold requests. */
 export type AddRequest =
   | NamedRequest<"service", { full: boolean; include: readonly ServiceInclude[] }>
   | NamedRequest<"function", { internal: boolean }>
@@ -131,28 +113,19 @@ export type AddRequest =
       readonly databaseDialect: DatabaseDialect;
       readonly basePath: string;
     });
-
-/**
- * Stable warning category and user-facing message retained in plans and results.
- */
+/** Stable warning category and user-facing message retained in plans and results. */
 export interface ScaffoldWarning {
   readonly code: string;
   readonly message: string;
 }
-
-/**
- * One ordered project-relative create/update operation with complete content and optional mode.
- */
+/** One ordered project-relative create/update operation with complete content and optional mode. */
 export interface ScaffoldFileOperation {
   readonly path: string;
   readonly action: "create" | "update";
   readonly content: string;
   readonly mode?: number;
 }
-
-/**
- * Complete conflict-checked request, ordered writes, concrete dependencies and follow-up details.
- */
+/** Complete conflict-checked request, ordered writes, concrete dependencies and follow-up details. */
 export interface ScaffoldPlan {
   readonly request: AddRequest;
   readonly projectRoot: string;
@@ -168,17 +141,11 @@ export interface ScaffoldPlan {
   readonly warnings: readonly ScaffoldWarning[];
   readonly nextSteps: readonly string[];
 }
-
-/**
- * Public result of the requested post-mutation project check.
- */
+/** Public result of the requested post-mutation project check. */
 export type ScaffoldVerification =
   | { readonly status: "passed"; readonly command: string }
   | { readonly status: "skipped"; readonly reason: string; readonly command: string };
-
-/**
- * Completed add transaction's files, packages, warnings, verification and next steps.
- */
+/** Completed add transaction's files, packages, warnings, verification and next steps. */
 export interface AddResult {
   readonly ok: true;
   readonly command: "add";
@@ -191,10 +158,7 @@ export interface AddResult {
   readonly verification: ScaffoldVerification;
   readonly nextSteps: readonly string[];
 }
-
-/**
- * Stable public diagnostic codes for scaffold failure categories.
- */
+/** Stable public diagnostic codes for scaffold failure categories. */
 export const ADD_FAILURE_CODES = Object.freeze({
   usage: "RELKIT_ADD_USAGE",
   invalidProject: "RELKIT_ADD_INVALID_PROJECT",
@@ -204,18 +168,11 @@ export const ADD_FAILURE_CODES = Object.freeze({
   validation: "RELKIT_ADD_VALIDATION_FAILED",
   cancellation: "RELKIT_ADD_CANCELLED",
 } as const);
-
-/**
- * Stable public diagnostic category of AddScaffoldError.
- */
+/** Stable public diagnostic category of AddScaffoldError. */
 export type AddFailureCode = (typeof ADD_FAILURE_CODES)[keyof typeof ADD_FAILURE_CODES];
-
-/**
- * Public scaffold failure retaining its stable code, name and category-specific exit status.
- */
+/** Public scaffold failure retaining its stable code, name and category-specific exit status. */
 export class AddScaffoldError extends Error {
   readonly exitCode: 1 | 2 | 130;
-
   /**
    * Creates a canonical add failure with its category-specific exit code.
    * @param code - Stable add failure category.

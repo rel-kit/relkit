@@ -1,3 +1,5 @@
+/** Builds a no-install creation preview from maintained template bytes and metadata without importing or evaluating authored template configuration. */
+
 import { join } from "node:path";
 import ownManifest from "../package.json";
 import { Effect, Schema } from "effect";
@@ -11,7 +13,6 @@ import type { CreateOptions } from "./options.js";
 import type { CreateScaffoldPlan } from "./create-preview.types.js";
 export type { CreateScaffoldPlan } from "./create-preview.types.js";
 import { ProjectManifest } from "./project-manifest.schemas.js";
-import { readAppDiscovery } from "./project-discovery-app.js";
 import { validateCreateOptionsEffect } from "./validate.js";
 import { resolveTemplateRootEffect } from "./template-root.js";
 
@@ -48,9 +49,6 @@ export const planCreateEffect = Effect.fn("CreatePreview.plan")(
       dependencies["@relkit/docker"] = version;
       dependencies[`@relkit/${options.jobs.replace(/-docker$/u, "")}`] = version;
     }
-    const configPath = join(root, "relkit.config.ts");
-    const configSource = yield* fs.readText(configPath);
-    const app = yield* domainTry(() => readAppDiscovery(configSource, configPath, root));
     const files = (yield* listProjectFilesEffect(root))
       .map((path) => (path === "gitignore" ? ".gitignore" : path))
       .filter(
@@ -62,9 +60,7 @@ export const planCreateEffect = Effect.fn("CreatePreview.plan")(
       destination: validated.destination,
       files: Object.freeze(files),
       dependencies: Object.freeze(Object.fromEntries(Object.entries(dependencies).sort())),
-      profiles: Object.freeze(
-        app.profiles.map((profile) => `${profile.capability}:${profile.name}`),
-      ),
+      profiles: Object.freeze([]),
       warnings: Object.freeze([]),
     });
   },
