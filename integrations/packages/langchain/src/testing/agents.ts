@@ -1,3 +1,5 @@
+/** Publishes the native agent test harness helpers from the explicit integration while sharing RELKIT testing ownership and clock boundaries. */
+
 import { createAgentState } from "./agent-state.js";
 
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
@@ -6,8 +8,8 @@ import {
   runExecutionPromise,
   runExecutionSync,
 } from "@relkit/contracts/operation";
-import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
-import { combineSignals } from "./runtime-clock.js";
+import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/internal/testing-owner";
+import { combineSignals } from "@relkit/testing/internal/runtime-clock";
 import type { AgentHarnessService } from "./agent-harness.types.js";
 
 import { createTestModel } from "./agents-model.js";

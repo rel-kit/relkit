@@ -1,3 +1,5 @@
+/** Constructs deterministic native test models from scripted steps and exposes their observed calls for invocation assertions. This companion preserves the native input and output types without starting runtime work. */
+
 import type { Effect } from "effect";
 import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import type { TestAgentModel } from "./agents-types.js";
@@ -17,4 +19,12 @@ export interface ModelScriptService {
 /** Native LangChain-compatible scripted model with owned release. */
 export interface RuntimeTestAgentModel extends TestAgentModel {
   readonly languageModel: BaseChatModel;
+}
+
+/** Script index, detached evidence and cancellation owners for one model. */
+export interface ModelScriptOwnedState {
+  turns: readonly TestModelTurn[];
+  next: number;
+  readonly calls: TestAgentModelCall[];
+  readonly active: Set<AbortController>;
 }

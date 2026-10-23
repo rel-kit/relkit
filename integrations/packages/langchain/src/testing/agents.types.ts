@@ -1,3 +1,5 @@
+/** Publishes the native agent test harness helpers from the explicit integration while sharing RELKIT testing ownership and clock boundaries. This companion preserves the native input and output types without starting runtime work. */
+
 import type {
   AgentApprovalHandler,
   AgentCapturePolicy,
@@ -7,11 +9,11 @@ import type {
   AgentRuntimeHooks,
   AgentRuntimeOptions,
   PendingApproval,
-} from "@relkit/agents";
+} from "../index.js";
 import type { spanSnapshot } from "@relkit/invocation";
 import type { JsonValue } from "@relkit/contracts";
 import type { InferInput, InferOutput } from "@relkit/schema";
-import type { TestFailureControls } from "./fakes.js";
+import type { TestFailureControls } from "@relkit/testing/internal/fakes";
 
 /** Native agent descriptor vocabulary retained by public test inference. */
 export type TestAgentDescriptor = AgentDescriptor<string, unknown, unknown>;
@@ -36,7 +38,9 @@ export type TestModelTurn =
 
 /** Network-free model identity, hanging behavior and explicit logging policy. */
 export interface TestAgentModelOptions {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: NonNullable<
+    Parameters<typeof import("@relkit/testing/internal/testing-owner").testingLoggerLayer>[0]
+  >;
   readonly provider?: string;
   readonly modelId?: string;
   readonly hang?: boolean;
@@ -67,7 +71,9 @@ export interface TestAgentModel {
  * @typeParam Agent - Native descriptor determining input/output schema inference.
  */
 export interface TestAgentOptions<Agent extends TestAgentDescriptor = TestAgentDescriptor> {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: NonNullable<
+    Parameters<typeof import("@relkit/testing/internal/testing-owner").testingLoggerLayer>[0]
+  >;
   readonly agent: Agent;
   readonly tools: AgentRuntimeOptions["tools"];
   readonly engine: AgentRuntimeOptions["engine"];

@@ -1,3 +1,5 @@
+/** Implements the scripted native chat-model adapter used by agent tests, preserving tool-call correlation and queued response ordering. */
+
 import type { CallbackManagerForLLMRun } from "@langchain/core/callbacks/manager";
 import {
   BaseChatModel,
