@@ -1,10 +1,12 @@
+/** Adapts interactive add questions to the shared prompt service and returns selected values or the original cancellation failure. */
+
 import { Effect, Ref } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { normalizeArtifactName } from "./add-name.js";
 
-import { GeneratorPrompt } from "./generator-prompt.js";
+import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
 
-import type { PromptOption } from "./prompt-driver.types.js";
+import type { PromptOption } from "create-relkit/internal/prompt-driver.types";
 import type { AddResolutionSnapshot } from "./add-resolution-state.types.js";
 
 /**
@@ -14,6 +16,10 @@ import type { AddResolutionSnapshot } from "./add-resolution-state.types.js";
  * @returns Typed prompt Effects; headless calls resolve without asking questions.
  */
 export function addResolutionPrompt(state: Ref.Ref<AddResolutionSnapshot>, interactive: boolean) {
+  return { ...primitivePrompts(state, interactive), ...choicePrompts(state, interactive) };
+}
+
+function primitivePrompts(state: Ref.Ref<AddResolutionSnapshot>, interactive: boolean) {
   return {
     /**
      * Asks text through explicit prompt authority only for an interactive request.
@@ -45,6 +51,26 @@ export function addResolutionPrompt(state: Ref.Ref<AddResolutionSnapshot>, inter
       (effect) => observeExecution("generator", "add.resolve.text", effect),
     ),
 
+    /**
+     * Asks consent through explicit prompt authority.
+     * @param message - Existing user-facing diagnostic.
+     * @param initialValue - Initial driver answer used when the question first appears.
+     * @returns The consent answer, or undefined when the request is headless.
+     */
+    confirmEffect: Effect.fn("AddResolution.confirm")(
+      (message: string, initialValue = true) =>
+        Effect.gen(function* () {
+          if (!interactive) return undefined;
+          yield* Ref.update(state, (state) => ({ ...state, prompted: true }));
+          return yield* (yield* GeneratorPrompt).confirm({ message, initialValue });
+        }),
+      (effect) => observeExecution("generator", "add.resolve.confirm", effect),
+    ),
+  };
+}
+
+function choicePrompts(state: Ref.Ref<AddResolutionSnapshot>, interactive: boolean) {
+  return {
     /**
      * Asks a finite choice through explicit prompt authority.
      * @typeParam Value - Union of declared prompt option values.
@@ -91,22 +117,6 @@ export function addResolutionPrompt(state: Ref.Ref<AddResolutionSnapshot>, inter
           return yield* (yield* GeneratorPrompt).multiselect({ message, options, required });
         }),
       (effect) => observeExecution("generator", "add.resolve.multiselect", effect),
-    ),
-
-    /**
-     * Asks consent through explicit prompt authority.
-     * @param message - Existing user-facing diagnostic.
-     * @param initialValue - Initial driver answer used when the question first appears.
-     * @returns The consent answer, or undefined when the request is headless.
-     */
-    confirmEffect: Effect.fn("AddResolution.confirm")(
-      (message: string, initialValue = true) =>
-        Effect.gen(function* () {
-          if (!interactive) return undefined;
-          yield* Ref.update(state, (state) => ({ ...state, prompted: true }));
-          return yield* (yield* GeneratorPrompt).confirm({ message, initialValue });
-        }),
-      (effect) => observeExecution("generator", "add.resolve.confirm", effect),
     ),
   };
 }

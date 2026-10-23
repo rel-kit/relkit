@@ -1,5 +1,12 @@
+/** Parses existing-project add flags and rejects malformed or conflicting arguments before request resolution or filesystem mutation. */
+
 import { resolve } from "node:path";
-import { ADD_FAILURE_CODES, ADD_KINDS, AddScaffoldError, type AddKind } from "./add-types.js";
+import {
+  ADD_FAILURE_CODES,
+  ADD_KINDS,
+  AddScaffoldError,
+  type AddKind,
+} from "create-relkit/internal/add-types";
 
 /**
  * Add flags that consume a string value.
@@ -157,6 +164,11 @@ export function choice<const Value extends string>(
 export function required(value: string | undefined, message: string): string {
   if (value?.trim()) return value.trim();
   usage(message);
+}
+
+/** Requires the artifact name using the existing kind-specific usage diagnostic. */
+export function requiredName(parsed: ParsedAddArguments): string {
+  return required(parsed.positional, `${parsed.kind} requires a name.`);
 }
 
 /**

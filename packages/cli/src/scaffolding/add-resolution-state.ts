@@ -1,9 +1,11 @@
+/** Updates one add-resolution request as choices are resolved, keeping discovery and user selections separate from file mutations. */
+
 import { Effect } from "effect";
 
-import { generatorPromptLayer } from "./generator-prompt.js";
-import { createClackPromptDriver } from "./prompt-driver.js";
-import { runGeneratorPromise, runGeneratorSync } from "./generator-runtime.js";
-import type { PromptOption } from "./prompt-driver.types.js";
+import { generatorPromptLayer } from "create-relkit/internal/generator-prompt";
+import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";
+import { runGeneratorPromise, runGeneratorSync } from "create-relkit/internal/generator-runtime";
+import type { PromptOption } from "create-relkit/internal/prompt-driver.types";
 
 import { AddResolutionStateBase } from "./add-resolution-state-base.js";
 

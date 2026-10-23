@@ -1,17 +1,19 @@
+/** Projects existing services, resources and provider profiles into add choices from the discovered project without executing authored application code. */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
-import { GeneratorPrompt, generatorPromptLayer } from "./generator-prompt.js";
-import { createClackPromptDriver } from "./prompt-driver.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/internal/generator-prompt";
+import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
+} from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 import { normalizeArtifactName } from "./add-name.js";
-import type { AddKind } from "./add-types.js";
+import type { AddKind } from "create-relkit/internal/add-types";
 import { AddResolutionState, label } from "./add-resolution-state.js";
 import type {
   DiscoveredArtifact,
