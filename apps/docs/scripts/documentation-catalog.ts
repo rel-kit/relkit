@@ -1,3 +1,4 @@
+/** Maps public package identities and feature entrypoints to generated documentation. */
 export const apiPackageDefinitions = [
   apiPackage("app", "Application", "@relkit/app", "packages/app", "core"),
   apiPackage("config", "Configuration", "@relkit/config", "packages/config", "core"),
@@ -13,6 +14,13 @@ export const apiPackageDefinitions = [
   apiPackage("cache", "Cache", "@relkit/cache", "packages/cache", "core"),
   apiPackage("tools", "Tools", "@relkit/tools", "packages/tools", "core"),
   apiPackage("agents", "Agents", "@relkit/agents", "packages/agents", "core"),
+  apiPackage(
+    "integrations/langchain",
+    "LangChain",
+    "@relkit/langchain",
+    "integrations/packages/langchain",
+    "integrations",
+  ),
   apiPackage("client", "Client", "@relkit/client", "packages/client", "core"),
   apiPackage("realtime", "Realtime", "@relkit/realtime", "packages/realtime", "core"),
   apiPackage("testing", "Testing", "@relkit/testing", "packages/testing", "core"),

@@ -1,3 +1,4 @@
+/** Keeps documentation builds serial while retaining the framework's native MDX integration. */
 import { createMDX } from "fumadocs-mdx/next";
 
 const withMDX = createMDX();
@@ -5,6 +6,12 @@ const withMDX = createMDX();
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  experimental: { cpus: 1, webpackBuildWorker: true, webpackMemoryOptimizations: true },
+  webpack(config, { dev }) {
+    config.parallelism = 1;
+    if (!dev) config.cache = false;
+    return config;
+  },
   async redirects() {
     return [
       ["/docs/start/events", "/docs/events"],
