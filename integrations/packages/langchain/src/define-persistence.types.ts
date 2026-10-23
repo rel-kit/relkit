@@ -1,3 +1,5 @@
+/** Creates native persistence descriptors around authored checkpointers and stores; runtime acquisition and release remain owned by the invocation scope. This companion preserves the native input and output types without starting runtime work. */
+
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
 import type { MaybePromise } from "@relkit/contracts";
 import type { RELKIT_PERSISTENCE } from "./persistence-symbol.js";

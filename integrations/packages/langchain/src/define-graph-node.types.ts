@@ -1,3 +1,5 @@
+/** Creates typed native graph node descriptors from author callbacks and records their execution metadata for later graph compilation. This companion preserves the native input and output types without starting runtime work. */
+
 import type { Command, LangGraphRunnableConfig } from "@langchain/langgraph";
 import type { DescriptorMetadata, MaybePromise } from "@relkit/contracts";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";

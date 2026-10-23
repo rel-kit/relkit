@@ -1,7 +1,9 @@
+/** Creates native persistence descriptors around authored checkpointers and stores; runtime acquisition and release remain owned by the invocation scope. */
+
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
 import { normalizeId, type MaybePromise } from "@relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { RELKIT_PERSISTENCE } from "./persistence-symbol.js";
 import { agentPersistenceFailure } from "./persistence-error.js";
 import type {
@@ -84,13 +86,7 @@ function buildAgentStorageResource<Kind extends "checkpointer" | "memory", Value
   resource: Kind,
   options: PersistenceOptions<Value>,
 ): PersistenceResource<Kind, Value> {
-  if (!isRecord(options)) throw new TypeError("Persistence options must be an object");
-  const id = normalizeId(options.id);
-  const factory = typeof options.client === "function";
-  const ownership = options.ownership ?? (factory ? "owned" : "borrowed");
-  if (ownership === "owned" && typeof options.dispose !== "function") {
-    throw new TypeError(`Owned ${resource} resource requires dispose`);
-  }
+  const { id, factory, ownership } = validateAgentStorageOptions(resource, options);
   let active: Promise<Value> | undefined;
   let released = false;
   const descriptor = {
@@ -138,4 +134,23 @@ function buildAgentStorageResource<Kind extends "checkpointer" | "memory", Value
 
 function isRecord(value: unknown): value is Record<PropertyKey, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+/** Validates storage ownership before allocating lazy acquisition state.
+ * @param resource - Checkpointer or memory resource family.
+ * @param options - Authored client, ownership and disposal policy.
+ * @returns Normalized identity and resource ownership.
+ */
+function validateAgentStorageOptions<Kind extends "checkpointer" | "memory", Value>(
+  resource: Kind,
+  options: PersistenceOptions<Value>,
+) {
+  if (!isRecord(options)) throw new TypeError("Persistence options must be an object");
+  const id = normalizeId(options.id);
+  const factory = typeof options.client === "function";
+  const ownership = options.ownership ?? (factory ? "owned" : "borrowed");
+  if (ownership === "owned" && typeof options.dispose !== "function") {
+    throw new TypeError(`Owned ${resource} resource requires dispose`);
+  }
+  return { id, factory, ownership };
 }

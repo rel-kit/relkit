@@ -1,6 +1,8 @@
+/** Recognizes supported native checkpointer and store shapes before persistence descriptors accept them, preserving SDK identity rather than cloning resources. */
+
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { RELKIT_PERSISTENCE } from "./persistence-symbol.js";
 import type { PersistenceResource } from "./define-persistence.types.js";
 import { agentPersistenceFailure } from "./persistence-error.js";

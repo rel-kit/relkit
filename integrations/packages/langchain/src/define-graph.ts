@@ -1,9 +1,11 @@
+/** Exposes typed LangGraph authoring and delegates descriptor validation and construction before any graph execution can begin. */
+
 import type { AnyStateSchema } from "@langchain/langgraph";
 import { createUnboundIdentityEffect } from "@relkit/invocation";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { isRecordEffect } from "./agent-validation-value.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { isRecordEffect } from "@relkit/agents/internal/agent-validation-value";
 import { prepareGraphDescriptor } from "./define-graph-build.js";
 import { graphDefinitionFailure } from "./define-graph-error.js";
 import type {

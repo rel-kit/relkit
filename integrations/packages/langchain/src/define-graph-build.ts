@@ -1,8 +1,10 @@
+/** Assembles graph nodes, edges, state and persistence into the authored native descriptor that compilation consumes without invoking graph nodes. */
+
 import type { AnyStateSchema } from "@langchain/langgraph";
 import { createDescriptorBase, normalizeId } from "@relkit/contracts";
 import type { StandardSchemaV1 } from "@relkit/schema";
-import { copyAgentClientPolicy, copyAgentControls } from "./agent-client.js";
-import { assertAgentSchema } from "./agent-validation.js";
+import { copyAgentClientPolicy, copyAgentControls } from "@relkit/agents/internal/agent-client";
+import { assertAgentSchema } from "@relkit/agents/internal/agent-validation";
 import { copyAgentLimits } from "./define-agent.js";
 import { prepareGraphDefinition } from "./graph-definition.js";
 import type { GraphEdgeBuilder } from "./graph-edges.js";
@@ -67,27 +69,9 @@ export function prepareGraphDescriptor<
       ...(stateProfile === undefined ? {} : { stateProfile }),
       ...(client === undefined ? {} : { client }),
       ...(controls === undefined ? {} : { controls }),
-      clientContract: graphClientContractMetadata({
-        id,
-        state: options.state,
-        ...(client === undefined ? {} : { client }),
-        workflow,
-      }),
+      clientContract: graphDescriptorClientMetadata(id, options.state, client, workflow),
     };
-    Object.defineProperty(descriptor, GRAPH_EXECUTION, {
-      value: Object.freeze({
-        state: options.state,
-        operations,
-        ...(options.checkpointer === undefined ? {} : { checkpointer: options.checkpointer }),
-        ...(options.store === undefined ? {} : { store: options.store }),
-      }),
-      enumerable: false,
-    });
-    Object.defineProperty(descriptor, "asGraphNode", {
-      value: (nodeOptions?: GraphAsNodeOptions) =>
-        createSubgraphNode(descriptor as unknown as GraphDescriptor, nodeOptions),
-      enumerable: false,
-    });
+    attachGraphExecution(descriptor, options, operations);
     return Object.freeze(descriptor) as unknown as GraphDescriptor<
       Id,
       InputSchema,
@@ -96,4 +80,59 @@ export function prepareGraphDescriptor<
       Nodes
     >;
   };
+}
+
+/** Projects validated graph metadata using the selected public client fields.
+ * @param id - Stable graph identity.
+ * @param state - Native state schema.
+ * @param client - Validated optional exposure policy.
+ * @param workflow - Validated workflow metadata.
+ * @returns The existing projected graph client contract.
+ */
+function graphDescriptorClientMetadata(
+  id: string,
+  state: import("./client-contract-metadata.types.js").GraphClientMetadataOptions["state"],
+  client: import("./client-contract-metadata.types.js").GraphClientMetadataOptions["client"],
+  workflow: import("./graph-workflow.types.js").GraphWorkflow,
+) {
+  return graphClientContractMetadata({
+    id,
+    state,
+    ...(client === undefined ? {} : { client }),
+    workflow,
+  });
+}
+
+/** Attaches hidden execution state and subgraph conversion after validation.
+ * @param descriptor - Validated descriptor before freezing.
+ * @param options - Native state and persistence options.
+ * @param operations - Validated edge operation tuple.
+ * @returns Nothing; the same descriptor receives hidden fields.
+ */
+function attachGraphExecution<
+  Descriptor extends object,
+  State extends AnyStateSchema,
+  Operations extends readonly object[],
+>(
+  descriptor: Descriptor,
+  options: { readonly state: State } & Pick<
+    import("./define-graph.types.js").GraphExecution,
+    "checkpointer" | "store"
+  >,
+  operations: Operations,
+): void {
+  Object.defineProperty(descriptor, GRAPH_EXECUTION, {
+    value: Object.freeze({
+      state: options.state,
+      operations,
+      ...(options.checkpointer === undefined ? {} : { checkpointer: options.checkpointer }),
+      ...(options.store === undefined ? {} : { store: options.store }),
+    }),
+    enumerable: false,
+  });
+  Object.defineProperty(descriptor, "asGraphNode", {
+    value: (nodeOptions?: GraphAsNodeOptions) =>
+      createSubgraphNode(descriptor as unknown as GraphDescriptor, nodeOptions),
+    enumerable: false,
+  });
 }

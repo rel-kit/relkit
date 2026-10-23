@@ -1,3 +1,5 @@
+/** Exercises native define graph effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
+
 import { END, START, StateSchema } from "@langchain/langgraph";
 import { IdentityStore } from "@relkit/invocation";
 import { z } from "@relkit/schema";

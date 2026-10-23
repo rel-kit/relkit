@@ -1,10 +1,13 @@
+/** Creates typed native graph node descriptors from author callbacks and records their execution metadata for later graph compilation. */
+
 import type { LangGraphRunnableConfig } from "@langchain/langgraph";
 import { normalizeId } from "@relkit/contracts";
 import type { InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "./agent-telemetry.js";
-import { assertAgentSchemaEffect, isAgentSchemaEffect } from "./agent-validation-schema.js";
-import { isRecordEffect } from "./agent-validation-value.js";
+import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { isAgentSchemaEffect } from "@relkit/agents/internal/agent-validation-schema";
+import { validateGraphNodeSchemasEffect } from "./graph-node-schema-validation.js";
+import { isRecordEffect } from "@relkit/agents/internal/agent-validation-value";
 import type {
   DefineGraphNodeOptions,
   GraphNodeAny,
@@ -72,15 +75,7 @@ export const defineGraphNodeEffect = Effect.fn("Agents.graphNode.define")(
         graphNodeValidationFailure(new TypeError("Graph node options must be an object")),
       );
     }
-    const asGraphFailure = (failure: { readonly message: string }) =>
-      graphNodeValidationFailure(new TypeError(failure.message));
-    yield* assertAgentSchemaEffect(options.input, "input").pipe(Effect.mapError(asGraphFailure));
-    yield* assertAgentSchemaEffect(options.output, "output").pipe(Effect.mapError(asGraphFailure));
-    if (options.resume !== undefined) {
-      yield* assertAgentSchemaEffect(options.resume, "resume").pipe(
-        Effect.mapError(asGraphFailure),
-      );
-    }
+    yield* validateGraphNodeSchemasEffect(options);
     if (typeof options.handler !== "function") {
       return yield* Effect.fail(
         graphNodeValidationFailure(new TypeError("Graph node handler is required")),

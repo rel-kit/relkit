@@ -1,3 +1,5 @@
+/** Defines graph authoring failures reported before native compilation, retaining the invalid graph field and actionable diagnostic. */
+
 import { Schema } from "effect";
 
 /** Tagged invalid graph authoring options or descriptor construction. */
