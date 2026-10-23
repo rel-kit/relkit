@@ -1,3 +1,5 @@
+/** Renders selected resource declarations and provider imports as source fragments for the owning service and platform configuration. */
+
 import type { DomainArtifact } from "./domain-planning.js";
 
 /**

@@ -1,12 +1,14 @@
+/** Plans event descriptors beneath the selected service and registers their imports and exports without creating a new domain boundary. */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
+} from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 
 import {
   addPublicMemberEffect,

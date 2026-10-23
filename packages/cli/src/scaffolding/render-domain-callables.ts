@@ -1,20 +1,21 @@
+/** Plans service-local functions and tools with validated schemas and public service exports, preserving logical IDs and chosen exposure. */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
-import type { AddRequest } from "./add-types.js";
+} from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import type { AddRequest } from "create-relkit/internal/add-types";
 import { normalizeArtifactName } from "./add-name.js";
 import {
   addPublicMemberEffect,
   assertAvailableId,
   domainArtifact,
   resolveArtifact,
-  type DomainArtifact,
   type DomainTarget,
 } from "./domain-planning.js";
 import { PlanBuilder } from "./plan-builder.js";

@@ -1,13 +1,15 @@
+/** Plans selected job and workflow artifacts with the existing execution profile and service boundary, retaining durable version and exposure choices. */
+
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "./generator-filesystem.js";
+import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "./generator-errors.js";
-import { runGeneratorPromise } from "./generator-runtime.js";
-import type { AddRequest } from "./add-types.js";
+} from "create-relkit/internal/generator-errors";
+import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import type { AddRequest } from "create-relkit/internal/add-types";
 
 import {
   addPublicMemberEffect,
@@ -41,14 +43,7 @@ export const renderJobEffect = Effect.fn("Scaffold.renderJob")(
     GeneratorFileSystem
   > {
     const artifact = domainArtifact(target, request.name, "jobs", "job", "job");
-    const taskTarget = builder.artifacts.find(
-      (item) =>
-        item.domain === target.domain.fileStem &&
-        item.kind === "task" &&
-        [item.id, item.binding, item.path.split("/").at(-1)?.split(".")[0]].includes(
-          request.target,
-        ),
-    );
+    const taskTarget = taskJobTarget(builder, target, request.target);
     if (taskTarget) {
       const profile = yield* ensureProviderProfileEffect(builder, "job", {
         requested: request.profile,
@@ -153,3 +148,12 @@ export function renderTask(
 }
 
 import { renderFunctionEffect } from "./render-domain-callables.js";
+
+function taskJobTarget(builder: PlanBuilder, target: DomainTarget, requested: string) {
+  return builder.artifacts.find(
+    (item) =>
+      item.domain === target.domain.fileStem &&
+      item.kind === "task" &&
+      [item.id, item.binding, item.path.split("/").at(-1)?.split(".")[0]].includes(requested),
+  );
+}
