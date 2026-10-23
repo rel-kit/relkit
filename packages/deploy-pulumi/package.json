@@ -29,12 +29,22 @@
     }
   },
   "dependencies": {
-    "@pulumi/pulumi": "catalog:",
     "@relkit/contracts": "workspace:*",
     "@relkit/deploy": "workspace:*",
     "@relkit/observability": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
     "effect": "catalog:"
+  },
+  "peerDependencies": {
+    "@pulumi/pulumi": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@pulumi/pulumi": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@pulumi/pulumi": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",

@@ -1,3 +1,4 @@
+/** Acquires an explicitly selected native Pulumi workspace without changing backend or stack ownership. */
 import { mkdtemp, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -9,7 +10,7 @@ import {
   type LocalWorkspaceOptions,
   type PulumiCommand,
   type PulumiFn,
-} from "@pulumi/pulumi/automation";
+} from "@pulumi/pulumi/automation/index.js";
 
 export const PULUMI_CLOUD_BACKEND_URL = "https://api.pulumi.com" as const;
 export type PulumiBackendKind = "cloud" | "object-storage" | "local";
