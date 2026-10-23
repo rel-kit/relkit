@@ -1,135 +1,126 @@
+/** Exercises lightweight wrapper archives through isolated native Bun/npm runners without an installed application CLI. */
 import { strict as assert } from "node:assert";
-import { mkdir, mkdtemp, readFile, readdir, rm, symlink } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { Effect } from "effect";
+import { startRegistry } from "./pack-and-smoke-create-relkit-pack.js";
+import { wrapperArchiveInputs } from "./packed-wrapper-archives.js";
+import { packedWrapperCommand } from "./packed-wrapper-command.js";
 import {
-  loadReleaseTarballs,
-  readManifests,
-  readPackedManifest,
-  startRegistry,
-} from "./pack-and-smoke-create-relkit-pack.js";
-import { snapshotProject } from "./pack-and-smoke-create-relkit-support.js";
+  checkWrapperCreation,
+  checkWrapperInstallation,
+  checkWrapperRunner,
+} from "./packed-wrapper-checks.js";
+import { wrapperContext, wrapperCreatorPrefix, wrapperRunners } from "./packed-wrapper-fixture.js";
+import type { ProjectSnapshot } from "./scaffold-process.types.js";
 
-/** Exercises the published command from an empty directory and isolated Bun cache.
- * @param artifacts - Release manifest directory containing validated package archives.
- * @returns After bare, latest, and pinned invocations preserve CLI behavior.
- */
-export async function smokePackedRelkit(artifacts: string): Promise<void> {
-  const root = resolve(import.meta.dir, "..");
-  const temporary = await mkdtemp(join(tmpdir(), "relkit-bunx-smoke-"));
-  let server: ReturnType<typeof Bun.serve> | undefined;
-  try {
-    const manifests = await readManifests(root);
-    const tarballs = await loadReleaseTarballs(artifacts);
-    const wrapper = tarballs.get("relkit");
-    assert.ok(wrapper, "Release artifacts do not include relkit");
-    const packed = await readPackedManifest(wrapper);
-    const cliVersion = manifests.get("@relkit/cli")?.manifest.version;
-    assert.ok(cliVersion);
-    assert.equal(packed.dependencies?.["@relkit/cli"], cliVersion);
-    server = await startRegistry(temporary, tarballs, manifests);
-    const registry = `http://127.0.0.1:${server.port!}`;
-    const consumer = join(temporary, "consumer");
-    const tools = join(temporary, "tools");
-    const bunxTemporary = join(temporary, "tmp");
-    await mkdir(consumer);
-    await mkdir(tools);
-    await mkdir(bunxTemporary);
-    await symlink(process.execPath, join(tools, "bun"));
-    const environment = {
-      ...process.env,
-      // Exclude global relkit installations and repository node_modules/.bin.
-      PATH: `${tools}:/usr/bin:/bin`,
-      BUN_INSTALL_CACHE_DIR: join(temporary, "cache"),
-      BUN_TMPDIR: bunxTemporary,
-      TMPDIR: bunxTemporary,
-      TEMP: bunxTemporary,
-      BUN_CONFIG_REGISTRY: registry,
-      npm_config_registry: registry,
-    };
-    const execute = async (args: string[], expectedCode = 0): Promise<string> => {
-      const child = Bun.spawn([process.execPath, ...args], {
-        cwd: consumer,
-        env: environment,
-        stdout: "pipe",
-        stderr: "pipe",
-      });
-      const [stdout, stderr, code] = await Promise.all([
-        new Response(child.stdout).text(),
-        new Response(child.stderr).text(),
-        child.exited,
-      ]);
-      assert.equal(code, expectedCode, `bun ${args.join(" ")}\n${stdout}${stderr}`);
-      return stdout;
-    };
-    const help = JSON.parse(await execute(["x", "relkit", "--json", "--help"]));
-    assert.equal(help.name, "relkit");
-    assert.ok(help.commands.includes("create"));
-    const installations = (await readdir(bunxTemporary)).filter((name) => name.startsWith("bunx-"));
-    assert.equal(installations.length, 1);
-    const installedWrapper = join(bunxTemporary, installations[0]!, "node_modules/relkit");
-    const installed = JSON.parse(await readFile(join(installedWrapper, "package.json"), "utf8"));
-    assert.equal(installed.name, "relkit");
-    assert.equal(installed.version, packed.version);
-    assert.equal(installed.dependencies["@relkit/cli"], cliVersion);
-    // Bun can link the hoisted dependency's bin; exercise the wrapper itself too.
-    const wrapperBinary = join(installedWrapper, "dist/bin.js");
-    assert.deepEqual(help, JSON.parse(await execute([wrapperBinary, "--json", "--help"])));
-    const scoped = ["x", "--package", `@relkit/cli@${cliVersion}`, "relkit"];
-    assert.deepEqual(help, JSON.parse(await execute([...scoped, "--json", "--help"])));
-    for (const specifier of ["relkit@latest", `relkit@${packed.version}`])
-      assert.deepEqual(JSON.parse(await execute(["x", specifier, "--json", "--version"])), {
-        name: "relkit",
-        version: cliVersion,
-      });
-    const invalid = ["--json", "--help", "--version"];
-    const scopedFailure = await execute([...scoped, ...invalid], 2);
-    assert.deepEqual(
-      JSON.parse(await execute(["x", "relkit", ...invalid], 2)),
-      JSON.parse(scopedFailure),
-    );
-    assert.deepEqual(
-      JSON.parse(await execute([wrapperBinary, ...invalid], 2)),
-      JSON.parse(scopedFailure),
-    );
-    const create = [
-      "create",
-      "alias-app",
-      "--template",
-      "minimal",
-      "--cloud",
-      "none",
-      "--deploy",
-      "none",
-      "--no-install",
-      "--no-git",
-      "--json",
-    ];
-    const aliasProject = join(consumer, "alias-project");
-    const scopedProject = join(consumer, "scoped-project");
-    const wrapperProject = join(consumer, "wrapper-project");
-    for (const [command, destination] of [
-      [["x", "relkit"], aliasProject],
-      [scoped, scopedProject],
-      [[wrapperBinary], wrapperProject],
-    ] as const) {
-      const result = JSON.parse(await execute([...command, ...create, "--directory", destination]));
-      assert.equal(result.destination, destination);
-      const project = JSON.parse(await readFile(join(destination, "package.json"), "utf8"));
-      assert.equal(project.devDependencies["@relkit/cli"], cliVersion);
+/** Uses only candidate creator-runtime archives; selected project-local CLI delegation is covered by owning C1 tests. */
+const wrapperSmoke = Effect.fn("PackedWrapper.smoke")(function* (artifacts: string) {
+  const temporary = yield* Effect.acquireRelease(
+    Effect.promise(() => mkdtemp(join(tmpdir(), "relkit-wrapper-smoke-"))),
+    (directory) => Effect.promise(() => rm(directory, { recursive: true, force: true })),
+  );
+  const input = yield* Effect.promise(() => wrapperArchiveInputs(artifacts));
+  const server = yield* Effect.acquireRelease(
+    Effect.promise(() => startRegistry(temporary, input.selected, input.manifests)),
+    (server) => Effect.promise(() => server.stop(true)),
+  );
+  const context = yield* Effect.promise(() =>
+    wrapperContext(
+      temporary,
+      `http://127.0.0.1:${server.port}`,
+      input.wrapperVersion,
+      input.creatorVersion,
+      input.cliVersion,
+    ),
+  );
+  const npmVersion = yield* packedWrapperCommand({
+    executable: "node",
+    args: [context.npmScript, "--version"],
+    cwd: context.consumer,
+    env: context.env,
+  });
+  assert.equal(npmVersion.stdout.trim(), context.npmVersion);
+  yield* seedRunnerCaches(context);
+  yield* Effect.promise(() => server.stop(true));
+  yield* checkRunners(context);
+  console.log(
+    `Packed wrapper passed: Bun ${process.versions.bun}, npm ${context.npmVersion}; creator-only archives, own help/version, missing CLI, no-install creation parity.`,
+  );
+});
+
+/** Runs package-manager paths serially and checks installed wrapper execution separately from binary selection. */
+const checkRunners = Effect.fn("PackedWrapper.runners")(function* (
+  context: Awaited<ReturnType<typeof wrapperContext>>,
+) {
+  let baseline: ProjectSnapshot | undefined;
+  for (const runner of wrapperRunners(context)) {
+    const help = yield* checkWrapperRunner(context, runner);
+    const binary = yield* Effect.promise(() => checkWrapperInstallation(context, runner));
+    const direct = yield* packedWrapperCommand({
+      args: [binary, "--help"],
+      cwd: context.consumer,
+      env: context.env,
+    });
+    assert.equal(direct.stdout, help);
+    for (const useCreator of [false, true]) {
+      const snapshot = yield* checkWrapperCreation(context, runner, useCreator);
+      if (baseline === undefined) baseline = snapshot;
+      else assert.deepEqual(snapshot, baseline);
     }
-    assert.deepEqual(await snapshotProject(aliasProject), await snapshotProject(scopedProject));
-    assert.deepEqual(await snapshotProject(wrapperProject), await snapshotProject(scopedProject));
-    console.log("Packed bunx relkit passed: help, versions, usage exits, and scaffold parity.");
-  } finally {
-    if (server !== undefined) await server.stop(true);
-    await rm(temporary, { recursive: true, force: true });
+    yield* Effect.promise(() => checkWrapperInstallation(context, runner));
   }
+  assert.equal(
+    (yield* packedWrapperCommand({
+      args: ["x", "--no-install", "relkit", "--version"],
+      cwd: context.consumer,
+      env: context.env,
+    })).stdout.trim(),
+    context.wrapperVersion,
+  );
+});
+
+/** Primes only candidate wrapper/creator closures before disabling the registry for offline runner assertions. */
+const seedRunnerCaches = Effect.fn("PackedWrapper.seed")(function* (
+  context: Awaited<ReturnType<typeof wrapperContext>>,
+) {
+  for (const runner of wrapperRunners(context))
+    for (const direct of [false, true]) {
+      const prefix = direct ? wrapperCreatorPrefix(context, runner) : runner.prefix;
+      const output = yield* packedWrapperCommand(
+        {
+          executable: runner.executable,
+          cwd: context.consumer,
+          env: context.env,
+          args: [
+            ...prefix.filter((part) => part !== "--offline" && part !== "--no-install"),
+            "--help",
+          ],
+        },
+        direct ? 2 : 0,
+      );
+      if (direct) assert.match(output.stderr, /RELKIT_CREATE_USAGE: Unknown create option: --help/);
+    }
+  for (const specifier of ["relkit", "relkit@latest"])
+    assert.equal(
+      (yield* packedWrapperCommand({
+        args: ["x", specifier, "--version"],
+        cwd: context.consumer,
+        env: context.env,
+      })).stdout.trim(),
+      context.wrapperVersion,
+    );
+});
+
+/** Checks actual candidate archives after joining every owned runner and registry resource. */
+export function smokePackedRelkit(artifacts: string): Promise<void> {
+  return Effect.runPromise(wrapperSmoke(artifacts).pipe(Effect.scoped));
 }
 
 if (import.meta.main) {
-  const index = process.argv.indexOf("--artifacts");
-  const directory = index === -1 ? undefined : process.argv[index + 1];
+  const index = process.argv.indexOf("--artifacts"),
+    directory = index === -1 ? undefined : process.argv[index + 1];
   if (directory === undefined) throw new Error("--artifacts requires a release manifest directory");
   await smokePackedRelkit(resolve(directory));
 }

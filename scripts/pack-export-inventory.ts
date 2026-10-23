@@ -20,7 +20,7 @@ import type { ExportInventory, ExportCommand } from "./pack-export.types.js";
 export const exportInventory = Effect.fn("ExportSmoke.inventory")(function* (repository: string) {
   const directories = workspacePackageDirectories(repository);
   const manifests: ExportInventory["manifests"] = new Map();
-  const requiredNames = new Set(["@relkit/app", "@relkit/compiler"]);
+  const requiredNames = new Set(["@relkit/app", "@relkit/compiler", "create-relkit"]);
   const integrationNames = new Set<string>();
   for (const directory of directories) {
     const manifest = yield* readExportManifest(directory);
@@ -39,7 +39,10 @@ export const exportInventory = Effect.fn("ExportSmoke.inventory")(function* (rep
     if (path.startsWith("integrations/packages/")) integrationNames.add(manifest.name);
   }
   for (const name of requiredNames)
-    for (const dependency of Object.keys(manifests.get(name)?.dependencies ?? {}))
+    for (const dependency of Object.keys({
+      ...manifests.get(name)?.dependencies,
+      ...manifests.get(name)?.peerDependencies,
+    }))
       if (manifests.has(dependency)) requiredNames.add(dependency);
   return { directories, manifests, requiredNames, integrationNames } satisfies ExportInventory;
 });
