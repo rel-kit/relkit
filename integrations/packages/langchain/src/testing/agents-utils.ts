@@ -1,4 +1,6 @@
-import type { AgentObservedEdge, AgentRuntimeHooks } from "@relkit/agents";
+/** Normalizes scripted native test values and observations for the agent harness without starting a separate execution owner. */
+
+import type { AgentObservedEdge, AgentRuntimeHooks } from "../index.js";
 import type { spanSnapshot } from "@relkit/invocation";
 import type {
   TestAgentTrace,

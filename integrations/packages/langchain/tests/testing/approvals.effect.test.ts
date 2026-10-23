@@ -1,7 +1,9 @@
+/** Verifies native agent approvals helper cancellation and settlement through the integration owner with substituted Effect services. */
+
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import type { PendingApproval } from "@relkit/agents";
-import { createAgentApprovalState } from "../../src/agent-approvals.js";
+import { createAgentApprovalState } from "../../src/testing/agent-approvals.js";
 
 const approval: PendingApproval = {
   invocationId: "invocation",

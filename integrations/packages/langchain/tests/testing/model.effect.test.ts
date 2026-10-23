@@ -1,6 +1,12 @@
+/** Verifies native agent model helper cancellation and settlement through the integration owner with substituted Effect services. */
+
 import { expect, it } from "@effect/vitest";
 import { Cause, Effect, Exit, Fiber, Layer } from "effect";
-import { TestModelScript, modelScriptLayer, createTestModel } from "../../src/agents-model.js";
+import {
+  TestModelScript,
+  modelScriptLayer,
+  createTestModel,
+} from "../../src/testing/agents-model.js";
 
 it.effect("a hanging native model turn consumes caller cancellation", () =>
   Effect.gen(function* () {
