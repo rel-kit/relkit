@@ -1,6 +1,7 @@
+/** Acquires and renews fenced execution claims for owned accepted runs. */
 import { Clock, Effect } from "effect";
 import { localOperation, localSync } from "../local-effect.js";
-import type { ClaimRunRequest, ExecutionClaim, RenewRunClaimRequest } from "@relkit/agents";
+import type { ClaimRunRequest, ExecutionClaim, RenewRunClaimRequest } from "@relkit/contracts";
 import { activeClaim, LocalAgentStateError, ownedThread } from "./common.js";
 import { replaceThread, requireRun } from "./run-state.js";
 import type { AgentStateStoreEffects as AgentStateStore } from "./storage.js";
