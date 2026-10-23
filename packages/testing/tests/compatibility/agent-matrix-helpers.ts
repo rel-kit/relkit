@@ -1,5 +1,6 @@
+/** Builds the retained selected-native helper matrix with explicit test ownership and cleanup. */
 import type { JsonValue } from "@relkit/contracts";
-import { defineAgent } from "@relkit/agents";
+import { defineAgent } from "@relkit/langchain";
 import { invokeFunction, type InvocationParent, type InvocationTarget } from "@relkit/engine";
 import { defineError, defineFunction } from "@relkit/functions";
 import { z } from "@relkit/schema";
@@ -10,7 +11,7 @@ import {
   type ToolEngineInvocation,
 } from "@relkit/tools";
 import { createTestAgent } from "../fixtures/owned-compatibility.ts";
-import type { TestAgentModelOptions, TestModelTurn } from "../../src/index.ts";
+import type { TestAgentModelOptions, TestModelTurn } from "@relkit/langchain/testing";
 
 import type { TargetFailure } from "./agent-matrix-helpers.types.ts";
 export type { TargetFailure } from "./agent-matrix-helpers.types.ts";
@@ -70,6 +71,12 @@ export function makeFixture(
       timeoutMs: 1_000,
     },
   });
+  const { engine, invocations } = recordingEngine();
+  return { agent, target, tool, unavailable, engine, invocations };
+}
+
+/** Captures each tool-engine request in order while returning the matrix's ready result. */
+function recordingEngine() {
   const invocations: ToolEngineInvocation[] = [];
   const engine: ToolEngine = {
     invoke: async (request) => {
@@ -77,7 +84,7 @@ export function makeFixture(
       return { state: "ready" };
     },
   };
-  return { agent, target, tool, unavailable, engine, invocations };
+  return { engine, invocations };
 }
 
 /**

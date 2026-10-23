@@ -1,3 +1,4 @@
+/** Exposes generic application test owners and fakes; native helpers have feature entrypoints. */
 export { invokeFunction } from "./invoke-function.js";
 export type {
   FunctionContextOf,
@@ -65,20 +66,3 @@ export type {
   TestEventPublishResult,
   TestEventTriggerOptions,
 } from "./events-types.js";
-export { assertAgentTrace, createTestAgent, createTestModel } from "./agents.js";
-export type {
-  TestAgent,
-  TestAgentApproval,
-  TestAgentApprovalMode,
-  TestAgentApprovals,
-  TestAgentDescriptor,
-  TestAgentInvocationOptions,
-  TestAgentModel,
-  TestAgentModelCall,
-  TestAgentModelOptions,
-  TestAgentOptions,
-  TestAgentTrace,
-  TestAgentTraceExpectation,
-  TestAgentTraceSnapshot,
-  TestModelTurn,
-} from "./agents.js";
