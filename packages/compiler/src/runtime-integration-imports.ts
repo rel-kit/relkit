@@ -1,3 +1,8 @@
+/**
+ * Emits statically analyzable selected integration imports after fresh dependency
+ * preflight. Literal dynamic imports preserve build tracing while preventing SDK
+ * evaluation from racing the diagnostic check or relying on old preparation.
+ */
 import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
@@ -31,7 +36,8 @@ export const generateRuntimeIntegrationImportsEffect = Effect.fn(
     const imports = yield* Effect.forEach(modules, (entry, index) =>
       specifierEffect(entry).pipe(
         Effect.map(
-          (value) => `import * as __relkit_runtime_${index} from ${JSON.stringify(value)};`,
+          (value) =>
+            `const __relkit_runtime_${index} = await Effect.runPromise(initializeIntegration(${JSON.stringify(entry.packageName)}, async () => await import(${JSON.stringify(value)})));`,
         ),
       ),
     );
@@ -40,7 +46,21 @@ export const generateRuntimeIntegrationImportsEffect = Effect.fn(
         `  { packageName: ${JSON.stringify(entry.packageName)}, packageVersion: ${JSON.stringify(entry.packageVersion)}, exportName: ${JSON.stringify(entry.exportName)}, module: __relkit_runtime_${index} },`,
     );
     if (imports.length === 0) return "export const runtimeIntegrationModules = [] as const;\n";
-    return `${imports.join("\n")}\n\nexport const runtimeIntegrationModules = [\n${entries.join("\n")}\n] as const;\n`;
+    const selectedPlan = {
+      ...plan,
+      integrations: [...plan.integrations].sort((left, right) =>
+        `${moduleKey(left)}\0${left.capability}\0${left.adapterId}`.localeCompare(
+          `${moduleKey(right)}\0${right.capability}\0${right.adapterId}`,
+        ),
+      ),
+    };
+    // Match the emitted module's native import ancestry after production relocation.
+    const preflight = `import { Effect } from "effect";
+import { fileURLToPath } from "node:url";
+import { checkIntegrationDependencies, SelectedDependenciesLive, initializeIntegration } from "@relkit/app/internal/runtime";
+await Effect.runPromise(checkIntegrationDependencies(${JSON.stringify(selectedPlan)}, { projectRoot: fileURLToPath(new URL(".", import.meta.url)), phase: "runtime" }).pipe(Effect.provide(SelectedDependenciesLive)));
+`;
+    return `${preflight}${imports.join("\n")}\n\nexport const runtimeIntegrationModules = [\n${entries.join("\n")}\n] as const;\n`;
   },
   (effect, plan) =>
     observeCompiler("generation", "generateRuntimeIntegrationImports", effect, () => ({

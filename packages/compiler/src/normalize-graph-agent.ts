@@ -1,3 +1,4 @@
+/** Projects agent descriptors into SDK-free graph metadata, including selected native execution requirements. */
 import { generatedAgentMarker } from "./normalize-generated-function.js";
 import { requestedProviderProfile, selectedProviderProfile } from "./normalize-graph-app.js";
 import { clean } from "./normalize-graph-utils.js";
@@ -54,6 +55,11 @@ export function agentNodeData(
     ...(value.chat === undefined ? {} : { chat: clean(value.chat) }),
     ...(value.controls === undefined ? {} : { controls: clean(value.controls) }),
     ...(value.execution === "graph" ? { execution: "graph" as const } : {}),
+    ...(["subagents", "skills", "memory", "backend", "interruptOn"].some(
+      (key) => value[key] !== undefined,
+    )
+      ? { requiresDeepAgents: true as const }
+      : {}),
     ...(value.workflow === undefined ? {} : { workflow: clean(value.workflow) }),
     ...(topology === undefined ? {} : { workflowTopology: topology }),
     ...(subagents === undefined ? {} : { subagents }),
