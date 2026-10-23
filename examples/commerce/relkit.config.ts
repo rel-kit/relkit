@@ -1,3 +1,6 @@
+/** Selects commerce's runtime, explicit Scalar reference UI and existing development inspector.
+ * Application service data and migration history remain owned by their declared services.
+ */
 import "@relkit/pulumi";
 import { defineApp, env as binding } from "@relkit/app/config";
 import { aws } from "@relkit/aws";
@@ -92,6 +95,7 @@ export default defineApp({
     port: 4000,
     maxBodyBytes: 1_048_576,
     apiDocs: {
+      ui: "scalar",
       enabledInProduction: false,
       excludeDomains: ["database", "navigation", "telemetry", "auth"],
     },

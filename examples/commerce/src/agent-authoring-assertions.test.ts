@@ -1,6 +1,6 @@
 /** Executes offline native support/delegation tools and checkpointed graph interruption/resume with the original public descriptors. */
 import { expect, test } from "bun:test";
-import { GraphInterruptedError, invokeAgent } from "@relkit/app/agents";
+import { GraphInterruptedError, invokeAgent } from "@relkit/langchain";
 import deepAgent from "./services/orders/agents/order-deep.agent.js";
 import orderReview from "./services/orders/agents/order-review.agent.js";
 import supportAgent from "./services/orders/agents/order-support.agent.js";

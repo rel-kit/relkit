@@ -1,14 +1,15 @@
+/** Exercises commerce HTTP behavior through the explicitly selected database/auth test owner. */
 import { afterAll, expect, test } from "bun:test";
 import { resolve } from "node:path";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import {
   createTestAgentStateProvider,
-  createTestApplication,
   createTestBucketFake,
   createTestCacheFake,
   createTestRealtimeProvider,
 } from "@relkit/testing";
+import { createTestApplication } from "@relkit/testing/better-auth";
 import config from "../relkit.config.js";
 
 const assets = createTestBucketFake({ bucketId: "assets" });

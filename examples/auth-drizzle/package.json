@@ -21,10 +21,19 @@
     "drizzle-orm": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "4.20250121.0",
     "@types/bun": "catalog:",
     "@relkit/cli": "workspace:*",
     "@relkit/testing": "workspace:*",
     "drizzle-kit": "catalog:",
     "typescript": "catalog:"
+  },
+  "overrides": {
+    "@better-fetch/fetch": "1.3.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "@better-fetch/fetch": "1.3.2"
+    }
   }
 }
