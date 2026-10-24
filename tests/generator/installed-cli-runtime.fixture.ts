@@ -1,6 +1,8 @@
 /** Preserves installed-project HTTP/readiness and joined process-group shutdown checks. */
 import { expect } from "bun:test";
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 /** Launches the same prepared application and joins its owned process group on every exit. */
 export async function launchPreparedProject(
@@ -32,6 +34,7 @@ export async function launchPreparedProject(
       startedAt,
       () => child.exitCode === null,
       () => output,
+      project,
     );
   } finally {
     signalOwnedGroup(child.pid, child.kill.bind(child), "SIGTERM");
@@ -46,8 +49,12 @@ export async function launchPreparedProject(
   }
 }
 
-/** Retains development transport and Inspector readiness assertions. */
-async function expectDevelopmentSurfaces(port: number, inspectorPort: number): Promise<void> {
+/** Default installed development retains core transports without starting optional inspection. */
+async function expectDevelopmentSurfaces(
+  port: number,
+  inspectorPort: number,
+  project: string,
+): Promise<void> {
   const graph = await fetch(`http://127.0.0.1:${port}/_relkit/v1/graph`);
   expect(graph.status).toBe(200);
   expect(await graph.json()).toMatchObject({ protocol: "relkit.inspector" });
@@ -58,22 +65,16 @@ async function expectDevelopmentSurfaces(port: number, inspectorPort: number): P
   const reference = await fetch(`http://127.0.0.1:${port}/_relkit/v1/api-reference`);
   expect(reference.status).toBe(404);
   expect(await reference.text()).not.toContain("RELKIT API Reference");
-  const deadline = Date.now() + 20_000;
-  while (Date.now() < deadline) {
-    try {
-      const inspector = await fetch(`http://127.0.0.1:${inspectorPort}`, {
-        signal: AbortSignal.timeout(1_000),
-      });
-      const html = await inspector.text();
-      if (inspector.status === 200) {
-        expect(html).toContain("RELKIT Inspector");
-        return;
-      }
-    } catch {
-      await Bun.sleep(25);
-    }
-  }
-  throw new Error("Packaged inspector did not become ready.");
+  await expect(
+    fetch(`http://127.0.0.1:${inspectorPort}`, {
+      signal: AbortSignal.timeout(250),
+    }),
+  ).rejects.toThrow();
+  expect(existsSync(join(project, ".relkit/connections"))).toBe(false);
+  expect(existsSync(join(project, ".relkit/observability/observability.duckdb"))).toBe(false);
+  const rich = await fetch(`http://127.0.0.1:${port}/_relkit/v1/runtime`);
+  expect(rich.status).toBe(404);
+  await rich.arrayBuffer();
 }
 
 /** Signals only the process group started by this fixture. */
@@ -106,6 +107,7 @@ async function waitPreparedProject(
   startedAt: number,
   running: () => boolean,
   output: () => string,
+  project: string,
 ): Promise<{ readonly body: string; readonly durationMs: number }> {
   const deadline = Date.now() + 20_000;
   let lastFailure = "";
@@ -122,7 +124,7 @@ async function waitPreparedProject(
         expect(subsequent.status).toBe(200);
         expect(await subsequent.text()).toBe('{"message":"Hello, Again!"}');
         if (script === "dev") {
-          await expectDevelopmentSurfaces(port, inspectorPort);
+          await expectDevelopmentSurfaces(port, inspectorPort, project);
           expect(output()).toMatch(/\bReady\b/);
           expect(output()).not.toMatch(/Reference\s+http:\/\/\S+\/_relkit\/v1\/api-reference/);
         }

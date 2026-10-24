@@ -114,6 +114,7 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
     {
       "action": "update",
       "content": [
+        "/** Declares backend defaults; inspection remains disabled unless explicitly enabled. */",
         "import { defineApp } from "@relkit/app/config";",
         "import env from "@app/platform/env.js";",
         "import { localEvent } from "@relkit/local";",
@@ -123,7 +124,6 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
         "  env,",
         "  telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },",
         "  server: { port: 3000, maxBodyBytes: 1_048_576 },",
-        "  inspector: { port: 3210 },",
         "  // relkit:create:deployment",
         "  event: { "local": localEvent() },",
         "  defaults: { event: "local" },",
@@ -354,6 +354,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "update",
       "content": [
+        "/** Declares backend defaults; inspection remains disabled unless explicitly enabled. */",
         "import { defineApp } from "@relkit/app/config";",
         "import env from "@app/platform/env.js";",
         "import { localEvent, localJob } from "@relkit/local";",
@@ -366,7 +367,6 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
         "  env,",
         "  telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },",
         "  server: { port: 3000, maxBodyBytes: 1_048_576 },",
-        "  inspector: { port: 3210 },",
         "  // relkit:create:deployment",
         "  event: { "local": localEvent() },",
         "  defaults: { event: "local", jobs: "local", cache: "local", bucket: "local" },",

@@ -34,10 +34,9 @@ const entries: readonly CreateCapabilityEvidence[] = Object.freeze([
       template: "default/v1/minimal",
       snapshotProtocol: 1,
     }),
-    templateDigest: "c9604a3cc86e4f7cce3b2fcaf23f9fb8d645cf0e1b9932f3ff6fdaa34238aefc",
-    freshEvidence: "docs/evidence/create-capabilities/0.7.11/lean-stage-1-2026-10-21/fresh.json",
-    restartEvidence:
-      "docs/evidence/create-capabilities/0.7.11/lean-stage-1-2026-10-21/restart.json",
+    templateDigest: "90a0376dbdd07de857d28b511a45b2595997ecad27fb3ad8121a63dd7c7ec7ff",
+    freshEvidence: "docs/evidence/create-capabilities/0.7.11/fresh.json",
+    restartEvidence: "docs/evidence/create-capabilities/0.7.11/restart.json",
   }),
 ]);
 
