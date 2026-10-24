@@ -78,11 +78,29 @@ export function closeWorkerClient(state: WorkerClientState): Promise<void> {
 
 /** @param state - Owned worker. @returns Completion after the worker close command or failure. */
 async function closeOnce(state: WorkerClientState): Promise<void> {
-  if (state.closed) return;
   state.closing = true;
+  const deadline = setTimeout(() => {
+    try {
+      failWorkerClient(
+        state,
+        new WorkerTransportError(
+          "timeout",
+          "Diagnostic history flush exceeded its five-second shutdown budget; history may be incomplete.",
+        ),
+      );
+    } finally {
+      state.child.kill("SIGKILL");
+    }
+  }, 4000);
   try {
-    if (!state.failure && state.opened) await sendWorkerCommand(state, { type: "close" });
+    if (!state.closed && !state.failure && state.opened)
+      await sendWorkerCommand(state, { type: "close" });
   } finally {
     stopWorkerClient(state);
+    try {
+      await state.exited;
+    } finally {
+      clearTimeout(deadline);
+    }
   }
 }

@@ -14,6 +14,7 @@ export interface WorkerClientState {
   readonly child: ChildProcess;
   readonly pending: Map<number, PendingWorkerCall>;
   readonly onFailure: (error: Error) => void;
+  readonly exited: Promise<void>;
   nextId: number;
   closed: boolean;
   closing: boolean;

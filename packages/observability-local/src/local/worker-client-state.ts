@@ -29,6 +29,7 @@ export function createWorkerClientState(
   const state: WorkerClientState = {
     child,
     onFailure,
+    exited: new Promise((resolve) => child.once("close", () => resolve())),
     pending: new Map(),
     nextId: 0,
     closed: false,
@@ -60,7 +61,6 @@ export function createWorkerClientState(
 export function stopWorkerClient(state: WorkerClientState): void {
   if (state.closed) return;
   state.closed = true;
-  if (state.child.connected) state.child.disconnect();
   state.child.kill();
 }
 

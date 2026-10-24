@@ -24,6 +24,13 @@ function fakeWorker() {
   child.disconnect.mockImplementation(() => {
     child.connected = false;
   });
+  child.kill.mockImplementation(() => {
+    queueMicrotask(() => {
+      child.connected = false;
+      child.emit("close", 0);
+    });
+    return true;
+  });
   vi.mocked(fork).mockReturnValue(child as ChildProcess);
   return child;
 }
