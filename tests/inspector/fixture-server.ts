@@ -1,6 +1,7 @@
 /** Owns the browser fixture's application and real private inspection bridge. */
 import { createHash } from "node:crypto";
-import { mkdir } from "node:fs/promises";
+import { lstat, mkdir, realpath } from "node:fs/promises";
+import { dirname, relative, resolve } from "node:path";
 import { Cause, Effect, Layer } from "effect";
 import {
   InspectionBridge,
@@ -35,9 +36,13 @@ const application = Effect.gen(function* () {
 });
 
 const run = Effect.gen(function* () {
-  const root = process.env.RELKIT_FIXTURE_PROJECT;
-  if (!root) return yield* Effect.fail(new Error("Browser fixture project is required"));
-  yield* Effect.promise(() => mkdir(root, { recursive: true }));
+  const selected = process.env.RELKIT_FIXTURE_PROJECT;
+  if (!selected) return yield* Effect.fail(new Error("Browser fixture project is required"));
+  const root = yield* Effect.tryPromise({
+    try: () => fixtureProject(selected),
+    catch: (cause) =>
+      cause instanceof Error ? cause : new Error("Fixture project failed", { cause }),
+  });
   const { fixture, server } = yield* application;
   const capture = yield* InspectionCapture.make({});
   yield* InspectionBridge.use((bridge) =>
@@ -68,6 +73,29 @@ const run = Effect.gen(function* () {
     }),
   );
 });
+
+/**
+ * Creates only a project beneath a real runner directory in this checkout's ignored state.
+ * @param selected - Environment path selected by either native browser runner.
+ * @returns Its absolute root after lexical, parent and existing-leaf ownership checks.
+ */
+async function fixtureProject(selected: string): Promise<string> {
+  const state = resolve(await realpath(resolve(import.meta.dir, "../..")), ".relkit");
+  const root = resolve(selected);
+  const child = relative(state, root);
+  if (!/^(?:playwright-inspector|inspector-browser)-[\w-]+\/project$/.test(child))
+    throw new Error("Invalid browser fixture project");
+  if ((await realpath(dirname(root))) !== dirname(root))
+    throw new Error("Invalid browser fixture project parent");
+  const existing = await lstat(root).catch((error) => {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") return;
+    throw error;
+  });
+  if (existing && (!existing.isDirectory() || existing.isSymbolicLink()))
+    throw new Error("Invalid browser fixture project directory");
+  await mkdir(root, { recursive: true });
+  return root;
+}
 
 const controller = new AbortController();
 const stop = () => controller.abort();
