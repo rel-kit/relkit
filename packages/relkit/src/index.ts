@@ -4,6 +4,7 @@ import { launchBun } from "create-relkit/launcher";
 import { readFileSync, realpathSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
 import manifest from "../package.json" with { type: "json" };
 import type { CliManifest } from "./index.types.js";
 
@@ -62,12 +63,30 @@ export async function main(
     const create = argv[0] === "create";
     const entry = create
       ? fileURLToPath(import.meta.resolve("create-relkit/cli"))
-      : resolveProjectCli(cwd);
+      : resolveProjectCli(selectedProjectRoot(argv, cwd));
     return await launchBun(entry, create ? argv.slice(1) : argv, cwd);
   } catch (cause) {
     process.stderr.write((cause instanceof Error ? cause.message : String(cause)) + "\n");
     return 1;
   }
+}
+
+/**
+ * Selects CLI ownership from the documented option without changing forwarded arguments.
+ * @param argv - Original arguments; operands after the delimiter remain uninterpreted.
+ * @param cwd - Original launch directory used to resolve a relative explicit root.
+ * @returns Explicit application directory or the unchanged default launch directory.
+ */
+function selectedProjectRoot(argv: readonly string[], cwd: string): string {
+  const delimiter = argv.indexOf("--");
+  const { values } = parseArgs({
+    args: [...(delimiter < 0 ? argv : argv.slice(0, delimiter))],
+    options: { "project-root": { type: "string" } },
+    strict: false,
+    allowPositionals: true,
+  });
+  const selected = values["project-root"];
+  return typeof selected === "string" ? resolve(cwd, selected) : cwd;
 }
 
 function projectRoot(cwd: string): string {
