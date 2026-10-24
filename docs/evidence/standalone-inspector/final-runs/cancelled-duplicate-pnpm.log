@@ -1,0 +1,434 @@
+[22:45:15.622] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.ownership",
+  outcome: "success",
+  duration_ms: 852.241,
+}
+[22:45:15.627] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 14.30419921875,
+    pressure: 2,
+    availableDiskBytes: 55205978112,
+  },
+}
+[22:45:15.627] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 3.400917,
+}
+[22:45:15.915] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 13.55908203125,
+    pressure: 2,
+    availableDiskBytes: 55205974016,
+  },
+}
+[22:45:15.916] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 2.641833,
+}
+[22:45:15.916] INFO (#1): Measuring consumer installation {
+  fixture: "creator-only",
+  manager: "pnpm",
+}
+[22:45:15.919] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 13.55908203125,
+    pressure: 2,
+    availableDiskBytes: 55205969920,
+  },
+}
+[22:45:15.919] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 2.090958,
+}
+[22:45:21.579] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 5658.575375,
+}
+[22:45:22.017] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.installation",
+  outcome: "success",
+  duration_ms: 437.141792,
+}
+[22:45:22.017] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.install.sample",
+  outcome: "success",
+  duration_ms: 6097.596709,
+}
+[22:45:22.292] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 13.03369140625,
+    pressure: 2,
+    availableDiskBytes: 55121379328,
+  },
+}
+[22:45:22.293] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 4.028291,
+}
+[22:45:23.570] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1276.836291,
+}
+[22:45:23.662] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.installation",
+  outcome: "success",
+  duration_ms: 91.222208,
+}
+[22:45:23.662] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.install.sample",
+  outcome: "success",
+  duration_ms: 1369.1295,
+}
+[22:45:23.867] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 13.03369140625,
+    pressure: 2,
+    availableDiskBytes: 55122214912,
+  },
+}
+[22:45:23.867] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 2.527458,
+}
+[22:45:23.867] INFO (#1): Measuring consumer installation {
+  fixture: "wrapper-only",
+  manager: "pnpm",
+}
+[22:45:23.870] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 13.03369140625,
+    pressure: 2,
+    availableDiskBytes: 55122206720,
+  },
+}
+[22:45:23.870] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 1.703208,
+}
+[22:45:27.623] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3752.566,
+}
+[22:45:27.770] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.installation",
+  outcome: "success",
+  duration_ms: 146.70675,
+}
+[22:45:27.770] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.install.sample",
+  outcome: "success",
+  duration_ms: 3900.681292,
+}
+[22:45:27.985] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 13.99169921875,
+    pressure: 2,
+    availableDiskBytes: 55068606464,
+  },
+}
+[22:45:27.985] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 4.302792,
+}
+[22:45:29.231] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1243.885042,
+}
+[22:45:29.405] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.installation",
+  outcome: "success",
+  duration_ms: 173.332042,
+}
+[22:45:29.406] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.install.sample",
+  outcome: "success",
+  duration_ms: 1420.474083,
+}
+[22:45:29.654] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 13.99169921875,
+    pressure: 2,
+    availableDiskBytes: 55068712960,
+  },
+}
+[22:45:29.654] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 3.763625,
+}
+[22:45:29.654] INFO (#1): Measuring consumer installation {
+  fixture: "minimal-development",
+  manager: "pnpm",
+}
+[22:45:29.658] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 13.99169921875,
+    pressure: 2,
+    availableDiskBytes: 55068708864,
+  },
+}
+[22:45:29.658] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 2.984166,
+}
+[22:46:14.678] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 45017.681083,
+}
+[22:46:15.141] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.installation",
+  outcome: "success",
+  duration_ms: 461.513916,
+}
+[22:46:15.141] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.install.sample",
+  outcome: "success",
+  duration_ms: 45482.001792,
+}
+[22:46:16.380] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 12.63818359375,
+    pressure: 2,
+    availableDiskBytes: 54752251904,
+  },
+}
+[22:46:16.380] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 6.495,
+}
+[22:46:20.303] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 3921.631834,
+}
+[22:46:20.892] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.installation",
+  outcome: "success",
+  duration_ms: 588.160125,
+}
+[22:46:20.892] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.install.sample",
+  outcome: "success",
+  duration_ms: 4511.899625,
+}
+[22:46:22.251] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 12.0263671875,
+    pressure: 2,
+    availableDiskBytes: 54753144832,
+  },
+}
+[22:46:22.251] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 3.282792,
+}
+[22:46:22.251] INFO (#1): Measuring consumer installation {
+  fixture: "production-only",
+  manager: "pnpm",
+}
+[22:46:22.254] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 12.0263671875,
+    pressure: 2,
+    availableDiskBytes: 54753140736,
+  },
+}
+[22:46:22.254] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 2.133,
+}
+[22:46:49.324] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 27068.195708,
+}
+[22:46:49.540] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.installation",
+  outcome: "success",
+  duration_ms: 214.951375,
+}
+[22:46:49.540] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.install.sample",
+  outcome: "success",
+  duration_ms: 27285.014792,
+}
+[22:46:49.969] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 10.953125,
+    pressure: 2,
+    availableDiskBytes: 54523305984,
+  },
+}
+[22:46:49.969] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 2.897458,
+}
+[22:46:51.191] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 1221.214417,
+}
+[22:46:51.350] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.installation",
+  outcome: "success",
+  duration_ms: 159.415209,
+}
+[22:46:51.350] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.install.sample",
+  outcome: "success",
+  duration_ms: 1381.448375,
+}
+[22:46:52.789] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 10.63623046875,
+    pressure: 2,
+    availableDiskBytes: 54633955328,
+  },
+}
+[22:46:52.790] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 2.31575,
+}
+[22:46:52.790] INFO (#1): Measuring consumer installation {
+  fixture: "api-development",
+  manager: "pnpm",
+}
+[22:46:52.792] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 10.63623046875,
+    pressure: 2,
+    availableDiskBytes: 54633951232,
+  },
+}
+[22:46:52.792] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 1.84025,
+}
+[22:47:26.610] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 33817.156541,
+}
+[22:47:27.160] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.installation",
+  outcome: "success",
+  duration_ms: 548.760458,
+}
+[22:47:27.160] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.install.sample",
+  outcome: "success",
+  duration_ms: 34367.5115,
+}
+[22:47:28.595] INFO (#1): Consumer resource admission explicitly overridden {
+  blocked: "Deferred: memory pressure level 2",
+  resources: {
+    cpus: 10,
+    load: 9.99462890625,
+    pressure: 2,
+    availableDiskBytes: 54392078336,
+  },
+}
+[22:47:28.595] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "consumer.resources",
+  outcome: "success",
+  duration_ms: 5.652792,
+}
+[22:47:34.752] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.command",
+  outcome: "success",
+  duration_ms: 6155.880417,
+}
