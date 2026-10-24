@@ -43,6 +43,7 @@
       "outputs": ["dist/**"]
     },
     "@relkit/cli#typecheck": {
+      "dependsOn": ["^typecheck"],
       "cache": false
     },
     "@relkit/testing#build:foundation": {
@@ -76,6 +77,7 @@
       "outputs": ["dist/**", "*.tsbuildinfo"]
     },
     "@relkit/inspector#typecheck": {
+      "dependsOn": ["^typecheck"],
       "cache": false
     },
     "create-relkit#typecheck": {
