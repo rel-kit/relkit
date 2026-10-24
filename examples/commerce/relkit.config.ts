@@ -1,4 +1,4 @@
-/** Selects commerce's runtime, explicit Scalar reference UI and existing development inspector.
+/** Selects commerce's runtime, explicit Scalar reference UI and development inspection bridge.
  * Application service data and migration history remain owned by their declared services.
  */
 import "@relkit/pulumi";
@@ -100,5 +100,5 @@ export default defineApp({
       excludeDomains: ["database", "navigation", "telemetry", "auth"],
     },
   },
-  inspector: { port: 4001 },
+  inspector: { enabled: true },
 });

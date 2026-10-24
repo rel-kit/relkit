@@ -1,3 +1,4 @@
+/** Declares auth/database environment requirements without selecting inspection. */
 import { defineApp, defineEnv, env } from "@relkit/app/config";
 
 export default defineApp({
@@ -7,5 +8,4 @@ export default defineApp({
     BETTER_AUTH_URL: env.url().default(new URL("http://127.0.0.1:3000")),
   }),
   server: { port: 3000 },
-  inspector: { port: 3210 },
 });
