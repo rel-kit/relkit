@@ -49,7 +49,7 @@ it("creator_before_application_install", () => {
   expect(dependencyViolations([path], { stage: "1", exceptions: [] })).toEqual([path]);
 });
 
-it("stage1_exception_requires_exact_path", () => {
+it("retired stage-one exceptions cannot admit any inspector path", () => {
   const admitted = { boundary: "installation", packages: ["@relkit/cli", "react"] } as const;
   const forbidden = { boundary: "installation", packages: ["@relkit/client", "react"] } as const;
   const extraHop = {
@@ -58,6 +58,7 @@ it("stage1_exception_requires_exact_path", () => {
   } as const;
   const policy = { stage: "1", exceptions: [admitted] } as const;
   expect(dependencyViolations([admitted, forbidden, extraHop], policy)).toEqual([
+    admitted,
     forbidden,
     extraHop,
   ]);
@@ -111,7 +112,7 @@ it("keeps essential transport infrastructure and the lightweight telemetry API a
     ).toEqual([]);
 });
 
-it("requires each expanded legacy path and rejects unrelated SDK descendants", () => {
+it("rejects retired expanded UI and native storage exceptions", () => {
   const ui = {
     boundary: "installation",
     packages: ["consumer", "@relkit/cli", "next", "react"],
@@ -128,7 +129,7 @@ it("requires each expanded legacy path and rejects unrelated SDK descendants", (
   } as const;
   const unrelated = { ...ui, packages: [...ui.packages, "langchain"] } as const;
   const policy = { stage: "1", exceptions: [ui, native, unrelated] } as const;
-  expect(dependencyViolations([ui, native, unrelated], policy)).toEqual([unrelated]);
+  expect(dependencyViolations([ui, native, unrelated], policy)).toEqual([ui, native, unrelated]);
   expect(dependencyViolations([ui, native], { stage: "1", exceptions: [] })).toEqual([ui, native]);
   expect(dependencyViolations([ui, native], { stage: "final", exceptions: [ui, native] })).toEqual([
     ui,

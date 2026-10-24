@@ -52,30 +52,9 @@ function samePath(left: DependencyPath, right: DependencyPath): boolean {
 }
 
 /**
- * Restricts temporary admissions to the enumerated legacy inspector owners.
- * @param path - Exact measured path proposed for Stage 1 admission.
- * @returns Whether the final edge is one of the design's temporary roots.
- */
-function legacyInspectorPath(path: DependencyPath): boolean {
-  const cli = path.packages.indexOf("@relkit/cli");
-  if (cli < 0) return false;
-  const tail = path.packages.slice(cli + 1);
-  const families = path.packages.filter(isForbiddenConsumerDependency);
-  const ui = families.every((name) =>
-    /^(?:next|react(?:-dom)?|@tanstack\/|@orpc\/tanstack-query)/.test(name),
-  );
-  if (ui && ["next", "react", "react-dom"].includes(tail[0] ?? "")) return true;
-  if (tail[0] === "@relkit/observability-local" && tail[1] === "@duckdb/node-api")
-    return families.every((name) => name.startsWith("@duckdb/"));
-  return (
-    ui && path.boundary === "artifact" && /(?:^|\/)dist\/inspector\//.test(path.artifact ?? "")
-  );
-}
-
-/**
  * Retains forbidden paths, including SDKs embedded inside executable artifacts.
  * @param paths - Independently observed complete dependency paths.
- * @param policy - Stage and exact measured selected/temporary admissions.
+ * @param policy - Stage provenance and exact measured selected capability admissions.
  * @returns Violations in observation order. Baseline reports the final policy.
  */
 export function dependencyViolations(
@@ -85,11 +64,7 @@ export function dependencyViolations(
   return paths.filter((path) => {
     if (!path.packages.some(isForbiddenConsumerDependency)) return false;
     if (policy.selected?.some((selected) => samePath(path, selected))) return false;
-    return (
-      policy.stage !== "1" ||
-      !legacyInspectorPath(path) ||
-      !policy.exceptions.some((exception) => samePath(path, exception))
-    );
+    return true;
   });
 }
 

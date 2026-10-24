@@ -102,6 +102,12 @@ export const consumerFixtures = Effect.fn("ConsumerFixtures.matrix")(function* (
     devDependencies: { "@types/bun": bunTypes },
     production: false,
   });
+  fixtures.push({
+    name: "standalone-inspector",
+    dependencies: { "@relkit/inspector": version("@relkit/inspector", manifests) },
+    devDependencies: {},
+    production: false,
+  });
   for (const [name, item] of manifests)
     if (item.directory.includes("/integrations/packages/"))
       fixtures.push({
