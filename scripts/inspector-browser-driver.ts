@@ -28,16 +28,19 @@ export function inspectorBrowserDriver(
   signal: AbortSignal,
   commands: Context.Service.Shape<typeof ScaffoldProcess>,
 ): BrowserAcceptanceDriver {
+  const command = (...args: string[]) =>
+    commands.run({
+      executable: "agent-browser",
+      args: ["--session", session, ...args],
+      cwd: root,
+      env: browserEnvironment,
+    });
   const run = (...args: string[]) =>
     Effect.runPromise(
-      commands
-        .run({
-          executable: "agent-browser",
-          args: ["--session", session, ...args],
-          cwd: root,
-          env: browserEnvironment,
-        })
-        .pipe(Effect.timeout("60 seconds")),
+      Effect.gen(function* () {
+        if (args[0] === "click" && args[1] !== undefined) yield* command("scrollintoview", args[1]);
+        return yield* command(...args);
+      }).pipe(Effect.timeout("60 seconds")),
       { signal },
     );
   return { baseUrl, run, snapshot: () => run("snapshot", "-i"), reference, includes };

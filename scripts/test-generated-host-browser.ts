@@ -19,8 +19,7 @@ class GeneratedBrowser extends Context.Service<GeneratedBrowser>()(
           Effect.gen(function* () {
             const root = yield* generatedBrowserProject;
             if (!grouped) yield* flattenGeneratedHost(root);
-            const port = yield* scaffoldPort,
-              inspector = yield* scaffoldPort;
+            const port = yield* scaffoldPort;
             const host = yield* scaffoldChild({
               cwd: root,
               args: [
@@ -30,8 +29,6 @@ class GeneratedBrowser extends Context.Service<GeneratedBrowser>()(
                 root,
                 "--port",
                 String(port),
-                "--inspector-port",
-                String(inspector),
                 "--no-color",
               ],
             });

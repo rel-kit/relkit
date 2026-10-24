@@ -1,17 +1,16 @@
 /** Owns this browser gate's dynamic listeners, unique evidence directory and
  * native processes. Browser closure precedes joined child-group shutdown; only
- * this run's Next cache is removed, while failure artifacts remain available.
+ * this run's evidence and standalone history remain available.
  */
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
-import { Effect } from "effect";
+import { Clock, Effect } from "effect";
 import { scaffoldPort } from "./scaffold-http.js";
 import { ScaffoldProcess, scaffoldChild } from "./scaffold-process.js";
 import type { ScaffoldChild } from "./scaffold-process.types.js";
 import { browserEnvironment, inspectorBrowserDriver } from "./inspector-browser-driver.js";
 import type { BrowserAcceptanceDriver } from "./test-inspector-agent-browser.js";
 import { browserCallback } from "./inspector-browser-callback.js";
-import { preserveBrowserState } from "./preserve-browser-state.js";
 
 const root = resolve(import.meta.dir, "..");
 
@@ -41,15 +40,16 @@ const browserRun = Effect.fn("InspectorBrowser.run")(function* (
 ) {
   const selected = yield* browserSelection;
   const commands = yield* ScaffoldProcess.make;
-  yield* Effect.addFinalizer(() =>
-    native(() => rm(selected.cache, { recursive: true, force: true })).pipe(Effect.orDie),
-  );
-  yield* preserveBrowserState(join(root, "apps/inspector"), selected.artifacts);
-  yield* scaffoldChild({
+  const fixture = yield* scaffoldChild({
     cwd: root,
     args: ["tests/inspector/fixture-server.ts"],
-    env: { RELKIT_FIXTURE_PORT: String(selected.backend) },
+    env: {
+      RELKIT_FIXTURE_PORT: String(selected.backend),
+      RELKIT_FIXTURE_PROJECT: selected.project,
+      RELKIT_FIXTURE_TIME: new Date(yield* Clock.currentTimeMillis).toISOString(),
+    },
   });
+  yield* Effect.addFinalizer(() => retainInspectorOutput(fixture, selected.artifacts, "fixture"));
   const inspector = yield* startInspector(selected);
   yield* Effect.addFinalizer(() => retainInspectorOutput(inspector, selected.artifacts));
   yield* Effect.addFinalizer(() =>
@@ -80,15 +80,15 @@ const browserRun = Effect.fn("InspectorBrowser.run")(function* (
  * @param artifacts - This run's retained evidence directory.
  * @returns Infallible cleanup unless native release or evidence writing defects.
  */
-function retainInspectorOutput(inspector: ScaffoldChild, artifacts: string) {
+function retainInspectorOutput(inspector: ScaffoldChild, artifacts: string, name = "inspector") {
   return native(async () => {
     const beforeRelease = inspector.process.exitCode;
     try {
       await inspector.release();
     } finally {
-      await writeFile(join(artifacts, "inspector.log"), inspector.output());
+      await writeFile(join(artifacts, `${name}.log`), inspector.output());
       await writeFile(
-        join(artifacts, "inspector-exit.json"),
+        join(artifacts, `${name}-exit.json`),
         JSON.stringify({
           pid: inspector.process.pid,
           beforeRelease,
@@ -99,26 +99,23 @@ function retainInspectorOutput(inspector: ScaffoldChild, artifacts: string) {
   }).pipe(Effect.orDie);
 }
 
-/** Starts installed Next through Node with the selected backend and owned cache.
- * @param selected - This run's concrete listener and cache selection.
+/** Starts the actual standalone tool, including its private BFF and history owner.
+ * @param selected - This run's concrete listener and project selection.
  * @returns The existing scoped child owner, with output drains already active.
  */
 function startInspector(selected: Effect.Success<typeof browserSelection>) {
   return scaffoldChild({
-    executable: "node",
-    cwd: join(root, "apps/inspector"),
+    cwd: root,
     args: [
-      join(root, "apps/inspector/node_modules/next/dist/bin/next"),
-      "dev",
-      "--webpack",
+      join(root, "packages/inspector/dist/bin.js"),
+      "--project-root",
+      selected.project,
       "--hostname",
       "127.0.0.1",
       "--port",
       String(selected.port),
     ],
     env: {
-      RELKIT_BACKEND_URL: `http://127.0.0.1:${selected.backend}`,
-      RELKIT_INSPECTOR_DIST_DIR: selected.dist,
       NODE_OPTIONS: "--max-old-space-size=2048",
       RAYON_NUM_THREADS: "1",
       NEXT_TELEMETRY_DISABLED: "1",
@@ -140,14 +137,12 @@ const browserSelection = Effect.gen(function* () {
   yield* native(() => mkdir(join(root, ".relkit"), { recursive: true }));
   const artifacts = yield* native(() => mkdtemp(join(root, ".relkit/inspector-browser-")));
   const session = basename(artifacts);
-  const dist = `.relkit/next-browser-${session}`;
   return {
     port,
     backend,
     artifacts,
     session,
-    dist,
-    cache: join(root, "apps/inspector", dist),
+    project: join(artifacts, "project"),
     baseUrl: `http://127.0.0.1:${port}`,
   };
 });

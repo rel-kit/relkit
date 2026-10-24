@@ -6,9 +6,11 @@ import { resolve } from "node:path";
 import { runAgentGraphAcceptance } from "./test-inspector-agent-browser.js";
 import { runResourceBrowserAcceptance } from "./test-inspector-resource-browser.js";
 import { withInspectorBrowser } from "./inspector-browser-runtime.js";
+import { runHistoryBrowserAcceptance } from "./test-inspector-history-browser.js";
 
 await withInspectorBrowser(async (driver, artifacts) => {
   try {
+    await runHistoryBrowserAcceptance(driver);
     await runResourceBrowserAcceptance(driver);
     await runAgentGraphAcceptance(driver);
     console.log("Inspector browser acceptance passed.");
