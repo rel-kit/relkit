@@ -37,6 +37,7 @@ function application() {
     "providerStartup",
     "plan",
     "InspectorQueryError",
+    "process",
     `
     const generationId = "test", graphHash = "sha256:test", activationFingerprint = undefined;
     const graph = { nodes: [], edges: [] }, environment = "test", internalEndpointsEnabled = true;
@@ -45,12 +46,16 @@ function application() {
     ${SERVER_RUNTIME_SUPPORT_SOURCE}
     ${source}
   `,
-  )(app, installInspectorEndpoints, Promise.resolve(registry), plan, InspectorQueryError);
+  )(app, installInspectorEndpoints, Promise.resolve(registry), plan, InspectorQueryError, {
+    env: { RELKIT_INSPECTOR_SESSION_TOKEN: "fixture-private-token" },
+  });
   return app;
 }
 
 test("generated host connects event runtime inspection", async () => {
-  const response = await application().request("/_relkit/v1/runtime/events?eventId=demo.event");
+  const response = await application().request("/_relkit/v1/runtime/events?eventId=demo.event", {
+    headers: { "x-relkit-inspector-session-token": "fixture-private-token" },
+  });
   expect(response.status).toBe(200);
   expect(await response.json()).toMatchObject({
     publications: [{ instanceId: "publication" }],
@@ -59,7 +64,9 @@ test("generated host connects event runtime inspection", async () => {
 });
 
 test("generated host projects bucket binding features", async () => {
-  const response = await application().request("/_relkit/v1/runtime/buckets/demo.bucket");
+  const response = await application().request("/_relkit/v1/runtime/buckets/demo.bucket", {
+    headers: { "x-relkit-inspector-session-token": "fixture-private-token" },
+  });
   expect(response.status).toBe(200);
   expect(await response.json()).toMatchObject({
     state: {
@@ -67,4 +74,8 @@ test("generated host projects bucket binding features", async () => {
       capabilities: { signedReadUrl: true, signedWriteUrl: true },
     },
   });
+});
+
+test("generated rich APIs reject direct callers without the private bridge credential", async () => {
+  expect((await application().request("/_relkit/v1/runtime/events")).status).toBe(401);
 });

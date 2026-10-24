@@ -2,6 +2,23 @@
 import { expect, test } from "@playwright/test";
 import { playwrightSelection } from "../../scripts/playwright-selection.js";
 const { backend } = playwrightSelection("inspector");
+test.beforeAll(async ({ request }) => {
+  // Compile this flow's cold routes outside the separate interaction deadline.
+  test.setTimeout(120_000);
+  for (const path of [
+    "/_relkit/backend/_relkit/v1/health/ready",
+    "/requests",
+    "/requests/request-initial-0001",
+    "/functions",
+    "/functions/orders.create",
+    "/logs",
+    "/traces",
+    "/traces/00000000000000000000000000000001",
+  ]) {
+    const response = await request.get(path);
+    expect(response.status()).toBe(200);
+  }
+});
 test.beforeEach(async ({ request }) => {
   await request.post(`${backend}/__fixture__/reset`);
 });

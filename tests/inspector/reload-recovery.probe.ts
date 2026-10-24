@@ -4,24 +4,19 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { Effect, Logger } from "effect";
 import { recoveryProcess } from "../../packages/cli/tests/dev-environment/recovery-process";
-import { recoveryFixture, recoveryInspector } from "../../scripts/test-inspector-recovery-fixture";
+import { recoveryFixture } from "../../scripts/test-inspector-recovery-fixture";
+import { launchGeneratedTool, toolReply } from "../fixtures/inspector/generated-app";
 import { scaffoldChild } from "../../scripts/scaffold-process";
 
 const repository = resolve(import.meta.dirname, "../..");
 const evidence = join(repository, ".relkit/reload-recovery");
 const sessionName = `relkit-reload-recovery-${process.pid}`;
-const inspector = join(repository, "apps/inspector");
-const nextEnvPath = join(inspector, "next-env.d.ts");
-const nextEnv = await readFile(nextEnvPath, "utf8");
-const inspectorDist = `.relkit/next-reload-recovery-${process.pid}`;
 const environment = {
   RAYON_NUM_THREADS: "1",
   UV_THREADPOOL_SIZE: "1",
   NODE_OPTIONS: "--max-old-space-size=1024",
   NEXT_TELEMETRY_DISABLED: "1",
   AGENT_BROWSER_DEFAULT_TIMEOUT: "15000",
-  RELKIT_INSPECTOR_ROOT: inspector,
-  RELKIT_INSPECTOR_DIST_DIR: inspectorDist,
 };
 
 /** Runs a finite owned browser/CLI command and joins its output streams. */
@@ -71,14 +66,12 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
   const output = join(evidence, mode);
   await mkdir(output, { recursive: true });
   let dev: ReturnType<typeof recoveryProcess> | undefined;
+  let tool: Awaited<ReturnType<typeof launchGeneratedTool>> | undefined;
   try {
-    const backendPort = port(),
-      inspectorPort = port();
+    const backendPort = port();
     const baseUrl = `http://127.0.0.1:${backendPort}`;
-    const inspectorUrl = `http://127.0.0.1:${inspectorPort}`;
     const cli = join(repository, "packages/cli/src/bin.ts");
-    await recoveryFixture(root, repository, backendPort, inspectorPort);
-    const inspectorRoot = await recoveryInspector(root, inspector);
+    await recoveryFixture(root, repository, backendPort);
     if (mode === "prepared")
       await writeFile(
         join(output, "prepare.txt"),
@@ -99,7 +92,7 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
     const startedAt = performance.now();
     dev = recoveryProcess(root, mode, backendPort, {
       path: "/hello/probe",
-      environment: { ...environment, RELKIT_INSPECTOR_ROOT: inspectorRoot },
+      environment,
     });
     const ownerPid = dev.child.pid;
     await dev.wait(
@@ -108,15 +101,10 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
     );
     const backendReadyMs = Math.round(performance.now() - startedAt);
     assert.equal(dev.logs().includes(".relkit/dev/sessions/"), mode === "prepared");
-    await dev.wait(
-      "CLI-owned Inspector ready",
-      () => {
-        if (dev?.logs().includes("dev.inspector.failed"))
-          throw new Error(`CLI-owned Inspector failed during startup: ${dev.logs().slice(-4000)}`);
-        return dev?.logs().includes("dev.inspector.ready") ?? false;
-      },
-      65_000,
-    );
+    tool = await launchGeneratedTool(root);
+    await toolReply(tool, "/_relkit/v1/runtime", "generationId");
+    const inspectorUrl = `http://127.0.0.1:${tool.port}`;
+    const toolPid = tool.child.pid;
     const inspectorReadyMs = Math.round(performance.now() - startedAt);
     await browser("open", `${inspectorUrl}/routes`);
     await browser("wait", "--fn", "document.querySelector('table')?.innerText.includes('/hello/')");
@@ -161,14 +149,16 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
     await writeFile(join(output, "recovered-tree.txt"), await browser("snapshot", "-c"));
     assert.equal(dev.child.pid, ownerPid);
     assert.equal(dev.child.exitCode, null);
+    assert.equal(tool.child.pid, toolPid);
+    assert.equal(tool.child.exitCode, null);
     await writeFile(
       join(output, "result.json"),
       JSON.stringify(
         {
           mode,
           sameDevPid: ownerPid,
-          inspectorLaunchedByBunDev: true,
-          controlledInspectorStartupDelayMs: 6_000,
+          standaloneToolPid: toolPid,
+          inspectorLaunchedSeparately: true,
           backendReadyMs,
           inspectorReadyMs,
           rejectedEditRetainedOldResponse: true,
@@ -183,7 +173,7 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
       ),
     );
     console.log(
-      `${mode}: bun dev owns Inspector; rejection, visible failure, typed recovery, new routes/OpenAPI and automatic error clearing passed (PID ${ownerPid}).`,
+      `${mode}: separate tool survived rejection and repair; typed recovery, routes/OpenAPI and automatic error clearing passed (dev PID ${ownerPid}, tool PID ${toolPid}).`,
     );
   } catch (error) {
     if (dev === undefined)
@@ -207,29 +197,24 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
   } finally {
     await browser("close").catch(() => undefined);
     try {
-      if (dev !== undefined) {
-        try {
-          await dev.stop();
-        } finally {
-          await writeFile(join(output, "dev.log"), dev.logs());
-        }
-      }
+      await tool?.close();
     } finally {
-      await rm(root, { recursive: true, force: true });
+      try {
+        if (dev !== undefined) {
+          try {
+            await dev.stop();
+          } finally {
+            await writeFile(join(output, "dev.log"), dev.logs());
+          }
+        }
+      } finally {
+        await rm(root, { recursive: true, force: true });
+      }
     }
   }
 }
 
-try {
-  const selected = process.argv[2];
-  assert.ok(selected === undefined || selected === "ordinary" || selected === "prepared");
-  for (const mode of ["ordinary", "prepared"] as const)
-    if (selected === undefined || selected === mode) await replay(mode);
-} finally {
-  const current = await readFile(nextEnvPath, "utf8");
-  if (current.includes(`${inspectorDist}/`)) {
-    const restored = current.replaceAll(`${inspectorDist}/dev/`, ".next/dev/");
-    if (restored === nextEnv) await writeFile(nextEnvPath, nextEnv);
-  }
-  await rm(join(inspector, inspectorDist), { recursive: true, force: true });
-}
+const selected = process.argv[2];
+assert.ok(selected === undefined || selected === "ordinary" || selected === "prepared");
+for (const mode of ["ordinary", "prepared"] as const)
+  if (selected === undefined || selected === mode) await replay(mode);

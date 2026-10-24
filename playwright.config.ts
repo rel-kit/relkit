@@ -2,6 +2,7 @@
  * existing listeners are rejected and native teardown is graceful and bounded.
  */
 import { defineConfig, devices } from "@playwright/test";
+import { randomBytes } from "node:crypto";
 import { resolve } from "node:path";
 import { playwrightSelection } from "./scripts/playwright-selection.js";
 import { playwrightServerCommand } from "./scripts/playwright-server-command.js";
@@ -27,7 +28,10 @@ export default defineConfig({
         "run",
         "tests/inspector/fixture-server.ts",
       ]),
-      env: { RELKIT_FIXTURE_PORT: new URL(selected.backend).port },
+      env: {
+        RELKIT_FIXTURE_PORT: new URL(selected.backend).port,
+        RELKIT_FIXTURE_PROJECT: resolve(selected.artifacts, "project"),
+      },
       url: `${selected.backend}/_relkit/v1/health/ready`,
       timeout: 120_000,
       reuseExistingServer: false,
@@ -48,6 +52,7 @@ export default defineConfig({
         CI: "1",
         RELKIT_INSPECTOR_DIST_DIR: selected.dist,
         RELKIT_BACKEND_URL: selected.backend,
+        RELKIT_INSPECTOR_API_TOKEN: randomBytes(32).toString("base64url"),
         NEXT_PUBLIC_RELKIT_BACKEND_URL: `${selected.ui}/_relkit/backend`,
         NEXT_PUBLIC_RELKIT_SOURCE_EDITOR: "vscode",
         NODE_OPTIONS: "--max-old-space-size=4096",
