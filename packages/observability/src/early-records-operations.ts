@@ -104,18 +104,19 @@ const admit = Effect.fn("EarlyRetention.redact")(function* (
   const safe = yield* admitObservabilityRecordEffect(record, options.redaction);
   if (safe === undefined) return undefined;
   const retained = identity === undefined ? {} : { identity: Object.freeze({ ...identity }) };
-  const bytes = Buffer.byteLength(
-    JSON.stringify(identity === undefined ? safe : { record: safe, ...retained }),
-    "utf8",
-  );
-  yield* Ref.update(state, (value) =>
-    retainEarlyRecord(
+  yield* Ref.update(state, (value) => {
+    const sequence = value.sequence + 1;
+    const bytes = Buffer.byteLength(
+      JSON.stringify({ sequence, record: safe, ...retained }),
+      "utf8",
+    );
+    return retainEarlyRecord(
       value,
-      Object.freeze({ sequence: value.sequence + 1, bytes, record: safe, ...retained }),
+      Object.freeze({ sequence, bytes, record: safe, ...retained }),
       options.maxRecords,
       options.maxBytes,
-    ),
-  );
+    );
+  });
   return safe;
 });
 
