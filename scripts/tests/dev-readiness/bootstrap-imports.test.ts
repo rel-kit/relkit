@@ -49,12 +49,7 @@ test("packaged snapshot hits keep checking and bundling behind dynamic miss impo
   ).toBe(false);
   expect(
     hitTrace.dynamicPaths.filter((path) => !path.startsWith("./prepared-hit-")).sort(),
-  ).toEqual([
-    "../commands/dev-local-compiler.js",
-    "../services/local-capabilities.js",
-    "./dev-telemetry-native.service.js",
-    "./dev-telemetry-operation.js",
-  ]);
+  ).toEqual(["../commands/dev-local-compiler.js", "../services/local-capabilities.js"]);
   expect(hitTrace.dynamicPaths.filter((path) => path.startsWith("./prepared-hit-"))).toHaveLength(
     1,
   );

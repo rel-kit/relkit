@@ -1,35 +1,68 @@
-import { access, cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+/** Packages the already-built private UI into the independently distributed inspector. */
+import { access, cp, lstat, mkdir, mkdtemp, rename, rm } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
+import { Effect } from "effect";
+import { scaffoldNative } from "./scaffold-native.js";
+import { runBenchmarkMain } from "./dev-readiness/benchmark-main.js";
 
-const root = resolve(import.meta.dir, "..");
-const inspector = join(root, "apps/inspector");
-const distName = ".next-packaged";
-const build = join(inspector, distName);
-const standalone = join(build, "standalone");
-const standaloneApp = join(standalone, "apps/inspector");
-const output = join(root, "packages/cli/dist/inspector");
-const nextEnv = join(inspector, "next-env.d.ts");
-const nextEnvSource = await readFile(nextEnv, "utf8");
-
-const child = Bun.spawn([process.execPath, "run", "build"], {
-  cwd: inspector,
-  env: { ...process.env, RELKIT_INSPECTOR_DIST_DIR: distName },
-  stdout: "inherit",
-  stderr: "inherit",
+/** The workspace task graph builds the private UI before this producer runs. */
+const packageInspector = Effect.fn("Inspector.packageUi")(function* () {
+  const root = resolve(import.meta.dir, "..");
+  const ui = join(root, "apps/inspector");
+  const distName = ".next";
+  const build = join(ui, distName);
+  const app = join(build, "standalone/apps/inspector");
+  const output = join(root, "packages/inspector/dist/ui");
+  for (const file of [
+    join(build, "BUILD_ID"),
+    join(app, "package.json"),
+    join(app, "server.js"),
+    join(build, "static"),
+  ])
+    yield* scaffoldNative("inspector.required-output", () => access(file));
+  yield* scaffoldNative("inspector.output-parent", () =>
+    mkdir(dirname(output), { recursive: true }),
+  );
+  const stage = yield* Effect.acquireRelease(
+    scaffoldNative("inspector.stage", () => mkdtemp(join(dirname(output), ".inspector-ui-"))),
+    (path) =>
+      scaffoldNative("inspector.stage-release", () =>
+        rm(path, { recursive: true, force: true }),
+      ).pipe(Effect.orDie),
+  );
+  for (const file of ["package.json", "server.js"])
+    yield* scaffoldNative("inspector.copy", () => cp(join(app, file), join(stage, file)));
+  yield* scaffoldNative("inspector.next-output", () =>
+    cp(join(app, distName), join(stage, distName), { recursive: true }),
+  );
+  yield* scaffoldNative("inspector.static", () =>
+    cp(join(build, "static"), join(stage, distName, "static"), { recursive: true }),
+  );
+  yield* scaffoldNative("inspector.public", () => copyPublic(ui, stage));
+  yield* scaffoldNative("inspector.publish", async () => {
+    const previous = await lstat(output).catch((cause) => {
+      if (cause instanceof Error && "code" in cause && cause.code === "ENOENT") return undefined;
+      throw cause;
+    });
+    if (previous?.isSymbolicLink()) throw new Error("Inspector output must not be a symlink");
+    await rm(output, { recursive: true, force: true });
+    await rename(stage, output);
+  });
+  yield* Effect.sync(() =>
+    console.log("Packaged standalone inspector UI in packages/inspector/dist/ui."),
+  );
 });
-const exitCode = await child.exited;
-await writeFile(nextEnv, nextEnvSource, "utf8");
-if (exitCode !== 0) throw new Error(`Inspector build failed with exit code ${exitCode}.`);
 
-await rm(output, { recursive: true, force: true });
-await mkdir(output, { recursive: true });
-for (const file of ["package.json", "server.js"])
-  await cp(join(standaloneApp, file), join(output, file));
-await cp(join(standaloneApp, distName), join(output, distName), { recursive: true });
-await cp(join(build, "static"), join(output, distName, "static"), { recursive: true });
-try {
-  await access(join(inspector, "public"));
-  await cp(join(inspector, "public"), join(output, "public"), { recursive: true });
-} catch {}
+/** Only an absent optional public directory is ignored; permissions and I/O failures remain failures. */
+async function copyPublic(ui: string, stage: string) {
+  const path = join(ui, "public");
+  try {
+    await access(path);
+  } catch (cause) {
+    if (cause instanceof Error && "code" in cause && cause.code === "ENOENT") return;
+    throw cause;
+  }
+  await cp(path, join(stage, "public"), { recursive: true });
+}
 
-console.log("Packaged inspector server in packages/cli/dist/inspector.");
+if (import.meta.main) await runBenchmarkMain(packageInspector().pipe(Effect.scoped));
