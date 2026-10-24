@@ -92,7 +92,7 @@
       },
     },
     "apps/inspector": {
-      "name": "@relkit/inspector",
+      "name": "@relkit/inspector-ui",
       "dependencies": {
         "@opentelemetry/api": "1.9.1",
         "@orpc/client": "catalog:",
@@ -555,7 +555,6 @@
         "@relkit/jobs": "workspace:*",
         "@relkit/local-service": "workspace:*",
         "@relkit/observability": "workspace:*",
-        "@relkit/observability-local": "workspace:*",
         "@relkit/provider": "workspace:*",
         "@relkit/realtime": "workspace:*",
         "@relkit/runtime-effect": "workspace:*",
@@ -564,9 +563,6 @@
         "create-relkit": "workspace:*",
         "effect": "catalog:",
         "hono": "catalog:",
-        "next": "catalog:",
-        "react": "catalog:",
-        "react-dom": "catalog:",
         "typescript": "catalog:",
       },
       "devDependencies": {
@@ -833,6 +829,28 @@
         "effect": "catalog:",
       },
       "devDependencies": {
+        "vitest": "catalog:",
+      },
+    },
+    "packages/inspector": {
+      "name": "@relkit/inspector",
+      "version": "0.1.0",
+      "bin": {
+        "relkit-inspector": "./dist/bin.js",
+      },
+      "dependencies": {
+        "@effect/platform-bun": "catalog:",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/inspector-api": "workspace:*",
+        "@relkit/observability": "workspace:*",
+        "@relkit/observability-local": "workspace:*",
+        "effect": "catalog:",
+        "next": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
         "vitest": "catalog:",
       },
     },
@@ -2193,9 +2211,11 @@
 
     "@relkit/inngest": ["@relkit/inngest@workspace:integrations/packages/inngest"],
 
-    "@relkit/inspector": ["@relkit/inspector@workspace:apps/inspector"],
+    "@relkit/inspector": ["@relkit/inspector@workspace:packages/inspector"],
 
     "@relkit/inspector-api": ["@relkit/inspector-api@workspace:packages/inspector-api"],
+
+    "@relkit/inspector-ui": ["@relkit/inspector-ui@workspace:apps/inspector"],
 
     "@relkit/integrations": ["@relkit/integrations@workspace:integrations/catalog"],
 

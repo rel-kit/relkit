@@ -67,7 +67,6 @@
     "@relkit/jobs": "workspace:*",
     "@relkit/local-service": "workspace:*",
     "@relkit/observability": "workspace:*",
-    "@relkit/observability-local": "workspace:*",
     "@relkit/provider": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
     "@relkit/runtime-hono": "workspace:*",
@@ -75,9 +74,6 @@
     "@relkit/supervisor": "workspace:*",
     "effect": "catalog:",
     "hono": "catalog:",
-    "next": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
     "typescript": "catalog:"
   },
   "devDependencies": {
@@ -88,7 +84,7 @@
     "vitest": "catalog:"
   },
   "scripts": {
-    "build": "tsc -b && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-inspector.ts && bun run ../../scripts/package-dev-bootstrap.ts",
+    "build": "tsc -b && bun run ../../scripts/prune-cli-output.ts && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-dev-bootstrap.ts",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false && bun run ../../scripts/package-editor.ts"
   },

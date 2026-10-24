@@ -1,5 +1,5 @@
 {
-  "name": "@relkit/inspector",
+  "name": "@relkit/inspector-ui",
   "private": true,
   "type": "module",
   "scripts": {

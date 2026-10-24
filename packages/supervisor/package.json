@@ -23,6 +23,10 @@
   },
   "type": "module",
   "exports": {
+    "./internal/request": {
+      "types": "./dist/proxy-request.d.ts",
+      "import": "./dist/proxy-request.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"

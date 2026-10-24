@@ -12,11 +12,14 @@ export const OBSERVABILITY_SOURCE_ROOTS = Object.freeze([
   "packages/engine/src",
   "packages/agents/src",
   "packages/inspector-api/src",
+  "packages/inspector/src",
   "packages/cli/src/commands",
 ] as const);
 
 export const OBSERVABILITY_DIRECT_OUTPUT_ADAPTERS = Object.freeze([
   "packages/cli/src/commands/dev-logger.ts",
+  // Native command help emits static usage text before acquiring observation resources.
+  "packages/inspector/src/tool-main.ts",
 ] as const);
 
 export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
@@ -25,6 +28,9 @@ export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
   "packages/observability/src/record-admission.ts",
   // Byte accounting and search operate on admitted, redacted records.
   "packages/observability/src/local/batch-queue-effect.ts",
+  "packages/observability/src/stream-subscriber-queue.ts",
+  // The standalone collector measures re-admitted redacted persistence envelopes.
+  "packages/inspector/src/collector.ts",
   "packages/observability/src/memory-storage.ts",
   "packages/observability/src/query.ts",
   "packages/observability/src/query-detail-effect.ts",

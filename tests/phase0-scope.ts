@@ -9,6 +9,23 @@ import { manifest } from "./phase0-contracts.js";
 import { scopeFixture } from "./phase0-scope-fixture.js";
 
 describe.serial("Phase 0 guardrails", () => {
+  test("scans content only when the final file extension is text", async () => {
+    const name = ["terra", "form"].join("");
+    const image = "tests/example.spec.ts-snapshots/image.png";
+    const source = "packages/app/src/value.ts";
+    return withFixture(
+      { [image]: name, [source]: `export const value = "${name}";` },
+      async (fixture) => {
+        expect(scanScope(fixture)).toEqual([
+          expect.objectContaining({ file: source, rule: "alternate-iac" }),
+        ]);
+        const result = await execute(process.execPath, ["run", boundaryScript, fixture]);
+        expect(result.exitCode).not.toBe(0);
+        expect(result.stderr).toContain(source);
+        expect(result.stderr).not.toContain(image);
+      },
+    );
+  });
   test("scope exclusions report each affected path and rule", async () => {
     const { files, expected } = scopeFixture();
     return withFixture(files, async (fixture) => {

@@ -39,6 +39,7 @@
     { "path": "./packages/functions" },
     { "path": "./packages/graph" },
     { "path": "./packages/inspector-api" },
+    { "path": "./packages/inspector" },
     { "path": "./packages/invocation" },
     { "path": "./packages/jobs" },
     { "path": "./packages/local-service" },
