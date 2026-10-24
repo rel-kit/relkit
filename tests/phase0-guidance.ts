@@ -1,4 +1,4 @@
-/** Retains exact original repository-command and topology expectations as pure read-only guardrail facts. */
+/** Defines current repository-command and topology expectations as pure read-only guardrail facts. */
 export const staleAdvice = [
   "apps/web",
   "packages/ui",
@@ -9,6 +9,7 @@ export const staleAdvice = [
   "Turborepo starter",
   "currently empty",
   "reserved inspector",
+  "RELKIT_INSPECTOR_ROOT",
 ];
 
 export const currentTopology = [
@@ -25,6 +26,16 @@ export const currentTopology = [
   "port `3210`",
 ];
 
-export const readmeTopology = ["apps/docs", "integrations/catalog", "integrations/packages"];
+export const readmeTopology = [
+  "apps/docs",
+  "apps/inspector",
+  "integrations/catalog",
+  "integrations/packages",
+];
 
-export const inspectorGuidance = ["apps/inspector", "Pulumi", "RELKIT_INSPECTOR_ROOT"];
+export const inspectorGuidance = [
+  "Pulumi",
+  "inspector: { enabled: true }",
+  "127.0.0.1",
+  "packages/inspector/README.md",
+];

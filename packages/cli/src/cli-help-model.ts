@@ -60,7 +60,7 @@ const root = command(
       addHelp,
       migrateHelp,
       dbHelp,
-      command("dev", "Run app, inspector, OpenAPI, and Scalar", "relkit dev", {
+      command("dev", "Run the app and its selected development features", "relkit dev", {
         options: [
           projectRoot,
           option(
@@ -69,7 +69,11 @@ const root = command(
             "Prepare a validated dev snapshot and exit without a server",
           ),
           option("port", "integer", "Application port"),
-          option("inspector-port", "integer", "Inspector port"),
+          option(
+            "inspector-port",
+            "integer",
+            "Retired; configure inspector.connection.port, or launch relkit-inspector --port separately",
+          ),
           option("local", "choice", "Start required local services", [], ["on", "off"]),
           ...devLogOptions,
         ],
@@ -96,7 +100,11 @@ const root = command(
         options: [
           projectRoot,
           option("port", "integer", "Application port"),
-          option("inspector-port", "integer", "Inspector port"),
+          option(
+            "inspector-port",
+            "integer",
+            "Retired; configure inspector.connection.port for the application bridge",
+          ),
           option("no-ports", "boolean", "Skip port availability checks"),
           option("pulumi", "boolean", "Require Pulumi"),
           option("no-pulumi", "boolean", "Skip Pulumi requirements"),

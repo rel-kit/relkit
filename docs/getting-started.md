@@ -116,16 +116,18 @@ and diagnostics output under `.relkit/generated`.
 bun run dev
 ```
 
-The backend starts on `http://localhost:3000` and the inspector starts on
-`http://localhost:3210`. In another terminal:
+The backend starts on `http://localhost:3000`. In another terminal:
 
 ```sh
 curl "http://localhost:3000/hello?name=RELKIT"
 ```
 
-The CLI includes the prebuilt inspector. Framework contributors testing inspector
-source can set `RELKIT_INSPECTOR_ROOT` to `apps/inspector`; generated applications
-do not need that override.
+The generated application keeps inspection disabled. To inspect development work,
+select `inspector: { enabled: true }` in `defineApp`, then run the separately
+installed `relkit-inspector --project-root .` in another terminal. The bridge uses
+`127.0.0.1:0`; the tool UI defaults to `127.0.0.1:3210` and owns local history.
+See the [standalone guide](../packages/inspector/README.md) for runtime requirements
+and current candidate availability. Stopping the tool leaves the backend running.
 
 Expected response:
 
@@ -133,9 +135,11 @@ Expected response:
 { "message": "Hello, RELKIT!" }
 ```
 
-The same process serves OpenAPI at
-`http://localhost:3000/_relkit/v1/openapi.json` and Scalar at
-`http://localhost:3000/_relkit/v1/api-reference`.
+The same process serves OpenAPI JSON at
+`http://localhost:3000/_relkit/v1/openapi.json`. The Scalar UI is a separate
+opt-in through `server.apiDocs.ui: "scalar"`; its route is absent by default.
+Follow the [OpenAPI guide](../apps/docs/content/docs/http/openapi.mdx) to install
+and configure the selected UI.
 
 ## 5. Apply a source change
 

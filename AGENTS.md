@@ -29,8 +29,10 @@ The main product topology is:
 | `openspec/`             | Change proposals, tasks, delta specifications, and change evidence.                                                             |
 | `repos/effect`          | Local Effect reference source, ignored by Git; never edit or install in it.                                                     |
 
-Generated projects run a backend on `PORT=3000` and the real Next inspector on
-port `3210` by default. `.relkit/generated` contains graph and manifest outputs;
+Generated projects run a backend on `PORT=3000`. Inspection defaults to disabled;
+`inspector: { enabled: true }` starts only an authenticated bridge on `127.0.0.1:0`.
+The separately installed `@relkit/inspector` owns the Next UI (default `3210`) and
+DuckDB history. `.relkit/generated` contains graph and manifest outputs;
 `.relkit/build` contains server and deployment build output; `.relkit/state` and
 `.relkit/observability` contain local runtime data. Preserve user-owned output
 and dirty worktree changes.
@@ -84,9 +86,10 @@ real AWS acceptance is opt-in locally and is not run by CI.
 Generated-project commands are `bun run dev`, `bun run test`, `bun run check`,
 `bun run typecheck`, `bun run build`, and `bun run start`. Cloud and deployment
 default to `none`; use `--cloud aws --deploy pulumi` when AWS deployment is
-required. The CLI package contains the prebuilt inspector;
-`RELKIT_INSPECTOR_ROOT` is only for framework contributors testing inspector
-source.
+required. Run the standalone `relkit-inspector` separately when inspection is
+selected; configure its UI port through its own `--port` flag. The application
+uses `inspector.connection.host/port` for bridge settings. Neither installing the
+tool nor legacy environment flags enables rich inspection in production.
 
 ## Editing rules
 
