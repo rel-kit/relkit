@@ -42,6 +42,8 @@ export const packageLeafExports: Readonly<Record<string, ReleaseExports>> = {
   "cloud-aws": { "./runtime": esm("runtime/index") },
   contracts: { "./operation": esm("operation"), "./jobs": esm("jobs") },
   "runtime-effect": { "./logger": esm("logger") },
+  "inspector-api": { "./connection": esm("connection") },
+  supervisor: { "./internal/request": esm("proxy-request") },
   events: { "./effect": esm("effect") },
   jobs: { "./adapter": esm("adapter"), "./server": esm("server"), "./legacy": esm("legacy") },
   cli: {
@@ -132,6 +134,7 @@ export const packageLeafExports: Readonly<Record<string, ReleaseExports>> = {
     "./early": esm("early-records.service"),
     "./local/record": esm("local/types"),
     "./local/worker-contract": esm("local/worker-contract"),
+    "./local/protocol": esm("local/protocol"),
     "./internal/query": esm("query-validation"),
     "./local/queue": esm("local/batch-queue-effect"),
   },

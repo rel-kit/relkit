@@ -24,7 +24,9 @@ export const descriptions: Record<string, string> = {
   "@relkit/functions":
     "RELKIT function authoring API; prefer @relkit/app/functions in applications.",
   "@relkit/graph": "Unsupported internal RELKIT graph model; use @relkit/app.",
-  "@relkit/inspector-api": "Unsupported internal API for the RELKIT inspector; use @relkit/cli.",
+  "@relkit/inspector-api": "Internal live bridge and native jobs protocol for RELKIT tooling.",
+  "@relkit/inspector":
+    "Standalone RELKIT development inspector, collector, and local diagnostic history.",
   "@relkit/integrations": "Metadata-only catalog of independently selected RELKIT integrations.",
   "@relkit/invocation": "Unsupported internal RELKIT invocation contracts; use @relkit/app.",
   "@relkit/jobs": "RELKIT job authoring API; prefer @relkit/app/jobs in applications.",

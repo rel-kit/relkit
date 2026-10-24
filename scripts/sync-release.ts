@@ -82,7 +82,7 @@ for (const directory of workspacePackageDirectories(root)) {
           ? ["dist", "src/catalog-resolution.ts", "src/catalog-resolution.types.ts"]
           : ["dist"],
     publishConfig: { access: "public" },
-    engines: { bun: ">=1.3.10" },
+    engines: { bun: ">=1.3.10", ...(name === "@relkit/inspector" ? { node: ">=20.9.0" } : {}) },
     ...rest,
     ...(relkitMetadata === undefined ? {} : { relkit: relkitMetadata }),
     ...(metadataPackages.has(name)

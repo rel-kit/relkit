@@ -168,7 +168,9 @@ export function checkManifests(
         ? { relkit: "./dist/bin.js" }
         : directoryName === "create-relkit"
           ? { "create-relkit": "./dist/bin.js" }
-          : undefined;
+          : directoryName === "inspector"
+            ? { "relkit-inspector": "./dist/bin.js" }
+            : undefined;
     if (JSON.stringify(stable(item.manifest.bin)) !== JSON.stringify(stable(expectedBin)))
       throw new Error(`Binary map mismatch: ${item.name}`);
     if (
@@ -189,6 +191,7 @@ export function checkManifests(
         ) ||
       item.manifest.publishConfig?.access !== "public" ||
       item.manifest.engines?.bun !== ">=1.3.10" ||
+      (directoryName === "inspector" && item.manifest.engines?.node !== ">=20.9.0") ||
       item.manifest.private === true
     )
       throw new Error(`Release metadata mismatch: ${item.name}`);

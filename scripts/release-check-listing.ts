@@ -24,6 +24,30 @@ export function assertListing(item: PackageInfo, listing: string[], packed: Reco
   if (item.name === "@relkit/cli" && !listing.includes("package/editor/package.json"))
     throw new Error("Packed CLI editor resolver entry is missing.");
   if (item.name === "@relkit/cli")
+    for (const path of listing)
+      if (
+        /^package\/dist\/(?:inspector\/|commands\/(?:dev-process|dev-inspector-installation|dev-telemetry(?!-config)))/.test(
+          path,
+        )
+      )
+        throw new Error(`Packed CLI contains retired inspector ownership: ${path}`);
+  if (item.name === "@relkit/inspector") {
+    for (const path of [
+      "dist/bin.js",
+      "dist/ui/server.js",
+      "dist/ui/package.json",
+      "dist/ui/.next/BUILD_ID",
+    ])
+      if (!listing.includes(`package/${path}`))
+        throw new Error(`Packed inspector asset is missing: ${path}`);
+    if (
+      !listing.some(
+        (path) => path.startsWith("package/dist/ui/.next/static/") && path.endsWith(".js"),
+      )
+    )
+      throw new Error("Packed inspector static assets are missing");
+  }
+  if (item.name === "@relkit/cli")
     for (const file of [
       "migration-worker",
       "migration-config",

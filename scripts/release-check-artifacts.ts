@@ -1,4 +1,5 @@
-import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { cpSync } from "node:fs";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import {
@@ -50,15 +51,16 @@ async function stagePackages(items: PackageInfo[]): Promise<string> {
       console.error(`Staging release package: ${item.name}`);
       const target = join(staging, "packages", basename(item.directory));
       await mkdir(target);
+      // Async copying stalled mid-package in the pinned Bun runtime.
       for (const file of item.manifest.files as string[])
-        await cp(join(item.directory, file), join(target, file), {
+        cpSync(join(item.directory, file), join(target, file), {
           recursive: true,
           filter: (path) => !/(?:^|\/)tsconfig\.tsbuildinfo$/.test(path),
         });
-      await cp(join(item.directory, "package.json"), join(target, "package.json"));
-      await cp(join(root, "LICENSE"), join(target, "LICENSE"));
+      cpSync(join(item.directory, "package.json"), join(target, "package.json"));
+      cpSync(join(root, "LICENSE"), join(target, "LICENSE"));
       try {
-        await cp(join(item.directory, "README.md"), join(target, "README.md"));
+        cpSync(join(item.directory, "README.md"), join(target, "README.md"));
       } catch {
         await writeFile(
           join(target, "README.md"),
