@@ -26,7 +26,7 @@ test("invalid selectors report exact properties without changing inspector confi
   expect(issues.map((issue) => issue.path)).toContain("server.agUi");
   expect(issues.map((issue) => issue.path)).toContain("server.apiDocs.ui");
   expect(loadConfig({}, "/workspace/app").inspector).toMatchObject({
-    port: 3210,
-    enabledInProduction: false,
+    enabled: false,
+    connection: { host: "127.0.0.1", port: 0 },
   });
 });

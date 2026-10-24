@@ -1,7 +1,7 @@
 /**
  * Defines accepted server/tooling data and defaults without acquiring transports.
- * Optional MCP, AG-UI and Scalar remain explicit selections; inspector settings
- * continue to use the existing Stage-1 schema.
+ * Optional MCP, AG-UI and Scalar remain explicit selections; inspection selects
+ * a development bridge whose listener is independent of the standalone UI.
  */
 export type {
   ConfigIssueCode,
@@ -14,6 +14,11 @@ export type {
   ConfigLoaderOptions,
 } from "./config-loader-types.types.js";
 import { Schema } from "effect";
+import {
+  DEFAULT_INSPECTOR_CONFIGURATION,
+  InspectorConfigurationSchema,
+  InspectorConfigurationInputSchema,
+} from "@relkit/contracts";
 
 /** Validated TCP port shared by field-level readers and normalized records. */
 export const ConfigPort = Schema.Number.check(
@@ -54,13 +59,7 @@ export const ToolingConfigInputSchema = Schema.Struct({
       agUi: Schema.optionalKey(Schema.Boolean),
     }),
   ),
-  inspector: Schema.optionalKey(
-    Schema.Struct({
-      port: Schema.optionalKey(Schema.Number),
-      enabledInProduction: Schema.optionalKey(Schema.Boolean),
-      maxPreviewBytes: Schema.optionalKey(Schema.Number),
-    }),
-  ),
+  inspector: Schema.optionalKey(InspectorConfigurationInputSchema),
   deployment: Schema.optionalKey(Schema.Struct({ engine: Schema.String, host: Schema.String })),
 });
 
@@ -82,11 +81,7 @@ export const LoadedToolingConfigSchema = Schema.Struct({
     mcp: Schema.Boolean,
     agUi: Schema.optionalKey(Schema.Boolean),
   }),
-  inspector: Schema.Struct({
-    port: ConfigPort,
-    enabledInProduction: Schema.Boolean,
-    maxPreviewBytes: ConfigPositive,
-  }),
+  inspector: InspectorConfigurationSchema,
   deployment: Schema.optionalKey(Schema.Struct({ engine: Schema.String, host: Schema.String })),
 });
 
@@ -115,11 +110,7 @@ export const DEFAULT_TOOLING_CONFIG = Object.freeze({
     mcp: false,
     agUi: false,
   }),
-  inspector: Object.freeze({
-    port: 3210,
-    enabledInProduction: false,
-    maxPreviewBytes: 1_048_576,
-  }),
+  inspector: DEFAULT_INSPECTOR_CONFIGURATION,
 });
 
 export const DEFAULT_CONFIG = DEFAULT_TOOLING_CONFIG;
