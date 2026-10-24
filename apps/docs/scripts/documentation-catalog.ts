@@ -24,6 +24,13 @@ export const apiPackageDefinitions = [
   apiPackage("client", "Client", "@relkit/client", "packages/client", "core"),
   apiPackage("realtime", "Realtime", "@relkit/realtime", "packages/realtime", "core"),
   apiPackage("testing", "Testing", "@relkit/testing", "packages/testing", "core"),
+  apiPackage(
+    "inspector",
+    "Standalone Inspector",
+    "@relkit/inspector",
+    "packages/inspector",
+    "core",
+  ),
   apiPackage("integrations/aws", "AWS", "@relkit/aws", "integrations/packages/aws", "integrations"),
   apiPackage(
     "integrations/cloudflare",

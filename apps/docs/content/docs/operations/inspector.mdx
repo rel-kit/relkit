@@ -5,8 +5,26 @@ description: Follow an active request through routes, functions, graph relations
 
 import inspectorShell from "../../../../../tests/e2e/inspector-redesign.spec.ts-snapshots/shell-dark-darwin.png";
 
-`bun run dev` starts the application on port 3000 and the Inspector on port 3210 by default. The Inspector reads
-the active backend's versioned internal API and displays the generation ID and graph hash serving requests.
+`bun run dev` starts the application on port 3000. Inspection is optional and disabled by default.
+The separate `@relkit/inspector` tool owns the UI and diagnostic history; enabling the application bridge
+does not launch or install it. The tool requires Bun 1.3.10 or newer and Node.js 20.9.0 or newer.
+The backend-only development workflow needs no Node.js installation.
+
+`relkit jobs` reads and controls live provider state on the application backend;
+it works independently of the inspector UI and application inspection setting.
+Selected jobs retain their native authorization and operation IDs. If the backend
+sets `RELKIT_INTERNAL_ENDPOINT_TOKEN`, set that same admin token explicitly for
+the jobs CLI. Logs, request history and traces belong to the separate inspector.
+
+Enable the bridge explicitly in `relkit.config.ts`:
+
+<include cwd lang="ts" meta='title="relkit.config.ts"'>
+  ../../apps/docs/examples/inspector/config.ts
+</include>
+
+The bridge defaults to `127.0.0.1` with an ephemeral port. Its optional
+`inspector.connection.host` and `inspector.connection.port` settings are separate from the tool's
+UI port, which defaults to 3210. Obsolete `inspector.port` configuration is rejected.
 
 <ImageZoom
   src={inspectorShell}
@@ -23,7 +41,15 @@ the active backend's versioned internal API and displays the generation ID and g
     bun run dev
     ```
 
-    Open `http://localhost:3210` and confirm that it is connected to `http://localhost:3000`.
+    Keep the backend running. In a second terminal, launch the independently installed tool:
+
+    ```sh title="Second terminal — relkit-orders"
+    bunx --no-install relkit-inspector --project-root .
+    ```
+
+    Install `@relkit/inspector` explicitly from the release containing it; local candidate verification
+    does not publish the package. Open `http://127.0.0.1:3210`. The tool discovers and authenticates the
+    running session without evaluating application configuration. Stopping it leaves the backend running.
 
   </Step>
   <Step>
@@ -46,7 +72,10 @@ the active backend's versioned internal API and displays the generation ID and g
     ### Compare graph and HTTP contract
 
     In **Graph**, find the route-to-function edge. The relationship table provides the keyboard and screen-reader
-    equivalent of the canvas. Open **API Reference** to inspect the same operation in Scalar.
+    equivalent of the canvas. Inspect the HTTP contract at
+    `http://localhost:3000/_relkit/v1/openapi.json`. To use **API Reference** in Scalar,
+    follow the [OpenAPI guide](/docs/http/openapi) to install the selected UI and set
+    `server.apiDocs.ui` to `"scalar"`; enabling the Inspector alone leaves that UI disabled.
 
   </Step>
 </Steps>
@@ -64,7 +93,15 @@ rows and Escape closes details. Missing or expired records are identified explic
 
 Filters and the selected log are saved in the URL. Live replacement pauses while inspecting a record, scrolling
 away from the top, or viewing an older page. **New logs available** returns to the newest results. Backend reloads
-and dev restarts preserve committed history within the configured retention limits.
+and dev restarts preserve committed history within the configured retention limits. History defaults to
+`.relkit/observability/observability.duckdb`; use the tool's `--history-directory` for a persistent override.
+Package-runner cache removal does not remove project history. The directory accepts one writer and is
+bound to one project identity.
+
+Before the tool connects, the bridge retains a bounded redacted buffer, initially 2,048 records/2 MiB.
+Overflow, producer delivery failures and interrupted flushing are reported as incomplete capture. The
+collector acknowledges a session/sequence only after committing it; replay does not duplicate history.
+Later span revisions remain distinct updates. Diagnostic history is separate from durable application data.
 
 Search and detail views cover services, routes, functions, jobs, events, storage, cache, AI, middleware,
 integrations, environment contracts, diagnostics, requests, logs, traces, graph relationships, and API contracts.
@@ -83,8 +120,16 @@ generation and the Inspector continues to show that active state.
 
 <Accordions type="multiple">
   <Accordion title="The Inspector is disconnected">
-    Call `http://localhost:3000/_relkit/v1/health/ready` and `/_relkit/v1/graph`. If the backend is
-    healthy, restart the Inspector and compare its graph hash with the backend response.
+    Confirm that the backend is running and inspection is explicitly enabled. With no compatible
+    live session the tool keeps retrying. With multiple sessions, select a private descriptor
+    through `--connection-file`. A reload keeps its session; a full dev restart rotates its
+    credentials.
+  </Accordion>
+  <Accordion title="History is locked or unavailable">
+    Stop the other inspector writing the same history directory. Never delete the database to clear
+    a lock. Resolve permission, disk or worker failures before restarting the tool; automatic
+    history opening stops after three failures. Existing application data remains outside this
+    history owner.
   </Accordion>
   <Accordion title="The graph looks stale">
     Read the rejected candidate diagnostic. The Inspector intentionally shows the last valid
@@ -100,7 +145,10 @@ generation and the Inspector continues to show that active state.
   </Accordion>
 </Accordions>
 
-Inspector actions are local-only and production-restricted. Do not expose an unprotected production Inspector
-endpoint.
+Inspection is development-only. Production builds exclude rich inspection regardless of development
+configuration or legacy environment overrides. Private descriptors contain session credentials: keep
+`.relkit/connections/` private and out of source control. The tool keeps credentials server-side and does
+not accept connection paths or network targets from browser requests. Controls retain native application
+authorization/operation identity and reject stale generations without blindly retrying mutations.
 
 <include cwd>content/generated/related/operations-inspector.mdx</include>

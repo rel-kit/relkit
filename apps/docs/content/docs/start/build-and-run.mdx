@@ -24,6 +24,10 @@ bun run start
 The ignored `.env` contains the same secret from the auth chapter; changing it would
 invalidate existing sessions. Keep this terminal open while the local production server runs.
 
+Production builds exclude the rich development Inspector even when `inspector.enabled`
+was selected during development. The optional [standalone Inspector](/docs/operations/inspector)
+runs separately from `bun run dev`; it is not part of `bun run start`.
+
 In a second terminal, sign in with the account from the authentication chapter and verify the
 protected read again:
 

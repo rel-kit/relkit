@@ -467,22 +467,22 @@ Apply pending migrations using the application's installed tools
 
 ### `relkit dev`
 
-Run app, inspector, OpenAPI, and Scalar
+Run the app and its selected development features
 
-| Option           | Value                                             | Description                                                |
-| ---------------- | ------------------------------------------------- | ---------------------------------------------------------- |
-| --project-root   | string                                            | Application directory (defaults to cwd)                    |
-| --prepare        | boolean                                           | Prepare a validated dev snapshot and exit without a server |
-| --port           | integer                                           | Application port                                           |
-| --inspector-port | integer                                           | Inspector port                                             |
-| --local          | on, off                                           | Start required local services                              |
-| --log-level      | all, trace, debug, info, warn, error, fatal, none | Minimum terminal severity (default: info)                  |
-| --verbose        | boolean                                           | Show debug events and full retained diagnostics            |
-| --no-color       | boolean                                           | Disable terminal colors                                    |
+| Option           | Value                                             | Description                                                                                |
+| ---------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| --project-root   | string                                            | Application directory (defaults to cwd)                                                    |
+| --prepare        | boolean                                           | Prepare a validated dev snapshot and exit without a server                                 |
+| --port           | integer                                           | Application port                                                                           |
+| --inspector-port | integer                                           | Retired; configure inspector.connection.port, or launch relkit-inspector --port separately |
+| --local          | on, off                                           | Start required local services                                                              |
+| --log-level      | all, trace, debug, info, warn, error, fatal, none | Minimum terminal severity (default: info)                                                  |
+| --verbose        | boolean                                           | Show debug events and full retained diagnostics                                            |
+| --no-color       | boolean                                           | Disable terminal colors                                                                    |
 
 #### Examples
 
-`relkit dev` — Run app, inspector, OpenAPI, and Scalar
+`relkit dev` — Run the app and its selected development features
 
 ### `relkit check`
 
@@ -972,14 +972,14 @@ Delete a schedule
 
 Check local prerequisites and ports
 
-| Option           | Value   | Description                             |
-| ---------------- | ------- | --------------------------------------- |
-| --project-root   | string  | Application directory (defaults to cwd) |
-| --port           | integer | Application port                        |
-| --inspector-port | integer | Inspector port                          |
-| --no-ports       | boolean | Skip port availability checks           |
-| --pulumi         | boolean | Require Pulumi                          |
-| --no-pulumi      | boolean | Skip Pulumi requirements                |
+| Option           | Value   | Description                                                             |
+| ---------------- | ------- | ----------------------------------------------------------------------- |
+| --project-root   | string  | Application directory (defaults to cwd)                                 |
+| --port           | integer | Application port                                                        |
+| --inspector-port | integer | Retired; configure inspector.connection.port for the application bridge |
+| --no-ports       | boolean | Skip port availability checks                                           |
+| --pulumi         | boolean | Require Pulumi                                                          |
+| --no-pulumi      | boolean | Skip Pulumi requirements                                                |
 
 #### Examples
 

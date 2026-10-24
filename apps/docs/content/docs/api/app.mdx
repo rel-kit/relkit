@@ -32,13 +32,9 @@ export * from "@relkit/agents";
 
 ## `app-config.types.ts`
 
-API documentation visibility and domain exclusions.
-
-**Example**
-
-```ts
-const docs: ApiDocsConfig = { enabledInProduction: false };
-```
+Declares server exposure and optional HTTP capability selection without loading
+native SDKs. Compiler validation supplies defaults before runtime generation;
+inspector settings select only the development bridge, independently of a tool.
 
 ---
 
@@ -75,7 +71,7 @@ export interface ApiDocsConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L10)
 
 ## AppCompatibilityConfig (interface)
 
@@ -95,29 +91,25 @@ export interface AppCompatibilityConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L38)
 
 ## InspectorConfig (interface)
 
-Inspector settings attached to an application descriptor.
+Development bridge selection; installing or running the UI is independent.
 
 **Example**
 
 ```ts
-const inspector: InspectorConfig = { port: 3210 };
+const inspector: InspectorConfig = { enabled: true };
 ```
 
 **Signature**
 
 ```ts
-export interface InspectorConfig {
-  readonly port?: number;
-  readonly enabledInProduction?: boolean;
-  readonly maxPreviewBytes?: number;
-}
+export interface InspectorConfig extends InspectorConfigurationInput {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L33)
 
 ## ServerConfig (interface)
 
@@ -143,7 +135,7 @@ export interface ServerConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L20)
 
 ## `app-observability.ts`
 
@@ -219,6 +211,10 @@ declare const observeApp: <A, E, R>(
 
 ## `app-observability.types.ts`
 
+Defines bounded application-authoring operation labels and the injectable
+observer contract. Observers preserve each operation's success/error/services
+while the live implementation records its spans and outcomes.
+
 ---
 
 ## Exports Grouped by Category
@@ -249,6 +245,7 @@ type AppOperation =
   | "env.isDefinition"
   | "id.derive"
   | "compatibility.normalize"
+  | "runtimeMetadata.normalize"
   | "alias.assertExclusive"
   | "constants.define"
   | "prompt.define"
@@ -256,7 +253,7 @@ type AppOperation =
   | "context.resolve";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.types.ts#L11)
 
 ## AppTelemetryService (interface)
 
@@ -285,7 +282,7 @@ export interface AppTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.types.ts#L26)
 
 ## `app-provider-capabilities.ts`
 
@@ -555,6 +552,45 @@ type NormalizedProviders<Providers extends AppProviderInputs> = {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L77)
+
+## `app-runtime-metadata.ts`
+
+Copies application server/deployment metadata and validates optional inspection
+selection before descriptor freezing. These pure authoring effects acquire no
+listeners or providers; invalid input retains the public validation cause.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [normalizeAppRuntimeMetadataEffect](#normalizeappruntimemetadataeffect)
+
+---
+
+# utils
+
+## normalizeAppRuntimeMetadataEffect
+
+Normalizes immutable runtime policy without starting its selected features.
+
+**Signature**
+
+```ts
+declare const normalizeAppRuntimeMetadataEffect: (
+  options: Pick<ApplicationDescriptor, "server" | "inspector" | "deployment">,
+) => Effect.Effect<
+  {
+    server: ServerConfig | undefined;
+    inspector: InspectorConfiguration | undefined;
+    deployment: Readonly<Record<string, JsonValue>> | undefined;
+  },
+  AppValidationFailure,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-runtime-metadata.ts#L18)
 
 ## `app-validation.ts`
 
@@ -1574,6 +1610,10 @@ export interface ResolvedApplicationContext {
 
 ## `define-app.ts`
 
+Constructs immutable application descriptors without acquiring providers or
+optional tools. Shared bridge validation rejects obsolete inspection settings;
+the synchronous facade preserves original validation errors for authors.
+
 ---
 
 ## Exports Grouped by Category
@@ -1619,7 +1659,7 @@ declare const defineApp: <
 ) => ApplicationDescriptor<Shape, Providers, Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L127)
 
 Since v0.2.0
 
@@ -1635,7 +1675,7 @@ Re-exports all named exports from the "./define-app.types.js" module.
 export * from "./define-app.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L30)
 
 ## APP_PROVIDER_CAPABILITIES
 
@@ -1653,7 +1693,7 @@ declare const APP_PROVIDER_CAPABILITIES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L31)
 
 ## defineAppEffect
 
@@ -1679,7 +1719,7 @@ declare const defineAppEffect: <
 ) => Effect.Effect<ApplicationDescriptor<Shape, Providers, Exporters>, AppValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L54)
 
 ## `define-app.types.ts`
 
