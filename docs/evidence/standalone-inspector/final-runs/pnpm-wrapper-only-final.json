@@ -1,0 +1,281 @@
+{
+  "policy": {
+    "stage": "final",
+    "exceptions": []
+  },
+  "observations": [
+    {
+      "boundary": "installation",
+      "complete": true,
+      "evidence": "/tmp/relkit-s2-config-20261023-01a1663e/final-boundaries/pnpm-wrapper-only-raw.json",
+      "paths": [
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@relkit/contracts"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "effect"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "@clack/core"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "fast-string-width"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "fast-wrap-ansi"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "sisteransi"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@relkit/contracts",
+            "effect"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@relkit/contracts",
+            "semver"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "@clack/core",
+            "fast-wrap-ansi"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "@clack/core",
+            "sisteransi"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "fast-string-width",
+            "fast-string-truncated-width"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "fast-wrap-ansi",
+            "fast-string-width"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "@clack/core",
+            "fast-wrap-ansi",
+            "fast-string-width"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "fast-wrap-ansi",
+            "fast-string-width",
+            "fast-string-truncated-width"
+          ]
+        },
+        {
+          "boundary": "installation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit",
+            "@clack/prompts",
+            "@clack/core",
+            "fast-wrap-ansi",
+            "fast-string-width",
+            "fast-string-truncated-width"
+          ]
+        }
+      ]
+    },
+    {
+      "boundary": "evaluation",
+      "evidence": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-XL6b96/wrapper-only/.consumer-probe/evaluated-d8bac825-079b-47e6-8618-acfc79123c88.json",
+      "complete": true,
+      "paths": [
+        {
+          "boundary": "evaluation",
+          "packages": [
+            "relkit-footprint-wrapper-only"
+          ],
+          "artifact": ".consumer-probe/retained-public-entry.ts"
+        },
+        {
+          "boundary": "evaluation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit"
+          ],
+          "artifact": "node_modules/.pnpm/relkit@0.7.11/node_modules/relkit/dist/index.js"
+        },
+        {
+          "boundary": "evaluation",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit",
+            "create-relkit"
+          ],
+          "artifact": "node_modules/.pnpm/create-relkit@0.7.11/node_modules/create-relkit/dist/launcher.js"
+        }
+      ]
+    },
+    {
+      "boundary": "declarations",
+      "complete": true,
+      "evidence": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-XL6b96/wrapper-only/.consumer-probe/retained-public-entry.ts",
+      "paths": [
+        {
+          "boundary": "declarations",
+          "packages": [
+            "relkit-footprint-wrapper-only"
+          ],
+          "artifact": ".consumer-probe/retained-public-entry.ts"
+        },
+        {
+          "boundary": "declarations",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit"
+          ],
+          "artifact": "node_modules/.pnpm/relkit@0.7.11/node_modules/relkit/dist/index.d.ts"
+        }
+      ]
+    },
+    {
+      "boundary": "artifact",
+      "evidence": "/tmp/relkit-s2-config-20261023-01a1663e/final-boundaries/pnpm-wrapper-only-raw.json",
+      "complete": true,
+      "paths": [
+        {
+          "boundary": "artifact",
+          "packages": [
+            "relkit-footprint-wrapper-only"
+          ],
+          "artifact": ".consumer-probe/retained-public-entry.ts"
+        },
+        {
+          "boundary": "artifact",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit"
+          ],
+          "artifact": "node_modules/.pnpm/relkit@0.7.11/node_modules/relkit/dist/index.js"
+        },
+        {
+          "boundary": "artifact",
+          "packages": [
+            "relkit-footprint-wrapper-only",
+            "relkit"
+          ],
+          "artifact": "node_modules/.pnpm/relkit@0.7.11/node_modules/relkit/package.json"
+        }
+      ]
+    }
+  ]
+}
