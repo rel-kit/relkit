@@ -13,10 +13,7 @@ import { CliProject } from "./project.service.js";
 import { CliDevSupervisor } from "./dev-supervisor.service.js";
 import { CliSourceWatch } from "./source-watch.service.js";
 import { CliPortProbe } from "../commands/port-availability.service.js";
-import {
-  CliTelemetryNative,
-  telemetryNativeLayer,
-} from "../commands/dev-telemetry-native.service.js";
+import { CliDevCapture, devCaptureLayer } from "../commands/dev-capture.service.js";
 import { localCapabilitiesLayer } from "./local-capabilities.js";
 import { devSessionCapabilitiesLayer } from "../commands/dev-session-engine.js";
 import type { DevOperations } from "./dev.types.js";
@@ -33,7 +30,7 @@ export class CliDev extends Context.Service<CliDev, DevOperations>()("relkit/cli
     const supervisor = yield* CliDevSupervisor;
     const sourceWatch = yield* CliSourceWatch;
     const ports = yield* CliPortProbe;
-    const telemetry = yield* CliTelemetryNative;
+    const telemetry = yield* CliDevCapture;
     const inspector = yield* CliInspectorSupport;
     return {
       run: (args, context) =>
@@ -46,7 +43,7 @@ export class CliDev extends Context.Service<CliDev, DevOperations>()("relkit/cli
           Effect.provideService(CliDevSupervisor, supervisor),
           Effect.provideService(CliSourceWatch, sourceWatch),
           Effect.provideService(CliPortProbe, ports),
-          Effect.provideService(CliTelemetryNative, telemetry),
+          Effect.provideService(CliDevCapture, telemetry),
           Effect.provideService(CliInspectorSupport, inspector),
         ),
     } satisfies DevOperations;
@@ -72,7 +69,7 @@ export const devLayer = Layer.effect(CliDev, CliDev.make);
 export function devLiveLayer() {
   return devLayer.pipe(
     Layer.provide(
-      Layer.mergeAll(localCapabilitiesLayer, devSessionCapabilitiesLayer, telemetryNativeLayer),
+      Layer.mergeAll(localCapabilitiesLayer, devSessionCapabilitiesLayer, devCaptureLayer),
     ),
   );
 }
