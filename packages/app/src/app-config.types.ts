@@ -1,8 +1,9 @@
 /**
  * Declares server exposure and optional HTTP capability selection without loading
  * native SDKs. Compiler validation supplies defaults before runtime generation;
- * inspector settings retain their existing independent Stage-1 behavior.
+ * inspector settings select only the development bridge, independently of a tool.
  */
+import type { InspectorConfigurationInput } from "@relkit/contracts";
 /** API documentation visibility and domain exclusions.
  * @example const docs: ApiDocsConfig = { enabledInProduction: false };
  */
@@ -26,14 +27,10 @@ export interface ServerConfig {
   readonly agUi?: boolean;
 }
 
-/** Inspector settings attached to an application descriptor.
- * @example const inspector: InspectorConfig = { port: 3210 };
+/** Development bridge selection; installing or running the UI is independent.
+ * @example const inspector: InspectorConfig = { enabled: true };
  */
-export interface InspectorConfig {
-  readonly port?: number;
-  readonly enabledInProduction?: boolean;
-  readonly maxPreviewBytes?: number;
-}
+export interface InspectorConfig extends InspectorConfigurationInput {}
 
 /** Transitional compatibility switches for application authoring.
  * @example const compatibility: AppCompatibilityConfig = { legacyJobs: true };

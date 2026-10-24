@@ -1,3 +1,8 @@
+/**
+ * Defines bounded application-authoring operation labels and the injectable
+ * observer contract. Observers preserve each operation's success/error/services
+ * while the live implementation records its spans and outcomes.
+ */
 import type { Effect } from "effect";
 
 /** Fixed operation labels used for application authoring telemetry.
@@ -8,6 +13,7 @@ export type AppOperation =
   | "env.isDefinition"
   | "id.derive"
   | "compatibility.normalize"
+  | "runtimeMetadata.normalize"
   | "alias.assertExclusive"
   | "constants.define"
   | "prompt.define"

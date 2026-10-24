@@ -14,6 +14,7 @@ export * from "./integration-dependencies.js";
 export * from "./activation.js";
 export * from "./client.js";
 export * from "./runtime-limits.js";
+export * from "./inspector-config.js";
 export * from "./trace-context.js";
 export * from "./trace-propagation.js";
 export * from "./trace-random.js";

@@ -1,3 +1,8 @@
+/**
+ * Constructs immutable application descriptors without acquiring providers or
+ * optional tools. Shared bridge validation rejects obsolete inspection settings;
+ * the synchronous facade preserves original validation errors for authors.
+ */
 import type { EnvShape } from "@relkit/config";
 import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
 import { createUnboundIdentityEffect, DescriptorIdentityFailure } from "@relkit/invocation";
@@ -8,11 +13,8 @@ import {
 import { Effect, Result } from "effect";
 import { observeApp } from "./app-observability.js";
 import { APP_PROVIDER_CAPABILITIES } from "./app-provider-capabilities.js";
-import {
-  copyEffect,
-  normalizeDefaultsEffect,
-  normalizeProvidersEffect,
-} from "./app-provider-normalization.js";
+import { normalizeDefaultsEffect, normalizeProvidersEffect } from "./app-provider-normalization.js";
+import { normalizeAppRuntimeMetadataEffect } from "./app-runtime-metadata.js";
 import {
   AppValidationFailure,
   assertExclusiveAliasEffect,
@@ -64,7 +66,12 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
           return yield* invalid("RELKIT app requires an environment definition");
         for (const key of Object.keys(options))
           if (!OPTION_KEYS.has(key)) return yield* invalid(`Unknown defineApp option "${key}"`);
-        yield* assertExclusiveAliasEffect(options, "jobs", "job", "defineApp");
+        yield* assertExclusiveAliasEffect(
+          { jobs: options.jobs, job: options.job },
+          "jobs",
+          "job",
+          "defineApp",
+        );
         yield* assertExclusiveAliasEffect(
           options.defaults ?? {},
           "jobs",
@@ -87,11 +94,8 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
                 try: () => normalizeTelemetryConfiguration(options.telemetry),
                 catch: fromCause,
               });
-        const server = options.server === undefined ? undefined : yield* copyEffect(options.server);
-        const inspector =
-          options.inspector === undefined ? undefined : yield* copyEffect(options.inspector);
-        const deployment =
-          options.deployment === undefined ? undefined : yield* copyEffect(options.deployment);
+        const { server, inspector, deployment } = yield* normalizeAppRuntimeMetadataEffect(options);
+        // Provider/default normalizers retain the authored generic profile keys.
         return deepFreeze({
           ...base,
           env: options.env,
@@ -102,7 +106,7 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
           ...(server === undefined ? {} : { server }),
           ...(inspector === undefined ? {} : { inspector }),
           ...(deployment === undefined ? {} : { deployment }),
-        }) as unknown as ApplicationDescriptor<Shape, Providers, Exporters>;
+        }) as ApplicationDescriptor<Shape, Providers, Exporters>;
       }),
     ),
 );
@@ -132,21 +136,32 @@ export function defineApp<
   return result.success;
 }
 
-/** Constructs a typed invalid-input failure. */
+/** Constructs a typed invalid-input failure.
+ * @param message - Safe author correction guidance.
+ * @returns The rejected validation effect.
+ */
 function invalid(message: string): Effect.Effect<never, AppValidationFailure> {
   return Effect.fail(fromCause(new TypeError(message)));
 }
 
-/** Preserves the cause for the synchronous adapter. */
-function fromCause(cause: unknown): AppValidationFailure {
-  if (cause instanceof DescriptorIdentityFailure) cause = cause.cause;
+/** Preserves the cause for the synchronous adapter.
+ * @typeParam Failure - Original validation or identity rejection.
+ * @param cause - Failure retained for the public synchronous boundary.
+ * @returns Typed validation error preserving its original cause.
+ */
+function fromCause<Failure>(cause: Failure): AppValidationFailure {
+  const original = cause instanceof DescriptorIdentityFailure ? cause.cause : cause;
   return new AppValidationFailure({
-    message: cause instanceof Error ? cause.message : String(cause),
-    cause,
+    message: original instanceof Error ? original.message : String(original),
+    cause: original,
   });
 }
 
-/** Checks for a non-array record. */
-function isRecord(value: unknown): value is Record<string, unknown> {
+/** Checks that authoring input is a non-array object.
+ * @typeParam Value - Actual constructor input type retained by the guard.
+ * @param value - Candidate input before property access.
+ * @returns Whether the input is a non-null, non-array object.
+ */
+function isRecord<Value>(value: Value): boolean {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
