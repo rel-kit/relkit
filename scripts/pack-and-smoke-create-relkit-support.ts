@@ -31,7 +31,7 @@ const projectLayer = Layer.effect(ScaffoldProject, ScaffoldProject.make).pipe(
 );
 
 /**
- * Checks a real installed project before starting backend and packaged Inspector.
+ * Checks a real installed project before starting its lean backend.
  * @param run - Captured finite command capability.
  * @param root - Standalone application.
  * @param registry - Exact candidate package registry.
