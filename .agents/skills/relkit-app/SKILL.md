@@ -22,6 +22,13 @@ Suggest only task-relevant optional modules, explain their benefit, and ask for 
 
 Default to backend work without unsolicited pages, app.js, assets.css or demo interfaces. Preserve explicit fullstack requests, existing frontend files and the Inspector. Give users/orders separate validated resource contracts with applicable authorization; do not expose a generic public table dispatcher. Infrastructure services and private tables need no endpoint; preserve intentional auth protocol handlers and shared internal helpers.
 
+Inspection is optional: generated apps omit it. `inspector: { enabled: true }` starts only
+the development bridge (`127.0.0.1:0`, configured with `inspector.connection.host/port`).
+Install and launch `@relkit/inspector` separately for its UI and history; its own `--port`
+defaults to `3210`. Keep dev and Inspector as separate scripts/processes. Preserve existing
+`.relkit/observability` history, private connection files and business data. Production
+builds exclude rich inspection even when development enables it.
+
 ## Design domain ownership
 
 Before scaffolding business behavior, identify its owning domain. For multi-capability work,

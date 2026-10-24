@@ -18,6 +18,10 @@ layout move must retain IDs, policies, bindings, and resource identities. Explic
 and provider fragments belong in `src/platform` and are imported by `relkit.config.ts`.
 Keep acquisition lazy; compiling or comparing an offline plan must not activate providers.
 
+Rich Inspector registration is excluded from production. The separate `@relkit/inspector`
+tool, UI and diagnostic DuckDB store are development support; do not add them to a backend
+production image or confuse their history with durable jobs, checkpoints or business data.
+
 ## Prepare a reviewable plan
 
 1. Identify the AWS account, region, Pulumi backend, and stack. Use an isolated stack for a

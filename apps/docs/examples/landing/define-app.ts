@@ -1,3 +1,4 @@
+/** Declares the landing backend example with inspection disabled by default. */
 import { defineApp, defineEnv } from "@relkit/app/config";
 
 export default defineApp({
@@ -5,5 +6,4 @@ export default defineApp({
   env: defineEnv({}),
   telemetry: { redaction: { mode: "off" } },
   server: { port: 3000 },
-  inspector: { port: 3210 },
 });
