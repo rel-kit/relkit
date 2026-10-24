@@ -1,4 +1,6 @@
-import { Context, Effect, Layer, Metric, Schema, Semaphore } from "effect";
+import { Context, Effect, Layer, Metric, Semaphore } from "effect";
+import { LocalBatchWriteError } from "./batch-queue-error.js";
+export { LocalBatchWriteError } from "./batch-queue-error.js";
 import { observeLocalBatchQueue as observe } from "./batch-queue-metrics.js";
 import type {
   LocalBatchQueueEffects,
@@ -6,20 +8,13 @@ import type {
   LocalBatchWriter,
 } from "./batch-queue.types.js";
 import type { LocalRecord } from "./types.js";
-/** A failed batch writer, recorded while the queue continues draining. */
-export class LocalBatchWriteError extends Schema.TaggedError<LocalBatchWriteError>()(
-  "LocalBatchWriteError",
-  { cause: Schema.Defect() },
-) {}
 /** Injectable local batch queue operations for Effect callers. */
 // prettier-ignore
 export class LocalBatchQueueService extends Context.Service<
   LocalBatchQueueService,
   LocalBatchQueueEffects
 >()("@relkit/observability/LocalBatchQueue") {}
-/**
- * Creates a bounded queue whose writes, drain, and metrics run through Effect.
- *
+/** Creates a bounded queue whose writes, drain, and metrics run through Effect.
  * @param write - Writer called for ordered batches of at most 256 records.
  * @param onFailure - Notification for rejected or failed records.
  * @returns A live queue with Effect operations and owned timer.
@@ -38,6 +33,8 @@ export const makeLocalBatchQueueEffect = Effect.fn("ObservabilityLocalBatch.crea
       const metricRegistry = yield* Metric.MetricRegistry;
       const queue: { record: LocalRecord; bytes: number }[] = [];
       let bytes = 0;
+      let activeRecords = 0;
+      let activeBytes = 0;
       let timer: ReturnType<typeof setTimeout> | undefined;
       let draining = false;
       let closed = false;
@@ -66,7 +63,8 @@ export const makeLocalBatchQueueEffect = Effect.fn("ObservabilityLocalBatch.crea
               timer = undefined;
               while (queue.length > 0) {
                 const batch: { record: LocalRecord; bytes: number }[] = [];
-                let batchBytes = 0;
+                // Producer requests wrap the record array in { records: [...] }.
+                let batchBytes = 13;
                 while (
                   queue.length &&
                   batch.length < 256 &&
@@ -77,6 +75,8 @@ export const makeLocalBatchQueueEffect = Effect.fn("ObservabilityLocalBatch.crea
                   batchBytes += next.bytes;
                   batch.push(next);
                 }
+                activeRecords = batch.length;
+                activeBytes = batchBytes - 13;
                 const persist = Effect.tryPromise({
                   try: (signal) =>
                     write(
@@ -88,7 +88,7 @@ export const makeLocalBatchQueueEffect = Effect.fn("ObservabilityLocalBatch.crea
                   Effect.onInterrupt(() =>
                     Effect.sync(() => {
                       queue.unshift(...batch);
-                      bytes += batchBytes;
+                      bytes += activeBytes;
                       schedule();
                     }),
                   ),
@@ -107,6 +107,12 @@ export const makeLocalBatchQueueEffect = Effect.fn("ObservabilityLocalBatch.crea
                         Metric.counter("relkit_observability_local_batch_write_failures_total"),
                         batch.length,
                       );
+                    }),
+                  ),
+                  Effect.ensuring(
+                    Effect.sync(() => {
+                      activeRecords = 0;
+                      activeBytes = 0;
                     }),
                   ),
                 );
@@ -132,7 +138,12 @@ export const makeLocalBatchQueueEffect = Effect.fn("ObservabilityLocalBatch.crea
           "enqueue",
           Effect.sync(() => {
             const size = Buffer.byteLength(JSON.stringify(record)) + 1;
-            if (closed || size > 1024 * 1024 || bytes + size > 4 * 1024 * 1024) {
+            if (
+              closed ||
+              size + 13 > 1024 * 1024 ||
+              queue.length + activeRecords >= 2048 ||
+              bytes + activeBytes + size > 4 * 1024 * 1024
+            ) {
               dropped++;
               report(new Error("Telemetry queue capacity exceeded"));
               return;
@@ -170,9 +181,7 @@ export const makeLocalBatchQueueEffect = Effect.fn("ObservabilityLocalBatch.crea
     }),
   );
 });
-/**
- * Provides a queue owned by the Layer scope.
- *
+/** Provides a queue owned by the Layer scope.
  * @param write - Injectable batch writer.
  * @param onFailure - Best-effort failure notification sink.
  * @returns A Layer that closes the queue at scope release.

@@ -23,6 +23,10 @@
   },
   "type": "module",
   "exports": {
+    "./local/protocol": {
+      "types": "./dist/local/protocol.d.ts",
+      "import": "./dist/local/protocol.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
