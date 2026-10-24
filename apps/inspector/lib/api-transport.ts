@@ -1,3 +1,4 @@
+/** Shares observed session headers and request handling; only control requests read action identity from JSON. */
 import {
   INSPECTOR_API_PROTOCOL,
   INSPECTOR_API_VERSION,
@@ -139,18 +140,26 @@ export class InspectorApiTransport {
     return encoded === "" ? "" : `?${encoded}`;
   }
 
-  protected requestHeaders(init: RequestInit): Headers {
+  /**
+   * Adds a mutation fence without interpreting application request bodies.
+   * @param init - Native request options; explicit headers retain precedence.
+   * @param generation - Observed identity, or the identity selected by a control request.
+   * @returns Merged headers fenced to the selected generation when present.
+   */
+  protected requestHeaders(init: RequestInit, generation = this.generation): Headers {
     const headers = new Headers(this.headers);
     new Headers(init.headers).forEach((value, name) => headers.set(name, value));
     if ((init.method ?? "GET") !== "GET" && !headers.has("x-relkit-generation-id")) {
-      const generation = mutationGeneration(init.body, this.generation);
       if (generation) headers.set("x-relkit-generation-id", generation);
     }
     return headers;
   }
 
   private prepareRequest(init: RequestInit): RequestInit {
-    const request: RequestInit = { ...init, headers: this.requestHeaders(init) };
+    const request: RequestInit = {
+      ...init,
+      headers: this.requestHeaders(init, mutationGeneration(init.body, this.generation)),
+    };
     if (init.signal === undefined && this.signal !== undefined) request.signal = this.signal;
     return request;
   }

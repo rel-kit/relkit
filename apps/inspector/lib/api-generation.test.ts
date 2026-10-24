@@ -1,7 +1,34 @@
-/** A stale control is never silently upgraded to the latest observed generation or retried. */
+/** Exercises client request headers: application payloads stay intact and explicit stale controls stay stale. */
 import { expect, test } from "bun:test";
 import { InspectorApiTransport } from "./api-transport";
 import { InspectorApiClient } from "./api";
+
+for (const mode of ["ordinary", "stream"])
+  for (const generationId of ["image-123", ""])
+    test(`${mode} application generationId ${JSON.stringify(generationId)} cannot replace its fence`, async () => {
+      const requests: RequestInit[] = [];
+      const client = new InspectorApiClient({
+        cacheTtlMs: 0,
+        fetch: async (_url, init) => {
+          requests.push(init ?? {});
+          return Response.json(
+            { protocol: "relkit.inspector", version: 1 },
+            { headers: { "x-relkit-generation-id": "current" } },
+          );
+        },
+      });
+      await client.graph();
+      const body = JSON.stringify({ generationId });
+      for (const headers of [{}, { "x-relkit-generation-id": "explicit-stale" }]) {
+        const input = { path: "/images", init: { method: "POST", body, headers } };
+        if (mode === "ordinary") await client.invokeRoute(input);
+        else await client.invokeRouteStream(input, "text", () => {}, new AbortController().signal);
+      }
+      expect(
+        requests.map((request) => new Headers(request.headers).get("x-relkit-generation-id")),
+      ).toEqual([null, "current", "explicit-stale"]);
+      expect(requests.slice(1).map((request) => request.body)).toEqual([body, body]);
+    });
 
 test("route console and streamed mutations retain the observed generation", async () => {
   const fences: (string | null)[] = [];
