@@ -11,6 +11,7 @@ import { useSignalPage } from "../../lib/use-signal-page";
 import { LogToolbar } from "../logs/log-toolbar";
 import { LogTrace } from "../logs/log-trace";
 import { TraceTable } from "./trace-table";
+import { HistoryStatus } from "../history-status";
 import "../logs/logs.css";
 
 export function TracesClient() {
@@ -97,6 +98,7 @@ export function TracesClient() {
           setScrolled(false);
         }}
       />
+      <HistoryStatus value={page.storage} />
       <div className="log-split">
         <section className="log-list-panel" aria-label="Traces">
           <div

@@ -20,6 +20,7 @@ import { Pagination } from "../components/ui/pagination";
 import { SignalsFilters } from "./signals-filters";
 import { SignalRows } from "./signal-rows";
 import { RuntimeStatus } from "./runtime-status";
+import { signalEventTypes } from "../lib/signal-events";
 
 export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
   const [draft, setDraft] = useState<SignalFilters>(() => defaultSignalFilters(kind));
@@ -63,7 +64,7 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
     const stream = createInspectorBackendStream({
       onStateChange: (snapshot) => mounted && setLiveState(snapshot.state),
       onEvent: (event) => {
-        if (!eventTypes(kind).includes(event.type)) return;
+        if (!signalEventTypes(kind).includes(event.type)) return;
         client.invalidate([kind, "signals"]);
         const record = eventRecord(event);
         if (cursor === undefined && record !== undefined && matchesQuery(record, query)) {
@@ -107,7 +108,8 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
           <p className="eyebrow">ACTIVE WORKSPACE</p>
           <h1>{title}</h1>
           <p className="lede">
-            Complete redacted local telemetry; external sampling happens afterward.
+            Retained redacted telemetry. Capture and history are bounded; external sampling is
+            independent.
           </p>
         </div>
         <div className="signal-status" role="status" aria-live="polite">
@@ -158,12 +160,4 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
       />
     </div>
   );
-}
-
-function eventTypes(kind: SignalKind): readonly string[] {
-  return kind === "requests"
-    ? ["request.started", "request.completed"]
-    : kind === "logs"
-      ? ["log.emitted"]
-      : ["span.started", "span.completed"];
 }

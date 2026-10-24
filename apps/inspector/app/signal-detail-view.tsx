@@ -36,8 +36,8 @@ export function SignalDetailView(props: SignalDetailViewProps) {
           <p className="eyebrow">ACTIVE WORKSPACE</p>
           <h1>{title}</h1>
           <p className="lede">
-            Complete local telemetry is rendered from redacted versioned records before export
-            sampling.
+            Retained telemetry is rendered from redacted versioned records. Collection gaps and
+            unavailable history are reported separately from external sampling.
           </p>
         </div>
         <div className="signal-status" role="status" aria-live="polite">
