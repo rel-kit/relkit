@@ -105,7 +105,11 @@ function candidateOptions(attempt: DevActivationAttempt): CandidateOptions {
     ...(options.generatedDirectory === undefined
       ? {}
       : { generatedDirectory: options.generatedDirectory }),
-    ...(options.environment === undefined ? {} : { environment: options.environment }),
+    environment: {
+      ...options.environment,
+      RELKIT_INSPECTOR_SESSION_TOKEN: session.inspectionIdentity?.token,
+      RELKIT_GENERATION_ID: `generation-${token.generationToken}`,
+    },
     ...(options.maxStartupOutputBytes === undefined
       ? {}
       : { maxStartupOutputBytes: options.maxStartupOutputBytes }),
