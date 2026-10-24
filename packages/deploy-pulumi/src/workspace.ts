@@ -147,9 +147,12 @@ function projectId(value: string): string {
   const normalized = value
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return nonEmpty(normalized, "projectName");
+    .replace(/[^a-z0-9_-]+/g, "-");
+  let start = 0;
+  let end = normalized.length;
+  while (normalized[start] === "-") start++;
+  while (end > start && normalized[end - 1] === "-") end--;
+  return nonEmpty(normalized.slice(start, end), "projectName");
 }
 
 function stackId(value: string): string {

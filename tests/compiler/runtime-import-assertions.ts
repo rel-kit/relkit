@@ -39,14 +39,17 @@ export function assertGuardedRuntimeImports(
   const ordered = [...modules.values()].sort((a, b) => a.packageName.localeCompare(b.packageName));
   expect(source.match(/await import\(/g)).toHaveLength(ordered.length);
   for (const [index, entry] of ordered.entries()) {
-    const owner = JSON.stringify(entry.packageName);
-    const specifier = JSON.stringify(`${entry.packageName}${entry.exportName.slice(1)}`);
+    const owner = JSON.stringify(entry.packageName).replaceAll("<", "\\u003c");
+    const specifier = JSON.stringify(`${entry.packageName}${entry.exportName.slice(1)}`).replaceAll(
+      "<",
+      "\\u003c",
+    );
     const binding = `__relkit_runtime_${index}`;
     const initialize = `const ${binding} = await Effect.runPromise(initializeIntegration(${owner}, async () => await import(${specifier})));`;
     expect(source.split(initialize)).toHaveLength(2);
     expect(source.indexOf(initialize)).toBeGreaterThan(preflightEnd + completion.length);
     expect(source).toContain(
-      `{ packageName: ${owner}, packageVersion: ${JSON.stringify(entry.packageVersion)}, exportName: ${JSON.stringify(entry.exportName)}, module: ${binding} }`,
+      `{ packageName: ${owner}, packageVersion: ${JSON.stringify(entry.packageVersion).replaceAll("<", "\\u003c")}, exportName: ${JSON.stringify(entry.exportName).replaceAll("<", "\\u003c")}, module: ${binding} }`,
     );
   }
   expect(source.match(/module: __relkit_runtime_\d+/g)).toHaveLength(ordered.length);
