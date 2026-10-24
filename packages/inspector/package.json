@@ -1,0 +1,56 @@
+{
+  "name": "@relkit/inspector",
+  "version": "0.1.0",
+  "description": "Standalone RELKIT development inspector, collector, and local diagnostic history.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rel-kit/relkit.git",
+    "directory": "packages/inspector"
+  },
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10",
+    "node": ">=20.9.0"
+  },
+  "type": "module",
+  "bin": {
+    "relkit-inspector": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@effect/platform-bun": "catalog:",
+    "@relkit/contracts": "workspace:*",
+    "@relkit/inspector-api": "workspace:*",
+    "@relkit/observability": "workspace:*",
+    "@relkit/observability-local": "workspace:*",
+    "effect": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "scripts": {
+    "build": "tsc -b && bun run ../../scripts/package-inspector.ts",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  }
+}

@@ -1,5 +1,7 @@
+/** Verifies build failures and published artifacts retain separate cleanup evidence. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit, Layer } from "effect";
+import { DependencySourceLive } from "@relkit/provider/internal/dependencies";
 import { CliAdapterError } from "../../src/cli-errors.js";
 import { CliCleanup, cleanupLayer } from "../../src/services/cleanup.service.js";
 import { CliProcess } from "../../src/services/process.service.js";
@@ -30,9 +32,11 @@ it.effect("failed bundling retains its primary failure and separate unlink evide
     Effect.provide(
       Layer.mergeAll(
         cleanupLayer,
+        DependencySourceLive,
         filesystemTestLayer({
+          mkdir: () => Effect.void,
           symlink: () => Effect.void,
-          unlink: () => Effect.fail(failure("unlink failed")),
+          remove: () => Effect.fail(failure("unlink failed")),
         }),
         Layer.succeed(
           CliProcess,

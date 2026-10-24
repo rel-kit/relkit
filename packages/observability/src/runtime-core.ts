@@ -1,198 +1,103 @@
-import type { ObservabilityRecord } from "./model.js";
+/**
+ * Composes collectors, bounded memory or explicitly injected storage, and exports.
+ * Default application logging never opens local history; CLI inspection selects
+ * its native store separately and remote application telemetry keeps its transport.
+ */
 import { createRemoteObservabilityRuntime } from "./remote-runtime.js";
 import { createObservabilityCollector } from "./collector.js";
-import { createObservabilityQuery, type ObservabilityQuery } from "./query.js";
 import { createObservabilityStream } from "./stream.js";
-import { streamType } from "./runtime-stream-type.js";
-import { createObservabilityIndex } from "./storage/index.js";
-import { createObservabilitySegmentStore } from "./storage/segments.js";
+import { createMemoryRuntimeStorage } from "./memory-storage.js";
 import { normalizeTelemetryConfiguration } from "./telemetry-config.js";
-import { telemetryExporterDiagnostic } from "./telemetry-exporter-diagnostic.js";
-import { releaseResources } from "./resource-release.js";
-import { telemetryExportDecision } from "./telemetry-sampling.js";
-import { Effect } from "effect";
-import { makeDirectExportEffect } from "./direct-export.js";
-import type { ObservabilityRuntimeOptions, TelemetryPipelineCounters } from "./runtime.types.js";
+import { runtimeQuery } from "./runtime-query.js";
+import {
+  initializeRuntimePipeline,
+  persistRuntimeRecord,
+  flushRuntimePipeline,
+  closeRuntimePipeline,
+} from "./runtime-pipeline.js";
+import type { RuntimePipelineState } from "./runtime-pipeline.types.js";
+import type { ObservabilityRecord } from "./model.js";
+import type { ObservabilityRuntimeOptions } from "./runtime.types.js";
+
 /**
- * Creates the local or remote observability runtime with owned resources.
- *
- * @param options - Retention, export, storage, and remote endpoint settings.
- * @returns A Promise with the runtime handle, including flush and close methods.
- * @throws {Error} If storage acquisition or configuration fails.
- * @example
- * const runtime = await createObservabilityRuntime({ root: "/tmp/observability" });
- * await runtime.close();
+ * Selects remote transport or explicitly injected/local memory capabilities.
+ * @param options - Capture, export and storage configuration.
+ * @returns A runtime handle whose close owns all acquired support resources.
  */
 async function createObservabilityRuntime(options: ObservabilityRuntimeOptions = {}) {
   if (options.remote !== undefined)
     return createRemoteObservabilityRuntime(options, options.remote);
+  const state = createRuntimeState(options);
+  try {
+    await initializeRuntimePipeline(state);
+  } catch (error) {
+    await closeRuntimePipeline(state).catch(() => undefined);
+    throw error;
+  }
+  return runtimeHandle(state);
+}
+
+/** @param options - Unnormalized caller policy. @returns Owned resources with explicit storage selection and bounded collector defaults. */
+function createRuntimeState(options: ObservabilityRuntimeOptions): RuntimePipelineState {
   const configuration = normalizeTelemetryConfiguration(options.configuration);
   const redaction = options.redaction ?? configuration.redaction;
+  const maxRecords = options.maxRecords ?? configuration.localRetention?.maxRecords;
+  const signals = options.signals ?? configuration.capture?.signals;
   const collector = createObservabilityCollector({
-    ...(options.maxRecords === undefined && configuration.localRetention?.maxRecords === undefined
-      ? {}
-      : { maxRecords: options.maxRecords ?? configuration.localRetention!.maxRecords }),
+    ...(maxRecords === undefined ? {} : { maxRecords }),
     ...(redaction === undefined ? {} : { redaction }),
-    ...(options.signals === undefined && configuration.capture?.signals === undefined
-      ? {}
-      : { signals: options.signals ?? configuration.capture!.signals }),
+    ...(signals === undefined ? {} : { signals }),
   });
-  const shared = {
-    ...(options.root === undefined ? {} : { root: options.root }),
-    ...(redaction === undefined ? {} : { redaction }),
-    ...(configuration.localRetention === undefined
-      ? {}
-      : { retention: retention(configuration.localRetention) }),
+  const normalized = { ...options, configuration };
+  const store = options.storage ?? createMemoryRuntimeStorage(normalized);
+  const stream = createObservabilityStream(redaction === undefined ? {} : { redaction });
+  return {
+    collector,
+    store,
+    stream,
+    options: normalized,
+    pending: new Set(),
+    directExport: undefined,
+    persistFailure: undefined,
+    closePromise: undefined,
+    counters: {
+      persisted: 0,
+      streamed: 0,
+      exportSelected: 0,
+      sampledOut: 0,
+      severityFiltered: 0,
+      exportFailures: 0,
+    },
   };
-  const index = await createObservabilityIndex(shared);
-  let store: Awaited<ReturnType<typeof createObservabilitySegmentStore>>;
-  try {
-    store = await createObservabilitySegmentStore({ ...shared, index });
-  } catch (error) {
-    await index.close().catch(() => undefined);
-    throw error;
-  }
-  let baseQuery: ReturnType<typeof createObservabilityQuery>;
-  let stream: ReturnType<typeof createObservabilityStream>;
-  try {
-    baseQuery = createObservabilityQuery(index, shared);
-    stream = createObservabilityStream(shared);
-  } catch (error) {
-    await releaseResources([() => store.close(), () => index.close()]).catch(() => undefined);
-    throw error;
-  }
-  const exportRecord = options.exporter?.exportRecord ?? options.exportRecord;
-  const pending = new Set<Promise<unknown>>();
-  let persistFailure: unknown;
-  let hasPersistFailure = false;
-  let closePromise: Promise<void> | undefined;
-  const counters = {
-    persisted: 0,
-    streamed: 0,
-    exportSelected: 0,
-    sampledOut: 0,
-    severityFiltered: 0,
-    exportFailures: 0,
-  };
-  const directExport =
-    exportRecord === undefined
-      ? undefined
-      : await Effect.runPromise(
-          makeDirectExportEffect(exportRecord, () => {
-            counters.exportFailures += 1;
-          }),
-        );
-  const persist = (record: ObservabilityRecord | undefined, external = true): void => {
-    if (record === undefined) return;
-    const write = store
-      .append(record)
-      .then(async (persisted) => {
-        if (persisted === undefined) return;
-        counters.persisted += 1;
-        const type = streamType(persisted);
-        if (type !== undefined) {
-          stream.publishRecord(type, persisted);
-          counters.streamed += 1;
-        }
-        if (!external) return;
-        const decision = telemetryExportDecision(persisted, configuration.exportSampling);
-        if (decision === "export") counters.exportSelected += 1;
-        else if (decision === "sampled-out") counters.sampledOut += 1;
-        else counters.severityFiltered += 1;
-        if (directExport !== undefined)
-          Effect.runSync(directExport.enqueue({ record: persisted, decision }));
-      })
-      .catch((error: unknown) => {
-        if (!hasPersistFailure) {
-          persistFailure = error;
-          hasPersistFailure = true;
-        }
-      })
-      .finally(() => pending.delete(write));
-    pending.add(write);
-  };
-  options.exporter?.setFailureHandler((failure) =>
-    persist(collector.collectRequired(telemetryExporterDiagnostic(failure)), false),
-  );
-  const flushLocal = async (): Promise<void> => {
-    await Promise.all([...pending]);
-    if (hasPersistFailure) throw persistFailure;
-    await store.flush();
-    await index.flush();
-  };
-  const flush = async (): Promise<void> => {
-    await flushLocal();
-    if (directExport !== undefined)
-      await Effect.runPromise(directExport.flush().pipe(Effect.mapError((error) => error.cause)));
-    await options.exporter?.flush();
-    await flushLocal();
-  };
-  const query: ObservabilityQuery = Object.freeze({
-    requests: async (value: Parameters<ObservabilityQuery["requests"]>[0]) => {
-      await flush();
-      return baseQuery.requests(value);
-    },
-    request: async (id: string) => {
-      await flush();
-      return baseQuery.request(id);
-    },
-    logs: async (value: Parameters<ObservabilityQuery["logs"]>[0]) => {
-      await flush();
-      return baseQuery.logs(value);
-    },
-    log: async (cursor: string) => {
-      await flush();
-      return baseQuery.log(cursor);
-    },
-    traces: async (value: Parameters<ObservabilityQuery["traces"]>[0]) => {
-      await flush();
-      return baseQuery.traces(value);
-    },
-    trace: async (id: string) => {
-      await flush();
-      return baseQuery.trace(id);
-    },
-  });
+}
+
+/** @param state - Runtime-owned acquired state. @returns The established collector/query/export compatibility surface. */
+function runtimeHandle(state: RuntimePipelineState) {
+  const { collector, stream } = state;
+  const flush = () => flushRuntimePipeline(state);
   return Object.freeze({
     protocol: collector.protocol,
     version: collector.version,
     collect: (record: ObservabilityRecord) => {
       const admitted = collector.collect(record);
-      persist(admitted);
+      persistRuntimeRecord(state, admitted);
       return admitted;
     },
-    emit: (event: unknown) => {
+    emit: <Event>(event: Event) => {
       const admitted = collector.emit(event);
-      persist(admitted);
+      persistRuntimeRecord(state, admitted);
       return admitted;
     },
     read: collector.read,
     readRecords: collector.read,
     capture: collector.capture,
-    query,
+    query: runtimeQuery(state.store.query, flush),
     stream,
-    exporterStats: () => options.exporter?.stats() ?? Object.freeze([]),
-    exportCounters: (): TelemetryPipelineCounters => Object.freeze({ ...counters }),
+    exporterStats: () => state.options.exporter?.stats() ?? Object.freeze([]),
+    exportCounters: () => Object.freeze({ ...state.counters }),
     flush,
-    close: () =>
-      (closePromise ??= releaseResources([
-        flush,
-        () =>
-          directExport === undefined
-            ? undefined
-            : Effect.runPromise(directExport.close().pipe(Effect.mapError((error) => error.cause))),
-        () => options.exporter?.close(),
-        flushLocal,
-        () => stream.close(),
-        () => store.close(),
-        () => index.close(),
-      ])),
+    close: () => closeRuntimePipeline(state),
   });
 }
-function retention(
-  value: NonNullable<NonNullable<ObservabilityRuntimeOptions["configuration"]>["localRetention"]>,
-) {
-  const { maxRecords: _, ...policy } = value;
-  return policy;
-}
+
 export const runtimeCore = { createObservabilityRuntime };

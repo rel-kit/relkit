@@ -1,7 +1,13 @@
+/**
+ * Composes selected toolchain, credential, filesystem and lockfile diagnostics.
+ * Port selection lives in doctor-ports so application checks do not acquire or
+ * probe the independently installed inspector UI.
+ */
 import { Effect, Layer } from "effect";
 import type { LoadedToolingConfig } from "@relkit/compiler";
-import { resolveApplicationPort, resolveInspectorPort } from "./ports.js";
-import { doctorCommandEffect, doctorPromise, availablePortEffect } from "./doctor-native.js";
+import { doctorCommandEffect, availablePortEffect } from "./doctor-native.js";
+import { checkPortsEffect } from "./doctor-ports.js";
+export { checkPortsEffect } from "./doctor-ports.js";
 import { runCliEffect, observeCli } from "../cli-runtime.js";
 import { processLayer } from "../services/process.service.js";
 import { checkRootsEffect } from "./doctor-roots.js";
@@ -70,66 +76,6 @@ export function checkAws(
     details: { sources: visible ?? [] },
   };
 }
-
-/** Checks configured ports in backend-first order.
- * @param config - Validated tooling config.
- * @param options - Port/environment flags.
- * @param probe - Optional finite native callback.
- * @returns A lazy result after admitted listeners close.
- */
-export const checkPortsEffect = Effect.fn("Doctor.ports")(
-  function* (
-    config: LoadedToolingConfig | undefined,
-    options: DoctorOptions,
-    probe?: (port: number) => Promise<boolean>,
-  ) {
-    const ports = yield* Effect.try({
-      try: () => {
-        const source = options.source ?? process.env;
-        return {
-          backend: resolveApplicationPort({
-            ...(options.backendPort === undefined ? {} : { flag: options.backendPort }),
-            source,
-            ...(config === undefined ? {} : { configured: config.server.port }),
-          }),
-          inspector: resolveInspectorPort({
-            ...(options.inspectorPort === undefined ? {} : { flag: options.inspectorPort }),
-            source,
-            ...(config === undefined ? {} : { configured: config.inspector.port }),
-          }),
-        };
-      },
-      catch: (error) => error,
-    }).pipe(Effect.result);
-    if (ports._tag === "Failure")
-      return {
-        name: "ports",
-        ok: false,
-        message:
-          ports.failure instanceof Error ? ports.failure.message : "Configured ports are invalid.",
-      };
-    const { backend, inspector } = ports.success;
-    if (backend === inspector)
-      return {
-        name: "ports",
-        ok: false,
-        message: "Configured backend and inspector ports collide.",
-        details: { backend, inspector },
-      };
-    const check = (port: number) =>
-      probe === undefined
-        ? availablePortEffect(port)
-        : doctorPromise("doctor.injectedPort", () => probe(port));
-    const ok = (yield* check(backend)) && (yield* check(inspector));
-    return {
-      name: "ports",
-      ok,
-      message: ok ? "Configured ports are available." : "A configured port is unavailable.",
-      details: { backend, inspector },
-    };
-  },
-  (effect) => observeCli("doctor.ports", effect),
-);
 
 /** Runs the established frozen dry-run check.
  * @param root - Project root.

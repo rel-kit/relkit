@@ -12,6 +12,38 @@ runtime wiring remain separate roles.
   target, review every preview, and continue only when authorized to incur cost.
 </Callout>
 
+## Run a built application
+
+Run `bun run build` in the development installation first. The build publishes the executable
+`.relkit/build/server/index.js`, its graph and manifests, public assets, and any selected immutable
+job workers. Copy the complete `.relkit/build` directory into the same relative path in your
+production application root.
+
+The build's `package.json` declares exact observed versions of selected runtime integrations and
+their required SDKs. Required dependency patches and overrides travel with this manifest; keep the
+complete output, including `patches/` when present. Install it before starting from the application root:
+
+```sh title="Terminal — production application root"
+cd .relkit/build
+bun install --production --network-concurrency 1
+cd ../..
+NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js
+```
+
+The framework runtime is bundled. This production installation does not need the development CLI,
+compiler, Inspector application, or unselected SDKs. `relkit start` remains a convenience command
+where the CLI is installed; the generated `start` script uses the JavaScript command above.
+
+Supply required application environment values through the process environment. Startup does not
+automatically read dotenv files, and build output does not inline their values. `PORT` overrides the
+configured listener port. Run from the application root so default local provider state remains at
+`.relkit/state`; public assets are resolved beside the built server. Keep existing state and
+immutable job generations when replacing build output.
+
+The generated Dockerfile uses `.relkit/build` as its build context. It installs the selected production
+manifest and copies the complete server, public assets, graph, and selected worker history. Environment
+files, existing local state, and temporary build module links are excluded from that context.
+
 ## Configure deployment roles
 
 The commerce application imports its integrations, binds local, connected, and infrastructure-owned profiles,

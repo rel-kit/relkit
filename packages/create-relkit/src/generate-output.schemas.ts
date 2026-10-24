@@ -3,6 +3,7 @@
  * Literal commands and endpoints stay aligned with the published result type;
  * arbitrary results fall back to JSON presentation and gain no command authority.
  */
+
 import { Schema } from "effect";
 
 /** Local commands reflect whether installation and preparation already ran. */
@@ -21,7 +22,9 @@ const Endpoints = Schema.Struct({
   backend: Schema.Literal("http://localhost:3000"),
   inspector: Schema.Literal("http://localhost:3210"),
   openapi: Schema.Literal("http://localhost:3000/_relkit/v1/openapi.json"),
-  apiReference: Schema.Literal("http://localhost:3000/_relkit/v1/api-reference"),
+  apiReference: Schema.optionalKey(
+    Schema.Literal("http://localhost:3000/_relkit/v1/api-reference"),
+  ),
   route: Schema.optionalKey(Schema.Literal("GET http://localhost:3000/hello?name=RelKit")),
 });
 

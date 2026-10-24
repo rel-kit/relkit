@@ -45,11 +45,11 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   const built = await buildProject({ projectRoot: validRoot });
   expect(built.ok).toBe(true);
   expect(built.artifacts).toContain("manifest.json");
-  const manifest = JSON.parse(await readFile(join(built.buildDirectory, "manifest.json")));
+  const manifest = JSON.parse(await readFile(join(built.buildDirectory, "manifest.json"), "utf8"));
   expect(manifest).toMatchObject({
     graphHash: built.graphHash,
     activationFingerprint: built.activationFingerprint,
-    entrypoint: "server/index.ts",
+    entrypoint: "server/index.js",
     containerEntrypoint: "server/index.js",
     contextIgnoreFile: ".dockerignore",
   });
@@ -117,13 +117,14 @@ test("build carries server port, body limit, and API docs settings into runtime 
   );
   const built = await buildProject({ projectRoot: root });
   expect(built.ok).toBe(true);
-  const manifest = JSON.parse(await readFile(join(built.buildDirectory, "manifest.json")));
+  const manifest = JSON.parse(await readFile(join(built.buildDirectory, "manifest.json"), "utf8"));
   expect(manifest.server).toEqual({
     port: 4321,
     maxBodyBytes: 2048,
-    apiDocs: { enabledInProduction: true },
+    apiDocs: { enabledInProduction: true, ui: false },
     clientContract: true,
-    mcp: true,
+    mcp: false,
+    agUi: false,
   });
   const server = await readFile(join(built.buildDirectory, "server/index.ts"), "utf8");
   expect(server).toContain("maxBodyBytes: 2048");

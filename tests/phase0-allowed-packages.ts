@@ -48,15 +48,13 @@ export const allowedPackages: readonly [Files, Files] = [
     {
       path: "integrations/catalog",
       name: "@relkit/integrations",
-      source: 'export * from "@relkit/redis";',
-      dependencies: { "@relkit/redis": "workspace:*" },
+      source: "export {};",
     },
     {
       path: "examples/commerce",
       name: "commerce-example",
-      source: 'import "@relkit/integrations/redis"; import "@relkit/redis/runtime";',
+      source: 'import "@relkit/redis"; import "@relkit/redis/runtime";',
       dependencies: {
-        "@relkit/integrations": "workspace:*",
         "@relkit/redis": "workspace:*",
       },
     },

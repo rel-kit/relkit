@@ -1,3 +1,4 @@
+/** Decodes owned contributor fields while preserving unrelated manifest metadata. */
 import { Schema } from "effect";
 
 /** Owned workspace fields, retaining unrelated project metadata verbatim. */
@@ -7,6 +8,7 @@ export const ContributorManifest = Schema.StructWithRest(
     version: Schema.optionalKey(Schema.String),
     dependencies: Schema.optionalKey(Schema.Record(Schema.String, Schema.String)),
     devDependencies: Schema.optionalKey(Schema.Record(Schema.String, Schema.String)),
+    peerDependencies: Schema.optionalKey(Schema.Record(Schema.String, Schema.String)),
   }),
   [Schema.Record(Schema.String, Schema.Unknown)],
 );

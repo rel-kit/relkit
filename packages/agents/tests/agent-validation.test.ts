@@ -1,3 +1,4 @@
+/** Checks generic descriptor schema and value validation while retaining original error diagnostics. */
 import { expect, test } from "vitest";
 import { Effect, Metric, Tracer } from "effect";
 import { z } from "@relkit/schema";
@@ -12,7 +13,7 @@ import {
   isRecordEffect,
   positiveInteger,
   positiveIntegerEffect,
-} from "../src/agent-validation.ts";
+} from "@relkit/agents/internal/agent-validation";
 
 test("validates authoring values through Effect and synchronous adapters", () => {
   const schema = z.string();

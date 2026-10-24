@@ -1,10 +1,15 @@
+/** Preserves log navigation, retained trace paging and viewport assertions while
+ * routing fixture mutations to the same selected native backend as the UI.
+ */
 import { expect, test } from "@playwright/test";
+import { playwrightSelection } from "../../scripts/playwright-selection.js";
 
+const { backend } = playwrightSelection("inspector");
 const initialTraceId = "11111111111111111111111111111111";
 
 test.beforeEach(async ({ request }) => {
-  await request.post("http://127.0.0.1:3212/__fixture__/reset");
-  await request.post("http://127.0.0.1:3212/__fixture__/logs");
+  await request.post(`${backend}/__fixture__/reset`);
+  await request.post(`${backend}/__fixture__/logs`);
 });
 
 test("keeps selected rows stable, navigates with keys, searches, and resumes live updates", async ({
@@ -26,7 +31,7 @@ test("keeps selected rows stable, navigates with keys, searches, and resumes liv
   await page.locator("[data-log-cursor='164']").focus();
   await page.keyboard.press("ArrowDown");
   await expect(page).toHaveURL(/log=163/);
-  await request.post("http://127.0.0.1:3212/orders", { data: {} });
+  await request.post(`${backend}/orders`, { data: {} });
   await expect(page.getByRole("button", { name: "New logs available" })).toBeVisible();
   await expect(rows).toHaveCount(50);
   await expect(page).toHaveURL(/log=163/);
@@ -94,9 +99,7 @@ test("loads additional trace pages in the log pane and full trace view", async (
   page,
   request,
 }) => {
-  const detail = await (
-    await request.get(`http://127.0.0.1:3212/_relkit/v1/traces/${initialTraceId}`)
-  ).json();
+  const detail = await (await request.get(`${backend}/_relkit/v1/traces/${initialTraceId}`)).json();
   const first = detail.spans.slice(0, 1);
   const rest = detail.spans.slice(1);
   await page.route(new RegExp(`/_relkit/v1/traces/${initialTraceId}`), (route) =>

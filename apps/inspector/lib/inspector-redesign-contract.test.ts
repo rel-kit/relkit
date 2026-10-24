@@ -78,7 +78,7 @@ describe("inspector redesign contracts", () => {
     expect(model).toContain('return "[redacted]"');
   });
 
-  test("renders provider topology and complete local observability status", async () => {
+  test("renders provider topology and distinguishes capture from durable history", async () => {
     const [provider, runtime, cohort, signals] = await Promise.all([
       app("provider-detail.tsx"),
       app("runtime-status.tsx"),
@@ -89,9 +89,11 @@ describe("inspector redesign contracts", () => {
     expect(provider).toContain("Package");
     expect(provider).toContain("LOCAL LIFECYCLE");
     expect(provider).not.toContain("node.configuration");
-    expect(runtime).toContain("COMPLETE LOCAL EVIDENCE");
+    expect(runtime).toContain("APPLICATION EXPORT STATUS");
+    expect(runtime).toContain("LiveHistoryStatus");
+    expect(runtime).toContain("Accepted by app capture");
     expect(runtime).toContain("External exporters");
     expect(cohort).toContain('role="alert"');
-    expect(signals).toContain("external sampling happens afterward");
+    expect(signals).toContain("Capture and history are bounded");
   });
 });

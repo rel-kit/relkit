@@ -1,30 +1,16 @@
+/** Discovers workspace owners and native TypeScript import references without evaluating source. */
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { builtinModules } from "node:module";
 import { isAbsolute, relative, resolve } from "node:path";
 import * as ts from "typescript";
 
-type DependencyMap = Record<string, string>;
-
-export type PackageManifest = {
-  name?: string;
-  workspaces?: string[];
-  dependencies?: DependencyMap;
-  devDependencies?: DependencyMap;
-  optionalDependencies?: DependencyMap;
-  peerDependencies?: DependencyMap;
-};
-
-export type Scope = {
-  root: string;
-  path: string;
-  manifest?: PackageManifest;
-  declaredDependencies: Set<string>;
-};
-
-export type ImportReference = {
-  specifier: string;
-  position: number;
-};
+import type {
+  DependencyMap,
+  PackageManifest,
+  Scope,
+  ImportReference,
+} from "./boundary-imports.types.js";
+export type { PackageManifest, Scope, ImportReference } from "./boundary-imports.types.js";
 
 export const publicApplicationPackages = new Set([
   "@relkit/agents",

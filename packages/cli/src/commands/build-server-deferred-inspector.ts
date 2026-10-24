@@ -12,14 +12,21 @@ import type { ServerSourceConfiguration } from "./build-server.types.js";
  * @returns Native initializer source; it contains no acquisition before invocation.
  */
 export function preparedInspectorSource(configuration: ServerSourceConfiguration): string {
+  if (!configuration.inspectorEnabled) return "undefined";
   // This replacement selects a callable in our fixed emitter, never application text.
   const registration = inspectorEndpointsSource(configuration).replace(
     "installInspectorEndpoints(app,",
     "module.installInspectorEndpoints(app,",
   );
-  return `async (app) => {
+  return `environment !== "production" && process.env.RELKIT_INSPECTOR_SESSION_TOKEN !== undefined ? async (app) => {
   const module = await import("@relkit/inspector-api");
   InspectorQueryError = module.InspectorQueryError;
-  ${registration}
-}`;
+  try {
+    ${registration}
+    return () => module.disposeInspectorEndpoints(app);
+  } catch (cause) {
+    await module.disposeInspectorEndpoints(app);
+    throw cause;
+  }
+} : undefined`;
 }

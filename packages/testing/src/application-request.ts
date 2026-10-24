@@ -1,8 +1,11 @@
+/** Routes application test HTTP through actual runtime invocation and selected service authorities.
+ * Request-local auth and context patches are evaluated per request under the application's owned runtime.
+ */
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { TestHttpApplication, TestHttpInput } from "./http.js";
 import type { TestRuntime } from "./runtime.js";
 import type { TestRoute } from "./application-routes.js";
-import type { TestApplicationServices } from "./application-services.js";
+import type { TestApplicationServices } from "./application-services.types.js";
 import { handleTestRequest } from "./application-http.js";
 
 /**

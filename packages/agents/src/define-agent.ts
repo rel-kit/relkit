@@ -1,52 +1,33 @@
+/**
+ * Builds plain agent descriptors without loading an execution SDK.
+ * The compiler selects native execution when an application actually declares agents.
+ */
 import { createUnboundIdentityEffect } from "@relkit/invocation";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
+import type { ToolRefAny } from "@relkit/tools";
 import { Effect } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
 import { isRecordEffect } from "./agent-validation-value.js";
 import { prepareAgentDescriptor } from "./define-agent-build.js";
 import { agentDefinitionFailure } from "./define-agent-error.js";
-import type { AgentMiddleware, AgentTool } from "./define-agent-native.types.js";
 import type { AgentDescriptor, DefineAgentOptions } from "./define-agent.types.js";
 
 export { assertAgentDescriptor, isAgentDescriptor } from "./define-agent-validation.js";
 export { copyAgentLimits, copyAgentLimitsEffect } from "./define-agent-limits.js";
-export type {
-  AgentClientStateKey,
-  AgentMiddleware,
-  AgentMiddlewareState,
-  AgentModel,
-  AgentModelFactory,
-  AgentTool,
-  NativeAgentTool,
-} from "./define-agent-native.types.js";
+export type * from "./define-agent.types.js";
 export type { AgentChatMapping, AgentClientPolicy, AgentControl } from "./agent-client.js";
-export type {
-  AgentFilesystemBackend,
-  AgentSubagent,
-  DeepAgentCapabilities,
-} from "./define-agent-deep.types.js";
-export type {
-  AgentDescriptor,
-  AgentInstructions,
-  AgentLimits,
-  DefineAgentOptions,
-  PromptInstructions,
-  PromptTemplate,
-} from "./define-agent.types.js";
 
-/** Defines a native agent with validated authoring options and substitutable identity generation.
- * @param options - Schemas, model, tools, middleware, limits, and client metadata.
- * @returns An Effect with a frozen agent descriptor or AgentDefinitionFailure.
- * @example Effect.runSync(defineAgentEffect({ id: "support", input, output, instructions: "Reply.", tools: [], limits }));
+/** Validates plain authoring inputs and preserves source identity generation.
+ * @param options - Schemas, selector model, RELKIT tools, limits and client policy.
+ * @returns A frozen descriptor or AgentDefinitionFailure.
  */
 export const defineAgentEffect = Effect.fn("Agents.definition.define")(
   function* <
     const Id extends string,
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
-    const Middleware extends readonly AgentMiddleware[] = readonly [],
-    const Tools extends readonly AgentTool[] = readonly AgentTool[],
-  >(options: DefineAgentOptions<Id, InputSchema, OutputSchema, Middleware, Tools>) {
+    const Tools extends readonly ToolRefAny[],
+  >(options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>) {
     if (!(yield* isRecordEffect(options))) {
       return yield* Effect.fail(
         agentDefinitionFailure(new TypeError("Agent options must be an object")),
@@ -67,18 +48,19 @@ export const defineAgentEffect = Effect.fn("Agents.definition.define")(
             Effect.mapError((error) => agentDefinitionFailure(error.cause)),
           )
         : options.id;
-    return yield* Effect.try({
-      try: () => assemble(id as Id),
-      catch: agentDefinitionFailure,
-    });
+    return yield* Effect.try({ try: () => assemble(id as Id), catch: agentDefinitionFailure });
   },
   (effect) => observeAgent("definition.define", effect),
 );
 
-/** Defines a native agent for existing synchronous authoring callers.
- * @param options - Schemas, model, tools, middleware, limits, and client metadata.
- * @returns A frozen agent descriptor.
- * @throws The original invalid authoring or identity error.
+/** Defines an SDK-independent agent using validated schemas and RELKIT tool references.
+ * @typeParam Id - Explicit or source-inferred agent identity.
+ * @typeParam InputSchema - Runtime input validator.
+ * @typeParam OutputSchema - Runtime output validator.
+ * @typeParam Tools - Authored tool tuple retained in the descriptor.
+ * @param options - Generic authoring inputs; native APIs use @relkit/langchain.
+ * @returns Frozen metadata consumed by compilation and selected execution.
+ * @throws The original authoring validation or identity error.
  * @example
  * ```ts
  * import { defineAgent } from "@relkit/app/agents";
@@ -101,17 +83,15 @@ export function defineAgent<
   const Id extends string,
   const InputSchema extends StandardSchemaV1,
   const OutputSchema extends StandardSchemaV1,
-  const Middleware extends readonly AgentMiddleware[] = readonly [],
-  const Tools extends readonly AgentTool[] = readonly AgentTool[],
+  const Tools extends readonly ToolRefAny[],
 >(
-  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Middleware, Tools>,
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>,
 ): AgentDescriptor<
   Id,
   InferInput<InputSchema>,
   InferOutput<OutputSchema>,
   InputSchema,
   OutputSchema,
-  Middleware,
   Tools
 > {
   return Effect.runSync(

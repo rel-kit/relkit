@@ -1,4 +1,5 @@
-import type { Effect } from "effect";
+/** Structural worker authority borrowed by telemetry producers without native dependencies. */
+import type { Effect, Schema } from "effect";
 import type { LocalWorkerError } from "./worker-client-error.js";
 import type { LocalWorkerCommand } from "./types.types.js";
 
@@ -13,7 +14,9 @@ import type { LocalWorkerCommand } from "./types.types.js";
 export interface LocalWorkerEffects {
   readonly pid: number | undefined;
   /** @param command - Worker IPC command. @returns Its response or a tagged worker error. */
-  readonly call: (command: LocalWorkerCommand) => Effect.Effect<unknown, LocalWorkerError>;
+  readonly call: (
+    command: LocalWorkerCommand,
+  ) => Effect.Effect<Schema.Json | undefined, LocalWorkerError>;
   /** @returns Completion after the worker process and pending calls are released. */
   readonly close: () => Effect.Effect<void, LocalWorkerError>;
 }

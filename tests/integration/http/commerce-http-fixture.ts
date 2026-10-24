@@ -12,6 +12,7 @@ import { compileProject } from "../../compiler/fixture-runner.ts";
 import { commerceHttpEngine } from "./commerce-http-engine.ts";
 import { commerceHttpManifest } from "./commerce-http-manifest.ts";
 import type { CommerceHttpFixture } from "./commerce-http.types.ts";
+import { scalarReference } from "../../../packages/runtime-hono/src/scalar.ts";
 
 /** Owns only the native test client; compilation evaluates descriptors without acquiring providers. */
 export const commerceHttpFixture = Effect.gen(function* () {
@@ -33,7 +34,7 @@ export const commerceHttpFixture = Effect.gen(function* () {
   const app = createApp({
     plan,
     manifest: commerceHttpManifest(plan),
-    apiDocs: { document },
+    apiDocs: { document, ui: "scalar", reference: scalarReference },
     engine: commerceHttpEngine(invocations, uploadedKeys),
     rateLimitRuntime: {
       resolveStore: () => ({

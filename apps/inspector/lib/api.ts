@@ -184,7 +184,7 @@ export class InspectorApiClient extends InspectorApiTransport {
     );
   }
   invokeRoute(input: RouteInvocationInput): Promise<RouteInvocationResult> {
-    return invokeInspectorRoute(this.fetcher, this.baseUrl, this.headers, input);
+    return invokeInspectorRoute(this.fetcher, this.baseUrl, this.requestHeaders(input.init), input);
   }
 }
 export const createInspectorApiClient = (options: InspectorFetchOptions = {}): InspectorApiClient =>

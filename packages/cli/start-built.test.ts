@@ -1,3 +1,4 @@
+/** Verifies canonical built artifacts and preserves version, completeness and activation cohort guards. */
 import { afterEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -17,9 +18,8 @@ import { readBuilt } from "./src/commands/start-built.js";
 
 const roots: string[] = [];
 
-test("accepts only the current complete built artifact cohort", async () => {
-  const root = await mkdtemp(join(process.cwd(), ".relkit-built-cohort-"));
-  roots.push(root);
+/** Writes a complete test-owned cohort using the production manifest's JavaScript entrypoint. */
+async function writeBuiltCohort(root: string) {
   const graph = {
     contractVersion: GRAPH_VERSION,
     appId: "cohort-test",
@@ -49,7 +49,7 @@ test("accepts only the current complete built artifact cohort", async () => {
     runtimeManifestFile: "server/runtime.manifest.ts",
     runtimeActivationFile: `server/${RUNTIME_ACTIVATION_FILE}`,
     runtimeIntegrationsPlanFile: `server/${RUNTIME_INTEGRATION_PLAN_FILE}`,
-    entrypoint: "server/index.ts",
+    entrypoint: "server/index.js",
     containerEntrypoint: "server/index.js",
   };
   await mkdir(join(root, "server"));
@@ -65,6 +65,13 @@ test("accepts only the current complete built artifact cohort", async () => {
     ),
     writeFile(join(root, "server", RUNTIME_INTEGRATION_PLAN_FILE), runtimeIntegrations),
   ]);
+  return { graphHash, manifest };
+}
+
+test("accepts only the current complete built artifact cohort", async () => {
+  const root = await mkdtemp(join(process.cwd(), ".relkit-built-cohort-"));
+  roots.push(root);
+  const { graphHash, manifest } = await writeBuiltCohort(root);
 
   await expect(readBuilt(root)).resolves.toMatchObject({ graphHash });
 

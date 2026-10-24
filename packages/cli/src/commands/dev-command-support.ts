@@ -3,7 +3,8 @@ import { admitObservabilityRecord } from "@relkit/observability";
 import { Effect, Ref } from "effect";
 import { makeDevLocalCompilerEffect } from "./dev-local-compiler.js";
 import { createDevLogger, devLogSinks } from "./dev-logger.js";
-import { makeDevTelemetryEffect } from "./dev-telemetry.js";
+import { CliDevCapture } from "./dev-capture.service.js";
+import type { DevCapture } from "./dev-capture.types.js";
 import type { DevOptions } from "./dev.types.js";
 import type { DevCommandSessionState } from "./dev-command-session.types.js";
 
@@ -34,9 +35,7 @@ export const acquireDevCommandSupport = Effect.fn("Dev.commandSupport")(function
 ) {
   const { configuration, projectRoot, options, terminal, initial, ports } = state;
   const logger = commandLogger(state);
-  const configured = yield* Ref.make<
-    Effect.Success<ReturnType<typeof makeDevTelemetryEffect>> | undefined
-  >(undefined);
+  const configured = yield* Ref.make<DevCapture | undefined>(undefined);
   const compiler = yield* makeDevLocalCompilerEffect({
     projectRoot,
     initialCheck: initial.take,
@@ -52,22 +51,9 @@ export const acquireDevCommandSupport = Effect.fn("Dev.commandSupport")(function
       ),
   });
   const log = createDevLogger({ compile: compiler.compile, logger, terminal });
-  const telemetry = yield* makeDevTelemetryEffect(
-    projectRoot,
-    Ref.getUnsafe(configuration),
-    (error) =>
-      log({
-        level: "error",
-        event: "dev.storage.failed",
-        fields: { message: error.message },
-      }),
+  const telemetry = yield* CliDevCapture.use((capture) =>
+    capture.acquire(ports.inspector !== false, Ref.getUnsafe(configuration)),
   );
   yield* Ref.set(configured, telemetry);
-  if (telemetry.imported.records || telemetry.imported.malformed)
-    log({
-      level: telemetry.imported.malformed ? "warn" : "info",
-      event: "dev.storage.imported",
-      fields: telemetry.imported,
-    });
   return { compiler, logger, log, telemetry };
 });

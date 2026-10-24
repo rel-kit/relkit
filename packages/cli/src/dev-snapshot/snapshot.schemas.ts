@@ -5,7 +5,7 @@
  * decoding; decoding alone never grants execution authority.
  */
 import { Schema } from "effect";
-import { APPLICATION_LAYOUT_VERSION } from "@relkit/contracts";
+import { APPLICATION_LAYOUT_VERSION, InspectorConfigurationSchema } from "@relkit/contracts";
 
 /** Project-relative paths exclude traversal, drive letters, escapes and empty segments. */
 export const SnapshotPath = Schema.String.check(
@@ -128,13 +128,10 @@ export const DevSnapshot = Schema.Struct({
   importIndex: SnapshotPath,
   activation: SnapshotActivation,
   tools: SnapshotTools,
+  inspector: Schema.optionalKey(InspectorConfigurationSchema),
   ports: Schema.optionalKey(
     Schema.Struct({
       backend: Schema.Number.check(
-        Schema.isInt(),
-        Schema.isBetween({ minimum: 1, maximum: 65_535 }),
-      ),
-      inspector: Schema.Number.check(
         Schema.isInt(),
         Schema.isBetween({ minimum: 1, maximum: 65_535 }),
       ),

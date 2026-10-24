@@ -1,35 +1,16 @@
-import { EventSchemas, EventType } from "@ag-ui/core";
-import { afterEach, expect, test } from "vitest";
-import { mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import {
-  defineAgent,
-  type AgentExecutionEvent,
-  type AgentStateProvider,
-  type ThreadSnapshot,
-} from "@relkit/agents";
-import type { RegistrationPlan } from "@relkit/graph";
-import { createLocalAgentStateProvider } from "@relkit/providers-local";
+/** Verifies canonical AG-UI replay, observation ownership and cancellation against explicitly selected native transport fixtures. */
+import { expect, test, afterEach } from "vitest";
+import { EventType } from "@ag-ui/core";
 import { createOperationId } from "@relkit/realtime";
+import { AGENT_CAPABILITY_HEADER, AGENT_CAPABILITY_VALUE } from "@relkit/contracts";
 import {
-  AGENT_CAPABILITY_HEADER,
-  AGENT_CAPABILITY_VALUE,
-  AGENT_STREAM_VERSION,
-} from "@relkit/contracts";
-import { z } from "@relkit/schema";
-import { createApp, type RuntimeManifest } from "../src/index.ts";
-import { agUiFrames } from "../src/agent-protocol-encoding.ts";
-import { snapshotFrames } from "../src/agent-protocol-frame-state.ts";
-import { runtimeCohort } from "./test-cohort.ts";
-import { trackFixtureRun, trackFixtureProvider, joinFixtureRuns } from "./fixture-lifetime.js";
-
-const roots: string[] = [];
-afterEach(async () => {
-  await joinFixtureRuns();
-  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true })));
-});
-
+  protocolFixture,
+  canonicalEvents,
+  parseSse,
+  disposeReplayFixtures,
+} from "./agent-protocol-replay-fixture.js";
+import { assertCanonicalFrames } from "./agent-protocol-replay-assertions.js";
+afterEach(disposeReplayFixtures);
 test("AG-UI preserves canonical state, nested, and custom events across cursor replay", async () => {
   let executions = 0;
   const fixture = await protocolFixture(async (request) => {
@@ -50,40 +31,7 @@ test("AG-UI preserves canonical state, nested, and custom events across cursor r
     body: fixture.body,
   });
   const frames = parseSse(await initial.text());
-  expect(frames.map(({ data }) => EventSchemas.parse(data).type)).toEqual([
-    EventType.RUN_STARTED,
-    EventType.STATE_SNAPSHOT,
-    EventType.CUSTOM,
-    EventType.CUSTOM,
-    EventType.TEXT_MESSAGE_START,
-    EventType.TEXT_MESSAGE_CONTENT,
-    EventType.TEXT_MESSAGE_END,
-    EventType.RUN_FINISHED,
-  ]);
-  expect(frames[1]?.data).toMatchObject({
-    type: EventType.STATE_SNAPSHOT,
-    snapshot: { todos: [{ content: "Inspect", status: "in_progress" }] },
-    metadata: {
-      relkit: {
-        protocol: "relkit.agent-event",
-        version: AGENT_STREAM_VERSION,
-        eventId: expect.any(String),
-        recordId: expect.any(String),
-        runId: expect.any(String),
-        kind: "values",
-      },
-    },
-  });
-  expect(frames[2]?.data).toMatchObject({
-    type: EventType.CUSTOM,
-    name: "relkit.execution",
-    value: { kind: "tasks", scope: ["tools:delegate"], agent: "researcher" },
-  });
-  expect(frames[3]?.data).toMatchObject({
-    type: EventType.CUSTOM,
-    name: "orders.notice",
-    value: { kind: "custom", value: { name: "orders.notice", status: "ready" } },
-  });
+  assertCanonicalFrames(frames);
   const stateCursor = frames[1]?.id;
   expect(stateCursor).toEqual(expect.any(String));
 
@@ -187,191 +135,9 @@ test("observe-only AG-UI replays an existing run without accepting another execu
   expect(
     frames.some(({ data }) => {
       if (typeof data !== "object" || data === null) return false;
-      const metadata = (data as { metadata?: { relkit?: { observation?: unknown } } }).metadata;
+      const metadata = (data as { metadata?: { relkit?: { observation?: object } } }).metadata;
       return metadata?.relkit?.observation !== undefined;
     }),
   ).toBe(true);
   expect(executions).toBe(1);
 });
-
-test("AG-UI gap recovery projects root values and nested execution snapshots", () => {
-  const snapshot = {
-    values: { todos: [{ content: "Recover", status: "pending" }] },
-    executions: [
-      {
-        scope: ["tools:delegate"],
-        agent: "researcher",
-        values: { phase: "collecting" },
-        status: "running",
-        lastEventSequence: 7,
-      },
-    ],
-    currentRuns: [{ runId: "run-1", acceptedAt: "2026-01-01T00:00:00.000Z" }],
-    currentMessages: [],
-    approvals: [],
-  } as unknown as ThreadSnapshot;
-  const projected = [
-    ...snapshotFrames(snapshot, new Set(["run-1"]), new Map(), new Map(), new Map(), true),
-  ].flatMap((frame) => [...agUiFrames(frame)] as Record<string, unknown>[]);
-  expect(projected).toEqual([
-    { type: EventType.STATE_SNAPSHOT, snapshot: snapshot.values },
-    {
-      type: EventType.CUSTOM,
-      name: "relkit.execution-snapshot",
-      value: snapshot.executions[0],
-    },
-  ]);
-});
-
-type EngineRequest = Parameters<
-  NonNullable<Parameters<typeof createApp>[0]["engine"]>["invoke"]
->[0];
-
-async function protocolFixture(
-  invoke: (request: EngineRequest) => Promise<unknown>,
-  wrap: (provider: AgentStateProvider) => AgentStateProvider = (provider) => provider,
-) {
-  const root = await mkdtemp(join(tmpdir(), "relkit-agent-protocol-replay-"));
-  roots.push(root);
-  const agent = defineAgent({
-    id: "support.echo",
-    input: z.string(),
-    output: z.string(),
-    instructions: "Echo.",
-    tools: [],
-    limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1_000 },
-    stateProfile: "default",
-    client: { authorize: () => true },
-    chat: { input: "message", output: "answer" },
-  });
-  const plan = agentPlan();
-  const provider = trackFixtureProvider(
-    wrap(createLocalAgentStateProvider(root, { pollingMs: 50 })),
-  );
-  return {
-    app: createApp({
-      plan,
-      manifest: manifest(plan, agent),
-      engine: { invoke },
-      clientIdentity: {
-        applicationId: "fixture",
-        publicFingerprint: "sha256:public",
-        resolve: () => ({ identityScope: "viewer", sessionEpoch: "session" }),
-      },
-      agentRuntime: {
-        track: trackFixtureRun,
-        applicationId: "fixture",
-        environment: "test",
-        generationId: "generation-a",
-        publicFingerprint: "sha256:public",
-        provider: () => provider,
-      },
-    }),
-    url: "http://relkit.test/_relkit/v1/agents/support.echo/ag-ui",
-    body: JSON.stringify({
-      threadId: "protocol-thread",
-      runId: "external-run",
-      state: {},
-      messages: [{ id: "message-1", role: "user", content: "hello" }],
-      tools: [],
-      context: [],
-    }),
-    headers: (operationId: string) => ({
-      "content-type": "application/json",
-      "x-relkit-identity-scope": "viewer",
-      "x-relkit-session-epoch": "session",
-      "x-relkit-operation-id": operationId,
-      [AGENT_CAPABILITY_HEADER]: AGENT_CAPABILITY_VALUE,
-    }),
-  };
-}
-
-function canonicalEvents(): readonly AgentExecutionEvent[] {
-  const occurredAt = "2026-01-01T00:00:00.000Z";
-  return [
-    {
-      nativeSequence: 1,
-      kind: "values",
-      scope: [],
-      occurredAt,
-      value: { todos: [{ content: "Inspect", status: "in_progress" }] },
-    },
-    {
-      nativeSequence: 2,
-      kind: "tasks",
-      scope: ["tools:delegate"],
-      occurredAt,
-      agent: "researcher",
-      parent: { kind: "tool", toolCallId: "delegate-1", toolId: "task" },
-      value: { id: "child-task", name: "research", status: "started" },
-    },
-    {
-      nativeSequence: 3,
-      kind: "custom",
-      scope: [],
-      occurredAt,
-      value: { name: "orders.notice", status: "ready" },
-    },
-  ];
-}
-
-function parseSse(text: string): readonly { readonly id?: string; readonly data: unknown }[] {
-  return text
-    .trim()
-    .split("\n\n")
-    .map((block) => {
-      const lines = block.split("\n");
-      const id = lines.find((line) => line.startsWith("id: "))?.slice(4);
-      const data = lines.find((line) => line.startsWith("data: "))?.slice(6);
-      if (data === undefined) throw new Error("SSE data is missing.");
-      return { ...(id === undefined ? {} : { id }), data: JSON.parse(data) as unknown };
-    });
-}
-
-function agentPlan(): RegistrationPlan {
-  return {
-    graphHash: "sha256:agent-protocol-replay",
-    functions: [],
-    httpTriggers: [],
-    queues: [],
-    schedules: [],
-    eventTriggers: [],
-    buckets: [],
-    caches: [],
-    tools: [],
-    channels: [],
-    agents: [
-      {
-        kind: "agent",
-        id: "support.echo",
-        source: { file: "agent.ts", line: 1, column: 1 },
-        input: {},
-        output: {},
-        instructions: "redacted",
-        toolIds: [],
-        limits: {},
-        generatedFunction: {
-          functionId: "relkit.agent.support.echo.invoke",
-          generated: true,
-          generatedBy: "agent",
-          agentId: "support.echo",
-        },
-        profile: "default",
-        stateProfile: "default",
-        client: "protected",
-        chat: { input: "message", output: "answer" },
-      },
-    ],
-    middlewares: [],
-  };
-}
-
-function manifest(plan: RegistrationPlan, agent: unknown): RuntimeManifest {
-  return {
-    ...runtimeCohort(plan.graphHash),
-    functions: {},
-    agents: { "support.echo": agent },
-    middleware: {},
-    requestTransforms: {},
-  };
-}

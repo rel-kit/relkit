@@ -11,7 +11,7 @@ test("serves eager routes before rich endpoints and initializes once before disp
   let initialized = 0;
   const prepared = await createPreparedApp(preparedOptions(), async (app) => {
     initialized += 1;
-    app.get("/_relkit/v1/test-query", (context) => context.text("inspector complete"));
+    app.get("/_relkit/v1/runtime/test-query", (context) => context.text("inspector complete"));
   });
   try {
     const eager = await prepared.fetch(new Request("http://localhost/hello"));
@@ -19,7 +19,9 @@ test("serves eager routes before rich endpoints and initializes once before disp
     await eager.text();
     expect(initialized).toBe(0);
     const responses = await Promise.all(
-      [0, 1].map(() => prepared.fetch(new Request("http://localhost/_relkit/v1/test-query"))),
+      [0, 1].map(() =>
+        prepared.fetch(new Request("http://localhost/_relkit/v1/runtime/test-query")),
+      ),
     );
     expect(await Promise.all(responses.map((response) => response.text()))).toEqual([
       "inspector complete",
@@ -41,7 +43,7 @@ test("retains eager traffic and caches one rich-endpoint initialization failure"
   try {
     for (let index = 0; index < 2; index += 1)
       await expect(
-        prepared.fetch(new Request("http://localhost/_relkit/v1/test-query")),
+        prepared.fetch(new Request("http://localhost/_relkit/v1/runtime/test-query")),
       ).rejects.toMatchObject({ cause: failure });
     const response = await prepared.fetch(new Request("http://localhost/hello"));
     expect(response.status).toBe(200);
@@ -50,4 +52,38 @@ test("retains eager traffic and caches one rich-endpoint initialization failure"
   } finally {
     await prepared.close();
   }
+});
+
+test("generation_close_joins_legacy_endpoint_disposal", async () => {
+  const entered = Promise.withResolvers<void>();
+  const release = Promise.withResolvers<void>();
+  let disposed = false;
+  const application = await createPreparedApp(preparedOptions(), async (app) => {
+    app.get("/_relkit/v1/runtime/test", (context) => context.text("ready"));
+    return async () => {
+      entered.resolve();
+      await release.promise;
+      disposed = true;
+    };
+  });
+  await application.fetch(new Request("http://localhost/_relkit/v1/runtime/test"));
+  const closing = application.close();
+  await entered.promise;
+  expect(disposed).toBe(false);
+  release.resolve();
+  await closing;
+  expect(disposed).toBe(true);
+});
+
+test("generation_close_preserves_disposal_failure", async () => {
+  const application = await createPreparedApp(preparedOptions(), async (app) => {
+    app.get("/_relkit/v1/runtime/test", (context) => context.text("ready"));
+    return async () => {
+      throw new Error("native endpoint disposal failed");
+    };
+  });
+  await application.fetch(new Request("http://localhost/_relkit/v1/runtime/test"));
+  await expect(application.close()).rejects.toMatchObject({
+    operation: "prepared.endpoints.dispose",
+  });
 });

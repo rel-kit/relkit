@@ -1,7 +1,9 @@
+/** Verifies native SQLite graph checkpoint recovery across competing Node processes. */
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { expect, test } from "bun:test";
+import { nativeAgentRuntimePackages } from "../compiler/native-agent-runtime.fixture.js";
 
 const repositoryRoot = resolve(import.meta.dir, "../..");
 const workerPath = join(import.meta.dir, "agent-graph-worker.ts");
@@ -9,9 +11,10 @@ const tsxPath = join(repositoryRoot, "node_modules/.bun/node_modules/tsx/dist/cl
 
 test("resumes a SQLite-checkpointed graph once across competing restart processes", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-restart-jobs-"));
+  let passed = false;
   try {
     const paused = await runWorker("pause", root);
-    expect(paused.exitCode).toBe(0);
+    expect(paused.exitCode, paused.stderr).toBe(0);
     expect(paused.result).toMatchObject({ outcome: "waiting" });
     const revision = requiredString(paused.result.revision);
 
@@ -50,8 +53,10 @@ test("resumes a SQLite-checkpointed graph once across competing restart processe
       terminal: [{ output: { result: "approved" } }],
     });
     expect(await nodeEntries(root)).toEqual(["review", "review", "finish"]);
+    passed = true;
   } finally {
-    await rm(root, { recursive: true, force: true });
+    if (passed) await rm(root, { recursive: true, force: true });
+    else console.error(`Failed restart fixture retained: ${root}`);
   }
 }, 20_000);
 
@@ -67,6 +72,11 @@ async function runWorker(
   readonly stderr: string;
   readonly result: Record<string, unknown>;
 }> {
+  if (mode === "pause")
+    await writeFile(
+      join(root, "runtime-integrations.json"),
+      JSON.stringify(nativeAgentRuntimePackages),
+    );
   const child = Bun.spawn(
     [
       Bun.which("node") ?? "node",

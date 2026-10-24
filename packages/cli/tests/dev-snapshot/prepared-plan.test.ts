@@ -41,8 +41,8 @@ it.effect("executes the exact canonical frozen projection without a runtime plan
     expect(source).not.toContain('import { createRegistrationPlan } from "@relkit/graph"');
     expect(source).toContain("Runtime graph hash verification failed.");
     expect(source).not.toContain('from "@relkit/inspector-api";');
-    expect(source).toContain('await import("@relkit/inspector-api")');
-    expect(source).toContain("module.installInspectorEndpoints(app,");
+    expect(source).not.toContain('await import("@relkit/inspector-api")');
+    expect(source).not.toContain("module.installInspectorEndpoints(app,");
     expect(source).toContain(
       "const generationId = `generation-${tokenFrom(process.env.RELKIT_GENERATION_TOKEN)}`;",
     );

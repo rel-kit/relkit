@@ -11,6 +11,7 @@ import { useInspectorGraph } from "../../lib/use-graph";
 import { LogToolbar } from "./log-toolbar";
 import { LogTable } from "./log-table";
 import { LogDetails } from "./log-details";
+import { HistoryStatus } from "../history-status";
 import "./logs.css";
 
 export function LogsClient() {
@@ -93,17 +94,7 @@ export function LogsClient() {
         }}
         onPause={() => (blocked ? resume() : setPaused(true))}
       />
-      {logs.storage?.state === "degraded" && (
-        <p role="alert" className="log-storage-warning">
-          Storage degraded. {String(logs.storage.failed ?? 0)} failed;{" "}
-          {String(logs.storage.dropped ?? 0)} dropped records. Restart dev to recover.
-        </p>
-      )}
-      {logs.storage?.state === "unavailable" && (
-        <p className="supporting-copy" role="status">
-          Storage status unavailable.
-        </p>
-      )}
+      <HistoryStatus value={logs.storage} />
       <div className="log-split" data-selected={!!selected}>
         <section className="log-list-panel" aria-label="Logs">
           <div

@@ -1,4 +1,6 @@
-import { betterAuth } from "better-auth";
+/** Constructs selected native Better Auth after metadata preflight at the SDK boundary.
+ * Factory failures retain their native cause and redact secret-bearing arguments from operation telemetry.
+ */
 import {
   nativeCall,
   observeSpecializedOperation,
@@ -7,6 +9,7 @@ import {
 import { Context, Effect, Layer } from "effect";
 import { AuthFailure } from "./auth.errors.js";
 import type { AuthFactoryInterface } from "./auth.types.js";
+import { checkNativeAuthDependencies } from "./dependencies.js";
 
 /**
  * Replaceable native SDK factory; auth service acquisition owns async initialization.
@@ -23,7 +26,7 @@ export class AuthFactory extends Context.Service<AuthFactory, AuthFactoryInterfa
  * @example
  * ```ts
  * import { Layer } from "effect";
- * import { authFactoryLiveLayer, authServiceLayer, type AuthConfiguration } from "@relkit/better-auth";
+ * import { authFactoryLiveLayer, authServiceLayer, type AuthConfiguration } from "@relkit/better-auth/drizzle";
  * function createAuthLayer(configuration: AuthConfiguration) {
  *   return authServiceLayer(configuration).pipe(Layer.provide(authFactoryLiveLayer));
  * }
@@ -33,9 +36,17 @@ export const authFactoryLiveLayer = Layer.effect(
   AuthFactory,
   Effect.gen(function* () {
     return makeAuthFactory((options) =>
-      nativeCall("auth.factory", () => betterAuth(options)).pipe(
-        Effect.mapError(
-          (failure) => new AuthFailure({ operation: "auth.factory", cause: failure.cause }),
+      checkNativeAuthDependencies().pipe(
+        Effect.flatMap(() =>
+          nativeCall("auth.factory", async () => {
+            const { betterAuth } = await import("better-auth");
+            return betterAuth(options);
+          }),
+        ),
+        Effect.mapError((failure) =>
+          failure instanceof AuthFailure
+            ? failure
+            : new AuthFailure({ operation: "auth.factory", cause: failure.cause }),
         ),
       ),
     );

@@ -28,6 +28,13 @@ defineApp({
     maxBodyBytes: 1_048_576,
     apiDocs: { enabledInProduction: false },
   },
+  inspector: { enabled: true, connection: { host: "127.0.0.1", port: 0 } },
+});
+
+defineApp({ env: defineEnv({}), inspector: { enabled: false } });
+defineApp({
+  env: defineEnv({}),
+  // @ts-expect-error the standalone UI port is not application configuration
   inspector: { port: 3210 },
 });
 

@@ -57,7 +57,22 @@
         },
         "localRecipe": "./local-recipe",
         "deploymentEngine": "./deployment"
-      }
+      },
+      "dependencies": [
+        {
+          "package": "inngest",
+          "supportedRange": "4.20.0",
+          "installSection": "dependencies",
+          "capabilities": [
+            "job"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        }
+      ]
     }
   },
   "scripts": {
@@ -69,7 +84,17 @@
     "@relkit/contracts": "workspace:*",
     "@relkit/jobs": "workspace:*",
     "@relkit/local-service": "workspace:*",
-    "@relkit/provider": "workspace:*",
+    "@relkit/provider": "workspace:*"
+  },
+  "peerDependencies": {
+    "inngest": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "inngest": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
     "inngest": "catalog:"
   }
 }

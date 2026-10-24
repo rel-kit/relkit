@@ -1,7 +1,7 @@
 {
   "name": "@relkit/inspector-api",
   "version": "0.7.10",
-  "description": "Unsupported internal API for the RELKIT inspector; use @relkit/cli.",
+  "description": "Internal live bridge and native jobs protocol for RELKIT tooling.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -23,6 +23,10 @@
   },
   "type": "module",
   "exports": {
+    "./connection": {
+      "types": "./dist/connection.d.ts",
+      "import": "./dist/connection.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"

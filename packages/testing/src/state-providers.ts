@@ -1,4 +1,5 @@
-import type { AgentStateProvider } from "@relkit/agents";
+/** Supplies local realtime and agent-state providers without selecting a native agent engine. */
+import type { AgentStateProvider } from "@relkit/contracts";
 import {
   createLocalAgentStateProvider,
   createLocalRealtimeProvider,

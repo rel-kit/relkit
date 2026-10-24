@@ -1,5 +1,6 @@
+/** Resolves interactive root actions from explicit project-file and prompt capabilities. */
 import { join, resolve } from "node:path";
-import { createClackPromptDriver } from "create-relkit";
+import { createClackPromptDriver } from "./scaffolding/index.js";
 import { Effect, Layer } from "effect";
 import { CliFileSystem, fileSystemLayer } from "./services/filesystem.service.js";
 import { CliInteraction, interactionLayer } from "./cli-interaction.service.js";

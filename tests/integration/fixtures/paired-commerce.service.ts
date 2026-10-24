@@ -2,7 +2,7 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { Context, Effect, Layer, Scope } from "effect";
+import { Context, Effect, Exit, Layer, Scope } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 import {
@@ -27,10 +27,12 @@ export class PairedCommerce extends Context.Service<PairedCommerce>()(
         scaffoldNative("commerce.pair.root", () =>
           mkdtemp(join(tmpdir(), "relkit-commerce-pair-")),
         ),
-        (root) =>
-          scaffoldNative("commerce.pair.release", () =>
-            rm(root, { recursive: true, force: true }),
-          ).pipe(Effect.orDie),
+        (root, exit) =>
+          Exit.isFailure(exit)
+            ? Effect.logWarning("Retained failed commerce fixture", { root })
+            : scaffoldNative("commerce.pair.release", () =>
+                rm(root, { recursive: true, force: true }),
+              ).pipe(Effect.orDie),
       );
       return {
         run: (grouped: boolean) =>

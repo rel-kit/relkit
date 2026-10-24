@@ -1,7 +1,7 @@
 /**
- * Reads validated authored port configuration through explicit compiler authority.
- * Prepared startup imports the separate installation leaf, avoiding evaluation;
- * these established APIs retain full configuration checks for the safe path.
+ * Reads the application's backend port through explicit compiler authority.
+ * Inspection starts only when enabled in authored configuration; its bind policy
+ * is unrelated to the independently launched standalone UI.
  */
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -10,21 +10,14 @@ import { CliCompiler, compilerLayer } from "../services/compiler.service.js";
 import { CliModules, moduleLayer } from "../services/modules.service.js";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
-import type { DevInspectorOptions } from "./dev-process.types.js";
 import type { DevelopmentPorts } from "./dev-inspector.types.js";
-import { resolveApplicationPort, resolveInspectorPort } from "./ports.js";
-import { defaultInspectorOptions } from "./dev-inspector-installation.js";
-export {
-  defaultInspectorOptions,
-  inspectorRoot,
-  resolveInspectorInstallation,
-} from "./dev-inspector-installation.js";
+import { resolveApplicationPort } from "./ports.js";
 
 /**
  * Reads authored configuration through explicit import/compiler authority.
  * @param projectRoot - Authored project root.
  * @param backendPort - Optional command override.
- * @param inspectorPort - Optional command override.
+ * @param inspectorPort - Retired flag, rejected with standalone-tool guidance.
  * @param source - Captured invocation environment.
  * @returns Validated ports and inspector launch policy.
  */
@@ -41,20 +34,20 @@ export const developmentPortsEffect = Effect.fn("Dev.ports")(
       `${pathToFileURL(join(projectRoot, "relkit.config.ts")).href}?relkit_dev=${crypto.randomUUID()}`,
     );
     const config = yield* compiler.loadConfig(loaded.default ?? loaded, projectRoot);
-    return yield* cliTry("dev.ports.resolve", (): DevelopmentPorts => ({
-      backend: resolveApplicationPort({
-        ...(backendPort === undefined ? {} : { flag: backendPort }),
-        source,
-        configured: config.server.port,
-      }),
-      inspector: defaultInspectorOptions(
-        resolveInspectorPort({
-          ...(inspectorPort === undefined ? {} : { flag: inspectorPort }),
+    return yield* cliTry("dev.ports.resolve", (): DevelopmentPorts => {
+      if (inspectorPort !== undefined)
+        throw new TypeError(
+          "--inspector-port moved to the standalone inspector; configure inspector.connection.port for the bridge.",
+        );
+      return {
+        backend: resolveApplicationPort({
+          ...(backendPort === undefined ? {} : { flag: backendPort }),
           source,
-          configured: config.inspector.port,
+          configured: config.server.port,
         }),
-      ),
-    }));
+        inspector: config.inspector.enabled ? config.inspector.connection : false,
+      };
+    });
   },
   (
     effect,
@@ -65,7 +58,7 @@ export const developmentPortsEffect = Effect.fn("Dev.ports")(
   ) => observeCli("dev.ports", effect),
 );
 
-/** Restores the validated inspector configuration at the public Promise boundary.
+/** Resolves the explicitly selected application bridge without looking up UI assets.
  * @param projectRoot - Authored root.
  * @param inspectorPort - Optional override.
  * @param source - Environment.
@@ -75,7 +68,7 @@ export async function configuredInspectorOptions(
   projectRoot: string,
   inspectorPort?: number,
   source: Readonly<Record<string, string | undefined>> = process.env,
-): Promise<DevInspectorOptions> {
+): Promise<DevelopmentPorts["inspector"]> {
   return (await developmentPorts(projectRoot, undefined, inspectorPort, source)).inspector;
 }
 /** Restores validated backend and inspector ports at the public Promise boundary.

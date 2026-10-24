@@ -2,8 +2,18 @@
 
 import type { InspectorObject } from "../lib/api-types";
 import { useRuntimeMetadata } from "../lib/use-runtime-metadata";
+import { LiveHistoryStatus } from "./history-status";
 
 export function RuntimeStatus({ telemetryOnly = false }: { readonly telemetryOnly?: boolean }) {
+  return (
+    <>
+      <LiveHistoryStatus />
+      <RuntimeMetadata telemetryOnly={telemetryOnly} />
+    </>
+  );
+}
+
+function RuntimeMetadata({ telemetryOnly }: { readonly telemetryOnly: boolean }) {
   const state = useRuntimeMetadata();
   if (state.loading)
     return (
@@ -73,18 +83,18 @@ function Telemetry({ value }: { readonly value?: InspectorObject }) {
     <section className="panel" aria-labelledby="telemetry-export-heading">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">COMPLETE LOCAL EVIDENCE</p>
+          <p className="eyebrow">APPLICATION EXPORT STATUS</p>
           <h2 id="telemetry-export-heading">External exporters</h2>
         </div>
         <span className="badge">{exporters.length}</span>
       </div>
       <p className="supporting-copy">
-        Local records remain complete. External traces sample at {percent(sampling?.traceRate)};
-        logs start at {text(sampling?.minimumLogLevel, "info")}; errors and diagnostics are always
+        Local capture is bounded. External traces sample at {percent(sampling?.traceRate)}; logs
+        start at {text(sampling?.minimumLogLevel, "info")}; errors and diagnostics are always
         selected.
       </p>
       <dl className="overview-metrics">
-        <Metric label="Persisted" value={count(counters?.persisted)} />
+        <Metric label="Accepted by app capture" value={count(counters?.persisted)} />
         <Metric label="Sampled out" value={count(counters?.sampledOut)} />
         <Metric label="Export failures" value={count(counters?.exportFailures)} />
       </dl>

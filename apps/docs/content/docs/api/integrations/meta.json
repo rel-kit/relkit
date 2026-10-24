@@ -2,6 +2,7 @@
   "title": "Integrations",
   "icon": "Plug",
   "pages": [
+    "langchain",
     "aws",
     "cloudflare",
     "docker",

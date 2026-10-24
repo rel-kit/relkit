@@ -28,7 +28,7 @@ runtime event
 → canonical record
 → capture policy
 → redaction
-→ bounded local persistence and live Inspector stream
+→ bounded retention and live Inspector stream
 → root trace-consistent sampling
 → independent exporters
 ```
@@ -41,6 +41,11 @@ not keep a second in-process tail-sampling buffer.
 
 `localRetention` bounds record count, age, and bytes. It is diagnostic evidence, not durable business storage.
 
+Application logging and production telemetry use bounded memory unless a storage capability is explicitly
+supplied. They do not install or open DuckDB. Normal console output and external exporters remain usable
+without development history. The default memory store keeps at most 1,024 records and 4 MiB of encoded
+record payloads; explicit retention settings can lower or change those bounds.
+
 ## Read development logs
 
 `bun run dev` prints startup URLs, compilation and reload outcomes, HTTP completions, and application output.
@@ -50,8 +55,9 @@ records on stderr. An explicit level overrides verbose's DEBUG selection. `NO_CO
 disable color. Terminal filtering does not reduce captured history.
 
 Development history is stored in `.relkit/observability/observability.duckdb`. `RELKIT_OBSERVABILITY_ROOT`
-changes the directory. Node.js must be available on PATH: the CLI owns a separate Node worker running the DuckDB
-driver, while generated applications continue to run on Bun. History and streaming survive backend reloads.
+changes the directory. The development CLI explicitly acquires `@relkit/observability-local`, which owns the
+DuckDB driver, history queries, retention, and worker assets. Node.js must be available on PATH for its separate
+worker, while generated applications continue to run on Bun. History and streaming survive backend reloads.
 Only one dev session can own a database at a time.
 
 In development, exporter delivery runs independently of collector acknowledgments. Live Inspector notifications
@@ -62,8 +68,10 @@ Explicit `localRetention.maxAgeMs`, `maxBytes`, and `maxEntries` override those 
 in-memory cache; it does not limit database history. The data budget excludes database metadata and temporary
 database/WAL overhead. Cleanup checkpoints and normal shutdown reclaim reusable space and flush pending writes.
 
-The current store uses observability model v2. Incompatible development state is not migrated automatically;
-RELKIT reports `RELKIT_OBSERVABILITY_STATE_INCOMPATIBLE` and requires a fresh development store.
+The current store uses observability model v2. Moving store ownership preserves existing database schemas,
+receipt identities, imported segment markers, and source history files. Incompatible development state is not
+reset automatically: RELKIT reports `RELKIT_OBSERVABILITY_STATE_INCOMPATIBLE` and preserves the directory for
+diagnosis. Diagnostic history does not own durable job, checkpoint, provider, or agent application state.
 
 If storage fails, application requests continue. The Logs workspace reports degraded storage and failed or
 dropped records. Restart the dev session after fixing the cause; records that failed to commit are not saved.

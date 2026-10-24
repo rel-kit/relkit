@@ -1,6 +1,7 @@
+/** Appends bounded public journal records and projects messages or complete approval sets atomically. */
 import { Clock, Effect } from "effect";
 import { localOperation, localSync } from "../local-effect.js";
-import type { AppendJournalRequest } from "@relkit/agents";
+import type { AppendJournalRequest } from "@relkit/contracts";
 import {
   activeClaim,
   checkpoint,
@@ -9,7 +10,7 @@ import {
   ownedThread,
 } from "./common.js";
 import { replaceThread } from "./run-state.js";
-import type { LocalAgentThread } from "./state.js";
+import type { LocalAgentState, LocalAgentThread } from "./state.js";
 import type { AgentStateStoreEffects as AgentStateStore } from "./storage.js";
 
 /**
@@ -49,41 +50,7 @@ export const appendJournal = Effect.fn("AgentState.appendJournal")(
               "AGENT_JOURNAL_OVERLOADED",
               "Agent journal capacity is full.",
             );
-          const approvals =
-            record.kind === "approval"
-              ? upsertApproval(local.approvals, record.publicValue)
-              : local.approvals;
-          const messages =
-            record.kind === "message"
-              ? upsertMessage(local.messages, record.publicValue)
-              : local.messages;
-          const interrupted =
-            record.kind === "approval" && approvalSetComplete(approvals, record.publicValue);
-          const run = local.runs[request.runId];
-          return [
-            replaceThread(state, request.threadId, {
-              ...local,
-              sequence,
-              journal,
-              approvals,
-              messages,
-              ...(interrupted && run !== undefined
-                ? {
-                    runs: {
-                      ...local.runs,
-                      [request.runId]: { ...run, status: "approval-interrupted" as const },
-                    },
-                    thread: {
-                      ...local.thread,
-                      status: "approval-interrupted" as const,
-                      updatedAt: record.createdAt,
-                      revision: String(Number(local.thread.revision) + 1),
-                    },
-                  }
-                : {}),
-            }),
-            { recordId: record.recordId, checkpoint: record.checkpoint, duplicate: false },
-          ] as const;
+          return projectJournal(state, local, request, record, journal, sequence);
         });
       }),
     );
@@ -159,4 +126,57 @@ function isBrowserMessage(value: unknown): value is LocalAgentThread["messages"]
     Array.isArray(message.parts) &&
     typeof message.createdAt === "string"
   );
+}
+
+/**
+ * Projects journal messages and complete approval sets atomically.
+ * @param state - Snapshot supplied by the owning atomic store update.
+ * @param local - Owned thread projected from the same snapshot.
+ * @param request - Validated scoped request, including operation identity and capacity policy.
+ * @param record - Capacity-checked journal record with its assigned checkpoint.
+ * @param journal - Retained journal including the new record.
+ * @param sequence - Next thread-local journal sequence.
+ * @returns The next snapshot and append receipt, including projected messages or approval interruption.
+ */
+export function projectJournal(
+  state: LocalAgentState,
+  local: LocalAgentThread,
+  request: AppendJournalRequest,
+  record: LocalAgentThread["journal"][number],
+  journal: LocalAgentThread["journal"],
+  sequence: number,
+) {
+  const approvals =
+    record.kind === "approval"
+      ? upsertApproval(local.approvals, record.publicValue)
+      : local.approvals;
+  const messages =
+    record.kind === "message" ? upsertMessage(local.messages, record.publicValue) : local.messages;
+  const interrupted =
+    record.kind === "approval" && approvalSetComplete(approvals, record.publicValue);
+  const run = local.runs[request.runId];
+  return [
+    replaceThread(state, request.threadId, {
+      ...local,
+      sequence,
+      journal,
+      approvals,
+      messages,
+      ...(interrupted && run !== undefined
+        ? {
+            runs: {
+              ...local.runs,
+              [request.runId]: { ...run, status: "approval-interrupted" as const },
+            },
+            thread: {
+              ...local.thread,
+              status: "approval-interrupted" as const,
+              updatedAt: record.createdAt,
+              revision: String(Number(local.thread.revision) + 1),
+            },
+          }
+        : {}),
+    }),
+    { recordId: record.recordId, checkpoint: record.checkpoint, duplicate: false },
+  ] as const;
 }

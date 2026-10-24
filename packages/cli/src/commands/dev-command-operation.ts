@@ -8,7 +8,7 @@ import type { CliCommandContext } from "../main-support-types.js";
 import { developmentPortsEffect } from "./dev-inspector.js";
 import { formatDevDiagnostics } from "./dev-local-diagnostics.js";
 import { parseProjectArgs } from "./project-args.js";
-import { telemetryConfigurationFromGraphEffect } from "./dev-telemetry.js";
+import { telemetryConfigurationFromGraphEffect } from "./dev-telemetry-config.js";
 import { checkInitialDevProjectEffect } from "./dev-initial-check.js";
 import { runDevCommandSession } from "./dev-command-session.js";
 

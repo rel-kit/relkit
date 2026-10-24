@@ -1,3 +1,4 @@
+/** Verifies doctor compares independent package versions without requiring public metadata exports. */
 import { afterEach, expect, test } from "bun:test";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -41,6 +42,12 @@ test("doctor rejects a wrong installed version even when declarations match each
   expect(await check(root, { "@relkit/app": "0.7.9", "@relkit/cli": "0.7.9" })).toMatchObject({
     ok: false,
   });
+});
+
+test("doctor validates the lightweight creator's real package identity", async () => {
+  const root = await fixture({ "create-relkit": "0.7.10" });
+  expect(await check(root, { "create-relkit": "0.7.11" })).toMatchObject({ ok: false });
+  expect(await check(root, { "create-relkit": "^0.7.10" })).toMatchObject({ ok: true });
 });
 
 test("doctor rejects missing packages and malformed installed versions", async () => {

@@ -1,3 +1,5 @@
+/** Redacted telemetry envelopes and the diagnostic worker IPC protocol; no storage resources. */
+import type { Schema } from "effect";
 import type { ObservabilityRecord } from "../model.js";
 import type { ObservabilityQueryRequest } from "../query-types.js";
 import type { RedactionPolicy } from "../redaction.js";
@@ -51,7 +53,7 @@ export type LocalWorkerCommand =
 export interface LocalWorkerResponse {
   readonly id: number;
   readonly fatal?: boolean;
-  readonly value?: unknown;
+  readonly value?: Schema.Json;
   readonly error?: string;
   readonly code?: ObservabilityQueryError["code"];
 }

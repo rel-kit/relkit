@@ -15,6 +15,11 @@ and removes only its temporary directory after closing the application:
 
 [Complete auth integration test](https://github.com/rel-kit/relkit/blob/main/examples/auth-drizzle/tests/auth.test.ts)
 
+Import `createTestApplication` from `@relkit/testing/better-auth` for this database-backed auth
+application. A database-only application uses `@relkit/testing/drizzle`; the general
+`@relkit/testing` harness does not install either SDK. Keep the selected integration and native SDK
+packages in the application's dependencies, as shown in [Better Auth setup](/docs/auth/better-auth).
+
 Run from the repository's `examples/auth-drizzle` directory:
 
 ```sh
@@ -38,11 +43,11 @@ Create the environment before loading the auth service: its `baseURL` option is 
 module loads, while the omitted secret uses Better Auth's process-environment lookup at activation.
 Passing only `createTestApplication(..., { env: ... })` does not update that native process environment.
 
-Service activation is cached by descriptor. Closing an activated service does not currently clear
-that cache. Reuse one application for a connected auth lifecycle test; do not repeatedly activate the
-same imported descriptor with different database paths and expect fresh clients. Use separate processes
-or independently constructed descriptors when a test genuinely needs separate applications. Do not
-run process-environment mutations concurrently within the same process.
+The selected test harness acquires isolated database and auth owners for each application and closes
+them independently. It leaves the lazy descriptor's shared handler target untouched. Explicit
+`activateBetterAuthService` calls outside this harness share the first activation by default; use
+its isolated option when independently owning a borrowed database. Do not run process-environment
+mutations concurrently within the same process.
 
 The harness clock is not a promise that native Better Auth time or browser expiry is simulated. For
 expiry/refresh policy tests, use a controlled configuration and time strategy appropriate to the native

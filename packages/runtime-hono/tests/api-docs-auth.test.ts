@@ -3,7 +3,8 @@ import { expect, test } from "vitest";
 import { Hono } from "hono";
 import type { RegistrationPlan } from "@relkit/graph";
 import { mergeAuthDocument } from "../src/api-docs-auth.js";
-import { installApiDocs, OPENAPI_PATH, API_REFERENCE_PATH } from "../src/api-docs.js";
+import { OPENAPI_PATH, API_REFERENCE_PATH } from "../src/api-docs.js";
+import { installScalarApiDocs as installApiDocs } from "../src/scalar.js";
 
 const document = {
   openapi: "3.1.0",

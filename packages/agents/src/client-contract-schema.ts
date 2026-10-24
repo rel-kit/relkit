@@ -1,4 +1,7 @@
-import { toJsonSchema } from "@langchain/core/utils/json_schema";
+/** Describes Standard Schema input and output contracts for generic agent clients without importing a native model or graph SDK. */
+
+import { getJsonSchema } from "@relkit/schema";
+import { isAgentSchema } from "./agent-validation-schema.js";
 import type { JsonValue } from "@relkit/contracts";
 import { Effect, Metric } from "effect";
 import { observeAgent } from "./agent-telemetry.js";
@@ -114,7 +117,11 @@ export const clientSchemaMetadataEffect = Effect.fn("Agents.clientSchema.project
     const metadata = yield* Effect.sync((): ClientSchemaMetadata => {
       if (isDynamic(value) || isJsonSchemaObject(value)) return value;
       try {
-        return JSON.parse(JSON.stringify(toJsonSchema(value as never))) as JsonValue;
+        if (!isAgentSchema(value)) return dynamicClientSchema;
+        const projected = getJsonSchema(value);
+        return projected.ok
+          ? (JSON.parse(JSON.stringify(projected.schema)) as JsonValue)
+          : dynamicClientSchema;
       } catch {
         return dynamicClientSchema;
       }

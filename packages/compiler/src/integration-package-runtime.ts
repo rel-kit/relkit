@@ -1,4 +1,10 @@
+/**
+ * Validates integration identity, exports and capability metadata without
+ * evaluating package code. Discovery preserves dependency requirements for
+ * later selected-phase checks and rejects duplicate runtime registrations.
+ */
 import { IntegrationPackageValidationError } from "./integration-package-errors.js";
+import { integrationPackageDependencies } from "./integration-package-dependencies.js";
 
 import { integrationMetadata, record, inside } from "./integration-package-metadata.js";
 import { Effect } from "effect";
@@ -54,7 +60,18 @@ export const runtimePackageEffect = Effect.fn("Compiler.runtimePackage")(
       return yield* new IntegrationPackageValidationError({
         cause: new TypeError(`Package "${packageName}" runtime export escapes its package root.`),
       });
-    return Object.freeze({ integrationId, packageName, packageVersion, exportName, registrations });
+    const requirements = yield* integrationPackageDependencies(
+      metadata.dependencies,
+      registrations.map((entry) => entry.capability),
+    );
+    return Object.freeze({
+      integrationId,
+      packageName,
+      packageVersion,
+      exportName,
+      registrations,
+      ...(requirements.length === 0 ? {} : { requirements }),
+    });
   },
   (effect) => observeCompiler("configuration", "runtimePackage", effect),
 );

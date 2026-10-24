@@ -12,12 +12,12 @@ temporary source error, repairs it, and checks the active app.
 
 ## Know the local surfaces
 
-| Surface        | Default address                                  | What it shows                                      |
-| -------------- | ------------------------------------------------ | -------------------------------------------------- |
-| Backend        | `http://localhost:3000`                          | Your Orders routes                                 |
-| Inspector      | `http://localhost:3210`                          | Functions, routes, requests, logs, and diagnostics |
-| HTTP reference | `http://localhost:3000/_relkit/v1/api-reference` | Generated endpoint contracts                       |
-| Readiness      | `http://localhost:3000/_relkit/v1/health/ready`  | Whether the active generation can serve            |
+| Surface       | Default address                                 | What it shows                                      |
+| ------------- | ----------------------------------------------- | -------------------------------------------------- |
+| Backend       | `http://localhost:3000`                         | Your Orders routes                                 |
+| Inspector     | `http://localhost:3210`                         | Functions, routes, requests, logs, and diagnostics |
+| HTTP contract | `http://localhost:3000/_relkit/v1/openapi.json` | Generated endpoint contracts                       |
+| Readiness     | `http://localhost:3000/_relkit/v1/health/ready` | Whether the active generation can serve            |
 
 Start `bun run dev` and open the Inspector. Choose **Routes**, then `POST /orders` to see the
 public function it targets. Open **Functions** and find the Orders pricing and creation
@@ -71,7 +71,8 @@ previous generation to keep serving.
 
 ## Inspect the generated contract
 
-Open the HTTP reference above and find `POST /orders` and `GET /orders/{orderId}`. Compare
+Open the HTTP contract above and find `POST /orders` and `GET /orders/{orderId}`. For an interactive
+reference, [explicitly select Scalar](/docs/http/openapi). Compare
 their methods, paths, and request shapes with the source. The checked graph and OpenAPI files
 under `.relkit/generated` are useful for diagnosis; repair source, then rerun `check`.
 `bun run check`, `bun run typecheck`, and `bun run test` cover different concerns: graph

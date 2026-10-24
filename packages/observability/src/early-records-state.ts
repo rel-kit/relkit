@@ -31,7 +31,8 @@ export function retainEarlyRecord(
   maxRecords: number,
   maxBytes: number,
 ): EarlyRetentionState {
-  if (entry.bytes > maxBytes)
+  // Reserve collection metadata and its separator inside the one-MiB transport ceiling.
+  if (entry.bytes > maxBytes || entry.bytes + 1025 > 1_048_576)
     return {
       ...state,
       sequence: entry.sequence,

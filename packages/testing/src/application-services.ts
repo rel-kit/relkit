@@ -1,5 +1,5 @@
 /** Owns scoped database/auth activation for a test application in either service layout. */
-import { activateBetterAuthService } from "@relkit/better-auth";
+import { activateBetterAuthService } from "@relkit/better-auth/drizzle";
 import { activateDrizzleService } from "@relkit/drizzle";
 import { observeExecution, runExecutionPromise } from "@relkit/contracts/operation";
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
@@ -10,13 +10,12 @@ import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
 import type {
   ApplicationServicesPlatform,
   NativeDatabase,
-  ServiceEnvironment,
-  TestApplicationServices,
-} from "./application-services.types.js";
-export type {
-  ApplicationServicesPlatform,
-  TestApplicationServices,
-} from "./application-services.types.js";
+  DatabaseDeclaration,
+  AuthDeclaration,
+} from "./application-native-services.types.js";
+import type { ServiceEnvironment, TestApplicationServices } from "./application-services.types.js";
+export type { ApplicationServicesPlatform } from "./application-native-services.types.js";
+export type { TestApplicationServices } from "./application-services.types.js";
 
 /** Native activation dependencies acquired once per application owner. */
 export class TestServicesPlatform extends Context.Service<
@@ -53,7 +52,7 @@ export class TestServices extends Context.Service<
       const platform = yield* TestServicesPlatform;
       const instrumentation = yield* Effect.context<never>();
       const services = yield* platform.load(root);
-      const declaration = soleNativeService(services, "drizzle");
+      const declaration = soleNativeService(services, "drizzle") as DatabaseDeclaration | undefined;
       let database: NativeDatabase | undefined;
       if (declaration !== undefined)
         database = yield* Effect.acquireRelease(
@@ -65,7 +64,7 @@ export class TestServices extends Context.Service<
         );
       const auth = yield* acquireApplicationAuth(
         platform,
-        soleNativeService(services, "better-auth"),
+        soleNativeService(services, "better-auth") as AuthDeclaration | undefined,
         database,
         routes,
       );

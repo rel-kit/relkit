@@ -69,7 +69,7 @@ export const admitAgentContinuation = Effect.fn("AgentContinuations.admit")(func
   if (input.waitingRevision !== waiting.revision)
     return yield* resumeError("Agent waiting revision is stale.");
   const reply = yield* httpBoundary("agent.resume.validate", async () => {
-    const validators = await import("@relkit/agents/continuation-validation");
+    const validators = await import("@relkit/langchain/continuation-validation");
     return validators.isGraphDescriptor(resolved.descriptor)
       ? validators.validateGraphResumeInput(resolved.descriptor, waiting.requests, input.payload)
       : validators.validateNativeAgentResumeInput(waiting.requests, input.payload);

@@ -1,5 +1,8 @@
-import { readdir, readFile } from "node:fs/promises";
-import { extname, relative, resolve } from "node:path";
+/** Scans native Inspector source boundaries and the actual selected compiled
+ * output, preserving the existing forbidden-payload and synthetic-secret rules.
+ */
+import { readdir, readFile, realpath } from "node:fs/promises";
+import { extname, isAbsolute, relative, resolve, sep } from "node:path";
 import * as ts from "typescript";
 import { dependencyName, importReferences } from "../../scripts/boundary-imports.ts";
 
@@ -74,15 +77,27 @@ export async function scanInspectorImports(root: string): Promise<InspectorImpor
   return { files: files.length, violations: violations.sort(), networkFiles: [...network].sort() };
 }
 
-export async function scanInspectorBundles(root: string): Promise<InspectorBundleScan> {
-  const browser = await firstBundleFiles([
-    resolve(root, "apps/inspector/.next/static"),
-    resolve(root, "apps/inspector/.next/dev/static"),
-  ]);
-  const server = await firstBundleFiles([
-    resolve(root, "apps/inspector/.next/server"),
-    resolve(root, "apps/inspector/.next/dev/server"),
-  ]);
+export async function scanInspectorBundles(
+  root: string,
+  dist = ".next",
+): Promise<InspectorBundleScan> {
+  if (!/^(?:\.next(?:-[\w-]+)?|\.relkit\/next-e2e-[\w-]+)$/.test(dist))
+    throw new TypeError("Invalid inspector build directory");
+  const inspector = resolve(root, "apps/inspector");
+  const build = resolve(inspector, dist);
+  try {
+    assertContained(await realpath(inspector), await realpath(build));
+  } catch (error) {
+    if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error;
+  }
+  const browser = await firstBundleFiles(
+    [resolve(build, "static"), resolve(build, "dev/static")],
+    inspector,
+  );
+  const server = await firstBundleFiles(
+    [resolve(build, "server"), resolve(build, "dev/server")],
+    inspector,
+  );
   const violations: string[] = [];
   for (const [kind, files] of [
     ["browser", browser],
@@ -117,31 +132,50 @@ async function sourceFiles(root: string): Promise<string[]> {
   return files.filter((file) => [".ts", ".tsx"].includes(extname(file))).sort();
 }
 
-async function bundleFiles(directory: string): Promise<string[]> {
+async function bundleFiles(directory: string, root: string): Promise<string[]> {
   try {
-    return (await filesUnder(directory)).filter((file) => bundleExtensions.has(extname(file)));
-  } catch {
+    return (await filesUnder(directory, root)).filter((file) =>
+      bundleExtensions.has(extname(file)),
+    );
+  } catch (error) {
+    if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error;
     return [];
   }
 }
 
-async function firstBundleFiles(directories: readonly string[]): Promise<string[]> {
+async function firstBundleFiles(directories: readonly string[], root: string): Promise<string[]> {
   for (const directory of directories) {
-    const files = await bundleFiles(directory);
+    const files = await bundleFiles(directory, root);
     if (files.length > 0) return files;
   }
   return [];
 }
 
-async function filesUnder(directory: string): Promise<string[]> {
+async function filesUnder(directory: string, root = directory): Promise<string[]> {
+  assertContained(resolve(root), resolve(directory));
+  const owner = await realpath(root);
   const files: string[] = [];
   async function visit(current: string): Promise<void> {
-    for (const entry of await readdir(current, { withFileTypes: true })) {
-      const path = resolve(current, entry.name);
+    const canonical = await realpath(current);
+    assertContained(owner, canonical);
+    for (const entry of await readdir(canonical, { withFileTypes: true })) {
+      const path = resolve(canonical, entry.name);
       if (entry.isDirectory()) await visit(path);
-      else files.push(path);
+      else if (entry.isFile()) files.push(path);
     }
   }
   await visit(directory);
   return files;
+}
+
+/**
+ * Rejects lexical or canonical escapes before a directory enumeration.
+ * @param root - Trusted Inspector/source directory in the same path representation.
+ * @param path - Candidate path, canonicalized before native traversal.
+ * @returns Nothing when the candidate remains within its owner.
+ */
+function assertContained(root: string, path: string): void {
+  const child = relative(root, path);
+  if (child === ".." || child.startsWith(`..${sep}`) || isAbsolute(child))
+    throw new Error("Refusing to scan outside inspector directory");
 }

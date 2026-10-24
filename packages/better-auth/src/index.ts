@@ -1,35 +1,23 @@
-/** Lazy authoring and Effect-native authentication borrowing the application's DB. @packageDocumentation */
+/** Lazy authentication authoring; select /drizzle for native database activation. @packageDocumentation */
 import { createDescriptorBase } from "@relkit/contracts";
 import { createUnboundIdentity } from "@relkit/invocation";
 import type { Auth } from "better-auth";
-import { Effect } from "effect";
-import { activateBetterAuthService, runAuthPromise } from "./activation.js";
-import { AuthService } from "./auth.service.js";
 import type {
   BetterAuthHandler,
-  BetterAuthRuntime,
+  BetterAuthDeclarationRuntime,
   BetterAuthServiceDescriptor,
   BetterAuthServiceOptions,
-} from "./auth.types.js";
+} from "./declaration.types.js";
 import { BETTER_AUTH_HANDLER, BETTER_AUTH_RUNTIME } from "./symbols.js";
 
-export { activateBetterAuthService };
 export { BETTER_AUTH_HANDLER };
-export { generateBetterAuthOpenApi } from "./openapi.js";
-export { AuthFailure } from "./auth.errors.js";
-export { AuthFactory, authFactoryLiveLayer } from "./auth.factory.js";
-export { AuthService, authServiceLayer, authLiveLayer } from "./auth.service.js";
-export type { BetterAuthActivationOptions } from "./activation.types.js";
 export type {
   BetterAuthServiceOptions,
   BetterAuthRegistration,
   BetterAuthHandler,
   InferBetterAuthSession,
   BetterAuthServiceDescriptor,
-  AuthConfiguration,
-  AuthServiceInterface,
-  AuthFactoryInterface,
-} from "./auth.types.js";
+} from "./declaration.types.js";
 
 /**
  * Defines lazy authentication using the application's Drizzle database.
@@ -61,16 +49,15 @@ export function defineBetterAuthService<const Options extends BetterAuthServiceO
     throw new TypeError("Better Auth service database is provided by the Drizzle service");
   if (Object.hasOwn(options, "basePath"))
     throw new TypeError("Better Auth basePath is derived from its ALL route");
-  const runtime: BetterAuthRuntime<Options> = { options, activation: undefined };
+  const runtime: BetterAuthDeclarationRuntime<Options> = {
+    options,
+    activation: undefined,
+    handle: undefined,
+  };
   const handler = (async (request: Request) => {
-    const owner = runtime.activation;
-    if (owner === undefined) return new Response("Service Unavailable", { status: 503 });
-    return runAuthPromise(
-      owner,
-      Effect.flatMap(AuthService, (auth) => auth.handler(request)),
-      { signal: request.signal },
-      "auth.handler",
-    );
+    return runtime.handle === undefined
+      ? new Response("Service Unavailable", { status: 503 })
+      : runtime.handle(request);
   }) as BetterAuthHandler<Auth<Options>["$Infer"]["Session"]>;
   const descriptor = {
     ...createDescriptorBase("service", createUnboundIdentity()),

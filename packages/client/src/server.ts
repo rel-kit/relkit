@@ -1,10 +1,14 @@
+/**
+ * Adds request-time tracing to the Bun server transport without loading frontend
+ * bindings. TanStack hydration is exposed by @relkit/client/server/tanstack-query
+ * and requires that integration's documented frontend peers.
+ */
 import { injectTraceContext } from "@relkit/contracts";
 import { currentExecutionContext, publicTrace, RelkitSpan, spanContext } from "@relkit/invocation";
 import type { RouterContract, RouterContractClient } from "@orpc/contract";
 import { createClient } from "./transport.js";
 import type { CreateClientOptions } from "./index.types.js";
 import type { DefaultContract } from "./index.js";
-export * from "./server-context.js";
 
 /** Bun server client with operation-time W3C propagation. Response bodies remain untouched.
  * @typeParam Contract - Declared Contract type retained by this operation.

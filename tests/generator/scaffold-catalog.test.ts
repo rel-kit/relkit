@@ -1,12 +1,14 @@
+/** Checks scaffold metadata and selected capability dependencies against the maintained catalog. */
 import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
   resolveProjectDependencies,
   SCAFFOLD_DEPENDENCIES,
-} from "../../packages/create-relkit/src/index.ts";
+} from "../../packages/cli/src/scaffolding/index.ts";
 
 const OWNERS = {
+  "@cloudflare/workers-types": "packages/better-auth/package.json",
   "@relkit/aws": "integrations/packages/aws/package.json",
   "@relkit/better-auth": "packages/better-auth/package.json",
   "@relkit/cloudflare": "integrations/packages/cloudflare/package.json",
@@ -15,6 +17,7 @@ const OWNERS = {
   "@relkit/effect-mq": "integrations/packages/effect-mq/package.json",
   "@relkit/inngest": "integrations/packages/inngest/package.json",
   "@relkit/local": "integrations/packages/local/package.json",
+  "@relkit/langchain": "integrations/packages/langchain/package.json",
   "@relkit/pulumi": "integrations/packages/pulumi/package.json",
   "@relkit/redis": "integrations/packages/redis/package.json",
   "@relkit/s3": "integrations/packages/s3/package.json",
@@ -22,7 +25,10 @@ const OWNERS = {
   "better-auth": "packages/better-auth/package.json",
   "drizzle-kit": "examples/auth-drizzle/package.json",
   "drizzle-orm": "packages/drizzle/package.json",
-  langchain: "packages/agents/package.json",
+  "@langchain/core": "integrations/packages/langchain/package.json",
+  "@langchain/langgraph": "integrations/packages/langchain/package.json",
+  langchain: "integrations/packages/langchain/package.json",
+  langsmith: "integrations/packages/langchain/package.json",
 } as const;
 
 test("keeps scaffold dependency versions aligned with owning manifests", async () => {

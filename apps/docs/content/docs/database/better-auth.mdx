@@ -79,10 +79,13 @@ descriptor and assume it can discover this integration.
 From an app using the matching RELKIT release, install the integration if missing:
 
 ```sh
-bun add @relkit/better-auth@0.0.5
+bun add @relkit/better-auth@0.0.5 better-auth@1.7.1
 ```
 
 The local showcase enables email/password authentication:
+
+Backend activation uses `@relkit/better-auth/drizzle`; React is optional and belongs only to the
+`/react` entrypoint. Native Drizzle drivers stay selected by the application's database setup.
 
 <include cwd lang="ts" meta='title="src/services/auth/service.ts — local demonstration"'>
   ../../examples/auth-drizzle/src/services/auth/service.ts

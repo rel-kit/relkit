@@ -8,6 +8,7 @@ import { Schema } from "effect";
 import type { JsonValue } from "../../packages/contracts/src/index.ts";
 import type { FixtureCompilation } from "./fixture-runner.ts";
 import { CommerceLocalBindings, CommerceRuntimePackages } from "./commerce-example.schemas.ts";
+import { assertGuardedRuntimeImports } from "./runtime-import-assertions.ts";
 
 /**
  * Verifies all integration and local-service projections plus portable output.
@@ -28,18 +29,7 @@ export function assertCommerceArtifacts(run: FixtureCompilation): void {
     "provider.job.default",
     "provider.realtime.default",
   ]);
-  const runtime = Schema.decodeUnknownSync(CommerceRuntimePackages)(
-    JSON.parse(run.normalization.outputs.runtimeIntegrations),
-  );
-  expect(runtime.integrations.map((entry) => entry.packageName)).toEqual([
-    "@relkit/redis",
-    "@relkit/s3",
-    "@relkit/redis",
-    "@relkit/inngest",
-    "@relkit/redis",
-    "@relkit/otlp",
-    "@relkit/sentry",
-  ]);
+  assertRuntimeIntegrations(run);
   expect(run.manifest).toContain('from "@relkit/app/internal/runtime";');
   expect(run.manifest).toContain('from "@relkit/app/agents";');
   expect(run.manifest).not.toMatch(/from "@relkit\/(?:agents|events|invocation)"/);
@@ -48,6 +38,34 @@ export function assertCommerceArtifacts(run: FixtureCompilation): void {
   assertPortableGraph(graph);
   expect(run.manifest).not.toContain("/Users/");
   expect(run.manifest).not.toContain("[Function");
+}
+
+/** Verifies native capability ownership without duplicating executable modules. */
+function assertRuntimeIntegrations(run: FixtureCompilation): void {
+  const runtime = Schema.decodeUnknownSync(CommerceRuntimePackages)(
+    JSON.parse(run.normalization.outputs.runtimeIntegrations),
+  );
+  expect(
+    runtime.integrations.map(({ capability, adapterId, packageName }) => [
+      capability,
+      adapterId,
+      packageName,
+    ]),
+  ).toEqual([
+    ["agent-deep", "deepagents", "@relkit/langchain"],
+    ["agent-execution", "langchain", "@relkit/langchain"],
+    ["agent-state", "redis-agent-state", "@relkit/redis"],
+    ["bucket", "s3", "@relkit/s3"],
+    ["cache", "redis", "@relkit/redis"],
+    ["job", "inngest", "@relkit/inngest"],
+    ["realtime", "redis-realtime", "@relkit/redis"],
+    ["telemetry", "otlp", "@relkit/otlp"],
+    ["telemetry", "sentry", "@relkit/sentry"],
+  ]);
+  assertGuardedRuntimeImports(
+    run.normalization.outputs.runtimeIntegrationImports,
+    runtime.integrations,
+  );
 }
 
 /**

@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "build": "relkit build",
-    "start": "relkit start",
+    "start": "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
     "jobs:trigger": "relkit jobs trigger --job exportOrders --input-file examples/export-orders.json --operation-id example-trigger"
   },
   "dependencies": {

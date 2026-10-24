@@ -1,10 +1,17 @@
+/** Portable database contracts; native model database types belong to selected dialect entrypoints. */
 import type { Row, Insert, Update, BaseOperations } from "./operations.types.js";
 import type { DescriptorBase, MaybePromise } from "@relkit/contracts";
-import type { MySqlAsyncDatabase, MySqlTable } from "drizzle-orm/mysql-core";
-import type { PgAsyncDatabase, PgTable } from "drizzle-orm/pg-core";
-import type { SQLiteAsyncDatabase, SQLiteTable } from "drizzle-orm/sqlite-core";
 import type { Table } from "drizzle-orm";
 import type { ZodType } from "zod";
+import type { ModelDescriptor, ModelExtensionMap } from "./model.types.js";
+export type {
+  ModelDescriptor,
+  ModelDescriptorAny,
+  ModelExtension,
+  ModelExtensionContext,
+  ModelExtensionMap,
+  NonEmptyExtensions,
+} from "./model.types.js";
 
 /** Supported tables keyed by authored schema names. */
 export type TableMap = Readonly<Record<string, Table>>;
@@ -64,71 +71,6 @@ export type TableOverrides<T extends Table> = {
 export type DrizzleOverrides<Tables extends TableMap> = {
   readonly [Name in keyof Tables]?: TableOverrides<Tables[Name]>;
 };
-
-/**
- * Transaction-aware native database surface inferred by dialect.
- * @typeParam T - Table declaring the native dialect.
- */
-export type DialectDatabase<T extends Table> = T extends SQLiteTable
-  ? Omit<SQLiteAsyncDatabase<any, any, any>, "query">
-  : T extends PgTable
-    ? Omit<PgAsyncDatabase<any, any>, "query">
-    : T extends MySqlTable
-      ? Omit<MySqlAsyncDatabase<any, any>, "query">
-      : never;
-
-/**
- * Injected table and transaction-bound native database.
- * @typeParam T - Matching table.
- */
-export interface ModelExtensionContext<T extends Table> {
-  readonly table: T;
-  readonly database: DialectDatabase<T>;
-}
-
-/**
- * Authored native extension with inferred caller arguments/results.
- * @typeParam T - Matching authored table.
- * @param context - Table and transaction-aware native database.
- * @param args - Custom caller arguments preserved in the public context.
- * @returns Authored result whose exact synchronous/asynchronous type is retained.
- */
-export type ModelExtension<T extends Table> = (
-  context: ModelExtensionContext<T>,
-  ...args: any[]
-) => unknown;
-
-/**
- * Named authored extension functions.
- * @typeParam T - Matching table.
- */
-export type ModelExtensionMap<T extends Table> = Readonly<Record<string, ModelExtension<T>>>;
-
-/**
- * Rejects declarations without any custom methods.
- * @typeParam Extensions - Authored method map.
- */
-export type NonEmptyExtensions<Extensions extends Readonly<Record<string, unknown>>> =
-  keyof Extensions extends never ? never : Extensions;
-
-declare const MODEL_TYPES: unique symbol;
-
-/**
- * Frozen lazy model descriptor retaining authored extension types.
- * @typeParam T - Matching table.
- * @typeParam Extensions - Inferred custom method signatures.
- */
-export interface ModelDescriptor<
-  T extends Table,
-  Extensions extends ModelExtensionMap<T> = ModelExtensionMap<T>,
-> {
-  readonly table: T;
-  readonly extensionNames: readonly Extract<keyof Extensions, string>[];
-  readonly [MODEL_TYPES]: Extensions;
-}
-
-/** Internal erased model descriptor used for pure discovery. */
-export type ModelDescriptorAny = ModelDescriptor<Table, ModelExtensionMap<Table>>;
 
 /**
  * Optional table-keyed model declarations.

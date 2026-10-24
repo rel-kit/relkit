@@ -1,3 +1,4 @@
+/** Checks declared generic client events and their schema-validated payload metadata. */
 import { expect, test } from "vitest";
 import { Effect, Metric, Tracer } from "effect";
 import {
@@ -5,7 +6,7 @@ import {
   agentClientEventsEffect,
   type JournalRecord,
   type ToolPartState,
-} from "../src/index.ts";
+} from "../src/index.js";
 
 test("projects durable tool states into explicit client lifecycle events", () => {
   const states: readonly ToolPartState[] = [

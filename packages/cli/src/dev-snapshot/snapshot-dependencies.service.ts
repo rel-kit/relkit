@@ -4,18 +4,24 @@
  * Bun did not bundle them; original project containment rejects escaped links.
  * Preparation owns checking/publication epochs and immutable artifact capture.
  */
-import { isAbsolute, relative } from "node:path";
-import { Context, Effect, Layer, Schema } from "effect";
+import { Context, Effect, Layer, Option } from "effect";
+import {
+  DependencySource,
+  type DependencySourceContract,
+} from "@relkit/provider/internal/dependencies";
 import { observeExecution } from "@relkit/contracts/operation";
 import { SnapshotFiles } from "./snapshot-files.service.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";
-import { SnapshotPath } from "./snapshot.schemas.js";
 import { SnapshotBundleInputs, SnapshotInstalledPackage } from "./snapshot-dependencies.schemas.js";
 import { decodeSnapshotJson } from "./snapshot-json.js";
 import { snapshotDigest } from "./snapshot-fingerprint.js";
 import type { SnapshotDependencyOperations } from "./snapshot-dependencies.types.js";
 import type { SnapshotFileOperations } from "./snapshot-files.types.js";
 import { stageSnapshotDependencies } from "./snapshot-dependency-capsule.js";
+import {
+  groupSnapshotDependencyPaths,
+  selectedManifestPaths,
+} from "./snapshot-dependency-paths.js";
 
 /** Preparation dependency authority with explicit replaceable file operations. */
 export class SnapshotDependencies extends Context.Service<
@@ -24,6 +30,7 @@ export class SnapshotDependencies extends Context.Service<
 >()("relkit/DevSnapshot/Dependencies", {
   make: Effect.gen(function* () {
     const files = yield* SnapshotFiles;
+    const packages = Option.getOrUndefined(yield* Effect.serviceOption(DependencySource));
     return {
       capture: Effect.fn("SnapshotDependencies.capture")(
         (
@@ -31,11 +38,12 @@ export class SnapshotDependencies extends Context.Service<
           metafile: Uint8Array,
           capsuleRoot?: string,
           writes?: import("../services/filesystem.types.js").FileSystemCapabilities,
+          selected?: Readonly<Record<string, string>>,
         ) =>
           observeExecution(
             "cli",
             "dev.snapshot.dependencies",
-            captureDependencies(files, writes, root, metafile, capsuleRoot),
+            captureDependencies(files, writes, root, metafile, capsuleRoot, packages, selected),
           ),
       ),
     } satisfies SnapshotDependencyOperations;
@@ -61,37 +69,21 @@ const captureDependencies = Effect.fn("DevSnapshot.dependencyInputs")(function* 
   root: string,
   metafile: Uint8Array,
   capsuleRoot?: string,
+  packages?: DependencySourceContract,
+  selected: Readonly<Record<string, string>> = {},
 ) {
   if (metafile.length > 8_388_608) return yield* ineligible("dependencies.metafileBound");
   const metadata = yield* decodeSnapshotJson(SnapshotBundleInputs, metafile);
-  const paths = Object.keys(metadata.inputs);
+  const paths = [
+    ...Object.keys(metadata.inputs),
+    ...(yield* selectedManifestPaths(packages, root, selected)),
+  ];
   if (paths.length > 20_000) return yield* ineligible("dependencies.memberBound");
-  const groups = new Map<string, Set<string>>();
-  const external: string[] = [];
-  for (const nativePath of paths) {
-    const path = (isAbsolute(nativePath) ? relative(root, nativePath) : nativePath).replaceAll(
-      "\\",
-      "/",
-    );
-    if (!Schema.is(SnapshotPath)(path)) {
-      if (capsuleRoot === undefined || writes === undefined)
-        return yield* ineligible("dependencies.path");
-      external.push(nativePath);
-      continue;
-    }
-    if (path.split("/").some((segment) => segment === ".env" || segment.startsWith(".env.")))
-      return yield* ineligible("dependencies.environment");
-    if (!path.startsWith("node_modules/")) continue;
-    const marker = path.lastIndexOf("node_modules/") + "node_modules/".length;
-    const segments = path.slice(marker).split("/");
-    const packageLength = segments[0]?.startsWith("@") ? 2 : 1;
-    if (segments.length <= packageLength) return yield* ineligible("dependencies.packagePath");
-    const packageRoot = path.slice(0, marker) + segments.slice(0, packageLength).join("/");
-    const members = groups.get(packageRoot) ?? new Set(["package.json"]);
-    members.add(path.slice(packageRoot.length + 1));
-    groups.set(packageRoot, members);
-  }
-  if (groups.size > 2_048) return yield* ineligible("dependencies.packageBound");
+  const { groups, external } = yield* groupSnapshotDependencyPaths(
+    root,
+    paths,
+    capsuleRoot !== undefined && writes !== undefined,
+  );
   const installed = yield* Effect.forEach(
     [...groups].sort(([left], [right]) => left.localeCompare(right)),
     ([packageRoot, paths]) => capturePackage(files, root, packageRoot, paths),

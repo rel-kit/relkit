@@ -1,3 +1,6 @@
+/** Derives selected native service imports and immutable generated-server verification fragments.
+ * Rendering acquires no SDK; runtime acquisition validates those selected dependencies before readiness.
+ */
 import { LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
 import type { ApplicationGraph } from "@relkit/graph";
 import type { RuntimeActivationFingerprint } from "@relkit/contracts";
@@ -20,7 +23,7 @@ export function serverSourceOptions(
     .map((node) => node.capability?.kind);
   const specializedImports = [
     serviceCapabilities.includes("better-auth")
-      ? 'import { activateBetterAuthService, generateBetterAuthOpenApi } from "@relkit/better-auth";'
+      ? 'import { activateBetterAuthService, generateBetterAuthOpenApi } from "@relkit/better-auth/drizzle";'
       : undefined,
     serviceCapabilities.includes("drizzle")
       ? 'import { activateDrizzleService } from "@relkit/drizzle/internal";'
@@ -51,6 +54,19 @@ if (artifactHash(localServicesPlan) !== activationFingerprint.localServicesPlanH
       ? "const localServicesInspector = undefined;"
       : `const localServicesRuntime = readLocalServiceInspectorState(process.env.RELKIT_LOCAL_SERVICE_INSPECTOR_STATE);
 const localServicesInspector = { plan: localServicesPlan, ...(localServicesRuntime === undefined ? {} : { runtime: localServicesRuntime }) };`;
+  return {
+    specializedImports,
+    localServicesImport,
+    jobsManifestImport,
+    jobsManifestVerification,
+    localServicesVerification,
+    localServicesInspectorSource,
+    ...providerOverridesOptions(activation),
+  };
+}
+
+/** Keeps provider override validation fragments paired with their selected imports. */
+function providerOverridesOptions(activation: RuntimeActivationFingerprint) {
   const providerOverridesImport =
     activation.providerOverridesGeneration === undefined
       ? ""
@@ -65,12 +81,6 @@ const providerOverridesInfo = lstatSync(providerOverridesFile);
 if (!providerOverridesInfo.isFile() || providerOverridesInfo.isSymbolicLink()) throw new Error("Runtime provider-override file is invalid.");
 const localBindingValues = providerOverrideBindingValues(JSON.parse(readFileSync(providerOverridesFile, "utf8")), { applicationId: graph.appId, planHash: activationFingerprint.localServicesPlanHash, generationId: activationFingerprint.providerOverridesGeneration });`;
   return {
-    specializedImports,
-    localServicesImport,
-    jobsManifestImport,
-    jobsManifestVerification,
-    localServicesVerification,
-    localServicesInspectorSource,
     providerOverridesImport,
     providerOverridesSource,
   };

@@ -1,3 +1,7 @@
+/**
+ * Checks immutable application normalization and authoring validation against
+ * real provider descriptors. These constructors do not acquire runtime resources.
+ */
 import { expect, test } from "vitest";
 import { defineEnv } from "@relkit/config";
 import {
@@ -32,7 +36,7 @@ test("defines one immutable application topology with singular provider inputs",
     defaults: { cache: "default" },
     telemetry,
     server: { port: 4000 },
-    inspector: { port: 4001 },
+    inspector: { enabled: true, connection: { port: 4001 } },
     deployment: { engine: "pulumi", host: "aws" },
   });
 
@@ -47,7 +51,7 @@ test("defines one immutable application topology with singular provider inputs",
     defaults: { cache: "default" },
     telemetry: { redaction: { mode: "off" }, localRetention: { maxRecords: 128 } },
     server: { port: 4000 },
-    inspector: { port: 4001 },
+    inspector: { enabled: true, connection: { host: "127.0.0.1", port: 4001 } },
     deployment: { engine: "pulumi", host: "aws" },
   });
   expect(Object.isFrozen(app)).toBe(true);
@@ -76,14 +80,15 @@ test("normalizes named profiles and validates explicit defaults", () => {
 });
 
 test("rejects plural and unknown application options", () => {
-  const unsafeDefineApp = defineApp as (options: Record<string, unknown>) => unknown;
-  expect(() => unsafeDefineApp({ env: defineEnv({}), caches: {} })).toThrow(
+  expect(() => Reflect.apply(defineApp, undefined, [{ env: defineEnv({}), caches: {} }])).toThrow(
     'Unknown defineApp option "caches"',
   );
-  expect(() => unsafeDefineApp({ env: defineEnv({}), observability: {} })).toThrow(
-    'Unknown defineApp option "observability"',
-  );
   expect(() =>
-    unsafeDefineApp({ env: defineEnv({}), telemetry: { bodyCapture: { mode: "off" } } }),
+    Reflect.apply(defineApp, undefined, [{ env: defineEnv({}), observability: {} }]),
+  ).toThrow('Unknown defineApp option "observability"');
+  expect(() =>
+    Reflect.apply(defineApp, undefined, [
+      { env: defineEnv({}), telemetry: { bodyCapture: { mode: "off" } } },
+    ]),
   ).toThrow('Unknown telemetry option "bodyCapture"');
 });

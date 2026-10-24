@@ -28,7 +28,17 @@ export const generatedBrowserProject = Effect.gen(function* () {
     await prepareProjectDependencyPatch(root);
     await linkWorkspacePackages(root);
     for (const [name, target] of [
-      ["langchain", join(repository, "packages/agents/node_modules/langchain")],
+      ["langchain", join(repository, "integrations/packages/langchain/node_modules/langchain")],
+      ["langsmith", join(repository, "integrations/packages/langchain/node_modules/langsmith")],
+      [
+        "@langchain/core",
+        join(repository, "integrations/packages/langchain/node_modules/@langchain/core"),
+      ],
+      [
+        "@langchain/langgraph",
+        join(repository, "integrations/packages/langchain/node_modules/@langchain/langgraph"),
+      ],
+      ["@ag-ui/core", join(repository, "packages/runtime-hono/node_modules/@ag-ui/core")],
       ["@types/bun", join(repository, "node_modules/@types/bun")],
     ]) {
       await mkdir(dirname(join(root, "node_modules", name)), { recursive: true });

@@ -10,7 +10,15 @@ export const CommerceLocalBindings = Schema.Struct({
   services: Schema.Array(Schema.Struct({ bindingId: Schema.String })),
 });
 
-/** Ordered package identities preserved in the serialized runtime plan. */
+/** Ordered capability registrations and owning modules in the runtime plan. */
 export const CommerceRuntimePackages = Schema.Struct({
-  integrations: Schema.Array(Schema.Struct({ packageName: Schema.String })),
+  integrations: Schema.Array(
+    Schema.Struct({
+      capability: Schema.String,
+      adapterId: Schema.String,
+      packageName: Schema.String,
+      packageVersion: Schema.String,
+      exportName: Schema.String,
+    }),
+  ),
 });

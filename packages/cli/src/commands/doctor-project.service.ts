@@ -1,6 +1,7 @@
+/** Captures one doctor invocation's native authorities and preserves ordered prerequisite reports. */
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer } from "effect";
-import { GeneratorFileSystem, generatorFileSystemLive } from "create-relkit";
+import { GeneratorFileSystem, generatorFileSystemLive } from "../scaffolding/index.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";
 import { CliModules, moduleLayer } from "../services/modules.service.js";
 import { CliProcess, processLayer } from "../services/process.service.js";
@@ -47,31 +48,7 @@ function makeDoctorLive(defaults: DoctorOptions) {
         check: Effect.fn("Doctor.check")((overrides: DoctorOptions) =>
           observeCli(
             "doctor.check",
-            Effect.gen(function* () {
-              const options = { ...defaults, ...overrides };
-              const root = resolve(options.projectRoot ?? process.cwd());
-              const manifest = yield* readJsonEffect(join(root, "package.json"));
-              const checks: DoctorCheck[] = [...(yield* versionChecksEffect(manifest, root))];
-              const config = yield* checkConfigEffect(root);
-              checks.push(config.check, yield* checkAppEffect(root, config.config));
-              const enabled =
-                options.deploymentEnabled ?? detectDeployment(manifest, config.config);
-              checks.push(yield* checkPulumiEffect(enabled, root, options.commandRunner));
-              checks.push(checkAws(enabled, options.source ?? process.env));
-              checks.push(yield* checkRootsEffect(root));
-              checks.push(
-                options.skipPorts
-                  ? { name: "ports", ok: true, message: "Port availability check skipped." }
-                  : yield* checkPortsEffect(config.config, options, options.portProbe),
-              );
-              checks.push(yield* checkLockfileEffect(root, options.commandRunner));
-              return Object.freeze({
-                ok: checks.every((check) => check.ok),
-                command: "doctor" as const,
-                projectRoot: root,
-                checks: Object.freeze(checks.map((check) => Object.freeze(check))),
-              });
-            }).pipe(
+            collectDoctorChecks(defaults, overrides).pipe(
               Effect.provideService(CliFileSystem, files),
               Effect.provideService(CliModules, modules),
               Effect.provideService(CliProcess, processes),
@@ -129,3 +106,32 @@ export const doctorProjectEffect = Effect.fn("Doctor.project")(
 export function doctorProject(options: DoctorOptions = {}): Promise<DoctorResult> {
   return runCliEffect(doctorProjectEffect(options), doctorLiveLayer(options));
 }
+
+/** Executes checks lazily under the exact service authorities captured for this invocation. */
+const collectDoctorChecks = Effect.fnUntraced(function* (
+  defaults: DoctorOptions,
+  overrides: DoctorOptions,
+) {
+  const options = { ...defaults, ...overrides };
+  const root = resolve(options.projectRoot ?? process.cwd());
+  const manifest = yield* readJsonEffect(join(root, "package.json"));
+  const checks: DoctorCheck[] = [...(yield* versionChecksEffect(manifest, root))];
+  const config = yield* checkConfigEffect(root);
+  checks.push(config.check, yield* checkAppEffect(root, config.config));
+  const enabled = options.deploymentEnabled ?? detectDeployment(manifest, config.config);
+  checks.push(yield* checkPulumiEffect(enabled, root, options.commandRunner));
+  checks.push(checkAws(enabled, options.source ?? process.env));
+  checks.push(yield* checkRootsEffect(root));
+  checks.push(
+    options.skipPorts
+      ? { name: "ports", ok: true, message: "Port availability check skipped." }
+      : yield* checkPortsEffect(config.config, options, options.portProbe),
+  );
+  checks.push(yield* checkLockfileEffect(root, options.commandRunner));
+  return Object.freeze({
+    ok: checks.every((check) => check.ok),
+    command: "doctor" as const,
+    projectRoot: root,
+    checks: Object.freeze(checks.map((check) => Object.freeze(check))),
+  });
+});

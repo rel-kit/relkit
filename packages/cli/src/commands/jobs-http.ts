@@ -50,6 +50,8 @@ export const fetchJobsJsonEffect = Effect.fn("Jobs.request")(
     const query = jobsQuery(parsed);
     const url = `${baseUrl}/_relkit/v1${path}${query.size === 0 ? "" : `?${query}`}`;
     const headers: Record<string, string> = { accept: "application/json" };
+    if (process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN !== undefined)
+      headers.authorization = `Bearer ${process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN}`;
     if (path.startsWith("/jobs/runs") || path.startsWith("/jobs/schedules"))
       Object.assign(headers, yield* jobsIdentityHeadersEffect(baseUrl));
     if (method !== "GET" || options.body !== undefined) {

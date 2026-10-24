@@ -1,5 +1,5 @@
 /**
- * Installs protected JSON and Scalar routes for the shared application reference.
+ * Installs protected JSON and explicitly selected reference routes independently.
  * Configuration is validated before registration; authorization precedes lazy
  * document generation through ApiDocuments, executed at each HTTP request edge.
  */
@@ -12,9 +12,8 @@ import {
 } from "@relkit/contracts";
 import type { RegistrationPlan } from "@relkit/graph";
 import { Effect, Layer } from "effect";
-import { Scalar } from "@scalar/hono-api-reference";
 import type { Context, Hono, Next } from "hono";
-import type { ApiDocsOptions } from "./api-docs.types.js";
+import type { ApiDocsOptions, ApiReferenceFactory } from "./api-docs.types.js";
 import { ApiDocuments, documentFrom } from "./api-docs-document.js";
 import { runHttp } from "./http-effect.js";
 import { isAuthorized, jsonResponse } from "./internal-endpoints-utils.js";
@@ -31,7 +30,7 @@ export class ApiDocsConfigurationError extends TypeError {
   }
 }
 
-/** Installs the active OpenAPI document and the sole bundled Scalar reference UI.
+/** Installs the active OpenAPI document and an explicitly supplied optional reference UI.
  * @param app - Hono application receiving the configured endpoints or middleware.
  * @param plan - Validated application registration plan.
  * @param options - Application dependencies and configuration for this domain.
@@ -47,6 +46,10 @@ export function installApiDocs(
     mode === "production" ? options.enabledInProduction === true : options.enabled !== false;
   validate(mode, enabled, options);
   if (!enabled) return;
+  if (options.ui === "scalar" && options.reference === undefined)
+    throw new ApiDocsConfigurationError(
+      "Scalar UI requires createPreparedApp or @relkit/runtime-hono/scalar.",
+    );
   const baseDocument = options.document ?? documentFrom(plan);
   assertJsonValue(baseDocument);
   const documents = Layer.effect(ApiDocuments, ApiDocuments.make(baseDocument, options));
@@ -55,7 +58,13 @@ export function installApiDocs(
   const auth = authorization(options);
   const embed =
     mode === "production" || auth.bearerToken !== undefined || auth.authorize !== undefined;
-  registerDocumentRoutes(app, document, auth, embed);
+  registerDocumentRoutes(
+    app,
+    document,
+    auth,
+    embed,
+    options.ui === false ? undefined : options.reference,
+  );
 }
 
 /**
@@ -64,13 +73,15 @@ export function installApiDocs(
  * @param document - Lazy JSON reader executed only for an authorized request.
  * @param auth - Existing internal endpoint authorization policy.
  * @param embed - Whether Scalar must embed JSON to avoid a second protected fetch.
- * @returns Nothing; installs two request handlers.
+ * @param reference - Explicitly supplied optional UI factory.
+ * @returns Nothing; installs JSON and, when supplied, the optional UI handler.
  */
 function registerDocumentRoutes(
   app: Hono,
   document: (signal: AbortSignal) => Promise<JsonValue>,
   auth: InternalEndpointOptions,
   embed: boolean,
+  reference?: ApiReferenceFactory,
 ): void {
   /** Require the configured inspector authorization before serving API documentation.
    * @param handler - Document or reference-UI handler to run after authorization.
@@ -96,16 +107,17 @@ function registerDocumentRoutes(
         }),
     ),
   );
+  if (reference === undefined) return;
   app.get(
     API_REFERENCE_PATH,
     protect(async (context, next) => {
-      const reference = Scalar({
+      const render = reference({
         ...(embed
           ? { content: canonicalJson(await document(context.req.raw.signal)) }
           : { url: "./openapi.json" }),
         pageTitle: "RELKIT API Reference",
       });
-      const response = await reference(context, next);
+      const response = await render(context, next);
       if (!(response instanceof Response)) return response;
       return new Response(response.body, {
         status: response.status,

@@ -1,3 +1,4 @@
+/** Checks AI learning, selected MCP exposure and native approval boundaries. */
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
 import { aiGuideGroup } from "../scripts/ai-guide-catalog.js";
@@ -46,7 +47,9 @@ test("documents an existing-app tutorial and MCP's exposure and approval boundar
 
   const mcp = await Bun.file(resolve(content, "ai/mcp.mdx")).text();
   expect(mcp).toContain("Streamable HTTP");
-  expect(mcp).toContain("exposed by default");
+  expect(mcp).toContain("The endpoint is opt-in");
+  expect(mcp).toContain("When the endpoint is enabled");
+  expect(mcp).toContain("defaults to disabled");
   expect(mcp).toContain("mcp: false");
   expect(mcp).toContain("explicit `timeoutMs`");
   expect(mcp).toContain("--method tools/call");
@@ -78,6 +81,9 @@ test("documents native compatibility, typed state, graphs, persistence, and resu
   expect(native).toContain("explicit dynamic");
   expect(native).toContain("order-support.agent.ts");
   expect(native).toContain("order-deep.agent.ts");
+  expect(native).toContain("bun add @relkit/langchain");
+  expect(native).toContain("langsmith@0.10.8");
+  expect(native).not.toContain("runtime dependencies of `@relkit/agents`");
 
   const graph = await Bun.file(resolve(content, "ai/graphs-persistence.mdx")).text();
   expect(graph).toContain("order-review.agent.ts");

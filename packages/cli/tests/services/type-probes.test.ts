@@ -19,7 +19,7 @@ import { CliDev, devLayer, devLiveLayer } from "../../src/services/dev.service.j
 import { CliDevSupervisor } from "../../src/services/dev-supervisor.service.js";
 import { CliSourceWatch, sourceWatchLayer } from "../../src/services/source-watch.service.js";
 import { CliPortProbe } from "../../src/commands/port-availability.service.js";
-import { CliTelemetryNative } from "../../src/commands/dev-telemetry-native.service.js";
+import { CliDevCapture } from "../../src/commands/dev-capture.service.js";
 import type { CliCommandContext } from "../../src/main-support-types.js";
 declare const files: CliFileSystem;
 declare const compiler: CliCompiler;
@@ -33,7 +33,7 @@ declare const pulumi: CliPulumi;
 declare const supervisor: CliDevSupervisor;
 declare const sourceWatch: CliSourceWatch;
 declare const ports: CliPortProbe;
-declare const telemetry: CliTelemetryNative;
+declare const telemetry: CliDevCapture;
 declare const context: CliCommandContext;
 const live = projectLayer;
 type IsAny<T> = 0 extends (1 & T) ? true : false;

@@ -1,3 +1,5 @@
+/** Loads and plans the canonical selected Drizzle repair, validating conflicts before delivery and preserving its release pin and exact patch bytes. */
+
 import { observeExecution } from "@relkit/contracts/operation";
 import { createHash } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
@@ -97,6 +99,14 @@ export const planDependencyPatchEffect = Effect.fn("DependencyPatch.plan")(
 export const prepareProjectDependencyPatchEffect = Effect.fn("DependencyPatch.prepare")(
   function* (projectRoot: string) {
     const source = yield* (yield* GeneratorFileSystem).readText(join(projectRoot, "package.json"));
+    const manifest = yield* Schema.decodeUnknownEffect(ProjectManifest)(
+      yield* domainTry(() => JSON.parse(source) as unknown),
+    ).pipe(Effect.mapError(domainError));
+    if (
+      manifest.dependencies?.["drizzle-orm"] === undefined &&
+      manifest.devDependencies?.["drizzle-orm"] === undefined
+    )
+      return;
     const result = yield* planDependencyPatchEffect(
       projectRoot,
       source,

@@ -9,18 +9,26 @@ import type { BunWebSocketData } from "hono/bun";
 import type { Server } from "bun";
 import type { CreateAppOptions } from "./create-app.types.js";
 import type { HttpBoundaryError } from "./http-effect.js";
+import type { SelectedHttpTransports } from "./selected-transports.service.js";
 
 /**
  * Installs optional generation endpoints before the deferred app handles requests.
- * @param app - Complete application owned by the same generation as the eager shell.
- * @returns Physical initialization settlement, joined before retirement.
+ * @param app - Unused inspection router owned by the same generation as the core app.
+ * @returns Initialization settlement and an optional disposer joined at retirement.
  */
-export type PreparedAppInitializer = (app: Hono) => Promise<void>;
+export type PreparedAppInitializer = (app: Hono) => Promise<void | PreparedAppDisposer>;
+
+/** Physically releases resources installed by the generation initializer. */
+export type PreparedAppDisposer = () => Promise<void>;
 
 /** Injectable physical transport initialization; it never captures a request. */
 export interface PreparedTransportLoaderOperations {
+  readonly prepare?: ContextServicePrepare;
   readonly load: (options: CreateAppOptions) => Effect.Effect<Hono, HttpBoundaryError>;
 }
+
+/** Native preparation contract inferred from its owning implementation. */
+type ContextServicePrepare = typeof SelectedHttpTransports.Service.prepare;
 
 /** A generation owns one eager REST application and one deferred rich initialization. */
 export interface PreparedTransportOperations {

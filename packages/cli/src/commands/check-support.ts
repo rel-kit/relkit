@@ -1,3 +1,8 @@
+/**
+ * Converts project evaluation/configuration failures into safe compiler diagnostics.
+ * The check service supplies source reads; this module preserves cancellation,
+ * source locations and actionable current application configuration examples.
+ */
 import { canonicalJson, RELKIT_DESCRIPTOR } from "@relkit/contracts";
 import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
 import { ConfigValidationError, type GeneratedOutputs } from "@relkit/compiler";
@@ -55,11 +60,12 @@ export function isInside(root: string, target: string): boolean {
 }
 
 /** Redacts project paths from an expected failure's diagnostic text.
+ * @typeParam Failure - Original failure retained until safe message projection.
  * @param error - Expected native/configuration failure.
  * @param projectRoot - Optional authored path to redact.
  * @returns Existing portable public diagnostic text.
  */
-export function safeMessage(error: unknown, projectRoot?: string): string {
+export function safeMessage<Failure>(error: Failure, projectRoot?: string): string {
   const message = error instanceof Error ? error.message : String(error);
   return projectRoot === undefined ? message : message.replaceAll(projectRoot, "<project>");
 }
@@ -88,13 +94,14 @@ export function emptyCheckOutputs(diagnostics: readonly Diagnostic[]): Generated
 
 /**
  * Locates expected configuration issues without recovering defects or interruption.
+ * @typeParam Failure - Original failure at the diagnostic boundary.
  * @param error - Expected native or configuration failure.
  * @param projectRoot - Authored project root used for portable messages.
  * @param configPath - Configuration source path.
  * @returns Lazy diagnostics requiring only filesystem reads.
  */
 export const checkFailureDiagnosticsEffect = Effect.fn("Project.failureDiagnostics")(
-  function* (error: unknown, projectRoot: string, configPath: string) {
+  function* <Failure>(error: Failure, projectRoot: string, configPath: string) {
     if (!(error instanceof ConfigValidationError)) {
       return [
         createDiagnostic({
@@ -115,25 +122,26 @@ export const checkFailureDiagnosticsEffect = Effect.fn("Project.failureDiagnosti
       return createDiagnostic({
         code: issue.code,
         severity: "error",
-        message: `${issue.message} Example: export default defineApp({ env: defineEnv({}), server: { port: 3000 }, inspector: { port: 3210 } });`,
+        message: `${issue.message} Example: export default defineApp({ env: defineEnv({}), server: { port: 3000 } }); Enable inspection explicitly with inspector: { enabled: true }.`,
         file,
         ...location,
       });
     });
   },
-  (effect, _error: unknown, _projectRoot: string, _configPath: string) =>
+  (effect, _error, _projectRoot: string, _configPath: string) =>
     observeCli("project.failureDiagnostics", effect),
 );
 
 /**
  * Reports expected configuration failures at the public Promise edge.
+ * @typeParam Failure - Original configuration or adapter failure.
  * @param error - Expected configuration or adapter failure.
  * @param projectRoot - Authored project root.
  * @param configPath - Configuration source path.
  * @returns Portable diagnostics after the source-read scope closes.
  */
-export function checkFailureDiagnostics(
-  error: unknown,
+export function checkFailureDiagnostics<Failure>(
+  error: Failure,
   projectRoot: string,
   configPath: string,
 ): Promise<readonly Diagnostic[]> {

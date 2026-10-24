@@ -19,6 +19,7 @@
     "client",
     "realtime",
     "testing",
+    "inspector",
     "integrations"
   ]
 }

@@ -1,0 +1,26 @@
+{
+  "candidateArtifacts": "/tmp/relkit-stage1-candidate-20261021-b18/artifacts",
+  "candidateManifestSHA256": "316773589b84cad655c60636fdf1ec5a1a51ebd8d573fbe58f1810f58af2f3f8",
+  "generic": [
+    {
+      "fixture": "creator-only",
+      "manager": "bun",
+      "measurement": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-installs-relkit-consumer-install-IxnZ4V.json",
+      "baseline": {
+        "measurement": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/baseline-relkit-consumer-install-z88KwA.json",
+        "manager": "bun"
+      },
+      "result": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-namespace-fixed-result.json",
+      "reviewed": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-namespace-fixed-raw.json",
+      "policyGateLog": "/tmp/relkit-s1-b18-creator-collector-policy-green.log"
+    }
+  ],
+  "selected": [],
+  "retainedAttempts": [
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-result.json",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-raw.json",
+    "/tmp/relkit-s1-namespace-collector-red.log",
+    "/tmp/relkit-s1-b18-creator-evidence-preservation-limit.md"
+  ],
+  "status": "Incomplete input index: one of 28 generic profiles accepted; selected measurement pairs remain pending. This is not a Stage 1 gate."
+}

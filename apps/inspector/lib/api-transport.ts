@@ -1,3 +1,4 @@
+/** Shares observed session headers and request handling; only control requests read action identity from JSON. */
 import {
   INSPECTOR_API_PROTOCOL,
   INSPECTOR_API_VERSION,
@@ -18,6 +19,7 @@ import {
 import { assertEnvelope } from "./api-validation";
 import { resolveBackendUrl } from "./backend-url";
 import { invokeInspectorRouteStream } from "./api-methods";
+import { mutationGeneration, observedGeneration } from "./api-generation";
 import type {
   RouteInvocationInput,
   RouteInvocationResult,
@@ -37,6 +39,7 @@ export class InspectorApiTransport {
   private readonly cacheTtlMs: number;
   private readonly signal: AbortSignal | undefined;
   private readonly cache = new Map<string, CacheEntry>();
+  private generation: string | undefined;
 
   constructor(options: InspectorFetchOptions = {}) {
     this.baseUrl = options.baseUrl === undefined ? "" : String(options.baseUrl).replace(/\/$/, "");
@@ -65,12 +68,7 @@ export class InspectorApiTransport {
     let attempt = 0;
     while (true) {
       try {
-        const headers = new Headers(this.headers);
-        if (init.headers !== undefined)
-          new Headers(init.headers).forEach((value, name) => headers.set(name, value));
-        const requestInit: RequestInit = { ...init, headers };
-        if (init.signal !== undefined) requestInit.signal = init.signal;
-        else if (this.signal !== undefined) requestInit.signal = this.signal;
+        const requestInit = this.prepareRequest(init);
         const response = await this.fetch(url, requestInit);
         const payload = await readPayload(response);
         assertEnvelope(
@@ -86,6 +84,11 @@ export class InspectorApiTransport {
             response.status,
           );
         }
+        if (method === "GET")
+          this.generation =
+            observedGeneration(payload) ??
+            response.headers.get("x-relkit-generation-id") ??
+            this.generation;
         if (method === "GET" && this.cacheTtlMs > 0)
           this.cache.set(key, {
             value: payload,
@@ -121,7 +124,7 @@ export class InspectorApiTransport {
     return invokeInspectorRouteStream(
       this.fetcher,
       this.baseUrl,
-      this.headers,
+      this.requestHeaders(input.init),
       input,
       format,
       onFrame,
@@ -135,6 +138,30 @@ export class InspectorApiTransport {
       if (value !== undefined) params.set(key, String(value));
     const encoded = params.toString();
     return encoded === "" ? "" : `?${encoded}`;
+  }
+
+  /**
+   * Adds a mutation fence without interpreting application request bodies.
+   * @param init - Native request options; explicit headers retain precedence.
+   * @param generation - Observed identity, or the identity selected by a control request.
+   * @returns Merged headers fenced to the selected generation when present.
+   */
+  protected requestHeaders(init: RequestInit, generation = this.generation): Headers {
+    const headers = new Headers(this.headers);
+    new Headers(init.headers).forEach((value, name) => headers.set(name, value));
+    if ((init.method ?? "GET") !== "GET" && !headers.has("x-relkit-generation-id")) {
+      if (generation) headers.set("x-relkit-generation-id", generation);
+    }
+    return headers;
+  }
+
+  private prepareRequest(init: RequestInit): RequestInit {
+    const request: RequestInit = {
+      ...init,
+      headers: this.requestHeaders(init, mutationGeneration(init.body, this.generation)),
+    };
+    if (init.signal === undefined && this.signal !== undefined) request.signal = this.signal;
+    return request;
   }
 
   private async fetch(url: string, init: RequestInit): Promise<Response> {

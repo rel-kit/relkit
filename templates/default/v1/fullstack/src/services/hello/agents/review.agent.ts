@@ -1,5 +1,5 @@
 /** Checkpoints a review graph in memory, interrupts for a boolean decision, and resumes to its final result. */
-import { defineGraph, defineGraphNode } from "@relkit/app/agents";
+import { defineGraph, defineGraphNode } from "@relkit/langchain";
 import { z } from "@relkit/app/schema";
 import { END, MemorySaver, START, StateSchema, interrupt } from "@langchain/langgraph";
 

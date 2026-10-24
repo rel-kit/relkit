@@ -1,6 +1,16 @@
 /** Graph projection containing provider and telemetry registration requirements. */
 export interface RuntimeIntegrationGraph {
-  readonly nodes: readonly { readonly kind: string; readonly id: string }[];
+  readonly nodes: readonly {
+    readonly kind: string;
+    readonly id: string;
+    readonly requiresDeepAgents?: true;
+    readonly capability?: string;
+    readonly adapter?: {
+      readonly integrationId: string;
+      readonly adapterId: string;
+      readonly protocolVersion: number;
+    };
+  }[];
   readonly edges: readonly { readonly kind: string; readonly to: string }[];
 }
 

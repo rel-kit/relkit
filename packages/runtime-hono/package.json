@@ -31,17 +31,27 @@
       "types": "./dist/prepared-app.d.ts",
       "import": "./dist/prepared-app.js"
     },
+    "./mcp": {
+      "types": "./dist/mcp.d.ts",
+      "import": "./dist/mcp.js"
+    },
+    "./ag-ui": {
+      "types": "./dist/agent-protocol.d.ts",
+      "import": "./dist/agent-protocol.js"
+    },
+    "./scalar": {
+      "types": "./dist/scalar.d.ts",
+      "import": "./dist/scalar.js"
+    },
     "./bun": {
       "types": "./dist/bun.d.ts",
       "import": "./dist/bun.js"
     }
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.3.0",
-    "@ag-ui/core": "0.0.59",
+    "@opentelemetry/api": "1.9.1",
     "@orpc/contract": "catalog:",
     "@orpc/server": "2.0.0-beta.31",
-    "@scalar/hono-api-reference": "0.12.9",
     "@relkit/contracts": "workspace:*",
     "@relkit/agents": "workspace:*",
     "@relkit/engine": "workspace:*",
@@ -49,6 +59,7 @@
     "@relkit/invocation": "workspace:*",
     "@relkit/jobs": "workspace:*",
     "@relkit/observability": "workspace:*",
+    "@relkit/provider": "workspace:*",
     "@relkit/openapi": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
     "@relkit/routes": "workspace:*",
@@ -58,7 +69,32 @@
     "hono": "catalog:",
     "hono-rate-limiter": "0.5.4"
   },
+  "peerDependencies": {
+    "@relkit/langchain": "workspace:*",
+    "@ag-ui/core": "0.0.59",
+    "@modelcontextprotocol/server": "2.3.0",
+    "@scalar/hono-api-reference": "0.12.9"
+  },
+  "peerDependenciesMeta": {
+    "@relkit/langchain": {
+      "optional": true
+    },
+    "@ag-ui/core": {
+      "optional": true
+    },
+    "@modelcontextprotocol/server": {
+      "optional": true
+    },
+    "@scalar/hono-api-reference": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "typescript": "catalog:",
+    "@relkit/langchain": "workspace:*",
+    "@ag-ui/core": "0.0.59",
+    "@modelcontextprotocol/server": "2.3.0",
+    "@scalar/hono-api-reference": "0.12.9",
     "@effect/vitest": "catalog:",
     "@langchain/core": "catalog:",
     "@langchain/langgraph": "catalog:",

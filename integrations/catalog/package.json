@@ -1,7 +1,7 @@
 {
   "name": "@relkit/integrations",
   "version": "0.7.10",
-  "description": "Optional catalog of standalone RELKIT integrations.",
+  "description": "Metadata-only catalog of independently selected RELKIT integrations.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -26,54 +26,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./redis": {
-      "types": "./dist/redis.d.ts",
-      "import": "./dist/redis.js"
-    },
-    "./s3": {
-      "types": "./dist/s3.d.ts",
-      "import": "./dist/s3.js"
-    },
-    "./docker": {
-      "types": "./dist/docker.d.ts",
-      "import": "./dist/docker.js"
-    },
-    "./local": {
-      "types": "./dist/local.d.ts",
-      "import": "./dist/local.js"
-    },
-    "./cloudflare": {
-      "types": "./dist/cloudflare.d.ts",
-      "import": "./dist/cloudflare.js"
-    },
-    "./sentry": {
-      "types": "./dist/sentry.d.ts",
-      "import": "./dist/sentry.js"
-    },
-    "./otlp": {
-      "types": "./dist/otlp.d.ts",
-      "import": "./dist/otlp.js"
-    },
-    "./aws": {
-      "types": "./dist/aws.d.ts",
-      "import": "./dist/aws.js"
-    },
-    "./pulumi": {
-      "types": "./dist/pulumi.d.ts",
-      "import": "./dist/pulumi.js"
-    },
-    "./inngest": {
-      "types": "./dist/inngest.d.ts",
-      "import": "./dist/inngest.js"
-    },
-    "./trigger": {
-      "types": "./dist/trigger.d.ts",
-      "import": "./dist/trigger.js"
-    },
-    "./effect-mq": {
-      "types": "./dist/effect-mq.d.ts",
-      "import": "./dist/effect-mq.js"
     }
   },
   "relkit": {
@@ -89,26 +41,13 @@
       "./sentry": "@relkit/sentry",
       "./inngest": "@relkit/inngest",
       "./trigger": "@relkit/trigger",
-      "./effect-mq": "@relkit/effect-mq"
+      "./effect-mq": "@relkit/effect-mq",
+      "./langchain": "@relkit/langchain"
     }
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && bun run ../../scripts/prune-moved-authoring-artifacts.ts catalog",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false"
-  },
-  "dependencies": {
-    "@relkit/aws": "workspace:*",
-    "@relkit/cloudflare": "workspace:*",
-    "@relkit/docker": "workspace:*",
-    "@relkit/local": "workspace:*",
-    "@relkit/otlp": "workspace:*",
-    "@relkit/pulumi": "workspace:*",
-    "@relkit/redis": "workspace:*",
-    "@relkit/s3": "workspace:*",
-    "@relkit/sentry": "workspace:*",
-    "@relkit/inngest": "workspace:*",
-    "@relkit/trigger": "workspace:*",
-    "@relkit/effect-mq": "workspace:*"
   }
 }

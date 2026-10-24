@@ -74,7 +74,6 @@
     "@relkit/cache": "workspace:*",
     "@relkit/contracts": "workspace:*",
     "@relkit/local-service": "workspace:*",
-    "@relkit/agents": "workspace:*",
     "@relkit/provider": "workspace:*",
     "@relkit/providers-local": "workspace:*",
     "@relkit/realtime": "workspace:*"

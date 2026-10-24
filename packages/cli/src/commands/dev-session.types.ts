@@ -7,7 +7,7 @@ import type { RuntimeActivationFingerprint } from "@relkit/contracts";
 import type { StartedCandidate, SupervisorGenerationDrain } from "@relkit/supervisor";
 import type { Deferred, Effect, Fiber, Queue, Scope } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
-import type { EffectDevInspector } from "./dev-process.types.js";
+import type { InspectionBridgeHandle } from "@relkit/inspector-api/connection";
 import type { EffectDevSourceWatcher } from "./dev-watch.types.js";
 import type { CleanupCapabilities } from "../services/cleanup.types.js";
 import type { SupervisorCandidateToken } from "@relkit/supervisor";
@@ -26,7 +26,7 @@ export interface DevSessionState {
   readonly stopping: boolean;
   readonly active: StartedCandidate | undefined;
   readonly fingerprint: RuntimeActivationFingerprint | undefined;
-  readonly inspector: EffectDevInspector | undefined;
+  readonly inspector: InspectionBridgeHandle | undefined;
   readonly signals: (() => void) | undefined;
   readonly fingerprints: Map<number, RuntimeActivationFingerprint>;
   readonly drains: Map<string, SupervisorGenerationDrain>;

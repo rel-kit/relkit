@@ -31,31 +31,106 @@
       "types": "./dist/client-events.d.ts",
       "import": "./dist/client-events.js"
     },
-    "./continuation-validation": {
-      "types": "./dist/continuation-validation.d.ts",
-      "import": "./dist/continuation-validation.js"
+    "./internal/agent-client": {
+      "types": "./dist/agent-client.d.ts",
+      "import": "./dist/agent-client.js"
+    },
+    "./internal/agent-telemetry": {
+      "types": "./dist/agent-telemetry.d.ts",
+      "import": "./dist/agent-telemetry.js"
+    },
+    "./internal/agent-validation": {
+      "types": "./dist/agent-validation.d.ts",
+      "import": "./dist/agent-validation.js"
+    },
+    "./internal/agent-validation-schema": {
+      "types": "./dist/agent-validation-schema.d.ts",
+      "import": "./dist/agent-validation-schema.js"
+    },
+    "./internal/agent-validation-value": {
+      "types": "./dist/agent-validation-value.d.ts",
+      "import": "./dist/agent-validation-value.js"
+    },
+    "./internal/approval": {
+      "types": "./dist/approval.d.ts",
+      "import": "./dist/approval.js"
+    },
+    "./internal/capture": {
+      "types": "./dist/capture.d.ts",
+      "import": "./dist/capture.js"
+    },
+    "./internal/capture-policy": {
+      "types": "./dist/capture-policy.d.ts",
+      "import": "./dist/capture-policy.js"
+    },
+    "./internal/client-contract-schema.types": {
+      "types": "./dist/client-contract-schema.types.d.ts",
+      "import": "./dist/client-contract-schema.types.js"
+    },
+    "./internal/client-events": {
+      "types": "./dist/client-events.d.ts",
+      "import": "./dist/client-events.js"
+    },
+    "./internal/define-agent-error": {
+      "types": "./dist/define-agent-error.d.ts",
+      "import": "./dist/define-agent-error.js"
+    },
+    "./internal/define-agent-limits": {
+      "types": "./dist/define-agent-limits.d.ts",
+      "import": "./dist/define-agent-limits.js"
+    },
+    "./internal/define-agent-support": {
+      "types": "./dist/define-agent-support.d.ts",
+      "import": "./dist/define-agent-support.js"
+    },
+    "./internal/generated-function": {
+      "types": "./dist/generated-function.d.ts",
+      "import": "./dist/generated-function.js"
+    },
+    "./internal/model-selection": {
+      "types": "./dist/model-selection.d.ts",
+      "import": "./dist/model-selection.js"
+    },
+    "./internal/observability": {
+      "types": "./dist/observability.d.ts",
+      "import": "./dist/observability.js"
+    },
+    "./internal/runtime-events": {
+      "types": "./dist/runtime-events.d.ts",
+      "import": "./dist/runtime-events.js"
+    },
+    "./internal/state-control-requests.types": {
+      "types": "./dist/state-control-requests.types.d.ts",
+      "import": "./dist/state-control-requests.types.js"
+    },
+    "./internal/state-provider.types": {
+      "types": "./dist/state-provider.types.d.ts",
+      "import": "./dist/state-provider.types.js"
+    },
+    "./internal/state-receipts.types": {
+      "types": "./dist/state-receipts.types.d.ts",
+      "import": "./dist/state-receipts.types.js"
+    },
+    "./internal/state-thread-requests.types": {
+      "types": "./dist/state-thread-requests.types.d.ts",
+      "import": "./dist/state-thread-requests.types.js"
+    },
+    "./internal/state.types": {
+      "types": "./dist/state.types.d.ts",
+      "import": "./dist/state.types.js"
+    },
+    "./internal/thread-transition": {
+      "types": "./dist/thread-transition.d.ts",
+      "import": "./dist/thread-transition.js"
     }
   },
   "dependencies": {
-    "@cfworker/json-schema": "4.1.1",
-    "@langchain/core": "catalog:",
-    "@langchain/langgraph": "catalog:",
     "@relkit/contracts": "workspace:*",
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*",
     "@relkit/tools": "workspace:*",
-    "effect": "catalog:",
-    "langchain": "catalog:",
-    "langsmith": "0.10.8"
-  },
-  "peerDependencies": {
-    "deepagents": "catalog:"
-  },
-  "peerDependenciesMeta": {
-    "deepagents": {
-      "optional": true
-    }
+    "effect": "catalog:"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "catalog:",
@@ -68,7 +143,7 @@
     "vitest": "catalog:"
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && bun run ../../scripts/prune-moved-authoring-artifacts.ts agents",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run --config vitest.config.ts",

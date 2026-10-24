@@ -1,14 +1,11 @@
-import {
-  defineAgent,
-  invokeAgent,
-  type AgentContentSink,
-  type AgentExecutionEvent,
-} from "@relkit/agents";
+/** Hosts the native todo protocol fixture with AG-UI explicitly selected; the test parent owns termination and releases blocked execution on shutdown. */
+import { type AgentExecutionEvent } from "@relkit/agents";
+import { defineAgent, invokeAgent, type AgentContentSink } from "@relkit/langchain";
 import { createLocalAgentStateProvider } from "@relkit/providers-local";
 import { z } from "@relkit/schema";
 import { todoListMiddleware } from "langchain";
 import { createTodoTestModel } from "../deepagent-test-model.ts";
-import { createApp } from "../../src/index.ts";
+import { createAgUiApp as createApp } from "../optional-app-fixture.js";
 import { upgradeWebSocket, websocket } from "hono/bun";
 import { expectedStates, expectedStateIndex, agentPlan, manifest } from "./todo-setup.ts";
 const { root }: { root: string } = JSON.parse(process.env.RELKIT_FIXTURE_CONFIG ?? "{}");

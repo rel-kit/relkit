@@ -23,6 +23,7 @@ import {
   DEFAULT_STREAM_QUEUE_SIZE,
 } from "./stream-types.js";
 import { streamUtilsCore } from "./stream-utils-core.js";
+import { makeStreamBudget } from "./stream-budget.js";
 const admitRecord = redactionCore.redactRecord;
 const { createStreamSubscriber } = streamSubscriberCore;
 const { assertType, bounded, invalid, positive, resolveCursor, validateCursor } = streamUtilsCore;
@@ -38,8 +39,9 @@ const { assertType, bounded, invalid, positive, resolveCursor, validateCursor } 
  */
 function createObservabilityStream(options: ObservabilityStreamOptions = {}): ObservabilityStream {
   const maxEvents = positive(options.maxEvents ?? DEFAULT_STREAM_MAX_EVENTS, "retention");
-  const maxQueueSize = positive(
+  const maxQueueSize = bounded(
     options.maxQueueSize ?? DEFAULT_STREAM_MAX_QUEUE_SIZE,
+    DEFAULT_STREAM_MAX_QUEUE_SIZE,
     "queue maximum",
   );
   const queueSize = bounded(options.queueSize ?? DEFAULT_STREAM_QUEUE_SIZE, maxQueueSize, "queue");
@@ -50,6 +52,7 @@ function createObservabilityStream(options: ObservabilityStreamOptions = {}): Ob
   const overflow = options.overflow ?? options.backpressure ?? "drop-oldest";
   const events: ObservabilityStreamEvent[] = [];
   const subscribers = new Map<string, StreamSubscriber>();
+  const budget = makeStreamBudget();
   let sequence = 0;
   let retainedDropped = 0;
   let subscriberDropped = 0;
@@ -135,6 +138,7 @@ function createObservabilityStream(options: ObservabilityStreamOptions = {}): Ob
       (count) => {
         subscriberDropped += count;
       },
+      budget,
     );
     subscribers.set(subscriber.id, subscriber);
     for (const event of page.events) subscriber.enqueue(event);
@@ -149,6 +153,7 @@ function createObservabilityStream(options: ObservabilityStreamOptions = {}): Ob
   const stats = (): ObservabilityStreamStats => ({
     ...counters(),
     retained: events.length,
+    backlogBytes: budget.bytes(),
     subscribers: subscribers.size,
     cursor: String(sequence),
     ...(events[0] === undefined ? {} : { earliestCursor: events[0].cursor }),
@@ -177,7 +182,7 @@ function createObservabilityStream(options: ObservabilityStreamOptions = {}): Ob
         redactionCore.redactRecord(record, options.redaction),
       ) as JsonValue | undefined;
     const accepted = options.collector.collect(record);
-    return accepted === undefined ? undefined : (accepted as unknown as JsonValue);
+    return accepted === undefined ? undefined : admitRecord(accepted, options.redaction);
   }
 }
 /** Internal stream state owned by an Effect Scope or compatibility adapter. */

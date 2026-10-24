@@ -5,50 +5,13 @@
  * schema/config construction must use the explicit pure authoring allowlist.
  */
 import ts from "typescript";
-import { posix } from "node:path";
 import { assertPureExpression } from "./snapshot-eligibility-expressions.js";
 import { Effect } from "effect";
 import { DevSnapshotRejected } from "./snapshot-error.js";
+import { snapshotFactories as factories, assertLocalImport } from "./snapshot-import-policy.js";
 import { isSnapshotFunctionImport, isSnapshotFunctionValue } from "./snapshot-function-bindings.js";
 
-const factories = new Map([
-  ["@langchain/langgraph", new Set(["END", "MemorySaver", "START", "StateSchema", "interrupt"])],
-  ["@relkit/app/agents", new Set(["defineAgent", "defineGraph", "defineGraphNode"])],
-  ["@relkit/app/config", new Set(["defineApp", "defineEnv", "env"])],
-  ["@relkit/app/functions", new Set(["defineFunction", "defineError"])],
-  ["@relkit/better-auth", new Set(["defineBetterAuthService"])],
-  ["@relkit/drizzle", new Set(["defineDrizzleService"])],
-  [
-    "drizzle-orm/sqlite-core",
-    new Set(["integer", "text", "sqliteTable", "check", "primaryKey", "uniqueIndex"]),
-  ],
-  ["drizzle-orm", new Set(["sql"])],
-  ["bun:sqlite", new Set(["Database"])],
-  ["node:fs", new Set(["mkdirSync"])],
-  ["node:path", new Set(["dirname"])],
-  ["drizzle-orm/bun-sqlite", new Set(["drizzle"])],
-  ["@relkit/app/jobs", new Set(["defineJob"])],
-  ["@relkit/app/services", new Set(["defineService"])],
-  ["@relkit/app/routes", new Set(["defineRoute", "defineServiceRoutes"])],
-  ["@relkit/app/schema", new Set(["z"])],
-  ["@relkit/app/tasks", new Set(["defineTask"])],
-  ["@relkit/local", new Set(["localAgentState", "localRealtime"])],
-  ["langchain", new Set(["FakeToolCallingModel", "todoListMiddleware", "tool"])],
-]);
-
-/** Detects authored files or package self-references that could shadow an audited import. */
-export function isSnapshotFactoryShadow(path: string): boolean {
-  const identity = path.toLowerCase();
-  return [...factories.keys()].some((module) => {
-    const parts = module.split("/");
-    const name = module.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0]!;
-    return (
-      identity === name ||
-      identity.startsWith(`${name}/`) ||
-      identity.replace(/\.(?:[cm]?[jt]sx?|json)$/, "") === name
-    );
-  });
-}
+export { isSnapshotFactoryShadow } from "./snapshot-import-policy.js";
 
 /**
  * Checks one actual compilation source before treating it as cacheable.
@@ -88,18 +51,7 @@ function assertStaticSource(
       continue;
     }
     if (ts.isVariableStatement(statement)) {
-      if ((statement.declarationList.flags & ts.NodeFlags.Const) === 0)
-        throw new Error("Mutable initialization");
-      for (const declaration of statement.declarationList.declarations) {
-        if (declaration.initializer !== undefined)
-          assertPureExpression(declaration.initializer, bindings);
-        const descriptor =
-          declaration.initializer !== undefined &&
-          isSnapshotFunctionValue(declaration.initializer, bindings);
-        bindLocalDeclaration(declaration.name, bindings);
-        if (descriptor && ts.isIdentifier(declaration.name))
-          bindings.set(declaration.name.text, "function-descriptor");
-      }
+      readStaticDeclarations(statement, bindings);
       continue;
     }
     if (ts.isExportAssignment(statement)) {
@@ -137,6 +89,22 @@ function assertStaticSource(
     )
       continue;
     throw new Error("Effectful top-level statement");
+  }
+}
+
+/** Checks immutable initializers and records descriptor bindings in declaration order. */
+function readStaticDeclarations(statement: ts.VariableStatement, bindings: Map<string, string>) {
+  if ((statement.declarationList.flags & ts.NodeFlags.Const) === 0)
+    throw new Error("Mutable initialization");
+  for (const declaration of statement.declarationList.declarations) {
+    if (declaration.initializer !== undefined)
+      assertPureExpression(declaration.initializer, bindings);
+    const descriptor =
+      declaration.initializer !== undefined &&
+      isSnapshotFunctionValue(declaration.initializer, bindings);
+    bindLocalDeclaration(declaration.name, bindings);
+    if (descriptor && ts.isIdentifier(declaration.name))
+      bindings.set(declaration.name.text, "function-descriptor");
   }
 }
 
@@ -216,29 +184,6 @@ function readPureImports(
       for (const element of names.elements)
         bindings.set(element.name.text, kind(element.propertyName?.text ?? element.name.text));
   }
-}
-
-/** All runtime imports and reexports stay within the audited backend source inventory. */
-function assertLocalImport(module: string, path: string): void {
-  if (!(module.startsWith("@app/") || module.startsWith("./") || module.startsWith("../")))
-    throw new Error("Unaudited module import");
-  const resolved = module.startsWith("@app/")
-    ? posix.normalize(`src/${module.slice(5)}`)
-    : posix.normalize(posix.join(posix.dirname(path), module));
-  if (
-    !resolved.startsWith("src/") ||
-    !/\.(?:[cm]?[jt]sx?)$/.test(resolved) ||
-    resolved.endsWith(".d.ts") ||
-    resolved
-      .split("/")
-      .some(
-        (segment) =>
-          ["tests", "web", ".relkit", "node_modules"].includes(segment) ||
-          segment === ".env" ||
-          segment.startsWith(".env."),
-      )
-  )
-    throw new Error("Uncaptured local import");
 }
 
 /** Reject even later declarations of native constructors, which can hoist. */

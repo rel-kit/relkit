@@ -1,4 +1,5 @@
 /** Validates and mutates only owned staged generator files; captured filesystem/error authorities retain native failure and cleanup disposition. */
+
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { Effect, Exit } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";

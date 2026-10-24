@@ -1,3 +1,4 @@
+/** Acquires an explicitly selected native Pulumi workspace without changing backend or stack ownership. */
 import { mkdtemp, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -9,7 +10,7 @@ import {
   type LocalWorkspaceOptions,
   type PulumiCommand,
   type PulumiFn,
-} from "@pulumi/pulumi/automation";
+} from "@pulumi/pulumi/automation/index.js";
 
 export const PULUMI_CLOUD_BACKEND_URL = "https://api.pulumi.com" as const;
 export type PulumiBackendKind = "cloud" | "object-storage" | "local";
@@ -146,9 +147,12 @@ function projectId(value: string): string {
   const normalized = value
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return nonEmpty(normalized, "projectName");
+    .replace(/[^a-z0-9_-]+/g, "-");
+  let start = 0;
+  let end = normalized.length;
+  while (normalized[start] === "-") start++;
+  while (end > start && normalized[end - 1] === "-") end--;
+  return nonEmpty(normalized.slice(start, end), "projectName");
 }
 
 function stackId(value: string): string {

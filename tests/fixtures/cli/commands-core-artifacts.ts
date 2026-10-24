@@ -42,7 +42,7 @@ export function assertBuildArtifacts(artifacts: readonly string[]): void {
     ignore = artifacts[0],
     server = artifacts[6];
   expect(docker).toContain("FROM oven/bun:1.3.10");
-  for (const text of ["USER bun", "STOPSIGNAL SIGTERM", "COPY server/index.js ./server/index.js"])
+  for (const text of ["USER bun", "STOPSIGNAL SIGTERM", "COPY server/ ./server/"])
     expect(docker).toContain(text);
   expect(docker).not.toContain("COPY .");
   expect(ignore).toContain(".env");

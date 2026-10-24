@@ -5,7 +5,10 @@
  */
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit, Schema } from "effect";
-import { verifyStaticSnapshotSource } from "../../src/dev-snapshot/snapshot-eligibility.js";
+import {
+  isSnapshotFactoryShadow,
+  verifyStaticSnapshotSource,
+} from "../../src/dev-snapshot/snapshot-eligibility.js";
 import { SnapshotEligibleTsConfig } from "../../src/dev-snapshot/snapshot-eligibility.schemas.js";
 
 it.effect("accepts generated symbolic environment, aliases and deferred runtime handlers", () =>
@@ -20,8 +23,8 @@ it.effect("accepts generated symbolic environment, aliases and deferred runtime 
       'import { defineJob } from "@relkit/app/jobs"; import task from "@app/orders/export.task.js"; export default defineJob({ id: "orders.job", name: "orders", task });',
       'import { defineApp } from "@relkit/app/config"; import { localAgentState, localRealtime } from "@relkit/local"; export default defineApp({ realtime: localRealtime(), "agent-state": localAgentState(), defaults: { realtime: "default", "agent-state": "default" } });',
       'import hello from "@app/hello/function.js"; export default hello.asTool({ id: "hello.lookup", description: "Lookup", sideEffect: "read", approval: "never", timeoutMs: 2000 });',
-      'import { defineAgent } from "@relkit/app/agents"; import { z } from "@relkit/app/schema"; import { FakeToolCallingModel, todoListMiddleware, tool } from "langchain"; const uppercase = tool(async ({ text }) => text, { name: "uppercase", description: "Uppercase", schema: z.object({ text: z.string() }) }); export default defineAgent({ id: "hello.assistant", input: z.string(), output: z.string(), model: new FakeToolCallingModel({ toolCalls: [] }), tools: [uppercase], middleware: [todoListMiddleware()], handler: async (value) => value });',
-      'import { defineGraph, defineGraphNode } from "@relkit/app/agents"; import { z } from "@relkit/app/schema"; import { END, MemorySaver, START, StateSchema, interrupt } from "@langchain/langgraph"; const state = new StateSchema({ request: z.string() }); const review = defineGraphNode({ id: "review", input: z.string(), output: z.string(), handler: () => interrupt("review") }); export default defineGraph({ id: "hello.review", state, input: z.string(), output: z.string(), nodes: [review], edges: (graph) => graph.addEdge(START, END), checkpointer: new MemorySaver() });',
+      'import { defineAgent } from "@relkit/langchain"; import { z } from "@relkit/app/schema"; import { FakeToolCallingModel, todoListMiddleware, tool } from "langchain"; const uppercase = tool(async ({ text }) => text, { name: "uppercase", description: "Uppercase", schema: z.object({ text: z.string() }) }); export default defineAgent({ id: "hello.assistant", input: z.string(), output: z.string(), model: new FakeToolCallingModel({ toolCalls: [] }), tools: [uppercase], middleware: [todoListMiddleware()], handler: async (value) => value });',
+      'import { defineGraph, defineGraphNode } from "@relkit/langchain"; import { z } from "@relkit/app/schema"; import { END, MemorySaver, START, StateSchema, interrupt } from "@langchain/langgraph"; const state = new StateSchema({ request: z.string() }); const review = defineGraphNode({ id: "review", input: z.string(), output: z.string(), handler: () => interrupt("review") }); export default defineGraph({ id: "hello.review", state, input: z.string(), output: z.string(), nodes: [review], edges: (graph) => graph.addEdge(START, END), checkpointer: new MemorySaver() });',
     ];
     for (const source of sources)
       expect(
@@ -70,6 +73,14 @@ it.effect("limits root discovery to authored inventory and the explicit generate
   }),
 );
 
+it.effect("tracks the exact native owner when detecting authored factory shadows", () =>
+  Effect.sync(() => {
+    expect(isSnapshotFactoryShadow("@relkit/langchain")).toBe(true);
+    expect(isSnapshotFactoryShadow("@relkit/langchain/src/index.ts")).toBe(true);
+    expect(isSnapshotFactoryShadow("@relkit/langchain-fake")).toBe(false);
+  }),
+);
+
 it.effect(
   "rejects compilation environment, time, randomness and unverified module evaluation",
   () =>
@@ -83,6 +94,8 @@ it.effect(
         'import data from "../web/private.js"; export default data;',
         'import data from "./.env.json"; export default data;',
         'import data from "node:fs"; export default data;',
+        'import { unauditedFactory } from "@relkit/langchain"; export default unauditedFactory();',
+        'import { defineGraph } from "@relkit/app/agents"; export default defineGraph({});',
         'const data = await import("./source.js"); export default data;',
         'import { defineApp } from "@relkit/app/config"; export default defineApp({source:{include:["web/**"]}});',
         'import { z } from "@relkit/app/schema"; export default z.lazy(() => process.env.SYNTHETIC_SECRET);',

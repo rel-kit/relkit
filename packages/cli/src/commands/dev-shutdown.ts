@@ -13,7 +13,7 @@ import type { DevSession } from "./dev-session.js";
  * @returns Cleanup completion; secondary failures remain in the invocation ledger.
  */
 export const shutdownDevEffect = Effect.fn("Dev.shutdown")(
-  function* (session: DevSession, reason: unknown, worker?: Fiber.Fiber<void>) {
+  function* <Reason>(session: DevSession, reason: Reason, worker?: Fiber.Fiber<void>) {
     const sdk = yield* CliDevSupervisor;
     session.markStopping();
     session.log({
@@ -34,27 +34,8 @@ export const shutdownDevEffect = Effect.fn("Dev.shutdown")(
       });
       yield* Ref.update(session.state, (state) => ({ ...state, pending: [] }));
     }
-    const inspector = worker ? (yield* Ref.get(session.state)).inspector : undefined;
-    const legacy = worker ? undefined : session.inspectorChild;
     const tasks = [
       cleanupEffect("dev.proxy.release", sdk.stopProxy(session.proxy)),
-      ...(inspector
-        ? [
-            cleanupEffect("dev.inspector.release", inspector.stop),
-            cleanupEffect("dev.inspector.output.release", inspector.output),
-          ]
-        : legacy
-          ? [
-              cleanupEffect(
-                "dev.inspector.release",
-                cliPromise("dev.inspector.stop", () => legacy.stop()),
-              ),
-              cleanupEffect(
-                "dev.inspector.output.release",
-                cliPromise("dev.inspector.output", () => legacy.output),
-              ),
-            ]
-          : []),
       worker
         ? Fiber.interrupt(worker).pipe(Effect.asVoid)
         : cleanupEffect(
@@ -66,34 +47,7 @@ export const shutdownDevEffect = Effect.fn("Dev.shutdown")(
       ),
     ];
     yield* Effect.all(tasks, { concurrency: "unbounded", discard: true });
-    if (worker) {
-      yield* Queue.shutdown(session.nativeEngine.queue);
-      yield* Ref.update(session.state, (state) => {
-        const fingerprints = new Map(state.fingerprints);
-        fingerprints.clear();
-        const drains = new Map(state.drains);
-        drains.clear();
-        return { ...state, fingerprints, drains, controllers: new Set<AbortController>() };
-      });
-    }
-    if (session.options.localServicesEffect)
-      yield* cleanupEffect("dev.local-services.release", session.options.localServicesEffect);
-    else if (session.options.localServices) {
-      yield* cleanupEffect(
-        "dev.local-services.release",
-        cliPromise("dev.local-services.close", () => session.options.localServices!.close()).pipe(
-          Effect.tapError((error) =>
-            Effect.sync(() =>
-              session.log({
-                level: "error",
-                event: "dev.local-services.cleanup-failed",
-                fields: { message: error.message },
-              }),
-            ),
-          ),
-        ),
-      );
-    }
+    yield* finishOwners(session, worker !== undefined);
     yield* cleanupEffect(
       "dev.observability.release",
       cliPromise("dev.observability.flush", () => session.observability.flush()),
@@ -101,8 +55,12 @@ export const shutdownDevEffect = Effect.fn("Dev.shutdown")(
     session.clearSignals();
     session.log({ level: "info", event: "dev.stopped" });
   },
-  (effect, _session: DevSession, _reason: unknown, _worker?: Fiber.Fiber<void>) =>
-    observeCli("dev.shutdown", effect.pipe(Effect.uninterruptible)),
+  <A, E, R, Reason>(
+    effect: Effect.Effect<A, E, R>,
+    _session: DevSession,
+    _reason: Reason,
+    _worker?: Fiber.Fiber<void>,
+  ) => observeCli("dev.shutdown", effect.pipe(Effect.uninterruptible)),
 );
 
 /** Joins shutdown through the retained public session facade.
@@ -110,9 +68,33 @@ export const shutdownDevEffect = Effect.fn("Dev.shutdown")(
  * @param reason - Shutdown reason.
  * @returns Joined native cleanup.
  */
-export function shutdownDev(session: DevSession, reason: unknown): Promise<void> {
+export function shutdownDev<Reason>(session: DevSession, reason: Reason): Promise<void> {
   return runCliEffect(
     shutdownDevEffect(session, reason),
     Layer.merge(devSupervisorLayer, cleanupLayer),
   );
 }
+
+/** Clears joined generation state and releases the session's local services. */
+const finishOwners = Effect.fn("Dev.finishOwners")(function* (
+  session: DevSession,
+  native: boolean,
+) {
+  if (native) {
+    yield* Queue.shutdown(session.nativeEngine.queue);
+    yield* Ref.update(session.state, (state) => ({
+      ...state,
+      fingerprints: new Map(),
+      drains: new Map(),
+      controllers: new Set<AbortController>(),
+    }));
+  }
+  const local = session.options.localServices;
+  if (session.options.localServicesEffect)
+    yield* cleanupEffect("dev.local-services.release", session.options.localServicesEffect);
+  else if (local)
+    yield* cleanupEffect(
+      "dev.local-services.release",
+      cliPromise("dev.local-services.close", () => local.close()),
+    );
+});

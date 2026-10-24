@@ -1,3 +1,6 @@
+/** Declares frozen model extensions and binds their native calls to the owning database admission scope.
+ * Dialect leaves provide precise database methods while shared descriptors preserve authored operation inference.
+ */
 import type { Table } from "drizzle-orm";
 import { runOperation } from "./operations.js";
 import { MODEL_RUNTIME, type ModelBinding, type ModelRuntime } from "./runtime-types.js";
@@ -26,6 +29,7 @@ export const RESERVED_OPERATIONS = Object.freeze([
 /**
  * Adds named table methods with an injected table and transaction-aware Drizzle client.
  * Use service overrides, not extensions, to replace the six reserved CRUD operations.
+ * Select a dialect entrypoint when an extension uses the injected native database.
  * @typeParam T - Authored Drizzle table.
  * @typeParam Extensions - Inferred custom operation arguments and results.
  * @param options - Matching table and non-empty extension map.
@@ -34,7 +38,7 @@ export const RESERVED_OPERATIONS = Object.freeze([
  *
  * @example
  * ```ts
- * import { defineModel } from "@relkit/drizzle"
+ * import { defineModel } from "@relkit/drizzle/sqlite"
  * import { integer, sqliteTable } from "drizzle-orm/sqlite-core"
  *
  * const users = sqliteTable("users", { id: integer().primaryKey() })

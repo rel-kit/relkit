@@ -1,0 +1,495 @@
+{
+  "fixture": "creator-only",
+  "manager": "pnpm",
+  "condition": "cold-owned-cache",
+  "root": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only",
+  "durationMs": 5659.209167,
+  "transferredBytes": 9318144,
+  "command": [
+    "node",
+    "/opt/homebrew/Cellar/pnpm/11.9.0/libexec/lib/node_modules/pnpm/bin/pnpm.mjs",
+    "install",
+    "--registry",
+    "http://127.0.0.1:59343",
+    "--store-dir",
+    "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only-cache",
+    "--network-concurrency=1",
+    "--child-concurrency=1",
+    "--reporter=append-only",
+    "--config.package-manager-strict=false",
+    "--config.manage-package-manager-versions=false"
+  ],
+  "stdout": "[WARN] The metadata of create-relkit is missing the \"time\" field; skipping the minimumReleaseAge check for this package.\nProgress: resolved 1, reused 0, downloaded 0, added 0\nProgress: resolved 2, reused 0, downloaded 1, added 0\n[WARN] The metadata of effect is missing the \"time\" field; skipping the minimumReleaseAge check for this package.\n[WARN] The metadata of @relkit/contracts is missing the \"time\" field; skipping the minimumReleaseAge check for this package.\nProgress: resolved 6, reused 0, downloaded 2, added 0\nProgress: resolved 9, reused 0, downloaded 2, added 0\nProgress: resolved 9, reused 0, downloaded 3, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ create-relkit 0.7.11\n\nDone in 5.5s using pnpm v11.9.0\n",
+  "failure": null,
+  "installation": {
+    "instances": [
+      {
+        "name": "create-relkit",
+        "version": "0.7.11",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/create-relkit@0.7.11/node_modules/create-relkit",
+        "logicalBytes": 895661,
+        "physicalBytes": 2162688,
+        "nativeFiles": [],
+        "archive": null
+      },
+      {
+        "name": "@clack/prompts",
+        "version": "1.7.0",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+prompts@1.7.0/node_modules/@clack/prompts",
+        "logicalBytes": 116266,
+        "physicalBytes": 131072,
+        "nativeFiles": [],
+        "archive": null
+      },
+      {
+        "name": "@relkit/contracts",
+        "version": "0.7.10",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@relkit+contracts@0.7.10/node_modules/@relkit/contracts",
+        "logicalBytes": 360216,
+        "physicalBytes": 1130496,
+        "nativeFiles": [],
+        "archive": null
+      },
+      {
+        "name": "effect",
+        "version": "4.0.1",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/effect@4.0.1/node_modules/effect",
+        "logicalBytes": 49597078,
+        "physicalBytes": 55734272,
+        "nativeFiles": [],
+        "archive": null
+      },
+      {
+        "name": "@clack/core",
+        "version": "1.4.3",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+core@1.4.3/node_modules/@clack/core",
+        "logicalBytes": 65914,
+        "physicalBytes": 81920,
+        "nativeFiles": [],
+        "archive": null
+      },
+      {
+        "name": "fast-string-width",
+        "version": "3.0.2",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-string-width@3.0.2/node_modules/fast-string-width",
+        "logicalBytes": 3515,
+        "physicalBytes": 20480,
+        "nativeFiles": [],
+        "archive": null
+      },
+      {
+        "name": "fast-wrap-ansi",
+        "version": "0.2.2",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-wrap-ansi@0.2.2/node_modules/fast-wrap-ansi",
+        "logicalBytes": 10710,
+        "physicalBytes": 24576,
+        "nativeFiles": [],
+        "archive": null
+      },
+      {
+        "name": "sisteransi",
+        "version": "1.0.5",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/sisteransi@1.0.5/node_modules/sisteransi",
+        "logicalBytes": 6791,
+        "physicalBytes": 20480,
+        "nativeFiles": [],
+        "archive": null
+      },
+      {
+        "name": "semver",
+        "version": "7.8.5",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/semver@7.8.5/node_modules/semver",
+        "logicalBytes": 101065,
+        "physicalBytes": 274432,
+        "nativeFiles": [],
+        "archive": null
+      },
+      {
+        "name": "fast-string-truncated-width",
+        "version": "3.0.3",
+        "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-string-truncated-width@3.0.3/node_modules/fast-string-truncated-width",
+        "logicalBytes": 12139,
+        "physicalBytes": 40960,
+        "nativeFiles": [],
+        "archive": null
+      }
+    ],
+    "paths": [
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@relkit/contracts"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "effect"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "@clack/core"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "fast-string-width"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "fast-wrap-ansi"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "sisteransi"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@relkit/contracts",
+          "effect"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@relkit/contracts",
+          "semver"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "@clack/core",
+          "fast-wrap-ansi"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "@clack/core",
+          "sisteransi"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "fast-string-width",
+          "fast-string-truncated-width"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "fast-wrap-ansi",
+          "fast-string-width"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "@clack/core",
+          "fast-wrap-ansi",
+          "fast-string-width"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "fast-wrap-ansi",
+          "fast-string-width",
+          "fast-string-truncated-width"
+        ]
+      },
+      {
+        "boundary": "installation",
+        "packages": [
+          "relkit-footprint-creator-only",
+          "create-relkit",
+          "@clack/prompts",
+          "@clack/core",
+          "fast-wrap-ansi",
+          "fast-string-width",
+          "fast-string-truncated-width"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/create-relkit@0.7.11/node_modules/create-relkit",
+        "name": "create-relkit",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/create-relkit@0.7.11/node_modules/create-relkit",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+prompts@1.7.0/node_modules/@clack/prompts",
+        "name": "@clack/prompts",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/create-relkit@0.7.11/node_modules/create-relkit",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@relkit+contracts@0.7.10/node_modules/@relkit/contracts",
+        "name": "@relkit/contracts",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/create-relkit@0.7.11/node_modules/create-relkit",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/effect@4.0.1/node_modules/effect",
+        "name": "effect",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+prompts@1.7.0/node_modules/@clack/prompts",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+core@1.4.3/node_modules/@clack/core",
+        "name": "@clack/core",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+prompts@1.7.0/node_modules/@clack/prompts",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-string-width@3.0.2/node_modules/fast-string-width",
+        "name": "fast-string-width",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+prompts@1.7.0/node_modules/@clack/prompts",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-wrap-ansi@0.2.2/node_modules/fast-wrap-ansi",
+        "name": "fast-wrap-ansi",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+prompts@1.7.0/node_modules/@clack/prompts",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/sisteransi@1.0.5/node_modules/sisteransi",
+        "name": "sisteransi",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@relkit+contracts@0.7.10/node_modules/@relkit/contracts",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/effect@4.0.1/node_modules/effect",
+        "name": "effect",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@relkit+contracts@0.7.10/node_modules/@relkit/contracts",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/semver@7.8.5/node_modules/semver",
+        "name": "semver",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+core@1.4.3/node_modules/@clack/core",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-wrap-ansi@0.2.2/node_modules/fast-wrap-ansi",
+        "name": "fast-wrap-ansi",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+core@1.4.3/node_modules/@clack/core",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/sisteransi@1.0.5/node_modules/sisteransi",
+        "name": "sisteransi",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-string-width@3.0.2/node_modules/fast-string-width",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-string-truncated-width@3.0.3/node_modules/fast-string-truncated-width",
+        "name": "fast-string-truncated-width",
+        "optionalPeer": false
+      },
+      {
+        "from": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-wrap-ansi@0.2.2/node_modules/fast-wrap-ansi",
+        "to": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-string-width@3.0.2/node_modules/fast-string-width",
+        "name": "fast-string-width",
+        "optionalPeer": false
+      }
+    ],
+    "missing": []
+  },
+  "instances": [
+    {
+      "name": "create-relkit",
+      "version": "0.7.11",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/create-relkit@0.7.11/node_modules/create-relkit",
+      "logicalBytes": 895661,
+      "physicalBytes": 2162688,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "create-relkit@0.7.11",
+        "bytes": 227948
+      }
+    },
+    {
+      "name": "@clack/prompts",
+      "version": "1.7.0",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+prompts@1.7.0/node_modules/@clack/prompts",
+      "logicalBytes": 116266,
+      "physicalBytes": 131072,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "@clack/prompts@1.7.0",
+        "bytes": 30753
+      }
+    },
+    {
+      "name": "@relkit/contracts",
+      "version": "0.7.10",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@relkit+contracts@0.7.10/node_modules/@relkit/contracts",
+      "logicalBytes": 360216,
+      "physicalBytes": 1130496,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "@relkit/contracts@0.7.10",
+        "bytes": 72803
+      }
+    },
+    {
+      "name": "effect",
+      "version": "4.0.1",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/effect@4.0.1/node_modules/effect",
+      "logicalBytes": 49597078,
+      "physicalBytes": 55734272,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "effect@4.0.1",
+        "bytes": 8925614
+      }
+    },
+    {
+      "name": "@clack/core",
+      "version": "1.4.3",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/@clack+core@1.4.3/node_modules/@clack/core",
+      "logicalBytes": 65914,
+      "physicalBytes": 81920,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "@clack/core@1.4.3",
+        "bytes": 19283
+      }
+    },
+    {
+      "name": "fast-string-width",
+      "version": "3.0.2",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-string-width@3.0.2/node_modules/fast-string-width",
+      "logicalBytes": 3515,
+      "physicalBytes": 20480,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "fast-string-width@3.0.2",
+        "bytes": 1805
+      }
+    },
+    {
+      "name": "fast-wrap-ansi",
+      "version": "0.2.2",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-wrap-ansi@0.2.2/node_modules/fast-wrap-ansi",
+      "logicalBytes": 10710,
+      "physicalBytes": 24576,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "fast-wrap-ansi@0.2.2",
+        "bytes": 3549
+      }
+    },
+    {
+      "name": "sisteransi",
+      "version": "1.0.5",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/sisteransi@1.0.5/node_modules/sisteransi",
+      "logicalBytes": 6791,
+      "physicalBytes": 20480,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "sisteransi@1.0.5",
+        "bytes": 2600
+      }
+    },
+    {
+      "name": "semver",
+      "version": "7.8.5",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/semver@7.8.5/node_modules/semver",
+      "logicalBytes": 101065,
+      "physicalBytes": 274432,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "semver@7.8.5",
+        "bytes": 29399
+      }
+    },
+    {
+      "name": "fast-string-truncated-width",
+      "version": "3.0.3",
+      "physicalPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only/node_modules/.pnpm/fast-string-truncated-width@3.0.3/node_modules/fast-string-truncated-width",
+      "logicalBytes": 12139,
+      "physicalBytes": 40960,
+      "nativeFiles": [],
+      "archive": {
+        "identity": "fast-string-truncated-width@3.0.3",
+        "bytes": 4390
+      }
+    }
+  ],
+  "accounting": {
+    "physicalInstances": 10,
+    "archiveBytes": 9318144,
+    "logicalBytes": 51169355,
+    "physicalBytes": 59621376,
+    "nativeFiles": []
+  }
+}

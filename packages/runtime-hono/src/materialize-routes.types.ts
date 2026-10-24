@@ -1,3 +1,4 @@
+/** Defines checked route, runtime and invocation contracts for core HTTP/RPC without importing optional transport SDK declarations. */
 import type { UpgradeWebSocket } from "hono/ws";
 import type { GENERATOR_VERSION, MANIFEST_VERSION, MaybePromise } from "@relkit/contracts";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
@@ -6,7 +7,7 @@ import type { MiddlewareContext } from "@relkit/routes";
 import type { MappingValue, RequestMappingOptions } from "./request-mapping.js";
 import type { RateLimitRuntimeOptions } from "./rate-limit.js";
 import type { HttpAuthInvocation, HttpAuthRuntime } from "./auth.js";
-import type { McpOptions } from "./mcp.js";
+import type { McpOptions } from "./optional-transports.types.js";
 import type { StaticFilesOptions } from "./static-files.js";
 import type { ClientIdentityRuntime } from "./client-identity.js";
 import type { TransportSecurityOptions } from "./transport-security.js";

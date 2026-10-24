@@ -1,5 +1,5 @@
+/** Checks inferred descriptor identities while retaining explicit native graph authoring types. */
 import {
-  defineAgent,
   defineApp,
   defineBucket,
   defineCache,
@@ -16,6 +16,7 @@ import {
   defineTransform,
   http,
 } from "@relkit/app";
+import { defineAgent } from "@relkit/langchain";
 import { z } from "@relkit/schema";
 
 const input = z.object({ id: z.string() });

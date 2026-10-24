@@ -9,6 +9,7 @@ import type { CheckOptions } from "./check.types.js";
 import type { CheckResult } from "./check-result.types.js";
 import type { JobsManifest, LoadedToolingConfig } from "@relkit/compiler";
 import type { ApplicationGraph } from "@relkit/graph";
+import type { ProductionRepairs } from "./build-production-repairs.js";
 
 /** Build inputs; an injected check remains the established public compatibility seam. */
 export interface BuildOptions extends CheckOptions {
@@ -55,6 +56,8 @@ export interface BuildManifestInputs {
 
 /** Validated sources and identity captured once before materializing a stage. */
 export interface BuildStageCohort {
+  readonly productionDependencies: Readonly<Record<string, string>>;
+  readonly productionRepairs: ProductionRepairs;
   readonly graph: ApplicationGraph;
   readonly graphHash: string;
   readonly jobsManifest: JobsManifest | undefined;

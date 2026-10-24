@@ -1,5 +1,6 @@
-/** Verifies native production start through public HTTP, observer pagination and joined external-abort shutdown. */
+/** Verifies native start through core HTTP, rich-inspection exclusion and joined external-abort shutdown. */
 import { expect, test } from "bun:test";
+import { readFile, writeFile } from "node:fs/promises";
 
 import { join } from "node:path";
 
@@ -14,9 +15,12 @@ import { registerCommandCleanup } from "../../tests/fixtures/cli/commands-core-f
 
 registerCommandCleanup();
 
-test("start serves health, graph, inspector collections, and rejects an invalid build", async () => {
+test("start serves core HTTP without rich inspection and rejects an invalid build", async () => {
   const root = await copyProject("tests/compiler/fixtures/valid-minimal");
   const built = await buildProject({ projectRoot: root });
+  const manifestPath = join(built.buildDirectory, "manifest.json");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  expect(manifest.entrypoint).toBe("server/index.js");
   const started = await startProject({ projectRoot: root, port: 0, healthTimeoutMs: 3_000 });
   try {
     await Effect.runPromise(assertStartedHttp(started, built));
@@ -28,6 +32,12 @@ test("start serves health, graph, inspector collections, and rejects an invalid 
   await expect(
     startProject({ projectRoot: root, buildDirectory: join(root, ".relkit", "missing") }),
   ).rejects.toThrow();
+  for (const entrypoint of ["server/index.ts", "../server/index.js", "/server/index.js"]) {
+    await writeFile(manifestPath, JSON.stringify({ ...manifest, entrypoint }));
+    await expect(startProject({ projectRoot: root, port: 0 })).rejects.toThrow(
+      "Built manifest paths are invalid.",
+    );
+  }
 });
 
 test("start cleanup follows an external abort signal", async () => {

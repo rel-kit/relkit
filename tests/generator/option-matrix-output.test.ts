@@ -11,8 +11,10 @@ import {
   generateProject,
   normalizeCreateOptions,
   formatGenerateResult,
-} from "../../packages/create-relkit/src/index.ts";
+} from "../../packages/cli/src/scaffolding/index.ts";
 import appManifest from "../../packages/app/package.json" with { type: "json" };
+import awsManifest from "../../integrations/packages/aws/package.json" with { type: "json" };
+import pulumiManifest from "../../integrations/packages/pulumi/package.json" with { type: "json" };
 import { makeRoot, contextFor, createOptions } from "./option-matrix-fixture.js";
 import { GeneratedManifest, GeneratedOutput } from "./option-matrix.schemas.js";
 
@@ -62,9 +64,10 @@ test("normalizes JSON options and keeps generated results JSON-safe", async () =
   expect(json.nextSteps.endpoints).not.toHaveProperty("route");
   expect(json.nextSteps.endpoints).toMatchObject({
     openapi: "http://localhost:3000/_relkit/v1/openapi.json",
-    apiReference: "http://localhost:3000/_relkit/v1/api-reference",
   });
-  expect(formatGenerateResult(json)).toContain("api docs:");
+  expect(json.nextSteps.endpoints).not.toHaveProperty("apiReference");
+  expect(formatGenerateResult(json)).toContain("openapi:");
+  expect(formatGenerateResult(json)).not.toContain("api docs:");
   expect(formatGenerateResult(json)).toContain(
     `Success! Created @scope/json-app at ${result.destination}.`,
   );
@@ -88,8 +91,8 @@ test("adds AWS and Pulumi only when explicitly selected", async () => {
   const config = await readFile(join(result.destination, "relkit.config.ts"), "utf8");
   expect(manifest.dependencies).toMatchObject({
     "@relkit/app": appManifest.version,
-    "@relkit/aws": appManifest.version,
-    "@relkit/pulumi": appManifest.version,
+    "@relkit/aws": awsManifest.version,
+    "@relkit/pulumi": pulumiManifest.version,
   });
   expect(manifest.scripts).toMatchObject({
     "deploy:preview": "relkit deploy preview",

@@ -5,9 +5,21 @@ description: Connect an external AI client to your RelKit tools through the buil
 
 Model Context Protocol (MCP) lets AI clients discover and call tools in your app. RelKit serves tools at `/mcp` using **Streamable HTTP**. You do not need to define an agent or write a separate MCP server.
 
+The endpoint is opt-in. From your application root, install `@modelcontextprotocol/server@2.3.0`, then
+set `server.mcp` to `true` in your existing `relkit.config.ts`:
+
+```sh
+bun add @modelcontextprotocol/server@2.3.0
+```
+
+Startup validates the selected SDK before readiness. Ordinary REST/RPC and OpenAPI do not load MCP.
+
 ## Choose which tools to expose
 
-**Yes—all discovered tools created with `defineTool` or `.asTool()` are exposed by default.** Omitting `mcp` is equivalent to `mcp: true`, and the app's MCP endpoint is enabled by default. For example, the [greeting tool](/docs/ai/function-tools) appears as `hello.lookup`, with a `name` argument and a `message` result.
+When the endpoint is enabled, discovered tools created with `defineTool` or `.asTool()` are eligible
+by default. Omitting a tool's `mcp` field is equivalent to `mcp: true`; the server endpoint itself
+defaults to disabled. For example, the [greeting tool](/docs/ai/function-tools) appears as
+`hello.lookup`, with a `name` argument and a `message` result.
 
 Set an explicit `timeoutMs` on tools you expose through MCP. The current runtime fails MCP calls when this option is omitted; the greeting example uses `2_000` milliseconds.
 

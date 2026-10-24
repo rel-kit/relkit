@@ -1,6 +1,16 @@
+/** Verifies native recovery-probe containment and separates emitted evidence markers from Bun source frames. */
 import { expect, test } from "bun:test";
 import { existsSync } from "node:fs";
-import { mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  realpath,
+  rm,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import ts from "typescript";
@@ -95,19 +105,31 @@ test("recovery probe rejects external, sibling-prefix and escaping symlink apps"
   const temporary = await mkdtemp(join(tmpdir(), "relkit-recovery-path-test-"));
   const link = join(temporary, "outside");
   await symlink("/", link);
+  const output = join(temporary, "probe-output.log");
+  await writeFile(output, "");
+  const before = (await readdir(temporary)).sort();
+  let successful = false;
   try {
-    for (const app of ["/", tmpdir() + "-sibling/app", link, tmpdir()]) {
-      const child = Bun.spawn([process.execPath, probe, app], { stdout: "pipe", stderr: "pipe" });
+    for (const app of ["/", tmpdir() + "-sibling/app", link, temporary, tmpdir()]) {
+      const child = Bun.spawn([process.execPath, probe, app], {
+        stdout: "pipe",
+        stderr: "pipe",
+        env: { ...process.env, TMPDIR: temporary },
+      });
       const [code, stdout, stderr] = await Promise.all([
         child.exited,
         new Response(child.stdout).text(),
         new Response(child.stderr).text(),
       ]);
+      await writeFile(output, stdout + stderr);
       expect(code).not.toBe(0);
       expect(stdout + stderr).toContain("Probe requires a disposable temporary app");
-      expect(stdout + stderr).not.toContain("Evidence directory:");
+      expect((await readdir(temporary)).sort()).toEqual(before);
+      expect(stdout + stderr).not.toMatch(/^Evidence directory:/m);
     }
+    successful = true;
   } finally {
-    await rm(temporary, { recursive: true, force: true });
+    if (successful) await rm(temporary, { recursive: true, force: true });
+    else console.error(`Failed recovery path fixture retained: ${temporary}`);
   }
 });

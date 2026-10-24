@@ -1,3 +1,8 @@
+/**
+ * Implements the opt-in Bun server query context and identity-bound hydration.
+ * Install @orpc/tanstack-query@2.0.0-beta.31 and @tanstack/query-core@^5 alongside
+ * @relkit/client and import @relkit/client/server/tanstack-query to select it.
+ */
 import type {
   CreateRelkitServerContextOptions,
   RelkitServerContext,
@@ -10,6 +15,7 @@ import { scopeFor } from "./react/context-support.js";
 export type {
   CreateRelkitServerContextOptions,
   RelkitServerContext,
+  RelkitServerHydrationState,
 } from "./server-context.types.js";
 
 /**

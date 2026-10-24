@@ -99,17 +99,7 @@ export default {};
         // Only the live isolated initial worker owns IPC and admits CPU work.
         const bin = fileURLToPath(new URL("../../src/bin.ts", import.meta.url));
         child = Bun.spawn(
-          [
-            process.execPath,
-            bin,
-            "dev",
-            "--project-root",
-            root,
-            "--port",
-            "12345",
-            "--inspector-port",
-            "12346",
-          ],
+          [process.execPath, bin, "dev", "--project-root", root, "--port", "12345"],
           {
             cwd: root,
             stdin: "ignore",

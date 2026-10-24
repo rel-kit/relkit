@@ -1,8 +1,9 @@
+/** Recovers expired control leases through the same fenced state transition used by explicit recovery. */
 import type { RecoveryRequest } from "./control-recovery.types.js";
 import { Clock, Effect } from "effect";
-import { localOperation } from "../local-effect.js";
+import { localOperation, localSync } from "../local-effect.js";
 import { ownedThread } from "./common.js";
-import { recoverControl } from "./control-lifecycle.js";
+import { recoverControl } from "./control-claim-recovery.js";
 import type { AgentStateStoreEffects as AgentStateStore } from "./storage.js";
 
 /** Provider-owned recovery for controls whose worker lease expired.
@@ -17,7 +18,7 @@ export const recoverExpiredControls = Effect.fn("AgentState.recoverExpiredContro
     now ??= operationNow;
 
     const state = yield* store.read();
-    const local = ownedThread(state, request, request.threadId);
+    const local = yield* localSync(() => ownedThread(state, request, request.threadId));
     const expired = Object.entries(local.controlClaims).filter(
       ([operationId, claim]) =>
         local.controls[operationId]?.receipt.status === "processing" &&

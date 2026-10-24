@@ -1,3 +1,4 @@
+/** Runs the complete local test layers serially, preserving fail-fast and cloud opt-in behavior. */
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "..");
@@ -52,7 +53,7 @@ async function runLayers(
 ): Promise<void> {
   let next = 0;
   let failure: Error | undefined;
-  const workers = Array.from({ length: Math.min(3, scripts.length) }, async () => {
+  const workers = Array.from({ length: Math.min(1, scripts.length) }, async () => {
     while (failure === undefined && next < scripts.length) {
       const script = scripts[next++]!;
       try {

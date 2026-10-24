@@ -1,6 +1,7 @@
+/** Reads bounded checkpointed journal pages and waits interruptibly for new records. */
 import { Clock, Effect } from "effect";
 import { localOperation, localSync } from "../local-effect.js";
-import type { ReadJournalRequest, WaitForJournalRequest } from "@relkit/agents";
+import type { ReadJournalRequest, WaitForJournalRequest } from "@relkit/contracts";
 import { checkpoint, ownedThread } from "./common.js";
 import type { AgentStateStoreEffects as AgentStateStore } from "./storage.js";
 
@@ -16,7 +17,7 @@ export const readJournal = Effect.fn("AgentState.readJournal")(
     const operationNow = yield* Clock.currentTimeMillis;
 
     const state = yield* store.read();
-    const local = ownedThread(state, request, request.threadId);
+    const local = yield* localSync(() => ownedThread(state, request, request.threadId));
     const foreign =
       request.after.threadId !== request.threadId ||
       request.after.applicationId !== request.applicationId ||

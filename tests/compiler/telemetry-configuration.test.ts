@@ -1,3 +1,7 @@
+/**
+ * Verifies telemetry graph projection and guarded selected-exporter imports.
+ * Secrets remain environment references throughout generated compiler artifacts.
+ */
 import { expect, test } from "bun:test";
 import { defineApp } from "../../packages/app/src/define-app.ts";
 import { defineEnv, env } from "../../packages/config/src/index.ts";
@@ -5,6 +9,7 @@ import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
 import { validateGraphShape } from "../../packages/graph/src/index.ts";
 import { otlp } from "../../integrations/packages/otlp/src/index.ts";
 import { sentry } from "../../integrations/packages/sentry/src/index.ts";
+import { assertGuardedRuntimeImports } from "./runtime-import-assertions.ts";
 
 test("projects typed telemetry and plans all configured exporter integrations", () => {
   const app = defineApp({
@@ -50,8 +55,10 @@ test("projects typed telemetry and plans all configured exporter integrations", 
     planEntry("otlp"),
     planEntry("sentry"),
   ]);
-  expect(result.outputs.runtimeIntegrationImports).toContain('from "@relkit/otlp/runtime";');
-  expect(result.outputs.runtimeIntegrationImports).toContain('from "@relkit/sentry/runtime";');
+  assertGuardedRuntimeImports(result.outputs.runtimeIntegrationImports, [
+    planEntry("otlp"),
+    planEntry("sentry"),
+  ]);
   expect(JSON.stringify(result.graph)).not.toContain("top-secret");
 });
 

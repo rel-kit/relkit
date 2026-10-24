@@ -3,11 +3,43 @@
  * Deferred synchronization. Tests own every fiber and Scope and verify that
  * waiter cancellation and generation retirement join the same physical import.
  */
-import { Deferred, Effect, Exit, Fiber, Layer, Ref, Scope } from "effect";
+import { Context, Deferred, Effect, Exit, Fiber, Layer, Ref, Scope } from "effect";
 import { expect, test } from "vitest";
 import { Hono } from "hono";
 import { PreparedTransports, PreparedTransportLoader } from "../src/prepared-transports.service.js";
 import { preparedOptions } from "./prepared-fixture.js";
+
+const RequestMarker = Context.Reference<string>("PreparedTest.RequestMarker", {
+  defaultValue: () => "generation",
+});
+
+test("single_flight_context_isolation_does_not_capture_first_request_services", async () => {
+  const seen: string[] = [];
+  const loader = Layer.succeed(PreparedTransportLoader, {
+    load: () =>
+      Effect.gen(function* () {
+        seen.push(yield* RequestMarker);
+        return new Hono();
+      }),
+  });
+  await Effect.runPromise(
+    Effect.scoped(
+      Effect.gen(function* () {
+        const service = yield* PreparedTransports.make(preparedOptions()).pipe(
+          Effect.provide(loader),
+        );
+        const first = yield* service
+          .load()
+          .pipe(Effect.provideService(RequestMarker, "request-one"));
+        const second = yield* service
+          .load()
+          .pipe(Effect.provideService(RequestMarker, "request-two"));
+        expect(first).toBe(second);
+        expect(seen).toEqual(["generation"]);
+      }),
+    ),
+  );
+});
 
 test("concurrent waiters share initialization and retain separate native requests", async () => {
   await Effect.runPromise(

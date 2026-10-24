@@ -22,7 +22,13 @@ export const aiGuideGroup = {
 
 export const aiGuideRelations = aiGuideGroup.pages.map((page) => ({
   path: `ai/${page}`,
-  api: ["agents", "tools", "functions", "testing"] satisfies readonly ApiPackage[],
+  api: [
+    "agents",
+    "integrations/langchain",
+    "tools",
+    "functions",
+    "testing",
+  ] satisfies readonly ApiPackage[],
   examples: [
     "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
     "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts",

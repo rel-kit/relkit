@@ -108,6 +108,29 @@ const main = Effect.gen(function* () {
     "run",
     "--config",
     "packages/create-relkit/vitest.config.ts",
+    "--maxWorkers=1",
+  ]);
+  yield* runGeneratorGate("scaffolding strict services", [
+    "x",
+    "tsc",
+    "-p",
+    "packages/cli/tsconfig.scaffolding-tests.json",
+    "--pretty",
+    "false",
+  ]);
+  yield* runGeneratorGate("scaffolding Effect services", [
+    "x",
+    "--bun",
+    "vitest",
+    "run",
+    "--config",
+    "packages/cli/vitest.scaffolding.config.ts",
+    "--maxWorkers=1",
+  ]);
+  yield* runGeneratorGate("scaffolding portable dependency patches", [
+    "test",
+    "packages/cli/tests/scaffolding/dependency-patches.test.ts",
+    "packages/cli/tests/scaffolding/project-catalog.test.ts",
   ]);
   const suites = yield* Effect.sync(generatorSuites);
   yield* Effect.forEach(suites, ({ name, args }) => runGeneratorGate(name, args), {

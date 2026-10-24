@@ -1,7 +1,8 @@
+/** Declares serializable agent client contract metadata shared by SDK-free authoring, graph normalization and runtime client projections. This companion contains the shared planning contracts without executing work. */
+
 import type { AgentClientPolicy } from "./agent-client.js";
 import type { ClientSchemaMetadata, ClientTypeField } from "./client-contract-schema.js";
-import type { AgentMiddleware, AgentTool } from "./define-agent-native.js";
-import type { GraphWorkflow } from "./graph-workflow.js";
+import type { ToolRefAny } from "@relkit/tools";
 
 /** Client visible event schema or dynamic event marker. */
 export type ClientEventMetadata = ClientTypeField | { readonly kind: "dynamic" };
@@ -45,17 +46,9 @@ export interface SubagentMetadataSource {
 /** Inputs for native agent client metadata. */
 export interface AgentClientMetadataOptions {
   readonly id: string;
-  readonly tools: readonly AgentTool[];
-  readonly middleware: readonly AgentMiddleware[];
+  readonly tools: readonly ToolRefAny[];
+  readonly middleware?: readonly [];
   readonly client?: AgentClientPolicy;
   readonly subagents?: readonly SubagentMetadataSource[];
   readonly interruptOn?: Readonly<Record<string, unknown>>;
-}
-
-/** Inputs for graph client metadata. */
-export interface GraphClientMetadataOptions {
-  readonly id: string;
-  readonly state: { readonly getJsonSchema: () => unknown };
-  readonly client?: AgentClientPolicy;
-  readonly workflow: GraphWorkflow;
 }

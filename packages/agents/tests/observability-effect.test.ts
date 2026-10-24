@@ -1,10 +1,11 @@
+/** Checks agent observability projection through the generic Effect service boundary. */
 import { Effect } from "effect";
 import { expect, test } from "vitest";
 import {
   emitAgentEdge,
   emitAgentEdgeEffect,
   type AgentObservedEdge,
-} from "../src/observability.js";
+} from "@relkit/agents/internal/observability";
 
 test("observed edges use the Effect path and preserve best-effort delivery", async () => {
   const delivered: AgentObservedEdge[] = [];

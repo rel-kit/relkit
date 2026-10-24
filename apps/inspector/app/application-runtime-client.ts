@@ -22,6 +22,7 @@ export interface ApplicationRuntimeClient {
 export function useApplicationRuntimeClient(): ApplicationRuntimeClient {
   const baseUrl = useMemo(applicationBaseUrl, []);
   const [identity, setIdentity] = useState<ClientIdentityDocument>();
+  const [generation, setGeneration] = useState<string>();
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
@@ -36,6 +37,7 @@ export function useApplicationRuntimeClient(): ApplicationRuntimeClient {
         const next = (await response.json()) as ClientIdentityDocument;
         if (controller.signal.aborted) return;
         setIdentity((current) => (sameIdentity(current, next) ? current : next));
+        setGeneration(response.headers.get("x-relkit-generation-id") ?? undefined);
         setFailed(false);
       } catch {
         if (!controller.signal.aborted) setFailed(true);
@@ -51,7 +53,10 @@ export function useApplicationRuntimeClient(): ApplicationRuntimeClient {
       window.removeEventListener("focus", onFocus);
     };
   }, [baseUrl]);
-  const client = useMemo(() => createApplicationClient(baseUrl, identity), [baseUrl, identity]);
+  const client = useMemo(
+    () => createApplicationClient(baseUrl, identity, generation),
+    [baseUrl, identity, generation],
+  );
   return {
     client,
     ...(identity === undefined ? {} : { identity }),
@@ -85,6 +90,7 @@ type ApplicationClient = ReturnType<typeof createORPCClient>;
 function createApplicationClient(
   baseUrl: string,
   identity: ClientIdentityDocument | undefined,
+  generation: string | undefined,
 ): ApplicationClient {
   const endpoint = new URL("rpc", baseUrl);
   return createORPCClient(
@@ -98,6 +104,7 @@ function createApplicationClient(
               ...agentCapabilityHeaders,
               "x-relkit-identity-scope": identity.identityScope,
               "x-relkit-session-epoch": identity.sessionEpoch,
+              ...(generation === undefined ? {} : { "x-relkit-generation-id": generation }),
               ...(browserCookie("relkit_csrf") === undefined
                 ? {}
                 : { "x-relkit-csrf": browserCookie("relkit_csrf")! }),

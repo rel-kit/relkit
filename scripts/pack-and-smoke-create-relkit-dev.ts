@@ -13,7 +13,7 @@ const packageScripts = Schema.Struct({
 });
 
 /**
- * Owns one installed application's backend and packaged Inspector until assertions finish.
+ * Owns one installed application's lean backend until assertions finish.
  * @param root - Standalone installed application.
  * @param exercise - Optional caller-owned native acceptance callback.
  * @returns Completion after the child group and output readers have terminated.
@@ -23,7 +23,6 @@ export const devSmokeAttempt = Effect.fn("ScaffoldDev.attempt")(function* (
   exercise?: (port: number) => Promise<void>,
 ) {
   const port = yield* scaffoldPort;
-  const inspector = yield* scaffoldPort;
   const text = yield* Effect.promise(() => readFile(join(root, "package.json"), "utf8"));
   const manifest = Schema.decodeUnknownSync(Schema.fromJsonString(packageScripts))(text);
   const devScript = manifest.scripts?.["dev:api"] === undefined ? "dev" : "dev:api";
@@ -33,21 +32,10 @@ export const devSmokeAttempt = Effect.fn("ScaffoldDev.attempt")(function* (
       const owner = yield* scaffoldChild({
         cwd: root,
         env: { PORT: String(port) },
-        args: [
-          "run",
-          devScript,
-          "--",
-          "--project-root",
-          root,
-          "--port",
-          String(port),
-          "--inspector-port",
-          String(inspector),
-        ],
+        args: ["run", devScript, "--", "--project-root", root, "--port", String(port)],
       });
       yield* awaitScaffoldHttp(owner.process, [
         `http://127.0.0.1:${port}${taskProject ? "/health" : "/hello?name=RelKit"}`,
-        `http://127.0.0.1:${inspector}`,
       ]).pipe(
         Effect.catchCause((cause) =>
           Effect.sync(() => console.error(owner.output())).pipe(
@@ -55,12 +43,11 @@ export const devSmokeAttempt = Effect.fn("ScaffoldDev.attempt")(function* (
           ),
         ),
       );
-      yield* verifyScaffoldDevContracts(port, inspector, taskProject);
+      yield* verifyScaffoldDevContracts(port, root, taskProject);
       if (exercise !== undefined) yield* Effect.promise(() => exercise(port));
     }),
   );
   yield* assertScaffoldPortReleased(port);
-  yield* assertScaffoldPortReleased(inspector);
 });
 
 /**

@@ -1,7 +1,36 @@
 /** Exercises native child-group exit/output ownership and preserves failed drain evidence through scoped release. */
 import { expect, test } from "bun:test";
 import { Effect, Exit, References } from "effect";
+import { chmod, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { basename, join } from "node:path";
 import { scaffoldChild, ScaffoldProcess, scaffoldProcessLayer } from "../scaffold-process.js";
+
+test("runs the selected browser executable without routing its arguments through Bun", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-browser-command-"));
+  const session = basename(root);
+  try {
+    const executable = join(root, "agent-browser");
+    await writeFile(
+      executable,
+      '#!/usr/bin/env node\nconsole.log(process.argv.slice(2).join(" "));\n',
+    );
+    await chmod(executable, 0o755);
+    const output = await Effect.runPromise(
+      ScaffoldProcess.use((commands) =>
+        commands.run({
+          executable: "agent-browser",
+          cwd: root,
+          args: ["--session", session, "close"],
+          env: { PATH: `${root}:${process.env.PATH ?? ""}` },
+        }),
+      ).pipe(Effect.provide(scaffoldProcessLayer)),
+    );
+    expect(output.trim()).toBe(`--session ${session} close`);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
 
 test(
   "forces a TERM-resistant producer to exit as soon as its bounded drain fails",

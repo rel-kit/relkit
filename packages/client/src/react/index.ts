@@ -1,3 +1,9 @@
+/**
+ * Exposes React providers and hooks backed by the selected query adapter. Install
+ * react, @tanstack/react-query@^5, @tanstack/query-core@^5 and
+ * @orpc/tanstack-query@2.0.0-beta.31 alongside @relkit/client for this entrypoint.
+ * TypeScript consumers also install @types/react for React's public types.
+ */
 export * from "./context.js";
 export * from "./agent-hook.js";
 export * from "./agent-reconcile.js";

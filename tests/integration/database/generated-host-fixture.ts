@@ -29,7 +29,7 @@ const writeFixture = Effect.fn("GeneratedHost.writeFixture")(function* (
   repository: string,
 ) {
   const example = join(repository, "examples/auth-drizzle");
-  for (const path of ["src", "drizzle", "relkit.config.ts", "package.json"])
+  for (const path of ["src", "relkit.config.ts", "package.json"])
     yield* scaffoldNative("generated.fixture.copy", () =>
       cp(join(example, path), join(root, path), { recursive: true }),
     );

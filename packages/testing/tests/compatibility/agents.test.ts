@@ -1,5 +1,6 @@
+/** Checks selected native test-helper compatibility through public integration-owned APIs. */
 import { describe, expect, test } from "bun:test";
-import { defineAgent } from "@relkit/agents";
+import { defineAgent } from "@relkit/langchain";
 import { defineFunction } from "@relkit/functions";
 import { z } from "@relkit/schema";
 import { defineTool } from "@relkit/tools";

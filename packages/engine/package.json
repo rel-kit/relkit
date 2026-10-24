@@ -23,6 +23,10 @@
   },
   "type": "module",
   "exports": {
+    "./internal/server-runtime": {
+      "types": "./dist/internal/server-runtime.d.ts",
+      "import": "./dist/internal/server-runtime.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
@@ -44,6 +48,9 @@
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@relkit/compiler": "workspace:*",
+    "@relkit/providers-local": "workspace:*",
+    "typescript": "catalog:",
     "@effect/vitest": "catalog:",
     "vitest": "catalog:"
   },

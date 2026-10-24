@@ -10,7 +10,7 @@ import type { RedactedObservabilityRecord } from "./record-admission.types.js";
 import type { RecordAdmissionError } from "./record-admission.js";
 import type { EarlyRetentionError } from "./early-records-error.js";
 
-/** Bounded session policy; bytes are counted after redaction and JSON encoding. */
+/** Bounded session policy; bytes count complete sequence/record envelopes after redaction. */
 export interface EarlyRetentionOptions {
   readonly maxRecords?: number;
   readonly maxBytes?: number;

@@ -1,4 +1,5 @@
-import { defineAgent } from "@relkit/agents";
+/** Hosts the native Bun HTTP/WebSocket echo agent against the parent-owned state directory. Reports its port over IPC and stops its server when the parent sends SIGTERM. */
+import { defineAgent } from "@relkit/langchain";
 import { createLocalAgentStateProvider } from "@relkit/providers-local";
 import { z } from "@relkit/schema";
 import { upgradeWebSocket, websocket } from "hono/bun";

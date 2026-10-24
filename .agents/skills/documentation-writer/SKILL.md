@@ -45,6 +45,11 @@ All repository paths below are relative to the repository root.
 - Confirm commands, defaults, paths, and ports from current source. Distinguish repository-root
   commands from generated-project commands and local workflows from cloud deployment.
   Do not incur cloud costs without authorization.
+- Keep inspection states distinct: installation does not enable inspection; omitted config
+  is disabled; `inspector.enabled` selects a private development bridge (`127.0.0.1:0`);
+  separately launched `@relkit/inspector` owns UI (`3210`) and history. Document separate
+  commands, private session selection, Bun/Node prerequisites and production exclusion.
+  Generated API/CLI references must come from source producers, not hand-edited promises.
 - Verify create examples against exact current certification. Only minimal, examples enabled,
   no jobs/cloud/deployment is currently publicly offered. Candidate API/agent/fullstack/jobs
   and AWS/Pulumi templates are not supported public creation tuples merely because tests pass.

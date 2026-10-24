@@ -1,0 +1,36 @@
+{
+  "fixture": "creator-only",
+  "manager": "bun",
+  "root": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V/creator-only",
+  "temporary": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-IxnZ4V",
+  "candidateManifestSHA256": "316773589b84cad655c60636fdf1ec5a1a51ebd8d573fbe58f1810f58af2f3f8",
+  "installIndex": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-installs.json",
+  "measurementReport": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-installs-relkit-consumer-install-IxnZ4V.json",
+  "evidence": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-namespace-fixed-raw.json",
+  "result": {
+    "passed": true,
+    "incomplete": [],
+    "violations": []
+  },
+  "policyReview": "no admissions",
+  "cleanup": null,
+  "proof": "new actual four-boundary reprobe of the same retained installation; no reinstall",
+  "supersededFailure": {
+    "result": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-result.json",
+    "resultSha256": "5f275fd90be8201c0073eb3c3d403ae4c473d16295ea2201181c2a8dfd14e0b8",
+    "evidence": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-raw.json",
+    "evidenceSha256": "0d3ffef03beb05a9a72f512e14dc9a59ec96c72ba62e948832d7afaa4df569d2"
+  },
+  "preservationReferences": [
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-result.json",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-raw.json",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-namespace-fixed-raw.json",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-relkit-consumer-install-IxnZ4V-namespace-fixed-result.json",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-installs.json",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/stage-1-b18/bun-creator-only-installs-relkit-consumer-install-IxnZ4V.json",
+    "/tmp/relkit-s1-namespace-collector-red.log",
+    "/tmp/relkit-s1-namespace-collector-green.log",
+    "/tmp/relkit-s1-b18-creator-collector-reprobe.log",
+    "/tmp/relkit-s1-b18-creator-collector-policy-green.log"
+  ]
+}

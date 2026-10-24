@@ -13,24 +13,31 @@ import { registerDevCleanup } from "../../tests/fixtures/cli/dev-fixture.js";
 
 registerDevCleanup();
 
-test("stops an inspector child through the external shutdown signal", async () => {
+test("releases the session bridge through the external shutdown signal", async () => {
   const root = await makeRoot();
   const controller = new AbortController();
   const session = await startDev({
     ...options(root, "sha256:dev-inspector"),
     signal: controller.signal,
     inspector: {
-      command: [process.execPath, "-e", "setTimeout(() => {}, 10000)"],
+      host: "127.0.0.1",
       port: 0,
     },
   });
   await adoptSession(session);
-  await waitFor(() => session.inspectorChild !== undefined);
+  await waitFor(() => session.inspectionConnection !== undefined);
+  const endpoint = session.inspectionConnection!.descriptor.endpoint;
   expect(session.inspectorPort).toBeGreaterThan(0);
 
   controller.abort(new Error("test shutdown"));
   await session.waitForShutdown();
   expect(session.activeTarget).toBeUndefined();
+  expect(
+    await fetch(endpoint).then(
+      () => true,
+      () => false,
+    ),
+  ).toBe(false);
 });
 
 test("releases the backend port when its terminal closes", async () => {

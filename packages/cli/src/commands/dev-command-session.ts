@@ -52,7 +52,7 @@ const acquireCommandSession = Effect.fn("Dev.acquireCommandSession")(function* (
     generatedDirectory,
     signal: context.signal,
     installSignalHandlers: false,
-    inspector: { ...ports.inspector, environment: { FORCE_COLOR: "0", NO_COLOR: undefined } },
+    inspector: ports.inspector,
     compile: compiler.compile,
     localServicesEffect: compiler.closeEffect,
     sourceChangedEffect: () => compiler.invalidateEffect,
@@ -64,8 +64,7 @@ const acquireCommandSession = Effect.fn("Dev.acquireCommandSession")(function* (
       RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS: process.env.RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS ?? "15000",
       ...telemetry.environment,
     },
-    intercept: telemetry.handle,
-    onStopping: telemetry.closeStream,
+    inspectionRecords: telemetry.records,
     onRecord: telemetry.append,
     observability: { append: telemetry.append },
   });

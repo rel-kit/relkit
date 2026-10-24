@@ -1,3 +1,4 @@
+/** Supplies a canonical JavaScript build cohort for native production-start lifetime tests. */
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
@@ -12,6 +13,12 @@ import {
 } from "@relkit/contracts";
 import { createRuntimeActivationFingerprint } from "@relkit/compiler";
 import { hashGraph, type ApplicationGraph } from "@relkit/graph";
+
+const source = `const server = Bun.serve({ hostname: "127.0.0.1", port: Number(process.env.PORT), fetch: () => Response.json({ ok: true }) });
+process.stdout.write("owned-output");
+process.stderr.write("owned-error-output");
+process.on("SIGTERM", async () => { await server.stop(true); process.exit(0); });
+`;
 
 /**
  * Writes a complete current build cohort with a native health/shutdown process.
@@ -46,17 +53,12 @@ export async function nativeStartFixture(root: string): Promise<string> {
     manifestVersion: MANIFEST_VERSION,
     graphHash,
     activationFingerprint: activation,
-    entrypoint: "server/index.ts",
+    entrypoint: "server/index.js",
     containerEntrypoint: "server/index.js",
     runtimeManifestFile: "server/runtime.manifest.ts",
     runtimeActivationFile: `server/${RUNTIME_ACTIVATION_FILE}`,
     runtimeIntegrationsPlanFile: `server/${RUNTIME_INTEGRATION_PLAN_FILE}`,
   };
-  const source = `const server = Bun.serve({ hostname: "127.0.0.1", port: Number(process.env.PORT), fetch: () => Response.json({ ok: true }) });
-process.stdout.write("owned-output");
-process.stderr.write("owned-error-output");
-process.on("SIGTERM", async () => { await server.stop(true); process.exit(0); });
-`;
   await Promise.all([
     writeFile(join(directory, "application.graph.json"), canonicalJson(graph)),
     writeFile(join(directory, "manifest.json"), canonicalJson(manifest)),

@@ -26,20 +26,44 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./internal/fakes": {
+      "types": "./dist/fakes.d.ts",
+      "import": "./dist/fakes.js"
+    },
+    "./internal/jobs-utils": {
+      "types": "./dist/jobs-utils.d.ts",
+      "import": "./dist/jobs-utils.js"
+    },
+    "./internal/runtime-clock": {
+      "types": "./dist/runtime-clock.d.ts",
+      "import": "./dist/runtime-clock.js"
+    },
+    "./internal/testing-owner": {
+      "types": "./dist/testing-owner.d.ts",
+      "import": "./dist/testing-owner.js"
+    },
+    "./internal/work-ownership": {
+      "types": "./dist/work-ownership.d.ts",
+      "import": "./dist/work-ownership.js"
+    },
+    "./drizzle": {
+      "types": "./dist/drizzle.d.ts",
+      "import": "./dist/drizzle.js"
+    },
+    "./better-auth": {
+      "types": "./dist/better-auth.d.ts",
+      "import": "./dist/better-auth.js"
     }
   },
   "dependencies": {
-    "@langchain/core": "catalog:",
-    "@relkit/agents": "workspace:*",
     "@relkit/buckets": "workspace:*",
     "@relkit/cache": "workspace:*",
-    "@relkit/better-auth": "workspace:*",
     "@relkit/config": "workspace:*",
     "@relkit/compiler": "workspace:*",
     "@relkit/contracts": "workspace:*",
     "@relkit/engine": "workspace:*",
     "@relkit/events": "workspace:*",
-    "@relkit/drizzle": "workspace:*",
     "@relkit/functions": "workspace:*",
     "@relkit/graph": "workspace:*",
     "@relkit/invocation": "workspace:*",
@@ -52,12 +76,29 @@
     "@relkit/tools": "workspace:*",
     "effect": "catalog:"
   },
+  "peerDependencies": {
+    "@relkit/better-auth": "workspace:*",
+    "@relkit/drizzle": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@relkit/better-auth": {
+      "optional": true
+    },
+    "@relkit/drizzle": {
+      "optional": true
+    }
+  },
   "scripts": {
-    "build": "tsc -b",
+    "build:foundation": "tsc -p tsconfig.foundation.json --pretty false",
+    "typecheck:foundation": "tsc -p tsconfig.foundation.json --pretty false",
+    "build": "tsc -b && bun run ../../scripts/prune-moved-authoring-artifacts.ts testing",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false"
   },
   "devDependencies": {
+    "@relkit/better-auth": "workspace:*",
+    "@relkit/drizzle": "workspace:*",
+    "@relkit/langchain": "workspace:*",
     "@effect/vitest": "catalog:",
     "@relkit/routes": "workspace:*",
     "drizzle-orm": "catalog:",

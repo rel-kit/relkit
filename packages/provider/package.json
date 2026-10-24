@@ -23,6 +23,10 @@
   },
   "type": "module",
   "exports": {
+    "./internal/dependencies": {
+      "types": "./dist/dependency-preflight.service.d.ts",
+      "import": "./dist/dependency-preflight.service.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
@@ -30,9 +34,11 @@
   },
   "dependencies": {
     "@relkit/contracts": "workspace:*",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "semver": "7.8.5"
   },
   "devDependencies": {
+    "@types/semver": "7.8.0",
     "@vitest/coverage-v8": "catalog:",
     "vitest": "catalog:"
   },

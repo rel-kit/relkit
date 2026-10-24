@@ -3,11 +3,7 @@
  * Pure tables describe intentional leaf boundaries; callers compare these maps
  * against manifests before accepting package bytes. No filesystem work occurs here.
  */
-import {
-  appSubpaths,
-  catalogSubpaths,
-  integrationSubpaths,
-} from "./release-package-contract-tables.js";
+import { appSubpaths, integrationSubpaths } from "./release-package-contract-tables.js";
 import { packageLeafExports } from "./release-package-leaves.js";
 import type { ReleaseExports } from "./release-package-contract.types.js";
 
@@ -20,11 +16,7 @@ const rootExport = { types: "./dist/index.d.ts", import: "./dist/index.js" };
  * @returns The export map required by manifest and packed-resolution checks.
  */
 export function expectedExports(directoryName: string, packageName?: string): ReleaseExports {
-  if (packageName === "@relkit/integrations")
-    return Object.fromEntries([
-      [".", rootExport],
-      ...catalogSubpaths.map((subpath) => [`./${subpath}`, leaf(subpath)]),
-    ]);
+  if (packageName === "@relkit/integrations") return { ".": rootExport };
   const subpaths = packageName ? integrationSubpaths[packageName] : undefined;
   if (subpaths)
     return Object.fromEntries([

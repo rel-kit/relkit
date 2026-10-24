@@ -7,7 +7,7 @@ import type {
   StartedCandidate,
   SupervisorObservabilityOptions,
 } from "@relkit/supervisor";
-import type { DevInspectorOptions } from "./dev-process.types.js";
+import type { InspectionBridgeOptions } from "@relkit/inspector-api/connection";
 import type { CliAdapterError } from "../cli-errors.js";
 
 /** One admitted development log, rendered by the existing terminal policy. */
@@ -86,7 +86,8 @@ export interface DevOptions {
   /** Native verification transport; prepared sessions restrict bearer credentials to internal probes. */
   readonly candidateVerificationFetch?: typeof fetch;
   readonly drainTimeoutMs?: number;
-  readonly inspector?: DevInspectorOptions | false;
+  readonly inspector?: Pick<InspectionBridgeOptions, "host" | "port"> | false;
+  readonly inspectionRecords?: InspectionBridgeOptions["records"];
   /** Grace period after backend activation before optional inspector acquisition. */
   readonly supportStartupDelayMs?: number;
   readonly spawn?: typeof Bun.spawn;

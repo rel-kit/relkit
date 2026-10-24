@@ -1,5 +1,5 @@
 /** Composes auth over a borrowed database without taking a second disposal authority. */
-import { generateBetterAuthOpenApi } from "@relkit/better-auth";
+import { generateBetterAuthOpenApi } from "@relkit/better-auth/drizzle";
 import { createHttpAuthRuntime } from "@relkit/runtime-hono";
 import { Effect } from "effect";
 import type { TestRawRoute, TestRoute } from "./application-routes.js";
@@ -7,8 +7,9 @@ import type {
   ApplicationServicesPlatform,
   AuthDeclaration,
   NativeDatabase,
-  TestApplicationServices,
-} from "./application-services.types.js";
+} from "./application-native-services.types.js";
+import type { TestApplicationServices } from "./application-services.types.js";
+import { nativeServiceError } from "./application-errors.js";
 
 /**
  * Acquires the optional native auth handler and its protection runtime.
@@ -55,9 +56,7 @@ export const acquireApplicationAuth = Effect.fn("Testing.services.auth")(functio
  * @param cause - Rejection returned by native activation.
  * @returns The original Error or an Error carrying the foreign cause.
  */
-export function nativeServiceError<Failure>(cause: Failure): Error {
-  return cause instanceof Error ? cause : new Error("Native service activation failed", { cause });
-}
+export { nativeServiceError } from "./application-errors.js";
 
 /**
  * Recognizes the explicit native authentication mount.

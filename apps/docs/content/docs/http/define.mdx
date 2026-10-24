@@ -41,7 +41,8 @@ service-route commands need at least one `--map`; supported methods are `GET`, `
 
 Quote route paths so your shell does not expand `*` or `?`. Existing target files are never
 overwritten; edit an existing route to add another method. Run `bun run check`, then verify
-the endpoint and its entry in `/_relkit/v1/api-reference` while dev is running.
+the endpoint and its entry in `/_relkit/v1/openapi.json` while dev is running. The
+[Scalar UI](/docs/http/openapi) is available when explicitly selected.
 
 For every route scaffolding flag, see the [CLI reference](/docs/operations/cli-reference).
 

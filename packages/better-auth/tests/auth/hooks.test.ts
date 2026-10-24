@@ -1,9 +1,12 @@
+/** Checks reentrant native hooks against the actual database admission boundary.
+ * Explicit gates establish transaction ordering, inherited leases and shutdown settlement without timing assumptions.
+ */
 import { expect, it } from "@effect/vitest";
-import { Deferred, Effect, ManagedRuntime } from "effect";
-import { activateBetterAuthService, defineBetterAuthService } from "../../src/index.js";
+import { Deferred, Effect } from "effect";
+import { activateBetterAuthService, defineBetterAuthService } from "../../src/drizzle.js";
 import { authNativeAdapter } from "../../src/activation.js";
 import { AuthService, authNativeOf } from "../../src/auth.service.js";
-import { authTestLayer, nativeAuthStub } from "./auth-test-layer.js";
+import { managedTestAuth, nativeAuthStub } from "./auth-test-layer.js";
 import { coordinatedDatabase } from "./coordination-fixture.js";
 
 it.effect(
@@ -51,16 +54,9 @@ it.effect(
           return new Response("ok");
         },
       });
-      const owner = yield* Effect.acquireRelease(
-        Effect.sync(() =>
-          ManagedRuntime.make(
-            authTestLayer(
-              { database: fixture.database, options: {}, basePath: "/api/auth" },
-              Effect.succeed(native),
-            ),
-          ),
-        ),
-        (runtime) => Effect.promise(() => runtime.dispose()),
+      const owner = yield* managedTestAuth(
+        { database: fixture.database, options: {}, basePath: "/api/auth" },
+        Effect.succeed(native),
       );
       const service = yield* Effect.promise(() => owner.runPromise(AuthService));
       yield* Effect.promise(() =>
@@ -178,16 +174,9 @@ it.effect(
         },
         session: async () => fixture.read("nested session"),
       });
-      const owner = yield* Effect.acquireRelease(
-        Effect.sync(() =>
-          ManagedRuntime.make(
-            authTestLayer(
-              { database: fixture.database, options: {}, basePath: "/api/auth" },
-              Effect.succeed(native),
-            ),
-          ),
-        ),
-        (runtime) => Effect.promise(() => runtime.dispose()),
+      const owner = yield* managedTestAuth(
+        { database: fixture.database, options: {}, basePath: "/api/auth" },
+        Effect.succeed(native),
       );
       const service = yield* Effect.promise(() => owner.runPromise(AuthService));
       const adapter = authNativeAdapter(owner, authNativeOf(service));

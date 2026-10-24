@@ -1,10 +1,7 @@
-import { access, cp, mkdir, readFile, realpath } from "node:fs/promises";
+/** Proves peer-free authoring before loading selected public runtime entries with their real native peers. */
+import { access, cp, mkdir, readFile, realpath, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
-
-interface PackedManifest {
-  readonly dependencies?: Readonly<Record<string, string>>;
-  readonly exports?: Readonly<Record<string, unknown>>;
-}
+import type { PackageExportManifest as PackedManifest } from "./pack-export.types.js";
 
 export async function unpackTarball(tarball: string, target: string): Promise<void> {
   await mkdir(target, { recursive: true });
@@ -17,6 +14,17 @@ export async function unpackTarball(tarball: string, target: string): Promise<vo
     throw new Error(`tar extraction failed for ${tarball}\n${stderr}`);
 }
 
+/**
+ * Checks SDK-free descriptor roots before importing all selected public leaves with real peers.
+ * @param root - Owned independent integration consumers.
+ * @param repositoryRoot - Read-only generic dependency copy authority for authoring checks.
+ * @param packageDirectories - Native dependency search roots for those existing generic copies.
+ * @param integrationNames - Exact independent integration cohort.
+ * @param manifests - Validated first-party dependency and public-entry declarations.
+ * @param tarballs - Required first-party archives, never workspace source links.
+ * @param install - Captured real isolated installer for the selected runtime/testing leaves.
+ * @returns The number of integrations whose complete public-entry assertions passed.
+ */
 export async function smokeMinimalIntegrationInstalls(
   root: string,
   repositoryRoot: string,
@@ -24,6 +32,7 @@ export async function smokeMinimalIntegrationInstalls(
   integrationNames: ReadonlySet<string>,
   manifests: ReadonlyMap<string, PackedManifest>,
   tarballs: ReadonlyMap<string, string>,
+  install: (root: string, names: readonly string[]) => Promise<void>,
 ): Promise<number> {
   for (const name of [...integrationNames].sort()) {
     const closure = workspaceClosure(name, manifests);
@@ -44,7 +53,19 @@ export async function smokeMinimalIntegrationInstalls(
       repositoryRoot,
       packageDirectories,
     );
-    await importPublicEntries(fixture, name, manifests.get(name)?.exports);
+    const manifest = manifests.get(name);
+    const peers = Object.keys(manifest?.peerDependencies ?? {}).filter(
+      (peer) => !manifests.has(peer) && !(peer in (manifest?.dependencies ?? {})),
+    );
+    // LangChain's authoring root is intrinsically native; descriptor-only owners remain SDK-free.
+    if (name !== "@relkit/langchain")
+      await importPublicEntries(fixture, name, { ".": manifest?.exports?.["."] ?? "" }, peers);
+    try {
+      await install(fixture, [name]);
+      await importPublicEntries(fixture, name, manifest?.exports);
+    } finally {
+      await rm(join(fixture, "node_modules"), { recursive: true, force: true });
+    }
   }
   return integrationNames.size;
 }
@@ -105,7 +126,12 @@ function workspaceClosure(
   root: string,
   manifests: ReadonlyMap<string, PackedManifest>,
 ): Set<string> {
-  const names = [root];
+  const names = [
+    root,
+    ...Object.keys(manifests.get(root)?.peerDependencies ?? {}).filter((peer) =>
+      manifests.has(peer),
+    ),
+  ];
   for (let index = 0; index < names.length; index += 1) {
     for (const dependency of Object.keys(manifests.get(names[index]!)?.dependencies ?? {}))
       if (manifests.has(dependency) && !names.includes(dependency)) names.push(dependency);
@@ -127,7 +153,8 @@ function externalDependencies(
 async function importPublicEntries(
   cwd: string,
   packageName: string,
-  exports: Readonly<Record<string, unknown>> | undefined,
+  exports: PackedManifest["exports"],
+  absentPeers: readonly string[] = [],
 ): Promise<void> {
   const entries = Object.keys(exports ?? {}).map((key) =>
     key === "." ? packageName : `${packageName}${key.slice(1)}`,
@@ -137,8 +164,14 @@ async function importPublicEntries(
       "node",
       "--input-type=module",
       "--eval",
-      "for (const entry of JSON.parse(process.argv[1])) await import(entry);",
+      `for (const peer of JSON.parse(process.argv[2])) {
+        try { import.meta.resolve(peer); }
+        catch (error) { if (error.code === "ERR_MODULE_NOT_FOUND") continue; throw error; }
+        throw new Error("Unselected SDK is installed: " + peer);
+      }
+      for (const entry of JSON.parse(process.argv[1])) await import(entry);`,
       JSON.stringify(entries),
+      JSON.stringify(absentPeers),
     ],
     { cwd, stdout: "pipe", stderr: "pipe" },
   );

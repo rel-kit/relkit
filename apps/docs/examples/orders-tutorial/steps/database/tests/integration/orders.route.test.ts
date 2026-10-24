@@ -1,5 +1,6 @@
+/** Exercises the database tutorial through its explicitly selected native test owner. */
 import { afterAll, expect, test } from "bun:test";
-import { createTestApplication } from "@relkit/testing";
+import { createTestApplication } from "@relkit/testing/drizzle";
 import config from "../../relkit.config.js";
 const app = await createTestApplication(config);
 afterAll(() => app.close());
