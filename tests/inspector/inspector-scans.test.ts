@@ -3,12 +3,18 @@ import { resolve } from "node:path";
 import {
   FORBIDDEN_PAYLOAD_MARKERS,
   payloadViolations,
+  scanInspectorBundles,
   scanInspectorImports,
 } from "./inspector-scans.ts";
 
 const root = resolve(import.meta.dir, "../..");
 
 describe("inspector protocol boundary scans", () => {
+  test("rejects selected bundle directories outside the inspector", async () => {
+    for (const dist of ["../../..", "/tmp", "../inspector-other"])
+      await expect(scanInspectorBundles(root, dist)).rejects.toThrow("build directory");
+  });
+
   test("keeps imports and network access behind the local protocol clients", async () => {
     const result = await scanInspectorImports(root);
     expect(result.files).toBeGreaterThan(0);

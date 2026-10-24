@@ -81,6 +81,8 @@ export async function scanInspectorBundles(
   root: string,
   dist = ".next",
 ): Promise<InspectorBundleScan> {
+  if (!/^(?:\.next(?:-[\w-]+)?|\.relkit\/next-e2e-[\w-]+)$/.test(dist))
+    throw new TypeError("Invalid inspector build directory");
   const browser = await firstBundleFiles([
     resolve(root, "apps/inspector", dist, "static"),
     resolve(root, "apps/inspector", dist, "dev/static"),
@@ -145,7 +147,7 @@ async function filesUnder(directory: string): Promise<string[]> {
     for (const entry of await readdir(current, { withFileTypes: true })) {
       const path = resolve(current, entry.name);
       if (entry.isDirectory()) await visit(path);
-      else files.push(path);
+      else if (entry.isFile()) files.push(path);
     }
   }
   await visit(directory);

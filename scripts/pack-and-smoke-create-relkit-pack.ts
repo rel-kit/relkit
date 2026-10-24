@@ -1,6 +1,6 @@
 /** Reads and packs first-party release identities and owns the bounded candidate fixture registry listener. */
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { runCommand, type Manifest } from "./pack-and-smoke-create-relkit-support.js";
 import { workspacePackageDirectories } from "./workspace-packages.js";
 import { registryPackages, registryResponse, registryUpstream } from "./packed-registry-runtime.js";
@@ -94,7 +94,22 @@ export async function loadReleaseTarballs(directory: string): Promise<Map<string
   const manifest = JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")) as {
     packages: { name: string; file: string }[];
   };
-  return new Map(manifest.packages.map((item) => [item.name, join(directory, item.file)]));
+  const root = resolve(directory);
+  return new Map(
+    manifest.packages.map((item) => {
+      const archive = resolve(root, item.file);
+      const local = relative(root, archive);
+      if (
+        isAbsolute(item.file) ||
+        local === ".." ||
+        local.startsWith("../") ||
+        isAbsolute(local) ||
+        !local.endsWith(".tgz")
+      )
+        throw new TypeError("Release archive must remain inside its manifest directory");
+      return [item.name, archive];
+    }),
+  );
 }
 
 /**

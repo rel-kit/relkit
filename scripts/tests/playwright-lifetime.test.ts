@@ -16,6 +16,7 @@ import { closePlaywright } from "../playwright-cleanup.js";
 
 test("native Playwright SIGINT cleans descendants before fallback ownership runs", async () => {
   const artifacts = await mkdtemp(join(tmpdir(), "relkit-playwright-native-"));
+  const foreign = await mkdtemp(join(tmpdir(), "relkit-playwright-foreign-"));
   const port = await Effect.runPromise(scaffoldPort);
   try {
     await writeNativeFixture(artifacts, port);
@@ -30,7 +31,7 @@ test("native Playwright SIGINT cleans descendants before fallback ownership runs
             cwd: artifacts,
             args: [cli, "test", "--config=playwright.config.mjs"],
             env: {
-              RELKIT_E2E_ARTIFACTS: artifacts,
+              RELKIT_E2E_ARTIFACTS: foreign,
               RELKIT_LIFETIME_PORT: String(port),
               NODE_OPTIONS: "--max-old-space-size=512",
             },
@@ -41,11 +42,15 @@ test("native Playwright SIGINT cleans descendants before fallback ownership runs
           yield* Effect.promise(() => owner.settled).pipe(Effect.timeout("10 seconds"));
           // These checks run before scope release can invoke the fallback finalizer.
           yield* Effect.promise(() => assertDescendantsClosed(artifacts));
+          expect(
+            yield* Effect.promise(() => Bun.file(join(foreign, "descendants.json")).exists()),
+          ).toBe(false);
         }),
       ),
     );
   } finally {
     await rm(artifacts, { recursive: true, force: true });
+    await rm(foreign, { recursive: true, force: true });
   }
 }, 30000);
 
