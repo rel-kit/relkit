@@ -1,4 +1,4 @@
-/** Verifies native production start through public HTTP, observer pagination and joined external-abort shutdown. */
+/** Verifies native start through core HTTP, rich-inspection exclusion and joined external-abort shutdown. */
 import { expect, test } from "bun:test";
 import { readFile, writeFile } from "node:fs/promises";
 
@@ -15,7 +15,7 @@ import { registerCommandCleanup } from "../../tests/fixtures/cli/commands-core-f
 
 registerCommandCleanup();
 
-test("start serves health, graph, inspector collections, and rejects an invalid build", async () => {
+test("start serves core HTTP without rich inspection and rejects an invalid build", async () => {
   const root = await copyProject("tests/compiler/fixtures/valid-minimal");
   const built = await buildProject({ projectRoot: root });
   const manifestPath = join(built.buildDirectory, "manifest.json");

@@ -2,10 +2,17 @@
 import { afterEach, expect, test } from "bun:test";
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { Schema } from "effect";
 import { buildProject } from "./src/commands/build.js";
-import { startProject } from "./src/commands/start.js";
+import { openProductInspection } from "../../tests/fixtures/cli/product-inspection.js";
 import { linkWorkspacePackages } from "./test-workspace.js";
-import { eventually, invoke, page, readChunk } from "./product-runtime.fixture.js";
+import {
+  eventually,
+  invoke,
+  page,
+  readChunk,
+  requestDetailSchema,
+} from "./product-runtime.fixture.js";
 
 const roots: string[] = [];
 
@@ -15,25 +22,27 @@ test("the emitted full-graph server runs agents and correlated observability", a
   const built = await buildProject({ projectRoot: root });
   expect(built).toMatchObject({ ok: true });
   if (built.graphHash === undefined) throw new Error("Built graph hash is unavailable.");
-  const started = await startProject({
-    projectRoot: root,
-    port: 0,
-    healthTimeoutMs: 3_000,
-  });
-  const base = `http://${started.hostname}:${started.port}`;
+  const started = await openProductInspection(root);
+  const base = started.inspection;
   const streamController = new AbortController();
   const streamResponse = fetch(`${base}/_relkit/v1/stream`, { signal: streamController.signal });
+  void streamResponse.catch(() => undefined);
   try {
+    expect((await page(base, "/routes")).items).toContainEqual(
+      expect.objectContaining({ id: "orders.get-route" }),
+    );
+    expect((await page(base, "/functions")).items).toContainEqual(
+      expect.objectContaining({ id: "orders.create" }),
+    );
     const requestId = await verifyRouteStream(base, built.graphHash, streamResponse);
     streamController.abort();
     await verifyAgentDetail(base, built.graphHash, requestId);
     await verifyHistory(base, built.graphHash, requestId);
   } finally {
     streamController.abort();
-    await started.stop();
-    await started.exited;
+    await started.close();
   }
-});
+}, 60_000);
 
 async function verifyRouteStream(
   base: string,
@@ -70,9 +79,7 @@ async function verifyAgentDetail(base: string, graphHash: string, requestId: str
   if (agent.status !== 200) throw new Error(JSON.stringify(agentBody));
   expect(agentBody).toMatchObject({ output: { answer: "local answer" } });
 
-  const detail = await fetch(`${base}/_relkit/v1/requests/${requestId}`);
-  expect(detail.status).toBe(200);
-  expect(await detail.json()).toMatchObject({
+  const expected = {
     request: {
       requestId,
       functionId: "orders.get",
@@ -80,7 +87,19 @@ async function verifyAgentDetail(base: string, graphHash: string, requestId: str
     spans: expect.arrayContaining([
       expect.objectContaining({ functionId: "orders.get", status: "completed" }),
     ]),
+  };
+  let detail: typeof requestDetailSchema.Type | undefined;
+  await eventually(async () => {
+    const response = await fetch(`${base}/_relkit/v1/requests/${requestId}`);
+    if (response.status !== 200) return false;
+    detail = Schema.decodeUnknownSync(requestDetailSchema)(await response.json());
+    return (
+      detail.request.requestId === requestId &&
+      detail.request.functionId === "orders.get" &&
+      detail.spans.some((span) => span.functionId === "orders.get" && span.status === "completed")
+    );
   });
+  expect(detail).toMatchObject(expected);
 }
 
 async function verifyHistory(base: string, graphHash: string, requestId: string | null) {
@@ -88,6 +107,11 @@ async function verifyHistory(base: string, graphHash: string, requestId: string 
     orderId: "order-2",
     sku: "second-secret",
   });
+  expect(
+    await eventually(
+      async () => (await page(base, "/logs?functionId=orders.create&limit=2")).items.length === 2,
+    ),
+  ).toBe(true);
   const logs = await page(base, "/logs?functionId=orders.create&limit=1");
   expect(logs.items[0]).toMatchObject({ fields: {} });
   expect(JSON.stringify(logs)).not.toContain("pre-sink-secret");
@@ -97,6 +121,9 @@ async function verifyHistory(base: string, graphHash: string, requestId: string 
     `/logs?functionId=orders.create&limit=1&cursor=${logs.nextCursor}`,
   );
   expect(continued.items).toHaveLength(1);
+  expect(logs.items[0]?.invocationId).toBeString();
+  expect(continued.items[0]?.invocationId).toBeString();
+  expect(continued.items[0]?.invocationId).not.toBe(logs.items[0]?.invocationId);
 
   await expect(
     eventually(async () => {
@@ -113,6 +140,14 @@ async function verifyHistory(base: string, graphHash: string, requestId: string 
 }
 
 async function configureProductFixture(root: string): Promise<void> {
+  const configPath = join(root, "relkit.config.ts");
+  await writeFile(
+    configPath,
+    (await readFile(configPath, "utf8")).replace(
+      "defineApp({",
+      "defineApp({ inspector: { enabled: true },",
+    ),
+  );
   const agentPath = join(root, "src/orders/agents/order-support.agent.ts");
   const agent = await readFile(agentPath, "utf8");
   await writeFile(
