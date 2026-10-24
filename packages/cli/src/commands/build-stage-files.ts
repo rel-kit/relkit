@@ -63,6 +63,8 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
 ) {
   const files = yield* CliFileSystem;
   const outputs = input.checked.outputs;
+  const development =
+    input.options.mode === "development" || input.options.bundleInputInventory !== undefined;
   const entrypoint = yield* cliTry("build.serverSource", () =>
     serverSource(
       cohort.graph,
@@ -73,6 +75,8 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
       {
         ...cohort.tooling.server,
         maxPreviewBytes: cohort.tooling.inspector.maxPreviewBytes,
+        inspectorEnabled: development && cohort.tooling.inspector.enabled,
+        jobsAdministration: development && cohort.jobsManifest !== undefined,
         ...(input.options.bundleInputInventory === undefined
           ? {}
           : { httpApplication: "prepared" }),

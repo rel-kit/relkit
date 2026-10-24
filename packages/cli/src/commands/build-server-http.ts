@@ -6,6 +6,7 @@
  */
 import { serverHttpOptionsSource } from "./build-server-http-options.js";
 import { preparedInspectorSource } from "./build-server-deferred-inspector.js";
+import { serverJobsAdministrationSource } from "./build-server-jobs-administration.js";
 
 import type { ServerSourceConfiguration } from "./build-server.types.js";
 export type { ServerSourceConfiguration } from "./build-server.types.js";
@@ -18,6 +19,7 @@ export type { ServerSourceConfiguration } from "./build-server.types.js";
 export function serverHttpSource(configuration: ServerSourceConfiguration): string {
   const applicationSource = `const preparedApplication = await runtimeOwner.resource("http.application", async () => createPreparedApp(httpApplicationOptions, ${preparedInspectorSource(configuration)}), (value) => value.close());
 const app = preparedApplication.app;
+${serverJobsAdministrationSource(configuration)}
 `;
   const dispatchSource = "preparedApplication.fetch(request, bunServer)";
   return `const internalEndpointsEnabled = environment !== "production";

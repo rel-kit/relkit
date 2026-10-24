@@ -4,18 +4,23 @@ import { GRAPH_VERSION, type RuntimeActivationFingerprint } from "@relkit/contra
 import { serverSource } from "./src/commands/build-server.ts";
 
 const graphHash = "sha256:graph";
+const graph = { contractVersion: GRAPH_VERSION, appId: "test", nodes: [], edges: [] };
 const activationFingerprint: RuntimeActivationFingerprint = {
   graphHash,
   manifestHash: "sha256:manifest",
   runtimeIntegrationsPlanHash: "sha256:runtime-integrations",
 };
+const inspection = {
+  maxBodyBytes: 1_048_576,
+  apiDocs: { enabledInProduction: false },
+  clientContract: true,
+  mcp: false,
+  maxPreviewBytes: 1_048_576,
+  inspectorEnabled: true,
+};
 
 test("generated runtime carries and verifies its activation fingerprint", () => {
-  const source = serverSource(
-    { contractVersion: GRAPH_VERSION, appId: "test", nodes: [], edges: [] },
-    graphHash,
-    activationFingerprint,
-  );
+  const source = serverSource(graph, graphHash, activationFingerprint, {}, {}, inspection);
   expect(source).toContain(
     `const activationFingerprint = ${JSON.stringify(activationFingerprint)};`,
   );

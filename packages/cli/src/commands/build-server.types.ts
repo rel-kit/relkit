@@ -20,6 +20,9 @@ export interface ServerSourceConfiguration {
   readonly mcp: boolean;
   readonly agUi?: boolean;
   readonly maxPreviewBytes: number;
+  readonly inspectorEnabled?: boolean;
+  /** Existing native provider operations are available in development without inspection. */
+  readonly jobsAdministration?: boolean;
 }
 
 /** Pure source fragments derived from activation identities and declared features. */

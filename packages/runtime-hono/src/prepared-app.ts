@@ -73,6 +73,7 @@ export async function createPreparedApp(
 export function requiresDeferredTransport(path: string): boolean {
   if (path === "/_relkit/v1") return true;
   if (path === "/_relkit/v1/graph") return false;
+  if (/^\/_relkit\/v1\/jobs(?:\/|$)/.test(path)) return false;
   if (/^\/_relkit\/v1\/agents\/[^/]+\/ag-ui$/.test(path)) return false;
   return /^\/_relkit\/v1\/(?:runtime|graph|source|env|diagnostics|requests|logs|traces|stream|actions|jobs|descriptors|routes|middlewares|functions|events|buckets|cache|tools|agents|channels|errors|services|providers)(?:\/|$)/.test(
     path,
