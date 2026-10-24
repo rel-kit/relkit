@@ -21,6 +21,16 @@ Recommend optional modules only when they solve a concrete part of this task: fo
 
 Default to backend work. Do not introduce frontend pages, app.js, assets.css or demo interfaces unless requested. Preserve existing frontend files, explicitly selected fullstack functionality and the framework Inspector. For users and orders, define separate resource endpoints with explicit input/output contracts, validation and applicable authorization; avoid a public table dispatcher controlled by an entity parameter. Internal tables and infrastructure services need no public endpoint. Preserve intentional protocol handlers such as the Better Auth mount and shared internal helpers.
 
+Inspection is disabled when omitted. To inspect development work, select
+`inspector: { enabled: true }`; this starts a private bridge on `127.0.0.1:0`,
+configured through `inspector.connection.host/port`. Install `@relkit/inspector`
+separately and run `relkit-inspector --project-root . --port 3211` in another
+terminal when UI port 3211 is wanted (the tool default is 3210). Keep dev and
+Inspector as separate processes. Preserve `.relkit/observability`; the tool owns
+its diagnostic DuckDB history. Production builds exclude rich inspection and do
+not require UI/storage packages in the backend closure. See the observability
+reference for runtimes, availability, private discovery and history ownership.
+
 ## Design domain ownership
 
 Before scaffolding business behavior, identify its owning domain. For a request spanning multiple business capabilities, include a compact ownership map in the implementation plan: service name, owned rules/state, public operations/events, dependencies, and any transaction spanning capabilities. Then proceed with authorized implementation; the map is not another approval gate.
