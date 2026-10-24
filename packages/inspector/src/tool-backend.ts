@@ -2,7 +2,11 @@
 import { timingSafeEqual } from "node:crypto";
 import { Effect, Ref } from "effect";
 import { streamResponse } from "@relkit/inspector-api";
-import type { ObservabilityStream } from "@relkit/observability";
+import {
+  ObservabilityQueryError,
+  ObservabilityStreamError,
+  type ObservabilityStream,
+} from "@relkit/observability";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorToolState, InspectorToolStateRef } from "./tool-state.types.js";
 import type { InspectorOptions } from "./options.types.js";
@@ -66,7 +70,7 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
   const history = /^\/_relkit\/v1\/(logs|requests|traces)(?:\/([^/]+))?$/.exec(url.pathname);
   if (history && request.method === "GET") return yield* historyResponse(current, request, history);
   if (url.pathname === "/_relkit/v1/stream" && request.method === "GET")
-    return yield* Effect.sync(() => streamResponse(stream, request, 1));
+    return yield* localStreamResponse(stream, request);
   if (current.selection.state !== "connected")
     return backendError(
       current.selection.state === "ambiguous"
@@ -76,6 +80,24 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
     );
   return yield* forwardBackend(remote, current.selection.connection, request, options.target);
 });
+
+/**
+ * Converts expected native replay validation failures into the browser protocol.
+ * @param stream - Borrowed tool-owned event feed.
+ * @param request - Authenticated UI request carrying replay selectors and cancellation.
+ * @returns A lazy SSE response or 400 JSON; unexpected defects retain their identity.
+ */
+const localStreamResponse = Effect.fn("Inspector.streamResponse")(
+  (stream: ObservabilityStream, request: Request) =>
+    Effect.try(() => streamResponse(stream, request, 1)).pipe(
+      Effect.catch((error) => {
+        const cause = error.cause;
+        if (cause instanceof ObservabilityStreamError || cause instanceof ObservabilityQueryError)
+          return Effect.succeed(backendError(cause.code, 400));
+        return Effect.die(cause);
+      }),
+    ),
+);
 
 /** Projects history readiness without leaking private connection descriptors or credentials. */
 function backendStatus(current: InspectorToolState, path: string): Response | undefined {

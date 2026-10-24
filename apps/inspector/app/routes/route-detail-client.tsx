@@ -1,5 +1,6 @@
 "use client";
 
+/** Keeps route metadata and composer calls on one observed browser generation across rerenders. */
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { InspectorObject, ObservabilityPage } from "../../lib/api-types";
@@ -8,6 +9,7 @@ import { RouteComposer } from "./route-composer";
 import { RouteContract } from "./route-contract";
 
 export function RouteDetailClient() {
+  const [api] = useState(createInspectorClient);
   const params = useParams<{ id: string }>();
   const id = typeof params?.id === "string" ? params.id : "";
   const [route, setRoute] = useState<InspectorObject>();
@@ -31,7 +33,6 @@ export function RouteDetailClient() {
 
   useEffect(() => {
     if (id === "") return;
-    const api = createInspectorClient();
     void Promise.all([
       api.detail<InspectorObject>("routes", id),
       api
@@ -54,7 +55,7 @@ export function RouteDetailClient() {
         }
       })
       .catch(() => setError(true));
-  }, [id]);
+  }, [api, id]);
 
   if (error || route === undefined)
     return (
@@ -62,7 +63,6 @@ export function RouteDetailClient() {
         {error ? "The route API is unavailable." : "Loading route contract…"}
       </section>
     );
-  const api = createInspectorClient();
   return (
     <div className="route-page">
       <header className="page-heading">

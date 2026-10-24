@@ -42,6 +42,9 @@ export function selectedHttpCapabilities(
   const capabilities: OptionalHttpCapability[] = [];
   if (options.mcp?.enabled === true) capabilities.push("mcp");
   if (options.agUi === true) capabilities.push("ag-ui");
-  if (options.apiDocs?.ui === "scalar") capabilities.push("scalar");
+  const docs = options.apiDocs;
+  const docsEnabled =
+    docs?.mode === "production" ? docs.enabledInProduction === true : docs?.enabled !== false;
+  if (docsEnabled && docs?.ui === "scalar") capabilities.push("scalar");
   return capabilities;
 }
