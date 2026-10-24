@@ -1,0 +1,116 @@
+/** Proves CLI capture is memory-only, authenticated, redacted and independent of support bind failure. */
+import { expect, it } from "@effect/vitest";
+import { Effect, Layer } from "effect";
+import { InspectionNative, InspectionConnectionError } from "@relkit/inspector-api/connection";
+import type { InspectionNativeOperations } from "@relkit/inspector-api/connection";
+import { CliDevCapture } from "../../src/commands/dev-capture.service.js";
+
+/** Supplies bounded transport authority without ever opening a store or native socket. */
+function fixture(fail = false) {
+  let starts = 0;
+  let stops = 0;
+  let producer: Parameters<InspectionNativeOperations["listen"]>[1] | undefined;
+  const native: InspectionNativeOperations = {
+    listen: (_options, handler) =>
+      Effect.gen(function* () {
+        starts++;
+        if (fail)
+          return yield* new InspectionConnectionError({
+            operation: "fixture.bind",
+            cause: new Error("bind failed"),
+          });
+        producer = handler;
+        return yield* Effect.acquireRelease(Effect.succeed("http://127.0.0.1:43210"), () =>
+          Effect.sync(() => {
+            stops++;
+          }),
+        );
+      }),
+    forward: () => Effect.die("capture does not forward application operations"),
+  };
+  return {
+    starts: () => starts,
+    stops: () => stops,
+    producer: () => producer!,
+    layer: Layer.effect(CliDevCapture, CliDevCapture.make).pipe(
+      Layer.provide(Layer.succeed(InspectionNative, native)),
+    ),
+  };
+}
+
+it.effect("installed-but-disabled capture opens no support resource", () => {
+  const f = fixture();
+  return Effect.scoped(
+    Effect.gen(function* () {
+      const capture = yield* CliDevCapture.use((service) => service.acquire(false, {}));
+      expect(f.starts()).toBe(0);
+      expect(capture.environment.RELKIT_TELEMETRY_URL).toBeUndefined();
+      expect((yield* capture.records(new Request("http://localhost/v1/records"))).status).toBe(503);
+    }),
+  ).pipe(Effect.provide(f.layer));
+});
+
+it.effect("support bind failure degrades capture without preventing backend startup", () => {
+  const f = fixture(true);
+  return Effect.scoped(
+    Effect.gen(function* () {
+      const capture = yield* CliDevCapture.use((service) => service.acquire(true, {}));
+      expect(capture.environment.RELKIT_TELEMETRY_URL).toBeUndefined();
+      const status = yield* capture.records(new Request("http://localhost/v1/records"));
+      expect(yield* Effect.promise(() => status.json())).toMatchObject({ incomplete: true });
+    }),
+  ).pipe(Effect.provide(f.layer));
+});
+
+it.effect("validates producer auth/body and redacts before memory replay", () => {
+  const f = fixture();
+  return Effect.scoped(
+    Effect.gen(function* () {
+      const capture = yield* CliDevCapture.use((service) =>
+        service.acquire(true, { redaction: { redactKeys: ["customerEmail"] } }),
+      );
+      const send = (token: string, body: string) =>
+        f.producer()(
+          new Request("http://127.0.0.1:43210/records", {
+            method: "POST",
+            headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+            body,
+          }),
+        );
+      expect((yield* send("wrong", "{}")).status).toBe(401);
+      expect((yield* send(capture.environment.RELKIT_TELEMETRY_TOKEN!, "{")).status).toBe(400);
+      const body = JSON.stringify({
+        records: [
+          {
+            key: "producer:1",
+            origin: "application",
+            record: {
+              version: 2,
+              signal: "log",
+              timestamp: "2026-10-23T00:00:00.000Z",
+              level: "info",
+              component: "app",
+              message: "safe",
+              fields: { customerEmail: "private@example.test", password: "never" },
+            },
+          },
+        ],
+      });
+      expect((yield* send(capture.environment.RELKIT_TELEMETRY_TOKEN!, body)).status).toBe(200);
+      const records = yield* capture.records(new Request("http://localhost/v1/records"));
+      const bytes = yield* Effect.promise(() => records.text());
+      expect(bytes).toContain("safe");
+      expect(bytes).not.toContain("private@example.test");
+      expect(bytes).not.toContain("never");
+    }),
+  ).pipe(Effect.provide(f.layer));
+});
+
+it.effect("closing the session joins its exact producer listener once", () => {
+  const f = fixture();
+  return Effect.gen(function* () {
+    yield* Effect.scoped(CliDevCapture.use((service) => service.acquire(true, {})));
+    expect(f.starts()).toBe(1);
+    expect(f.stops()).toBe(1);
+  }).pipe(Effect.provide(f.layer));
+});
