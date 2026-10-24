@@ -89,6 +89,8 @@
     }
   },
   "scripts": {
+    "build:foundation": "tsc -p tsconfig.foundation.json --pretty false",
+    "typecheck:foundation": "tsc -p tsconfig.foundation.json --pretty false",
     "build": "tsc -b && bun run ../../scripts/prune-moved-authoring-artifacts.ts testing",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false"

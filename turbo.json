@@ -45,6 +45,34 @@
     "@relkit/cli#typecheck": {
       "cache": false
     },
+    "@relkit/testing#build:foundation": {
+      "cache": false,
+      "dependsOn": [
+        "@relkit/providers-local#build",
+        "@relkit/buckets#build",
+        "@relkit/cache#build",
+        "@relkit/config#build"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "@relkit/testing#typecheck:foundation": {
+      "cache": false,
+      "dependsOn": [
+        "@relkit/providers-local#typecheck",
+        "@relkit/buckets#typecheck",
+        "@relkit/cache#typecheck",
+        "@relkit/config#typecheck"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "@relkit/langchain#build": {
+      "dependsOn": ["^build", "@relkit/testing#build:foundation"],
+      "outputs": ["dist/**"]
+    },
+    "@relkit/langchain#typecheck": {
+      "dependsOn": ["^typecheck", "@relkit/testing#typecheck:foundation"],
+      "outputs": ["dist/**", "*.tsbuildinfo"]
+    },
     "@relkit/inspector#typecheck": {
       "cache": false
     },
