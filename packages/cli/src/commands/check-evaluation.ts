@@ -42,6 +42,7 @@ const readCheckSources = Effect.fn("Project.checkSources")(function* (
     projectRoot,
     discoverySources,
     options.configPath,
+    config.exclude,
   );
   return { config, discoverySources, prefiltered, declaredIntegrations };
 });

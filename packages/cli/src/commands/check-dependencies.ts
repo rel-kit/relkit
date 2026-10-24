@@ -28,16 +28,18 @@ const Plan = Schema.Struct({
  * @param projectRoot - Actual consuming application root.
  * @param sources - Unevaluated source snapshots already owned by the caller.
  * @param configurationPath - Exact selected config remains strict even under excluded source paths.
+ * @param exclude - Accepted compiler exclusions for ordinary application sources.
  * @returns Lazy validated integration metadata or original compiler I/O failure.
  */
 export const preflightSourceImports = Effect.fn("Project.preflightImports")(function* (
   projectRoot: string,
   sources: readonly CheckSource[],
   configurationPath = "relkit.config.ts",
+  exclude?: readonly string[],
 ) {
   const compiler = yield* CliCompiler;
   const candidates = yield* cliTry("project.dependencyImports", () =>
-    sourceIntegrationCandidates(projectRoot, sources, configurationPath),
+    sourceIntegrationCandidates(projectRoot, sources, configurationPath, exclude),
   );
   yield* checkSourceServiceRequirements(projectRoot, candidates);
   const packages = yield* compiler.integrationPackages(
