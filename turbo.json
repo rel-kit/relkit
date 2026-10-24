@@ -48,6 +48,7 @@
     "@relkit/testing#build:foundation": {
       "cache": false,
       "dependsOn": [
+        "@relkit/engine#build",
         "@relkit/providers-local#build",
         "@relkit/buckets#build",
         "@relkit/cache#build",
@@ -58,6 +59,7 @@
     "@relkit/testing#typecheck:foundation": {
       "cache": false,
       "dependsOn": [
+        "@relkit/engine#typecheck",
         "@relkit/providers-local#typecheck",
         "@relkit/buckets#typecheck",
         "@relkit/cache#typecheck",

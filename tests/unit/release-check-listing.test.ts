@@ -1,3 +1,4 @@
+/** Checks native archive listings for required assets and rejects development-only source or metadata. */
 import { expect, test } from "bun:test";
 import { assertListing } from "../../scripts/release-check-listing.ts";
 import type { PackageInfo } from "../../scripts/release-check-support.ts";
@@ -99,5 +100,13 @@ test("forbids the same catalog source pair in every unrelated package", () => {
   for (const asset of catalogAssets)
     expect(() => assertListing(unrelated, [...metadata, asset], {})).toThrow(
       `Packed development files found in @relkit/contracts: ${asset}`,
+    );
+});
+
+test("testing archives reject both standard and foundation incremental metadata", () => {
+  const testing: PackageInfo = { name: "@relkit/testing", directory: "/fixture", manifest: {} };
+  for (const name of ["tsconfig.tsbuildinfo", "tsconfig.foundation.tsbuildinfo"])
+    expect(() => assertListing(testing, [...metadata, `package/dist/${name}`], {})).toThrow(
+      `Packed development files found in @relkit/testing: package/dist/${name}`,
     );
 });

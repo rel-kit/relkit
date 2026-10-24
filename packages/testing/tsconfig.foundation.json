@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": false,
     "incremental": true,
-    "tsBuildInfoFile": "dist/tsconfig.foundation.tsbuildinfo"
+    "tsBuildInfoFile": "tsconfig.foundation.tsbuildinfo"
   },
   "include": [
     "src/fakes.ts",
