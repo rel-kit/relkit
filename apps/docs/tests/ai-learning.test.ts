@@ -81,6 +81,9 @@ test("documents native compatibility, typed state, graphs, persistence, and resu
   expect(native).toContain("explicit dynamic");
   expect(native).toContain("order-support.agent.ts");
   expect(native).toContain("order-deep.agent.ts");
+  expect(native).toContain("bun add @relkit/langchain");
+  expect(native).toContain("langsmith@0.10.8");
+  expect(native).not.toContain("runtime dependencies of `@relkit/agents`");
 
   const graph = await Bun.file(resolve(content, "ai/graphs-persistence.mdx")).text();
   expect(graph).toContain("order-review.agent.ts");

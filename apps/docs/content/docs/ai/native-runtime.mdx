@@ -16,12 +16,21 @@ The supported native cohort is tested together:
 | `langchain`            | `1.5.10` | Agents, native tools, middleware, and structured output     |
 | `@langchain/core`      | `1.2.9`  | Model, message, callback, and tool contracts                |
 | `@langchain/langgraph` | `1.4.14` | State, scheduling, checkpoints, commands, and interruptions |
+| `langsmith`            | `0.10.8` | Native SDK tracing and compatibility contracts              |
 | `deepagents`           | `1.13.3` | Optional subagents, skills, memory files, and backends      |
 | `@ag-ui/core`          | `0.0.59` | Public SSE agent-event schemas                              |
 
-`langchain` and LangGraph are runtime dependencies of `@relkit/agents`. Install a model-provider package
-in the application that constructs it. Install `deepagents@1.13.3` only when the declaration uses a deep
-capability.
+Native execution belongs to the explicit `@relkit/langchain` integration. Install it and the supported
+SDK peers in the application that declares native agents:
+
+```sh
+bun add @relkit/langchain langchain@1.5.10 @langchain/core@1.2.9 @langchain/langgraph@1.4.14 langsmith@0.10.8
+```
+
+Import native `defineAgent`, `defineGraph`, and persistence resources from `@relkit/langchain`.
+Generic descriptors and public event/state contracts remain available from `@relkit/app/agents`.
+Install the model-provider package used by the application separately. Add `deepagents@1.13.3` only
+when a declaration uses a deep capability; `@ag-ui/core` is needed only when the AG-UI transport is selected.
 
 If a deep capability is activated without that package, execution fails with
 `RELKIT_DEEPAGENTS_UNAVAILABLE` and names the required version. Optional model, saver, store, and backend
