@@ -1,6 +1,6 @@
 # OpenSpec: Lean Installation and Standalone Inspector
 
-> Stage 1 is accepted: 39/39 tasks. Actual packed Docker production, the complete `prepush` and uninterrupted `prepush:full` commands pass; retained evidence is in `docs/evidence/lean-install/stage-1.md`. Stage 2 remains 0/29 and unstarted under the user's explicit scope. Execution uses `openspec-apply-change`, `use-effect` and its required references, together with the applicable Superpowers execution workflow.
+> Stage 1 is accepted: 39/39 tasks. Stage 2 is accepted: 29/29 tasks. The complete current `prepush` and uninterrupted `prepush:full` commands, external installation/boundary matrix, native/browser/container acceptance and owned-resource cleanup pass. Retained evidence is in `docs/evidence/lean-install/stage-1.md` and `docs/evidence/standalone-inspector/stage-2.md`. Execution uses `openspec-apply-change`, `use-effect` and its required references, together with the applicable Superpowers execution workflow. Hosted CI, cloud acceptance and publication remain separate from this local acceptance.
 
 **Goal:** A normal RELKIT backend installs and runs without unselected SDK stacks or inspector UI/storage, while selected capabilities and independently enabled inspection preserve behavior.
 
@@ -25,13 +25,13 @@
 
 ## Review focus
 
-| ID | Failure input and expected outcome | Owning task groups |
-| --- | --- | --- |
-| R1 | Selected SDK disappears after preparation, while an unused capability has a missing peer: reject stale selected requirements before readiness; ignore unused capability requirements. | S1.2–S1.4, S1.7, S1.10 |
-| R2 | Inspection disabled or production override attempted: health/activation/client identity/jobs/realtime/RPC work; no production rich inspection. | S1.5, S2.1, S2.3–S2.4, S2.8 |
-| R3 | Commit succeeds but acknowledgement is lost, then the same span changes revision: deduplicate replayed envelope and preserve later update. | S2.5, S2.8 |
-| R4 | Bridge restarts or two sessions exist under Docker discovery: rotate safely, reject stale identity, demand explicit selection and preserve foreign descriptors. | S2.3–S2.6, S2.8 |
-| R5 | Relocated production-only artifact uses selected native modules/workers: ready behavior and shutdown without workspace/CLI fallback. | S1.7, S1.10, S2.8 |
+| ID  | Failure input and expected outcome                                                                                                                                                    | Owning task groups          |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| R1  | Selected SDK disappears after preparation, while an unused capability has a missing peer: reject stale selected requirements before readiness; ignore unused capability requirements. | S1.2–S1.4, S1.7, S1.10      |
+| R2  | Inspection disabled or production override attempted: health/activation/client identity/jobs/realtime/RPC work; no production rich inspection.                                        | S1.5, S2.1, S2.3–S2.4, S2.8 |
+| R3  | Commit succeeds but acknowledgement is lost, then the same span changes revision: deduplicate replayed envelope and preserve later update.                                            | S2.5, S2.8                  |
+| R4  | Bridge restarts or two sessions exist under Docker discovery: rotate safely, reject stale identity, demand explicit selection and preserve foreign descriptors.                       | S2.3–S2.6, S2.8             |
+| R5  | Relocated production-only artifact uses selected native modules/workers: ready behavior and shutdown without workspace/CLI fallback.                                                  | S1.7, S1.10, S2.8           |
 
 ## 1. S1.1 — Dependency ownership and reproducible baselines
 
@@ -258,9 +258,9 @@
 
 **Required evidence and gate contribution:** Stage-2 configuration matrix, emitted production registration scan and real HTTP endpoint results. Covers R2.
 
-- [ ] 11.1 [S2.1] Implement bridge configuration/defaults and obsolete-port rejection, keep tool UI settings separate; run C1 configuration cases.
-- [ ] 11.2 [S2.1] Exclude rich inspection from production regardless of configuration/legacy environment toggles while preserving core probes and business endpoints; run C1 production and disabled cases.
-- [ ] 11.3 [S2.1] Update creator defaults/current manually configured samples and config guidance directly, omitting tool/config unless selected; verify regenerated template snapshots and C1 installed-but-disabled case.
+- [x] 11.1 [S2.1] Implement bridge configuration/defaults and obsolete-port rejection, keep tool UI settings separate; run C1 configuration cases.
+- [x] 11.2 [S2.1] Exclude rich inspection from production regardless of configuration/legacy environment toggles while preserving core probes and business endpoints; run C1 production and disabled cases.
+- [x] 11.3 [S2.1] Update creator defaults/current manually configured samples and config guidance directly, omitting tool/config unless selected; verify regenerated template snapshots and C1 installed-but-disabled case.
 
 ## 12. S2.2 — Standalone distribution
 
@@ -278,9 +278,9 @@
 
 **Required evidence and gate contribution:** Stage-2 tarball inventories/checksums, required tool runtimes/native platforms/licenses, process ownership and tested package-runner syntax; publication remains not performed.
 
-- [ ] 12.1 [S2.2] Rename private UI workspace before registering the publishable tool, update selectors/build/release references and verify unique names through C1.
-- [ ] 12.2 [S2.2] Move packaging output out of CLI, include traced UI/native assets and store/launcher ownership; run C1/C2 and inspect actual tarballs.
-- [ ] 12.3 [S2.2] Implement explicit launcher options and scoped process tree, document canonical separate dev/inspector scripts and tested runner behavior; run external packed execution and C1 uninstall/cache/launch-choice cases.
+- [x] 12.1 [S2.2] Rename private UI workspace before registering the publishable tool, update selectors/build/release references and verify unique names through C1.
+- [x] 12.2 [S2.2] Move packaging output out of CLI, include traced UI/native assets and store/launcher ownership; run C1/C2 and inspect actual tarballs.
+- [x] 12.3 [S2.2] Implement explicit launcher options and scoped process tree, document canonical separate dev/inspector scripts and tested runner behavior; run external packed execution and C1 uninstall/cache/launch-choice cases.
 
 ## 13. S2.3 — Development and session ownership
 
@@ -298,10 +298,10 @@
 
 **Required evidence and gate contribution:** Stage-2 session/generation IDs, activation/drain traces, process cleanup counts and prepared-secret scans. Covers R2/R4.
 
-- [ ] 13.1 [S2.3] Remove UI lookup/spawn/probe/poll/reinstall errors and UI shutdown ownership from dev, keep normal local-service/reload/logging behavior; run C1 no-tool and lifetime cases.
-- [ ] 13.2 [S2.3] Acquire the bridge once per session, switch only on validated candidates and retain old-generation attribution; run C1 valid/rejected/repeated reload and ownership cases.
-- [ ] 13.3 [S2.3] Separate invalid configuration from bind/runtime bridge failure, bound recovery and retain backend readiness; run C1 failure/restart/prepared-secret cases.
-- [ ] 13.4 [S2.3] Update doctor and classify historical CLI versus live jobs/provider operations; preserve auth/operation IDs, add no new inspector alias and document optional local delegation only where already present; run C1/C2.
+- [x] 13.1 [S2.3] Remove UI lookup/spawn/probe/poll/reinstall errors and UI shutdown ownership from dev, keep normal local-service/reload/logging behavior; run C1 no-tool and lifetime cases.
+- [x] 13.2 [S2.3] Acquire the bridge once per session, switch only on validated candidates and retain old-generation attribution; run C1 valid/rejected/repeated reload and ownership cases.
+- [x] 13.3 [S2.3] Separate invalid configuration from bind/runtime bridge failure, bound recovery and retain backend readiness; run C1 failure/restart/prepared-secret cases.
+- [x] 13.4 [S2.3] Update doctor and classify historical CLI versus live jobs/provider operations; preserve auth/operation IDs, add no new inspector alias and document optional local delegation only where already present; run C1/C2.
 
 ## 14. S2.4 — Bridge protocol and private discovery
 
@@ -319,10 +319,10 @@
 
 **Required evidence and gate contribution:** Stage-2 protocol/schema/version tables, permission/atomic-file assertions, no-secret scans and mutation receipt cases. Covers R2/R4.
 
-- [ ] 14.1 [S2.4] Separate live projections/actions/collection from tool history, keep core business endpoints in place and bridge free of compiler/UI/store/SDK implementations; run C1 agentless and dependency scans.
-- [ ] 14.2 [S2.4] Implement private session descriptor publication with owner permissions, atomic replacement, containment/symlink checks and owner-only cleanup; run C1 collision/foreign/symlink/PID cases.
-- [ ] 14.3 [S2.4] Implement 0/1/multiple-session discovery with bounded retry, authenticated identity negotiation and explicit connection-file selection, no config execution; run C1 stale/cross-project/ambiguity cases.
-- [ ] 14.4 [S2.4] Authenticate/constrain every operation, preserve server-only credentials and existing authorization/idempotency, reject stale controls and blind retries after lost responses; run C1/C2 and update protocol/security guidance.
+- [x] 14.1 [S2.4] Separate live projections/actions/collection from tool history, keep core business endpoints in place and bridge free of compiler/UI/store/SDK implementations; run C1 agentless and dependency scans.
+- [x] 14.2 [S2.4] Implement private session descriptor publication with owner permissions, atomic replacement, containment/symlink checks and owner-only cleanup; run C1 collision/foreign/symlink/PID cases.
+- [x] 14.3 [S2.4] Implement 0/1/multiple-session discovery with bounded retry, authenticated identity negotiation and explicit connection-file selection, no config execution; run C1 stale/cross-project/ambiguity cases.
+- [x] 14.4 [S2.4] Authenticate/constrain every operation, preserve server-only credentials and existing authorization/idempotency, reject stale controls and blind retries after lost responses; run C1/C2 and update protocol/security guidance.
 
 ## 15. S2.5 — History, replay and bounded collection
 
@@ -340,11 +340,11 @@
 
 **Required evidence and gate contribution:** Stage-2 original/history checksums and readback, durable cursors versus commit receipts, per-boundary queue high-water marks/loss counters, fault outcomes, browser assertions and five-second flush cleanup. Covers R3.
 
-- [ ] 15.1 [S2.5] Make the standalone tool the sole DuckDB writer/query/retention/worker owner; preserve history/schema, detect writer locks and project-volume mismatches without deletion; run C1 history/conflict cases.
-- [ ] 15.2 [S2.5] Implement session/sequence durable replay identity with generation attribution and atomic data+identity commit before ack; run C1 lost-ack, disconnect, repeated-revision and old-generation cases.
-- [ ] 15.3 [S2.5] Enforce all design S2.5 limits: early 2048/2097152 (ceilings 65536/67108864), individual 1 MiB, batch 256/1 MiB, pending 2048/4 MiB, 100 ms flush, subscriber default64/max256/1 MiB, aggregate4 MiB and five-second flush; run C1 exact-bound/one-over cases with independent counters.
-- [ ] 15.4 [S2.5] Validate decoded redacted records, disconnect slow subscribers, bound failures/retries and preserve primary outcomes/durable jobs/checkpoints; run C1 privacy/worker/disk/permission/corruption cases.
-- [ ] 15.5 [S2.5] Update views and guidance for buffered/incomplete/gap/unavailable states, preserve real graph/log/trace/job/agent actions; run C2 browser workflows beyond homepage loading.
+- [x] 15.1 [S2.5] Make the standalone tool the sole DuckDB writer/query/retention/worker owner; preserve history/schema, detect writer locks and project-volume mismatches without deletion; run C1 history/conflict cases.
+- [x] 15.2 [S2.5] Implement session/sequence durable replay identity with generation attribution and atomic data+identity commit before ack; run C1 lost-ack, disconnect, repeated-revision and old-generation cases.
+- [x] 15.3 [S2.5] Enforce all design S2.5 limits: early 2048/2097152 (ceilings 65536/67108864), individual 1 MiB, batch 256/1 MiB, pending 2048/4 MiB, 100 ms flush, subscriber default64/max256/1 MiB, aggregate4 MiB and five-second flush; run C1 exact-bound/one-over cases with independent counters.
+- [x] 15.4 [S2.5] Validate decoded redacted records, disconnect slow subscribers, bound failures/retries and preserve primary outcomes/durable jobs/checkpoints; run C1 privacy/worker/disk/permission/corruption cases.
+- [x] 15.5 [S2.5] Update views and guidance for buffered/incomplete/gap/unavailable states, preserve real graph/log/trace/job/agent actions; run C2 browser workflows beyond homepage loading.
 
 ## 16. S2.6 — Docker distribution
 
@@ -362,9 +362,9 @@
 
 **Required evidence and gate contribution:** Stage-2 image digest, platforms/native assets, mount/network/UID inspection, credential rotation and persistence assertions, health/signal results and executed host/private-network examples. Covers R4.
 
-- [ ] 16.1 [S2.6] Add dedicated image build/release classification using existing infrastructure, package required runtime/native assets, non-root execution, signals and distinct health states; run C1 and image assertions in C2.
-- [ ] 16.2 [S2.6] Use read-only directory/secret mounts plus explicit history volume, default host-loopback UI publishing and no source/dependencies/env/Docker socket mounts; run C2 mount/history/recreation tests.
-- [ ] 16.3 [S2.6] Document and execute Desktop, Linux host-gateway and private-network binding/target/file-credential examples, preserving handshake identity during target override and atomic rotation; run C2 rotation/ambiguity/network cases without publishing.
+- [x] 16.1 [S2.6] Add dedicated image build/release classification using existing infrastructure, package required runtime/native assets, non-root execution, signals and distinct health states; run C1 and image assertions in C2.
+- [x] 16.2 [S2.6] Use read-only directory/secret mounts plus explicit history volume, default host-loopback UI publishing and no source/dependencies/env/Docker socket mounts; run C2 mount/history/recreation tests.
+- [x] 16.3 [S2.6] Document and execute Desktop, Linux host-gateway and private-network binding/target/file-credential examples, preserving handshake identity during target override and atomic rotation; run C2 rotation/ambiguity/network cases without publishing.
 
 ## 17. S2.7 — Documentation, templates, skills and releases
 
@@ -382,9 +382,9 @@
 
 **Required evidence and gate contribution:** Stage-2 source-to-derived inventory, canonical/distributed skill parity, executable guide results, intentional import/config changes, changesets and package classification; preserve independent versions.
 
-- [ ] 17.1 [S2.7] Reconcile source documentation/config/help/JSDoc with actual installs, supported ranges, bridge/UI addresses, tool prerequisites, session selection, capture limits, history and production exclusion; run C1 and guide scenarios.
-- [ ] 17.2 [S2.7] Update templates/examples/canonical skills and distributed copies via their producers, retain lean and explicitly inspected examples plus selected frontend/data/migrations/repair; run C2 and packed instruction flows.
-- [ ] 17.3 [S2.7] Register every new/renamed package in TypeScript/Turbo/structural/export/API/packing/changeset/release machinery without exemptions; run C3 and release contract tests, record publication as separately authorized.
+- [x] 17.1 [S2.7] Reconcile source documentation/config/help/JSDoc with actual installs, supported ranges, bridge/UI addresses, tool prerequisites, session selection, capture limits, history and production exclusion; run C1 and guide scenarios.
+- [x] 17.2 [S2.7] Update templates/examples/canonical skills and distributed copies via their producers, retain lean and explicitly inspected examples plus selected frontend/data/migrations/repair; run C2 and packed instruction flows.
+- [x] 17.3 [S2.7] Register every new/renamed package in TypeScript/Turbo/structural/export/API/packing/changeset/release machinery without exemptions; run C3 and release contract tests, record publication as separately authorized.
 
 ## 18. S2.8 — Final gate
 
@@ -402,36 +402,36 @@
 
 **Required evidence and gate contribution:** Stage-2 final comparison and commands/results, failed/noisy observations, measured size/count budgets, exact tested hashes/platforms, Effect per-file reviews and remaining external release evidence. No claim of hosted CI/publication/registry proof from local commands.
 
-- [ ] 18.1 [S2.8] Remove every temporary inspector path exemption and run C1 across all matching external fixtures; reject forbidden dependencies regardless of total size improvements.
-- [ ] 18.2 [S2.8] Execute the final scenario matrix and R1–R5 through owning boundary tests, including actual browser/Docker/native checks and relocated production-only closure; record unavailable prerequisites as incomplete.
-- [ ] 18.3 [S2.8] Run C2 in current required build order with supported worker/resource limits, review every changed authored file under use-effect and rerun checks invalidated by fixes; verify all owned processes/resources are cleaned up.
-- [ ] 18.4 [S2.8] Reconcile final ownership, API/config docs and measured budgets against S1.1, preserve historical failures and functional/performance distinction, then record final acceptance only if every required row passes without cloud/publication assumptions.
+- [x] 18.1 [S2.8] Remove every temporary inspector path exemption and run C1 across all matching external fixtures; reject forbidden dependencies regardless of total size improvements.
+- [x] 18.2 [S2.8] Execute the final scenario matrix and R1–R5 through owning boundary tests, including actual browser/Docker/native checks and relocated production-only closure; record unavailable prerequisites as incomplete.
+- [x] 18.3 [S2.8] Run C2 in current required build order with supported worker/resource limits, review every changed authored file under use-effect and rerun checks invalidated by fixes; verify all owned processes/resources are cleaned up.
+- [x] 18.4 [S2.8] Reconcile final ownership, API/config docs and measured budgets against S1.1, preserve historical failures and functional/performance distinction, then record final acceptance only if every required row passes without cloud/publication assumptions.
 
 ## Requirement coverage
 
 Every design section below retains the original brief's obligations and its review additions. The matching task group implements the whole section, including its acceptance paragraph. Delta requirements express observable behavior; pure ownership/execution details remain in design/tasks.
 
-| Source section | Design decision | Delta capabilities | Task group / evidence |
-| --- | --- | --- | --- |
-| S1.1 | Reproducible actual-consumer baselines and four boundaries | workspace-foundation; acceptance-verification | 1; baseline.json/stage-1.md |
-| S1.2 | Shared selected dependency metadata and producer integrity | workspace-foundation; provider-bindings | 2; packed manifests/ranges |
-| S1.3 | Static preflight, correct resolver context and failure categories | provider-bindings; compiler-graph | 3; typed diagnostics/no mutation |
-| S1.4 | Generic declarations versus explicit native execution | public-authoring; tools-agents | 4; agent/native/state parity |
-| S1.5 | Independent transports/docs and core endpoint classification | http-runtime | 5; real HTTP/lifecycle/security |
-| S1.6 | Generic client/testing, selected frontend/auth/database | typed-agent-client; workspace-foundation | 6; strict consumer declarations |
-| S1.7 | Runtime lifecycle, JS start, native artifact closure | cli-scaffolding; pulumi-aws-deployment; compiler-graph | 7; relocated production |
-| S1.8 | Lightweight observability and explicit local store | observability | 8; history/worker/import proof |
-| S1.9 | Creator/wrapper/AST tooling/catalog/starter selection | cli-scaffolding; workspace-foundation | 9; runner/no-install/repair |
-| S1.10 | Stage admission with exact temporary exceptions | acceptance-verification | 10; stage-1.md |
-| S2.1 | Omitted-disabled, bridge configuration, production exclusion | public-authoring; development-inspector; http-runtime | 11; four-state configuration matrix |
-| S2.2 | Private UI rename and standalone tool packaging | development-inspector; cli-scaffolding; workspace-foundation | 12; tarballs/runtime/process proof |
-| S2.3 | Session versus generation versus tool lifetime | development-inspector; cli-scaffolding | 13; reload/bind/restart cleanup |
-| S2.4 | Authenticated private discovery and live actions | development-inspector; http-runtime | 14; protocol/security/file ownership |
-| S2.5 | Tool-owned history, bounded collection and durable replay | observability; development-inspector; typed-agent-client | 15; commit/revision/fault/browser |
-| S2.6 | Independent restricted Docker execution | development-inspector; developer-documentation | 16; native/container/network evidence |
-| S2.7 | Executable docs/templates/skills and producer registration | developer-documentation; workspace-foundation | 17; generated/packed parity |
-| S2.8 | No-exception final gate and measured budgets | acceptance-verification | 18; stage-2.md |
-| Shared contract | Effect guidance, data preservation, selected frontend, four independent boundaries | existing acceptance-verification per-file review plus all applicable deltas | Every task; per-file review/evidence |
+| Source section  | Design decision                                                                    | Delta capabilities                                                          | Task group / evidence                 |
+| --------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------- |
+| S1.1            | Reproducible actual-consumer baselines and four boundaries                         | workspace-foundation; acceptance-verification                               | 1; baseline.json/stage-1.md           |
+| S1.2            | Shared selected dependency metadata and producer integrity                         | workspace-foundation; provider-bindings                                     | 2; packed manifests/ranges            |
+| S1.3            | Static preflight, correct resolver context and failure categories                  | provider-bindings; compiler-graph                                           | 3; typed diagnostics/no mutation      |
+| S1.4            | Generic declarations versus explicit native execution                              | public-authoring; tools-agents                                              | 4; agent/native/state parity          |
+| S1.5            | Independent transports/docs and core endpoint classification                       | http-runtime                                                                | 5; real HTTP/lifecycle/security       |
+| S1.6            | Generic client/testing, selected frontend/auth/database                            | typed-agent-client; workspace-foundation                                    | 6; strict consumer declarations       |
+| S1.7            | Runtime lifecycle, JS start, native artifact closure                               | cli-scaffolding; pulumi-aws-deployment; compiler-graph                      | 7; relocated production               |
+| S1.8            | Lightweight observability and explicit local store                                 | observability                                                               | 8; history/worker/import proof        |
+| S1.9            | Creator/wrapper/AST tooling/catalog/starter selection                              | cli-scaffolding; workspace-foundation                                       | 9; runner/no-install/repair           |
+| S1.10           | Stage admission with exact temporary exceptions                                    | acceptance-verification                                                     | 10; stage-1.md                        |
+| S2.1            | Omitted-disabled, bridge configuration, production exclusion                       | public-authoring; development-inspector; http-runtime                       | 11; four-state configuration matrix   |
+| S2.2            | Private UI rename and standalone tool packaging                                    | development-inspector; cli-scaffolding; workspace-foundation                | 12; tarballs/runtime/process proof    |
+| S2.3            | Session versus generation versus tool lifetime                                     | development-inspector; cli-scaffolding                                      | 13; reload/bind/restart cleanup       |
+| S2.4            | Authenticated private discovery and live actions                                   | development-inspector; http-runtime                                         | 14; protocol/security/file ownership  |
+| S2.5            | Tool-owned history, bounded collection and durable replay                          | observability; development-inspector; typed-agent-client                    | 15; commit/revision/fault/browser     |
+| S2.6            | Independent restricted Docker execution                                            | development-inspector; developer-documentation                              | 16; native/container/network evidence |
+| S2.7            | Executable docs/templates/skills and producer registration                         | developer-documentation; workspace-foundation                               | 17; generated/packed parity           |
+| S2.8            | No-exception final gate and measured budgets                                       | acceptance-verification                                                     | 18; stage-2.md                        |
+| Shared contract | Effect guidance, data preservation, selected frontend, four independent boundaries | existing acceptance-verification per-file review plus all applicable deltas | Every task; per-file review/evidence  |
 
 ## Implementation verification sequence
 
