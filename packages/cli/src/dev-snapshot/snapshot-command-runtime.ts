@@ -15,9 +15,7 @@ import { snapshotProbeLive } from "./snapshot-probe.service.js";
 import { snapshotFallbackLive } from "./snapshot-fallback.service.js";
 import { snapshotSessionCompilersLive } from "./snapshot-session-compiler.service.js";
 import { httpLayer } from "../services/http.service.js";
-import { telemetryListenerLayer } from "../commands/dev-telemetry-listener.service.js";
-import { telemetryStorageLayer } from "../commands/dev-telemetry-storage.service.js";
-import { telemetryRelaysLayer } from "../commands/dev-telemetry-relay.service.js";
+import { devCaptureLayer } from "../commands/dev-capture.service.js";
 
 const authorities = Layer.mergeAll(
   DependencySourceLive,
@@ -28,14 +26,11 @@ const authorities = Layer.mergeAll(
   snapshotFallbackLive,
   snapshotProbeLive,
   httpLayer,
-  telemetryListenerLayer,
+  devCaptureLayer,
 );
-const support = telemetryStorageLayer.pipe(Layer.provideMerge(authorities));
-const policies = Layer.mergeAll(
-  devSnapshotsLive,
-  snapshotCandidatesLive,
-  telemetryRelaysLayer,
-).pipe(Layer.provideMerge(support));
+const policies = Layer.mergeAll(devSnapshotsLive, snapshotCandidatesLive).pipe(
+  Layer.provideMerge(authorities),
+);
 
 /** One memoized live graph exposes session policy and its shared native authorities. */
 export const preparedDevRuntime = snapshotSessionCompilersLive.pipe(Layer.provideMerge(policies));

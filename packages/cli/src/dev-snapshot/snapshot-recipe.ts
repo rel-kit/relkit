@@ -144,7 +144,8 @@ export function snapshotReceipt(
     ...(checked.config === undefined
       ? {}
       : {
-          ports: { backend: checked.config.server.port, inspector: checked.config.inspector.port },
+          ports: { backend: checked.config.server.port },
+          inspector: checked.config.inspector,
         }),
     tools,
     readiness: cohort.readiness,
