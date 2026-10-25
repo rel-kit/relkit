@@ -23,7 +23,11 @@ The [`defineJob` example](/docs/modules/jobs/quickstart#2-expose-a-job) names th
 and exposes `trigger`, `get`, `list`, and `watch`. After [frontend setup](/guides/frontend/connect-react)
 and pulling that backend's contract, render this component under `RelkitClientProvider`:
 
-<include source="apps/docs/examples/frontend/export-orders.tsx" lang="tsx" meta='title="src/ExportOrders.tsx"'>
+<include
+  source="apps/docs/examples/frontend/export-orders.tsx"
+  lang="tsx"
+  meta='title="src/ExportOrders.tsx"'
+>
   /_snippets/source/apps/docs/examples/frontend/export-orders.tsx
 </include>
 
@@ -32,13 +36,13 @@ The hook selector is the job's public **name**, `exportOrders`, rather than its 
 receipt metadata. `useJobRun` waits for an accepted `runId`; mounting it does not submit a job.
 Persist that receipt in your application's own UI state if the page must restore it after navigation.
 
-| Client API | Backend policy required | Use |
-| --- | --- | --- |
-| [`useJobTrigger`](/docs/api/client#usejobtrigger) | `trigger` | Submit typed task input and receive a run handle. |
-| [`useJobRun`](/docs/api/client#usejobrun) / [`watchJobRun`](/docs/api/client#watchjobrun) | `watch` | Observe only the fields selected by the job's client policy. |
-| [`useJobCancel`](/docs/api/client#usejobcancel) | `cancel` | Send an explicit control with `runId` and `operationId`. |
-| [`useJobRetry`](/docs/api/client#usejobretry) | `retry` | Ask the provider to retry a run explicitly. |
-| [`watchJobStream`](/docs/api/client#watchjobstream) | `streams` and a declared named stream | Read the run's named content stream with its own lifecycle. |
+| Client API                                                                                | Backend policy required               | Use                                                          |
+| ----------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
+| [`useJobTrigger`](/docs/api/client#usejobtrigger)                                         | `trigger`                             | Submit typed task input and receive a run handle.            |
+| [`useJobRun`](/docs/api/client#usejobrun) / [`watchJobRun`](/docs/api/client#watchjobrun) | `watch`                               | Observe only the fields selected by the job's client policy. |
+| [`useJobCancel`](/docs/api/client#usejobcancel)                                           | `cancel`                              | Send an explicit control with `runId` and `operationId`.     |
+| [`useJobRetry`](/docs/api/client#usejobretry)                                             | `retry`                               | Ask the provider to retry a run explicitly.                  |
+| [`watchJobStream`](/docs/api/client#watchjobstream)                                       | `streams` and a declared named stream | Read the run's named content stream with its own lifecycle.  |
 
 Cancel, retry, and named streams are not exposed by this example's policy. Declare the needed
 operations on the backend and pull a new contract before using them. Generated types also restrict
