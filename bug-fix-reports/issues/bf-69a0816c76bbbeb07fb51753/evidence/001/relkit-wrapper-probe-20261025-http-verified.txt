@@ -1,0 +1,6 @@
+Command: ['bun', 'run', 'dev', '--port', '51076', '--log-level', 'error', '--no-color']
+Working directory: /Users/mustafaelsayed/Workspace/typescripts/relkit-wrapper-probe-20261025
+$ relkit dev --port "51076" --log-level error --no-color
+relkit-wrapper-probe-20261025: GET /hello?name=RelKit -> {'message': 'Hello, RelKit!'}; empty name -> HTTP 422 {'error': 'validation', 'issues': [{'code': 'validation', 'message': 'Must contain at least 1 characters', 'path': ['name']}]}.
+RELKIT_INTERRUPTED: Received SIGTERM.
+error: script "dev" exited with code 143

@@ -1,0 +1,40 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/local-workspace.test.ts:
+[18:49:41.049] INFO (#59): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.terminal",
+  outcome: "success",
+  duration_ms: 6276.106667,
+}
+(pass) local create installs workspace links after jobs and final confirmation [6326.90ms]
+(pass) local create preserves unrelated dependency versions when linking RELKIT packages [28.26ms]
+(pass) doctor accepts local RELKIT package links [3.71ms]
+(pass) local add installs workspace integration exports for a full service bundle [6935.01ms]
+(pass) local launcher exposes the shared add API for events and routes [822.49ms]
+
+tests/generator/failure-cleanup.test.ts:
+(pass) cleans the staged sibling after an injected copy failure [11.08ms]
+(pass) cleans the staged sibling after an injected substitute failure [24.03ms]
+(pass) cleans the staged sibling after an injected install failure [19.25ms]
+(pass) cleans the staged sibling after an injected git failure [17.77ms]
+(pass) cleans the staged sibling after an injected doctor failure [18.84ms]
+(pass) cleans the staged sibling after an injected check failure [19.58ms]
+(pass) cleans the staged sibling after an injected rename failure [19.94ms]
+(pass) preserves an existing empty destination when publication fails [19.73ms]
+(pass) refuses broad cleanup paths without recursive deletion [0.68ms]
+
+tests/generator/local-workspace-native.test.ts:
+(pass) local create shares matching native dependencies without changing different versions [22.46ms]
+(pass) local links keep web dependencies local and repair previously linked inspector packages [18.60ms]
+(pass) local launcher and linked CLI hide workspace build output [13615.18ms]
+
+packages/create-relkit/tests/generation-preparation.test.ts:
+(pass) finite preparation is the only compiler command and its artifact survives atomic rename [36.90ms]
+(pass) preparation rejection cleans its private stage and preserves an existing empty destination [29.15ms]
+(pass) no-install performs no preparation subprocess and reports the finite workflow [26.62ms]
+
+ 20 pass
+ 0 fail
+ 110 expect() calls
+Ran 20 tests across 4 files. [28.50s]

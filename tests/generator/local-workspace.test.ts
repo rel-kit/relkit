@@ -13,7 +13,7 @@ import { runScaffoldTerminal } from "../../scripts/scaffold-smoke-terminal.ts";
 const roots: string[] = [];
 const successful = new Set<string>();
 
-test("local create asks for jobs and final confirmation when other choices are explicit", async () => {
+test("local create installs workspace links after jobs and final confirmation", async () => {
   const parent = await mkdtemp(join(tmpdir(), "relkit-local-create-terminal-"));
   roots.push(parent);
   const result = await runScaffoldTerminal(
@@ -29,7 +29,6 @@ test("local create asks for jobs and final confirmation when other choices are e
       "none",
       "--deploy",
       "none",
-      "--no-install",
       "--no-git",
       "--examples",
     ],
@@ -48,6 +47,10 @@ test("local create asks for jobs and final confirmation when other choices are e
   expect(result.output).not.toContain("Initialize a Git repository?");
   expect(result.output).not.toContain("Planned project");
   expect(await Bun.file(join(parent, "app/package.json")).exists()).toBe(true);
+  const manifest = await Bun.file(join(parent, "app/package.json")).json();
+  expect(manifest.dependencies["@relkit/app"]).toBe("link:@relkit/app");
+  const graph = Bun.file(join(parent, "app/.relkit/generated/application.graph.json"));
+  expect(await graph.exists()).toBe(true);
   successful.add(parent);
 }, 600_000);
 

@@ -1,0 +1,5 @@
+Command: ['bun', 'run', 'dev', '--port', '51134', '--log-level', 'error', '--no-color']
+Working directory: /Users/mustafaelsayed/Workspace/typescripts/relkit-demo-7
+$ relkit dev --port "51134" --log-level error --no-color
+relkit-demo-7: GET /hello?name=RelKit -> {'message': 'Hello, RelKit!'}; empty name -> HTTP 422 {'error': 'validation', 'issues': [{'code': 'validation', 'message': 'Must contain at least 1 characters', 'path': ['name']}]}.
+error: script "dev" exited with code 143

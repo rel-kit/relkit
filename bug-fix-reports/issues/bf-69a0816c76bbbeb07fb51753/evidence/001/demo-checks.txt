@@ -1,0 +1,10 @@
+Working directory: /Users/mustafaelsayed/Workspace/typescripts/relkit-demo-7
+Command: bun run typecheck && bun run test
+Exit code: 0
+$ tsc --noEmit
+$ bun test
+tests/unit/hello.function.test.ts: hello returns a greeting passed.
+tests/integration/hello.route.test.ts: GET /hello passed.
+2 pass, 0 fail, 3 assertions.
+
+The demo was generated using the standard CLI with installed published dependencies before the contributor shell override was identified. Its manifest remains unchanged. Both the demo and a separate workspace-linked contributor project were verified over real HTTP.

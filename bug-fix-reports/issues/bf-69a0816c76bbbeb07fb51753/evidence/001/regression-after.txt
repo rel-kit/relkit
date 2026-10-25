@@ -1,0 +1,30 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/local-workspace.test.ts:
+[18:49:13.194] INFO (#59): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.terminal",
+  outcome: "success",
+  duration_ms: 5681.532708,
+}
+47 |   expect(result.output).not.toContain("Initialize a Git repository?");
+48 |   expect(result.output).not.toContain("Planned project");
+49 |   expect(await Bun.file(join(parent, "app/package.json")).exists()).toBe(true);
+50 |   const manifest = await Bun.file(join(parent, "app/package.json")).json();
+51 |   expect(manifest.dependencies["@relkit/app"]).toBe("link:@relkit/app");
+52 |   expect(await Bun.file(join(parent, "app/.relkit/generated/graph.json")).exists()).toBe(true);
+                                                                                         ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/local-workspace.test.ts:52:85)
+Failed local workspace fixture retained: /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-local-create-terminal-NN5E0E
+(fail) local create installs workspace links after jobs and final confirmation [5694.13ms]
+
+ 0 pass
+ 4 filtered out
+ 1 fail
+ 11 expect() calls
+Ran 1 test across 1 file. [6.18s]

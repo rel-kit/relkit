@@ -1,0 +1,19 @@
+{
+  "key": "contributor",
+  "matches": {
+    "bf-69a0816c76bbbeb07fb51753": {
+      "id": "bf-69a0816c76bbbeb07fb51753",
+      "status": "verified",
+      "what": "Contributor relkit create fails to publish a minimal project with no jobs.",
+      "root_cause": "packages/cli/src/local.ts forwarded generator-owned dev --prepare after installing mutable workspace links. packages/compiler/src/typecheck-inputs-native.ts:55-60 intentionally excludes externally linked declarations from portable snapshot evidence and requires ordinary checking.",
+      "fixed_by": "The contributor adapter selects the existing full check for generator-owned dev --prepare while preserving project-root arguments, exit failures, cancellation, and cleanup. The interactive regression and original contributor wrapper now succeed. 20 focused tests, typechecking, formatting, boundaries, and live HTTP chec",
+      "files": [
+        "packages/cli/src/local.ts",
+        "tests/generator/local-workspace.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-25T18:53:00+00:00",
+      "report": "bug-fix-reports/issues/bf-69a0816c76bbbeb07fb51753/report.md"
+    }
+  }
+}

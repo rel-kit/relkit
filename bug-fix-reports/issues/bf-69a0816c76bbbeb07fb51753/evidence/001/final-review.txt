@@ -1,0 +1,7 @@
+git diff --check: exit 0.
+Final source changes: packages/cli/src/local.ts and tests/generator/local-workspace.test.ts.
+TypeScript AST line check: local.ts has 176 physical lines and maximum 32 function code lines; local-workspace.test.ts has 158 physical lines and maximum 38 function code lines.
+No new dependency, public API, snapshot exception, service, error recovery, concurrency, or cleanup policy was introduced. Ordinary creation and no-install paths retain their existing tests.
+Effect remains 4.0.1. The read-only repos/effect checkout lacks core Effect.ts and the repository AGENTS/LLMS files. Installed Effect 4.0.1 implementation and TSDoc examples plus available upstream StackCapture.test.ts were inspected for the existing Effect.fn workflow. Only pure command argument selection changed within it.
+The first post-fix test reached successful creation but exposed an incorrect fixture filename assertion (graph.json instead of application.graph.json). It was corrected and the test passed. An initial HTTP probe expected status 400; the established validation contract is 422, confirmed in existing runtime tests and the actual response. The corrected probes passed without product changes.
+Changes remain uncommitted. Full repository acceptance, Docker, cloud acceptance, and publishing were not run.
