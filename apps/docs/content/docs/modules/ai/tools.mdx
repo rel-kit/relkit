@@ -13,7 +13,8 @@ model SDK. Choose [native agent installation](/guides/ai/build-an-offline-agent)
 or [MCP installation](/docs/modules/ai/mcp) only for that external protocol.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Use an existing application with a function to expose. [Create an application](/docs/learn/create-an-app) if you need one.
+  Use an existing application with a function to expose. [Create an
+  application](/docs/learn/create-an-app) if you need one.
 </Callout>
 
 ## Scaffold a function-backed tool
@@ -110,4 +111,3 @@ Set `timeoutMs` to limit how long the tool can run. It is optional in the tool A
 Add the tool to an [agent's `tools` array](/docs/modules/ai/agents) to let that agent call it.
 
 Tools are also available through [MCP](/docs/modules/ai/mcp) by default. Set `mcp: false` in the tool options to keep a tool out of MCP; it can still be used by your RELKIT agents.
-

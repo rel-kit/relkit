@@ -9,8 +9,9 @@ sidebar:
 Stream agent updates to a client while keeping cancellation and other controls available.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Complete the [native agent installation and runtime bindings](/guides/ai/build-an-offline-agent) first.
-For a browser caller, also complete [frontend client setup](/docs/modules/client) in its own package.
+  Complete the [native agent installation and runtime bindings](/guides/ai/build-an-offline-agent)
+  first. For a browser caller, also complete [frontend client setup](/docs/modules/client) in its
+  own package.
 </Callout>
 
 ## Expose the declared controls
@@ -33,7 +34,11 @@ After [frontend setup and contract pull](/guides/frontend/connect-react), use
 [`useAgent`](/docs/api/client#useagent) under `RelkitClientProvider`. This component selects
 `orders.order-support`, the agent above, and reads its typed `answer`:
 
-<include source="apps/docs/examples/frontend/order-support.tsx" lang="tsx" meta='title="src/OrderSupport.tsx"'>
+<include
+  source="apps/docs/examples/frontend/order-support.tsx"
+  lang="tsx"
+  meta='title="src/OrderSupport.tsx"'
+>
   /_snippets/source/apps/docs/examples/frontend/order-support.tsx
 </include>
 
@@ -41,13 +46,13 @@ Pass an application-owned thread ID, for example `<OrderSupport threadId="suppor
 and retain it when reopening the same conversation. The hook does not create a thread on mount.
 The selected backend declaration determines the available client operations:
 
-| Backend declaration | Typed frontend behavior |
-| --- | --- |
-| `chat` mapping | `send(message, { threadId })`; other agents use `run(input, { threadId })`. |
-| Input and output schemas | Typed initial input and `output`. |
-| `client.state`, tool contracts, and custom events | Selected `values`, `toolCalls`, `timeline`, and event payloads. |
-| Declared controls | Stop, steer, follow-up, approval, and denial methods only when supported. |
-| A graph continuation schema | `run(reply, { threadId, resume: true })` for the same waiting thread. |
+| Backend declaration                               | Typed frontend behavior                                                     |
+| ------------------------------------------------- | --------------------------------------------------------------------------- |
+| `chat` mapping                                    | `send(message, { threadId })`; other agents use `run(input, { threadId })`. |
+| Input and output schemas                          | Typed initial input and `output`.                                           |
+| `client.state`, tool contracts, and custom events | Selected `values`, `toolCalls`, `timeline`, and event payloads.             |
+| Declared controls                                 | Stop, steer, follow-up, approval, and denial methods only when supported.   |
+| A graph continuation schema                       | `run(reply, { threadId, resume: true })` for the same waiting thread.       |
 
 `observe({ threadId })` reconnects to an existing authorized thread. Never replace an uncertain run
 by choosing a new thread ID. See [threads and recovery](/docs/modules/ai/threads-recovery) and

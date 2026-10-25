@@ -69,9 +69,9 @@ For every prompt scaffolding flag, see the [prompt command reference](/docs/api/
 ## Install the native runtime
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Start with an [existing minimal app](/docs/learn/create-an-app). Its generic agent contracts do not
-install native execution. When adding the declaration manually, install the explicit integration
-and SDK cohort before importing `defineAgent` from `@relkit/langchain`:
+  Start with an [existing minimal app](/docs/learn/create-an-app). Its generic agent contracts do
+  not install native execution. When adding the declaration manually, install the explicit
+  integration and SDK cohort before importing `defineAgent` from `@relkit/langchain`:
 </Callout>
 
 <include>/_snippets/generated/installations/agent.mdx</include>
@@ -148,4 +148,3 @@ The client-exposed agent has a durable thread journal: `useAgent` restores its a
 observes text parts, tool calls, progress, approvals, selected state, nested execution, and terminal
 output incrementally. Mounting the hook never creates a thread or starts a run. See
 [Agent streaming](/docs/modules/ai/streaming) and [Threads and recovery](/docs/modules/ai/threads-recovery).
-
