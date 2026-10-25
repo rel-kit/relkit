@@ -9,9 +9,9 @@ sidebar:
 A task defines the input, result, and behavior of work that a job can run durably.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Install and bind a [compatible job provider](/docs/modules/jobs/quickstart) before scaffolding
-the task. `relkit add task` checks the application, so it needs a configured `jobs` profile and
-`defaults.jobs`. The task command does not configure the provider or install its native SDK.
+  Install and bind a [compatible job provider](/docs/modules/jobs/quickstart) before scaffolding the
+  task. `relkit add task` checks the application, so it needs a configured `jobs` profile and
+  `defaults.jobs`. The task command does not configure the provider or install its native SDK.
 </Callout>
 
 ## Scaffold a task
@@ -41,7 +41,6 @@ A task contains the code and schemas for one durable operation. A task is not a 
 >
   /_snippets/source/examples/commerce/src/services/orders/tasks/export-orders.task.ts
 </include>
-
 
 Use a stable task ID. The version identifies a compatible task definition, not a deployment build. Schema hashes and the client fingerprint are recorded with each job definition so migration checks can reject accidental contract changes.
 

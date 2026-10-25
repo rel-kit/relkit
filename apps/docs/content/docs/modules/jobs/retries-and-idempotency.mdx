@@ -9,8 +9,9 @@ sidebar:
 Retry transient failures while using a stable idempotency key to prevent duplicate business work.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Use an existing [task/job with its selected provider installed and bound](/docs/modules/jobs/quickstart)
-before running this example. Core task declarations do not install the provider's native SDK.
+  Use an existing [task/job with its selected provider installed and
+  bound](/docs/modules/jobs/quickstart) before running this example. Core task declarations do not
+  install the provider's native SDK.
 </Callout>
 
 The default retry policy is three attempts with a one-second initial delay, a 30-second maximum delay, factor two, and no jitter.

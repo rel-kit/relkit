@@ -11,9 +11,10 @@ Start with the failing run or command, then check the selected provider's capabi
 ### Capability or binding errors
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Complete the selected [provider installation](/docs/modules/jobs/providers/inngest) first, using
-[Effect MQ](/docs/modules/jobs/providers/effect-mq) or [Trigger](/docs/modules/jobs/providers/trigger) when selected
-instead. The adapter wrapper alone does not install a native SDK or register an application patch.
+  Complete the selected [provider installation](/docs/modules/jobs/providers/inngest) first, using
+  [Effect MQ](/docs/modules/jobs/providers/effect-mq) or
+  [Trigger](/docs/modules/jobs/providers/trigger) when selected instead. The adapter wrapper alone
+  does not install a native SDK or register an application patch.
 </Callout>
 
 Run `relkit jobs capabilities` and compare the job's requested execution mode with the selected binding. The compiler and deployment plan report the missing capability and the provider's actual limit.
