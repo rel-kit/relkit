@@ -1,0 +1,6 @@
+{
+  "orders": [
+    { "id": "order-1", "sku": "tea", "quantity": 2, "unitPriceCents": 450 },
+    { "id": "order-2", "sku": "mug", "quantity": 1, "unitPriceCents": 1200 }
+  ]
+}

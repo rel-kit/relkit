@@ -1,0 +1,35 @@
+## Pre-setup
+
+Use a native task provider in local Docker. Inngest is the starting path here;
+[Trigger.dev](/docs/modules/jobs/providers/trigger) and [Effect MQ](/docs/modules/jobs/providers/effect-mq)
+also have Docker recipes. Choose one and review its [capabilities](/docs/modules/jobs/providers/comparison).
+
+<Steps>
+<Step title="Install Inngest and local tooling" icon="package">
+
+<include>/_snippets/generated/installations/inngest.mdx</include>
+
+</Step>
+<Step title="Configure the jobs profile" icon="settings">
+
+Merge `jobs` and `defaults.jobs` into your root configuration. Keep your existing ID,
+`env` import and other settings; the example imports the environment contract from `src/platform/env.ts`.
+
+<include source="apps/docs/examples/jobs/providers/inngest-config.ts" lang="ts" meta='title="relkit.config.ts"'>
+  /_snippets/source/apps/docs/examples/jobs/providers/inngest-config.ts
+</include>
+
+Docker supplies the local provider's connection values; there are no new `defineEnv` secrets
+for this recipe. Jobs with `profile: "default"` use this binding. `localJob()` is the older
+function-target provider and is not a substitute for the native task provider used here.
+
+</Step>
+<Step title="Check and start after registering the task and job" icon="terminal">
+
+<include>/_setup/docker-run.mdx</include>
+
+Use `bun run relkit jobs capabilities` to inspect the selected provider, then follow
+[Your first durable job](/docs/modules/jobs/quickstart) to submit and observe a run.
+
+</Step>
+</Steps>

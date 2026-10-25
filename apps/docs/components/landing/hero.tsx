@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "fumadocs-core/framework";
 import { Heading } from "fumadocs-ui/components/heading";
 import { buttonVariants } from "fumadocs-ui/components/ui/button";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
@@ -27,7 +27,7 @@ export function LandingHero() {
         <motion.div className="hero-actions">
           <Link
             className={buttonVariants({ className: "hero-start", variant: "primary" })}
-            href="/docs/start/create-an-app"
+            href="/docs/learn/create-an-app"
           >
             Start building <ArrowUpRight size={14} aria-hidden="true" />
           </Link>

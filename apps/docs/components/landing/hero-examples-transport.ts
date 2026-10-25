@@ -3,7 +3,7 @@ export const transportExamples = [
   {
     id: "routes",
     title: "Routes",
-    guide: "/docs/http/routes",
+    guide: "/docs/modules/http/routes",
     panels: [
       {
         label: "Backend",
@@ -20,7 +20,7 @@ export const transportExamples = [
   {
     id: "agent",
     title: "Agent",
-    guide: "/docs/ai/agents",
+    guide: "/docs/modules/ai/agents",
     panels: [
       {
         label: "Backend",
@@ -37,7 +37,7 @@ export const transportExamples = [
   {
     id: "graph",
     title: "Graph",
-    guide: "/docs/ai/graphs-persistence",
+    guide: "/docs/modules/ai/graphs-persistence",
     panels: [
       {
         label: "Backend",
@@ -54,7 +54,7 @@ export const transportExamples = [
   {
     id: "auth",
     title: "Auth",
-    guide: "/docs/auth/better-auth",
+    guide: "/docs/modules/auth/better-auth",
     panels: [
       {
         label: "Backend",
@@ -71,7 +71,7 @@ export const transportExamples = [
   {
     id: "realtime",
     title: "Realtime",
-    guide: "/docs/realtime/react",
+    guide: "/docs/modules/realtime/react",
     panels: [
       {
         label: "Backend",
@@ -88,7 +88,7 @@ export const transportExamples = [
   {
     id: "stream",
     title: "Streaming",
-    guide: "/docs/http/streaming",
+    guide: "/docs/modules/http/streaming",
     panels: [
       {
         label: "Backend",

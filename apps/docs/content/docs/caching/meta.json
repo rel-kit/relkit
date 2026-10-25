@@ -1,5 +1,0 @@
-{
-  "title": "Caching",
-  "icon": "Zap",
-  "pages": ["index", "define", "read-write", "expiration", "first-cache"]
-}

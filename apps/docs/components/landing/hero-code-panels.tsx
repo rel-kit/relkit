@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "fumadocs-core/framework";
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 import * as motion from "motion/react-m";
 import type { HeroCodePanel } from "./hero-examples";

@@ -1,0 +1,69 @@
+---
+title: Consume an event
+description: Run your code when an event is published.
+pagination: false
+sidebar:
+  icon: antenna
+---
+
+An event function reacts to a published event without returning a result to the publisher.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Start with an [existing application](/docs/learn/create-an-app) and the event you want to handle.
+</Callout>
+
+## Scaffold an event-only function
+
+First complete [event runtime installation and binding](/guides/events/react-to-order-events#install-and-bind-the-selected-event-runtime).
+The scaffold reuses or selects a profile; a manually copied subscriber does not install a provider.
+
+After [defining the `orders.created` event](/docs/modules/events/define#define-the-event), run from
+the application root:
+
+```sh
+bun run relkit add event-function on-order-created --service orders \
+  --event orders.created --delivery durable
+```
+
+Creates `src/services/orders/functions/on-order-created.function.ts`. `--event` selects an existing
+event by ID, binding, or filename. The default delivery is `durable`; choose `transient` for
+non-durable delivery. `--profile` selects a compatible event provider profile. In a terminal,
+omitted choices are prompted; headless execution needs an unambiguous event target.
+
+The function is event-only, not a public callable service member. Review the placeholder handler
+against your event payload before implementing its reaction; the CLI does not generate business logic.
+
+If you scaffolded the event with `add event order-created`, use its generated ID
+`orders.order-created-event` for `--event` instead. Keep the subscriber's selected event ID
+when adapting the handler below. For manual setup, create the subscriber directly.
+
+For every subscriber scaffolding flag, see the [event-function command reference](/docs/api/cli#relkit-add-event-function-name).
+
+## Create a subscriber
+
+Use `defineEventFunction` to run work when an event is published. After [defining `orders.created`](/docs/modules/events/define), create `src/services/orders/functions/order-confirmation.function.ts`:
+
+<include
+  source="apps/docs/examples/events/order-confirmation.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/order-confirmation.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/order-confirmation.function.ts
+</include>
+
+- `id` uniquely names this function.
+- `event` is the exact ID of the event to consume.
+- `handler` receives the event data. This example logs a confirmation; replace the log with your own work, such as sending an email.
+
+Run `bun run check` from your app's root. RELKIT runs the handler when `orders.created` is published; you do not call it yourself.
+
+Use `defineFunction` when the caller needs a result, such as the created order. Use `defineEventFunction` for a reaction that runs separately, without returning a result to the publisher.
+
+When the reaction must survive the consumer process or expose run progress, trigger a task-first job from
+the event function. Event delivery and task admission remain separate operations; use an explicit stable
+idempotency key where repeated event delivery could duplicate business work.
+
+## Add another subscriber
+
+To run multiple reactions, add another event function with a different `id` and the same `event`.
+

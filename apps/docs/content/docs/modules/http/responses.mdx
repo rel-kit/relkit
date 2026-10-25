@@ -1,0 +1,107 @@
+---
+title: HTTP responses
+description: Infer JSON success and error responses, select a success status, and understand explicit response-contract limits.
+pagination: false
+sidebar:
+  icon: arrow-up-from-line
+---
+
+A function-backed route turns the function's validated result or declared error into an HTTP response. Start with inference;
+override the transport only when the public HTTP contract needs it. Keep reusable errors in the
+[domain's error declarations](/docs/learn/concepts/errors).
+
+## Understand inferred responses
+
+| Outcome                                       | Default response                         |
+| --------------------------------------------- | ---------------------------------------- |
+| Non-void function output                      | JSON `200`                               |
+| `void` or `undefined` output                  | Empty `204`                              |
+| Request mapping or input validation failure   | Validation JSON `422`                    |
+| Declared application error                    | Its `http.status`, or `500` when omitted |
+| Route rate-limit rejection                    | JSON `429`                               |
+| Invalid function output or an internal defect | Safe server error `500`                  |
+
+Declared application errors use the public error envelope, including their stable identity and
+validated data. Do not assume the envelope is identical to the error's data schema alone.
+Undeclared exceptions are not a way to create a public error contract.
+
+Runtime failures can also produce responses such as provider failure `502` or timeout `504`.
+The inferred OpenAPI list is not an exhaustive list of infrastructure or middleware failures.
+
+## Choose one successful status
+
+`POST` does not imply `201`. Set `successStatus` when one successful operation needs a different
+`2xx` status while retaining inferred output and errors:
+
+<include
+  source="examples/commerce/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/routes/orders/route.ts"'
+>
+  /_snippets/source/examples/commerce/src/routes/orders/route.ts
+</include>
+
+The Orders `POST` returns JSON `201`; its output schema and declared errors still come from
+`createOrder`. The route above does not use an explicit `responses` array.
+Use `successStatus` for this case instead of copying all inferred response declarations.
+
+`HEAD` invokes the target but removes the response body. `204` responses are empty as well;
+do not choose `204` when callers need the returned JSON.
+
+## Replace the complete response contract only when needed
+
+An explicit `responses` array replaces inference. The [Routes API](/docs/api/routes) provides:
+
+| Helper                                 | Declaration                                                 |
+| -------------------------------------- | ----------------------------------------------------------- |
+| `http.success(status, schema)`         | Successful output and status                                |
+| `http.error(errorId, status, schema)`  | Status for a declared application error and its data schema |
+| `http.validationError(status, schema)` | Validation response; status defaults to `422`               |
+| `http.response(id, status, schema)`    | A named generic response declaration                        |
+
+Include success, validation, declared application errors, and any other outcomes the endpoint
+promises. Omission does not prevent a runtime failure; it can leave the generated contract incomplete.
+An omitted application-error mapping falls back to an internal error rather than a declared status.
+
+Declarations are not branch handlers. Ordinary successful invocation uses the first success
+declaration (or the first generic response when there is no success declaration). Listing several
+success statuses does not select one based on returned data. These helpers do not define response
+headers or content negotiation, and adding a `3xx` declaration does not implement a redirect.
+
+Use [middleware](/docs/modules/http/middleware) for response headers and transport short-circuits. For an
+adapter that owns redirects, binary bodies, or another HTTP protocol, consider a
+[raw handler](/docs/modules/http/raw-handlers) and document its separate contract.
+
+## Distinguish request failures from server failures
+
+Input schema and mapping failures return `422` by default. That includes malformed JSON and
+unsupported body content types in the request mapper. The framework's global Content-Length
+check can reject an oversized request with `413`; a byte-limit failure encountered later while
+mapping the body is a validation response. Test the layer your client actually reaches.
+
+Function output is validated by the invocation engine. Invalid output is a server defect, not
+a caller's `422`. Additional explicit response-schema checks run in development and test mode;
+do not use a response-only schema as the sole production validation boundary.
+
+## Verify status, headers, and body together
+
+With the [Echo endpoint](/docs/modules/http/first-route) running on port `3000`:
+
+```sh
+curl -i -X POST http://localhost:3000/echo \
+  -H 'content-type: application/json' \
+  -d '{"message":"hello"}'
+curl -i -X POST http://localhost:3000/echo \
+  -H 'content-type: application/json' \
+  -d '{"message":""}'
+```
+
+Expect JSON `200` for the first request and validation `422` for the second. Add tests for every
+declared application error and middleware rejection in your own endpoint. A correct body with the
+wrong status is still a broken HTTP contract.
+
+Middleware-only responses are not automatically added to OpenAPI or the generated client's error
+types. Describe them explicitly, and test the [RPC client](/docs/modules/http/generated-clients) separately:
+it does not consume the REST response envelope.
+
+<include>/_snippets/generated/related/docs-modules-http-responses.mdx</include>

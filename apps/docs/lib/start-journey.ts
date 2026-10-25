@@ -1,9 +1,9 @@
 export const startJourney = [
-  "start/create-an-app",
-  "start/first-route",
-  "start/save-orders",
-  "start/protect-orders",
-  "start/test-orders",
-  "start/local-development",
-  "start/build-and-run",
+  "docs/learn/create-an-app",
+  "docs/learn/first-route",
+  "docs/learn/save-orders",
+  "docs/learn/protect-orders",
+  "docs/learn/test-orders",
+  "docs/learn/local-development",
+  "docs/learn/build-and-run",
 ] as const;

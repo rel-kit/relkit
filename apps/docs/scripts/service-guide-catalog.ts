@@ -2,30 +2,39 @@
 import type { ApiPackage } from "./documentation-catalog.js";
 
 export const serviceGuideGroup = {
-  directory: "service",
+  directory: "docs/modules/service",
   title: "Service",
   icon: "Boxes",
-  pages: ["index", "domains", "organization", "define", "routes", "first-service", "migration"],
+  pages: [
+    "index",
+    "first-service",
+    "domains",
+    "organization",
+    "define",
+    "context-values",
+    "routes",
+    "migration",
+  ],
 } as const;
 
 export const serviceGuideRelations = [
   {
-    path: "service/migration",
+    path: "docs/modules/service/migration",
     api: ["services", "functions"],
     examples: ["packages/cli/tests/migration/layout.probe.ts"],
   },
   {
-    path: "service/index",
+    path: "docs/modules/service/index",
     api: ["services", "functions"],
     examples: ["examples/commerce/src/services/orders/service.ts"],
   },
   {
-    path: "service/domains",
+    path: "docs/modules/service/domains",
     api: ["services", "events"],
     examples: ["apps/docs/examples/events/order-confirmation.function.ts"],
   },
   {
-    path: "service/organization",
+    path: "docs/modules/service/organization",
     api: ["services", "functions", "tools", "agents", "jobs", "events", "cache", "buckets"],
     examples: [
       "examples/commerce/src/services/orders/functions/create-order.function.ts",
@@ -33,17 +42,17 @@ export const serviceGuideRelations = [
     ],
   },
   {
-    path: "service/define",
+    path: "docs/modules/service/define",
     api: ["services", "functions"],
     examples: ["examples/commerce/src/services/orders/service.ts"],
   },
   {
-    path: "service/routes",
+    path: "docs/modules/service/routes",
     api: ["services", "routes"],
     examples: ["examples/commerce/src/routes/orders/route.ts"],
   },
   {
-    path: "service/first-service",
+    path: "docs/modules/service/first-service",
     api: ["services", "functions", "routes", "testing"],
     examples: [
       "templates/default/v1/minimal/src/services/hello/service.ts",

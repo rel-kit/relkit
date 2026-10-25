@@ -1,0 +1,35 @@
+---
+title: Execution policy
+description: Control concurrency, duration, admission, and cancellation.
+pagination: false
+sidebar:
+  icon: sliders-horizontal
+---
+
+Set retry, timeout, concurrency, and cancellation policy on the task that owns the work.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Use an existing [task/job with its selected provider installed and bound](/docs/modules/jobs/quickstart)
+before running this example. Core task declarations do not install the provider's native SDK.
+</Callout>
+
+Execution policy belongs to the task because it describes how the durable operation runs.
+
+<include
+  source="examples/commerce/src/services/orders/tasks/export-orders.task.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/tasks/export-orders.task.ts
+</include>
+
+Use task fields such as `maxDuration`, `maxElapsed`, `resources`, `concurrency`, `logging`, and `retry`.
+Jobs keep admission and client exposure together; they do not override task execution policy.
+
+Admission runs before a durable run is accepted. Keep admission checks fast and deterministic. Authorization belongs at the public boundary; the task must still validate every value it trusts from persisted input.
+
+Cancellation is cooperative: the runtime records the requested state and the task should stop between side effects or checkpointable work. Do not delete a run to cancel it. Use the run control API so the provider can retain history and the operation ID can be audited.
+
+The default run-list limit is 25 and the maximum is 100. Provider-specific ceilings are reported by `relkit jobs capabilities`.
+
+<include>/_snippets/generated/related/docs-modules-jobs-execution-policy.mdx</include>

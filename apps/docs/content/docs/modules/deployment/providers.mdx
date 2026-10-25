@@ -1,0 +1,118 @@
+---
+title: Configure production providers
+description: Connect production storage, caches, databases, jobs, and telemetry without confusing resources with application hosting.
+pagination: false
+sidebar:
+  icon: plug
+---
+
+Choose runtime resources independently from the application host. An AWS-hosted app can use an
+existing Redis service or Cloudflare R2; selecting those adapters does not make the deployment
+stack own their lifecycle.
+
+## Pre-setup
+
+Begin with [local Docker configuration](/docs/modules/integrations#pre-setup) and passing module
+checks. Before releasing, obtain the target resource's connection values and store secrets in
+your deployment's runtime environment. Keep stable descriptor IDs and profile names when changing
+their provider. Verify supported operations: a connected provider is not automatically equivalent
+to the one used during development.
+
+Application fields belong in `defineEnv`. The named `binding` references below describe provider
+connections; they are not extra `context.env` fields. Keep your existing environment contract,
+server settings, and application identity when merging either example.
+
+## Buckets and caches
+
+<Tabs sync={false} hash={false}>
+<Tab title="S3 and Redis" icon="database">
+
+Keep Docker as the local default, with explicit connected values available for release builds.
+Install the owners you select; this complete example uses both:
+
+<include>/_snippets/generated/installations/s3.mdx</include>
+
+<include>/_snippets/generated/installations/redis.mdx</include>
+
+<include source="apps/docs/examples/setup/connected.ts" lang="ts" meta='title="relkit.config.ts"'>
+  /_snippets/source/apps/docs/examples/setup/connected.ts
+</include>
+
+Set `ASSETS_S3_ENDPOINT`, `ASSETS_S3_BUCKET`, `ASSETS_S3_REGION`, the two S3 credential values,
+and `REQUESTS_REDIS_URL` in the production process environment. The resources must already exist
+and be reachable by the server. Adjust path-style access for the selected S3 service.
+Docker overrides local connection values during development; it does not provision production resources.
+
+For stack-owned resources, use [AWS wrappers](/docs/modules/deployment/aws#understand-resource-ownership)
+and review their [options](/docs/api/integrations/aws). AWS can own supported S3 and Redis/Valkey
+resources; a direct connected adapter never requests that lifecycle.
+
+</Tab>
+<Tab title="Cloudflare R2 and KV" icon="cloud">
+
+Cloudflare has no bundled Docker recipe. Keep MinIO/Redis for ordinary local development,
+then explicitly select this configuration when testing or releasing against existing R2/KV resources:
+
+<include>/_snippets/generated/installations/cloudflare.mdx</include>
+
+<include source="apps/docs/examples/setup/cloudflare.ts" lang="ts" meta='title="relkit.config.ts — connected Cloudflare alternative"'>
+  /_snippets/source/apps/docs/examples/setup/cloudflare.ts
+</include>
+
+Supply the account ID, bucket name, namespace ID, and three credential values named in the example.
+Use credentials scoped to the intended resources. R2 supports signed URLs; KV requires a TTL
+of at least 60 seconds and does not support atomic increment. Do not reuse a Redis counter/rate-limit
+cache without checking those limits. See [R2 and KV reference](/docs/api/integrations/cloudflare).
+
+This connects REST/S3-compatible runtime APIs from the Bun server. It does not deploy the application
+to Cloudflare Workers or create the bucket/namespace.
+
+</Tab>
+</Tabs>
+
+## Realtime and agent checkpoints
+
+Use the [Redis realtime configuration](/docs/modules/realtime/providers) with a reachable secret
+connection binding in production, and configure `agent-state` separately for agents. Confirm Redis
+persistence and shared fanout across replicas; local filesystem profiles require one shared,
+appropriately managed state location and are not a replacement for distributed provider semantics.
+
+## Durable job providers
+
+| Provider | Local default | Deployment guidance |
+| --- | --- | --- |
+| Inngest | `docker(inngest())` | [Inngest setup](/docs/modules/jobs/providers/inngest): connected credentials, native worker registration, and capability evidence |
+| Trigger.dev | `docker(trigger())` | [Trigger.dev setup](/docs/modules/jobs/providers/trigger): target runtime, immutable worker publication, and provider connection |
+| Effect MQ | `docker(effectMq())` | [Effect MQ setup](/docs/modules/jobs/providers/effect-mq): PostgreSQL-backed native execution and worker lifecycle |
+
+Follow [job deployment](/docs/modules/jobs/deployment) to publish workers, verify readiness, and
+activate schedules. Keep previous worker generations while they own accepted runs. Application
+events use the [filesystem provider](/docs/modules/events#pre-setup); persist their state explicitly.
+
+## Database and authentication
+
+The [database service](/docs/modules/database/define) connects PostgreSQL, MySQL, or SQLite.
+RELKIT does not provision an application database through `defineApp`. Supply its connection via
+`defineEnv`, migrate once before rollout, and keep backups and connection/network policy with the
+database owner. The Docker PostgreSQL walkthrough is development setup, not a managed cloud database.
+
+[Better Auth](/docs/modules/auth#pre-setup) shares that service. Use the public production origin
+for `BETTER_AUTH_URL`, a stable secret across replicas, and reviewed cookie/origin policy. Keep
+credentials and session tables out of generated public CRUD endpoints.
+
+## Models and telemetry
+
+Selected [model SDKs](/docs/modules/ai/agents#choose-a-model) own model credentials and availability.
+Sentry and OTLP are independent [telemetry exporters](/docs/modules/operations/observability),
+configured with named endpoint/secret bindings. AWS hosting supplies CloudWatch stdout routing;
+it does not create a model account, Sentry project, or OTLP service.
+
+## Verify the release configuration
+
+Run `bun run check`, `bun run typecheck`, and `bun run build` after changing bindings. These
+validate the application and selected contracts; they do not prove remote credentials or network
+access. Verify a real read/write and applicable rejection path against your intended provider in
+an isolated environment before accepting traffic. Follow [AWS deployment](/docs/modules/deployment/aws)
+only when that host is selected.
+
+<include>/_snippets/generated/related/docs-modules-deployment-providers.mdx</include>

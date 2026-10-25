@@ -1,0 +1,91 @@
+---
+title: Native runtime and DeepAgents
+description: Choose supported LangChain packages, expose middleware state safely, and add DeepAgents capabilities without adapters.
+pagination: false
+sidebar:
+  icon: cpu
+---
+
+RELKIT runs ordinary agents through LangChain and uses DeepAgents when you select capabilities such as subagents, skills, or memory files. There is no public conversion wrapper or application-level runtime adapter.
+
+## Use the certified package cohort
+
+Native execution belongs to the explicit `@relkit/langchain` integration. Its selected SDK cohort
+comes from that integration's dependency metadata. The following setup also selects the local runtime
+profiles used by the [first-agent tutorial](/guides/ai/build-an-offline-agent#configure-the-runtime):
+
+<include>/_snippets/generated/installations/agent.mdx</include>
+
+Import native `defineAgent`, `defineGraph`, and persistence resources from `@relkit/langchain`.
+Generic descriptors and public event/state contracts remain available from `@relkit/app/agents`.
+Install the model-provider package used by the application separately. DeepAgents is required only
+when a declaration selects a deep capability; AG-UI has its own independent
+[transport installation](/docs/modules/ai#observe-durable-execution). Neither belongs in a tool-only MCP app.
+
+If a deep capability is activated without that package, execution fails with
+`RELKIT_DEEPAGENTS_UNAVAILABLE` and names the required version. Optional model, saver, store, and backend
+packages remain application dependencies; a missing import fails before execution, while an incompatible
+checkpointer or store fails protocol validation instead of being cast to a supported driver.
+
+## Combine native and RELKIT behavior
+
+This agent passes a native model, native tool, real `todoListMiddleware()`, and RELKIT function-backed
+tools through one declaration:
+
+<include
+  source="examples/commerce/src/services/orders/agents/order-support.agent.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/agents/order-support.agent.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/agents/order-support.agent.ts
+</include>
+
+RELKIT function tools still execute through the common function engine, including schema validation,
+authorization, cancellation, tracing, approval policy, and output validation. Native tools execute through
+their native contract. Unknown native output remains `unknown` unless the declaration supplies output
+schema metadata; RELKIT does not infer a contract by running the tool.
+
+Middleware state is private unless `client.state` selects a contributed key. In the example, `todos` is
+inferred from `todoListMiddleware()` and becomes a precise generated status union. `values` remains
+undefined until an authorized snapshot or state event arrives. Messages, tool calls, progress, custom
+events, waiting requests, and final `output` remain separate client fields.
+
+Declared custom-event and tool schemas remain exact. Opaque native extensions use an explicit dynamic
+discriminator with `unknown` data instead of widening every known event or tool.
+
+## Add DeepAgents capabilities
+
+Only for a declaration using deep capabilities, use this selected recipe instead of the ordinary-agent
+recipe. SDK installation alone does not expand the currently verified native capability boundary:
+
+<include>/_snippets/generated/installations/deep-agent.mdx</include>
+
+This declaration adds a subagent, skills, memory files, a RELKIT bucket backend, checkpointer, and store:
+
+<include
+  source="examples/commerce/src/services/orders/agents/order-deep.agent.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/agents/order-deep.agent.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/agents/order-deep.agent.ts
+</include>
+
+Children inherit the parent model unless they declare one. They share the caller-supplied root thread and
+use isolated native checkpoint namespaces; nested scopes do not become independent business threads.
+Root cancellation and limits include child execution. Start an unrelated child operation with another
+application-owned thread ID.
+
+RELKIT does not emulate Python-only APIs, LangSmith Agent Server, or arbitrary structured-agent message
+conversion. A RELKIT bucket backend implements the supported DeepAgents filesystem protocol, but Redis
+cache clients are not saver/store drivers and generic S3 clients are not treated as DeepAgents backends.
+
+## Understand public event semantics
+
+One authorized, redacted event sequence feeds HTTP iteration, AG-UI SSE, WebSocket, snapshots, replay,
+generated clients, and Inspector. The transports do not execute the agent independently. Disconnecting an
+observer does not cancel execution; reconnect restores a consistent snapshot and continues after its
+journal cursor. A cursor gap triggers explicit snapshot recovery rather than silent event loss.
+
+Public events preserve root, node, task, attempt, subgraph, and subagent scope where metadata is known.
+Raw checkpoints, commands, private middleware state, provider payloads, system prompts, credentials,
+hidden reasoning, and unrestricted native state never enter browser contracts.

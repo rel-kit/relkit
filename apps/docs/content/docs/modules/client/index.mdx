@@ -1,0 +1,136 @@
+---
+title: Typed Client
+description: Call backend routes, jobs, agents, and channels with generated TypeScript contracts and optional React helpers.
+pagination: false
+sidebar:
+  icon: panels-top-left
+---
+
+Use the generated client to call your backend with typed inputs, results, and application errors.
+
+<Callout type="tip" title="Start here" icon="route">
+Follow [Call your API from React](/guides/frontend/connect-react) for a complete frontend workflow.
+Use [TypeScript clients and transports](/docs/modules/client/transports) for a caller without React.
+The [Client reference](/docs/api/client) lists exact helpers, hooks, and their import paths.
+</Callout>
+
+## Pre-setup
+
+Run the [backend locally](/docs/modules/http#pre-setup) and complete the setup for each
+capability you expose. Docker belongs to those backend providers; the typed client itself
+needs no `defineApp` or `defineEnv` entry. Keep backend secrets and descriptors out of the frontend.
+Choose the [Vite or Next.js proxy and build setup](/docs/modules/client/build-integration)
+and use the public backend origin when pulling its contract. The steps below install the
+frontend packages and connect that contract.
+
+<Steps>
+<Step>
+
+## Install the selected frontend packages
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Start with a running RELKIT backend and a separate React app. Run the following in the **frontend
+package root**, not the backend root. A TypeScript React app also keeps its framework's TypeScript
+and React declarations (`@types/react`) as development tooling. The React leaf selects React/query peers and the required
+OpenTelemetry API; a framework-independent client does not need those React/query peers.
+</Callout>
+
+<include>/_snippets/generated/installations/client-react.mdx</include>
+
+The displayed React/query ranges are the owner's supported peer ranges. Preserve already compatible
+framework versions and commit the resolved lockfile; this is not an instruction to upgrade every
+frontend dependency. Install the CLI as development tooling for contract pull/check:
+
+<include>/_snippets/generated/installations/client-cli.mdx</include>
+
+These frontend commands do not install the backend, database integrations or native agent engine.
+For a framework-independent caller, use [the base client installation](/docs/modules/http/generated-clients#install-the-caller)
+instead of the React recipe.
+
+</Step>
+<Step>
+
+## Pull the public contract
+
+From the frontend root, pull the running server's public contract into a frontend-owned directory:
+
+```sh title="Terminal — frontend root"
+bun run relkit client pull http://127.0.0.1:3000 --out .relkit/generated
+```
+
+This writes `contract.ts`, `client.ts`, `client-registry.d.ts`, and `client-manifest.json`. Include
+`.relkit/generated/**/*.ts` in the TypeScript project that checks your frontend source, as shown
+in the [Frontend guide](/guides/frontend/connect-react#2-pull-the-backend-contract), and regenerate them when the public API
+changes. The backend must be reachable while you pull; do not import backend source into a
+browser bundle.
+
+The recipe explicitly declares `@opentelemetry/api`, the required oRPC peer, so setup does not depend
+on whether a package manager automatically installs required peers.
+
+</Step>
+<Step>
+
+## Install the provider
+
+Wrap your React tree in [`RelkitClientProvider`](/docs/api/client#relkitclientprovider). This small
+example calls the minimal starter's Hello route through the
+[same-origin development proxy](/guides/frontend/connect-react#3-connect-the-local-frontend).
+For a separate backend origin, set `baseUrl` on the provider and configure its cookie/CORS boundary.
+
+<include
+  source="apps/docs/examples/frontend/app.tsx"
+  lang="tsx"
+  meta='title="src/App.tsx"'
+>
+  /_snippets/source/apps/docs/examples/frontend/app.tsx
+</include>
+
+</Step>
+<Step>
+
+## Enforce compatibility
+
+The provider defaults to the same-origin backend, credentialed requests, a 30-second finite request
+timeout, and a 10-second stream-establishment timeout. An established healthy stream is not capped by
+the finite timeout. From the frontend root, check the pulled contract against the running
+backend before shipping:
+
+```sh title="Terminal — frontend root"
+bun run relkit client check http://127.0.0.1:3000 --out .relkit/generated
+```
+
+For Next.js or Vite, [configure `withRelkit()` or `relkit()`](/docs/modules/client/build-integration)
+to embed the public fingerprint at build time. Both read `.relkit/generated/client-manifest.json`
+from the frontend root; `client pull` is what writes it and the declarations.
+
+The compiled public-contract fingerprint must match the backend. A mismatch enters `application-updated` and blocks
+new typed work until frontend and backend are coordinated; unresolved mutation or control metadata is
+preserved rather than retried.
+
+Job hooks use the same provider and identity handshake. `useJobTrigger` retains the accepted `runId`, while
+`useJobRun` observes that run without starting a subscription during server rendering. Unknown submission
+outcomes remain visible for same-key recovery instead of becoming an automatic replay queue.
+
+</Step>
+</Steps>
+
+## Find the right client API
+
+| Task                                          | API                                                         | Example                                                |
+| --------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------ |
+| Call without React                            | `createClient`, `createWebSocketClient`, `createAutoClient` | [Transports](/docs/modules/client/transports)          |
+| Provide clients and inspect connection status | `RelkitClientProvider`, `useRelkitClient`                   | Provider and `Greeting` above                      |
+| Read a route                                  | `useRoute`, `useSuspenseRoute`, `useInfiniteRoute`          | [Route queries](/docs/modules/client/routes)           |
+| Submit a change                               | `useRouteMutation`, `useRouteUtils`                         | [Mutations](/docs/modules/client/mutations)            |
+| Observe a response stream                     | `useStream`                                               | [HTTP streaming](/docs/modules/http/streaming#use-from-the-frontend) |
+| Run or observe an agent                       | `useAgent`                                                | [Agent streaming](/docs/modules/ai/streaming#use-from-the-frontend) |
+| Trigger, observe, or control a job             | `useJobRun`, `useJobTrigger`, `useJobCancel`, `useJobRetry` | [Job clients](/docs/modules/jobs/clients#use-from-react) |
+| Render on the server                          | `createServerClient`, `createRelkitServerContext`           | [Server rendering](/docs/modules/client/ssr)           |
+| Subscribe to channels                         | `useRealtime`, `useChannel`                                 | [Realtime React clients](/docs/modules/realtime/react) |
+| Embed the public fingerprint                   | `withRelkit`, `relkit`                                     | [Build integration](/docs/modules/client/build-integration) |
+
+[`useRelkitClient`](/docs/api/client#userelkitclient) must run inside the provider. It exposes
+the client runtime and a `status` of `loading`, `ready`, `error`, or `application-updated`.
+The [client export index](/docs/api/client#all-exported-apis) lists every import path and companion type.
+
+<include>/_snippets/generated/related/docs-modules-client-index.mdx</include>

@@ -1,0 +1,13 @@
+After [frontend setup and pulling the commerce contract](/guides/frontend/connect-react), render
+this component under the provider. The `GET /reports/:reportId` route exposes the streaming function:
+
+<include source="apps/docs/examples/frontend/report.tsx" lang="tsx" meta='title="src/Report.tsx"'>
+  /_snippets/source/apps/docs/examples/frontend/report.tsx
+</include>
+
+`streamOf` supplies the item type, so `report.items` exposes each item's `completed` field.
+`start({ reportId })` begins the request; `cancel()` releases it. Use the domain input even when
+REST places a field in the URL. Streaming operations are excluded from finite `useRoute` queries.
+
+Reference: [`useStream`](/docs/api/client#usestream).
+Continue with [stream lifecycle and failures](/docs/modules/client/streams).

@@ -1,0 +1,14 @@
+After [frontend setup and contract pull](/guides/frontend/connect-react), render the Hello route
+through its generated `GET /hello` selector. `name` and `data.message` are inferred from the
+backend function's schemas:
+
+<include source="apps/docs/examples/frontend/app.tsx" lang="tsx" meta='title="src/App.tsx — frontend"'>
+  /_snippets/source/apps/docs/examples/frontend/app.tsx
+</include>
+
+Keep `.invoke()` and service imports on the backend. A function or service needs a client-exposed
+route before the browser can call it. The provider handles identity and query state; the
+[Frontend guide](/guides/frontend/connect-react) also shows where this component belongs in Next.js.
+
+Reference: [`useRoute`](/docs/api/client#useroute),
+[`RelkitClientProvider`](/docs/api/client#relkitclientprovider).

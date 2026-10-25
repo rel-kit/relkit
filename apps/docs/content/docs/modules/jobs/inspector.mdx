@@ -1,0 +1,33 @@
+---
+title: Inspector
+description: Inspect job definitions, runs, schedules, and services locally.
+pagination: false
+sidebar:
+  icon: scan-eye
+---
+
+Use the Inspector's Jobs area to find runs, inspect progress, and request supported controls.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Complete the separate [Inspector installation, bridge enablement and tool launch](/docs/modules/operations/inspector)
+first, alongside the selected [job provider setup](/docs/modules/jobs/providers). The backend's `relkit jobs`
+CLI remains usable independently of this optional tool.
+</Callout>
+
+- Definitions: task/job IDs, versions, schema hashes, bindings, and limits.
+- Runs: status, attempts, progress, output metadata, errors, and controls.
+- Schedules: registered definitions, pause state, next occurrence, and ownership.
+- Services: worker generations, provider identity, readiness, and rollout state.
+
+Run lists are bounded: 25 by default and 100 maximum. Filters should be scoped to a service, job, tenant, or time range before loading history.
+
+Controls are asynchronous. A cancel, retry, or schedule write returns an operation ID; keep the operation visible until the Inspector observes the resulting state. The Inspector reports provider capability errors rather than presenting an unsupported control as successful.
+
+Protect the Inspector endpoint. It is an operator surface, not a replacement for application authorization.
+
+The run detail keeps the accepted `runId`, task version, service generation, result availability, progress,
+and native diagnostics separate. A disconnected Inspector view never cancels accepted work.
+
+[Inspector job-filter regression test](https://github.com/rel-kit/relkit/blob/main/tests/inspector/job-name-filters.test.ts)
+
+<include>/_snippets/generated/related/docs-modules-jobs-inspector.mdx</include>

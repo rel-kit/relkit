@@ -1,0 +1,47 @@
+---
+title: Automate project tooling
+description: Preview project creation, inspect CLI help, and choose the correct public tooling package.
+pagination: false
+sidebar:
+  icon: code
+---
+
+Use the CLI commands for everyday development. Use the programmatic APIs when an editor,
+test harness, or other tool needs to inspect or drive the same behavior.
+
+## Preview a new application
+
+Install `create-relkit` and `@relkit/cli` as development dependencies in your tooling package.
+Call `previewOrders` with an existing parent directory that does not contain `relkit-orders`:
+
+<include
+  source="apps/docs/examples/public-api/tooling.ts"
+  lang="ts"
+  meta='title="preview-orders.ts"'
+>
+  /_snippets/source/apps/docs/examples/public-api/tooling.ts
+</include>
+
+The preview contains the destination, planned files, and dependency versions. It does not
+create the application, install packages, or initialize Git. `normalizeCreateOptions`
+validates the same explicit template/cloud/deployment choices as the command line.
+`findCliHelp` returns the command model used by terminal help and the
+[CLI reference](/docs/api/cli).
+
+## Choose the package and operation
+
+| Package            | Use it for                                                                          | Reference                                                   |
+| ------------------ | ----------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `create-relkit`    | Normalize creation options, preview a project, or explicitly generate it            | [Generator APIs](/docs/api/create-relkit#all-exported-apis) |
+| `@relkit/cli`      | Invoke commands with controlled I/O/cancellation, run development, or add artifacts | [CLI automation APIs](/docs/api/cli-api#all-exported-apis)  |
+| `@relkit/cli/help` | Read command descriptions, arguments, flags, and examples                           | [Help model](/docs/api/cli-api#public-imports)              |
+| `relkit`           | Resolve and launch the CLI installed in the target project                          | [Launcher APIs](/docs/api/relkit#all-exported-apis)         |
+
+Creation and scaffold execution write files; preview operations return plans. Keep the
+preview and execution boundaries explicit in your own tool. A development handle owns
+processes and watchers: await its stop operation when your tool is finished.
+
+Follow [Create an application](/docs/learn/create-an-app) for the complete user workflow,
+or [Add application files](/docs/modules/cli/add-artifacts) for an existing project.
+
+<include>/_snippets/generated/related/docs-modules-cli-automation.mdx</include>

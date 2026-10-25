@@ -1,0 +1,95 @@
+---
+title: OpenAPI and Scalar
+description: Generate OpenAPI 3.1 from checked routes, inspect the human reference, and protect production documentation endpoints.
+pagination: false
+sidebar:
+  icon: file-json
+---
+
+Generate an OpenAPI document from your application's checked routes, schemas, and declared responses. Paths, methods, request locations,
+schemas, statuses, declared errors, rate limits, and operation IDs therefore come from authored descriptors
+rather than a separate annotation file.
+
+The document describes HTTP routes, not the generated client's `/rpc` protocol.
+[Raw handlers](/docs/modules/http/raw-handlers) use a generic response contract because their adapters own the response.
+
+## Generate the document
+
+### Refresh checked artifacts
+
+```sh title="Terminal — relkit-orders"
+bun run check
+```
+
+Inspect `.relkit/generated/openapi.json` when no server is running. The file is generated; fix route or
+schema source when it is wrong.
+
+### Inspect the runtime document
+
+```sh title="Terminal — relkit-orders"
+curl http://localhost:3000/_relkit/v1/openapi.json
+```
+
+With your existing app's [Echo endpoint](/docs/modules/http/define#expose-one-public-function) running, confirm
+`openapi` is `3.1.0` and find `POST /echo`. Use the configured backend port if it differs.
+The commerce example uses `4000` and also includes `/orders/{orderId}`.
+
+### Open the interactive reference
+
+JSON OpenAPI needs no documentation UI package. To select Scalar, install its optional peer from
+your application root, then set `server.apiDocs.ui` to `"scalar"` in your existing `relkit.config.ts`:
+
+<include>/_snippets/generated/installations/scalar.mdx</include>
+
+Restart the application after changing the selection. Startup validates the selected peer and
+initializes the renderer before publishing readiness.
+
+```sh title="Terminal — relkit-orders"
+open http://localhost:3000/_relkit/v1/api-reference
+```
+
+Scalar renders the same protected document. Select an operation and verify parameters, request body,
+success response, declared errors, and validation response.
+
+## Trace a field back to source
+
+The dynamic order route demonstrates path mapping, a named transform, several HTTP methods, and
+response-status overrides:
+
+<include
+  source="examples/commerce/src/routes/orders/[orderId]/route.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/routes/orders/[orderId]/route.ts"'
+>
+  /_snippets/source/examples/commerce/src/routes/orders/[orderId]/route.ts
+</include>
+
+If a path parameter is absent from OpenAPI, inspect the filesystem segment and the route request mapping. If
+a response is absent, inspect the target's declared errors or the route's explicit `responses` array. Use
+`bun run relkit graph print` to connect the operation back to its source file.
+
+## Operation identity and compatibility
+
+OpenAPI's operation ID and the generated client's procedure key use the checked route ID. Changing a
+path or method changes the inferred ID unless it is pinned explicitly. Moving a private function
+without changing its route does not rename the endpoint. Compare generated contracts in review and
+treat removed paths, newly required inputs, and narrowed outputs as compatibility decisions.
+
+## Protect production documentation
+
+<Callout type="warning" title="Production documentation is opt-in">
+  Enable `server.apiDocs.enabledInProduction` only with internal-endpoint authorization. Scalar
+  embeds the protected OpenAPI document; protect the raw JSON endpoint as well as the UI. Enabling
+  production docs without the required authorization configuration causes a startup configuration
+  error.
+</Callout>
+
+In development and test, JSON OpenAPI is available independently of the UI. Scalar is disabled by
+default; `server.apiDocs.ui: false` leaves the JSON document available without loading Scalar.
+`server.apiDocs.excludeDomains` filters the served document; it does not disable those domains'
+routes, revoke access, or remove generated-client operations. Documentation visibility is not authorization.
+
+Disabling the public reference does not remove the build-time `openapi.json` artifact. Release tooling can
+publish it to a controlled developer portal without exposing introspection from every application instance.
+
+<include>/_snippets/generated/related/docs-modules-http-openapi.mdx</include>

@@ -1,0 +1,64 @@
+---
+title: Job clients
+description: Trigger a public job, retain its run ID, and watch or control that run.
+pagination: false
+sidebar:
+  icon: panels-top-left
+---
+
+Trigger a job through the generated client, then use its run handle to observe progress and completion. Only jobs with a `client` policy appear. Triggering one admits work; the returned
+handle identifies a run and is **not** the completed result:
+
+Install the [frontend client and development CLI](/docs/modules/client) in the caller's package first.
+Submit with `client.jobs.exportOrders.trigger({ input: { orderIds }, options: { operationId } })`,
+then read `client.jobs.exportOrders.runs.get({ runId: accepted.runId })`. The caller installs no
+provider SDK; those dependencies belong to the backend's selected job binding.
+
+Keep `accepted.runId` and `operationId` so a later page load or retry can inspect the same run.
+The app must authorize the caller for this job; a typed client alone does not grant access.
+
+## Use from React
+
+The [`defineJob` example](/docs/modules/jobs/quickstart#2-expose-a-job) names this job `exportOrders`
+and exposes `trigger`, `get`, `list`, and `watch`. After [frontend setup](/guides/frontend/connect-react)
+and pulling that backend's contract, render this component under `RelkitClientProvider`:
+
+<include source="apps/docs/examples/frontend/export-orders.tsx" lang="tsx" meta='title="src/ExportOrders.tsx"'>
+  /_snippets/source/apps/docs/examples/frontend/export-orders.tsx
+</include>
+
+The hook selector is the job's public **name**, `exportOrders`, rather than its stable backend ID
+`orders.export-orders`. `useJobTrigger` supplies managed operation identity and retains pending
+receipt metadata. `useJobRun` waits for an accepted `runId`; mounting it does not submit a job.
+Persist that receipt in your application's own UI state if the page must restore it after navigation.
+
+| Client API | Backend policy required | Use |
+| --- | --- | --- |
+| [`useJobTrigger`](/docs/api/client#usejobtrigger) | `trigger` | Submit typed task input and receive a run handle. |
+| [`useJobRun`](/docs/api/client#usejobrun) / [`watchJobRun`](/docs/api/client#watchjobrun) | `watch` | Observe only the fields selected by the job's client policy. |
+| [`useJobCancel`](/docs/api/client#usejobcancel) | `cancel` | Send an explicit control with `runId` and `operationId`. |
+| [`useJobRetry`](/docs/api/client#usejobretry) | `retry` | Ask the provider to retry a run explicitly. |
+| [`watchJobStream`](/docs/api/client#watchjobstream) | `streams` and a declared named stream | Read the run's named content stream with its own lifecycle. |
+
+Cancel, retry, and named streams are not exposed by this example's policy. Declare the needed
+operations on the backend and pull a new contract before using them. Generated types also restrict
+which run fields the frontend can read. For an uncertain write, follow
+[recovery guidance](/docs/modules/client/offline); do not turn reconnect into automatic resubmission.
+
+## Watch one accepted run
+
+`watchJobRun` uses the accepted run ID. This public API example subscribes to state changes,
+connects once, and disposes the watcher when its caller is finished:
+
+<include source="apps/docs/examples/jobs/watch-run.ts" lang="ts" meta='title="Watch an export run"'>
+  /_snippets/source/apps/docs/examples/jobs/watch-run.ts
+</include>
+
+Call the returned cleanup function when the component or request scope ends. Reconnection
+resumes observation; it does not trigger a second run. Keep credentials on the server-side
+boundary for private jobs.
+
+Cancel and retry are explicit controls with `{ runId, operationId }`, allowing audit and recovery.
+The server may process them asynchronously; read or watch until the requested state appears.
+
+<include>/_snippets/generated/related/docs-modules-jobs-clients.mdx</include>

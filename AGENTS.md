@@ -16,7 +16,7 @@ The main product topology is:
 
 | Path                    | Role                                                                                                                            |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/docs`             | Searchable Next.js/Fumadocs guides and generated API/CLI reference, normally served on port `3001`.                             |
+| `apps/docs`             | Searchable Blume/Astro Learn, Modules, Guides, and generated API/CLI reference, normally served on port `3001`.                 |
 | `apps/inspector`        | Next.js inspector app, normally served on port `3210`.                                                                          |
 | `examples/commerce`     | Canonical executable example and cross-feature acceptance application.                                                          |
 | `integrations/catalog`  | Optional side-effect-free `@relkit/integrations` catalog.                                                                       |
@@ -114,6 +114,10 @@ Before changing exports, imports, directories, or naming conventions, read
 
 ## Effect work
 
+- For all code changes, always use the
+  [use-effect skill](/Users/mustafaelsayed/.codex/skills/use-effect/SKILL.md).
+  Read it before discovery or editing, and read and apply its required
+  references before each relevant phase.
 - For Effect implementation or review, read `.agents/skills/effect/SKILL.md`
   and the references matching the task before editing. Apply it alongside the
   nearest `AGENTS.md` and established RELKIT conventions. Use the skill to

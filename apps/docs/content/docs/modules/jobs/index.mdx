@@ -1,0 +1,79 @@
+---
+title: Jobs
+description: Durable task execution with typed inputs, progress, retries, and schedules.
+pagination: false
+sidebar:
+  icon: list-todo
+---
+
+A job exposes work that can continue after the request that started it has ended. Define a typed task, expose it through a job, and let RELKIT persist the run, retry transient failures, and report progress.
+
+<Callout type="tip" title="Start here" icon="route">
+Follow the [quickstart](/docs/modules/jobs/quickstart) to run an order export. For exact task and job options, open the [Jobs reference](/docs/api/jobs).
+</Callout>
+
+<include>/_setup/jobs.mdx</include>
+
+## Start here
+
+<CardGroup cols={2}>
+<Card icon="rocket">
+[Quickstart](/docs/modules/jobs/quickstart) — define a task and trigger its job.
+</Card>
+<Card icon="list-checks">
+[Tasks](/docs/modules/jobs/tasks) — the unit of durable execution.
+</Card>
+<Card icon="plug">
+[Bindings](/docs/modules/jobs/bindings) — choose a provider and bind jobs to it.
+</Card>
+<Card icon="sliders-horizontal">
+[Execution policy](/docs/modules/jobs/execution-policy) — timeouts, concurrency, and cancellation.
+</Card>
+<Card icon="repeat-2">
+[Retries and idempotency](/docs/modules/jobs/retries-and-idempotency) — safe retry behavior.
+</Card>
+<Card icon="panels-top-left">
+[Clients](/docs/modules/jobs/clients) — trigger, watch, and recover runs.
+</Card>
+<Card icon="calendar-clock">
+[Schedules](/docs/modules/jobs/schedules) — register provider-backed schedules.
+</Card>
+<Card icon="columns-2">
+[Providers](/docs/modules/jobs/providers) — compare native capability evidence.
+</Card>
+</CardGroup>
+
+## The model
+
+<include
+  source="examples/commerce/src/services/orders/tasks/export-orders.task.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/tasks/export-orders.task.ts
+</include>
+
+<include
+  source="examples/commerce/src/services/orders/jobs/export-orders.job.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/jobs/export-orders.job.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/jobs/export-orders.job.ts
+</include>
+
+Tasks own execution code, schemas, retry policy, limits, and hooks. Jobs own the public API name, admission, schedules, service selection, and client projection. The task ID, version, input schema, output schema, and policy are part of the durable identity of a run.
+
+## Defaults worth knowing
+
+- A run accepts at most 1 MiB of input and returns at most 1 MiB of output.
+- A progress or stream item is limited to 64 KiB.
+- The default retry policy is three attempts, one-second initial delay, 30-second maximum delay, factor two, and no jitter.
+- Run lists default to 25 items and accept at most 100.
+
+Read [provider comparison](/docs/modules/jobs/providers) before depending on durable sleep, native listing, or a schedule policy.
+
+## Legacy API
+
+The older function-target pages (`define`, `enqueue`, `first-job`, `retries`, `idempotency`, and `schedules`) remain available for migration. New code should use task-first jobs so task identity and compatibility checks are explicit.
+
+<include>/_snippets/generated/related/docs-modules-jobs-index.mdx</include>

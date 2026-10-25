@@ -1,0 +1,54 @@
+---
+title: Troubleshooting
+description: Diagnose common job and provider failures.
+pagination: false
+sidebar:
+  icon: bug
+---
+
+Start with the failing run or command, then check the selected provider's capabilities, registration, and connection.
+
+### Capability or binding errors
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Complete the selected [provider installation](/docs/modules/jobs/providers/inngest) first, using
+[Effect MQ](/docs/modules/jobs/providers/effect-mq) or [Trigger](/docs/modules/jobs/providers/trigger) when selected
+instead. The adapter wrapper alone does not install a native SDK or register an application patch.
+</Callout>
+
+Run `relkit jobs capabilities` and compare the job's requested execution mode with the selected binding. The compiler and deployment plan report the missing capability and the provider's actual limit.
+
+### A run is not progressing
+
+Check worker readiness, service generation, provider health, and the run's last attempt. Do not trigger a duplicate while a run is merely delayed; use the run ID and operation history.
+
+### Watch reconnects or shows a gap
+
+Reload the latest run snapshot, then resume observation. Progress and stream retention are bounded and are not a durable replacement for task output.
+
+### A schedule fires twice
+
+Check for a process-local scheduler, overlapping provider registrations, and a changed dedupe scope. Pause the schedule before removing a registration.
+
+### Deployment rollback is blocked
+
+An old build may still own active runs or a key/registration may still be referenced. Finish or migrate those runs before retiring the generation.
+
+### Trigger is unavailable
+
+Confirm that the backend is running and `jobs list`/`jobs capabilities` identify the selected job and
+binding. Resolve missing SDK, binding and provider-readiness diagnostics before retrying. An accepted
+CLI receipt proves admission; inspect the native run separately before reporting execution success.
+
+When a trigger response is lost, retain the original `operationId`, idempotency key, and request digest. Show
+an unknown outcome and use only the provider-certified recovery action; do not discard the handle or submit a
+different payload automatically.
+
+Check the [commerce job binding](https://github.com/rel-kit/relkit/blob/main/examples/commerce/relkit.config.ts)
+against the selected provider when investigating a binding error.
+
+The [task fixture manifest](https://github.com/rel-kit/relkit/blob/main/templates/default/v1/tasks/package.json)
+is a repository reference, not an installation recipe. Preserve your own manifest and install only
+the packages required by your selected provider.
+
+<include>/_snippets/generated/related/docs-modules-jobs-troubleshooting.mdx</include>

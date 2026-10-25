@@ -1,0 +1,87 @@
+---
+title: TypeScript clients and transports
+description: Call generated operations without React and choose HTTP, WebSocket, or automatic transport selection.
+pagination: false
+sidebar:
+  icon: cable
+---
+
+Use `@relkit/client` when a browser, script, or application already owns its request lifecycle.
+The client returns typed results and rejects on failures. React applications can use the
+[provider and hooks](/docs/modules/client) to manage loading, caching, and identity state.
+
+## Install and load your contract
+
+In the caller package:
+
+<include>/_snippets/generated/installations/client.mdx</include>
+
+Use the [Frontend guide](/guides/frontend/connect-react#2-pull-the-backend-contract) to install the
+development CLI and pull the public contract. Include `contract.ts` and `client-registry.d.ts` in the
+caller's TypeScript program. The generated `client.ts` also imports its contract; installing the
+package alone cannot infer the backend's operations.
+
+## Call a function-backed route
+
+With the [Echo route](/docs/modules/http/define#expose-one-public-function) on the backend and its
+contract pulled into the caller, this function sends domain input and returns `{ message: string }`:
+
+<include source="apps/docs/examples/frontend/rpc.ts" lang="ts" meta='title="src/echo-client.ts"'>
+  /_snippets/source/apps/docs/examples/frontend/rpc.ts
+</include>
+
+Call `echoMessage(window.location.origin, "Hello from the frontend")` behind a same-origin proxy,
+or pass your configured backend origin. Handle the returned Promise's rejection in your UI.
+The pulled contract exposes `client["route.post.echo"]`. React hooks also accept the `POST /echo`
+selector through their generated registry. The call uses `/rpc` and returns the function output;
+it does not return an HTTP `Response`.
+
+`createClient` configures transport; it does not perform the identity handshake. This example first
+loads the current browser identity, validates its scope and session epoch, and sends them with the
+mutation. The React provider manages that handshake for hooks. Server callers must forward the same
+request credentials to both requests; [Bun's server context](/docs/modules/client/ssr) does this for you.
+If the identity changes between requests, surface the rejection and reconcile the outcome before
+submitting again. Do not bypass the identity headers or automatically retry a write.
+
+## Choose a transport
+
+All three factories are exported from `@relkit/client` and use the same generated contract:
+
+| Factory | Use it for | Configuration and behavior |
+| --- | --- | --- |
+| [`createClient`](/docs/api/client#createclient) | Finite HTTP calls and supported HTTP streams | `baseUrl`, request-time `headers`, `credentials`, and an optional `fetch`. |
+| [`createWebSocketClient`](/docs/api/client#createwebsocketclient) | A backend with WebSocket RPC enabled | `baseUrl`, an optional WebSocket constructor, and `establishmentTimeoutMs`. Connection establishment is lazy. |
+| [`createAutoClient`](/docs/api/client#createautoclient) | WebSocket preference with HTTP fallback | Combines the transport options. Fallback applies to connection establishment, not replay of an accepted operation. |
+
+Pass the backend origin without appending `/rpc`. A custom transport still needs the backend's
+matching configuration and authentication. Use [HTTP streaming](/docs/modules/http/streaming) for
+stream contracts, and [client stream hooks](/docs/modules/client/streams) when React owns them.
+
+`headers` may be a header collection or an asynchronous provider evaluated for future requests.
+Use request-scoped credentials for server callers. Browser requests include credentials by default;
+separate origins need [matching cookie and CORS configuration](/docs/modules/auth/clients#keep-cookies-and-origins-aligned).
+
+## Add query utilities or server tracing
+
+| Entry point | API | Owner |
+| --- | --- | --- |
+| `@relkit/client/tanstack-query` | [`createTanstackQueryUtils`](/docs/api/client#all-exported-apis) | [Query options and cache integration](/docs/modules/client/routes#choose-query-helpers) |
+| `@relkit/client/server` | [`createServerClient`](/docs/api/client#createserverclient) | [Bun server calls and tracing](/docs/modules/client/ssr) |
+| `@relkit/client/server/tanstack-query` | [`createRelkitServerContext`](/docs/api/client#createrelkitservercontext) | [Request-scoped hydration](/docs/modules/client/ssr) |
+| `@relkit/client/jobs` | [`watchJobRun`](/docs/api/client#watchjobrun), [`watchJobStream`](/docs/api/client#watchjobstream) | [Accepted job runs](/docs/modules/jobs/clients) |
+
+The server leaves are Bun-only exports. Use the base `createClient` in other server runtimes.
+Query integration is opt-in and has its own [peer installation](/docs/modules/client/routes#choose-query-helpers).
+
+## Handle errors and resource lifetimes
+
+Catch [`ORPCError`](/docs/api/client#all-exported-apis) for RPC failures and inspect its code and data.
+Do not treat a missing response to a write as proof that the write failed. Follow
+[uncertain-outcome recovery](/docs/modules/client/offline) before resubmitting.
+
+Pass cancellation signals to calls that need them, finish or cancel stream iteration, and dispose
+job watchers when their owner closes. A reconnect resumes observation; it is not permission to
+repeat a mutation. [Generated clients](/docs/modules/http/generated-clients) explains how route
+policy, REST mapping, and RPC input differ.
+
+<include>/_snippets/generated/related/docs-modules-client-transports.mdx</include>

@@ -1,0 +1,55 @@
+---
+title: Authentication and identity
+description: Partition browser state with server-derived identity and session epochs.
+pagination: false
+sidebar:
+  icon: shield-check
+---
+
+Connect the frontend client's identity to your application's authenticated session.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Complete [React client setup](/docs/modules/client) in the frontend and
+[Better Auth setup](/docs/modules/auth/better-auth) in the backend first. The React convenience provider
+uses the separate `@relkit/better-auth/react` leaf. Add only its selected frontend owner/peers:
+</Callout>
+
+<include>/_snippets/generated/installations/auth-react.mdx</include>
+
+This convenience leaf keeps backend database configuration out of the browser. The example below
+also uses Better Auth's native React `createAuthClient` and `useSession` hook, so install its
+browser SDK requirements:
+
+<include>/_snippets/generated/installations/auth-client.mdx</include>
+
+The [auth module](/docs/modules/auth/clients) owns sign-up, sign-in, and session operations.
+
+## Bootstrap identity
+
+`GET /_relkit/v1/client/identity` is private and non-cacheable. It returns opaque identity scope,
+session epoch, application ID, and public fingerprint. Scope or epoch changes abort in-flight work,
+clear private RELKIT stores, grants, and presence, and reject late callbacks.
+
+## Connect a provider
+
+Use `BetterAuthRelkitClientProvider` from `@relkit/better-auth/react` for cookie sessions. A manual
+`identityKey` adds a tenant/application partition but never grants authority. Cross-origin cookies
+still require exact credentialed CORS, suitable cookie `SameSite` policy, CSRF protection, and an
+allowed Origin.
+
+<include
+  source="apps/docs/examples/frontend/auth-provider.tsx"
+  lang="tsx"
+  meta='title="src/AuthProvider.tsx"'
+>
+  /_snippets/source/apps/docs/examples/frontend/auth-provider.tsx
+</include>
+
+Wrap the part of your app that calls RELKIT hooks in `AuthProvider`. For a same-origin proxy,
+forward the backend's `/api/auth` mount as well as `/rpc` and `/_relkit`, and configure Better Auth's
+trusted origins for the frontend. Do not nest a second generic provider around private queries.
+The wrapper responds to native session changes; it does not replace the server's authorization.
+
+Reference: [`BetterAuthRelkitClientProvider`](/docs/api/better-auth#betterauthrelkitclientprovider).
+
+<include>/_snippets/generated/related/docs-modules-client-authentication.mdx</include>

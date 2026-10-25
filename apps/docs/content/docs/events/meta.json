@@ -1,5 +1,0 @@
-{
-  "title": "Events",
-  "icon": "Radio",
-  "pages": ["index", "define", "publish", "consume", "first-event"]
-}

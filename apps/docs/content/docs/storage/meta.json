@@ -1,5 +1,0 @@
-{
-  "title": "Storage",
-  "icon": "HardDrive",
-  "pages": ["index", "define", "upload", "read-delete", "first-upload"]
-}

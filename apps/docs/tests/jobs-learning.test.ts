@@ -6,63 +6,74 @@ import { features } from "../scripts/feature-catalog.js";
 import { renderRelated } from "../scripts/generate-guides.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 import { jobsGuideGroup } from "../scripts/jobs-guide-catalog.js";
-const content = resolve(import.meta.dir, "../content/docs");
+const content = resolve(import.meta.dir, "../content");
 /** Reads one owned job guide at the native synchronous test boundary.
  * @param page - Job/provider guide path selected by this suite.
  * @returns Original guide text; missing input fails the native test.
  */
-const read = (page: string) => readFileSync(resolve(content, `jobs/${page}.mdx`), "utf8");
-test("connects Jobs between Events and Database with source-backed guides", () => {
+const read = (page: string) =>
+  readFileSync(
+    resolve(content, `docs/modules/jobs/${page === "providers" ? "providers/index" : page}.mdx`),
+    "utf8",
+  );
+test("connects Jobs between Events and Database with source-backed guides", async () => {
   expect(guideGroups.map(({ directory }) => directory).slice(0, 7)).toEqual([
-    "start",
-    "fundamentals",
-    "service",
-    "http",
-    "events",
-    "jobs",
-    "database",
+    "docs/learn",
+    "docs/learn/concepts",
+    "docs/modules/service",
+    "docs/modules/http",
+    "docs/modules/events",
+    "docs/modules/jobs",
+    "docs/modules/database",
   ]);
-  expect(JSON.parse(readFileSync(resolve(content, "jobs/meta.json"), "utf8"))).toEqual({
+  expect((await import("../content/docs/modules/jobs/meta.js")).default).toMatchObject({
     title: "Jobs",
-    icon: "ListTodo",
     pages: jobsGuideGroup.pages,
   });
-  expect(guideRelations.find(({ path }) => path === "events/first-event")?.next).toBeUndefined();
-  const relation = guideRelations.find(({ path }) => path === "events/first-event");
+  expect(
+    guideRelations.find(({ path }) => path === "guides/events/react-to-order-events")?.next,
+  ).toBeUndefined();
+  const relation = guideRelations.find(
+    ({ path }) => path === "guides/events/react-to-order-events",
+  );
   if (relation === undefined) throw new Error("The first-event guide relation is missing");
   expect(renderRelated(relation)).not.toContain("Next step");
-  expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBeUndefined();
-  expect(features.find(({ id }) => id === "jobs")?.guide).toBe("jobs/quickstart");
-  expect(features.find(({ id }) => id === "schedules")?.guide).toBe("jobs/schedules");
+  expect(
+    guideRelations.find(({ path }) => path === "docs/modules/jobs/troubleshooting")?.next,
+  ).toBeUndefined();
+  expect(features.find(({ id }) => id === "jobs")?.guide).toBe("docs/modules/jobs/quickstart");
+  expect(features.find(({ id }) => id === "schedules")?.guide).toBe("docs/modules/jobs/schedules");
   for (const page of jobsGuideGroup.pages) {
     const source = read(page);
-    expect(source).toContain(`content/generated/related/jobs-${page}.mdx`);
+    expect(source).toContain(
+      `/_snippets/generated/related/docs-modules-jobs-${page === "providers" ? "providers-index" : page}.mdx`,
+    );
     if (["quickstart", "tasks", "bindings", "clients", "schedules", "providers"].includes(page))
-      expect(read("index")).toContain(`](/docs/jobs/${page})`);
+      expect(read("index")).toContain(`](/docs/modules/jobs/${page})`);
   }
 });
-test("teaches task admission and completion using executable documentation sources", () => {
+test("teaches task admission and completion using executable documentation sources", async () => {
   const tutorial = read("quickstart");
   for (const path of [
     "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
     "examples/commerce/src/services/orders/jobs/export-orders.job.ts",
     "examples/commerce/src/routes/orders/export/route.ts",
   ]) {
-    expect(tutorial).toContain(`../../${path}`);
+    expect(tutorial).toContain(path);
   }
   expect(tutorial).toContain("RunHandle");
   expect(tutorial).toContain("bun run check");
   expect(tutorial).toContain("bun run typecheck");
   expect(read("migration")).toContain("task-first definition");
 });
-test("states current retry, overlap, and provider limits without exactly-once promises", () => {
+test("states current retry, overlap, and provider limits without exactly-once promises", async () => {
   expect(read("retries-and-idempotency")).toContain("three attempts");
   expect(read("retries-and-idempotency")).toContain("cannot multiply");
   expect(read("schedules")).toContain("provider accepted a write");
   expect(read("schedules")).toContain("does not cancel runs already accepted");
   expect(read("providers")).toContain("Managed cloud evidence");
 });
-test("provider guides show configuration, real input, registration, and native run evidence", () => {
+test("provider guides show configuration, real input, registration, and native run evidence", async () => {
   for (const provider of ["inngest", "effect-mq", "trigger"]) {
     const page = read(`providers/${provider}`);
     expect(page).toContain(`providers/${provider}-config.ts`);
@@ -79,7 +90,7 @@ test("provider guides show configuration, real input, registration, and native r
     "jobs-inngest-completed.png",
     "jobs-effect-mq-completed.png",
   ]) {
-    expect(existsSync(resolve(content, `../../public/${screenshot}`))).toBe(true);
+    expect(existsSync(resolve(import.meta.dir, `../public/${screenshot}`))).toBe(true);
     expect(read(`providers/${screenshot.includes("effect") ? "effect-mq" : "inngest"}`)).toContain(
       `/${screenshot}`,
     );

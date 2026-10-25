@@ -1,0 +1,146 @@
+---
+title: Your first durable job
+description: Read the commerce Orders export task, its public job, provider binding, and accepted run handle.
+pagination: false
+sidebar:
+  icon: rocket
+---
+
+Define an Orders export task, expose it through a job, and follow the run to completion. It is an optional extension after
+the [Orders API tutorial](/docs/learn/build-and-run), not a file replacement in your protected
+`relkit-orders` app. You need Bun, repository dependencies, and Docker for a live provider run.
+
+<include>/_setup/jobs.mdx</include>
+
+<Steps>
+<Step icon="list-todo">
+
+## 1. Define a task
+
+When adapting this to a separate lean app, first complete [Inngest's selected installation and
+binding](/docs/modules/jobs/providers/inngest). The repository example already declares its native SDK and
+local tooling; copying task/job files does not install them. Provider creation tuples remain unavailable.
+
+In your own application, with an existing `orders` service and no export task yet, run:
+
+```sh title="Terminal — application root"
+bun run relkit add task export-orders --service orders
+```
+
+This creates `src/services/orders/tasks/export-orders.task.ts` and registers `exportOrdersTask` in
+the service's task map. Replace its placeholder input, output, and handler with your operation.
+The [task command reference](/docs/api/cli#relkit-add-task-name) lists execution and version options.
+Skip scaffolding when reading the commerce example, which already contains these files.
+
+A task owns durable execution. This one accepts order IDs, emits progress, and returns CSV text.
+Its helper `exportOrderCsv` lives in the commerce example; if adapting the pattern to your app,
+replace that helper with your own business operation and keep its schemas explicit.
+
+<include
+  source="examples/commerce/src/services/orders/tasks/export-orders.task.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/tasks/export-orders.task.ts
+</include>
+
+The task ID and version are stable compatibility identifiers. Change the version when the input or output contract is intentionally incompatible.
+
+</Step>
+<Step icon="workflow">
+
+## 2. Expose a job
+
+In your own app, scaffold the job after creating the task:
+
+```sh title="Terminal — application root"
+bun run relkit add job export-orders --service orders \
+  --target orders.export-orders-task
+```
+
+`--target` is the task's stable ID. This creates `src/services/orders/jobs/export-orders.job.ts`
+and registers the job on the service. Review its provider profile and client policy before
+running it. It does not create the HTTP trigger below. See the
+[job command reference](/docs/api/cli#relkit-add-job-name) for all flags.
+
+The job gives the task a public name and client policy. The HTTP route below is a separate
+entry point; its handler accepts a run and returns `202`, not the CSV output.
+
+<include
+  source="examples/commerce/src/services/orders/jobs/export-orders.job.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/jobs/export-orders.job.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/jobs/export-orders.job.ts
+</include>
+
+### Use this job from the frontend
+
+<include>/_frontend/job.mdx</include>
+
+### Add a separate HTTP trigger
+
+<include
+  source="examples/commerce/src/routes/orders/export/route.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/routes/orders/export/route.ts"'
+>
+  /_snippets/source/examples/commerce/src/routes/orders/export/route.ts
+</include>
+
+The commerce Orders service exports both the task and job. Its `relkit.config.ts` binds
+`jobs.default` to `docker(inngest())`, so the compiler can check durable capabilities. When
+adapting this to your own app, add a supported job binding before starting a run.
+
+The generated job owns admission and client operations while
+the task remains the unit of execution and compatibility.
+
+For the browser side of this declaration, follow the
+[React trigger and run example](/docs/modules/jobs/clients#use-from-react). It uses this job's
+`exportOrders` name and the task's generated input/output types.
+
+</Step>
+<Step icon="activity">
+
+## 3. Trigger and observe
+
+The generated trigger receives `{ input, options }` and returns an accepted `RunHandle`. For example,
+call `client.jobs.exportOrders.trigger({ input: { orderIds }, options: { operationId } })`, then read
+`client.jobs.exportOrders.runs.get({ runId: accepted.runId })`. Keep the accepted `runId` and
+`operationId`; a handle is an admission receipt, not the task output.
+
+Use [job clients](/docs/modules/jobs/clients) for the complete trigger/watch lifecycle and
+[progress and streams](/docs/modules/jobs/progress-and-streams) for live updates.
+
+</Step>
+<Step icon="terminal">
+
+## 4. Run locally
+
+```sh title="Terminal — examples/commerce"
+bun run check
+bun run typecheck
+bun ../../packages/cli/dist/bin.js local up --detach
+bun ../../packages/cli/dist/bin.js local status
+```
+
+Start `bun run dev` after the provider reports ready. In another terminal, submit a run:
+
+```sh title="Second terminal — examples/commerce"
+bun ../../packages/cli/dist/bin.js jobs capabilities
+curl -i -X POST http://127.0.0.1:4000/orders/export \
+  -H 'content-type: application/json' \
+  -d '{"orderIds":["order-1"]}'
+```
+
+Expect HTTP `202` and a `RunHandle` with a `runId`; read or watch that ID until completion.
+The local provider is
+selected by the project binding. Use `relkit local reset --dry-run` before clearing local state.
+
+Run `bun run test` from `examples/commerce` before changing the task. A passing test checks
+application behavior, while the Docker run checks the selected provider.
+
+</Step>
+</Steps>
+
+<include>/_snippets/generated/related/docs-modules-jobs-quickstart.mdx</include>

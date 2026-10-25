@@ -57,7 +57,14 @@ export const defineConstantsEffect = Effect.fn("App.defineConstants")(
  * @param options - Optional stable descriptor identity.
  * @returns A frozen constants descriptor.
  * @throws The original validation error for invalid values.
- * @example defineConstants({ region: "eu" });
+ * @example
+ * ```ts
+ * import { defineConstants, defineEnv, env } from "@relkit/app";
+ * const environment = defineEnv({ REGION: env.string() });
+ * const limits = defineConstants({ maxItems: 20, region: environment.REGION });
+ * // Literal values are immutable; the environment reference resolves with the context.
+ * ```
+ * @see https://relkit.up.railway.app/docs/modules/service/context-values
  */
 export function defineConstants<const Values extends ConstantsShape>(
   values: Values,
@@ -103,7 +110,13 @@ export const definePromptEffect = Effect.fn("App.definePrompt")(
  * @param options - Optional stable descriptor identity.
  * @returns A frozen prompt descriptor.
  * @throws The original validation error for invalid text.
- * @example definePrompt("Be concise.");
+ * @example
+ * ```ts
+ * import { definePrompt } from "@relkit/app";
+ * const support = definePrompt(["Use the order details.", "Do not invent delivery dates."]);
+ * // support.value preserves the two fragments in order.
+ * ```
+ * @see https://relkit.up.railway.app/docs/modules/service/context-values
  */
 export function definePrompt<const Value extends PromptValue>(
   value: Value,

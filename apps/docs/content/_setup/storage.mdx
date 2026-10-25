@@ -1,0 +1,29 @@
+## Pre-setup
+
+Use MinIO in local Docker for development. Start from an existing RELKIT app and a running Docker daemon.
+
+<Steps>
+<Step title="Install the storage integration" icon="package">
+
+<include>/_snippets/generated/installations/s3.mdx</include>
+
+</Step>
+<Step title="Configure the assets profile" icon="settings">
+
+<include>/_setup/local-config.mdx</include>
+
+<include source="apps/docs/examples/setup/storage.ts" lang="ts" meta='title="relkit.config.ts"'>
+  /_snippets/source/apps/docs/examples/setup/storage.ts
+</include>
+
+Buckets with `profile: "assets"`, or no explicit profile, now select local MinIO.
+Docker supplies its endpoint and credentials; no S3 secrets belong in `defineEnv` for this local path.
+For an existing S3 service, follow [connected storage](/docs/modules/storage/local-storage) instead.
+
+</Step>
+<Step title="Check and start after defining the bucket" icon="terminal">
+
+<include>/_setup/docker-run.mdx</include>
+
+</Step>
+</Steps>

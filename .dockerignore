@@ -3,12 +3,14 @@
 .agents
 .turbo
 .next
+.relkit
 node_modules
 dist
 *.tsbuildinfo
 
 **/.turbo
 **/.next
+**/.blume
 **/node_modules
 **/dist
 

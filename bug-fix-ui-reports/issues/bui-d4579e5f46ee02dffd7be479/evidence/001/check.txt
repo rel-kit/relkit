@@ -1,0 +1,5 @@
+$ bun run generate:check && tsc --noEmit && bun run check:jsdoc && bun run check:links && bun run check:search
+$ bun run scripts/generate.ts --check
+Generated documentation is current.
+tests/navigation.test.ts(30,17): error TS2550: Property 'toSorted' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2023' or later.
+tests/navigation.test.ts(30,46): error TS2550: Property 'toSorted' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2023' or later.

@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",
+    "@effect/platform-node-shared": "catalog:",
     "@relkit/contracts": "workspace:*",
     "@relkit/inspector-api": "workspace:*",
     "@relkit/observability": "workspace:*",

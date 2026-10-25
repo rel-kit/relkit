@@ -49,8 +49,13 @@ Application code can import the root API or focused typed paths:
 - `@relkit/app/services`
 
 Optional integrations such as `@relkit/client`, `@relkit/drizzle`,
-`@relkit/better-auth`, providers, testing, and the CLI remain separate so the
+`@relkit/better-auth`, `@relkit/langchain`, providers, testing, the Inspector and CLI remain separate so the
 core API does not install the full AWS, Pulumi, Next.js, or testing stack.
+
+Follow the selected capability's [installation guide](apps/docs/content/docs/modules/integrations/index.mdx)
+before copying source. Native SDKs and declaration repairs remain application-owned;
+`relkit add` normally installs the requirements it selects, while `--no-install`
+leaves explicit install/check next steps. Public packages have independent versions.
 
 ## AI agent skills
 
@@ -119,7 +124,7 @@ bun run relkit:local -- create my-app --cloud none --deploy none
 
 ## Repository layout
 
-- `apps/docs` is the searchable Next.js/Fumadocs documentation application on
+- `apps/docs` is the searchable Blume/Astro documentation application on
   port `3001`.
 - `apps/inspector` is the private Next.js UI packaged by the independently installed
   `@relkit/inspector` tool, whose UI defaults to port `3210`.
@@ -160,7 +165,7 @@ for runtime requirements, current candidate availability and separate process co
 The example route is:
 
 ```sh
-curl 'http://localhost:3000/hello?name=RelKit'
+curl http://localhost:3000/hello\?name=RelKit
 ```
 
 AWS/Pulumi creation flags remain parsed for precise diagnostics but are rejected until that tuple

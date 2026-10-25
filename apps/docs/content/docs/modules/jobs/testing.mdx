@@ -1,0 +1,31 @@
+---
+title: Testing
+description: Test task behavior, provider contracts, and rollout safety.
+pagination: false
+sidebar:
+  icon: flask-conical
+---
+
+Test tasks with fixed inputs, explicit provider replacements, and controlled time. Assert input/output schemas, retry classification, idempotency, progress limits, and cancellation behavior.
+
+The focused repository suites are `test:jobs:unit`, `test:jobs:types`, `test:jobs:contracts`,
+`test:jobs:restart`, `test:jobs:client`, and `test:jobs:inspector`; Docker and native provider suites are
+explicitly gated by `test:jobs:docker` and `test:jobs:providers`.
+
+Use provider conformance tests for submission, read, list, observation, cancel, retry, schedules, and durable sleep only when the provider advertises each capability. Test the local rollout path for readiness, rollback, old-build retention, and unsafe retirement.
+
+After the [selected provider installation](/docs/modules/jobs/providers) is complete, application checks and
+tests with explicit provider replacements remain local. The generic [test harness](/docs/modules/operations/testing)
+does not install native SDKs or start a provider:
+
+```sh
+bun run check
+bun run typecheck
+bun run test
+```
+
+Docker lifecycle tests are opt-in. Cloud deployment and acceptance require explicit environment configuration and should not run as part of a normal local test loop.
+
+[Task-wire regression test](https://github.com/rel-kit/relkit/blob/main/packages/jobs/tests/task-wire.test.ts)
+
+<include>/_snippets/generated/related/docs-modules-jobs-testing.mdx</include>

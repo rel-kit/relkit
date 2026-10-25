@@ -32,7 +32,7 @@ export function relation(path: string, api: readonly ApiPackage[], examples: rea
  */
 export function nextGuide(path: string): string | undefined {
   const index = startJourney.findIndex((page) => page === path);
-  if (index >= 0) return startJourney[index + 1] ?? "fundamentals/index";
-  if (path === "index") return "start/create-an-app";
+  if (index >= 0) return startJourney[index + 1] ?? "docs/learn/concepts/index";
+  if (path === "docs/index" || path === "docs/learn/index") return "docs/learn/create-an-app";
   return undefined;
 }

@@ -4,7 +4,7 @@ export const testingFeature = feature(
   "testing",
   "Testing",
   "Exercise the engine with HTTP helpers and deterministic fakes.",
-  "operations/testing",
+  "docs/modules/operations/testing",
   "testing",
   [
     ["packages/testing/src/invoke-function.ts", "invokeFunction"],

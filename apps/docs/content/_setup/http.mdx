@@ -1,0 +1,19 @@
+## Pre-setup
+
+Start from the [minimal app](/docs/learn/create-an-app). Core HTTP needs no optional integration
+or external service. Merge listener settings in `relkit.config.ts` when changing the defaults:
+
+<include source="apps/docs/examples/setup/http.ts" lang="ts" meta='title="relkit.config.ts"'>
+  /_snippets/source/apps/docs/examples/setup/http.ts
+</include>
+
+Keep your app's existing ID, `env` contract, and other settings. `PORT` is a framework-owned
+runtime override; do not add it to `defineEnv`. Put application-specific values in
+[`src/platform/env.ts`](/docs/learn/concepts/environment) and keep that descriptor in `defineApp({ env })`.
+
+Configure a route's dependencies before serving it: [database](/docs/modules/database#pre-setup),
+[uploads](/docs/modules/storage#pre-setup), [cache/rate-limit storage](/docs/modules/caching#pre-setup),
+and [authentication](/docs/modules/auth#pre-setup). These use local Docker where a service is needed.
+Then run `bun run check`, `bun run typecheck`, and `bun run dev`; the first route guide verifies
+the actual HTTP response. [Scalar](/docs/modules/http/openapi) and
+[MCP](/docs/modules/ai/mcp) require their own opt-in setup.

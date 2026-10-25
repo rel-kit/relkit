@@ -1,42 +1,53 @@
-import { readFile, readdir } from "node:fs/promises";
-import { join, resolve } from "node:path";
+/** Checks Blume's expanded search documents, excluding references while retaining authored API usage. */
+import { resolve } from "node:path";
+import { scanProject } from "blume/core/project-graph.ts";
+import { buildSearchDocuments } from "blume/search/documents.ts";
+import { Effect } from "effect";
+import config from "../blume.config.js";
 
-const content = resolve(import.meta.dir, "../content/docs");
-const files = await markdownFiles(content);
-const missingMetadata: string[] = [];
-const indexedText: string[] = [];
-
-for (const file of files) {
-  const text = await readFile(file, "utf8");
-  const frontmatter = text.match(/^---\n([\s\S]*?)\n---/)?.[1];
-  if (!frontmatter || !/^title: .+/m.test(frontmatter) || !/^description: .+/m.test(frontmatter))
-    missingMetadata.push(file);
-  indexedText.push(text);
-}
-
-if (missingMetadata.length)
-  throw new Error(`Pages missing searchable title/description:\n${missingMetadata.join("\n")}`);
-const index = indexedText.join("\n");
-for (const term of [
-  "defineRoute",
-  "defineEventFunction",
-  "relkit graph diff",
-  "defineAgent",
-  "Scalar",
-]) {
-  if (!index.includes(term)) throw new Error(`Search corpus is missing required term: ${term}`);
-}
-const route = await readFile(resolve(import.meta.dir, "../app/api/search/route.ts"), "utf8");
-if (!route.includes("createFromSource(source)"))
-  throw new Error("Search route is not source-backed");
-console.log(`Validated metadata and search corpus for ${files.length} pages.`);
-
-async function markdownFiles(directory: string): Promise<string[]> {
-  const found: string[] = [];
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    const path = join(directory, entry.name);
-    if (entry.isDirectory()) found.push(...(await markdownFiles(path)));
-    else if (/\.mdx?$/.test(entry.name)) found.push(path);
-  }
-  return found;
-}
+await Effect.runPromise(
+  Effect.tryPromise(async () => {
+    const project = await scanProject(resolve(import.meta.dir, ".."), { mode: "build" });
+    const documents = await buildSearchDocuments(project);
+    for (const document of documents) {
+      if (/^\/docs\/api(?:\/|$)/.test(document.route))
+        throw new Error(`Reference page must stay out of search: ${document.route}`);
+      if (!document.title.trim() || !document.description.trim())
+        throw new Error(`Search metadata is missing: ${document.route}`);
+    }
+    const corpus = documents
+      .map(({ title, description, content }) => `${title}\n${description}\n${content}`)
+      .join("\n");
+    for (const term of [
+      "defineRoute",
+      "defineEventFunction",
+      "relkit add route",
+      "defineAgent",
+      "defineBucket",
+      "defineConstants",
+      "definePrompt",
+      "RelkitClientProvider",
+      "Call your API from React",
+      "useJobTrigger",
+      "useChannel",
+      "useRelkitClient",
+      "defineProviderAdapter",
+      "createTestBucketFake",
+      "normalizeCreateOptions",
+      "@relkit/client/server",
+      "Scalar",
+    ]) {
+      if (!corpus.includes(term)) throw new Error(`Search corpus is missing: ${term}`);
+    }
+    if (
+      !config.search ||
+      !("indexing" in config.search) ||
+      config.search.indexing?.includeCodeBlocks !== true
+    ) {
+      throw new Error("Native search must index code symbols and commands.");
+    }
+    console.log(
+      `Validated ${documents.length} searchable documents with all reference pages excluded.`,
+    );
+  }),
+);

@@ -1,0 +1,8 @@
+$ tsc --noEmit
+$ bun run scripts/check-jsdoc.ts
+Checked rich JSDoc for 32 public authoring APIs.
+$ blume validate --strict
+[blume] ✔ No broken links found.
+$ bun run scripts/check-search.ts
+Validated metadata and source-backed search corpus for 407 documents.
+Exit code: 0

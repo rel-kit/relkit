@@ -1,0 +1,44 @@
+---
+title: Offline writes and uncertain outcomes
+description: Reconcile writes without silently replaying payloads.
+pagination: false
+sidebar:
+  icon: wifi-off
+---
+
+Handle a lost connection according to what you know about the request's outcome.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
+Keep its selected React/query peers and generated declarations in the frontend package.
+</Callout>
+
+## Classify the outcome
+
+RELKIT has no implicit offline write queue. A known-offline write is `not-sent`; a lost response after
+transmission is `unknown`. Agent runs, controls, and continuations use scoped operation IDs and durable
+receipt lookup after refresh. Arbitrary mutations remain unknown unless the application supplies a
+reconciliation endpoint. Do not resubmit an uncertain external effect automatically.
+
+Job submissions additionally retain the original operation ID, idempotency key, request digest, and any
+provider-certified recovery window. A recovered job must use the same request; a discarded `runId` is not a
+safe recovery strategy.
+
+## Choose recovery from the outcome
+
+The public `isJobUnknownOutcome` guard tells you whether a caught value includes a job
+recovery action. Show that action to the user or use it in an explicit reconciliation flow:
+
+<include
+  source="apps/docs/examples/jobs/reconcile-unknown.ts"
+  lang="ts"
+  meta='title="Handle an uncertain job outcome"'
+>
+  /_snippets/source/apps/docs/examples/jobs/reconcile-unknown.ts
+</include>
+
+For ordinary route mutations, use an application-owned status endpoint before resubmitting.
+The client cannot infer whether a disconnected write reached your backend. For jobs, keep the
+original operation ID and request digest and follow the provider-certified recovery action.
+
+<include>/_snippets/generated/related/docs-modules-client-offline.mdx</include>

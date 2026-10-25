@@ -1,9 +1,21 @@
+/* Aligns the landing utilities and embedded Blume search with the neutral landing theme. */
 @import "tailwindcss";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
+@source "../node_modules/blume/src/components/layout/Search.astro";
+
+@theme inline {
+  --color-background: var(--color-fd-background);
+  --color-foreground: var(--color-fd-foreground);
+  --color-muted: var(--color-fd-muted);
+  --color-muted-foreground: var(--color-fd-muted-foreground);
+  --color-border: var(--color-fd-border);
+  --color-accent: var(--relkit-accent);
+  --radius-blume: 0.75rem;
+}
 
 :root {
-  --relkit-accent: oklch(0.64 0.18 262);
+  --relkit-accent: var(--color-fd-foreground);
 }
 
 ::selection {

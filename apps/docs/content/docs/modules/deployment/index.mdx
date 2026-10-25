@@ -1,0 +1,83 @@
+---
+title: Deployment
+description: Run locally with Docker, ship a built Bun application, and choose supported hosting, resource, and job providers.
+pagination: false
+sidebar:
+  icon: cloud-upload
+---
+
+Deployment makes a checked application run in its target environment. Begin with local Docker
+for development dependencies and container verification, then choose how to host the built server
+and supply its production resources.
+
+## Pre-setup
+
+Complete each module's local configuration before building: [database](/docs/modules/database#pre-setup),
+[auth](/docs/modules/auth#pre-setup), [storage](/docs/modules/storage#pre-setup),
+[cache](/docs/modules/caching#pre-setup), [jobs](/docs/modules/jobs#pre-setup), and
+[realtime](/docs/modules/realtime#pre-setup). Keep required application values in `defineEnv`
+and connect that descriptor through `defineApp({ env })`.
+
+From the backend root, verify the application before choosing a deployment target:
+
+```sh title="Terminal — application root"
+bun run check
+bun run typecheck
+bun run test
+bun run build
+```
+
+These commands create no cloud resources. A production server receives secrets from its process
+environment; the build does not embed `.env` values. Preserve application state, database migrations,
+and immutable worker versions across releases.
+
+<CardGroup cols={2}>
+<Card title="Start with local Docker" href="/docs/modules/deployment/local-docker" icon="container" arrow>
+Run local services, then build and verify the minimal app in a container.
+</Card>
+<Card title="Deploy to AWS with Pulumi" href="/docs/modules/deployment/aws" icon="cloud-upload" arrow>
+Install the supported host and engine, configure roles, preview, and apply a reviewed stack.
+</Card>
+<Card title="Run a built Bun server" href="/docs/modules/deployment/aws#run-a-built-application" icon="server" arrow>
+Install the generated production manifest and start the complete build on your own host.
+</Card>
+<Card title="Connect production resources" href="/docs/modules/deployment/providers" icon="plug" arrow>
+Choose storage, cache, database, task, and telemetry providers independently of the host.
+</Card>
+</CardGroup>
+
+## Supported providers
+
+| Role | Supported path | What RELKIT manages |
+| --- | --- | --- |
+| Local development services | Docker recipes for Redis, MinIO, Inngest, Trigger.dev, and Effect MQ | Graph-required containers, readiness, connection values, and persistent volumes; [coverage](/docs/modules/integrations/local-docker#supported-local-services) |
+| Self-hosted application | Built Bun server or generated Docker image | Portable build output; you provide the host, process/container supervisor, TLS, and resource connections |
+| Cloud application host | **AWS**, through `@relkit/aws` | ECS/Fargate, networking, load balancer, workload access, and CloudWatch stdout; [AWS setup](/docs/modules/deployment/aws) |
+| Infrastructure engine | **Pulumi**, through `@relkit/pulumi` | Stack configuration, preview, apply, outputs, refresh, and destroy |
+| Infrastructure-owned resources | AWS wrappers for supported S3 and Redis/Valkey resources | Resource lifecycle and access, separately from the application host |
+| Connected file/cache resources | S3-compatible storage, Redis, Cloudflare R2 and KV | Runtime connections to existing resources; [provider configuration](/docs/modules/deployment/providers) |
+| Native durable tasks | Inngest, Trigger.dev, Effect MQ | Provider-specific worker publication, schedules, and supported run semantics; [job deployment](/docs/modules/jobs/deployment) |
+| Application data and authentication | Drizzle with PostgreSQL, MySQL, or SQLite; Better Auth on that service | Application connection and auth activation; you own database hosting, migrations, and backups |
+| Models and telemetry | Selected LangChain model SDKs, Sentry, OTLP | Selected runtime integration; no implicit provisioning or model account |
+
+AWS is the current built-in cloud **host**. The Cloudflare package provides **R2/KV runtime
+adapters**, not Workers application deployment. There are no built-in Vercel, Railway, Azure,
+or Google Cloud host integrations. A platform that runs the built Bun server or image can be
+used through the self-hosted path; that is separate from `relkit deploy` support.
+
+Pulumi's cloud, local, and object-storage state backends store stack state; they do not add
+application hosts. The native job packages also publish deployment hooks for their workers,
+not alternative infrastructure engines selected by `defineApp.deployment.engine`.
+
+## Move from local to production deliberately
+
+`docker(adapter)` is a development selection. It does not create cloud infrastructure or make
+a loopback connection reachable from production. Use configured connected adapters or supported
+infrastructure wrappers for release builds, and keep descriptor IDs and profile names consistent.
+Verify the real provider's behavior, credentials, network access, persistence, and migrations before
+accepting production traffic.
+
+Cloud/deployment creation flags remain unavailable for new starters. Add the selected tooling to
+an existing app following [AWS setup](/docs/modules/deployment/aws#install-deployment-tooling-for-an-existing-app).
+
+<include>/_snippets/generated/related/docs-modules-deployment-index.mdx</include>

@@ -1,0 +1,129 @@
+---
+title: Request mapping
+description: Map HTTP path, query, header, cookie, JSON, and multipart values into validated domain input.
+pagination: false
+sidebar:
+  icon: arrow-down-to-line
+---
+
+Map HTTP parameters, headers, and body fields into the input expected by your function. The handler receives validated
+business data, not a framework request object. Keep parsing choices on the route and reusable constraints
+in the [function's schema](/docs/learn/concepts/schemas).
+
+
+## Start with inference
+
+When `request` is omitted, RELKIT projects the target's object input schema:
+
+| Method                             | Properties matching path parameters | Remaining properties       |
+| ---------------------------------- | ----------------------------------- | -------------------------- |
+| `GET`, `HEAD`, `DELETE`, `OPTIONS` | Read from the path                  | Read from query parameters |
+| `POST`, `PUT`, `PATCH`             | Read from the path                  | Read from the JSON body    |
+
+For a write route with `accept: "multipart/form-data"`, remaining properties map from multipart fields
+instead. Array properties use repeated fields; scalar properties use one field. See [Uploads](/docs/modules/http/uploads).
+
+Thus `POST /echo` maps a JSON `message` into the Echo function without an explicit descriptor:
+
+<include
+  source="templates/default/v1/api/src/routes/echo/route.ts"
+  lang="ts"
+  meta='title="src/routes/echo/route.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/routes/echo/route.ts
+</include>
+
+Path, query, header, and cookie scalar values arrive as strings. Use a schema that intentionally
+coerces a number when needed; do not assume `?quantity=2` is already a JavaScript number.
+Catch-all path values are arrays of decoded segments, not slash-joined strings.
+
+## Replace inference when the HTTP contract differs
+
+Use `http.input` for headers, cookies, renamed fields, nesting, or explicit transformations:
+
+<include
+  source="examples/commerce/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/routes/orders/route.ts"'
+>
+  /_snippets/source/examples/commerce/src/routes/orders/route.ts
+</include>
+
+The public Create Order input remains independent of HTTP. This route chooses to obtain `orderId`
+and `customerEmail` from headers, and `sku` and `quantity` from the JSON body.
+
+An explicit `request` replaces inference completely. Include every required input field, including
+matching path properties; RELKIT does not merge omitted fields back into the mapping.
+If the input schema cannot be projected as an object, the compiler asks for an explicit mapping.
+The mapping root is still `http.input`, which constructs an object: wrap a scalar or array body in a
+named function-input property rather than expecting arbitrary non-object root input.
+
+## Choose a source for each input property
+
+| Helper                              | Value supplied                                     |
+| ----------------------------------- | -------------------------------------------------- |
+| `http.path(name)`                   | One path parameter                                 |
+| `http.pathSegments(name)`           | Catch-all segment array                            |
+| `http.query(name)`                  | One query parameter                                |
+| `http.header(name)`                 | One header, matched case-insensitively             |
+| `http.cookie(name)`                 | One cookie                                         |
+| `http.body(name)`                   | One top-level JSON body field                      |
+| `http.body()` or `http.wholeBody()` | The whole parsed JSON body, assigned to a property |
+| `http.multipart(name)`              | One multipart text field or file                   |
+| `http.multipartAll(name)`           | Repeated multipart fields or files                 |
+| `http.constant(value)`              | A declared constant                                |
+| `http.nested(fields)`               | An object assembled from nested mappings           |
+
+`http.optional(source)` permits absence; `http.default(source, value)` supplies a fallback for absence.
+Neither makes malformed or duplicated scalar input valid. Keep the resulting optional/default shape
+consistent with the function schema.
+
+## Scaffold a request transform
+
+From your application's root:
+
+```sh
+bun run relkit add transform normalize-id
+```
+
+Creates `src/routes/transforms/normalize-id.transform.ts` with a string schema. Specialize
+the schema and reference the descriptor with `http.transform` in a route's request mapping;
+the CLI does not attach it to routes automatically. Transforms belong to the route platform,
+so no service selection is needed.
+
+For every transform scaffolding flag, see the [transform command reference](/docs/api/cli#relkit-add-transform-name).
+
+Use `http.transform(transform, source)` with a compiler-known `defineTransform` descriptor, not an
+inline callback. Put HTTP transforms under `src/routes/transforms/`. The commerce transform is schema-based:
+
+<include
+  source="examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts"'
+>
+  /_snippets/source/examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts
+</include>
+
+The [dynamic Orders route](/docs/modules/http/routes#export-the-methods-you-support) applies it to `http.path("orderId")`.
+See the [Routes API reference](/docs/api/routes) for helper signatures.
+
+## Verify the transport boundary
+
+For an app containing the [Echo tutorial](/docs/modules/http/first-route), with the backend running on port `3000`:
+
+```sh
+curl -i -X POST http://localhost:3000/echo \
+  -H 'content-type: application/json' \
+  -d '{"message":"hello"}'
+```
+
+Expect `200`. Repeat with an empty message, a missing field, and malformed JSON; expect validation
+`422` before the function handler. For explicit mappings, also test a missing header, repeated scalar
+query fields, and each optional/default branch. Unsupported body content types are mapping failures,
+not automatically a `415` response.
+
+HTTP middleware can inspect native request details, but function calls from jobs, events, tools,
+or other domains do not receive a fabricated HTTP request. Pass business data explicitly.
+
+<include>/_snippets/generated/related/docs-modules-http-requests.mdx</include>
+

@@ -1,0 +1,26 @@
+---
+title: Realtime, agents, and streaming
+description: Operate generations, limits, Redis state, and strict client deployments.
+pagination: false
+sidebar:
+  icon: radio
+---
+
+Keep health checks and controls responsive while clients observe long-running jobs, agents, or streams. Observation
+does not consume finite function concurrency. A run remains bound to its original generation;
+another generation may serve compatible journal reads and persist controls for the owner, but cannot
+migrate execution or continuation. Forced retirement reports `GENERATION_UNAVAILABLE` without replay.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Apply this operational guidance after [realtime provider installation](/docs/modules/realtime/providers),
+the selected [native agent setup](/guides/ai/build-an-offline-agent), and [frontend installation](/docs/modules/client).
+Selecting a channel does not select a model engine, and frontend installation does not install backend providers.
+</Callout>
+
+Deploy frontend and backend public-contract changes together. Even an additive public change blocks
+an older browser under exact fingerprint matching. Show an application-updated state, preserve
+unknown-operation metadata, and do not auto-reload while a mutation or control is unresolved.
+
+Tune aggregate connection, partition, retained-byte, run, thread, and control limits before public
+exposure. Per-principal overload is 429; application/provider overload is 503. Redis-backed guarantees
+depend on persistence configuration, and provider resets must advance the provider epoch.

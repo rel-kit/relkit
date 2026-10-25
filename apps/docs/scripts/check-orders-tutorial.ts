@@ -1,4 +1,4 @@
-/** Executes the documented grouped Orders tutorial using certified minimal creation and owned native resources. */
+/** Checks grouped Orders behavior with workspace-backed packages; the packed installation runner separately proves fresh dependency and repair setup. */
 import { Effect, Layer } from "effect";
 import {
   tutorialProject,
@@ -9,6 +9,9 @@ import {
 import { TutorialProcess } from "./orders-tutorial-process.js";
 import { verifyTutorialProduction } from "./orders-tutorial-http.js";
 
+/** Exercises maintained Orders behavior with workspace packages and owned SQLite state.
+ * @returns Lazy source, migration, test and production HTTP checks with scoped cleanup.
+ */
 const check = Effect.fn("Tutorial.check")(function* () {
   const project = yield* tutorialProject;
   const process = yield* TutorialProcess;

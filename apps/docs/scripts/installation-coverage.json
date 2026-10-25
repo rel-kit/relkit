@@ -1,0 +1,323 @@
+{
+  "docs/modules/integrations/provider-authoring": ["update", "concept", ""],
+  "docs/modules/integrations/local-providers": ["update", "concept", ""],
+  "docs/modules/cli/automation": ["update", "concept", ""],
+  "guides/cli/create-and-build-an-api": ["update", "concept", ""],
+  "docs/modules/service/context-values": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/index": ["update", "concept", ""],
+  "docs/learn/build-and-run": ["retain", "concept", ""],
+  "docs/learn/concepts/application": ["update", "concept", ""],
+  "docs/learn/concepts/context": ["update", "continuation", "/guides/caching/cache-product-prices"],
+  "docs/learn/concepts/environment": ["retain", "concept", ""],
+  "docs/learn/concepts/errors": ["retain", "concept", ""],
+  "docs/learn/concepts/functions": ["retain", "concept", ""],
+  "docs/learn/concepts/index": ["update", "concept", ""],
+  "docs/learn/concepts/schemas": ["retain", "concept", ""],
+  "docs/learn/create-an-app": ["update", "concept", ""],
+  "docs/learn/first-route": ["retain", "continuation", "/docs/learn/create-an-app"],
+  "docs/learn/index": ["update", "concept", ""],
+  "docs/learn/local-development": ["update", "concept", ""],
+  "docs/learn/protect-orders": ["update", "continuation", "/docs/modules/auth/better-auth"],
+  "docs/learn/save-orders": ["update", "continuation", "/docs/modules/database/define"],
+  "docs/learn/test-orders": ["update", "continuation", "/docs/learn/protect-orders"],
+  "docs/modules/ai/agents": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/agent.mdx"
+  ],
+  "docs/modules/ai/approvals": ["update", "continuation", "/docs/modules/ai/tools"],
+  "docs/modules/ai/function-tools": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/ai/graphs-persistence": [
+    "update",
+    "continuation",
+    "/guides/ai/build-an-offline-agent"
+  ],
+  "docs/modules/ai/index": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/ag-ui.mdx"
+  ],
+  "docs/modules/ai/mcp": ["update", "installation", "/_snippets/generated/installations/mcp.mdx"],
+  "docs/modules/ai/native-runtime": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/agent.mdx"
+  ],
+  "docs/modules/ai/streaming": ["update", "continuation", "/guides/ai/build-an-offline-agent"],
+  "docs/modules/ai/threads-recovery": [
+    "update",
+    "continuation",
+    "/guides/ai/build-an-offline-agent"
+  ],
+  "docs/modules/ai/tools": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/auth/better-auth": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/auth.mdx"
+  ],
+  "docs/modules/auth/clients": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/auth-client.mdx"
+  ],
+  "docs/modules/auth/customization": ["update", "continuation", "/docs/modules/auth/better-auth"],
+  "docs/modules/auth/index": ["retain", "continuation", "/docs/modules/auth/better-auth"],
+  "docs/modules/auth/protect-routes": ["update", "continuation", "/docs/modules/auth/better-auth"],
+  "docs/modules/auth/sessions": ["update", "continuation", "/docs/modules/auth/better-auth"],
+  "docs/modules/auth/testing": ["update", "continuation", "/docs/modules/auth/better-auth"],
+  "docs/modules/caching/define": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/caching/expiration": [
+    "update",
+    "continuation",
+    "/guides/caching/cache-product-prices"
+  ],
+  "docs/modules/caching/index": ["update", "continuation", "/guides/caching/cache-product-prices"],
+  "docs/modules/caching/read-write": [
+    "update",
+    "continuation",
+    "/guides/caching/cache-product-prices"
+  ],
+  "docs/modules/client/authentication": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/auth-react.mdx"
+  ],
+  "docs/modules/client/index": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/client-react.mdx"
+  ],
+  "docs/modules/client/mutations": ["update", "continuation", "/docs/modules/client"],
+  "docs/modules/client/transports": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/client.mdx"
+  ],
+  "docs/modules/client/build-integration": [
+    "update",
+    "continuation",
+    "/guides/frontend/connect-react"
+  ],
+  "guides/frontend/connect-react": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/client-react.mdx"
+  ],
+  "docs/modules/client/offline": ["update", "continuation", "/docs/modules/client"],
+  "docs/modules/client/routes": ["update", "continuation", "/docs/modules/client"],
+  "docs/modules/client/ssr": ["update", "continuation", "/docs/modules/client"],
+  "docs/modules/client/streams": ["update", "continuation", "/docs/modules/client"],
+  "docs/modules/database/better-auth": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/auth.mdx"
+  ],
+  "docs/modules/database/define": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/database.mdx"
+  ],
+  "docs/modules/database/drizzle": ["update", "continuation", "/docs/modules/database/define"],
+  "docs/modules/database/generated-schemas": [
+    "update",
+    "continuation",
+    "/docs/modules/database/define"
+  ],
+  "docs/modules/database/index": ["retain", "continuation", "/docs/modules/database/define"],
+  "docs/modules/database/migrations": ["update", "continuation", "/docs/modules/database/define"],
+  "docs/modules/database/models": ["update", "continuation", "/docs/modules/database/define"],
+  "docs/modules/database/overrides": ["update", "continuation", "/docs/modules/database/define"],
+  "docs/modules/database/queries": ["update", "continuation", "/docs/modules/database/define"],
+  "docs/modules/database/schema": ["update", "continuation", "/docs/modules/database/define"],
+  "docs/modules/database/testing": ["update", "continuation", "/docs/modules/database/define"],
+  "docs/modules/database/transactions": ["update", "continuation", "/docs/modules/database/define"],
+  "docs/modules/events/consume": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/events/define": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/events/index": ["update", "continuation", "/guides/events/react-to-order-events"],
+  "docs/modules/events/publish": ["update", "continuation", "/guides/events/react-to-order-events"],
+  "docs/modules/http/define": ["retain", "concept", ""],
+  "docs/modules/http/first-route": ["retain", "concept", ""],
+  "docs/modules/http/generated-clients": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/client.mdx"
+  ],
+  "docs/modules/http/index": ["update", "concept", ""],
+  "docs/modules/http/middleware": ["retain", "concept", ""],
+  "docs/modules/http/openapi": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/scalar.mdx"
+  ],
+  "docs/modules/http/rate-limits": ["retain", "concept", ""],
+  "docs/modules/http/raw-handlers": ["update", "continuation", "/docs/modules/auth/better-auth"],
+  "docs/modules/http/requests": ["retain", "concept", ""],
+  "docs/modules/http/responses": ["retain", "concept", ""],
+  "docs/modules/http/routes": ["retain", "concept", ""],
+  "docs/modules/http/streaming": ["retain", "concept", ""],
+  "docs/modules/http/uploads": ["update", "continuation", "/guides/storage/upload-product-images"],
+  "docs/modules/index": ["update", "concept", ""],
+  "docs/modules/integrations/index": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/redis.mdx"
+  ],
+  "docs/modules/integrations/local-docker": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/local.mdx"
+  ],
+  "docs/modules/jobs/bindings": ["update", "continuation", "/docs/modules/jobs/providers/inngest"],
+  "docs/modules/jobs/clients": ["update", "continuation", "/docs/modules/client"],
+  "docs/modules/jobs/deployment": ["update", "continuation", "/docs/modules/deployment/aws"],
+  "docs/modules/jobs/docker": ["retain", "concept", ""],
+  "docs/modules/jobs/durations-and-sleep": [
+    "update",
+    "continuation",
+    "/docs/modules/jobs/quickstart"
+  ],
+  "docs/modules/jobs/execution-policy": ["update", "continuation", "/docs/modules/jobs/quickstart"],
+  "docs/modules/jobs/index": ["retain", "concept", ""],
+  "docs/modules/jobs/inspector": ["update", "continuation", "/docs/modules/operations/inspector"],
+  "docs/modules/jobs/migration": ["update", "concept", ""],
+  "docs/modules/jobs/progress-and-streams": [
+    "update",
+    "continuation",
+    "/docs/modules/jobs/quickstart"
+  ],
+  "docs/modules/jobs/providers/comparison": ["retain", "concept", ""],
+  "docs/modules/jobs/providers/effect-mq": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/effect-mq.mdx"
+  ],
+  "docs/modules/jobs/providers/index": ["retain", "concept", ""],
+  "docs/modules/jobs/providers/inngest": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/inngest.mdx"
+  ],
+  "docs/modules/jobs/providers/trigger": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/trigger.mdx"
+  ],
+  "docs/modules/jobs/quickstart": [
+    "update",
+    "continuation",
+    "/docs/modules/jobs/providers/inngest"
+  ],
+  "docs/modules/jobs/retries-and-idempotency": [
+    "update",
+    "continuation",
+    "/docs/modules/jobs/quickstart"
+  ],
+  "docs/modules/jobs/schedules": ["update", "continuation", "/docs/modules/jobs/quickstart"],
+  "docs/modules/jobs/security": ["update", "continuation", "/docs/modules/jobs/quickstart"],
+  "docs/modules/jobs/tasks": ["update", "continuation", "/docs/modules/jobs/quickstart"],
+  "docs/modules/jobs/testing": ["update", "continuation", "/docs/modules/jobs/providers"],
+  "docs/modules/jobs/troubleshooting": [
+    "update",
+    "continuation",
+    "/docs/modules/jobs/providers/inngest"
+  ],
+  "docs/modules/database/local-docker": ["update", "continuation", "/docs/learn/save-orders"],
+  "docs/modules/deployment/index": ["update", "continuation", "/docs/modules/database"],
+  "docs/modules/deployment/local-docker": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/deployment/providers": ["update", "continuation", "/docs/modules/integrations"],
+  "docs/modules/deployment/aws": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/deployment.mdx"
+  ],
+  "docs/modules/operations/index": ["update", "concept", ""],
+  "docs/modules/operations/inspector": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/inspector.mdx"
+  ],
+  "docs/modules/operations/observability": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/otlp.mdx"
+  ],
+  "docs/modules/operations/realtime-agents-streaming": [
+    "update",
+    "continuation",
+    "/docs/modules/realtime/providers"
+  ],
+  "docs/modules/operations/testing": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/testing.mdx"
+  ],
+  "docs/modules/operations/troubleshooting": ["update", "concept", ""],
+  "docs/modules/realtime/access": ["update", "continuation", "/docs/modules/realtime/providers"],
+  "docs/modules/realtime/index": ["update", "continuation", "/docs/modules/realtime/providers"],
+  "docs/modules/realtime/presence": ["update", "continuation", "/docs/modules/realtime/providers"],
+  "docs/modules/realtime/providers": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/local.mdx"
+  ],
+  "docs/modules/realtime/react": ["update", "continuation", "/docs/modules/client"],
+  "docs/modules/realtime/recovery": ["update", "continuation", "/docs/modules/realtime/providers"],
+  "docs/modules/service/define": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/service/domains": ["retain", "concept", ""],
+  "docs/modules/service/first-service": ["update", "continuation", "/docs/learn/first-route"],
+  "docs/modules/service/index": ["update", "concept", ""],
+  "docs/modules/service/migration": ["retain", "concept", ""],
+  "docs/modules/service/organization": ["update", "concept", ""],
+  "docs/modules/service/routes": ["retain", "concept", ""],
+  "docs/modules/storage/define": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/storage/index": ["update", "concept", ""],
+  "docs/modules/storage/local-storage": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/s3.mdx"
+  ],
+  "docs/modules/storage/read-delete": [
+    "update",
+    "continuation",
+    "/guides/storage/upload-product-images"
+  ],
+  "docs/modules/storage/upload": [
+    "update",
+    "continuation",
+    "/guides/storage/upload-product-images"
+  ],
+  "docs/modules/cli/add-artifacts": ["update", "concept", ""],
+  "docs/modules/cli/create-an-app": ["update", "concept", ""],
+  "docs/modules/cli/index": ["update", "concept", ""],
+  "guides/ai/build-an-offline-agent": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/agent.mdx"
+  ],
+  "guides/auth/email-password-sign-in": [
+    "update",
+    "continuation",
+    "/docs/modules/auth/better-auth"
+  ],
+  "guides/caching/cache-product-prices": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/redis.mdx"
+  ],
+  "guides/database/register-users-in-a-transaction": [
+    "update",
+    "continuation",
+    "/docs/modules/database/define"
+  ],
+  "guides/events/react-to-order-events": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/local.mdx"
+  ],
+  "guides/index": ["update", "concept", ""],
+  "guides/storage/upload-product-images": [
+    "update",
+    "installation",
+    "/_snippets/generated/installations/s3.mdx"
+  ]
+}

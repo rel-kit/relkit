@@ -1,0 +1,376 @@
+15:42:46 [@astrojs/node] Enabling sessions with filesystem storage
+15:42:51 [vite] connected.
+15:42:51 [types] Generated 8ms
+15:43:09 [vite] connected.
+15:43:09 [vite] connected.
+15:43:09 [content] Syncing content
+15:43:09 [content] Astro config changed
+15:43:09 [content] Clearing content store
+15:43:10 [content] Synced content
+ astro  v7.4.2 ready in 53864 ms
+┃ Local    http://127.0.0.1:3003/
+15:43:11 watching for file changes...
+15:43:28 [glob-loader] Reloaded data from docs/api/routes.mdx
+15:43:28 [glob-loader] Reloaded data from docs/api/jobs.mdx
+15:43:28 [glob-loader] Reloaded data from docs/api/better-auth.mdx
+15:45:07 [glob-loader] Reloaded data from docs/index.mdx
+15:45:07 [glob-loader] Reloaded data from guides/index.mdx
+15:45:07 [glob-loader] Reloaded data from guides/database/register-users-in-a-transaction.mdx
+15:45:07 [glob-loader] Reloaded data from guides/auth/email-password-sign-in.mdx
+15:45:07 [glob-loader] Reloaded data from guides/cli/create-and-build-an-api.mdx
+15:45:07 [glob-loader] Reloaded data from guides/storage/upload-product-images.mdx
+15:45:07 [glob-loader] Reloaded data from guides/events/react-to-order-events.mdx
+15:45:07 [glob-loader] Reloaded data from guides/caching/cache-product-prices.mdx
+15:45:07 [glob-loader] Reloaded data from guides/ai/build-an-offline-agent.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/api/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/overrides.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/queries.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/migrations.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/models.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/testing.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/drizzle.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/define.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/transactions.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/schema.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/better-auth.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/database/generated-schemas.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/auth/customization.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/auth/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/auth/sessions.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/auth/testing.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/auth/protect-routes.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/auth/clients.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/operations/inspector.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/auth/better-auth.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/operations/observability.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/operations/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/operations/testing.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/operations/deployment.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/operations/realtime-agents-streaming.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/operations/troubleshooting.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/storage/local-storage.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/storage/define.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/storage/read-delete.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/storage/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/storage/upload.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/realtime/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/realtime/access.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/realtime/recovery.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/realtime/presence.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/realtime/react.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/integrations/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/integrations/local-docker.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/integrations/local-providers.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/realtime/providers.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/streaming.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/integrations/provider-authoring.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/requests.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/rate-limits.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/first-route.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/uploads.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/raw-handlers.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/define.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/responses.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/generated-clients.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/middleware.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/openapi.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/agents.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/http/routes.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/approvals.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/streaming.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/function-tools.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/graphs-persistence.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/tools.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/threads-recovery.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/mcp.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/ai/native-runtime.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/tasks.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/inspector.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/retries-and-idempotency.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/bindings.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/durations-and-sleep.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/docker.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/execution-policy.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/testing.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/clients.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/migration.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/deployment.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/security.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/quickstart.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/schedules.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/progress-and-streams.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/troubleshooting.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/service/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/service/domains.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/service/define.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/service/organization.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/service/context-values.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/service/migration.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/service/first-service.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/service/routes.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/events/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/events/define.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/events/publish.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/events/consume.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/caching/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/caching/expiration.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/caching/define.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/client/offline.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/caching/read-write.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/client/ssr.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/client/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/client/streams.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/client/authentication.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/client/mutations.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/client/routes.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/providers/comparison.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/providers/inngest.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/providers/trigger.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/providers/effect-mq.mdx
+15:45:07 [glob-loader] Reloaded data from docs/modules/jobs/providers/index.mdx
+15:45:07 [glob-loader] Reloaded data from docs/learn/concepts/application.mdx
+15:45:07 [glob-loader] Reloaded data from docs/learn/concepts/errors.mdx
+15:45:07 [glob-loader] Reloaded data from docs/learn/concepts/functions.mdx
+15:45:07 [glob-loader] Reloaded data from docs/learn/concepts/environment.mdx
+15:45:07 [glob-loader] Reloaded data from docs/learn/concepts/schemas.mdx
+15:45:07 [glob-loader] Reloaded data from docs/learn/concepts/context.mdx
+15:45:07 [glob-loader] Reloaded data from docs/api/realtime.mdx
+15:45:08 [glob-loader] Reloaded data from docs/modules/caching/expiration.mdx
+15:45:15 [glob-loader] Reloaded data from docs/api/agents.mdx
+15:45:15 [glob-loader] Reloaded data from docs/api/tools.mdx
+15:45:23 [vite] changed tsconfig file detected: /Users/mustafaelsayed/Workspace/relkit/apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+15:45:24 [vite] program reload
+15:45:24 [vite] program reload
+15:45:24 [vite] program reload
+15:45:28 [glob-loader] Reloaded data from docs/modules/ai/agents.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/auth/better-auth.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/auth/clients.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/caching/expiration.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/caching/read-write.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/client/index.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/database/better-auth.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/database/migrations.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/database/models.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/jobs/providers/trigger.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/jobs/troubleshooting.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/realtime/index.mdx
+15:45:28 [glob-loader] Reloaded data from docs/modules/realtime/react.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/create-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/capabilities.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-function-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-service-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-task-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-error-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-event-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-event-function-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-job-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-cache-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-tool-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-agent-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-bucket-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-prompt-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-constants-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-middleware-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-transform-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-route-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/guides-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/guides-storage-upload-product-images.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/guides-caching-cache-product-prices.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-providers-comparison.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-providers-inngest.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-providers-trigger.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-providers-effect-mq.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-create-an-app.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-first-route.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-save-orders.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-database-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-protect-orders.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-test-orders.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-local-development.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/add-auth-options.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-build-and-run.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-concepts-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-concepts-application.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-concepts-functions.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-concepts-schemas.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-concepts-errors.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-concepts-context.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-learn-concepts-environment.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-service-migration.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-service-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-service-domains.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-service-define.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-service-organization.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-service-routes.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-service-first-service.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-define.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-routes.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-requests.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-uploads.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-rate-limits.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-middleware.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-responses.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-streaming.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-raw-handlers.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-openapi.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-generated-clients.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-first-route.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-events-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-events-define.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-events-publish.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-events-consume.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-http-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/guides-events-react-to-order-events.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-quickstart.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-bindings.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-durations-and-sleep.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-execution-policy.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-retries-and-idempotency.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-tasks.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-clients.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-progress-and-streams.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-schedules.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-inspector.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-docker.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-providers-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-testing.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-migration.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/guides-ai-build-an-offline-agent.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-deployment.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-troubleshooting.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-jobs-security.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-drizzle.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-define.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-schema.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-queries.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-generated-schemas.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-models.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-overrides.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-transactions.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-migrations.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-better-auth.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-database-testing.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-auth-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-auth-better-auth.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-auth-protect-routes.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-auth-clients.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-auth-sessions.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-auth-customization.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/guides-database-register-users-in-a-transaction.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/guides-auth-email-password-sign-in.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-storage-define.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-storage-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-storage-local-storage.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-auth-testing.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-storage-read-delete.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-storage-upload.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-caching-define.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-caching-read-write.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-caching-expiration.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-agents.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-caching-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-streaming.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-graphs-persistence.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-native-runtime.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-threads-recovery.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-tools.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-function-tools.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-mcp.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-client-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-ai-approvals.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-client-routes.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-client-mutations.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-client-streams.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-client-ssr.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-client-authentication.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-realtime-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-realtime-react.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-realtime-presence.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-realtime-recovery.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-client-offline.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-realtime-access.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-realtime-providers.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-integrations-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-operations-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-integrations-local-docker.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-operations-observability.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-operations-realtime-agents-streaming.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-operations-testing.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-operations-inspector.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-operations-deployment.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-operations-troubleshooting.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-integrations-provider-authoring.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-integrations-local-providers.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-service-context-values.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-cli-create-an-app.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-cli-index.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-cli-add-artifacts.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/docs-modules-cli-automation.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/related/guides-cli-create-and-build-an-api.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/native-drivers.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/database.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/auth-client.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/database-mysql.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/deep-agent.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/auth.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/mcp.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/tools.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/agent.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/ag-ui.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/client.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/scalar.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/client-react.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/client-query.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/auth-react.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/redis.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/testing.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/client-cli.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/redis-connected.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/s3.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/s3-connected.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/cloudflare.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/local.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/docker.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/inngest.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/trigger.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/effect-mq.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/otlp.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/deployment.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/sentry.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/installations/inspector.mdx
+15:45:28 [glob-loader] Reloaded data from _snippets/generated/api-overview.mdx
+15:45:28 [glob-loader] Reloaded data from docs/api/cli.mdx
+15:45:30 [content] Syncing content
+15:45:47 [content] Synced content
+15:45:47 [content] Syncing content
+15:45:56 [ERROR] Vite module runner has been closed.
+  Stack trace:
+    at /Users/mustafaelsayed/Workspace/relkit/apps/docs/.blume/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/vite@8.3.5+e8ab4fe9993aaa0d/node_modules/vite/dist/node/module-runner.js:1216:26
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:45:56 [ERROR] Vite module runner has been closed.
+  Stack trace:
+    at /Users/mustafaelsayed/Workspace/relkit/apps/docs/.blume/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/vite@8.3.5+e8ab4fe9993aaa0d/node_modules/vite/dist/node/module-runner.js:1216:26
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:45:56 [ERROR] Vite module runner has been closed.
+  Stack trace:
+    at ModuleRunner.getModuleInformation (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/vite@8.3.5+e8ab4fe9993aaa0d/node_modules/vite/dist/node/module-runner.js:1216:26)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:45:56 [ERROR] Vite module runner has been closed.
+  Stack trace:
+    at /Users/mustafaelsayed/Workspace/relkit/apps/docs/.blume/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/vite@8.3.5+e8ab4fe9993aaa0d/node_modules/vite/dist/node/module-runner.js:1216:26
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:45:56 [ERROR] Vite module runner has been closed.
+  Stack trace:
+    at /Users/mustafaelsayed/Workspace/relkit/apps/docs/.blume/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/vite@8.3.5+e8ab4fe9993aaa0d/node_modules/vite/dist/node/module-runner.js:1216:26
+    [...] See full stack trace in the browser, or rerun with --verbose.

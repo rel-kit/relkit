@@ -1,0 +1,170 @@
+---
+title: React to order events
+description: Create an order, publish an event, and run a confirmation function.
+pagination: false
+sidebar:
+  icon: radio
+---
+
+Create an order, publish its details, and run a confirmation function. This example logs the reaction without sending email or writing to a database.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+You'll need an [existing RELKIT application](/docs/learn/create-an-app) and Bun 1.3.10 or later.
+</Callout>
+
+Create the files shown below. If your app already has the Orders example, update those files instead. Run all commands from your app's root.
+
+<Steps>
+<Step icon="settings">
+
+## 1. Install and bind the selected event runtime [#install-and-bind-the-selected-event-runtime]
+
+The manual path below uses the file-backed local event integration, which is not selected by the
+minimal app. Install its owner first; no Docker or model SDK is needed:
+
+<include>/_snippets/generated/installations/local.mdx</include>
+
+Create `src/platform/events.ts` from this descriptor:
+
+<include
+  source="apps/docs/examples/events/profile.ts"
+  lang="ts"
+  meta='title="src/platform/events.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/profile.ts
+</include>
+
+Import `event` from `@app/platform/events.js` into the existing `relkit.config.ts`. Add it as the
+singular `event` option and merge `event: "default"` into `defaults`, preserving other profiles and
+settings. The event scaffold can install/configure this selected baseline automatically; manual
+source copying does not. With `--no-install`, complete `bun install` and `bun run check` first.
+
+</Step>
+<Step icon="radio">
+
+## 2. Add the event and its callers [#add-the-event-and-its-callers]
+
+### Define the event
+
+<include
+  source="apps/docs/examples/events/order-created.event.ts"
+  lang="ts"
+  meta='title="src/services/orders/events/order-created.event.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/order-created.event.ts
+</include>
+
+`orders.created` carries the order ID, product code, and total.
+
+### Publish after creating the order
+
+Add a pricing function. For this example, each item costs 100 cents:
+
+<include
+  source="templates/default/v1/api/src/services/orders/functions/price-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/price-order.function.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/services/orders/functions/price-order.function.ts
+</include>
+
+Create the order and publish its details:
+
+<include
+  source="apps/docs/examples/events/create-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/create-order.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/create-order.function.ts
+</include>
+
+`publishes` allows this function to send `orders.created`. The handler returns the order without waiting for the confirmation.
+
+### Consume the event
+
+<include
+  source="apps/docs/examples/events/order-confirmation.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/order-confirmation.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/order-confirmation.function.ts
+</include>
+
+`event: "orders.created"` subscribes this function to the event. Its handler receives the order details.
+
+### Add an endpoint
+
+Expose the order-creating function through an Orders service. If you already have this service, add these members alongside your existing ones:
+
+<include
+  source="templates/default/v1/api/src/services/orders/service.ts"
+  lang="ts"
+  meta='title="src/services/orders/service.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/services/orders/service.ts
+</include>
+
+Connect it to `POST /orders`:
+
+<include
+  source="templates/default/v1/api/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/route.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/routes/orders/route.ts
+</include>
+
+### Check and test delivery
+
+Configure a compatible event adapter under singular `event`, then check the graph:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+No environment mode silently substitutes an event provider. For a credential-free behavior test, use
+the deterministic event harness:
+
+[Event-harness regression test](https://github.com/rel-kit/relkit/blob/main/packages/testing/tests/compatibility/events.test.ts)
+
+Start the application with `bun run dev`. In a second terminal, create an order:
+
+```sh
+curl -i -X POST http://localhost:3000/orders \
+  -H 'content-type: application/json' \
+  -d '{"orderId":"order-100","sku":"book","quantity":2}'
+```
+
+Expect HTTP `201` and `totalCents: 200`. In the application terminal, look for
+`order.confirmation.requested` with `orderId=order-100`. The response confirms publication was
+accepted; the log separately confirms that the consumer ran.
+
+</Step>
+<Step icon="git-branch">
+
+## 3. Add another reaction [#add-another-reaction]
+
+In a second terminal, open your app's root directory and copy the consumer:
+
+```sh
+cp src/services/orders/functions/order-confirmation.function.ts src/services/orders/functions/order-analytics.function.ts
+```
+
+Change the copy's `id` to `orders.analytics` and its log message to `order.analytics.recorded`. Keep `event: "orders.created"`.
+
+After configuring an event binding and starting the app, call the publishing route with `orderId` set to
+`order-101`. Look for both `order.confirmation.requested` and `order.analytics.recorded` with that ID. You
+added a reaction without changing the publishing function.
+
+Optionally complete the separate [Inspector setup](/docs/modules/operations/inspector), then open
+`orders.created` in its UI at `http://localhost:3210` to see both subscribers under **Consumer functions**.
+
+</Step>
+</Steps>
+
+## Related tasks
+
+<Card icon="arrow-right">
+[Run a durable task](/docs/modules/jobs/quickstart) when follow-up work must survive a process restart. For transactional database changes, follow [Register users in a transaction](/guides/database/register-users-in-a-transaction).
+</Card>

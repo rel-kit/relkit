@@ -7,9 +7,17 @@
     "incremental": true,
     "jsx": "preserve",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "noEmit": true,
-    "plugins": [{ "name": "next" }]
+    "noEmit": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "examples/orders-tutorial/steps", "examples/jobs/providers"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": [
+    "node_modules",
+    ".blume",
+    ".next",
+    "dist",
+    "content/_snippets",
+    "examples/frontend",
+    "examples/orders-tutorial/steps",
+    "examples/jobs/providers"
+  ]
 }

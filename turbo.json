@@ -22,6 +22,19 @@
       ],
       "outputs": ["dist/**"]
     },
+    "@relkit/docs#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/examples/**",
+        "$TURBO_ROOT$/templates/default/v1/**",
+        "$TURBO_ROOT$/tests/**",
+        "$TURBO_ROOT$/packages/*/src/**",
+        "$TURBO_ROOT$/integrations/packages/*/src/**",
+        "$TURBO_ROOT$/docgen.json"
+      ],
+      "outputs": ["dist/**", "content/_snippets/**", "content/**/meta.ts", "content/docs/api/**"]
+    },
     "@relkit/inspector#build": {
       "dependsOn": ["^build", "@relkit/inspector-ui#build"],
       "inputs": [

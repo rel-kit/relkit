@@ -1,101 +1,72 @@
 ---
-title: RELKIT
-description: Build typed TypeScript backends from one application model, then use the same model in development, tests, documentation, inspection, and deployment.
+title: RELKIT documentation
+description: Build your first TypeScript API, configure a module, solve a practical task, or look up an API.
+pagination: false
+mode: frame
+sidebar:
+  icon: compass
 ---
 
-RELKIT is a convention-first framework for TypeScript backend applications. You describe functions,
-HTTP routes, events, jobs, resources, and AI boundaries in ordinary source files. RELKIT compiles
-those descriptors into one deterministic application graph and uses that graph everywhere.
+<div className="docs-home">
 
-<Callout title="Who these guides are for">
-  You only need basic TypeScript. The guides explain RELKIT, Bun commands, HTTP behavior, provider
-  configuration, testing, and deployment concepts when they first appear.
-</Callout>
+<DocsHero>
 
-## Why RELKIT exists
+<p className="docs-hero-eyebrow">RELKIT documentation</p>
 
-Backend projects often describe the same operation several times: once in a handler, again in a router,
-again in validation, again in OpenAPI, and again in deployment configuration. Those copies drift.
-RELKIT makes the validated function the reusable unit and derives the surrounding transport and
-operational artifacts from it.
+# Build your first TypeScript API.
 
-```text title="The RELKIT application model"
-TypeScript descriptors
-        ↓
-checked application graph
-        ↓
-development · tests · HTTP · jobs · events · OpenAPI · clients · inspector · deployment
-```
+<span id="why-relkit-exists"></span>
 
-The graph is not a second application that you maintain. It is generated output. You edit TypeScript
-source, run `relkit check`, and let every consumer use the same checked result.
+Build TypeScript backends with RELKIT. Start with a working HTTP endpoint, then add data, sign-in, and tests as you need them.
 
-## What you can build
+<span id="the-recommended-sequence"></span>
 
-<include cwd>content/generated/capabilities.mdx</include>
+<div className="docs-hero-actions">
+  <a href="/docs/learn/create-an-app">Start building</a>
+  <a href="/docs/modules">Explore modules</a>
+</div>
 
-## Choose a path
+</DocsHero>
 
-<Cards>
-  <Card
-    title="Build your first application"
-    description="Create a local-only API, run your first route, and learn the development loop."
-    href="/docs/start/create-an-app"
-  />
-  <Card
-    title="Understand the authoring model"
-    description="Learn the application graph, functions, schemas, errors, context, and environment contracts."
-    href="/docs/fundamentals"
-  />
-  <Card
-    title="Solve an HTTP task"
-    description="Find route, request, upload, middleware, response, OpenAPI, and client guidance."
-    href="/docs/http"
-  />
-  <Card
-    title="Look up an API"
-    description="Use generated TypeScript signatures, descriptions, source links, and runnable examples."
-    href="/docs/api/app"
-  />
-</Cards>
+Create an application and send your first request. Continue with the same Orders application through persistence, authentication, testing, and production builds.
 
-## The recommended sequence
+## Find what you need
 
-<Steps>
-  <Step>
-    ### Create and run an application
+<span id="choose-a-path"></span>
+<span id="what-you-can-build"></span>
 
-    Follow [Start](/docs/start/create-an-app) through your first route and local development loop. This
-    path requires no cloud credentials and does not create paid resources.
+<CardGroup cols={4}>
+  <Card title="Learn" href="/docs/learn" icon="graduation-cap" arrow>
+    Follow a continuous tutorial. New terms appear alongside the code that uses them.
+  </Card>
+  <Card title="Modules" href="/docs/modules" icon="blocks" arrow>
+    Understand a capability, configure its providers, and learn its limits.
+  </Card>
+  <Card title="Guides" href="/guides" icon="book-open" arrow>
+    Complete a specific task, such as uploading product images or caching prices.
+  </Card>
+  <Card title="Reference" href="/docs/api" icon="braces" arrow>
+    Look up exact API signatures, types, options, and CLI commands.
+  </Card>
+</CardGroup>
 
-  </Step>
-  <Step>
-    ### Learn the reusable model
+You'll need basic TypeScript and Bun 1.3.10 or later for the first tutorial. Each later chapter names any additional requirements.
 
-    Read [Core concepts](/docs/fundamentals) for the application graph, functions, schemas, errors,
-    context, and environment contracts. Continue with [Service](/docs/service) for domain ownership and
-    public boundaries, then choose the capability guide you need.
+<div className="docs-home-details">
 
-  </Step>
-  <Step>
-    ### Operate what you built
+## Already have an application?
 
-    Use the inspector, traces, deterministic tests, diagnostics, and deployment preview only after the
-    application behavior is clear.
+Choose a [module](/docs/modules) to configure, or a [guide](/guides) for the task you want to complete. For example, [Buckets](/docs/modules/storage) explains storage configuration, while [Upload product images](/guides/storage/upload-product-images) builds an HTTP upload endpoint.
 
-  </Step>
-</Steps>
+The [Inspector](/docs/modules/operations/inspector) is an optional, separately installed tool. You can complete the tutorial and verify responses from your terminal.
 
-## Documentation and source of truth
+For terminal workflows, start with the [CLI module](/docs/modules/cli). It connects project creation, scaffolding, development, and production builds to the [command reference](/docs/api/cli).
 
-Guide prose teaches when and why to use a feature. The [generated API reference](/docs/api/app) is the
-source for exact signatures, while the [CLI reference](/docs/operations/cli-reference) is generated from
-the same help model as `relkit --help`. Complete examples are included from tested template and commerce
-source files so the documentation cannot silently preserve an old copy.
+## Documentation and source [#documentation-and-source-of-truth]
 
-The canonical cross-feature application is
-[`examples/commerce`](https://github.com/rel-kit/relkit/tree/main/examples/commerce). To report a problem,
-open an issue in the [`rel-kit/relkit` repository](https://github.com/rel-kit/relkit/issues) with the
-command, diagnostic code, and a minimal reproduction.
+Examples come from maintained repository sources. API reference comes from TypeScript, and CLI reference comes from the command's help model.
 
-<include cwd>content/generated/related/index.mdx</include>
+If a step doesn't work, [report the command and its diagnostic](https://github.com/rel-kit/relkit/issues), together with your package versions and a small reproduction.
+
+</div>
+</div>

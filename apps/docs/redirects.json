@@ -1,0 +1,822 @@
+[
+  {
+    "from": "/docs/modules/tooling",
+    "to": "/docs/modules/cli",
+    "status": 301
+  },
+  {
+    "from": "/docs/modules/tooling/create-an-app",
+    "to": "/docs/modules/cli/create-an-app",
+    "status": 301
+  },
+  {
+    "from": "/docs/modules/tooling/add-artifacts",
+    "to": "/docs/modules/cli/add-artifacts",
+    "status": 301
+  },
+  {
+    "from": "/docs/modules/tooling/automation",
+    "to": "/docs/modules/cli/automation",
+    "status": 301
+  },
+  {
+    "from": "/docs/api/integrations/ai-sdk",
+    "to": "/docs/modules/ai/native-runtime",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai",
+    "to": "/docs/modules/ai",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/agents",
+    "to": "/docs/modules/ai/agents",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/approvals",
+    "to": "/docs/modules/ai/approvals",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/first-agent",
+    "to": "/guides/ai/build-an-offline-agent",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/function-tools",
+    "to": "/docs/modules/ai/function-tools",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/graphs-persistence",
+    "to": "/docs/modules/ai/graphs-persistence",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/mcp",
+    "to": "/docs/modules/ai/mcp",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/native-runtime",
+    "to": "/docs/modules/ai/native-runtime",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/streaming",
+    "to": "/docs/modules/ai/streaming",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/threads-recovery",
+    "to": "/docs/modules/ai/threads-recovery",
+    "status": 301
+  },
+  {
+    "from": "/docs/ai/tools",
+    "to": "/docs/modules/ai/tools",
+    "status": 301
+  },
+  {
+    "from": "/docs/async/events",
+    "to": "/docs/modules/events",
+    "status": 301
+  },
+  {
+    "from": "/docs/async/jobs",
+    "to": "/docs/modules/jobs",
+    "status": 301
+  },
+  {
+    "from": "/docs/async/listeners",
+    "to": "/docs/modules/events/consume",
+    "status": 301
+  },
+  {
+    "from": "/docs/async/schedules",
+    "to": "/docs/modules/jobs/schedules",
+    "status": 301
+  },
+  {
+    "from": "/docs/auth",
+    "to": "/docs/modules/auth",
+    "status": 301
+  },
+  {
+    "from": "/docs/auth/better-auth",
+    "to": "/docs/modules/auth/better-auth",
+    "status": 301
+  },
+  {
+    "from": "/docs/auth/clients",
+    "to": "/docs/modules/auth/clients",
+    "status": 301
+  },
+  {
+    "from": "/docs/auth/customization",
+    "to": "/docs/modules/auth/customization",
+    "status": 301
+  },
+  {
+    "from": "/docs/auth/first-auth",
+    "to": "/guides/auth/email-password-sign-in",
+    "status": 301
+  },
+  {
+    "from": "/docs/auth/protect-routes",
+    "to": "/docs/modules/auth/protect-routes",
+    "status": 301
+  },
+  {
+    "from": "/docs/auth/sessions",
+    "to": "/docs/modules/auth/sessions",
+    "status": 301
+  },
+  {
+    "from": "/docs/auth/testing",
+    "to": "/docs/modules/auth/testing",
+    "status": 301
+  },
+  {
+    "from": "/docs/caching",
+    "to": "/docs/modules/caching",
+    "status": 301
+  },
+  {
+    "from": "/docs/caching/define",
+    "to": "/docs/modules/caching/define",
+    "status": 301
+  },
+  {
+    "from": "/docs/caching/expiration",
+    "to": "/docs/modules/caching/expiration",
+    "status": 301
+  },
+  {
+    "from": "/docs/caching/first-cache",
+    "to": "/guides/caching/cache-product-prices",
+    "status": 301
+  },
+  {
+    "from": "/docs/caching/read-write",
+    "to": "/docs/modules/caching/read-write",
+    "status": 301
+  },
+  {
+    "from": "/docs/client",
+    "to": "/docs/modules/client",
+    "status": 301
+  },
+  {
+    "from": "/docs/client/authentication",
+    "to": "/docs/modules/client/authentication",
+    "status": 301
+  },
+  {
+    "from": "/docs/client/mutations",
+    "to": "/docs/modules/client/mutations",
+    "status": 301
+  },
+  {
+    "from": "/docs/client/offline",
+    "to": "/docs/modules/client/offline",
+    "status": 301
+  },
+  {
+    "from": "/docs/client/routes",
+    "to": "/docs/modules/client/routes",
+    "status": 301
+  },
+  {
+    "from": "/docs/client/ssr",
+    "to": "/docs/modules/client/ssr",
+    "status": 301
+  },
+  {
+    "from": "/docs/client/streams",
+    "to": "/docs/modules/client/streams",
+    "status": 301
+  },
+  {
+    "from": "/docs/database",
+    "to": "/docs/modules/database",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/better-auth",
+    "to": "/docs/modules/database/better-auth",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/define",
+    "to": "/docs/modules/database/define",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/drizzle",
+    "to": "/docs/modules/database/drizzle",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/first-database",
+    "to": "/guides/database/register-users-in-a-transaction",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/generated-schemas",
+    "to": "/docs/modules/database/generated-schemas",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/migrations",
+    "to": "/docs/modules/database/migrations",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/models",
+    "to": "/docs/modules/database/models",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/overrides",
+    "to": "/docs/modules/database/overrides",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/queries",
+    "to": "/docs/modules/database/queries",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/schema",
+    "to": "/docs/modules/database/schema",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/testing",
+    "to": "/docs/modules/database/testing",
+    "status": 301
+  },
+  {
+    "from": "/docs/database/transactions",
+    "to": "/docs/modules/database/transactions",
+    "status": 301
+  },
+  {
+    "from": "/docs/events",
+    "to": "/docs/modules/events",
+    "status": 301
+  },
+  {
+    "from": "/docs/events/consume",
+    "to": "/docs/modules/events/consume",
+    "status": 301
+  },
+  {
+    "from": "/docs/events/define",
+    "to": "/docs/modules/events/define",
+    "status": 301
+  },
+  {
+    "from": "/docs/events/first-event",
+    "to": "/guides/events/react-to-order-events",
+    "status": 301
+  },
+  {
+    "from": "/docs/events/publish",
+    "to": "/docs/modules/events/publish",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals",
+    "to": "/docs/learn/concepts",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/application",
+    "to": "/docs/learn/concepts/application",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/context",
+    "to": "/docs/learn/concepts/context",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/domain-first-migration",
+    "to": "/docs/modules/service/organization",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/environment",
+    "to": "/docs/learn/concepts/environment",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/errors",
+    "to": "/docs/learn/concepts/errors",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/functions",
+    "to": "/docs/learn/concepts/functions",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/providers",
+    "to": "/docs/modules/integrations",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/schemas",
+    "to": "/docs/learn/concepts/schemas",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/schemas-errors-context",
+    "to": "/docs/learn/concepts/schemas",
+    "status": 301
+  },
+  {
+    "from": "/docs/fundamentals/services",
+    "to": "/docs/modules/service/define",
+    "status": 301
+  },
+  {
+    "from": "/docs/http",
+    "to": "/docs/modules/http",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/define",
+    "to": "/docs/modules/http/define",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/first-route",
+    "to": "/docs/modules/http/first-route",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/generated-clients",
+    "to": "/docs/modules/http/generated-clients",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/middleware",
+    "to": "/docs/modules/http/middleware",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/openapi",
+    "to": "/docs/modules/http/openapi",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/rate-limits",
+    "to": "/docs/modules/http/rate-limits",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/raw-handlers",
+    "to": "/docs/modules/http/raw-handlers",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/requests",
+    "to": "/docs/modules/http/requests",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/responses",
+    "to": "/docs/modules/http/responses",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/responses-openapi-clients",
+    "to": "/docs/modules/http/responses",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/routes",
+    "to": "/docs/modules/http/routes",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/streaming",
+    "to": "/docs/modules/http/streaming",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/uploads",
+    "to": "/docs/modules/http/uploads",
+    "status": 301
+  },
+  {
+    "from": "/docs/http/uploads-middleware-rate-limits",
+    "to": "/docs/modules/http/uploads",
+    "status": 301
+  },
+  {
+    "from": "/docs/integrations",
+    "to": "/docs/modules/integrations",
+    "status": 301
+  },
+  {
+    "from": "/docs/integrations/local-docker",
+    "to": "/docs/modules/integrations/local-docker",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs",
+    "to": "/docs/modules/jobs",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/bindings",
+    "to": "/docs/modules/jobs/bindings",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/clients",
+    "to": "/docs/modules/jobs/clients",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/define",
+    "to": "/docs/modules/jobs/quickstart",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/deployment",
+    "to": "/docs/modules/jobs/deployment",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/docker",
+    "to": "/docs/modules/jobs/docker",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/durations-and-sleep",
+    "to": "/docs/modules/jobs/durations-and-sleep",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/enqueue",
+    "to": "/docs/modules/jobs/quickstart",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/execution-policy",
+    "to": "/docs/modules/jobs/execution-policy",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/first-job",
+    "to": "/docs/modules/jobs/quickstart",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/idempotency",
+    "to": "/docs/modules/jobs/retries-and-idempotency",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/inspector",
+    "to": "/docs/modules/jobs/inspector",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/migration",
+    "to": "/docs/modules/jobs/migration",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/progress-and-streams",
+    "to": "/docs/modules/jobs/progress-and-streams",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/providers",
+    "to": "/docs/modules/jobs/providers",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/providers/comparison",
+    "to": "/docs/modules/jobs/providers/comparison",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/providers/effect-mq",
+    "to": "/docs/modules/jobs/providers/effect-mq",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/providers/inngest",
+    "to": "/docs/modules/jobs/providers/inngest",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/providers/trigger",
+    "to": "/docs/modules/jobs/providers/trigger",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/quickstart",
+    "to": "/docs/modules/jobs/quickstart",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/retries",
+    "to": "/docs/modules/jobs/retries-and-idempotency",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/retries-and-idempotency",
+    "to": "/docs/modules/jobs/retries-and-idempotency",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/schedules",
+    "to": "/docs/modules/jobs/schedules",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/security",
+    "to": "/docs/modules/jobs/security",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/tasks",
+    "to": "/docs/modules/jobs/tasks",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/testing",
+    "to": "/docs/modules/jobs/testing",
+    "status": 301
+  },
+  {
+    "from": "/docs/jobs/troubleshooting",
+    "to": "/docs/modules/jobs/troubleshooting",
+    "status": 301
+  },
+  {
+    "from": "/docs/operations",
+    "to": "/docs/modules/operations",
+    "status": 301
+  },
+  {
+    "from": "/docs/operations/cli-reference",
+    "to": "/docs/api/cli",
+    "status": 301
+  },
+  {
+    "from": "/docs/operations/deployment",
+    "to": "/docs/modules/deployment/aws",
+    "status": 301
+  },
+  {
+    "from": "/docs/modules/operations/deployment",
+    "to": "/docs/modules/deployment/aws",
+    "status": 301
+  },
+  {
+    "from": "/docs/operations/inspector",
+    "to": "/docs/modules/operations/inspector",
+    "status": 301
+  },
+  {
+    "from": "/docs/operations/observability",
+    "to": "/docs/modules/operations/observability",
+    "status": 301
+  },
+  {
+    "from": "/docs/operations/realtime-agents-streaming",
+    "to": "/docs/modules/operations/realtime-agents-streaming",
+    "status": 301
+  },
+  {
+    "from": "/docs/operations/testing",
+    "to": "/docs/modules/operations/testing",
+    "status": 301
+  },
+  {
+    "from": "/docs/operations/troubleshooting",
+    "to": "/docs/modules/operations/troubleshooting",
+    "status": 301
+  },
+  {
+    "from": "/docs/realtime",
+    "to": "/docs/modules/realtime",
+    "status": 301
+  },
+  {
+    "from": "/docs/realtime/access",
+    "to": "/docs/modules/realtime/access",
+    "status": 301
+  },
+  {
+    "from": "/docs/realtime/presence",
+    "to": "/docs/modules/realtime/presence",
+    "status": 301
+  },
+  {
+    "from": "/docs/realtime/providers",
+    "to": "/docs/modules/realtime/providers",
+    "status": 301
+  },
+  {
+    "from": "/docs/realtime/react",
+    "to": "/docs/modules/realtime/react",
+    "status": 301
+  },
+  {
+    "from": "/docs/realtime/recovery",
+    "to": "/docs/modules/realtime/recovery",
+    "status": 301
+  },
+  {
+    "from": "/docs/resources-ai/agents",
+    "to": "/docs/modules/ai/agents",
+    "status": 301
+  },
+  {
+    "from": "/docs/resources-ai/approvals",
+    "to": "/docs/modules/ai/approvals",
+    "status": 301
+  },
+  {
+    "from": "/docs/resources-ai/buckets",
+    "to": "/docs/modules/storage",
+    "status": 301
+  },
+  {
+    "from": "/docs/resources-ai/buckets-cache",
+    "to": "/docs/modules/storage",
+    "status": 301
+  },
+  {
+    "from": "/docs/resources-ai/cache",
+    "to": "/docs/modules/caching",
+    "status": 301
+  },
+  {
+    "from": "/docs/resources-ai/tools",
+    "to": "/docs/modules/ai/tools",
+    "status": 301
+  },
+  {
+    "from": "/docs/resources-ai/tools-agents",
+    "to": "/docs/modules/ai/tools",
+    "status": 301
+  },
+  {
+    "from": "/docs/service",
+    "to": "/docs/modules/service",
+    "status": 301
+  },
+  {
+    "from": "/docs/service/define",
+    "to": "/docs/modules/service/define",
+    "status": 301
+  },
+  {
+    "from": "/docs/service/domains",
+    "to": "/docs/modules/service/domains",
+    "status": 301
+  },
+  {
+    "from": "/docs/service/first-service",
+    "to": "/docs/modules/service/first-service",
+    "status": 301
+  },
+  {
+    "from": "/docs/service/migration",
+    "to": "/docs/modules/service/migration",
+    "status": 301
+  },
+  {
+    "from": "/docs/service/organization",
+    "to": "/docs/modules/service/organization",
+    "status": 301
+  },
+  {
+    "from": "/docs/service/routes",
+    "to": "/docs/modules/service/routes",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/add-artifacts",
+    "to": "/docs/modules/cli/add-artifacts",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/build",
+    "to": "/docs/api/cli#relkit-build",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/build-and-run",
+    "to": "/docs/learn/build-and-run",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/check",
+    "to": "/docs/learn/local-development#verify-changes",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/check-build-deploy",
+    "to": "/docs/learn/local-development#verify-changes",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/create-an-app",
+    "to": "/docs/learn/create-an-app",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/events",
+    "to": "/docs/modules/events",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/events/consume",
+    "to": "/docs/modules/events/consume",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/events/define",
+    "to": "/docs/modules/events/define",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/events/first-event",
+    "to": "/guides/events/react-to-order-events",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/events/publish",
+    "to": "/docs/modules/events/publish",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/first-route",
+    "to": "/docs/learn/first-route",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/local-development",
+    "to": "/docs/learn/local-development",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/production",
+    "to": "/docs/api/cli#relkit-start",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/protect-orders",
+    "to": "/docs/learn/protect-orders",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/save-orders",
+    "to": "/docs/learn/save-orders",
+    "status": 301
+  },
+  {
+    "from": "/docs/start/test-orders",
+    "to": "/docs/learn/test-orders",
+    "status": 301
+  },
+  {
+    "from": "/docs/storage",
+    "to": "/docs/modules/storage",
+    "status": 301
+  },
+  {
+    "from": "/docs/storage/define",
+    "to": "/docs/modules/storage/define",
+    "status": 301
+  },
+  {
+    "from": "/docs/storage/first-upload",
+    "to": "/guides/storage/upload-product-images",
+    "status": 301
+  },
+  {
+    "from": "/docs/storage/read-delete",
+    "to": "/docs/modules/storage/read-delete",
+    "status": 301
+  },
+  {
+    "from": "/docs/storage/upload",
+    "to": "/docs/modules/storage/upload",
+    "status": 301
+  }
+]

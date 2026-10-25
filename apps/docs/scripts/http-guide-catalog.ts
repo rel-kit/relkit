@@ -1,89 +1,90 @@
+/** Orders HTTP learning topics and source-backed links for generated navigation and related content. */
 import type { ApiPackage } from "./documentation-catalog.js";
 
 export const httpGuideGroup = {
-  directory: "http",
+  directory: "docs/modules/http",
   title: "HTTP Routes",
   icon: "Globe",
   pages: [
     "index",
+    "first-route",
     "define",
     "routes",
     "requests",
-    "uploads",
+    "responses",
     "middleware",
     "rate-limits",
-    "responses",
+    "uploads",
     "streaming",
     "raw-handlers",
     "openapi",
     "generated-clients",
-    "first-route",
   ],
 } as const;
 
 export const httpGuideRelations = [
   {
-    path: "http/index",
+    path: "docs/modules/http/index",
     api: ["routes", "services"],
     examples: ["templates/default/v1/api/src/routes/echo/route.ts"],
   },
   {
-    path: "http/define",
+    path: "docs/modules/http/define",
     api: ["routes", "services"],
     examples: ["examples/commerce/src/routes/orders/route.ts"],
   },
   {
-    path: "http/routes",
+    path: "docs/modules/http/routes",
     api: ["routes"],
     examples: ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
   },
   {
-    path: "http/requests",
+    path: "docs/modules/http/requests",
     api: ["routes", "schema"],
     examples: ["examples/commerce/src/routes/orders/route.ts"],
   },
   {
-    path: "http/uploads",
+    path: "docs/modules/http/uploads",
     api: ["routes", "schema", "buckets"],
     examples: ["examples/commerce/src/routes/uploads/route.ts"],
   },
   {
-    path: "http/middleware",
+    path: "docs/modules/http/middleware",
     api: ["routes"],
     examples: ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"],
   },
   {
-    path: "http/rate-limits",
+    path: "docs/modules/http/rate-limits",
     api: ["routes", "cache"],
     examples: ["tests/compiler/rate-limit.test.ts"],
   },
   {
-    path: "http/responses",
+    path: "docs/modules/http/responses",
     api: ["routes", "functions"],
     examples: ["examples/commerce/src/routes/orders/route.ts"],
   },
   {
-    path: "http/streaming",
+    path: "docs/modules/http/streaming",
     api: ["routes", "functions", "client"],
     examples: ["packages/runtime-hono/tests/native-stream.test.ts"],
   },
   {
-    path: "http/raw-handlers",
+    path: "docs/modules/http/raw-handlers",
     api: ["routes"],
     examples: ["examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"],
   },
   {
-    path: "http/openapi",
+    path: "docs/modules/http/openapi",
     api: ["routes"],
     examples: ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
   },
   {
-    path: "http/generated-clients",
+    path: "docs/modules/http/generated-clients",
     api: ["client", "routes"],
     examples: ["examples/commerce/src/platform/generated-client.ts"],
   },
   {
-    path: "http/first-route",
+    path: "docs/modules/http/first-route",
     api: ["routes", "functions", "services", "testing"],
     examples: ["templates/default/v1/api/tests/integration/echo.route.test.ts"],
   },

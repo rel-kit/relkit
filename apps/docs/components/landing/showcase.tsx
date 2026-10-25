@@ -1,5 +1,4 @@
-import Image from "next/image";
-import Link from "next/link";
+import { Image, Link } from "fumadocs-core/framework";
 import { Activity, ArrowRight, ArrowUpRight, Braces, Terminal } from "lucide-react";
 import { observabilityFeatures } from "./data";
 import { SectionHeading } from "./sections";
@@ -14,7 +13,7 @@ const guides = [
     label: "01 / Get started",
     title: "Your first Relkit app",
     description: "Create, change, verify, and run an application.",
-    href: "/docs/start/create-an-app",
+    href: "/docs/learn/create-an-app",
     icon: Terminal,
     visual: "$ bunx create-relkit@latest",
   },
@@ -22,7 +21,7 @@ const guides = [
     label: "02 / HTTP contracts",
     title: "From function to endpoint",
     description: "Connect validated functions to routes and OpenAPI.",
-    href: "/docs/http/routes",
+    href: "/docs/modules/http/routes",
     icon: Braces,
     visual: "POST /orders → createOrder",
   },
@@ -30,7 +29,7 @@ const guides = [
     label: "03 / Operations",
     title: "Follow the execution",
     description: "Test failure paths and trace a request end to end.",
-    href: "/docs/operations/testing",
+    href: "/docs/modules/operations/testing",
     icon: Activity,
     visual: "request → log → span",
   },
@@ -48,7 +47,7 @@ export function InspectorShowcase() {
         <div className={styles.inspectorStage}>
           <Link
             className={styles.inspector}
-            href="/docs/operations/inspector"
+            href="/docs/modules/operations/inspector"
             aria-label="Explore the Relkit Inspector guide"
           >
             <div className={styles.inspectorBar}>
@@ -64,6 +63,7 @@ export function InspectorShowcase() {
               alt="Relkit Inspector with its navigation sidebar and routes workspace"
               width={1280}
               height={900}
+              loading="lazy"
               sizes="(max-width: 560px) 90vw, (max-width: 1200px) 85vw, 992px"
             />
           </Link>
@@ -170,7 +170,7 @@ export function FinalCallToAction() {
           work together.
         </h2>
         <p>One TypeScript application. From the first local run.</p>
-        <Link className={system.button} href="/docs/start/create-an-app">
+        <Link className={system.button} href="/docs/learn/create-an-app">
           Start building <ArrowUpRight size={16} aria-hidden="true" />
         </Link>
         <code>bunx create-relkit@latest</code>

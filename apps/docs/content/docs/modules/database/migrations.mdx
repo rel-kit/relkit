@@ -1,0 +1,154 @@
+---
+title: Migrations
+description: Use Drizzle Kit to generate and apply migrations from TypeScript tables, and evolve persistent data safely.
+pagination: false
+sidebar:
+  icon: git-branch
+---
+
+A migration applies a reviewed schema change to a database. With Drizzle, generate migrations from your TypeScript tables using Drizzle Kit. You do not write table-creation statements in `defineDrizzleService`
+or maintain a second handwritten copy of your schema.
+
+RELKIT's `check`, `build`, and `dev` commands do not apply migrations. Migrate the database before
+starting code that depends on its new shape.
+
+<Steps>
+<Step>
+
+## Configure Drizzle Kit
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Complete [database installation](/docs/modules/database/define#install-compatible-packages) first. That setup
+selects the compatible ORM, development-only Drizzle Kit and application-owned declaration repair;
+the database scaffold installs them automatically. Keep that cohort and lockfile together instead
+of installing an arbitrary Kit version separately.
+</Callout>
+
+Add this application-root configuration, adjusting the schema path for your app:
+
+<include source="examples/data-model/drizzle.config.ts" lang="ts" meta='title="drizzle.config.ts"'>
+  /_snippets/source/examples/data-model/drizzle.config.ts
+</include>
+
+`schema` points to the same table exports used by the service. `dialect` describes the database,
+`out` owns the generated migration history, and `dbCredentials` selects the migration target.
+The configuration deliberately requires an explicit persistent file path. A separate process cannot
+migrate the in-memory connection later opened by your application.
+
+The example's package scripts use `bun --bun drizzle-kit generate` and
+`relkit db migrate`. Shared migration execution lives in installed RELKIT tooling;
+SQLite uses the Bun-native driver without a copied runner. PostgreSQL/MySQL
+delegate to the application's installed Drizzle Kit under Bun.
+
+Keep SQL and required metadata tracked in `src/services/database/migrations`, beside
+the owning service and schema. Auth and business tables share this one ordered
+history; `.relkit/` contains ignored runtime/build output, not migration source.
+
+</Step>
+<Step>
+
+## Generate, review, and apply
+
+For a new app and a new local file, run these commands from the application root:
+
+```sh
+export DATABASE_PATH=./data-model.sqlite
+bun --bun drizzle-kit generate --name=initial
+bun run db:migrate
+bun run check
+bun run typecheck
+bun run dev
+```
+
+If you are running the repository example, its initial migration is already generated and checked in;
+start with `bun run db:migrate` after setting `DATABASE_PATH`. Use the same path for the migration
+command and the running server. Run from the application root containing package.json
+and relkit.config.ts. Select another config with `bun run relkit db migrate --config
+configs/database.ts`; the default is root `drizzle.config.ts`. Its connection, output
+and supported log settings are authoritative. Relative database/output paths still
+use the application root even for nested or absolute config selections.
+
+Bun loads the application's normal dotenv files, with inherited variables taking
+precedence; `.env.example` is never loaded. Keep PostgreSQL/MySQL configuration
+deterministic because delegated Kit loads it again. Missing tooling is an explicit
+installation error; the migration command never downloads packages implicitly.
+
+`generate` compares TypeScript schema definitions with migration snapshots and creates migration
+artifacts; it does not modify your database. Review the generated changes before applying them.
+`migrate` applies pending migrations and records their history. See the official
+[Drizzle Kit generate guide](https://orm.drizzle.team/docs/drizzle-kit-generate) and
+[migrate guide](https://orm.drizzle.team/docs/drizzle-kit-migrate) for the tooling contract.
+
+Commit the generated migration directory, including snapshots, alongside the schema change. Let Kit
+own the output layout. Do not hand-edit generated snapshots or rewrite migrations already applied to
+shared environments. Native statements and advanced manual migrations belong in the
+[Drizzle documentation](https://orm.drizzle.team/docs/sql), not the normal service setup.
+
+</Step>
+</Steps>
+
+## Change an existing model
+
+Edit the relevant Drizzle table, then generate a new named migration:
+
+```sh
+export DATABASE_PATH=./data-model.sqlite
+bun --bun drizzle-kit generate --name=users-change
+```
+
+Review the diff and test it on an isolated copy of the old schema with representative data. After
+verification, apply the pending migrations to the intended target with `bun run db:migrate`
+(or `bun run relkit db migrate` if you have not added the script).
+
+Keep model changes, generated artifacts, and affected application contracts in the same change.
+Renames need particular attention so they are not mistaken for deleting and recreating data.
+
+A database created by older demo bootstrap code or by another tool has no matching Drizzle migration
+history. Do not blindly apply the initial migration to it. Establish a baseline using a workflow
+appropriate to your existing database and Drizzle version before continuing. Do not use a reset or
+force flag to make an existing database fit the tutorial.
+
+## Deploy without racing application replicas
+
+Run migrations as one coordinated deployment step, with deliberate credentials and the required
+Drizzle tooling/configuration/artifacts available. Do not run schema changes in a request handler
+or have every server replica migrate at startup.
+
+For changes used by running versions, prefer an additive field or table, a controlled backfill,
+a compatible application rollout, and only then removal of the old shape. Non-null fields may need
+defaults or a backfill; unique constraints may fail on existing duplicates.
+
+Before destructive changes, verify backups, restoration, the exact database target, and lock/downtime
+expectations. A rollback cannot necessarily recover discarded data. Keep seeding separate from
+migrations and normal server startup.
+
+For PostgreSQL or MySQL, use matching table definitions, Kit dialect/connection settings, and the
+appropriate driver. This executable workflow verifies Bun SQLite; it is not a test of other dialects.
+
+## Verify migrations separately from queries
+
+From the data-model example root:
+
+```sh
+bun test tests/migrations.test.ts
+bun test tests/data-model.test.ts
+bun run check
+bun run typecheck
+```
+
+The migration test invokes shared RELKIT tooling against a temporary file, writes data through Drizzle, and
+runs migrations again to verify that the data survives. Application tests apply the generated
+migration to their own isolated connection. As history grows, add upgrade tests from deployed
+versions, not just tests of an empty database.
+
+`relkit db migrate --json` emits one secret-safe result after cleanup: success
+identifies command, dialect and config/history paths, without inventing an applied
+count. Usage/configuration errors exit 2, operational failures 1, interruption 130,
+and success 0. Missing, empty or incompatible history fails before opening the
+target database and points to generation/compatibility checks. Failed SQL is not
+automatically retried; partial DDL rollback is not guaranteed.
+
+See [Testing](/docs/modules/database/testing) for the executable tests and
+[Better Auth](/docs/modules/database/better-auth) before adding authentication tables.
+
+<include>/_snippets/generated/related/docs-modules-database-migrations.mdx</include>

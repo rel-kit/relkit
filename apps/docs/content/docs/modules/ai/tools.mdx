@@ -1,0 +1,113 @@
+---
+title: Define a tool
+description: Let a model call an existing function with a clear description and execution policy.
+pagination: false
+sidebar:
+  icon: wrench
+---
+
+A tool names an action an AI client can request, such as looking up an order or cancelling it. Use `defineTool` to name the action, explain when to use it, and point it at an existing function.
+
+Function-backed tools use the lean app's `@relkit/app` authoring facades; they need no native
+model SDK. Choose [native agent installation](/guides/ai/build-an-offline-agent) only for model execution,
+or [MCP installation](/docs/modules/ai/mcp) only for that external protocol.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Use an existing application with a function to expose. [Create an application](/docs/learn/create-an-app) if you need one.
+</Callout>
+
+## Scaffold a function-backed tool
+
+From an [installed minimal app](/docs/learn/create-an-app) with its `hello` service and function:
+
+```sh
+bun run relkit add tool greeting-lookup --service hello \
+  --target hello --side-effect read --approval never
+```
+
+Creates `src/services/hello/tools/greeting-lookup.tool.ts` using the function's `.asTool()` method.
+Select a callable function in the same service; the CLI accepts its ID, binding, or filename.
+The default side-effect class is `read`, and approval defaults to `never`. Choose accurate policies
+before exposing a real operation. The tool remains internal to the domain, and adding it does not
+automatically add it to an existing agent.
+
+To scaffold the function and tool together, use `--create-function` instead of `--target`:
+
+```sh
+bun run relkit add tool find-order --service hello --create-function find-order
+```
+
+This creates `src/services/hello/functions/find-order.function.ts` and `src/services/hello/tools/find-order.tool.ts`,
+and exposes the new function through the service. Without either option, the interactive prompt
+lists existing functions and offers **Create a new function**. When no functions exist, it asks
+for a new function name directly.
+
+For every tool scaffolding flag, see the [tool command reference](/docs/api/cli#relkit-add-tool-name).
+
+<Steps>
+<Step>
+
+## Define the input and output
+
+Declare `input` and `output` on the function the tool will call:
+
+<include
+  source="templates/default/v1/agent/src/services/hello/functions/hello.function.ts"
+  lang="ts"
+  meta='title="src/services/hello/functions/hello.function.ts"'
+>
+  /_snippets/source/templates/default/v1/agent/src/services/hello/functions/hello.function.ts
+</include>
+
+Here, the tool will accept `{ "name": "Ada" }` and return `{ "message": "Hello, Ada!" }`. Input defaults and validation come from the same function schemas.
+
+</Step>
+<Step>
+
+## Define the tool
+
+This tool calls the [greeting function](/docs/modules/ai/function-tools#define-the-function). Save it under your domain's `tools` directory:
+
+<include
+  source="templates/default/v1/agent/tests/fixtures/lookup.tool.ts"
+  lang="ts"
+  meta='title="src/services/hello/tools/lookup.tool.ts"'
+>
+  /_snippets/source/templates/default/v1/agent/tests/fixtures/lookup.tool.ts
+</include>
+
+`defineTool` has no separate `input` or `output` options: it inherits both from `target`. You do not repeat the schemas in the tool definition. To expose a different input or output, define a function with those schemas and use it as the target.
+
+Native LangChain `tool()` values can appear directly in an agent's `tools` array. Use `defineTool` or
+`.asTool()` when the action should run through a RELKIT function or needs RELKIT side-effect, approval,
+timeout, or MCP metadata. Do not wrap native tools in a public adapter. Use the
+[RELKIT tool reference](/docs/api/tools#definetool) for the supported policy fields.
+
+Give the tool a stable `id` and a specific `description`: explain what it does, when to use it, and what it returns. “Look up an order by ID” is more useful than “Handle orders.”
+
+If you prefer to start from the function, [`hello.asTool(...)`](/docs/modules/ai/function-tools) creates the same kind of tool. Choose one form for each tool.
+
+</Step>
+</Steps>
+
+## Describe the action accurately
+
+| `sideEffect` | Use it for                                                 |
+| ------------ | ---------------------------------------------------------- |
+| `none`       | A calculation that does not read or change external state. |
+| `read`       | Reading data without changing it.                          |
+| `write`      | Changing application data.                                 |
+| `external`   | An external action, such as sending a message.             |
+
+`approval` is also required. Use `never` for an operation that may run without a separate decision, `on-write` to require approval for `write` and `external`, or `always` to require approval on every call. See [tool approvals](/docs/modules/ai/approvals) before exposing sensitive actions.
+
+The `approval` option on `defineTool` is a policy string, not a function. For a custom decision, pass a synchronous or asynchronous callback to [`tool.invoke(input, { approval })`](/docs/modules/ai/approvals#use-an-approval-callback).
+
+Set `timeoutMs` to limit how long the tool can run. It is optional in the tool API, but the current [MCP runtime requires an explicit value](/docs/modules/ai/mcp#choose-which-tools-to-expose). Check permissions inside the target function even for read-only tools.
+
+## Make the tool available
+
+Add the tool to an [agent's `tools` array](/docs/modules/ai/agents) to let that agent call it.
+
+Tools are also available through [MCP](/docs/modules/ai/mcp) by default. Set `mcp: false` in the tool options to keep a tool out of MCP; it can still be used by your RELKIT agents.
+

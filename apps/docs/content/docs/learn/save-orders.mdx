@@ -1,0 +1,218 @@
+---
+title: Save and retrieve orders
+description: Add a local SQLite database, persist POST /orders, and read a saved order after restart.
+sidebar:
+  icon: database
+---
+
+The Orders route from [the previous chapter](/docs/learn/first-route) only calculates a response.
+Here you will store that result in SQLite and add `GET /orders/:orderId`. Stop `bun run dev`
+before changing the database. Keep working in the same `relkit-orders` application.
+
+<Steps>
+<Step icon="database">
+
+## 1. Add the local database [#add-the-local-database]
+
+Scaffold the supported Drizzle service. This installs the compatible packages and creates an
+`items` placeholder. **Replace** that placeholder with the Orders schema below; do not keep both.
+
+```sh title="Terminal — relkit-orders"
+bun run relkit add database --orm drizzle --dialect sqlite
+```
+
+This also installs Drizzle Kit and registers the release-owned Drizzle declaration repair. If you
+pass `--no-install`, complete `bun install` and `bun run check` before the next step. For a manual
+alternative, follow [database installation](/docs/modules/database/define); do not run both setup paths.
+
+Replace `src/services/database/schema/index.ts` with one Orders table. `orderId` is the unique key;
+`ownerId` is empty until the next chapter adds sign-in. Existing anonymous demonstration orders
+will not become anyone's private orders automatically.
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/src/services/database/schema/index.ts"
+  lang="ts"
+  meta='title="src/services/database/schema/index.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/database/schema/index.ts
+</include>
+
+Use Bun's SQLite driver in `src/services/database/service.ts`. Replace the scaffolded service with:
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/src/services/database/service.ts"
+  lang="ts"
+  meta='title="src/services/database/service.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/database/service.ts
+</include>
+
+Replace `src/platform/env.ts` to keep the existing log-level setting and add the SQLite file path:
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/src/platform/env.ts"
+  lang="ts"
+  meta='title="src/platform/env.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/platform/env.ts
+</include>
+
+Update `tsconfig.json` so TypeScript loads the context registry produced by `relkit check`.
+Keep the starter's `@app/*` alias; the complete config below adds the generated declaration
+and includes the migration script.
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/tsconfig.json"
+  lang="json"
+  meta='title="tsconfig.json"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/tsconfig.json
+</include>
+
+Add the SQLite path to the ignored `.env` file, preserving its existing settings. The same path will be loaded when you
+restart the app or run the production build. Keep the database out of source control too.
+
+```sh title="Terminal — relkit-orders"
+printf '\nDATABASE_PATH=./orders.sqlite\n' >> .env
+printf '\norders.sqlite\n' >> .gitignore
+```
+
+</Step>
+<Step icon="save">
+
+## 2. Save an order [#save-an-order]
+
+The existing `createOrder` function already validates input and calls `priceOrder`. Replace
+`src/services/orders/functions/create-order.function.ts` so it inserts the calculated result into the
+Orders table. The response now includes the original `quantity` as well as the price.
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/src/services/orders/functions/create-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/create-order.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/orders/functions/create-order.function.ts
+</include>
+
+</Step>
+<Step icon="search">
+
+## 3. Add a read operation [#add-a-read-operation]
+
+From the application root, scaffold the read function:
+
+```sh title="Terminal — relkit-orders"
+bun run relkit add function get-order --service orders
+```
+
+This creates `src/services/orders/functions/get-order.function.ts` and exposes `getOrder` through
+the service. Replace its placeholder with the lookup below. It returns `found: false` when there
+is no row, so callers receive no fabricated order. For manual setup, create the same file instead.
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/src/services/orders/functions/get-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/get-order.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/orders/functions/get-order.function.ts
+</include>
+
+Replace `src/services/orders/service.ts` to expose that operation alongside the existing two functions:
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/src/services/orders/service.ts"
+  lang="ts"
+  meta='title="src/services/orders/service.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/orders/service.ts
+</include>
+
+Scaffold the read route after updating the function and service:
+
+```sh title="Terminal — relkit-orders"
+bun run relkit add route /orders/:orderId \
+  --mode service-route --service orders --map GET=getOrder
+```
+
+This creates `src/routes/orders/[orderId]/route.ts`. Its directory supplies the URL parameter;
+the named `GET` export selects the public `getOrder` member. The generated shorthand and the
+explicit mapping below select the same operation; use this source to match the tutorial:
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/src/routes/orders/[orderId]/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/[orderId]/route.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/routes/orders/[orderId]/route.ts
+</include>
+
+</Step>
+<Step icon="flask-conical">
+
+## 4. Keep existing HTTP tests compatible [#keep-existing-http-tests-compatible]
+
+Application test fixtures load the app's declared services, even when a test only calls `/hello`.
+After adding the database, replace the starter's generic `createTestApplication` import with
+`@relkit/testing/drizzle` in every application fixture. Keep `invokeFunction` unit tests on the
+generic helper when they inject their own dependencies.
+
+Update the existing Hello HTTP test:
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/tests/integration/hello.route.test.ts"
+  lang="ts"
+  meta='title="tests/integration/hello.route.test.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/tests/integration/hello.route.test.ts
+</include>
+
+</Step>
+<Step icon="list-checks">
+
+## 5. Migrate, run, and check [#migrate-run-and-check]
+
+Replace the scaffolded `drizzle.config.ts` with this configuration. It refuses an unset or
+in-memory path so the migration cannot quietly target the wrong database.
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/database/drizzle.config.ts"
+  lang="ts"
+  meta='title="drizzle.config.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/drizzle.config.ts
+</include>
+
+Generate and review the initial SQL migration, then apply it and start the app:
+
+Use installed RELKIT migration tooling, which selects the Bun-native SQLite driver.
+Keep generated SQL and required metadata tracked beside the database service in
+`src/services/database/migrations`; do not copy runner code into the application.
+
+```sh title="Terminal — relkit-orders"
+export DATABASE_PATH=./orders.sqlite
+bun --bun drizzle-kit generate --name=initial
+bun run relkit db migrate
+bun run check
+bun run typecheck
+bun run dev
+```
+
+In another terminal, submit a new order and read it back:
+
+```sh title="Second terminal — relkit-orders"
+curl -i -X POST http://localhost:3000/orders \
+  -H 'content-type: application/json' \
+  -d '{"orderId":"saved-1","sku":"book","quantity":10}'
+curl http://localhost:3000/orders/saved-1
+```
+
+Expect HTTP `201` with `totalCents: 900`; the GET response has `found: true` and the same
+order. Restart `bun run dev` and repeat the GET: the result remains. Use a new `orderId` for
+another POST because the database enforces uniqueness.
+
+This chapter's API has no access control yet.
+
+</Step>
+</Steps>
+
+<include>/_snippets/generated/related/docs-learn-save-orders.mdx</include>

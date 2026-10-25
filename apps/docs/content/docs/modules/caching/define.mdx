@@ -1,0 +1,101 @@
+---
+title: Define a cache
+description: Choose your cache's keys, value shape, and default lifetime.
+pagination: false
+sidebar:
+  icon: settings
+---
+
+Define a cache to name a stored value, describe its schema, and set how long it remains valid.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Start with an [existing application](/docs/learn/create-an-app). The cache definition uses the base app package; the provider configuration below adds the storage integration.
+</Callout>
+
+## Pre-setup
+
+Complete [local Docker Redis setup](/docs/modules/caching#pre-setup) before using a cache.
+It installs the provider and configures `cache.requests` and `defaults.cache` in `defineApp`.
+Docker supplies its connection values; no new `defineEnv` fields are needed for that path.
+Keep the definition's profile aligned with the configured one.
+
+## Scaffold a cache
+
+From the application root, with an existing `orders` service:
+
+```sh
+bun run relkit add cache Prices --service orders --provider redis --source docker
+```
+
+Creates `src/services/orders/cache/prices.cache.ts` and configures Docker Redis. Without provider flags,
+a default/unique compatible cache profile is reused; otherwise Docker Redis is the fallback.
+
+Edit the generated key/value schemas and lifetime for your data. Keep its generated `id` and
+`profile`; the complete manual example below uses a different profile named `requests`.
+For the full application workflow, follow [Cache product prices](/guides/caching/cache-product-prices).
+
+<Accordion>
+<AccordionItem title="Choose a different cache provider" icon="settings">
+
+Choose one configuration form when running the command:
+
+| Selection                                  | Command options                               |
+| ------------------------------------------ | --------------------------------------------- |
+| Existing profile                           | `--profile requests`                          |
+| Docker Redis                               | `--provider redis --source docker`            |
+| Connected Redis                            | `--provider redis --source connected`         |
+| Redis on an existing AWS/Pulumi deployment | `--provider redis --source aws`               |
+| Connected Cloudflare KV                    | `--provider cloudflare-kv --source connected` |
+
+Do not combine `--profile` with `--provider` or `--source`. AWS requires an already configured
+AWS/Pulumi deployment; scaffolding does not provision it. Connected profiles add named environment
+references and blank examples, not credentials. Docker startup is a separate
+[post-add confirmation](/docs/modules/cli/add-artifacts#start-local-resources).
+Declare the cache as a function dependency before using it.
+
+</AccordionItem>
+</Accordion>
+
+For every cache scaffolding flag, see the [cache command reference](/docs/api/cli#relkit-add-cache-name).
+
+The scaffold normally installs the selected owners and checks the app. With `--no-install`, run
+`bun install` and `bun run check` before continuing. For manual descriptor/configuration setup,
+complete [the selected adapter installation](/guides/caching/cache-product-prices#configure-caching) first;
+connected Cloudflare uses [its own package](/docs/modules/integrations) instead of Docker Redis.
+
+## Define the cache
+
+Use `defineCache` in your app's domain directory. Edit the scaffolded file, or create
+`src/services/orders/cache/prices.cache.ts` manually. This source shows the complete manual example:
+
+<include
+  source="examples/commerce/src/services/orders/cache/prices.cache.ts"
+  lang="ts"
+  meta='title="src/services/orders/cache/prices.cache.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/cache/prices.cache.ts
+</include>
+
+- `id` is the cache's stable, unique name.
+- `key` describes how to identify a value. Here, `{ sku: "book" }` identifies one product's price.
+- `value` describes what to store: a non-negative integer price in cents.
+- `defaultTtlMs` is the lifetime in milliseconds when a write does not specify one. `60_000` means one minute.
+- `maxTtlMs` is the longest allowed lifetime. Requests above this limit are rejected, not shortened.
+- `profile` selects a physical cache configuration in `relkit.config.ts`. This example uses `"requests"`.
+
+Both lifetime settings are optional. Set a default when data should expire; setting only `maxTtlMs` does not choose a lifetime for every write.
+
+## Check your cache
+
+Make sure the descriptor's `profile` matches its cache profile in `relkit.config.ts`. Keep the
+scaffolded profile, or use `requests` for the manual example. The
+[tutorial's configuration step](/guides/caching/cache-product-prices#configure-caching) shows that setup.
+
+From your app's root, run:
+
+```sh
+bun run check
+```
+
+Next, [read and write values from a function](/docs/modules/caching/read-write).
+

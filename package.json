@@ -8,7 +8,7 @@
     "check": "bun run scripts/check-boundaries.ts",
     "typecheck": "tsc -b --pretty false && bun packages/cli/dist/bin.js check --project-root examples/commerce --json",
     "lint": "bun run scripts/lint.ts",
-    "lint:fix": "bun x eslint --fix eslint.config.mjs apps/docs/next.config.mjs apps/docs/postcss.config.mjs apps/inspector/postcss.config.mjs scripts/jobs-coverage/stryker.config.mjs && bun run lint",
+    "lint:fix": "bun x eslint --fix eslint.config.mjs apps/docs/postcss.config.mjs apps/inspector/postcss.config.mjs scripts/jobs-coverage/stryker.config.mjs && bun run lint",
     "format:fix": "bun x prettier --write AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md",
     "test": "bun run scripts/test-all.ts",
     "test:types": "bun run scripts/test-types.ts",
@@ -51,7 +51,7 @@
     "relkit:local": "bun scripts/relkit-local.ts",
     "build": "bun run scripts/build.ts",
     "verify": "bun run scripts/verify.ts",
-    "prepush": "bun install --frozen-lockfile && bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md && bun run lint && bun run check && bun run konsistent -- validate && bun run scripts/check-observability-sinks.ts && bun x turbo run typecheck --concurrency=1 --filter='./packages/*' --filter='./integrations/catalog' --filter='./integrations/packages/*' --output-logs=errors-only && bun x tsc -b --pretty false && bun run test:types && bun run test:certification && bun run test:unit && bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts && bun run test:graph && bun run test:contracts && bun run test:security",
+    "prepush": "bun install --frozen-lockfile && bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md && bun run lint && bun run check && bun test ./tests/phase0-docs-imports.ts && bun run konsistent -- validate && bun run scripts/check-observability-sinks.ts && bun x turbo run typecheck --concurrency=1 --filter='./packages/*' --filter='./integrations/catalog' --filter='./integrations/packages/*' --output-logs=errors-only && bun x tsc -b --pretty false && bun run test:types && bun run test:certification && bun run test:unit && bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts && bun run test:graph && bun run test:contracts && bun run test:security && bun x --bun vitest run packages/inspector/tests/platform-cohort.test.ts && bun --cwd=apps/docs run test:installations && bun run test:docs && bun --cwd=apps/docs run build",
     "prepush:full": "docker info >/dev/null && bun run verify && bun run test:jobs:docker && bun run test:scaffold && bun run test:container && bun run test:local-docker && bun run test:deployment && bun run test:inspector:browser && bun run test:e2e",
     "konsistent": "konsistent",
     "changeset": "node ./node_modules/@changesets/cli/bin.js",
@@ -160,6 +160,8 @@
     }
   },
   "patchedDependencies": {
-    "drizzle-orm@1.0.0-rc.5-169397b": "patches/drizzle-orm.patch"
+    "drizzle-orm@1.0.0-rc.5-169397b": "patches/drizzle-orm.patch",
+    "blume@2.2.5": "patches/blume@2.2.5.patch",
+    "@effect/docgen@4.0.1": "patches/@effect%2Fdocgen@4.0.1.patch"
   }
 }

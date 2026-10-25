@@ -1,0 +1,79 @@
+---
+title: CLI
+description: Create an application, add files, check your work, and run development and production builds from the terminal.
+pagination: false
+search:
+  keywords: [CLI, command line, terminal, scaffold, development, build]
+sidebar:
+  icon: terminal
+---
+
+<Callout type="tip" title="Start here" icon="terminal">
+The RELKIT CLI creates projects, adds application files, validates their connections, and runs your backend. Start with **[Create and build an API](/guides/cli/create-and-build-an-api)** to add an endpoint, call it, and run the production build.
+</Callout>
+
+## Pre-setup
+
+Use Bun 1.3.10 or later and install your application's dependencies before running its local CLI.
+Keep `relkit.config.ts` and the environment contract it passes to `defineApp`. New provider-backed
+modules start with [local Docker setup](/docs/modules/integrations#pre-setup); the CLI itself
+needs no extra `defineEnv` field. `relkit add` scaffolds selected configuration, but it does not
+apply database migrations or supply secrets on your behalf.
+
+## Run commands in the right place
+
+Use `bunx create-relkit@latest` in the parent directory when creating a project. Inside an installed application, use its local CLI through `bun run relkit`; no global installation is required.
+
+```sh title="Terminal — application root"
+bun run relkit --help
+bun run relkit add route --help
+```
+
+The first command lists available commands. The second shows the arguments and flags for adding a route without writing files. In an interactive terminal, `bun run relkit` opens an action menu; with redirected input it prints help. Supply explicit values for automation.
+
+## Follow the application lifecycle
+
+The generated project includes package scripts for common commands. Run these from the application root:
+
+| Stage              | Command              | What happens                                                      | Continue with                                                                |
+| ------------------ | -------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Add a capability   | `bun run relkit add` | Choose files, their owning service, and any required packages.    | [Add application files](/docs/modules/cli/add-artifacts)                     |
+| Validate structure | `bun run check`      | Check application descriptors and their relationships.            | [`relkit check`](/docs/api/cli#relkit-check)                                 |
+| Check TypeScript   | `bun run typecheck`  | Check source and generated types with TypeScript.                 | [CLI walkthrough](/guides/cli/create-and-build-an-api#check-the-application) |
+| Test behavior      | `bun run test`       | Run the application's tests.                                      | [Testing](/docs/modules/operations/testing)                                  |
+| Develop            | `bun run dev`        | Prepare the application, start the server, and watch for changes. | [`relkit dev`](/docs/api/cli#relkit-dev)                                     |
+| Build              | `bun run build`      | Write the production output into `.relkit/build`.                 | [`relkit build`](/docs/api/cli#relkit-build)                                 |
+| Run the build      | `bun run start`      | Start the built server.                                           | [`relkit start`](/docs/api/cli#relkit-start)                                 |
+
+`check` validates structure; `typecheck` checks types; tests verify behavior. Run all three when changing application code. Build before starting production output, and stop the development server before starting another server on the same port.
+
+## Choose a practical task
+
+<CardGroup cols={2}>
+<Card title="Create, add a route, and build:" icon="terminal">
+follow the [CLI walkthrough](/guides/cli/create-and-build-an-api).
+</Card>
+<Card title="Control project creation:" icon="folder-plus">
+choose [installation and Git options](/docs/modules/cli/create-an-app).
+</Card>
+<Card title="Add services, functions, or resources:" icon="boxes">
+use [application scaffolding](/docs/modules/cli/add-artifacts).
+</Card>
+<Card title="Start Redis or MinIO:" icon="hard-drive">
+follow [Local Docker](/docs/modules/integrations/local-docker); these commands manage declared local resources separately from the backend.
+</Card>
+<Card title="Apply database migrations:" icon="database">
+follow [Migrations](/docs/modules/database/migrations).
+</Card>
+<Card title="Generate a frontend client:" icon="panels-top-left">
+follow [Generated clients](/docs/modules/http/generated-clients).
+</Card>
+<Card title="Prepare a deployment:" icon="rocket">
+follow [Deployment](/docs/modules/deployment), starting with local Docker and the supported provider paths.
+</Card>
+<Card title="Build an editor integration:" icon="code">
+use the [programmatic tooling APIs](/docs/modules/cli/automation).
+</Card>
+</CardGroup>
+
+For the longer Orders application, continue through [Learn](/docs/learn). For flags and exact syntax, use the **[command reference](/docs/api/cli)**. The separate [CLI automation API reference](/docs/api/cli-api) documents JavaScript imports used by tool authors.

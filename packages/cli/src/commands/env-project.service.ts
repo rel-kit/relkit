@@ -1,3 +1,4 @@
+/** Loads current or flat-layout environment contracts without hiding an invalid selected module. */
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Context, Effect, Layer, Schema } from "effect";
@@ -35,7 +36,10 @@ export const environmentProjectLive = Layer.effect(
         function* (options) {
           if (options.definition !== undefined) return options.definition;
           const root = resolve(options.projectRoot ?? process.cwd());
-          const path = resolve(root, options.envPath ?? join("src", "env.ts"));
+          let path = resolve(root, options.envPath ?? join("src", "platform", "env.ts"));
+          if (options.envPath === undefined && !(yield* files.exists(path))) {
+            path = resolve(root, "src", "env.ts");
+          }
           yield* cliTry("env.path", () => assertInside(root, path, "Environment"));
           const loaded = yield* modules
             .load(`${pathToFileURL(path).href}?relkit_env=1`)

@@ -1,0 +1,194 @@
+/* Keeps the docs hero self-contained; readable content and links never depend on motion. */
+.docs-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 28rem;
+  overflow: hidden;
+  margin: 0.5rem 0 2rem;
+  padding: 3.5rem 3rem;
+  border: 1px solid var(--blume-border);
+  border-radius: 1rem;
+  background: var(--blume-background);
+}
+
+.docs-hero::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: radial-gradient(var(--blume-foreground) 0.8px, transparent 0.8px);
+  background-size: 20px 20px;
+  opacity: 0.16;
+  mask-image: linear-gradient(110deg, transparent 25%, black 75%);
+  content: "";
+}
+
+.docs-hero-art {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--blume-accent);
+  opacity: 0.5;
+  mask-image: linear-gradient(to right, transparent 30%, black 65%);
+  pointer-events: none;
+}
+
+.docs-hero-track {
+  opacity: 0.35;
+}
+
+.docs-hero-flow {
+  stroke-dasharray: 9 91;
+  stroke-linecap: round;
+  opacity: 0.65;
+  animation: docs-hero-flow 8s linear infinite;
+}
+
+.docs-hero-track-core {
+  stroke: var(--blume-background);
+}
+
+.docs-hero-hub {
+  fill: var(--blume-code-background);
+  stroke: var(--blume-border);
+}
+
+.docs-hero-copy {
+  width: 60%;
+  max-width: 36rem;
+}
+
+.docs-hero-copy .docs-hero-eyebrow {
+  margin: 0 0 1.5rem;
+  color: var(--blume-muted-foreground);
+  font-family: var(--blume-font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.docs-hero-copy h1 {
+  margin: 0 0 1.5rem;
+  color: var(--blume-foreground);
+  font-size: clamp(2.5rem, 4.5vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 1.06;
+}
+
+.docs-hero-copy > p {
+  max-width: 29rem;
+  margin: 0;
+  color: var(--blume-muted-foreground);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.docs-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.docs-hero-actions a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--blume-accent);
+  border-radius: 0.5rem;
+  background: var(--blume-accent);
+  color: var(--blume-accent-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 160ms ease;
+}
+
+.docs-hero-actions a + a {
+  border-color: var(--blume-border);
+  background: var(--blume-background);
+  color: var(--blume-foreground);
+}
+
+.docs-hero-actions a:hover {
+  opacity: 0.75;
+}
+
+.docs-hero-motion {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1rem;
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--blume-muted-foreground);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.docs-hero-motion input {
+  width: 0.875rem;
+  height: 0.875rem;
+  accent-color: var(--blume-accent);
+}
+
+.docs-hero:has(input:checked) .docs-hero-flow {
+  animation-play-state: paused;
+}
+
+@keyframes docs-hero-flow {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .docs-hero {
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  .docs-hero-copy {
+    width: 100%;
+  }
+  .docs-hero-art {
+    left: 8rem;
+    width: 54rem;
+    opacity: 0.2;
+  }
+  .docs-hero-mark {
+    display: none;
+  }
+  .docs-hero::before {
+    opacity: 0.1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-hero-flow {
+    animation: none;
+    opacity: 0;
+  }
+  .docs-hero-motion {
+    display: none;
+  }
+  .docs-hero-actions a {
+    transition: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .docs-hero-art {
+    left: -20rem;
+  }
+}

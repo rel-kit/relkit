@@ -1,0 +1,72 @@
+---
+title: Core concepts
+description: Understand the application graph, validated functions, runtime contracts, invocation context, and environment before adding capabilities.
+sidebar:
+  icon: lightbulb
+---
+
+Use these pages to understand the code you've written in the Orders tutorial. Start with functions and schemas, then explore how RELKIT connects the application. Development,
+tests, HTTP, events, jobs, the Inspector, generated clients, and deployment all consume that graph instead of
+maintaining separate descriptions of the application.
+
+## Learn the model in order
+
+<CardGroup>
+  <Card title="Application configuration" href="/docs/learn/concepts/application" icon="settings" arrow>
+    Use defineApp to connect the server, environment, and integrations in relkit.config.ts.
+  </Card>
+  <Card title="Environment contracts" href="/docs/learn/concepts/environment" icon="key-round" arrow>
+    Use defineEnv to declare typed values, defaults, and secrets.
+  </Card>
+  <Card title="Functions" href="/docs/learn/concepts/functions" icon="braces" arrow>
+    Define reusable behavior with validated input, output, errors, and dependencies.
+  </Card>
+  <Card title="Schemas and errors" href="/docs/learn/concepts/schemas" icon="list-checks" arrow>
+    Keep runtime boundaries explicit and failures safe for callers.
+  </Card>
+  <Card title="Context and environment" href="/docs/learn/concepts/context" icon="workflow" arrow>
+    Use invocation-scoped capabilities and typed runtime configuration.
+  </Card>
+</CardGroup>
+
+Start with the application model and functions. Schemas define values crossing a boundary; declared errors
+define expected failures. Context grants one invocation access to its approved capabilities, while the
+environment contract resolves process configuration before handlers run.
+
+## One source, many consumers
+
+The certified minimal starter keeps the root configuration intentionally small:
+
+<include
+  source="templates/default/v1/minimal/relkit.config.ts"
+  lang="ts"
+  meta='title="templates/default/v1/minimal/relkit.config.ts"'
+>
+  /_snippets/source/templates/default/v1/minimal/relkit.config.ts
+</include>
+
+Source files are the application. `.relkit/generated` and `.relkit/build` are derived artifacts; inspect them
+when diagnosing a problem, but repair the descriptor, configuration, or environment that produced them.
+
+```text title="Application flow"
+TypeScript descriptors → relkit check → application graph
+                                      ↘ dev · tests · build · inspector · deployment
+```
+
+## Check your understanding
+
+From a generated application, run:
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run relkit graph print
+```
+
+`check` evaluates configuration, discovers descriptors, validates graph relationships, and refreshes generated
+contracts. `graph print` lets you inspect the resulting IDs and edges without starting the server or creating
+external resources.
+
+Continue with [Service](/docs/modules/service) after these concepts to organize behavior by domain and choose the
+public operations other domains and transports may call.
+
+<include>/_snippets/generated/related/docs-learn-concepts-index.mdx</include>

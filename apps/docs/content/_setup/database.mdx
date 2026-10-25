@@ -1,0 +1,36 @@
+## Pre-setup
+
+For a new database service, use [PostgreSQL in local Docker](/docs/modules/database/local-docker).
+That walkthrough covers the Compose file, persistent volume, CLI scaffold, credentials,
+environment validation, and migration. Complete it before adding queries or auth tables.
+
+<Steps>
+<Step title="Start the database and scaffold its service" icon="container">
+
+Follow the [Docker setup](/docs/modules/database/local-docker), then run
+`bun run relkit add database --orm drizzle --dialect postgresql` once in an app with no database
+service. The CLI installs the integration and creates the service, schema, and migration config.
+
+</Step>
+<Step title="Connect defineEnv to defineApp" icon="key-round">
+
+The CLI merges `DATABASE_URL` into `src/platform/env.ts`. Keep that contract imported by
+`relkit.config.ts`. This minimal inline example shows their relationship:
+
+<include source="apps/docs/examples/setup/postgresql.ts" lang="ts" meta='title="relkit.config.ts — equivalent inline environment"'>
+  /_snippets/source/apps/docs/examples/setup/postgresql.ts
+</include>
+
+Keep the actual URL in the backend's untracked `.env.local`. The Drizzle service opens it
+inside `client({ env })`; no database provider profile belongs in `defineApp`.
+
+</Step>
+<Step title="Migrate and verify" icon="clipboard-check">
+
+Use the [migration steps](/docs/modules/database/local-docker#pre-setup) to generate, review,
+and apply your schema, then run `bun run check`, `bun run typecheck`, and `bun run dev`.
+Existing SQLite/MySQL apps keep their dialect and history; the [SQLite tutorial](/docs/learn/save-orders)
+is an explicit alternative, not a conversion step.
+
+</Step>
+</Steps>

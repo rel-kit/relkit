@@ -1,0 +1,70 @@
+---
+title: Define an event
+description: Name an event and choose the data it carries.
+pagination: false
+sidebar:
+  icon: settings
+---
+
+Define an event to give an application fact a stable name and a validated payload.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Start with an [existing application](/docs/learn/create-an-app). Event definitions use the app package already installed by the starter.
+</Callout>
+
+## Pre-setup
+
+Complete [event provider setup](/docs/modules/events#pre-setup) to install `@relkit/local`
+and configure `event` plus `defaults.event` in `defineApp`. No additional `defineEnv` values
+are required. This provider has no Docker recipe; retain its `.relkit/state` data across restarts.
+
+## Scaffold an event contract
+
+From an application's root, with an existing `orders` service:
+
+```sh
+bun run relkit add event order-created --service orders
+```
+
+Creates `src/services/orders/events/order-created.event.ts`, a version-1 contract with a string `value`
+payload and ID `orders.order-created-event`. It registers the event's type and exposes the event
+through the service. Pass `--internal` to omit service exposure.
+
+Use `--profile events` to select that compatible event profile. Without one, scaffolding reuses
+a configured default or unique profile, or adds a file-backed `localEvent()` profile. The sample
+payload is a starting point; it is different from the hand-authored example below. Declare publication
+on a function and add a consumer when needed.
+
+For every event scaffolding flag, see the [event command reference](/docs/api/cli#relkit-add-event-name).
+
+The scaffold normally installs/configures its selected runtime. With `--no-install`, finish
+`bun install` and `bun run check`. For manual source setup, complete the
+[local event installation and binding](/guides/events/react-to-order-events#install-and-bind-the-selected-event-runtime)
+before using the descriptor below; its declaration alone does not select a provider.
+
+## Define the event
+
+Use `defineEvent` to name an event and describe its data. In your app, create `src/services/orders/events/order-created.event.ts`:
+
+<include
+  source="apps/docs/examples/events/order-created.event.ts"
+  lang="ts"
+  meta='title="src/services/orders/events/order-created.event.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/order-created.event.ts
+</include>
+
+- `id` uniquely names the event. Use this same name when publishing and consuming it.
+- `input` describes the data to send with the event.
+- `version` is optional and defaults to `1`.
+
+Here, each order event carries an order ID, product code, and total.
+
+## Check your event
+
+After adding the file, run this from your app's root:
+
+```sh
+bun run check
+```
+

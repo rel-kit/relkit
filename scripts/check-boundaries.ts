@@ -1,3 +1,4 @@
+/** Checks every workspace's package/import ownership and source scope; documentation build-only edges have a separate finite policy. */
 import { readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import * as ts from "typescript";
@@ -17,16 +18,20 @@ import {
 } from "./boundary-imports";
 import { dependencyDirectionViolations, integrationPackageNames } from "./boundary-directions";
 import { scanScope } from "./scope-scan";
+import { isDocumentationBuildImport } from "./docs-build-imports.js";
 import type { ImportReference, Scope } from "./boundary-imports";
+import type { Violation } from "./check-boundaries.types.js";
 
-type Violation = {
-  file: string;
-  line: number;
-  column: number;
-  rule: string;
-  message: string;
-};
-
+/** Classifies one import without resolving or evaluating the target module.
+ * @param root - Repository or guardrail fixture root.
+ * @param scopes - Discovered workspace owners.
+ * @param integrationNames - Independently published integration package names.
+ * @param owner - Importing workspace scope.
+ * @param file - Absolute source filename.
+ * @param sourceFile - Parsed native TypeScript source.
+ * @param reference - Literal import extracted from that source.
+ * @returns All applicable diagnostics for this single source edge.
+ */
 function reportImport(
   root: string,
   scopes: Scope[],
@@ -124,6 +129,10 @@ function reportImport(
   return violations;
 }
 
+/** Scans current native source without evaluating application or SDK modules.
+ * @param root - Repository or owned guardrail fixture.
+ * @returns File/root counts and all package boundary diagnostics.
+ */
 function checkBoundaries(root: string): { files: number; roots: number; violations: Violation[] } {
   const rootManifest = readManifest(resolve(root, "package.json"));
   if (!rootManifest?.workspaces) throw new Error(`No workspace manifest found at ${root}`);
@@ -134,7 +143,8 @@ function checkBoundaries(root: string): { files: number; roots: number; violatio
 
   for (const owner of scopes) {
     const paths = [...new Bun.Glob("**/*.{ts,tsx,mts,cts}").scanSync({ cwd: owner.root })]
-      .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.relkit)(\/|$)/.test(path))
+      .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.relkit|\.blume)(\/|$)/.test(path))
+      .filter((path) => owner.path !== "apps/docs" || !path.startsWith("content/_snippets/"))
       .sort();
     for (const path of paths) {
       const file = resolve(owner.root, path);
@@ -147,6 +157,10 @@ function checkBoundaries(root: string): { files: number; roots: number; violatio
       );
       files += 1;
       for (const reference of importReferences(sourceFile)) {
+        if (reference.specifier.startsWith(".")) {
+          const target = relative(root, resolve(dirname(file), reference.specifier));
+          if (isDocumentationBuildImport(relative(root, file), target)) continue;
+        }
         violations.push(
           ...reportImport(root, scopes, integrationNames, owner, file, sourceFile, reference),
         );
@@ -161,6 +175,9 @@ function checkBoundaries(root: string): { files: number; roots: number; violatio
   return { files, roots: scopes.length, violations };
 }
 
+/** Reports every current package/source violation and sets the native command status.
+ * @returns Normally after printing the scan result.
+ */
 function main(): void {
   const root = resolve(process.argv[2] ?? resolve(import.meta.dir, ".."));
   const result = checkBoundaries(root);

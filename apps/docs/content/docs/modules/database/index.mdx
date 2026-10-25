@@ -1,0 +1,124 @@
+---
+title: Database overview
+description: Organize durable application data, choose a database service, and keep persistence separate from business rules and public APIs.
+pagination: false
+sidebar:
+  icon: database
+---
+
+A database keeps application records, such as accounts and orders, after a request or process ends. A database service owns how the application connects
+to that data and exposes data operations to business domains. It is not the business domain itself.
+
+<Callout type="tip" title="Start here" icon="route">
+Start with [PostgreSQL in local Docker](/docs/modules/database/local-docker). The [Orders tutorial](/docs/learn/save-orders) is a complete SQLite alternative. The [Drizzle reference](/docs/api/drizzle) lists the exact service, model, and query contracts.
+</Callout>
+
+Start with the data your product needs, then choose the database and integration that fit it. The
+architecture below applies whether your model uses relational tables or documents; the concrete schema,
+query, and migration APIs belong to the chosen integration.
+
+<include>/_setup/database.mdx</include>
+
+## Keep the responsibilities separate
+
+| Responsibility      | What belongs here                                                          | Typical location                                                   |
+| ------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Database service    | Connection configuration, lifecycle, and integration-specific registration | `src/services/database/service.ts`                                 |
+| Data model          | Stored record shapes, identities, relationships, and constraints           | `src/services/database/schema/` in the current Drizzle integration |
+| Data operations     | Reusable queries and persistence-specific customization                    | `src/services/database/models/` for Drizzle custom methods         |
+| Business domain     | Validation, authorization, and workflows such as registering a member      | `src/services/users/functions/` or another owning domain           |
+| Operational tooling | Schema migrations, backfills, backups, and recovery                        | Application-root tooling, outside business handlers                |
+| HTTP interface      | Which business operations callers can invoke                               | `src/routes/`                                                      |
+
+A Users function decides whether someone may join an organization. The database stores the user and
+membership and enforces the configured constraints. A route exposes that workflow only when the product
+needs an HTTP endpoint. Keeping these responsibilities separate lets you change a query without moving
+routes, and evolve storage without duplicating business rules across transports.
+
+The database is a specialized [service](/docs/modules/service). It does not replace domain services, and table
+access alone never grants permission to a caller. See [Service organization](/docs/modules/service/organization)
+for where functions, tools, agents, jobs, and other domain members belong.
+
+## Choose an integration
+
+[Drizzle](/docs/modules/database/drizzle) is the database service integration available today. It supports
+relational table definitions and adds typed CRUD operations, generated validation schemas, custom
+models, and transactions.
+
+MongoDB and Prisma integrations are planned, not available APIs in this release. Their guides will
+describe their own APIs as they are introduced; Drizzle's method names are not a universal contract
+for future integrations. Database concepts stay separate from the currently implemented Drizzle workflow.
+
+For the Drizzle path, follow [Save and retrieve orders](/docs/learn/save-orders) for a complete
+SQLite example, then use [connection setup](/docs/modules/database/define) for other databases. Other database clients should remain behind your
+domain's own operations until a supported integration is available; they are not automatically
+registered by naming a file `service.ts`.
+
+## Follow data through the application
+
+```text
+Route, job, tool, or other entry point
+  → owning domain's business function
+  → database service's data operations
+  → database
+
+Schema changes → migration tooling → database
+```
+
+The current Drizzle integration makes its typed client available through `context.database`.
+Business functions do not open a new connection for each call or declare `dependencies.database`.
+This injection and its exact types are documented in the [Drizzle service guide](/docs/modules/database/drizzle).
+
+From an existing app's root, check service discovery and generated context types after changing registration:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+These commands check application structure and types; they do not provision a database or migrate it.
+
+## Find the guide for your task
+
+The following implementation guides use the current Drizzle integration:
+
+<CardGroup cols={2}>
+<Card title="Understand what the integration generates:" icon="database">
+[Drizzle database service](/docs/modules/database/drizzle).
+</Card>
+<Card title="Connect and configure lifecycle:" icon="settings">
+[Define a Drizzle service](/docs/modules/database/define).
+</Card>
+<Card title="Define tables, keys, and relationships:" icon="table-2">
+[Define the schema](/docs/modules/database/schema).
+</Card>
+<Card title="Reuse and customize generated validation:" icon="braces">
+[Generated CRUD and schemas](/docs/modules/database/generated-schemas).
+</Card>
+<Card title="Read and change records:" icon="search">
+[Query data](/docs/modules/database/queries).
+</Card>
+<Card title="Add a named query:" icon="box">
+[Custom models](/docs/modules/database/models).
+</Card>
+<Card title="Change a built-in operation:" icon="replace">
+[Override operations](/docs/modules/database/overrides).
+</Card>
+<Card title="Commit related writes together:" icon="git-merge">
+[Transactions](/docs/modules/database/transactions).
+</Card>
+<Card title="Evolve persistent data:" icon="git-branch">
+[Migrations](/docs/modules/database/migrations).
+</Card>
+<Card title="Share the database with authentication:" icon="shield-check">
+[Integrate Better Auth](/docs/modules/database/better-auth).
+</Card>
+<Card title="Verify behavior safely:" icon="flask-conical">
+[Testing](/docs/modules/database/testing).
+</Card>
+<Card title="Follow the complete application workflow:" icon="rocket">
+[Your first database](/guides/database/register-users-in-a-transaction).
+</Card>
+</CardGroup>
+
+<include>/_snippets/generated/related/docs-modules-database-index.mdx</include>

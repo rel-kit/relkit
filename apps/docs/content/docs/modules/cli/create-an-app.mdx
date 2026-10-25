@@ -1,0 +1,34 @@
+---
+title: Creation options
+description: Control dependency installation, Git initialization, and supported starter choices when creating an application.
+pagination: false
+sidebar:
+  icon: folder-plus
+---
+
+The [quickstart](/docs/learn/create-an-app) uses the default minimal starter. Use these options when another tool owns installation or repository initialization.
+
+## Supported choices
+
+The packaged capability table currently offers the certified `minimal` template with examples, no jobs service, no cloud, and no deployment adapter. Interactive and headless creation use the same table. Explicit unsupported combinations fail before staging or installation.
+
+Interactive creation asks for a missing project name and confirms the destination before writing. Git initializes by default; pass `--no-git` to disable it.
+
+Add capabilities later with [application scaffolding](/docs/modules/cli/add-artifacts). See the [CLI reference](/docs/api/cli) for every creation option.
+
+## Install dependencies separately
+
+Pass `--no-install` when another tool owns installation. Then run the workflow printed by the generator from the new project directory:
+
+```sh title="Terminal — generated project"
+bun install
+bunx --no-install relkit dev --prepare
+```
+
+Preparation validates the installed project, writes a development snapshot, and exits without opening backend or Inspector ports. On the next `bun run dev`, RELKIT verifies that snapshot against the current source, dependencies, toolchain, and runtime environment before starting.
+
+## Add only the capabilities you use
+
+The starter installs the application facade, CLI, and generic test tooling. Database and authentication adapters, agent engines, provider SDKs, exporters, optional HTTP protocols, and the Inspector are selected later.
+
+`relkit add` normally installs the requirements it selects. When copying example files manually, complete the module's installation and configuration steps first. Keep application-owned overrides and patches supplied by those instructions.

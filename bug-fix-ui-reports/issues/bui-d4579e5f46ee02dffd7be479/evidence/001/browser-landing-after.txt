@@ -1,0 +1,11 @@
+$ playwright test --config=playwright.config.ts browser/landing.spec.ts --grep "navigation between docs"
+[WebServer] (node:4255) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:4426) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 browser/landing.spec.ts:79:1 › navigation between docs and the landing preserves hydration and styling (1.7s)
+
+  1 passed (6.4s)

@@ -1,0 +1,81 @@
+---
+title: Operations
+description: Observe, inspect, test, build, diagnose, and deploy the same checked application graph.
+pagination: false
+sidebar:
+  icon: wrench
+---
+
+Use these pages to test application behavior, inspect running work, diagnose failures, and prepare a deployment. Use local telemetry
+and the Inspector while developing, deterministic tests for behavior, a reproducible build before release, and
+deployment preview only when cloud infrastructure is intentionally configured.
+
+<Callout type="tip" title="Start here" icon="route">
+Start with [Testing](/docs/modules/operations/testing) to verify an application operation. For a terminal walkthrough from a new project to a running build, follow [Create and build an API](/guides/cli/create-and-build-an-api). Exact helpers are in the [Testing reference](/docs/api/testing).
+</Callout>
+
+<include>/_setup/telemetry.mdx</include>
+
+## Choose the operational task
+
+<CardGroup>
+  <Card title="Observability" href="/docs/modules/operations/observability" icon="activity" arrow>
+    Configure redaction, local evidence, sampling, Sentry, and OTLP.
+  </Card>
+  <Card title="Inspector" href="/docs/modules/operations/inspector" icon="scan-search" arrow>
+    Follow requests through graph nodes, logs, traces, diagnostics, and API contracts.
+  </Card>
+  <Card title="Testing" href="/docs/modules/operations/testing" icon="flask-conical" arrow>
+    Test functions and the in-process application with explicit provider fakes.
+  </Card>
+  <Card title="Deployment" href="/docs/modules/deployment" icon="cloud-upload" arrow>
+    Verify Docker images and choose supported application hosts and runtime providers.
+  </Card>
+  <Card title="Troubleshooting" href="/docs/modules/operations/troubleshooting" icon="wrench" arrow>
+    Use stable diagnostics to repair the owning source of truth.
+  </Card>
+  <Card title="CLI" href="/docs/modules/cli" icon="terminal" arrow>
+    Follow terminal workflows and find command syntax and options.
+  </Card>
+</CardGroup>
+
+## Use the generated project commands
+
+The minimal starter exposes the normal application lifecycle as package scripts. This manifest is a
+reference for the base app; optional feature guides add only their selected dependencies:
+
+<include
+  source="templates/default/v1/minimal/package.json"
+  lang="json"
+  meta='title="templates/default/v1/minimal/package.json"'
+>
+  /_snippets/source/templates/default/v1/minimal/package.json
+</include>
+
+During development, run the narrowest check that proves the change. Before releasing an application, run the
+complete local sequence:
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run typecheck
+bun run test
+bun run build
+bun run start
+```
+
+Building and starting do not create cloud resources. Deployment is a separate, explicit lifecycle.
+
+## Match the repository gate before pushing
+
+RELKIT contributors can run the same locally reproducible CI coverage before a push:
+
+```sh title="Terminal — relkit repository"
+bun run prepush
+```
+
+That focused merge gate needs no Docker daemon. Use `bun run prepush:full` with Docker available for
+full local acceptance, including container/local-service and browser checks. Dependency review is hosted
+CI-only. Real AWS acceptance is separately opt-in locally and is not run by CI; it needs explicit
+credentials and authorization for cloud cost.
+
+<include>/_snippets/generated/related/docs-modules-operations-index.mdx</include>

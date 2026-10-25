@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "fumadocs-core/framework";
 import * as motion from "motion/react-m";
 import { ArrowUpRight, Grid2X2 } from "lucide-react";
 import { RelkitLogo } from "./logo";
@@ -26,7 +26,7 @@ export function LandingHeader() {
           <Link href="https://github.com/rel-kit/relkit">
             GitHub <ArrowUpRight size={12} aria-hidden="true" />
           </Link>
-          <Link href="/docs/start/create-an-app">
+          <Link href="/docs/learn/create-an-app">
             Start building <ArrowUpRight size={12} aria-hidden="true" />
           </Link>
         </motion.nav>
@@ -45,7 +45,7 @@ export function LandingFooter() {
         </Link>
         <nav aria-label="Footer navigation">
           <Link href="/docs">Docs</Link>
-          <Link href="/docs/operations/cli-reference">CLI</Link>
+          <Link href="/docs/api/cli">CLI</Link>
           <Link href="/docs/api/app">API</Link>
           <a href="https://github.com/rel-kit/relkit">GitHub</a>
         </nav>

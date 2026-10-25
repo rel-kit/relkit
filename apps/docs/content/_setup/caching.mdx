@@ -1,0 +1,29 @@
+## Pre-setup
+
+Use Redis in local Docker. Start from an existing RELKIT app and a running Docker daemon.
+
+<Steps>
+<Step title="Install Redis and Docker support" icon="package">
+
+<include>/_snippets/generated/installations/redis.mdx</include>
+
+</Step>
+<Step title="Configure the requests profile" icon="settings">
+
+<include>/_setup/local-config.mdx</include>
+
+<include source="apps/docs/examples/setup/caching.ts" lang="ts" meta='title="relkit.config.ts"'>
+  /_snippets/source/apps/docs/examples/setup/caching.ts
+</include>
+
+The examples use `profile: "requests"`. Docker supplies the Redis connection; this path adds
+no `defineEnv` fields. If a scaffold used a different profile, align its `profile` with this
+configuration. [Connected Redis](/docs/modules/caching/define) uses an explicit secret binding.
+
+</Step>
+<Step title="Check and start after defining the cache" icon="terminal">
+
+<include>/_setup/docker-run.mdx</include>
+
+</Step>
+</Steps>

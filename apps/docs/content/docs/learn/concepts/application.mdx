@@ -1,0 +1,113 @@
+---
+title: Application configuration
+description: Use defineApp in relkit.config.ts to connect environment values, server settings, integrations, and optional tools.
+sidebar:
+  icon: settings
+---
+
+Your application configuration connects the server, environment values, integrations, and optional tools in one place: `relkit.config.ts`. The compiler evaluates it to connect the environment
+contract, integration bindings, server policy, telemetry, Inspector, and optional deployment roles. Domain
+handlers do not import this file.
+
+Use [defineApp](/docs/api/app#defineapp) from `@relkit/app/config` to declare this configuration.
+`defineConfig` is no longer exported by RELKIT. The environment declaration comes from
+[defineEnv](/docs/api/config#defineenv), explained in [Environment contracts](/docs/learn/concepts/environment).
+
+## Configure the application with defineApp [#read-the-generated-configuration]
+
+<include
+  source="templates/default/v1/minimal/relkit.config.ts"
+  lang="ts"
+  meta='title="templates/default/v1/minimal/relkit.config.ts"'
+>
+  /_snippets/source/templates/default/v1/minimal/relkit.config.ts
+</include>
+
+The certified minimal app starts local-only: one environment contract, bounded telemetry capture and
+an application listener. Inspection is disabled; the [standalone tool](/docs/modules/operations/inspector) has
+its own install/enable/run procedure. Cloud and deployment remain unselected, and the AWS/Pulumi
+creation tuple is currently unavailable. Add only explicitly [selected integration packages](/docs/modules/integrations)
+and their native SDKs before importing their constructors into this config.
+
+## Import Platform fragments explicitly
+
+Keep domain-independent configuration under `src/platform/` when the root configuration
+becomes long. Import each fragment into `relkit.config.ts` and pass it to the existing
+`defineApp` option. For example:
+
+Create the shared server fragment:
+
+<include
+  source="apps/docs/examples/platform/server.ts"
+  lang="ts"
+  meta='title="src/platform/server.ts"'
+>
+  /_snippets/source/apps/docs/examples/platform/server.ts
+</include>
+
+In the existing root configuration, import `server` from `@app/platform/server.js` and pass it to
+`defineApp` alongside the existing `env` and other options. Preserve those existing options when merging.
+
+The same explicit-import pattern applies to Inspector, telemetry, provider and deployment
+configuration. A filename does not activate a fragment. Unused Platform modules are not
+autoloaded, and imported configuration still must not acquire native clients or provision
+resources. Platform fragments cannot import services, routes or application tooling.
+
+Add an explicit application `id` before the application owns durable deployment state. Keep the same ID across
+staging and production; stacks isolate environments. Changing a deployed application ID can make its resources
+appear to have a new owner.
+
+## Keep evaluation deterministic
+
+Configuration describes topology. It must not open a database connection, call a remote API, start a server,
+or create cloud resources during module import. Integration constructors describe bindings; runtimes activate
+their clients only after the graph has passed validation.
+
+Use each layer for one responsibility:
+
+| Concern                                                          | Source of truth                                              |
+| ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| Stable identity, ports, limits, telemetry, and binding selection | `relkit.config.ts`                                           |
+| Runtime values and secrets                                       | The [environment contract](/docs/learn/concepts/environment) |
+| Business behavior                                                | [Functions](/docs/learn/concepts/functions)                  |
+| Public domain boundary                                           | [Services](/docs/modules/service/define)                     |
+| Durable task/job bindings and schedules                          | [Jobs](/docs/modules/jobs/bindings)                          |
+| Adapter and infrastructure selection                             | [Integrations](/docs/modules/integrations)                   |
+
+## Verify a topology change
+
+<Steps>
+<Step>
+
+### Change one setting
+
+Edit `server.maxBodyBytes`, a provider profile, or another configuration value. Keep credentials out of
+literals and pass named secret bindings to integrations.
+
+</Step>
+<Step>
+
+### Validate without starting the app
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run relkit graph print
+```
+
+Expect one application graph with the configured bindings and no external provisioning.
+
+</Step>
+<Step>
+
+### Restart listener changes
+
+Development can activate descriptor changes without dropping the last valid generation. Port and listener
+changes may require stopping and restarting `bun run dev`.
+
+If a release check rejects a `docker(adapter)` binding, add a connected or supported infrastructure source.
+Docker recipes are local development services and never become deployment resources.
+
+</Step>
+</Steps>
+
+<include>/_snippets/generated/related/docs-learn-concepts-application.mdx</include>

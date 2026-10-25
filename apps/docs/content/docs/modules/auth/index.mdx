@@ -1,0 +1,100 @@
+---
+title: Authentication overview
+description: Understand authentication, sessions, and authorization, and decide where each responsibility belongs in a RELKIT application.
+pagination: false
+sidebar:
+  icon: shield-check
+---
+
+Authentication tells your application who is making a request. A session lets that caller make subsequent
+requests without entering credentials again. Authorization decides what that identity may do: read an
+order, join an organization, or change another user's settings. Signing in does not grant those permissions.
+
+<Callout type="tip" title="Start here" icon="route">
+Start with [Add email and password sign-in](/guides/auth/email-password-sign-in) to register a user and verify a protected endpoint. Use the [Better Auth reference](/docs/api/better-auth) for the integration's exact options and types.
+</Callout>
+
+Keep these concepts separate from the authentication library you choose. An auth service owns identity
+and session integration; business domains own permission checks and product behavior. Your routes and
+clients connect those responsibilities without becoming a second authentication system.
+
+<include>/_setup/auth.mdx</include>
+
+## Organize authentication by responsibility
+
+| What you need to add                          | Where it belongs                                                      | Continue with                                                                                               |
+| --------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Sign-in methods, session policy, auth plugins | `src/services/auth/service.ts`, using the chosen integration          | [Better Auth service](/docs/modules/auth/better-auth)                                                       |
+| Auth tables, connection, schema changes       | The existing database domain and migration tooling                    | [Database integration](/docs/modules/database/better-auth)                                                  |
+| Public authentication endpoints               | A filesystem route under `src/routes/`                                | [Protect routes](/docs/modules/auth/protect-routes)                                                         |
+| The current caller in a business operation    | The owning domain's function                                          | [Read sessions](/docs/modules/auth/sessions)                                                                |
+| Ownership, roles, organization access         | The business operation that reads or changes the resource             | [Authorization boundaries](/docs/modules/auth/protect-routes#enforce-permissions-in-the-business-operation) |
+| Sign-up forms and sign-in state               | Your frontend and auth client's public configuration                  | [Clients](/docs/modules/auth/clients)                                                                       |
+| Background work on behalf of a user           | The owning job/function, with an explicit trusted identity and policy | [Sessions outside HTTP](/docs/modules/auth/sessions#work-without-an-http-request)                           |
+
+This separation keeps identity plumbing out of every domain. Changing an auth provider's settings does
+not require moving Orders functions; changing an Orders permission rule does not require rewriting the
+login route. See [Service organization](/docs/modules/service/organization) for the wider application layout.
+
+## Understand the request boundary
+
+```text
+Browser → auth endpoint → authentication service → persisted identity/session
+Browser → application endpoint → session check → business function → permission check → data
+```
+
+The auth endpoint owns credential validation and session cookies. Application endpoints either allow
+anonymous callers or require a session. A business function uses the verified identity to enforce its
+own rules. Never treat an arbitrary input field, header, or client-side “logged in” flag as verified identity.
+
+Public service functions can also be called outside HTTP. Protecting a route does not secure every job,
+tool, or direct invocation of the same function. Put the permission decision at the operation boundary
+and explicitly define which trusted non-HTTP callers may invoke it.
+
+## Choose the current integration
+
+[Better Auth](/docs/modules/auth/better-auth) is the supported auth service integration today. It uses the
+application's [Drizzle service](/docs/modules/database/drizzle), mounts a native HTTP handler, and supplies
+`context.auth.getSession()` to application functions. Other auth libraries do not gain this wiring just
+because their file is named `service.ts`; these guides do not promise a universal provider API.
+
+The getting-started concepts apply generally. Better Auth options, cookie behavior, plugins, and table
+requirements belong to the integration guides. For a complete local flow, follow
+[Your first auth flow](/guides/auth/email-password-sign-in).
+
+After changing service or route registration, run from your app root:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+These check discovery and types, not real credentials, schema migrations, or browser cookie behavior.
+
+## Find the guide for your task
+
+<CardGroup cols={2}>
+<Card title="Configure the integration and secrets:" icon="settings">
+[Better Auth service](/docs/modules/auth/better-auth).
+</Card>
+<Card title="Read a nullable, request-bound identity:" icon="key-round">
+[Sessions](/docs/modules/auth/sessions).
+</Card>
+<Card title="Require authentication and enforce permissions:" icon="lock-keyhole">
+[Protect routes](/docs/modules/auth/protect-routes).
+</Card>
+<Card title="Build sign-up, sign-in, and sign-out flows:" icon="panels-top-left">
+[Clients](/docs/modules/auth/clients).
+</Card>
+<Card title="Add providers, plugins, fields, and production policy:" icon="sliders-horizontal">
+[Customize authentication](/docs/modules/auth/customization).
+</Card>
+<Card title="Verify sessions and failure cases:" icon="flask-conical">
+[Testing](/docs/modules/auth/testing).
+</Card>
+<Card title="Add authentication to an existing app:" icon="rocket">
+[Your first auth flow](/guides/auth/email-password-sign-in).
+</Card>
+</CardGroup>
+
+<include>/_snippets/generated/related/docs-modules-auth-index.mdx</include>

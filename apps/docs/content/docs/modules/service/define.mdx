@@ -1,0 +1,239 @@
+---
+title: Define a service
+description: Expose selected functions and events, keep implementation details private, and use another domain through its service.
+pagination: false
+sidebar:
+  icon: box
+---
+
+A service's `service.ts` file lists the operations and event contracts other parts of your application may use. Keep handlers in their own files and list only the
+operations and event contracts that should form that boundary. `defineService` is available from
+`@relkit/app/services`.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Start with an [existing application](/docs/learn/create-an-app). Services use the app package already installed by the starter.
+</Callout>
+
+## Scaffold a service
+
+From an installed application's root, create a service with one example function:
+
+```sh title="Terminal — application root"
+bun run relkit add service Billing
+```
+
+If the terminal asks which contents to include, choose the simple service. This creates
+`src/services/billing/service.ts` and `functions/example.function.ts` beneath it.
+The service exposes the function as `example`. Replace the placeholder schemas and handler with
+your behavior, then choose the public members as explained below. If you already have the service,
+[add a function to it](/docs/learn/concepts/functions#scaffold-a-callable-function) instead.
+
+For a manual setup, create the service and its owned descriptors yourself. The CLI and manual
+paths use the same public APIs. See the [service command reference](/docs/api/cli#relkit-add-service-name)
+for all flags, or [scaffold constants and prompts](/docs/modules/service/context-values#scaffold-shared-values).
+
+<Accordion>
+<AccordionItem title="Custom and full service bundles" icon="package-plus">
+
+Choose a custom or full bundle when you need more than the example function:
+
+```sh title="Terminal — application root"
+bun run relkit add service Receipts --include function --include error --include job
+bun run relkit add service Shipping --full
+```
+
+These create different domains; do not run all three if you only need one. Without a mode in
+headless execution, the default is `service.ts` plus `functions/example.function.ts`, exposed as
+`example`. `--include` is repeatable and cannot be combined with `--full`; dependent sample
+artifacts are added and wired automatically.
+
+Simple service creation adds no native model/provider stack. A selected custom/full bundle normally
+installs its required adapters, native SDKs and local tooling. With `--no-install`, finish the reported
+`bun install` and check steps. Manual source setup follows each capability's installation guide.
+
+The full bundle creates a service, callable function, event-only function, typed error, event,
+job, cache, bucket, tool, prompt, agent, constants, and `GET /shipping`. Auth, database, middleware,
+and transforms are excluded. See [full-bundle prerequisites](/docs/modules/cli/add-artifacts#add-a-domain)
+before starting the generated providers.
+
+For `Shipping --full`, the domain files are:
+
+```text
+src/services/shipping/
+  service.ts
+  functions/example.function.ts
+  functions/on-example.function.ts
+  errors/example.error.ts
+  events/example.event.ts
+  tasks/example.task.ts
+  jobs/example.job.ts
+  cache/example.cache.ts
+  buckets/example.bucket.ts
+  tools/example.tool.ts
+  prompts/example.prompt.ts
+  agents/example.agent.ts
+  constants/example.constants.ts
+src/routes/shipping/route.ts
+```
+
+The service exposes the example function, event, task, and job. The function declares its sample error
+and publishes the event; the event-only function consumes it. The job targets the task, the tool
+targets the callable function, the agent uses the tool and prompt, and the route maps `GET` to `example`
+member. Provider configuration, environment examples, and package dependencies are merged as needed.
+
+For every scaffolding flag, see the [CLI reference](/docs/api/cli).
+
+</AccordionItem>
+</Accordion>
+
+## Select public members
+
+<include
+  source="examples/commerce/src/services/orders/service.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/service.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/service.ts
+</include>
+
+`functions` contains ordinary callable function descriptors. `events` contains handler-free event
+contracts. `tasks` and `jobs` contain the task/job descriptors owned by the service. All maps are optional.
+They are **definition options**, not namespaces on the resulting
+service: callers use `orders.createOrder` and `orders.orderCreated`, not
+`orders.functions.createOrder` or `orders.events.orderCreated`.
+
+Members are the original descriptors, not copies. A function exposed through a service retains its
+identity, input and output schemas, declared errors, and `.invoke()` behavior. Changing the local import
+name does not create a new operation.
+
+## Use public functions from the frontend
+
+The service boundary is internal to the backend. Expose its selected functions through a route
+before calling them from the browser. These are the same Orders members declared above:
+
+<include source="examples/commerce/src/routes/orders/route.ts" lang="ts" meta='title="src/routes/orders/route.ts — backend"'>
+  /_snippets/source/examples/commerce/src/routes/orders/route.ts
+</include>
+
+<include>/_frontend/orders.mdx</include>
+
+## Decide what stays internal
+
+Leave a function out of the service if only its own domain uses it. It is still discovered and can be
+called by other functions in that domain. A helper does not become public just because its module
+exports it in TypeScript.
+
+Do not put caches, buckets, tools, agents, or plain helper values into the member maps. A task/job member
+does not expose a browser client by itself; its explicit `client` policy still controls that boundary.
+`defineEventFunction` subscribers are event-only and cannot be public callable members either. Keep
+those artifacts in the domain; expose an ordinary function when another domain needs their behavior.
+
+For example, expose `askAssistant` as a function that calls a declared agent dependency, rather than
+trying to expose the agent descriptor itself. See [the agent placement example](/docs/modules/service/organization#tools-and-agents-stay-with-their-business-domain).
+
+This boundary is about application dependencies. It is not user authorization, an HTTP registration,
+or a switch controlling MCP tool visibility.
+
+## Use another domain's service
+
+Import `@app/services/orders/service.js`, then invoke a member such as
+`orders.getOrder.invoke({ orderId: "order-1" })` from your function handler. Use `.invoke()`, not
+`.handler()`, so the call goes through the common validation and execution boundary.
+
+Within Orders, import other Orders modules directly rather than importing the service back into its
+own implementation. Across domains, import the service rather than a private function path.
+
+| Importing layer    | Allowed application imports                                  |
+| ------------------ | ------------------------------------------------------------ |
+| A domain           | Its own modules, other domains' `service.ts`, and Platform.  |
+| Routes             | Route modules, domain `service.ts` boundaries, and Platform. |
+| Platform           | Other Platform modules, not domains or routes.               |
+| `relkit.config.ts` | Platform support, not domains or routes.                     |
+
+Generated projects map `@app/*` to `src/*`. Keep the `.js` extension in imports for emitted ESM.
+An import of another domain's service records a `depends-on-service` graph edge; there is no service
+`imports` option or service dependency container to configure.
+
+A service may expose only its **own** functions and events. To compose another service's behavior,
+write an operation in the consuming domain that calls it. Do not re-export another domain's descriptor
+as your own service member.
+
+## Keep runtime access explicit
+
+Service membership does not provide a cache, bucket, job client, or agent client. Those remain explicit
+function dependencies. Event publication uses `publishes` and `context.events[eventId].publish(...)`.
+Exposing an event in `service.events` at definition time does not authorize a function to publish it.
+
+There is no general service lifecycle, service middleware, or `context.service` API. Put HTTP policy in
+[route middleware](/docs/modules/http/middleware). Put rules that must apply to every invocation in function
+logic or [function hooks](/docs/learn/concepts/functions#hooks-and-transport-policy). The specialized
+database and authentication services have their own integration APIs.
+
+## Naming and discovery rules
+
+Use a lowercase domain name beginning with a letter and containing only letters, digits, and hyphens,
+such as `orders` or `customer-support`. Technical layer names such as `functions`, `events`, and `tools`
+are reserved as legacy roots, not useful domain names.
+
+Each domain's `service.ts` must construct and export exactly one service runtime value. Follow the
+default-export form above; do not use it as a general barrel of unrelated exports.
+
+The service ID is inferred from its domain directory. If you set it explicitly, it must equal that
+directory name. IDs of owned descriptors must start with the domain prefix, such as `orders.`.
+Capabilities that support inferred IDs can omit them; follow each capability's guide for its ID rules.
+
+Public member names must be nonempty, normalized, and distinct across both maps. Descriptor fields such
+as `id`, `ref`, `functions`, `events`, and `handler` are reserved member names. See the
+[Services API](/docs/api/services) for the full type and validation reference.
+
+The recognized flat-to-grouped move preserves explicit and inferred logical IDs: `src/orders` becomes
+`src/services/orders` without introducing a `services.` identity prefix. Diagnostics, source maps,
+manifests, and editor links retain the real physical path. Other file moves or renaming the domain can
+change inferred IDs and their required prefix; review those as contract migrations.
+
+## Can a service expose nothing?
+
+Yes. A domain consisting of internal event subscribers can use this boundary:
+
+<include
+  source="apps/docs/examples/events/order-confirmation.service.ts"
+  lang="ts"
+  meta='title="src/notifications/service.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/order-confirmation.service.ts
+</include>
+
+The receiving domain owns actual subscriber functions even though it exposes no public members. A
+normal domain containing only this empty service and no graph-visible artifacts fails compilation.
+Conversely, a domain that only publishes event contracts can expose `events` without exposing any
+functions.
+
+## Verify the boundary
+
+From your application's root, run:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+The compiler reports missing or duplicate services, invalid domain IDs, foreign service members, and
+disallowed imports. Once the checks pass, [connect public functions to routes](/docs/modules/service/routes)
+or [test a first service end to end](/docs/modules/service/first-service).
+
+<include>/_snippets/generated/related/docs-modules-service-define.mdx</include>
+
+
+## Scaffold domain constants
+
+With an existing `orders` service, run from the application root:
+
+```sh
+bun run relkit add constants receipt-settings --service orders
+```
+
+Creates `src/services/orders/constants/receipt-settings.constants.ts` with a domain-qualified key and
+a `"replace-me"` value. Replace that placeholder in source. Constants remain internal and are
+not added to service member maps. There is no CLI flag for the final value.
+
+For every constants scaffolding flag, see the [CLI reference](/docs/api/cli).

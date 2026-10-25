@@ -1,0 +1,101 @@
+---
+title: Define a bucket
+description: Name your bucket and choose which files it accepts.
+pagination: false
+sidebar:
+  icon: settings
+---
+
+Give a bucket a stable identity, choose a storage profile, and set the files it accepts.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Start with an [existing application](/docs/learn/create-an-app). Bucket definitions use the base app package; configure the selected storage integration before running file operations.
+</Callout>
+
+## Pre-setup
+
+Complete [local Docker storage setup](/docs/modules/storage#pre-setup) before using the bucket.
+It installs the S3/Docker integrations and adds `bucket.assets` plus `defaults.bucket` to
+`defineApp`. Docker supplies the local credentials; keep your existing `defineEnv` contract.
+If scaffolding creates a different profile, align it with the definition below.
+
+## Scaffold a bucket
+
+From the application root, with an existing `assets` service:
+
+```sh
+bun run relkit add bucket Uploads --service assets --provider s3 --source docker
+```
+
+Creates `src/services/assets/buckets/uploads.bucket.ts` and configures Docker MinIO/S3. Without provider
+flags, scaffolding reuses an eligible default/unique profile or creates a Docker S3 profile.
+A bucket profile can belong to only one bucket; an already-owned profile is rejected.
+
+Edit the generated bucket's visibility and file limits. Keep its `id` and `profile`; the manual
+example below defines a different bucket named `assets`. Choose one setup path rather than
+adding a second bucket for the same files. For the complete HTTP workflow, follow
+[Upload product images](/guides/storage/upload-product-images).
+
+<Accordion>
+<AccordionItem title="Choose a different storage provider" icon="settings">
+
+| Selection                               | Command options                               |
+| --------------------------------------- | --------------------------------------------- |
+| Unused compatible profile               | `--profile uploads`                           |
+| Docker MinIO/S3                         | `--provider s3 --source docker`               |
+| Connected S3                            | `--provider s3 --source connected`            |
+| S3 on an existing AWS/Pulumi deployment | `--provider s3 --source aws`                  |
+| Connected Cloudflare R2                 | `--provider cloudflare-r2 --source connected` |
+
+Do not combine `--profile` with `--provider` or `--source`. Cloudflare R2 supports only
+`connected`. AWS requires an existing AWS/Pulumi deployment and is not provisioned by this command.
+Set connected-profile environment values yourself; the CLI never asks for credentials.
+See [Docker startup after adding a resource](/docs/modules/cli/add-artifacts#start-local-resources).
+The bucket remains internal; declare it as a function dependency to use it.
+
+</AccordionItem>
+</Accordion>
+
+For every bucket scaffolding flag, see the [bucket command reference](/docs/api/cli#relkit-add-bucket-name).
+
+The scaffold normally installs the selected owners and checks the app. With `--no-install`, finish
+`bun install` and `bun run check`. For manual setup, complete [the selected adapter installation](/guides/storage/upload-product-images#configure-storage)
+first. Connected Cloudflare uses [its own package](/docs/modules/integrations), and connected S3 does not
+require a Docker materializer or local MinIO process.
+
+## Define the bucket
+
+Use `defineBucket` in your app's domain directory. For the manual path, create
+`src/services/assets/buckets/assets.bucket.ts`. If you scaffolded `Uploads`, apply these policy
+options to `uploads.bucket.ts` while retaining that bucket's identity and profile:
+
+<include
+  source="examples/commerce/src/services/assets/buckets/assets.bucket.ts"
+  lang="ts"
+  meta='title="src/services/assets/buckets/assets.bucket.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/assets/buckets/assets.bucket.ts
+</include>
+
+- `id` is the bucket's stable, unique name. Keep it unchanged when moving or renaming the file.
+- `visibility` is required. Start with `"private"` for user uploads.
+- `maxObjectBytes` sets the maximum size of one file: 5 MB here.
+- `allowedContentTypes` lists accepted media types. `image/*` allows image types; `application/json` allows JSON files.
+- `profile` selects a physical bucket configuration in `relkit.config.ts`. This example uses `"assets"`.
+
+Size and content-type limits are optional. For HTTP uploads, also validate incoming files with `z.file()` as shown in [Upload files](/docs/modules/storage/upload).
+
+## Check your bucket
+
+Make sure the descriptor's bucket profile exists in `relkit.config.ts`. The scaffold already
+adds its selected profile; the [tutorial's configuration step](/guides/storage/upload-product-images#configure-storage)
+shows the `assets` profile used by the manual example.
+
+Then, from your app's root, run:
+
+```sh
+bun run check
+```
+
+Next, [give a function access to the bucket](/docs/modules/storage/upload). For cloud storage, [configure an integration](/docs/modules/integrations).
+

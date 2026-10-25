@@ -1,0 +1,16 @@
+Once the service and `/api/auth` mount are running, use Better Auth's browser client for sign-in.
+First complete the [frontend auth installation](/docs/modules/auth/clients#create-a-browser-auth-client):
+
+<include source="examples/auth-drizzle/src/platform/auth-client.ts" lang="ts" meta='title="src/auth-client.ts — frontend"'>
+  /_snippets/source/examples/auth-drizzle/src/platform/auth-client.ts
+</include>
+
+`emailAndPassword` on the service enables this `signIn.email` operation. Keep the public URL and
+mount aligned with your backend, allow the browser to manage session cookies, and handle rejected
+requests in the calling UI. These native auth endpoints are not RELKIT-generated RPC operations.
+Never import the server service, database, or secret into the browser.
+
+For application route hooks after sign-in, use
+[`BetterAuthRelkitClientProvider`](/docs/api/better-auth#betterauthrelkitclientprovider) as shown in
+[React authentication](/docs/modules/client/authentication). Follow the
+[sign-in guide](/guides/auth/email-password-sign-in) for the complete flow.

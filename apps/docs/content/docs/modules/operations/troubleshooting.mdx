@@ -1,0 +1,72 @@
+---
+title: Troubleshooting
+description: Preserve the first diagnostic, repair its source of truth, and widen verification only after the narrow failure passes.
+pagination: false
+sidebar:
+  icon: bug
+---
+
+Begin with the first failing command and its diagnostic code and source location. Do not delete or hand-edit
+`.relkit/generated` or `.relkit/build` to hide a failure; they are evidence produced from authored source,
+configuration, and environment.
+
+## Collect structured diagnostics
+
+```sh title="Terminal — relkit-orders"
+bun run relkit --version
+bun run relkit --help
+bun run relkit --json doctor
+bun run relkit --json check
+```
+
+`--json` is a global option and appears before the command. `check` also writes
+`.relkit/generated/diagnostics.json` with stable codes, severity, source locations, descriptor IDs, and suggested
+repairs. Review output before sharing it; external tools can still print values RELKIT did not create.
+
+## Diagnose the owning layer
+
+| Symptom                            | Inspect                                                 | Repair                                                                                                                      |
+| ---------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| CLI rejects a flag                 | `relkit <command> --help`                               | Use the contextual option and place global flags first.                                                                     |
+| Graph will not compile             | `relkit --json check`                                   | Fix the first source-located configuration, identity, target, route, or schema diagnostic.                                  |
+| Environment is incomplete          | `relkit env check` and `relkit env explain NAME`        | Supply the declared value; do not add a hidden runtime branch.                                                              |
+| Local integration will not start   | `relkit local status` and Docker health                 | Repair the recipe or use `dev --local=off` with connected values.                                                           |
+| A new generation will not activate | Candidate diagnostic and readiness                      | Fix graph, manifest, integration, or readiness state; the last valid generation remains active.                             |
+| A prepared start falls back        | `relkit --json check` and `relkit dev --prepare`        | Repair stale inputs or an ineligible dynamic configuration; fallback keeps the full safe check.                             |
+| Route is unavailable               | `/_relkit/v1/health/live` and the route URL             | Confirm the active project, port, method, and route-to-function edge.                                                       |
+| Inspector is stale or absent       | Standalone tool status and private connection selection | Complete [tool install, bridge enablement and launch](/docs/modules/operations/inspector); distinguish UI and bridge ports. |
+| Build will not start               | `bun run build` and manifest/hash diagnostic            | Start only the current unedited build output.                                                                               |
+| Deployment preview fails           | `relkit --json doctor --pulumi` and preview             | Fix the first Pulumi, backend, role, integration, or environment diagnostic.                                                |
+| Test is flaky                      | The smallest test file                                  | Use deterministic fakes and explicit completion; remove arbitrary sleeps.                                                   |
+
+## Verify from narrow to broad
+
+Selected integration diagnostics include `RELKIT_DEPENDENCY_ADAPTER_MISSING`,
+`RELKIT_DEPENDENCY_MISSING` and `RELKIT_DEPENDENCY_VERSION_UNSUPPORTED`. Use the diagnostic's
+package, supported range and install command from the application root; keep its runtime/development
+section and selected repairs. An incompatible authored declaration may instead produce
+`RELKIT_ADD_COLLISION`; resolve it deliberately rather than overwriting the manifest or copying an
+entire example's dependencies. Reinstall after patch/override changes, then rerun check/typecheck.
+These checks report missing packages; they never download SDKs implicitly.
+
+Rerun the command that failed, then expand only as far as the change requires:
+
+```sh title="Terminal — relkit-orders"
+bun run test
+bun run check
+bun run typecheck
+bun run build
+bun run start
+```
+
+For a graph mismatch, run `bun run relkit graph check --hash <expected-hash>` after `check`. For local-service
+state, stop the owning process before using `local reset --yes`; reset removes this project's containers,
+volumes, and local override state. Deployment state is separate and must be managed through its Pulumi stack.
+
+## Ask for help safely
+
+Include the exact command, exit code, diagnostic code, project-relative source location, Bun version, and whether
+the failure occurred in development, tests, build, or deployment. Do not share `.env`, credentials, Pulumi state,
+or unreviewed external-tool output.
+
+<include>/_snippets/generated/related/docs-modules-operations-troubleshooting.mdx</include>

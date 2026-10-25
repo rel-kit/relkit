@@ -1,0 +1,71 @@
+
+Running 24 tests using 1 worker
+
+(node:99517) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 browser/cli.spec.ts:4:1 › CLI module connects discovery, a verified workflow, and command reference (6.4s)
+  ✓   2 browser/cli.spec.ts:26:1 › CLI search and mobile navigation expose authored instructions (1.8s)
+  ✓   3 browser/content.spec.ts:6:1 › every page serves expanded examples, sidebar icons and working internal anchors (13.9s)
+  ✓   4 browser/docs.spec.ts:5:1 › legacy URLs resolve directly, including their target anchors (19.6s)
+  ✓   5 browser/docs.spec.ts:22:1 › search exposes each section and supports keyboard selection (7.1s)
+  ✓   6 browser/docs.spec.ts:60:1 › modules have contextual navigation and guides have curated next actions (1.5s)
+  ✓   7 browser/docs.spec.ts:84:1 › configuration APIs are reachable directly from the reference overview (5.1s)
+  ✓   8 browser/docs.spec.ts:96:1 › public exports lead from package imports to React, provider, testing and tooling contracts (21.7s)
+  ✓   9 browser/docs.spec.ts:124:1 › search discovers React APIs and the previously unlisted packages (8.0s)
+  ✓  10 browser/docs.spec.ts:142:1 › examples and page Markdown copy expanded source (1.8s)
+  ✓  11 browser/docs.spec.ts:157:1 › mobile navigation reaches a module without horizontal overflow (1.3s)
+  ✓  12 browser/landing.spec.ts:4:1 › landing retains keyboard tabs, persisted pause and global search (3.7s)
+  ✓  13 browser/landing.spec.ts:35:1 › mobile landing respects reduced motion and keeps example tabs usable (2.5s)
+  ✓  14 browser/landing.spec.ts:48:1 › landing and docs retain canonical and social metadata (4.2s)
+  ✘  15 browser/landing.spec.ts:79:1 › navigation between docs and the landing preserves hydration and styling (7.1s)
+(node:3026) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  16 browser/navigation.spec.ts:4:1 › common links and section sublinks remain available without duplicate destinations (4.4s)
+  ✓  17 browser/navigation.spec.ts:41:1 › mobile readers can expand a different section with the keyboard and follow its sublink (1.0s)
+  ✓  18 browser/presentation.spec.ts:4:1 › section navigation and grouped capability cards render meaningful icons (1.1s)
+  ✓  19 browser/presentation.spec.ts:21:1 › walkthrough steps retain numbered headings and direct anchors (1.0s)
+  ✓  20 browser/presentation.spec.ts:30:1 › next actions stay visible while optional source links open with the keyboard (1.2s)
+  ✓  21 browser/presentation.spec.ts:51:1 › alternative setup tabs support keyboard selection and preserve both Markdown recipes (1.1s)
+  ✓  22 browser/presentation.spec.ts:76:1 › native presentation fits mobile layouts in both themes (4.5s)
+  ✓  23 browser/presentation.spec.ts:99:1 › module walkthroughs preserve their outlines and related guide links (5.8s)
+  ✓  24 browser/presentation.spec.ts:129:1 › realtime setup alternatives retain keyboard access and both Markdown recipes (1.4s)
+
+
+  1) browser/landing.spec.ts:79:1 › navigation between docs and the landing preserves hydration and styling 
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected: "http://127.0.0.1:3002/"
+    Received: "http://127.0.0.1:3001/"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        - waiting for navigation to finish...
+        - navigated to "http://127.0.0.1:3001/"
+        13 × locator resolved to <html lang="en" class="dark" data-astro-cid-5yyv5j6q="">…</html>
+           - unexpected value "http://127.0.0.1:3001/"
+
+
+      84 |   await page.goto("/docs/modules/storage");
+      85 |   await page.getByRole("banner").getByRole("link", { name: "RELKIT", exact: true }).click();
+    > 86 |   await expect(page).toHaveURL("http://127.0.0.1:3002/");
+         |                      ^
+      87 |   await expect(page.getByRole("tab", { name: "Routes", exact: true })).toBeVisible();
+      88 |   await expect(page.locator("h1")).toHaveCount(1);
+      89 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        at /Users/mustafaelsayed/Workspace/relkit/apps/docs/browser/landing.spec.ts:86:22
+
+    Error Context: ../../bug-fix-ui-reports/issues/bui-d4579e5f46ee02dffd7be479/evidence/001/browser-results/landing-navigation-between-81642-erves-hydration-and-styling/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../bug-fix-ui-reports/issues/bui-d4579e5f46ee02dffd7be479/evidence/001/browser-results/landing-navigation-between-81642-erves-hydration-and-styling/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../bug-fix-ui-reports/issues/bui-d4579e5f46ee02dffd7be479/evidence/001/browser-results/landing-navigation-between-81642-erves-hydration-and-styling/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    browser/landing.spec.ts:79:1 › navigation between docs and the landing preserves hydration and styling 
+  23 passed (2.3m)

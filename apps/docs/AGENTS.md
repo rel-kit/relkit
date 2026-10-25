@@ -1,9 +1,18 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# Documentation workspace
 
-# This is NOT the Next.js you know
+Read `CONTRIBUTING.md` before changing documentation. Blume 2.2.5 renders the
+documentation; `pages/index.astro` hosts the existing React landing as one island.
+Keep landing styles and Motion context separate from documentation layouts.
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+Author pages in `content/docs/learn`, `content/docs/modules`, and `content/guides`.
+API and CLI reference, `meta.ts` navigation, and `content/_snippets` are generated
+by `scripts/generate.ts`; change their sources instead of editing generated files.
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+Use installed Blume documentation in `node_modules/blume/docs` for components,
+metadata, includes, and configuration. Keep `redirects.json` direct: an old URL
+must reach its final destination in one permanent redirect.
 
-<!-- END:nextjs-agent-rules -->
+Run focused documentation tests and `bun run check` after content changes. Rendering
+or configuration changes also require `bun run build` and browser verification.
+Use development port 3001. Do not build into the runtime of a running development
+server; stop it first or use Blume's `--isolated` build option.

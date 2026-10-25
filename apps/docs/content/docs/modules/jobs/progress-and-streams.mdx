@@ -1,0 +1,33 @@
+---
+title: Progress and streams
+description: Report typed progress and consume bounded live output.
+pagination: false
+sidebar:
+  icon: radio
+---
+
+Report bounded progress from a task so callers can follow the run without holding its execution open.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Use an existing [task/job with its selected provider installed and bound](/docs/modules/jobs/quickstart)
+before running this example. Core task declarations do not install the provider's native SDK.
+</Callout>
+
+Progress is an observation channel, not a second source of truth. Define its shape and emit snapshots from
+the task:
+
+<include
+  source="examples/commerce/src/services/orders/tasks/export-orders.task.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/tasks/export-orders.task.ts
+</include>
+
+Progress and stream items are limited to 64 KiB. Keep payloads small, include a sequence or cursor when consumers need ordering, and store durable results in the task output or application database.
+
+Streams may be live, durable, or unavailable depending on the binding. A reconnect can observe a gap when retention has expired; reset the UI from the latest run snapshot instead of replaying untrusted client state. Provider capability output is authoritative for the selected environment.
+
+Progress does not authorize a client to read a private run. Apply the same ownership and field-level redaction rules to progress and stream payloads as to the final output.
+
+<include>/_snippets/generated/related/docs-modules-jobs-progress-and-streams.mdx</include>

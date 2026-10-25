@@ -89,10 +89,11 @@ export default defineApp({
   defaults: { realtime: "default" },
   telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
   server: { port: 3000 },
-  inspector: { port: 3210 },
 });
 ```
 
-Merge these fields into an existing `defineApp` while preserving its other providers and settings. Redis supports fanout across application instances. Provider storage, retention, and Redis persistence determine recovery guarantees. Run `bun run check`, `bun run typecheck`, then test publication, browser subscription, reconnect, and gap recovery. Inspect channels in the Inspector while `bun run dev` is running.
+Merge these fields into an existing `defineApp` while preserving its other providers and settings. Redis supports fanout across application instances. Provider storage, retention, and Redis persistence determine recovery guarantees. Run `bun run check`, `bun run typecheck`, then test publication, browser subscription, reconnect, and gap recovery.
+
+Inspection is optional. Set `inspector: { enabled: true }` to enable the authenticated backend bridge, then install and run the separate `@relkit/inspector` tool with `relkit-inspector --project-root .`. Its UI defaults to port `3210`; change it with the tool's `--port` flag. The app's `inspector.connection.host/port` settings configure only the bridge. See the [Inspector setup](https://relkit.dev/docs/operations/inspector) for prerequisites and history ownership.
 
 The current `relkit add` kinds do not include `channel`. Create the descriptor and provider configuration in the app source.

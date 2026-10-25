@@ -2,6 +2,8 @@ tests/integration/http/fixtures/orders.client.ts
 **/.relkit/**
 **/.?sys/**
 **/.next-e2e/**
+apps/docs/.blume/**
+apps/docs/content/_snippets/source/**
 openspec/changes/archive/**
 tests/compiler/fixtures/**/expected*.json
 tests/deployment/golden/**

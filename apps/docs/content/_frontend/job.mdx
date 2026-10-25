@@ -1,0 +1,14 @@
+After [frontend setup and pulling the commerce contract](/guides/frontend/connect-react), render
+this component under the provider. It selects this job's public `exportOrders` name:
+
+<include source="apps/docs/examples/frontend/export-orders.tsx" lang="tsx" meta='title="src/ExportOrders.tsx"'>
+  /_snippets/source/apps/docs/examples/frontend/export-orders.tsx
+</include>
+
+The task determines the `orderIds` input. The job's `client.operations` permits triggering and
+observation, while `client.fields` selects public run data. The returned `runId` is an admission
+receipt; completion and output arrive through the run observer. The example keeps uncertain
+submissions visible instead of automatically sending them again.
+
+Reference: [`useJobTrigger`](/docs/api/client#usejobtrigger), [`useJobRun`](/docs/api/client#usejobrun).
+Continue with [job clients and recovery](/docs/modules/jobs/clients).

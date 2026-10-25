@@ -1,0 +1,128 @@
+---
+title: Create and build an API
+description: Use the CLI to create a project, add a GET endpoint, check its response, and run the production build.
+pagination: false
+search:
+  keywords: [CLI tutorial, command line, add route, production build]
+sidebar:
+  icon: terminal
+---
+
+Create an application, add `GET /ping`, and call the same endpoint in development and from a production build. You will use the CLI installed in the application.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+You need Bun **1.3.10 or later**, an internet connection to install packages, two terminals, and port **3000** available. This example needs no Docker services or cloud credentials.
+</Callout>
+
+<Steps>
+<Step icon="folder-plus">
+
+## 1. Create the application [#create-the-application]
+
+From the directory where you keep projects, run:
+
+```sh title="Terminal 1 — projects directory"
+bunx create-relkit@latest relkit-cli-demo
+cd relkit-cli-demo
+cp .env.example .env
+```
+
+The generator installs the minimal starter and its local CLI. If prompted, confirm the new destination. Keep this terminal in `relkit-cli-demo` for the remaining commands. For an existing minimal application, use its root directory and keep its current `.env`.
+
+[Creation options](/docs/modules/cli/create-an-app) explains deferred installation, Git initialization, and supported starter choices.
+
+</Step>
+<Step icon="route">
+
+## 2. Add an endpoint [#add-an-endpoint]
+
+Inspect the command, then create a new route:
+
+```sh title="Terminal 1 — relkit-cli-demo"
+bun run relkit add route --help
+bun run relkit add route /ping --mode route
+```
+
+The second command creates `src/routes/ping/route.ts` with a `GET` handler that returns `{ "ok": true }`. The directory determines the URL. `--mode route` selects a standalone HTTP handler, which is useful for this small response. For business operations with input and output schemas, use a [service-backed route](/docs/modules/http/first-route).
+
+If `/ping` already exists, choose a new path and use that path in the requests below. Scaffolding rejects collisions instead of overwriting existing files.
+
+</Step>
+<Step icon="list-checks">
+
+## 3. Check the application [#check-the-application]
+
+Run these checks from the same directory:
+
+```sh title="Terminal 1 — relkit-cli-demo"
+bun run check
+bun run typecheck
+bun run test
+```
+
+All three commands should finish successfully. `check` validates the application's structure, `typecheck` checks TypeScript, and `test` runs the starter tests. Adding a route does not generate tests for that route; you will verify its response next. See [Testing](/docs/modules/operations/testing) when adding behavior of your own.
+
+</Step>
+<Step icon="terminal">
+
+## 4. Run and call the endpoint [#run-and-call-the-endpoint]
+
+Start development:
+
+```sh title="Terminal 1 — relkit-cli-demo"
+bun run dev
+```
+
+Keep it running. When the server is ready, send a request from the second terminal:
+
+```sh title="Terminal 2"
+curl -i http://localhost:3000/ping
+```
+
+Expect **HTTP 200** and this JSON body:
+
+```json
+{ "ok": true }
+```
+
+If connection fails, wait for readiness and check Terminal 1 for diagnostics. If the response is `404`, check the route directory and whether validation succeeded. [Troubleshooting](/docs/modules/operations/troubleshooting) explains how to follow diagnostics back to the file to repair.
+
+</Step>
+<Step icon="package-check">
+
+## 5. Build and run production output [#build-and-run-production-output]
+
+In Terminal 1, press **Ctrl+C** to stop development. Build and start from the same application directory:
+
+```sh title="Terminal 1 — relkit-cli-demo"
+bun run build
+bun run start
+```
+
+The build writes `.relkit/build`; `start` runs that output. When it is ready, repeat the request in Terminal 2:
+
+```sh title="Terminal 2"
+curl -i http://localhost:3000/ping
+```
+
+Expect **HTTP 200** and `{ "ok": true }` again. Production does not watch source changes: rebuild after editing. Press **Ctrl+C** in Terminal 1 when finished. Building and starting locally do not deploy the application.
+
+</Step>
+</Steps>
+
+## Related tasks
+
+<CardGroup cols={2}>
+<Card icon="boxes">
+Add business behavior with [Your first service](/docs/modules/service/first-service).
+</Card>
+<Card icon="files">
+Choose another capability in [Add application files](/docs/modules/cli/add-artifacts).
+</Card>
+<Card icon="rocket">
+Follow the full [Orders tutorial](/docs/learn) for persistence, authentication, and tests.
+</Card>
+<Card icon="terminal">
+Look up flags in the [command reference](/docs/api/cli), including [`dev`](/docs/api/cli#relkit-dev), [`check`](/docs/api/cli#relkit-check), [`build`](/docs/api/cli#relkit-build), and [`start`](/docs/api/cli#relkit-start).
+</Card>
+</CardGroup>

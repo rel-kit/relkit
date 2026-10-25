@@ -2,7 +2,7 @@
 import type { ApiPackage } from "./documentation-catalog.js";
 
 export const realtimeGuideGroup = {
-  directory: "realtime",
+  directory: "docs/modules/realtime",
   title: "Realtime",
   icon: "Radio",
   pages: ["index", "access", "react", "presence", "recovery", "providers"],
@@ -28,5 +28,5 @@ export const realtimeGuideRelations = [
  * @returns Pure guide/API/example relation consumed by the documentation generator.
  */
 function relation(page: (typeof realtimeGuideGroup.pages)[number], example: string) {
-  return { path: `realtime/${page}`, api, examples: [example] };
+  return { path: `docs/modules/realtime/${page}`, api, examples: [example] };
 }

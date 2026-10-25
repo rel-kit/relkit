@@ -1,0 +1,59 @@
+---
+title: Queries and cache utilities
+description: Call finite client-exposed routes with native TanStack Query types.
+pagination: false
+sidebar:
+  icon: route
+---
+
+Call a backend operation from React using the contract generated from your application's routes.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
+Keep its selected React/query peers and generated declarations in the frontend package.
+</Callout>
+
+## Query finite routes
+
+`useRoute`, `useInfiniteRoute`, `useSuspenseRoute`, and `useRouteUtils` accept only finite exposed
+routes. Inputs, outputs, errors, selection, page parameters, signals, and query options are inferred
+from generated declarations.
+
+The [Hello route](/docs/modules/service/routes#when-to-use-defineroute) generates `GET /hello`.
+Import `useRoute` and `useRelkitClient` from `@relkit/client/react`, then render this component
+under the provider from the [Frontend guide](/guides/frontend/connect-react):
+
+<include source="apps/docs/examples/frontend/app.tsx#greeting" lang="tsx" meta='title="src/Greeting.tsx — component body"'>
+  /_snippets/source/apps/docs/examples/frontend/app--greeting.tsx
+</include>
+
+The input and `data.message` follow the backend's schemas. An invalid selector or input fails
+typechecking after the generated declarations are included. `GET /hello` is the procedure selector;
+the client still uses RPC rather than constructing a REST request.
+
+## Choose query helpers
+
+| API | Use it when |
+| --- | --- |
+| [`useRoute`](/docs/api/client#useroute) | The component renders loading, error, and success states. |
+| [`useSuspenseRoute`](/docs/api/client#usesuspenseroute) | A ready provider and your Suspense/error boundaries own loading and failure. It throws while the provider is not ready. |
+| [`useInfiniteRoute`](/docs/api/client#useinfiniteroute) | The backend already accepts pagination input; supply `initialPageParam`, `input(page)`, and `getNextPageParam`. It does not add backend pagination. |
+| [`useRouteUtils`](/docs/api/client#userouteutils) | You need the selected procedure's underlying query/mutation option builders. |
+| [`createTanstackQueryUtils`](/docs/api/client#all-exported-apis) | An application outside the RELKIT React hooks owns its QueryClient and identity lifecycle. Import it from `@relkit/client/tanstack-query`. |
+
+For the standalone query adapter, install its selected peers in the caller package:
+
+<include>/_snippets/generated/installations/client-query.mdx</include>
+
+The React installation already includes these peers. Its managed hooks use identity-scoped
+[`relkitKey`](/docs/api/client#relkitkey) keys. The underlying option builders do not automatically
+produce those keys: use a managed query's `refetch()` for a simple refresh, or preserve the full
+provider scope when interacting with its cache. See [server rendering](/docs/modules/client/ssr)
+for the same requirement when prefetching.
+
+## Keep streams separate
+
+Routes with streaming output are deliberately absent from these selectors. Use `useStream` instead.
+Routes marked `client: false` have neither a route-ID RPC procedure nor a URL alias.
+
+<include>/_snippets/generated/related/docs-modules-client-routes.mdx</include>

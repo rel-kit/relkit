@@ -1,0 +1,46 @@
+---
+title: Mutations
+description: Execute finite writes without implicit retries or an offline queue.
+pagination: false
+sidebar:
+  icon: send
+---
+
+Use a mutation for a request that changes application state, and track whether the server accepted it.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
+Keep its selected React/query peers and generated declarations in the frontend package.
+</Callout>
+
+## Submit once
+
+`useRouteMutation` never runs on mount and defaults to no retry. Known-offline work fails as
+`not-sent`; after a request is handed to `fetch`, timeout or disconnect is conservatively `unknown`.
+RELKIT stores only scoped reconciliation metadata in `sessionStorage`, never variables or retry
+payloads. Application mutations need an application-owned status endpoint to reconcile an unknown
+outcome.
+
+Every managed write carries the rendered identity scope and session epoch as a precondition. The
+server authenticates independently and compares them before application code runs.
+
+## Call a defined route
+
+The backend's [Echo `defineRoute`](/docs/modules/http/define#expose-one-public-function) generates
+`POST /echo`. Render this component under the provider after pulling that backend's contract:
+
+<include
+  source="apps/docs/examples/frontend/echo.tsx"
+  lang="tsx"
+  meta='title="src/EchoButton.tsx"'
+>
+  /_snippets/source/apps/docs/examples/frontend/echo.tsx
+</include>
+
+The hook infers `{ message }` input and `data.message` from the target function. For a real write,
+refresh the affected [`useRoute` query](/docs/modules/client/routes) in `onSuccess`. Reconcile an
+uncertain result before retrying a non-idempotent operation. See
+[`useRouteMutation`](/docs/api/client#useroutemutation) for all options and
+[offline writes](/docs/modules/client/offline) for recovery.
+
+<include>/_snippets/generated/related/docs-modules-client-mutations.mdx</include>

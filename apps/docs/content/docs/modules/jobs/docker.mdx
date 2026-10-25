@@ -1,0 +1,35 @@
+---
+title: Docker providers
+description: Run local job providers with persisted state.
+pagination: false
+sidebar:
+  icon: container
+---
+
+Local job providers can use Docker, but the generator currently accepts only certified creation combinations. The explicit `--jobs` flags below are rejected before staging or installation:
+
+```sh
+relkit create my-app --jobs inngest-docker
+relkit create my-app --jobs effect-mq-docker
+relkit create my-app --jobs trigger-docker
+```
+
+For an existing project, install the provider packages and bind the selected provider in
+`relkit.config.ts`; do not interpret performance evidence as native-provider certification.
+The local CLI also needs `@relkit/local` in the application. Follow the provider-specific setup:
+[Inngest](/docs/modules/jobs/providers/inngest), [Effect MQ](/docs/modules/jobs/providers/effect-mq), or
+[Trigger.dev](/docs/modules/jobs/providers/trigger).
+
+```sh
+relkit local up --detach
+relkit local status
+relkit local stop
+relkit local reset --dry-run
+```
+
+`--detach` lets you start the backend in the same terminal afterward. Without it, `local up`
+stays attached until interrupted. `local stop` stops services without deleting state.
+`local reset` is destructive to local job state; use the dry run first. Run `relkit jobs capabilities`
+after the backend starts to inspect the selected provider's limits.
+
+<include>/_snippets/generated/related/docs-modules-jobs-docker.mdx</include>

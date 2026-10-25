@@ -1,0 +1,80 @@
+---
+title: AI agents overview
+description: Build AI agents that use your app's functions, and share tools with MCP clients.
+pagination: false
+sidebar:
+  icon: bot
+---
+
+Use agents when your application needs a model to interpret a request and choose how to complete it. Tools let it do useful work in
+your app: look up an order, search a catalog, or prepare a response using current data.
+
+<Callout type="tip" title="Start here" icon="route">
+Start with [Build an offline agent](/guides/ai/build-an-offline-agent) for installation, a working assistant, and a test without a model API key. The [Agents](/docs/api/agents), [Tools](/docs/api/tools), and [LangChain integration](/docs/api/integrations/langchain) references describe the exact APIs.
+</Callout>
+
+**RELKIT agents run through native LangChain and LangGraph APIs.** RELKIT connects those workflows to
+your application's functions, validation, permissions, durable threads, and execution limits. Use
+`defineAgent` for model-driven work, or `defineGraph` and `defineGraphNode` for explicit workflows.
+Adding subagents, skills, memory files, or a backend to `defineAgent` selects native DeepAgents
+behavior through the same declaration.
+
+Use an agent when the next step depends on a user's question. Use an ordinary function when you already know the steps, such as calculating a total or saving an order.
+
+<include>/_setup/agents.mdx</include>
+
+## The AI APIs
+
+Usually, adding tools to a model means writing argument schemas, dispatching tool calls, handling results, and controlling how long the model can keep working. RELKIT lets you reuse validated functions as tools, choose which tools an agent can use, and set limits on each run.
+
+| API                 | What you use it for                                                       |
+| ------------------- | ------------------------------------------------------------------------- |
+| `defineAgent`       | Set native model, tool, middleware, DeepAgents, and client behavior.      |
+| `defineGraph`       | Register a typed native LangGraph workflow and its public result.         |
+| `defineGraphNode`   | Validate graph-node state updates, routes, and human continuation.        |
+| `defineTool`        | Give an existing function a tool name, description, and execution policy. |
+| `function.asTool()` | Turn a function into a tool directly.                                     |
+| `mcp`               | Choose whether a tool is available to external MCP clients.               |
+
+The same tool can serve a RELKIT agent and an external AI client through **Model Context Protocol (MCP)**. You do not need a RELKIT agent just to expose tools over MCP.
+
+## Native framework boundary
+
+Pass compatible LangChain models, tools, and middleware directly—there is no public adapter wrapper.
+RELKIT function-backed tools remain native-compatible while preserving function execution, validation,
+authorization, and tool policies. LangGraph owns scheduling and control flow; RELKIT validates declared
+state and public output around it.
+
+## Observe durable execution
+
+Client-exposed agents stream one canonical event history over HTTP iteration, AG-UI SSE, or WebSocket.
+AG-UI is independently opt-in. Only when selecting that protocol, install its SDK and set
+`server.agUi` to `true` in your existing application configuration:
+
+<include>/_snippets/generated/installations/ag-ui.mdx</include>
+
+This optional protocol is validated before readiness; ordinary
+typed agent RPC and streaming do not select it.
+The typed client exposes messages, tools, progress, selected middleware state, waiting requests, nested
+execution, and final output separately. Every run, observation, control, and continuation supplies an
+application-owned `threadId`; mounting a hook never invents one or starts work.
+
+See [Agent streaming](/docs/modules/ai/streaming) and [Threads and recovery](/docs/modules/ai/threads-recovery).
+
+For the complete native boundary, continue with [Native runtime and DeepAgents](/docs/modules/ai/native-runtime)
+and [LangGraph, persistence, and resume](/docs/modules/ai/graphs-persistence).
+
+## Choose where to start
+
+Follow the [greeting-assistant tutorial](/guides/ai/build-an-offline-agent) to add an agent to an existing app and test it without a model API key.
+
+Already have application functions? [Turn one into a tool](/docs/modules/ai/function-tools), then [give it to an agent](/docs/modules/ai/agents) or [connect an MCP client](/docs/modules/ai/mcp).
+
+With the separately installed and enabled [Inspector](/docs/modules/operations/inspector), open **Agents**
+to review an agent's tools and limits, or **Tools** to review the functions each tool calls.
+
+<Callout type="warning" title="Review MCP access">
+  MCP is disabled by default. When you explicitly enable it, tools are exposed unless you set `mcp:
+  false`. Before making your app reachable by other users, review tool visibility and protect
+  `/mcp`. An agent's tools list does not restrict the MCP endpoint.
+</Callout>

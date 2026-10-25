@@ -1,0 +1,67 @@
+---
+title: Build and run for production
+description: Build the protected Orders API and verify it with the local production server.
+sidebar:
+  icon: package-check
+---
+
+Build the Orders API and run the production server on your machine. You'll verify that the same
+account can still read its stored order after the development server stops.
+
+Continue from [Local development](/docs/learn/local-development), with the tests and migrations from the preceding chapters complete.
+
+<Steps>
+<Step icon="package-check">
+
+## 1. Build and start the server
+
+Stop `bun run dev` first. Keep `DATABASE_PATH`, `BETTER_AUTH_URL`, and the **same**
+`BETTER_AUTH_SECRET` used for the existing accounts. Keep the migrations and SQLite file in place.
+
+```sh title="Terminal — relkit-orders"
+set -a
+. ./.env
+set +a
+bun run check
+bun run typecheck
+bun run test
+bun run build
+bun run start
+```
+
+The ignored `.env` contains the same secret from the auth chapter; changing it would
+invalidate existing sessions. Keep this terminal open while the local production server runs.
+
+Production builds exclude the rich development Inspector even when `inspector.enabled`
+was selected during development. The optional [standalone Inspector](/docs/modules/operations/inspector)
+runs separately from `bun run dev`; it is not part of `bun run start`.
+
+</Step>
+<Step icon="key-round">
+
+## 2. Sign in and read the order
+
+In a second terminal, sign in with the account from the authentication chapter and verify the
+protected read again:
+
+```sh title="Second terminal — relkit-orders"
+auth_cookies=$(mktemp -t relkit-orders-cookies)
+curl -i -c "$auth_cookies" http://127.0.0.1:3000/api/auth/sign-in/email \
+  -H 'content-type: application/json' -H 'origin: http://127.0.0.1:3000' \
+  --data '{"email":"demo@example.com","password":"local-demo-password-123"}'
+curl -i http://127.0.0.1:3000/orders/private-1
+curl -i -b "$auth_cookies" http://127.0.0.1:3000/orders/private-1
+```
+
+Expect `401` without a cookie and `found: true` with the same account's valid cookie.
+The order data should survive both development-server and production-server restarts because
+it is stored in `orders.sqlite`.
+
+Your local application is complete. For another capability, use the relevant feature guide;
+for exact signatures or flags, use the API and CLI references. Cloud deployment is a separate
+optional task covered by [Deployment](/docs/modules/deployment).
+
+</Step>
+</Steps>
+
+<include>/_snippets/generated/related/docs-learn-build-and-run.mdx</include>

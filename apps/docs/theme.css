@@ -1,0 +1,43 @@
+/* Matches the landing palette through Blume tokens without importing landing layout styles. */
+:root {
+  --blume-foreground: #111216;
+  --blume-muted: #eeeef1;
+  --blume-muted-foreground: #686973;
+  --blume-border: #d9d9df;
+  --blume-code-background: #ffffff;
+}
+
+:root[data-theme="dark"] {
+  --blume-foreground: #f7f7f8;
+  --blume-muted: #1b1c20;
+  --blume-muted-foreground: #a7a7b0;
+  --blume-border: #28292e;
+  --blume-code-background: #151619;
+}
+
+[data-blume-callout="info"] {
+  border-color: var(--blume-border);
+  background: var(--blume-muted);
+}
+
+[data-blume-callout="info"] > span {
+  color: var(--blume-accent);
+}
+
+.docs-home {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.docs-home > h2 {
+  margin-top: 2.5rem;
+}
+
+.docs-home > p,
+.docs-home-details {
+  max-width: 52rem;
+}
+
+.docs-home > p {
+  color: var(--blume-muted-foreground);
+}

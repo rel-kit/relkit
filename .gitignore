@@ -29,6 +29,7 @@ reports/mutation/
 .next/
 apps/inspector/.next-packaged/
 apps/docs/.source/
+apps/docs/.blume/
 out/
 build
 !packages/client/src/build/

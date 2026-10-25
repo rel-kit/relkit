@@ -1,0 +1,150 @@
+---
+title: Cache product prices
+description: Load a product price once, reuse it from Redis, and verify that it loads again after expiration.
+pagination: false
+sidebar:
+  icon: zap
+---
+
+Add a product-price lookup to your application. You'll load a price, reuse it for one minute, and verify that it loads again after expiration. This example uses a fixed price, so it needs no database.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+Continue from the [Orders endpoint](/docs/learn/first-route), so the Orders service already exists.
+Create the two files below, or update them if they already exist. Run commands from your app's root.
+This selected local profile requires a running Docker daemon and uses Redis.
+</Callout>
+
+<Steps>
+<Step icon="settings">
+
+## 1. Configure caching [#configure-caching]
+
+Install the local Redis integration from your app root:
+
+<include>/_snippets/generated/installations/redis.mdx</include>
+
+In `relkit.config.ts`, import `redis` from `@relkit/redis`, `docker` from `@relkit/docker`, and
+`env as binding` from `@relkit/app/config`. Create a `cache` object inside `defineApp()` if the
+app has none, then add this `requests` entry. It is the only cache profile needed here:
+
+<include
+  source="examples/commerce/relkit.config.ts#cache-local-profile"
+  lang="ts"
+  meta='title="relkit.config.ts — cache configuration"'
+>
+  /_snippets/source/examples/commerce/relkit.config--cache-local-profile.ts
+</include>
+
+The excerpt is from the larger commerce example, which also has a `timeline` profile. Do not add
+that second profile here. `requests` starts a Docker Redis recipe during local development;
+`orders.prices` selects it explicitly. Connected or cloud-owned profiles are covered in
+[Define a cache](/docs/modules/caching/define).
+
+</Step>
+<Step icon="database">
+
+## 2. Define the prices cache [#define-the-prices-cache]
+
+<include
+  source="examples/commerce/src/services/orders/cache/prices.cache.ts"
+  lang="ts"
+  meta='title="src/services/orders/cache/prices.cache.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/cache/prices.cache.ts
+</include>
+
+Each product code has its own cached price, which expires one minute after it is saved.
+
+</Step>
+<Step icon="braces">
+
+## 3. Add the lookup function [#add-the-lookup-function]
+
+<include
+  source="examples/commerce/tests/fixtures/get-price.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/get-price.function.ts"'
+>
+  /_snippets/source/examples/commerce/tests/fixtures/get-price.function.ts
+</include>
+
+The `price.loaded` log runs only when the callback loads a price.
+
+</Step>
+<Step icon="route">
+
+## 4. Expose a price endpoint [#expose-a-price-endpoint]
+
+In `src/services/orders/service.ts`, import the function and add `getPrice` to the existing
+`functions` object. Keep the service's other members:
+
+```ts title="src/services/orders/service.ts — new import"
+import getPrice from "./functions/get-price.function.js";
+```
+
+Create `src/routes/prices/route.ts`:
+
+```ts title="src/routes/prices/route.ts"
+import { defineServiceRoutes } from "@relkit/app/routes";
+import orders from "@app/services/orders/service.js";
+
+export const { GET } = defineServiceRoutes(orders, {
+  GET: { member: "getPrice" },
+});
+```
+
+</Step>
+<Step icon="repeat">
+
+## 5. Try a miss and a hit [#try-a-miss-and-a-hit]
+
+Check and start the app:
+
+```sh
+bun run check
+```
+
+```sh
+bun run dev
+```
+
+Docker is contacted only after the checked plan exists. To prove there is no hidden fallback, use
+`bun run dev --local=off`; startup then requires the named connected/infrastructure values.
+
+In a second terminal, send the same request twice:
+
+```sh
+curl http://localhost:3000/prices\?sku=book-demo
+curl http://localhost:3000/prices\?sku=book-demo
+```
+
+Expect this output:
+
+```json
+{ "sku": "book-demo", "unitPriceCents": 1000 }
+```
+
+Look for `price.loaded` with `sku=book-demo` in the app terminal. The second request within one minute returns the same output without another `price.loaded` log. Use a new SKU if this key was already cached from an earlier run.
+
+</Step>
+<Step icon="timer">
+
+## 6. Inspect expiration [#inspect-expiration]
+
+Optionally complete [Inspector setup](/docs/modules/operations/inspector). Open **Cache**, select `orders.prices`, and find the key containing `book-demo`. Its remaining TTL is the time before the cached value expires. Click **View value** to see `1000`.
+
+Once the minute has passed, repeat the curl request with the same SKU. A new `price.loaded` log confirms the price was loaded again. The next request performs the reload; nothing refreshes in the background.
+
+Tests must pass an explicit replacement for the `requests` profile; no test environment selects
+a fake for you. In your app, replace the fixed price with a database lookup and
+[invalidate the cached price after updates](/docs/modules/caching/expiration). Before deploying, review which
+profiles are connected and which are infrastructure-owned in [Integrations](/docs/modules/integrations).
+
+</Step>
+</Steps>
+
+## Related tasks
+
+<Card icon="arrow-right">
+[Invalidate prices after an update](/docs/modules/caching/expiration), or [react to order events](/guides/events/react-to-order-events).
+</Card>

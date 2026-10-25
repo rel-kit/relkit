@@ -1,0 +1,96 @@
+---
+title: Your first HTTP route
+description: Read the Orders endpoint extension and verify its request and response boundary.
+pagination: false
+sidebar:
+  icon: rocket
+---
+
+Follow a `POST /orders` request from its JSON body to the validated function result. That chapter creates this route from maintained API-candidate sources. Follow one `POST /orders` request from JSON to a validated
+function result and verify both accepted and rejected input. Run commands from the app root.
+
+<Steps>
+<Step>
+
+## Select the public operation
+
+The Orders domain calculates a price in `createOrder`. Its service exposes that operation to
+the route. Read the **existing** `src/services/orders/service.ts`:
+
+<include
+  source="templates/default/v1/api/src/services/orders/service.ts"
+  lang="ts"
+  meta='title="src/services/orders/service.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/services/orders/service.ts
+</include>
+
+The service is the public boundary. A route imports the service, not a private function file.
+If you have the Orders functions but no route yet, scaffold it from the application root:
+
+```sh title="Terminal — application root"
+bun run relkit add route /orders \
+  --mode service-route --service orders --map POST=createOrder
+```
+
+Skip this command when continuing from the [Orders endpoint chapter](/docs/learn/first-route),
+which already created that file. The scaffold maps `POST` to the function and defaults to HTTP
+`200`; edit it to match the `201` response below. The route's folder supplies `/orders`:
+
+<include
+  source="templates/default/v1/api/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/route.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/routes/orders/route.ts
+</include>
+
+`member: "createOrder"` selects the public operation. `successStatus: 201` changes only the
+successful response status; RELKIT infers the JSON input and output contracts from the function.
+The [endpoint chapter](/docs/learn/first-route) changes the price rule without editing this route.
+
+</Step>
+<Step>
+
+## Send a request and inspect the result
+
+Start the app with `bun run dev`. In another terminal, send a valid request:
+
+```sh title="Terminal — relkit-orders"
+curl -i -X POST http://localhost:3000/orders \
+  -H 'content-type: application/json' \
+  -d '{"orderId":"route-1","sku":"book","quantity":3}'
+```
+
+Expect HTTP `201` and `totalCents: 300`. The starter's HTTP test checks the same status and
+body in process. Create `tests/integration/orders.route.test.ts` from this source:
+
+<include
+  source="templates/default/v1/api/tests/integration/orders.route.test.ts"
+  lang="ts"
+  meta='title="tests/integration/orders.route.test.ts"'
+>
+  /_snippets/source/templates/default/v1/api/tests/integration/orders.route.test.ts
+</include>
+
+Run `bun test tests/integration/orders.route.test.ts`. Then send `quantity: 0`; the running
+server returns HTTP `422` before the handler creates an order. The test harness also maps
+function-input validation to `422`, but it does not reproduce every middleware or transport
+behavior. Check security policy and alternate transports against the running server.
+
+</Step>
+<Step>
+
+## Inspect the generated contract
+
+Run `bun run check` and `bun run typecheck`, then open `/_relkit/v1/openapi.json` on the
+running backend. Find `POST /orders`, its request fields, success response, and validation
+response. Edit source to change the contract; do not edit `.relkit/generated` output.
+Select the [optional Scalar UI](/docs/modules/http/openapi) when you want an interactive reference.
+
+For path parameters, headers, and cookies, continue with [Request mapping](/docs/modules/http/requests).
+
+</Step>
+</Steps>
+
+<include>/_snippets/generated/related/docs-modules-http-first-route.mdx</include>

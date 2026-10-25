@@ -1,0 +1,142 @@
+---
+title: Set up PostgreSQL in Docker
+description: Start a local PostgreSQL database, scaffold a Drizzle service, validate its environment, and apply the first migration.
+pagination: false
+sidebar:
+  icon: container
+---
+
+Connect an existing RELKIT app to PostgreSQL running in local Docker. This is the default
+database setup for a new module. The [Orders tutorial](/docs/learn/save-orders) remains a
+separate SQLite walkthrough; keep its database and migration history when continuing that app.
+
+## Pre-setup
+
+You need a working minimal app, Bun, and Docker with Compose. Run these commands in the
+backend root. This walkthrough adds a database only when the app has no database service.
+For an existing service, retain its dialect, tables, credentials, and applied migrations.
+
+<Steps>
+<Step title="Start PostgreSQL" icon="container">
+
+Check the daemon, then create one local password:
+
+```sh title="Terminal — application root"
+docker version
+openssl rand -hex 24
+```
+
+Add the following values to your untracked `.env.local`, replacing both placeholders with
+the same generated password. Preserve other entries. Port `5433` must be free; if you change
+it, change both the connection URL and Compose port mapping.
+
+```dotenv title=".env.local"
+RELKIT_LOCAL_DATABASE_PASSWORD=PASTE_GENERATED_HEX
+DATABASE_URL=postgres://relkit:PASTE_GENERATED_HEX@127.0.0.1:5433/relkit
+```
+
+Create `compose.local.yaml`, or merge this service and volume into your existing Compose file:
+
+<include source="apps/docs/examples/setup/compose.yaml" lang="yaml" meta='title="compose.local.yaml"'>
+  /_snippets/source/apps/docs/examples/setup/compose.yaml
+</include>
+
+This pins the same PostgreSQL image used by RELKIT's local job infrastructure. The named volume
+keeps data across stops; the published port accepts only loopback connections. Start it:
+
+```sh title="Terminal — application root"
+docker compose --env-file .env.local -f compose.local.yaml up -d --wait database
+docker compose --env-file .env.local -f compose.local.yaml exec database pg_isready -U relkit -d relkit
+```
+
+Expect `accepting connections`. RELKIT has no `docker(postgresql())` integration; Compose owns
+this database lifecycle. Changing `POSTGRES_PASSWORD` does not rotate an initialized volume's
+password. Keep the original value across restarts.
+
+</Step>
+<Step title="Scaffold the database service" icon="terminal">
+
+```sh title="Terminal — application root"
+bun run relkit add database --orm drizzle --dialect postgresql
+```
+
+The command installs the selected Drizzle packages and declaration repair, creates
+`src/services/database/service.ts`, adds an `items` table in its schema directory, and creates
+`drizzle.config.ts`. It also merges the database environment declaration. It does not start
+PostgreSQL or apply migrations. See the [command reference](/docs/api/cli#relkit-add-database).
+
+</Step>
+<Step title="Check the environment contract" icon="key-round">
+
+Keep `DATABASE_URL: env.secret()` in the generated `src/platform/env.ts` and pass that
+environment descriptor to `defineApp({ env })` in `relkit.config.ts`. The same configuration
+can be expressed inline as this complete minimal example:
+
+<include source="apps/docs/examples/setup/postgresql.ts" lang="ts" meta='title="relkit.config.ts — equivalent inline environment"'>
+  /_snippets/source/apps/docs/examples/setup/postgresql.ts
+</include>
+
+Merge the field into your app's existing contract; retain its ID and other settings. The
+generated Drizzle client reads `context.env.DATABASE_URL` through its `client({ env })` factory.
+There is no `database` profile to add to `defineApp`: the specialized service registers it.
+`RELKIT_LOCAL_DATABASE_PASSWORD` belongs to Compose and need not be exposed to application functions.
+
+```sh title="Terminal — application root"
+bun run relkit env check
+```
+
+Bun loads `.env.local`; `.env.example` is only a template. Drizzle Kit and the app must use
+the same `DATABASE_URL`. Keep production credentials out of this local file and browser bundles.
+
+</Step>
+<Step title="Generate and apply a migration" icon="git-branch">
+
+Review the scaffolded table, then generate the initial migration:
+
+```sh title="Terminal — application root"
+bun --bun drizzle-kit generate --name=initial
+```
+
+Review the SQL and snapshots in `src/services/database/migrations`. Apply the reviewed history
+to the local database and start the app:
+
+```sh title="Terminal — application root"
+bun run relkit db migrate
+bun run check
+bun run typecheck
+bun run dev
+```
+
+Expect successful migration, checks, and server readiness. In another terminal, verify that
+the scaffolded table exists:
+
+```sh title="Second terminal — application root"
+docker compose --env-file .env.local -f compose.local.yaml exec database psql -U relkit -d relkit -c '\dt'
+```
+
+Expect `items` in the table list. If you renamed the schema table, check its new name instead.
+`check`, `build`, and `dev` never apply migrations for you.
+
+Before running application tests, update existing HTTP fixtures to import
+`createTestApplication` from `@relkit/testing/drizzle` and supply an explicit test environment.
+The harness does not inherit `.env.local`. Use a separate test database and apply its migrations;
+follow [database testing](/docs/modules/database/testing) before changing the fixtures.
+
+</Step>
+</Steps>
+
+## Stop and resume without resetting data
+
+Stop the application with Ctrl+C, then stop its database:
+
+```sh title="Terminal — application root"
+docker compose --env-file .env.local -f compose.local.yaml stop database
+```
+
+Run the earlier `up -d --wait` command to resume with the same volume and password. Keep
+your schema, migration history, and volume; do not remove volumes to resolve a migration error.
+
+Continue with [Drizzle services](/docs/modules/database/drizzle),
+[schema definitions](/docs/modules/database/schema), or [authentication setup](/docs/modules/auth#pre-setup).
+
+<include>/_snippets/generated/related/docs-modules-database-local-docker.mdx</include>
