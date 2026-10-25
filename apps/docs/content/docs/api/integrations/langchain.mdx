@@ -8043,7 +8043,7 @@ Constructs invocation failures with agent identity and native causes, including 
 
 ### AgentRuntimeError (class)
 
-Safe, bounded failures from the model/tool loop. No input or result is retained.
+Safe public failure fields; a non-enumerable native cause is private diagnostic data.
 
 **Signature**
 
@@ -8052,10 +8052,30 @@ declare class AgentRuntimeError { constructor(
     readonly code: string,
     message: string,
     readonly issues?: readonly StandardIssue[],
+    options?: ErrorOptions,
   ) }
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-errors.ts#L6)
+
+## `runtime-failure-diagnostics.ts`
+
+Records bounded failure categories at the invocation boundary; native causes remain private and are never logged raw.
+
+### logAgentFailure
+
+Logs one safe diagnostic before public failure mapping, without retrying execution.
+
+**Signature**
+
+```ts
+declare const logAgentFailure: (
+  failure: AgentInvocationFailure,
+  options: AgentRuntimeOptions & AgentInvocationOptions,
+) => Effect.Effect<void, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-failure-diagnostics.ts#L45)
 
 ## `runtime-integration.ts`
 
@@ -8792,7 +8812,12 @@ declare const createToolsForAgentEffect: (
 ```ts
 declare const responseFormatEffect: (
   schema: StandardSchemaV1<unknown, unknown>,
-) => Effect.Effect<TypedToolStrategy<Record<string, unknown>>, AgentInvocationFailure, never>;
+  model?: NativeModel | undefined,
+) => Effect.Effect<
+  ProviderStrategy<Record<string, unknown>> | TypedToolStrategy<Record<string, unknown>>,
+  AgentInvocationFailure,
+  never
+>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-agent-build.ts#L161)
@@ -8886,7 +8911,7 @@ declare const createNativeAgentEffect: (options: CreateNativeAgentOptions) => Ef
   | {
       agent: ReactAgent<
         AgentTypeConfig<
-          Record<string, unknown>,
+          ResponseFormatUndefined,
           undefined,
           AnyAnnotationRoot,
           Array<AnyAgentMiddleware>,
@@ -9550,10 +9575,15 @@ Effect.runSync(responseFormatEffect(output));
 ```ts
 declare const responseFormatEffect: (
   schema: StandardSchemaV1<unknown, unknown>,
-) => Effect.Effect<TypedToolStrategy<Record<string, unknown>>, AgentInvocationFailure, never>;
+  model?: NativeModel | undefined,
+) => Effect.Effect<
+  ProviderStrategy<Record<string, unknown>> | TypedToolStrategy<Record<string, unknown>>,
+  AgentInvocationFailure,
+  never
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-response-format.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-response-format.ts#L20)
 
 ## `runtime-native-subagents.ts`
 
@@ -9592,7 +9622,8 @@ declare const childAgentCommon: (
     | DynamicTool<unknown, unknown>
   >;
   middleware: Array<AnyAgentMiddleware>;
-  responseFormat: TypedToolStrategy<Record<string, unknown>>;
+  responseFormat:
+    ProviderStrategy<Record<string, unknown>> | TypedToolStrategy<Record<string, unknown>>;
 };
 ```
 
@@ -9633,7 +9664,8 @@ declare const nestedChildAgentEffect: (
       | DynamicTool<unknown, unknown>
     >;
     middleware: Array<AnyAgentMiddleware>;
-    responseFormat: TypedToolStrategy<Record<string, unknown>>;
+    responseFormat:
+      ProviderStrategy<Record<string, unknown>> | TypedToolStrategy<Record<string, unknown>>;
   },
   persistence: ResolvedGraphPersistence,
   nested: Array<unknown>,
@@ -10278,6 +10310,22 @@ declare const selectedStateSchemasEffect: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-state-schemas.ts#L14)
+
+## `runtime-strict-response-schema.ts`
+
+Selects the structural JSON-schema subset that can use provider enforcement without making optional fields required.
+
+### strictResponseSchema
+
+Closes declared objects for native generation; runtime validation still uses the authored schema.
+
+**Signature**
+
+```ts
+declare const strictResponseSchema: (schema: JsonSchema, depth?: number) => JsonSchema | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-strict-response-schema.ts#L24)
 
 ## `runtime-tool-adapter.ts`
 
@@ -11072,7 +11120,7 @@ Re-exports all named exports from the "./runtime.types.js" module.
 export * from "./runtime.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L19)
 
 ### AgentInvocationFailure
 
@@ -11082,7 +11130,7 @@ export * from "./runtime.types.js";
 declare const AgentInvocationFailure: typeof AgentInvocationFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L26)
 
 ### AgentRuntimeError
 
@@ -11092,7 +11140,7 @@ declare const AgentInvocationFailure: typeof AgentInvocationFailure;
 declare const AgentRuntimeError: typeof AgentRuntimeError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L25)
 
 ### assertAgentRuntimeDependencies
 
@@ -11104,7 +11152,7 @@ declare const assertAgentRuntimeDependencies: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L23)
 
 ### createAgentRuntime
 
@@ -11122,7 +11170,7 @@ const runtime = createAgentRuntime(options);
 declare const createAgentRuntime: (options: AgentRuntimeOptions) => AgentRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L116)
 
 ### createAgentRuntimeEffect
 
@@ -11142,7 +11190,7 @@ declare const createAgentRuntimeEffect: (
 ) => Effect.Effect<AgentRuntime, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L99)
 
 ### createGeneratedAgentFunction
 
@@ -11155,7 +11203,7 @@ declare const createGeneratedAgentFunction: (
 ) => GeneratedAgentFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L21)
 
 ### invokeAgent
 
@@ -11179,7 +11227,7 @@ declare const invokeAgent: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L64)
 
 ### invokeAgentEffect
 
@@ -11199,7 +11247,27 @@ declare const invokeAgentEffect: (
 ) => Effect.Effect<unknown, AgentInvocationFailure, AgentExecution>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L33)
+
+### invokeAgentFunction
+
+Runs an agent once for generated function actions, retaining output failure identity.
+
+**Example**
+
+```ts
+await invokeAgentFunction(options);
+```
+
+**Signature**
+
+```ts
+declare const invokeAgentFunction: (
+  options: AgentRuntimeOptions & AgentInvocationOptions,
+) => Promise<unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L82)
 
 ### releaseAgentPersistence
 
@@ -11209,7 +11277,7 @@ declare const invokeAgentEffect: (
 declare const releaseAgentPersistence: (descriptors: readonly unknown[]) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L22)
 
 ### runAgent
 
@@ -11219,7 +11287,7 @@ declare const releaseAgentPersistence: (descriptors: readonly unknown[]) => Prom
 declare const runAgent: (options: AgentRuntimeOptions & AgentInvocationOptions) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L120)
 
 ### runtimeIntegration
 
@@ -11233,7 +11301,7 @@ declare const runtimeIntegration: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.ts#L20)
 
 ## `runtime.types.ts`
 
