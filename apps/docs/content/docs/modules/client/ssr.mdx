@@ -9,8 +9,8 @@ sidebar:
 Fetch backend data during server rendering, then hydrate the matching frontend client.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
-Keep its selected React/query peers and generated declarations in the frontend package.
+  Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
+  Keep its selected React/query peers and generated declarations in the frontend package.
 </Callout>
 
 ## Select the server entry point
@@ -39,7 +39,11 @@ identity cookie. For a first visit without that cookie, let the browser provider
 before loading private data. The server context does not forward new `Set-Cookie` headers to your
 framework's response; custom server-side identity bootstrapping must handle that separately.
 
-<include source="apps/docs/examples/frontend/ssr.ts" lang="ts" meta='title="server/prefetch-greeting.ts — Bun only"'>
+<include
+  source="apps/docs/examples/frontend/ssr.ts"
+  lang="ts"
+  meta='title="server/prefetch-greeting.ts — Bun only"'
+>
   /_snippets/source/apps/docs/examples/frontend/ssr.ts
 </include>
 

@@ -32,7 +32,11 @@ a project root, not an arbitrary manifest filename. Keep the declarations in the
 Merge `relkit()` into your existing plugins. This example also adds the development proxy used by
 the Frontend guide; the plugin itself does not configure routing:
 
-<include source="apps/docs/examples/frontend/vite.config.ts" lang="ts" meta='title="vite.config.ts"'>
+<include
+  source="apps/docs/examples/frontend/vite.config.ts"
+  lang="ts"
+  meta='title="vite.config.ts"'
+>
   /_snippets/source/apps/docs/examples/frontend/vite.config.ts
 </include>
 
@@ -45,7 +49,11 @@ Wrap your existing configuration with `withRelkit`. Keep its routes, rewrites, a
 inside that configuration. This example also forwards RPC and identity requests to the local backend;
 the helper itself only embeds the fingerprint and supports workspace-linked client resolution:
 
-<include source="apps/docs/examples/frontend/next.config.ts" lang="ts" meta='title="next.config.ts"'>
+<include
+  source="apps/docs/examples/frontend/next.config.ts"
+  lang="ts"
+  meta='title="next.config.ts"'
+>
   /_snippets/source/apps/docs/examples/frontend/next.config.ts
 </include>
 

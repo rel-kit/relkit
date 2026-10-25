@@ -9,8 +9,8 @@ sidebar:
 Use a mutation for a request that changes application state, and track whether the server accepted it.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
-Keep its selected React/query peers and generated declarations in the frontend package.
+  Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
+  Keep its selected React/query peers and generated declarations in the frontend package.
 </Callout>
 
 ## Submit once
@@ -29,11 +29,7 @@ server authenticates independently and compares them before application code run
 The backend's [Echo `defineRoute`](/docs/modules/http/define#expose-one-public-function) generates
 `POST /echo`. Render this component under the provider after pulling that backend's contract:
 
-<include
-  source="apps/docs/examples/frontend/echo.tsx"
-  lang="tsx"
-  meta='title="src/EchoButton.tsx"'
->
+<include source="apps/docs/examples/frontend/echo.tsx" lang="tsx" meta='title="src/EchoButton.tsx"'>
   /_snippets/source/apps/docs/examples/frontend/echo.tsx
 </include>
 

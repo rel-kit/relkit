@@ -47,11 +47,11 @@ submitting again. Do not bypass the identity headers or automatically retry a wr
 
 All three factories are exported from `@relkit/client` and use the same generated contract:
 
-| Factory | Use it for | Configuration and behavior |
-| --- | --- | --- |
-| [`createClient`](/docs/api/client#createclient) | Finite HTTP calls and supported HTTP streams | `baseUrl`, request-time `headers`, `credentials`, and an optional `fetch`. |
-| [`createWebSocketClient`](/docs/api/client#createwebsocketclient) | A backend with WebSocket RPC enabled | `baseUrl`, an optional WebSocket constructor, and `establishmentTimeoutMs`. Connection establishment is lazy. |
-| [`createAutoClient`](/docs/api/client#createautoclient) | WebSocket preference with HTTP fallback | Combines the transport options. Fallback applies to connection establishment, not replay of an accepted operation. |
+| Factory                                                           | Use it for                                   | Configuration and behavior                                                                                         |
+| ----------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| [`createClient`](/docs/api/client#createclient)                   | Finite HTTP calls and supported HTTP streams | `baseUrl`, request-time `headers`, `credentials`, and an optional `fetch`.                                         |
+| [`createWebSocketClient`](/docs/api/client#createwebsocketclient) | A backend with WebSocket RPC enabled         | `baseUrl`, an optional WebSocket constructor, and `establishmentTimeoutMs`. Connection establishment is lazy.      |
+| [`createAutoClient`](/docs/api/client#createautoclient)           | WebSocket preference with HTTP fallback      | Combines the transport options. Fallback applies to connection establishment, not replay of an accepted operation. |
 
 Pass the backend origin without appending `/rpc`. A custom transport still needs the backend's
 matching configuration and authentication. Use [HTTP streaming](/docs/modules/http/streaming) for
@@ -63,12 +63,12 @@ separate origins need [matching cookie and CORS configuration](/docs/modules/aut
 
 ## Add query utilities or server tracing
 
-| Entry point | API | Owner |
-| --- | --- | --- |
-| `@relkit/client/tanstack-query` | [`createTanstackQueryUtils`](/docs/api/client#all-exported-apis) | [Query options and cache integration](/docs/modules/client/routes#choose-query-helpers) |
-| `@relkit/client/server` | [`createServerClient`](/docs/api/client#createserverclient) | [Bun server calls and tracing](/docs/modules/client/ssr) |
-| `@relkit/client/server/tanstack-query` | [`createRelkitServerContext`](/docs/api/client#createrelkitservercontext) | [Request-scoped hydration](/docs/modules/client/ssr) |
-| `@relkit/client/jobs` | [`watchJobRun`](/docs/api/client#watchjobrun), [`watchJobStream`](/docs/api/client#watchjobstream) | [Accepted job runs](/docs/modules/jobs/clients) |
+| Entry point                            | API                                                                                                | Owner                                                                                   |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `@relkit/client/tanstack-query`        | [`createTanstackQueryUtils`](/docs/api/client#all-exported-apis)                                   | [Query options and cache integration](/docs/modules/client/routes#choose-query-helpers) |
+| `@relkit/client/server`                | [`createServerClient`](/docs/api/client#createserverclient)                                        | [Bun server calls and tracing](/docs/modules/client/ssr)                                |
+| `@relkit/client/server/tanstack-query` | [`createRelkitServerContext`](/docs/api/client#createrelkitservercontext)                          | [Request-scoped hydration](/docs/modules/client/ssr)                                    |
+| `@relkit/client/jobs`                  | [`watchJobRun`](/docs/api/client#watchjobrun), [`watchJobStream`](/docs/api/client#watchjobstream) | [Accepted job runs](/docs/modules/jobs/clients)                                         |
 
 The server leaves are Bun-only exports. Use the base `createClient` in other server runtimes.
 Query integration is opt-in and has its own [peer installation](/docs/modules/client/routes#choose-query-helpers).

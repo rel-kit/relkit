@@ -9,8 +9,8 @@ sidebar:
 Call a backend operation from React using the contract generated from your application's routes.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
-Keep its selected React/query peers and generated declarations in the frontend package.
+  Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
+  Keep its selected React/query peers and generated declarations in the frontend package.
 </Callout>
 
 ## Query finite routes
@@ -23,7 +23,11 @@ The [Hello route](/docs/modules/service/routes#when-to-use-defineroute) generate
 Import `useRoute` and `useRelkitClient` from `@relkit/client/react`, then render this component
 under the provider from the [Frontend guide](/guides/frontend/connect-react):
 
-<include source="apps/docs/examples/frontend/app.tsx#greeting" lang="tsx" meta='title="src/Greeting.tsx — component body"'>
+<include
+  source="apps/docs/examples/frontend/app.tsx#greeting"
+  lang="tsx"
+  meta='title="src/Greeting.tsx — component body"'
+>
   /_snippets/source/apps/docs/examples/frontend/app--greeting.tsx
 </include>
 
@@ -33,13 +37,13 @@ the client still uses RPC rather than constructing a REST request.
 
 ## Choose query helpers
 
-| API | Use it when |
-| --- | --- |
-| [`useRoute`](/docs/api/client#useroute) | The component renders loading, error, and success states. |
-| [`useSuspenseRoute`](/docs/api/client#usesuspenseroute) | A ready provider and your Suspense/error boundaries own loading and failure. It throws while the provider is not ready. |
-| [`useInfiniteRoute`](/docs/api/client#useinfiniteroute) | The backend already accepts pagination input; supply `initialPageParam`, `input(page)`, and `getNextPageParam`. It does not add backend pagination. |
-| [`useRouteUtils`](/docs/api/client#userouteutils) | You need the selected procedure's underlying query/mutation option builders. |
-| [`createTanstackQueryUtils`](/docs/api/client#all-exported-apis) | An application outside the RELKIT React hooks owns its QueryClient and identity lifecycle. Import it from `@relkit/client/tanstack-query`. |
+| API                                                              | Use it when                                                                                                                                         |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`useRoute`](/docs/api/client#useroute)                          | The component renders loading, error, and success states.                                                                                           |
+| [`useSuspenseRoute`](/docs/api/client#usesuspenseroute)          | A ready provider and your Suspense/error boundaries own loading and failure. It throws while the provider is not ready.                             |
+| [`useInfiniteRoute`](/docs/api/client#useinfiniteroute)          | The backend already accepts pagination input; supply `initialPageParam`, `input(page)`, and `getNextPageParam`. It does not add backend pagination. |
+| [`useRouteUtils`](/docs/api/client#userouteutils)                | You need the selected procedure's underlying query/mutation option builders.                                                                        |
+| [`createTanstackQueryUtils`](/docs/api/client#all-exported-apis) | An application outside the RELKIT React hooks owns its QueryClient and identity lifecycle. Import it from `@relkit/client/tanstack-query`.          |
 
 For the standalone query adapter, install its selected peers in the caller package:
 

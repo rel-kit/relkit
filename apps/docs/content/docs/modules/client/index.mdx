@@ -9,9 +9,10 @@ sidebar:
 Use the generated client to call your backend with typed inputs, results, and application errors.
 
 <Callout type="tip" title="Start here" icon="route">
-Follow [Call your API from React](/guides/frontend/connect-react) for a complete frontend workflow.
-Use [TypeScript clients and transports](/docs/modules/client/transports) for a caller without React.
-The [Client reference](/docs/api/client) lists exact helpers, hooks, and their import paths.
+  Follow [Call your API from React](/guides/frontend/connect-react) for a complete frontend
+  workflow. Use [TypeScript clients and transports](/docs/modules/client/transports) for a caller
+  without React. The [Client reference](/docs/api/client) lists exact helpers, hooks, and their
+  import paths.
 </Callout>
 
 ## Pre-setup
@@ -29,10 +30,11 @@ frontend packages and connect that contract.
 ## Install the selected frontend packages
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Start with a running RELKIT backend and a separate React app. Run the following in the **frontend
-package root**, not the backend root. A TypeScript React app also keeps its framework's TypeScript
-and React declarations (`@types/react`) as development tooling. The React leaf selects React/query peers and the required
-OpenTelemetry API; a framework-independent client does not need those React/query peers.
+  Start with a running RELKIT backend and a separate React app. Run the following in the **frontend
+  package root**, not the backend root. A TypeScript React app also keeps its framework's TypeScript
+  and React declarations (`@types/react`) as development tooling. The React leaf selects React/query
+  peers and the required OpenTelemetry API; a framework-independent client does not need those
+  React/query peers.
 </Callout>
 
 <include>/_snippets/generated/installations/client-react.mdx</include>
@@ -77,11 +79,7 @@ example calls the minimal starter's Hello route through the
 [same-origin development proxy](/guides/frontend/connect-react#3-connect-the-local-frontend).
 For a separate backend origin, set `baseUrl` on the provider and configure its cookie/CORS boundary.
 
-<include
-  source="apps/docs/examples/frontend/app.tsx"
-  lang="tsx"
-  meta='title="src/App.tsx"'
->
+<include source="apps/docs/examples/frontend/app.tsx" lang="tsx" meta='title="src/App.tsx"'>
   /_snippets/source/apps/docs/examples/frontend/app.tsx
 </include>
 
@@ -116,18 +114,18 @@ outcomes remain visible for same-key recovery instead of becoming an automatic r
 
 ## Find the right client API
 
-| Task                                          | API                                                         | Example                                                |
-| --------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------ |
-| Call without React                            | `createClient`, `createWebSocketClient`, `createAutoClient` | [Transports](/docs/modules/client/transports)          |
-| Provide clients and inspect connection status | `RelkitClientProvider`, `useRelkitClient`                   | Provider and `Greeting` above                      |
-| Read a route                                  | `useRoute`, `useSuspenseRoute`, `useInfiniteRoute`          | [Route queries](/docs/modules/client/routes)           |
-| Submit a change                               | `useRouteMutation`, `useRouteUtils`                         | [Mutations](/docs/modules/client/mutations)            |
-| Observe a response stream                     | `useStream`                                               | [HTTP streaming](/docs/modules/http/streaming#use-from-the-frontend) |
-| Run or observe an agent                       | `useAgent`                                                | [Agent streaming](/docs/modules/ai/streaming#use-from-the-frontend) |
-| Trigger, observe, or control a job             | `useJobRun`, `useJobTrigger`, `useJobCancel`, `useJobRetry` | [Job clients](/docs/modules/jobs/clients#use-from-react) |
-| Render on the server                          | `createServerClient`, `createRelkitServerContext`           | [Server rendering](/docs/modules/client/ssr)           |
-| Subscribe to channels                         | `useRealtime`, `useChannel`                                 | [Realtime React clients](/docs/modules/realtime/react) |
-| Embed the public fingerprint                   | `withRelkit`, `relkit`                                     | [Build integration](/docs/modules/client/build-integration) |
+| Task                                          | API                                                         | Example                                                              |
+| --------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------- |
+| Call without React                            | `createClient`, `createWebSocketClient`, `createAutoClient` | [Transports](/docs/modules/client/transports)                        |
+| Provide clients and inspect connection status | `RelkitClientProvider`, `useRelkitClient`                   | Provider and `Greeting` above                                        |
+| Read a route                                  | `useRoute`, `useSuspenseRoute`, `useInfiniteRoute`          | [Route queries](/docs/modules/client/routes)                         |
+| Submit a change                               | `useRouteMutation`, `useRouteUtils`                         | [Mutations](/docs/modules/client/mutations)                          |
+| Observe a response stream                     | `useStream`                                                 | [HTTP streaming](/docs/modules/http/streaming#use-from-the-frontend) |
+| Run or observe an agent                       | `useAgent`                                                  | [Agent streaming](/docs/modules/ai/streaming#use-from-the-frontend)  |
+| Trigger, observe, or control a job            | `useJobRun`, `useJobTrigger`, `useJobCancel`, `useJobRetry` | [Job clients](/docs/modules/jobs/clients#use-from-react)             |
+| Render on the server                          | `createServerClient`, `createRelkitServerContext`           | [Server rendering](/docs/modules/client/ssr)                         |
+| Subscribe to channels                         | `useRealtime`, `useChannel`                                 | [Realtime React clients](/docs/modules/realtime/react)               |
+| Embed the public fingerprint                  | `withRelkit`, `relkit`                                      | [Build integration](/docs/modules/client/build-integration)          |
 
 [`useRelkitClient`](/docs/api/client#userelkitclient) must run inside the provider. It exposes
 the client runtime and a `status` of `loading`, `ready`, `error`, or `application-updated`.
