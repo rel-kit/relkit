@@ -3,19 +3,22 @@
  * strategy, preserving schema failures and disabling native silent recovery.
  */
 import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
-import { toolStrategy } from "langchain";
+import { providerStrategy, toolStrategy } from "langchain";
 import { Effect } from "effect";
 import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
+import type { NativeModel } from "./runtime-loop.types.js";
+import { strictResponseSchema } from "./runtime-strict-response-schema.js";
 
 /** Creates the native structured output strategy.
  * @param schema - Authored output validator.
+ * @param model - Resolved model; explicit OpenAI Responses clients use native JSON schema.
  * @returns An Effect with a strategy or AgentInvocationFailure.
  * @example Effect.runSync(responseFormatEffect(output));
  */
 export const responseFormatEffect = Effect.fn("Agents.runtime.responseFormat")(
-  (schema: StandardSchemaV1) =>
+  (schema: StandardSchemaV1, model?: NativeModel) =>
     Effect.try({
       try: () => {
         const projection = getJsonSchema(schema);
@@ -25,16 +28,27 @@ export const responseFormatEffect = Effect.fn("Agents.runtime.responseFormat")(
             "Agent output schema is unavailable",
           );
         }
-        return toolStrategy(
-          {
-            title: "relkit_output",
-            type: "object",
-            properties: { value: projection.schema },
-            required: ["value"],
-            additionalProperties: false,
-          },
-          { handleError: false },
-        );
+        const wrapped = {
+          title: "relkit_output",
+          type: "object" as const,
+          properties: { value: projection.schema },
+          required: ["value"],
+          additionalProperties: false,
+        };
+        // Responses clients can drop string tool_choice; use their native schema channel.
+        if (
+          typeof model === "object" &&
+          model !== null &&
+          "useResponsesApi" in model &&
+          model.useResponsesApi === true
+        ) {
+          const strictSchema = strictResponseSchema(wrapped);
+          return providerStrategy({
+            schema: { ...(strictSchema ?? wrapped), type: "object" },
+            strict: strictSchema !== undefined,
+          });
+        }
+        return toolStrategy(wrapped, { handleError: false });
       },
       catch: agentInvocationFailure,
     }),

@@ -133,6 +133,9 @@ export function modelFailure(cause: unknown, signal: AbortSignal): AgentRuntimeE
   return Effect.runSync(modelFailureEffect(cause, signal));
 }
 
+/** Maps provider failures to safe fields while retaining their non-enumerable diagnostic cause.
+ * @param cause - Native failure; may contain private provider payloads.
+ * @param signal - Invocation cancellation authority. @returns Safe failure without retrying work. */
 function modelFailureCore(cause: unknown, signal: AbortSignal): AgentRuntimeError {
   if (signal.aborted) return signalFailure(signal);
   return cause instanceof AgentRuntimeError && cause.code === "RELKIT_AGENT_RESPONSE_LIMIT"
@@ -140,5 +143,7 @@ function modelFailureCore(cause: unknown, signal: AbortSignal): AgentRuntimeErro
     : new AgentRuntimeError(
         "RELKIT_AGENT_MODEL_ERROR",
         "Model response was invalid or unavailable",
+        undefined,
+        { cause },
       );
 }

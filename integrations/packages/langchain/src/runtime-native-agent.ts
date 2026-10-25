@@ -115,7 +115,7 @@ const nativeAgentCommonEffect = Effect.fn("Agents.runtime.nativeCommon")(functio
   ).pipe(Effect.mapError((failure) => agentInvocationFailure(failure.cause)));
   const limitMiddleware = yield* createNativeLimitMiddlewareEffect(runtime.agent.limits);
   const instructions = yield* nativeInstructionsEffect(runtime.agent);
-  const format = yield* responseFormatEffect(runtime.agent.output);
+  const format = yield* responseFormatEffect(runtime.agent.output, options.model);
   const common = {
     name: runtime.agent.id,
     model: options.model,

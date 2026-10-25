@@ -2,7 +2,9 @@
 
 import { resolveNativeInvocationEffect, invokeNativeWithContextEffect } from "./runtime-invoke.js";
 import { normalizeId } from "@relkit/contracts";
-import { frameworkTrace } from "@relkit/invocation";
+import { frameworkTrace, unexpectedDefect } from "@relkit/invocation";
+import { AgentRuntimeError } from "./runtime-errors.js";
+import { logAgentFailure } from "./runtime-failure-diagnostics.js";
 import { Effect } from "effect";
 import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { createAgentCapturePolicyEffect } from "@relkit/agents/internal/capture-policy";
@@ -64,10 +66,29 @@ export function invokeAgent(
 ): Promise<unknown> {
   return Effect.runPromise(
     invokeAgentEffect(options).pipe(
+      Effect.tapError((failure) => logAgentFailure(failure, options)),
       Effect.catchTag("AgentInvocationFailure", (error) => Effect.fail(error.cause)),
       Effect.provide(AgentExecutionLive),
     ),
   );
+}
+
+/**
+ * Runs an agent once for generated function actions, retaining output failure identity.
+ * @param options - Agent dependencies, invocation identity and cancellation.
+ * @returns Validated output; a failed final response does not undo completed tool actions.
+ * @example await invokeAgentFunction(options);
+ */
+export function invokeAgentFunction(options: AgentRuntimeOptions & AgentInvocationOptions) {
+  return invokeAgent(options).catch((cause) => {
+    if (cause instanceof AgentRuntimeError && cause.code === "RELKIT_AGENT_OUTPUT_VALIDATION")
+      throw unexpectedDefect(cause, {
+        code: cause.code,
+        message:
+          "Agent output validation failed. Tool actions may have completed; check their results before retrying.",
+      });
+    throw cause;
+  });
 }
 
 /** Creates a reusable runtime through an observable Effect.
