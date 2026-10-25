@@ -5,7 +5,7 @@ import {
 } from "../../../../lib/backend-proxy-body";
 import type { JsonValue } from "@relkit/contracts";
 
-const requestHeadersToDrop = ["connection", "content-length", "host"];
+const requestHeadersToDrop = ["connection", "host", "transfer-encoding"];
 const responseHeadersToDrop = ["connection", "content-encoding", "content-length"];
 const OPENAPI_PATH = "_relkit/v1/openapi.json";
 const INSPECTOR_BACKEND_PATH = "/_relkit/backend";
@@ -39,6 +39,7 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
       method: request.method,
       headers,
       body: hasBody ? await readInspectorProxyBody(request) : undefined,
+      duplex: "half",
       redirect: "manual",
       signal: request.signal,
     });
@@ -46,7 +47,10 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
     if (error instanceof InspectorProxyBodyError)
       return Response.json({ error: "Request body exceeds one MiB" }, { status: 413 });
     if (request.signal.aborted) return new Response(null, { status: 499 });
-    throw error;
+    return Response.json(
+      { error: "RELKIT inspector backend is unavailable." },
+      { status: 503, headers: { "cache-control": "no-store" } },
+    );
   }
   const responseHeaders = new Headers(response.headers);
   for (const name of responseHeadersToDrop) responseHeaders.delete(name);

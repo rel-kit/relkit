@@ -15,6 +15,8 @@ export const forwardBackend = Effect.fn("Inspector.forwardBackend")(function* (
   const url = new URL(request.url);
   const headers = new Headers(request.headers);
   headers.delete("x-relkit-inspector-token");
+  headers.delete("connection");
+  headers.delete("transfer-encoding");
   const response = yield* remote.request(
     connection,
     `${url.pathname}${url.search}`,
@@ -22,7 +24,10 @@ export const forwardBackend = Effect.fn("Inspector.forwardBackend")(function* (
       method: request.method,
       headers,
       signal: request.signal,
-      ...(request.body === null ? {} : { body: request.body, duplex: "half" }),
+      // Re-stream decoded bytes: Bun 1.3.10's native chunked passthrough can produce empty 400s.
+      ...(request.body === null
+        ? {}
+        : { body: request.body.pipeThrough(new TransformStream()), duplex: "half" }),
     },
     target,
   );

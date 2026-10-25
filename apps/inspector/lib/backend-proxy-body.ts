@@ -1,9 +1,13 @@
-/** Bounds browser mutation bodies before the Node UI forwards bytes to its private backend. */
+/** Rejects oversized control bodies before the Node UI forwards them to its private backend. */
 export class InspectorProxyBodyError extends Error {}
 
-/** Reads at most one MiB, including streamed requests without content-length. */
-export async function readInspectorProxyBody(request: Request): Promise<Uint8Array | undefined> {
+/** Streams app uploads to their route limits; control bodies remain bounded before forwarding. */
+export async function readInspectorProxyBody(
+  request: Request,
+): Promise<Uint8Array | ReadableStream<Uint8Array> | undefined> {
   if (request.body === null) return undefined;
+  if (!/^\/_relkit\/backend\/(?:_relkit\/v1|rpc)(\/|$)/.test(new URL(request.url).pathname))
+    return request.body;
   const length = request.headers.get("content-length");
   if (length !== null && (!/^\d+$/.test(length) || Number(length) > 1_048_576))
     throw new InspectorProxyBodyError("Request body exceeds one MiB");

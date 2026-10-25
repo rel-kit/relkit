@@ -27,7 +27,10 @@ test("native bridge keeps session identity across target changes and releases it
   const backend = Bun.serve({
     port: 0,
     hostname: "127.0.0.1",
-    fetch: () => Response.json({ live: true }),
+    fetch: async (request) =>
+      request.method === "POST"
+        ? Response.json({ bytes: (await request.arrayBuffer()).byteLength })
+        : Response.json({ live: true }),
   });
   let endpoint = "";
   let path = "";
@@ -86,6 +89,15 @@ const probeBridge = Effect.fn("test.nativeBridge")(function* (root: string, back
     generationId: "two",
     sessionId: connection.descriptor.sessionId,
   });
+  const upload = yield* Effect.promise(() =>
+    fetch(`${endpoint}/uploads`, {
+      method: "POST",
+      headers: { ...options.headers, "x-relkit-generation-id": "two" },
+      body: new Uint8Array(1_100_000),
+    }),
+  );
+  expect(upload.status).toBe(200);
+  expect(yield* Effect.promise(() => upload.json())).toEqual({ bytes: 1_100_000 });
   const response = yield* Effect.promise(() => fetch(`${endpoint}/_relkit/v1/graph`, options));
   expect(yield* Effect.promise(() => response.json())).toEqual({ live: true });
   expect((yield* Effect.promise(() => fetch(`${endpoint}/v1/handshake`))).status).toBe(401);

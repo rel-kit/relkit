@@ -4,15 +4,18 @@ import { readInspectorProxyBody } from "./backend-proxy-body";
 
 test("preserves bounded mutation bytes and rejects oversized declared or streamed bodies", async () => {
   expect(
-    new TextDecoder().decode(
+    await new Response(
       await readInspectorProxyBody(
-        new Request("http://ui", { method: "POST", body: '{"operationId":"same"}' }),
+        new Request("http://ui/_relkit/backend/rpc", {
+          method: "POST",
+          body: '{"operationId":"same"}',
+        }),
       ),
-    ),
+    ).text(),
   ).toBe('{"operationId":"same"}');
   await expect(
     readInspectorProxyBody(
-      new Request("http://ui", {
+      new Request("http://ui/_relkit/backend/rpc", {
         method: "POST",
         body: "{}",
         headers: { "content-length": "1048577" },
@@ -29,7 +32,20 @@ test("preserves bounded mutation bytes and rejects oversized declared or streame
     },
   });
   await expect(
-    readInspectorProxyBody(new Request("http://ui", { method: "POST", body, duplex: "half" })),
+    readInspectorProxyBody(
+      new Request("http://ui/_relkit/backend/rpc", { method: "POST", body, duplex: "half" }),
+    ),
   ).rejects.toThrow();
   expect(canceled).toBe(true);
+});
+
+test("streams application uploads without consuming or applying a control limit", async () => {
+  const request = new Request("http://ui/_relkit/backend/uploads", {
+    method: "POST",
+    body: new Uint8Array(1_100_000),
+  });
+  const body = await readInspectorProxyBody(request);
+  expect(body).toBe(request.body);
+  expect(request.bodyUsed).toBe(false);
+  expect((await new Response(body).arrayBuffer()).byteLength).toBe(1_100_000);
 });

@@ -4,6 +4,7 @@ import { Effect, Ref } from "effect";
 import type { InspectionConnectionFile } from "@relkit/inspector-api/connection";
 import { inspectorBackend } from "../src/tool-backend.js";
 import { InspectorRemote } from "../src/remote.service.js";
+import { forwardBackend } from "../src/backend-forward.js";
 import { acquireLiveEvents } from "../src/live-events.js";
 import type { InspectorToolState } from "../src/tool-state.types.js";
 import type { InspectorRemoteOperations } from "../src/remote.types.js";
@@ -20,6 +21,27 @@ const connection: InspectionConnectionFile = {
     process: { pid: 1, startedAt: "2026-10-23T00:00:00.000Z" },
   },
 };
+
+test("stream forwarding drops incoming hop framing before Fetch chooses outgoing framing", async () => {
+  const request = new Request("http://localhost/uploads", {
+    method: "POST",
+    headers: { "transfer-encoding": "chunked", connection: "keep-alive" },
+    body: "upload",
+    duplex: "half",
+  });
+  const remote: InspectorRemoteOperations = {
+    request: (_connection, _path, options) =>
+      Effect.promise(async () => {
+        const headers = new Headers(options?.headers);
+        expect(headers.has("transfer-encoding")).toBe(false);
+        expect(headers.has("connection")).toBe(false);
+        expect(await new Response(options?.body).text()).toBe("upload");
+        return new Response(null, { status: 201 });
+      }),
+    json: () => Effect.die("must not decode"),
+  };
+  expect((await Effect.runPromise(forwardBackend(remote, connection, request))).status).toBe(201);
+});
 
 /** Only authenticated negotiated sessions can become forwarding authority. */
 function state(): InspectorToolState {

@@ -41,7 +41,8 @@ const listenInspection: InspectionNativeOperations["listen"] = (options, handler
           Bun.serve({
             hostname: options.host,
             port: options.port,
-            maxRequestBodySize: 1_048_576,
+            // Control readers bound their bytes; streamed app requests use the application's limits.
+            maxRequestBodySize: Infinity,
             fetch: (request) =>
               run(
                 handler(request).pipe(

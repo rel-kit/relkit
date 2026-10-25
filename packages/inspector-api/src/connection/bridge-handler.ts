@@ -92,15 +92,15 @@ const serveInspection = Effect.fn("Inspection.serve")(function* (
 /** JSON validation belongs to control APIs; route-console bodies retain their native media type. */
 const boundedRequest = Effect.fn("Inspection.boundedRequest")(function* (request: Request) {
   const control = /^\/(?:_relkit\/v1|rpc)(\/|$)/.test(new URL(request.url).pathname);
-  const bytes = yield* readInspectionBody(request, control);
-  if (control)
-    yield* Schema.decodeUnknownEffect(Schema.fromJsonString(Schema.Json))(
-      new TextDecoder().decode(bytes),
-    ).pipe(
-      Effect.mapError(
-        (cause) => new InspectionConnectionError({ operation: "body.invalid-json", cause }),
-      ),
-    );
+  if (!control) return request;
+  const bytes = yield* readInspectionBody(request);
+  yield* Schema.decodeUnknownEffect(Schema.fromJsonString(Schema.Json))(
+    new TextDecoder().decode(bytes),
+  ).pipe(
+    Effect.mapError(
+      (cause) => new InspectionConnectionError({ operation: "body.invalid-json", cause }),
+    ),
+  );
   return new Request(request.url, {
     method: request.method,
     headers: request.headers,
