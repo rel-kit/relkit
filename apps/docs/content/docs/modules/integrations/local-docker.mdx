@@ -18,16 +18,16 @@ fields still belong in `defineEnv`. Keep all existing profiles and state when ad
 
 ## Supported local services
 
-| Capability | Default local setup | Configuration and environment |
-| --- | --- | --- |
-| Buckets | MinIO through `docker(s3())` | [Storage pre-setup](/docs/modules/storage#pre-setup); generated local credentials |
-| Caches | Redis through `docker(redis())` | [Caching pre-setup](/docs/modules/caching#pre-setup); generated connection |
-| Realtime | Redis through `docker(redisRealtime())` | [Realtime pre-setup](/docs/modules/realtime#pre-setup) |
-| Agent state | Redis through `docker(redisAgentState())` | [AI pre-setup](/docs/modules/ai#pre-setup); model secrets are separate |
-| Native jobs | Docker Inngest, Trigger.dev, or Effect MQ | [Jobs pre-setup](/docs/modules/jobs#pre-setup); provider-specific composite recipes |
-| Application database | PostgreSQL through an application-owned Compose file | [Database pre-setup](/docs/modules/database/local-docker); `DATABASE_URL` |
-| Application events | Filesystem provider; no Docker recipe | [Events pre-setup](/docs/modules/events#pre-setup); preserve `.relkit/state` |
-| HTTP, local logs, Inspector | No external service required | [HTTP](/docs/modules/http#pre-setup) and [Operations](/docs/modules/operations#pre-setup) |
+| Capability                  | Default local setup                                  | Configuration and environment                                                             |
+| --------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Buckets                     | MinIO through `docker(s3())`                         | [Storage pre-setup](/docs/modules/storage#pre-setup); generated local credentials         |
+| Caches                      | Redis through `docker(redis())`                      | [Caching pre-setup](/docs/modules/caching#pre-setup); generated connection                |
+| Realtime                    | Redis through `docker(redisRealtime())`              | [Realtime pre-setup](/docs/modules/realtime#pre-setup)                                    |
+| Agent state                 | Redis through `docker(redisAgentState())`            | [AI pre-setup](/docs/modules/ai#pre-setup); model secrets are separate                    |
+| Native jobs                 | Docker Inngest, Trigger.dev, or Effect MQ            | [Jobs pre-setup](/docs/modules/jobs#pre-setup); provider-specific composite recipes       |
+| Application database        | PostgreSQL through an application-owned Compose file | [Database pre-setup](/docs/modules/database/local-docker); `DATABASE_URL`                 |
+| Application events          | Filesystem provider; no Docker recipe                | [Events pre-setup](/docs/modules/events#pre-setup); preserve `.relkit/state`              |
+| HTTP, local logs, Inspector | No external service required                         | [HTTP](/docs/modules/http#pre-setup) and [Operations](/docs/modules/operations#pre-setup) |
 
 The database Compose service is managed with `docker compose`, not `relkit local`.
 Connected Cloudflare KV/R2, hosted models, Sentry, and OTLP have no bundled local Docker recipe.
@@ -35,9 +35,9 @@ Connected Cloudflare KV/R2, hosted models, Sentry, and OTLP have no bundled loca
 ## Current bundled images
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-First complete the selected [Redis cache](/guides/caching/cache-product-prices) or
-[S3/MinIO bucket](/guides/storage/upload-product-images) installation. Each selects its adapter plus
-`@relkit/docker`; installing the materializer alone supplies no Redis/S3 adapter or binding.
+  First complete the selected [Redis cache](/guides/caching/cache-product-prices) or [S3/MinIO
+  bucket](/guides/storage/upload-product-images) installation. Each selects its adapter plus
+  `@relkit/docker`; installing the materializer alone supplies no Redis/S3 adapter or binding.
 </Callout>
 
 The integration packages pin an immutable digest. A RELKIT package release therefore

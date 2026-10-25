@@ -11,7 +11,11 @@ depend on checked capability contracts; integrations connect those contracts to 
 telemetry exporters, local Docker services, and deployment platforms.
 
 <Callout type="tip" title="Start here" icon="route">
-For your first local integration, follow [Cache product prices](/guides/caching/cache-product-prices) for Redis or [Upload product images](/guides/storage/upload-product-images) for MinIO. Both include installation, configuration, and verification. The [integration references](/docs/api#integrations) list each package's exact APIs.
+  For your first local integration, follow [Cache product
+  prices](/guides/caching/cache-product-prices) for Redis or [Upload product
+  images](/guides/storage/upload-product-images) for MinIO. Both include installation,
+  configuration, and verification. The [integration references](/docs/api#integrations) list each
+  package's exact APIs.
 </Callout>
 
 ## Pre-setup
@@ -22,12 +26,17 @@ a local recipe; the wrapper supplies development connection values. Follow the m
 setup before adding its first resource:
 
 <CardGroup cols={2}>
-<Card title="Buckets and MinIO" href="/docs/modules/storage#pre-setup" icon="hard-drive" arrow />
-<Card title="Cache and Redis" href="/docs/modules/caching#pre-setup" icon="zap" arrow />
-<Card title="Realtime and Redis" href="/docs/modules/realtime#pre-setup" icon="radio" arrow />
-<Card title="Native task providers" href="/docs/modules/jobs#pre-setup" icon="list-todo" arrow />
-<Card title="PostgreSQL and auth" href="/docs/modules/database/local-docker" icon="database" arrow />
-<Card title="Agent state" href="/docs/modules/ai#pre-setup" icon="bot" arrow />
+  <Card title="Buckets and MinIO" href="/docs/modules/storage#pre-setup" icon="hard-drive" arrow />
+  <Card title="Cache and Redis" href="/docs/modules/caching#pre-setup" icon="zap" arrow />
+  <Card title="Realtime and Redis" href="/docs/modules/realtime#pre-setup" icon="radio" arrow />
+  <Card title="Native task providers" href="/docs/modules/jobs#pre-setup" icon="list-todo" arrow />
+  <Card
+    title="PostgreSQL and auth"
+    href="/docs/modules/database/local-docker"
+    icon="database"
+    arrow
+  />
+  <Card title="Agent state" href="/docs/modules/ai#pre-setup" icon="bot" arrow />
 </CardGroup>
 
 Named connection bindings such as `binding.secret(...)` select provider values; `defineEnv`
@@ -47,9 +56,9 @@ identifies providers without a recipe.
 | `@relkit/otlp`        | OTLP trace exporter                                                              | [Observability](/docs/modules/operations/observability)       |
 | `@relkit/docker`      | Local-recipe selector and Docker materializer                                    | [Local Docker](/docs/modules/integrations/local-docker)       |
 | `@relkit/local`       | Filesystem event/job, realtime and agent-state profiles; local lifecycle support | [Local providers](/docs/modules/integrations/local-providers) |
-| `@relkit/aws`         | AWS host, infrastructure ownership, and access materialization                   | [AWS deployment](/docs/modules/deployment/aws)             |
-| `@relkit/pulumi`      | Pulumi deployment engine                                                         | [Deployment](/docs/modules/deployment)             |
-| `@relkit/cloudflare`  | R2/KV runtime adapters; no application host                                       | [Connected providers](/docs/modules/deployment/providers) |
+| `@relkit/aws`         | AWS host, infrastructure ownership, and access materialization                   | [AWS deployment](/docs/modules/deployment/aws)                |
+| `@relkit/pulumi`      | Pulumi deployment engine                                                         | [Deployment](/docs/modules/deployment)                        |
+| `@relkit/cloudflare`  | R2/KV runtime adapters; no application host                                      | [Connected providers](/docs/modules/deployment/providers)     |
 | `@relkit/inngest`     | Native durable-task adapter and account-free Docker recipe                       | [Jobs](/docs/modules/jobs/providers/inngest)                  |
 | `@relkit/trigger`     | Trigger.dev task adapter and worker publication                                  | [Jobs](/docs/modules/jobs/providers/trigger)                  |
 | `@relkit/effect-mq`   | PostgreSQL-backed retryable task adapter                                         | [Jobs](/docs/modules/jobs/providers/effect-mq)                |
