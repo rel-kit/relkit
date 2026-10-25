@@ -11,9 +11,10 @@ Publish an event from the function that performs the operation, so other functio
 ## Publish from a function
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Complete the [event runtime installation and binding](/guides/events/react-to-order-events#install-and-bind-the-selected-event-runtime)
-before publishing. Acceptance requires the selected profile; a function's `publishes` list grants a
-checked capability but does not install its runtime package.
+  Complete the [event runtime installation and
+  binding](/guides/events/react-to-order-events#install-and-bind-the-selected-event-runtime) before
+  publishing. Acceptance requires the selected profile; a function's `publishes` list grants a
+  checked capability but does not install its runtime package.
 </Callout>
 
 First, [define `orders.created`](/docs/modules/events/define). Then publish it from the `defineFunction` that creates the order:
