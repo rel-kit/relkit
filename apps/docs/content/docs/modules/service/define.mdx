@@ -11,7 +11,8 @@ operations and event contracts that should form that boundary. `defineService` i
 `@relkit/app/services`.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Start with an [existing application](/docs/learn/create-an-app). Services use the app package already installed by the starter.
+  Start with an [existing application](/docs/learn/create-an-app). Services use the app package
+  already installed by the starter.
 </Callout>
 
 ## Scaffold a service
@@ -111,7 +112,11 @@ name does not create a new operation.
 The service boundary is internal to the backend. Expose its selected functions through a route
 before calling them from the browser. These are the same Orders members declared above:
 
-<include source="examples/commerce/src/routes/orders/route.ts" lang="ts" meta='title="src/routes/orders/route.ts — backend"'>
+<include
+  source="examples/commerce/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/route.ts — backend"'
+>
   /_snippets/source/examples/commerce/src/routes/orders/route.ts
 </include>
 
@@ -222,7 +227,6 @@ disallowed imports. Once the checks pass, [connect public functions to routes](/
 or [test a first service end to end](/docs/modules/service/first-service).
 
 <include>/_snippets/generated/related/docs-modules-service-define.mdx</include>
-
 
 ## Scaffold domain constants
 
