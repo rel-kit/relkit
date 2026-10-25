@@ -305,7 +305,11 @@ declare const createRedisAgentStateProvider: (
 
 ## `client.ts`
 
+Owns the native Redis connection; a later operation can reconnect without replaying failed commands.
+
 ### RedisClientOptions (interface)
+
+Owns the native Redis connection; a later operation can reconnect without replaying failed commands.
 
 **Signature**
 
@@ -316,7 +320,7 @@ export interface RedisClientOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L2)
 
 ### RedisProtocolClient (interface)
 
@@ -344,9 +348,11 @@ export interface RedisProtocolClient {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L7)
 
 ### createRedisClient
+
+Creates a protocol client whose next connection attempt replaces a failed native socket.
 
 **Signature**
 
@@ -354,7 +360,7 @@ export interface RedisProtocolClient {
 declare const createRedisClient: (options: RedisClientOptions) => RedisProtocolClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L30)
 
 ## `index.ts`
 
