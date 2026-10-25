@@ -10,7 +10,6 @@ Map HTTP parameters, headers, and body fields into the input expected by your fu
 business data, not a framework request object. Keep parsing choices on the route and reusable constraints
 in the [function's schema](/docs/learn/concepts/schemas).
 
-
 ## Start with inference
 
 When `request` is omitted, RELKIT projects the target's object input schema:
@@ -126,4 +125,3 @@ HTTP middleware can inspect native request details, but function calls from jobs
 or other domains do not receive a fabricated HTTP request. Pass business data explicitly.
 
 <include>/_snippets/generated/related/docs-modules-http-requests.mdx</include>
-
