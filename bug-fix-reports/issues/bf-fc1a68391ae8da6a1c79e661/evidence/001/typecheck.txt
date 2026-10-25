@@ -1,0 +1,1 @@
+bun x tsc --noEmit -p apps/inspector/tsconfig.json: exit code 0; no diagnostics.

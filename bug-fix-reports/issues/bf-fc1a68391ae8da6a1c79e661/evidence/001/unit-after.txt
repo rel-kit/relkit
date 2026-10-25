@@ -1,0 +1,24 @@
+bun test v1.3.10 (30e609e0)
+
+apps/inspector/next-config.test.ts:
+(pass) builds a standalone inspector distribution [0.05ms]
+(pass) proxies browser backend requests using runtime configuration [20.94ms]
+(pass) adds the inspector proxy base to proxied OpenAPI documents [2.97ms]
+(pass) forwards the browser abort signal to the upstream request [0.11ms]
+(pass) keeps proxy route segments inside the configured backend origin [0.26ms]
+(pass) rejects non-local proxy backends [0.07ms]
+
+apps/inspector/tests/api-reference.test.ts:
+(pass) Scalar links point to an inspector-owned page [0.04ms]
+(pass) serves Scalar using the proxied OpenAPI document without a backend UI [0.35ms]
+
+apps/inspector/lib/accessibility-contract.test.ts:
+(pass) inspector accessibility contract > critical forms expose names, descriptions, errors, and live status [2.33ms]
+(pass) inspector accessibility contract > critical actions use semantic groups and an accessible modal confirmation [0.82ms]
+(pass) inspector accessibility contract > the API reference opens Scalar directly in a new tab [0.26ms]
+(pass) inspector accessibility contract > provider and runtime topology panels expose accessible headings [0.33ms]
+
+ 12 pass
+ 0 fail
+ 53 expect() calls
+Ran 12 tests across 3 files. [111.00ms]

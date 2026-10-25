@@ -1,0 +1,18 @@
+
+/Users/mustafaelsayed/Workspace/relkit/apps/inspector/app/api-reference/page.tsx
+  0:0  warning  File ignored because no matching configuration was supplied
+
+/Users/mustafaelsayed/Workspace/relkit/apps/inspector/app/scalar/route.ts
+  0:0  warning  File ignored because no matching configuration was supplied
+
+/Users/mustafaelsayed/Workspace/relkit/apps/inspector/lib/api-reference.ts
+  0:0  warning  File ignored because no matching configuration was supplied
+
+/Users/mustafaelsayed/Workspace/relkit/apps/inspector/tests/api-reference.test.ts
+  0:0  warning  File ignored because no matching configuration was supplied
+
+/Users/mustafaelsayed/Workspace/relkit/tests/e2e/inspector-redesign.spec.ts
+  0:0  warning  File ignored because no matching configuration was supplied
+
+✖ 5 problems (0 errors, 5 warnings)
+

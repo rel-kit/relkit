@@ -1,0 +1,93 @@
+Open Search
+Search
+KEYBOARD SHORTCUT:
+COMMAND
+⌘ K
+Ask AI
+Introduction
+hello
+Close Group - hello
+/hello
+HTTP METHOD: 
+GET
+Developer
+Portals
+Scalar embraces open standards and makes it easy for you to embrace them too. Join the open-source community and start building on open foundations.
+WWW.SCALAR.COM
+SDKs
+SCALAR.COM
+SOFTWARE • DEVELOPMENT • KITS
+SCALAR.COM
+AT YOUR SERVICE
+Agent Scalar
+©
+Instantly generate SDKs, MCPs & docs for your API
+Generate SDKs & MCP
+Powered by Scalar
+Developer Tools
+Configure
+Share
+Deploy
+Generate SDK
+v7
+OpenAPI 3.1.0
+relkit-demo-77
+Download OpenAPI Document
+Download OpenAPI Document
+Server
+Server:
+http://127.0.0.1:3210/_relkit/backend
+Client Libraries
+Shell
+Ruby
+Node.js
+PHP
+Python
+Select from all clients
+Shell Curl
+Generate SDK
+hello ​
+Copy link
+hello
+Operations
+GET
+/hello
+/hello​
+Copy link
+Copy as Markdown
+Query Parameters
+name
+Type:
+string
+min length:  
+1
+Default
+Copy link to name
+Responses
+200
+Successful response
+application/json
+422
+Validation error
+application/json
+Request Example for
+GET/hello
+Shell Curl
+curl 'http://127.0.0.1:3210/_relkit/backend/hello?name=world'
+
+Generate SDK
+Ask AI Agent
+Test Request
+(get /hello)
+STATUS:
+200
+SUCCESSFUL RESPONSE
+STATUS:
+422
+VALIDATION ERROR
+Show Schema
+{
+  "message": "string"
+}
+
+Successful response

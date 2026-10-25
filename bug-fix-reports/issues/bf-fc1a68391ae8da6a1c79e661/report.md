@@ -1,0 +1,198 @@
+# bf-fc1a68391ae8da6a1c79e661: Inspector Scalar link returns 404 for default applications.
+
+Status: **verified**
+Attempt: 1 · Updated: 2026-10-25T19:12:50+00:00
+
+## What
+
+Inspector Scalar link returns 404 for default applications.
+
+## Expected
+
+The standalone inspector opens Scalar using the application OpenAPI document.
+
+## Observed before
+
+The navigation targeted an optional backend UI route; the OpenAPI document itself returned 200.
+
+## Root cause
+
+apps/inspector/lib/api-reference.ts linked to the backend Scalar endpoint even though default applications do not select apiDocs.ui=scalar.
+
+## Fixed by
+
+Host Scalar at the inspector /scalar route, load the same-origin OpenAPI proxy, and update the shared navigation URL and browser regression. Rebuilt and restarted the local standalone inspector.
+
+## Changed files
+
+- apps/inspector/app/scalar/route.ts
+- apps/inspector/lib/api-reference.ts
+- apps/inspector/app/api-reference/page.tsx
+- apps/inspector/tests/api-reference.test.ts
+- tests/e2e/inspector-redesign.spec.ts
+- tests/e2e/inspector-redesign.spec.ts-snapshots/api-reference-darwin.png
+
+## Reproduction
+
+- Run default demo77 with inspector enabled and no apiDocs.ui setting
+- Open the inspector Scalar link
+- Observe 404 while OpenAPI JSON returns 200
+
+## Evidence
+
+- before: [api](evidence/001/runtime-before.txt) — Original link returns 404
+- after: [api](evidence/001/runtime-after.txt) — Fixed navigation target returns Scalar HTML
+- after: [api](evidence/001/try-it.txt) — Real browser request succeeds
+
+## Scope
+
+```json
+{
+  "modules": [
+    "InspectorApiReference"
+  ],
+  "entrypoints": [
+    "GET /scalar",
+    "GET /_relkit/backend/_relkit/v1/openapi.json"
+  ],
+  "invariants": [
+    "Backend Scalar stays optional",
+    "Try requests use the existing same-origin application proxy"
+  ]
+}
+```
+
+## Environment
+
+```json
+{
+  "package": "apps/inspector",
+  "target": "http://127.0.0.1:3210",
+  "api_exposed": true,
+  "e2e_available": true,
+  "revision": "183a82007f43fb94258261142ed689bc063a7679 + local Scalar inspector fix",
+  "role": "local developer"
+}
+```
+
+## Verification
+
+```json
+{
+  "unit": {
+    "before": {
+      "status": "failed",
+      "command": "bun test apps/inspector/tests/api-reference.test.ts",
+      "cwd": ".",
+      "exit_code": 1,
+      "assertion": "Scalar navigation targets the inspector-owned page",
+      "output": "evidence/001/unit-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "bun test apps/inspector/tests/api-reference.test.ts apps/inspector/next-config.test.ts apps/inspector/lib/accessibility-contract.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Scalar navigation targets the inspector-owned page; HTML uses the OpenAPI proxy",
+      "output": "evidence/001/unit-after.txt"
+    }
+  },
+  "runtime": {
+    "kind": "api",
+    "boundary": "Inspector navigation -> UI HTML endpoint",
+    "dependencies": [
+      "Real standalone inspector",
+      "Running demo77 backend"
+    ],
+    "steps": [
+      "Request navigation target",
+      "Render Scalar document",
+      "Execute GET /hello through proxy"
+    ],
+    "before": {
+      "status": "failed",
+      "command": "curl --fail-with-body -i http://127.0.0.1:3210/_relkit/backend/_relkit/v1/api-reference",
+      "cwd": ".",
+      "exit_code": 22,
+      "assertion": "The Scalar navigation target serves HTML successfully",
+      "output": "evidence/001/runtime-before.txt"
+    },
+    "after": {
+      "status": "passed",
+      "command": "curl --fail-with-body -i http://127.0.0.1:3210/scalar",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "The Scalar navigation target serves HTML successfully",
+      "output": "evidence/001/runtime-after.txt"
+    }
+  },
+  "e2e": {
+    "status": "passed",
+    "command": "Owned playwrightSuite/runPlaywright harness: bun x playwright test tests/e2e/inspector-redesign.spec.ts --grep \"renders the Scalar reference\"",
+    "cwd": ".",
+    "exit_code": 0,
+    "assertion": "API reference link, screenshot and inspector-owned HTML route pass",
+    "output": "evidence/001/e2e-after.txt"
+  },
+  "regressions": [
+    {
+      "status": "passed",
+      "command": "Bun Playwright Chromium browser: open /scalar, Test Request (get /hello), Send get request, assert response",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Real demo77 Scalar UI renders and sends a proxied GET /hello returning 200 and Hello, world!",
+      "output": "evidence/001/try-it.txt",
+      "kind": "api",
+      "boundary": "Scalar browser -> inspector proxy -> demo77 real application"
+    }
+  ],
+  "checks": [
+    {
+      "name": "inspector tests",
+      "status": "passed",
+      "command": "bun test apps/inspector/lib apps/inspector/tests apps/inspector/next-config.test.ts",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "80 tests pass",
+      "output": "evidence/001/inspector-tests.txt"
+    },
+    {
+      "name": "typecheck",
+      "status": "passed",
+      "command": "bun x tsc --noEmit -p apps/inspector/tsconfig.json",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "No diagnostics",
+      "output": "evidence/001/typecheck.txt"
+    },
+    {
+      "name": "format",
+      "status": "passed",
+      "command": "bun x prettier --check [changed source files]",
+      "cwd": ".",
+      "exit_code": 0,
+      "assertion": "Changed source files formatted",
+      "output": "evidence/001/format.txt"
+    }
+  ],
+  "limitations": [
+    "Full monorepo suite was not run.",
+    "Scalar uses its existing upstream CDN distribution and requires network access."
+  ]
+}
+```
+
+## Related reports
+
+```json
+[]
+```
+
+## Notes
+
+```json
+[
+  "Production next build and standalone packaging succeeded; demo77 inspector restarted on 3210. Backend kept running.",
+  "The browser fixture has no public OpenAPI document endpoint; the existing E2E checks inspector navigation and HTML while real demo77 browser validation covers document rendering and Try Request."
+]
+```
