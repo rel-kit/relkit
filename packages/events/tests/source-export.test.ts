@@ -57,7 +57,11 @@ function sourceFiles(directory: string): SourceFile[] {
     for (const entry of readdirSync(current, { withFileTypes: true })) {
       const path = join(current, entry.name);
       if (entry.isDirectory()) {
-        if (!/^(dist|node_modules|\.turbo|\.relkit|\.next|\.next-packaged)$/.test(entry.name))
+        if (
+          !/^(dist|node_modules|\.turbo|\.relkit|\.next|\.next-packaged|\.blume|\.blume-verify)$/.test(
+            entry.name,
+          )
+        )
           pending.push(path);
       } else if (entry.isFile() && /\.(?:ts|tsx|mts|cts|js|jsx|mjs|cjs|json)$/.test(entry.name)) {
         paths.push(relative(directory, path));
@@ -71,13 +75,13 @@ function sourceFiles(directory: string): SourceFile[] {
 }
 
 function repositorySources(): SourceFile[] {
-  return scanRoots
-    .flatMap((root) => sourceFiles(join(repositoryRoot, root)))
-    .filter(({ path }) => !scanGuardFiles.has(path));
+  return scanRoots.flatMap((root) => sourceFiles(join(repositoryRoot, root)));
 }
 
 function violations(files: readonly SourceFile[]): string[] {
-  return files.flatMap(({ path, text }) => {
+  return files.flatMap(({ path: publishedPath, text }) => {
+    const path = publishedPath.replace(/^apps\/docs\/content\/_snippets\/source\//, "");
+    if (scanGuardFiles.has(path)) return [];
     const findings: string[] = [];
     if (forbiddenSuffix.test(path)) findings.push(`${path}:source-suffix`);
     if (
@@ -162,4 +166,16 @@ test("archived evaluation JSON preserves observations without exempting executab
   expect(violations([{ path: executable, text: `export const name = "${term}";` }])).toEqual([
     `${executable}:source-name`,
   ]);
+});
+
+test("documentation source mirrors retain their original terminology boundary", () => {
+  const prefix = "apps/docs/content/_snippets/source/";
+  const historical = `${evidencePathPrefix}capability-matrix.json`;
+  const executable = "packages/events/src/index.ts";
+  expect(violations([{ path: prefix + historical, text: `{"observation":"${term}"}` }])).toEqual(
+    [],
+  );
+  expect(
+    violations([{ path: prefix + executable, text: `export const name = "${term}";` }]),
+  ).toEqual([`${executable}:source-name`]);
 });

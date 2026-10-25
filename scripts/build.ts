@@ -9,15 +9,16 @@ import { ScaffoldProcessFailure } from "./scaffold-process.errors.js";
 import { runBenchmarkMain } from "./dev-readiness/benchmark-main.js";
 
 /** Validates metadata before owning editor snapshots and running every native build task.
- * @returns Completion after the build child and both declaration restorations settle. */
+ * @returns Completion after the build child and Inspector declaration restoration settle. */
 const buildWorkspace = Effect.fn("WorkspaceBuild.run")(function* () {
   const root = resolve(import.meta.dir, "..");
   yield* buildStep(root, "metadata", ["run", "scripts/sync-release.ts"]);
-  for (const path of ["apps/inspector/next-env.d.ts", "apps/docs/next-env.d.ts"])
-    yield* Effect.acquireRelease(
-      scaffoldNative("build.snapshot", () => snapshotFile(join(root, path))),
-      (snapshot) => scaffoldNative("build.restore", () => restoreFile(snapshot)).pipe(Effect.orDie),
-    );
+  yield* Effect.acquireRelease(
+    scaffoldNative("build.snapshot", () =>
+      snapshotFile(join(root, "apps/inspector/next-env.d.ts")),
+    ),
+    (snapshot) => scaffoldNative("build.restore", () => restoreFile(snapshot)).pipe(Effect.orDie),
+  );
   yield* buildStep(root, "workspace", ["x", "turbo", "run", "build", "--concurrency=1"]);
   yield* Effect.sync(() => console.log("Workspace build passed."));
 });

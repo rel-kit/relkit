@@ -15,9 +15,11 @@ import { createDevLocalCompiler } from "../../../packages/cli/src/commands/dev-l
 async function generatedProject(root: string, inspected: boolean) {
   const projectRoot = join(root, "example");
   const repository = resolve(import.meta.dirname, "../../..");
+  const { jobs, ...defaults } = CREATE_OPTION_DEFAULTS;
   await generateProject(
     {
-      ...CREATE_OPTION_DEFAULTS,
+      ...defaults,
+      ...(jobs === undefined ? {} : { jobs }),
       name: "example",
       directory: projectRoot,
       install: false,

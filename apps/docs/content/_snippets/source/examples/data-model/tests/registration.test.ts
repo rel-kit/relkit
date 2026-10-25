@@ -28,7 +28,7 @@ for (const failMembership of [false, true]) {
         },
         dispose: (database) => database.$client.close(),
       });
-      const handle = await activateDrizzleService(definition);
+      const handle = await activateDrizzleService(definition, {});
       try {
         migrate(handle.client, { migrationsFolder: "src/services/database/migrations" });
         const registration = invokeFunction(
