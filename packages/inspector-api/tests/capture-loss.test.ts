@@ -22,7 +22,9 @@ test("duplicate and older reports cannot multiply loss; one diagnostic is retain
       yield* capture.producer(report(3, 2));
       yield* capture.producer(report(1, 1));
       yield* capture.producer(report(4, 2));
-      const result = yield* capture.records(new Request("http://localhost/v1/records"));
+      const result = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records"),
+      );
       expect(yield* Effect.promise(() => result.json())).toMatchObject({
         incomplete: true,
         producerFailed: 4,
@@ -38,7 +40,9 @@ test("invalid producer counters fail before changing capture", async () => {
     Effect.gen(function* () {
       const capture = yield* InspectionCapture.make({});
       expect((yield* Effect.result(capture.producer(report(-1, 0))))._tag).toBe("Failure");
-      const result = yield* capture.records(new Request("http://localhost/v1/records"));
+      const result = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records"),
+      );
       expect(yield* Effect.promise(() => result.json())).toMatchObject({
         incomplete: false,
         producerFailed: 0,

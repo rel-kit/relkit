@@ -26,7 +26,9 @@ test.each([0, 1] as const)(
         expect(wireBytes(message) + 1025).toBe(1_048_576 + over);
         yield* capture.append(record(message));
         yield* capture.append(record("later"));
-        const first = yield* capture.records(new Request("http://localhost/v1/records"));
+        const first = yield* capture.records(
+          new Request("http://localhost/_relkit/bridge/v1/records"),
+        );
         const body = yield* Effect.promise(() => first.text());
         expect(Buffer.byteLength(body)).toBeLessThanOrEqual(1_048_576);
         const value = JSON.parse(body) as {
@@ -39,7 +41,7 @@ test.each([0, 1] as const)(
         expect(value.droppedRecords).toBe(over);
         expect(value.incomplete).toBe(over === 1);
         const next = yield* capture.records(
-          new Request(`http://localhost/v1/records?after=${over === 0 ? 1 : 0}`),
+          new Request(`http://localhost/_relkit/bridge/v1/records?after=${over === 0 ? 1 : 0}`),
         );
         expect(yield* Effect.promise(() => next.json())).toMatchObject({
           records: [{ sequence: 2, record: { message: "later" } }],

@@ -34,7 +34,7 @@ function remote(events: string[], failAck: () => boolean): InspectorRemoteOperat
   return {
     request: (_connection, path) =>
       Effect.gen(function* () {
-        if (path === "/v1/ack") {
+        if (path === "/_relkit/bridge/v1/ack") {
           events.push("ack");
           if (failAck())
             return yield* new InspectionConnectionError({
@@ -183,7 +183,9 @@ test("near-full multi-record pulls fit persistence envelopes and make progress w
         through = (yield* collectInspectionBatch(transport, history, connection, through)).through;
       expect(through).toBe(256);
       expect(committed).toBe(256);
-      const final = yield* capture.records(new Request("http://localhost/v1/records?after=256"));
+      const final = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records?after=256"),
+      );
       expect(yield* Effect.promise(() => final.json())).toMatchObject({
         records: [],
         droppedRecords: 0,

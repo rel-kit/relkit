@@ -60,7 +60,8 @@ const requestRemote: InspectorRemoteOperations["request"] = (
               cause instanceof Error ? cause : new Error("Inspection request failed", { cause }),
           }),
   }).pipe(
-    (operation) => (path.startsWith("/v1/") ? operation.pipe(Effect.timeout(2000)) : operation),
+    (operation) =>
+      path.startsWith("/_relkit/bridge/v1/") ? operation.pipe(Effect.timeout(2000)) : operation,
     Effect.catchCause((cause) =>
       Effect.failCause(Cause.map(cause, (error) => remoteFailure("remote.timeout", error))),
     ),

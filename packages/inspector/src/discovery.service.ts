@@ -92,7 +92,7 @@ const verifySession = Effect.fn("Inspector.verifySession")(function* (
   const connection = credential
     ? { ...candidate, descriptor: { ...descriptor, token: credential.descriptor.token } }
     : candidate;
-  const response = yield* remote.request(connection, "/v1/handshake", {}, target);
+  const response = yield* remote.request(connection, "/_relkit/bridge/v1/handshake", {}, target);
   const handshake = yield* remote.json(response).pipe(
     Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(InspectionHandshakeSchema))),
     Effect.mapError((cause) =>

@@ -17,7 +17,7 @@ registerDevCleanup();
 /** Reads the authenticated live session using server-only metadata. */
 async function handshake(session: DevSession) {
   const descriptor = session.inspectionConnection!.descriptor;
-  return fetch(`${descriptor.endpoint}/v1/handshake`, {
+  return fetch(`${descriptor.endpoint}/_relkit/bridge/v1/handshake`, {
     headers: {
       authorization: `Bearer ${descriptor.token}`,
       "x-relkit-project-id": descriptor.projectId,

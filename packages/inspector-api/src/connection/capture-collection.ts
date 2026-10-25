@@ -23,7 +23,7 @@ export const collectCapture = Effect.fn("Inspection.collect")(function* (
   producer = { producerFailed: 0, producerDropped: 0, producerSourcesExceeded: false },
 ) {
   const url = new URL(request.url);
-  if (url.pathname === "/v1/ack" && request.method === "POST") {
+  if (url.pathname === "/_relkit/bridge/v1/ack" && request.method === "POST") {
     const body = yield* readInspectionBody(request);
     const value = yield* Schema.decodeUnknownEffect(ack)(new TextDecoder().decode(body)).pipe(
       Effect.mapError((cause) => new InspectionConnectionError({ operation: "body.ack", cause })),
@@ -37,7 +37,7 @@ export const collectCapture = Effect.fn("Inspection.collect")(function* (
       );
     return Response.json({ acknowledged: value.through });
   }
-  if (url.pathname !== "/v1/records" || request.method !== "GET")
+  if (url.pathname !== "/_relkit/bridge/v1/records" || request.method !== "GET")
     return new Response("Method not allowed", { status: 405 });
   const cursor = url.searchParams.get("after") ?? "0";
   if (!/^\d+$/.test(cursor) || !Number.isSafeInteger(Number(cursor)))

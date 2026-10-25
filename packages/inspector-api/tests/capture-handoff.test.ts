@@ -18,17 +18,21 @@ test("an ACK retires only its frozen prefix while later arrivals remain redacted
     Effect.gen(function* () {
       const capture = yield* InspectionCapture.make({});
       yield* capture.append(record);
-      const first = yield* capture.records(new Request("http://localhost/v1/records"));
+      const first = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records"),
+      );
       yield* capture.append({ ...record, message: "later" });
       expect(yield* Effect.promise(() => first.text())).not.toContain("later");
       yield* capture.records(
-        new Request("http://localhost/v1/ack", {
+        new Request("http://localhost/_relkit/bridge/v1/ack", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: '{"through":1}',
         }),
       );
-      const second = yield* capture.records(new Request("http://localhost/v1/records?after=1"));
+      const second = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records?after=1"),
+      );
       const bytes = yield* Effect.promise(() => second.text());
       expect(bytes).toContain("later");
       expect(bytes).not.toContain("SYNTHETIC_SECRET");
@@ -44,20 +48,24 @@ test("default overflow retains exactly 2048 and cumulative loss survives every A
     Effect.gen(function* () {
       const capture = yield* InspectionCapture.make({});
       for (let i = 0; i < 2050; i++) yield* capture.append(record);
-      const response = yield* capture.records(new Request("http://localhost/v1/records"));
+      const response = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records"),
+      );
       expect(yield* Effect.promise(() => response.json())).toMatchObject({
         bufferedRecords: 2048,
         droppedRecords: 2,
         incomplete: true,
       });
       yield* capture.records(
-        new Request("http://localhost/v1/ack", {
+        new Request("http://localhost/_relkit/bridge/v1/ack", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: '{"through":2050}',
         }),
       );
-      const status = yield* capture.records(new Request("http://localhost/v1/records"));
+      const status = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records"),
+      );
       expect(yield* Effect.promise(() => status.json())).toMatchObject({
         bufferedRecords: 0,
         droppedRecords: 2,
@@ -80,7 +88,9 @@ test("latest valid configuration applies immediately; invalid updates retain the
       ).toBe("Failure");
       yield* capture.append({ ...record, fields: { customerEmail: "private@example.test" } });
       yield* capture.append({ ...record, message: "newest" });
-      const response = yield* capture.records(new Request("http://localhost/v1/records"));
+      const response = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records"),
+      );
       const bytes = yield* Effect.promise(() => response.text());
       expect(bytes).not.toContain("private@example.test");
       expect(JSON.parse(bytes)).toMatchObject({

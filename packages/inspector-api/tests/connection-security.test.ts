@@ -44,7 +44,7 @@ test.each([
     forward: () => Effect.die("must not forward"),
   });
   const response = await Effect.runPromise(
-    handler(request("/v1/handshake", { headers: { [header]: value } })),
+    handler(request("/_relkit/bridge/v1/handshake", { headers: { [header]: value } })),
   );
   expect(response.status).toBe(status);
   expect(await response.text()).not.toContain(descriptor.token);
@@ -59,7 +59,7 @@ test("handshake proves live identity and reports agentless capabilities without 
     }),
     forward: () => Effect.die("must not forward"),
   });
-  const response = await Effect.runPromise(handler(request("/v1/handshake")));
+  const response = await Effect.runPromise(handler(request("/_relkit/bridge/v1/handshake")));
   expect(await response.json()).toEqual({
     protocol: 1,
     projectId: descriptor.projectId,
@@ -122,49 +122,57 @@ test("history and unknown private protocol paths are not forwarded", async () =>
     active: () => undefined,
     forward: () => Effect.die("must not forward"),
   });
-  for (const path of ["/_relkit/v1/logs", "/_relkit/v1/traces", "/v1/unknown", "//foreign.invalid"])
+  for (const path of [
+    "/_relkit/v1/logs",
+    "/_relkit/v1/traces",
+    "/_relkit/bridge/v1/unknown",
+    "//foreign.invalid",
+  ])
     expect((await Effect.runPromise(handler(request(path)))).status).toBe(404);
 });
 
-test("route console preserves application paths, text bodies and generation fences", async () => {
-  let calls = 0;
-  const handler = createInspectionHandler(descriptor, {
-    active: () => ({ generationId: "one", endpoint: "http://127.0.0.1:43000", capabilities: [] }),
-    forward: (_target, request) =>
-      Effect.promise(async () => {
-        calls++;
-        expect(new URL(request.url).pathname).toBe("/orders");
-        expect(request.headers.get("authorization")).toBe("Bearer app-user");
-        expect(request.headers.get("x-relkit-inspector-session-token")).toBeNull();
-        expect(await request.text()).toBe("order=one");
-        return new Response("created", { status: 201 });
-      }),
-  });
-  const options = {
-    method: "POST",
-    body: "order=one",
-    headers: {
-      "content-type": "text/plain",
-      "x-relkit-generation-id": "one",
-      "x-relkit-user-authorization": "Bearer app-user",
-      "x-relkit-inspector-session-token": "browser-supplied-copy",
-    },
-  };
-  expect((await Effect.runPromise(handler(request("/orders", options)))).status).toBe(201);
-  expect(
-    (
-      await Effect.runPromise(
-        handler(
-          request("/orders", {
-            ...options,
-            headers: { ...options.headers, "x-relkit-generation-id": "old" },
-          }),
-        ),
-      )
-    ).status,
-  ).toBe(409);
-  expect(calls).toBe(1);
-});
+test.each(["/orders", "/v1/orders", "/v1/handshake", "/v1/records", "/v1/ack"])(
+  "route console preserves %s, text bodies and generation fences",
+  async (path) => {
+    let calls = 0;
+    const handler = createInspectionHandler(descriptor, {
+      active: () => ({ generationId: "one", endpoint: "http://127.0.0.1:43000", capabilities: [] }),
+      forward: (_target, request) =>
+        Effect.promise(async () => {
+          calls++;
+          expect(new URL(request.url).pathname).toBe(path);
+          expect(request.headers.get("authorization")).toBe("Bearer app-user");
+          expect(request.headers.get("x-relkit-inspector-session-token")).toBeNull();
+          expect(await request.text()).toBe("order=one");
+          return new Response("created", { status: 201 });
+        }),
+    });
+    const options = {
+      method: "POST",
+      body: "order=one",
+      headers: {
+        "content-type": "text/plain",
+        "x-relkit-generation-id": "one",
+        "x-relkit-user-authorization": "Bearer app-user",
+        "x-relkit-inspector-session-token": "browser-supplied-copy",
+      },
+    };
+    expect((await Effect.runPromise(handler(request(path, options)))).status).toBe(201);
+    expect(
+      (
+        await Effect.runPromise(
+          handler(
+            request(path, {
+              ...options,
+              headers: { ...options.headers, "x-relkit-generation-id": "old" },
+            }),
+          ),
+        )
+      ).status,
+    ).toBe(409);
+    expect(calls).toBe(1);
+  },
+);
 
 test("bridge credentials do not replace native user authorization or operation identity", async () => {
   const handler = createInspectionHandler(descriptor, {

@@ -60,7 +60,7 @@ const serveInspection = Effect.fn("Inspection.serve")(function* (
   if (denied !== undefined) return denied;
   const url = new URL(request.url);
   const target = authority.active();
-  if (url.pathname === "/v1/handshake" && request.method === "GET")
+  if (url.pathname === "/_relkit/bridge/v1/handshake" && request.method === "GET")
     return Response.json(
       {
         protocol: 1,
@@ -71,7 +71,7 @@ const serveInspection = Effect.fn("Inspection.serve")(function* (
       },
       { headers: { "cache-control": "no-store" } },
     );
-  if (/^\/v1\/(records|ack)$/.test(url.pathname)) {
+  if (/^\/_relkit\/bridge\/v1\/(records|ack)$/.test(url.pathname)) {
     if (authority.records === undefined) return failure(503, "collection.unavailable");
     return yield* authority.records(request);
   }
@@ -167,7 +167,7 @@ function inspectAccess(descriptor: InspectionDescriptor, request: Request): Resp
  * @returns Whether this private bridge may forward the established live API path.
  */
 function liveInspectionPath(path: string): boolean {
-  if (path.startsWith("//") || /^\/v1(\/|$)/.test(path)) return false;
+  if (path.startsWith("//")) return false;
   if (/^\/_relkit\/v1\/(logs|requests|traces|stream|storage)(\/|$)/.test(path)) return false;
   return !path.startsWith("/_relkit") || path === "/_relkit/v1" || path.startsWith("/_relkit/v1/");
 }

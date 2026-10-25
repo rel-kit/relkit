@@ -46,7 +46,7 @@ test("native bridge keeps session identity across target changes and releases it
       ),
     ).toBe(false);
     expect(
-      await fetch(`${endpoint}/v1/handshake`).then(
+      await fetch(`${endpoint}/_relkit/bridge/v1/handshake`).then(
         () => true,
         () => false,
       ),
@@ -75,7 +75,7 @@ const probeBridge = Effect.fn("test.nativeBridge")(function* (root: string, back
   const path = connection.path;
   const options = { headers: headers(connection.descriptor) };
   const first = yield* Effect.promise(() =>
-    fetch(`${endpoint}/v1/handshake`, options).then((r) => r.json()),
+    fetch(`${endpoint}/_relkit/bridge/v1/handshake`, options).then((r) => r.json()),
   );
   expect(first).toMatchObject({
     generationId: "one",
@@ -83,7 +83,7 @@ const probeBridge = Effect.fn("test.nativeBridge")(function* (root: string, back
   });
   generationId = "two";
   const second = yield* Effect.promise(() =>
-    fetch(`${endpoint}/v1/handshake`, options).then((r) => r.json()),
+    fetch(`${endpoint}/_relkit/bridge/v1/handshake`, options).then((r) => r.json()),
   );
   expect(second).toMatchObject({
     generationId: "two",
@@ -98,8 +98,15 @@ const probeBridge = Effect.fn("test.nativeBridge")(function* (root: string, back
   );
   expect(upload.status).toBe(200);
   expect(yield* Effect.promise(() => upload.json())).toEqual({ bytes: 1_100_000 });
+  for (const path of ["/v1/orders", "/v1/handshake", "/v1/records", "/v1/ack"]) {
+    const application = yield* Effect.promise(() => fetch(`${endpoint}${path}`, options));
+    expect(application.status).toBe(200);
+    expect(yield* Effect.promise(() => application.json())).toEqual({ live: true });
+  }
   const response = yield* Effect.promise(() => fetch(`${endpoint}/_relkit/v1/graph`, options));
   expect(yield* Effect.promise(() => response.json())).toEqual({ live: true });
-  expect((yield* Effect.promise(() => fetch(`${endpoint}/v1/handshake`))).status).toBe(401);
+  expect(
+    (yield* Effect.promise(() => fetch(`${endpoint}/_relkit/bridge/v1/handshake`))).status,
+  ).toBe(401);
   return { endpoint, path };
 });

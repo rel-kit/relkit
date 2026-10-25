@@ -45,7 +45,9 @@ it.effect("installed-but-disabled capture opens no support resource", () => {
       const capture = yield* CliDevCapture.use((service) => service.acquire(false, {}));
       expect(f.starts()).toBe(0);
       expect(capture.environment.RELKIT_TELEMETRY_URL).toBeUndefined();
-      expect((yield* capture.records(new Request("http://localhost/v1/records"))).status).toBe(503);
+      expect(
+        (yield* capture.records(new Request("http://localhost/_relkit/bridge/v1/records"))).status,
+      ).toBe(503);
     }),
   ).pipe(Effect.provide(f.layer));
 });
@@ -56,7 +58,9 @@ it.effect("support bind failure degrades capture without preventing backend star
     Effect.gen(function* () {
       const capture = yield* CliDevCapture.use((service) => service.acquire(true, {}));
       expect(capture.environment.RELKIT_TELEMETRY_URL).toBeUndefined();
-      const status = yield* capture.records(new Request("http://localhost/v1/records"));
+      const status = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records"),
+      );
       expect(yield* Effect.promise(() => status.json())).toMatchObject({ incomplete: true });
     }),
   ).pipe(Effect.provide(f.layer));
@@ -97,7 +101,9 @@ it.effect("validates producer auth/body and redacts before memory replay", () =>
         ],
       });
       expect((yield* send(capture.environment.RELKIT_TELEMETRY_TOKEN!, body)).status).toBe(200);
-      const records = yield* capture.records(new Request("http://localhost/v1/records"));
+      const records = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records"),
+      );
       const bytes = yield* Effect.promise(() => records.text());
       expect(bytes).toContain("safe");
       expect(bytes).not.toContain("private@example.test");

@@ -17,12 +17,16 @@ test.each([256, 257])("capture of %s records returns at most 256 per pull", asyn
           message: String(i),
           fields: {},
         });
-      const response = yield* capture.records(new Request("http://localhost/v1/records"));
+      const response = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records"),
+      );
       const text = yield* Effect.promise(() => response.text());
       expect(Buffer.byteLength(text)).toBeLessThan(1_048_576);
       expect(JSON.parse(text)).toMatchObject({ droppedRecords: 0, incomplete: false });
       expect(JSON.parse(text).records).toHaveLength(256);
-      const rest = yield* capture.records(new Request("http://localhost/v1/records?after=256"));
+      const rest = yield* capture.records(
+        new Request("http://localhost/_relkit/bridge/v1/records?after=256"),
+      );
       const remainder = yield* Schema.decodeUnknownEffect(
         Schema.Struct({ records: Schema.Array(Schema.Json) }),
       )(yield* Effect.promise(() => rest.json()));

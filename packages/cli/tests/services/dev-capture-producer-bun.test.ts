@@ -36,7 +36,9 @@ test("remote capture reports oversize queue loss and preserves subsequent record
         runtime.collect({ ...base, message: "x".repeat(1_048_576) });
         runtime.collect({ ...base, message: "also retained" });
         yield* Effect.promise(() => runtime.flush());
-        const response = yield* capture.records(new Request("http://localhost/v1/records"));
+        const response = yield* capture.records(
+          new Request("http://localhost/_relkit/bridge/v1/records"),
+        );
         const bytes = yield* Effect.promise(() => response.text());
         expect(bytes).not.toContain("private@example.test");
         expect(bytes).toContain("also retained");

@@ -23,7 +23,12 @@ export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
     target?: string,
     previousLossKey?: string,
   ) {
-    const response = yield* remote.request(connection, `/v1/records?after=${after}`, {}, target);
+    const response = yield* remote.request(
+      connection,
+      `/_relkit/bridge/v1/records?after=${after}`,
+      {},
+      target,
+    );
     const batch = yield* remote.json(response).pipe(
       Effect.flatMap(Schema.decodeUnknownEffect(InspectionCollectionBatch)),
       Effect.mapError((cause) =>
@@ -107,7 +112,7 @@ const acknowledgeCollection = Effect.fn("Inspector.acknowledge")(function* (
 ) {
   const response = yield* remote.request(
     connection,
-    "/v1/ack",
+    "/_relkit/bridge/v1/ack",
     {
       method: "POST",
       headers: { "content-type": "application/json" },
