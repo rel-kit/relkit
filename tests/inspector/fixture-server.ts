@@ -21,6 +21,27 @@ const application = Effect.gen(function* () {
       await disposeInspectorEndpoints(fixture.app);
     }),
   );
+  fixture.app.get("/_relkit/v1/openapi.json", (context) =>
+    context.json(
+      {
+        openapi: "3.1.0",
+        info: { title: "Inspector fixture", version: "1" },
+        paths: {
+          "/orders": { post: { responses: { "201": { description: "Order created" } } } },
+          "/orders/{orderId}": {
+            get: {
+              parameters: [
+                { name: "orderId", in: "path", required: true, schema: { type: "string" } },
+              ],
+              responses: { "200": { description: "Order" } },
+            },
+          },
+        },
+      },
+      200,
+      { "x-relkit-generation-id": FIXTURE_GENERATION_ID },
+    ),
+  );
   const server = yield* Effect.acquireRelease(
     Effect.sync(() =>
       Bun.serve({

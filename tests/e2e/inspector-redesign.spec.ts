@@ -94,7 +94,7 @@ test("renders the Scalar reference", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "API Reference" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open Scalar API Reference" })).toHaveAttribute(
     "href",
-    "/_relkit/backend/_relkit/v1/api-reference",
+    "/scalar",
   );
   await expect(page.getByRole("link", { name: "Open Scalar API Reference" })).toHaveAttribute(
     "rel",
@@ -103,6 +103,15 @@ test("renders the Scalar reference", async ({ page }) => {
   await expect(page.locator(".api-reference-page")).toHaveScreenshot("api-reference.png", {
     animations: "disabled",
   });
+  const reference = await page.request.get("/scalar");
+  expect(reference.status()).toBe(200);
+  const html = await reference.text();
+  const document = await page.request.get("/_relkit/backend/_relkit/v1/openapi.json");
+  const generation = document.headers()["x-relkit-generation-id"];
+  expect(generation).toBeTruthy();
+  expect(html).toContain("Scalar.createApiReference");
+  expect(html).toContain(`"generation":${JSON.stringify(generation)}`);
+  expect(html).toContain('"url":"/_relkit/backend"');
 });
 
 test("keeps the shell usable in dark mode and on mobile", async ({ page }) => {
