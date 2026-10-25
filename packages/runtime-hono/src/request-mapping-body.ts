@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { runHttp } from "./http-effect.js";
 import { RequestBodyReader, RequestBodyReaderLive } from "./request-body-service.js";
+import { parseMultipart } from "./request-multipart.js";
 import type {
   BodyIssue,
   BodyState,
@@ -74,12 +75,7 @@ async function parseFormBody(state: BodyState): Promise<BodyValue<FormDataLike>>
       issue: { code: "content-type", message: "Request content type must be multipart/form-data" },
     };
   try {
-    const request = new Request(state.request.url, {
-      method: "POST",
-      headers: state.request.headers,
-      body: new Uint8Array(body.bytes),
-    });
-    return { value: await request.formData() };
+    return { value: parseMultipart(state.request.headers, body.bytes) };
   } catch {
     return {
       value: MISSING,
