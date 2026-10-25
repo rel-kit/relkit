@@ -49,7 +49,11 @@ causation. Calling another descriptor's handler directly bypasses that contract.
 Expose `createOrder` through its Orders service and a route. The API example maps that public
 member to `POST /orders`:
 
-<include source="templates/default/v1/api/src/routes/orders/route.ts" lang="ts" meta='title="src/routes/orders/route.ts — backend"'>
+<include
+  source="templates/default/v1/api/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/route.ts — backend"'
+>
   /_snippets/source/templates/default/v1/api/src/routes/orders/route.ts
 </include>
 
@@ -96,4 +100,3 @@ bun test tests/unit/orders.function.test.ts
 explicit test fakes; tests do not infer production replacements from `RELKIT_ENV`.
 
 <include>/_snippets/generated/related/docs-learn-concepts-functions.mdx</include>
-
