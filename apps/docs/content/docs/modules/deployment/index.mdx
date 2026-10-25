@@ -32,33 +32,53 @@ environment; the build does not embed `.env` values. Preserve application state,
 and immutable worker versions across releases.
 
 <CardGroup cols={2}>
-<Card title="Start with local Docker" href="/docs/modules/deployment/local-docker" icon="container" arrow>
-Run local services, then build and verify the minimal app in a container.
-</Card>
-<Card title="Deploy to AWS with Pulumi" href="/docs/modules/deployment/aws" icon="cloud-upload" arrow>
-Install the supported host and engine, configure roles, preview, and apply a reviewed stack.
-</Card>
-<Card title="Run a built Bun server" href="/docs/modules/deployment/aws#run-a-built-application" icon="server" arrow>
-Install the generated production manifest and start the complete build on your own host.
-</Card>
-<Card title="Connect production resources" href="/docs/modules/deployment/providers" icon="plug" arrow>
-Choose storage, cache, database, task, and telemetry providers independently of the host.
-</Card>
+  <Card
+    title="Start with local Docker"
+    href="/docs/modules/deployment/local-docker"
+    icon="container"
+    arrow
+  >
+    Run local services, then build and verify the minimal app in a container.
+  </Card>
+  <Card
+    title="Deploy to AWS with Pulumi"
+    href="/docs/modules/deployment/aws"
+    icon="cloud-upload"
+    arrow
+  >
+    Install the supported host and engine, configure roles, preview, and apply a reviewed stack.
+  </Card>
+  <Card
+    title="Run a built Bun server"
+    href="/docs/modules/deployment/aws#run-a-built-application"
+    icon="server"
+    arrow
+  >
+    Install the generated production manifest and start the complete build on your own host.
+  </Card>
+  <Card
+    title="Connect production resources"
+    href="/docs/modules/deployment/providers"
+    icon="plug"
+    arrow
+  >
+    Choose storage, cache, database, task, and telemetry providers independently of the host.
+  </Card>
 </CardGroup>
 
 ## Supported providers
 
-| Role | Supported path | What RELKIT manages |
-| --- | --- | --- |
-| Local development services | Docker recipes for Redis, MinIO, Inngest, Trigger.dev, and Effect MQ | Graph-required containers, readiness, connection values, and persistent volumes; [coverage](/docs/modules/integrations/local-docker#supported-local-services) |
-| Self-hosted application | Built Bun server or generated Docker image | Portable build output; you provide the host, process/container supervisor, TLS, and resource connections |
-| Cloud application host | **AWS**, through `@relkit/aws` | ECS/Fargate, networking, load balancer, workload access, and CloudWatch stdout; [AWS setup](/docs/modules/deployment/aws) |
-| Infrastructure engine | **Pulumi**, through `@relkit/pulumi` | Stack configuration, preview, apply, outputs, refresh, and destroy |
-| Infrastructure-owned resources | AWS wrappers for supported S3 and Redis/Valkey resources | Resource lifecycle and access, separately from the application host |
-| Connected file/cache resources | S3-compatible storage, Redis, Cloudflare R2 and KV | Runtime connections to existing resources; [provider configuration](/docs/modules/deployment/providers) |
-| Native durable tasks | Inngest, Trigger.dev, Effect MQ | Provider-specific worker publication, schedules, and supported run semantics; [job deployment](/docs/modules/jobs/deployment) |
-| Application data and authentication | Drizzle with PostgreSQL, MySQL, or SQLite; Better Auth on that service | Application connection and auth activation; you own database hosting, migrations, and backups |
-| Models and telemetry | Selected LangChain model SDKs, Sentry, OTLP | Selected runtime integration; no implicit provisioning or model account |
+| Role                                | Supported path                                                         | What RELKIT manages                                                                                                                                           |
+| ----------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local development services          | Docker recipes for Redis, MinIO, Inngest, Trigger.dev, and Effect MQ   | Graph-required containers, readiness, connection values, and persistent volumes; [coverage](/docs/modules/integrations/local-docker#supported-local-services) |
+| Self-hosted application             | Built Bun server or generated Docker image                             | Portable build output; you provide the host, process/container supervisor, TLS, and resource connections                                                      |
+| Cloud application host              | **AWS**, through `@relkit/aws`                                         | ECS/Fargate, networking, load balancer, workload access, and CloudWatch stdout; [AWS setup](/docs/modules/deployment/aws)                                     |
+| Infrastructure engine               | **Pulumi**, through `@relkit/pulumi`                                   | Stack configuration, preview, apply, outputs, refresh, and destroy                                                                                            |
+| Infrastructure-owned resources      | AWS wrappers for supported S3 and Redis/Valkey resources               | Resource lifecycle and access, separately from the application host                                                                                           |
+| Connected file/cache resources      | S3-compatible storage, Redis, Cloudflare R2 and KV                     | Runtime connections to existing resources; [provider configuration](/docs/modules/deployment/providers)                                                       |
+| Native durable tasks                | Inngest, Trigger.dev, Effect MQ                                        | Provider-specific worker publication, schedules, and supported run semantics; [job deployment](/docs/modules/jobs/deployment)                                 |
+| Application data and authentication | Drizzle with PostgreSQL, MySQL, or SQLite; Better Auth on that service | Application connection and auth activation; you own database hosting, migrations, and backups                                                                 |
+| Models and telemetry                | Selected LangChain model SDKs, Sentry, OTLP                            | Selected runtime integration; no implicit provisioning or model account                                                                                       |
 
 AWS is the current built-in cloud **host**. The Cloudflare package provides **R2/KV runtime
 adapters**, not Workers application deployment. There are no built-in Vercel, Railway, Azure,

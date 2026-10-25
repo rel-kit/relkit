@@ -55,7 +55,11 @@ then explicitly select this configuration when testing or releasing against exis
 
 <include>/_snippets/generated/installations/cloudflare.mdx</include>
 
-<include source="apps/docs/examples/setup/cloudflare.ts" lang="ts" meta='title="relkit.config.ts — connected Cloudflare alternative"'>
+<include
+  source="apps/docs/examples/setup/cloudflare.ts"
+  lang="ts"
+  meta='title="relkit.config.ts — connected Cloudflare alternative"'
+>
   /_snippets/source/apps/docs/examples/setup/cloudflare.ts
 </include>
 
@@ -79,11 +83,11 @@ appropriately managed state location and are not a replacement for distributed p
 
 ## Durable job providers
 
-| Provider | Local default | Deployment guidance |
-| --- | --- | --- |
-| Inngest | `docker(inngest())` | [Inngest setup](/docs/modules/jobs/providers/inngest): connected credentials, native worker registration, and capability evidence |
-| Trigger.dev | `docker(trigger())` | [Trigger.dev setup](/docs/modules/jobs/providers/trigger): target runtime, immutable worker publication, and provider connection |
-| Effect MQ | `docker(effectMq())` | [Effect MQ setup](/docs/modules/jobs/providers/effect-mq): PostgreSQL-backed native execution and worker lifecycle |
+| Provider    | Local default        | Deployment guidance                                                                                                               |
+| ----------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Inngest     | `docker(inngest())`  | [Inngest setup](/docs/modules/jobs/providers/inngest): connected credentials, native worker registration, and capability evidence |
+| Trigger.dev | `docker(trigger())`  | [Trigger.dev setup](/docs/modules/jobs/providers/trigger): target runtime, immutable worker publication, and provider connection  |
+| Effect MQ   | `docker(effectMq())` | [Effect MQ setup](/docs/modules/jobs/providers/effect-mq): PostgreSQL-backed native execution and worker lifecycle                |
 
 Follow [job deployment](/docs/modules/jobs/deployment) to publish workers, verify readiness, and
 activate schedules. Keep previous worker generations while they own accepted runs. Application
