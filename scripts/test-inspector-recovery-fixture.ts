@@ -24,6 +24,12 @@ export async function recoveryFixture(
       (await readFile(path, "utf8")).replace('"@relkit/app"', `"@relkit/app/${entrypoint}"`),
     );
   }
+  const route = join(root, "src/routes/hello/[name]/route.ts");
+  await writeFile(
+    route,
+    (await readFile(route, "utf8")) +
+      '\nexport const POST = defineRoute({ id: "hello.write", target: hello.sayHello });\n',
+  );
   const cli = join(repository, "packages/cli/src/bin.ts");
   await writeFile(
     join(root, "package.json"),

@@ -113,7 +113,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
             API reference <ExternalLink aria-hidden="true" className="size-3" />
           </a>
         </div>
-        <DevelopmentFailureBanner />
+        <DevelopmentFailureBanner generationId={graph.graph?.generationId} />
         <div id="main-content" className="main-content" tabIndex={-1}>
           {children}
         </div>

@@ -7,6 +7,13 @@ import { recoveryProcess } from "../../packages/cli/tests/dev-environment/recove
 import { recoveryFixture } from "../../scripts/test-inspector-recovery-fixture";
 import { launchGeneratedTool, toolReply } from "../fixtures/inspector/generated-app";
 import { scaffoldChild } from "../../scripts/scaffold-process";
+import {
+  hasPath,
+  pinnedRequest,
+  referenceSnapshot,
+  sourceRecovery,
+  withRecoveryTraffic,
+} from "./reload-recovery-checks.js";
 
 const repository = resolve(import.meta.dirname, "../..");
 const evidence = join(repository, ".relkit/reload-recovery");
@@ -49,15 +56,6 @@ function port(): number {
   server.stop(true);
   assert.ok(value !== undefined);
   return value;
-}
-
-function hasPath(specification: unknown, path: string): boolean {
-  assert.ok(
-    specification !== null && typeof specification === "object" && "paths" in specification,
-  );
-  const paths = specification.paths;
-  assert.ok(paths !== null && typeof paths === "object");
-  return Object.hasOwn(paths, path);
 }
 
 /** Exercises one unchanged dev PID across a rejected edit and a repaired generation. */
@@ -106,47 +104,72 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
     const inspectorUrl = `http://127.0.0.1:${tool.port}`;
     const toolPid = tool.child.pid;
     const inspectorReadyMs = Math.round(performance.now() - startedAt);
-    await browser("open", `${inspectorUrl}/routes`);
-    await browser("wait", "--fn", "document.querySelector('table')?.innerText.includes('/hello/')");
-    await browser("wait", "--fn", "!document.body.innerText.includes('Latest reload failed')");
-    const before = dev.logs().length;
-    await writeFile(join(root, ".env"), "DAYS=invalid\n");
-    await mkdir(join(root, "src/routes/recovered/[name]"), { recursive: true });
-    await writeFile(
-      join(root, "src/routes/recovered/[name]/route.ts"),
-      (await readFile(join(root, "src/routes/hello/[name]/route.ts"), "utf8")).replace(
-        'id: "hello.route"',
-        'id: "hello.recovered-route"',
-      ),
-    );
-    await dev.wait("Rejected candidate", () =>
-      /dev\.generation\.failed|Reload failed; previous version/.test(
-        dev?.logs().slice(before) ?? "",
-      ),
-    );
-    await dev.wait(
-      "Old version retained",
-      async () => (await dev?.read()) === '{"message":"number:7"}',
-    );
-    await browser("wait", "--text", "Latest reload failed");
-    assert.match(await browser("get", "text", "body"), /DAYS|environment/i);
-    await writeFile(join(output, "failed-tree.txt"), await browser("snapshot", "-c"));
-    const oldSpec = await (await fetch(`${baseUrl}/_relkit/v1/openapi.json`)).json();
-    assert.equal(hasPath(oldSpec, "/recovered/{name}"), false);
-    await writeFile(join(root, ".env"), "DAYS=30\n");
-    await dev.wait(
-      "Repaired typed response",
-      async () => (await dev?.read()) === '{"message":"number:30"}',
-    );
-    const currentSpec = await (await fetch(`${baseUrl}/_relkit/v1/openapi.json`)).json();
-    assert.ok(hasPath(currentSpec, "/recovered/{name}"));
-    await browser("wait", "--fn", "!document.body.innerText.includes('Latest reload failed')");
-    await browser(
-      "wait",
-      "--fn",
-      "document.querySelector('table')?.innerText.includes('/recovered/')",
-    );
-    await writeFile(join(output, "recovered-tree.txt"), await browser("snapshot", "-c"));
+    await withRecoveryTraffic(baseUrl, output, async () => {
+      assert.ok(dev !== undefined);
+      await browser("open", `${inspectorUrl}/routes`);
+      await browser(
+        "wait",
+        "--fn",
+        "document.querySelector('table')?.innerText.includes('/hello/')",
+      );
+      await browser("wait", "--fn", "!document.body.innerText.includes('Latest reload failed')");
+      const before = dev.logs().length;
+      const active = await referenceSnapshot(inspectorUrl);
+      await writeFile(join(root, ".env"), "DAYS=invalid\n");
+      await mkdir(join(root, "src/routes/recovered/[name]"), { recursive: true });
+      await writeFile(
+        join(root, "src/routes/recovered/[name]/route.ts"),
+        (await readFile(join(root, "src/routes/hello/[name]/route.ts"), "utf8"))
+          .replace('id: "hello.route"', 'id: "hello.recovered-route"')
+          .replace('id: "hello.write"', 'id: "hello.recovered-write"'),
+      );
+      await dev.wait("Rejected candidate", () =>
+        /dev\.generation\.failed|Reload failed; previous version/.test(
+          dev?.logs().slice(before) ?? "",
+        ),
+      );
+      await dev.wait(
+        "Old version retained",
+        async () => (await dev?.read()) === '{"message":"number:7"}',
+      );
+      await browser("wait", "--text", "Latest reload failed");
+      await browser("wait", "--text", "Showing the last valid snapshot");
+      assert.deepEqual(await referenceSnapshot(inspectorUrl), active);
+      await pinnedRequest(inspectorUrl, active.generation, 7);
+      await browser(
+        "wait",
+        "--fn",
+        `document.querySelector('section[aria-label="Development reload status"] details')?.open === false && document.querySelector('section[aria-label="Development reload status"] code')?.textContent === ${JSON.stringify(active.generation)}`,
+      );
+      await browser("click", 'section[aria-label="Development reload status"] summary');
+      assert.match(await browser("get", "text", "body"), /DAYS|environment/i);
+      await writeFile(join(output, "failed-tree.txt"), await browser("snapshot", "-c"));
+      const oldSpec = await (await fetch(`${baseUrl}/_relkit/v1/openapi.json`)).json();
+      assert.equal(hasPath(oldSpec, "/recovered/{name}"), false);
+      const rejectedRoute = await fetch(`${baseUrl}/recovered/probe`);
+      assert.equal(rejectedRoute.status, 404);
+      await rejectedRoute.text();
+      await writeFile(join(root, ".env"), "DAYS=30\n");
+      await dev.wait(
+        "Repaired typed response",
+        async () => (await dev?.read()) === '{"message":"number:30"}',
+      );
+      const currentSpec = await (await fetch(`${baseUrl}/_relkit/v1/openapi.json`)).json();
+      assert.ok(hasPath(currentSpec, "/recovered/{name}"));
+      const recoveredRoute = await fetch(`${baseUrl}/recovered/probe`);
+      assert.equal(recoveredRoute.status, 200);
+      assert.deepEqual(await recoveredRoute.json(), { message: "number:30" });
+      await browser("wait", "--fn", "!document.body.innerText.includes('Latest reload failed')");
+      await browser(
+        "wait",
+        "--fn",
+        "document.querySelector('table')?.innerText.includes('/recovered/')",
+      );
+      await writeFile(join(output, "recovered-tree.txt"), await browser("snapshot", "-c"));
+      await pinnedRequest(inspectorUrl, active.generation);
+      await sourceRecovery(root, dev, inspectorUrl, browser);
+      await writeFile(join(output, "final-tree.txt"), await browser("snapshot", "-c"));
+    });
     assert.equal(dev.child.pid, ownerPid);
     assert.equal(dev.child.exitCode, null);
     assert.equal(tool.child.pid, toolPid);
@@ -167,6 +190,9 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
           newOpenApiPath: "/recovered/{name}",
           newRouteVisibleWithoutRefresh: true,
           errorClearedWithoutRefresh: true,
+          sourceFailuresRecovered: ["syntax", "service descriptor"],
+          finalResponse: "number:32",
+          generationSafetyPreserved: true,
         },
         null,
         2,
