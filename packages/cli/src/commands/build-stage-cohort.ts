@@ -51,7 +51,7 @@ export const loadBuildStageCohort = Effect.fn("Project.buildCohort")(function* (
   );
   const tooling = checked.config ?? DEFAULT_TOOLING_CONFIG;
   const httpCapabilities = selectedHttpCapabilities({
-    apiDocs: { ...tooling.server.apiDocs, mode: "production" },
+    apiDocs: { ...tooling.server.apiDocs, mode: input.options.mode ?? "production" },
     mcp: { enabled: tooling.server.mcp },
     agUi: tooling.server.agUi ?? false,
   });

@@ -29,9 +29,16 @@ const authorities = Layer.merge(
   SelectedDependenciesLayer.pipe(Layer.provideMerge(source)),
 );
 
-test.each([false, true])(
-  "production cohort uses production docs exposure: %s",
-  async (enabledInProduction) => {
+test.each([
+  [undefined, false, false],
+  [undefined, true, true],
+  ["production", false, false],
+  ["production", true, true],
+  ["development", false, true],
+  ["development", true, true],
+] as const)(
+  "build mode %s with production exposure %s selects HTTP dependencies: %s",
+  async (mode, enabledInProduction, selected) => {
     const root = await mkdtemp(join(tmpdir(), "relkit-production-docs-"));
     const generatedDirectory = join(root, ".relkit/generated");
     const graph = { contractVersion: GRAPH_VERSION, nodes: [], edges: [] };
@@ -47,7 +54,7 @@ test.each([false, true])(
           projectRoot: root,
           buildDirectory: join(root, "build"),
           stage: join(root, "stage"),
-          options: {},
+          options: mode === undefined ? {} : { mode },
           checked: {
             ok: true,
             activatable: true,
@@ -81,7 +88,7 @@ test.each([false, true])(
         }).pipe(Effect.provide(authorities)),
       );
       expect(cohort.productionDependencies).toEqual(
-        enabledInProduction
+        selected
           ? { "@relkit/runtime-hono": "0.7.10", "@scalar/hono-api-reference": "0.12.9" }
           : {},
       );
