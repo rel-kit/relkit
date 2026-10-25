@@ -12,11 +12,11 @@ Select a realtime provider to carry channel events between your backend and conn
 
 ## Choose a provider
 
-| Provider          | Best fit                                    | Replay and fanout                                                  | Durability                                 |
-| ----------------- | ------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------ |
-| `docker(redisRealtime())` | Default local development | Pinned Redis recipe with retained streams and presence | Persistent Docker volume |
-| `redisRealtime()` | Connected Redis; multiple application or gateway instances | Redis Streams read independently by every gateway; shared presence | Depends on Redis persistence configuration |
-| `localRealtime()` | Optional one-machine workflow without Docker | Filesystem-backed retained state with bounded polling | Local filesystem |
+| Provider                  | Best fit                                                   | Replay and fanout                                                  | Durability                                 |
+| ------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------ |
+| `docker(redisRealtime())` | Default local development                                  | Pinned Redis recipe with retained streams and presence             | Persistent Docker volume                   |
+| `redisRealtime()`         | Connected Redis; multiple application or gateway instances | Redis Streams read independently by every gateway; shared presence | Depends on Redis persistence configuration |
+| `localRealtime()`         | Optional one-machine workflow without Docker               | Filesystem-backed retained state with bounded polling              | Local filesystem                           |
 
 The local provider keeps state under `.relkit/state` by default. Its wait loop polls every 250 ms, so another process can make progress even when filesystem notifications are unavailable. Use its `root` option only when the application needs a different state directory.
 

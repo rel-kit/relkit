@@ -9,7 +9,9 @@ sidebar:
 A realtime channel sends live application updates to clients that are currently connected. An order-status change, a new announcement, or a dashboard invalidation are good channel events.
 
 <Callout type="tip" title="Start here" icon="route">
-Start with [provider setup](/docs/modules/realtime/providers), then follow the announcement example below and [connect a React subscriber](/docs/modules/realtime/react). The [Realtime reference](/docs/api/realtime) lists channel declarations and operations.
+  Start with [provider setup](/docs/modules/realtime/providers), then follow the announcement
+  example below and [connect a React subscriber](/docs/modules/realtime/react). The [Realtime
+  reference](/docs/api/realtime) lists channel declarations and operations.
 </Callout>
 
 The channel is not your database. Load the current state from an ordinary route, then use channel events to update or invalidate that state. This distinction makes refresh and reconnect behavior predictable: the route restores the truth, while the channel keeps the page current.
@@ -47,8 +49,9 @@ notifications and do not become a substitute for task output, run status, or pro
 ## Declare a channel
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Before running this declaration in your own lean app, complete [provider installation and binding](/docs/modules/realtime/providers).
-For a browser consumer, also complete [frontend client setup](/docs/modules/client) in its own package.
+  Before running this declaration in your own lean app, complete [provider installation and
+  binding](/docs/modules/realtime/providers). For a browser consumer, also complete [frontend client
+  setup](/docs/modules/client) in its own package.
 </Callout>
 
 This public announcements channel has one partition because its parameter schema is empty. It retains recent events for brief reconnects.
@@ -131,18 +134,21 @@ event, but does not prove browser delivery or reconnect behavior. The
 ## Choose the next step
 
 <CardGroup cols={2}>
-<Card icon="shield-check">
-[Access and revocation](/docs/modules/realtime/access) explains internal, public, and protected channels.
-</Card>
-<Card icon="panels-top-left">
-[React channels](/docs/modules/realtime/react) connects generated channel types to application state.
-</Card>
-<Card icon="plug">
-[Replay and recovery](/docs/modules/realtime/recovery) defines mount, reconnect, refresh, and gap behavior.
-</Card>
-<Card icon="users">
-[Presence](/docs/modules/realtime/presence) adds connection or member awareness.
-</Card>
+  <Card icon="shield-check">
+    [Access and revocation](/docs/modules/realtime/access) explains internal, public, and protected
+    channels.
+  </Card>
+  <Card icon="panels-top-left">
+    [React channels](/docs/modules/realtime/react) connects generated channel types to application
+    state.
+  </Card>
+  <Card icon="plug">
+    [Replay and recovery](/docs/modules/realtime/recovery) defines mount, reconnect, refresh, and
+    gap behavior.
+  </Card>
+  <Card icon="users">
+    [Presence](/docs/modules/realtime/presence) adds connection or member awareness.
+  </Card>
 </CardGroup>
 
 <include>/_snippets/generated/related/docs-modules-realtime-index.mdx</include>

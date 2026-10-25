@@ -9,8 +9,9 @@ sidebar:
 Recover a disconnected client by combining current application state with channel updates.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Start with a channel using an explicitly [installed and bound realtime provider](/docs/modules/realtime/providers).
-Browser consumers also need [frontend installation and contract pull](/docs/modules/client).
+  Start with a channel using an explicitly [installed and bound realtime
+  provider](/docs/modules/realtime/providers). Browser consumers also need [frontend installation
+  and contract pull](/docs/modules/client).
 </Callout>
 
 Realtime events describe changes; they do not contain a complete application snapshot. Reliable recovery therefore combines an authoritative route query with a gap-free channel handoff.
