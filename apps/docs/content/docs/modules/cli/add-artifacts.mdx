@@ -37,26 +37,26 @@ Adding an agent or resource never installs or starts the separate [Inspector too
 
 Each linked guide explains a runnable command and the files it creates. The [command reference](/docs/api/cli) lists every option. For a first hands-on example, [add and call a new endpoint](/guides/cli/create-and-build-an-api#add-an-endpoint).
 
-| Command                            | Detailed guide                                                                                       |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `relkit add service [name]`        | [Services](/docs/modules/service/define#scaffold-a-service)                                          |
-| `relkit add function [name]`       | [Functions](/docs/learn/concepts/functions#scaffold-a-callable-function)                             |
-| `relkit add error [name]`          | [Typed errors](/docs/learn/concepts/errors#scaffold-a-typed-error)                                   |
-| `relkit add event [name]`          | [Event contracts](/docs/modules/events/define#scaffold-an-event-contract)                            |
-| `relkit add event-function [name]` | [Event consumers](/docs/modules/events/consume#scaffold-an-event-only-function)                      |
-| `relkit add task [name]`           | [Tasks](/docs/modules/jobs/tasks#scaffold-a-task)                                                     |
-| `relkit add job [name]`            | [Jobs](/docs/modules/jobs/quickstart)                                                                |
-| `relkit add cache [name]`          | [Caches and profiles](/docs/modules/caching/define#scaffold-a-cache)                                 |
-| `relkit add bucket [name]`         | [Buckets and profiles](/docs/modules/storage/define#scaffold-a-bucket)                               |
-| `relkit add tool [name]`           | [Tools](/docs/modules/ai/tools#scaffold-a-function-backed-tool)                                      |
-| `relkit add prompt [name]`         | [Prompts](/docs/modules/ai/agents#scaffold-a-reusable-prompt)                                        |
-| `relkit add agent [name]`          | [Agents and models](/docs/modules/ai/agents#scaffold-an-agent)                                       |
-| `relkit add constants [name]`      | [Domain constants](/docs/modules/service/context-values#scaffold-shared-values)                      |
-| `relkit add route [path]`          | [Routes and method mappings](/docs/modules/http/define#scaffold-a-route)                             |
-| `relkit add middleware [name]`     | [HTTP middleware](/docs/modules/http/middleware#scaffold-middleware)                                 |
-| `relkit add transform [name]`      | [Request transforms](/docs/modules/http/requests#scaffold-a-request-transform)                       |
-| `relkit add database`              | [Drizzle databases](/docs/modules/database/define#scaffold-the-database-baseline)                    |
-| `relkit add auth`                  | [Better Auth](/docs/modules/auth/better-auth#scaffold-the-auth-baseline)                             |
+| Command                            | Detailed guide                                                                    |
+| ---------------------------------- | --------------------------------------------------------------------------------- |
+| `relkit add service [name]`        | [Services](/docs/modules/service/define#scaffold-a-service)                       |
+| `relkit add function [name]`       | [Functions](/docs/learn/concepts/functions#scaffold-a-callable-function)          |
+| `relkit add error [name]`          | [Typed errors](/docs/learn/concepts/errors#scaffold-a-typed-error)                |
+| `relkit add event [name]`          | [Event contracts](/docs/modules/events/define#scaffold-an-event-contract)         |
+| `relkit add event-function [name]` | [Event consumers](/docs/modules/events/consume#scaffold-an-event-only-function)   |
+| `relkit add task [name]`           | [Tasks](/docs/modules/jobs/tasks#scaffold-a-task)                                 |
+| `relkit add job [name]`            | [Jobs](/docs/modules/jobs/quickstart)                                             |
+| `relkit add cache [name]`          | [Caches and profiles](/docs/modules/caching/define#scaffold-a-cache)              |
+| `relkit add bucket [name]`         | [Buckets and profiles](/docs/modules/storage/define#scaffold-a-bucket)            |
+| `relkit add tool [name]`           | [Tools](/docs/modules/ai/tools#scaffold-a-function-backed-tool)                   |
+| `relkit add prompt [name]`         | [Prompts](/docs/modules/ai/agents#scaffold-a-reusable-prompt)                     |
+| `relkit add agent [name]`          | [Agents and models](/docs/modules/ai/agents#scaffold-an-agent)                    |
+| `relkit add constants [name]`      | [Domain constants](/docs/modules/service/context-values#scaffold-shared-values)   |
+| `relkit add route [path]`          | [Routes and method mappings](/docs/modules/http/define#scaffold-a-route)          |
+| `relkit add middleware [name]`     | [HTTP middleware](/docs/modules/http/middleware#scaffold-middleware)              |
+| `relkit add transform [name]`      | [Request transforms](/docs/modules/http/requests#scaffold-a-request-transform)    |
+| `relkit add database`              | [Drizzle databases](/docs/modules/database/define#scaffold-the-database-baseline) |
+| `relkit add auth`                  | [Better Auth](/docs/modules/auth/better-auth#scaffold-the-auth-baseline)          |
 
 Square brackets in usage mean the value can be prompted for, not that names are unnecessary in CI.
 Database and auth take no name argument.
