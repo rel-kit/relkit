@@ -11,7 +11,8 @@ tables, generate migrations, add a custom query and an override, and use the gen
 in a member-registration transaction. You will expose a read operation and verify the result.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-You'll need an existing RELKIT application, Bun 1.3.10 or later, and a new local SQLite database. The final test verifies that registration writes both records and rolls back on failure.
+  You'll need an existing RELKIT application, Bun 1.3.10 or later, and a new local SQLite database.
+  The final test verifies that registration writes both records and rolls back on failure.
 </Callout>
 
 Use an installed app with the standard `@app/*` alias. If needed, follow [Create an app](/docs/learn/create-an-app).
@@ -280,5 +281,6 @@ to plan authentication tables and session wiring.
 ## Related tasks
 
 <Card icon="arrow-right">
-Continue with [Add email and password sign-in](/guides/auth/email-password-sign-in). Review [transaction limits](/docs/modules/database/transactions) when adapting the registration workflow.
+  Continue with [Add email and password sign-in](/guides/auth/email-password-sign-in). Review
+  [transaction limits](/docs/modules/database/transactions) when adapting the registration workflow.
 </Card>
