@@ -73,9 +73,9 @@ test.each([
   },
 );
 
-test("unexpected subscription defects retain their identity", async () => {
+test("unexpected stream consumer defects retain their identity", async () => {
   const events = createObservabilityStream();
-  const defect = new Error("subscription defect");
+  const defect = new Error("stream consumer defect");
   const current = await Effect.runPromise(Ref.make(state));
   const handler = inspectorBackend(
     current,

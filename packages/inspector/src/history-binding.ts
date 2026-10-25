@@ -41,11 +41,11 @@ export const bindInspectorHistory = Effect.fn("Inspector.bindHistory")(function*
         file.writeFile(JSON.stringify({ projectId }), "utf8"),
       );
       yield* connectionAttempt("history.marker-sync", () => file.sync());
-      yield* connectionAttempt("history.marker-publish", () => link(temporary, path)).pipe(
-        Effect.catchIf(
-          (error) => "code" in error.cause && error.cause.code === "EEXIST",
-          () => Effect.void,
-        ),
+      yield* connectionAttempt("history.marker-publish", () =>
+        link(temporary, path).catch((error) => {
+          if (error instanceof Error && "code" in error && error.code === "EEXIST") return;
+          throw error;
+        }),
       );
     }),
   );

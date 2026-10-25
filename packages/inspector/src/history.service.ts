@@ -4,6 +4,7 @@ import type { InspectorHistoryOperations } from "./history.types.js";
 import { InspectorHistoryNative, historyNativeFailure } from "./history-native.service.js";
 import { validateHistoryReply } from "./history-reply.js";
 import { observeExecution } from "@relkit/contracts/operation";
+import { LocalWorkerError } from "@relkit/observability/local/worker-contract";
 
 /** Persistent history opens only inside the standalone tool's Scope. */
 export class InspectorHistory extends Context.Service<
@@ -24,6 +25,14 @@ export class InspectorHistory extends Context.Service<
                 Effect.failCause(Cause.map(cause, historyNativeFailure)),
               ),
               Effect.tap((value) => validateHistoryReply(command, value)),
+              Effect.tapError((error) =>
+                Effect.logWarning("Inspection history command failed", {
+                  command: command.type,
+                  failure: error.operation,
+                  reason:
+                    error.cause instanceof LocalWorkerError ? error.cause.reason : "unclassified",
+                }),
+              ),
             ),
             () => ({
               commands: 1,

@@ -78,13 +78,22 @@ test("replay preserves envelope keys and ACK happens after the commit receipt", 
   expect(new Set(keys)).toEqual(new Set([`${connection.descriptor.sessionId}:1`]));
 });
 
-test("failed persistence sends no durable acknowledgement", async () => {
+test("failed persistence sends no acknowledgement and recovery commits the same replay key", async () => {
   const events: string[] = [];
+  const keys: string[] = [];
+  let failing = true;
   const history: InspectorHistoryOperations = {
-    call: () =>
-      Effect.fail(
-        new InspectionConnectionError({ operation: "disk-full", cause: new Error("full") }),
-      ),
+    call: (command) => {
+      if (failing)
+        return Effect.fail(
+          new InspectionConnectionError({ operation: "disk-full", cause: new Error("full") }),
+        );
+      return Effect.sync(() => {
+        if (command.type === "append") keys.push(...command.records.map((entry) => entry.key));
+        events.push("commit");
+        return [];
+      });
+    },
   };
   await expect(
     Effect.runPromise(
@@ -97,6 +106,19 @@ test("failed persistence sends no durable acknowledgement", async () => {
     ),
   ).rejects.toThrow();
   expect(events).toEqual([]);
+  failing = false;
+  expect(
+    await Effect.runPromise(
+      collectInspectionBatch(
+        remote(events, () => false),
+        history,
+        connection,
+        0,
+      ),
+    ),
+  ).toMatchObject({ through: 1 });
+  expect(events).toEqual(["commit", "ack"]);
+  expect(keys).toEqual([`${connection.descriptor.sessionId}:1`]);
 });
 
 test("an unsafe sequence cannot commit data or advance durable acknowledgement", async () => {

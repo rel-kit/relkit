@@ -1,6 +1,7 @@
 /**
  * Sends timeout-bound commands to an owned storage child and joins its close IPC.
- * Cancellation rejects pending callers and terminates that child's transport.
+ * Caller cancellation stops waiting; the shared worker retains sent commands
+ * until their reply or deadline, so one disconnected reader cannot abort writes.
  */
 import type { Schema } from "effect";
 import { WorkerTransportError } from "@relkit/observability/local/worker-contract";
@@ -18,18 +19,18 @@ export function sendWorkerCommand(
     return Promise.reject(state.failure ?? new Error("Telemetry worker is closed"));
   return new Promise((resolve, reject) => {
     const id = ++state.nextId;
-    const abort = () => failWorkerClient(state, new Error("Telemetry worker interrupted"));
+    const abort = () => reject(new DOMException("Telemetry request interrupted", "AbortError"));
     if (signal?.aborted) {
       abort();
-      reject(state.failure);
       return;
     }
     signal?.addEventListener("abort", abort, { once: true });
     if (signal?.aborted) {
       abort();
-      reject(state.failure);
+      signal.removeEventListener("abort", abort);
       return;
     }
+    // Sent work still owns its deadline and receipt, even after its caller leaves.
     const timer = setTimeout(
       () =>
         failWorkerClient(

@@ -1,6 +1,5 @@
 /** Checks IPC error codes, cancellation, send/timeouts and scoped worker release through Effect and Promise adapters. */
-import { fork } from "node:child_process";
-import type { ChildProcess } from "node:child_process";
+import { ChildProcess, fork } from "node:child_process";
 import { EventEmitter } from "node:events";
 import { Effect, Fiber, Layer } from "effect";
 import { beforeEach, expect, test, vi } from "vitest";
@@ -10,10 +9,13 @@ import { LocalWorkerService, localWorkerLayer } from "../src/local/worker-client
 import { startLocalWorker } from "../src/local/worker-client.js";
 import { ObservabilityQueryError } from "@relkit/observability";
 
-vi.mock("node:child_process", () => ({ fork: vi.fn() }));
+vi.mock("node:child_process", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("node:child_process")>()),
+  fork: vi.fn(),
+}));
 
 function fakeWorker() {
-  const child = Object.assign(new EventEmitter(), {
+  const child = Object.assign(new ChildProcess(), {
     pid: 9001,
     stderr: new EventEmitter(),
     connected: true,
@@ -31,7 +33,7 @@ function fakeWorker() {
     });
     return true;
   });
-  vi.mocked(fork).mockReturnValue(child as ChildProcess);
+  vi.mocked(fork).mockReturnValue(child);
   return child;
 }
 
@@ -60,16 +62,21 @@ test("Effect worker maps response codes and closed calls to tagged errors", asyn
   expect(child.kill).toHaveBeenCalledOnce();
 });
 
-test("interrupting the exported call aborts IPC and kills its worker", async () => {
+test("interrupting one call preserves the shared worker and unrelated replies", async () => {
   const child = fakeWorker();
   const failures: Error[] = [];
   const worker = Effect.runSync(startLocalWorkerEffect((error) => failures.push(error)));
   const fiber = Effect.runFork(worker.call({ type: "flush" }));
   await vi.waitFor(() => expect(child.send).toHaveBeenCalledOnce());
+  const sibling = Effect.runPromise(worker.call({ type: "query", kind: "logs", query: {} }));
+  await vi.waitFor(() => expect(child.send).toHaveBeenCalledTimes(2));
   await Effect.runPromise(Fiber.interrupt(fiber));
-  expect(child.kill).toHaveBeenCalledOnce();
-  expect(child.connected).toBe(false);
-  expect(failures[0]?.message).toBe("Telemetry worker interrupted");
+  expect(child.kill).not.toHaveBeenCalled();
+  expect(child.connected).toBe(true);
+  expect(failures).toEqual([]);
+  child.emit("message", { id: child.send.mock.calls[0]![0].id, value: null });
+  child.emit("message", { id: child.send.mock.calls[1]![0].id, value: { items: [] } });
+  await expect(sibling).resolves.toEqual({ items: [] });
   await Effect.runPromise(worker.close());
   expect(child.kill).toHaveBeenCalledOnce();
 });
@@ -88,20 +95,25 @@ test("IPC send failures use a tagged reason and release the worker", async () =>
   expect(child.kill).toHaveBeenCalledOnce();
 });
 
-test("IPC timeouts fail pending work and release the worker", async () => {
-  vi.useFakeTimers();
-  try {
-    const child = fakeWorker();
-    const worker = Effect.runSync(startLocalWorkerEffect());
-    const errorPromise = Effect.runPromise(Effect.flip(worker.call({ type: "flush" })));
-    await vi.advanceTimersByTimeAsync(15_000);
-    const error = await errorPromise;
-    expect(error.reason).toBe("timeout");
-    expect(child.kill).toHaveBeenCalledOnce();
-  } finally {
-    vi.useRealTimers();
-  }
-});
+test.each([false, true])(
+  "IPC deadlines still release stalled workers after cancellation=%s",
+  async (cancel) => {
+    vi.useFakeTimers();
+    try {
+      const child = fakeWorker();
+      const worker = Effect.runSync(startLocalWorkerEffect());
+      const fiber = Effect.runFork(worker.call({ type: "flush" }));
+      await vi.waitFor(() => expect(child.send).toHaveBeenCalledOnce());
+      if (cancel) await Effect.runPromise(Fiber.interrupt(fiber));
+      await vi.advanceTimersByTimeAsync(15_000);
+      const error = await Effect.runPromise(Effect.flip(worker.call({ type: "flush" })));
+      expect(error.reason).toBe("timeout");
+      expect(child.kill).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  },
+);
 
 test("worker Layer releases its process when the supplied effect finishes", async () => {
   const child = fakeWorker();

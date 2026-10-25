@@ -29,6 +29,7 @@ it.effect("direct history methods instrument success and native failure with fix
   Effect.gen(function* () {
     const registry: Metric.MetricRegistry = new Map();
     const logs: string[] = [];
+    const details: string[] = [];
     let fail = false;
     const native = historyNative(() => fail);
     yield* Effect.scoped(
@@ -45,6 +46,7 @@ it.effect("direct history methods instrument success and native failure with fix
         Logger.layer([
           Logger.make((event) => {
             logs.push(String(event.message));
+            details.push(JSON.stringify(event.message));
           }),
         ]),
       ),
@@ -63,6 +65,9 @@ it.effect("direct history methods instrument success and native failure with fix
     expect(logs).toContain("Execution operation completed");
     expect(logs).toContain("Execution operation failed");
     expect(JSON.stringify(logs)).not.toContain("synthetic-private-value");
+    expect(details.join("\n")).toContain('"reason":"worker"');
+    expect(details.join("\n")).toContain('"failure":"history.unavailable"');
+    expect(details.join("\n")).not.toContain("synthetic-private-value");
     expect(JSON.stringify(entries.map((entry) => entry.attributes))).not.toContain("/private/");
   }),
 );
