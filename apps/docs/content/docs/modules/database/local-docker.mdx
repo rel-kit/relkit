@@ -37,7 +37,11 @@ DATABASE_URL=postgres://relkit:PASTE_GENERATED_HEX@127.0.0.1:5433/relkit
 
 Create `compose.local.yaml`, or merge this service and volume into your existing Compose file:
 
-<include source="apps/docs/examples/setup/compose.yaml" lang="yaml" meta='title="compose.local.yaml"'>
+<include
+  source="apps/docs/examples/setup/compose.yaml"
+  lang="yaml"
+  meta='title="compose.local.yaml"'
+>
   /_snippets/source/apps/docs/examples/setup/compose.yaml
 </include>
 
@@ -72,7 +76,11 @@ Keep `DATABASE_URL: env.secret()` in the generated `src/platform/env.ts` and pas
 environment descriptor to `defineApp({ env })` in `relkit.config.ts`. The same configuration
 can be expressed inline as this complete minimal example:
 
-<include source="apps/docs/examples/setup/postgresql.ts" lang="ts" meta='title="relkit.config.ts — equivalent inline environment"'>
+<include
+  source="apps/docs/examples/setup/postgresql.ts"
+  lang="ts"
+  meta='title="relkit.config.ts — equivalent inline environment"'
+>
   /_snippets/source/apps/docs/examples/setup/postgresql.ts
 </include>
 

@@ -11,13 +11,13 @@ named functions; it does not create a new table, require a class, or replace the
 If the six base methods are sufficient, do not create an empty model file.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-Complete [database installation](/docs/modules/database/define) before importing the model API.
-Select the native model entrypoint for your dialect: `@relkit/drizzle/sqlite`,
-`@relkit/drizzle/pg`, or `@relkit/drizzle/mysql`. Each keeps the real native query-builder types in
-that selected declaration graph. The general root supports portable service operations and
-table-only model extensions; it does not implicitly select every dialect's native database type.
-Install your chosen Drizzle driver explicitly. In particular, the pinned MySQL declaration graph
-requires `mysql2`; a SQLite application does not need that driver.
+  Complete [database installation](/docs/modules/database/define) before importing the model API.
+  Select the native model entrypoint for your dialect: `@relkit/drizzle/sqlite`,
+  `@relkit/drizzle/pg`, or `@relkit/drizzle/mysql`. Each keeps the real native query-builder types
+  in that selected declaration graph. The general root supports portable service operations and
+  table-only model extensions; it does not implicitly select every dialect's native database type.
+  Install your chosen Drizzle driver explicitly. In particular, the pinned MySQL declaration graph
+  requires `mysql2`; a SQLite application does not need that driver.
 </Callout>
 
 Only when selecting the MySQL model entrypoint, add its declaration requirement:
