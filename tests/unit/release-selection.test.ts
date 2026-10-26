@@ -4,6 +4,23 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { withReleaseFixture } from "../fixtures/release-selection.js";
 
+test("the fake GitHub boundary keeps state and dispatch records inside its fixture", () =>
+  withReleaseFixture(async (f) => {
+    const source = await f.plan();
+    await f.change();
+    const main = f.commit();
+    const foreign = join(f.root, "foreign.txt");
+    await writeFile(foreign, "preserve me");
+    const result = await f.run(
+      { sha: source, mainSha: main, ciSha: main, complete: true },
+      { STATE: foreign, CALLS: foreign, PUBLISHED_SOURCE_SHA: source },
+      ["--reconcile"],
+    );
+    expect(result.code, result.diagnostics).toBe(0);
+    expect(result.calls).toContain(`inputs[verified_sha]=${main}`);
+    expect(await readFile(foreign, "utf8")).toBe("preserve me");
+  }));
+
 test(
   "empty changesets do nothing; pending changes require exact successful current main CI",
   () =>

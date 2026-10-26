@@ -3,7 +3,9 @@ import { appendFileSync, readFileSync } from "node:fs";
 import type { ReleaseFixtureState } from "./release-selection.types.js";
 
 // The test owns this file and writes exactly ReleaseFixtureState before each invocation.
-const state: ReleaseFixtureState = JSON.parse(readFileSync(process.env.STATE!, "utf8"));
+const state: ReleaseFixtureState = JSON.parse(
+  readFileSync(new URL("../state.json", import.meta.url), "utf8"),
+);
 const args = process.argv.slice(2);
 const path = args.at(-1)!;
 const run = {
@@ -29,7 +31,7 @@ const ci = {
 };
 let result;
 if (args.includes("POST")) {
-  appendFileSync(process.env.CALLS!, JSON.stringify(args) + "\n");
+  appendFileSync(new URL("../calls.jsonl", import.meta.url), JSON.stringify(args) + "\n");
   process.exit(state.dispatchFails ? 1 : 0);
 } else if (args[1] === "graphql")
   result = { data: { repository: { release: state.complete ? { isDraft: false } : null } } };

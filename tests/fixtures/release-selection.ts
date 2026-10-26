@@ -120,8 +120,6 @@ async function runSelector(
     env: {
       ...process.env,
       PATH: `${join(root, "bin")}:${process.env.PATH}`,
-      STATE: join(root, "state.json"),
-      CALLS: join(root, "calls.jsonl"),
       GITHUB_REPOSITORY: "rel-kit/relkit",
       RECOVERY_RUN_ID: "",
       PUBLISHED_SOURCE_SHA: "",

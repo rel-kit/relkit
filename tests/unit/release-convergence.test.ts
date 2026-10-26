@@ -18,12 +18,14 @@ const concurrency = Schema.Struct({
   queue: Schema.optionalKey(Schema.String),
 });
 const workflow = Schema.Struct({
+  "cache-mode": Schema.optionalKey(Schema.String),
   concurrency,
   jobs: Schema.Record(
     Schema.String,
     Schema.Struct({
       name: Schema.String,
       if: Schema.String,
+      "cache-mode": Schema.optionalKey(Schema.String),
       steps: Schema.Array(step),
       permissions: Schema.Record(Schema.String, Schema.String),
     }),
@@ -47,6 +49,9 @@ test("main CI cannot replace another commit and release snapshots reconcile with
     "cancel-in-progress": false,
     queue: "max",
   });
+  expect(release["cache-mode"]).toBe("none");
+  for (const job of Object.values(release.jobs))
+    expect(job["cache-mode"] ?? release["cache-mode"]).toBe("none");
   const select = release.jobs["select-release-mode"];
   expect(select.steps[0]?.with?.ref).toBe("${{ github.sha }}");
   expect(release.jobs.pack.name).toContain("${{ needs.select-release-mode.outputs.sha }}");

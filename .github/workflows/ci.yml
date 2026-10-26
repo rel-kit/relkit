@@ -19,6 +19,7 @@ on:
         type: string
 
 permissions: {}
+cache-mode: none
 
 concurrency:
   group: relkit-release-main
