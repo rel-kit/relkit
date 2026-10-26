@@ -1,10 +1,12 @@
 /** Verifies production bundling resolves its actual installed consumer context. */
 import { expect, it } from "@effect/vitest";
-import { Effect, Layer } from "effect";
+import { Effect, Exit, Layer } from "effect";
 import { DependencySource } from "@relkit/provider/internal/dependencies";
 import { bundleServerEffect } from "../../src/commands/build-support.js";
 import { cleanupLayer } from "../../src/services/cleanup.service.js";
 import { CliProcess } from "../../src/services/process.service.js";
+import { CliFileSystem } from "../../src/services/filesystem.service.js";
+import { linkRuntimeModules } from "../../src/services/runtime-module-links.js";
 import { filesystemTestLayer } from "./test-layers.js";
 
 it.effect("ordinary and prepared builds resolve modules from the consuming project", () =>
@@ -56,5 +58,41 @@ it.effect("ordinary and prepared builds resolve modules from the consuming proje
       expect(links.every(([target]) => target?.startsWith("/consumer/node_modules/"))).toBe(true);
       expect(links.some(([target]) => /langchain|pulumi|drizzle/.test(target ?? ""))).toBe(false);
     }
+  }),
+);
+
+it.effect("rejects a missing selected runtime owner before writing any links", () =>
+  Effect.gen(function* () {
+    const writes: string[] = [];
+    const result = yield* Effect.exit(
+      CliFileSystem.use((files) =>
+        linkRuntimeModules(
+          files,
+          DependencySource.of({
+            manager: () => Effect.succeed("pnpm"),
+            resolve: () => Effect.succeed(null),
+            satisfies: () => true,
+          }),
+          "/stage/server",
+          "/consumer",
+          ["@relkit/runtime-hono"],
+        ),
+      ).pipe(
+        Effect.provide(
+          filesystemTestLayer({
+            mkdir: (path) =>
+              Effect.sync(() => {
+                writes.push(path);
+              }),
+            symlink: (_target, path) =>
+              Effect.sync(() => {
+                writes.push(path);
+              }),
+          }),
+        ),
+      ),
+    );
+    expect(Exit.isFailure(result)).toBe(true);
+    expect(writes).toEqual([]);
   }),
 );

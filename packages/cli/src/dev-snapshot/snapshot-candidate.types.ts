@@ -11,6 +11,17 @@ import type { SnapshotEpoch, SnapshotEpochToken } from "./snapshot-epoch.types.j
 
 /** Owned output writes belong to the supervisor's freshly acquired generation directory. */
 export interface SnapshotCandidateFileOperations {
+  /** Recreates selected local runtime ownership after sealed bytes are installed.
+   * @param directory - Fresh supervisor-owned candidate output.
+   * @param projectRoot - Current installed application root.
+   * @param dependencies - Selected package names from the sealed production manifest.
+   * @returns Link completion or a typed failure before candidate startup.
+   */
+  readonly linkRuntime: (
+    directory: string,
+    projectRoot: string,
+    dependencies: readonly string[],
+  ) => Effect.Effect<void, CliAdapterError>;
   readonly write: (
     directory: string,
     path: string,

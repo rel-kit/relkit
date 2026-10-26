@@ -111,6 +111,8 @@ function copyHelperFiles(root: string) {
       "services/filesystem.types.ts",
       "services/filesystem-exclusive.ts",
       "services/filesystem-exclusive.types.ts",
+      "services/runtime-module-links.ts",
+      "services/production-dependency-source.ts",
       "services/process.service.ts",
       "services/process.types.ts",
       "services/cleanup.service.ts",

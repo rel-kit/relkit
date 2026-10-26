@@ -3,12 +3,13 @@
  * probes its normal backend route before traffic activation. It reuses validation
  * metadata and captured byte strings; later cache edits cannot replace their content.
  */
-import { Cause, Context, Effect, Layer } from "effect";
+import { Cause, Context, Effect, Layer, Schema } from "effect";
 import { mapErrorCause } from "../services/map-error-cause.js";
 import { API_BASE_PATH } from "@relkit/contracts";
 import { canonicalJson } from "@relkit/contracts";
 import { observeExecution } from "@relkit/contracts/operation";
 import { cliAdapterError } from "../cli-errors.js";
+import { ProductionManifest } from "../commands/build-production.schemas.js";
 import { SnapshotCandidateFiles } from "./snapshot-candidate-files.js";
 import { SnapshotProbe } from "./snapshot-probe.service.js";
 import { verifySnapshotGraphResponse } from "./snapshot-graph-proof.js";
@@ -76,6 +77,7 @@ const install = Effect.fn("DevSnapshot.installCandidate")(function* (
   yield* writes
     .write(candidate.outputDirectory, "deferred-integrity.json", integrityBytes)
     .pipe(mapErrorCause((error) => cliAdapterError("dev.snapshot.install", error)));
+  yield* linkSnapshotRuntime(writes, request);
   yield* epoch
     .verify(token)
     .pipe(mapErrorCause((error) => cliAdapterError("dev.snapshot.epoch", error)));
@@ -83,6 +85,28 @@ const install = Effect.fn("DevSnapshot.installCandidate")(function* (
     entrypoint: snapshot.receipt.entrypoint,
     environment: { RELKIT_DEFERRED_INTEGRITY_HASH: snapshotDigest(integrityBytes) },
   };
+});
+
+/**
+ * Recreates local dependency links from the accepted manifest without rereading mutable cache files.
+ * @param writes - Captured candidate output authority.
+ * @param request - Sealed manifest bytes and the current physical application root.
+ * @returns Runtime ownership or a typed manifest/link failure before epoch acceptance.
+ */
+const linkSnapshotRuntime = Effect.fn("DevSnapshot.linkRuntime")(function* (
+  writes: SnapshotCandidateFileOperations,
+  request: SnapshotCandidateRequest,
+) {
+  const manifest = request.snapshot.artifacts.find((member) => member.path === "package.json");
+  if (manifest === undefined) return;
+  const selected = yield* Schema.decodeUnknownEffect(Schema.fromJsonString(ProductionManifest))(
+    Buffer.from(manifest.content, "base64").toString("utf8"),
+  ).pipe(Effect.mapError((cause) => cliAdapterError("dev.snapshot.runtimeManifest", cause)));
+  yield* writes.linkRuntime(
+    request.candidate.outputDirectory,
+    request.projectRoot,
+    Object.keys(selected.dependencies),
+  );
 });
 
 /**

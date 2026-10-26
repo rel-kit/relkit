@@ -2,6 +2,7 @@
  * Bundles a staged backend through owned filesystem and subprocess services and
  * rebases compiler manifest imports for publication. Temporary module links and
  * process groups share one scope, so failed or cancelled bundles cannot leak them.
+ * Selected runtime ownership is retained separately inside the caller-owned stage.
  */
 import { join, relative } from "node:path";
 import { Effect, Layer } from "effect";
@@ -11,7 +12,8 @@ import { CliProcess, processLayer } from "../services/process.service.js";
 import { cleanupLayer } from "../services/cleanup.service.js";
 import { runBundleProcess } from "./build-bundle-process.js";
 import { linkBuildModules } from "./build-module-links.js";
-import { DependencySourceLive } from "@relkit/provider/internal/dependencies";
+import { DependencySource, DependencySourceLive } from "@relkit/provider/internal/dependencies";
+import { linkRuntimeModules } from "../services/runtime-module-links.js";
 
 export { dockerfile, dockerignore } from "./build-container.js";
 
@@ -21,6 +23,7 @@ export { dockerfile, dockerignore } from "./build-container.js";
  * @param projectRoot - Root used by Bun resolution.
  * @param development - Whether to retain inline source maps.
  * @param inventoryFile - Preparation inventory filename; enables sealed lazy chunks.
+ * @param external - Selected packages left external by the bundler.
  * @returns Lazy bundling requiring filesystem and subprocess authority.
  */
 export const bundleServerEffect = Effect.fn("Project.bundleServer")(
@@ -33,6 +36,7 @@ export const bundleServerEffect = Effect.fn("Project.bundleServer")(
   ) {
     const files = yield* CliFileSystem;
     const processes = yield* CliProcess;
+    const source = yield* DependencySource;
     const moduleLink = join(serverDirectory, "node_modules");
     yield* Effect.scoped(
       Effect.gen(function* () {
@@ -47,6 +51,7 @@ export const bundleServerEffect = Effect.fn("Project.bundleServer")(
         );
       }),
     );
+    yield* linkRuntimeModules(files, source, serverDirectory, projectRoot, external);
   },
   (
     effect,
