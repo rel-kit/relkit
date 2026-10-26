@@ -1,121 +1,126 @@
+/** Exercises real CLI decisions against competing main snapshots, original archives and retryable follow-up dispatch. */
 import { expect, test } from "bun:test";
-import { execFileSync } from "node:child_process";
-import { chmod, copyFile, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { withReleaseFixture } from "../fixtures/release-selection.js";
 
-test("real selector skips empty changesets, reuses archives, and recovers after main advances", async () => {
-  const fixture = await mkdtemp(join(tmpdir(), "relkit-release-selection-"));
-  try {
-    const git = (...args: string[]) =>
-      execFileSync("git", args, { cwd: fixture, encoding: "utf8" }).trim();
-    git("init", "-b", "main");
-    const commit = () =>
-      git(
-        "-c",
-        "user.name=Test",
-        "-c",
-        "user.email=release@example.test",
-        "-c",
-        "commit.gpgsign=false",
-        "-c",
-        "core.hooksPath=/dev/null",
-        "commit",
-        "--allow-empty",
-        "-m",
-        "fixture",
+test("the fake GitHub boundary keeps state and dispatch records inside its fixture", () =>
+  withReleaseFixture(async (f) => {
+    const source = await f.plan();
+    await f.change();
+    const main = f.commit();
+    const foreign = join(f.root, "foreign.txt");
+    await writeFile(foreign, "preserve me");
+    const result = await f.run(
+      { sha: source, mainSha: main, ciSha: main, complete: true },
+      { STATE: foreign, CALLS: foreign, PUBLISHED_SOURCE_SHA: source },
+      ["--reconcile"],
+    );
+    expect(result.code, result.diagnostics).toBe(0);
+    expect(result.calls).toContain(`inputs[verified_sha]=${main}`);
+    expect(await readFile(foreign, "utf8")).toBe("preserve me");
+  }));
+
+test(
+  "empty changesets do nothing; pending changes require exact successful current main CI",
+  () =>
+    withReleaseFixture(async (f) => {
+      expect((await f.run()).output).toContain("mode=none");
+      await f.change();
+      expect((await f.run()).output).toContain("mode=version");
+      expect((await f.run({ noCi: true })).output).toContain("mode=none");
+      const wrong = await f.run({ ciSha: "a".repeat(40) });
+      expect(wrong.code).not.toBe(0);
+    }),
+  30_000,
+);
+
+test(
+  "main advancing before the first pack publishes the original verified version commit",
+  () =>
+    withReleaseFixture(async (f) => {
+      const source = await f.plan();
+      expect((await f.run()).output).toBe(`mode=publish\nsha=${source}\n`);
+      await f.change();
+      const advanced = f.commit();
+      const selected = await f.run({ sha: source, mainSha: advanced });
+      expect(selected.code, selected.diagnostics).toBe(0);
+      expect(selected.output).toBe(`mode=publish\nsha=${source}\n`);
+      expect((await f.run({ sha: source, noCi: true })).output).toContain("mode=none");
+      const next = await f.run({ complete: true, mainSha: advanced, ciSha: advanced });
+      expect(next.output).toBe(`mode=version\nsha=${advanced}\n`);
+    }),
+  30_000,
+);
+
+test(
+  "an old queued snapshot recovers an archive produced by a newer execution",
+  () =>
+    withReleaseFixture(async (f) => {
+      const source = await f.plan();
+      const newer = f.commit();
+      f.git("checkout", "--detach", source);
+      const recovered = await f.run({ sha: source, executionSha: newer, previous: true });
+      expect(recovered.code, recovered.diagnostics).toBe(0);
+      expect(recovered.output).toContain(`mode=recover\nsha=${source}\nartifact_id=123`);
+      for (const failure of [{ expired: true }, { missing: true }]) {
+        const refused = await f.run({
+          sha: source,
+          executionSha: newer,
+          previous: true,
+          ...failure,
+        });
+        expect(refused.code).not.toBe(0);
+        expect(refused.diagnostics).toContain("Original release archives");
+      }
+      expect(
+        (await f.run({ sha: source, executionSha: newer }, { RECOVERY_RUN_ID: "42" })).output,
+      ).toContain("mode=recover");
+    }),
+  30_000,
+);
+
+test(
+  "formatting cannot move batch identity and semantic same-version edits are rejected",
+  () =>
+    withReleaseFixture(async (f) => {
+      const source = await f.plan();
+      const path = join(f.root, ".changeset/release.json");
+      const plan = JSON.parse(await readFile(path, "utf8"));
+      await writeFile(path, JSON.stringify(plan, null, 2));
+      f.commit();
+      expect((await f.run({ sha: source })).output).toBe(`mode=publish\nsha=${source}\n`);
+      plan.packages[0].version = "0.7.11";
+      await writeFile(path, JSON.stringify(plan));
+      f.commit();
+      const refused = await f.run({ sha: source });
+      expect(refused.code).not.toBe(0);
+      expect(refused.diagnostics).toContain("without a new batch version");
+    }),
+  30_000,
+);
+
+test(
+  "publication requeues newer verified work; retrying a failed dispatch progresses and same-SHA runs stop",
+  () =>
+    withReleaseFixture(async (f) => {
+      const source = await f.plan();
+      await f.change();
+      const main = f.commit();
+      const env = { PUBLISHED_SOURCE_SHA: source };
+      const state = { sha: source, mainSha: main, ciSha: main, complete: true };
+      const failed = await f.run({ ...state, dispatchFails: true }, env, ["--reconcile"]);
+      expect(failed.code).not.toBe(0);
+      const retry = await f.run(state, env, ["--reconcile"]);
+      expect(retry.code, retry.diagnostics).toBe(0);
+      expect(retry.calls).toContain(`inputs[verified_sha]=${main}`);
+      expect((await f.run(state)).output).toContain("mode=version");
+      expect((await f.run(state, {}, ["--reconcile"])).calls).toBe("");
+      expect((await f.run({ ...state, noCi: true }, env, ["--reconcile"])).calls).toBe("");
+      f.git("checkout", "--detach", source);
+      expect((await f.run(state, {}, ["--reconcile"])).calls).toContain(
+        `inputs[verified_sha]=${main}`,
       );
-    commit();
-    for (const directory of ["scripts", ".changeset", "bin"]) await mkdir(join(fixture, directory));
-    for (const file of ["select-release.ts", "release-plan.ts", "release-recovery.ts"])
-      await copyFile(
-        resolve(import.meta.dir, "../../scripts", file),
-        join(fixture, "scripts", file),
-      );
-    const gh = join(fixture, "bin/gh");
-    const statePath = join(fixture, "state.json");
-    await writeFile(
-      gh,
-      `#!${process.execPath}\n` +
-        String.raw`
-      import { readFileSync } from "node:fs";
-      const state = JSON.parse(readFileSync(process.env.STATE, "utf8"));
-      const args = process.argv.slice(2);
-      const path = args.at(-1);
-      let result;
-      if (args[1] === "graphql") result = { data: { repository: { release: state.complete ? { isDraft: false } : null } } };
-      else if (path.includes("/actions/workflows/")) result = { workflow_runs: state.previous ? [{ id: 42, head_sha: state.sha, status: "completed" }] : [] };
-      else if (path.includes("/jobs")) result = { jobs: [{ name: "Build validated npm artifacts", conclusion: "success" }] };
-      else if (path.includes("/artifacts")) result = { artifacts: [{ id: 123, name: "npm-release-" + state.sha, expired: !!state.expired }] };
-      else result = { path: ".github/workflows/ci.yml", head_branch: "main", head_sha: state.sha, event: "workflow_dispatch", status: "completed", head_repository: { full_name: "rel-kit/relkit" } };
-      console.log(JSON.stringify(result));
-    `,
-    );
-    await chmod(gh, 0o755);
-    let sha = git("rev-parse", "HEAD");
-    const run = async (state: Record<string, unknown> = {}, env: Record<string, string> = {}) => {
-      await writeFile(statePath, JSON.stringify({ sha, ...state }));
-      const child = Bun.spawn([process.execPath, "scripts/select-release.ts"], {
-        cwd: fixture,
-        env: {
-          ...process.env,
-          PATH: `${join(fixture, "bin")}:${process.env.PATH}`,
-          STATE: statePath,
-          GITHUB_REPOSITORY: "rel-kit/relkit",
-          GITHUB_RUN_ID: "44",
-          VERIFIED_SHA: sha,
-          RECOVERY_RUN_ID: "",
-          ...env,
-        },
-        stdout: "pipe",
-        stderr: "pipe",
-      });
-      const [code, stdout, stderr] = await Promise.all([
-        child.exited,
-        new Response(child.stdout).text(),
-        new Response(child.stderr).text(),
-      ]);
-      return { code, diagnostics: stdout + stderr, output: stdout };
-    };
-    await writeFile(join(fixture, ".changeset/empty.md"), "---\n---\n\nNo public change.\n");
-    expect((await run()).output).toBe(`mode=none\nsha=${sha}\n`);
-    await writeFile(
-      join(fixture, ".changeset/change.md"),
-      '---\n"create-relkit": patch\n---\n\nChanged.\n',
-    );
-    expect((await run()).output).toContain("mode=version");
-    await rm(join(fixture, ".changeset/change.md"));
-    await writeFile(
-      join(fixture, ".changeset/release.json"),
-      JSON.stringify({
-        protocol: "relkit.release-plan.v1",
-        version: "0.7.10",
-        packages: [{ name: "create-relkit", version: "0.7.10" }],
-      }),
-    );
-    git("add", ".changeset/release.json");
-    commit();
-    sha = git("rev-parse", "HEAD");
-    const fresh = await run();
-    expect(fresh.code, fresh.diagnostics).toBe(0);
-    expect(fresh.output).toContain("mode=publish");
-    expect((await run({ previous: true })).output).toContain("mode=recover");
-    expect((await run({ complete: true })).output).toContain("mode=none");
-    await writeFile(join(fixture, "docs.md"), "later commit");
-    git("add", "docs.md");
-    commit();
-    const advanced = git("rev-parse", "HEAD");
-    expect((await run()).output).toBe(`mode=none\nsha=${sha}\n`);
-    const refused = await run({}, { VERIFIED_SHA: advanced });
-    expect(refused.code).not.toBe(0);
-    expect(refused.diagnostics).toContain("original archives");
-    const recovered = await run({}, { RECOVERY_RUN_ID: "42", VERIFIED_SHA: "" });
-    expect(recovered.code, recovered.diagnostics).toBe(0);
-    expect(recovered.output).toContain(`mode=recover\nsha=${sha}\nartifact_id=123`);
-    const expired = await run({ expired: true }, { RECOVERY_RUN_ID: "42" });
-    expect(expired.code).not.toBe(0);
-    expect(expired.diagnostics).toContain("expired");
-  } finally {
-    await rm(fixture, { recursive: true, force: true });
-  }
-}, 30_000);
+    }),
+  30_000,
+);

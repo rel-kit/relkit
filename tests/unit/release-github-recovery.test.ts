@@ -12,9 +12,11 @@ const publish = steps.find(
   (step: { name?: string }) => step.name === "Publish the immutable GitHub release",
 );
 
-test("only recovery requests workflow authority, after npm verification", () => {
+test("historical publication requests workflow authority only after npm verification", () => {
   const recovery = steps.find((step: { id?: string }) => step.id === "recovery-app");
-  expect(recovery?.if).toBe("needs.select-release-mode.outputs.mode == 'recover'");
+  expect(recovery?.if).toBe(
+    "needs.select-release-mode.outputs.mode == 'recover' || needs.select-release-mode.outputs.sha != github.sha",
+  );
   expect(recovery.with["permission-contents"]).toBe("write");
   expect(recovery.with["permission-workflows"]).toBe("write");
   expect(steps.indexOf(recovery)).toBeGreaterThan(
