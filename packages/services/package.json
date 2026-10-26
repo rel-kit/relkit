@@ -1,6 +1,6 @@
 {
   "name": "@relkit/services",
-  "version": "0.7.11",
+  "version": "0.7.12",
   "description": "RELKIT service authoring API; prefer @relkit/app/services in applications.",
   "license": "MIT",
   "repository": {

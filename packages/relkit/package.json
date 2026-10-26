@@ -1,6 +1,6 @@
 {
   "name": "relkit",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "The RELKIT CLI for bunx relkit and global installation.",
   "license": "MIT",
   "repository": {
