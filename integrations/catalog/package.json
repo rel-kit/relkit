@@ -1,6 +1,6 @@
 {
   "name": "@relkit/integrations",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Metadata-only catalog of independently selected RELKIT integrations.",
   "license": "MIT",
   "repository": {
