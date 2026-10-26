@@ -39,7 +39,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           CI_RUN_ID: ${{ github.event.workflow_run.id }}
-        run: bun scripts/pr-automation.ts
+        run: |
+          bun scripts/pr-automation.ts > "$RUNNER_TEMP/pr-preparation.json"
+          if test -s "$RUNNER_TEMP/pr-preparation.json"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
       - id: release-app
         if: steps.plan.outputs.changed == 'true'
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3

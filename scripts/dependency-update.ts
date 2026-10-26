@@ -1,8 +1,8 @@
-/** Normalizes a Dependabot candidate in read-only CI and exports only changed UTF-8 data for separate trusted admission. */
+/** Normalizes a Dependabot candidate in read-only CI and exports changed UTF-8 data on stdout for separate trusted admission. */
 import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { Effect, Schema } from "effect";
+import { Effect, Logger, Schema } from "effect";
 import { runBenchmarkMain } from "./dev-readiness/benchmark-main.js";
 import { automationCommand, prepareOperation } from "./pr-automation-io.js";
 import {
@@ -72,15 +72,10 @@ export async function normalizeDependencies(
 /**
  * Exports tracked modifications without tar extraction or executable transport.
  * @param root - Candidate checkout after frozen-install and sync validation.
- * @param output - CI-owned JSON file outside the checkout.
  * @param signal - Owning CI cancellation signal.
- * @returns Completion after the head-bound artifact is written.
+ * @returns Completion after the head-bound JSON data is emitted to stdout.
  */
-async function exportDependencies(
-  root: string,
-  output: string,
-  signal: AbortSignal,
-): Promise<void> {
+async function exportDependencies(root: string, signal: AbortSignal): Promise<void> {
   const head = (await automationCommand("git", ["rev-parse", "HEAD"], root, signal)).trim();
   const paths = (
     await automationCommand("git", ["diff", "--name-only", "-z", "HEAD"], root, signal)
@@ -95,19 +90,14 @@ async function exportDependencies(
     );
     files.push({ path, content: await readFile(resolve(root, path), "utf8") });
   }
-  await writeFile(
-    output,
-    JSON.stringify({ repository: process.env.GITHUB_REPOSITORY, head, files }),
-  );
+  console.log(JSON.stringify({ repository: process.env.GITHUB_REPOSITORY, head, files }));
 }
 
 if (import.meta.main) {
   const root = resolve(import.meta.dir, "..");
   const program = Effect.gen(function* () {
     if (process.argv[2] === "--export") {
-      yield* prepareOperation("dependency.export", (signal) =>
-        exportDependencies(root, process.argv[3]!, signal),
-      );
+      yield* prepareOperation("dependency.export", (signal) => exportDependencies(root, signal));
     } else {
       yield* prepareOperation("dependency.normalize", (signal) =>
         normalizeDependencies(root, process.env.PR_BASE_SHA ?? "", signal),
@@ -115,5 +105,5 @@ if (import.meta.main) {
     }
     yield* Effect.logInfo("Dependency preparation completed");
   });
-  await runBenchmarkMain(program);
+  await runBenchmarkMain(program.pipe(Effect.provideService(Logger.LogToStderr, true)));
 }

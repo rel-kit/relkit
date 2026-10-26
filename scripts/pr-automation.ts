@@ -1,8 +1,7 @@
-/** Prepares an exact-head commit using trusted base code and GitHub/PR data; a later workflow step alone receives write credentials. */
+/** Emits an exact-head commit as JSON using trusted base code and GitHub/PR data; the workflow owns output files and later write credentials. */
 import assert from "node:assert/strict";
-import { appendFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { Context, Effect, Layer, Schema } from "effect";
+import { Context, Effect, Layer, Logger, Schema } from "effect";
 import { runBenchmarkMain } from "./dev-readiness/benchmark-main.js";
 import { automationCommand, prepareOperation } from "./pr-automation-io.js";
 import {
@@ -128,16 +127,12 @@ if (import.meta.main) {
       process.env.GITHUB_REPOSITORY ?? "",
       process.env.CI_RUN_ID ?? "",
     );
-    yield* prepareOperation("pull-request.output", async () => {
-      if (request)
-        await writeFile(
-          resolve(process.env.RUNNER_TEMP!, "pr-preparation.json"),
-          JSON.stringify(request),
-        );
-      await appendFile(process.env.GITHUB_OUTPUT!, `changed=${request !== undefined}\n`);
-    });
+    if (request) yield* Effect.sync(() => console.log(JSON.stringify(request)));
   });
   await runBenchmarkMain(
-    program.pipe(Effect.provide(Layer.effect(PullRequestPreparation, PullRequestPreparation.make))),
+    program.pipe(
+      Effect.provide(Layer.effect(PullRequestPreparation, PullRequestPreparation.make)),
+      Effect.provideService(Logger.LogToStderr, true),
+    ),
   );
 }

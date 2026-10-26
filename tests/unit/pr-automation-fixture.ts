@@ -1,6 +1,6 @@
 /** Owns disposable Git repositories for exercising PR-data reads and dependency normalization without touching the user's checkout. */
 import { execFileSync } from "node:child_process";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -53,4 +53,27 @@ export async function withAutomationRepository(
   } finally {
     await rm(root, { recursive: true, force: true });
   }
+}
+
+/**
+ * Replaces GitHub reads with fixed JSON and directs Git reads to the disposable object database.
+ * @param root - Owned fixture repository; no live fetches or API requests are allowed.
+ * @param responses - Exact API paths and their serialized responses.
+ * @returns Completion after both finite command shims are executable.
+ */
+export async function installAutomationCommands(
+  root: string,
+  responses: Readonly<Record<string, string>>,
+): Promise<void> {
+  await mkdir(join(root, "bin"));
+  await writeFile(
+    join(root, "bin/gh"),
+    `#!${process.execPath}\nconst responses = ${JSON.stringify(responses)};\nconsole.log(responses[process.argv.at(-1)]);\n`,
+  );
+  await writeFile(
+    join(root, "bin/git"),
+    `#!/bin/sh\nif test "$1" = fetch; then exit 0; fi\nexec /usr/bin/git -C '${root.replaceAll("'", "'\\''")}' "$@"\n`,
+  );
+  await chmod(join(root, "bin/gh"), 0o755);
+  await chmod(join(root, "bin/git"), 0o755);
 }
