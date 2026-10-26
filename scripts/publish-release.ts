@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import { appendFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { readManifest, type Artifact, type Manifest } from "./release-manifest.ts";
+import { publishWithProvenanceRetry } from "./release-publish-retry.ts";
 
 let logFile: string | undefined;
 const visibilityAttempts = 180;
@@ -140,17 +141,19 @@ async function main(): Promise<void> {
         true,
       );
       try {
-        run([
-          "publish",
-          join(directory, artifact.file),
-          "--access",
-          "public",
-          "--tag",
-          newer === undefined || newer === "" || newer === "[]"
-            ? "latest"
-            : `release-${manifest.version}`,
-          "--provenance",
-        ]);
+        await publishWithProvenanceRetry(() =>
+          run([
+            "publish",
+            join(directory, artifact.file),
+            "--access",
+            "public",
+            "--tag",
+            newer === undefined || newer === "" || newer === "[]"
+              ? "latest"
+              : `release-${manifest.version}`,
+            "--provenance",
+          ]),
+        );
       } catch (cause) {
         // npm can reject an already accepted version while public metadata still returns 404.
         if (
