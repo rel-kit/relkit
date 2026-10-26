@@ -1,12 +1,13 @@
 /**
  * Checks current machine headroom before expensive fixture work. The benchmark
  * normally defers new work under warning pressure, CPU saturation or low disk
- * space. An explicit operator override retains observations while admitting work.
+ * space. Container gates can wait for headroom; benchmarks keep immediate deferral.
+ * An explicit operator override retains observations while admitting work.
  */
 import { execFileSync } from "node:child_process";
 import { statfs } from "node:fs/promises";
 import { cpus, loadavg, platform } from "node:os";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Schedule } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
 import { inspectionNative } from "./consumer-installation-native.js";
 import type {
@@ -72,6 +73,27 @@ export class ConsumerResourceMonitor extends Context.Service<
 >()("relkit.scripts.ConsumerResourceMonitor", {
   make: Effect.succeed({ inspect: inspectConsumerResources }),
 }) {}
+
+/**
+ * Waits for fresh headroom before container builds without relaxing admission limits.
+ * @param directory - Fixture volume whose available capacity constrains work.
+ * @returns Lazy admission after at most 30 ten-second waits; a final rejection remains blocked.
+ * @remarks Requires ConsumerResourceMonitor. Probe failures and interruption propagate.
+ */
+export const awaitConsumerResources = Effect.fn("ConsumerResources.await")(
+  function* (directory: string) {
+    const monitor = yield* ConsumerResourceMonitor;
+    return yield* monitor.inspect(directory).pipe(
+      Effect.tap((admission) => Effect.logInfo("Container resource preflight", admission)),
+      Effect.repeat({
+        while: (admission) => admission.blocked !== null,
+        times: 30,
+        schedule: Schedule.spaced("10 seconds"),
+      }),
+    );
+  },
+  (effect) => observeExecution("testing", "consumer.resources.wait", effect),
+);
 
 /** Native implementation; tests substitute the same admission contract. */
 export const consumerResourceMonitorLayer = Layer.effect(

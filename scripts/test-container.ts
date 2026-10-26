@@ -1,4 +1,7 @@
-/** Builds an exact standalone image before the existing real container acceptance suite. */
+/**
+ * Waits for machine headroom, then builds an exact standalone image for native
+ * container acceptance. The invocation owns its build inputs, image and cleanup.
+ */
 import { randomUUID } from "node:crypto";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -8,7 +11,7 @@ import { buildInspectorImage } from "./build-inspector-image.js";
 import { prepareInspectorImage } from "./prepare-inspector-image.js";
 import { packAll } from "./release-check-artifacts.js";
 import { packages } from "./release-check-support.js";
-import { inspectConsumerResources } from "./consumer-resources.js";
+import { awaitConsumerResources, consumerResourceMonitorLayer } from "./consumer-resources.js";
 import { scaffoldNative } from "./scaffold-native.js";
 import { scaffoldChild, ScaffoldProcess, scaffoldProcessLayer } from "./scaffold-process.js";
 import { docker } from "./tests/server-runtime/production-docker-owner.js";
@@ -75,8 +78,7 @@ const buildPackages = Effect.gen(function* () {
 
 /** Every build tag, builder, input directory and archive directory belongs to this invocation. */
 const main = Effect.gen(function* () {
-  const admission = yield* inspectConsumerResources(root);
-  console.log(JSON.stringify({ containerResourcePreflight: admission }));
+  const admission = yield* awaitConsumerResources(root);
   if (admission.blocked) return yield* Effect.fail(new Error(admission.blocked));
   yield* buildPackages;
   const directory = yield* Effect.acquireRelease(
@@ -111,4 +113,6 @@ const main = Effect.gen(function* () {
 });
 
 if (import.meta.main)
-  await runBenchmarkMain(main.pipe(Effect.scoped, Effect.provide(scaffoldProcessLayer)));
+  await runBenchmarkMain(
+    main.pipe(Effect.scoped, Effect.provide([scaffoldProcessLayer, consumerResourceMonitorLayer])),
+  );
