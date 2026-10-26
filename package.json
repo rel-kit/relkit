@@ -57,6 +57,7 @@
     "konsistent": "konsistent",
     "changeset": "node ./node_modules/@changesets/cli/bin.js",
     "version:packages": "bun run build:tooling && bun run scripts/version-packages.ts",
+    "version:docs": "bun x turbo run build --filter=@relkit/cli --filter=create-relkit --output-logs=errors-only && bun --cwd=apps/docs run generate --content-only",
     "release:sync": "bun run build:tooling && bun run scripts/sync-release.ts --write",
     "release:check": "bun run build:tooling && bun run scripts/release-check.ts --readiness --allow-dirty --skip-build",
     "release:pack": "bun run build:tooling && bun run scripts/release-check.ts"

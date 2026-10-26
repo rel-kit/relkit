@@ -1,3 +1,4 @@
+/** Exercises real Changesets against isolated manifests, with explicit certification and documentation stubs, so independent release versions and read-only planning remain observable. */
 import { expect, test } from "bun:test";
 import { copyFile, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -83,6 +84,7 @@ test("real Changesets versions only the generator and its two dependents", async
         type: "module",
         packageManager: "bun@1.3.10",
         workspaces: ["packages/*"],
+        scripts: { "version:docs": "bun scripts/version-docs.ts" },
       }),
     );
     await copyFile(join(root, ".changeset/config.json"), join(fixture, ".changeset/config.json"));
@@ -120,6 +122,10 @@ test("real Changesets versions only the generator and its two dependents", async
       'await Bun.write("certified", "yes");',
     );
     await writeFile(join(fixture, "scripts/release-check.ts"), "");
+    await writeFile(
+      join(fixture, "scripts/version-docs.ts"),
+      'await Bun.write("documented", await Bun.file("packages/create-relkit/package.json").text());',
+    );
     const lock = Bun.spawn([process.execPath, "install", "--lockfile-only", "--ignore-scripts"], {
       cwd: fixture,
       stdout: "pipe",
@@ -167,6 +173,8 @@ test("real Changesets versions only the generator and its two dependents", async
       },
       stdio: "ignore",
     });
+    execFileSync(process.execPath, ["scripts/version-packages.ts", "--check"], { cwd: fixture });
+    expect(await Bun.file(join(fixture, "documented")).exists()).toBe(false);
     const child = Bun.spawn([process.execPath, "scripts/version-packages.ts"], {
       cwd: fixture,
       stdout: "pipe",
@@ -192,6 +200,7 @@ test("real Changesets versions only the generator and its two dependents", async
       JSON.parse(await readFile(join(fixture, "packages/sentry/package.json"), "utf8")).version,
     ).toBe("0.7.9");
     expect(await readFile(join(fixture, "certified"), "utf8")).toBe("yes");
+    expect(JSON.parse(await readFile(join(fixture, "documented"), "utf8")).version).toBe("0.7.10");
     await rm(join(fixture, "certified"));
     await writeFile(
       join(fixture, ".changeset/sentry.md"),
