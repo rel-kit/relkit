@@ -127,7 +127,7 @@ plus registry lookup time) before failing with the original-artifact recovery co
 Both automatic Changeset commits and release PR writes use repository-scoped,
 short-lived App tokens. PR preparation requests only Contents; release PR writes
 request Contents and Pull requests;
-only the historical GitHub release recovery step requests Contents and Workflows.
+only historical GitHub publication requests Contents and Workflows.
 Fork checks never receive the key. Missing configuration
 stops release PR generation with a setup error; there is no `GITHUB_TOKEN`
 fallback that would recreate approval-expired runs. npm continues to use OIDC
@@ -151,17 +151,25 @@ building and republishes only missing exact versions. It accepts historical v1
 manifests as well as scoped v2 manifests. A checksum or registry integrity conflict
 fails explicitly; recovery cannot replace an immutable npm version.
 
-Repeated CI for the same release commit automatically reuses its earlier
-successful pack. A new batch cannot be versioned while the preceding recorded
-batch remains unfinished. New release archives and npm diagnostics are retained
+Repeated CI and rerun attempts automatically reuse the earlier successful pack.
+Selection uses the workflow's immutable main snapshot. An unfinished batch belongs
+to the first main commit introducing its version, even if later merges add more
+Changesets or reformat the plan. Its first pack requires successful CI for that
+exact source; later attempts require the original archives. A semantic plan edit
+without a new batch version is rejected. A new batch cannot be versioned while the
+preceding recorded batch remains unfinished. New release archives and npm diagnostics are retained
 for 30 days. Missing,
 expired, or ambiguous archives stop recovery; do not rebuild a partially published
 version. If a higher package version already exists, a recovered older package
 uses a batch-specific dist-tag instead of lowering npm `latest`. Recovery also
 preserves a newer GitHub latest release. The GitHub release
 is completed only after all selected npm integrities match. Later CI-only or
-documentation changes skip completed batches. For an unfinished earlier batch,
-use recovery rather than packing it from a later commit.
+documentation changes skip completed batches. Every main commit has its own CI
+concurrency group. Releases serialize through GitHub's pending queue and reconcile
+newer successful main CI after publication or a superseded snapshot. This lets a
+merge arriving during publication proceed to the next batch without rebuilding
+the preceding batch from newer source. If follow-up dispatch fails, rerun Release;
+it rechecks publication state and continues from the immutable original archives.
 
 Pull requests from this repository automatically receive a patch Changeset when
 they touch a publishable package, the bundled templates, or the bundled

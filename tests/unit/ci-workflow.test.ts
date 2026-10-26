@@ -65,13 +65,15 @@ test("release writes use the App and recovery cannot rebuild its archives", asyn
     const checkout = release.jobs[name].steps.find((step: { uses?: string }) =>
       step.uses?.startsWith("actions/checkout"),
     );
-    expect(checkout.with.ref).toBe("${{ github.sha }}");
+    expect(checkout.with.ref).toBe(
+      name === "pack" ? "${{ needs.select-release-mode.outputs.sha }}" : "${{ github.sha }}",
+    );
   }
   const packGuard = release.jobs.pack.steps.find(
     (step: { name?: string }) => step.name === "Require the exact verified pack commit",
   );
   expect(packGuard.env.VERIFIED_SHA).toBe("${{ needs.select-release-mode.outputs.sha }}");
-  expect(packGuard.run).toContain('test "$GITHUB_SHA" = "$VERIFIED_SHA"');
+  expect(packGuard.run).toContain('git merge-base --is-ancestor "$VERIFIED_SHA" "$GITHUB_SHA"');
   expect(packGuard.run).toContain('test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"');
   const selector = release.jobs["select-release-mode"].steps.find(
     (step: { id?: string }) => step.id === "select",

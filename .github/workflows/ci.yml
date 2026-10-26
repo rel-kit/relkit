@@ -19,10 +19,12 @@ on:
         type: string
 
 permissions: {}
+cache-mode: none
 
 concurrency:
   group: relkit-release-main
   cancel-in-progress: false
+  queue: max
 
 env:
   NEXT_TELEMETRY_DISABLED: "1"
@@ -56,10 +58,11 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          ref: main
+          ref: ${{ github.sha }}
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
       - name: Verify the dispatched CI authority
         if: github.event_name == 'workflow_dispatch' && inputs.recovery_run_id == ''
         env:
@@ -99,12 +102,17 @@ jobs:
           persist-credentials: false
           ref: ${{ github.sha }}
       - name: Require the verified main commit
+        id: current
         env:
           GH_TOKEN: ${{ github.token }}
           VERIFIED_SHA: ${{ needs.select-release-mode.outputs.sha }}
         run: |
           test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
-          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$VERIFIED_SHA"
+          if test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$VERIFIED_SHA"; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Main advanced; reconciliation will select its verified snapshot"
+          fi
       - name: Restore the local Changesets base branch
         run: git branch --force main "$GITHUB_SHA"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -115,6 +123,7 @@ jobs:
           bun-version: "1.3.10"
       - run: bun install --frozen-lockfile
       - id: release-app
+        if: steps.current.outputs.ready == 'true'
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
         with:
           client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
@@ -122,6 +131,7 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
       - name: Create or update the reviewed release pull request
+        if: steps.current.outputs.ready == 'true'
         timeout-minutes: 20
         uses: changesets/action/version@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
@@ -139,6 +149,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
       - name: Auto-merge after the actual pull request checks pass
+        if: steps.current.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}
         run: |
@@ -147,7 +158,7 @@ jobs:
           gh pr merge "$pr_number" --auto --squash
 
   pack:
-    name: Build validated npm artifacts
+    name: Build validated npm artifacts (${{ needs.select-release-mode.outputs.sha }})
     if: needs.select-release-mode.outputs.mode == 'publish'
     needs: select-release-mode
     runs-on: ubuntu-24.04
@@ -161,13 +172,13 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          ref: ${{ github.sha }}
+          ref: ${{ needs.select-release-mode.outputs.sha }}
       - name: Require the exact verified pack commit
         env:
           VERIFIED_SHA: ${{ needs.select-release-mode.outputs.sha }}
         run: |
-          test "$GITHUB_SHA" = "$VERIFIED_SHA"
           test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
+          git merge-base --is-ancestor "$VERIFIED_SHA" "$GITHUB_SHA"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
@@ -236,8 +247,8 @@ jobs:
           path: npm-release/publish.log
           if-no-files-found: ignore
           retention-days: 30
-      - name: Authenticate historical GitHub release recovery
-        if: needs.select-release-mode.outputs.mode == 'recover'
+      - name: Authenticate historical GitHub publication
+        if: needs.select-release-mode.outputs.mode == 'recover' || needs.select-release-mode.outputs.sha != github.sha
         id: recovery-app
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
         with:
@@ -268,3 +279,30 @@ jobs:
             make_latest=false
           fi
           gh release edit "$tag" --draft=false --latest="$make_latest"
+
+  reconcile:
+    name: Reconcile newer main changes
+    if: >-
+      !cancelled() && needs.select-release-mode.result == 'success' &&
+      (needs.select-release-mode.outputs.mode == 'none' ||
+       needs.version.result == 'success' || needs.publish.result == 'success')
+    needs: [select-release-mode, version, publish]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Continue with the latest successful main CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISHED_SOURCE_SHA: ${{ needs.publish.result == 'success' && needs.select-release-mode.outputs.sha || '' }}
+        run: bun scripts/select-release.ts --reconcile
