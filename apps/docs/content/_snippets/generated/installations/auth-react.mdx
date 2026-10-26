@@ -3,7 +3,7 @@
 From this guide's application/package root, install only its selected requirements:
 
 ```sh
-bun add @opentelemetry/api@1.9.1 @relkit/better-auth@0.7.10 @relkit/client@0.7.10 'react@>=18.0.0'
+bun add @opentelemetry/api@1.9.1 @relkit/better-auth@0.8.0 @relkit/client@0.8.0 'react@>=18.0.0'
 ```
 
 Keep these owner-specific versions and the lockfile together. Runtime SDKs belong in `dependencies`; build/type tooling belongs in `devDependencies`. Installing an adapter does not supply its optional SDK peers or enable the feature's configuration.
