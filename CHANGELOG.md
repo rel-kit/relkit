@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.7.12
+
+### Changes
+
+- Bootstrap release tooling in clean installations and validate versioning and packaging before merging. Normalize dependency security updates through their owning catalog and lockfile, with automatic Changesets prepared by trusted repository automation.
+- Fix/lean installation and standalone inspector
+- Keep ordinary backend, generic client and testing installations free of unselected native SDKs. Selected integrations declare optional peers and validate their actual installed versions before configuration evaluation, startup or deployment. Move native agent APIs and test helpers to `@relkit/langchain`, local diagnostic storage to `@relkit/observability-local`, and native auth/database testing to explicit testing leaves. Frontend clients and optional HTTP transports remain explicit selections. Runtime lifecycle belongs to the engine; production starts emitted JavaScript with an exact selected dependency manifest. The legacy CLI inspector remains a Stage 1 development dependency. The lightweight creator owns new project creation; existing project editing belongs to the CLI. The wrapper resolves compatible project-local tooling, and the catalog contains metadata only. Selected auth scaffolds preserve Better Auth 1.7.1 schema history and the existing Drizzle patch while carrying the official fetch typing fix. These packages retain independent versions. Existing package minor releases carry the intentional import and dependency-policy changes; the new native packages have their own initial release identities. No publication or version command is included.
+- Disable development inspection by default and move the UI, collector and diagnostic history into the separately installed `@relkit/inspector` tool. Enabled applications publish a private authenticated bridge that survives reloads; the CLI no longer installs or starts Next.js, React, DuckDB or a history worker. Production excludes rich inspection even when development inspection is enabled. Preserve project history with transactional replay receipts, bounded redacted capture and explicit incomplete states. Ship an independent non-root Docker build with directory credentials and persistent project-bound history. The tool keeps its own release identity; image and package publication require separate authorization.
+
 ## 0.7.11
 
 ### Changes

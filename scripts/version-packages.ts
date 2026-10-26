@@ -1,3 +1,4 @@
+/** Applies Changesets, certifies changed generator assets and refreshes version-derived documentation before the release action commits its candidate; check mode only reports the plan. */
 import { spawn } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -153,6 +154,7 @@ async function main(): Promise<void> {
   await run("bun", ["install", "--lockfile-only"]);
   if (plan.packages.some((item) => item.name === "create-relkit"))
     await run("bun", ["run", "scripts/certify-create.ts"]);
+  await run("bun", ["run", "version:docs"]);
   await writeFile(join(root, ".changeset/release.json"), `${JSON.stringify(plan, null, 2)}\n`);
   await writeFile(changelogPath, changelog);
   await run("bun", [

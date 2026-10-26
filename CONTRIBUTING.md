@@ -31,7 +31,11 @@ their implementation files directly assumes those prerequisites already exist.
 
 `bun run version:packages` records the exact package/version list in
 `.changeset/release.json` after applying Changesets and synchronizing template
-pins. Packages have independent versions; the root changelog and `v` tag number
+pins. It then builds the documentation's CLI and creator inputs and regenerates
+version-derived install instructions, source snippets and CLI reference before
+the release PR is committed. Use `bun run version:docs` to refresh those outputs
+on an already versioned candidate without applying Changesets again.
+Packages have independent versions; the root changelog and `v` tag number
 identify the release batch, not a version shared by every package. When the
 generator is in that batch, versioning certifies it with 20 fresh starts and
 20 restarts from packed
