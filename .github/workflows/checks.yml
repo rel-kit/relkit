@@ -151,6 +151,7 @@ jobs:
           bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md
           bun run lint
           bun run check
+          bun x turbo run build --filter=@relkit/contracts --output-logs=errors-only
           bun test ./tests/phase0-docs-imports.ts
           bun run konsistent -- validate
           bun run scripts/check-observability-sinks.ts
