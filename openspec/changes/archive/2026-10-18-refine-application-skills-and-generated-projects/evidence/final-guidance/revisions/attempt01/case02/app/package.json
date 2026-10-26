@@ -19,7 +19,7 @@
     "@relkit/client": "0.7.7",
     "@tanstack/react-query": "5.102.3",
     "effect": "4.0.1",
-    "next": "16.4.1",
+    "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
