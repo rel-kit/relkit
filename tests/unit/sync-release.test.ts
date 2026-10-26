@@ -1,13 +1,13 @@
 /** Verifies authoritative release regeneration, packed asset policy and stale catalog detection. */
 import { expect, test } from "bun:test";
-import { copyFile, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { copyFile, cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { packedTemplates } from "../../scripts/release-templates.ts";
 
 const root = resolve(import.meta.dir, "../..");
 
-/** Copies source producers and explicit test-only public package links into one owned fixture. */
+/** Copies real source producers and contracts without any contributor build output. */
 async function prepareProducers(fixture: string) {
   await mkdir(join(fixture, "scripts"), { recursive: true });
   for (const file of [
@@ -24,6 +24,17 @@ async function prepareProducers(fixture: string) {
   ])
     await copyFile(join(root, "scripts", file), join(fixture, "scripts", file));
   await copyFile(join(root, "package.json"), join(fixture, "package.json"));
+  await copyFile(join(root, "tsconfig.base.json"), join(fixture, "tsconfig.base.json"));
+  await mkdir(join(fixture, "packages/contracts"), { recursive: true });
+  for (const file of ["package.json", "tsconfig.json", "src"])
+    await cp(join(root, "packages/contracts", file), join(fixture, "packages/contracts", file), {
+      recursive: true,
+    });
+  await symlink(
+    join(root, "packages/contracts/node_modules"),
+    join(fixture, "packages/contracts/node_modules"),
+    "dir",
+  );
   await mkdir(join(fixture, "packages/create-relkit/src"), { recursive: true });
   for (const file of ["catalog-resolution.ts", "catalog-resolution.types.ts"])
     await copyFile(
@@ -35,10 +46,11 @@ async function prepareProducers(fixture: string) {
     join(fixture, "packages/create-relkit/package.json"),
   );
   await mkdir(join(fixture, "node_modules"));
-  await symlink(join(root, "node_modules/effect"), join(fixture, "node_modules/effect"), "dir");
+  for (const name of ["effect", "typescript", "@types"])
+    await symlink(join(root, "node_modules", name), join(fixture, "node_modules", name), "dir");
   await mkdir(join(fixture, "node_modules/@relkit"));
   await symlink(
-    join(root, "packages/contracts"),
+    join(fixture, "packages/contracts"),
     join(fixture, "node_modules/@relkit/contracts"),
     "dir",
   );
@@ -111,7 +123,7 @@ async function assertReleaseMetadata(fixture: string) {
 /** Joins all output and exit from one finite metadata producer invocation. */
 async function runSync(fixture: string, write = false) {
   const child = Bun.spawn(
-    [process.execPath, "scripts/sync-release.ts", ...(write ? ["--write"] : [])],
+    [process.execPath, ...(write ? ["run", "release:sync"] : ["scripts/sync-release.ts"])],
     {
       cwd: fixture,
       stdout: "pipe",
@@ -126,15 +138,15 @@ async function runSync(fixture: string, write = false) {
   return { stdout, stderr, code };
 }
 
-test("release sync retains the CLI editor assets and remains idempotent", async () => {
+test("release sync bootstraps real contracts from source and remains idempotent", async () => {
   const fixture = await mkdtemp(join(tmpdir(), "relkit-release-sync-"));
   let complete = false;
   try {
     await prepareProducers(fixture);
     await prepareManifests(fixture);
+    expect(await Bun.file(join(fixture, "packages/contracts/dist/index.js")).exists()).toBe(false);
     const sync = await runSync(fixture, true);
-    expect(sync.stderr).toBe("");
-    expect(sync.code).toBe(0);
+    expect(sync.code, sync.stdout + sync.stderr).toBe(0);
     await assertReleaseMetadata(fixture);
     const check = await runSync(fixture);
     expect(check.stderr).toBe("");
