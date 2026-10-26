@@ -3,7 +3,7 @@ version: 2
 updates:
   - package-ecosystem: bun
     directory: /
-    exclude-paths: ["repos/**"]
+    exclude-paths: ["repos/**", "openspec/changes/archive/**", "docs/evidence/**"]
     open-pull-requests-limit: 0
     schedule:
       interval: weekly
@@ -22,6 +22,15 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+  # npm security alerts have a separate updater path, including generated templates.
+  # CI promotes those proposals to the Bun catalog and regenerates the root lockfile.
+  - package-ecosystem: npm
+    directory: /
+    exclude-paths: ["repos/**", "openspec/changes/archive/**", "docs/evidence/**"]
+    open-pull-requests-limit: 0
+    schedule:
+      interval: weekly
+      day: monday
   - package-ecosystem: github-actions
     directory: /
     open-pull-requests-limit: 0

@@ -49,16 +49,17 @@
     "test:jobs:matrix": "bun tests/jobs/compatibility/capability-matrix.ts",
     "test:all": "bun run scripts/test-all.ts",
     "relkit:local": "bun scripts/relkit-local.ts",
-    "build": "bun run scripts/build.ts",
+    "build:tooling": "bun node_modules/typescript/bin/tsc -b packages/contracts --pretty false",
+    "build": "bun run build:tooling && bun run scripts/build.ts",
     "verify": "bun run scripts/verify.ts",
     "prepush": "bun install --frozen-lockfile && bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md && bun run lint && bun run check && bun x turbo run build --filter=@relkit/contracts --output-logs=errors-only && bun test ./tests/phase0-docs-imports.ts && bun run konsistent -- validate && bun run scripts/check-observability-sinks.ts && bun x turbo run typecheck --concurrency=1 --filter='./packages/*' --filter='./integrations/catalog' --filter='./integrations/packages/*' --output-logs=errors-only && bun x tsc -b --pretty false && bun run test:types && bun run test:certification && bun run test:unit && bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts && bun run test:graph && bun run test:contracts && bun run test:security && bun x --bun vitest run packages/inspector/tests/platform-cohort.test.ts && bun --cwd=apps/docs run test:installations && bun run test:docs && bun --cwd=apps/docs run build",
     "prepush:full": "docker info >/dev/null && bun run verify && bun run test:jobs:docker && bun run test:scaffold && bun run test:container && bun run test:local-docker && bun run test:deployment && bun run test:inspector:browser && bun run test:e2e",
     "konsistent": "konsistent",
     "changeset": "node ./node_modules/@changesets/cli/bin.js",
-    "version:packages": "bun run scripts/version-packages.ts",
-    "release:sync": "bun run scripts/sync-release.ts --write",
-    "release:check": "bun run scripts/release-check.ts --readiness --allow-dirty --skip-build",
-    "release:pack": "bun run scripts/release-check.ts"
+    "version:packages": "bun run build:tooling && bun run scripts/version-packages.ts",
+    "release:sync": "bun run build:tooling && bun run scripts/sync-release.ts --write",
+    "release:check": "bun run build:tooling && bun run scripts/release-check.ts --readiness --allow-dirty --skip-build",
+    "release:pack": "bun run build:tooling && bun run scripts/release-check.ts"
   },
   "packageManager": "bun@1.3.10",
   "devDependencies": {

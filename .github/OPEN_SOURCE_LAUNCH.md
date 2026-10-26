@@ -56,7 +56,7 @@ archives used by CI:
 npm install --global npm@11.19.0
 bun install --frozen-lockfile
 release_dir="$(mktemp -d)"
-bun run scripts/release-check.ts --output "$release_dir"
+bun run release:pack --output "$release_dir"
 node --experimental-strip-types scripts/publish-release.ts --directory "$release_dir"
 ```
 
