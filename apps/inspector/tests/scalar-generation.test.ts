@@ -32,7 +32,7 @@ test("pins the embedded document without browser fetches or foreign identity lea
   const html = await response.text();
   expect(html).toContain('<link rel="icon" href="/logo.svg" type="image/svg+xml" />');
   expect(html).not.toContain(title);
-  const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+  const script = html.match(/<script>([\s\S]*?)<\/script>/i)?.[1];
   if (!script) throw new Error("Missing Scalar bootstrap");
   let before:
     ((input: { request: Request; requestBuilder?: { headers: Headers } }) => void) | undefined;
