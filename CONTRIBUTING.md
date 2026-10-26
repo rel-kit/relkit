@@ -24,6 +24,11 @@ provides an isolated environment.
 
 ## Changesets
 
+`build`, `version:packages`, `release:sync`, `release:check`, and `release:pack`
+share `build:tooling`, which compiles the contracts used by repository tooling
+before loading it. Use these package scripts from a fresh checkout; invoking
+their implementation files directly assumes those prerequisites already exist.
+
 `bun run version:packages` records the exact package/version list in
 `.changeset/release.json` after applying Changesets and synchronizing template
 pins. Packages have independent versions; the root changelog and `v` tag number
@@ -76,6 +81,14 @@ normal main CI. Successful main CI starts Release for the exact verified commit.
 Superseded CI commits are skipped. Manually dispatched main CI can also explicitly
 start Release, which verifies the CI run's actual successful conclusion.
 
+`CI Gate` also requires release rehearsal. One read-only job installs frozen,
+runs the real versioning command (including generator certification when needed),
+and checks synchronization again. It transfers only a source patch to a second
+fresh checkout, which installs frozen and runs `release:pack --ci-pack` without
+publication credentials. The jobs share no compiled output or build cache.
+Already versioned release PRs check their existing batch and run the same pack
+validation. A green lint/typecheck run alone does not satisfy this gate.
+
 Publishing validates the complete local packed closure, then saves and publishes
 only the packages in the reviewed batch, in dependency order. First-party
 dependencies retain their own exact versions. Template dependency and optional
@@ -105,7 +118,8 @@ plus registry lookup time) before failing with the original-artifact recovery co
    follows the existing merge requirements; it does not bypass them.
 
 Both automatic Changeset commits and release PR writes use repository-scoped,
-short-lived App tokens. Their tokens request only Contents and Pull requests;
+short-lived App tokens. PR preparation requests only Contents; release PR writes
+request Contents and Pull requests;
 only the historical GitHub release recovery step requests Contents and Workflows.
 Fork checks never receive the key. Missing configuration
 stops release PR generation with a setup error; there is no `GITHUB_TOKEN`
@@ -147,6 +161,29 @@ they touch a publishable package, the bundled templates, or the bundled
 inspector. Documentation and internal chores outside those release paths do not
 produce a release. Forks must run `bun run changeset` and commit the generated
 Markdown file because GitHub does not grant their workflows write access.
+
+PR CI checks Changeset coverage with read-only access. After it completes,
+**Prepare pull request** runs trusted `main` code, reads the PR's Git objects as
+data, and generates any missing Changeset. It acquires the App token only after
+preparing the commit. GitHub applies that commit only if the PR head still matches,
+then runs normal CI again. PR code never receives the App key or token, including
+Dependabot PRs; the Actions secret does not need a duplicate Dependabot secret.
+
+Dependabot security updates have explicit Bun and npm configuration. Archived
+OpenSpec evidence, recorded evidence and vendored repositories are excluded.
+For a same-repository Dependabot PR, a read-only preparation job promotes changed
+catalog-owned pins from active manifests to the root catalog, restores historical
+evidence, synchronizes templates/integration metadata, regenerates `bun.lock`
+with Bun 1.3.10, and proves a frozen install plus a second clean synchronization.
+The trusted workflow admits only the exact run's bounded data artifact and known
+tracked dependency files; archived evidence must match its original bytes.
+All acceptance jobs continue to install with `--frozen-lockfile`.
+
+When first rolling out this automation, update existing Dependabot branches onto
+the new `main` before rerunning them: older heads do not contain the preparation
+script. Verify a normal PR and a Dependabot PR through CI, the version PR, clean
+packing, publishing and original-artifact recovery before considering the hosted
+lifecycle verified. Local tests cannot establish GitHub secret access or npm OIDC.
 
 Automatic Changesets are intentionally patch-only. Run `bun run changeset`
 before pushing when a public change requires a minor or major bump; automation
